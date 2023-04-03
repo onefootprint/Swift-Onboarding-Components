@@ -141,6 +141,8 @@ export abstract class ServiceContainers {
         secretsStore.stripeApiKey.arn,
         secretsStore.fpcProtectedCustodianKeyParameter.arn,
         secretsStore.fingerprintSdkKey.arn,
+        secretsStore.incodeApiKey.arn,
+        secretsStore.incodeClientId.arn,
       ])
       .apply(
         ([
@@ -167,6 +169,8 @@ export abstract class ServiceContainers {
           stripeApiKeyArn,
           fpcProtectedArn,
           fingerprintSdkKey,
+          incodeApiKey,
+          incodeClientId
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -252,6 +256,14 @@ export abstract class ServiceContainers {
               {
                 name: 'FINGERPRINTJS_SDK_KEY',
                 valueFrom: fingerprintSdkKey,
+              },
+              {
+                name: 'INCODE_API_KEY',
+                valueFrom: incodeApiKey,
+              },
+              {
+                name: 'INCODE_CLIENT_ID',
+                valueFrom: incodeClientId,
               },
             ],
             environment: [

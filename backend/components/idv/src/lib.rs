@@ -18,6 +18,7 @@ use socure::response::SocureIDPlusResponse;
 pub mod experian;
 pub mod fingerprintjs;
 pub mod idology;
+pub mod incode;
 pub mod lexis;
 pub mod middesk;
 pub mod requirements;

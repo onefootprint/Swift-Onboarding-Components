@@ -14,7 +14,7 @@ use db::DbPool;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
     experian::cross_core::client::ExperianClient, fingerprintjs::client::FingerprintJSClient,
-    idology::client::IdologyClient, socure::client::SocureClient,
+    idology::client::IdologyClient, incode::client::IncodeClient, socure::client::SocureClient,
 };
 use newtypes::PiiString;
 use workos::{ApiKey, WorkOs};
@@ -40,9 +40,10 @@ pub struct State {
     pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
-    #[allow(unused)]
     pub experian_client: ExperianClient,
     pub fingerprintjs_client: FingerprintJSClient,
+    #[allow(unused)]
+    pub incode_client: IncodeClient,
 }
 impl State {
     /// initialize global state in test context
@@ -146,6 +147,9 @@ impl State {
         let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
             .expect("failed to build fingerprint client");
 
+        let incode_client = IncodeClient::new(config.incode.api_key.clone(), config.incode.client_id.clone())
+            .expect("failed to build fingerprint client");
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -194,6 +198,7 @@ impl State {
             billing_client,
             experian_client,
             fingerprintjs_client,
+            incode_client,
         }
     }
 }

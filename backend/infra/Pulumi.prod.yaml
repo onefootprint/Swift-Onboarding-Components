@@ -40,6 +40,11 @@ config:
         secure: v1:q92hc+VbZdquciLs:zGgLapi+yhg6psjd8RbW6mptrg6kzvx8NKfi0a1qa9jyByceiJ+2KFLEuKtDKkrpLEI7kqRNvSmsNrdiiLU=
       username:
         secure: v1:NEy9kUqxfuQKj1Xb:BQoRc+VSA5pdkg2mv79OwGSNnUEZ71DUfFOTN+lT7/lASQlbI0ol
+    incode:
+      incodeApiKey:
+        secure: v1:R9/eQeKhN8gH0Xem:QT57b6t1PFpKxCvcbtRIV3L1QXeZ9wR4xUvZiNZg12xZuto6G0Co5eop/SKjPtR6gpDao2Quk8U=
+      incodeClientId:
+        secure: v1:XCx8mvzJqPMUJDBR:Nxt8vmsIm/8SIJ0EwutrrYZSvsZ06lL1IG0ssz7AQQ==
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:DrKn4q/fyK2+S+sJ:V/huczZNR1v2VKctscz6cCDZhx3nl8DyDBw+njGsun69ftSiRh7Z08QDoYAKBCyG9ItmpSiL0YY=
