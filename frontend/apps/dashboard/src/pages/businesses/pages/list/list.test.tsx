@@ -7,6 +7,7 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import { BusinessDI, VaultTextData } from '@onefootprint/types';
 import React from 'react';
 
 import ProxyConfigs from './list';
@@ -54,7 +55,7 @@ describe('<List />', () => {
       });
     });
 
-    it('should show the business id and status', async () => {
+    it('should show the business id, name and status', async () => {
       await renderBusinessesAndWaitData();
 
       entitiesFixture.forEach((business, index) => {
@@ -63,6 +64,11 @@ describe('<List />', () => {
 
         const id = within(row).getByText(business.id);
         expect(id).toBeInTheDocument();
+
+        const name = within(row).getByText(
+          business.decryptedAttributes[BusinessDI.name] as VaultTextData,
+        );
+        expect(name).toBeInTheDocument();
 
         const status = within(row).getByText(formattedValues.status);
         expect(status).toBeInTheDocument();

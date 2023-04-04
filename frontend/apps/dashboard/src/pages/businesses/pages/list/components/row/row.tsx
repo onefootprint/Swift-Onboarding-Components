@@ -24,7 +24,9 @@ const Row = ({ entity }: RowProps) => {
   return (
     <>
       <td>
-        <FieldOrPlaceholder data={vault[BusinessDI.name]} />
+        <FieldOrPlaceholder
+          data={entity.decryptedAttributes[BusinessDI.name]}
+        />
       </td>
       <td>
         <CodeInline isPrivate truncate>

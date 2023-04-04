@@ -51,6 +51,14 @@ export enum DocumentDI {
   finraComplianceLetter = 'document.finra_compliance_letter',
 }
 
+export const DataIdentifierKeys = [
+  ...Object.values(IdDocDI),
+  ...Object.values(BusinessDI),
+  ...Object.values(InvestorProfileDI),
+  ...Object.values(IdDI),
+  ...Object.values(DocumentDI),
+];
+
 export type DataIdentifier =
   | IdDocDI
   | InvestorProfileDI

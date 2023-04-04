@@ -86,9 +86,11 @@ export const entityFixture: Entity = {
     ],
     canAccessAttributes: [],
   },
-  orderingId: 19789,
   requiresManualReview: false,
   status: EntityStatus.pass,
+  decryptedAttributes: {
+    [BusinessDI.name]: 'Acme Inc.',
+  },
 };
 
 export const withEntity = (entity = entityFixture) =>

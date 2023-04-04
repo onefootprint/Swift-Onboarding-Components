@@ -87,9 +87,11 @@ export const entitiesFixture: Entity[] = [
       ],
       canAccessAttributes: [],
     },
-    orderingId: 19789,
     requiresManualReview: false,
     status: EntityStatus.pass,
+    decryptedAttributes: {
+      [BusinessDI.name]: 'Acme Inc.',
+    },
   },
 ];
 

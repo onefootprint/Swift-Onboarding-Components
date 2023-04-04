@@ -1,4 +1,5 @@
 import { getCustomEnvVariable, getSessionId } from '@onefootprint/dev-tools';
+import { DataIdentifierKeys } from '@onefootprint/types';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
@@ -79,11 +80,15 @@ const getRequestOptions = (
   };
 };
 
+// Disable transformation when the string matched or satisfied the condition.
+// https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
+const preservedKeys = [...DataIdentifierKeys];
+
 const request = <Response = any>(
   requestConfig: AxiosRequestConfig = {},
   omitSessionId?: boolean,
 ) => {
-  const client = applyCaseMiddleware(axios.create());
+  const client = applyCaseMiddleware(axios.create(), { preservedKeys });
   const options = getRequestOptions(requestConfig, omitSessionId);
   return client.request<Response>(options);
 };

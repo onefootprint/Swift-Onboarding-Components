@@ -23,11 +23,10 @@ export type Entity = {
   isPortable: boolean;
   kind: EntityKind;
   onboarding?: Onboarding;
-  orderingId: number;
   requiresManualReview: boolean;
   startTimestamp: string;
   status: EntityStatus;
-  vault?: EntityVault;
+  decryptedAttributes: EntityVault;
 };
 
 export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
