@@ -1,15 +1,29 @@
 use crate::{
-    AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId, LivenessEventId,
-    OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
+    util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId,
+    LivenessEventId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
 };
-use diesel::{AsExpression, FromSqlRow};
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::str::FromStr;
+use strum::Display;
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
 #[strum_discriminants(name(DbUserTimelineEventKind))]
+#[strum_discriminants(derive(
+    Apiv2Schema,
+    DeserializeFromStr,
+    SerializeDisplay,
+    Display,
+    strum_macros::EnumString,
+    AsExpression,
+    FromSqlRow,
+))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[strum_discriminants(diesel(sql_type = Text))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum DbUserTimelineEvent {
@@ -21,6 +35,8 @@ pub enum DbUserTimelineEvent {
     DocumentUploaded(DocumentUploadedInfo),
     WatchlistCheck(WatchlistCheckInfo),
 }
+
+impl_enum_string_diesel!(DbUserTimelineEventKind);
 
 impl From<DataCollectedInfo> for DbUserTimelineEvent {
     fn from(s: DataCollectedInfo) -> Self {

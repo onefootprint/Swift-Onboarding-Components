@@ -631,6 +631,7 @@ table! {
         _updated_at -> Timestamptz,
         vault_id -> Text,
         is_portable -> Bool,
+        event_kind -> Text,
     }
 }
 

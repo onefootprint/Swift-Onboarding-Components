@@ -9,7 +9,6 @@ use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::DocumentDataId;
 use newtypes::VendorAPI;
@@ -37,6 +36,7 @@ pub struct UserTimeline {
     pub vault_id: VaultId,
     /// Designates whether the UserTimeline event can be seen by tenants other than the one that created it
     pub is_portable: bool,
+    pub event_kind: DbUserTimelineEventKind,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -47,6 +47,7 @@ pub struct NewUserTimeline {
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub is_portable: bool,
+    pub event_kind: DbUserTimelineEventKind,
 }
 
 #[allow(clippy::large_enum_variant)]
@@ -79,12 +80,15 @@ impl UserTimeline {
     where
         T: Into<DbUserTimelineEvent>,
     {
+        let event = event.into();
+        let event_kind = (&event).into();
         let new = NewUserTimeline {
-            event: event.into(),
+            event,
             scoped_vault_id,
             vault_id,
             timestamp: chrono::Utc::now(),
             is_portable: false,
+            event_kind,
         };
         diesel::insert_into(user_timeline::table)
             .values(new)
@@ -98,19 +102,9 @@ impl UserTimeline {
         scoped_vault_id: &ScopedVaultId,
         kind: DbUserTimelineEventKind,
     ) -> DbResult<()> {
-        let events = user_timeline::table
-            .filter(user_timeline::scoped_vault_id.eq(scoped_vault_id))
-            .get_results::<Self>(conn)?;
-        // Since we can't filter on the jsonb column very easily in postgres, filter in RAM. There
-        // won't be many events for each scoped user
-        let event_ids = events
-            .into_iter()
-            .filter(|e| DbUserTimelineEventKind::from(&e.event) == kind)
-            .map(|e| e.id)
-            .collect_vec();
         diesel::update(user_timeline::table)
             .filter(user_timeline::scoped_vault_id.eq(scoped_vault_id))
-            .filter(user_timeline::id.eq_any(event_ids))
+            .filter(user_timeline::event_kind.eq(kind))
             .set(user_timeline::is_portable.eq(true))
             .execute(conn)?;
         Ok(())
