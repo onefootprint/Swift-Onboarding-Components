@@ -36,12 +36,8 @@ export const statusForScopedUser = (scopedUser: ScopedUser) => {
   if (!scopedUser.isPortable) {
     return UserStatus.vaultOnly;
   }
-  return (
-    (scopedUser.onboarding &&
-      scopedUser.onboarding.isAuthorized &&
-      (scopedUser.onboarding.status as unknown as UserStatus)) ||
-    UserStatus.incomplete
-  );
+  return (scopedUser.onboarding?.status ||
+    UserStatus.incomplete) as unknown as UserStatus;
 };
 
 export const requiresManualReview = (scopedUser: ScopedUser) => {

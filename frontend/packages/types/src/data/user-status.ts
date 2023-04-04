@@ -3,9 +3,10 @@
 enum UserStatus {
   verified = 'pass',
   failed = 'fail',
-  vaultOnly = 'vault_only',
   incomplete = 'incomplete',
   pending = 'pending',
+
+  vaultOnly = 'vault_only',
 }
 
 export default UserStatus;
