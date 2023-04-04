@@ -43,9 +43,7 @@ The vault proxy supports the following main features:
 | **Server Certificate Pinning**  | Specify one or more Root CAs and leaf certificates to securely validate the destination                                          |
 | **Ingress Vaulting**            | Securely vault data that comes back on the ingress. Support for JSONPath (XPath and Regex coming soon) rules                     |
 
-# Basic Proxying
-
-## Configuration
+# Configuration
 
 The proxy can be configured in two main ways: define the configuration using the dashboard/admin API or dynamically specify all the configuration values via headers "just-in-time."
 
@@ -55,6 +53,18 @@ Both methods support the same fundamental capabilities, but the two options offe
 | ----------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `x-fp-proxy-target-url` | Required if "just-in-time"      | The target destination HTTPS URL to which the request will be routed                                 |
 | `x-fp-proxy-id`         | Required if proxy configuration | The `id` of the Proxy Configuration declared in the developer dashboard or created via the admin API |
+
+<img
+  alt="Vault proxy configuration"
+  height={250}
+  src="/vault-proxy/dashboard.png"
+  width={720}
+/>
+
+Configure basic and advanced proxy settings right from the Footprint Developer Dashboard on [Vault Proxy Settings tab](https://dashboard.onefootprint.com/developers?tab=proxy_configs).
+You can also programmtically create a proxy configuration [using the Admin API](#configure-via-admin-api).
+
+# Basic Proxying
 
 ## Making the proxy request
 
@@ -148,35 +158,33 @@ Footprint's vault proxy supports advanced configurations such as mTLS (client ce
 
 Optionally, specify a client certificate and key in order to connect securely to the proxy destination using Mutual TLS (mTLS).
 
-| Header                   | Format              | Value                                     |
-| ------------------------ | ------------------- | ----------------------------------------- |
-| `x-fp-proxy-client-cert` | Percent-encoded PEM | The client certificate to use             |
-| `x-fp-proxy-client-key`  | Percent-encoded PEM | The client certificate private key to use |
-
 Only a single cert/key pair can be supplied. Note the format of the certificate/key is in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) and then [Percent-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
 
 ## Service certificate pinning and Root CAs
 
 Optionally, specify zero or more server certificates or Root CAs to pin the upstream proxy request server certificate validation.
 
-| Header                | Format              | Value                                                                                      |
-| --------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| `x-fp-proxy-pin-cert` | Percent-encoded PEM | A root CA certificate or self-signed certificate to validate the certificate of the server |
+If multiple certificates are specified, all the supplied certificates will be used in the validation process and as long as a single certificate can validate the incoming certificate chain, the connection will succeed. Note the format of the certificate/key is in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format and then [`Percent-encoded`](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
 
-If multiple headers above are defined, all the supplied certificates will be used in the validation process. Note the format of the certificate/key is in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format and then [`Percent-encoded`](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+## Ingress Vaulting
 
-## Ingress Vaulting (just-in-time)
+Ingress vaulting rules define how to tokenize and vault certain sensitive fields that appear in the response from the upstream proxy destination. This allows the vault proxy to not only de-tokenize outgoing data but to also tokenize incoming data to vault it just in time.
 
-Ingress vaulting rules define how to tokenize and vault certain sensitive fields that in the response from the upstream proxy destination.
+For simplicity, you can also define all of your ingress vaulting rules via the developer dashboard or admin API and simply reference the proxy configuration via the `x-fp-proxy-id` header.
 
-| Header                            | Format           | value                                                                                                                                 |
-| --------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `x-fp-proxy-ingress-content-type` | `json`           | The content-type of the response to process ingress rules. Currently only `json` is supported, but `regex` and `xml` are coming soon! |
-| `x-fp-proxy-ingress-rule`         | `<token>=<path>` | The rule itself, assigning a specific namepspeced token to the corresponding path of the value to vault                               |
+However, when you declare ingress vaulting rules in the configuration, you still need to denote in the proxy request into which Footprint user vault to tokenize the data. Therefore, the following header value is required when using ingress rules for pre-configured proxy:
+
+| Header                       | Format                | value                                                           |
+| ---------------------------- | --------------------- | --------------------------------------------------------------- |
+| `x-fp-proxy-footprint-token` | `<footprint_user_id>` | The Footprint user token for which the vaulting rules apply too |
+
+For example: add the header `'x-fp-proxy-footprint-token: fp_id_tctecBEvGc98V7Vx4MhZU'` where the rule in the proxy configuration would be defined as `custom.credit_card_number=$.data.card.number`.
+
+### Just-in-time ingress vaulting
 
 The format of the rule is defined as `<footprint_token_id>.custom.<property_name>=<path-to-value>` where the path format is relative to the content-type being used.
 
-Note that you **must specify** a single `x-fp-proxy-ingress-content-type` header if one more `x-fp-proxy-ingress-rule` headers are present.
+Note if using a dynamic proxy configuration (just-in-time), you **must specify** a single `x-fp-proxy-ingress-content-type` header if one more `x-fp-proxy-ingress-rule` headers are present.
 Ingress rules use a similar token format to the body format above, except without the `{{` and `}}` delimiters.
 
 ### JSONPath
@@ -207,28 +215,29 @@ The above token would extract `4242424242424` from the following response object
 | `fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card.exp=$.data.card.expiration`    |
 | `fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card.cvc=$.data.card.security_code` |
 
-## Ingress vaulting (via proxy-id)
+# Header and Configuration Reference
 
-For simplicity, you can also define all of your ingress vaulting rules via the developer dashboard or admin API and simply reference the proxy configuration via the `x-fp-proxy-id` header.
+Below find the complete reference guide of headers and their uses for both configuring and invoking the proxy "just-in-time".
+Note that some values can be defined in the proxy configuration settings and do not need to be sent each time.
 
-However, when you declare ingress vaulting rules in the configuration, you still need to denote in the proxy request into which Footprint user vault to tokenize the data. Therefore, the following header value is required when using ingress rules for pre-configured proxy:
+| Header                            | Usage                                            | Description                                                                                                                           |
+| --------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `x-fp-proxy-target-url`           | Required if "just-in-time"                       | The target destination HTTPS URL to which the request will be routed                                                                  |
+| `x-fp-proxy-id`                   | Required if proxy configuration                  | The `id` of the Proxy Configuration declared in the developer dashboard or created via the admin API                                  |
+| `x-fp-proxy-method`               | Optional.                                        | Selects the HTTP Method Verb to use (defaults to POST if unspecified). Overrides a configuration's value if present.                  |
+| `x-fp-proxy-fwd-<HEADER>`         | Optional. Multiple allowed.                      | Sends a header named `<HEADER>` with the corresponding value                                                                          |
+| `x-fp-path-and-query`             | Optional.                                        | Use this header to customize/add additional path and/or query parameters to your existing proxy target URL                            |
+| `x-fp-proxy-footprint-token`      | Optional.                                        | The Footprint user token for which the proxy rules apply to. Required if tokens in the body dont specify an `fp_id_` prefix.          |
+| `x-fp-proxy-access-reason`        | Optional.                                        | The decryption reason to use for access/security logs during detokenization. Defaults to empty/no-reason.                             |
+| `x-fp-proxy-client-cert`          | Optional. Percent-encoded PEM                    | The client certificate to use                                                                                                         |
+| `x-fp-proxy-client-key`           | Optional. Percent-encoded PEM                    | The client certificate private key to use                                                                                             |
+| `x-fp-proxy-pin-cert`             | Optional. Percent-encoded PEM. Multiple allowed. | A root CA certificate or self-signed certificate to validate the certificate of the server                                            |
+| `x-fp-proxy-ingress-content-type` | Optional.                                        | The content-type of the response to process ingress rules. Currently only `json` is supported, but `regex` and `xml` are coming soon! |
+| `x-fp-proxy-ingress-rule`         | Optional. `<token>=<path>`. Multiple allowed.    | Ingress rule itself, assigning a specific namepspeced token to the corresponding path of the value to vault                           |
 
-| Header                       | Format                | value                                                           |
-| ---------------------------- | --------------------- | --------------------------------------------------------------- |
-| `x-fp-proxy-footprint-token` | `<footprint_user_id>` | The Footprint user token for which the vaulting rules apply too |
-
-For example: add the header `'x-fp-proxy-footprint-token: fp_id_tctecBEvGc98V7Vx4MhZU'` where the rule in the proxy configuration would be defined as `custom.credit_card_number=$.data.card.number`.
-
-# Proxy configuration via the admin API
+# Configure via Admin API
 
 In some cases you may want to create a proxy configuration in an API call.
-
-<inline-alert variant="info">
-  **Coming soon!** From the Developer dashboard setup and configure proxy
-  destinations with customizable support for mutual TLS (mTLS) connections,
-  destination certificate pinning, secure authentication secrets, ingress rules,
-  and more.
-</inline-alert>
 
 ## First specify your proxy configuraton object
 
@@ -299,12 +308,6 @@ curl  -X POST -u <YOUR_API_KEY>: \
           "data": { "card_number": "1234-4567-8910"}
       }'
 ```
-
-| Header                       | Required | Value                                                                                                                        |
-| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `x-fp-proxy-method`          | Optional | Override the default HTTP Method. Defaults to the configured value.                                                          |
-| `x-fp-path-and-query`        | Optional | Proxy configurations specify only base URL origin. Use this header to add additional path and/or query parameters.           |
-| `x-fp-proxy-footprint-token` | Optional | The Footprint user token for which the proxy rules apply to. Required if tokens in the body dont specify an `fp_id_` prefix. |
 
 # Playground
 
