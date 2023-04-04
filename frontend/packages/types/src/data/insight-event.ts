@@ -1,14 +1,14 @@
 export type InsightEvent = {
-  city?: string;
-  country?: string;
-  ipAddress?: string;
-  latitude?: number;
-  longitude?: number;
-  metroCode?: string;
-  postalCode?: string;
-  region?: string;
-  regionName?: string;
-  timeZone?: string;
-  userAgent?: string;
+  city: string | null;
+  country: string | null;
+  ipAddress: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  metroCode: string | null;
+  postalCode: string | null;
+  region: string | null;
+  regionName: string | null;
+  timeZone: string | null;
+  userAgent: string | null;
   timestamp: string;
 };

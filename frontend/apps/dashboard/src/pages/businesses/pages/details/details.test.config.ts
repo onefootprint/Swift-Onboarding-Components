@@ -46,18 +46,19 @@ export const entityFixture: Entity = {
     timestamp: '2023-03-27T14:43:47.446874Z',
     isLivenessSkipped: false,
     insightEvent: {
-      timestamp: '2023-03-27T14:43:47.418406Z',
-      ipAddress: '191.251.92.92',
-      city: 'Florian%C3%B3polis',
-      country: 'Brazil',
-      region: 'SC',
-      regionName: 'Santa Catarina',
-      latitude: -27.6147,
-      longitude: -48.4976,
-      postalCode: '88000',
-      timeZone: 'America/Sao_Paulo',
+      timestamp: '2023-04-03T17:42:30.799202Z',
+      ipAddress: '67.243.21.56',
+      city: 'New York',
+      country: 'United States',
+      region: 'NY',
+      regionName: 'New York',
+      latitude: 40.7365,
+      longitude: -74.0055,
+      metroCode: '501',
+      postalCode: '10014',
+      timeZone: 'America/New_York',
       userAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
     },
     canAccessPermissions: [
       RoleScope.decryptName,
@@ -146,8 +147,16 @@ export const withEntityDecrypt = (
     },
   });
 
-export const getTextByRow = (name: string, value: string) => {
-  const row = screen.getByRole('row', { name });
+export const getTextByRow = ({
+  name,
+  value,
+  container,
+}: {
+  name: string;
+  value: string;
+  container: HTMLElement;
+}) => {
+  const row = within(container).getByRole('row', { name });
   return within(row).getByText(value);
 };
 

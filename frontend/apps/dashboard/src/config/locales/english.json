@@ -804,6 +804,12 @@
           "title": "Identity data's risk signal",
           "description": "Select a risk signal"
         }
+      },
+      "device-insights": {
+        "title": "Device insights",
+        "ip-address": "IP address",
+        "region": "Region",
+        "country": "Country"
       }
     },
     "security-logs": {

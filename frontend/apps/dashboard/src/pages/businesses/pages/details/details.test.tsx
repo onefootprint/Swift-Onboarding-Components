@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
@@ -114,14 +115,23 @@ describe('<Details />', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
 
-          const name = getTextByRow('Name', '•••••••••');
+          const container = screen.getByRole('group', {
+            name: 'Basic data',
+          });
+
+          const name = getTextByRow({
+            name: 'Name',
+            value: '•••••••••',
+            container,
+          });
           expect(name).toBeInTheDocument();
 
-          const ein = getTextByRow(
-            'Taxpayer Identification Number (TIN)',
-            '•••••••••',
-          );
-          expect(ein).toBeInTheDocument();
+          const tin = getTextByRow({
+            name: 'Taxpayer Identification Number (TIN)',
+            value: '•••••••••',
+            container,
+          });
+          expect(tin).toBeInTheDocument();
         });
 
         describe('when clicking on the decrypt button', () => {
@@ -137,7 +147,14 @@ describe('<Details />', () => {
             await decryptFields(['Name']);
 
             await waitFor(() => {
-              const name = getTextByRow('Name', 'Acme Inc.');
+              const container = screen.getByRole('group', {
+                name: 'Basic data',
+              });
+              const name = getTextByRow({
+                name: 'Name',
+                value: 'Acme Inc.',
+                container,
+              });
               expect(name).toBeInTheDocument();
             });
           });
@@ -148,23 +165,54 @@ describe('<Details />', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
 
-          const country = getTextByRow('Country', '•••••••••');
-          expect(country).toBeInTheDocument();
+          const container = screen.getByRole('group', {
+            name: 'Registered business address',
+          });
 
-          const addressLine1 = getTextByRow('Address line 1', '•••••••••');
-          expect(addressLine1).toBeInTheDocument();
+          await waitFor(() => {
+            const addressLine1 = getTextByRow({
+              name: 'Address line 1',
+              value: '•••••••••',
+              container,
+            });
+            expect(addressLine1).toBeInTheDocument();
+          });
 
-          const addressLine2 = getTextByRow('Address line 2', '-');
-          expect(addressLine2).toBeInTheDocument();
+          await waitFor(() => {
+            const addressLine2 = getTextByRow({
+              name: 'Address line 2',
+              value: '-',
+              container,
+            });
+            expect(addressLine2).toBeInTheDocument();
+          });
 
-          const city = getTextByRow('City', '•••••••••');
-          expect(city).toBeInTheDocument();
+          await waitFor(() => {
+            const city = getTextByRow({
+              name: 'City',
+              value: '•••••••••',
+              container,
+            });
+            expect(city).toBeInTheDocument();
+          });
 
-          const zipCode = getTextByRow('Zip code', '•••••••••');
-          expect(zipCode).toBeInTheDocument();
+          await waitFor(() => {
+            const zipCode = getTextByRow({
+              name: 'Zip code',
+              value: '•••••••••',
+              container,
+            });
+            expect(zipCode).toBeInTheDocument();
+          });
 
-          const state = getTextByRow('State', '•••••••••');
-          expect(state).toBeInTheDocument();
+          await waitFor(() => {
+            const state = getTextByRow({
+              name: 'State',
+              value: '•••••••••',
+              container,
+            });
+            expect(state).toBeInTheDocument();
+          });
         });
 
         describe('when clicking on the decrypt button', () => {
@@ -188,31 +236,52 @@ describe('<Details />', () => {
               'State',
             ]);
 
+            const container = screen.getByRole('group', {
+              name: 'Registered business address',
+            });
+
             await waitFor(() => {
-              const country = getTextByRow('Country', 'US');
+              const country = getTextByRow({
+                name: 'Country',
+                value: 'US',
+                container,
+              });
               expect(country).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const addressLine1 = getTextByRow(
-                'Address line 1',
-                '14 Linda Street',
-              );
+              const addressLine1 = getTextByRow({
+                name: 'Address line 1',
+                value: '14 Linda Street',
+                container,
+              });
               expect(addressLine1).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const city = getTextByRow('City', 'West Haven');
+              const city = getTextByRow({
+                name: 'City',
+                value: 'West Haven',
+                container,
+              });
               expect(city).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const zip = getTextByRow('Zip code', '06516');
-              expect(zip).toBeInTheDocument();
+              const zipCode = getTextByRow({
+                name: 'Zip code',
+                value: '06516',
+                container,
+              });
+              expect(zipCode).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const state = getTextByRow('State', 'CT');
+              const state = getTextByRow({
+                name: 'State',
+                value: 'CT',
+                container,
+              });
               expect(state).toBeInTheDocument();
             });
           });
@@ -222,14 +291,84 @@ describe('<Details />', () => {
       describe('BOs section', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
+          const container = screen.getByRole('group', {
+            name: 'Beneficial owners',
+          });
 
-          const bo = getTextByRow('Beneficial owner', '-');
-          expect(bo).toBeInTheDocument();
+          await waitFor(() => {
+            const bo = getTextByRow({
+              name: 'Beneficial owner',
+              value: '-',
+              container,
+            });
+            expect(bo).toBeInTheDocument();
+          });
         });
 
         describe('when clicking on the decrypt button', () => {
           it('should allow to decrypt the data', async () => {});
         });
+      });
+    });
+
+    describe('device insights', () => {
+      it('should show the user agent', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Device insights',
+        });
+
+        const agent = within(container).getByText(
+          'Apple Macintosh, Mac OS 10.15.7',
+        );
+
+        expect(agent).toBeInTheDocument();
+      });
+
+      it('should show the ip address', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Device insights',
+        });
+        const ip = getTextByRow({
+          name: 'IP address',
+          value: '67.243.21.56',
+          container,
+        });
+
+        expect(ip).toBeInTheDocument();
+      });
+
+      it('should show the region', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Device insights',
+        });
+        const region = getTextByRow({
+          name: 'Region',
+          value: 'New York, NY',
+          container,
+        });
+
+        expect(region).toBeInTheDocument();
+      });
+
+      it('should show the country', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Device insights',
+        });
+        const country = getTextByRow({
+          name: 'Country',
+          value: 'United States',
+          container,
+        });
+
+        expect(country).toBeInTheDocument();
       });
     });
   });
