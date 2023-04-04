@@ -97,22 +97,20 @@ export async function CreateDB(
   });
 
   // TODO use this in the db cluster
-  const clusterParameterGroup = new aws.rds.ClusterParameterGroup(
-    'fpc-pg-cluster',
-    {
-      family: 'aurora-postgresql14',
-      parameters: DEFAULT_PG_PARAMETERS,
-    },
-  );
+  const clusterParameterGroupName = `fpc-pg-cluster-${clusterIdentifier}`;
+  new aws.rds.ClusterParameterGroup(clusterParameterGroupName, {
+    name: clusterParameterGroupName,
+    family: 'aurora-postgresql14',
+    parameters: DEFAULT_PG_PARAMETERS,
+  });
 
   // TODO use this in the db instances
-  const instanceParameterGroup = new aws.rds.ClusterParameterGroup(
-    'fpc-pg-instance',
-    {
-      family: 'aurora-postgresql14',
-      parameters: DEFAULT_PG_PARAMETERS,
-    },
-  );
+  const instanceParameterGroupName = `fpc-pg-instance-${clusterIdentifier}`;
+  new aws.rds.ParameterGroup(instanceParameterGroupName, {
+    name: instanceParameterGroupName,
+    family: 'aurora-postgresql14',
+    parameters: DEFAULT_PG_PARAMETERS,
+  });
 
   const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
     clusterIdentifier: `${clusterIdentifier}`,
