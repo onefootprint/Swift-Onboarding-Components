@@ -49,7 +49,9 @@ const Scopes = ({ scopes }: ScopesProps) => {
 const Tags = styled.div`
   ${({ theme }) => css`
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
     gap: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} 0;
   `}

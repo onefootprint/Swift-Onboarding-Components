@@ -43,15 +43,14 @@ const CopyLink = ({ slug }: CopyLinkProps) => {
   };
 
   return (
-    <Tooltip
-      placement="top"
-      size="compact"
-      text={showConfirmation ? t('copy.confirmation') : t('copy.title')}
-    >
-      <CopyLinkContainer onClick={handleClick}>
+    <CopyLinkContainer onClick={handleClick}>
+      <Tooltip
+        position="top"
+        text={showConfirmation ? t('copy.confirmation') : t('copy.title')}
+      >
         <IcoLink24 color="tertiary" />
-      </CopyLinkContainer>
-    </Tooltip>
+      </Tooltip>
+    </CopyLinkContainer>
   );
 };
 

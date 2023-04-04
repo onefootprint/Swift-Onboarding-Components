@@ -23,22 +23,21 @@ const Header = () => {
             : t('header.subtitle.live')}
         </Typography>
       </Box>
-      <ToggleContainer>
+      <Box>
         <Tooltip
           disabled={sandbox.canToggle}
-          size="compact"
           text={t('header.toggle-sandbox.tooltip')}
+          alignment="end"
+          position="bottom"
         >
-          <Box>
-            <Toggle
-              checked={sandbox.isSandbox}
-              disabled={!sandbox.canToggle}
-              label={t('header.toggle-sandbox.label')}
-              onChange={sandbox.toggle}
-            />
-          </Box>
+          <Toggle
+            checked={sandbox.isSandbox}
+            disabled={!sandbox.canToggle}
+            label={t('header.toggle-sandbox.label')}
+            onChange={sandbox.toggle}
+          />
         </Tooltip>
-      </ToggleContainer>
+      </Box>
     </HeaderContainer>
   );
 };
@@ -49,14 +48,6 @@ const HeaderContainer = styled.header`
     display: flex;
     justify-content: space-between;
     margin-bottom: ${theme.spacing[9]};
-  `};
-`;
-
-const ToggleContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    gap: ${theme.spacing[3]};
   `};
 `;
 

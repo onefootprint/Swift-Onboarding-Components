@@ -44,7 +44,7 @@ const SupportedIdDocuments = () => {
               </Typography>
               <Tooltip
                 text={t('table-headers.id-card.tooltip')}
-                placement="bottom-start"
+                position="bottom"
               >
                 <Box sx={{ display: 'flex' }}>
                   <IcoInfo16 color="secondary" />

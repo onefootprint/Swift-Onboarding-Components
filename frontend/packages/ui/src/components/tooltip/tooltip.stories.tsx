@@ -1,105 +1,74 @@
+import { IcoInfo16 } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
+import styled from 'styled-components';
 
-import Button from '../button';
-import Tooltip, { TooltipProps } from './tooltip';
+import Tooltip from './tooltip';
 
 export default {
-  component: Tooltip,
   title: 'Components/Tooltip',
+  component: Tooltip,
   argTypes: {
-    text: {
-      control: 'string',
-      table: {
-        type: { summary: 'string', required: true },
-      },
-      description: 'The text of the tooltip',
+    content: {
+      control: 'text',
+      description: 'Tooltip content',
+      required: true,
     },
-    children: {
-      control: 'string',
-      table: {
-        type: { summary: 'string', required: true },
+    position: {
+      control: {
+        type: 'select',
+        options: ['top', 'bottom', 'left', 'right'],
       },
-      description: 'The tooltip trigger',
+      description: 'Tooltip position',
+      table: { defaultValue: { summary: 'top' } },
     },
-    'aria-label': {
-      control: 'string',
-      table: {
-        type: { summary: 'string', required: false },
+    alignment: {
+      control: {
+        type: 'select',
+        options: ['start', 'center', 'end'],
       },
-      description:
-        'The accessible, human friendly label to use for screen readers.',
+      description: 'Tooltip alignment',
+      table: { defaultValue: { summary: 'center' } },
     },
+
     testID: {
       control: 'text',
-      table: {
-        type: { summary: 'string', required: false },
-      },
       description: 'Append an attribute data-testid for testing purposes',
-    },
-    size: {
-      control: 'select',
-      defaultValue: 'default',
-      description: 'The size of the tooltip',
-      options: ['default', 'compact'],
-      table: {
-        type: { summary: 'string', required: false },
-        defaultValue: { summary: 'default' },
-      },
-    },
-    placement: {
-      control: 'select',
-      defaultValue: 'bottom',
-      description:
-        'Where the tooltip should be placed, according to its children',
-      options: [
-        'auto',
-        'auto-start',
-        'auto-end',
-        'top',
-        'top-start',
-        'top-end',
-        'bottom',
-        'bottom-start',
-        'bottom-end',
-        'right',
-        'right-start',
-        'right-end',
-        'left',
-        'left-start',
-        'left-end',
-      ],
-      table: {
-        type: { summary: 'string', required: false },
-        defaultValue: { summary: 'bottom' },
-      },
     },
   },
 } as Meta;
 
-const Template: Story<TooltipProps> = ({
-  'aria-label': ariaLabel,
-  placement,
-  size,
-  testID,
-  text,
-}: TooltipProps) => (
-  <Tooltip
-    aria-label={ariaLabel}
-    placement={placement}
-    size={size}
-    testID={testID}
-    text={text}
-  >
-    <Button>Hover me</Button>
-  </Tooltip>
+const Template: Story = ({
+  position,
+  alignment,
+  content,
+  children,
+  onOpenChange,
+}) => (
+  <Aligner>
+    <Tooltip
+      position={position}
+      alignment={alignment}
+      text={content}
+      onOpenChange={onOpenChange}
+    >
+      {children}
+    </Tooltip>
+  </Aligner>
 );
 
-export const Base = Template.bind({});
-Base.args = {
-  'aria-label': 'Aria label',
-  placement: 'bottom',
-  size: 'default',
-  testID: 'tooltip-test-id',
-  text: 'Some text',
+export const Default = Template.bind({});
+Default.args = {
+  content: 'Tooltip content',
+  position: 'top',
+  alignment: 'center',
+  children: <IcoInfo16 />,
+  onOpenChange: () => null,
 };
+
+const Aligner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;

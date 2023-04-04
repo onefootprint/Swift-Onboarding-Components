@@ -63,8 +63,7 @@ const CodeBlock = ({
       <Header>
         <Typography variant="label-3">{language}</Typography>
         <Tooltip
-          placement="left"
-          size="compact"
+          position="left"
           text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
         >
           <CopyButton

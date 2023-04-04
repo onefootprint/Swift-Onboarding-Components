@@ -16,6 +16,7 @@ const Tag = styled.span<TagProps>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.full};
     white-space: nowrap;
+    user-select: none;
   `};
 `;
 

@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   userEvent,
+  waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -42,18 +43,25 @@ describe('<CodeInline />', () => {
     expect(screen.getByText('fp_xm7T6MqhfRBkxL0DPOpfwM4')).toBeInTheDocument();
   });
 
-  describe('when hovering the button', () => {
+  describe('when hovering the button on desktop', () => {
     it('should show a tooltip', async () => {
       renderCodeInline({
+        children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
+        tooltipTextConfirmation: 'Copied!',
         buttonAriaLabel: 'Copy',
       });
       const code = screen.getByRole('button', { name: 'Copy' });
+      expect(code).toBeInTheDocument();
+
       await userEvent.hover(code);
-      const tooltip = screen.getByRole('tooltip', {
-        name: 'Copy to clipboard',
+
+      await waitFor(() => {
+        const tooltip = screen.getByRole('tooltip', {
+          name: 'Copy to clipboard',
+        });
+        expect(tooltip).toBeInTheDocument();
       });
-      expect(tooltip).toBeInTheDocument();
     });
   });
 
@@ -67,12 +75,16 @@ describe('<CodeInline />', () => {
         buttonAriaLabel: 'Copy',
       });
       const code = screen.getByRole('button', { name: 'Copy' });
+      expect(code).toBeInTheDocument();
+
       await userEvent.click(code);
-      await userEvent.hover(code);
-      const confirmationTooltip = screen.getByRole('tooltip', {
-        name: 'Copied!',
+
+      await waitFor(() => {
+        const confirmationTooltip = screen.getByRole('tooltip', {
+          name: 'Copied!',
+        });
+        expect(confirmationTooltip).toBeInTheDocument();
       });
-      expect(confirmationTooltip).toBeInTheDocument();
       expect(writeTestMockFn).toHaveBeenCalledWith(
         'fp_xm7T6MqhfRBkxL0DPOpfwM4',
       );

@@ -25,12 +25,12 @@ const Row = ({ riskSignal }: RowProps) => {
         )}
       </td>
       <td>
-        <Tooltip text={riskSignal.description}>
-          <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
-            {riskSignal.note}
+        <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
+          {riskSignal.note}
+          <Tooltip text={riskSignal.description}>
             <IcoInfo16 />
-          </Box>
-        </Tooltip>
+          </Tooltip>
+        </Box>
       </td>
       <td>
         <Box

@@ -1,101 +1,66 @@
-import type { Placement } from '@popperjs/core';
-import React, { useCallback, useId, useState } from 'react';
-import { usePopper } from 'react-popper';
-import styled, { css, useTheme } from 'styled-components';
-import { useUpdateEffect } from 'usehooks-ts';
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import React, { useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import useGetElementRef from './hooks/use-get-element-ref';
-import useVisibility from './hooks/use-visibility';
-
-type Size = 'default' | 'compact';
 
 export type TooltipProps = {
-  disabled?: boolean;
-  'aria-label'?: string;
   children: React.ReactElement;
-  placement?: Placement;
-  size?: Size;
-  testID?: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  alignment?: 'start' | 'center' | 'end';
   text?: string;
+  onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
 };
 
 const Tooltip = ({
-  disabled,
-  'aria-label': ariaLabel,
   children,
-  placement = 'bottom',
-  size = 'default',
-  testID,
   text,
+  position = 'top',
+  alignment = 'center',
+  disabled,
+
+  onOpenChange,
 }: TooltipProps) => {
-  const id = useId();
-  const theme = useTheme();
-  const [refElement, setRefElement] = useState<HTMLElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
-  const {
-    forceUpdate,
-    styles,
-    attributes: { popper },
-  } = usePopper(refElement, popperElement, {
-    placement,
-    strategy: 'fixed',
-    modifiers: [
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 4],
-        },
-      },
-    ],
-  });
-  const isVisible = useVisibility(refElement);
-  const shouldShowTooltip = isVisible && !disabled && !!text;
-  const clonedChildren = useGetElementRef(children, id, setRefElement);
-
-  const recalculateStylesAfterTextChange = useCallback(() => {
-    if (forceUpdate) {
-      forceUpdate();
-    }
-  }, [forceUpdate]);
-
-  useUpdateEffect(() => {
-    if (text) {
-      queueMicrotask(recalculateStylesAfterTextChange);
-    }
-  }, [text, recalculateStylesAfterTextChange]);
+  const [open, setOpen] = useState(false);
 
   return (
-    <>
-      {clonedChildren}
-      {shouldShowTooltip && (
-        <TooltipContainer
-          aria-label={ariaLabel}
-          data-popper-escaped={popper && popper['data-popper-escaped']}
-          data-popper-placement={popper && popper['data-popper-placement']}
-          data-popper-reference-hidden={
-            popper && popper['data-popper-reference-hidden']
-          }
-          data-testid={testID}
-          id={id}
-          ref={setPopperElement}
-          role="tooltip"
-          size={size}
-          style={{
-            ...styles.popper,
-            zIndex: theme.zIndex.tooltip,
-          }}
+    <TooltipPrimitive.Provider>
+      <TooltipPrimitive.Root
+        delayDuration={0}
+        open={open}
+        onOpenChange={onOpenChange}
+      >
+        <TooltipPrimitive.Trigger
+          onMouseEnter={() => !disabled && setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          onMouseOver={() => !disabled && setOpen(true)}
+          onClick={() => !disabled && setOpen(true)}
+          onTouchEnd={() => !disabled && setOpen(!open)}
+          asChild
         >
-          {text}
-        </TooltipContainer>
-      )}
-    </>
+          <TriggerContainer>{children}</TriggerContainer>
+        </TooltipPrimitive.Trigger>
+        {open ? (
+          <TooltipPrimitive.Portal forceMount>
+            <TooltipContainer
+              side={position}
+              align={alignment}
+              sideOffset={8}
+              forceMount
+            >
+              {text}
+            </TooltipContainer>
+          </TooltipPrimitive.Portal>
+        ) : null}
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
   );
 };
 
-const TooltipContainer = styled.span<{ size: Size }>`
-  ${({ theme, size }) => css`
-    ${createFontStyles(size === 'default' ? 'body-4' : 'caption-2')};
+const TooltipContainer = styled(TooltipPrimitive.Content)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-4')}
     background: ${theme.backgroundColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[2]};
@@ -104,7 +69,34 @@ const TooltipContainer = styled.span<{ size: Size }>`
     min-width: fit-content;
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     text-align: center;
+    z-index: ${theme.zIndex.tooltip};
+    will-change: opacity;
+
+    &[data-state='open'],
+    &[data-state='delayed-open'],
+    &[data-state='instant-open'] {
+      animation-name: ${fadeIn};
+      animation-duration: 0.2s;
+      animation-timing-function: ease-out;
+    }
   `}
+`;
+
+const TriggerContainer = styled.span`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+`;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 `;
 
 export default Tooltip;

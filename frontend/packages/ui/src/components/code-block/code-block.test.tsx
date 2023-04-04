@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   userEvent,
+  waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -46,11 +47,16 @@ describe('<CodeBlock />', () => {
         buttonAriaLabel: 'Copy',
       });
       const copyButton = screen.getByRole('button', { name: 'Copy' });
+      expect(copyButton).toBeInTheDocument();
+
       await userEvent.hover(copyButton);
-      const tooltip = screen.getByRole('tooltip', {
-        name: 'Copy to clipboard',
+
+      await waitFor(() => {
+        const tooltip = screen.getByRole('tooltip', {
+          name: 'Copy to clipboard',
+        });
+        expect(tooltip).toBeInTheDocument();
       });
-      expect(tooltip).toBeInTheDocument();
     });
   });
 
@@ -64,12 +70,16 @@ describe('<CodeBlock />', () => {
         buttonAriaLabel: 'Copy',
       });
       const copyButton = screen.getByRole('button', { name: 'Copy' });
+      expect(copyButton).toBeInTheDocument();
+
       await userEvent.click(copyButton);
-      await userEvent.hover(copyButton);
-      const confirmationTooltip = screen.getByRole('tooltip', {
-        name: 'Copied!',
+
+      await waitFor(() => {
+        const confirmationTooltip = screen.getByRole('tooltip', {
+          name: 'Copied!',
+        });
+        expect(confirmationTooltip).toBeInTheDocument();
       });
-      expect(confirmationTooltip).toBeInTheDocument();
       expect(writeTestMockFn).toHaveBeenCalledWith(content);
     });
   });

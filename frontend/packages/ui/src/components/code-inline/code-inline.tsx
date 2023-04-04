@@ -58,15 +58,20 @@ const CodeInline = ({
     }, HIDE_TIMEOUT);
   };
 
-  return disable ? (
-    <CodeContent data-truncate={truncate} data-private={isPrivate}>
-      {children}
-    </CodeContent>
-  ) : (
+  if (disable) {
+    return (
+      <CodeContent data-truncate={truncate} data-private={isPrivate}>
+        {children}
+      </CodeContent>
+    );
+  }
+
+  return (
     <Tooltip
-      placement="right"
-      size="compact"
+      position="right"
+      alignment="center"
       text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
+      disabled={disable}
     >
       <Button
         aria-label={buttonAriaLabel}

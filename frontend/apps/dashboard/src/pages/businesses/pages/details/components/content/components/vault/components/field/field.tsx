@@ -38,11 +38,7 @@ const Field = ({
   return (
     <Container role="row" aria-label={label}>
       {showCheckbox ? (
-        <Tooltip
-          disabled={canDecrypt}
-          placement="right"
-          text={t('not-allowed')}
-        >
+        <Tooltip disabled={canDecrypt} position="right" text={t('not-allowed')}>
           <Box>
             <Checkbox
               checked={isDataDecrypted || undefined}

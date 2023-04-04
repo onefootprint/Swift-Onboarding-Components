@@ -72,8 +72,12 @@ describe('<Row />', () => {
         expect(tag).toBeInTheDocument();
 
         await userEvent.hover(tag);
-        const tooltipContent = screen.getByText('Full name, Email');
-        expect(tooltipContent).toBeInTheDocument();
+        await waitFor(() => {
+          const tooltip = screen.getByRole('tooltip', {
+            name: 'Full name, Email',
+          });
+          expect(tooltip).toBeInTheDocument();
+        });
       });
     });
   });

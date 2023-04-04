@@ -1,4 +1,9 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import { RoleScope } from '@onefootprint/types';
 import React from 'react';
 import { asUserWithScope } from 'src/config/tests';
@@ -37,7 +42,12 @@ describe('<PermissionGate />', () => {
       expect(button).toHaveAttribute('disabled');
 
       await userEvent.hover(button);
-      expect(screen.getByText("You don't have permission")).toBeInTheDocument();
+      await waitFor(() => {
+        const tooltip = screen.getByRole('tooltip', {
+          name: "You don't have permission",
+        });
+        expect(tooltip).toBeInTheDocument();
+      });
     });
   });
 });

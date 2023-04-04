@@ -85,10 +85,12 @@ describe('<RiskSignals />', () => {
         expect(note).toBeInTheDocument();
 
         await userEvent.hover(note);
-        const description = within(tr).getByText(
-          "The consumer's phone number could be tied to an answering service, page, or VoIP.",
-        );
-        expect(description).toBeInTheDocument();
+        await waitFor(() => {
+          const tooltip = screen.getByRole('tooltip', {
+            name: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+          });
+          expect(tooltip).toBeInTheDocument();
+        });
       });
 
       describe('when clicking on the table row', () => {

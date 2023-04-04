@@ -17,6 +17,7 @@ const Row = ({ riskSignal }: RowProps) => {
   const scopesList = uniqueScopes.map(scope =>
     allT(`signal-attributes.${scope}`),
   );
+  const shouldShowTooltip = riskSignal.description !== riskSignal.note;
 
   return (
     <>
@@ -25,12 +26,18 @@ const Row = ({ riskSignal }: RowProps) => {
       </td>
       <td>{createStringList(scopesList)}</td>
       <td>
-        <Tooltip text={riskSignal.description}>
+        {shouldShowTooltip ? (
+          <Tooltip text={riskSignal.description}>
+            <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
+              {riskSignal.note}
+              <IcoInfo16 />
+            </Box>
+          </Tooltip>
+        ) : (
           <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
             {riskSignal.note}
-            <IcoInfo16 />
           </Box>
-        </Tooltip>
+        )}
       </td>
     </>
   );
