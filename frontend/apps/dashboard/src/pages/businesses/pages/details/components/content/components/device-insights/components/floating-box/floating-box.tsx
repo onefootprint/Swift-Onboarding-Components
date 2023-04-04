@@ -75,7 +75,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[3]};
-    left: ${theme.spacing[10]}
+    left: ${theme.spacing[10]};
     min-width: 240px;
     padding: ${theme.spacing[7]};
     position: absolute;

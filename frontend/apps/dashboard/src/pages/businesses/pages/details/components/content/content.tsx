@@ -14,7 +14,7 @@ const Content = () => (
     <Box sx={{ marginBottom: 5 }}>
       <Divider />
     </Box>
-    <Box sx={{ marginBottom: 5 }}>
+    <Box sx={{ marginBottom: 9 }}>
       <Vault />
     </Box>
     <DeviceInsights />
