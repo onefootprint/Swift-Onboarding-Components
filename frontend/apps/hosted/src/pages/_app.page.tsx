@@ -8,6 +8,7 @@ import type { AppProps } from 'next/app';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
+import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
@@ -20,24 +21,27 @@ const App = ({ Component, pageProps }: AppProps) => (
     <ObserveCollectorProvider appName="handoff">
       <DesignSystemProvider theme={themes.light}>
         <GlobalStyle />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </DesignSystemProvider>
     </ObserveCollectorProvider>
   </QueryClientProvider>
 );
+
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
-    body {
-      background-color: ${theme.backgroundColor.primary};
-      overflow: hidden;
-    }
-
     #__next {
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0 0 ${theme.spacing[11]} 0;
+      padding: 0 ${theme.spacing[11]};
+    }
+
+    body {
+      background-color: ${theme.backgroundColor.primary};
+      overflow: hidden;
     }
   `}`;
 
