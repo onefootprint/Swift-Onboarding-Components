@@ -9,6 +9,7 @@ import {
 } from '@onefootprint/test-utils';
 import { BusinessDI, VaultTextData } from '@onefootprint/types';
 import React from 'react';
+import { asAdminUser, resetUser } from 'src/config/tests';
 
 import ProxyConfigs from './list';
 import {
@@ -22,10 +23,15 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<List />', () => {
   beforeEach(() => {
+    asAdminUser();
     useRouterSpy({
       pathname: '/businesses',
       query: {},
     });
+  });
+
+  afterAll(() => {
+    resetUser();
   });
 
   const renderBusinesses = () => customRender(<ProxyConfigs />);

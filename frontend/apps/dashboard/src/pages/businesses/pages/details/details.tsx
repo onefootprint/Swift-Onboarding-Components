@@ -10,7 +10,7 @@ import useCurrentEntity from './hooks/use-current-entity';
 
 const Details = () => {
   const { t } = useTranslation('pages.business');
-  const { errorMessage, isLoading, data } = useCurrentEntity();
+  const { isLoading, errorMessage, data } = useCurrentEntity();
 
   return (
     <>

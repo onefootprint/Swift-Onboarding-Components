@@ -15,7 +15,7 @@ type RowProps = {
 // TODO: https://linear.app/footprint/issue/FP-3097/business-list-user-list-use-right-function-to-format-date
 const Row = ({ entity }: RowProps) => {
   const { t } = useTranslation();
-  const [vault] = useEntityVault(entity.id, entity);
+  const { data: vault } = useEntityVault(entity.id, entity);
   const badgeVariant = getBadgeVariantByStatus(
     entity.status,
     entity.requiresManualReview,
@@ -44,7 +44,7 @@ const Row = ({ entity }: RowProps) => {
         </Badge>
       </td>
       <td>
-        <FieldOrPlaceholder data={vault[BusinessDI.beneficialOwners]} />
+        <FieldOrPlaceholder data={vault?.[BusinessDI.beneficialOwners]} />
       </td>
       <td>
         <Typography variant="body-3" color="primary">

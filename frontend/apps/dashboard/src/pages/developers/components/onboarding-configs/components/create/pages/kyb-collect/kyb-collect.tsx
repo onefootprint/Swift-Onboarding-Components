@@ -44,16 +44,16 @@ const KybCollect = () => {
   const website = watch(CollectedKybDataOption.website);
   const phoneNumber = watch(CollectedKybDataOption.phoneNumber);
   const collectedDataTags = [
-    allT('collected-kyb-data-options.name'),
-    allT('collected-kyb-data-options.tin'),
-    allT('collected-kyb-data-options.address'),
-    allT('collected-kyb-data-options.beneficial_owner'),
+    allT('cdo.business_name'),
+    allT('cdo.business_tin'),
+    allT('cdo.business_address'),
+    allT('cdo.business_beneficial_owners'),
   ];
   if (website) {
-    collectedDataTags.push(allT('collected-kyb-data-options.website'));
+    collectedDataTags.push(allT('cdo.business_website'));
   }
   if (phoneNumber) {
-    collectedDataTags.push(allT('collected-kyb-data-options.phone_number'));
+    collectedDataTags.push(allT('cdo.business_phone_number'));
   }
 
   return (
@@ -74,11 +74,11 @@ const KybCollect = () => {
           </Typography>
           <OptionsContainer data-testid="kyb-collect-form-options">
             <Checkbox
-              label={allT('collected-kyb-data-options.website')}
+              label={allT('cdo.business_website')}
               {...register(CollectedKybDataOption.website)}
             />
             <Checkbox
-              label={allT('collected-kyb-data-options.phone_number')}
+              label={allT('cdo.business_phone_number')}
               {...register(CollectedKybDataOption.phoneNumber)}
             />
           </OptionsContainer>

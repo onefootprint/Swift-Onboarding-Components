@@ -8,12 +8,18 @@ export type VaultEmptyData = undefined;
 
 export type VaultTextData = string;
 
+export type VaultObjectData<T = Object> = T;
+
+export type VaultArrayData<T = any> = Array<T>;
+
 export type VaultIdDocumentData = DecryptedIdDoc[];
 
 export type VaultDocumentData = { name: string; content: Blob };
 
 export type VaultValue =
   | VaultTextData
+  | VaultObjectData
+  | VaultArrayData
   | VaultIdDocumentData
   | VaultDocumentData
   | VaultEncryptedData

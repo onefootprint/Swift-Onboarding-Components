@@ -1,23 +1,23 @@
-import { mockRequest } from '@onefootprint/test-utils';
+import {
+  mockRequest,
+  screen,
+  selectEvents,
+  userEvent,
+  waitFor,
+  within,
+} from '@onefootprint/test-utils';
 import {
   BusinessDI,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  DataIdentifier,
   Entity,
   EntityKind,
   EntityStatus,
   OnboardingStatus,
   RoleScope,
+  VaultValue,
 } from '@onefootprint/types';
-import { asAdminUser, resetUser } from 'src/config/tests';
-
-beforeEach(() => {
-  asAdminUser();
-});
-
-afterAll(() => {
-  resetUser();
-});
 
 export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
@@ -26,6 +26,7 @@ export const entityFixture: Entity = {
   attributes: [
     BusinessDI.city,
     BusinessDI.name,
+    BusinessDI.tin,
     BusinessDI.website,
     BusinessDI.addressLine1,
     BusinessDI.phoneNumber,
@@ -113,3 +114,59 @@ export const withEntityError = (entityId = entityFixture.id) =>
       },
     },
   });
+
+export const withEntityDecrypt = (
+  entityId: string,
+  decryptedData: Partial<Record<DataIdentifier, VaultValue>>,
+) =>
+  mockRequest({
+    method: 'post',
+    path: `/entities/${entityId}/vault/decrypt`,
+    response: {
+      ...decryptedData,
+    },
+  });
+
+export const getTextByRow = (name: string, value: string) => {
+  const row = screen.getByRole('row', { name });
+  return within(row).getByText(value);
+};
+
+export const decryptFields = async (fields: string[]) => {
+  const decryptButton = screen.getByRole('button', {
+    name: 'Decrypt data',
+  });
+  await userEvent.click(decryptButton);
+
+  await Promise.all(
+    fields.map(async name => {
+      const field = screen.getByRole('checkbox', {
+        name,
+      });
+      await userEvent.click(field);
+    }),
+  );
+
+  const nextButton = screen.getByRole('button', {
+    name: 'Next',
+  });
+  await userEvent.click(nextButton);
+
+  await waitFor(() => {
+    expect(
+      screen.getByRole('dialog', { name: 'Decrypt data' }),
+    ).toBeInTheDocument();
+  });
+
+  const dialog = screen.getByRole('dialog', { name: 'Decrypt data' });
+
+  const trigger = within(dialog).getByRole('button', {
+    name: 'Select...',
+  });
+  await selectEvents.select(trigger, 'Verifying customer identity');
+
+  const submitButton = within(dialog).getByRole('button', {
+    name: 'Next',
+  });
+  await userEvent.click(submitButton);
+};

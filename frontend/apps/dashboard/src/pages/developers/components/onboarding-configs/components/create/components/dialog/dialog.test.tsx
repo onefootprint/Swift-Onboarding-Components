@@ -510,13 +510,13 @@ describe('<CreateConfig />', () => {
 
       const collectedData = screen.getByTestId('collected-data');
       expect(
-        within(collectedData).getByText('Legal business name'),
+        within(collectedData).getByText('Business name'),
       ).toBeInTheDocument();
       expect(
         within(collectedData).getByText('Registered business address'),
       ).toBeInTheDocument();
       expect(
-        within(collectedData).getByText('Beneficial owner'),
+        within(collectedData).getByText('Business beneficial owners'),
       ).toBeInTheDocument();
       expect(
         within(collectedData).getByText('Taxpayer Identification Number (TIN)'),
@@ -524,7 +524,7 @@ describe('<CreateConfig />', () => {
 
       const options = screen.getByTestId('kyb-collect-form-options');
       const website = within(options).getByLabelText(
-        'Website',
+        'Business website',
       ) as HTMLInputElement;
       expect(website).toBeInTheDocument();
       expect(website.checked).toBeFalsy();
@@ -532,7 +532,7 @@ describe('<CreateConfig />', () => {
       expect(website.checked).toBeTruthy();
 
       const phoneNumber = within(options).getByLabelText(
-        'Phone number',
+        'Business phone number',
       ) as HTMLInputElement;
       expect(phoneNumber).toBeInTheDocument();
       expect(phoneNumber.checked).toBeFalsy();

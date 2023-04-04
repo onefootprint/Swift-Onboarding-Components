@@ -1,6 +1,10 @@
 import { Entity, EntityVault } from '@onefootprint/types';
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 
+// This is a custom hook that returns the vault for an entity.
+// The vault is stored in the query cache, so can persist and access from anywhere (e.g list page)
+// The main reason for keeping it separated is is because we should not overwrite it once we make an entity request,
+// any only when we decrypt some data we should update it.
 const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
   const getFromCache = () =>
     queryClient.getQueryData<EntityVault>(['entity', entity.id, 'vault']);
@@ -38,7 +42,7 @@ const useEntityVault = (entityId: string, entity?: Entity) => {
     { enabled: !!entity },
   );
 
-  return [query.data || {}, update] as const;
+  return { ...query, update };
 };
 
 export default useEntityVault;

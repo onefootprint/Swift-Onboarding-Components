@@ -62,7 +62,18 @@
     "id_document.driver_license": "Driver's License",
     "selfie.passport": "Selfie",
     "selfie.id_card": "Selfie",
-    "selfie.driver_license": "Selfie"
+    "selfie.driver_license": "Selfie",
+    "business.name": "Name",
+    "business.website": "Website",
+    "business.phone_number": "Phone number",
+    "business.tin": "Taxpayer Identification Number (TIN)",
+    "business.beneficial_owners": "Beneficial owner",
+    "business.address_line1": "Address line 1",
+    "business.address_line2": "Address line 2",
+    "business.city": "City",
+    "business.state": "State",
+    "business.country": "Country",
+    "business.zip": "Zip code"
   },
   "cdo": {
     "name": "Full name",
@@ -83,14 +94,6 @@
     "business_website": "Business website",
     "business_beneficial_owners": "Business beneficial owners",
     "investor_profile": "Investor profile"
-  },
-  "collected-kyb-data-options": {
-    "name": "Legal business name",
-    "tin": "Taxpayer Identification Number (TIN)",
-    "address": "Registered business address",
-    "beneficial_owner": "Beneficial owner",
-    "website": "Website",
-    "phone_number": "Phone number"
   },
   "vendor": {
     "idology": "Idology",
@@ -735,6 +738,54 @@
       },
       "header": {
         "title": "Business info"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "bos": {
+          "title": "Beneficial owners"
+        },
+        "address": {
+          "title": "Registered business address"
+        }
+      },
+      "fieldset": {
+        "select-all": "Select all",
+        "deselect-all": "Deselect all"
+      },
+      "decrypt": {
+        "start": "Decrypt data",
+        "not-allowed": "You're not allowed to decrypt data",
+        "reason-dialog": {
+          "title": "Decrypt data",
+          "description": "Why are you decrypting this data?",
+          "form": {
+            "reason": {
+              "label": "Reason",
+              "placeholder": "Select...",
+              "errors": {
+                "required": "A reason is needed"
+              },
+              "options": {
+                "customer-support-inquiry": "Responding to customer support inquiry",
+                "customer-communication": "Sending communication to customer",
+                "customer-verification": "Verifying customer identity",
+                "auditor-review": "Auditor review",
+                "transation-over-5k": "Transaction over $5k",
+                "change-of-direct-deposit": "Change of direct deposit",
+                "other": "Other"
+              }
+            },
+            "custom-reason": {
+              "placeholder": "Type the reason here...",
+              "errors": {
+                "required": "A reason is needed"
+              }
+            }
+          },
+          "disclaimer": "Please note that all data attribute access are logged for security reasons."
+        }
       }
     },
     "security-logs": {

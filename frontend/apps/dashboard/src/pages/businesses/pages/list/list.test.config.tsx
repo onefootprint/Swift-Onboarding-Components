@@ -9,15 +9,6 @@ import {
   OnboardingStatus,
   RoleScope,
 } from '@onefootprint/types';
-import { asAdminUser, resetUser } from 'src/config/tests';
-
-beforeEach(() => {
-  asAdminUser();
-});
-
-afterAll(() => {
-  resetUser();
-});
 
 export const entitiesFixture: Entity[] = [
   {
