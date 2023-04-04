@@ -96,7 +96,6 @@ export async function CreateDB(
     subnetIds: vpc.privateSubnetIds,
   });
 
-  // TODO use this in the db cluster
   const clusterParameterGroupName = `fpc-pg-cluster-${clusterIdentifier}`;
   new aws.rds.ClusterParameterGroup(clusterParameterGroupName, {
     name: clusterParameterGroupName,
@@ -104,7 +103,6 @@ export async function CreateDB(
     parameters: DEFAULT_PG_PARAMETERS,
   });
 
-  // TODO use this in the db instances
   const instanceParameterGroupName = `fpc-pg-instance-${clusterIdentifier}`;
   new aws.rds.ParameterGroup(instanceParameterGroupName, {
     name: instanceParameterGroupName,
@@ -129,6 +127,8 @@ export async function CreateDB(
     skipFinalSnapshot: !dbConfig.protectDeletion,
     deletionProtection: dbConfig.protectDeletion,
     restoreToPointInTime: await getRestorePointIfNeeded(),
+    dbClusterParameterGroupName: clusterParameterGroupName,
+    dbInstanceParameterGroupName: instanceParameterGroupName,
     serverlessv2ScalingConfiguration: {
       maxCapacity: 16,
       minCapacity: 2,
@@ -142,6 +142,7 @@ export async function CreateDB(
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
     performanceInsightsEnabled: true,
+    dbParameterGroupName: instanceParameterGroupName,
   });
 
   const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
@@ -150,6 +151,7 @@ export async function CreateDB(
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
     performanceInsightsEnabled: true,
+    dbParameterGroupName: instanceParameterGroupName,
   });
 
   const {
