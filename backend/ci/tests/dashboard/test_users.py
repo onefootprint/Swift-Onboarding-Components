@@ -181,6 +181,30 @@ def test_liveness_list(sandbox_user):
     assert creds[0]["insight_event"]
 
 
+def test_timeline(sandbox_user):
+    body = get(
+        f"entities/{sandbox_user.fp_id}/timeline",
+        None,
+        sandbox_user.tenant.sk.key,
+    )
+    assert any(i["event"]["kind"] == "data_collected" for i in body)
+    assert any(i["event"]["kind"] == "liveness" for i in body)
+    decision_event = next(
+        i for i in body if i["event"]["kind"] == "onboarding_decision"
+    )
+    assert decision_event["event"]["data"]["decision"]["status"] == "pass"
+    assert decision_event["event"]["data"]["decision"]["source"]["kind"] == "footprint"
+
+    # Test filtering
+    body = get(
+        f"entities/{sandbox_user.fp_id}/timeline",
+        dict(kinds="onboarding_decision"),
+        sandbox_user.tenant.sk.key,
+    )
+    assert len(body) == 1
+    assert body[0] == decision_event
+
+
 def test_access_events_list(sandbox_user):
     # Make some decryptions to make access events
     tenant = sandbox_user.tenant

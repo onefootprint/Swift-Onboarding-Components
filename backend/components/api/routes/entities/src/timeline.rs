@@ -6,6 +6,7 @@ use crate::auth::Either;
 
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
+use api_wire_types::ListTimelineRequest;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 
@@ -25,17 +26,19 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 #[get("/entities/{fp_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    fp_id: web::Path<FpId>,
+    filters: web::Query<ListTimelineRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<TimelineEventsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let fp_id = request.into_inner();
+    let fp_id = fp_id.into_inner();
     // Not all tenants should see socure related risk signals
     let tenant_can_view_socure_risk_signal = state
         .feature_flag_client
         .flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
+    let ListTimelineRequest { kinds } = filters.into_inner();
 
     let events = state
         .db_pool
@@ -44,6 +47,7 @@ pub async fn get(
                 conn,
                 (&fp_id, &tenant_id, is_live),
                 tenant_can_view_socure_risk_signal,
+                kinds,
             )
         })
         .await??;

@@ -115,6 +115,7 @@ impl UserTimeline {
         conn: &mut PgConn,
         scoped_vault_id: T,
         tenant_can_view_socure_risk_signal: bool,
+        kinds: Vec<DbUserTimelineEventKind>,
     ) -> DbResult<Vec<UserTimelineInfo>>
     where
         T: Into<ScopedVaultIdentifier<'a>>,
@@ -122,7 +123,7 @@ impl UserTimeline {
         let su = ScopedVault::get(conn, scoped_vault_id)?;
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
-        let results: Vec<Self> = user_timeline::table
+        let mut query = user_timeline::table
             .filter(user_timeline::vault_id.eq(&su.vault_id))
             .filter(
                 user_timeline::scoped_vault_id
@@ -130,8 +131,13 @@ impl UserTimeline {
                     .or(user_timeline::scoped_vault_id.eq(&su.id))
                     .or(user_timeline::is_portable),
             )
-            .order_by(user_timeline::timestamp.asc())
-            .get_results(conn)?;
+            .into_boxed();
+
+        if !kinds.is_empty() {
+            query = query.filter(user_timeline::event_kind.eq_any(kinds));
+        }
+
+        let results: Vec<Self> = query.order_by(user_timeline::timestamp.asc()).get_results(conn)?;
 
         // Batch fetch any related metadata from the source-of-truth business objects
         let decision_ids = results.iter().flat_map(|ut| match ut.event {
@@ -324,7 +330,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), true).unwrap();
+            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), true, vec![]).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 
