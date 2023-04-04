@@ -48,7 +48,7 @@ impl TenantUvw {
         self.check_ob_config_access(ids)?;
         let results = self.uvw.decrypt_unchecked(&state.enclave_client, ids).await?;
         if let Some(req) = req {
-            req.create_access_event(state, self.scoped_user_id.clone(), ids.to_vec())
+            req.create_access_event(state, self.scoped_vault_id.clone(), ids.to_vec())
                 .await?;
         }
         Ok(results)

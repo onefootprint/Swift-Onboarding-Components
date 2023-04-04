@@ -32,7 +32,7 @@ impl TenantUvw {
                 .await?[0];
             let plaintext = PiiBytes::new(key.unseal_bytes(AeadSealedBytes(bytes.to_vec()))?);
 
-            req.create_access_event(state, self.scoped_user_id.clone(), di)
+            req.create_access_event(state, self.scoped_vault_id.clone(), di)
                 .await?;
 
             Ok(Some(DecryptedDocument {

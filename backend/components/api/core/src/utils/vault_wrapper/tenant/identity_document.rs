@@ -130,7 +130,7 @@ impl TenantUvw {
                 })
             })
             .collect::<ApiResult<_>>()?;
-        let scoped_user_id = self.scoped_user_id.clone();
+        let scoped_user_id = self.scoped_vault_id.clone();
         let targets = [
             Some(DataIdentifier::IdDocument(document_type)),
             include_selfie.then_some(DataIdentifier::Selfie(document_type)),

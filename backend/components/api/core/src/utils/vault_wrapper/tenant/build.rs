@@ -14,12 +14,12 @@ use newtypes::{ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
 impl VaultWrapper<Person> {
-    pub fn build_for_tenant(conn: &mut PgConn, su_id: &ScopedVaultId) -> ApiResult<TenantUvw> {
-        let uvw = Self::build(conn, VwArgs::Tenant(su_id))?;
-        let onboarding = Onboarding::bulk_get_for_users(conn, vec![su_id])?.remove(su_id);
+    pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantUvw> {
+        let uvw = Self::build(conn, VwArgs::Tenant(sv_id))?;
+        let onboarding = Onboarding::bulk_get_for_users(conn, vec![sv_id])?.remove(sv_id);
         Ok(TenantUvw {
             uvw,
-            scoped_user_id: su_id.clone(),
+            scoped_vault_id: sv_id.clone(),
             onboarding,
         })
     }
@@ -43,13 +43,13 @@ impl VaultWrapper<Person> {
         // VaultWrapper for each User
         let vds = VaultData::bulk_get(conn, &active_lifetime_list)?;
         let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
-        let scoped_user_ids = users.iter().map(|(su, _)| &su.id).collect();
-        let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_user_ids)?;
+        let scoped_vault_ids = users.iter().map(|(sv, _)| &sv.id).collect();
+        let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_vault_ids)?;
 
         // Map over our UserVaults, assembling the VaultWrappers from the data we fetched above
         let results = users
             .into_iter()
-            .map(move |(su, uv)| {
+            .map(move |(sv, uv)| {
                 let uv_id = uv.id.clone();
                 let uvw = Self::build_internal(
                     uv,
@@ -66,10 +66,10 @@ impl VaultWrapper<Person> {
                 )?;
                 let uvw = TenantUvw {
                     uvw,
-                    scoped_user_id: su.id.clone(),
-                    onboarding: onboarding_map.get(&su.id).cloned(),
+                    scoped_vault_id: sv.id.clone(),
+                    onboarding: onboarding_map.get(&sv.id).cloned(),
                 };
-                Ok((su.id, uvw))
+                Ok((sv.id, uvw))
             })
             .collect::<ApiResult<_>>()?;
         Ok(results)

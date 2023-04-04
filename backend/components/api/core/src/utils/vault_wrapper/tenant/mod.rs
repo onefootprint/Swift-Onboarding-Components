@@ -25,6 +25,6 @@ pub struct TenantUvw {
     // The behavior of the VW doesn't materially branch on VaultWrapper or TenantVw, only on WriteableVw.
     // Maybe in the future we move the typed parameterization to the WriteableVw
     uvw: VaultWrapper<Person>,
-    scoped_user_id: ScopedVaultId,
+    scoped_vault_id: ScopedVaultId,
     onboarding: Option<OnboardingAndConfig>,
 }
