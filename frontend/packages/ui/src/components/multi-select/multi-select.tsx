@@ -84,6 +84,7 @@ const MultiSelect = <
           IndicatorSeparator,
           MultiValueRemove,
         }}
+        menuPlacement="auto"
         defaultValue={defaultValue}
         inputId={id}
         isDisabled={disabled}
