@@ -75,3 +75,6 @@ pub use self::document_upload_timeline_event::*;
 
 pub mod watchlist_check;
 pub use self::watchlist_check::*;
+
+pub mod business_owner;
+pub use self::business_owner::*;

@@ -68,7 +68,7 @@ mod tests {
 
     use super::*;
     use dotenv;
-    use newtypes::{BusinessData, BusinessOwnerData, PiiString};
+    use newtypes::{BoData, BusinessData, PiiString};
 
     #[ignore]
     #[tokio::test]
@@ -86,7 +86,7 @@ mod tests {
             city: PiiString::from("San Francisco".to_owned()),
             state: PiiString::from("CA".to_owned()),
             zip: PiiString::from("94110".to_owned()),
-            business_owners: vec![BusinessOwnerData {
+            business_owners: vec![BoData {
                 first_name: PiiString::from("Jane".to_owned()),
                 last_name: PiiString::from("Match".to_owned()),
             }],

@@ -1,28 +1,35 @@
 import pytest
+import typing
 from tests.dashboard.utils import latest_access_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, build_business_data
 
 
+class Business(typing.NamedTuple):
+    fp_uid: str
+    fp_bid: str
+
+
 @pytest.fixture(scope="session")
-def sb_user_with_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
+def sb_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     bifrost_client = BifrostClient(kyb_sandbox_ob_config)
     bifrost_client.init_user_for_onboarding(twilio)
-    bifrost_client.onboard_user_onto_tenant(sandbox_tenant, add_business_data=True)
+    user = bifrost_client.onboard_user_onto_tenant(
+        sandbox_tenant, add_business_data=True
+    )
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
     entity = body["data"][0]
     assert entity["kind"] == "business"
-    print(body)
     assert set(entity["attributes"]) == set(build_business_data())
 
     # TODO should get the fp_biz_id from validate
-    fp_id = entity["id"]
-    return fp_id
+    fp_bid = entity["id"]
+    return Business(user.fp_id, fp_bid)
 
 
-def test_get_entities(sandbox_tenant, sb_user_with_business):
+def test_get_entities(sandbox_tenant, sb_business):
     body = get(
-        f"entities/{sb_user_with_business}",
+        f"entities/{sb_business.fp_bid}",
         None,
         sandbox_tenant.sk.key,
     )
@@ -30,9 +37,24 @@ def test_get_entities(sandbox_tenant, sb_user_with_business):
     assert body["decrypted_attributes"] == {"business.name": "Foobar Inc"}
 
 
-def test_get_vault(sandbox_tenant, sb_user_with_business):
+def test_get_business_owners(sandbox_tenant, sb_business):
     body = get(
-        f"entities/{sb_user_with_business}/vault",
+        f"businesses/{sb_business.fp_bid}/owners",
+        None,
+        sandbox_tenant.sk.key,
+    )
+    assert len(body) == 2
+    primary_bo = body[0]
+    secondary_bo = body[1]
+    assert primary_bo["id"] == sb_business.fp_uid
+    assert primary_bo["ownership_stake"] == 50
+    assert not secondary_bo.get("id")
+    assert secondary_bo["ownership_stake"] == 30
+
+
+def test_get_vault(sandbox_tenant, sb_business):
+    body = get(
+        f"entities/{sb_business.fp_bid}/vault",
         None,
         sandbox_tenant.sk.key,
     )
@@ -55,7 +77,7 @@ def test_get_vault(sandbox_tenant, sb_user_with_business):
         ["business.beneficial_owners"],
     ],
 )
-def test_decrypt(sandbox_tenant, sb_user_with_business, fields_to_decrypt):
+def test_decrypt(sandbox_tenant, sb_business, fields_to_decrypt):
     data = dict(
         fields=fields_to_decrypt,
         reason="Doing a business hecking decrypt",
@@ -66,12 +88,12 @@ def test_decrypt(sandbox_tenant, sb_user_with_business, fields_to_decrypt):
     ].replace(" ", "")
 
     body = post(
-        f"entities/{sb_user_with_business}/vault/decrypt",
+        f"entities/{sb_business.fp_bid}/vault/decrypt",
         data,
         sandbox_tenant.sk.key,
     )
     for field in fields_to_decrypt:
         assert body[field] == expected_data.get(field)
 
-    access_event = latest_access_event_for(sb_user_with_business, sandbox_tenant.sk)
+    access_event = latest_access_event_for(sb_business.fp_bid, sandbox_tenant.sk)
     assert set(access_event["targets"]) == set(fields_to_decrypt)

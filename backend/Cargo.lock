@@ -555,6 +555,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "api_route_businesses"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "api_core",
+ "api_wire_types",
+ "db",
+ "newtypes",
+ "paperclip",
+ "serde_json",
+]
+
+[[package]]
 name = "api_route_entities"
 version = "0.1.0"
 dependencies = [
@@ -1058,6 +1071,7 @@ dependencies = [
 name = "api_routes_root"
 version = "0.1.0"
 dependencies = [
+ "api_route_businesses",
  "api_route_entities",
  "api_route_hosted",
  "api_route_index",

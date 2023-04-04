@@ -67,7 +67,7 @@ mod tests {
     use crate::middesk::request;
 
     use super::*;
-    use newtypes::{BusinessData, BusinessOwnerData};
+    use newtypes::{BoData, BusinessData};
 
     #[test]
     fn test_from_business_data() {
@@ -82,11 +82,11 @@ mod tests {
             state: PiiString::from("CA"),
             zip: PiiString::from("94110"),
             business_owners: vec![
-                BusinessOwnerData {
+                BoData {
                     first_name: PiiString::from("Marvin"),
                     last_name: PiiString::from("Gaye"),
                 },
-                BusinessOwnerData {
+                BoData {
                     first_name: PiiString::from("Miles"),
                     last_name: PiiString::from("Davis"),
                 },

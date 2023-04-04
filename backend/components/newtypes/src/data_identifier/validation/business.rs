@@ -45,18 +45,19 @@ enum CorporationType {
 
 #[derive(Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub struct BusinessOwner {
+pub struct BusinessOwnerData {
+    // TODO probably want an ID here
     #[allow(unused)]
     first_name: PiiString,
     #[allow(unused)]
     last_name: PiiString,
     #[allow(unused)]
     email: Option<Email>,
-    ownership_stake: u32,
+    pub ownership_stake: u32,
 }
 
 fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> {
-    utils::parse_json_and_validate::<Vec<BusinessOwner>, _>(input, |l| {
+    utils::parse_json_and_validate::<Vec<BusinessOwnerData>, _>(input, |l| {
         if l.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }

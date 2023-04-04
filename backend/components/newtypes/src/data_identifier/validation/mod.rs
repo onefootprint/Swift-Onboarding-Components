@@ -5,6 +5,8 @@ mod identity;
 mod investor_profile;
 mod utils;
 
+pub use business::BusinessOwnerData;
+
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
     /// When `for_bifrost` is true, performs more advanced validation that attempts to proactively

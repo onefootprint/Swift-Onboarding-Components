@@ -62,7 +62,7 @@ impl IdvData {
 
 // KYB analogs of IdvData, still TBD and subject to change
 #[derive(Debug, Clone, Default)]
-pub struct BusinessOwnerData {
+pub struct BoData {
     pub first_name: PiiString,
     pub last_name: PiiString,
 }
@@ -78,5 +78,5 @@ pub struct BusinessData {
     pub city: PiiString,
     pub state: PiiString,
     pub zip: PiiString,
-    pub business_owners: Vec<BusinessOwnerData>,
+    pub business_owners: Vec<BoData>,
 }

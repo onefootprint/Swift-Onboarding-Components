@@ -290,7 +290,7 @@ def build_business_data():
         "business.zip": "10009",
         "business.country": "US",
         "business.tin": "121231234",
-        "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 90}]',
+        "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}, {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 30}]',
     }
 
 
