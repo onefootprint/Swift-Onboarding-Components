@@ -7,7 +7,7 @@ use strum_macros::{AsRefStr, EnumString};
 
 use crate::DecisionStatus;
 
-/// The status of the onboarding, a go, no-go decision.
+/// The status of the onboarding
 #[derive(
     Debug,
     Display,
@@ -28,9 +28,13 @@ use crate::DecisionStatus;
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum OnboardingStatus {
+    /// Passed all checks
     Pass,
+    /// Failed one or more check
     Fail,
+    /// The user aborted the onboarding flow and we don't have enough information to make a decision.
     Incomplete,
+    /// Waiting for user input or a decision
     Pending,
 }
 
