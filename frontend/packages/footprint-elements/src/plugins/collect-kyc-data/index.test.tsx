@@ -189,6 +189,11 @@ describe('Collect KYC Data', () => {
 
       submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
       expect(submitButton).toBeInTheDocument();
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
     });
   });
 });
