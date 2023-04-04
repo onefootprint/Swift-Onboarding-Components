@@ -26,8 +26,8 @@ const CardContent = ({ post }: CardContentProps) => {
         <ImageContainer>
           <Image
             src={post.feature_image}
-            height={800}
-            width={800}
+            height={900}
+            width={900}
             alt={post.feature_image_alt || post.title}
           />
         </ImageContainer>
@@ -100,7 +100,7 @@ const ImageContainer = styled.div`
     backdrop-filter: (8px);
     overflow: hidden;
     width: 100%;
-    height: 430px;
+    height: 240px;
 
     img {
       object-fit: cover;
@@ -108,11 +108,16 @@ const ImageContainer = styled.div`
       height: 100%;
     }
   `}
+
+  ${media.greaterThan('md')`
+    height: 430px;
+  `}
 `;
 
 const Title = styled.div`
   ${({ theme }) => css`
     display: flex;
+    flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     gap: ${theme.spacing[4]};

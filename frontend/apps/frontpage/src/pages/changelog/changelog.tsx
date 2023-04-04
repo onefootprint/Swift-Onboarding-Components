@@ -126,7 +126,7 @@ const Recaps = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: ${theme.spacing[2]};
+    gap: ${theme.spacing[8]};
     width: 100%;
 
     a {
@@ -138,7 +138,6 @@ const Recaps = styled.div`
 const RecapCard = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('heading-2')}
-    margin: ${theme.spacing[10]} auto;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     padding: ${theme.spacing[4]} ${theme.spacing[6]};
@@ -163,6 +162,7 @@ const Links = styled.div`
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: ${theme.spacing[4]};
   `}
 `;
