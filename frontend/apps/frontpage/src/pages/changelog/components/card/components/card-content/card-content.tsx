@@ -26,8 +26,8 @@ const CardContent = ({ post }: CardContentProps) => {
         <ImageContainer>
           <Image
             src={post.feature_image}
-            height={200}
-            width={200}
+            height={800}
+            width={800}
             alt={post.feature_image_alt || post.title}
           />
         </ImageContainer>
