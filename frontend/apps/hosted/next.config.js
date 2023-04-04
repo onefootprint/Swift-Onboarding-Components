@@ -2,15 +2,14 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com unpkg.com http://localhost:8000 vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live; 
+  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
-  frame-ancestors 'self';
-  frame-src 'self' *.onefootprint.com http://localhost:3000 vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live footprint-blog.ghost.io vercel.com;
+  frame-src 'self' vercel.live;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
   worker-src 'self' blob:;
 `;
@@ -29,10 +28,6 @@ const securityHeaders = [
     value: '1; mode=block',
   },
   {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=()',
-  },
-  {
     key: 'X-Content-Type-Options',
     value: 'nosniff',
   },
@@ -47,6 +42,12 @@ const securityHeaders = [
 ];
 
 module.exports = {
+  productionBrowserSourceMaps: true,
+  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
+  reactStrictMode: false,
+  compiler: {
+    styledComponents: true,
+  },
   async headers() {
     return [
       {
@@ -55,18 +56,13 @@ module.exports = {
       },
     ];
   },
-  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
-  reactStrictMode: true,
-  compiler: {
-    styledComponents: true,
-  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
-    '@onefootprint/global-constants',
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
+    '@onefootprint/global-constants',
   ],
 };

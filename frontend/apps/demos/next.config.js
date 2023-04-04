@@ -77,7 +77,6 @@ module.exports = {
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
     '@onefootprint/global-constants',
-    '@onefootprint/icons',
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
