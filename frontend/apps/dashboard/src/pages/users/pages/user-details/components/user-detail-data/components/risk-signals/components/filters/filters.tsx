@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { SignalAttribute } from '@onefootprint/types';
+import { RiskSignalAttribute } from '@onefootprint/types';
 import { Filters } from '@onefootprint/ui';
 import React from 'react';
 
@@ -43,51 +43,51 @@ const RiskSignalsFilters = () => {
           options: [
             {
               label: allT('signal-attributes.name'),
-              value: SignalAttribute.name,
+              value: RiskSignalAttribute.name,
             },
             {
               label: allT('signal-attributes.email'),
-              value: SignalAttribute.email,
+              value: RiskSignalAttribute.email,
             },
             {
               label: allT('signal-attributes.phone_number'),
-              value: SignalAttribute.phoneNumber,
+              value: RiskSignalAttribute.phoneNumber,
             },
             {
               label: allT('signal-attributes.dob'),
-              value: SignalAttribute.dob,
+              value: RiskSignalAttribute.dob,
             },
             {
               label: allT('signal-attributes.ssn'),
-              value: SignalAttribute.ssn,
+              value: RiskSignalAttribute.ssn,
             },
             {
               label: allT('signal-attributes.document'),
-              value: SignalAttribute.document,
+              value: RiskSignalAttribute.document,
             },
             {
               label: allT('signal-attributes.address'),
-              value: SignalAttribute.address,
+              value: RiskSignalAttribute.address,
             },
             {
               label: allT('signal-attributes.street_address'),
-              value: SignalAttribute.streetAddress,
+              value: RiskSignalAttribute.streetAddress,
             },
             {
               label: allT('signal-attributes.city'),
-              value: SignalAttribute.city,
+              value: RiskSignalAttribute.city,
             },
             {
               label: allT('signal-attributes.state'),
-              value: SignalAttribute.state,
+              value: RiskSignalAttribute.state,
             },
             {
               label: allT('signal-attributes.zip'),
-              value: SignalAttribute.zip,
+              value: RiskSignalAttribute.zip,
             },
             {
               label: allT('signal-attributes.ip_address'),
-              value: SignalAttribute.ipAddress,
+              value: RiskSignalAttribute.ipAddress,
             },
           ],
           selectedOptions: filters.values.scope,

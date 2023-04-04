@@ -8,27 +8,32 @@ import {
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 import React from 'react';
 
-import Data, { DataProps } from './data';
+import Content, { ContentProps } from './content';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Data />', () => {
+describe('<Content />', () => {
   beforeEach(() => {
-    useRouterSpy({ pathname: '/users/detail', query: {} });
+    useRouterSpy({
+      pathname: '/businesses/fp_bid_VXND11zUVRYQKKUxbUN3KD',
+      query: {
+        id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
+      },
+    });
   });
 
-  const renderData = ({ high, medium, low }: DataProps) =>
-    customRender(<Data high={high} medium={medium} low={low} />);
+  const renderContent = ({ high, medium, low }: ContentProps) =>
+    customRender(<Content high={high} medium={medium} low={low} />);
 
   describe('when there are no risks', () => {
     it('should render an empty state message', () => {
-      renderData({ high: [], medium: [], low: [] });
+      renderContent({ high: [], medium: [], low: [] });
 
       expect(screen.getByText('No risk signals')).toBeInTheDocument();
     });
 
     it('should not render a link to see details', () => {
-      renderData({ high: [], medium: [], low: [] });
+      renderContent({ high: [], medium: [], low: [] });
 
       expect(screen.queryByText('See details')).not.toBeInTheDocument();
     });
@@ -36,7 +41,7 @@ describe('<Data />', () => {
 
   describe('when there is at least one risk', () => {
     it('should render a link to see details', () => {
-      renderData({
+      renderContent({
         high: [],
         medium: [],
         low: [
@@ -58,7 +63,7 @@ describe('<Data />', () => {
     });
 
     it('should open the list of risks when clicking on the "See details" button', async () => {
-      renderData({
+      renderContent({
         high: [],
         medium: [
           {
@@ -105,12 +110,14 @@ describe('<Data />', () => {
       it('should append risk signal id to the url', async () => {
         const pushMockFn = jest.fn();
         useRouterSpy({
-          pathname: '/users/detail',
-          query: {},
+          pathname: '/businesses/fp_bid_VXND11zUVRYQKKUxbUN3KD',
+          query: {
+            id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
+          },
           push: pushMockFn,
         });
 
-        renderData({
+        renderContent({
           high: [],
           medium: [
             {
@@ -141,6 +148,7 @@ describe('<Data />', () => {
         expect(pushMockFn).toHaveBeenCalledWith(
           {
             query: {
+              id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
               risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
             },
           },
@@ -152,7 +160,7 @@ describe('<Data />', () => {
 
     describe('when it has only low risks', () => {
       it('should render correctly when it has only one low risk', () => {
-        renderData({
+        renderContent({
           high: [],
           medium: [],
           low: [
@@ -175,7 +183,7 @@ describe('<Data />', () => {
       });
 
       it('should render correctly when it has two or more low risks', () => {
-        renderData({
+        renderContent({
           high: [],
           medium: [],
           low: [
@@ -211,7 +219,7 @@ describe('<Data />', () => {
 
     describe('when it has only medium risks', () => {
       it('should render correctly when it has only one medium risk', () => {
-        renderData({
+        renderContent({
           high: [],
           medium: [
             {
@@ -234,7 +242,7 @@ describe('<Data />', () => {
       });
 
       it('should render correctly when it has two or more medium risks', () => {
-        renderData({
+        renderContent({
           high: [],
           medium: [
             {
@@ -270,7 +278,7 @@ describe('<Data />', () => {
 
     describe('when it has only high risks', () => {
       it('should render correctly when it has only one high risk', () => {
-        renderData({
+        renderContent({
           high: [
             {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -293,7 +301,7 @@ describe('<Data />', () => {
       });
 
       it('should render correctly when it has two or more high risks', () => {
-        renderData({
+        renderContent({
           high: [
             {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -329,7 +337,7 @@ describe('<Data />', () => {
 
     describe('when it only low and medium risks', () => {
       it('should render correctly', () => {
-        renderData({
+        renderContent({
           high: [],
           medium: [
             {
@@ -366,7 +374,7 @@ describe('<Data />', () => {
 
     describe('when it only low and high risks', () => {
       it('should render correctly', () => {
-        renderData({
+        renderContent({
           high: [
             {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -403,7 +411,7 @@ describe('<Data />', () => {
 
     describe('when it only medium and high risks', () => {
       it('should render correctly', () => {
-        renderData({
+        renderContent({
           high: [
             {
               id: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -440,7 +448,7 @@ describe('<Data />', () => {
 
     describe('when it has low, medium and high risks', () => {
       it('should render correctly', () => {
-        renderData({
+        renderContent({
           high: [
             {
               id: 'sig_ryxauTlDX8hIm3wVRmm',

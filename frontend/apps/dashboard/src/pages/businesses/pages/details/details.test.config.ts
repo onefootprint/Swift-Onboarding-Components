@@ -115,6 +115,25 @@ export const withEntityError = (entityId = entityFixture.id) =>
     },
   });
 
+export const withRiskSignals = (entity = entityFixture) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/risk_signals`,
+    response: [],
+  });
+
+export const withRiskSignalsError = () =>
+  mockRequest({
+    method: 'get',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
 export const withEntityDecrypt = (
   entityId: string,
   decryptedData: Partial<Record<DataIdentifier, VaultValue>>,

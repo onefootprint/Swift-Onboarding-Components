@@ -1,11 +1,9 @@
-import { useRouter } from 'next/router';
-
 import useEntityVault from '../../../hooks/use-entity-vault';
 import useEntity from './use-entity';
+import useEntityId from './use-entity-id';
 
 const useCurrentEntity = () => {
-  const router = useRouter();
-  const id = router.query.id as string;
+  const id = useEntityId();
   const entityQuery = useEntity(id);
   const entityVaultQuery = useEntityVault(id, entityQuery.data);
 

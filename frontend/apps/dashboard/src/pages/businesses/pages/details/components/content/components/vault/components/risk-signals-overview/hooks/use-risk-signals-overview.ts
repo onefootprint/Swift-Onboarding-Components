@@ -1,5 +1,8 @@
 import request from '@onefootprint/request';
-import type { GetEntityRiskSignalsResponse } from '@onefootprint/types';
+import type {
+  GetEntityRiskSignalsRequest,
+  GetEntityRiskSignalsResponse,
+} from '@onefootprint/types';
 import { RiskSignal } from '@onefootprint/types/src/data/risk-signal';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
@@ -8,14 +11,14 @@ import { RiskSignalsSummary } from '../risk-signals-overview.types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
 
-const getRiskSignalsRequest = async (
-  userId: string,
+const getRiskSignals = async (
+  { id }: GetEntityRiskSignalsRequest,
   authHeaders: AuthHeaders,
 ) => {
   const { data: response } = await request<GetEntityRiskSignalsResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: `/entities/${userId}/risk_signals`,
+    url: `/entities/${id}/risk_signals`,
   });
   return groupBySectionAndSeverity(response);
 };
@@ -32,14 +35,14 @@ export const groupBySectionAndSeverity = (
   };
 };
 
-const useUserRiskSignalsOverview = (userId: string) => {
+const useRiskSignalsOverview = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery(
-    ['user', 'riskSignalsOverview', authHeaders, userId],
-    () => getRiskSignalsRequest(userId, authHeaders),
-    { enabled: !!userId },
+    ['entity', id, 'risk-signals-overview'],
+    () => getRiskSignals({ id }, authHeaders),
+    { enabled: !!id },
   );
 };
 
-export default useUserRiskSignalsOverview;
+export default useRiskSignalsOverview;

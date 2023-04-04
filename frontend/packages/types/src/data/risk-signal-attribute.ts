@@ -1,4 +1,4 @@
-export enum SignalAttribute {
+export enum RiskSignalAttribute {
   name = 'name',
   dob = 'dob',
   ssn = 'ssn',
@@ -15,4 +15,4 @@ export enum SignalAttribute {
   document = 'document',
 }
 
-export default SignalAttribute;
+export default RiskSignalAttribute;

@@ -18,6 +18,7 @@ import {
   withEntity,
   withEntityDecrypt,
   withEntityError,
+  withRiskSignals,
 } from './details.test.config';
 
 beforeEach(() => {
@@ -78,6 +79,7 @@ describe('<Details />', () => {
   describe('when the request to fetch the entities succeeds', () => {
     beforeEach(() => {
       withEntity();
+      withRiskSignals();
     });
 
     it('should show a breadcrumb, with an option to return to the list pages', async () => {

@@ -15,10 +15,10 @@ import {
   InvestorProfileDI,
   OnboardingStatus,
   RiskSignal,
+  RiskSignalAttribute,
   RiskSignalSeverity,
   RoleScope,
   ScopedUser,
-  SignalAttribute,
 } from '@onefootprint/types';
 import { DocumentDI } from '@onefootprint/types/src/data/di';
 
@@ -26,7 +26,7 @@ export const riskSignalsFixture: RiskSignal[] = [
   {
     id: 'sig_ryxauTlDX8hIm3wVRmm',
     severity: RiskSignalSeverity.Low,
-    scopes: [SignalAttribute.phoneNumber],
+    scopes: [RiskSignalAttribute.phoneNumber],
     reasonCode: 'phone_number_located_is_voip',
     note: 'VOIP phone number',
     description:
@@ -42,7 +42,7 @@ export const riskSignalsFixture: RiskSignal[] = [
     description:
       'The domain of the email address has been identified as belonging to a corporate entity.',
     severity: RiskSignalSeverity.Low,
-    scopes: [SignalAttribute.email],
+    scopes: [RiskSignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',
   },
 ];

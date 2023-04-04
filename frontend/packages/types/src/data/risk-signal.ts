@@ -1,4 +1,4 @@
-import { SignalAttribute } from './signal-attribute';
+import { RiskSignalAttribute } from './risk-signal-attribute';
 
 export enum RiskSignalSeverity {
   Low = 'low',
@@ -13,7 +13,7 @@ export type RiskSignal = {
   note: string;
   onboardingDecisionId: string;
   reasonCode: string;
-  scopes: SignalAttribute[];
+  scopes: RiskSignalAttribute[];
   severity: RiskSignalSeverity;
   timestamp: string;
 };

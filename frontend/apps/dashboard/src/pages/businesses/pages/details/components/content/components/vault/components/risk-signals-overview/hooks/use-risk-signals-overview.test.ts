@@ -5,17 +5,22 @@ import {
 } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
-import useUserRiskSignalsOverview from './use-user-risk-signals-overview';
+import useRiskSignalsOverview from './use-risk-signals-overview';
 import {
   createRiskSignal,
   withRiskSignals,
-} from './use-user-risk-signals-overview.test.config';
+} from './use-risk-signals-overview.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('useUserRiskSignalsOverview', () => {
+describe('useRiskSignalsOverview', () => {
   beforeEach(() => {
-    useRouterSpy({ pathname: '/users/detail', query: {} });
+    useRouterSpy({
+      pathname: '/businesses/fp_bid_cDsFPmDwz784hdwovghMqt',
+      query: {
+        id: 'fp_bid_cDsFPmDwz784hdwovghMqt',
+      },
+    });
   });
 
   describe('when the request succeeds', () => {
@@ -40,9 +45,7 @@ describe('useUserRiskSignalsOverview', () => {
       withRiskSignals(riskSignalsResponse);
 
       const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
-      const { result } = customRenderHook(() =>
-        useUserRiskSignalsOverview(userId),
-      );
+      const { result } = customRenderHook(() => useRiskSignalsOverview(userId));
       await waitFor(() => {
         expect(result.current.data).toBeDefined();
       });

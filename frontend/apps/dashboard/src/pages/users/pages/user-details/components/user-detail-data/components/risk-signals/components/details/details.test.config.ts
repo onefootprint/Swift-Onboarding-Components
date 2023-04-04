@@ -1,8 +1,8 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import {
   RiskSignal,
+  RiskSignalAttribute,
   RiskSignalSeverity,
-  SignalAttribute,
 } from '@onefootprint/types';
 
 export const riskSignalDetailsFixture: RiskSignal = {
@@ -13,7 +13,7 @@ export const riskSignalDetailsFixture: RiskSignal = {
   description:
     "The consumer's phone number could be tied to an answering service, page, or VoIP.",
   severity: RiskSignalSeverity.Low,
-  scopes: [SignalAttribute.phoneNumber, SignalAttribute.dob],
+  scopes: [RiskSignalAttribute.phoneNumber, RiskSignalAttribute.dob],
   timestamp: '2022-10-24T21:56:12.682238Z',
 };
 
