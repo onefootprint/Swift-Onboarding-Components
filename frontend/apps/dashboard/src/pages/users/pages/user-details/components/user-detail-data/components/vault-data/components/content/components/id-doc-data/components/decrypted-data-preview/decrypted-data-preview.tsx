@@ -28,30 +28,31 @@ const DecryptedDataPreview = ({ images }: DecryptedDataPreviewProps) => {
     <Container>
       <Tabs variant="underlined">
         {successfulUploads.length > 0 && (
-          <>
-            <Tab
-              key={DecryptedIdDocStatus.success}
-              onClick={() => setTab(DecryptedIdDocStatus.success)}
-              selected={tab === DecryptedIdDocStatus.success}
-            >
-              {t('tabs.successful-uploads')}
-            </Tab>
-            <ImagesPreview images={successfulUploads} />
-          </>
+          <Tab
+            key={DecryptedIdDocStatus.success}
+            onClick={() => setTab(DecryptedIdDocStatus.success)}
+            selected={tab === DecryptedIdDocStatus.success}
+          >
+            {t('tabs.successful-uploads')}
+          </Tab>
         )}
         {failedUploads.length > 0 && (
-          <>
-            <Tab
-              key={DecryptedIdDocStatus.fail}
-              onClick={() => setTab(DecryptedIdDocStatus.fail)}
-              selected={tab === DecryptedIdDocStatus.fail}
-            >
-              {t('tabs.failed-uploads')}
-            </Tab>
-            <ImagesPreview images={failedUploads} />
-          </>
+          <Tab
+            key={DecryptedIdDocStatus.fail}
+            onClick={() => setTab(DecryptedIdDocStatus.fail)}
+            selected={tab === DecryptedIdDocStatus.fail}
+          >
+            {t('tabs.failed-uploads')}
+          </Tab>
         )}
       </Tabs>
+      <ImagesPreview
+        images={
+          tab === DecryptedIdDocStatus.success
+            ? successfulUploads
+            : failedUploads
+        }
+      />
     </Container>
   ) : null;
 };
