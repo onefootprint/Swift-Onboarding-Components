@@ -9,6 +9,7 @@ pub struct BusinessRequest {
     people: Vec<Person>,
     website: Option<Website>,
     phone_numbers: Option<Vec<PhoneNumber>>,
+    names: Option<Vec<Name>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
@@ -24,6 +25,7 @@ pub struct Address {
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
 pub struct Person {
     pub name: PiiString,
+    pub email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
@@ -36,16 +38,23 @@ pub struct Website {
     pub url: PiiString,
 }
 
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
+pub struct Name {
+    pub name: PiiString,
+    pub name_type: PiiString,
+}
+
 impl From<BusinessData> for BusinessRequest {
     fn from(data: BusinessData) -> Self {
+        // TODO: .ok_or(ConversionError::MissingFirstName)? here
         Self {
-            name: data.name,
+            name: data.name.unwrap(),
             addresses: vec![Address {
-                address_line1: data.address_line1,
+                address_line1: data.address_line1.unwrap(),
                 address_line2: data.address_line2,
-                city: data.city,
-                state: data.state,
-                postal_code: data.zip,
+                city: data.city.unwrap(),
+                state: data.state.unwrap(),
+                postal_code: data.zip.unwrap(),
             }],
             tin: data.tin,
             people: data
@@ -53,10 +62,17 @@ impl From<BusinessData> for BusinessRequest {
                 .into_iter()
                 .map(|bo| Person {
                     name: PiiString::from(format!("{} {}", bo.first_name.leak(), bo.last_name.leak())),
+                    email: bo.email,
                 })
                 .collect(),
             website: data.website_url.map(|url| Website { url }),
             phone_numbers: data.phone_number.map(|p| vec![PhoneNumber { phone_number: p }]),
+            names: data.dba.map(|dba| {
+                vec![Name {
+                    name: dba,
+                    name_type: PiiString::from("dba"),
+                }]
+            }),
         }
     }
 }
@@ -72,23 +88,26 @@ mod tests {
     #[test]
     fn test_from_business_data() {
         let business_data = BusinessData {
-            name: PiiString::from("Waffle House"),
+            name: Some(PiiString::from("Waffle House")),
+            dba: Some(PiiString::from("waho")),
             website_url: Some(PiiString::from("www.wafflehouse.com")),
             phone_number: Some(PiiString::from("+11234567890")),
             tin: Some(PiiString::from("23571113171923")),
-            address_line1: PiiString::from("2180 Bryant St"),
+            address_line1: Some(PiiString::from("2180 Bryant St")),
             address_line2: Some(PiiString::from("#9")),
-            city: PiiString::from("San Francisco"),
-            state: PiiString::from("CA"),
-            zip: PiiString::from("94110"),
+            city: Some(PiiString::from("San Francisco")),
+            state: Some(PiiString::from("CA")),
+            zip: Some(PiiString::from("94110")),
             business_owners: vec![
                 BoData {
                     first_name: PiiString::from("Marvin"),
                     last_name: PiiString::from("Gaye"),
+                    email: Some(PiiString::from("marvin@gaye.com")),
                 },
                 BoData {
                     first_name: PiiString::from("Miles"),
                     last_name: PiiString::from("Davis"),
+                    email: None,
                 },
             ],
         };
@@ -107,10 +126,12 @@ mod tests {
                 tin: Some(PiiString::from("23571113171923")),
                 people: vec![
                     Person {
-                        name: PiiString::from("Marvin Gaye")
+                        name: PiiString::from("Marvin Gaye"),
+                        email: Some(PiiString::from("marvin@gaye.com"))
                     },
                     Person {
-                        name: PiiString::from("Miles Davis")
+                        name: PiiString::from("Miles Davis"),
+                        email: None,
                     }
                 ],
                 website: Some(Website {
@@ -118,6 +139,10 @@ mod tests {
                 }),
                 phone_numbers: Some(vec![request::business::PhoneNumber {
                     phone_number: PiiString::from("+11234567890")
+                }]),
+                names: Some(vec![request::business::Name {
+                    name: PiiString::from("waho"),
+                    name_type: PiiString::from("dba")
                 }])
             }
         );

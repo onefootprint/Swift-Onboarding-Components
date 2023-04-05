@@ -48,11 +48,11 @@ enum CorporationType {
 pub struct BusinessOwnerData {
     // TODO probably want an ID here
     #[allow(unused)]
-    first_name: PiiString,
+    pub first_name: PiiString,
     #[allow(unused)]
-    last_name: PiiString,
+    pub last_name: PiiString,
     #[allow(unused)]
-    email: Option<Email>,
+    pub email: Option<Email>,
     pub ownership_stake: u32,
 }
 

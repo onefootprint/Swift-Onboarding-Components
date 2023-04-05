@@ -77,18 +77,20 @@ mod tests {
         let client = MiddeskClient::new(api_key, true).unwrap();
 
         let business_data = BusinessData {
-            name: PiiString::from("Middesk".to_owned()),
+            name: Some(PiiString::from("Middesk".to_owned())),
+            dba: Some(PiiString::from("mid")),
             website_url: None,
             phone_number: None,
             tin: None,
-            address_line1: PiiString::from("2180 Bryant St".to_owned()),
+            address_line1: Some(PiiString::from("2180 Bryant St".to_owned())),
             address_line2: None,
-            city: PiiString::from("San Francisco".to_owned()),
-            state: PiiString::from("CA".to_owned()),
-            zip: PiiString::from("94110".to_owned()),
+            city: Some(PiiString::from("San Francisco".to_owned())),
+            state: Some(PiiString::from("CA".to_owned())),
+            zip: Some(PiiString::from("94110".to_owned())),
             business_owners: vec![BoData {
                 first_name: PiiString::from("Jane".to_owned()),
                 last_name: PiiString::from("Match".to_owned()),
+                email: None,
             }],
         };
 

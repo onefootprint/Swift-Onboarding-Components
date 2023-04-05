@@ -1,4 +1,4 @@
-use crate::{IdentityDataKind, PiiString};
+use crate::{BusinessOwnerData, IdentityDataKind, PiiString};
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
@@ -65,18 +65,30 @@ impl IdvData {
 pub struct BoData {
     pub first_name: PiiString,
     pub last_name: PiiString,
+    pub email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct BusinessData {
-    pub name: PiiString,
+    pub name: Option<PiiString>,
+    pub dba: Option<PiiString>,
     pub website_url: Option<PiiString>,
     pub phone_number: Option<PiiString>,
     pub tin: Option<PiiString>,
-    pub address_line1: PiiString,
+    pub address_line1: Option<PiiString>,
     pub address_line2: Option<PiiString>,
-    pub city: PiiString,
-    pub state: PiiString,
-    pub zip: PiiString,
+    pub city: Option<PiiString>,
+    pub state: Option<PiiString>,
+    pub zip: Option<PiiString>,
     pub business_owners: Vec<BoData>,
+}
+
+impl From<BusinessOwnerData> for BoData {
+    fn from(value: BusinessOwnerData) -> Self {
+        Self {
+            first_name: value.first_name,
+            last_name: value.last_name,
+            email: value.email.map(|e| e.email),
+        }
+    }
 }

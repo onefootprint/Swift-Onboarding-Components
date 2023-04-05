@@ -1,13 +1,13 @@
 use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business};
 use crate::{errors::ApiError, State};
 use crypto::aead::AeadSealedBytes;
 use db::DbPool;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
-use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber};
-use newtypes::{DocVData, Base64Data, PiiString, DataIdentifier};
+use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
+use newtypes::{DocVData, Base64Data, PiiString, DataIdentifier, BusinessData, BusinessOwnerData, BoData};
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
@@ -135,6 +135,41 @@ async fn build_docv_for_scan_verify_results(state: &State, request: Verification
 
 fn parse_reference_id_for_scan_verify(reference_id: Option<String>) -> Result<Option<u64>, ApiError> {
     reference_id.map(|r| r.parse::<u64>()).transpose().map_err(|_| ApiError::AssertionError("could not parse ref_id for idology".into()))
+}
+
+pub async fn build_business_data_from_verification_request(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    request: VerificationRequest,
+) -> Result<BusinessData, ApiError> {
+    let bvw = db_pool
+        .db_query(|conn| VaultWrapper::<Business>::build(conn, VwArgs::Idv(request)))
+        .await??;
+
+    let all_bdks: Vec<_> = BDK::iter().map(DataIdentifier::from).collect();
+    let mut decrypted_values = bvw.decrypt_unchecked(enclave_client, &all_bdks).await?;
+
+    let business_owners: Vec<BoData> = if let Some(bo_str) = decrypted_values.remove(&BDK::BeneficialOwners.into()) {
+        serde_json::de::from_str::<Vec<BusinessOwnerData>>(bo_str.leak())?.into_iter().map(|b| b.into()).collect()
+    } else {
+        vec![]
+    };
+
+    let bd = BusinessData {
+        name: decrypted_values.remove(&BDK::Name.into()),
+        dba: decrypted_values.remove(&BDK::Dba.into()),
+        website_url: decrypted_values.remove(&BDK::Website.into()),
+        phone_number: decrypted_values.remove(&BDK::PhoneNumber.into()),
+        tin: decrypted_values.remove(&BDK::Tin.into()),
+        address_line1: decrypted_values.remove(&BDK::AddressLine1.into()),
+        address_line2: decrypted_values.remove(&BDK::AddressLine2.into()),
+        city: decrypted_values.remove(&BDK::City.into()),
+        state: decrypted_values.remove(&BDK::State.into()),
+        zip: decrypted_values.remove(&BDK::Zip.into()),
+        business_owners,
+    };
+
+    Ok(bd)
 }
 
 
