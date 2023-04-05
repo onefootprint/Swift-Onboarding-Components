@@ -2,7 +2,7 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { Organization, OrgAssumeRoleResponse } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSession from 'src/hooks/use-session';
 
 import ButtonGroup from '../button-group';
@@ -42,6 +42,14 @@ const Data = ({ authToken, organizations }: DataProps) => {
       },
     );
   };
+
+  useEffect(() => {
+    if (organizations.length === 1) {
+      // If this user only belongs to one org, automatically log in
+      handleClick(organizations[0].id)();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authToken, organizations]);
 
   return (
     <>

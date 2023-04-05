@@ -11,7 +11,10 @@ const AssumeBanner = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    router.push('/logout');
+    router.push({
+      pathname: '/organizations',
+      query: { token: data?.auth },
+    });
   };
 
   return data?.meta.isAssumed ? (
