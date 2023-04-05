@@ -49,8 +49,10 @@ def test_get_business_owners(sandbox_tenant, sb_business):
     assert primary_bo["id"] == sb_business.fp_uid
     assert primary_bo["ownership_stake"] == 50
     assert primary_bo["status"] == "pass"
+    assert primary_bo["kind"] == "primary"
     assert not secondary_bo.get("id")
     assert secondary_bo["ownership_stake"] == 30
+    assert secondary_bo["kind"] == "secondary"
 
 
 def test_get_vault(sandbox_tenant, sb_business):

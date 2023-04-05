@@ -14,6 +14,7 @@ use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::BusinessDataKind;
 use newtypes::BusinessOwnerData;
+use newtypes::BusinessOwnerKind;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
 use newtypes::PiiString;
@@ -72,6 +73,11 @@ pub async fn get(
         // Zip bo_data from vault with BusinessOwner data from DB.
         // Eventually, we'll need a smarter way of mapping bo_data from vault to the BusinessOwners from the DB
         .zip(bos.into_iter().map(|(_, ob_info)| Some(ob_info)).chain(std::iter::repeat(None)))
+        .enumerate()
+        .map(|(i, (bo_data, ob_info))| {
+            let kind = if i == 0 { BusinessOwnerKind::Primary } else { BusinessOwnerKind::Secondary };
+            (bo_data, kind, ob_info)
+        })
         .map(api_wire_types::BusinessOwner::from_db)
         .collect();
 
