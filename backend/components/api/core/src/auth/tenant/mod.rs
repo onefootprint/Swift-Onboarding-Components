@@ -55,8 +55,6 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
-    /// The role associated with the authed principal that gives permissions
-    fn role(&self) -> &TenantRole;
     /// The rolebinding that ties the authed principal to the role. Will be None for firm employee
     /// auth and API key auth
     fn rolebinding(&self) -> Option<&TenantRolebinding>;
@@ -130,17 +128,20 @@ trait CanCheckTenantGuard: Sized {
 /// sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
 pub trait CheckTenantGuard {
+    /// Checks if the guard is met by self.token_permissions().
+    /// If so, returns self.tenant_auth(), otherwise returns an auth error
     fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet;
+
+    /// The list of TenantPermissions scopes that are allowed by this auth token
+    fn token_scopes(&self) -> Vec<TenantScope>;
 }
 
 impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor
 where
     TAuthExtractor: CanCheckTenantGuard,
 {
-    /// Checks if the guard is met by self.token_permissions().
-    /// If so, returns self.tenant_auth(), otherwise returns an auth error
     fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
     where
         T: IsGuardMet,
@@ -152,6 +153,10 @@ where
         } else {
             Err(AuthError::MissingTenantPermission(requested_permission_str))
         }
+    }
+
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        CanCheckTenantGuard::token_scopes(self)
     }
 }
 

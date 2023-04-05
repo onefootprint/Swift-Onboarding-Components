@@ -19,10 +19,13 @@ use paperclip::actix::{api_v2_operation, get, patch, web};
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationMember> {
+) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
+    // Fetch the scopes from the auth token, which may have some additional dynamic permissions for
+    // firm employee users
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
-    let role = auth.role().clone();
     let rb = auth.rolebinding().cloned();
+    let tenant = auth.tenant().clone();
     let user_id = match auth.actor() {
         AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
         AuthActor::FirmEmployee(tenant_user_id) => tenant_user_id,
@@ -33,7 +36,7 @@ async fn get(
         .db_query(move |conn| TenantUser::get(conn, &user_id))
         .await??;
 
-    let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
+    let result = api_wire_types::AuthOrgMember::from_db((user, rb, tenant, scopes));
     ResponseData::ok(result).json()
 }
 
@@ -50,10 +53,11 @@ async fn patch(
     request: web::Json<UpdateTenantUserRequest>,
     // Weird to take in an impersonation token here
     auth: TenantRbAuthContext,
-) -> JsonApiResponse<api_wire_types::OrganizationMember> {
+) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(Any)?;
-    let role = auth.role().clone();
     let rb = auth.rolebinding().cloned();
+    let tenant = auth.tenant().clone();
 
     let UpdateTenantUserRequest {
         first_name,
@@ -74,6 +78,6 @@ async fn patch(
         .db_transaction(move |conn| TenantUser::update(conn, &user_id, user_update))
         .await?;
 
-    let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
+    let result = api_wire_types::AuthOrgMember::from_db((user, rb, tenant, scopes));
     ResponseData::ok(result).json()
 }

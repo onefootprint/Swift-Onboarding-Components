@@ -175,10 +175,6 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
         &self.data.tenant
     }
 
-    fn role(&self) -> &TenantRole {
-        &self.data.role
-    }
-
     fn rolebinding(&self) -> Option<&TenantRolebinding> {
         None
     }

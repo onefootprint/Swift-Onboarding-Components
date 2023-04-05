@@ -110,10 +110,6 @@ impl TenantAuth for SecretTenantAuthContext {
         Ok(self.api_key.is_live)
     }
 
-    fn role(&self) -> &TenantRole {
-        &self.role
-    }
-
     fn rolebinding(&self) -> Option<&TenantRolebinding> {
         None
     }

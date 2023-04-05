@@ -136,10 +136,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
         self.data.tenant()
     }
 
-    fn role(&self) -> &TenantRole {
-        &self.data.tenant_role
-    }
-
     fn rolebinding(&self) -> Option<&TenantRolebinding> {
         Some(&self.data.tenant_rolebinding)
     }

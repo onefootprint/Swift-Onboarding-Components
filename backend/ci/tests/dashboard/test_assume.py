@@ -17,7 +17,7 @@ def assumed_token(tenant, sandbox_tenant_data):
 
     body = get("org/member", None, auth_token)
     assert body["is_firm_employee"]
-    assert body["rolebinding"]
+    assert not body.get("is_assumed_session")
 
     # Integration testing tenant should not be able to assume role for a real org
     post(
@@ -43,7 +43,7 @@ def assumed_token(tenant, sandbox_tenant_data):
 
     body = get("org/member", None, auth_token)
     assert body["is_firm_employee"]
-    assert not body["rolebinding"]
+    assert body.get("is_assumed_session")
 
     return auth_token
 
