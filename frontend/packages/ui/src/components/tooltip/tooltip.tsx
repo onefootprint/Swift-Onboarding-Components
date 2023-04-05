@@ -33,7 +33,11 @@ const Tooltip = ({
       >
         <TooltipPrimitive.Trigger
           onMouseEnter={() => !disabled && setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
+          onMouseLeave={() => {
+            setOpen(false);
+          }}
+          onPointerEnter={() => !disabled && setOpen(true)}
+          onPointerLeave={() => setOpen(false)}
           onMouseOver={() => !disabled && setOpen(true)}
           onClick={() => !disabled && setOpen(true)}
           onTouchEnd={() => !disabled && setOpen(!open)}
@@ -82,7 +86,7 @@ const TooltipContainer = styled(TooltipPrimitive.Content)`
   `}
 `;
 
-const TriggerContainer = styled.span`
+const TriggerContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
