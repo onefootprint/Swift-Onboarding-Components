@@ -43,7 +43,7 @@ enum CorporationType {
     Agent,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct BusinessOwnerData {
     // TODO probably want an ID here

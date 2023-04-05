@@ -1,3 +1,5 @@
+use std::iter::repeat;
+
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
@@ -68,17 +70,25 @@ pub async fn get(
         .remove(&di)
         .unwrap_or_else(|| PiiString::from("[]"));
     let bo_data: Vec<BusinessOwnerData> = serde_json::de::from_str(bos_str.leak())?;
+
+    // Pad each array to the max length
+    let max_n = std::cmp::max(bo_data.len(), bos.len());
+    let bo_data = bo_data.into_iter().map(Some).chain(repeat(None)).take(max_n);
+    let bos = bos.into_iter().map(|x| Some(x.1)).chain(repeat(None)).take(max_n);
+    // Zip the two lists together to combine BO data from the vault and BO data from the DB
+    // When we have multiple BOs from the DB, we'll want a better way to combine these
     let results = bo_data
-        .into_iter()
-        // Zip bo_data from vault with BusinessOwner data from DB.
-        // Eventually, we'll need a smarter way of mapping bo_data from vault to the BusinessOwners from the DB
-        .zip(bos.into_iter().map(|(_, ob_info)| Some(ob_info)).chain(std::iter::repeat(None)))
+        .zip(bos)
         .enumerate()
         .map(|(i, (bo_data, ob_info))| {
-            let kind = if i == 0 { BusinessOwnerKind::Primary } else { BusinessOwnerKind::Secondary };
-            (bo_data, kind, ob_info)
+            // For now, the first bo is always
+            let kind = if i == 0 {
+                BusinessOwnerKind::Primary
+            } else {
+                BusinessOwnerKind::Secondary
+            };
+            api_wire_types::BusinessOwner::from_db((bo_data, kind, ob_info))
         })
-        .map(api_wire_types::BusinessOwner::from_db)
         .collect();
 
     ResponseData::ok(results).json()
