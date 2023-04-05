@@ -1,12 +1,17 @@
 import { IcoClose24, Icon } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { useEventListener, useLockedBody } from 'usehooks-ts';
+import {
+  useEventListener,
+  useLockedBody,
+  useOnClickOutside,
+} from 'usehooks-ts';
 
 import media from '../../../../utils/media';
 import Box from '../../../box';
 import Button from '../../../button';
+import Fade from '../../../fade/fade';
 import IconButton from '../../../icon-button';
 import LinkButton from '../../../link-button';
 import Overlay from '../../../overlay';
@@ -41,6 +46,11 @@ type BaseDialogProps = {
   | NoButtons
 );
 
+const SMALL_WIDTH = 343;
+const MEDIUM_WIDTH = 500;
+const LARGE_WIDTH = 650;
+const DEFAULT_WIDTH = 800;
+
 const BaseDialog = ({
   children,
   closeAriaLabel = 'Close',
@@ -56,6 +66,8 @@ const BaseDialog = ({
   isResponsive = false,
   isConfirmation = false,
 }: BaseDialogProps) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(dialogRef, onClose);
   useLockedBody(open);
   useEventListener('keydown', event => {
     if (event.key === 'Escape') {
@@ -63,25 +75,25 @@ const BaseDialog = ({
     }
   });
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    onClose();
-  };
-
   return open ? (
     <Portal selector="#footprint-portal">
       <FocusTrap>
-        <Overlay onClick={handleClick} aria-modal>
+        <div>
+          <Overlay isVisible={open} />
           <DialogContainer
-            aria-label={title}
-            data-testid={testID}
             role="dialog"
+            aria-label={title}
+            testID={testID}
+            isVisible={open}
+            from="center"
+            to="center"
             size={size}
             isResponsive={isResponsive}
             onClick={(event: React.MouseEvent<HTMLDivElement>) => {
               event.stopPropagation();
             }}
             isConfirmation={isConfirmation}
+            ref={dialogRef}
           >
             <Header>
               <CloseContainer>
@@ -139,16 +151,17 @@ const BaseDialog = ({
               </Footer>
             ) : null}
           </DialogContainer>
-        </Overlay>
+        </div>
       </FocusTrap>
     </Portal>
   ) : null;
 };
 
-const DialogContainer = styled.div<{
+const DialogContainer = styled(Fade)<{
   size: Size;
   isResponsive: boolean;
   isConfirmation: boolean;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }>`
   ${({ theme, isResponsive, isConfirmation }) => css`
     position: absolute;
@@ -163,6 +176,7 @@ const DialogContainer = styled.div<{
     top: ${theme.spacing[9]};
     max-height: calc(100vh - ${theme.spacing[9]} * 2);
     isolation: isolate;
+    left: 50%;
 
     ${isConfirmation &&
     `
@@ -171,34 +185,39 @@ const DialogContainer = styled.div<{
       left: 50%;
       max-width: 90%;
     `}
+
     ${isResponsive &&
     media.lessThan('sm')`
-      top: 0;
-      max-height: none;
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
+        top: 0;
+        left: 0;
+        max-height: none;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
     `};
   `}
 
   ${({ size }) => {
     if (size === 'small') {
       return css`
-        width: 343px;
+        width: ${SMALL_WIDTH}px;
+        left: calc(50% - ${SMALL_WIDTH / 2}px);
       `;
     }
     if (size === 'compact') {
       return css`
-        width: 500px;
+        width: ${MEDIUM_WIDTH}px;
+        left: calc(50% - ${MEDIUM_WIDTH / 2}px);
       `;
     }
     if (size === 'default') {
       return css`
-        width: 650px;
+        width: ${LARGE_WIDTH}px;
+        left: calc(50% - ${LARGE_WIDTH / 2}px);
       `;
     }
     return css`
-      width: 800px;
+      width: ${DEFAULT_WIDTH}px;
     `;
   }}
 `;

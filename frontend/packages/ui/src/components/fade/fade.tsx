@@ -1,16 +1,31 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { forwardRef } from 'react';
+import React, { AriaRole, forwardRef } from 'react';
 
 type FadeProps = {
+  'aria-label'?: string;
   children: React.ReactNode;
-  isVisible: boolean;
-  from: 'left' | 'right' | 'top' | 'bottom' | 'center';
-  to: 'left' | 'right' | 'top' | 'bottom' | 'center';
   className?: string;
+  from: 'left' | 'right' | 'top' | 'bottom' | 'center';
+  isVisible: boolean;
+  role?: AriaRole;
+  testID?: string;
+  to: 'left' | 'right' | 'top' | 'bottom' | 'center';
 };
 
 const Fade = forwardRef<HTMLDivElement, FadeProps>(
-  ({ children, isVisible, from, to, className }, ref) => {
+  (
+    {
+      'aria-label': ariaLabel,
+      children,
+      className,
+      from,
+      isVisible,
+      role,
+      testID,
+      to,
+    },
+    ref,
+  ) => {
     let initialX = 0;
     let initialY = 0;
     let finalX = 0;
@@ -72,12 +87,15 @@ const Fade = forwardRef<HTMLDivElement, FadeProps>(
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ opacity: 0.5, x: initialX, y: initialY, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-            exit={{ opacity: 0, x: finalX, y: finalY, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            aria-label={ariaLabel}
             className={className}
+            data-testid={testID}
+            exit={{ opacity: 0, x: finalX, y: finalY, scale: 0.98 }}
+            initial={{ opacity: 0.5, x: initialX, y: initialY, scale: 0.98 }}
             ref={ref}
+            role={role}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
             {children}
           </motion.div>

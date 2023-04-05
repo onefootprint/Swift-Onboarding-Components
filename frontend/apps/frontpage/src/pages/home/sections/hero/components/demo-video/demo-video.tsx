@@ -17,7 +17,7 @@ const DemoVideo = ({ open, title, link, onClose }: DemoVideoProps) => {
   const { t } = useTranslation('pages.home.hero');
 
   return open ? (
-    <Overlay onClick={onClose} aria-modal>
+    <>
       <ModalContainer role="dialog" aria-label="Footprint Demo Modal">
         <CloseContainer onClick={onClose}>
           <IcoClose24 color="quinary" />
@@ -33,12 +33,17 @@ const DemoVideo = ({ open, title, link, onClose }: DemoVideoProps) => {
           allowFullScreen
         />
       </ModalContainer>
-    </Overlay>
+      <Overlay aria-modal isVisible={open} />
+    </>
   ) : null;
 };
 
 const ModalContainer = styled.div`
-  position: relative;
+  position: absolute;
+  transform: translateY(-50%);
+  z-index: 100;
+  top: 50%;
+  left: 5%;
   width: 90%; /* Leave some space at the edges of the modal */
   padding-top: 50.625%; /* Preserves 16:9 Aspect Ratio */
 `;

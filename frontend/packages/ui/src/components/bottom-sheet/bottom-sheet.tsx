@@ -1,7 +1,8 @@
 import { IcoClose24 } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useOnClickOutside } from 'usehooks-ts';
 
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
@@ -33,6 +34,13 @@ const BottomSheet = ({
   closeAriaLabel = 'Close',
   testID,
 }: BottomSheetProps) => {
+  const bottomSheetRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(bottomSheetRef, () => {
+    if (open) {
+      onClose?.();
+    }
+  });
+
   const [visibleState, setVisibleState] = useState<State>(State.closed);
   useEffect(() => {
     setVisibleState(open ? State.open : State.closed);
@@ -69,12 +77,13 @@ const BottomSheet = ({
 
   return visibleState === State.closed ? null : (
     <FocusTrap active={open}>
-      <StyledOverlay onClick={onClose} aria-modal className={visibleState}>
+      <span>
         <Sheet
           onClick={handleClick}
           className={visibleState}
           role="dialog"
           data-testid={testID}
+          ref={bottomSheetRef}
         >
           <Header hasBorder={!!title}>
             <CloseContainer onClick={onClose}>
@@ -86,23 +95,11 @@ const BottomSheet = ({
           </Header>
           <Body>{children}</Body>
         </Sheet>
-      </StyledOverlay>
+        <Overlay aria-modal isVisible={open} />
+      </span>
     </FocusTrap>
   );
 };
-
-const StyledOverlay = styled(Overlay)`
-  transition: all 0.2s linear;
-
-  &.open {
-    opacity: 1;
-  }
-
-  &.closing,
-  &.opening {
-    opacity: 0;
-  }
-`;
 
 const CloseContainer = styled.div`
   ${({ theme }) => css`
@@ -115,10 +112,13 @@ const CloseContainer = styled.div`
 
 const Sheet = styled.div`
   ${({ theme }) => css`
+    position: fixed;
+    left: 0;
+    bottom: 0;
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
-    z-index: ${theme.zIndex.overlay + 1};
+    z-index: ${theme.zIndex.overlay + 10};
     align-self: end;
     transition: all 0.2s linear;
 

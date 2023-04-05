@@ -1,8 +1,12 @@
 import { IcoClose24, Icon } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { useEventListener, useLockedBody } from 'usehooks-ts';
+import {
+  useEventListener,
+  useLockedBody,
+  useOnClickOutside,
+} from 'usehooks-ts';
 
 import { media } from '../../utils';
 import IconButton from '../icon-button';
@@ -31,6 +35,8 @@ const Drawer = ({
   title,
 }: DrawerProps) => {
   const state = useOpenAnimation(open);
+  const DrawerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(DrawerRef, onClose);
   useLockedBody(open);
   useEventListener('keydown', event => {
     if (event.key === 'Escape') {
@@ -41,12 +47,14 @@ const Drawer = ({
   return state === State.closed ? null : (
     <Portal selector="#footprint-portal">
       <FocusTrap>
-        <StyledOverlay onClick={onClose} aria-modal className={state}>
+        <span>
+          <Overlay aria-modal isVisible={open} />
           <DrawerContainer
             className={state}
             aria-label={title}
             data-testid={testID}
             role="dialog"
+            ref={DrawerRef}
             onClick={(event: React.MouseEvent<HTMLDivElement>) => {
               event.stopPropagation();
             }}
@@ -63,24 +71,11 @@ const Drawer = ({
             </Header>
             <Body>{children}</Body>
           </DrawerContainer>
-        </StyledOverlay>
+        </span>
       </FocusTrap>
     </Portal>
   );
 };
-
-const StyledOverlay = styled(Overlay)`
-  transition: all 0.2s linear;
-
-  &.open {
-    opacity: 1;
-  }
-
-  &.closing,
-  &.opening {
-    opacity: 0;
-  }
-`;
 
 const DrawerContainer = styled.div`
   ${({ theme }) => css`
@@ -89,6 +84,7 @@ const DrawerContainer = styled.div`
     height: 100vh;
     position: fixed;
     right: 0;
+    top: 0;
     width: 500px;
     transition: transform 0.2s ease-in-out;
     z-index: ${theme.zIndex.drawer};

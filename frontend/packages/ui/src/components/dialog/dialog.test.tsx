@@ -1,4 +1,9 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Dialog, { DialogProps } from './dialog';
@@ -42,19 +47,25 @@ describe('<Dialog />', () => {
   describe('when the prop open is true', () => {
     it('should show the dialog', async () => {
       renderDialog({ open: true });
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
     });
   });
 
   describe('when the dialog is open', () => {
-    it('should assign a test id', () => {
+    it('should assign a test id', async () => {
       renderDialog({ open: true, testID: 'dialog-test-id' });
-      expect(screen.getByTestId('dialog-test-id')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('dialog-test-id')).toBeInTheDocument();
+      });
     });
 
-    it('should show the header text', () => {
+    it('should show the header text', async () => {
       renderDialog({ open: true, title: 'header' });
-      expect(screen.getByText('header')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('header')).toBeInTheDocument();
+      });
     });
 
     it('should trigger onClose when clicking on the close button', async () => {
@@ -118,27 +129,33 @@ describe('<Dialog />', () => {
     });
 
     describe('sizes', () => {
-      it('should render the right width when is compact', () => {
+      it('should render the right width when is compact', async () => {
         renderDialog({ open: true, size: 'compact' });
-        const dialog = screen.getByRole('dialog');
-        expect(dialog).toHaveStyle({
-          width: '500px',
+        await waitFor(() => {
+          const dialog = screen.getByRole('dialog');
+          expect(dialog).toHaveStyle({
+            width: '500px',
+          });
         });
       });
 
-      it('should render the right width when is default', () => {
+      it('should render the right width when is default', async () => {
         renderDialog({ open: true, size: 'default' });
         const dialog = screen.getByRole('dialog');
-        expect(dialog).toHaveStyle({
-          width: '650px',
+        await waitFor(() => {
+          expect(dialog).toHaveStyle({
+            width: '650px',
+          });
         });
       });
 
-      it('should render the right width when is large', () => {
+      it('should render the right width when is large', async () => {
         renderDialog({ open: true, size: 'large' });
-        const dialog = screen.getByRole('dialog');
-        expect(dialog).toHaveStyle({
-          width: '800px',
+        await waitFor(() => {
+          const dialog = screen.getByRole('dialog');
+          expect(dialog).toHaveStyle({
+            width: '800px',
+          });
         });
       });
     });
