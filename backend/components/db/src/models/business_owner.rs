@@ -2,7 +2,7 @@ use crate::{schema::business_owner, DbResult, PgConn, TxnPgConn};
 use diesel::prelude::*;
 use newtypes::{BoId, ObConfigurationId, VaultId};
 
-use super::scoped_vault::ScopedVault;
+use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
@@ -40,12 +40,14 @@ impl BusinessOwner {
         conn: &mut PgConn,
         bv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(Self, ScopedVault)>> {
-        use crate::schema::scoped_vault;
+    ) -> DbResult<Vec<(Self, (ScopedVault, Onboarding))>> {
+        use crate::schema::{onboarding, scoped_vault};
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
             .inner_join(
-                scoped_vault::table.on(scoped_vault::vault_id
+                scoped_vault::table
+                    .inner_join(onboarding::table)
+                    .on(scoped_vault::vault_id
                     .eq(business_owner::user_vault_id)
                     // Only get the ScopedVault for the owner's user vault that onboarded onto the
                     // same ob config

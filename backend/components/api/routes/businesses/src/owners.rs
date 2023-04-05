@@ -71,7 +71,7 @@ pub async fn get(
         .into_iter()
         // Zip bo_data from vault with BusinessOwner data from DB.
         // Eventually, we'll need a smarter way of mapping bo_data from vault to the BusinessOwners from the DB
-        .zip(bos.into_iter().map(|(_, sv)| Some(sv)).chain(std::iter::repeat(None)))
+        .zip(bos.into_iter().map(|(_, ob_info)| Some(ob_info)).chain(std::iter::repeat(None)))
         .map(api_wire_types::BusinessOwner::from_db)
         .collect();
 

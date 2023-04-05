@@ -48,6 +48,7 @@ def test_get_business_owners(sandbox_tenant, sb_business):
     secondary_bo = body[1]
     assert primary_bo["id"] == sb_business.fp_uid
     assert primary_bo["ownership_stake"] == 50
+    assert primary_bo["status"] == "pass"
     assert not secondary_bo.get("id")
     assert secondary_bo["ownership_stake"] == 30
 
