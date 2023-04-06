@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/test-utils';
 import {
   BusinessDI,
+  BusinessOwner,
   CollectedKybDataOption,
   CollectedKycDataOption,
   DataIdentifier,
@@ -28,16 +29,17 @@ export const entityFixture: Entity = {
   isPortable: true,
   kind: EntityKind.business,
   attributes: [
-    BusinessDI.city,
-    BusinessDI.name,
-    BusinessDI.tin,
-    BusinessDI.website,
     BusinessDI.addressLine1,
-    BusinessDI.phoneNumber,
-    BusinessDI.zip,
+    BusinessDI.beneficialOwners,
+    BusinessDI.city,
     BusinessDI.country,
+    BusinessDI.name,
+    BusinessDI.phoneNumber,
     BusinessDI.state,
     BusinessDI.tin,
+    BusinessDI.tin,
+    BusinessDI.website,
+    BusinessDI.zip,
   ],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   onboarding: {
@@ -76,6 +78,7 @@ export const entityFixture: Entity = {
       RoleScope.decryptBusinessAddress,
       RoleScope.decryptBusinessPhoneNumber,
       RoleScope.decryptBusinessWebsite,
+      RoleScope.decryptBusinessBeneficialOwners,
     ],
     canAccessData: [
       CollectedKycDataOption.name,
@@ -89,6 +92,7 @@ export const entityFixture: Entity = {
       CollectedKybDataOption.address,
       CollectedKybDataOption.phoneNumber,
       CollectedKybDataOption.website,
+      CollectedKybDataOption.beneficialOwners,
     ],
     canAccessAttributes: [],
   },
@@ -152,6 +156,16 @@ export const timelineFixture: Timeline = [
   },
 ];
 
+export const businessOwnersFixture: BusinessOwner[] = [
+  {
+    id: 'fp_id_XW3pNYPpV4Niup1PgFZBg6',
+    status: EntityStatus.pass,
+    ownershipStake: 50,
+    kind: 'primary',
+  },
+  { ownershipStake: 50, kind: 'secondary' },
+];
+
 export const withEntity = (entity = entityFixture) =>
   mockRequest({
     method: 'get',
@@ -190,16 +204,11 @@ export const withRiskSignals = (entity = entityFixture, response = []) =>
     response,
   });
 
-export const withRiskSignalsError = () =>
+export const withBusinessOwners = (entity = entityFixture) =>
   mockRequest({
     method: 'get',
-    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
-    statusCode: 400,
-    response: {
-      error: {
-        message: 'Something went wrong',
-      },
-    },
+    path: `/businesses/${entity.id}/owners`,
+    response: businessOwnersFixture,
   });
 
 export const withEntityDecrypt = (
@@ -235,7 +244,7 @@ export const decryptFields = async (fields: string[]) => {
 
   await Promise.all(
     fields.map(async name => {
-      const field = screen.getByRole('checkbox', {
+      const [field] = screen.getAllByRole('checkbox', {
         name,
       });
       await userEvent.click(field);

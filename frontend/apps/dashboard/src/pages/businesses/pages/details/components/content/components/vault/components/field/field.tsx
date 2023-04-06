@@ -8,7 +8,7 @@ import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FieldOrPlaceholder } from 'src/components';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export type FieldProps = {
   canDecrypt: boolean;
@@ -19,6 +19,7 @@ export type FieldProps = {
   value: VaultValue;
   hint?: string;
   renderValue?: () => React.ReactNode;
+  renderLabel?: () => React.ReactNode;
 };
 
 const Field = ({
@@ -30,6 +31,7 @@ const Field = ({
   value,
   hint,
   renderValue,
+  renderLabel,
 }: FieldProps) => {
   const { t } = useTranslation('pages.business.decrypt');
   const { register } = useFormContext();
@@ -50,16 +52,20 @@ const Field = ({
           </Box>
         </Tooltip>
       ) : (
-        <Box>
-          <Typography variant="body-3" color="tertiary">
-            {label}
-          </Typography>
+        <LabelContainer>
+          {renderLabel ? (
+            renderLabel()
+          ) : (
+            <Typography variant="body-3" color="tertiary">
+              {label}
+            </Typography>
+          )}
           {hint && (
             <Typography variant="caption-2" color="secondary">
               {hint}
             </Typography>
           )}
-        </Box>
+        </LabelContainer>
       )}
       {renderValue ? renderValue() : <FieldOrPlaceholder data={value} />}
     </Container>
@@ -70,6 +76,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column wrap;
   justify-content: space-between;
+`;
+
+const LabelContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[2]};
+    flex-direction: column;
+  `};
 `;
 
 export default Field;

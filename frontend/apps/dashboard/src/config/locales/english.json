@@ -744,7 +744,12 @@
           "title": "Basic data"
         },
         "bos": {
-          "title": "Beneficial owners"
+          "title": "Beneficial owners",
+          "link": "View profile",
+          "hint": {
+            "primary": "Owns {{stake}}%  of the business & submitted the business information",
+            "secondary": "Owns {{stake}}% of the business"
+          }
         },
         "address": {
           "title": "Registered business address"

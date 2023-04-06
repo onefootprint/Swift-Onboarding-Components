@@ -8,6 +8,7 @@ export * from './biometric-login-challenge-json';
 export * from './biometric-register-challenge-json';
 export * from './business-data';
 export { default as BusinessDataAttribute } from './business-data-attribute';
+export * from './business-owner';
 export { default as CdoToDiMap } from './cdo-to-di-map';
 export * from './challenge-data';
 export { default as ChallengeKind } from './challenge-kind';

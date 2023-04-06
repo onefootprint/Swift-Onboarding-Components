@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { AriaRole, forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
@@ -11,8 +11,9 @@ export type BoxProps = {
   as?: BoxTag;
   children?: React.ReactNode;
   id?: string;
-  testID?: string;
+  role?: AriaRole;
   sx?: SXStyleProps;
+  testID?: string;
 };
 
 const Box = forwardRef<HTMLElement, BoxProps>(
@@ -21,9 +22,10 @@ const Box = forwardRef<HTMLElement, BoxProps>(
       'aria-busy': ariaBusy,
       ariaLabel,
       as = 'div',
-      id,
-      sx,
       children,
+      id,
+      role,
+      sx,
       testID,
     }: BoxProps,
     ref: any,
@@ -38,6 +40,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
         id={id}
         ref={ref}
         sx={sxStyles}
+        role={role}
       >
         {children}
       </StyledBox>

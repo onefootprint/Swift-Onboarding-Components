@@ -9,10 +9,13 @@ import getBadgeVariantByStatus from '../../utils';
 
 export type StatusBadgeProps = {
   status: EntityStatus;
-  requiresManualReview: boolean;
+  requiresManualReview?: boolean;
 };
 
-const StatusBadge = ({ status, requiresManualReview }: StatusBadgeProps) => {
+const StatusBadge = ({
+  status,
+  requiresManualReview = false,
+}: StatusBadgeProps) => {
   const { t } = useTranslation('entity-statuses');
   const badgeVariant = getBadgeVariantByStatus(status, requiresManualReview);
 

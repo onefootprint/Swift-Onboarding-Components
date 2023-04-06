@@ -6,8 +6,8 @@ import React from 'react';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import useUserVault from 'src/pages/users/pages/user-details/hooks/use-user-vault';
 import { User } from 'src/pages/users/users.types';
-import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
 import getUserStatusBadgeVariant from 'src/pages/users/utils/get-user-status-badge-variant';
+import getFullName from 'src/utils/get-full-name-data';
 
 type RowProps = {
   user: User;
@@ -25,7 +25,7 @@ const Row = ({ user }: RowProps) => {
     <>
       <td>
         <FieldOrPlaceholder
-          data={getFullNameDataValue(
+          data={getFullName(
             vault?.id[IdDI.firstName],
             vault?.id[IdDI.lastName],
           )}

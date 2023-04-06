@@ -16,6 +16,7 @@ import {
   decryptFields,
   entityFixture,
   getTextByRow,
+  withBusinessOwners,
   withEntity,
   withEntityDecrypt,
   withEntityError,
@@ -44,6 +45,7 @@ describe('<Details />', () => {
     });
     withRiskSignals();
     withTimeline();
+    withBusinessOwners();
   });
 
   afterAll(() => {
@@ -291,24 +293,90 @@ describe('<Details />', () => {
       });
 
       describe('BOs section', () => {
-        it('should display the encrypted data', async () => {
+        it('should display the stake of each beneficial owner', async () => {
           await renderDetailsAndWaitData();
+          await waitFor(() => {
+            screen.getByTestId('business-owners-content');
+          });
           const container = screen.getByRole('group', {
             name: 'Beneficial owners',
           });
 
           await waitFor(() => {
-            const bo = getTextByRow({
-              name: 'Beneficial owner',
-              value: '-',
-              container,
-            });
-            expect(bo).toBeInTheDocument();
+            const primary = within(container).getByText(
+              'Owns 50% of the business & submitted the business information',
+            );
+            expect(primary).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const secondary = within(container).getByText(
+              'Owns 50% of the business',
+            );
+            expect(secondary).toBeInTheDocument();
+          });
+        });
+
+        it('should display a status and a link to check a beneficial owner', async () => {
+          await renderDetailsAndWaitData();
+          await waitFor(() => {
+            screen.getByTestId('business-owners-content');
+          });
+
+          const container = screen.getByRole('group', {
+            name: 'Beneficial owners',
+          });
+
+          await waitFor(() => {
+            const status = within(container).getByText('Verified');
+            expect(status).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const link = within(container).getByText('View profile');
+            expect(link).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const link = within(container).getByText(
+              'View profile',
+            ) as HTMLAnchorElement;
+            const url = link.href.endsWith(
+              '/users/detail?footprint_user_id=fp_id_XW3pNYPpV4Niup1PgFZBg6',
+            );
+            expect(url).toBeTruthy();
           });
         });
 
         describe('when clicking on the decrypt button', () => {
-          it('should allow to decrypt the data', async () => {});
+          beforeEach(() => {
+            withEntityDecrypt(entityFixture.id, {
+              [BusinessDI.beneficialOwners]:
+                '[{"first_name":"Jack","last_name":"Johnson","ownership_stake":50},{"first_name":"Billy","last_name":"Jackson","email":"billy@onefootprint.com","ownership_stake":50}]',
+            });
+          });
+
+          it('should allow to decrypt the data', async () => {
+            await renderDetailsAndWaitData();
+            await waitFor(() => {
+              screen.getByTestId('business-owners-content');
+            });
+            await decryptFields(['Beneficial owner']);
+
+            const container = screen.getByRole('group', {
+              name: 'Beneficial owners',
+            });
+
+            await waitFor(() => {
+              const primary = within(container).getByText('Jack Johnson');
+              expect(primary).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const secondary = within(container).getByText('Billy Jackson');
+              expect(secondary).toBeInTheDocument();
+            });
+          });
         });
       });
     });

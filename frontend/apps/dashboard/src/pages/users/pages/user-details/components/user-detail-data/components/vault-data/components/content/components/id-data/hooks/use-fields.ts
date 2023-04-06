@@ -13,7 +13,7 @@ import {
 import get from 'lodash/get';
 import usePermissions from 'src/hooks/use-permissions';
 import { User } from 'src/pages/users/users.types';
-import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
+import getFullName from 'src/utils/get-full-name-data';
 
 import useFormValues from '../../../hooks/use-form-values';
 
@@ -53,10 +53,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
       {
         ...getData(IdDI.firstName, [RoleScope.decryptName]),
         label: allT('cdo.name'),
-        value: getFullNameDataValue(
-          vault.id[IdDI.firstName],
-          vault.id[IdDI.lastName],
-        ),
+        value: getFullName(vault.id[IdDI.firstName], vault.id[IdDI.lastName]),
       },
       {
         ...getData(IdDI.email, [RoleScope.decryptEmail]),
