@@ -11,6 +11,7 @@ export type UserSession = {
   firstName: string | null;
   lastName: string | null;
   scopes: RoleScope[];
+  isAssumedSession: boolean;
 };
 
 export type OrgSession = {
@@ -24,7 +25,6 @@ export type MetaSession = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
-  isAssumed: boolean;
 };
 
 export type Session = {
@@ -42,7 +42,6 @@ export const defaultSession = {
     createdNewTenant: false,
     isFirstLogin: false,
     requiresOnboarding: false,
-    isAssumed: false,
   },
 };
 

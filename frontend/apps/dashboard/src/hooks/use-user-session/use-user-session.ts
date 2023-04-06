@@ -31,7 +31,7 @@ const useUserSession = () => {
   const mutation = useMutation({
     mutationFn: (payload: UserUpdateRequest) =>
       updateUser(session.authHeaders, payload),
-    onSuccess: session.setUser,
+    onSuccess: session.updateUserName,
     onError: showErrorToast,
   });
 

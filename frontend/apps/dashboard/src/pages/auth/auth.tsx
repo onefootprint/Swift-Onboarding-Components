@@ -33,7 +33,7 @@ const Auth = () => {
   useWorkosParams({
     onCodeFound: (code: string) => {
       loginMutation.mutate(code, {
-        onSuccess: ({
+        onSuccess: async ({
           authToken,
           user,
           tenant,
@@ -50,19 +50,12 @@ const Auth = () => {
               });
             });
           } else {
-            // Will simplify in follow-up
-            logIn({
+            await logIn({
               auth: authToken,
-              user: {
-                ...user,
-                scopes: user.role.scopes,
-              },
-              org: tenant,
               meta: {
                 isFirstLogin,
                 requiresOnboarding,
                 createdNewTenant,
-                isAssumed: user.rolebinding == null, // If there's no rolebinding, we have an assumed session
               },
             });
             waitForAnimation(() => {

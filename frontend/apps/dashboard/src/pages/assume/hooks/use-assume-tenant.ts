@@ -32,7 +32,7 @@ const useAssumeTenant = () => {
     (data: PostAssumeRequest) =>
       postAssumeTenantReadOnly(authHeaders, data.tenantId),
     {
-      onSuccess: session.setAssumedOrg,
+      onSuccess: session.refreshUserPermissions,
       onError: showErrorToast,
     },
   );

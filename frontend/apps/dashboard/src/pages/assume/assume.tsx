@@ -2,6 +2,7 @@ import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import useSession from 'src/hooks/use-session';
 
 import Loading from '../auth/components/loading';
 import useAssumeTenant from './hooks/use-assume-tenant';
@@ -12,6 +13,7 @@ const Assume = () => {
     query: { tenantId },
     isReady,
   } = router;
+  const { refreshUserPermissions } = useSession();
 
   const useAssumeTenantMutation = useAssumeTenant();
 
@@ -22,7 +24,8 @@ const Assume = () => {
     useAssumeTenantMutation.mutate(
       { tenantId },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await refreshUserPermissions();
           router.replace('/');
         },
         onError: () => {

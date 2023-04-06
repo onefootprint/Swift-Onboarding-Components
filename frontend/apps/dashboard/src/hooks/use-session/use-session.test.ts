@@ -1,4 +1,4 @@
-import { act, renderHook } from '@onefootprint/test-utils';
+import { act, mockRequest, renderHook } from '@onefootprint/test-utils';
 import { RoleScope } from '@onefootprint/types';
 import { resetUser } from 'src/config/tests';
 
@@ -6,44 +6,35 @@ import useSession from './use-session';
 
 const loginPayload = {
   auth: '1',
-  user: {
-    id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-    email: 'jane.doe@acme.com',
-    firstName: 'Jane',
-    lastName: 'Doe',
-    scopes: [RoleScope.admin],
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Admin',
-      numActiveUsers: 1,
-      scopes: [RoleScope.admin],
-    },
-    rolebinding: {
-      lastLoginAt: '2023-01-18T17:54:10.668420Z',
-    },
-  },
-  org: {
-    id: 'org_0912ufkdsmk1l2oedASDF',
-    name: 'Acme',
-    logoUrl: null,
-    isSandboxRestricted: false,
-    websiteUrl: null,
-    companySize: null,
-  },
   meta: {
     createdNewTenant: false,
     isFirstLogin: false,
     requiresOnboarding: false,
-    isAssumed: false,
-    isLive: true,
+  },
+};
+
+const getOrgMemberResponse = {
+  id: 'orguser_LHX6Nbt32W2gbDrXacVyU',
+  email: 'hi@onefootprint.com',
+  firstName: 'Piip',
+  lastName: 'Penguin',
+  isAssumedSession: false,
+  scopes: [RoleScope.admin],
+  tenant: {
+    name: 'Acme',
+    logoUrl: null,
+    isSandboxRestricted: false,
   },
 };
 
 describe('useSession', () => {
   beforeEach(() => {
     resetUser();
+    mockRequest({
+      method: 'get',
+      path: '/org/member',
+      response: getOrgMemberResponse,
+    });
   });
 
   describe('when the state is empty', () => {
@@ -54,21 +45,36 @@ describe('useSession', () => {
   });
 
   describe('when logging in', () => {
-    it('should indicate the user is logged in and return the session data', () => {
+    it('should indicate the user is logged in and have user and org session data', async () => {
       const { result } = renderHook(() => useSession());
-      act(() => {
-        result.current.logIn(loginPayload);
+      await act(async () => {
+        await result.current.logIn(loginPayload);
       });
-      expect(result.current.data).toBeDefined();
       expect(result.current.isLoggedIn).toBeTruthy();
+      // Make sure the user and org are updated
+      expect(result.current.data.user).toBeDefined();
+      expect(result.current.data.user?.id).toEqual(
+        'orguser_LHX6Nbt32W2gbDrXacVyU',
+      );
+      expect(result.current.data.user?.email).toEqual('hi@onefootprint.com');
+      expect(result.current.data.user?.firstName).toEqual('Piip');
+      expect(result.current.data.user?.lastName).toEqual('Penguin');
+      expect(result.current.data.user?.isAssumedSession).toEqual(false);
+      expect(result.current.data.user?.scopes).toEqual([RoleScope.admin]);
+      expect(result.current.data.org).toEqual({
+        isLive: true,
+        isSandboxRestricted: false,
+        logoUrl: null,
+        name: 'Acme',
+      });
     });
   });
 
   describe('when completing the onboarding', () => {
-    it('should indicate the user has completed the onboarding', () => {
+    it('should indicate the user has completed the onboarding', async () => {
       const { result } = renderHook(() => useSession());
-      act(() => {
-        result.current.logIn(loginPayload);
+      await act(async () => {
+        await result.current.logIn(loginPayload);
       });
       act(() => {
         result.current.completeOnboarding();
@@ -78,10 +84,10 @@ describe('useSession', () => {
   });
 
   describe('when logging out', () => {
-    it('should indicate the user is logged out and return an undefined session data', () => {
+    it('should indicate the user is logged out and return an undefined session data', async () => {
       const { result } = renderHook(() => useSession());
-      act(() => {
-        result.current.logIn(loginPayload);
+      await act(async () => {
+        await result.current.logIn(loginPayload);
       });
       act(() => {
         result.current.logOut();
@@ -91,16 +97,71 @@ describe('useSession', () => {
     });
   });
 
-  describe('when updating the org', () => {
-    it('should update correctly', () => {
+  describe('when updating is live', () => {
+    it('should update correctly', async () => {
       const { result } = renderHook(() => useSession());
-      act(() => {
-        result.current.logIn(loginPayload);
+      await act(async () => {
+        await result.current.logIn(loginPayload);
       });
       act(() => {
         result.current.setIsLive(true);
       });
       expect(result.current.data.org?.isLive).toBeTruthy();
+    });
+  });
+
+  describe('when updating the org name', () => {
+    it('should update', async () => {
+      const { result } = renderHook(() => useSession());
+      await act(async () => {
+        await result.current.logIn(loginPayload);
+      });
+
+      expect(result.current.dangerouslyCastedData.org).toEqual({
+        isLive: true,
+        isSandboxRestricted: false,
+        logoUrl: null,
+        name: 'Acme',
+      });
+
+      act(() => {
+        result.current.setOrg({ name: 'Lorem' });
+      });
+      expect(result.current.dangerouslyCastedData.org).toEqual({
+        isLive: true,
+        isSandboxRestricted: false,
+        logoUrl: null,
+        name: 'Lorem',
+      });
+    });
+  });
+
+  describe('when updating the user name', () => {
+    it('should update', async () => {
+      const { result } = renderHook(() => useSession());
+      await act(async () => {
+        await result.current.logIn(loginPayload);
+      });
+
+      expect(result.current.dangerouslyCastedData.user.firstName).toEqual(
+        'Piip',
+      );
+      expect(result.current.dangerouslyCastedData.user.lastName).toEqual(
+        'Penguin',
+      );
+
+      act(() => {
+        result.current.updateUserName({
+          firstName: 'Lorem',
+          lastName: 'Ipsum',
+        });
+      });
+      expect(result.current.dangerouslyCastedData.user.firstName).toEqual(
+        'Lorem',
+      );
+      expect(result.current.dangerouslyCastedData.user.lastName).toEqual(
+        'Ipsum',
+      );
     });
   });
 });

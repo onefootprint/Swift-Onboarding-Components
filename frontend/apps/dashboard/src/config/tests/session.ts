@@ -9,6 +9,7 @@ const baseUser = {
   firstName: 'Jane',
   lastName: 'Doe',
   scopes: [RoleScope.admin],
+  isAssumedSession: false,
 };
 
 const baseOrg = {
@@ -129,12 +130,12 @@ export const asAssumedUser = () => {
   useStore.setState({
     data: {
       auth: '1',
-      user: baseUser,
-      org: baseOrg,
-      meta: {
-        ...baseMeta,
-        isAssumed: true,
+      user: {
+        ...baseUser,
+        isAssumedSession: true,
       },
+      org: baseOrg,
+      meta: baseMeta,
     },
   });
 };

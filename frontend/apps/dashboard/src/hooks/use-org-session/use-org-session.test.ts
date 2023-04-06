@@ -38,24 +38,4 @@ describe('useOrgSession', () => {
 
     expect(result.current.sandbox.isSandbox).toBeFalsy();
   });
-
-  it('should update', () => {
-    const { result } = customRenderHook(() => useOrgSession());
-    expect(result.current.dangerouslyCastedData).toEqual({
-      isLive: false,
-      isSandboxRestricted: false,
-      logoUrl: null,
-      name: 'Acme',
-    });
-
-    act(() => {
-      result.current.sandbox.update({ name: 'Lorem' });
-    });
-    expect(result.current.dangerouslyCastedData).toEqual({
-      isLive: false,
-      isSandboxRestricted: false,
-      logoUrl: null,
-      name: 'Lorem',
-    });
-  });
 });

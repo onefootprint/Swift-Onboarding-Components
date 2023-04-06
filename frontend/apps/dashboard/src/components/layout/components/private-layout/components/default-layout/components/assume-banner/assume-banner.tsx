@@ -17,7 +17,7 @@ const AssumeBanner = () => {
     });
   };
 
-  return data.meta.isAssumed ? (
+  return data.user?.isAssumedSession ? (
     <AssumeBannerContainer>
       <Banner variant="info">
         {t('title', { orgName: data.org?.name })}

@@ -1,5 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { Organization, OrgAssumeRoleResponse } from '@onefootprint/types';
+import { Organization } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -24,21 +24,8 @@ const Data = ({ authToken, organizations }: DataProps) => {
     assumeRoleMutation.mutate(
       { tenantId, authToken },
       {
-        onSuccess({ user, tenant }: OrgAssumeRoleResponse) {
-          logIn({
-            auth: authToken,
-            user: {
-              ...user,
-              scopes: user.role.scopes,
-            },
-            org: tenant,
-            meta: {
-              isFirstLogin: false,
-              requiresOnboarding: false,
-              createdNewTenant: false,
-              isAssumed: user.rolebinding == null, // If there's no rolebinding, we have an assumed session
-            },
-          });
+        async onSuccess() {
+          await logIn({ auth: authToken });
           router.push('/users');
         },
         onError: showErrorToast,

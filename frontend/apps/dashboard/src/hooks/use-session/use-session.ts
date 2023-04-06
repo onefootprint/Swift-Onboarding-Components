@@ -1,3 +1,6 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
+import request from '@onefootprint/request';
+import { OrgMemberResponse } from '@onefootprint/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -14,6 +17,18 @@ import {
   UserSession,
   UserSessionState,
 } from './user-session.types';
+
+const getUser = async (auth: string) => {
+  const response = await request<OrgMemberResponse>({
+    headers: {
+      [DASHBOARD_AUTHORIZATION_HEADER]: auth,
+    },
+    method: 'GET',
+    url: '/org/member',
+  });
+
+  return response.data;
+};
 
 export const useStore = create<UserSessionState>()(
   persist(
@@ -34,13 +49,14 @@ export const useStore = create<UserSessionState>()(
       },
     }),
     {
-      version: 8,
+      version: 9,
       name: 'dashboard-storage',
     },
   ),
 );
 
 const useSession = () => {
+  const showRequestErrorToast = useRequestErrorToast();
   const { data, reset, update } = useStore(state => state);
   // Dangerously cast fields that are nullable when the user is logged out into non-nullable fields
   // in order to remove unnecessary null checks in logged-in pages
@@ -58,38 +74,49 @@ const useSession = () => {
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
 
-  const logIn = (session: {
-    auth: string;
-    user: UserSession;
-    meta: MetaSession;
-    org: Omit<OrgSession, 'isLive'>;
-  }) => {
-    update({
-      auth: session.auth,
-      user: session.user,
-      meta: session.meta,
-      org: {
-        ...session.org,
-        isLive: !session.org.isSandboxRestricted,
-      },
-    });
+  const logIn = async (session: { auth: string; meta?: MetaSession }) => {
+    // Update local storage with the auth and meta ASAP
+    update({ auth: session.auth });
+    if (session.meta) {
+      update({ meta: session.meta });
+    }
+    // Then asynchronously fetch user and tenant info from the backend for the new auth
+    await refreshPermissions(session.auth);
   };
 
-  const setAssumedOrg = (nextOrg: Omit<OrgSession, 'isLive'>) => {
-    update({
-      org: {
-        ...nextOrg,
-        isLive: nextOrg.isSandboxRestricted,
-      },
-      meta: { ...data.meta, isAssumed: true },
-    });
+  const refreshPermissions = async (authToken: string) => {
+    try {
+      const user = await getUser(authToken);
+      update({
+        user: {
+          ...user,
+          isAssumedSession: !!user.isAssumedSession,
+        },
+        org: {
+          ...user.tenant,
+          isLive: !user.tenant.isSandboxRestricted,
+        },
+      });
+    } catch (error: unknown) {
+      // If we can't fetch the user from the backend, just log out and display a toast
+      logOut();
+      showRequestErrorToast(error);
+      console.error(error);
+    }
+  };
+
+  const refreshUserPermissions = async () => {
+    if (!data.auth) return;
+    await refreshPermissions(data.auth);
   };
 
   const logOut = () => {
     reset();
   };
 
-  const setUser = (nextUser: Partial<UserSession>) => {
+  const updateUserName = (
+    nextUser: Pick<UserSession, 'firstName' | 'lastName'>,
+  ) => {
     if (!data.user) return;
     update({
       user: {
@@ -127,13 +154,13 @@ const useSession = () => {
     dangerouslyCastedData,
     data,
     isLoggedIn,
+    refreshUserPermissions,
     logIn,
     logOut,
     setOrg,
-    setUser,
+    updateUserName,
     isLive,
     setIsLive,
-    setAssumedOrg,
     completeOnboarding,
   };
 };

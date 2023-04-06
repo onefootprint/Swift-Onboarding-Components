@@ -8,7 +8,6 @@ const useOrgSession = () => {
     dangerouslyCastedData: dangerouslySessionData,
     isLive,
     setIsLive,
-    setOrg,
   } = useSession();
   const queryClient = useQueryClient();
   const dangerouslyCastedData = dangerouslySessionData.org;
@@ -24,14 +23,12 @@ const useOrgSession = () => {
     canToggle,
     isSandbox: !isLive,
     toggle,
-    update: setOrg,
   };
 
   return {
     dangerouslyCastedData,
     data,
     sandbox,
-    update: setOrg,
   };
 };
 
