@@ -67,12 +67,12 @@ fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> 
 // Or should we branch validation logic based on a ParseArg
 #[derive(Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
-pub struct KycedBusinessOwnerData<IdT>
+pub struct KycedBusinessOwnerDataT<IdT>
 where
     IdT: Serialize,
 {
     /// We'll autogenerate a link_id that is used as the PK of the BO in the DB
-    link_id: IdT,
+    pub link_id: IdT,
     #[allow(unused)]
     first_name: PiiString,
     #[allow(unused)]
@@ -82,11 +82,14 @@ where
     email: Email,
     #[allow(unused)]
     phone_number: PhoneNumber,
-    pub ownership_stake: u32,
+    ownership_stake: u32,
 }
 
+type KycedBusinessOwnerDataDe = KycedBusinessOwnerDataT<Option<()>>;
+pub type KycedBusinessOwnerData = KycedBusinessOwnerDataT<BoLinkId>;
+
 fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiString> {
-    utils::parse_json_and_map::<Vec<KycedBusinessOwnerData<Option<()>>>, _>(input, |bos| {
+    utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }
@@ -95,7 +98,7 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         let bos_with_id = bos
             .into_iter()
             .map(|bo| {
-                let KycedBusinessOwnerData {
+                let KycedBusinessOwnerDataT {
                     link_id: _,
                     first_name,
                     last_name,
@@ -154,7 +157,6 @@ fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
 mod test {
     use super::KycedBusinessOwnerData;
     use super::BDK::*;
-    use crate::BoId;
     use crate::BusinessDataKind as BDK;
     use crate::PiiString;
     use crate::Validate;
@@ -210,9 +212,9 @@ mod test {
         let result = BDK::KycedBeneficialOwners
             .validate(PiiString::new(input_str), false)
             .unwrap();
-        let result: Vec<KycedBusinessOwnerData<BoId>> = serde_json::de::from_str(result.leak()).unwrap();
+        let result: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(result.leak()).unwrap();
         let owner = result.into_iter().next().unwrap();
-        assert!(owner.link_id.to_string().starts_with("bo_"));
+        assert!(owner.link_id.to_string().starts_with("bo_link_"));
         assert_eq!(owner.first_name.leak(), "Piip");
         assert_eq!(owner.last_name.leak(), "Penguin");
         assert_eq!(owner.email.leak(), "piip@onefootprint.com");

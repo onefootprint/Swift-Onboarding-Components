@@ -1,6 +1,7 @@
 use crate::{schema::business_owner, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::{BoId, BoLinkId, BusinessOwnerKind, ObConfigurationId, VaultId};
 
 use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
@@ -41,6 +42,26 @@ impl BusinessOwner {
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)
+            .get_result(conn.conn())?;
+        Ok(result)
+    }
+
+    pub fn bulk_create_secondary(
+        conn: &mut TxnPgConn,
+        link_ids: Vec<BoLinkId>,
+        business_vault_id: VaultId,
+    ) -> DbResult<Self> {
+        let rows = link_ids
+            .into_iter()
+            .map(|link_id| NewBusinessOwnerRow {
+                user_vault_id: None,
+                business_vault_id: business_vault_id.clone(),
+                kind: BusinessOwnerKind::Secondary,
+                link_id,
+            })
+            .collect_vec();
+        let result = diesel::insert_into(business_owner::table)
+            .values(rows)
             .get_result(conn.conn())?;
         Ok(result)
     }

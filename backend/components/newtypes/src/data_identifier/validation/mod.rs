@@ -5,7 +5,7 @@ mod identity;
 mod investor_profile;
 mod utils;
 
-pub use business::BusinessOwnerData;
+pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
 
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.

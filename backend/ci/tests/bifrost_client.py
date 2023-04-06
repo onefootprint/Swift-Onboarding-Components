@@ -194,6 +194,8 @@ class BifrostClient:
         assert (
             self.auth_token and self.phone_number
         ), "please call init_user_for_onboarding() before calling onboard_user_onto_tenant"
+        # TODO should use GET /status to dynamically determine what requirements are needed
+        # TODO might need to set up another twilio number in order to integration test
 
         sandbox_email = _sandbox_email(self.phone_number)
         self.add_email(sandbox_email)
