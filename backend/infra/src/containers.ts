@@ -74,7 +74,7 @@ export abstract class ServiceContainers {
   }
 
   /**
-   * Our man API server contianer
+   * Our main API server contianer
    */
   static async createApiServer(
     name: string,
@@ -143,6 +143,7 @@ export abstract class ServiceContainers {
         secretsStore.fingerprintSdkKey.arn,
         secretsStore.incodeApiKey.arn,
         secretsStore.incodeClientId.arn,
+        secretsStore.middeskSandboxApiKey.arn,
       ])
       .apply(
         ([
@@ -170,7 +171,8 @@ export abstract class ServiceContainers {
           fpcProtectedArn,
           fingerprintSdkKey,
           incodeApiKey,
-          incodeClientId
+          incodeClientId,
+          middeskSandboxApiKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -264,6 +266,10 @@ export abstract class ServiceContainers {
               {
                 name: 'INCODE_CLIENT_ID',
                 valueFrom: incodeClientId,
+              },
+              {
+                name: 'MIDDESK_SANDBOX_API_KEY',
+                valueFrom: middeskSandboxApiKey,
               },
             ],
             environment: [

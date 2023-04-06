@@ -48,6 +48,9 @@ config:
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:DrKn4q/fyK2+S+sJ:V/huczZNR1v2VKctscz6cCDZhx3nl8DyDBw+njGsun69ftSiRh7Z08QDoYAKBCyG9ItmpSiL0YY=
+    middesk:
+      sandboxApiKey:
+        secure: v1:7kXpZXaJ7W9e5k5e:mAeRoJx7ZfdQAMT9oumkgb/MbzTXaK74Siyvbx2FGNTcyn26ai6ftPD6+n0j6PoI
     resources:
       cpuUnits: 2048
       instances: 2
