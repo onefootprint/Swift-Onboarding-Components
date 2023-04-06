@@ -39,8 +39,12 @@ table! {
 
     business_owner (id) {
         id -> Text,
-        user_vault_id -> Text,
+        user_vault_id -> Nullable<Text>,
         business_vault_id -> Text,
+        kind -> Text,
+        link_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 

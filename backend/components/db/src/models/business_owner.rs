@@ -1,6 +1,7 @@
 use crate::{schema::business_owner, DbResult, PgConn, TxnPgConn};
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{BoId, ObConfigurationId, VaultId};
+use newtypes::{BoId, BoLinkId, BusinessOwnerKind, ObConfigurationId, VaultId};
 
 use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
 
@@ -8,27 +9,35 @@ use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
 #[diesel(table_name = business_owner)]
 pub struct BusinessOwner {
     pub id: BoId,
-    pub user_vault_id: VaultId,
+    pub user_vault_id: Option<VaultId>,
     pub business_vault_id: VaultId,
+    pub kind: BusinessOwnerKind,
+    pub link_id: BoLinkId,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = business_owner)]
 struct NewBusinessOwnerRow {
-    user_vault_id: VaultId,
+    user_vault_id: Option<VaultId>,
     business_vault_id: VaultId,
+    kind: BusinessOwnerKind,
+    link_id: BoLinkId,
 }
 
 impl BusinessOwner {
     #[tracing::instrument(skip(conn))]
-    pub fn create(
+    pub fn create_primary(
         conn: &mut TxnPgConn,
         user_vault_id: VaultId,
         business_vault_id: VaultId,
     ) -> DbResult<Self> {
         let new = NewBusinessOwnerRow {
-            user_vault_id,
+            user_vault_id: Some(user_vault_id),
             business_vault_id,
+            kind: BusinessOwnerKind::Primary,
+            link_id: BoLinkId::generate(),
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)
@@ -47,7 +56,7 @@ impl BusinessOwner {
             .inner_join(
                 scoped_vault::table
                     .inner_join(onboarding::table)
-                    .on(scoped_vault::vault_id
+                    .on(scoped_vault::vault_id.nullable()
                     .eq(business_owner::user_vault_id)
                     // Only get the ScopedVault for the owner's user vault that onboarded onto the
                     // same ob config

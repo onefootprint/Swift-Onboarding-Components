@@ -107,7 +107,7 @@ pub async fn post(
                 // TODO don't create a business vault for this onboarding if already exists. Can
                 // also short circuit if ob config is authorized
                 let business_vault = Vault::create(conn, args)?;
-                BusinessOwner::create(conn, user_vault.id.clone(), business_vault.id.clone())?;
+                BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
                 let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
                     ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
                 })?;
