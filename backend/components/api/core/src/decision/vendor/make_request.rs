@@ -17,12 +17,13 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
+use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
-use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI};
+use newtypes::{BusinessData, DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI};
 use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
@@ -544,7 +545,7 @@ pub async fn make_vendor_requests(
     Ok(results)
 }
 
-#[tracing::instrument(skip(db_pool, enclave_client, middesk_client))]
+#[tracing::instrument(skip(db_pool, enclave_client, middesk_client, ff_client))]
 pub async fn make_kyb_request(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
@@ -555,6 +556,8 @@ pub async fn make_kyb_request(
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,
     >,
+    ff_client: &impl FeatureFlagClient,
+    ob_configuration_key: ObConfigurationKey,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let vreq_id = vreq.id.clone();
 
@@ -562,9 +565,7 @@ pub async fn make_kyb_request(
         build_request::build_business_data_from_verification_request(db_pool, enclave_client, vreq.clone())
             .await?;
 
-    let res = middesk_client
-        .make_request(MiddeskCreateBusinessRequest { business_data })
-        .await;
+    let res = send_middesk_call(business_data, middesk_client, ff_client, ob_configuration_key).await;
 
     let vendor_response = res
         .map(|r| {
@@ -596,6 +597,40 @@ pub async fn make_kyb_request(
     };
 
     Ok(result)
+}
+
+async fn send_middesk_call(
+    business_data: BusinessData,
+    middesk_client: &impl VendorAPICall<
+        MiddeskCreateBusinessRequest,
+        MiddeskCreateBusinessResponse,
+        idv::middesk::Error,
+    >,
+    ff_client: &impl FeatureFlagClient,
+    ob_configuration_key: ObConfigurationKey,
+) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
+    if ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key)) {
+        middesk_client
+            .make_request(MiddeskCreateBusinessRequest { business_data })
+            .await
+    } else {
+        let raw = serde_json::json!(
+          {
+            "object": "business",
+            "id": "dd16b27e-e6b7-4rf34-5454-d77e6d1b9dfe",
+            "name": "Waffle House",
+            "created_at": "2023-02-07T21:51:21.234Z",
+            "updated_at": "2023-02-07T21:51:24.894Z",
+            "status": "in_review",
+          }
+        );
+        let parsed: BusinessResponse = idv::middesk::response::parse_response(raw.clone())?;
+
+        Ok(MiddeskCreateBusinessResponse {
+            raw_response: raw.into(),
+            parsed_response: parsed,
+        })
+    }
 }
 
 #[cfg(test)]

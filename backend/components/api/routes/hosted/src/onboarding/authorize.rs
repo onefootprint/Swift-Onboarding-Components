@@ -13,6 +13,7 @@ use crate::State;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
@@ -255,14 +256,16 @@ async fn run_kyc(
 
 async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
     let obid = biz_ob.id.clone();
-    let vreq = state
+    let (vreq, ob_configuration_key) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &biz_ob.id)?;
 
             if biz_ob.idv_reqs_initiated_at.is_some() {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
+
+            let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &ob.id)?.key;
 
             let decision_intent = DecisionIntent::get_or_create_onboarding_kyb(conn, &ob.scoped_vault_id)?;
             let vreq = VerificationRequest::create(
@@ -275,7 +278,7 @@ async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
             ob.into_inner()
                 .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
 
-            Ok(vreq)
+            Ok((vreq, ob_configuration_key))
         })
         .await?;
 
@@ -285,6 +288,8 @@ async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
         vreq,
         &obid,
         &state.middesk_client,
+        &state.feature_flag_client,
+        ob_configuration_key,
     )
     .await?;
 
