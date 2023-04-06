@@ -37,6 +37,16 @@ lazy_static! {
         Regex::new(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
 }
 
+impl serde::Serialize for Email {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let s = self.to_piistring();
+        s.serialize(serializer)
+    }
+}
+
 impl std::str::FromStr for Email {
     type Err = crate::Error;
 

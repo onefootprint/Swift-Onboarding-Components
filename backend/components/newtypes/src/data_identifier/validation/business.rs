@@ -1,9 +1,10 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::email::Email;
-use crate::{BusinessDataKind as BDK, PhoneNumber, PiiString};
+use crate::{BoLinkId, BusinessDataKind as BDK, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
-use serde::Deserialize;
+use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 use serde_with::DeserializeFromStr;
 use strum::EnumString;
 use url::{Host, Url};
@@ -24,6 +25,7 @@ impl Validate for BDK {
             BDK::Zip => utils::clean_and_validate_zip(value)?,
             BDK::Country => utils::clean_and_validate_country(value)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
+            BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value)?,
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value)?,
         };
         Ok(result)
@@ -46,13 +48,10 @@ enum CorporationType {
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct BusinessOwnerData {
-    // TODO probably want an ID here
     #[allow(unused)]
     pub first_name: PiiString,
     #[allow(unused)]
     pub last_name: PiiString,
-    #[allow(unused)]
-    pub email: Option<Email>,
     pub ownership_stake: u32,
 }
 
@@ -62,6 +61,61 @@ fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> 
             return Err(Error::BusinessOwnersStakeAbove100);
         }
         Ok(())
+    })
+}
+
+// Or should we branch validation logic based on a ParseArg
+#[derive(Deserialize, Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub struct KycedBusinessOwnerData<IdT>
+where
+    IdT: Serialize,
+{
+    /// We'll autogenerate a link_id that is used as the PK of the BO in the DB
+    link_id: IdT,
+    #[allow(unused)]
+    first_name: PiiString,
+    #[allow(unused)]
+    last_name: PiiString,
+    // TODO don't allow sandbox suffixes
+    #[allow(unused)]
+    email: Email,
+    #[allow(unused)]
+    phone_number: PhoneNumber,
+    pub ownership_stake: u32,
+}
+
+fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiString> {
+    utils::parse_json_and_map::<Vec<KycedBusinessOwnerData<Option<()>>>, _>(input, |bos| {
+        if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
+            return Err(Error::BusinessOwnersStakeAbove100);
+        }
+        // Create a BoID for each Kyced BO item. This ID will be used to link the JSON BO to the
+        // BO in the DB
+        let bos_with_id = bos
+            .into_iter()
+            .map(|bo| {
+                let KycedBusinessOwnerData {
+                    link_id: _,
+                    first_name,
+                    last_name,
+                    email,
+                    phone_number,
+                    ownership_stake,
+                } = bo;
+                KycedBusinessOwnerData {
+                    // TODO weird becuase the primary BO's link_id won't match
+                    link_id: BoLinkId::generate(),
+                    first_name,
+                    last_name,
+                    email,
+                    phone_number,
+                    ownership_stake,
+                }
+            })
+            .collect_vec();
+        let serialized_value = PiiString::from(serde_json::ser::to_string(&bos_with_id)?);
+        Ok(serialized_value)
     })
 }
 
@@ -98,10 +152,13 @@ fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
 
 #[cfg(test)]
 mod test {
+    use super::KycedBusinessOwnerData;
     use super::BDK::*;
+    use crate::BoId;
     use crate::BusinessDataKind as BDK;
     use crate::PiiString;
     use crate::Validate;
+    use serde_json::json;
     use test_case::test_case;
 
     #[test_case(Name, "Acme Bank" => Some("Acme Bank".to_owned()))]
@@ -137,5 +194,55 @@ mod test {
         bdk.validate(PiiString::new(pii.to_owned()), false)
             .ok()
             .map(|pii| pii.leak_to_string())
+    }
+
+    #[test]
+    fn test_clean_and_validate_kyced_bo() {
+        // Make sure we autopopulate a link_id when parsing
+        let input = json!([{
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "email": "piip@onefootprint.com",
+            "phone_number": "+14155555555",
+            "ownership_stake": 90
+        }]);
+        let input_str = serde_json::ser::to_string(&input).unwrap();
+        let result = BDK::KycedBeneficialOwners
+            .validate(PiiString::new(input_str), false)
+            .unwrap();
+        let result: Vec<KycedBusinessOwnerData<BoId>> = serde_json::de::from_str(result.leak()).unwrap();
+        let owner = result.into_iter().next().unwrap();
+        assert!(owner.link_id.to_string().starts_with("bo_"));
+        assert_eq!(owner.first_name.leak(), "Piip");
+        assert_eq!(owner.last_name.leak(), "Penguin");
+        assert_eq!(owner.email.leak(), "piip@onefootprint.com");
+        assert_eq!(owner.phone_number.e164_with_suffix().leak(), "+14155555555",);
+        assert_eq!(owner.ownership_stake, 90);
+
+        // Test bad email
+        let input = json!([{
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "email": "piip",
+            "phone_number": "+14155555555",
+            "ownership_stake": 90
+        }]);
+
+        let input_str = serde_json::ser::to_string(&input).unwrap();
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        assert!(result.is_err());
+
+        // Test bad phone
+        let input = json!([{
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "email": "piip@onefootprint.com",
+            "phone_number": "blerp",
+            "ownership_stake": 90
+        }]);
+
+        let input_str = serde_json::ser::to_string(&input).unwrap();
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        assert!(result.is_err());
     }
 }

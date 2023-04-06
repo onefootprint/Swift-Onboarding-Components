@@ -88,7 +88,8 @@ impl From<BusinessOwnerData> for BoData {
         Self {
             first_name: value.first_name,
             last_name: value.last_name,
-            email: value.email.map(|e| e.email),
+            // TODO populate other BO data
+            email: None,
         }
     }
 }

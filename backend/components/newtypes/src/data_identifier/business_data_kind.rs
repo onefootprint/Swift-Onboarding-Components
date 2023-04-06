@@ -38,7 +38,11 @@ pub enum BusinessDataKind {
     State,
     Zip,
     Country,
+    /// A JSON-serialized list of beneficial owners
     BeneficialOwners,
+    /// Very similar to BeneficialOwners, but with a few additional fields required to KYC
+    /// the BOs
+    KycedBeneficialOwners,
     CorporationType,
 }
 
@@ -77,6 +81,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::Zip => CollectedData::BusinessAddress,
             Self::Country => CollectedData::BusinessAddress,
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::KycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::CorporationType => CollectedData::BusinessCorporationType,
         };
         Some(result)

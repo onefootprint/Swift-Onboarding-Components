@@ -73,7 +73,18 @@ where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<()>,
 {
+    parse_json_and_map(value.clone(), |v| {
+        f(v)?;
+        Ok(value) // Return unchanged value
+    })
+}
+
+pub(super) fn parse_json_and_map<T, F>(value: PiiString, f: F) -> VResult<PiiString>
+where
+    T: DeserializeOwned,
+    F: FnOnce(T) -> VResult<PiiString>,
+{
     let parsed_value = serde_json::de::from_str(value.leak())?;
-    f(parsed_value)?;
+    let value = f(parsed_value)?;
     Ok(value)
 }

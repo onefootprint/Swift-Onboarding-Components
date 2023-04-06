@@ -83,6 +83,16 @@ impl PhoneNumber {
     }
 }
 
+impl serde::Serialize for PhoneNumber {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let s = self.e164_with_suffix();
+        s.serialize(serializer)
+    }
+}
+
 impl FromStr for PhoneNumber {
     type Err = crate::Error;
 

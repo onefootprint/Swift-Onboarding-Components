@@ -57,7 +57,7 @@ impl CollectedData {
             Self::BusinessAddress => vec![BusinessAddress],
             Self::BusinessPhoneNumber => vec![BusinessPhoneNumber],
             Self::BusinessWebsite => vec![BusinessWebsite],
-            Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners],
+            Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners, BusinessKycedBeneficialOwners],
             Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
         }
@@ -127,6 +127,7 @@ pub enum CollectedDataOption {
     BusinessPhoneNumber,
     BusinessWebsite,
     BusinessBeneficialOwners,
+    BusinessKycedBeneficialOwners,
     BusinessCorporationType,
 
     InvestorProfile,
@@ -151,6 +152,7 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => CollectedData::BusinessPhoneNumber,
             Self::BusinessWebsite => CollectedData::BusinessWebsite,
             Self::BusinessBeneficialOwners => CollectedData::BusinessBeneficialOwners,
+            Self::BusinessKycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
         }
@@ -187,6 +189,7 @@ impl CollectedDataOption {
             Self::BusinessPhoneNumber => Some(vec![BDK::PhoneNumber.into()]),
             Self::BusinessWebsite => Some(vec![BDK::Website.into()]),
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
+            Self::BusinessKycedBeneficialOwners => Some(vec![BDK::KycedBeneficialOwners.into()]),
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
 
             // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
@@ -261,6 +264,7 @@ impl CollectedDataOption {
             Self::Ssn4 => Some(Self::Ssn9),
             Self::PartialAddress => Some(Self::FullAddress),
             Self::Document => Some(Self::DocumentAndSelfie),
+            Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
             _ => None,
         }
     }

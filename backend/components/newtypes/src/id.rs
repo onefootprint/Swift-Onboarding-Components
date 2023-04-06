@@ -99,6 +99,11 @@ define_newtype_id!(
 );
 define_newtype_id!(VaultId, String, "Identifier for a User Vault");
 define_newtype_id!(BoId, String, "Identifier for a business owner");
+define_newtype_id!(
+    BoLinkId,
+    String,
+    "Identifier to link a BO in the DB to a BO in the vault"
+);
 
 define_newtype_id!(FingerprintId, String, "Identifier for a fingerprint");
 define_newtype_id!(AddressId, String, "Identifier for an address");
@@ -206,7 +211,11 @@ define_newtype_id!(TaskId, String, "Identifier for a task");
 define_newtype_id!(DocumentDataId, String, "Identifier for a DocumentData");
 define_newtype_id!(DecisionIntentId, String, "Identifier for a decision_intent");
 define_newtype_id!(WatchlistCheckId, String, "Identifier for a watchlist_check");
-define_newtype_id!(TenantVendorControlId, String, "Identifier for a a tenant vendor control");
+define_newtype_id!(
+    TenantVendorControlId,
+    String,
+    "Identifier for a a tenant vendor control"
+);
 
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(
@@ -299,6 +308,15 @@ impl FpId {
             VaultKind::Business => "fp_bid",
         };
         Self(generate_random_id(prefix, Self::LENGTH))
+    }
+}
+
+impl BoLinkId {
+    const LENGTH: usize = 22;
+    const PREFIX: &str = "bo_link";
+
+    pub fn generate() -> Self {
+        Self(generate_random_id(Self::PREFIX, Self::LENGTH))
     }
 }
 
