@@ -42,7 +42,7 @@ impl MiddeskClient {
     }
 
     #[allow(unused)]
-    async fn post_business(&self, business_data: BusinessData) -> Result<serde_json::Value, Error> {
+    pub async fn post_business(&self, business_data: BusinessData) -> Result<serde_json::Value, Error> {
         let req = BusinessRequest::from(business_data);
 
         let url = Url::parse(self.base_url.as_str())

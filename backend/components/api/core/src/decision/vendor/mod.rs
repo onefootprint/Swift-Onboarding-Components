@@ -63,5 +63,6 @@ fn is_vendor_api_enabled_for_tenant(vendor_api: &VendorAPI, tenant: &Tenant) -> 
         VendorAPI::TwilioLookupV2 => true,
         VendorAPI::SocureIDPlus => true,
         VendorAPI::ExperianPreciseID => tenant.is_experian_enabled,
+        VendorAPI::MiddeskCreateBusiness => true,
     }
 }

@@ -70,6 +70,9 @@ impl VendorResult {
                         newtypes::VendorAPI::ExperianPreciseID => {
                             ParsedResponse::from_experian_cross_core(decrypted_response.into_leak())?
                         }
+                        newtypes::VendorAPI::MiddeskCreateBusiness => {
+                            ParsedResponse::from_middesk_create_business(decrypted_response.into_leak())?
+                        }
                     };
                     let res = VendorResult {
                         response: VendorResponse {

@@ -6,6 +6,7 @@ use idv::{
         pa::{IdologyPaAPIResponse, IdologyPaRequest},
         IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
     },
+    middesk::{client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
     socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
     ParsedResponse,
@@ -213,5 +214,40 @@ impl VendorAPIResponse for ExperianCrossCoreResponse {
 
     fn parsed_response(self) -> ParsedResponse {
         ParsedResponse::ExperianPreciseID(self.parsed_response)
+    }
+}
+
+//////////////////////
+/// Middesk impl
+/// /////////////////
+#[async_trait]
+impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>
+    for MiddeskClient
+{
+    async fn make_request(
+        &self,
+        request: MiddeskCreateBusinessRequest,
+    ) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
+        let raw_response = self.post_business(request.business_data).await?;
+        let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
+
+        Ok(MiddeskCreateBusinessResponse {
+            raw_response: PiiJsonValue::new(raw_response),
+            parsed_response,
+        })
+    }
+}
+
+impl VendorAPIResponse for MiddeskCreateBusinessResponse {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::MiddeskCreateBusiness
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::MiddeskCreateBusiness(self.parsed_response)
     }
 }

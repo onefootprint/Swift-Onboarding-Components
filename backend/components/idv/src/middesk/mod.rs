@@ -1,3 +1,4 @@
+use newtypes::{BusinessData, PiiJsonValue};
 use thiserror::Error;
 
 pub mod client;
@@ -5,7 +6,16 @@ pub mod request;
 pub mod response;
 pub use derive_more::Display;
 
-use self::response::MiddeskApiErrorResponse;
+use self::response::{business::BusinessResponse, MiddeskApiErrorResponse};
+
+pub struct MiddeskCreateBusinessRequest {
+    pub business_data: BusinessData,
+}
+#[derive(Clone)]
+pub struct MiddeskCreateBusinessResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: BusinessResponse,
+}
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

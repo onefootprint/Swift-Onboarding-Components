@@ -101,6 +101,7 @@ impl FeatureVector {
                 .as_ref()
                 .map(|f| f.footprint_reason_codes.clone()),
             VendorAPI::IdologyPa => None,
+            VendorAPI::MiddeskCreateBusiness => None,
         }
     }
 

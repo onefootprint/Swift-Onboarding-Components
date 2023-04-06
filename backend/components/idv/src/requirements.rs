@@ -76,6 +76,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
         VendorAPI::IdologyPa => idology_pa_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
+        VendorAPI::MiddeskCreateBusiness => false,
     }
 }
 
@@ -98,6 +99,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::TwilioLookupV2 => true,
         VendorAPI::SocureIDPlus => true,
         VendorAPI::ExperianPreciseID => true,
+        VendorAPI::MiddeskCreateBusiness => false,
     }
 }
 

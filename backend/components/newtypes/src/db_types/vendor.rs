@@ -36,6 +36,7 @@ pub enum Vendor {
     LexisNexis,
     Experian,
     Twilio,
+    Middesk,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -71,6 +72,7 @@ pub enum VendorAPI {
     TwilioLookupV2,
     SocureIDPlus,
     ExperianPreciseID,
+    MiddeskCreateBusiness,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -85,6 +87,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::SocureIDPlus => Self::Socure,
             VendorAPI::IdologyPa => Self::Idology,
             VendorAPI::ExperianPreciseID => Self::Experian,
+            VendorAPI::MiddeskCreateBusiness => Self::Middesk,
         }
     }
 }
@@ -100,6 +103,7 @@ impl VendorAPI {
             VendorAPI::SocureIDPlus => false,
             VendorAPI::IdologyPa => false,
             VendorAPI::ExperianPreciseID => false,
+            VendorAPI::MiddeskCreateBusiness => false,
         }
     }
 }

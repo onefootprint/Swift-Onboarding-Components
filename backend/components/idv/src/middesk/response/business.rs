@@ -1,6 +1,7 @@
 use newtypes::PiiString;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, serde::Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct BusinessResponse {
     pub object: Option<String>,
     pub id: Option<String>,
