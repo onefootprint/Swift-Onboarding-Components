@@ -9,3 +9,10 @@ impl FootprintVendorHttpClient {
         Ok(Self { client })
     }
 }
+
+impl std::ops::Deref for FootprintVendorHttpClient {
+    type Target = reqwest::Client;
+    fn deref(&self) -> &Self::Target {
+        &self.client
+    }
+}

@@ -4,6 +4,7 @@ use newtypes::{IdvData, PiiString, Uuid};
 
 use crate::experian::auth::{self, response::JwtTokenResponse};
 use crate::experian::error::{EnvironmentMismatchError, Error, ValidationError};
+use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{Base64Data, Base64EncodedString};
 
 use super::request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig};
@@ -21,14 +22,14 @@ pub enum ClientEnvironment {
 /// We specify in the CC request which of the products we'd like to use
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-pub struct ExperianClient {
-    client: reqwest::Client,
+pub struct ExperianClientAdapter {
     jwt_token_auth_credentials: CrossCoreAuthTokenCredentials,
     cross_core_credentials: CrossCoreRequestCredentials,
     environment: ClientEnvironment,
+    subscriber_code: PiiString,
 }
 
-impl ExperianClient {
+impl ExperianClientAdapter {
     #[allow(unused)]
     pub fn new(
         auth_username: PiiString,
@@ -37,6 +38,7 @@ impl ExperianClient {
         auth_client_secret: PiiString,
         cross_core_username: PiiString,
         cross_core_password: PiiString,
+        subscriber_code: PiiString,
     ) -> Result<Self, Error> {
         let client_mode = Self::get_environment(&auth_username)?;
 
@@ -48,12 +50,11 @@ impl ExperianClient {
             client_id: auth_client_id,
             client_secret: auth_client_secret,
         };
-        let client = reqwest::Client::builder().build()?;
         Ok(Self {
-            client,
             jwt_token_auth_credentials,
             cross_core_credentials,
             environment: client_mode,
+            subscriber_code: "2956241".into(),
         })
     }
 
@@ -83,7 +84,7 @@ impl ExperianClient {
     }
 }
 
-impl ExperianClient {
+impl ExperianClientAdapter {
     #[allow(dead_code)]
     fn create_cross_core_token_request(&self) -> auth::request::CrossCoreJwtTokenRequest {
         auth::request::CrossCoreJwtTokenRequest {
@@ -95,14 +96,16 @@ impl ExperianClient {
     }
 
     #[allow(dead_code)]
-    pub(self) async fn send_token_request(&self) -> Result<JwtTokenResponse, Error> {
+    pub(self) async fn send_token_request(
+        &self,
+        client: &FootprintVendorHttpClient,
+    ) -> Result<JwtTokenResponse, Error> {
         let url = "https://us-api.experian.com/oauth2/experianone/v1/token";
         let req = serde_json::to_string(&self.create_cross_core_token_request()).map_err(Error::from)?;
         // A global unique identifier. When submitting a token request, an X-Correlation-Id must be populated with a globally unique identifier
         let correlation_id = Uuid::new_v4().to_string();
 
-        let raw_response = self
-            .client
+        let raw_response = client
             .post(url)
             .body(req)
             .header("X-Correlation-Id", correlation_id.as_str())
@@ -119,16 +122,13 @@ impl ExperianClient {
         Ok(response)
     }
 }
-impl ExperianClient {
-    pub async fn send_precise_id_request(&self, idv_data: IdvData) -> Result<serde_json::Value, Error> {
-        let validated_data = self.validate_data(idv_data)?;
 
-        self.internal_send(validated_data).await
-    }
-}
-
-impl ExperianClient {
-    async fn internal_send(&self, validated_idv_data: ValidatedIdvData) -> Result<serde_json::Value, Error> {
+impl ExperianClientAdapter {
+    pub(crate) async fn send_precise_id_request(
+        &self,
+        client: &FootprintVendorHttpClient,
+        validated_idv_data: ValidatedIdvData,
+    ) -> Result<serde_json::Value, Error> {
         let url =
             "https://us-api.experian.com/decisionanalytics/crosscore/npfrawmfuwsu/services/v0/applications/3";
 
@@ -138,10 +138,9 @@ impl ExperianClient {
             self.environment == ClientEnvironment::Production,
         )?;
         let req = serde_json::to_string(req_struct)?;
-        let auth_token = self.send_token_request().await?.access_token;
+        let auth_token = self.send_token_request(client).await?.access_token;
 
-        let response = self
-            .client
+        let response = client
             .post(url)
             .body(req)
             .bearer_auth(auth_token)
@@ -183,7 +182,7 @@ impl ExperianClient {
             // TODO: should this be in secrets? they asked me for it on the phone...
             ControlOption {
                 option: "SUBSCRIBER_SUB_CODE".to_string().into(),
-                value: "2956241".to_string().into(),
+                value: self.subscriber_code.clone(),
             },
             ControlOption {
                 option: "PIDXML_VERSION".to_string().into(),
@@ -210,7 +209,7 @@ impl ExperianClient {
     }
 
     /// We cannot send test data to production, or production data to test environment
-    fn validate_data(&self, idv_data: IdvData) -> Result<ValidatedIdvData, Error> {
+    pub(crate) fn validate_data(&self, idv_data: IdvData) -> Result<ValidatedIdvData, Error> {
         // what environment is this client in
         let is_production = self.environment == ClientEnvironment::Production;
         // is the data provided a test case
@@ -230,7 +229,7 @@ impl ExperianClient {
 }
 
 /// Wrapper struct the ensure we've validated the input data before sending to experian
-struct ValidatedIdvData {
+pub(crate) struct ValidatedIdvData {
     idv_data: IdvData,
 }
 
@@ -272,52 +271,61 @@ impl CrossCoreRequestCredentials {
 
 #[cfg(test)]
 mod tests {
-    use super::{ClientEnvironment, ExperianClient};
-    use crate::experian::{
-        cross_core::{
-            request::CrossCoreAPIRequest,
-            response::CrossCoreAPIResponse,
-            validation::{self, load_sandbox_data},
+    use super::{ClientEnvironment, ExperianClientAdapter};
+    use crate::{
+        experian::{
+            cross_core::{
+                request::CrossCoreAPIRequest,
+                response::CrossCoreAPIResponse,
+                send_precise_id_request,
+                validation::{self, load_sandbox_data},
+            },
+            error::{Error, ValidationError},
+            ExperianCrossCoreRequest,
         },
-        error::{Error, ValidationError},
+        footprint_http_client::FootprintVendorHttpClient,
     };
-    use newtypes::{IdvData, PiiString};
+    use newtypes::{vendor_credentials::ExperianCredentials, IdvData, PiiString};
     use test_case::test_case;
 
-    fn load_sandbox_credentials() -> (PiiString, PiiString, PiiString, PiiString, PiiString, PiiString) {
+    fn load_sandbox_credentials() -> ExperianCredentials {
         let auth_username = PiiString::from(dotenv::var("EXPERIAN_AUTH_USERNAME").unwrap());
         let auth_password = PiiString::from(dotenv::var("EXPERIAN_AUTH_PASSWORD").unwrap());
         let auth_client_id = PiiString::from(dotenv::var("EXPERIAN_AUTH_CLIENT_ID").unwrap());
         let auth_client_secret = PiiString::from(dotenv::var("EXPERIAN_AUTH_CLIENT_SECRET").unwrap());
         let cross_core_username = PiiString::from(dotenv::var("EXPERIAN_CROSS_CORE_USERNAME").unwrap());
         let cross_core_password = PiiString::from(dotenv::var("EXPERIAN_CROSS_CORE_PASSWORD").unwrap());
+        let subscriber_code = PiiString::from("2956241");
 
-        (
+        ExperianCredentials {
             auth_username,
             auth_password,
             auth_client_id,
             auth_client_secret,
             cross_core_username,
             cross_core_password,
-        )
+            subscriber_code,
+        }
     }
-    fn sandbox_client() -> Result<ExperianClient, Error> {
-        let (
+    fn sandbox_client() -> Result<ExperianClientAdapter, Error> {
+        let ExperianCredentials {
             auth_username,
             auth_password,
             auth_client_id,
             auth_client_secret,
             cross_core_username,
             cross_core_password,
-        ) = load_sandbox_credentials();
+            subscriber_code,
+        } = load_sandbox_credentials();
 
-        ExperianClient::new(
+        ExperianClientAdapter::new(
             auth_username,
             auth_password,
             auth_client_id,
             auth_client_secret,
             cross_core_username,
             cross_core_password,
+            subscriber_code,
         )
     }
 
@@ -327,17 +335,25 @@ mod tests {
         let client = sandbox_client().expect("failed to load sandbox client");
         assert!(client.environment == ClientEnvironment::Sandbox);
 
-        let (_, auth_password, auth_client_id, auth_client_secret, cross_core_username, cross_core_password) =
-            load_sandbox_credentials();
+        let ExperianCredentials {
+            auth_username: _,
+            auth_password,
+            auth_client_id,
+            auth_client_secret,
+            cross_core_username,
+            cross_core_password,
+            subscriber_code,
+        } = load_sandbox_credentials();
 
         // client with wrong auth username
-        let res = ExperianClient::new(
+        let res = ExperianClientAdapter::new(
             PiiString::from("production-scary-secret"),
             auth_password,
             auth_client_id,
             auth_client_secret,
             cross_core_username,
             cross_core_password,
+            subscriber_code,
         );
 
         let assertion = match res {
@@ -377,11 +393,16 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_send_precise_id_request() {
-        let client = sandbox_client().unwrap();
-
+        let fp_client = FootprintVendorHttpClient::new().unwrap();
+        let credentials = load_sandbox_credentials();
         let idv_data = load_sandbox_data()[0].clone();
 
-        let res = client.send_precise_id_request(idv_data).await.unwrap();
+        let request = ExperianCrossCoreRequest {
+            idv_data,
+            credentials,
+        };
+
+        let res = send_precise_id_request(&fp_client, request).await.unwrap();
         let resp: CrossCoreAPIResponse = serde_json::from_value(res).unwrap();
 
         resp.precise_id_response().unwrap().score().unwrap();

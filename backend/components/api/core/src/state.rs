@@ -13,7 +13,7 @@ use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
-    experian::cross_core::client::ExperianClient, fingerprintjs::client::FingerprintJSClient,
+    experian::cross_core::client::ExperianClientAdapter, fingerprintjs::client::FingerprintJSClient,
     footprint_http_client::FootprintVendorHttpClient, idology::client::IdologyClient,
     incode::client::IncodeClient, middesk::client::MiddeskClient, socure::client::SocureClient,
 };
@@ -41,7 +41,7 @@ pub struct State {
     pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
-    pub experian_client: ExperianClient,
+    pub experian_client: ExperianClientAdapter,
     pub fingerprintjs_client: FingerprintJSClient,
     #[allow(unused)]
     pub incode_client: IncodeClient,
@@ -130,8 +130,9 @@ impl State {
 
         let billing_client = billing::BillingClient::new(config.stripe.api_key.clone());
 
-        let experian_client = ExperianClient::new(
+        let experian_client = ExperianClientAdapter::new(
             PiiString::from("crosscore2.uat@onefootprint.com"),
+            PiiString::from(""),
             PiiString::from(""),
             PiiString::from(""),
             PiiString::from(""),

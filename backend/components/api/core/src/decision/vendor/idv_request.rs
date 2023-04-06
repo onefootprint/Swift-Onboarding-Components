@@ -1,4 +1,4 @@
-use idv::idology::IdologyExpectIDRequest;
+use idv::{experian::ExperianCrossCoreRequest, idology::IdologyExpectIDRequest};
 use newtypes::IdvData;
 
 use super::tenant_vendor_control::TenantVendorControl;
@@ -21,6 +21,12 @@ impl<'a> KycRequestBuilder<'a> {
         IdologyExpectIDRequest {
             idv_data: self.idv_data.clone(),
             credentials: self.credentials.idology_credentials(),
+        }
+    }
+    pub fn build_experian_request(self) -> ExperianCrossCoreRequest {
+        ExperianCrossCoreRequest {
+            idv_data: self.idv_data.clone(),
+            credentials: self.credentials.experian_credentials(),
         }
     }
 

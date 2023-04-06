@@ -3,8 +3,8 @@ use std::str::FromStr;
 use chrono::Utc;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use newtypes::{
-    vendor_credentials::IdologyCredentials, EncryptedVaultPrivateKey, SealedVaultBytes, TenantId,
-    TenantVendorControlId,
+    vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
+    EncryptedVaultPrivateKey, SealedVaultBytes, TenantId, TenantVendorControlId,
 };
 
 use crate::{
@@ -35,6 +35,7 @@ fn db_vendor_control(
 
 struct DefaultCredentials {
     pub idology: IdologyCredentials,
+    pub experian: ExperianCredentials,
 }
 async fn new_tenant_vendor_control(
     state: &State,
@@ -51,9 +52,13 @@ async fn new_tenant_vendor_control(
     .await
     .unwrap();
 
+    let experian_builder = ExperianCredentialBuilder::from(&state.config);
+    let experian_creds = experian_builder.build_with_subscriber_code("2956241".into());
+
     (
         DefaultCredentials {
             idology: IdologyCredentials::from(&state.config),
+            experian: experian_creds,
         },
         tvc,
     )
@@ -68,7 +73,46 @@ async fn test_update_credentials() {
     let (default_creds_from_state, updated) =
         new_tenant_vendor_control(state, None, &tenant_e_key, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
+    assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
 
+    // -------------------
+    // ---- Experian -------
+    // -------------------
+    // if experian enabled, and a sub code provided, we update
+    let db_experian1 = Some(db_vendor_control(
+        false,
+        None,
+        None,
+        true,
+        Some("sub_code123".into()),
+    ));
+
+    let (default_creds_from_state, updated) =
+        new_tenant_vendor_control(state, db_experian1, &tenant_e_key, &state.enclave_client).await;
+    assert_eq!(
+        updated.experian_credentials().subscriber_code,
+        "sub_code123".into()
+    );
+    assert_ne!(default_creds_from_state.experian, updated.experian_credentials());
+
+    // if experian isn't enabled, we shouldn't change credentials, even if provided
+    let db_experian2 = Some(db_vendor_control(
+        false,
+        None,
+        None,
+        // false
+        false,
+        Some("sub_code123".into()),
+    ));
+    let (default_creds_from_state, updated) =
+        new_tenant_vendor_control(state, db_experian2, &tenant_e_key, &state.enclave_client).await;
+    assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
+
+    // if experian sub code isn't provided, we shouldn't change credentials,
+    let db_experian3 = Some(db_vendor_control(false, None, None, true, None));
+    let (default_creds_from_state, updated) =
+        new_tenant_vendor_control(state, db_experian3, &tenant_e_key, &state.enclave_client).await;
+    assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
     // -------------------
     // ---- Idology -------
     // -------------------

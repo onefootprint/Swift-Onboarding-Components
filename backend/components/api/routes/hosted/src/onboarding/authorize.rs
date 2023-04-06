@@ -244,7 +244,7 @@ async fn run_kyc(
             &state.footprint_vendor_http_client,
             &state.socure_production_client,
             &state.twilio_client.client,
-            &state.experian_client,
+            &state.footprint_vendor_http_client,
             tenant_vendor_control,
         )
         .await?;

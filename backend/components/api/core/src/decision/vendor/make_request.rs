@@ -73,8 +73,9 @@ pub async fn send_idv_request(
     // still TODO: traitfy the ff logic shared by these requests
     let result = match request.vendor_api {
         VendorAPI::IdologyExpectID => {
+            let request = kyc_request_builder.build_idology_request();
             send_idology_idv_request(
-                kyc_request_builder,
+                request,
                 is_production,
                 ob_configuration_key,
                 idology_client,
@@ -98,8 +99,9 @@ pub async fn send_idv_request(
         }
         // TODO finish this
         VendorAPI::ExperianPreciseID => {
+            let request = kyc_request_builder.build_experian_request();
             send_experian_idv_request(
-                kyc_request_builder.idv_data(),
+                request,
                 is_production,
                 ob_configuration_key,
                 experian_client,
@@ -180,7 +182,7 @@ where
 
 #[tracing::instrument(skip_all)]
 pub async fn send_idology_idv_request(
-    kyc_request_builder: KycRequestBuilder<'_>,
+    request: IdologyExpectIDRequest,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
     idology_api_call: &impl VendorAPICall<
@@ -191,9 +193,7 @@ pub async fn send_idology_idv_request(
     ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
-        let res = idology_api_call
-            .make_request(kyc_request_builder.build_idology_request())
-            .await;
+        let res = idology_api_call.make_request(request).await;
 
         match res {
             Ok(ref vr) => {
@@ -320,7 +320,7 @@ pub async fn send_socure_idv_request(
 
 // #[tracing::instrument(skip_all)]
 pub async fn send_experian_idv_request(
-    data: IdvData,
+    request: ExperianCrossCoreRequest,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
     experian_api_call: &impl VendorAPICall<
@@ -331,9 +331,7 @@ pub async fn send_experian_idv_request(
     ff_client: &impl FeatureFlagClient,
 ) -> Result<VendorResponse, ApiError> {
     if is_production || ff_client.flag(BoolFlag::EnableExperianInNonProd(&ob_configuration_key)) {
-        let res = experian_api_call
-            .make_request(ExperianCrossCoreRequest { idv_data: data })
-            .await;
+        let res = experian_api_call.make_request(request).await;
 
         res.map(|r| {
             let parsed_response = r.clone().parsed_response();
@@ -660,8 +658,9 @@ mod tests {
             });
         }
         let tvc = TenantVendorControl::default();
+        let kyc_request = KycRequestBuilder::new(IdvData { ..Default::default() }, &tvc);
         send_idology_idv_request(
-            KycRequestBuilder::new(IdvData { ..Default::default() }, &tvc),
+            kyc_request.build_idology_request(),
             is_production,
             ob_configuration_key,
             &mock_api,

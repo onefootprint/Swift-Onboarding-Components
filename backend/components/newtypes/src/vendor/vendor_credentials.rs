@@ -7,6 +7,30 @@ pub struct IdologyCredentials {
     pub password: PiiString,
 }
 
+pub struct ExperianCredentialBuilder {
+    pub auth_username: PiiString,
+    pub auth_password: PiiString,
+    pub auth_client_id: PiiString,
+    pub auth_client_secret: PiiString,
+    pub cross_core_username: PiiString,
+    pub cross_core_password: PiiString,
+}
+
+/// The bulk of experian credentials are shared across requests for different tenants
+/// All that is different is the subscriber code
+impl ExperianCredentialBuilder {
+    pub fn build_with_subscriber_code(self, subscriber_code: PiiString) -> ExperianCredentials {
+        ExperianCredentials {
+            subscriber_code,
+            auth_username: self.auth_username,
+            auth_password: self.auth_password,
+            auth_client_id: self.auth_client_id,
+            auth_client_secret: self.auth_client_secret,
+            cross_core_username: self.cross_core_username,
+            cross_core_password: self.cross_core_password,
+        }
+    }
+}
 #[allow(unused)]
 /// credentials for experian
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -18,13 +42,4 @@ pub struct ExperianCredentials {
     pub auth_client_secret: PiiString,
     pub cross_core_username: PiiString,
     pub cross_core_password: PiiString,
-}
-
-impl ExperianCredentials {
-    #[allow(unused)]
-    pub fn update_subscriber_code(mut self, subscriber_code: PiiString) -> Self {
-        self.subscriber_code = subscriber_code;
-
-        self
-    }
 }

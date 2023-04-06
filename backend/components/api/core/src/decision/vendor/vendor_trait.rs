@@ -188,13 +188,13 @@ impl VendorAPIResponse for TwilioLookupV2APIResponse {
 /// /// ////////////////
 #[async_trait]
 impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>
-    for experian::cross_core::client::ExperianClient
+    for FootprintVendorHttpClient
 {
     async fn make_request(
         &self,
         request: ExperianCrossCoreRequest,
     ) -> Result<ExperianCrossCoreResponse, idv::experian::error::Error> {
-        let raw_response = self.send_precise_id_request(request.idv_data).await?;
+        let raw_response = idv::experian::cross_core::send_precise_id_request(self, request).await?;
         let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())?;
 
         Ok(ExperianCrossCoreResponse {
