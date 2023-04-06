@@ -113,7 +113,7 @@ pub struct Config {
     #[envconfig(nested = true)]
     pub incode: IncodeConfig,
 
-    #[envconfig(from = "MIDDESK_SANDBOX_API_KEY")]
+    #[envconfig(from = "MIDDESK_SANDBOX_API_KEY", default = "")]
     pub middesk_sandbox_api_key: String,
 }
 
