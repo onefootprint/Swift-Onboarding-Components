@@ -1,7 +1,13 @@
 import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
 
-import { Breadcrumb, DeviceInsights, Header, Vault } from './components';
+import {
+  AuditTrail,
+  Breadcrumb,
+  DeviceInsights,
+  Header,
+  Vault,
+} from './components';
 
 const Content = () => (
   <Box as="section" testID="entity-content">
@@ -16,6 +22,9 @@ const Content = () => (
     </Box>
     <Box sx={{ marginBottom: 9 }}>
       <Vault />
+    </Box>
+    <Box sx={{ marginBottom: 9 }}>
+      <AuditTrail />
     </Box>
     <DeviceInsights />
   </Box>

@@ -50,7 +50,7 @@ describe('<AuditTrailTimeline />', () => {
   describe('when timeline data is loaded', () => {
     it('should render kyc data collection event correctly', () => {
       renderAuditTrailTimeline({ timeline: TimelineFixture });
-      const header = screen.getByTestId('kyc-data-collected-event-header');
+      const header = screen.getByTestId('data-collected-event-header');
       expect(header).toBeInTheDocument();
       expect(within(header).getByText('Full name')).toBeInTheDocument();
       expect(within(header).getByText('Date of Birth')).toBeInTheDocument();

@@ -1,32 +1,27 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  CollectedKycDataEventData,
-  CollectedKycDataOption,
-} from '@onefootprint/types';
+import { CollectedDataEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import createTagList from 'src/utils/create-tag-list';
 import styled, { css } from 'styled-components';
 
-type KycDataCollectedEventHeaderProps = {
-  data: CollectedKycDataEventData;
+type DataCollectedEventHeaderProps = {
+  data: CollectedDataEventData;
   isFromOtherOrg?: boolean;
 };
 
-const KycDataCollectedEventHeader = ({
+const DataCollectedEventHeader = ({
   data,
   isFromOtherOrg,
-}: KycDataCollectedEventHeaderProps) => {
+}: DataCollectedEventHeaderProps) => {
   const { t, allT } = useTranslation(
-    'pages.user-details.audit-trail.timeline.kyc-data-collected-event',
+    'pages.business.audit-trail.timeline.data-collected-event',
   );
   const { attributes } = data;
-  const attributeLabels = attributes.map((attr: CollectedKycDataOption) =>
-    allT(`cdo.${attr}`),
-  );
+  const attributeLabels = attributes.map(attr => allT(`cdo.${attr}`));
 
   return (
-    <Container data-testid="kyc-data-collected-event-header">
+    <Container data-testid="data-collected-event-header">
       <Typography
         variant="label-3"
         color={isFromOtherOrg ? 'tertiary' : 'primary'}
@@ -50,4 +45,4 @@ const Container = styled.div`
   `}
 `;
 
-export default KycDataCollectedEventHeader;
+export default DataCollectedEventHeader;

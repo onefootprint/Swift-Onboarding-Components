@@ -1,4 +1,4 @@
-import { CollectedKycDataOption } from './collected-data-option';
+import { CollectedDataOption } from './collected-data-option';
 import DecisionStatus from './decision-status';
 import Vendor from './vendor';
 
@@ -32,7 +32,7 @@ export type OnboardingDecision = {
   timestamp: Date;
   source: DecisionSource;
   obConfiguration: {
-    mustCollectData: CollectedKycDataOption[];
+    mustCollectData: CollectedDataOption[];
     mustCollectIdentityDocument: boolean;
     // TODO: replace with the following
     // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to

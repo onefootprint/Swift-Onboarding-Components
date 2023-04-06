@@ -2,20 +2,19 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import {
   CollectedDataEventData,
+  Entity,
+  EntityStatus,
   IdDocUploadedEventData,
   LivenessEventData,
   OnboardingDecisionEventData,
-  Timeline as UserTimeline,
+  Timeline as EntityTimeline,
   TimelineEventKind,
-  UserStatus,
   WatchlistCheckEventData,
   WatchlistCheckStatus,
 } from '@onefootprint/types';
-import { Shimmer, Typography } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline, { TimelineItem } from 'src/components/timeline';
-import useUser from 'src/pages/users/pages/user-details/hooks/use-user';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
 import {
   AbandonedEventBody,
@@ -49,23 +48,12 @@ import mergeAuditTrailTimelineEvents, {
 } from './utils/merge-audit-trail-timeline-events/merge-audit-trail-timeline-events';
 
 export type AuditTrailTimelineProps = {
-  timeline: UserTimeline;
-  isLoading?: boolean;
+  timeline: EntityTimeline;
+  entity: Entity;
 };
 
-const AuditTrailTimeline = ({
-  timeline,
-  isLoading,
-}: AuditTrailTimelineProps) => {
-  const userId = useUserId();
-  const { data: user } = useUser(userId);
-  const { t } = useTranslation('pages.user-details.audit-trail');
-
-  if (isLoading) {
-    return (
-      <Shimmer sx={{ height: '100px' }} testID="audit-trail-timeline-loading" />
-    );
-  }
+const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
+  const { t } = useTranslation('pages.business.audit-trail');
   const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
 
   const items: TimelineItem[] = [];
@@ -75,6 +63,7 @@ const AuditTrailTimeline = ({
       time,
       isFromOtherOrg,
     } = event;
+
     if (kind === TimelineEventKind.liveness) {
       const eventData = data as LivenessEventData;
       items.push({
@@ -129,7 +118,7 @@ const AuditTrailTimeline = ({
       }
     }
   });
-  if (user?.status === UserStatus.incomplete) {
+  if (entity.status === EntityStatus.incomplete) {
     // Postpend a custom timeline item for incomplete users with no timestamp
     items.push({
       time: undefined,

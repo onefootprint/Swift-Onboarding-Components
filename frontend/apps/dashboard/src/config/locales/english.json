@@ -805,6 +805,65 @@
           "description": "Select a risk signal"
         }
       },
+      "audit-trail": {
+        "title": "Audit trail",
+        "empty": "No entries",
+        "timeline": {
+          "liveness-event": {
+            "success-title": "Liveness check succeeded",
+            "skipped-title": "Liveness check skipped",
+            "attested-by": "Attested by {{attestations}}",
+            "ip-address": "{{ipAddress}} (IP Address)"
+          },
+          "id-doc-uploaded-event": {
+            "title": "Collected "
+          },
+          "data-collected-event": {
+            "title": "Collected ",
+            "title-from-other-org": "Collected (from other companies) "
+          },
+          "onboarding-decision-event": {
+            "verified-by-footprint": "Verified by Footprint",
+            "not-verified-by-footprint": "Could not be verified by Footprint",
+            "verified-by-firm-employee": "Verified by Footprint Risk Ops",
+            "not-verified-by-firm-employee": "Could not be verified by Footprint Risk Ops",
+            "verified": "Verified",
+            "not-verified": "Failed",
+            "decision-status": {
+              "pass": "Verified",
+              "fail": "Failed",
+              "step_up_required": "Step up required"
+            },
+            "with": " with ",
+            "org-overwrite": {
+              "title": "Marked as {{decision}} by {{user}}",
+              "see-details": "See details",
+              "drawer": {
+                "title": "Review details",
+                "decision": "Decision",
+                "reviewer": "Reviewer",
+                "date": "Date",
+                "note": "Note",
+                "pin-note": "Pin note to the top of the page"
+              }
+            }
+          },
+          "abandoned-event": {
+            "title": "User dropped off before providing all information"
+          },
+          "watchlist-check-event": {
+            "title": "Watchlist check performed",
+            "status": {
+              "pass": "User was not found on a watchlist",
+              "fail": "User was found on a watchlist"
+            },
+            "reason-codes": {
+              "watchlist_hit_ofac": "User was found on OFAC watchlist",
+              "watchlist_hit_pep": "User was found on PEP watchlist"
+            }
+          }
+        }
+      },
       "device-insights": {
         "title": "Device insights",
         "ip-address": "IP address",

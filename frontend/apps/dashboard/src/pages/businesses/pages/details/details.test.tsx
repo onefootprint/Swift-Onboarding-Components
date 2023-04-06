@@ -20,6 +20,7 @@ import {
   withEntityDecrypt,
   withEntityError,
   withRiskSignals,
+  withTimeline,
 } from './details.test.config';
 
 beforeEach(() => {
@@ -41,6 +42,8 @@ describe('<Details />', () => {
         id: entityFixture.id,
       },
     });
+    withRiskSignals();
+    withTimeline();
   });
 
   afterAll(() => {
@@ -80,7 +83,6 @@ describe('<Details />', () => {
   describe('when the request to fetch the entities succeeds', () => {
     beforeEach(() => {
       withEntity();
-      withRiskSignals();
     });
 
     it('should show a breadcrumb, with an option to return to the list pages', async () => {
@@ -100,13 +102,13 @@ describe('<Details />', () => {
       const header = screen.getByRole('banner', { name: 'Business info' });
       expect(header).toBeInTheDocument();
 
-      const status = screen.getByText('Verified');
+      const status = within(header).getByText('Verified');
       expect(status).toBeInTheDocument();
 
-      const start = screen.getByText('3/27/23, 2:43 PM');
+      const start = within(header).getByText('3/27/23, 2:43 PM');
       expect(start).toBeInTheDocument();
 
-      const id = screen.getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD');
+      const id = within(header).getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD');
       expect(id).toBeInTheDocument();
     });
 

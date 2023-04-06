@@ -13,7 +13,7 @@ import {
 export const timelineFixture: Timeline = [
   {
     event: {
-      kind: TimelineEventKind.kycDataCollected,
+      kind: TimelineEventKind.dataCollected,
       data: {
         attributes: [
           CollectedKycDataOption.name,
@@ -80,6 +80,7 @@ export const timelineFixture: Timeline = [
           },
           vendors: [Vendor.idology],
         },
+        annotation: null,
       },
     },
     timestamp: '2022-11-08T20:21:53.752388Z',
@@ -108,6 +109,7 @@ export const timelineFixture: Timeline = [
           },
           vendors: [Vendor.idology],
         },
+        annotation: null,
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',

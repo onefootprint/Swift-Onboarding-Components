@@ -11,11 +11,15 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
   DataIdentifier,
+  DecisionSourceKind,
+  DecisionStatus,
   Entity,
   EntityKind,
   EntityStatus,
   OnboardingStatus,
   RoleScope,
+  Timeline,
+  TimelineEventKind,
   VaultValue,
 } from '@onefootprint/types';
 
@@ -95,6 +99,59 @@ export const entityFixture: Entity = {
   },
 };
 
+export const timelineFixture: Timeline = [
+  {
+    event: {
+      kind: TimelineEventKind.dataCollected,
+      data: {
+        attributes: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.phoneNumber,
+          CollectedKybDataOption.website,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.beneficialOwners,
+          CollectedKybDataOption.tin,
+        ],
+      },
+    },
+    timestamp: '2023-04-05T11:16:13.599001Z',
+    isFromOtherOrg: false,
+  },
+  {
+    event: {
+      kind: TimelineEventKind.onboardingDecision,
+      data: {
+        decision: {
+          id: 'decision_ukUpX59i8VJZiuk6boskdR',
+          status: DecisionStatus.pass,
+          timestamp: new Date('2023-04-05T11:17:06.773951Z'),
+          source: {
+            kind: DecisionSourceKind.footprint,
+          },
+          obConfiguration: {
+            mustCollectData: [
+              CollectedKybDataOption.name,
+              CollectedKybDataOption.address,
+              CollectedKybDataOption.tin,
+              CollectedKybDataOption.beneficialOwners,
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.fullAddress,
+              CollectedKycDataOption.phoneNumber,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn4,
+            ],
+            mustCollectIdentityDocument: false,
+          },
+          vendors: [],
+        },
+        annotation: null,
+      },
+    },
+    timestamp: '2023-04-05T11:17:06.776409Z',
+    isFromOtherOrg: false,
+  },
+];
+
 export const withEntity = (entity = entityFixture) =>
   mockRequest({
     method: 'get',
@@ -116,11 +173,21 @@ export const withEntityError = (entityId = entityFixture.id) =>
     },
   });
 
-export const withRiskSignals = (entity = entityFixture) =>
+export const withTimeline = (
+  entity = entityFixture,
+  response = timelineFixture,
+) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/timeline`,
+    response,
+  });
+
+export const withRiskSignals = (entity = entityFixture, response = []) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/risk_signals`,
-    response: [],
+    response,
   });
 
 export const withRiskSignalsError = () =>

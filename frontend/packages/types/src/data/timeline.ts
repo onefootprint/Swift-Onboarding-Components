@@ -1,5 +1,9 @@
 import { Annotation } from './annotation';
-import { CollectedKycDataOption } from './collected-data-option';
+import {
+  CollectedInvestorProfileDataOption,
+  CollectedKybDataOption,
+  CollectedKycDataOption,
+} from './collected-data-option';
 import { DecryptedIdDocStatus } from './decrypted-id-doc';
 import IdDocType from './id-doc-type';
 import { InsightEvent } from './insight-event';
@@ -7,20 +11,24 @@ import { LivenessAttribute, LivenessSource } from './liveness';
 import { OnboardingDecision } from './onboarding-decision';
 
 export enum TimelineEventKind {
-  kycDataCollected = 'data_collected',
+  dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
   idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
 }
 
-export type CollectedKycDataEvent = {
-  kind: TimelineEventKind.kycDataCollected;
-  data: CollectedKycDataEventData;
+export type CollectedDataEvent = {
+  kind: TimelineEventKind.dataCollected;
+  data: CollectedDataEventData;
 };
 
-export type CollectedKycDataEventData = {
-  attributes: CollectedKycDataOption[];
+export type CollectedDataEventData = {
+  attributes: (
+    | CollectedKybDataOption
+    | CollectedKycDataOption
+    | CollectedInvestorProfileDataOption
+  )[];
 };
 
 export type LivenessEvent = {
@@ -54,7 +62,7 @@ export type OnboardingDecisionEvent = {
 
 export type OnboardingDecisionEventData = {
   decision: OnboardingDecision;
-  annotation?: Annotation;
+  annotation: Annotation | null;
 };
 
 export type WatchlistCheckEvent = {
@@ -81,7 +89,7 @@ export type WatchlistCheckEventData = {
 
 export type TimelineEvent = {
   event:
-    | CollectedKycDataEvent
+    | CollectedDataEvent
     | LivenessEvent
     | IdDocUploadedEvent
     | OnboardingDecisionEvent

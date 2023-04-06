@@ -1,21 +1,30 @@
 import {
   IcoBuilding16,
+  IcoDollar16,
   IcoEmail16,
   Icon,
   IcoPhone16,
+  IcoStore16,
   IcoUserCircle16,
 } from '@onefootprint/icons';
 import {
-  CollectedKycDataEventData,
+  CollectedDataEventData,
+  CollectedInvestorProfileDataOption,
+  CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 import React from 'react';
 
-type KycDataCollectedEventIconProps = {
-  data: CollectedKycDataEventData;
+type DataCollectedEventIconProps = {
+  data: CollectedDataEventData;
 };
 
-const iconForAttribute: Record<CollectedKycDataOption, Icon> = {
+const iconForAttribute: Record<
+  | CollectedKycDataOption
+  | CollectedKybDataOption
+  | CollectedInvestorProfileDataOption,
+  Icon
+> = {
   [CollectedKycDataOption.name]: IcoUserCircle16,
   [CollectedKycDataOption.email]: IcoEmail16,
   [CollectedKycDataOption.phoneNumber]: IcoPhone16,
@@ -24,11 +33,16 @@ const iconForAttribute: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.dob]: IcoUserCircle16,
   [CollectedKycDataOption.fullAddress]: IcoBuilding16,
   [CollectedKycDataOption.partialAddress]: IcoBuilding16,
+  [CollectedKybDataOption.name]: IcoStore16,
+  [CollectedKybDataOption.tin]: IcoStore16,
+  [CollectedKybDataOption.address]: IcoBuilding16,
+  [CollectedKybDataOption.phoneNumber]: IcoPhone16,
+  [CollectedKybDataOption.website]: IcoStore16,
+  [CollectedKybDataOption.beneficialOwners]: IcoStore16,
+  [CollectedInvestorProfileDataOption.investorProfile]: IcoDollar16,
 };
 
-const KycDataCollectedEventIcon = ({
-  data,
-}: KycDataCollectedEventIconProps) => {
+const DataCollectedEventIcon = ({ data }: DataCollectedEventIconProps) => {
   const icons = data.attributes.map(attribute => iconForAttribute[attribute]);
   const HeaderIcon = icons
     .sort(
@@ -39,4 +53,4 @@ const KycDataCollectedEventIcon = ({
   return HeaderIcon ? <HeaderIcon /> : <IcoUserCircle16 />;
 };
 
-export default KycDataCollectedEventIcon;
+export default DataCollectedEventIcon;
