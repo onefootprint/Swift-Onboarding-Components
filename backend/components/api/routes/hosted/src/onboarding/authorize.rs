@@ -15,9 +15,11 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
+use db::models::verification_request::VerificationRequest;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
+use newtypes::VendorAPI;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use tracing::{field, instrument};
 use webhooks::events::WebhookEvent;
@@ -97,13 +99,24 @@ pub async fn post(
     // Run KYC checks
     let ob_id = ob_info.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, ob_info, biz_ob).await;
+        let engine_result = run_kyc(&state, ob_info, biz_ob.clone()).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
             Ok(_) => (),
             Err(e) => {
                 tracing::error!(error=%e, "Error running decision engine")
+            }
+        }
+    }
+
+    // Kickoff KYB
+    if let Some(biz_ob) = biz_ob {
+        // TODO: also check ob_config here to ensure this is a single-KYC flow
+        if biz_ob.idv_reqs_initiated_at.is_none() {
+            let kyb_res = run_kyb(&state, biz_ob).await;
+            if let Err(e) = kyb_res {
+                tracing::error!(error=%e, "Error kicking off KYB")
             }
         }
     }
@@ -159,7 +172,7 @@ pub async fn post(
 async fn run_kyc(
     state: &State,
     ob_info: AuthedOnboardingInfo,
-    biz_ob: Option<Onboarding>,
+    biz_ob: Option<Onboarding>, // TODO: remove from run_kyc and setup fixtures in run_kyb instead
 ) -> Result<(), ApiError> {
     let scoped_user_id = ob_info.scoped_user.id.clone();
     let uvw = state
@@ -219,6 +232,44 @@ async fn run_kyc(
         )
         .await?;
     }
+
+    Ok(())
+}
+
+async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
+    let obid = biz_ob.id.clone();
+    let vreq = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
+            let ob = Onboarding::lock(conn, &biz_ob.id)?;
+
+            if biz_ob.idv_reqs_initiated_at.is_some() {
+                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+            }
+
+            let decision_intent = DecisionIntent::get_or_create_onboarding_kyb(conn, &ob.scoped_vault_id)?;
+            let vreq = VerificationRequest::create(
+                conn,
+                &ob.scoped_vault_id,
+                &decision_intent.id,
+                VendorAPI::MiddeskCreateBusiness,
+            )?;
+
+            ob.into_inner()
+                .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
+
+            Ok(vreq)
+        })
+        .await?;
+
+    decision::vendor::make_request::make_kyb_request(
+        &state.db_pool,
+        &state.enclave_client,
+        vreq,
+        &obid,
+        &state.middesk_client,
+    )
+    .await?;
 
     Ok(())
 }

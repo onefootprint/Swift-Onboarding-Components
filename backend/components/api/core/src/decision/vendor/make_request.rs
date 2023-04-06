@@ -15,6 +15,7 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
+use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
@@ -536,6 +537,60 @@ pub async fn make_vendor_requests(
         .collect();
 
     Ok(results)
+}
+
+#[tracing::instrument(skip(db_pool, enclave_client, middesk_client))]
+pub async fn make_kyb_request(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    vreq: VerificationRequest,
+    onboarding_id: &OnboardingId,
+    middesk_client: &impl VendorAPICall<
+        MiddeskCreateBusinessRequest,
+        MiddeskCreateBusinessResponse,
+        idv::middesk::Error,
+    >,
+) -> Result<vendor_result::VendorResult, ApiError> {
+    let vreq_id = vreq.id.clone();
+
+    let business_data =
+        build_request::build_business_data_from_verification_request(db_pool, enclave_client, vreq.clone())
+            .await?;
+
+    let res = middesk_client
+        .make_request(MiddeskCreateBusinessRequest { business_data })
+        .await;
+
+    let vendor_response = res
+        .map(|r| {
+            let parsed_response = r.clone().parsed_response();
+            let raw_response = r.raw_response();
+            VendorResponse {
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+
+    let uv = db_pool
+        .db_query(move |conn| VerificationRequest::get_user_vault(conn, vreq_id))
+        .await??;
+
+    let vendor_responses = &vec![(vreq.clone(), vendor_response.clone())];
+
+    let verification_result =
+        verification_result::save_verification_result(db_pool, vendor_responses, &uv.public_key)
+            .await?
+            .pop()
+            .ok_or(DbError::IncorrectNumberOfRowsUpdated)?; // not really the most apt error but this should never happen
+
+    let result = vendor_result::VendorResult {
+        response: vendor_response,
+        verification_result_id: verification_result.id,
+        verification_request_id: vreq.id.clone(),
+    };
+
+    Ok(result)
 }
 
 #[cfg(test)]

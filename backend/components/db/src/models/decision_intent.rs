@@ -43,18 +43,20 @@ impl DecisionIntent {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_or_create_onboarding_kyc(
+    fn get_or_create_for_kind(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
+        kind: DecisionIntentKind,
     ) -> DbResult<Self> {
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),
-            kind: DecisionIntentKind::OnboardingKyc,
+            kind,
             scoped_vault_id: scoped_vault_id.clone(),
         };
 
         let existing_di = decision_intent::table
             .filter(decision_intent::scoped_vault_id.eq(scoped_vault_id))
+            .filter(decision_intent::kind.eq(kind))
             .first(conn.conn())
             .optional()?;
 
@@ -67,6 +69,22 @@ impl DecisionIntent {
             .get_result::<DecisionIntent>(conn.conn())?;
 
         Ok(new_di)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_or_create_onboarding_kyc(
+        conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Self> {
+        Self::get_or_create_for_kind(conn, scoped_vault_id, DecisionIntentKind::OnboardingKyc)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_or_create_onboarding_kyb(
+        conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Self> {
+        Self::get_or_create_for_kind(conn, scoped_vault_id, DecisionIntentKind::OnboardingKyb)
     }
 }
 

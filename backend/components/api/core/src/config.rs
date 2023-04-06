@@ -112,6 +112,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub incode: IncodeConfig,
+
+    #[envconfig(from = "MIDDESK_SANDBOX_API_KEY")]
+    pub middesk_sandbox_api_key: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {

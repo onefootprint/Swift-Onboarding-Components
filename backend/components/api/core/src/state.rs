@@ -14,7 +14,8 @@ use db::DbPool;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
     experian::cross_core::client::ExperianClient, fingerprintjs::client::FingerprintJSClient,
-    idology::client::IdologyClient, incode::client::IncodeClient, socure::client::SocureClient,
+    idology::client::IdologyClient, incode::client::IncodeClient, middesk::client::MiddeskClient,
+    socure::client::SocureClient,
 };
 use newtypes::PiiString;
 use workos::{ApiKey, WorkOs};
@@ -44,6 +45,7 @@ pub struct State {
     pub fingerprintjs_client: FingerprintJSClient,
     #[allow(unused)]
     pub incode_client: IncodeClient,
+    pub middesk_client: MiddeskClient,
 }
 impl State {
     /// initialize global state in test context
@@ -150,6 +152,9 @@ impl State {
         let incode_client = IncodeClient::new(config.incode.api_key.clone(), config.incode.client_id.clone())
             .expect("failed to build fingerprint client");
 
+        let middesk_client = MiddeskClient::new(config.middesk_sandbox_api_key.clone(), true)
+            .expect("failed to build middesk client");
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -199,6 +204,7 @@ impl State {
             experian_client,
             fingerprintjs_client,
             incode_client,
+            middesk_client,
         }
     }
 }

@@ -30,6 +30,7 @@ pub enum DecisionIntentKind {
     OnboardingKyc,
     ManualRunKyc,
     WatchlistCheck,
+    OnboardingKyb,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionIntentKind);
