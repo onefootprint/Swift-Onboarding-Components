@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use idv::{
     experian::{self, ExperianCrossCoreRequest, ExperianCrossCoreResponse},
+    footprint_http_client::FootprintVendorHttpClient,
     idology::{
         client::IdologyClient,
         pa::{IdologyPaAPIResponse, IdologyPaRequest},
@@ -39,13 +40,13 @@ where
 /// ////////////////
 #[async_trait]
 impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>
-    for IdologyClient
+    for FootprintVendorHttpClient
 {
     async fn make_request(
         &self,
         request: IdologyExpectIDRequest,
     ) -> Result<IdologyExpectIDAPIResponse, idv::idology::error::Error> {
-        let raw_response = self.verify_expectid(request.idv_data).await?; // TODO: this should return PiiJsonValue itself
+        let raw_response = idv::idology::verify_expectid(self, request).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::expectid::response::parse_response(raw_response.clone())?;
 
         parsed_response.response.validate()?;

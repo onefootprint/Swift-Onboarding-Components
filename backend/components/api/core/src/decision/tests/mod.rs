@@ -22,3 +22,7 @@ mod rules;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod requirements;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tenant_vendor_control;

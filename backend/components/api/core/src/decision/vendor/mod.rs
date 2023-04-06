@@ -10,11 +10,12 @@ use db::{
 use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
 
 pub mod build_request;
+pub mod idv_request;
 pub mod make_request;
+pub mod tenant_vendor_control;
 pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
-
 /// Build verification requests from the VaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests
 #[tracing::instrument(skip(conn, uvw))]

@@ -10,8 +10,8 @@ use super::{
     features::kyc_features::FeatureVector,
     risk::OnboardingRulesDecisionOutput,
     vendor::{
-        make_request::VerificationRequestWithVendorResponse, vendor_result::VendorResult,
-        vendor_trait::VendorAPICall, verification_result,
+        make_request::VerificationRequestWithVendorResponse, tenant_vendor_control::TenantVendorControl,
+        vendor_result::VendorResult, vendor_trait::VendorAPICall, verification_result,
     },
     *,
 };
@@ -57,6 +57,7 @@ pub async fn run(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
+    tenant_vendor_control: TenantVendorControl,
 ) -> ApiResult<()> {
     let vendor_requests =
         get_latest_verification_requests_and_results(&ob.id, &ob.scoped_vault_id, db_pool, enclave_client)
@@ -73,6 +74,7 @@ pub async fn run(
         socure_client,
         twilio_client,
         experian_client,
+        tenant_vendor_control,
     )
     .await?;
 
@@ -261,6 +263,7 @@ pub async fn make_vendor_requests(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
+    tenant_vendor_control: TenantVendorControl,
 ) -> ApiResult<VendorResults> {
     // Make requests
     let results = vendor::make_request::make_vendor_requests(
@@ -274,6 +277,7 @@ pub async fn make_vendor_requests(
         socure_client,
         twilio_client,
         experian_client,
+        tenant_vendor_control,
     )
     .await?;
 

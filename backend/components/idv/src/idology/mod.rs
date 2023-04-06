@@ -7,8 +7,10 @@ pub mod pa;
 pub mod scan_onboarding;
 pub mod scan_verify;
 
+use newtypes::vendor_credentials::IdologyCredentials;
 use newtypes::{DocVData, IdvData, PiiJsonValue};
 
+use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::{ParsedResponse, VendorResponse};
 
 use crate::idology::client::IdologyClient;
@@ -21,10 +23,12 @@ use tokio_retry::{
     RetryIf,
 };
 
+use self::common::request::{IdologyRequestData, Request};
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
 
 pub struct IdologyExpectIDRequest {
     pub idv_data: IdvData,
+    pub credentials: IdologyCredentials,
 }
 
 #[derive(Clone)]
@@ -33,6 +37,34 @@ pub struct IdologyExpectIDAPIResponse {
     pub parsed_response: ExpectIDResponse,
 }
 
+/// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
+/// scopes that were sent to IDology's ExpectID
+#[tracing::instrument(skip_all)]
+pub async fn verify_expectid(
+    fp_http_client: &FootprintVendorHttpClient,
+    request: IdologyExpectIDRequest,
+) -> Result<serde_json::Value, IdologyError::Error> {
+    let url = "https://web.idologylive.com/api/idiq.svc";
+    let req_data = expectid::request::RequestData::try_from(request.idv_data)?;
+    let req_list = Request::new(
+        request.credentials.username.clone(),
+        request.credentials.password.clone(),
+        IdologyRequestData::ExpectId(req_data),
+    );
+    let response = fp_http_client
+        .client
+        .post(url)
+        .query(&req_list)
+        .send()
+        .await
+        .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
+
+    let idology_response = response
+        .json::<serde_json::Value>()
+        .await
+        .map_err(IdologyError::ReqwestError::InternalError)?;
+    Ok(idology_response)
+}
 pub async fn send_scan_verify_request(
     client: &IdologyClient,
     data: DocVData,
@@ -134,13 +166,7 @@ mod test {
 
         // First get a queryID from expectID
         let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
-        let client = super::client::IdologyClient::new(
-            test_data.username.clone(),
-            test_data.password.clone(),
-            None,
-            None,
-        )
-        .unwrap();
+        let client = FootprintVendorHttpClient::new().unwrap();
         let idv_data = IdvData {
             // We have to induce a failure to get access to scan verify, so we do that here
             first_name: map_pii("intentional_fail".to_string()),
@@ -149,10 +175,30 @@ mod test {
             zip: map_pii(test_data.zip.clone()),
             ..Default::default()
         };
+        let credentials = IdologyCredentials {
+            username: test_data.username.clone(),
+            password: test_data.password.clone(),
+        };
+        // TODO: remove as Part of migrating away from clients with credentials per vendor
+        let legacy_idology_client = IdologyClient::new(
+            credentials.username.clone(),
+            credentials.password.clone(),
+            None,
+            None,
+        )
+        .unwrap();
         // ////////////
         // Send to ExpectID
         // ////////////
-        let res = client.verify_expectid(idv_data).await.unwrap();
+        let res = super::verify_expectid(
+            &client,
+            IdologyExpectIDRequest {
+                idv_data,
+                credentials,
+            },
+        )
+        .await
+        .unwrap();
         let expect_id_response = crate::idology::expectid::response::parse_response(res).unwrap();
 
         let parsed_expect_id = expect_id_response.response.clone();
@@ -172,7 +218,9 @@ mod test {
             document_type: Some(IdDocKind::DriverLicense),
         };
 
-        let scan_res = send_scan_verify_request(&client, docv_data).await.unwrap();
+        let scan_res = send_scan_verify_request(&legacy_idology_client, docv_data)
+            .await
+            .unwrap();
 
         let ParsedResponse::IDologyScanVerifySubmission(scan_verify_response) = scan_res.response else {
             panic!("incorrect scan verify submission type")
@@ -183,7 +231,7 @@ mod test {
         // ////////////
         // Fetch Results
         // ////////////
-        let results = poll_scan_verify_results_request(&client, query_id.unwrap())
+        let results = poll_scan_verify_results_request(&legacy_idology_client, query_id.unwrap())
             .await
             .unwrap();
 

@@ -1,5 +1,6 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
@@ -145,6 +146,10 @@ async fn test_run(
     let state = &StateWithMockEnclave::init().await.state;
 
     let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool).await;
+    let tenant_vendor_control =
+        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
+            .await
+            .unwrap();
 
     //
     // Mocking
@@ -226,6 +231,7 @@ async fn test_run(
         &mock_socure_api_call,
         &mock_twilio_api_call,
         &mock_experian_api_call,
+        tenant_vendor_control,
     )
     .await
     .unwrap();

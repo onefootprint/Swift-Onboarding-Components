@@ -6,6 +6,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -71,7 +72,7 @@ async fn make_vendor_calls(
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
     let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (requests, ob) = state
+    let (requests, ob, tenant) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
@@ -79,6 +80,7 @@ async fn make_vendor_calls(
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
+            let tenant = Tenant::get(conn, &scoped_user.id)?;
 
             let decision_intent =
                 DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &scoped_user.id)?;
@@ -89,9 +91,14 @@ async fn make_vendor_calls(
                 &decision_intent.id,
             )?;
 
-            Ok((requests, ob))
+            Ok((requests, ob, tenant))
         })
         .await?;
+
+    let tenant_vendor_control =
+        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
+            .await
+            .map_err(crate::decision::Error::from)?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
@@ -100,10 +107,11 @@ async fn make_vendor_calls(
         state.config.service_config.is_production(),
         requests,
         &state.feature_flag_client,
-        &state.idology_client,
+        &state.footprint_vendor_http_client,
         &state.socure_production_client,
         &state.twilio_client.client,
         &state.experian_client,
+        tenant_vendor_control,
     )
     .await?;
 
@@ -230,7 +238,7 @@ async fn shadow_run(
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
     let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (ob, requests) = state
+    let (ob, requests, tenant) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
@@ -259,9 +267,13 @@ async fn shadow_run(
                 })
                 .collect();
 
-            Ok((ob, memory_only_requests))
+            Ok((ob, memory_only_requests, tenant))
         })
         .await?;
+    let tenant_vendor_control =
+        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
+            .await
+            .map_err(crate::decision::Error::from)?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
@@ -270,10 +282,11 @@ async fn shadow_run(
         state.config.service_config.is_production(),
         requests,
         &state.feature_flag_client,
-        &state.idology_client,
+        &state.footprint_vendor_http_client,
         &state.socure_production_client,
         &state.twilio_client.client,
         &state.experian_client,
+        tenant_vendor_control,
     )
     .await?;
 

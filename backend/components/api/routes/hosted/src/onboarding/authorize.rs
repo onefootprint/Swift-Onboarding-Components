@@ -10,11 +10,13 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
+use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use db::models::verification_request::VerificationRequest;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
@@ -53,7 +55,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (ob_info, biz_ob, tenant) = state
+    let (ob_info, biz_ob, tenant, db_tenant_vendor_control) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
@@ -66,7 +68,7 @@ pub async fn post(
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
             }
             let biz_ob = user_auth.business_onboarding(c)?;
-            let tenant = Tenant::get(c, &ob_info.scoped_user.id).ok();
+            let tenant = Tenant::get(c, &ob_info.scoped_user.id)?;
 
             // Mark as authorized
             let ob = Onboarding::lock(c, &ob_info.onboarding.id)?;
@@ -77,14 +79,15 @@ pub async fn post(
             let bizob = biz_ob
                 .map(|b| b.update(c, OnboardingUpdate::is_authorized()))
                 .transpose()?;
+            let db_tenant_vendor_control = DbTenantVendorControl::get(c, tenant.id.clone())?;
 
-            Ok((ob_info, bizob, tenant))
+            Ok((ob_info, bizob, tenant, db_tenant_vendor_control))
         })
         .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", tenant.as_ref().map(|t| &t.id)));
-    span.record("tenant_name", &format!("{:?}", tenant.as_ref().map(|t| &t.name)));
+    span.record("tenant_id", &format!("{:?}", tenant.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", tenant.id.as_str()));
     span.record("onboarding_id", &format!("{}", ob_info.onboarding.id));
     span.record("scoped_use_id", &format!("{}", ob_info.scoped_user.id));
     span.record(
@@ -99,7 +102,7 @@ pub async fn post(
     // Run KYC checks
     let ob_id = ob_info.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, ob_info, biz_ob.clone()).await;
+        let engine_result = run_kyc(&state, ob_info, biz_ob.clone(), tenant, db_tenant_vendor_control).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
@@ -173,6 +176,8 @@ async fn run_kyc(
     state: &State,
     ob_info: AuthedOnboardingInfo,
     biz_ob: Option<Onboarding>, // TODO: remove from run_kyc and setup fixtures in run_kyb instead
+    tenant: Tenant,
+    db_tenant_vendor_control: Option<DbTenantVendorControl>,
 ) -> Result<(), ApiError> {
     let scoped_user_id = ob_info.scoped_user.id.clone();
     let uvw = state
@@ -194,6 +199,17 @@ async fn run_kyc(
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending
         let ob = ob_info.onboarding.clone();
         let scoped_user_id = ob_info.scoped_user.id.clone();
+
+        // Load vendor control
+        let tenant_vendor_control = TenantVendorControl::new(
+            &state.config,
+            db_tenant_vendor_control,
+            &state.enclave_client,
+            &tenant.e_private_key,
+        )
+        .await
+        .map_err(crate::decision::Error::from)?;
+
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<()> {
@@ -225,10 +241,11 @@ async fn run_kyc(
             &state.enclave_client,
             state.config.service_config.is_production(),
             &state.feature_flag_client,
-            &state.idology_client,
+            &state.footprint_vendor_http_client,
             &state.socure_production_client,
             &state.twilio_client.client,
             &state.experian_client,
+            tenant_vendor_control,
         )
         .await?;
     }

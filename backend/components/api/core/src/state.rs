@@ -14,8 +14,8 @@ use db::DbPool;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
     experian::cross_core::client::ExperianClient, fingerprintjs::client::FingerprintJSClient,
-    idology::client::IdologyClient, incode::client::IncodeClient, middesk::client::MiddeskClient,
-    socure::client::SocureClient,
+    footprint_http_client::FootprintVendorHttpClient, idology::client::IdologyClient,
+    incode::client::IncodeClient, middesk::client::MiddeskClient, socure::client::SocureClient,
 };
 use newtypes::PiiString;
 use workos::{ApiKey, WorkOs};
@@ -46,6 +46,7 @@ pub struct State {
     #[allow(unused)]
     pub incode_client: IncodeClient,
     pub middesk_client: MiddeskClient,
+    pub footprint_vendor_http_client: FootprintVendorHttpClient,
 }
 impl State {
     /// initialize global state in test context
@@ -161,6 +162,9 @@ impl State {
         //     .unwrap();
         // dbg!(crypto::hex::encode(&out));
 
+        let footprint_vendor_http_client =
+            FootprintVendorHttpClient::new().expect("failed to build vendor client");
+
         // run migrations
         db::run_migrations(&config.database_url).expect("failed to run migrations");
 
@@ -205,6 +209,7 @@ impl State {
             fingerprintjs_client,
             incode_client,
             middesk_client,
+            footprint_vendor_http_client,
         }
     }
 }

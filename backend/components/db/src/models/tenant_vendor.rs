@@ -6,7 +6,7 @@ use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{SealedVaultBytes, TenantId, TenantVendorControlId};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
 #[diesel(table_name = tenant_vendor_control)]
 pub struct TenantVendorControl {
     pub id: TenantVendorControlId,
@@ -46,6 +46,7 @@ impl TenantVendorControl {
     pub fn get(conn: &mut PgConn, tenant_id: TenantId) -> Result<Option<Self>, crate::DbError> {
         let control: Option<Self> = tenant_vendor_control::table
             .filter(tenant_vendor_control::tenant_id.eq(tenant_id))
+            .filter(tenant_vendor_control::deactivated_at.is_null())
             .first(conn)
             .optional()?;
         Ok(control)

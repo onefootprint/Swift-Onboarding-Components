@@ -1,4 +1,6 @@
 #![allow(clippy::too_many_arguments)]
+use super::idv_request::KycRequestBuilder;
+use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
 use crate::enclave_client::EnclaveClient;
@@ -25,7 +27,7 @@ use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
 #[tracing::instrument(skip(
-    data,
+    kyc_request_builder,
     db_pool,
     ff_client,
     idology_client,
@@ -35,7 +37,7 @@ use prometheus::labels;
 ))]
 pub async fn send_idv_request(
     request: VerificationRequest,
-    data: IdvData,
+    kyc_request_builder: KycRequestBuilder<'_>,
     onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     is_production: bool,
@@ -72,7 +74,7 @@ pub async fn send_idv_request(
     let result = match request.vendor_api {
         VendorAPI::IdologyExpectID => {
             send_idology_idv_request(
-                data,
+                kyc_request_builder,
                 is_production,
                 ob_configuration_key,
                 idology_client,
@@ -80,11 +82,13 @@ pub async fn send_idv_request(
             )
             .await?
         }
-        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(data, twilio_client).await?,
+        VendorAPI::TwilioLookupV2 => {
+            send_twilio_lookupv2_request(kyc_request_builder.idv_data(), twilio_client).await?
+        }
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(
                 onboarding_id,
-                data,
+                kyc_request_builder.idv_data(),
                 is_production,
                 db_pool,
                 socure_client,
@@ -95,7 +99,7 @@ pub async fn send_idv_request(
         // TODO finish this
         VendorAPI::ExperianPreciseID => {
             send_experian_idv_request(
-                data,
+                kyc_request_builder.idv_data(),
                 is_production,
                 ob_configuration_key,
                 experian_client,
@@ -176,7 +180,7 @@ where
 
 #[tracing::instrument(skip_all)]
 pub async fn send_idology_idv_request(
-    data: IdvData,
+    kyc_request_builder: KycRequestBuilder<'_>,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
     idology_api_call: &impl VendorAPICall<
@@ -188,7 +192,7 @@ pub async fn send_idology_idv_request(
 ) -> Result<VendorResponse, ApiError> {
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
         let res = idology_api_call
-            .make_request(IdologyExpectIDRequest { idv_data: data })
+            .make_request(kyc_request_builder.build_idology_request())
             .await;
 
         match res {
@@ -414,14 +418,15 @@ pub async fn make_idv_request(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
+    tenant_vendor_control: &TenantVendorControl,
 ) -> Result<VendorResponse, ApiError> {
     let data =
         build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
             .await?;
-
+    let kyc_request_builder = KycRequestBuilder::new(data, tenant_vendor_control);
     let vendor_response = send_idv_request(
         request,
-        data,
+        kyc_request_builder,
         onboarding_id,
         db_pool,
         is_production,
@@ -498,6 +503,7 @@ pub async fn make_vendor_requests(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
+    tenant_vendor_control: TenantVendorControl,
 ) -> Result<Vec<Result<VerificationRequestWithVendorResponse, ApiError>>, ApiError> {
     let raw_futures_with_vendors = requests.into_iter().map(|r| {
         (
@@ -513,6 +519,7 @@ pub async fn make_vendor_requests(
                 socure_client,
                 twilio_client,
                 experian_client,
+                &tenant_vendor_control,
             ),
         )
     });
@@ -652,9 +659,9 @@ mod tests {
                 })
             });
         }
-
+        let tvc = TenantVendorControl::default();
         send_idology_idv_request(
-            IdvData { ..Default::default() },
+            KycRequestBuilder::new(IdvData { ..Default::default() }, &tvc),
             is_production,
             ob_configuration_key,
             &mock_api,
