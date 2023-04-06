@@ -13,10 +13,10 @@ const ContactForm = ({ children }: ContactFormProps) => {
   const { data } = useSession();
 
   const prefill = {
-    email: data?.user.email || '',
-    firstName: data?.user.firstName || '',
-    lastName: data?.user.lastName || '',
-    name: `${data?.user.firstName} ${data?.user.lastName}` || '',
+    email: data.user?.email || '',
+    firstName: data.user?.firstName || '',
+    lastName: data.user?.lastName || '',
+    name: `${data.user?.firstName} ${data.user?.lastName}` || '',
   };
 
   const handleClickTrigger = () => {

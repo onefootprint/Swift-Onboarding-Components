@@ -8,14 +8,7 @@ const baseUser = {
   email: 'jane.doe@acme.com',
   firstName: 'Jane',
   lastName: 'Doe',
-  role: {
-    createdAt: '2022-09-19T16:24:34.368337Z',
-    id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-    isImmutable: true,
-    name: 'Admin',
-    numActiveUsers: 1,
-    scopes: [RoleScope.admin],
-  },
+  scopes: [RoleScope.admin],
 };
 
 const baseOrg = {
@@ -82,8 +75,8 @@ export const asAdminUserInSandboxAndRestricted = () => {
       user: baseUser,
       org: {
         ...baseOrg,
-        isLive: false,
         isSandboxRestricted: true,
+        isLive: false,
       },
       meta: baseMeta,
     },
@@ -110,10 +103,7 @@ export const asMemberUser = () => {
       auth: '1',
       user: {
         ...baseUser,
-        role: {
-          ...baseUser.role,
-          scopes: ['member' as RoleScope],
-        },
+        scopes: ['member' as RoleScope],
       },
       org: baseOrg,
       meta: baseMeta,
@@ -127,10 +117,7 @@ export const asUserWithScope = (scopes: RoleScope[]) => {
       auth: '1',
       user: {
         ...baseUser,
-        role: {
-          ...baseUser.role,
-          scopes,
-        },
+        scopes,
       },
       org: baseOrg,
       meta: baseMeta,

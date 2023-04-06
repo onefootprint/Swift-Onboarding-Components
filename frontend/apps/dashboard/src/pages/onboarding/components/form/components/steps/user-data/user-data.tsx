@@ -18,7 +18,7 @@ type FormData = {
 };
 
 const UserData = ({ id, onComplete }: UserDataProps) => {
-  const { dangerouslyCastedData, mutation } = useUserSession();
+  const { data, dangerouslyCastedData, mutation } = useUserSession();
   const { t, allT } = useTranslation('pages.onboarding.user-data');
   const {
     register,
@@ -26,8 +26,8 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      firstName: dangerouslyCastedData.firstName || '',
-      lastName: dangerouslyCastedData.lastName || '',
+      firstName: data?.firstName || '',
+      lastName: data?.lastName || '',
     },
   });
 

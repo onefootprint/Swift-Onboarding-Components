@@ -27,7 +27,10 @@ const Data = ({ authToken, organizations }: DataProps) => {
         onSuccess({ user, tenant }: OrgAssumeRoleResponse) {
           logIn({
             auth: authToken,
-            user,
+            user: {
+              ...user,
+              scopes: user.role.scopes,
+            },
             org: tenant,
             meta: {
               isFirstLogin: false,

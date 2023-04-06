@@ -16,11 +16,10 @@ const getOnboardingConfig = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useOnboardingConfig = (id: string = '') => {
-  const { authHeaders, data: sessionData } = useSession();
-  const isLive = sessionData?.org?.isLive;
+  const { authHeaders } = useSession();
 
   const onboardingConfigQuery = useQuery(
-    [QUERY_KEY, id, isLive],
+    [QUERY_KEY, id],
     () => getOnboardingConfig(authHeaders, id),
     {
       enabled: !!id,

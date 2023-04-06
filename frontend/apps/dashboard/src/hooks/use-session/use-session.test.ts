@@ -11,6 +11,7 @@ const loginPayload = {
     email: 'jane.doe@acme.com',
     firstName: 'Jane',
     lastName: 'Doe',
+    scopes: [RoleScope.admin],
     role: {
       createdAt: '2022-09-19T16:24:34.368337Z',
       id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -36,6 +37,7 @@ const loginPayload = {
     isFirstLogin: false,
     requiresOnboarding: false,
     isAssumed: false,
+    isLive: true,
   },
 };
 
@@ -84,7 +86,7 @@ describe('useSession', () => {
       act(() => {
         result.current.logOut();
       });
-      expect(result.current.data).toBeUndefined();
+      expect(result.current.data.user).toBeUndefined();
       expect(result.current.isLoggedIn).toBeFalsy();
     });
   });
@@ -96,9 +98,9 @@ describe('useSession', () => {
         result.current.logIn(loginPayload);
       });
       act(() => {
-        result.current.setOrg({ isLive: true });
+        result.current.setIsLive(true);
       });
-      expect(result.current.data?.org.isLive).toBeTruthy();
+      expect(result.current.data.org?.isLive).toBeTruthy();
     });
   });
 });

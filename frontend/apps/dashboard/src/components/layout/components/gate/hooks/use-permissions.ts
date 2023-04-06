@@ -33,7 +33,7 @@ const usePermissionsByRoute = (options: {
     }
     if (isPrivateRoute) {
       if (isLoggedIn) {
-        const requiresOnboarding = data?.meta?.requiresOnboarding;
+        const { requiresOnboarding } = data.meta;
         if (requiresOnboarding && pathname !== '/onboarding') {
           privateRoute.onError({ isLoggedIn: true, requiresOnboarding: true });
         }

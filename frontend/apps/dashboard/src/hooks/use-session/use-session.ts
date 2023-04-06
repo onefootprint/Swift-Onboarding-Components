@@ -7,6 +7,7 @@ import {
 } from '../../config/constants';
 import {
   AuthHeaders,
+  defaultSession,
   MetaSession,
   OrgSession,
   Session,
@@ -17,12 +18,23 @@ import {
 export const useStore = create<UserSessionState>()(
   persist(
     set => ({
-      data: undefined,
-      reset: () => set({ data: undefined }),
-      update: (data?: Session) => set({ data }),
+      data: defaultSession,
+      reset: () =>
+        set({
+          data: defaultSession,
+        }),
+      update: (data: Partial<Session>) => {
+        set(oldSession => ({
+          ...oldSession,
+          data: {
+            ...oldSession.data,
+            ...data,
+          },
+        }));
+      },
     }),
     {
-      version: 7,
+      version: 8,
       name: 'dashboard-storage',
     },
   ),
@@ -30,9 +42,16 @@ export const useStore = create<UserSessionState>()(
 
 const useSession = () => {
   const { data, reset, update } = useStore(state => state);
-  const dangerouslyCastedData = data as Session;
-  const isLoggedIn = !!data;
-  const isLive = !!data?.org?.isLive;
+  // Dangerously cast fields that are nullable when the user is logged out into non-nullable fields
+  // in order to remove unnecessary null checks in logged-in pages
+  const dangerouslyCastedData = {
+    auth: data.auth as string,
+    user: data.user as UserSession,
+    org: data.org as OrgSession,
+    meta: data.meta,
+  };
+  const isLoggedIn = !!data.user;
+  const isLive = !!data.org?.isLive;
 
   const authHeaders = {
     [DASHBOARD_AUTHORIZATION_HEADER]: data?.auth as string,
@@ -56,11 +75,12 @@ const useSession = () => {
     });
   };
 
-  const setAssumedOrg = (nextOrg: Partial<OrgSession>) => {
-    if (!data) return;
+  const setAssumedOrg = (nextOrg: Omit<OrgSession, 'isLive'>) => {
     update({
-      ...data,
-      org: { ...data.org, ...nextOrg },
+      org: {
+        ...nextOrg,
+        isLive: nextOrg.isSandboxRestricted,
+      },
       meta: { ...data.meta, isAssumed: true },
     });
   };
@@ -69,26 +89,35 @@ const useSession = () => {
     reset();
   };
 
-  const setOrg = (nextOrg: Partial<OrgSession>) => {
-    if (!data) return;
+  const setUser = (nextUser: Partial<UserSession>) => {
+    if (!data.user) return;
     update({
-      ...data,
-      org: { ...data.org, ...nextOrg },
+      user: {
+        ...data.user,
+        ...nextUser,
+      },
     });
   };
 
-  const setUser = (nextUser: Partial<UserSession>) => {
-    if (!data) return;
+  const setOrg = (nextOrg: Partial<Omit<OrgSession, 'isLive'>>) => {
+    if (!data.org) return;
     update({
-      ...data,
-      user: { ...data.user, ...nextUser },
+      org: {
+        ...data.org,
+        ...nextOrg,
+      },
+    });
+  };
+
+  const setIsLive = (newIsLive: boolean) => {
+    if (!data.org) return;
+    update({
+      org: { ...data.org, isLive: newIsLive },
     });
   };
 
   const completeOnboarding = () => {
-    if (!data) return;
     update({
-      ...data,
       meta: { ...data.meta, requiresOnboarding: false },
     });
   };
@@ -102,6 +131,8 @@ const useSession = () => {
     logOut,
     setOrg,
     setUser,
+    isLive,
+    setIsLive,
     setAssumedOrg,
     completeOnboarding,
   };

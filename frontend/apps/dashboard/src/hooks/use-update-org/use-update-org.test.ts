@@ -25,7 +25,7 @@ describe('useUpdateOrg', () => {
 
       await waitFor(() => {
         const state = useStore.getState();
-        expect(state.data?.org.name).toEqual('Acme Inc.');
+        expect(state.data.org?.name).toEqual('Acme Inc.');
       });
     });
   });

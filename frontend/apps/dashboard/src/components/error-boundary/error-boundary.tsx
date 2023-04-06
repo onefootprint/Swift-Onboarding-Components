@@ -13,9 +13,9 @@ const ErrorBoundary = ({ children }: ErrorBoundaryProps) => {
   const observeCollector = useObserveCollector();
   const { data } = useSession();
   observeCollector.setAppContext({
-    meta: data?.meta,
-    org: data?.org,
-    user: data?.user,
+    meta: data.meta,
+    org: data.org,
+    user: data.user,
   });
 
   return (

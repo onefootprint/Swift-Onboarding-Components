@@ -13,14 +13,14 @@ const AssumeBanner = () => {
   const handleLogout = () => {
     router.push({
       pathname: '/organizations',
-      query: { token: data?.auth },
+      query: { token: data.auth },
     });
   };
 
-  return data?.meta.isAssumed ? (
+  return data.meta.isAssumed ? (
     <AssumeBannerContainer>
       <Banner variant="info">
-        {t('title', { orgName: data?.org.name })}
+        {t('title', { orgName: data.org?.name })}
         <button type="button" onClick={handleLogout}>
           {t('log-out')}
         </button>

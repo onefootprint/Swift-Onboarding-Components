@@ -1,4 +1,4 @@
-import { Organization, Role } from '@onefootprint/types';
+import { Organization, RoleScope } from '@onefootprint/types';
 
 import {
   DASHBOARD_AUTHORIZATION_HEADER,
@@ -10,7 +10,7 @@ export type UserSession = {
   email: string;
   firstName: string | null;
   lastName: string | null;
-  role: Role;
+  scopes: RoleScope[];
 };
 
 export type OrgSession = {
@@ -28,17 +28,29 @@ export type MetaSession = {
 };
 
 export type Session = {
-  auth: string;
-  user: UserSession;
-  org: OrgSession;
+  auth?: string;
+  user?: UserSession;
+  org?: OrgSession;
   meta: MetaSession;
+};
+
+export const defaultSession = {
+  auth: undefined,
+  user: undefined,
+  org: undefined,
+  meta: {
+    createdNewTenant: false,
+    isFirstLogin: false,
+    requiresOnboarding: false,
+    isAssumed: false,
+  },
 };
 
 // Whenever changing this, make sure to read this guide:
 // https://www.notion.so/onefootprint/Migrating-session-w-Zustand-92cc5a563d6747ca80fd689232c5b7b4
 export type UserSessionState = {
-  data?: Session;
-  update: (data?: Session) => void;
+  data: Session;
+  update: (data: Partial<Session>) => void;
   reset: () => void;
 };
 

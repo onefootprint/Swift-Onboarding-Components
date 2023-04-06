@@ -18,7 +18,7 @@ const Onboarding = () => {
     router.push('/users');
   };
 
-  return session.data ? (
+  return session.data.user ? (
     <>
       <Head>
         <title>{t('page-title')}</title>

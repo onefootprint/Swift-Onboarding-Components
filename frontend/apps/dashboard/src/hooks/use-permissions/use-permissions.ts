@@ -4,7 +4,7 @@ import useSession from '../use-session';
 
 const usePermissions = () => {
   const session = useSession();
-  const scopes = session.data?.user.role.scopes || [];
+  const scopes = session.data.user?.scopes || [];
   const isAdmin = scopes.includes(RoleScope.admin);
   const canDecrypt =
     isAdmin || scopes.some(scope => scope.startsWith('decrypt'));

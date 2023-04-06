@@ -50,9 +50,13 @@ const Auth = () => {
               });
             });
           } else {
+            // Will simplify in follow-up
             logIn({
               auth: authToken,
-              user,
+              user: {
+                ...user,
+                scopes: user.role.scopes,
+              },
               org: tenant,
               meta: {
                 isFirstLogin,

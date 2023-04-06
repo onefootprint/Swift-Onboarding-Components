@@ -25,7 +25,7 @@ type DefaultLayoutProps = {
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
-  const { dangerouslyCastedData } = useOrgSession();
+  const { data } = useOrgSession();
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
     { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
@@ -74,9 +74,11 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
         <Container>{children}</Container>
       </Header>
       <Footer>
-        <Typography color="tertiary" variant="label-4">
-          Footprint ❤️ {dangerouslyCastedData.name}
-        </Typography>
+        {data?.name && (
+          <Typography color="tertiary" variant="label-4">
+            Footprint ❤️ {data.name}
+          </Typography>
+        )}
       </Footer>
     </DefaultLayoutContainer>
   );
