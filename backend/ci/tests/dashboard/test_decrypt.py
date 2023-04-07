@@ -5,6 +5,7 @@ from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
     post,
+    build_user_data,
 )
 from tests.bifrost_client import BifrostClient, DocumentDataOptions
 
@@ -24,17 +25,11 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
 
 def test_tenant_decrypt(sandbox_user):
     tenant = sandbox_user.tenant
-    expected_data = {
-        "id.first_name": sandbox_user.first_name,
-        "id.last_name": sandbox_user.last_name,
-        "id.email": sandbox_user.email,
-        "id.address_line1": sandbox_user.address_line1,
-        "id.address_line2": sandbox_user.address_line2,
-        "id.zip": sandbox_user.zip,
-        "id.country": sandbox_user.country,
-        "id.ssn9": sandbox_user.ssn,
-        "id.ssn4": sandbox_user.ssn[-4:],
-    }
+    expected_data = build_user_data()
+    # TODO weird
+    expected_data["id.ssn9"] = sandbox_user.ssn
+    expected_data["id.ssn4"] = sandbox_user.ssn[-4:]
+    expected_data["id.email"] = sandbox_user.email
     for attributes in FIELDS_TO_DECRYPT:
         data = {
             "fields": attributes,

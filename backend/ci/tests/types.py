@@ -52,19 +52,10 @@ class BasicUser(NamedTuple):
 
 
 class User(NamedTuple):
-    auth_token: str
-    fp_id: str
-    first_name: str
-    last_name: str
-    address_line1: str
-    address_line2: str
-    zip: str
-    city: str
-    state: str
-    country: str
-    ssn: str
-    phone_number: str
-    real_phone_number: str
-    email: str
     validation_token: str
+    fp_id: str
+    auth_token: str
     tenant: Tenant
+    phone_number: str
+    email: str
+    ssn: str
