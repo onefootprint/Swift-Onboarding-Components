@@ -9,25 +9,13 @@ type ContentProps = {
 };
 
 const Content = ({ riskSignal }: ContentProps) => (
-  <>
-    <Box sx={{ marginBottom: 9 }}>
-      <Overview
-        description={riskSignal.description}
-        scopes={riskSignal.scopes}
-        severity={riskSignal.severity}
-      />
-    </Box>
-    {/* 
-      TODO: https://linear.app/footprint/issue/FP-1690/risk-signal-details-show-related-signals
-      <Box sx={{ marginBottom: 9 }}>
-      <RelatedSignals relatedSignals={riskSignal.relatedSignals} />
-    </Box> */}
-    {/* 
-      TODO: https://linear.app/footprint/issue/FP-1689/risk-signal-details-show-raw-response
-      <Box>
-      <RawResponse rawResponse={riskSignal.rawResponse} />
-    </Box> */}
-  </>
+  <Box sx={{ marginBottom: 9 }}>
+    <Overview
+      description={riskSignal.description}
+      scopes={riskSignal.scopes}
+      severity={riskSignal.severity}
+    />
+  </Box>
 );
 
 export default Content;
