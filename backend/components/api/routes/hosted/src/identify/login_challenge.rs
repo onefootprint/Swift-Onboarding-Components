@@ -8,7 +8,7 @@ use crate::utils::challenge::Challenge;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
-use api_core::auth::ob_config::ObPkAuth;
+use api_core::auth::ob_config::ObConfigAuth;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
@@ -37,7 +37,7 @@ pub struct LoginChallengeResponse {
 pub async fn post(
     request: Json<LoginChallengeRequest>,
     state: web::Data<State>,
-    ob_context: Option<ObPkAuth>,
+    ob_context: Option<ObConfigAuth>,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     // clean phone number
     let LoginChallengeRequest {

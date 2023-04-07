@@ -37,4 +37,7 @@ pub enum AuthSessionData {
 
     /// Used to provide a single use onboarding session token for bifrost initialization
     OnboardingSession(crate::auth::ob_config::OnboardingSession),
+
+    /// Used to initialize an onboarding session to KYC an owner of a business
+    BusinessOwner(crate::auth::ob_config::BoSession),
 }

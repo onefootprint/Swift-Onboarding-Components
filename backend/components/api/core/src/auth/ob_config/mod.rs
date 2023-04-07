@@ -1,30 +1,41 @@
+mod bo_session;
 mod ob_public_key;
 mod ob_session;
 
-use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
+pub use bo_session::*;
 pub use ob_public_key::*;
 pub use ob_session::*;
 
-use super::{Either, SessionContext};
+use super::Either;
+use db::models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant};
 
-/// Auth extractor for a short-lived session that represents the onboarding
-pub type ObPkSessionAuth = SessionContext<ParsedOnboardingSession>;
+/// Auth extractor for any header that uniquely identifies an onboarding configuration
+pub type ObConfigAuth = Either<PublicOnboardingContext, Either<ObPkSessionAuth, BoSessionAuth>>;
 
-/// Auth extractor for methods that
-pub type ObPkAuth = Either<PublicOnboardingContext, ObPkSessionAuth>;
-
-impl ObPkAuth {
+impl ObConfigAuth {
+    /// The ob configuration associated with this auth method
     pub fn ob_config(&self) -> &ObConfiguration {
         match self {
-            Either::Left(l) => &l.ob_config,
-            Either::Right(r) => &r.data.ob_config,
+            Either::Left(a) => &a.ob_config,
+            Either::Right(Either::Left(a)) => &a.data.ob_config,
+            Either::Right(Either::Right(a)) => &a.data.ob_config,
         }
     }
 
+    /// The tenant associated with this auth method
     pub fn tenant(&self) -> &Tenant {
         match self {
-            Either::Left(l) => &l.tenant,
-            Either::Right(r) => &r.data.tenant,
+            Either::Left(a) => &a.tenant,
+            Either::Right(Either::Left(a)) => &a.data.tenant,
+            Either::Right(Either::Right(a)) => &a.data.tenant,
+        }
+    }
+
+    /// The BusinessOwner associated with this auth session. Only non-null for BoSessionAuth
+    pub fn business_owner(&self) -> Option<&BusinessOwner> {
+        match self {
+            Either::Right(Either::Right(a)) => Some(&a.data.bo),
+            _ => None,
         }
     }
 }

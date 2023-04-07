@@ -1,5 +1,5 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
-use crate::auth::ob_config::ObPkAuth;
+use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
@@ -55,7 +55,7 @@ pub struct VerifyResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
-    ob_pk_auth: ObPkAuth,
+    ob_pk_auth: ObConfigAuth,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let challenge_state =

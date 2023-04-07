@@ -1,4 +1,4 @@
-use crate::auth::ob_config::ObPkAuth;
+use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::{
@@ -26,7 +26,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 )]
 #[get("/org/onboarding_config")]
 pub fn get_bifrost(
-    ob_pk_auth: ObPkAuth,
+    ob_pk_auth: ObConfigAuth,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db((

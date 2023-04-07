@@ -86,4 +86,11 @@ impl BusinessOwner {
             .get_results(conn)?;
         Ok(result)
     }
+
+    pub fn get(conn: &mut PgConn, id: &BoId) -> DbResult<Self> {
+        let result = business_owner::table
+            .filter(business_owner::id.eq(id))
+            .get_result(conn)?;
+        Ok(result)
+    }
 }

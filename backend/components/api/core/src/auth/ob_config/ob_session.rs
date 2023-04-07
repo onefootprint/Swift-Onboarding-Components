@@ -5,7 +5,10 @@ use db::{
 use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
 
-use crate::auth::session::{AuthSessionData, ExtractableAuthSession};
+use crate::auth::{
+    session::{AuthSessionData, ExtractableAuthSession},
+    SessionContext,
+};
 use crate::{auth::AuthError, errors::ApiError};
 use feature_flag::LaunchDarklyFeatureFlagClient;
 
@@ -27,6 +30,9 @@ pub struct ParsedOnboardingSession {
     pub tenant: Tenant,
     pub ob_config: ObConfiguration,
 }
+
+/// Auth extractor for a short-lived session that represents the onboarding
+pub type ObPkSessionAuth = SessionContext<ParsedOnboardingSession>;
 
 impl ExtractableAuthSession for ParsedOnboardingSession {
     fn header_names() -> Vec<&'static str> {
