@@ -237,6 +237,11 @@ export const getTextByRow = ({
 };
 
 export const decryptFields = async (fields: string[]) => {
+  await waitFor(() => {
+    screen.getByRole('button', {
+      name: 'Decrypt data',
+    });
+  });
   const decryptButton = screen.getByRole('button', {
     name: 'Decrypt data',
   });

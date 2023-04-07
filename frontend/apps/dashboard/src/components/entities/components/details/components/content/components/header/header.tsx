@@ -56,9 +56,12 @@ const Row = styled.div`
 `;
 
 const SubHeader = styled.div`
-  display: flex;
-  flex-direction: column wrap;
-  justify-content: space-between;
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column wrap;
+    justify-content: space-between;
+    height: ${theme.spacing[8]};
+  `};
 `;
 
 export default Header;

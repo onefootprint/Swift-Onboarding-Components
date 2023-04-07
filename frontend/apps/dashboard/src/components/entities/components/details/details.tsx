@@ -1,4 +1,5 @@
 import { EntityKind } from '@onefootprint/types';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 
 import Content from './components/content';
@@ -16,11 +17,13 @@ const Details = ({ kind, listPath }: DetailsProps) => {
   const { isLoading, errorMessage, data } = useEntityInitialData();
 
   return (
-    <Provider kind={kind} listPath={listPath}>
-      {isLoading && <Loading />}
-      {errorMessage && !isLoading && <Error message={errorMessage} />}
-      {data && !isLoading && <Content />}
-    </Provider>
+    <Box>
+      <Provider kind={kind} listPath={listPath}>
+        {isLoading && <Loading />}
+        {errorMessage && !isLoading && <Error message={errorMessage} />}
+        {data && !isLoading && <Content />}
+      </Provider>
+    </Box>
   );
 };
 

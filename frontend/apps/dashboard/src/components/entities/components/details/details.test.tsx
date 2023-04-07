@@ -70,11 +70,6 @@ describe('<Details />', () => {
     });
 
     await waitFor(() => {
-      const content = screen.getByTestId('entity-content');
-      expect(content).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
       const decryptButton = screen.getByRole('button', {
         name: 'Decrypt data',
       });
