@@ -7,8 +7,8 @@ from tests.constants import (
     TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY,
     TWILIO_API_KEY_SECRET,
-    TENANT_ID1,
     TENANT_ID2,
+    TENANT_ID1,
 )
 from tests.utils import (
     EXPECTED_SERVER_VERSION_GIT_HASH,
@@ -84,23 +84,6 @@ def must_collect_data(can_access_data):
 
 
 @pytest.fixture(scope="session")
-def tenant(must_collect_data, can_access_data):
-    org_data = {
-        "id": TENANT_ID1,
-        "name": "Footprint Live Integration Testing",
-        "is_live": True,
-    }
-
-    ob_conf_data = {
-        "name": "Acme Bank Card",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-    }
-
-    return create_tenant(org_data, ob_conf_data)
-
-
-@pytest.fixture(scope="session")
 def sandbox_tenant_data(must_collect_data, can_access_data):
     # We reuse this in another place
     org_data = {
@@ -119,28 +102,28 @@ def sandbox_tenant_data(must_collect_data, can_access_data):
 
 
 @pytest.fixture(scope="session")
+def tenant(must_collect_data, can_access_data):
+    """
+    Production, non-sandbox tenant. Only used for these tests
+    """
+    org_data = {
+        "id": TENANT_ID1,
+        "name": "Footprint Live Integration Testing",
+        "is_live": True,
+    }
+
+    ob_conf_data = {
+        "name": "Acme Bank Card",
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+    }
+
+    return create_tenant(org_data, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
 def sandbox_tenant(sandbox_tenant_data):
     return create_tenant(*sandbox_tenant_data)
-
-
-@pytest.fixture(scope="session")
-def doc_request_ob_config(tenant, must_collect_data, can_access_data):
-    ob_conf_data = {
-        "name": "Doc request config",
-        "must_collect_data": must_collect_data + ["document"],
-        "can_access_data": can_access_data,
-    }
-    return create_ob_config(tenant.sk, ob_conf_data)
-
-
-@pytest.fixture(scope="session")
-def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
-    ob_conf_data = {
-        "name": "Doc request config",
-        "must_collect_data": must_collect_data + ["document"],
-        "can_access_data": can_access_data,
-    }
-    return create_ob_config(tenant.sk, ob_conf_data)
 
 
 @pytest.fixture(scope="session")

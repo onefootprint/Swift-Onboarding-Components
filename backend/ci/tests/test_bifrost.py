@@ -1,5 +1,4 @@
 import json
-import os
 import pytest
 
 from tests.constants import (
@@ -25,12 +24,33 @@ from tests.utils import (
     get_requirement_from_requirements,
     create_ob_config,
     inherit_user,
+    create_tenant,
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
+
+
+@pytest.fixture(scope="session")
+def doc_request_ob_config(tenant, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": "Doc request config",
+        "must_collect_data": must_collect_data + ["document"],
+        "can_access_data": can_access_data,
+    }
+    return create_ob_config(tenant.sk, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": "Doc request config",
+        "must_collect_data": must_collect_data + ["document"],
+        "can_access_data": can_access_data,
+    }
+    return create_ob_config(tenant.sk, ob_conf_data)
 
 
 @pytest.fixture(scope="module", autouse="true")
@@ -40,7 +60,10 @@ def cleanup():
 
 
 @pytest.fixture(scope="module")
-def non_sandbox_auth_token(twilio, tenant):
+def auth_token(twilio, tenant):
+    """
+    Auth token for a non-sandbox user
+    """
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER)
 
@@ -88,35 +111,18 @@ class TestBifrost:
         assert not body["user_found"]
         assert not body["available_challenge_kinds"]
 
-    @pytest.mark.parametrize("token_type", ["publishable", "session"])
     def test_onboarding_init(
         self,
         tenant,
-        non_sandbox_auth_token,
-        token_type,
-        ob_session_token,
+        auth_token,
     ):
-        ob_auth = {
-            "publishable": tenant.default_ob_config.key,
-            "session": ob_session_token,
-        }[token_type]
-        body = post(
-            "hosted/onboarding",
-            None,
-            ob_auth,
-            non_sandbox_auth_token,
-        )
+        body = post("hosted/onboarding", None, auth_token)
         assert not body["validation_token"]
         # Try again to make sure this endpoint is idempotent
-        body = post(
-            "hosted/onboarding",
-            None,
-            ob_auth,
-            non_sandbox_auth_token,
-        )
+        body = post("hosted/onboarding", None, auth_token)
         assert not body["validation_token"]
 
-        body = get("hosted/onboarding/status", None, non_sandbox_auth_token)
+        body = get("hosted/onboarding/status", None, auth_token)
         assert body["ob_configuration"]["org_name"] == tenant.name
 
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
@@ -136,7 +142,7 @@ class TestBifrost:
             "hosted/onboarding/authorize",
             None,
             tenant.default_ob_config.key,
-            non_sandbox_auth_token,
+            auth_token,
             status_code=400,
         )
 
@@ -155,12 +161,12 @@ class TestBifrost:
         must_collect_data,
         can_access_data,
         twilio,
-        non_sandbox_auth_token,
+        auth_token,
         addl_must_collect_data,
         addl_can_access_data,
     ):
         # Not used in test, but want to make sure the user has been created before running this test
-        non_sandbox_auth_token
+        auth_token
 
         # Create an ob_config
 
@@ -180,17 +186,9 @@ class TestBifrost:
         assert set(listed_ob_config["can_access_data"]) > set(addl_can_access_data)
 
         # Create a user and begin onboarding
-        auth_token = create_inherited_non_sandbox_user(
-            twilio,
-            ob_config.key,
-        )
+        auth_token = create_inherited_non_sandbox_user(twilio, ob_config.key)
 
-        post(
-            "hosted/onboarding",
-            None,
-            ob_config.key,
-            auth_token,
-        )
+        post("hosted/onboarding", None, auth_token)
 
         # The correct doc requirements are given by hosted/onboarding/status
         body = get("hosted/onboarding/status", None, auth_token)
@@ -207,40 +205,21 @@ class TestBifrost:
         else:
             assert collect_document_req is None
 
-    def test_skip_liveness(self, non_sandbox_auth_token, tenant):
+    def test_skip_liveness(self, auth_token):
         # Liveness requirement exists
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
+        body = get("hosted/onboarding/status", None, auth_token)
         assert list(r for r in body["requirements"] if r["kind"] == "liveness")
 
-        post(
-            "hosted/onboarding/skip_liveness",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
+        post("hosted/onboarding/skip_liveness", None, auth_token)
 
         # After skipping, liveness requirement does not exist
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
+        body = get("hosted/onboarding/status", None, auth_token)
         assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
 
-    def test_user_data(self, non_sandbox_auth_token):
+    def test_user_data(self, auth_token):
         # Test failed validation
-        data = {
-            "id.email": "flerpderp",
-        }
-        post(
-            "hosted/user/vault/validate", data, non_sandbox_auth_token, status_code=400
-        )
+        data = {"id.email": "flerpderp"}
+        post("hosted/user/vault/validate", data, auth_token, status_code=400)
 
         # Test validating data before setting
         data = {
@@ -254,30 +233,28 @@ class TestBifrost:
             "id.country": "US",
             "id.ssn9": _gen_random_ssn(),
         }
-        post("hosted/user/vault/validate", data, non_sandbox_auth_token)
+        post("hosted/user/vault/validate", data, auth_token)
 
         # Actually set the data
-        put("hosted/user/vault", data, non_sandbox_auth_token)
+        put("hosted/user/vault", data, auth_token)
 
         # Should be allowed to update speculative fields that are already set
         data = {
             "id.first_name": "Flerp2",
             "id.last_name": "Derp2",
         }
-        put("hosted/user/vault", data, non_sandbox_auth_token)
+        put("hosted/user/vault", data, auth_token)
 
-    def test_add_email(self, non_sandbox_auth_token):
-        put("hosted/user/vault", {"id.email": EMAIL}, non_sandbox_auth_token)
+    def test_add_email(self, auth_token):
+        put("hosted/user/vault", {"id.email": EMAIL}, auth_token)
 
-    def test_d2p_biometric(self, non_sandbox_auth_token):
+    def test_d2p_biometric(self, auth_token):
         # Try generating tokens with no metadata for backwards compatibility
-        post("hosted/onboarding/d2p/generate", None, non_sandbox_auth_token)
-        post("hosted/onboarding/d2p/generate", dict(), non_sandbox_auth_token)
+        post("hosted/onboarding/d2p/generate", None, auth_token)
+        post("hosted/onboarding/d2p/generate", dict(), auth_token)
         # Get new auth token in d2p/generate endpoint
         meta = dict(opener="mobile", style_params="lots of CSS things")
-        body = post(
-            "hosted/onboarding/d2p/generate", dict(meta=meta), non_sandbox_auth_token
-        )
+        body = post("hosted/onboarding/d2p/generate", dict(meta=meta), auth_token)
         d2p_auth_token = FpAuth(body["auth_token"])
 
         # Send the d2p token to the user via SMS
@@ -325,65 +302,29 @@ class TestBifrost:
         post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
         post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
 
-    def test_onboarding_authorize(self, tenant, non_sandbox_auth_token):
-        body = post(
-            "hosted/onboarding/authorize",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
+    def test_onboarding_authorize(self, tenant, auth_token, sandbox_tenant):
+        post("hosted/onboarding/authorize", None, auth_token)
+        # Should be idempotent
+        body = post("hosted/onboarding/authorize", None, auth_token)
         validation_token = body["validation_token"]
-        # temporary before we move this
-        body = get(
-            "hosted/onboarding/kyc",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
-        assert body["status"] == "complete"
-
         assert validation_token
 
-        # test the validate api call
+        # test the validate api call. Shouldn't be able to validate with other tenant
         data = dict(validation_token=validation_token)
+        post(
+            "onboarding/session/validate", data, sandbox_tenant.sk.key, status_code=400
+        )
         body = post("onboarding/session/validate", data, tenant.sk.key)
-        assert body["footprint_user_id"]
+        fp_id = body["footprint_user_id"]
         assert body["status"]
 
-    def test_onboard_onto_same_ob_config(self, tenant, non_sandbox_auth_token):
-        body = post(
-            "hosted/onboarding",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
-        validation_token = body["validation_token"]
-        data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, tenant.sk.key)
-        assert body["footprint_user_id"]
-
-        # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
-        # but if we do, we should no-op and succeed
-        body = post(
-            "hosted/onboarding/authorize",
-            None,
-            tenant.default_ob_config.key,
-            non_sandbox_auth_token,
-        )
-        validation_token = body["validation_token"]
-        data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, tenant.sk.key)
-        footprint_user_id = body["footprint_user_id"]
-        assert footprint_user_id
-
-        body = get(f"entities/{footprint_user_id}/timeline", None, tenant.sk.key)
+        # Make sure the fp_id works
+        body = get(f"entities/{fp_id}/timeline", None, tenant.sk.key)
         assert len(body) > 0
 
-    def test_identify_login_repeat_customer_biometric(
-        self, non_sandbox_auth_token, tenant
-    ):
+    def test_identify_login_repeat_customer_biometric(self, auth_token, tenant):
         # Not used in test, but want to make sure the user has been created before running this test
-        non_sandbox_auth_token
+        auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = dict(
@@ -435,9 +376,9 @@ class TestBifrost:
         body = post("hosted/identify/verify", data, tenant.default_ob_config.key)
         assert body["kind"] == "user_inherited"
 
-    def test_identify_login_repeat_customer_no_challenge(self, non_sandbox_auth_token):
+    def test_identify_login_repeat_customer_no_challenge(self, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
-        non_sandbox_auth_token
+        auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = dict(
@@ -463,15 +404,13 @@ class TestBifrost:
     def test_onboarding_requiring_document(
         self,
         twilio,
-        non_sandbox_auth_token,
+        auth_token,
         test_name,
-        # TODO: For now, need two separate tenants since we use the same user. Can change this once
-        # we start allowing multiple ScopedUsers per tenant
         doc_request_ob_config,
         doc_request_ob_config2,
     ):
         # Not used but need to create the fixture
-        non_sandbox_auth_token
+        auth_token
         from .image_fixtures import test_image
 
         # This is non-ideal, but creating new users integration tests is a little tricky at the moment
@@ -505,55 +444,22 @@ class TestBifrost:
         )
 
         # Onboard a user onto a tenant that requests a document
-        post(
-            "hosted/onboarding",
-            None,
-            ob_config_key,
-            auth_token,
-        )
+        post("hosted/onboarding", None, auth_token)
+        body = get("hosted/onboarding/status", None, auth_token)
 
-        body = get(
-            "hosted/onboarding/status",
-            None,
-            ob_config_key,
-            auth_token,
-        )
-
-        # We have a requirement
-        req = get_requirement_from_requirements(
-            "collect_document", body["requirements"]
-        )
-        assert req
-        # stash the request id
-        document_request_id = req["document_request_id"]
+        # Make sure we have a requirement
+        get_requirement_from_requirements("collect_document", body["requirements"])
 
         # Submit the document
-        post_body = post(
-            f"hosted/user/document",
-            data,
-            auth_token,
-            ob_config_key,
-        )
+        post(f"hosted/user/document", data, auth_token)
 
-        assert post_body == {}
-
-        # get status.
-        # We always move to complete now, this will change once we have vendor integrations
-        expected = {
+        body = get(f"hosted/user/document/status", None, auth_token)
+        assert body == {
             "status": {"kind": "complete"},
             "errors": [],
             "front_image_error": None,
             "back_image_error": None,
         }
-
-        get_body = get(
-            f"hosted/user/document/status",
-            None,
-            auth_token,
-            ob_config_key,
-        )
-
-        assert get_body == expected
 
 
 class TestBifrostSandbox:
