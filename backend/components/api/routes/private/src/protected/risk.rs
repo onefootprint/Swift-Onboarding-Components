@@ -6,13 +6,12 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
-use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControlBuilder;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
-use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId};
@@ -71,8 +70,15 @@ async fn make_vendor_calls(
     request: Json<MakeVendorCallsRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
     let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
+    let tid = tenant_id.clone();
+    let tvc_builder = state
+        .db_pool
+        .db_query(move |conn| TenantVendorControlBuilder::new(conn, &tid))
+        .await??;
+    let tenant_vendor_control = tvc_builder.build(&state).await?;
+    let tenant_vendor_control2 = tenant_vendor_control.clone();
 
-    let (requests, ob, tenant) = state
+    let (requests, ob) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
@@ -80,7 +86,6 @@ async fn make_vendor_calls(
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
-            let tenant = Tenant::get(conn, &scoped_user.id)?;
 
             let decision_intent =
                 DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &scoped_user.id)?;
@@ -89,16 +94,12 @@ async fn make_vendor_calls(
                 &uvw,
                 &scoped_user.id,
                 &decision_intent.id,
+                &tenant_vendor_control2,
             )?;
 
-            Ok((requests, ob, tenant))
+            Ok((requests, ob))
         })
         .await?;
-
-    let tenant_vendor_control =
-        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
-            .await
-            .map_err(crate::decision::Error::from)?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
@@ -238,18 +239,27 @@ async fn shadow_run(
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
     let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (ob, requests, tenant) = state
+    let tid = tenant_id.clone();
+    let tvc_builder = state
+        .db_pool
+        .db_query(move |conn| TenantVendorControlBuilder::new(conn, &tid))
+        .await??;
+    let tenant_vendor_control = tvc_builder.build(&state).await?;
+    let tenant_vendor_control2 = tenant_vendor_control.clone();
+
+    let (ob, requests) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let tenant = Tenant::get(conn, &scoped_user.id)?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
-            let vendor_apis =
-                vendor::get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?;
+            let vendor_apis = vendor::get_vendor_apis_for_verification_requests(
+                uvw.populated().as_slice(),
+                &tenant_vendor_control2,
+            )?;
             #[allow(clippy::unwrap_used)]
             let memory_only_requests = vendor_apis
                 .into_iter()
@@ -267,13 +277,9 @@ async fn shadow_run(
                 })
                 .collect();
 
-            Ok((ob, memory_only_requests, tenant))
+            Ok((ob, memory_only_requests))
         })
         .await?;
-    let tenant_vendor_control =
-        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
-            .await
-            .map_err(crate::decision::Error::from)?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,

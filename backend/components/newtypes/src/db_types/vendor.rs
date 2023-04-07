@@ -3,6 +3,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumString};
 
 use crate::util::impl_enum_str_diesel;
@@ -90,6 +91,13 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::MiddeskCreateBusiness => Self::Middesk,
         }
     }
+}
+
+// convenience method for getting all vendor apis for a vendor
+pub fn vendor_apis_from_vendor(vendor: Vendor) -> Vec<VendorAPI> {
+    VendorAPI::iter()
+        .filter(|api| Vendor::from(*api) == vendor)
+        .collect()
 }
 
 impl VendorAPI {

@@ -9,5 +9,6 @@ pub mod task;
 pub mod tenant;
 pub mod tenant_role;
 pub mod tenant_user;
+pub mod tenant_vendor_control;
 pub mod vault;
 pub mod verification_request;

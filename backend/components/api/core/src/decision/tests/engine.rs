@@ -147,7 +147,7 @@ async fn test_run(
 
     let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool).await;
     let tenant_vendor_control =
-        TenantVendorControl::new(&state.config, None, &state.enclave_client, &tenant.e_private_key)
+        TenantVendorControl::new_for_test(&state.config, None, &state.enclave_client, &tenant.e_private_key)
             .await
             .unwrap();
 

@@ -1,5 +1,5 @@
 use crate::schema::tenant_vendor_control;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use diesel::ExpressionMethods;
 use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
@@ -28,18 +28,38 @@ pub struct TenantVendorControl {
 #[diesel(table_name = tenant_vendor_control)]
 struct NewTenantVendorControl {
     tenant_id: TenantId,
+    idology_enabled: bool,
+    idology_username: Option<String>,
+    idology_e_password: Option<SealedVaultBytes>,
+    experian_enabled: bool,
+    experian_subscriber_code: Option<String>,
 }
 
 impl TenantVendorControl {
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut PgConn, tenant_id: TenantId) -> Result<(), crate::DbError> {
-        let new = NewTenantVendorControl { tenant_id };
+    pub fn create(
+        conn: &mut PgConn,
+        tenant_id: TenantId,
+        idology_enabled: bool,
+        idology_username: Option<String>,
+        idology_e_password: Option<SealedVaultBytes>,
+        experian_enabled: bool,
+        experian_subscriber_code: Option<String>,
+    ) -> DbResult<Self> {
+        let new = NewTenantVendorControl {
+            tenant_id,
+            idology_enabled,
+            idology_username,
+            idology_e_password,
+            experian_enabled,
+            experian_subscriber_code,
+        };
 
-        diesel::insert_into(tenant_vendor_control::table)
+        let tvc = diesel::insert_into(tenant_vendor_control::table)
             .values(new)
-            .execute(conn)?;
+            .get_result(conn)?;
 
-        Ok(())
+        Ok(tvc)
     }
 
     #[tracing::instrument(skip_all)]

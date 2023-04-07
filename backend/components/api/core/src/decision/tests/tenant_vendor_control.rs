@@ -43,7 +43,7 @@ async fn new_tenant_vendor_control(
     tenant_key: &EncryptedVaultPrivateKey,
     enclave_client: &EnclaveClient,
 ) -> (DefaultCredentials, TenantVendorControl) {
-    let tvc = TenantVendorControl::new(
+    let tvc = TenantVendorControl::new_for_test(
         &state.config,
         db_tenant_vendor_control,
         enclave_client,
@@ -158,4 +158,26 @@ async fn test_update_credentials() {
     let (default_creds_from_state, updated) =
         new_tenant_vendor_control(state, db_idology3, &tenant_e_key, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
+}
+
+pub mod fixtures {
+    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
+    use newtypes::EncryptedVaultPrivateKey;
+
+    use crate::{decision::vendor::tenant_vendor_control::TenantVendorControl, State};
+
+    pub async fn create(
+        state: &State,
+        tenant_e_private_key: EncryptedVaultPrivateKey,
+        vendor_control: Option<DbTenantVendorControl>,
+    ) -> TenantVendorControl {
+        TenantVendorControl::new_for_test(
+            &state.config,
+            vendor_control,
+            &state.enclave_client,
+            &tenant_e_private_key,
+        )
+        .await
+        .expect("couldn't create tenant vendor control")
+    }
 }

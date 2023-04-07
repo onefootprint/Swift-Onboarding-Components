@@ -3,11 +3,10 @@ use crate::{
     utils::vault_wrapper::{Person, VaultWrapper},
 };
 
-use db::{
-    models::{tenant::Tenant, verification_request::VerificationRequest},
-    TxnPgConn,
-};
+use db::{models::verification_request::VerificationRequest, TxnPgConn};
 use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
+
+use self::tenant_vendor_control::TenantVendorControl;
 
 pub mod build_request;
 pub mod idv_request;
@@ -24,10 +23,10 @@ pub fn build_verification_requests_and_checkpoint(
     uvw: &VaultWrapper<Person>,
     su_id: &ScopedVaultId,
     decision_intent_id: &DecisionIntentId,
+    tenant_vendor_control: &TenantVendorControl,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
-    let tenant = Tenant::get(conn, su_id)?;
-
-    let vendor_apis = get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tenant)?;
+    let vendor_apis =
+        get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), tenant_vendor_control)?;
 
     let requests_to_initiate =
         VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis, decision_intent_id)?;
@@ -37,13 +36,13 @@ pub fn build_verification_requests_and_checkpoint(
 
 pub fn get_vendor_apis_for_verification_requests(
     present_data_lifetime_kinds: &[IdentityDataKind],
-    tenant: &Tenant,
+    tenant_vendor_control: &TenantVendorControl,
 ) -> ApiResult<Vec<VendorAPI>> {
     // From the data in the vault, figure out which vendors we _can_ send to
     let vendor_apis = idv::requirements::available_vendor_apis(present_data_lifetime_kinds)
         .into_iter()
         // filter available vendor apis by whether or not this vendor is enabled for a tenant
-        .filter(|v| is_vendor_api_enabled_for_tenant(v, tenant))
+        .filter(|v| tenant_vendor_control.enabled_vendor_apis().contains(v))
         .collect::<Vec<_>>();
 
     if vendor_apis.is_empty() {
@@ -52,18 +51,4 @@ pub fn get_vendor_apis_for_verification_requests(
         ));
     } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
     Ok(vendor_apis)
-}
-
-fn is_vendor_api_enabled_for_tenant(vendor_api: &VendorAPI, tenant: &Tenant) -> bool {
-    match vendor_api {
-        VendorAPI::IdologyExpectID => true,
-        VendorAPI::IdologyScanVerifySubmission => true,
-        VendorAPI::IdologyScanVerifyResults => true,
-        VendorAPI::IdologyScanOnboarding => true,
-        VendorAPI::IdologyPa => true,
-        VendorAPI::TwilioLookupV2 => true,
-        VendorAPI::SocureIDPlus => true,
-        VendorAPI::ExperianPreciseID => tenant.is_experian_enabled,
-        VendorAPI::MiddeskCreateBusiness => true,
-    }
 }
