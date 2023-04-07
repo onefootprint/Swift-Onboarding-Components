@@ -6,10 +6,7 @@ use futures_util::Future;
 use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Header;
 
-use crate::{
-    auth::{tenant::ParsedOnboardingSession, AuthError, Either, SessionContext},
-    State,
-};
+use crate::{auth::AuthError, State};
 
 #[derive(Debug, Clone, Apiv2Header)]
 /// Extracts a publishable key from the X-Onboarding-Config-Key header
@@ -75,27 +72,5 @@ impl FromRequest for PublicOnboardingContext {
 
     fn extract(req: &actix_web::HttpRequest) -> Self::Future {
         Self::from_request(req, &mut actix_web::dev::Payload::None)
-    }
-}
-
-/// Auth extractor for a short-lived session that represents the onboarding
-pub type ObPkSessionAuth = SessionContext<ParsedOnboardingSession>;
-
-/// Auth extractor for methods that
-pub type ObPkAuth = Either<PublicOnboardingContext, ObPkSessionAuth>;
-
-impl Either<PublicOnboardingContext, ObPkSessionAuth> {
-    pub fn ob_config(&self) -> &ObConfiguration {
-        match self {
-            Either::Left(l) => &l.ob_config,
-            Either::Right(r) => &r.data.ob_config,
-        }
-    }
-
-    pub fn tenant(&self) -> &Tenant {
-        match self {
-            Either::Left(l) => &l.tenant,
-            Either::Right(r) => &r.data.tenant,
-        }
     }
 }

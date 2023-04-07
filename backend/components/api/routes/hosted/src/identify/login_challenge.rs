@@ -8,7 +8,7 @@ use crate::utils::challenge::Challenge;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
-use api_core::auth::tenant::PublicOnboardingContext;
+use api_core::auth::ob_config::ObPkAuth;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
@@ -37,7 +37,7 @@ pub struct LoginChallengeResponse {
 pub async fn post(
     request: Json<LoginChallengeRequest>,
     state: web::Data<State>,
-    ob_context: Option<PublicOnboardingContext>,
+    ob_context: Option<ObPkAuth>,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     // clean phone number
     let LoginChallengeRequest {
@@ -76,8 +76,9 @@ pub async fn post(
             (challenge_data, 0, Some(challenge.challenge_json))
         }
         ChallengeKind::Sms => {
+            let tenant_name = ob_context.map(|obc| obc.tenant().name.clone());
             let (challenge_state, time_before_retry_s) = twilio_client
-                .send_challenge(&state, ob_context.map(|obc| obc.tenant.name), &phone_number)
+                .send_challenge(&state, tenant_name, &phone_number)
                 .await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             (challenge_data, time_before_retry_s.num_seconds(), None)

@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
-use api_core::auth::tenant::PublicOnboardingContext;
+use api_core::auth::ob_config::ObPkAuth;
 use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -28,13 +28,14 @@ pub struct SignupChallengeResponse {
 pub async fn post(
     request: Json<SignupChallengeRequest>,
     state: web::Data<State>,
-    ob_context: Option<PublicOnboardingContext>,
+    ob_context: Option<ObPkAuth>,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     // clean phone number
     let SignupChallengeRequest { phone_number } = request.into_inner();
+    let tenant_name = ob_context.map(|obc| obc.tenant().name.clone());
     let (challenge_state_data, time_before_retry_s) = state
         .twilio_client
-        .send_challenge(&state, ob_context.map(|obc| obc.tenant.name), &phone_number)
+        .send_challenge(&state, tenant_name, &phone_number)
         .await?;
 
     let challenge_state = ChallengeState {

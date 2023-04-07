@@ -1,5 +1,5 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
-use crate::auth::tenant::ObPkAuth;
+use crate::auth::ob_config::ObPkAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 

@@ -1,4 +1,4 @@
-use crate::auth::tenant::ObPkAuth;
+use crate::auth::ob_config::ObPkAuth;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::{

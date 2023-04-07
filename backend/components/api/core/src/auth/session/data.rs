@@ -36,5 +36,5 @@ pub enum AuthSessionData {
     ValidateUserToken(crate::auth::user::ValidateUserToken),
 
     /// Used to provide a single use onboarding session token for bifrost initialization
-    OnboardingSession(crate::auth::tenant::OnboardingSession),
+    OnboardingSession(crate::auth::ob_config::OnboardingSession),
 }

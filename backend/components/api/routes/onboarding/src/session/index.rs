@@ -1,6 +1,6 @@
+use crate::auth::ob_config::OnboardingSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::Any;
-use crate::auth::tenant::OnboardingSession;
 use crate::auth::tenant::SecretTenantAuthContext;
 
 use crate::auth::tenant::CheckTenantGuard;
