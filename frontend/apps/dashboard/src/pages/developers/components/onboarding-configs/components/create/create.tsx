@@ -3,6 +3,7 @@ import { RoleScope } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
+import useOrgSession from 'src/hooks/use-org-session';
 
 import Dialog from './components/dialog';
 import OnboardingConfigMachineProvider from './components/machine-provider';
@@ -13,6 +14,9 @@ type CreateProps = {
 
 const Create = ({ onCreate }: CreateProps) => {
   const { t } = useTranslation('pages.developers.onboarding-configs');
+  const {
+    sandbox: { isSandbox },
+  } = useOrgSession();
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
 
@@ -28,7 +32,7 @@ const Create = ({ onCreate }: CreateProps) => {
       </PermissionGate>
       <OnboardingConfigMachineProvider>
         <Dialog
-          hideKyb // TODO: comment this out if you want to test out the KYB flows
+          hideKyb={!isSandbox}
           open={isCreateDialogOpen}
           onClose={closeCreateDialog}
           onCreate={onCreate}

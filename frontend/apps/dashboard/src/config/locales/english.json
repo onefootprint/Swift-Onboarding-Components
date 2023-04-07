@@ -125,6 +125,7 @@
     "private-layout": {
       "nav": {
         "users": "Users",
+        "businesses": "Businesses",
         "security-logs": "Security Logs",
         "developers": "Developers",
         "settings": "Settings",

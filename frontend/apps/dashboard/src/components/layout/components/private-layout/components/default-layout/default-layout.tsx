@@ -3,6 +3,7 @@ import {
   IcoCode16,
   IcoFileText16,
   IcoSettings16,
+  IcoStore16,
   IcoUsers16,
   LogoFpCompact,
 } from '@onefootprint/icons';
@@ -25,13 +26,28 @@ type DefaultLayoutProps = {
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
-  const { data } = useOrgSession();
+  const {
+    data,
+    sandbox: { isSandbox },
+  } = useOrgSession();
+
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
     { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
     { href: '/developers', Icon: IcoCode16, text: t('developers') },
     { href: '/settings', Icon: IcoSettings16, text: t('settings') },
   ];
+
+  // TODO:
+  // https://linear.app/footprint/issue/FP-3469/remove-business-condition
+  if (isSandbox) {
+    const business = {
+      href: '/businesses',
+      Icon: IcoStore16,
+      text: t('businesses'),
+    };
+    routes.splice(1, 0, business);
+  }
 
   return (
     <DefaultLayoutContainer
