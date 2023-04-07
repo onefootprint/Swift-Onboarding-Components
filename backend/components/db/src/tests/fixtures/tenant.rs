@@ -31,7 +31,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         company_size: None,
         privacy_policy_url: None,
         stripe_customer_id: None,
-        is_experian_enabled: false,
         is_demo_tenant: false,
     }
 }

@@ -15,7 +15,4 @@ fn test_get(conn: &mut TestPgConn) {
 
     let tenant_from_db_from_su = Tenant::get(conn, &su.id).unwrap();
     assert_eq!(tenant_from_db_from_su.id, tenant.id);
-
-    // Just to be safe :)
-    assert!(!tenant_from_db_from_su.is_experian_enabled)
 }

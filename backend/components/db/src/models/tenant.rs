@@ -32,7 +32,6 @@ pub struct Tenant {
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
-    pub is_experian_enabled: bool,
     pub is_demo_tenant: bool,
 }
 
