@@ -1,4 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { DecryptedIdDoc } from '@onefootprint/types';
 import React from 'react';
 
@@ -38,7 +38,7 @@ describe('<DecryptedDataPreview />', () => {
   });
 
   describe('when there are both failed and succeedeed uploads', () => {
-    it('should show both tabs', () => {
+    it('should show both tabs', async () => {
       const images = [...successImagesFixture, ...failedImagesFixture];
       renderDecryptedDataPreview(images);
       const failedTab = screen.getByRole('tab', { name: 'Failed uploads' });
@@ -50,8 +50,14 @@ describe('<DecryptedDataPreview />', () => {
       expect(failedTab).toHaveAttribute('data-selected', 'false');
       expect(successTab).toHaveAttribute('data-selected', 'true');
 
-      const imagesElements = screen.getAllByRole('img');
-      expect(imagesElements).toHaveLength(4);
+      let imagesElements = screen.getAllByRole('img');
+      expect(imagesElements).toHaveLength(2);
+
+      await userEvent.click(failedTab);
+      imagesElements = screen.getAllByRole('img');
+      expect(failedTab).toHaveAttribute('data-selected', 'true');
+      expect(successTab).toHaveAttribute('data-selected', 'false');
+      expect(imagesElements).toHaveLength(2);
     });
   });
 });
