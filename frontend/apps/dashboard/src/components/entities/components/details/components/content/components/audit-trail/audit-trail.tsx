@@ -3,7 +3,7 @@ import React from 'react';
 
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
 
-import SectionHeader from '../section-header';
+import Section from '../section';
 import Content from './components/content';
 import Error from './components/error';
 
@@ -12,11 +12,10 @@ const AuditTrail = () => {
   const { errorMessage, data } = useCurrentEntityTimeline();
 
   return (
-    <section>
-      <SectionHeader title={t('title')} />
+    <Section title={t('title')}>
       {errorMessage && <Error message={errorMessage} />}
       {data && <Content timeline={data} />}
-    </section>
+    </Section>
   );
 };
 

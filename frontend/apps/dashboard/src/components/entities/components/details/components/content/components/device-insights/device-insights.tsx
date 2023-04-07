@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
-import SectionHeader from '../section-header';
+import Section from '../section';
 import FloatingBox from './components/floating-box';
 import Map from './components/map';
 
@@ -15,8 +15,7 @@ const DeviceInsights = ({ entity }: DeviceInsightsProps) => {
   const insightEvent = entity.onboarding?.insightEvent;
 
   return insightEvent ? (
-    <section>
-      <SectionHeader title={t('title')} />
+    <Section title={t('title')}>
       <MapContainer>
         <Map
           latitude={insightEvent.latitude}
@@ -30,7 +29,7 @@ const DeviceInsights = ({ entity }: DeviceInsightsProps) => {
           userAgent={insightEvent.userAgent}
         />
       </MapContainer>
-    </section>
+    </Section>
   ) : null;
 };
 

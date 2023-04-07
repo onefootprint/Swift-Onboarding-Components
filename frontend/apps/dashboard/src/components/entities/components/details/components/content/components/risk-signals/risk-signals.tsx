@@ -7,7 +7,7 @@ import React from 'react';
 import useCurrentEntityRiskSignals from '@/entity/hooks/use-current-entity-risk-signals';
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
-import SectionHeader from '../section-header';
+import Section from '../section';
 import Details from './components/details';
 import Filters from './components/filters';
 import Row from './components/row';
@@ -31,8 +31,7 @@ const RiskSignals = () => {
   };
 
   return (
-    <section aria-label={t('title')}>
-      <SectionHeader title={t('title')} />
+    <Section title={t('title')}>
       <Table<RiskSignal>
         aria-label={t('table.aria-label')}
         columns={columns}
@@ -47,7 +46,7 @@ const RiskSignals = () => {
         renderTr={renderTr}
       />
       <Details />
-    </section>
+    </Section>
   );
 };
 

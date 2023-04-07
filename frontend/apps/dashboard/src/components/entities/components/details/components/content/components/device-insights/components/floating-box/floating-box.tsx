@@ -26,7 +26,7 @@ const FloatingBox = ({
   const fullRegion = getRegion(city, region);
 
   return (
-    <Container role="region" title={t('title')}>
+    <Container>
       {icoForUserAgent(userAgentText)}
       <Typography variant="label-2" sx={{ marginBottom: 5 }} isPrivate>
         {displayForUserAgent(userAgentText)}

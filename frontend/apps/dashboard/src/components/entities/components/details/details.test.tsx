@@ -333,9 +333,9 @@ describe('<Details />', () => {
           });
 
           await waitFor(() => {
-            const link = within(container).getByText(
-              'View profile',
-            ) as HTMLAnchorElement;
+            const link = within(container).getByRole('link', {
+              name: 'View profile',
+            }) as HTMLAnchorElement;
             const url = link.href.endsWith(
               '/users/detail?footprint_user_id=fp_id_XW3pNYPpV4Niup1PgFZBg6',
             );

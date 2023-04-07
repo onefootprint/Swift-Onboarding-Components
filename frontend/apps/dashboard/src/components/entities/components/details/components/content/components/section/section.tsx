@@ -2,19 +2,21 @@ import { Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type SectionHeaderProps = {
+type SectionProps = {
   title: string;
+  children: React.ReactNode;
 };
 
-const SectionHeader = ({ title }: SectionHeaderProps) => (
-  <>
+const Section = ({ children, title }: SectionProps) => (
+  <section aria-label={title}>
     <Header>
       <Typography as="h2" variant="label-1">
         {title}
       </Typography>
     </Header>
     <StyledDivider />
-  </>
+    {children}
+  </section>
 );
 
 const Header = styled.header`
@@ -29,4 +31,4 @@ const StyledDivider = styled(Divider)`
   `}
 `;
 
-export default SectionHeader;
+export default Section;
