@@ -4,7 +4,7 @@ import React from 'react';
 
 const AbandonedEventHeader = () => {
   const { t } = useTranslation(
-    'pages.business.audit-trail.timeline.abandoned-event',
+    'pages.entity.audit-trail.timeline.abandoned-event',
   );
 
   return (

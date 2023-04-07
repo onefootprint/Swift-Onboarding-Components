@@ -20,7 +20,7 @@ const OnboardingDecisionEventBody = ({
   data,
 }: OnboardingDecisionEventBodyProps) => {
   const { t, allT } = useTranslation(
-    'pages.business.audit-trail.timeline.onboarding-decision-event',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
   const {
     decision: {

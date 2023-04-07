@@ -3,9 +3,9 @@ import { Pagination, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 
+import useFilters from '../../hooks/use-filters';
 import useEntities from './hooks/use-entities';
-import useFilters from './hooks/use-filters';
-import Provider from './hooks/use-list';
+import Provider from './hooks/use-entities-context';
 
 export type ListProps = {
   children: React.ReactNode;
@@ -25,7 +25,10 @@ const List = ({ children, title, kind, basePath }: ListProps) => {
   } = useEntities(kind);
 
   const handleRowClick = (entity: Entity) => {
-    router.push({ pathname: `/${basePath}/${entity.id}` });
+    router.push({
+      pathname: `/${basePath}/${entity.id}`,
+      query: filters.query,
+    });
   };
 
   const handleSearchChange = (search: string) => {

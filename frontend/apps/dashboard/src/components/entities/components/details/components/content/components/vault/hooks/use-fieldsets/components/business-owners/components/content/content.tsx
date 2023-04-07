@@ -30,7 +30,7 @@ const BusinessOwnersField = ({
   showCheckbox,
   value,
 }: ContentProps) => {
-  const { t } = useTranslation('pages.business.vault.bos');
+  const { t } = useTranslation('pages.entity.vault.bos');
 
   const renderValue = (index: number) => {
     if (

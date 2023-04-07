@@ -25,7 +25,7 @@ const AnnotationDetails = ({
   source,
 }: AnnotationDetailsProps) => {
   const { t } = useTranslation(
-    'pages.business.audit-trail.timeline.onboarding-decision-event',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
   const entityQuery = useCurrentEntity();
   const [isDrawerOpen, setDrawerOpen] = useState(false);

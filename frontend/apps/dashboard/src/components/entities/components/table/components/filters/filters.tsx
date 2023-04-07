@@ -3,7 +3,7 @@ import { EntityStatus } from '@onefootprint/types';
 import { Filters as FPFilter } from '@onefootprint/ui';
 import React from 'react';
 
-import useFilters from '../../../list/hooks/use-filters';
+import useFilters from '../../../../hooks/use-filters';
 
 const Filters = () => {
   const { t } = useTranslation('pages.entities.filters');

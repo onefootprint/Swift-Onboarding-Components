@@ -5,7 +5,7 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import { BusinessDI } from '@onefootprint/types';
+import { BusinessDI, EntityKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -34,12 +34,11 @@ afterAll(() => {
 
 const useRouterSpy = createUseRouterSpy();
 
-// TODO: Enable again once we migrate
-describe.skip('<Details />', () => {
+describe('<Details />', () => {
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({
-      pathname: `/businesses/${entityFixture.id}`,
+      pathname: `/entities/${entityFixture.id}`,
       query: {
         id: entityFixture.id,
       },
@@ -57,7 +56,7 @@ describe.skip('<Details />', () => {
     customRender(
       <>
         <div id={HEADER_ACTIONS_ID} />
-        <Details />
+        <Details kind={EntityKind.business} listPath="/entities" />
       </>,
     );
   };
@@ -96,7 +95,7 @@ describe.skip('<Details />', () => {
 
       const listLink = screen.getByRole('link', { name: 'Businesses' });
       expect(listLink).toBeInTheDocument();
-      expect(listLink.getAttribute('href')).toEqual('/businesses');
+      expect(listLink.getAttribute('href')).toEqual('/entities');
     });
 
     it('should show a header with the entity status, start and id', async () => {

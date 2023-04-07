@@ -2,7 +2,7 @@ import { Entity } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 
-import { useList } from '../list/hooks/use-list';
+import { useEntitiesContext } from '../list/hooks/use-entities-context';
 import Filters from './components/filters';
 
 export type TableProps = {
@@ -18,7 +18,7 @@ const Table = ({
   emptyStateText,
   renderTr,
 }: TableProps) => {
-  const context = useList();
+  const context = useEntitiesContext();
 
   return (
     <UITable<Entity>

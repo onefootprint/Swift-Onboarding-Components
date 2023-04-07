@@ -1,7 +1,7 @@
 import { Entity } from '@onefootprint/types';
 import constate from 'constate';
 
-type UserListData = {
+type UseEntitiesContext = {
   data?: Entity[];
   errorMessage?: string;
   initialSearch?: string;
@@ -10,9 +10,9 @@ type UserListData = {
   onSearchChange: (search: string) => void;
 };
 
-const useListData = (options: UserListData) => options;
+const useEntities = (options: UseEntitiesContext) => options;
 
-const [Provider, useList] = constate(useListData);
+const [Provider, useEntitiesContext] = constate(useEntities);
 
 export default Provider;
-export { useList };
+export { useEntitiesContext };

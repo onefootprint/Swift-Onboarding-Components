@@ -118,6 +118,7 @@ describe('<List />', () => {
 
         expect(push).toHaveBeenCalledWith({
           pathname: `/entities/${firstResult.id}`,
+          query: {},
         });
       });
     });

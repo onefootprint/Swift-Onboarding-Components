@@ -18,7 +18,7 @@ const OnboardingDecisionEventHeader = ({
   data,
 }: OnboardingDecisionEventHeaderProps) => {
   const { t } = useTranslation(
-    'pages.business.audit-trail.timeline.onboarding-decision-event',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
   const {
     decision: { source, status },

@@ -16,7 +16,7 @@ type WatchlistCheckEventBodyProps = {
 
 const WatchlistCheckEventBody = ({ data }: WatchlistCheckEventBodyProps) => {
   const { t } = useTranslation(
-    'pages.business.audit-trail.timeline.watchlist-check-event',
+    'pages.entity.audit-trail.timeline.watchlist-check-event',
   );
   const { status, reasonCodes } = data;
   const isPass = status === WatchlistCheckStatus.pass;

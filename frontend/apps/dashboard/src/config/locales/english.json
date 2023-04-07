@@ -713,9 +713,16 @@
     },
     "entity": {
       "breadcrumb": {
-        "title": "Business details breadcrumb",
-        "list": "Businesses",
-        "details": "Details"
+        "title": "{{kind}} details breadcrumb",
+        "details": "Details",
+        "business": {
+          "label": "Business",
+          "title": "Businesses"
+        },
+        "person": {
+          "label": "User",
+          "title": "Users"
+        }
       },
       "header": {
         "title": "Business info"
@@ -872,6 +879,12 @@
           "submitted-by": "Submitted by (beneficial owner)",
           "start": "Date"
         }
+      }
+    },
+    "business": {
+      "page-title": "Footprint | Business",
+      "header": {
+        "title": "Business"
       }
     },
     "security-logs": {

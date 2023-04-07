@@ -4,7 +4,7 @@ import React from 'react';
 
 const WatchlistCheckEventHeader = () => {
   const { t } = useTranslation(
-    'pages.business.audit-trail.timeline.watchlist-check-event',
+    'pages.entity.audit-trail.timeline.watchlist-check-event',
   );
 
   return (

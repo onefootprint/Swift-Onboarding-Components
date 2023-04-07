@@ -10,7 +10,7 @@ type IdDocUploadedEventHeaderProps = {
 
 const IdDocUploadedEventHeader = ({ data }: IdDocUploadedEventHeaderProps) => {
   const { t, allT } = useTranslation(
-    'pages.business.audit-trail.timeline.id-doc-uploaded-event',
+    'pages.entity.audit-trail.timeline.id-doc-uploaded-event',
   );
 
   // TODO: Once we receive the dataIdentifier from the backend, we can use and we won't need to append the prefix anymore`
