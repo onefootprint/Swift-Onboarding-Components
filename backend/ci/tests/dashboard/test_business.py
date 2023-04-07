@@ -14,7 +14,7 @@ class Business(typing.NamedTuple):
 @pytest.fixture(scope="session")
 def sb_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
-    user = bifrost.run(sandbox_tenant)
+    user = bifrost.run()
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
     entity = body["data"][0]
     assert entity["kind"] == "business"

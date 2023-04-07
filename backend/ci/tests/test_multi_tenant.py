@@ -37,7 +37,7 @@ class DualOnboardedUser(NamedTuple):
 def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
     # Create a sandbox user, onboard them onto sandbox_tenant
     bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
-    user = bifrost.run(sandbox_tenant)
+    user = bifrost.run()
     fp_id = user.fp_id
 
     #
@@ -55,7 +55,7 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
     post("hosted/onboarding", None, inherited_auth_token)
     foo_bifrost.auth_token = inherited_auth_token
 
-    foo_user = foo_bifrost.run(foo_sandbox_tenant)
+    foo_user = foo_bifrost.run()
     foo_fp_id = foo_user.fp_id
 
     return DualOnboardedUser(fp_id, foo_fp_id)

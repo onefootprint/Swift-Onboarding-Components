@@ -1,4 +1,6 @@
 from typing import NamedTuple
+
+from pyparsing import Any
 from tests.auth import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
 
 
@@ -24,8 +26,9 @@ class ObConfiguration(NamedTuple):
     status: str
     must_collect_data: list
     can_access_data: list
+    tenant: Any  # Tenant
 
-    def from_response(resp):
+    def from_response(resp, tenant):
         return ObConfiguration(
             PublishableOnboardingKey(resp["key"]),
             resp["id"],
@@ -33,6 +36,7 @@ class ObConfiguration(NamedTuple):
             resp["status"],
             resp["must_collect_data"],
             resp["can_access_data"],
+            tenant,
         )
 
 

@@ -95,7 +95,7 @@ class TestDocuments:
         assert "image upload error: invalid file type" == res["error"]["message"]
 
     def test_valid_upload(self, incomplete_client, sandbox_tenant):
-        user = incomplete_client.run(sandbox_tenant)
+        user = incomplete_client.run()
 
         res = post(
             f"/users/{user.fp_id}/vault/document/decrypt",
@@ -128,7 +128,7 @@ class TestDocuments:
         bifrost.data["document.finra_compliance_letter"] = multipart_file(
             "example_pdf2.pdf", "application/pdf"
         )
-        user = bifrost.run(sandbox_tenant)
+        user = bifrost.run()
 
         res = post(
             f"/users/{user.fp_id}/vault/document/decrypt",

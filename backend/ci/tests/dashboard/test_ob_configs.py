@@ -5,6 +5,7 @@ from tests.utils import (
     post,
     patch,
     create_basic_sandbox_user,
+    create_ob_config,
 )
 from tests.auth import (
     PublishableOnboardingKey,
@@ -13,13 +14,9 @@ from tests.auth import (
 
 @pytest.fixture(scope="session")
 def ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
-    data = dict(
-        name="Test OB config",
-        must_collect_data=must_collect_data,
-        can_access_data=can_access_data,
+    return create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
     )
-    body = post("org/onboarding_configs", data, sandbox_tenant.sk.key)
-    return ObConfiguration.from_response(body)
 
 
 def test_config_list(sandbox_tenant, ob_configuration):

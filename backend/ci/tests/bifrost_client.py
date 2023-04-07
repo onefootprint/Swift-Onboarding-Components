@@ -145,23 +145,25 @@ class BifrostClient:
         body = post("hosted/onboarding/authorize", None, self.auth_token)
         return body["validation_token"]
 
-    def validate(self, validation_token, tenant_sk):
+    def validate(self, validation_token):
+        # Use the SK of the tenant that owns the ob config
+        tenant_sk = self.ob_config.tenant.sk
         data = dict(validation_token=validation_token)
         body = post("onboarding/session/validate", data, tenant_sk.key)
         self.validate_response = body
         return body["footprint_user_id"]
 
-    def run(self, tenant):
+    def run(self):
         """
         Simulates all bifrost logic of satisfying requirements and authorizing.
         """
         self.handle_requirements()
         validation_token = self.authorize()
-        fp_id = self.validate(validation_token, tenant.sk)
+        fp_id = self.validate(validation_token)
 
         return User(
             fp_id=fp_id,
-            tenant=tenant,
+            tenant=self.ob_config.tenant,
             client=self,
         )
 

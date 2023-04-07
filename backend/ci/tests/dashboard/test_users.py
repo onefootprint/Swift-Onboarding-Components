@@ -132,7 +132,7 @@ def test_get_users_detail_doc(
 ):
     tenant = sandbox_user.tenant
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
-    user = bifrost.run(tenant)
+    user = bifrost.run()
 
     res = get(f"users/{user.fp_id}", None, tenant.sk.key)
     assert len(res["identity_document_info"]) == 1

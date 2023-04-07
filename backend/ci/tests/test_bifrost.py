@@ -24,7 +24,6 @@ from tests.utils import (
     get_requirement_from_requirements,
     create_ob_config,
     inherit_user,
-    create_tenant,
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -35,22 +34,22 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 @pytest.fixture(scope="session")
 def doc_request_ob_config(tenant, must_collect_data, can_access_data):
-    ob_conf_data = {
-        "name": "Doc request config",
-        "must_collect_data": must_collect_data + ["document"],
-        "can_access_data": can_access_data,
-    }
-    return create_ob_config(tenant.sk, ob_conf_data)
+    return create_ob_config(
+        tenant,
+        "Doc request config",
+        must_collect_data + ["document"],
+        can_access_data,
+    )
 
 
 @pytest.fixture(scope="session")
 def doc_request_ob_config2(tenant, must_collect_data, can_access_data):
-    ob_conf_data = {
-        "name": "Doc request config",
-        "must_collect_data": must_collect_data + ["document"],
-        "can_access_data": can_access_data,
-    }
-    return create_ob_config(tenant.sk, ob_conf_data)
+    return create_ob_config(
+        tenant,
+        "Doc request config 2",
+        must_collect_data + ["document"],
+        can_access_data,
+    )
 
 
 @pytest.fixture(scope="module", autouse="true")
@@ -169,13 +168,12 @@ class TestBifrost:
         auth_token
 
         # Create an ob_config
-
-        ob_conf_data = {
-            "name": "Flerp Config",
-            "must_collect_data": must_collect_data + addl_must_collect_data,
-            "can_access_data": can_access_data + addl_can_access_data,
-        }
-        ob_config = create_ob_config(tenant.sk, ob_conf_data)
+        ob_config = create_ob_config(
+            tenant,
+            "Flerp Config",
+            must_collect_data + addl_must_collect_data,
+            can_access_data + addl_can_access_data,
+        )
 
         # The new ob_config retrieved via org/onboarding_configs has the correct doc requirements
         onboarding_configs_res = get("org/onboarding_configs", None, tenant.sk.key)
@@ -482,7 +480,7 @@ class TestBifrostSandbox:
         bifrost = BifrostClient(
             sandbox_tenant.default_ob_config, twilio, sandbox_suffix=suffix
         )
-        bifrost.run(sandbox_tenant)
+        bifrost.run()
 
         bifrost.validate_response["status"] == expected_status
         bifrost.validate_response[

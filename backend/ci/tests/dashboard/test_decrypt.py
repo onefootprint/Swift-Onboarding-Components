@@ -10,13 +10,13 @@ from tests.bifrost_client import BifrostClient
 
 
 @pytest.fixture(scope="session")
-def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
+def user_with_documents(doc_request_sandbox_ob_config, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
-    return bifrost.run(sandbox_tenant)
+    return bifrost.run()
 
 
 def test_tenant_decrypt(sandbox_user):
@@ -157,21 +157,13 @@ def test_tenant_document_decrypt(user_with_documents):
 
 def test_tenant_selfie_decrypt(
     sandbox_tenant,
-    must_collect_data,
-    can_access_data,
     twilio,
+    doc_request_sandbox_ob_config,
 ):
     from tests.image_fixtures import test_image
 
-    ob_conf_data = {
-        "name": "Flerp Config",
-        "must_collect_data": must_collect_data + ["document_and_selfie"],
-        "can_access_data": can_access_data + ["document_and_selfie"],
-    }
-    ob_config = create_ob_config(sandbox_tenant.sk, ob_conf_data)
-
-    bifrost = BifrostClient(ob_config, twilio)
-    user = bifrost.run(sandbox_tenant)
+    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    user = bifrost.run()
 
     data = {
         "document_type": "driver_license",

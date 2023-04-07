@@ -230,32 +230,38 @@ def create_sandbox_user(sandbox_tenant, twilio):
     from tests.bifrost_client import BifrostClient
 
     bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
-    return bifrost.run(sandbox_tenant)
+    return bifrost.run()
 
 
 def create_tenant(org_data, ob_conf_data):
     body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
-    sk = SecretApiKey.from_response(body["key"])
-    auth_token = DashboardAuth(body["auth_token"])
-    ob_config = create_ob_config(sk, ob_conf_data)
     print("\n======org info======")
     print(body)
+    sk = SecretApiKey.from_response(body["key"])
+    auth_token = DashboardAuth(body["auth_token"])
     tenant = Tenant(
         id=body["org_id"],
-        default_ob_config=ob_config,
         sk=sk,
         name=org_data["name"],
         auth_token=auth_token,
         member_id=body["tenant_user_id"],
+        default_ob_config=None,  # Will populate this after making OB config
     )
+    ob_config = create_ob_config(tenant, **ob_conf_data)
+    # Circular reference, but worth it for simplicity of writing tests
+    tenant = tenant._replace(default_ob_config=ob_config)
     return tenant
 
 
-def create_ob_config(sk, ob_conf_data):
-    # TODO save the tenant on the ob config for easier bifrost client?
+def create_ob_config(tenant, name, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": name,
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+    }
     # TODO also make this get or create?
-    body = post("org/onboarding_configs", ob_conf_data, sk.key)
-    ob_config = ObConfiguration.from_response(body)
+    body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
+    ob_config = ObConfiguration.from_response(body, tenant)
     print("\n======org onboarding info======")
     print(body)
     return ob_config
