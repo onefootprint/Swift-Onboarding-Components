@@ -8,6 +8,8 @@ use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
+/// Represents a _KYCed_ owner of a business. Non-KYCed owners only exist in the vault and not in
+/// this table
 pub struct BusinessOwner {
     pub id: BoId,
     pub user_vault_id: Option<VaultId>,

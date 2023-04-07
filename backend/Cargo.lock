@@ -562,6 +562,7 @@ dependencies = [
  "api_core",
  "api_wire_types",
  "db",
+ "itertools 0.10.3",
  "newtypes",
  "paperclip",
  "serde_json",

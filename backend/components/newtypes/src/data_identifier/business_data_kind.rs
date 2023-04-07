@@ -38,10 +38,12 @@ pub enum BusinessDataKind {
     State,
     Zip,
     Country,
-    /// A JSON-serialized list of beneficial owners
+    /// A JSON-serialized list of beneficial owners. Very interestingly, the primary BO exists in
+    /// this JSON blob _and_ in the BusinessOwner table in the database.
     BeneficialOwners,
-    /// Very similar to BeneficialOwners, but with a few additional fields required to KYC
-    /// the BOs
+    /// Very similar to BeneficialOwners, but with a few additional fields required to KYC the
+    /// secondary BOs. Every record in this JSON blob will also have a corresponding BusinessOwner
+    /// row in the database
     KycedBeneficialOwners,
     CorporationType,
 }

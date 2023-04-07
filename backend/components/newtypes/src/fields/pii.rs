@@ -91,6 +91,14 @@ impl PiiString {
     pub fn clean_for_fingerprint(&self) -> PiiString {
         PiiString(self.0.trim().to_lowercase())
     }
+
+    pub fn deserialize<T>(self) -> serde_json::error::Result<T>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let result = serde_json::de::from_str(self.leak())?;
+        Ok(result)
+    }
 }
 
 impl TryFrom<PiiBytes> for PiiString {

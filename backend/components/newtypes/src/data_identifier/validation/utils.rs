@@ -84,7 +84,7 @@ where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<PiiString>,
 {
-    let parsed_value = serde_json::de::from_str(value.leak())?;
+    let parsed_value = value.deserialize()?;
     let value = f(parsed_value)?;
     Ok(value)
 }

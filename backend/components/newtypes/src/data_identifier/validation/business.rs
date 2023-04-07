@@ -68,9 +68,9 @@ fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> 
 }
 
 // Or should we branch validation logic based on a ParseArg
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
-pub struct KycedBusinessOwnerDataT<IdT>
+pub struct KycedBusinessOwnerData<IdT = BoLinkId>
 where
     IdT: Serialize,
 {
@@ -85,11 +85,10 @@ where
     email: Email,
     #[allow(unused)]
     phone_number: PhoneNumber,
-    ownership_stake: u32,
+    pub ownership_stake: u32,
 }
 
-type KycedBusinessOwnerDataDe = KycedBusinessOwnerDataT<Option<()>>;
-pub type KycedBusinessOwnerData = KycedBusinessOwnerDataT<BoLinkId>;
+type KycedBusinessOwnerDataDe = KycedBusinessOwnerData<Option<()>>;
 
 fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiString> {
     utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
@@ -104,7 +103,7 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         let bos_with_id = bos
             .into_iter()
             .map(|bo| {
-                let KycedBusinessOwnerDataT {
+                let KycedBusinessOwnerData {
                     link_id: _,
                     first_name,
                     last_name,

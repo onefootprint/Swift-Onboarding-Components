@@ -1,6 +1,7 @@
 import pytest
 from tests.auth import BusinessOwnerAuth
 from tests.utils import (
+    get,
     create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
@@ -46,7 +47,24 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
         req["kind"] == "collect_business_data"
         for req in secondary_bo.client.handled_requirements
     )
-    # TODO test business owners
+
+    # TODO get fp_bid from bifrost client eventually
+    tenant_sk = kyb_sandbox_ob_config.tenant.sk.key
+    body = get("entities", dict(kind="business"), tenant_sk)
+    fp_bid = body["data"][0]["id"]
+
+    # Validate the business owners
+    body = get(f"businesses/{fp_bid}/owners", None, tenant_sk)
+    assert len(body) == 2
+    assert body[0]["kind"] == "primary"
+    assert body[0]["id"] == primary_bo.fp_id
+    assert body[0]["status"] == "pass"
+    assert body[0]["ownership_stake"] == 50
+    assert body[1]["kind"] == "secondary"
+    assert body[1]["id"] == secondary_bo.fp_id
+    assert body[1]["status"] == "pass"
+    assert body[1]["ownership_stake"] == 30
+
     # TODO test can't reuse secondary BO token for other user but can reuse for same user
 
 
