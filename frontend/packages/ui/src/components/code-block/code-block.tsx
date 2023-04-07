@@ -1,80 +1,38 @@
-import { IcoClipboard24 } from '@onefootprint/icons';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import Tooltip from '../tooltip';
+import CopyButton from '../copy-button';
 import Typography from '../typography';
 
 export type CodeBlockProps = {
   language: string;
   children: string;
-  buttonAriaLabel?: string;
-  testID?: string;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
+  ariaLabel?: string;
 };
-
-const HIDE_TIMEOUT = 600;
-
-let confirmationTimeout: null | NodeJS.Timeout = null;
 
 const CodeBlock = ({
   language,
   children,
-  buttonAriaLabel = 'Copy to clipboard',
-  testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
+  ariaLabel = 'Copy to clipboard',
 }: CodeBlockProps) => {
   const theme = useTheme();
-  const [shouldShowConfirmation, setShowConfirmation] = useState(false);
-
-  useEffect(
-    () => () => {
-      clearTooltipTimeout();
-    },
-    [],
-  );
-
-  const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setShowConfirmation(true);
-    scheduleToHideConfirmation();
-    navigator.clipboard.writeText(children);
-  };
-
-  const clearTooltipTimeout = () => {
-    if (confirmationTimeout) {
-      clearTimeout(confirmationTimeout);
-      confirmationTimeout = null;
-    }
-  };
-
-  const scheduleToHideConfirmation = () => {
-    confirmationTimeout = setTimeout(() => {
-      setShowConfirmation(false);
-    }, HIDE_TIMEOUT);
-  };
 
   return (
     <Container>
       <Header>
         <Typography variant="label-3">{language}</Typography>
-        <Tooltip
-          position="left"
-          text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
-        >
-          <CopyButton
-            onClick={handleCopy}
-            aria-label={buttonAriaLabel}
-            data-testid={testID}
-            type="button"
-          >
-            <IcoClipboard24 />
-          </CopyButton>
-        </Tooltip>
+        <CopyButton
+          contentToCopy={children}
+          tooltipText={tooltipText}
+          tooltipTextConfirmation={tooltipTextConfirmation}
+          ariaLabel={ariaLabel}
+        />
       </Header>
       <Content>
         <SyntaxHighlighter language={language} style={theme.codeHighlight}>
@@ -107,18 +65,6 @@ const Header = styled.header`
     width: 100%;
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `}
-`;
-
-const CopyButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-
-  &:hover {
-    opacity: 0.8;
-  }
 `;
 
 const Content = styled.div`

@@ -24,6 +24,7 @@ export * from './code-inline';
 export { default as CodeInline } from './code-inline';
 export * from './container';
 export { default as Container } from './container';
+export { default as CopyButton } from './copy-button';
 export * from './country-select';
 export { default as CountrySelect } from './country-select';
 export * from './dialog';

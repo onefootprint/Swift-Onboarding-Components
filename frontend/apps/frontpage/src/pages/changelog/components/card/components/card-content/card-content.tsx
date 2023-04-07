@@ -1,5 +1,5 @@
-import { useIntl } from '@onefootprint/hooks';
-import { media, Typography } from '@onefootprint/ui';
+import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { CopyButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 
 import HtmlContent from '../../../html-content';
 import Author from '../author';
-import CopyLink from '../copy-link';
 
 const BASE_URL = 'https://onefootprint.com/changelog';
 
@@ -17,6 +16,7 @@ type CardContentProps = {
 };
 
 const CardContent = ({ post }: CardContentProps) => {
+  const { t } = useTranslation('components.copy-link');
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
 
@@ -42,7 +42,11 @@ const CardContent = ({ post }: CardContentProps) => {
           <Link href={`/changelog/${post.slug}`}>
             <Typography variant="display-3">{post.title}</Typography>
           </Link>
-          <CopyLink slug={`${BASE_URL}/${post.slug}`} />
+          <CopyButton
+            ariaLabel={t('cta')}
+            tooltipText={t('cta')}
+            contentToCopy={`${BASE_URL}/${post.slug}`}
+          />
         </Title>
         <Author
           authorImg={post.primary_author.profile_image}

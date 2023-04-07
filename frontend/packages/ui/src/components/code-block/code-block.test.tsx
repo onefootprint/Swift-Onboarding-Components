@@ -14,9 +14,8 @@ const content = `<div id="footprint-button"/>`;
 
 describe('<CodeBlock />', () => {
   const renderCode = ({
-    buttonAriaLabel = 'Copy to clipboard',
+    ariaLabel = 'Copy to clipboard',
     children = content,
-    testID,
     language = 'html',
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
@@ -25,8 +24,7 @@ describe('<CodeBlock />', () => {
       <ToastProvider>
         <CodeBlock
           language={language}
-          buttonAriaLabel={buttonAriaLabel}
-          testID={testID}
+          ariaLabel={ariaLabel}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
         >
@@ -35,18 +33,15 @@ describe('<CodeBlock />', () => {
       </ToastProvider>,
     );
 
-  it('should assign a testID', () => {
-    renderCode({ testID: 'code-test-id' });
-    expect(screen.getByTestId('code-test-id')).toBeInTheDocument();
-  });
-
   describe('when hovering the button', () => {
     it('should show a tooltip', async () => {
       renderCode({
         tooltipText: 'Copy to clipboard',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
       });
-      const copyButton = screen.getByRole('button', { name: 'Copy' });
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy to clipboard',
+      });
       expect(copyButton).toBeInTheDocument();
 
       await userEvent.hover(copyButton);
@@ -67,9 +62,11 @@ describe('<CodeBlock />', () => {
         children: content,
         tooltipText: 'Copy to clipboard',
         tooltipTextConfirmation: 'Copied!',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
       });
-      const copyButton = screen.getByRole('button', { name: 'Copy' });
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy to clipboard',
+      });
       expect(copyButton).toBeInTheDocument();
 
       await userEvent.click(copyButton);

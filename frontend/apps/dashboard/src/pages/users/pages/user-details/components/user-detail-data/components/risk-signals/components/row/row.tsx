@@ -27,7 +27,11 @@ const Row = ({ riskSignal }: RowProps) => {
       <td>{createStringList(scopesList)}</td>
       <td>
         {shouldShowTooltip ? (
-          <Tooltip text={riskSignal.description}>
+          <Tooltip
+            text={riskSignal.description}
+            position="top"
+            alignment="start"
+          >
             <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
               {riskSignal.note}
               <IcoInfo16 />

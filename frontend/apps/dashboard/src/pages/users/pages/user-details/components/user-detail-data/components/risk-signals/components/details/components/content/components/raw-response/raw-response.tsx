@@ -40,11 +40,7 @@ const RawResponse = ({ rawResponse }: RawResponseProps) => {
         )}
       </Header>
       <Box ref={animate}>
-        {visible && (
-          <CodeBlock language="json" testID="raw-response-json">
-            {rawResponse}
-          </CodeBlock>
-        )}
+        {visible && <CodeBlock language="json">{rawResponse}</CodeBlock>}
       </Box>
     </section>
   );

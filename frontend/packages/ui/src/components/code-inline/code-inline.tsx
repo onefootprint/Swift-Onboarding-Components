@@ -1,63 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import Tooltip from '../tooltip';
+import CopyButton from '../copy-button/copy-button';
 
 export type CodeInlineProps = {
-  buttonAriaLabel?: string;
+  ariaLabel?: string;
   children: string;
   disable?: boolean;
-  testID?: string;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
   truncate?: boolean;
   isPrivate?: boolean;
 };
 
-const HIDE_TIMEOUT = 600;
-
-let confirmationTimeout: null | NodeJS.Timeout = null;
-
 const CodeInline = ({
-  buttonAriaLabel = 'Copy to clipboard',
+  ariaLabel = 'Copy to clipboard',
   children,
   disable,
-  testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
   truncate,
   isPrivate,
 }: CodeInlineProps) => {
-  const [shouldShowConfirmation, setShowConfirmation] = useState(false);
-
-  useEffect(
-    () => () => {
-      clearTooltipTimeout();
-    },
-    [],
-  );
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setShowConfirmation(true);
-    scheduleToHideConfirmation();
-    navigator.clipboard.writeText(children);
-  };
-
-  const clearTooltipTimeout = () => {
-    if (confirmationTimeout) {
-      clearTimeout(confirmationTimeout);
-      confirmationTimeout = null;
-    }
-  };
-
-  const scheduleToHideConfirmation = () => {
-    confirmationTimeout = setTimeout(() => {
-      setShowConfirmation(false);
-    }, HIDE_TIMEOUT);
-  };
-
   if (disable) {
     return (
       <CodeContent data-truncate={truncate} data-private={isPrivate}>
@@ -67,38 +32,18 @@ const CodeInline = ({
   }
 
   return (
-    <Tooltip
-      position="right"
-      alignment="center"
-      text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
-      disabled={disable}
+    <CopyButton
+      ariaLabel={ariaLabel}
+      contentToCopy={children}
+      tooltipText={tooltipText}
+      tooltipTextConfirmation={tooltipTextConfirmation}
     >
-      <Button
-        aria-label={buttonAriaLabel}
-        data-testid={testID}
-        data-truncate={truncate}
-        onClick={disable ? undefined : handleClick}
-        type="button"
-      >
-        <CodeContent data-truncate={truncate} data-private={isPrivate}>
-          {children}
-        </CodeContent>
-      </Button>
-    </Tooltip>
+      <CodeContent data-truncate={truncate} data-private={isPrivate}>
+        {children}
+      </CodeContent>
+    </CopyButton>
   );
 };
-
-const Button = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
-
-  &[data-truncate='true'] {
-    max-width: 100%;
-  }
-`;
 
 const CodeContent = styled.code`
   ${({ theme }) => css`

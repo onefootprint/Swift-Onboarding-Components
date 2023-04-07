@@ -7,7 +7,7 @@ export default {
   component: CodeInline,
   title: 'Components/CodeInline',
   argTypes: {
-    buttonAriaLabel: {
+    ariaLabel: {
       control: 'text',
       description: 'Copy to clipboard',
       required: true,
@@ -26,10 +26,6 @@ export default {
       control: 'boolean',
       description: 'Prevent to break the line',
       required: false,
-    },
-    testID: {
-      control: 'text',
-      description: 'Append an attribute data-testid for testing purposes',
     },
     tooltipText: {
       control: {
@@ -51,18 +47,16 @@ export default {
 } as Meta;
 
 const Template: Story<CodeInlineProps> = ({
-  buttonAriaLabel,
+  ariaLabel,
   children,
   disable,
-  testID,
   tooltipText,
   tooltipTextConfirmation,
   truncate,
 }: CodeInlineProps) => (
   <CodeInline
-    buttonAriaLabel={buttonAriaLabel}
+    ariaLabel={ariaLabel}
     disable={disable}
-    testID={testID}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
     truncate={truncate}
@@ -73,10 +67,9 @@ const Template: Story<CodeInlineProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  buttonAriaLabel: 'Copy',
+  ariaLabel: 'Copy',
   children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
   disable: false,
-  testID: 'code-test-id',
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
   truncate: false,

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { VaultValue } from '@onefootprint/types';
-import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
+import { Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FieldOrPlaceholder } from 'src/components';
@@ -48,14 +48,12 @@ const Field = ({
     <Container role="row" aria-label={label}>
       {showCheckbox ? (
         <Tooltip disabled={!showTooltip} text={getTooltip()}>
-          <Box>
-            <Checkbox
-              checked={isDataDecrypted || undefined}
-              {...register(name)}
-              disabled={disabled}
-              label={label}
-            />
-          </Box>
+          <Checkbox
+            checked={isDataDecrypted || undefined}
+            {...register(name)}
+            disabled={disabled}
+            label={label}
+          />
         </Tooltip>
       ) : (
         <Typography variant="body-3" color="tertiary">

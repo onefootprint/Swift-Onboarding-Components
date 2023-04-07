@@ -30,10 +30,20 @@ export default {
       description: 'Tooltip alignment',
       table: { defaultValue: { summary: 'center' } },
     },
-
-    testID: {
-      control: 'text',
-      description: 'Append an attribute data-testid for testing purposes',
+    disabled: {
+      control: 'boolean',
+      description: 'Disable tooltip',
+      required: false,
+    },
+    open: {
+      control: 'boolean',
+      description: 'Control open tooltip',
+      required: false,
+    },
+    onOpenChange: {
+      control: 'boolean',
+      description: 'Control open tooltip',
+      required: false,
     },
   },
 } as Meta;
@@ -43,6 +53,8 @@ const Template: Story = ({
   alignment,
   content,
   children,
+  disabled,
+  open,
   onOpenChange,
 }) => (
   <Aligner>
@@ -50,6 +62,8 @@ const Template: Story = ({
       position={position}
       alignment={alignment}
       text={content}
+      disabled={disabled}
+      open={open}
       onOpenChange={onOpenChange}
     >
       {children}
@@ -63,7 +77,6 @@ Default.args = {
   position: 'top',
   alignment: 'center',
   children: <IcoInfo16 />,
-  onOpenChange: () => null,
 };
 
 const Aligner = styled.div`

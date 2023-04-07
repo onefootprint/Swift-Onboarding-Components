@@ -7,7 +7,7 @@ export default {
   component: CodeBlock,
   title: 'Components/CodeBlock',
   argTypes: {
-    buttonAriaLabel: {
+    ariaLabel: {
       control: 'text',
       description: 'Copy to clipboard',
       required: true,
@@ -21,10 +21,6 @@ export default {
       control: 'text',
       description: 'Code language to display in header',
       required: true,
-    },
-    testID: {
-      control: 'text',
-      description: 'Append an attribute data-testid for testing purposes',
     },
     tooltipText: {
       control: {
@@ -46,17 +42,15 @@ export default {
 } as Meta;
 
 const Template: Story<CodeBlockProps> = ({
-  buttonAriaLabel,
+  ariaLabel = 'Copy to clipboard',
   children,
   language,
-  testID,
   tooltipText,
   tooltipTextConfirmation,
 }: CodeBlockProps) => (
   <CodeBlock
     language={language}
-    buttonAriaLabel={buttonAriaLabel}
-    testID={testID}
+    ariaLabel={ariaLabel}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
   >
@@ -66,7 +60,7 @@ const Template: Story<CodeBlockProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  buttonAriaLabel: 'Copy',
+  ariaLabel: 'Copy',
   children: `
   function doSomething(){
     x = 33;
@@ -75,7 +69,6 @@ Base.args = {
   } 
   `,
   language: 'javascript',
-  testID: 'code-test-id',
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
 };

@@ -9,8 +9,9 @@ export type TooltipProps = {
   position?: 'top' | 'bottom' | 'left' | 'right';
   alignment?: 'start' | 'center' | 'end';
   text?: string;
-  onOpenChange?: (open: boolean) => void;
   disabled?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const Tooltip = ({
@@ -19,43 +20,40 @@ const Tooltip = ({
   position = 'top',
   alignment = 'center',
   disabled,
-
+  open: controlledOpen,
   onOpenChange,
 }: TooltipProps) => {
-  const [open, setOpen] = useState(false);
+  const controlled = typeof controlledOpen === 'boolean';
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlled ? controlledOpen : internalOpen;
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
 
   return (
     <TooltipPrimitive.Provider>
       <TooltipPrimitive.Root
         delayDuration={0}
-        open={open}
-        onOpenChange={onOpenChange}
+        open={controlled ? controlledOpen : open}
+        onOpenChange={handleOpenChange}
       >
         <TooltipPrimitive.Trigger
-          onMouseEnter={() => !disabled && setOpen(true)}
-          onMouseLeave={() => {
-            setOpen(false);
-          }}
-          onPointerEnter={() => !disabled && setOpen(true)}
-          onPointerLeave={() => setOpen(false)}
-          onMouseOver={() => !disabled && setOpen(true)}
-          onClick={() => !disabled && setOpen(true)}
-          onTouchEnd={() => !disabled && setOpen(!open)}
+          onMouseEnter={() => handleOpenChange(true)}
+          onMouseLeave={() => handleOpenChange(false)}
+          onPointerEnter={() => handleOpenChange(true)}
+          onPointerLeave={() => handleOpenChange(false)}
+          onTouchStart={() => handleOpenChange(!open)}
+          onClick={() => handleOpenChange(!open)}
           asChild
         >
           <TriggerContainer>{children}</TriggerContainer>
         </TooltipPrimitive.Trigger>
-        {open ? (
-          <TooltipPrimitive.Portal forceMount>
-            <TooltipContainer
-              side={position}
-              align={alignment}
-              sideOffset={8}
-              forceMount
-            >
-              {text}
-            </TooltipContainer>
-          </TooltipPrimitive.Portal>
+        {(open || controlledOpen) && !disabled ? (
+          <TooltipContainer side={position} align={alignment} sideOffset={8}>
+            {text}
+          </TooltipContainer>
         ) : null}
       </TooltipPrimitive.Root>
     </TooltipPrimitive.Provider>
@@ -86,7 +84,7 @@ const TooltipContainer = styled(TooltipPrimitive.Content)`
   `}
 `;
 
-const TriggerContainer = styled.div`
+const TriggerContainer = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;

@@ -201,6 +201,10 @@
           }
         }
       }
+    },
+    "copy-link": {
+      "cta": "Copy link to clipboard",
+      "success": "Copied!"
     }
   },
   "pages": {

@@ -12,9 +12,8 @@ import CodeInline, { CodeInlineProps } from './code-inline';
 
 describe('<CodeInline />', () => {
   const renderCodeInline = ({
-    buttonAriaLabel = 'Copy to clipboard',
+    ariaLabel = 'Copy to clipboard',
     children = 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-    testID,
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
     disable = false,
@@ -22,9 +21,8 @@ describe('<CodeInline />', () => {
     customRender(
       <ToastProvider>
         <CodeInline
-          buttonAriaLabel={buttonAriaLabel}
+          ariaLabel={ariaLabel}
           disable={disable}
-          testID={testID}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
         >
@@ -32,11 +30,6 @@ describe('<CodeInline />', () => {
         </CodeInline>
       </ToastProvider>,
     );
-
-  it('should assign a testID', () => {
-    renderCodeInline({ testID: 'code-test-id' });
-    expect(screen.getByTestId('code-test-id')).toBeInTheDocument();
-  });
 
   it('should show the text', () => {
     renderCodeInline({ children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4' });
@@ -49,9 +42,9 @@ describe('<CodeInline />', () => {
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         tooltipTextConfirmation: 'Copied!',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
       });
-      const code = screen.getByRole('button', { name: 'Copy' });
+      const code = screen.getByRole('button', { name: 'Copy to clipboard' });
       expect(code).toBeInTheDocument();
 
       await userEvent.hover(code);
@@ -72,9 +65,9 @@ describe('<CodeInline />', () => {
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         tooltipTextConfirmation: 'Copied!',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
       });
-      const code = screen.getByRole('button', { name: 'Copy' });
+      const code = screen.getByRole('button', { name: 'Copy to clipboard' });
       expect(code).toBeInTheDocument();
 
       await userEvent.click(code);
@@ -96,10 +89,10 @@ describe('<CodeInline />', () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
         disable: true,
       });
-      const code = screen.queryByRole('button', { name: 'Copy' });
+      const code = screen.queryByRole('button', { name: 'Copy to clipboard' });
       expect(code).not.toBeInTheDocument();
     });
 
@@ -107,7 +100,7 @@ describe('<CodeInline />', () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
-        buttonAriaLabel: 'Copy',
+        ariaLabel: 'Copy to clipboard',
         disable: true,
       });
       const code = screen.getByText('fp_xm7T6MqhfRBkxL0DPOpfwM4');
