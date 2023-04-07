@@ -17,7 +17,7 @@ const Details = ({ kind, listPath }: DetailsProps) => {
   const { isLoading, errorMessage, data } = useEntityInitialData();
 
   return (
-    <Box>
+    <Box aria-busy={isLoading}>
       <Provider kind={kind} listPath={listPath}>
         {isLoading && <Loading />}
         {errorMessage && !isLoading && <Error message={errorMessage} />}
