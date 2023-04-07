@@ -21,7 +21,6 @@ export enum CollectedKybDataOption {
   beneficialOwners = 'business_beneficial_owners',
 }
 
-// TODO: the backend type for CDO has become more advanced and includes more than just KYC data
 export enum CollectedKycDataOption {
   name = 'name',
   dob = 'dob',

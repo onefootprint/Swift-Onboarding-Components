@@ -13,6 +13,7 @@ const useFieldsets = (): Fieldset => {
       iconComponent: IcoFileText224,
       fields: [
         { di: BusinessDI.name },
+        { di: BusinessDI.doingBusinessAs },
         {
           di: BusinessDI.tin,
         },

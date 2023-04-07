@@ -56,6 +56,8 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
 
   const defaultValues = {
     [BusinessDataAttribute.name]: data?.[BusinessDataAttribute.name],
+    [BusinessDataAttribute.doingBusinessAs]:
+      data?.[BusinessDataAttribute.doingBusinessAs],
     [BusinessDataAttribute.tin]: data?.[BusinessDataAttribute.tin],
     [BusinessDataAttribute.phoneNumber]:
       data?.[BusinessDataAttribute.phoneNumber],

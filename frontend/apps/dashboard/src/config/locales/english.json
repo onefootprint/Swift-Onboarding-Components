@@ -64,6 +64,7 @@
     "selfie.id_card": "Selfie",
     "selfie.driver_license": "Selfie",
     "business.name": "Name",
+    "business.dba": "Doing Business As",
     "business.website": "Website",
     "business.phone_number": "Phone number",
     "business.tin": "Taxpayer Identification Number (TIN)",

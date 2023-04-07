@@ -9,6 +9,7 @@ export enum IdDocDI {
 
 export enum BusinessDI {
   name = 'business.name',
+  doingBusinessAs = 'business.dba',
   website = 'business.website',
   phoneNumber = 'business.phone_number',
   tin = 'business.tin',

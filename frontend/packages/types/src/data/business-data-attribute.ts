@@ -1,5 +1,6 @@
 enum BusinessDataAttribute {
   name = 'name',
+  doingBusinessAs = 'dba',
   website = 'website',
   phoneNumber = 'phone_number',
   tin = 'tin',

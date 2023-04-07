@@ -125,6 +125,13 @@ describe('<Details />', () => {
           });
           expect(name).toBeInTheDocument();
 
+          const dba = getTextByRow({
+            name: 'Doing Business As',
+            value: '•••••••••',
+            container,
+          });
+          expect(dba).toBeInTheDocument();
+
           const tin = getTextByRow({
             name: 'Taxpayer Identification Number (TIN)',
             value: '•••••••••',
@@ -137,13 +144,14 @@ describe('<Details />', () => {
           beforeEach(() => {
             withEntityDecrypt(entityFixture.id, {
               [BusinessDI.name]: 'Acme Inc.',
+              [BusinessDI.doingBusinessAs]: 'Acme',
               [BusinessDI.tin]: '12-3456789',
             });
           });
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields(['Name']);
+            await decryptFields(['Name', 'Doing Business As']);
 
             await waitFor(() => {
               const container = screen.getByRole('group', {
@@ -155,6 +163,18 @@ describe('<Details />', () => {
                 container,
               });
               expect(name).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const container = screen.getByRole('group', {
+                name: 'Basic data',
+              });
+              const dba = getTextByRow({
+                name: 'Doing Business As',
+                value: 'Acme',
+                container,
+              });
+              expect(dba).toBeInTheDocument();
             });
           });
         });

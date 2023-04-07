@@ -18,6 +18,7 @@ export type BasicDataFormProps = {
   defaultValues?: Pick<
     BusinessData,
     | BusinessDataAttribute.name
+    | BusinessDataAttribute.doingBusinessAs
     | BusinessDataAttribute.tin
     | BusinessDataAttribute.phoneNumber
     | BusinessDataAttribute.website
@@ -64,6 +65,11 @@ const BasicDataForm = ({
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
       [BusinessDataAttribute.name]: formData[BusinessDataAttribute.name],
+      [BusinessDataAttribute.doingBusinessAs]: formData[
+        BusinessDataAttribute.doingBusinessAs
+      ]
+        ? formData[BusinessDataAttribute.doingBusinessAs]
+        : undefined,
       [BusinessDataAttribute.tin]: formData[BusinessDataAttribute.tin],
       [BusinessDataAttribute.phoneNumber]:
         formData[BusinessDataAttribute.phoneNumber],
@@ -85,6 +91,13 @@ const BasicDataForm = ({
         label={t('business-name.label')}
         placeholder={t('business-name.placeholder')}
         {...register(BusinessDataAttribute.name, { required: true })}
+      />
+      <TextInput
+        data-private
+        hasError={!!errors[BusinessDataAttribute.doingBusinessAs]}
+        label={t('doing-business-as.label')}
+        placeholder={t('doing-business-as.placeholder')}
+        {...register(BusinessDataAttribute.doingBusinessAs)}
       />
       <TextInput
         data-private

@@ -23,6 +23,10 @@
           "placeholder": "Acme Bank Inc.",
           "error": "Business name cannot be empty or is invalid"
         },
+        "doing-business-as": {
+          "label": "Doing Business As (optional)",
+          "placeholder": "Acme Bank"
+        },
         "tin": {
           "label": "Taxpayer Identification Number (TIN)",
           "placeholder": "12-3456789",

@@ -34,6 +34,7 @@ export const entityFixture: Entity = {
     BusinessDI.city,
     BusinessDI.country,
     BusinessDI.name,
+    BusinessDI.doingBusinessAs,
     BusinessDI.phoneNumber,
     BusinessDI.state,
     BusinessDI.tin,

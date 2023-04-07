@@ -84,6 +84,10 @@ describe('<BasicDataForm />', () => {
     expect(name).toBeInTheDocument();
     await userEvent.type(name, 'Acme Inc.');
 
+    const dba = screen.getByLabelText('Doing Business As (optional)');
+    expect(dba).toBeInTheDocument();
+    await userEvent.type(dba, 'Acme');
+
     const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
     expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
     expect(tin).toBeInTheDocument();
@@ -101,6 +105,7 @@ describe('<BasicDataForm />', () => {
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
         name: 'Acme Inc.',
+        dba: 'Acme',
         tin: '12-9876543',
       });
     });

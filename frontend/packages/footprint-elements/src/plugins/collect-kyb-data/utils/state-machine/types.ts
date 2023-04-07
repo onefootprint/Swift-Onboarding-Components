@@ -12,7 +12,9 @@ export type BasicData = Required<
 > &
   Pick<
     BusinessData,
-    BusinessDataAttribute.phoneNumber | BusinessDataAttribute.website
+    | BusinessDataAttribute.doingBusinessAs
+    | BusinessDataAttribute.phoneNumber
+    | BusinessDataAttribute.website
   >;
 
 export type BusinessAddressData = Required<
