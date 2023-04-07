@@ -48,3 +48,84 @@ TENANT_ID1 = "_private_it_org_1"
 TENANT_ID2 = "_private_it_org_2"
 TENANT_ID3 = "_private_it_org_3"
 TENANT_ID4 = "_private_it_org_4"
+
+
+# Sans phone number, ssn, email
+ID_DATA = {
+    "id.first_name": "Sandbox",
+    "id.last_name": "User",
+    "id.dob": "1995-12-25",
+    "id.address_line1": "1 Footprint Way",
+    "id.address_line2": "PO Box Wallaby Way",
+    "id.city": "Enclave",
+    "id.state": "NY",
+    "id.zip": "10009",
+    "id.country": "US",
+}
+
+BUSINESS_DATA = {
+    "business.name": "Foobar Inc",
+    "business.dba": "Barfoo Inc",
+    "business.website": "https://foobar.com",
+    "business.phone_number": PHONE_NUMBER,
+    "business.address_line1": "1 Footprint Way",
+    "business.city": "Enclave",
+    "business.state": "NY",
+    "business.zip": "10009",
+    "business.country": "US",
+    "business.tin": "121231234",
+    "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}, {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 30}]',
+}
+
+IP_DATA = {
+    "investor_profile.occupation": "Neurosurgeon",
+    "investor_profile.annual_income": "lt50k",
+    "investor_profile.net_worth": "gt1m",
+    "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
+    "investor_profile.risk_tolerance": "conservative",
+    "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
+}
+
+CDO_TO_DIS = {
+    "name": ["id.first_name", "id.last_name"],
+    "dob": ["id.dob"],
+    "ssn9": [
+        "id.ssn9"
+    ],  # Technically requires ssn4, but the backend will auto-populate
+    "ssn4": ["id.ssn4"],
+    "full_address": [
+        "id.address_line1",
+        "id.address_line2",
+        "id.city",
+        "id.state",
+        "id.zip",
+        "id.country",
+    ],
+    "partial_address": ["id.zip", "id.country"],
+    "email": ["id.email"],
+    "phone_number": ["id.phone_number"],
+    "business_name": ["business.name", "business.dba"],
+    "business_tin": ["business.tin"],
+    "business_address": [
+        "business.address_line1",
+        "business.address_line2",
+        "business.city",
+        "business.state",
+        "business.zip",
+        "business.country",
+    ],
+    "business_phone_number": ["business.phone_number"],
+    "business_website": ["business.website"],
+    "business_beneficial_owners": ["business.beneficial_owners"],
+    "business_kyced_beneficial_owners": ["business.kyced_beneficial_owners"],
+    "business_corporation_type": ["business.corporation_type"],
+    "investor_profile": [
+        "investor_profile.occupation",
+        "investor_profile.brokerage_firm_employer",
+        "investor_profile.annual_income",
+        "investor_profile.net_worth",
+        "investor_profile.investment_goals",
+        "investor_profile.risk_tolerance",
+        "investor_profile.declarations",
+    ],
+}

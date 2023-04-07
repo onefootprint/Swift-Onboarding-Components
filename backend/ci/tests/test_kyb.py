@@ -9,16 +9,14 @@ from tests.constants import PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
-def sandbox_user_w_business(kyb_sandbox_ob_config, twilio, kyb_cdos):
-    bifrost_client = BifrostClient(kyb_sandbox_ob_config)
-    auth_token = bifrost_client.init_user_for_onboarding(twilio)
-    bifrost_client.initialize_onboarding()
-    requirements = bifrost_client.get_requirements()
+def incomplete_bifrost(kyb_sandbox_ob_config, twilio, kyb_cdos):
+    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    requirements = bifrost.get_requirements()
     business_requirement = get_requirement_from_requirements(
         "collect_business_data", requirements
     )
     assert set(business_requirement["missing_attributes"]) == set(kyb_cdos)
-    return auth_token
+    return bifrost
 
 
 @pytest.mark.parametrize(
@@ -72,26 +70,23 @@ def sandbox_user_w_business(kyb_sandbox_ob_config, twilio, kyb_cdos):
         ({"id.ssn4": "1234"}, 400),
     ],
 )
-def test_put_business_vault(
-    sandbox_user_w_business, business_data, expected_status_code
-):
+def test_put_business_vault(incomplete_bifrost, business_data, expected_status_code):
     post(
         "hosted/business/vault/validate",
         business_data,
-        sandbox_user_w_business,
+        incomplete_bifrost.auth_token,
         status_code=expected_status_code,
     )
     put(
         "hosted/business/vault",
         business_data,
-        sandbox_user_w_business,
+        incomplete_bifrost.auth_token,
         status_code=expected_status_code,
     )
 
 
 def test_put_business_vault_not_authorized(sandbox_tenant, twilio):
-    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
-    auth_token = bifrost_client.auth_token
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    auth_token = bifrost.auth_token
     # Can't hit PUT /hosted/business/vault without a business vault
     put("hosted/business/vault", {}, auth_token, status_code=401)

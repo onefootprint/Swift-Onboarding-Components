@@ -1,9 +1,8 @@
 from tests.cert_fixtures import GOOGLE_CERT
 from tests.utils import _make_request, patch
 from tests.auth import BaseAuth
-import pytest
-from tests.utils import url
-from tests.utils import post, get, put, build_user_data
+from tests.utils import post, get, put
+from tests.constants import ID_DATA
 import requests
 import urllib.parse
 
@@ -105,11 +104,10 @@ class TestVaultProxy:
         assert fp_id
 
         # post data to it
-        user_data = build_user_data()
         data = {
             "custom.ach_account_number": "123467890",
             "custom.cc4": "4242",
-            **user_data,
+            **ID_DATA,
         }
         put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -121,7 +119,7 @@ class TestVaultProxy:
             "full_name": f"{{{{ {fp_id}.id.first_name }}}} {{{{ {fp_id}.id.last_name }}}}",
             "last4_credit_card": f"{{{{ {fp_id}.custom.cc4 }}}}",
             "ach": f"{{{{ {fp_id}.custom.ach_account_number }}}}",
-            "ssn": f"{{{{ {fp_id}.id.ssn9 }}}}",
+            "zip": f"{{{{ {fp_id}.id.zip }}}}",
         }
 
         response = _make_request(
@@ -148,10 +146,10 @@ class TestVaultProxy:
         assert result["ach"] == "123467890"
         assert result["last4_credit_card"] == "4242"
 
-        first = user_data["id.first_name"]
-        last = user_data["id.last_name"]
+        first = ID_DATA["id.first_name"]
+        last = ID_DATA["id.last_name"]
         assert result["full_name"] == f"{first} {last}"
-        assert result["ssn"] == user_data["id.ssn9"]
+        assert result["zip"] == ID_DATA["id.zip"]
 
     def test_proxy_tls(self, sandbox_tenant):
         # create the vault
@@ -161,10 +159,9 @@ class TestVaultProxy:
         assert fp_id
 
         # post data to it
-        user_data = build_user_data()
         data = {
             "custom.test_field": "hello world",
-            **user_data,
+            **ID_DATA,
         }
         put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -226,10 +223,9 @@ class TestVaultProxy:
         assert fp_id
 
         # post data to it
-        user_data = build_user_data()
         data = {
             "custom.test_field": "hello world",
-            **user_data,
+            **ID_DATA,
         }
         put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -279,10 +275,9 @@ class TestVaultProxy:
         assert fp_id
 
         # post data to it
-        user_data = build_user_data()
         data = {
             "custom.message": "hello world",
-            **user_data,
+            **ID_DATA,
         }
         put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
@@ -316,8 +311,8 @@ class TestVaultProxy:
         result = response.json()
         # print(result)
 
-        first = user_data["id.first_name"]
-        last = user_data["id.last_name"]
+        first = ID_DATA["id.first_name"]
+        last = ID_DATA["id.last_name"]
         assert result["full_name"] == f"{first} {last}"
         assert result["msg"] == "hello world"
 

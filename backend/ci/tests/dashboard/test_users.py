@@ -1,7 +1,6 @@
 import pytest
 import arrow
-from tests.bifrost_client import BifrostClient, DocumentDataOptions
-from tests.utils import build_user_data
+from tests.bifrost_client import BifrostClient
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
@@ -22,18 +21,11 @@ def sandbox_user2(sandbox_tenant, twilio):
 
 @pytest.fixture(scope="module")
 def incomplete_user(sandbox_tenant, twilio):
-    from tests.bifrost_client import BifrostClient
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
 
-    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
-    bifrost_client.initialize_onboarding()
-
+    phone_number = bifrost.data["id.phone_number"].replace(" ", "")
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
-    body = get(
-        "entities",
-        dict(search=bifrost_client.phone_number.replace(" ", "")),
-        sandbox_tenant.sk.key,
-    )
+    body = get("entities", dict(search=phone_number), sandbox_tenant.sk.key)
     return body["data"][0]["id"]
 
 
@@ -50,7 +42,7 @@ def test_get_org(sandbox_user):
     tenant["logo_url"]
 
 
-def test_get_users_list(sandbox_user, sandbox_user2, vault_user, incomplete_user):
+def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user):
     tenant = sandbox_user.tenant
     body = get("entities", None, tenant.sk.key)
     scoped_users = body["data"]
@@ -90,10 +82,10 @@ def test_get_users_by_fp_id_query(sandbox_user):
     ],
 )
 def test_get_users_filter(
+    incomplete_user,
     sandbox_user,
     sandbox_user2,
     vault_user,
-    incomplete_user,
     filters,
     expected_user_idxs,
 ):
@@ -132,45 +124,22 @@ def test_get_users_detail(sandbox_user):
     assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
 
 
-@pytest.mark.parametrize(
-    "document_data,expected_identity_document_info",
-    [
-        (
-            DocumentDataOptions.front_back,
-            {
-                "data_identifier": "id_document.passport",
-                "status": "success",
-                "selfie_collected": False,
-            },
-        ),
-        (
-            DocumentDataOptions.front_back_selfie,
-            {
-                "data_identifier": "id_document.passport",
-                "status": "success",
-                "selfie_collected": True,
-            },
-        ),
-    ],
-)
-def test_get_users_detail_doc_and_selfie(
+# TODO no longer have coverage here of uploading without selfie - somewhere else?
+def test_get_users_detail_doc(
     sandbox_user,
     twilio,
     doc_request_sandbox_ob_config,
-    document_data,
-    expected_identity_document_info,
 ):
     tenant = sandbox_user.tenant
-    bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(
-        twilio, identity_document_data=document_data
-    )
-    user = bifrost_client.onboard_user_onto_tenant(tenant)
+    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    user = bifrost.run(tenant)
 
     res = get(f"users/{user.fp_id}", None, tenant.sk.key)
     assert len(res["identity_document_info"]) == 1
-    for (k, v) in expected_identity_document_info.items():
-        assert res["identity_document_info"][0][k] == v
+    doc_info = res["identity_document_info"][0]
+    assert doc_info["data_identifier"] == "id_document.driver_license"
+    assert doc_info["status"] == "success"
+    assert doc_info["selfie_collected"]
 
 
 def test_liveness_list(sandbox_user):

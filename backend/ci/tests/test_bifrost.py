@@ -573,15 +573,12 @@ class TestBifrostSandbox:
         expected_status,
         expected_requires_manual_review,
     ):
-        bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-        bifrost_client.init_user_for_onboarding(twilio, sandbox_suffix=suffix)
-        user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
-
-        # Get the status
-        body = post(
-            "onboarding/session/validate",
-            dict(validation_token=user.validation_token),
-            sandbox_tenant.sk.key,
+        bifrost = BifrostClient(
+            sandbox_tenant.default_ob_config, twilio, sandbox_suffix=suffix
         )
-        assert body["status"] == expected_status
-        assert body["requires_manual_review"] == expected_requires_manual_review
+        bifrost.run(sandbox_tenant)
+
+        bifrost.validate_response["status"] == expected_status
+        bifrost.validate_response[
+            "requires_manual_review"
+        ] == expected_requires_manual_review

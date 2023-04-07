@@ -7,26 +7,22 @@ from tests.utils import (
     multipart_file,
     get,
 )
+from tests.constants import IP_DATA
 from tests.bifrost_client import BifrostClient
-from tests.dashboard.test_investor_profile import sb_user_with_investor_profile
 
 
 @pytest.fixture(scope="function")
-def sandbox_user(investor_profile_ob_config, twilio):
-    bifrost_client = BifrostClient(investor_profile_ob_config)
-    auth_token = bifrost_client.init_user_for_onboarding(twilio)
-    bifrost_client.initialize_onboarding()
-    requirements = bifrost_client.get_requirements()
-    ip_requirement = get_requirement_from_requirements(
+def incomplete_client(investor_profile_ob_config, twilio):
+    """
+    Sandbox user partially onboarded onto an ob config requiring investor profile
+    """
+    bifrost = BifrostClient(investor_profile_ob_config, twilio)
+    requirements = bifrost.get_requirements()
+    ip_requirements = get_requirement_from_requirements(
         "collect_investor_profile", requirements
     )
-    assert "investor_profile" in ip_requirement["missing_attributes"]
-    return bifrost_client
-
-
-def test_put_ip_info_valid(sandbox_user, ip_data):
-    post("hosted/user/vault/validate", ip_data, sandbox_user.auth_token)
-    put("hosted/user/vault", ip_data, sandbox_user.auth_token)
+    assert "investor_profile" in ip_requirements["missing_attributes"]
+    return bifrost
 
 
 @pytest.mark.parametrize(
@@ -54,68 +50,52 @@ def test_put_ip_info_valid(sandbox_user, ip_data):
         ),
     ],
 )
-def test_put_ip_info_invalid(sandbox_user, ip_data, key, value, expected_error):
-    ip_data = {
-        **ip_data,
+def test_put_ip_info_invalid(incomplete_client, key, value, expected_error):
+    auth_token = incomplete_client.auth_token
+    data = {
+        **IP_DATA,
         key: value,
     }
-    body = post(
-        "hosted/user/vault/validate", ip_data, sandbox_user.auth_token, status_code=400
-    )
+    body = post("hosted/user/vault/validate", data, auth_token, status_code=400)
     assert expected_error in body["error"]["message"][key]
 
-    body = put("hosted/user/vault", ip_data, sandbox_user.auth_token, status_code=400)
+    body = put("hosted/user/vault", data, auth_token, status_code=400)
     assert expected_error in body["error"]["message"][key]
 
 
-def test_put_ip_info_incomplete_data(sandbox_user):
+def test_put_ip_info_incomplete_data(incomplete_client):
+    auth_token = incomplete_client.auth_token
     data = {"investor_profile.occupation": "Penguin veterinarian"}
     # Should not be able to provide single pieces of data without addl_headers
-    post(
-        "hosted/user/vault/validate",
-        data,
-        sandbox_user.auth_token,
-        status_code=400,
-    )
+    post("hosted/user/vault/validate", data, auth_token, status_code=400)
 
     # But, when we provide this special header, should silence that error
-    addl_headers = {
-        "x-fp-allow-extra-fields": "true",
-    }
-    post(
-        "hosted/user/vault/validate",
-        data,
-        sandbox_user.auth_token,
-        addl_headers=addl_headers,
-    )
+    addl_headers = {"x-fp-allow-extra-fields": "true"}
+    post("hosted/user/vault/validate", data, auth_token, addl_headers=addl_headers)
 
     # The non-speculative endpoint should never accept this header
     put(
         "hosted/user/vault",
         data,
-        sandbox_user.auth_token,
+        auth_token,
         status_code=400,
         addl_headers=addl_headers,
     )
 
 
 class TestDocuments:
-    def test_invalid_upload(self, sandbox_user):
+    def test_invalid_upload(self, incomplete_client):
         res = post(
             "/hosted/user/upload/document.finra_compliance_letter",
             None,
-            sandbox_user.auth_token,
+            incomplete_client.auth_token,
             files=multipart_file("example_txt.txt", "text/plain"),
             status_code=400,
         )
         assert "image upload error: invalid file type" == res["error"]["message"]
 
-    def test_valid_upload(self, sandbox_user, ip_data, sandbox_tenant):
-        user = sandbox_user.onboard_user_onto_tenant(
-            sandbox_tenant,
-            investor_profile=ip_data,
-            document_files=[multipart_file("example_pdf.pdf", "application/pdf")],
-        )
+    def test_valid_upload(self, incomplete_client, sandbox_tenant):
+        user = incomplete_client.run(sandbox_tenant)
 
         res = post(
             f"/users/{user.fp_id}/vault/document/decrypt",
@@ -140,15 +120,15 @@ class TestDocuments:
         )
 
     # Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
-    def test_reupload(self, sandbox_user, ip_data, sandbox_tenant):
-        user = sandbox_user.onboard_user_onto_tenant(
-            sandbox_tenant,
-            investor_profile=ip_data,
-            document_files=[
-                multipart_file("example_pdf.pdf", "application/pdf"),
-                multipart_file("example_pdf2.pdf", "application/pdf"),
-            ],
+    def test_reupload(self, sandbox_tenant, investor_profile_ob_config, twilio):
+        bifrost = BifrostClient(investor_profile_ob_config, twilio)
+        # First upload one document
+        bifrost.handle_ip_doc()
+        # Then change the document and run again
+        bifrost.data["document.finra_compliance_letter"] = multipart_file(
+            "example_pdf2.pdf", "application/pdf"
         )
+        user = bifrost.run(sandbox_tenant)
 
         res = post(
             f"/users/{user.fp_id}/vault/document/decrypt",

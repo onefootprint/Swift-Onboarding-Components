@@ -5,9 +5,8 @@ from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
     post,
-    build_user_data,
 )
-from tests.bifrost_client import BifrostClient, DocumentDataOptions
+from tests.bifrost_client import BifrostClient
 
 
 @pytest.fixture(scope="session")
@@ -16,20 +15,13 @@ def user_with_documents(sandbox_tenant, doc_request_sandbox_ob_config, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    bifrost_client = BifrostClient(doc_request_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(
-        twilio, identity_document_data=DocumentDataOptions.front_back_selfie
-    )
-    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    return bifrost.run(sandbox_tenant)
 
 
 def test_tenant_decrypt(sandbox_user):
     tenant = sandbox_user.tenant
-    expected_data = build_user_data()
-    # TODO weird
-    expected_data["id.ssn9"] = sandbox_user.ssn
-    expected_data["id.ssn4"] = sandbox_user.ssn[-4:]
-    expected_data["id.email"] = sandbox_user.email
+
     for attributes in FIELDS_TO_DECRYPT:
         data = {
             "fields": attributes,
@@ -41,8 +33,11 @@ def test_tenant_decrypt(sandbox_user):
             tenant.sk.key,
         )
         attributes = body
-        for attribute, value in attributes.items():
-            assert expected_data[attribute] == value
+        for di, value in attributes.items():
+            if di == "id.ssn4":
+                assert sandbox_user.client.data["id.ssn9"][-4:] == value
+            else:
+                assert sandbox_user.client.data[di] == value
 
         access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
         assert set(access_event["targets"]) == set(attributes)
@@ -89,7 +84,7 @@ def test_tenant_decrypt_identity_doc_with_identity_endpoint(sandbox_user):
 def test_tenant_document_decrypt_no_permissions(sandbox_user):
     tenant = sandbox_user.tenant
     data = {
-        "document_type": "passport",
+        "document_type": "driver_license",
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
@@ -129,7 +124,7 @@ def test_tenant_document_get_decrypt(user_with_documents):
         tenant.sk.key,
         status_code=200,
     )
-    expected = {"passport": True}
+    expected = {"driver_license": True}
     assert resp == expected
 
 
@@ -138,7 +133,7 @@ def test_tenant_document_decrypt(user_with_documents):
     from tests.image_fixtures import test_image
 
     tenant = user_with_documents.tenant
-    requested_doc_type = "passport"
+    requested_doc_type = "driver_license"
     data = {
         "document_type": requested_doc_type,
         "reason": "Responding to a customer request",
@@ -157,7 +152,7 @@ def test_tenant_document_decrypt(user_with_documents):
     assert not resp["images"][0]["selfie"]
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
-    assert set(access_event["targets"]) == {"id_document.passport"}
+    assert set(access_event["targets"]) == {"id_document.driver_license"}
 
 
 def test_tenant_selfie_decrypt(
@@ -175,15 +170,11 @@ def test_tenant_selfie_decrypt(
     }
     ob_config = create_ob_config(sandbox_tenant.sk, ob_conf_data)
 
-    bifrost_client = BifrostClient(ob_config)
-    bifrost_client.init_user_for_onboarding(
-        twilio,
-        identity_document_data=DocumentDataOptions.front_back_selfie,
-    )
-    user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+    bifrost = BifrostClient(ob_config, twilio)
+    user = bifrost.run(sandbox_tenant)
 
     data = {
-        "document_type": "passport",
+        "document_type": "driver_license",
         "reason": "Responding to a customer request",
         "include_selfie": True,
     }
@@ -194,13 +185,13 @@ def test_tenant_selfie_decrypt(
         sandbox_tenant.sk.key,
     )
 
-    assert resp["document_type"] == "passport"
+    assert resp["document_type"] == "driver_license"
     assert resp["images"][0]["front"] == test_image
     assert resp["images"][0]["back"] == test_image
     assert resp["images"][0]["selfie"] == test_image
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {
-        "id_document.passport",
-        "selfie.passport",
+        "id_document.driver_license",
+        "selfie.driver_license",
     }

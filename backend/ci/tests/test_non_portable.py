@@ -1,6 +1,6 @@
 import pytest
-from tests.utils import post, get, put, build_user_data
-from tests.constants import EMAIL, PHONE_NUMBER
+from tests.utils import post, get, put
+from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA
 
 
 class TestNonPortableVaultApi:
@@ -54,7 +54,7 @@ def test_vault_create_write_decrypt(tenant):
         "id.phone_number": PHONE_NUMBER,
         "id.email": EMAIL,
         "custom.hi": "bye",
-        **build_user_data(),
+        **ID_DATA,
     }
     body = post("users/", initial_data, tenant.sk.key)
     user = body

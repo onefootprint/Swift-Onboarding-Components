@@ -23,8 +23,6 @@ pub enum OnboardingRequirement {
     },
     /// Perform liveness checks
     Liveness,
-    /// The KYC checks have not yet been initiated for the user's data
-    IdentityCheck,
     CollectDocument {
         document_request_id: DocumentRequestId,
         should_collect_selfie: bool,

@@ -3,6 +3,7 @@ import pytest
 from tests.utils import (
     get,
     put,
+    post,
     create_tenant,
     inherit_user,
 )
@@ -35,33 +36,32 @@ class DualOnboardedUser(NamedTuple):
 @pytest.fixture(scope="session")
 def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
     # Create a sandbox user, onboard them onto sandbox_tenant
-    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
-    user = bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    user = bifrost.run(sandbox_tenant)
     fp_id = user.fp_id
 
     #
     # Then onboard them onto foo_sandbox_tenant
     #
     inherited_auth_token = inherit_user(
-        twilio, user.phone_number, foo_sandbox_tenant.default_ob_config.key
+        twilio,
+        bifrost.data["id.phone_number"],
+        foo_sandbox_tenant.default_ob_config.key,
     )
-    foo_bifrost_client = BifrostClient(foo_sandbox_tenant.default_ob_config)
-    # Used instead of `init_user_for_onboarding` to instantiate the BifrostClient with the existing user's auth token.
+    foo_bifrost = BifrostClient(foo_sandbox_tenant.default_ob_config, twilio)
+    # Manually initialize the onboarding and overwrite the auth token on the BifrostClient.
     # The behavior of BifrostClient is still a little undefined in this case, though - don't do
     # this unless you know what you're doing
-    foo_bifrost_client.auth_token = inherited_auth_token
+    post("hosted/onboarding", None, inherited_auth_token)
+    foo_bifrost.auth_token = inherited_auth_token
 
-    user = foo_bifrost_client.initialize_onboarding()
-    validation_token = foo_bifrost_client.authorize_user_to_tenant()
-    foo_fp_id = foo_bifrost_client.validate_user(
-        validation_token, foo_sandbox_tenant.sk
-    )
+    foo_user = foo_bifrost.run(foo_sandbox_tenant)
+    foo_fp_id = foo_user.fp_id
 
     return DualOnboardedUser(fp_id, foo_fp_id)
 
 
-def test_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
+def test_fp_id(dual_onboarded_user):
     # Make sure the fp_ids are different
     assert (
         dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id

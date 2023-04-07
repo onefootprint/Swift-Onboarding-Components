@@ -229,9 +229,8 @@ def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
 def create_sandbox_user(sandbox_tenant, twilio):
     from tests.bifrost_client import BifrostClient
 
-    bifrost_client = BifrostClient(sandbox_tenant.default_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
-    return bifrost_client.onboard_user_onto_tenant(sandbox_tenant)
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    return bifrost.run(sandbox_tenant)
 
 
 def create_tenant(org_data, ob_conf_data):
@@ -253,45 +252,13 @@ def create_tenant(org_data, ob_conf_data):
 
 
 def create_ob_config(sk, ob_conf_data):
+    # TODO save the tenant on the ob config for easier bifrost client?
     # TODO also make this get or create?
     body = post("org/onboarding_configs", ob_conf_data, sk.key)
     ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
     return ob_config
-
-
-def build_user_data():
-    ssn = _gen_random_ssn()
-    user_data = {
-        "id.first_name": "Sandbox",
-        "id.last_name": "User",
-        "id.dob": "1995-12-25",
-        "id.address_line1": "1 Footprint Way",
-        "id.address_line2": "PO Box Wallaby Way",
-        "id.city": "Enclave",
-        "id.state": "NY",
-        "id.zip": "10009",
-        "id.country": "US",
-        "id.ssn9": ssn,
-    }
-    return user_data
-
-
-def build_business_data():
-    return {
-        "business.name": "Foobar Inc",
-        "business.dba": "Barfoo Inc",
-        "business.website": "https://foobar.com",
-        "business.phone_number": PHONE_NUMBER,
-        "business.address_line1": "1 Footprint Way",
-        "business.city": "Enclave",
-        "business.state": "NY",
-        "business.zip": "10009",
-        "business.country": "US",
-        "business.tin": "121231234",
-        "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}, {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 30}]',
-    }
 
 
 def clean_up_user(phone_number, email):
@@ -333,10 +300,6 @@ def _sandbox_email(phone_number):
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
-
-
-def _pretty_print_json(o):
-    print(json.dumps(o, indent=4, sort_keys=True))
 
 
 def _b64_decode(v):

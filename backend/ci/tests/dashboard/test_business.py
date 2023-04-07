@@ -2,7 +2,8 @@ import pytest
 import typing
 from tests.dashboard.utils import latest_access_event_for
 from tests.bifrost_client import BifrostClient
-from tests.utils import get, post, build_business_data
+from tests.utils import get, post
+from tests.constants import BUSINESS_DATA
 
 
 class Business(typing.NamedTuple):
@@ -12,15 +13,12 @@ class Business(typing.NamedTuple):
 
 @pytest.fixture(scope="session")
 def sb_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
-    bifrost_client = BifrostClient(kyb_sandbox_ob_config)
-    bifrost_client.init_user_for_onboarding(twilio)
-    user = bifrost_client.onboard_user_onto_tenant(
-        sandbox_tenant, add_business_data=True
-    )
+    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    user = bifrost.run(sandbox_tenant)
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
     entity = body["data"][0]
     assert entity["kind"] == "business"
-    assert set(entity["attributes"]) == set(build_business_data())
+    assert set(entity["attributes"]) == set(BUSINESS_DATA)
 
     # TODO should get the fp_biz_id from validate
     fp_bid = entity["id"]
@@ -33,7 +31,7 @@ def test_get_entities(sandbox_tenant, sb_business):
         None,
         sandbox_tenant.sk.key,
     )
-    assert set(body["attributes"]) == set(build_business_data())
+    assert set(body["attributes"]) == set(BUSINESS_DATA)
     assert body["decrypted_attributes"] == {"business.name": "Foobar Inc"}
 
 
@@ -62,7 +60,7 @@ def test_get_vault(sandbox_tenant, sb_business):
         sandbox_tenant.sk.key,
     )
     populated_keys = set(k for (k, v) in body.items() if v)
-    assert populated_keys == set(build_business_data())
+    assert populated_keys == set(BUSINESS_DATA)
 
 
 @pytest.mark.parametrize(
@@ -85,7 +83,7 @@ def test_decrypt(sandbox_tenant, sb_business, fields_to_decrypt):
         fields=fields_to_decrypt,
         reason="Doing a business hecking decrypt",
     )
-    expected_data = build_business_data()
+    expected_data = BUSINESS_DATA
     expected_data["business.phone_number"] = expected_data[
         "business.phone_number"
     ].replace(" ", "")
