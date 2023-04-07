@@ -13,6 +13,8 @@ pub enum UserError {
     NotAllowedWithoutTenant,
     #[error("Data update is not allowed without business")]
     NotAllowedWithoutBusiness,
+    #[error("This business owner has already started KYC")]
+    BoAlreadyHasVault,
     #[error("Unable to add {0} in this method")]
     InvalidDataKind(IdentityDataKind),
     #[error("Cannot decrypt {0}")]

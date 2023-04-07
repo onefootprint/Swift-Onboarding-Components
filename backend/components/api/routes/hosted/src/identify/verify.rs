@@ -11,8 +11,10 @@ use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::config::Config;
+use api_core::errors::user::UserError;
 use chrono::Duration;
 use crypto::sha256;
+use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -83,11 +85,12 @@ pub async fn post(
         ChallengeData::Biometric(challenge_state) => ChallengeData::Biometric(challenge_state),
     };
 
-    let ob_config = ob_pk_auth.ob_config().clone();
     let config = state.config.clone();
-    let (uv_id, su_id, user_kind) = state
+    let session_key = state.session_sealing_key.clone();
+    let (auth_token, user_kind) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
+            let ob_config = ob_pk_auth.ob_config();
             let (user_vault_id, user_kind) = match challenge_data {
                 ChallengeData::Sms(c_state) => {
                     validate_sms_challenge(conn, c_state, &challenge_response, ob_config.clone())?
@@ -96,23 +99,47 @@ pub async fn post(
                     validate_biometric_challenge(conn, &config, c_state, &challenge_response)?
                 }
             };
+
             // Since only some codepaths above will create a SU, we need to always get_or_create
             // a SU here
             let uv = Vault::lock(conn, &user_vault_id)?;
-            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
-            Ok((uv.into_inner().id, su.id, user_kind))
+            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id.clone())?;
+
+            // If we verified with a BoSessionAuth, update the corresponding BO
+            let bo_scope = if let Some(business_owner) = ob_pk_auth.business_owner() {
+                let bo = BusinessOwner::lock(conn, &business_owner.id)?.into_inner();
+                let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &ob_config.id))?;
+                if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
+                    // If uv on the BO, make sure it is the same UV that was located in identify flow
+                    if existing_uv_id != &uv.id {
+                        return Err(UserError::BoAlreadyHasVault.into());
+                    }
+                } else {
+                    // If no uv_id on the BO, add it
+                    bo.add_user_vault_id(conn, &uv.id)?;
+                }
+                // TODO this scope will give the secondary BO perms to update the business vault
+                Some(UserAuthScope::Business(scoped_business.id))
+            } else {
+                None
+            };
+
+            // Create the auth token for this user
+            let token_scopes = bo_scope
+                .into_iter()
+                .chain([
+                    UserAuthScope::SignUp,
+                    UserAuthScope::OrgOnboardingInit { id: su.id },
+                ])
+                .collect();
+            let duration = Duration::minutes(30);
+
+            // Create the auth session and save it in the database
+            let data = UserSession::make(uv.into_inner().id, token_scopes);
+            let auth_token = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            Ok((auth_token, user_kind))
         })
         .await?;
-
-    let token_scopes = vec![
-        UserAuthScope::SignUp,
-        UserAuthScope::OrgOnboardingInit { id: su_id },
-    ];
-    let duration = Duration::minutes(30);
-
-    // Create the auth session and save it in the database
-    let data = UserSession::make(uv_id, token_scopes);
-    let auth_token = AuthSession::create(&state, data, duration).await?;
 
     Ok(Json(ResponseData {
         data: VerifyResponse {

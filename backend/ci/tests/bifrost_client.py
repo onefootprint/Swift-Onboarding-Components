@@ -21,12 +21,16 @@ class BifrostClient:
     BifrostClient simulates Footprint hosted frontend's requests to the backend APIs.
     """
 
-    def __init__(self, ob_config, twilio, sandbox_suffix=None):
+    def __init__(
+        self, ob_config, twilio, sandbox_suffix=None, override_ob_config_auth=None
+    ):
         """
         Creates a BifrostClient associated with a specific ob config and a specific user with
         default data populated.
 
         Can override any data with BifrostClient.data.
+
+        Can also override the auth method we use in the identify flow.
         """
         self.ob_config = ob_config
         # Generate all default data up front. Pluck from it to satisfy requirements
@@ -34,7 +38,7 @@ class BifrostClient:
 
         user = create_basic_sandbox_user(
             twilio,
-            tenant_pk=self.ob_config.key,
+            ob_config_auth=override_ob_config_auth or self.ob_config.key,
             suffix=sandbox_suffix,
         )
         self.auth_token = user.auth_token
@@ -50,6 +54,9 @@ class BifrostClient:
             "id.phone_number": user.phone_number,
             "id.email": _sandbox_email(user.phone_number),
         }
+
+        # After running bifrost, this will be the list of requirements satisfied
+        self.handled_requirements = []
 
         # Initialize the onboarding
         post("hosted/onboarding", None, self.auth_token)
@@ -69,6 +76,7 @@ class BifrostClient:
             else next(i for i in requirements if i["kind"] == kind)
         )
 
+        self.handled_requirements = requirements_to_handle
         for req in requirements_to_handle:
             self.handle_requirement(req)
 
@@ -78,27 +86,40 @@ class BifrostClient:
         user to input a specific piece of information.
         """
         if requirement["kind"] == "collect_data":
-            self.handle_collect(requirement, "/hosted/user/vault")
+            self.handle_collect_user(requirement)
         elif requirement["kind"] == "collect_investor_profile":
-            self.handle_collect(requirement, "/hosted/user/vault")
+            self.handle_collect_user(requirement)
             self.handle_ip_doc()
         elif requirement["kind"] == "collect_business_data":
-            self.handle_collect(requirement, "/hosted/business/vault")
+            self.handle_collect_business(requirement)
         elif requirement["kind"] == "collect_document":
             self.handle_collect_document(requirement)
         elif requirement["kind"] == "liveness":
             self.handle_liveness()
 
-    def handle_collect(self, requirement, url):
+    def handle_collect_user(self, requirement):
         """
         PUT data in the vault to satisfy the provided requirement.
-        Operates on collect_data, collect_investor_profile, or collect_business_data requirements
+        Operates on collect_data or collect_investor_profile requirement
         """
         dis_to_provide = [
             di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
-        put(url, data, self.auth_token)
+        put("/hosted/user/vault", data, self.auth_token)
+
+    def handle_collect_business(self, requirement):
+        """
+        PUT data in the vault to satisfy the provided requirement.
+        Operates on collect_business_data requirement
+        """
+        dis_to_provide = [
+            di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
+        ]
+        data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
+        body = put("/hosted/business/vault", data, self.auth_token)
+        # TODO don't save this here after we stop returning the secondary BO auth tokens
+        self.put_business_response = body
 
     def handle_ip_doc(self):
         """Some special logic to upload a document for certain investor profile options"""

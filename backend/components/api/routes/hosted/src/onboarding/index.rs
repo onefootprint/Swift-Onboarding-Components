@@ -60,7 +60,8 @@ pub async fn post(
 
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
-    let should_create_new_business_vault = ob_config.must_collect_business();
+    let should_create_new_business_vault =
+        ob_config.must_collect_business() && !user_auth.data.has_scope(&UserAuthScopeDiscriminant::Business);
     let new_business_keypair = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         Some(state.enclave_client.generate_sealed_keypair().await?)
@@ -95,7 +96,6 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            // TODO: Only do this if we aren't part of a business
             let business_scope = if let Some(new_business_keypair) = new_business_keypair {
                 let (public_key, e_private_key) = new_business_keypair;
                 let args = NewVaultArgs {
@@ -105,8 +105,7 @@ pub async fn post(
                     is_portable: true,
                     kind: VaultKind::Business,
                 };
-                // TODO don't create a business vault for this onboarding if already exists. Can
-                // also short circuit if ob config is authorized
+                // TODO don't create a business vault for this onboarding if is authorized
                 let business_vault = Vault::create(conn, args)?;
                 BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
                 let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {

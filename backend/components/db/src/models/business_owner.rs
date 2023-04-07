@@ -1,8 +1,8 @@
-use crate::{schema::business_owner, DbResult, PgConn, TxnPgConn};
+use crate::{schema::business_owner, DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{BoId, BoLinkId, BusinessOwnerKind, ObConfigurationId, VaultId};
+use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, VaultId};
 
 use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
 
@@ -90,6 +90,26 @@ impl BusinessOwner {
     pub fn get(conn: &mut PgConn, id: &BoId) -> DbResult<Self> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    pub fn lock(conn: &mut TxnPgConn, id: &BoId) -> DbResult<Locked<Self>> {
+        let result = business_owner::table
+            .filter(business_owner::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
+
+    pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Self> {
+        // This should only happen inside of a Locked<Self>
+        if self.user_vault_id.is_some() {
+            return Err(DbError::ValidationError("BO already has a user_vault_id".into()));
+        }
+        let result = diesel::update(business_owner::table)
+            .filter(business_owner::id.eq(self.id))
+            .set(business_owner::user_vault_id.eq(user_vault_id))
             .get_result(conn)?;
         Ok(result)
     }

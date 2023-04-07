@@ -55,9 +55,9 @@ impl ExtractableAuthSession for ParsedBoSession {
         };
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
         let bo = BusinessOwner::get(conn, &data.bo_id)?;
-        // TODO should we make sure the user vault ID hasn't been populated?
+        // Note: the bo may or may not have a populated user_vault_id
 
-        tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, bo_id=%bo.id, "kyb session authenticated");
+        tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, bo_id=%bo.id, user_vault_id=%format!("{:?}", bo.user_vault_id), "kyb session authenticated");
 
         Ok(Self {
             ob_config,

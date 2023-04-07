@@ -59,6 +59,10 @@ pub enum ScopedVaultIdentifier<'a> {
         t_id: &'a TenantId,
         is_live: IsLive,
     },
+    ObConfig {
+        v_id: &'a VaultId,
+        ob_config_id: &'a ObConfigurationId,
+    },
 }
 
 impl<'a> From<&'a ScopedVaultId> for ScopedVaultIdentifier<'a> {
@@ -82,6 +86,12 @@ impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for ScopedVaultIdentifier<'a> {
 impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
     fn from((fp_id, t_id, is_live): (&'a FpId, &'a TenantId, IsLive)) -> Self {
         Self::FpId { fp_id, t_id, is_live }
+    }
+}
+
+impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for ScopedVaultIdentifier<'a> {
+    fn from((v_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
+        Self::ObConfig { v_id, ob_config_id }
     }
 }
 
@@ -189,6 +199,11 @@ impl ScopedVault {
                     .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live));
+            }
+            ScopedVaultIdentifier::ObConfig { v_id, ob_config_id } => {
+                query = query
+                    .filter(scoped_vault::vault_id.eq(v_id))
+                    .filter(scoped_vault::ob_configuration_id.eq(ob_config_id));
             }
         }
         let result = query.first(conn)?;

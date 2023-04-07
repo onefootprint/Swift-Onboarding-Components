@@ -161,7 +161,7 @@ def inherit_user(twilio, phone_number, tenant_pk):
             twilio,
             real_phone_number,
             challenge_token,
-            tenant_pk=tenant_pk,
+            ob_config_auth=tenant_pk,
             expected_kind="user_inherited",
         ),
         5,
@@ -169,7 +169,11 @@ def inherit_user(twilio, phone_number, tenant_pk):
 
 
 def identify_verify(
-    twilio, phone_number, challenge_token, tenant_pk=None, expected_kind="user_created"
+    twilio,
+    phone_number,
+    challenge_token,
+    ob_config_auth=None,
+    expected_kind="user_created",
 ):
     messages = twilio.messages.list(to=phone_number, limit=6)
 
@@ -187,7 +191,7 @@ def identify_verify(
                 "challenge_kind": "sms",
                 "challenge_token": challenge_token,
             }
-            args = [tenant_pk] if tenant_pk else []
+            args = [ob_config_auth] if ob_config_auth else []
             body = post("hosted/identify/verify", data, *args)
             assert body["kind"] == expected_kind
             return FpAuth(body["auth_token"])
@@ -198,7 +202,7 @@ def identify_verify(
     assert False, "Didn't find correct code for identify"
 
 
-def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
+def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> BasicUser:
     sandbox_phone_number = _random_sandbox_phone(suffix)
     phone_number = sandbox_phone_number.split("#")[0]
 
@@ -215,7 +219,7 @@ def create_basic_sandbox_user(twilio, tenant_pk=None, suffix=None) -> BasicUser:
     # Respond to the challenge and create the sandbox user
     auth_token = try_until_success(
         lambda: identify_verify(
-            twilio, phone_number, challenge_token, tenant_pk=tenant_pk
+            twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
         ),
         5,
     )

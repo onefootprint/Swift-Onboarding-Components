@@ -56,6 +56,8 @@ pub enum DbError {
     CannotUpdateImmutableRole(String),
     #[error("Tenant role scopes must include at least Read")]
     InsufficientTenantScopes,
+    #[error("{0}")]
+    ValidationError(String),
 
     // Pass-through errors from other crates
     #[error("{0}")]
