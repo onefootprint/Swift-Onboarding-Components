@@ -15,7 +15,7 @@ const DataCollectedEventHeader = ({
   isFromOtherOrg,
 }: DataCollectedEventHeaderProps) => {
   const { t, allT } = useTranslation(
-    'pages.business.audit-trail.timeline.data-collected-event',
+    'pages.entity.audit-trail.timeline.data-collected-event',
   );
   const { attributes } = data;
   const attributeLabels = attributes.map(attr => allT(`cdo.${attr}`));
