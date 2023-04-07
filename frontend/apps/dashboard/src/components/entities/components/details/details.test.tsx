@@ -381,6 +381,23 @@ describe('<Details />', () => {
       });
     });
 
+    describe('risk signals', () => {
+      it('should show the results', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Risk signals',
+        });
+
+        await waitFor(() => {
+          const noResults = within(container).getByText(
+            'No risk signals found',
+          );
+          expect(noResults).toBeInTheDocument();
+        });
+      });
+    });
+
     describe('device insights', () => {
       it('should show the user agent', async () => {
         await renderDetailsAndWaitData();

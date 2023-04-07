@@ -6,27 +6,28 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
-import useUserId from '../../../../../../../hooks/use-user-id';
+import useEntityId from '@/entity/hooks/use-entity-id';
 
 const getRiskSignalDetails = async ({
   authHeaders,
-  riskSignalId,
   entityId,
+  riskSignalId,
 }: GetRiskSignalDetailsRequest) => {
   const { data: response } = await request<GetRiskSignalDetailsResponse>({
     headers: authHeaders,
     method: 'GET',
     url: `/entities/${entityId}/risk_signals/${riskSignalId}`,
   });
+
   return response;
 };
 
 const useRiskSignalDetails = (riskSignalId = '') => {
   const { authHeaders } = useSession();
-  const entityId = useUserId();
+  const entityId = useEntityId();
 
   return useQuery(
-    ['risk-signal-details', authHeaders, entityId, riskSignalId],
+    ['entity', entityId, 'risk-signals', riskSignalId],
     () => getRiskSignalDetails({ authHeaders, entityId, riskSignalId }),
     {
       enabled: !!riskSignalId,

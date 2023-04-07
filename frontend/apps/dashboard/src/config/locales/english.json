@@ -857,6 +857,41 @@
           }
         }
       },
+      "risk-signals": {
+        "title": "Risk signals",
+        "empty-state": "No risk signals found",
+        "severity": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "info": "Info"
+        },
+        "table": {
+          "aria-label": "Risk signals",
+          "empty-state": "No risk signals found",
+          "header": {
+            "severity": "Severity",
+            "scopes": "Scopes",
+            "note": "Note"
+          }
+        },
+        "filters": {
+          "severity": {
+            "label": "Severity"
+          },
+          "scope": {
+            "label": "Scope"
+          }
+        },
+        "details": {
+          "overview": {
+            "title": "Overview",
+            "severity": "Severity",
+            "scopes": "Scopes",
+            "description": "Description"
+          }
+        }
+      },
       "device-insights": {
         "title": "Device insights",
         "ip-address": "IP address",
