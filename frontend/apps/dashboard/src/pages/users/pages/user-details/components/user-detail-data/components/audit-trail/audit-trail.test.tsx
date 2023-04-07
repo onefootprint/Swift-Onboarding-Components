@@ -6,7 +6,7 @@ import {
 import React from 'react';
 
 import AuditTrail from './audit-trail';
-import { withTimeline } from './audit-trail.test.config';
+import { withTimeline, withUser } from './audit-trail.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -21,6 +21,10 @@ describe('<AuditTrail />', () => {
       },
     });
     withTimeline(footprintUserId);
+  });
+
+  beforeEach(() => {
+    withUser(footprintUserId);
   });
 
   const renderAuditTrail = () => customRender(<AuditTrail />);

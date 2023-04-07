@@ -1,4 +1,4 @@
-import { act, mockRequest, renderHook } from '@onefootprint/test-utils';
+import { act, customRenderHook, mockRequest } from '@onefootprint/test-utils';
 import { RoleScope } from '@onefootprint/types';
 import { resetUser } from 'src/config/tests';
 
@@ -39,14 +39,14 @@ describe('useSession', () => {
 
   describe('when the state is empty', () => {
     it('should indicate that the user is not logged in', () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       expect(result.current.isLoggedIn).toBeFalsy();
     });
   });
 
   describe('when logging in', () => {
     it('should indicate the user is logged in and have user and org session data', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
@@ -72,7 +72,7 @@ describe('useSession', () => {
 
   describe('when completing the onboarding', () => {
     it('should indicate the user has completed the onboarding', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
@@ -85,7 +85,7 @@ describe('useSession', () => {
 
   describe('when logging out', () => {
     it('should indicate the user is logged out and return an undefined session data', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
@@ -99,7 +99,7 @@ describe('useSession', () => {
 
   describe('when updating is live', () => {
     it('should update correctly', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
@@ -112,7 +112,7 @@ describe('useSession', () => {
 
   describe('when updating the org name', () => {
     it('should update', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
@@ -138,7 +138,7 @@ describe('useSession', () => {
 
   describe('when updating the user name', () => {
     it('should update', async () => {
-      const { result } = renderHook(() => useSession());
+      const { result } = customRenderHook(() => useSession());
       await act(async () => {
         await result.current.logIn(loginPayload);
       });

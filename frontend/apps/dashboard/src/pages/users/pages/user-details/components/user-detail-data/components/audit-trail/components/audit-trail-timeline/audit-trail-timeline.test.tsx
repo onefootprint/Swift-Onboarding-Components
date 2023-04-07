@@ -9,18 +9,24 @@ import React from 'react';
 import AuditTrailTimeline, {
   AuditTrailTimelineProps,
 } from './audit-trail-timeline';
-import TimelineFixture from './audit-trail-timeline.test.config';
+import TimelineFixture, { withUser } from './audit-trail-timeline.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
 describe('<AuditTrailTimeline />', () => {
+  const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
+
   beforeAll(() => {
     useRouterSpy({
       pathname: '/users/detail',
       query: {
-        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+        footprint_user_id: userId,
       },
     });
+  });
+
+  beforeEach(() => {
+    withUser(userId);
   });
 
   const renderAuditTrailTimeline = ({
