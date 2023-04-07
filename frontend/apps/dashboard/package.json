@@ -75,8 +75,8 @@
     ],
     "moduleNameMapper": {
       "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1",
-      "@/businesses/(.*)": "<rootDir>/src/pages/businesses/$1",
-      "@/business/(.*)": "<rootDir>/src/pages/businesses/pages/details/$1"
+      "@/entities/(.*)": "<rootDir>/src/components/entities/$1",
+      "@/entity/(.*)": "<rootDir>/src/components/entities/components/details/$1"
     }
   }
 }

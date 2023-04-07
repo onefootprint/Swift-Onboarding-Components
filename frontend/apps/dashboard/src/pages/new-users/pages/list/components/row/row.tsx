@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
-import { BusinessDI, Entity } from '@onefootprint/types';
+import { Entity, IdDI } from '@onefootprint/types';
 import { Badge, Box, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
@@ -11,7 +11,6 @@ type RowProps = {
   entity: Entity;
 };
 
-// TODO: https://linear.app/footprint/issue/FP-3097/business-list-user-list-use-right-function-to-format-date
 const Row = ({ entity }: RowProps) => {
   const { t } = useTranslation();
   const { data: vault } = useEntityVault(entity.id, entity);
@@ -23,9 +22,7 @@ const Row = ({ entity }: RowProps) => {
   return (
     <>
       <td>
-        <FieldOrPlaceholder
-          data={entity.decryptedAttributes[BusinessDI.name]}
-        />
+        <FieldOrPlaceholder data={vault?.[IdDI.firstName]} />
       </td>
       <td>
         <CodeInline isPrivate truncate>
@@ -43,10 +40,24 @@ const Row = ({ entity }: RowProps) => {
         </Badge>
       </td>
       <td>
-        <FieldOrPlaceholder data={vault?.[BusinessDI.beneficialOwners]} />
+        <FieldOrPlaceholder data={vault?.[IdDI.email]} />
       </td>
       <td>
-        <Typography variant="body-3" color="primary">
+        <FieldOrPlaceholder data={vault?.[IdDI.ssn9] || vault?.[IdDI.ssn4]} />
+      </td>
+      <td>
+        <FieldOrPlaceholder data={vault?.[IdDI.phoneNumber]} />
+      </td>
+      <td>
+        <Typography
+          variant="body-3"
+          color="primary"
+          sx={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           {new Date(entity.startTimestamp).toLocaleString('en-us', {
             month: 'numeric',
             day: 'numeric',

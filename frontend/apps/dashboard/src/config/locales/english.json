@@ -696,11 +696,7 @@
         }
       }
     },
-    "businesses": {
-      "page-title": "Footprint | Businesses",
-      "header": {
-        "title": "Businesses"
-      },
+    "entities": {
       "filters": {
         "status": {
           "label": "Status",
@@ -713,24 +709,9 @@
         "date-range": {
           "label": "Date range"
         }
-      },
-      "table": {
-        "aria-label": "Businesses table",
-        "search": {
-          "placeholder": "Search (exact match)..."
-        },
-        "empty-state": "No businesses found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "Status",
-          "submitted-by": "Submitted by (beneficial owner)",
-          "start": "Date"
-        }
       }
     },
-    "business": {
-      "page-title": "Footprint | Business details",
+    "entity": {
       "breadcrumb": {
         "title": "Business details breadcrumb",
         "list": "Businesses",
@@ -874,6 +855,23 @@
         "ip-address": "IP address",
         "region": "Region",
         "country": "Country"
+      }
+    },
+    "businesses": {
+      "page-title": "Footprint | Businesses",
+      "header": {
+        "title": "Businesses"
+      },
+      "table": {
+        "aria-label": "Businesses table",
+        "empty-state": "No businesses found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "submitted-by": "Submitted by (beneficial owner)",
+          "start": "Date"
+        }
       }
     },
     "security-logs": {

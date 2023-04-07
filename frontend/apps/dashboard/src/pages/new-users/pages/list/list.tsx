@@ -7,13 +7,15 @@ import { EntitiesList, EntitiesTable } from 'src/components/entities';
 import Row from './components/row';
 
 const List = () => {
-  const { t } = useTranslation('pages.businesses');
+  const { t } = useTranslation('pages.users');
   const columns = [
-    { text: t('table.header.name'), width: '20%' },
-    { text: t('table.header.token'), width: '20%' },
-    { text: t('table.header.status'), width: '17.5%' },
-    { text: t('table.header.submitted-by'), width: '25%' },
-    { text: t('table.header.start'), width: '17.5%' },
+    { text: t('table.header.name'), width: '14%' },
+    { text: t('table.header.token'), width: '18%' },
+    { text: t('table.header.status'), width: '12%' },
+    { text: t('table.header.email'), width: '20%' },
+    { text: t('table.header.ssn'), width: '12%' },
+    { text: t('table.header.phone-number'), width: '15%' },
+    { text: t('table.header.start'), width: '15%' },
   ];
 
   return (
@@ -22,9 +24,9 @@ const List = () => {
         <title>{t('page-title')}</title>
       </Head>
       <EntitiesList
-        basePath="businesses"
-        kind={EntityKind.business}
         title={t('header.title')}
+        kind={EntityKind.business}
+        basePath="users"
       >
         <EntitiesTable
           aria-label={t('table.aria-label')}

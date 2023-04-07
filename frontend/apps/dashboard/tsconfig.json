@@ -8,9 +8,11 @@
     "paths": {
       "src/*": ["./src/*"],
       "@/proxy-configs/*": ["./src/pages/developers/components/proxy-configs/*"],
-      "@/businesses/*": ["./src/pages/businesses/*"],
-      "@/business/*": ["./src/pages/businesses/pages/details/*"],
+      "@/entities/*": ["./src/components/entities/*"],
+      "@/entity/*": ["./src/components/entities/components/details/*"],
     }
   },
   "include": ["src", "next-env.d.ts"]
 }
+
+
