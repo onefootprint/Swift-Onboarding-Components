@@ -57,6 +57,9 @@ pub struct BusinessOwnerData {
 
 fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> {
     utils::parse_json_and_validate::<Vec<BusinessOwnerData>, _>(input, |l| {
+        if l.is_empty() {
+            return Err(Error::InvalidLength);
+        }
         if l.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }
@@ -90,6 +93,9 @@ pub type KycedBusinessOwnerData = KycedBusinessOwnerDataT<BoLinkId>;
 
 fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiString> {
     utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
+        if bos.is_empty() {
+            return Err(Error::InvalidLength);
+        }
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }

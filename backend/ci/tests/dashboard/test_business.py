@@ -3,7 +3,7 @@ import typing
 from tests.dashboard.utils import latest_access_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post
-from tests.constants import BUSINESS_DATA
+from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
 
 class Business(typing.NamedTuple):
@@ -12,26 +12,35 @@ class Business(typing.NamedTuple):
 
 
 @pytest.fixture(scope="session")
-def sb_business(sandbox_tenant, kyb_sandbox_ob_config, twilio):
+def populated_business_data(kyb_cdos):
+    """
+    The set of fields we expect to be populated on a business vault that onboarded onto an ob config
+    with kyb_cdos
+    """
+    return set(di for cdo in kyb_cdos for di in CDO_TO_DIS[cdo]) & set(BUSINESS_DATA)
+
+
+@pytest.fixture(scope="session")
+def sb_business(sandbox_tenant, kyb_sandbox_ob_config, twilio, populated_business_data):
     bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
     user = bifrost.run()
     body = get("entities", dict(kind="business"), sandbox_tenant.sk.key)
     entity = body["data"][0]
     assert entity["kind"] == "business"
-    assert set(entity["attributes"]) == set(BUSINESS_DATA)
+    assert set(entity["attributes"]) == populated_business_data
 
     # TODO should get the fp_biz_id from validate
     fp_bid = entity["id"]
     return Business(user.fp_id, fp_bid)
 
 
-def test_get_entities(sandbox_tenant, sb_business):
+def test_get_entities(sandbox_tenant, sb_business, populated_business_data):
     body = get(
         f"entities/{sb_business.fp_bid}",
         None,
         sandbox_tenant.sk.key,
     )
-    assert set(body["attributes"]) == set(BUSINESS_DATA)
+    assert set(body["attributes"]) == populated_business_data
     assert body["decrypted_attributes"] == {"business.name": "Foobar Inc"}
 
 
@@ -53,14 +62,14 @@ def test_get_business_owners(sandbox_tenant, sb_business):
     assert secondary_bo["kind"] == "secondary"
 
 
-def test_get_vault(sandbox_tenant, sb_business):
+def test_get_vault(sandbox_tenant, sb_business, populated_business_data):
     body = get(
         f"entities/{sb_business.fp_bid}/vault",
         None,
         sandbox_tenant.sk.key,
     )
     populated_keys = set(k for (k, v) in body.items() if v)
-    assert populated_keys == set(BUSINESS_DATA)
+    assert populated_keys == populated_business_data
 
 
 @pytest.mark.parametrize(
@@ -83,7 +92,7 @@ def test_decrypt(sandbox_tenant, sb_business, fields_to_decrypt):
         fields=fields_to_decrypt,
         reason="Doing a business hecking decrypt",
     )
-    expected_data = BUSINESS_DATA
+    expected_data = {**BUSINESS_DATA}
     expected_data["business.phone_number"] = expected_data[
         "business.phone_number"
     ].replace(" ", "")

@@ -78,6 +78,9 @@ impl WriteableVw<Business> {
         let kyced_bos: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(kyced_bos.leak())?;
         // Skip the first BO since it is the primary
         let bo_ids = kyced_bos.into_iter().skip(1).map(|bo| bo.link_id).collect_vec();
+        if bo_ids.is_empty() {
+            return Ok(());
+        }
         BusinessOwner::bulk_create_secondary(conn, bo_ids, self.vault().id.clone())?;
 
         Ok(())

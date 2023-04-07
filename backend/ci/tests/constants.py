@@ -1,3 +1,4 @@
+import json
 import os
 from .auth import CustodianAuth
 
@@ -74,7 +75,30 @@ BUSINESS_DATA = {
     "business.zip": "10009",
     "business.country": "US",
     "business.tin": "121231234",
-    "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}, {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 30}]',
+    "business.beneficial_owners": json.dumps(
+        [
+            {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+            {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
+        ]
+    ),
+    "business.kyced_beneficial_owners": json.dumps(
+        [
+            {
+                "first_name": "Piip",
+                "last_name": "Penguin",
+                "email": "piip@onefootprint.com",
+                "phone_number": "+14155555555",
+                "ownership_stake": 50,
+            },
+            {
+                "first_name": "Franklin",
+                "last_name": "Frog",
+                "email": "frankling@onefootprint.com",
+                "phone_number": "+14144444444",
+                "ownership_stake": 30,
+            },
+        ]
+    ),
 }
 
 IP_DATA = {

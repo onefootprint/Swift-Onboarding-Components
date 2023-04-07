@@ -67,6 +67,38 @@ def incomplete_bifrost(kyb_sandbox_ob_config, twilio, kyb_cdos):
             },
             400,
         ),
+        (
+            {"business.beneficial_owners": "[]"},
+            400,
+        ),
+        (
+            {"business.kyced_beneficial_owners": "[]"},
+            400,
+        ),
+        (
+            {
+                "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}]'
+            },
+            200,
+        ),
+        (
+            {
+                "business.beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin"}]'
+            },
+            400,
+        ),
+        (
+            {
+                "business.kyced_beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "email": "e@e.com", "phone_number": "+14155555555", "ownership_stake": 50}]'
+            },
+            200,
+        ),
+        (
+            {
+                "business.kyced_beneficial_owners": '[{"first_name": "Piip", "last_name": "Penguin", "email": "e@e.com", "phone_number": "not a phone", "ownership_stake": 50}]'
+            },
+            400,
+        ),
         ({"id.ssn4": "1234"}, 400),
     ],
 )
