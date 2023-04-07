@@ -1,12 +1,8 @@
 import pytest
 from tests.utils import (
-    put,
-    post,
-    get_requirement_from_requirements,
     create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
-from tests.constants import PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")

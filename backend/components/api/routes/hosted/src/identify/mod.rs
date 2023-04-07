@@ -71,8 +71,8 @@ pub enum Identifier {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub enum ChallengeData {
-    Sms(PhoneChallengeState),
+pub enum ChallengeData<PhoneChallengeT = PhoneChallengeState> {
+    Sms(PhoneChallengeT),
     Biometric(BiometricChallengeState),
 }
 
@@ -105,7 +105,7 @@ async fn get_user_by_identifier(
     // TODO should we only look for verified emails?
     let existing_user = state
         .db_pool
-        .db_query(|conn| Vault::find_portable(conn, sh_data))
+        .db_query(move |conn| Vault::find_portable(conn, &sh_data))
         .await??;
     Ok(existing_user)
 }

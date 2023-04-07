@@ -2,8 +2,6 @@ use super::{BiometricChallengeState, PhoneChallengeState};
 use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
-
-use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::identify::{ChallengeData, ChallengeState};
 use crate::types::response::ResponseData;
@@ -12,15 +10,17 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-
+use api_core::config::Config;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::{NewVaultInfo, Vault};
+use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
+use db::TxnPgConn;
 use newtypes::{
-    DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PhoneNumber, PiiString, SessionAuthToken, VaultId,
+    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
+    SessionAuthToken, VaultId, VaultPublicKey,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -58,39 +58,60 @@ pub async fn post(
     ob_pk_auth: ObConfigAuth,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
+    let VerifyRequest {
+        challenge_token,
+        challenge_response,
+    } = request.into_inner();
     let challenge_state =
-        Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?.data;
+        Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
-    let ob_config = ob_pk_auth.ob_config().clone();
-    let (user_vault_id, user_kind) = match challenge_state.data {
-        ChallengeData::Sms(c_state) => {
-            validate_sms_challenge(&state, c_state, &request.challenge_response, ob_config.clone()).await?
+    // Generate fingerprints and keypairs async if needed
+    let challenge_data = match challenge_state.data {
+        ChallengeData::Sms(challenge_state) => {
+            // TODO this keypair won't always be used... but helps to generate this proactively.
+            let keypair = state.enclave_client.generate_sealed_keypair().await?;
+            let di = DataIdentifier::from(IDK::PhoneNumber);
+            let phone_number = challenge_state.phone_number_e164_with_suffix.clone();
+            let sh_phone_number = state.compute_fingerprint(di, phone_number).await?;
+            let context = SmsContext {
+                challenge_state,
+                sh_phone_number,
+                keypair,
+            };
+            ChallengeData::Sms(context)
         }
-        ChallengeData::Biometric(challenge_state) => {
-            validate_biometric_challenge(&state, challenge_state, &request.challenge_response).await?
-        }
+        ChallengeData::Biometric(challenge_state) => ChallengeData::Biometric(challenge_state),
     };
 
-    // Tenant ob config public key is provided - we are in the identify flow for bifrost.
-    let user_vault_id2 = user_vault_id.clone();
-    let su = state
+    let ob_config = ob_pk_auth.ob_config().clone();
+    let config = state.config.clone();
+    let (uv_id, su_id, user_kind) = state
         .db_pool
-        // This already happens if we make a UserVault. But if we are logging into an existing
-        // user vault to onboard onto a new ob config, we need to make the ScopedUser
         .db_transaction(move |conn| -> ApiResult<_> {
-            let uv = Vault::lock(conn, &user_vault_id2)?;
-            let result = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
-            Ok(result)
+            let (user_vault_id, user_kind) = match challenge_data {
+                ChallengeData::Sms(c_state) => {
+                    validate_sms_challenge(conn, c_state, &challenge_response, ob_config.clone())?
+                }
+                ChallengeData::Biometric(c_state) => {
+                    validate_biometric_challenge(conn, &config, c_state, &challenge_response)?
+                }
+            };
+            // Since only some codepaths above will create a SU, we need to always get_or_create
+            // a SU here
+            let uv = Vault::lock(conn, &user_vault_id)?;
+            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
+            Ok((uv.into_inner().id, su.id, user_kind))
         })
         .await?;
+
     let token_scopes = vec![
         UserAuthScope::SignUp,
-        UserAuthScope::OrgOnboardingInit { id: su.id },
+        UserAuthScope::OrgOnboardingInit { id: su_id },
     ];
     let duration = Duration::minutes(30);
 
     // Create the auth session and save it in the database
-    let data = UserSession::make(user_vault_id, token_scopes);
+    let data = UserSession::make(uv_id, token_scopes);
     let auth_token = AuthSession::create(&state, data, duration).await?;
 
     Ok(Json(ResponseData {
@@ -101,13 +122,14 @@ pub async fn post(
     }))
 }
 
-async fn validate_biometric_challenge(
-    state: &web::Data<State>,
+fn validate_biometric_challenge(
+    conn: &mut TxnPgConn,
+    config: &Config,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
 ) -> ApiResult<(VaultId, VerifyKind)> {
     // Decode and validate the response to the biometric challenge
-    let webauthn = LivenessWebauthnConfig::new(state);
+    let webauthn = LivenessWebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
 
     let result = webauthn
@@ -118,72 +140,41 @@ async fn validate_biometric_challenge(
     // update the backup state to learn that a credential is now portable across devices
     if result.backup_state && challenge_state.non_synced_cred_ids.contains(&result.cred_id) {
         let uv_id = challenge_state.user_vault_id.clone();
-
-        state
-            .db_pool
-            .db_query(move |conn| WebauthnCredential::update_backup_state(conn, &uv_id, &result.cred_id.0))
-            .await??;
+        WebauthnCredential::update_backup_state(conn, &uv_id, &result.cred_id.0)?;
     }
 
     Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))
 }
 
-async fn validate_sms_challenge(
-    state: &web::Data<State>,
+struct SmsContext {
     challenge_state: PhoneChallengeState,
+    sh_phone_number: Fingerprint,
+    keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
+}
+
+fn validate_sms_challenge(
+    conn: &mut TxnPgConn,
+    context: SmsContext,
     challenge_response: &str,
     ob_config: ObConfiguration,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
-    if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
+    if context.challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     }
-
-    let phone_number = challenge_state.phone_number_e164_with_suffix;
-    let di = DataIdentifier::from(IDK::PhoneNumber);
-    let sh_phone_number = state.compute_fingerprint(di, phone_number.clone()).await?;
-    let existing_user = state
-        .db_pool
-        .db_query(|conn| Vault::find_portable(conn, sh_phone_number))
-        .await??;
+    let existing_user = Vault::find_portable(conn, &context.sh_phone_number)?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, phone_number, ob_config).await?;
-            (user.id, VerifyKind::UserCreated)
+            let (uv, _) = VaultWrapper::create_user_vault(
+                conn,
+                context.keypair,
+                ob_config,
+                context.challenge_state.phone_number_e164_with_suffix,
+                context.sh_phone_number,
+            )?;
+            (uv.into_inner().id, VerifyKind::UserCreated)
         }
     };
     Ok(result)
-}
-
-async fn create_new_user_vault(
-    state: &web::Data<State>,
-    phone_number: PiiString,
-    ob_config: ObConfiguration,
-) -> ApiResult<Vault> {
-    let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-
-    let phone_number = PhoneNumber::parse(phone_number)?;
-    // Verify that the ob config is_live matches the user vault
-    if ob_config.is_live != phone_number.is_live() {
-        return Err(UserError::SandboxMismatch.into());
-    }
-
-    let user_info = NewVaultInfo {
-        e_private_key,
-        public_key,
-        is_live: phone_number.is_live(),
-    };
-    let phone = phone_number.e164_with_suffix();
-    let di = DataIdentifier::from(IDK::PhoneNumber);
-    let sh_phone = state.compute_fingerprint(di, phone.clone()).await?;
-    let user = state
-        .db_pool
-        .db_transaction(|conn| -> ApiResult<_> {
-            let (uv, _) = VaultWrapper::create_user_vault(conn, user_info, ob_config, phone, sh_phone)?;
-            Ok(uv.into_inner())
-        })
-        .await?;
-
-    Ok(user)
 }

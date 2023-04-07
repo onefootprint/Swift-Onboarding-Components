@@ -154,7 +154,7 @@ async fn initiate_biometric_challenge_for_user(
         .collect();
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(state);
+    let webauthn = LivenessWebauthnConfig::new(&state.config);
     let (challenge, auth_state) = webauthn
         .webauthn()
         .generate_challenge_authenticate_options(creds, None)?;

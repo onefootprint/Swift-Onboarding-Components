@@ -93,7 +93,7 @@ BUSINESS_DATA = {
             {
                 "first_name": "Franklin",
                 "last_name": "Frog",
-                "email": "frankling@onefootprint.com",
+                "email": "franklin@onefootprint.com",
                 "phone_number": "+14144444444",
                 "ownership_stake": 30,
             },

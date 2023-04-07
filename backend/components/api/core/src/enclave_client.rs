@@ -18,6 +18,8 @@ pub struct EnclaveClient {
     kms_creds: KmsCredentials,
 }
 
+pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
+
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
     /// initialize a new enclave client with a pool of connections
@@ -70,9 +72,7 @@ impl EnclaveClient {
 
     /// generates a new sealed vault key pair via the enclave
     #[tracing::instrument(skip_all)]
-    pub async fn generate_sealed_keypair(
-        &self,
-    ) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), EnclaveError> {
+    pub async fn generate_sealed_keypair(&self) -> Result<VaultKeyPair, EnclaveError> {
         let req =
             enclave_proxy::RpcRequest::new(RpcPayload::GenerateDataKeypair(GenerateDataKeypairRequest {
                 kms_creds: self.kms_creds.clone(),

@@ -165,7 +165,7 @@ impl Vault {
 
     /// Look for the portable user vault with a matching fingerprint
     #[tracing::instrument(skip_all)]
-    pub fn find_portable(conn: &mut PgConn, sh_data: Fingerprint) -> DbResult<Option<Vault>> {
+    pub fn find_portable(conn: &mut PgConn, sh_data: &Fingerprint) -> DbResult<Option<Vault>> {
         use crate::schema::{data_lifetime, fingerprint};
 
         let results = vault::table

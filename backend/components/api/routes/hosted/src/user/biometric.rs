@@ -62,7 +62,7 @@ pub async fn init_post(
     }
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(&state);
+    let webauthn = LivenessWebauthnConfig::new(&state.config);
     let vault_id = user_auth.user_vault_id();
     let (challenge, reg_state) = webauthn.webauthn().generate_challenge_register_options(
         vault_id.to_string().as_bytes(),
@@ -116,7 +116,7 @@ pub async fn complete_post(
     let reg_state = challenge_data.data;
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(&state);
+    let webauthn = LivenessWebauthnConfig::new(&state.config);
     let cas = AttestationCaList::apple_and_android();
 
     let reg = serde_json::from_str(&request.device_response_json)?;

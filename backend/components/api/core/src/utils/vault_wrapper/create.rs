@@ -1,13 +1,15 @@
 use super::{Person, VaultWrapper};
+use crate::enclave_client::VaultKeyPair;
+use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
-use db::models::vault::{NewVaultArgs, NewVaultInfo};
 use db::TxnPgConn;
-use newtypes::{DataIdentifier, DataRequest, Fingerprint, SealedVaultBytes};
+use newtypes::{DataIdentifier, DataRequest, Fingerprint, PhoneNumber, SealedVaultBytes};
 use newtypes::{IdentityDataKind as IDK, PiiString, VaultKind};
 use newtypes::{Locked, ParseOptions};
 use std::collections::HashMap;
@@ -23,15 +25,23 @@ impl VaultWrapper<Person> {
     /// with a provided ob_config
     pub fn create_user_vault(
         conn: &mut TxnPgConn,
-        user_info: NewVaultInfo,
+        keypair: VaultKeyPair,
         ob_config: ObConfiguration,
         phone_number: PiiString,
         sh_phone_number: Fingerprint,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
+        // Verify that the ob config is_live matches the user vault
+        let phone_number_parsed = PhoneNumber::parse(phone_number.clone())?;
+        if ob_config.is_live != phone_number_parsed.is_live() {
+            return Err(UserError::SandboxMismatch.into());
+        }
+
+        // Create the UV and SU
+        let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {
-            e_private_key: user_info.e_private_key,
-            public_key: user_info.public_key,
-            is_live: user_info.is_live,
+            e_private_key,
+            public_key,
+            is_live: phone_number_parsed.is_live(),
             is_portable: true,
             kind: VaultKind::Person,
         };

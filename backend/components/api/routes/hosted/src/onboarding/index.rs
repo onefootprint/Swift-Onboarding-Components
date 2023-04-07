@@ -95,6 +95,7 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
+            // TODO: Only do this if we aren't part of a business
             let business_scope = if let Some(new_business_keypair) = new_business_keypair {
                 let (public_key, e_private_key) = new_business_keypair;
                 let args = NewVaultArgs {

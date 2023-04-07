@@ -69,7 +69,7 @@ async fn post(
 
     let uv = state
         .db_pool
-        .db_query(|conn| Vault::find_portable(conn, sh_data))
+        .db_query(move |conn| Vault::find_portable(conn, &sh_data))
         .await??;
     let user_vault_id = if let Some(uv) = uv {
         uv.id

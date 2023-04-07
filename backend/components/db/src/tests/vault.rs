@@ -28,6 +28,6 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     );
     fixtures::fingerprint::create(conn, lifetime.id, fingerprint.clone(), IDK::PhoneNumber.into());
 
-    let u = Vault::find_portable(conn, fingerprint).unwrap();
+    let u = Vault::find_portable(conn, &fingerprint).unwrap();
     u.is_some()
 }
