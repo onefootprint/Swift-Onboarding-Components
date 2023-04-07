@@ -75,29 +75,31 @@ const BusinessOwnersField = ({
 
   return (
     <Box testID="business-owners-content">
-      {businessOwners.map((businessOwner, index) => (
-        <FieldContainer
-          key={businessOwner.id || index}
-          hideCheckbox={index !== 0}
-        >
-          <Field
-            canDecrypt={canDecrypt}
-            disabled={disabled}
-            hint={t(
-              businessOwner.kind === 'primary'
-                ? 'hint.primary'
-                : 'hint.secondary',
-              { stake: businessOwner.ownershipStake },
-            )}
-            label={label}
-            name={name}
-            showCheckbox={showCheckbox}
-            value={value}
-            renderValue={() => renderValue(index)}
-            renderLabel={() => renderLabel(businessOwner)}
-          />
-        </FieldContainer>
-      ))}
+      <Grid>
+        {businessOwners.map((businessOwner, index) => (
+          <FieldContainer
+            key={businessOwner.id || index}
+            hideCheckbox={index !== 0}
+          >
+            <Field
+              canDecrypt={canDecrypt}
+              disabled={disabled}
+              hint={t(
+                businessOwner.kind === 'primary'
+                  ? 'hint.primary'
+                  : 'hint.secondary',
+                { stake: businessOwner.ownershipStake },
+              )}
+              label={label}
+              name={name}
+              showCheckbox={showCheckbox}
+              value={value}
+              renderValue={() => renderValue(index)}
+              renderLabel={() => renderLabel(businessOwner)}
+            />
+          </FieldContainer>
+        ))}
+      </Grid>
     </Box>
   );
 };
@@ -110,6 +112,13 @@ const FieldContainer = styled.div<{ hideCheckbox: boolean }>`
         visibility: hidden;
       }
     `}
+`;
+
+const Grid = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    gap: ${theme.spacing[4]};
+  `}
 `;
 
 export default BusinessOwnersField;
