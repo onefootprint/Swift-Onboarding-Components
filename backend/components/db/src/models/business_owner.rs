@@ -50,7 +50,7 @@ impl BusinessOwner {
         conn: &mut TxnPgConn,
         link_ids: Vec<BoLinkId>,
         business_vault_id: VaultId,
-    ) -> DbResult<Self> {
+    ) -> DbResult<Vec<Self>> {
         let rows = link_ids
             .into_iter()
             .map(|link_id| NewBusinessOwnerRow {
@@ -62,7 +62,7 @@ impl BusinessOwner {
             .collect_vec();
         let result = diesel::insert_into(business_owner::table)
             .values(rows)
-            .get_result(conn.conn())?;
+            .get_results(conn.conn())?;
         Ok(result)
     }
 

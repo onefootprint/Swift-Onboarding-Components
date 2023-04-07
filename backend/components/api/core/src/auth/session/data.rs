@@ -41,3 +41,9 @@ pub enum AuthSessionData {
     /// Used to initialize an onboarding session to KYC an owner of a business
     BusinessOwner(crate::auth::ob_config::BoSession),
 }
+
+impl From<crate::auth::ob_config::BoSession> for AuthSessionData {
+    fn from(value: crate::auth::ob_config::BoSession) -> Self {
+        Self::BusinessOwner(value)
+    }
+}
