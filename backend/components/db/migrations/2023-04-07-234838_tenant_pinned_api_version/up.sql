@@ -1,0 +1,1 @@
+ALTER TABLE tenant ADD COLUMN IF NOT EXISTS pinned_api_version INTEGER;

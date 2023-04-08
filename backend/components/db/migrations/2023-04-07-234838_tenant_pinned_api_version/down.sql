@@ -1,0 +1,1 @@
+ALTER TABLE tenant DROP COLUMN pinned_api_version;

@@ -32,7 +32,12 @@ pub struct Tenant {
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
+    // TODO: consolidate with IsDemoTenant feature flag
     pub is_demo_tenant: bool,
+    /// When non-null, pins arbitrary APIs to an older version because we believe that the tenant
+    /// may be using an older version. These are only set manually through the DB shell.
+    /// Be careful when using this.
+    pub pinned_api_version: Option<i32>,
 }
 
 pub enum TenantIdentifier<'a> {
