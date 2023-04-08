@@ -28,7 +28,10 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config, twilio):
     bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
-    return bifrost.run()
+    user = bifrost.run()
+    assert user.fp_id
+    assert user.fp_bid
+    return user
 
 
 def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
@@ -42,19 +45,19 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
         kyb_sandbox_ob_config, twilio, override_ob_config_auth=secondary_bo_token
     )
     secondary_bo = bifrost.run()
+
     # Shouldn't have collected business data from the secondary owner
     assert not any(
         req["kind"] == "collect_business_data"
         for req in secondary_bo.client.handled_requirements
     )
 
-    # TODO get fp_bid from bifrost client eventually
-    tenant_sk = kyb_sandbox_ob_config.tenant.sk.key
-    body = get("entities", dict(kind="business"), tenant_sk)
-    fp_bid = body["data"][0]["id"]
+    # fp_bid should be the same for each business owner
+    assert primary_bo.fp_bid == secondary_bo.fp_bid
 
     # Validate the business owners
-    body = get(f"businesses/{fp_bid}/owners", None, tenant_sk)
+    tenant_sk = kyb_sandbox_ob_config.tenant.sk.key
+    body = get(f"businesses/{primary_bo.fp_bid}/owners", None, tenant_sk)
     assert len(body) == 2
     assert body[0]["kind"] == "primary"
     assert body[0]["id"] == primary_bo.fp_id

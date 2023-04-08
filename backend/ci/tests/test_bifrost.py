@@ -313,8 +313,8 @@ class TestBifrost:
             "onboarding/session/validate", data, sandbox_tenant.sk.key, status_code=400
         )
         body = post("onboarding/session/validate", data, tenant.sk.key)
-        fp_id = body["footprint_user_id"]
-        assert body["status"]
+        fp_id = body["user"]["fp_id"]
+        assert body["user"]["status"]
 
         # Make sure the fp_id works
         body = get(f"entities/{fp_id}/timeline", None, tenant.sk.key)
@@ -482,7 +482,7 @@ class TestBifrostSandbox:
         )
         bifrost.run()
 
-        bifrost.validate_response["status"] == expected_status
-        bifrost.validate_response[
+        bifrost.validate_response["user"]["status"] == expected_status
+        bifrost.validate_response["user"][
             "requires_manual_review"
         ] == expected_requires_manual_review

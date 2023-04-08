@@ -1,5 +1,5 @@
 import json
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 from tests.types import Tenant
 from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -172,7 +172,8 @@ class BifrostClient:
         data = dict(validation_token=validation_token)
         body = post("onboarding/session/validate", data, tenant_sk.key)
         self.validate_response = body
-        return body["footprint_user_id"]
+        # The response body looks different for business onboardings
+        return (body["user"]["fp_id"], body.get("business", {}).get("fp_id"))
 
     def run(self):
         """
@@ -180,10 +181,11 @@ class BifrostClient:
         """
         self.handle_requirements()
         validation_token = self.authorize()
-        fp_id = self.validate(validation_token)
+        (fp_id, fp_bid) = self.validate(validation_token)
 
         return User(
             fp_id=fp_id,
+            fp_bid=fp_bid,
             tenant=self.ob_config.tenant,
             client=self,
         )
@@ -191,5 +193,6 @@ class BifrostClient:
 
 class User(NamedTuple):
     fp_id: str
+    fp_bid: Optional[str]
     tenant: Tenant
     client: BifrostClient
