@@ -122,30 +122,33 @@ pub async fn save_vendor_responses(
     onboarding_id: &OnboardingId,
 ) -> ApiResult<Vec<VendorResult>> {
     let obid = onboarding_id.clone();
-    let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
 
-    let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
-        verification_result::save_verification_result(db_pool, vendor_responses, &uv.public_key)
-            .await?
-            .into_iter()
-            .map(|vr| (vr.request_id.clone(), vr))
-            .collect();
+    let responses = vendor_responses.to_owned();
+    let results = db_pool
+        .db_query(move |conn| -> ApiResult<Vec<VendorResult>> {
+            let uv = Vault::get(conn, &obid)?;
+            let vres = verification_result::save_verification_results(conn, &responses, &uv.public_key)?;
 
-    let results: Vec<VendorResult> = vendor_responses
-        .iter()
-        .map(|(req, res)| -> ApiResult<VendorResult> {
-            let verification_result = verification_results
-                .remove(&req.id)
-                .ok_or(DbError::RelatedObjectNotFound)?;
+            let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
+                vres.into_iter().map(|vr| (vr.request_id.clone(), vr)).collect();
 
-            Ok(VendorResult {
-                response: res.clone(),
-                verification_result_id: verification_result.id,
-                verification_request_id: req.id.clone(),
-            })
+            let results: Vec<VendorResult> = responses
+                .iter()
+                .map(|(req, res)| -> ApiResult<VendorResult> {
+                    let verification_result = verification_results
+                        .remove(&req.id)
+                        .ok_or(DbError::RelatedObjectNotFound)?;
+
+                    Ok(VendorResult {
+                        response: res.clone(),
+                        verification_result_id: verification_result.id,
+                        verification_request_id: req.id.clone(),
+                    })
+                })
+                .collect::<Result<Vec<VendorResult>, _>>()?;
+            Ok(results)
         })
-        .collect::<Result<Vec<VendorResult>, _>>()?;
-
+        .await??;
     Ok(results)
 }
 

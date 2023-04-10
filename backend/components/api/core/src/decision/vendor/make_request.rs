@@ -458,18 +458,15 @@ pub async fn make_docv_request(
             .await?;
 
     let vendor_response = send_docv_request(state, request.clone(), onboarding_id, data).await?;
-    let uv = state
+
+    let vr = (request.clone(), vendor_response.clone());
+    let verification_result = state
         .db_pool
-        .db_query(move |conn| VerificationRequest::get_user_vault(conn, requestid))
+        .db_query(move |conn| -> ApiResult<_> {
+            let uv = VerificationRequest::get_user_vault(conn, requestid)?;
+            verification_result::save_verification_result(conn, &vr, &uv.public_key)
+        })
         .await??;
-
-    let vendor_responses = &vec![(request.clone(), vendor_response.clone())];
-
-    let verification_result =
-        verification_result::save_verification_result(&state.db_pool, vendor_responses, &uv.public_key)
-            .await?
-            .pop()
-            .ok_or(DbError::IncorrectNumberOfRowsUpdated)?; // not really the most apt error but this should never happen
 
     let result = vendor_result::VendorResult {
         response: vendor_response,
@@ -578,17 +575,13 @@ pub async fn make_kyb_request(
         })
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
-    let uv = db_pool
-        .db_query(move |conn| VerificationRequest::get_user_vault(conn, vreq_id))
+    let vr = (vreq.clone(), vendor_response.clone());
+    let verification_result = db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
+            verification_result::save_verification_result(conn, &vr, &uv.public_key)
+        })
         .await??;
-
-    let vendor_responses = &vec![(vreq.clone(), vendor_response.clone())];
-
-    let verification_result =
-        verification_result::save_verification_result(db_pool, vendor_responses, &uv.public_key)
-            .await?
-            .pop()
-            .ok_or(DbError::IncorrectNumberOfRowsUpdated)?; // not really the most apt error but this should never happen
 
     let result = vendor_result::VendorResult {
         response: vendor_response,

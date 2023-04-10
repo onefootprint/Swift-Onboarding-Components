@@ -1,5 +1,6 @@
 use crate::decision::vendor;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
+use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::utils::webhook_app::IntoWebhookApp;
 use crate::{
@@ -31,7 +32,7 @@ use idv::{
 };
 use newtypes::{
     DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
-    TaskId, TenantId, VaultPublicKey, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
+    TaskId, TenantId, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
     WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 use webhooks::events::WebhookEvent;
@@ -316,21 +317,14 @@ impl WatchlistCheckTask {
         };
 
         let svid = sv_id.clone();
-        let vault_public_key = db_pool
-            .db_query(move |conn| -> Result<VaultPublicKey, DbError> {
-                let vault = Vault::get(conn, &svid)?;
-                Ok(vault.public_key)
+
+        let vr = (vreq.clone(), vendor_response.clone());
+        let _vres = db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let uv = Vault::get(conn, &svid)?;
+                decision::vendor::verification_result::save_verification_result(conn, &vr, &uv.public_key)
             })
             .await??;
-
-        let _vres = decision::vendor::verification_result::save_verification_result(
-            db_pool,
-            &vec![(vreq.clone(), vendor_response.clone())],
-            &vault_public_key,
-        )
-        .await?
-        .pop()
-        .ok_or(DbError::RelatedObjectNotFound)?;
 
         Ok(vendor_response)
     }

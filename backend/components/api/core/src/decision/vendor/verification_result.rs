@@ -1,19 +1,20 @@
+use std::slice;
+
+use crate::{enclave_client::EnclaveClient, errors::ApiError};
 use chrono::Utc;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::{
     models::verification_result::{NewVerificationResult, VerificationResult},
-    DbPool,
+    DbError, PgConn,
 };
 use enclave_proxy::DataTransform;
 use newtypes::{EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey};
 
-use crate::{enclave_client::EnclaveClient, errors::ApiError};
-
 use super::make_request::VerificationRequestWithVendorResponse;
 
 /// Save a verification result, encrypting the response payload in the process
-pub async fn save_verification_result(
-    db_pool: &DbPool, // TODO: migrate to PgConn
+pub fn save_verification_results(
+    conn: &mut PgConn,
     vendor_responses: &[VerificationRequestWithVendorResponse],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<Vec<VerificationResult>, ApiError> {
@@ -35,9 +36,17 @@ pub async fn save_verification_result(
         })
         .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;
 
-    db_pool
-        .db_query(move |conn| Ok(VerificationResult::bulk_create(conn, new_verification_results)?))
-        .await?
+    Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
+}
+
+pub fn save_verification_result(
+    conn: &mut PgConn,
+    vendor_response: &VerificationRequestWithVendorResponse,
+    user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
+) -> Result<VerificationResult, ApiError> {
+    save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
+        .pop()
+        .ok_or(ApiError::from(DbError::IncorrectNumberOfRowsUpdated))
 }
 
 // Encrypt payload using UV
