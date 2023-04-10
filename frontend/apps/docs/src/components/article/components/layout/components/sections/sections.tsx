@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from '@onefootprint/icons';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';
 
@@ -12,10 +13,32 @@ type SectionsProps = {
 };
 
 const Sections = ({ sections }: SectionsProps) => {
+  const [activeSection, setActiveSection] = useState(
+    sections.length ? sections[0].id : null,
+  );
+  const ref = useRef<HTMLLIElement>(null);
   const { t } = useTranslation('components.article-sections');
+
   useEffect(() => {
     scrollSpy();
+    setActiveSection(sections[0].id);
   }, [sections]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const elementActiveClass = document.querySelector('.active');
+      const elementID = elementActiveClass
+        ?.getAttribute('data-scroll-id')
+        ?.valueOf();
+      if (elementID && elementID !== activeSection) {
+        setActiveSection(elementID);
+      }
+    };
+    document.addEventListener('scroll', handleScroll);
+    return () => {
+      document.removeEventListener('scroll', handleScroll);
+    };
+  }, [activeSection]);
 
   return (
     <Container>
@@ -26,23 +49,19 @@ const Sections = ({ sections }: SectionsProps) => {
         <Typography variant="label-4">{t('title')}</Typography>
       </Header>
       <nav>
-        <ul
-          id="article-sections-list"
-          className="article-sections-list"
-          style={
-            {
-              '--index-from-selected': 0,
-            } as React.CSSProperties
-          }
-        >
+        <ul id="article-sections-list" className="article-sections-list">
           {sections.map(({ level, anchor, label, id }, index) => (
             <li
               data-level={level}
               key={anchor}
               data-scroll-id={id}
               className={index === 0 ? 'active' : undefined}
+              ref={ref}
             >
               <a href={anchor}>{label}</a>
+              {id === activeSection ? (
+                <ActiveMarker layoutId="active-marker" />
+              ) : null}
             </li>
           ))}
         </ul>
@@ -50,6 +69,17 @@ const Sections = ({ sections }: SectionsProps) => {
     </Container>
   );
 };
+
+const ActiveMarker = styled(motion.div)`
+  ${({ theme }) => css`
+    width: ${theme.borderWidth[2]};
+    height: 90%;
+    background-color: ${theme.color.accent};
+    position: absolute;
+    left: calc(-1 * ${theme.spacing[5]});
+    top: 0;
+  `}
+`;
 
 const Container = styled.aside`
   ${({ theme }) => css`
@@ -66,26 +96,12 @@ const Container = styled.aside`
 
     ul {
       padding-left: ${theme.spacing[5]};
-
-      &::before {
-        background-color: ${theme.color.accent};
-        content: '';
-        height: 20px;
-        left: ${theme.spacing[1]};
-        position: absolute;
-        transform: translateY(
-          calc(
-            ${theme.spacing[7] + theme.spacing[2]}px *
-              var(--index-from-selected)
-          )
-        );
-        transition: transform 0.25s;
-        width: ${theme.borderWidth[2]};
-      }
+      position: relative;
     }
 
     li {
       margin-bottom: ${theme.spacing[3]};
+      position: relative;
 
       a {
         display: block;

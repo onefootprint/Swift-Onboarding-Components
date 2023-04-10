@@ -1,6 +1,7 @@
 const scrollSpy = () => {
   const navList = document.getElementById('article-sections-list');
   const navItems = Array.from(document.querySelectorAll('[data-scroll-id]'));
+
   const sections = navItems
     .map(li => {
       const id = li.getAttribute('data-scroll-id') as string;
