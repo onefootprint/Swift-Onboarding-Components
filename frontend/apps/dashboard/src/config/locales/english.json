@@ -886,8 +886,11 @@
       "device-insights": {
         "title": "Device insights",
         "ip-address": "IP address",
+        "biometrics": "Biometrics",
         "region": "Region",
-        "country": "Country"
+        "country": "Country",
+        "verified": "Verified",
+        "not_verified": "Not verified"
       }
     },
     "businesses": {

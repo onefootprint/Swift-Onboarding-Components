@@ -1,46 +1,32 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import { Error } from 'src/components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
+import useCurrentEntityLiveness from '@/entity/hooks/use-current-entity-liveness';
 
 import Section from '../section';
-import FloatingBox from './components/floating-box';
-import Map from './components/map';
+import Content from './components/content';
 
-export type DeviceInsightsProps = WithEntityProps;
+export type ContentProps = WithEntityProps;
 
-const DeviceInsights = ({ entity }: DeviceInsightsProps) => {
+const DeviceInsights = ({ entity }: ContentProps) => {
   const { t } = useTranslation('pages.entity.device-insights');
-  const insightEvent = entity.onboarding?.insightEvent;
+  const { error, data, isSuccess } = useCurrentEntityLiveness();
+  const onboardingInsightEvent = entity.onboarding?.insightEvent;
+  const biometricCred = data?.[0];
 
-  return insightEvent ? (
+  return (
     <Section title={t('title')}>
-      <MapContainer>
-        <Map
-          latitude={insightEvent.latitude}
-          longitude={insightEvent.longitude}
+      {error && <Error error={error} />}
+      {isSuccess && (
+        <Content
+          insightEvent={biometricCred?.insightEvent || onboardingInsightEvent}
+          hasBiometrics={!!biometricCred}
         />
-        <FloatingBox
-          city={insightEvent.city}
-          country={insightEvent.country}
-          ipAddress={insightEvent.ipAddress}
-          region={insightEvent.region}
-          userAgent={insightEvent.userAgent}
-        />
-      </MapContainer>
+      )}
     </Section>
-  ) : null;
+  );
 };
-
-const MapContainer = styled.div`
-  ${({ theme }) => css`
-    height: 384px;
-    width: 100%;
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-    position: relative;
-  `}
-`;
 
 export default DeviceInsights;

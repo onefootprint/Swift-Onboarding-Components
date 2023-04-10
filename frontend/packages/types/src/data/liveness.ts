@@ -2,7 +2,7 @@ import { InsightEvent } from './insight-event';
 
 export type Liveness = {
   source: LivenessSource;
-  attributes: LivenessAttribute[];
+  attributes: LivenessAttribute[] | null;
   insightEvent: InsightEvent;
 };
 

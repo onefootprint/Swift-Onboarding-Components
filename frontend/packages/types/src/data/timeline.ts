@@ -83,6 +83,7 @@ export enum WatchlistCheckStatus {
 }
 
 export type WatchlistCheckEventData = {
+  id: string;
   reasonCodes: WatchlistCheckReasonCode[];
   status: WatchlistCheckStatus;
 };

@@ -7,9 +7,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
-  BusinessDI,
-  BusinessOwner,
-  CollectedKybDataOption,
+  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   DataIdentifier,
   DecisionSourceKind,
@@ -17,55 +15,62 @@ import {
   Entity,
   EntityKind,
   EntityStatus,
+  IdDI,
+  Liveness,
+  LivenessSource,
   OnboardingStatus,
   RoleScope,
   Timeline,
   TimelineEventKind,
   VaultValue,
+  Vendor,
+  WatchlistCheckStatus,
 } from '@onefootprint/types';
 
 export const entityFixture: Entity = {
-  id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
+  id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
   isPortable: true,
-  kind: EntityKind.business,
+  kind: EntityKind.person,
+  requiresManualReview: false,
+  status: EntityStatus.pass,
   attributes: [
-    BusinessDI.addressLine1,
-    BusinessDI.beneficialOwners,
-    BusinessDI.city,
-    BusinessDI.country,
-    BusinessDI.name,
-    BusinessDI.doingBusinessAs,
-    BusinessDI.phoneNumber,
-    BusinessDI.state,
-    BusinessDI.tin,
-    BusinessDI.tin,
-    BusinessDI.website,
-    BusinessDI.zip,
+    IdDI.phoneNumber,
+    IdDI.email,
+    IdDI.firstName,
+    IdDI.lastName,
+    IdDI.country,
+    IdDI.addressLine1,
+    IdDI.ssn9,
+    IdDI.ssn4,
+    IdDI.dob,
+    IdDI.state,
+    IdDI.city,
+    IdDI.zip,
   ],
-  startTimestamp: '2023-03-27T14:43:47.444716Z',
+  startTimestamp: '2023-03-29T23:07:44.435194Z',
   onboarding: {
-    id: 'ob_Y3gPIFuPyhqK4f9w2f8QF7',
+    id: 'ob_8GqQaovsdqwinBE6mh5SXW',
     isAuthorized: true,
-    name: '[Test] Business',
-    configId: 'ob_config_id_RccCUPbZVaarmtjfNwM9vo',
+    name: 'test',
+    configId: 'ob_config_id_BPfmnLfwBj0Vom0iHukzhS',
     requiresManualReview: false,
     status: OnboardingStatus.verified,
-    timestamp: '2023-03-27T14:43:47.446874Z',
-    isLivenessSkipped: false,
+    timestamp: '2023-03-29T23:07:46.866954Z',
+    isLivenessSkipped: true,
     insightEvent: {
-      timestamp: '2023-04-03T17:42:30.799202Z',
-      ipAddress: '67.243.21.56',
-      city: 'New York',
+      timestamp: '2023-03-29T23:07:46.850237Z',
+      ipAddress: '73.222.157.30',
+      city: 'San Francisco',
       country: 'United States',
-      region: 'NY',
-      regionName: 'New York',
-      latitude: 40.7365,
-      longitude: -74.0055,
-      metroCode: '501',
-      postalCode: '10014',
-      timeZone: 'America/New_York',
+      region: 'CA',
+      regionName: 'California',
+      latitude: 37.7595,
+      longitude: -122.4367,
+      metroCode: '807',
+      postalCode: '94114',
+      timeZone: 'America/Los_Angeles',
       userAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
     },
     canAccessPermissions: [
       RoleScope.decryptName,
@@ -74,12 +79,7 @@ export const entityFixture: Entity = {
       RoleScope.decryptFullAddress,
       RoleScope.decryptEmail,
       RoleScope.decryptPhoneNumber,
-      RoleScope.decryptBusinessName,
-      RoleScope.decryptBusinessTin,
-      RoleScope.decryptBusinessAddress,
-      RoleScope.decryptBusinessPhoneNumber,
-      RoleScope.decryptBusinessWebsite,
-      RoleScope.decryptBusinessBeneficialOwners,
+      RoleScope.decryptInvestorProfile,
     ],
     canAccessData: [
       CollectedKycDataOption.name,
@@ -88,38 +88,82 @@ export const entityFixture: Entity = {
       CollectedKycDataOption.fullAddress,
       CollectedKycDataOption.email,
       CollectedKycDataOption.phoneNumber,
-      CollectedKybDataOption.name,
-      CollectedKybDataOption.tin,
-      CollectedKybDataOption.address,
-      CollectedKybDataOption.phoneNumber,
-      CollectedKybDataOption.website,
-      CollectedKybDataOption.beneficialOwners,
+      CollectedInvestorProfileDataOption.investorProfile,
     ],
     canAccessAttributes: [],
+    latestDecision: {
+      id: 'decision_0tNR5dWi8JAdbRP7DO9xxC',
+      status: DecisionStatus.pass,
+      timestamp: new Date('2023-03-29T23:08:36.755235Z'),
+      source: {
+        kind: DecisionSourceKind.footprint,
+      },
+      vendors: [],
+      obConfiguration: {
+        mustCollectData: [],
+        mustCollectIdentityDocument: false,
+      },
+    },
   },
-  requiresManualReview: false,
-  status: EntityStatus.pass,
-  decryptedAttributes: {
-    [BusinessDI.name]: 'Acme Inc.',
-  },
+  decryptedAttributes: {},
 };
+
+export const livenessFixture: Liveness[] = [
+  {
+    source: LivenessSource.skipped,
+    attributes: null,
+    insightEvent: {
+      timestamp: '2023-03-29T23:08:33.147280Z',
+      ipAddress: '73.222.157.30',
+      city: 'San Francisco',
+      country: 'United States',
+      region: 'CA',
+      regionName: 'California',
+      latitude: 37.7595,
+      longitude: -122.4367,
+      metroCode: '807',
+      postalCode: '94114',
+      timeZone: 'America/Los_Angeles',
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+    },
+  },
+];
 
 export const timelineFixture: Timeline = [
   {
     event: {
       kind: TimelineEventKind.dataCollected,
       data: {
+        attributes: [CollectedKycDataOption.phoneNumber],
+      },
+    },
+    timestamp: '2023-03-29T23:07:44.493561Z',
+    isFromOtherOrg: false,
+  },
+  {
+    event: {
+      kind: TimelineEventKind.dataCollected,
+      data: {
+        attributes: [CollectedKycDataOption.email],
+      },
+    },
+    timestamp: '2023-03-29T23:07:44.854515Z',
+    isFromOtherOrg: false,
+  },
+  {
+    event: {
+      kind: TimelineEventKind.dataCollected,
+      data: {
         attributes: [
-          CollectedKybDataOption.name,
-          CollectedKybDataOption.phoneNumber,
-          CollectedKybDataOption.website,
-          CollectedKybDataOption.address,
-          CollectedKybDataOption.beneficialOwners,
-          CollectedKybDataOption.tin,
+          CollectedKycDataOption.dob,
+          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.ssn9,
+          CollectedKycDataOption.name,
         ],
       },
     },
-    timestamp: '2023-04-05T11:16:13.599001Z',
+    timestamp: '2023-03-29T23:08:13.960464Z',
     isFromOtherOrg: false,
   },
   {
@@ -127,44 +171,36 @@ export const timelineFixture: Timeline = [
       kind: TimelineEventKind.onboardingDecision,
       data: {
         decision: {
-          id: 'decision_ukUpX59i8VJZiuk6boskdR',
+          id: 'decision_0tNR5dWi8JAdbRP7DO9xxC',
           status: DecisionStatus.pass,
-          timestamp: new Date('2023-04-05T11:17:06.773951Z'),
+          timestamp: new Date('2023-03-29T23:08:36.755235Z'),
           source: {
             kind: DecisionSourceKind.footprint,
           },
           obConfiguration: {
-            mustCollectData: [
-              CollectedKybDataOption.name,
-              CollectedKybDataOption.address,
-              CollectedKybDataOption.tin,
-              CollectedKybDataOption.beneficialOwners,
-              CollectedKycDataOption.name,
-              CollectedKycDataOption.fullAddress,
-              CollectedKycDataOption.phoneNumber,
-              CollectedKycDataOption.dob,
-              CollectedKycDataOption.ssn4,
-            ],
+            mustCollectData: [],
             mustCollectIdentityDocument: false,
           },
-          vendors: [],
+          vendors: [Vendor.idology, Vendor.twilio],
         },
         annotation: null,
       },
     },
-    timestamp: '2023-04-05T11:17:06.776409Z',
+    timestamp: '2023-03-29T23:08:36.768054Z',
     isFromOtherOrg: false,
   },
-];
-
-export const businessOwnersFixture: BusinessOwner[] = [
   {
-    id: 'fp_id_XW3pNYPpV4Niup1PgFZBg6',
-    status: EntityStatus.pass,
-    ownershipStake: 50,
-    kind: 'primary',
+    event: {
+      kind: TimelineEventKind.watchlistCheck,
+      data: {
+        id: 'wc_DLq34gSJIoO9xSgwwrlZaI',
+        status: WatchlistCheckStatus.pass,
+        reasonCodes: [],
+      },
+    },
+    timestamp: '2023-03-30T00:15:27.173615Z',
+    isFromOtherOrg: false,
   },
-  { ownershipStake: 50, kind: 'secondary' },
 ];
 
 export const withEntity = (entity = entityFixture) =>
@@ -205,18 +241,14 @@ export const withRiskSignals = (entity = entityFixture, response = []) =>
     response,
   });
 
-export const withLiveness = (entity = entityFixture, response = []) =>
+export const withLiveness = (
+  entity = entityFixture,
+  response = livenessFixture,
+) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/liveness`,
     response,
-  });
-
-export const withBusinessOwners = (entity = entityFixture) =>
-  mockRequest({
-    method: 'get',
-    path: `/businesses/${entity.id}/owners`,
-    response: businessOwnersFixture,
   });
 
 export const withEntityDecrypt = (

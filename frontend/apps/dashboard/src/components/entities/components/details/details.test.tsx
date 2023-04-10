@@ -20,6 +20,7 @@ import {
   withEntity,
   withEntityDecrypt,
   withEntityError,
+  withLiveness,
   withRiskSignals,
   withTimeline,
 } from './details.test.config';
@@ -46,6 +47,7 @@ describe('<Details />', () => {
     withRiskSignals();
     withTimeline();
     withBusinessOwners();
+    withLiveness();
   });
 
   afterAll(() => {

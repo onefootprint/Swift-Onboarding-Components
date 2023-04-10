@@ -2,9 +2,8 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetLivenessRequest, GetLivenessResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
-import useUserId from 'src/pages/users/pages/user-details/hooks/use-user-id';
 
-const getLivenessRequest = async (
+const getLiveness = async (
   { id }: GetLivenessRequest,
   authHeaders: AuthHeaders,
 ) => {
@@ -17,17 +16,16 @@ const getLivenessRequest = async (
   return response.data;
 };
 
-const useUserLiveness = () => {
-  const id = useUserId();
+const useEntityLiveness = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery<GetLivenessResponse, RequestError>(
-    ['user', 'liveness', id, authHeaders],
-    () => getLivenessRequest({ id }, authHeaders),
+    ['entity', 'liveness', id],
+    () => getLiveness({ id }, authHeaders),
     {
       enabled: !!id,
     },
   );
 };
 
-export default useUserLiveness;
+export default useEntityLiveness;
