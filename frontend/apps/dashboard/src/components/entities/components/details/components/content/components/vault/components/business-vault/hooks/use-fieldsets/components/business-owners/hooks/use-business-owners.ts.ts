@@ -1,4 +1,4 @@
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   GetBusinessOwnersRequest,
   GetBusinessOwnersResponse,
@@ -22,19 +22,13 @@ const getBusinessOwners = async (
 const useBusinessOwners = (id: string) => {
   const { authHeaders } = useSession();
 
-  const query = useQuery(
+  return useQuery(
     ['business', id, 'owners'],
     () => getBusinessOwners(authHeaders, { id }),
     {
       enabled: !!id,
     },
   );
-
-  const { error } = query;
-  return {
-    ...query,
-    errorMessage: error ? getErrorMessage(error) : undefined,
-  };
 };
 
 export default useBusinessOwners;

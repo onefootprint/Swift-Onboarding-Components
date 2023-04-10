@@ -1,10 +1,9 @@
-import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
+import { Error } from 'src/components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import Content from './components/content';
-import Error from './components/error';
 import Loading from './components/loading';
 import useRiskSignalsOverview from './hooks/use-risk-signals-overview';
 import type { RiskSignalsSummary } from './risk-signals-overview.types';
@@ -21,7 +20,7 @@ const RiskSignalsOverview = ({ type }: RiskSignalsOverviewProps) => {
     return <Loading />;
   }
   if (error) {
-    return <Error>{getErrorMessage(error)}</Error>;
+    return <Error error={error} />;
   }
   if (data) {
     const { high, medium, low } = data[type];

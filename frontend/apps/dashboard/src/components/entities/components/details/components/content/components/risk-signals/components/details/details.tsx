@@ -1,12 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
+import { Error } from 'src/components';
 
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
 import Content from './components/content';
-import Error from './components/error';
 import Loading from './components/loading';
 import useRiskSignalDetails from './hooks/use-risk-signal-details';
 
@@ -28,7 +27,7 @@ const Details = () => {
       <>
         {data && <Content riskSignal={data} />}
         {isLoading && <Loading />}
-        {error && <Error message={getErrorMessage(error)} />}
+        {error && <Error error={error} />}
       </>
     </Drawer>
   );

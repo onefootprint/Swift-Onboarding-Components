@@ -1,4 +1,4 @@
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   augmentEntityWithOnboardingInfo,
   GetEntityRequest,
@@ -25,17 +25,11 @@ const useEntity = (id: string) => {
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  const query = useQuery(['entity', id], () => getEntity(authHeaders, { id }), {
+  return useQuery(['entity', id], () => getEntity(authHeaders, { id }), {
     enabled: isReady && !!id,
     select: (response: GetEntityResponse) =>
       augmentEntityWithOnboardingInfo(response),
   });
-
-  const { error } = query;
-  return {
-    ...query,
-    errorMessage: error ? getErrorMessage(error) : undefined,
-  };
 };
 
 export default useEntity;

@@ -1,11 +1,11 @@
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { Error } from 'src/components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import { FieldProps } from '../../../../../field';
 import Content from './components/content';
-import Error from './components/error';
 import Loading from './components/loading';
 import useBusinessOwners from './hooks/use-business-owners.ts';
 
@@ -20,23 +20,25 @@ const BusinessOwners = ({
   value,
 }: FieldProps) => {
   const id = useEntityId();
-  const { isLoading, errorMessage, data } = useBusinessOwners(id);
+  const { isLoading, error, data } = useBusinessOwners(id);
 
   return (
     <Box key={name}>
-      {isLoading && <Loading />}
-      {errorMessage && <Error message={errorMessage} />}
-      {data && data.length > 0 && (
-        <Content
-          businessOwners={data}
-          canDecrypt={canDecrypt}
-          disabled={disabled}
-          label={label}
-          name={name}
-          showCheckbox={showCheckbox}
-          value={value}
-        />
-      )}
+      <>
+        {isLoading && <Loading />}
+        {error && <Error error={error} />}
+        {data && data.length > 0 && (
+          <Content
+            businessOwners={data}
+            canDecrypt={canDecrypt}
+            disabled={disabled}
+            label={label}
+            name={name}
+            showCheckbox={showCheckbox}
+            value={value}
+          />
+        )}
+      </>
     </Box>
   );
 };
