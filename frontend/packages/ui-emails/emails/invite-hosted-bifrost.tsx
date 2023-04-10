@@ -2,27 +2,33 @@ import { Container as BaseContainer } from '@react-email/container';
 import { Head } from '@react-email/head';
 import { Html } from '@react-email/html';
 
+import { Img } from '@react-email/img';
+
 import { Preview } from '@react-email/preview';
 import { Section } from '@react-email/section';
 import * as React from 'react';
 
 import { Button as BaseButton } from '@react-email/button';
-import FootprintLogo from './components/logo';
 
 import { Link } from '@react-email/link';
 import { Text } from '@react-email/text';
 
+const name = 'John Doe';
+const businessName = 'Acme Inc.';
+const flowLink = 'https://footprint.com/verify-email';
+const logoUrl = '/static/fractional.png';
+
 const content = {
   title:
-    'You asked us to send you a magic link for quickly signing in to your workspace.',
+    'A business you own is being verified and you need to verify your identity as one of its owners.',
+  description: `${name} is verifying ${businessName}, and you were identified as a beneficial owner. For it to be successfully verified you need to verify your identity.`,
   button: {
-    label: 'Sign-in to Footprint',
-    href: 'https://footprint.com/verify-email',
+    label: 'Verify your identity',
+    href: `${flowLink}`,
   },
   copyLink: {
     content: 'Or copy and paste this link into your browser:',
     href: 'https://www.onefootprint.com/confirmation/XjasoI1k2',
-    note: 'Note: your magic link will expire in 24 hours and can only be used one time.',
   },
 };
 
@@ -34,10 +40,17 @@ const Email = () => {
       <Section style={main}>
         <BaseContainer style={emailContainer}>
           <Section style={{ marginTop: '32px' }}>
-            <FootprintLogo />
+            <Img
+              src={logoUrl}
+              width="40"
+              height="40"
+              alt={businessName}
+              style={logo}
+            />
           </Section>
           <BaseContainer style={messageContainer}>
             <Text style={h1}>{content.title}</Text>
+            <Text style={text}>{content.description}</Text>
           </BaseContainer>
           <BaseButton href={content.button.href} style={btn}>
             {content.button.label}
@@ -47,7 +60,6 @@ const Email = () => {
             <Link href={content.copyLink.href} style={hyperlink}>
               {content.copyLink.href}
             </Link>
-            <Text style={text}>{content.copyLink.note}</Text>
           </BaseContainer>
         </BaseContainer>
       </Section>
@@ -82,7 +94,7 @@ const emailContainer = {
   border: '1px solid #E2E2E2',
   backgroundColor: '#fff',
   borderRadius: '5px',
-  margin: '40px auto',
+  margin: '32px auto 40px auto',
   padding: '20px',
   width: '70%',
   textAlign: 'center' as const,
@@ -92,6 +104,10 @@ const copyLinkContainer = {
   fontSize: '14px',
   lineHeight: '24px',
   margin: '32px auto',
+};
+
+const logo = {
+  margin: '0 auto',
 };
 
 const hyperlink = {

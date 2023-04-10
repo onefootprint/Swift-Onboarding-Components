@@ -1,11 +1,11 @@
-import { Button } from '@react-email/button';
+import { Button as BaseButton } from '@react-email/button';
 import * as React from 'react';
 
-const StyledButton = ({ href, label }) => {
+const Button = ({ href, label }) => {
   return (
-    <Button style={btn} href={href}>
+    <BaseButton style={btn} href={href}>
       {label}
-    </Button>
+    </BaseButton>
   );
 };
 
@@ -22,4 +22,4 @@ const btn = {
   margin: '0',
 };
 
-export default StyledButton;
+export default Button;
