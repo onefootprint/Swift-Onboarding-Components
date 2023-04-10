@@ -1,6 +1,6 @@
 enum OnboardingStatus {
-  verified = 'pass',
-  failed = 'fail',
+  pass = 'pass',
+  fail = 'fail',
   pending = 'pending',
   incomplete = 'incomplete',
 }

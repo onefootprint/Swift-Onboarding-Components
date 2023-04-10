@@ -80,7 +80,7 @@ export const userFixture: ScopedUser = {
     name: 'User ID verification',
     configId: 'ob_config_id_HPuJsnhKSX4GwuK6FXG9F3',
     requiresManualReview: false,
-    status: OnboardingStatus.verified,
+    status: OnboardingStatus.pass,
     timestamp: '2023-02-04T00:02:12.743759Z',
     isLivenessSkipped: false,
     insightEvent: {

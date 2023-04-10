@@ -54,7 +54,7 @@ export const entityFixture: Entity = {
     name: 'test',
     configId: 'ob_config_id_BPfmnLfwBj0Vom0iHukzhS',
     requiresManualReview: false,
-    status: OnboardingStatus.verified,
+    status: OnboardingStatus.pass,
     timestamp: '2023-03-29T23:07:46.866954Z',
     isLivenessSkipped: true,
     insightEvent: {
