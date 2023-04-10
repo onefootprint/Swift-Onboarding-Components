@@ -734,22 +734,6 @@
           "title": "User info"
         }
       },
-      "vault": {
-        "basic": {
-          "title": "Basic data"
-        },
-        "bos": {
-          "title": "Beneficial owners",
-          "link": "View profile",
-          "hint": {
-            "primary": "Owns {{stake}}%  of the business & submitted the business information",
-            "secondary": "Owns {{stake}}% of the business"
-          }
-        },
-        "address": {
-          "title": "Registered business address"
-        }
-      },
       "fieldset": {
         "select-all": "Select all",
         "deselect-all": "Deselect all"
@@ -927,6 +911,58 @@
       "page-title": "Footprint | Business",
       "header": {
         "title": "Business"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "bos": {
+          "title": "Beneficial owners",
+          "link": "View profile",
+          "hint": {
+            "primary": "Owns {{stake}}%  of the business & submitted the business information",
+            "secondary": "Owns {{stake}}% of the business"
+          }
+        },
+        "address": {
+          "title": "Registered business address"
+        }
+      }
+    },
+    "new-users": {
+      "page-title": "Footprint | Users",
+      "header": {
+        "title": "Users"
+      },
+      "table": {
+        "aria-label": "Users table",
+        "empty-state": "No users found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "email": "Email",
+          "ssn": "SSN",
+          "phone-number": "Phone number",
+          "start": "Date"
+        }
+      }
+    },
+    "new-user": {
+      "page-title": "Footprint | User",
+      "header": {
+        "title": "User"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "identity": {
+          "title": "Identity data"
+        },
+        "address": {
+          "title": "Address data"
+        }
       }
     },
     "security-logs": {

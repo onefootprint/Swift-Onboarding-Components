@@ -3,7 +3,7 @@ import React from 'react';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import { FieldProps } from '../../../../components/field';
+import { FieldProps } from '../../../../../field';
 import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';

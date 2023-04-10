@@ -7,7 +7,7 @@ import { EntitiesList, EntitiesTable } from 'src/components/entities';
 import Row from './components/row';
 
 const List = () => {
-  const { t } = useTranslation('pages.users');
+  const { t } = useTranslation('pages.new-users');
   const columns = [
     { text: t('table.header.name'), width: '14%' },
     { text: t('table.header.token'), width: '18%' },

@@ -20,6 +20,7 @@ const getRiskSignals = async (
     method: 'GET',
     url: `/entities/${id}/risk_signals`,
   });
+
   return groupBySectionAndSeverity(response);
 };
 

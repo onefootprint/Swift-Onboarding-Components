@@ -13,7 +13,7 @@ import StatusBadge from 'src/components/status-badge';
 import getFullName from 'src/utils/get-full-name-data';
 import styled, { css } from 'styled-components';
 
-import Field, { FieldProps } from '../../../../../../components/field';
+import Field, { FieldProps } from '../../../../../../../field';
 import isVaultDataBusinessOwner from './utils/is-vault-data-business-owner';
 
 export type ContentProps = FieldProps & {
@@ -30,7 +30,7 @@ const BusinessOwnersField = ({
   showCheckbox,
   value,
 }: ContentProps) => {
-  const { t } = useTranslation('pages.entity.vault.bos');
+  const { t } = useTranslation('pages.business.vault.bos');
 
   const renderValue = (index: number) => {
     if (
