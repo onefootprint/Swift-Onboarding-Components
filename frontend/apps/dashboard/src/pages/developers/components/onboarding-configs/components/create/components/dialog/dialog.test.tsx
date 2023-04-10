@@ -185,7 +185,7 @@ describe('<CreateConfig />', () => {
       ).toBeInTheDocument();
       expect(within(collectedData).getByText('Full name')).toBeInTheDocument();
       expect(
-        within(collectedData).getByText('Date of Birth'),
+        within(collectedData).getByText('Date of birth'),
       ).toBeInTheDocument();
       expect(within(collectedData).getByText('Address')).toBeInTheDocument();
       expect(
@@ -317,7 +317,7 @@ describe('<CreateConfig />', () => {
       expect(fullName.checked).toBeTruthy();
 
       const dateOfBirth = screen.getByLabelText(
-        'Date of Birth',
+        'Date of birth',
       ) as HTMLInputElement;
       expect(dateOfBirth).toBeInTheDocument();
       expect(dateOfBirth.checked).toBeTruthy();

@@ -145,7 +145,7 @@ describe('<VaultDataContent />', () => {
         const ssn4 = getTextByRow('SSN (Last 4)', '•••••••••');
         expect(ssn4).toBeInTheDocument();
 
-        const dob = getTextByRow('Date of Birth', '•••••••••');
+        const dob = getTextByRow('Date of birth', '•••••••••');
         expect(dob).toBeInTheDocument();
       });
 
@@ -174,7 +174,7 @@ describe('<VaultDataContent />', () => {
           await userEvent.click(ssn4Field);
 
           const dobField = screen.getByRole('checkbox', {
-            name: 'Date of Birth',
+            name: 'Date of birth',
           });
           await userEvent.click(dobField);
 
@@ -196,7 +196,7 @@ describe('<VaultDataContent />', () => {
           });
 
           await waitFor(() => {
-            const dob = getTextByRow('Date of Birth', '1990-01-04');
+            const dob = getTextByRow('Date of birth', '1990-01-04');
             expect(dob).toBeInTheDocument();
           });
         });

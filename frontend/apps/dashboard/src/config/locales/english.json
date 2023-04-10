@@ -40,7 +40,7 @@
     "id.last_name": "Last name",
     "id.ssn9": "SSN (Full)",
     "id.ssn4": "SSN (Last 4)",
-    "id.dob": "Date of Birth",
+    "id.dob": "Date of birth",
     "id.address_line1": "Address line 1",
     "id.address_line2": "Address line 2",
     "id.city": "City",
@@ -78,7 +78,7 @@
   },
   "cdo": {
     "name": "Full name",
-    "dob": "Date of Birth",
+    "dob": "Date of birth",
     "ssn9": "SSN (Full)",
     "ssn4": "SSN (Last 4)",
     "full_address": "Address",
@@ -105,7 +105,7 @@
   },
   "signal-attributes": {
     "name": "Full name",
-    "dob": "Date of Birth",
+    "dob": "Date of birth",
     "ssn": "SSN",
     "address": "Address",
     "street_address": "Street Address",
