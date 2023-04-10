@@ -1,0 +1,19 @@
+[package]
+name = "api_route_webhooks"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+api_core = { path = "../../core" }
+crypto = { path = "../../../enclave/crypto" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+paperclip = { workspace = true }
+tracing = { workspace = true }
+actix-web = { workspace = true }
+futures-util = { workspace = true }
+futures = { workspace = true }
+hmac = "0.12.1"
+sha2 = "0.10.2"
+thiserror = { workspace = true }

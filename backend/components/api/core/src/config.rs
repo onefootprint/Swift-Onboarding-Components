@@ -113,8 +113,8 @@ pub struct Config {
     #[envconfig(nested = true)]
     pub incode: IncodeConfig,
 
-    #[envconfig(from = "MIDDESK_SANDBOX_API_KEY")]
-    pub middesk_sandbox_api_key: String,
+    #[envconfig(nested = true)]
+    pub middesk_config: MiddeskConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -270,4 +270,13 @@ pub struct ExperianConfig {
     pub cross_core_username: PiiString,
     #[envconfig(from = "EXPERIAN_CROSS_CORE_PASSWORD")]
     pub cross_core_password: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct MiddeskConfig {
+    #[envconfig(from = "MIDDESK_SANDBOX_API_KEY")]
+    pub middesk_sandbox_api_key: String,
+
+    #[envconfig(from = "MIDDESK_WEBHOOK_SECRET")]
+    pub middesk_webhook_secret: String,
 }

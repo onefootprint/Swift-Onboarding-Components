@@ -21,6 +21,8 @@ pub enum AuthError {
     MissingHeader(String),
     #[error("Invalid {0}")]
     InvalidHeader(String),
+    #[error("Invalid request body")]
+    InvalidBody,
     #[error("Incorrect session type auth")]
     SessionTypeError,
     #[error("Session expired or does not exist")]

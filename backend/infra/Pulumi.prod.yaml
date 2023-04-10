@@ -51,6 +51,8 @@ config:
     middesk:
       sandboxApiKey:
         secure: v1:7kXpZXaJ7W9e5k5e:mAeRoJx7ZfdQAMT9oumkgb/MbzTXaK74Siyvbx2FGNTcyn26ai6ftPD6+n0j6PoI
+      webhookSecret:
+        secure: v1:m/qmyjeTEkwjciLr:SDhOUeBWKokpSt6NWo96wCPDMPcwoxCpx77Xak6LqHbUx6aAw3d80afzH6worY6JSxBqHBWcf446zA==
     resources:
       cpuUnits: 2048
       instances: 2

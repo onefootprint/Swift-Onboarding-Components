@@ -1069,6 +1069,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "api_route_webhooks"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "api_core",
+ "crypto",
+ "futures",
+ "futures-util",
+ "hmac",
+ "paperclip",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "api_routes_root"
 version = "0.1.0"
 dependencies = [
@@ -1081,6 +1099,7 @@ dependencies = [
  "api_route_private",
  "api_route_proxy",
  "api_route_users",
+ "api_route_webhooks",
  "paperclip",
 ]
 

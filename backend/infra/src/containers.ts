@@ -144,6 +144,7 @@ export abstract class ServiceContainers {
         secretsStore.incodeApiKey.arn,
         secretsStore.incodeClientId.arn,
         secretsStore.middeskSandboxApiKey.arn,
+        secretsStore.middeskWebhookSecret.arn,
       ])
       .apply(
         ([
@@ -173,6 +174,7 @@ export abstract class ServiceContainers {
           incodeApiKey,
           incodeClientId,
           middeskSandboxApiKey,
+          middeskWebhookSecret,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -270,6 +272,10 @@ export abstract class ServiceContainers {
               {
                 name: 'MIDDESK_SANDBOX_API_KEY',
                 valueFrom: middeskSandboxApiKey,
+              },
+              {
+                name: 'MIDDESK_WEBHOOK_SECRET',
+                valueFrom: middeskWebhookSecret,
               },
             ],
             environment: [

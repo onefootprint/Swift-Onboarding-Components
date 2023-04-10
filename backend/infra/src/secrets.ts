@@ -42,6 +42,7 @@ export interface StaticSecrets {
   incodeApiKey: aws.ssm.Parameter;
   incodeClientId: aws.ssm.Parameter;
   middeskSandboxApiKey: aws.ssm.Parameter;
+  middeskWebhookSecret: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -122,6 +123,10 @@ interface Middesk {
 
 interface Fingerprint {
   fingerprintSdkKey: string;
+}
+
+interface Middesk {
+  webhookSecret: string;
 }
 
 export async function LoadSecrets(
@@ -299,6 +304,10 @@ export async function LoadSecrets(
     middeskSandboxApiKey: createSecretParameter(
       `middeskSandboxApiKey-${stack}`,
       secretConstants.middesk.sandboxApiKey,
+    ),
+    middeskWebhookSecret: createSecretParameter(
+      `middeskWebhookSecret-${stack}`,
+      secretConstants.middesk.webhookSecret,
     ),
   };
 }

@@ -154,7 +154,7 @@ impl State {
         let incode_client = IncodeClient::new(config.incode.api_key.clone(), config.incode.client_id.clone())
             .expect("failed to build fingerprint client");
 
-        let middesk_client = MiddeskClient::new(config.middesk_sandbox_api_key.clone(), true)
+        let middesk_client = MiddeskClient::new(config.middesk_config.middesk_sandbox_api_key.clone(), true)
             .expect("failed to build middesk client");
 
         // let out = hmac_client
