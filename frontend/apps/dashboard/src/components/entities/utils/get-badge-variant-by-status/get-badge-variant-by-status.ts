@@ -6,6 +6,7 @@ const statusToVariant: Record<EntityStatus, UIState> = {
   [EntityStatus.failed]: 'error',
   [EntityStatus.incomplete]: 'warning',
   [EntityStatus.pending]: 'warning',
+  [EntityStatus.vaultOnly]: 'info',
 };
 
 const getBadgeVariantByStatus = (
