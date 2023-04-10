@@ -11,6 +11,10 @@ echo "----------------------------------------------"
 if [[ $(command -v brew) == "" ]]; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add brew to path
+    (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"')  >> ~/.zprofile
+    source ~/.zprofile
 fi
 
 # Useful packages
@@ -21,7 +25,11 @@ brew install awscli
 brew install jq
 brew install wget
 brew install watchman
-brew install node@16
+brew install node@18
+
+# Add NPM to path
+echo 'export PATH="/opt/homebrew/opt/node@18/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
 
 # For iOS / React Native
 curl -sSL https://get.rvm.io | bash -s stable --ruby
