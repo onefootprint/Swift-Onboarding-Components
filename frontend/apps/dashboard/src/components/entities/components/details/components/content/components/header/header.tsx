@@ -6,17 +6,19 @@ import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
+import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 type HeaderProps = WithEntityProps;
 
 const Header = ({ entity }: HeaderProps) => {
   const { t } = useTranslation('pages.entity.header');
+  const { kind } = useEntityContext();
   const { formatDateWithTime } = useIntl();
 
   return (
-    <HeaderContainer aria-label={t('title')}>
+    <HeaderContainer aria-label={t(`${kind}.title`)}>
       <Row>
-        <Typography variant="label-1">{t('title')}</Typography>
+        <Typography variant="label-1">{t(`${kind}.title`)}</Typography>
         <StatusBadge
           status={entity.status}
           requiresManualReview={entity.requiresManualReview}

@@ -26,7 +26,7 @@ const BusinessOwners = ({
     <Box key={name}>
       {isLoading && <Loading />}
       {errorMessage && <Error message={errorMessage} />}
-      {data && data.length && (
+      {data && data.length > 0 && (
         <Content
           businessOwners={data}
           canDecrypt={canDecrypt}

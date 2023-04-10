@@ -15,6 +15,7 @@ export enum EntityStatus {
   incomplete = 'incomplete',
   pending = 'pending',
   pass = 'pass',
+  vaultOnly = 'vault_only',
 }
 
 export type Entity = {
@@ -44,6 +45,9 @@ export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
 });
 
 const getEntityStatus = (entity: Entity): EntityStatus => {
+  if (!entity.isPortable) {
+    return EntityStatus.vaultOnly;
+  }
   if (entity.onboarding?.isAuthorized && entity.onboarding?.status) {
     return entity.onboarding.status as unknown as EntityStatus;
   }

@@ -727,7 +727,12 @@
         }
       },
       "header": {
-        "title": "Business info"
+        "business": {
+          "title": "Business info"
+        },
+        "person": {
+          "title": "User info"
+        }
       },
       "vault": {
         "basic": {
