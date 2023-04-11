@@ -80,7 +80,6 @@ where
     pub first_name: PiiString,
     #[allow(unused)]
     pub last_name: PiiString,
-    // TODO don't allow sandbox suffixes
     #[allow(unused)]
     pub email: Email,
     #[allow(unused)]
@@ -97,6 +96,12 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         }
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
+        }
+        if bos
+            .iter()
+            .any(|bo| !bo.email.is_live() || !bo.phone_number.is_live())
+        {
+            return Err(Error::SandboxNotAllowed);
         }
         // Create a BoID for each Kyced BO item. This ID will be used to link the JSON BO to the
         // BO in the DB
@@ -235,7 +240,7 @@ mod test {
         let input = json!([{
             "first_name": "Piip",
             "last_name": "Penguin",
-            "email": "piip",
+            "email": "piip@onefootprint.com#sandbox",
             "phone_number": "+14155555555",
             "ownership_stake": 90
         }]);
@@ -249,7 +254,7 @@ mod test {
             "first_name": "Piip",
             "last_name": "Penguin",
             "email": "piip@onefootprint.com",
-            "phone_number": "blerp",
+            "phone_number": "+14155555555#sandbox",
             "ownership_stake": 90
         }]);
 
