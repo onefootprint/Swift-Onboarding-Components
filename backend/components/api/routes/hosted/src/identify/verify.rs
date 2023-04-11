@@ -11,7 +11,7 @@ use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::config::Config;
-use api_core::errors::user::UserError;
+use api_core::errors::business::BusinessError;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::business_owner::BusinessOwner;
@@ -121,7 +121,7 @@ pub async fn post(
                 if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
                     // If uv on the BO, make sure it is the same UV that was located in identify flow
                     if existing_uv_id != &uv.id {
-                        return Err(UserError::BoAlreadyHasVault.into());
+                        return Err(BusinessError::BoAlreadyHasVault.into());
                     }
                 } else {
                     // If no uv_id on the BO, add it

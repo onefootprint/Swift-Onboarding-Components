@@ -1,13 +1,13 @@
 use crate::{
     auth::session::AuthSessionData,
     auth::user::{AuthedOnboardingInfo, ValidateUserToken},
-    errors::{user::UserError, ApiResult},
     utils::{
         self,
         session::AuthSession,
         vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
     },
 };
+use api_core::errors::{business::BusinessError, ApiResult};
 use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
@@ -78,7 +78,7 @@ pub fn get_requirements(
 
     // Fetch missing business fields
     let missing_business_fields = if ob_info.ob_config.must_collect_business() {
-        let scoped_business_id = scoped_business_id.ok_or(UserError::NotAllowedWithoutBusiness)?;
+        let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
         bvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Business)
     } else {

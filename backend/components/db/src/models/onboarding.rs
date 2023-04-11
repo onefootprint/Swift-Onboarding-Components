@@ -182,11 +182,12 @@ where
 pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, SaturatedActor)>;
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo<ObT> = (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
+pub type BasicOnboardingInfo<ObT = Onboarding> =
+    (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
     #[tracing::instrument(skip_all)]
-    pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo<Onboarding>>
+    pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo>
     where
         T: Into<OnboardingIdentifier<'a>>,
     {

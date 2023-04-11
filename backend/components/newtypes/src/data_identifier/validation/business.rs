@@ -77,14 +77,14 @@ where
     /// We'll autogenerate a link_id that is used as the PK of the BO in the DB
     pub link_id: IdT,
     #[allow(unused)]
-    first_name: PiiString,
+    pub first_name: PiiString,
     #[allow(unused)]
-    last_name: PiiString,
+    pub last_name: PiiString,
     // TODO don't allow sandbox suffixes
     #[allow(unused)]
-    email: Email,
+    pub email: Email,
     #[allow(unused)]
-    phone_number: PhoneNumber,
+    pub phone_number: PhoneNumber,
     pub ownership_stake: u32,
 }
 

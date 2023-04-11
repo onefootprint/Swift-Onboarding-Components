@@ -3,11 +3,11 @@
 use paperclip::actix::web;
 
 mod business;
-pub mod identify;
-pub mod onboarding;
-pub mod user;
+mod identify;
+mod onboarding;
+mod user;
 
-pub use api_core::*;
+use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     user::routes(config);

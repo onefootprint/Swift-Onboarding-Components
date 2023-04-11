@@ -41,4 +41,6 @@ pub enum AuthError {
     CannotCreateMultipleHandoffTokens,
     #[error("Not allowed: user is not a firm employee")]
     NotFirmEmployee,
+    #[error("Not allowed: ob config doesn't require collecting business")]
+    BusinessNotRequired,
 }

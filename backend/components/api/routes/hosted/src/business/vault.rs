@@ -6,6 +6,7 @@ use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use api_core::auth::ob_config::BoSession;
+use api_core::errors::business::BusinessError;
 use api_core::types::ResponseData;
 use api_core::utils::session::AuthSession;
 use db::models::scoped_vault::ScopedVault;
@@ -37,7 +38,7 @@ pub async fn post_validate(
             pre_add_data_checks(&user_auth, conn)?;
             let sb_id = user_auth
                 .scoped_business_id()
-                .ok_or(UserError::NotAllowedWithoutBusiness)?;
+                .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             Ok(bvw)
         })
@@ -68,7 +69,7 @@ pub async fn put(
         .clean_and_validate(ParseOptions::for_bifrost())?;
     let scoped_business_id = user_auth
         .scoped_business_id()
-        .ok_or(UserError::NotAllowedWithoutBusiness)?;
+        .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
 
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 

@@ -1,5 +1,6 @@
 pub mod authorized_orgs;
 pub use authorized_orgs::*;
+pub mod business;
 pub mod consent;
 pub mod fingerprint_visit;
 pub mod onboarding_requirement;

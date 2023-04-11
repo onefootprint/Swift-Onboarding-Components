@@ -1,3 +1,4 @@
+import json
 import pytest
 from tests.auth import BusinessOwnerAuth
 from tests.utils import (
@@ -39,6 +40,17 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # send this directly to the user's phone
     token = primary_bo.client.put_business_response["tokens"][0]
     secondary_bo_token = BusinessOwnerAuth(token)
+
+    # Check the business information for the hosted bifrost flow associated with the secondary BO's
+    # token
+    body = get("hosted/business", None, secondary_bo_token)
+    print(body)
+    assert body["name"] == primary_bo.client.data["business.name"]
+    assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
+    assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
+    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
+    assert body["invited"]["email"] == bos[1]["email"]
+    assert body["invited"]["phone_number"] == bos[1]["phone_number"]
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient(

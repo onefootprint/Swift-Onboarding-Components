@@ -93,7 +93,7 @@ def test_vault_create_write_decrypt(tenant):
     )
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
     data = body
-    assert data["id.first_name"] == "Sandbox"
+    assert data["id.first_name"] == "Piip"
     assert data["id.zip"] == "10009"
     assert data["custom.ach_account_number"] == "123467890"
     assert data["custom.cc4"] == "4242"

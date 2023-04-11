@@ -8,6 +8,7 @@ use newtypes::{ErrorMessage, Uuid, VendorAPI};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
+pub mod business;
 pub mod challenge;
 pub mod enclave;
 pub mod file_upload;
@@ -44,6 +45,8 @@ pub enum ApiError {
     HandoffError(#[from] HandoffError),
     #[error("{0}")]
     UserError(#[from] user::UserError),
+    #[error("{0}")]
+    BusinessError(#[from] business::BusinessError),
     #[error("{0}")]
     ChallengeError(#[from] ChallengeError),
     #[error("{0}")]
@@ -200,6 +203,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
+            ApiError::BusinessError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,

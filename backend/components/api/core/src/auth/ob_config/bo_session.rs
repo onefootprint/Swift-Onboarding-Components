@@ -54,6 +54,9 @@ impl ExtractableAuthSession for ParsedBoSession {
             }
         };
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
+        if !ob_config.must_collect_business() {
+            return Err(AuthError::BusinessNotRequired.into());
+        }
         let bo = BusinessOwner::get(conn, &data.bo_id)?;
         // Note: the bo may or may not have a populated user_vault_id
 
