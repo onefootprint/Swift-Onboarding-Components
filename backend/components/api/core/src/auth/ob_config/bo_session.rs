@@ -25,7 +25,7 @@ pub struct BoSession {
 #[openapi(
     apiKey,
     in = "header",
-    name = "X-Kyb-Token",
+    name = "X-Kyb-Bo-Token",
     description = "Token to initialize KYC of a business owner"
 )]
 pub struct ParsedBoSession {
@@ -39,7 +39,7 @@ pub type BoSessionAuth = SessionContext<ParsedBoSession>;
 
 impl ExtractableAuthSession for ParsedBoSession {
     fn header_names() -> Vec<&'static str> {
-        vec!["X-Kyb-Token"]
+        vec!["X-Kyb-Bo-Token"]
     }
 
     fn try_from(

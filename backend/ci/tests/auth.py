@@ -15,7 +15,7 @@ class PublishableOnboardingKey(BaseAuth):
 
 
 class BusinessOwnerAuth(BaseAuth):
-    HEADER_NAME = "X-Kyb-Token"
+    HEADER_NAME = "X-Kyb-Bo-Token"
 
 
 class OnboardingSessionToken(BaseAuth):
