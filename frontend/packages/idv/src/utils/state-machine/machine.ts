@@ -1,5 +1,5 @@
 import { BootstrapData } from 'src/idv.types';
-import { createMachine } from 'xstate';
+import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
 
@@ -26,12 +26,23 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
         tenantPk,
         bootstrapData,
       },
+      on: {
+        reset: {
+          target: 'init',
+          actions: ['resetContext'],
+        },
+      },
       states: {
         init: {},
       },
     },
     {
-      actions: {},
+      actions: {
+        resetContext: assign(context => ({
+          tenantPk: context.tenantPk,
+          bootstrapData: context.bootstrapData,
+        })),
+      },
     },
   );
 
