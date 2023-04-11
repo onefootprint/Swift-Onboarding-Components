@@ -1,6 +1,7 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::enclave_client::EnclaveClient;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
@@ -68,10 +69,14 @@ fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfigurati
     (uv.into_inner(), su)
 }
 
-async fn create_user_and_onboarding(db_pool: &DbPool) -> (Tenant, Onboarding, VaultId) {
+async fn create_user_and_onboarding(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+) -> (Tenant, Onboarding, VaultId) {
+    let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let tenant = fixtures::tenant::create(conn);
+            let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
             let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
             let ob_config_id = ob_config.id.clone();
 
@@ -145,9 +150,9 @@ async fn test_run(
     let db_pool = test_db_pool();
     let state = &StateWithMockEnclave::init().await.state;
 
-    let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool).await;
+    let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
     let tenant_vendor_control =
-        TenantVendorControl::new_for_test(&state.config, None, &state.enclave_client, &tenant.e_private_key)
+        TenantVendorControl::new(tenant.id.clone(), &db_pool, &state.enclave_client, &state.config)
             .await
             .unwrap();
 

@@ -1,50 +1,14 @@
 use crate::{
     config::Config, decision::TenantVendorControlError, enclave_client::EnclaveClient, errors::ApiResult,
-    State,
 };
 use db::{
-    models::{
-        tenant::{Tenant, TenantIdentifier},
-        tenant_vendor::TenantVendorControl as DbTenantVendorControl,
-    },
-    DbResult, PgConn,
+    models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl},
+    DbPool, DbResult,
 };
 use newtypes::{
     vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
-    EncryptedVaultPrivateKey, PiiString, Vendor, VendorAPI,
+    EncryptedVaultPrivateKey, PiiString, TenantId, Vendor, VendorAPI,
 };
-
-pub struct TenantVendorControlBuilder {
-    tenant_e_private_key: EncryptedVaultPrivateKey,
-    vendor_control: Option<DbTenantVendorControl>,
-}
-impl TenantVendorControlBuilder {
-    pub fn new<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
-    where
-        T: Into<TenantIdentifier<'a>>,
-    {
-        let t = Tenant::get(conn, id)?;
-        let tvc = DbTenantVendorControl::get(conn, t.id.clone())?;
-
-        Ok(Self {
-            tenant_e_private_key: t.e_private_key,
-            vendor_control: tvc,
-        })
-    }
-
-    pub async fn build(self, state: &State) -> ApiResult<TenantVendorControl> {
-        let res = TenantVendorControl::new(
-            &state.config,
-            self.vendor_control,
-            &state.enclave_client,
-            &self.tenant_e_private_key,
-        )
-        .await
-        .map_err(crate::decision::Error::from)?;
-
-        Ok(res)
-    }
-}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate
@@ -56,17 +20,51 @@ pub struct TenantVendorControl {
 }
 
 impl TenantVendorControl {
-    async fn new(
+    pub async fn new(
+        tenant_id: TenantId,
+        db_pool: &DbPool,
+        enclave_client: &EnclaveClient,
         config: &Config,
+    ) -> ApiResult<TenantVendorControl> {
+        let (tenant, vendor_control) = db_pool
+            .db_query(move |conn| -> DbResult<_> {
+                let t = Tenant::get(conn, &tenant_id)?;
+                let tvc = DbTenantVendorControl::get(conn, t.id.clone())?;
+
+                Ok((t, tvc))
+            })
+            .await??;
+
+        Self::new_internal(vendor_control, config, enclave_client, &tenant.e_private_key).await
+    }
+
+    // Accessors
+    pub fn idology_credentials(&self) -> IdologyCredentials {
+        self.idology_credentials.clone()
+    }
+
+    pub fn experian_credentials(&self) -> ExperianCredentials {
+        self.experian_credentials.clone()
+    }
+
+    pub fn enabled_vendor_apis(&self) -> Vec<VendorAPI> {
+        self.enabled_vendor_apis.clone()
+    }
+}
+
+impl TenantVendorControl {
+    async fn new_internal(
         vendor_control: Option<DbTenantVendorControl>,
+        config: &Config,
         enclave_client: &EnclaveClient,
         tenant_e_private_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Self, TenantVendorControlError> {
+    ) -> ApiResult<Self> {
         // Check if this tenant has specific IDology credentials, if not, fall back to default creds from state
         // In the future we'll error here
         let idology_credentials = if let Some(id_creds) =
             Self::get_tenant_idology_credentials(&vendor_control, enclave_client, tenant_e_private_key)
-                .await?
+                .await
+                .map_err(crate::decision::Error::from)?
         {
             id_creds
         } else {
@@ -99,21 +97,6 @@ impl TenantVendorControl {
         Ok(control)
     }
 
-    // Accessors
-    pub fn idology_credentials(&self) -> IdologyCredentials {
-        self.idology_credentials.clone()
-    }
-
-    pub fn experian_credentials(&self) -> ExperianCredentials {
-        self.experian_credentials.clone()
-    }
-
-    pub fn enabled_vendor_apis(&self) -> Vec<VendorAPI> {
-        self.enabled_vendor_apis.clone()
-    }
-}
-
-impl TenantVendorControl {
     async fn get_tenant_idology_credentials(
         vendor_control: &Option<DbTenantVendorControl>,
         enclave_client: &EnclaveClient,
@@ -200,8 +183,8 @@ impl TenantVendorControl {
         vendor_control: Option<DbTenantVendorControl>,
         enclave_client: &EnclaveClient,
         tenant_e_private_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Self, TenantVendorControlError> {
-        Self::new(config, vendor_control, enclave_client, tenant_e_private_key).await
+    ) -> ApiResult<Self> {
+        Self::new_internal(vendor_control, config, enclave_client, tenant_e_private_key).await
     }
 }
 

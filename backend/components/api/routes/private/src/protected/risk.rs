@@ -6,7 +6,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
-use api_core::decision::vendor::tenant_vendor_control::TenantVendorControlBuilder;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -71,11 +71,8 @@ async fn make_vendor_calls(
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
     let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
     let tid = tenant_id.clone();
-    let tvc_builder = state
-        .db_pool
-        .db_query(move |conn| TenantVendorControlBuilder::new(conn, &tid))
-        .await??;
-    let tenant_vendor_control = tvc_builder.build(&state).await?;
+    let tenant_vendor_control =
+        TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
     let (requests, ob) = state
@@ -240,11 +237,8 @@ async fn shadow_run(
     let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
 
     let tid = tenant_id.clone();
-    let tvc_builder = state
-        .db_pool
-        .db_query(move |conn| TenantVendorControlBuilder::new(conn, &tid))
-        .await??;
-    let tenant_vendor_control = tvc_builder.build(&state).await?;
+    let tenant_vendor_control =
+        TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
     let (ob, requests) = state

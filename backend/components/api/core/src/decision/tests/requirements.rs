@@ -1,7 +1,6 @@
 use db::models::tenant::Tenant;
 use db::tests::fixtures;
 use newtypes::IdentityDataKind;
-use newtypes::TenantId;
 use newtypes::Vendor;
 use newtypes::VendorAPI;
 use strum::IntoEnumIterator;
@@ -35,7 +34,7 @@ async fn create_tvc_for_requirements(
         };
 
         fixtures::tenant_vendor_control::create_in_memory(
-            TenantId::from("t1".to_string()),
+            tenant.id,
             idology_enabled,
             idology_username,
             idology_e_password,
@@ -46,8 +45,8 @@ async fn create_tvc_for_requirements(
 
     crate::decision::tests::tenant_vendor_control::fixtures::create(
         state,
-        tenant.e_private_key,
         db_tenant_vendor_control,
+        tenant.e_private_key,
     )
     .await
 }

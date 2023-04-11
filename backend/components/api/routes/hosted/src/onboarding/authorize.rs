@@ -11,7 +11,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use api_core::decision::vendor::tenant_vendor_control::TenantVendorControlBuilder;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
@@ -56,7 +55,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (ob_info, biz_ob, tenant, tenant_vendor_control_builder) = state
+    let (ob_info, biz_ob, tenant) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob_info = user_auth.assert_onboarding(c)?;
@@ -80,9 +79,8 @@ pub async fn post(
             let bizob = biz_ob
                 .map(|b| b.update(c, OnboardingUpdate::is_authorized()))
                 .transpose()?;
-            let tenant_vendor_control_builder = TenantVendorControlBuilder::new(c, &tenant.id)?;
 
-            Ok((ob_info, bizob, tenant, tenant_vendor_control_builder))
+            Ok((ob_info, bizob, tenant))
         })
         .await?;
 
@@ -95,7 +93,13 @@ pub async fn post(
         "ob_configuration_id",
         &format!("{}", ob_info.onboarding.ob_configuration_id),
     );
-    let tenant_vendor_control = tenant_vendor_control_builder.build(&state).await?;
+    let tenant_vendor_control = TenantVendorControl::new(
+        tenant.id.clone(),
+        &state.db_pool,
+        &state.enclave_client,
+        &state.config,
+    )
+    .await?;
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
     let should_run_kyc_checks = ob_info.onboarding.idv_reqs_initiated_at.is_none();

@@ -16,6 +16,23 @@ pub fn create(conn: &mut PgConn) -> Tenant {
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
 }
 
+pub fn create_with_keys(
+    conn: &mut PgConn,
+    public_key: VaultPublicKey,
+    e_private_key: EncryptedVaultPrivateKey,
+) -> Tenant {
+    let new_tenant = NewTenant {
+        name: "Test tenant".to_owned(),
+        public_key,
+        e_private_key,
+        workos_id: None,
+        logo_url: None,
+        sandbox_restricted: false,
+    };
+
+    Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
+}
+
 pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaultPrivateKey) -> Tenant {
     Tenant {
         name: "Test tenant".to_owned(),
