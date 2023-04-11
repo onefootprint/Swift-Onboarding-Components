@@ -72,8 +72,8 @@ const PostPage = ({ post }: PostProps) => {
           <ImageContainer>
             <Image
               src={post.feature_image}
-              height={200}
-              width={200}
+              height={900}
+              width={900}
               alt={post.feature_image_alt || post.title}
             />
           </ImageContainer>
