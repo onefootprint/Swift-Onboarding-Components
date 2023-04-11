@@ -1,10 +1,11 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import SecuredByFootprint from '../secured-by-footprint';
+import useIdvMachine from '../../../../hooks/use-idv-machine';
+import SecuredByFootprint from './components/secured-by-footprint';
 
 type FootprintFooterProps = {
   variant?: 'modal' | 'mobile';
@@ -13,17 +14,17 @@ type FootprintFooterProps = {
 type Link = { label: string; href: string };
 
 const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
-  const router = useRouter();
+  const { t } = useTranslation('components.footprint-footer.links');
+  const [state] = useIdvMachine();
+  const { tenantPk } = state.context;
 
   const links: Link[] = [
     {
-      label: "What's this?",
-      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${
-        router.query.public_key as string
-      }`,
+      label: t('what-is-this'),
+      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
     },
     {
-      label: 'Privacy',
+      label: t('privacy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];

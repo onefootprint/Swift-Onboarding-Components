@@ -1,4 +1,30 @@
 {
+  "components": {
+    "layout": {
+      "sandbox-banner": {
+        "title": "Sandbox Mode"
+      },
+      "navigation-header": {
+        "close-button": {
+          "aria-label": "Close window",
+          "confirm-dialog": {
+            "title": "Are you sure?",
+            "description": "Leaving this flow will not save your data.",
+            "cta": "Yes",
+            "cancel": "No"
+          }
+        },
+        "back-button": {
+          "aria-label": "Go back"
+        }
+      },
+      "footprint-footer": {
+        "what-is-this": "What's this?",
+        "privacy-policy": "Privacy",
+        "secured-by-footprint": "Secured by Footprint"
+      }
+    }
+  },
   "pages": {
     "error": {
       "title": "Oops! An error occurred.",

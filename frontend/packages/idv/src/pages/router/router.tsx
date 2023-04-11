@@ -14,15 +14,15 @@ type RouterProps = {
 
 const Router = ({ onComplete }: RouterProps) => {
   const [state, send] = useIdvMachine();
-  const isDone = state.done;
+  const isComplete = state.matches('complete');
   const observeCollector = useObserveCollector();
   useLogStateMachine('idv', state);
 
   useEffect(() => {
-    if (isDone) {
+    if (isComplete) {
       onComplete();
     }
-  }, [isDone, onComplete]);
+  }, [isComplete, onComplete]);
 
   return (
     <ErrorBoundary

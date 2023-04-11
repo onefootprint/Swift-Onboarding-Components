@@ -34,6 +34,12 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
       },
       states: {
         init: {},
+        complete: {
+          type: 'final',
+        },
+        expired: {
+          type: 'final',
+        },
       },
     },
     {

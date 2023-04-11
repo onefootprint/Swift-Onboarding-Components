@@ -18,6 +18,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'init';
+  matchesStates: 'complete' | 'expired' | 'init';
   tags: never;
 }

@@ -2,14 +2,14 @@ import { media } from '@onefootprint/ui';
 import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import FootprintFooter, { FootprintFooterVariant } from '../footprint-footer';
+import FootprintFooter from '../footprint-footer';
 import NavigationHeaderContainer from '../navigation-header/components/navigation-header-container';
 import SandboxBanner, { SandboxBannerHandler } from '../sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 type LayoutProps = {
   children: React.ReactNode;
-  footerVariant: FootprintFooterVariant;
+  footerVariant: 'modal' | 'mobile';
   isSandbox?: boolean;
   hasBorderRadius?: boolean;
 };

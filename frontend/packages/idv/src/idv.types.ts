@@ -1,7 +1,5 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js/src/footprint-js.types';
 
-import { LayoutConfig } from './components/layout';
-
 export type IdvProps = {
   config: Config;
   appearance: FootprintAppearance;
@@ -13,6 +11,20 @@ export type IdvProps = {
 export type Config = {
   tenantPk: string;
   bootstrapData?: BootstrapData;
+};
+
+export type LayoutConfig = {
+  header: {
+    hideClose?: boolean;
+    hideSandboxBanner?: boolean;
+  };
+  footer: {
+    hideFooter?: boolean;
+    footerVariant?: 'modal' | 'mobile';
+  };
+  container: {
+    hasBorderRadius?: boolean;
+  };
 };
 
 export type BootstrapData = {
