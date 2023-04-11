@@ -1,5 +1,4 @@
 #![allow(clippy::too_many_arguments)]
-use super::idv_request::KycRequestBuilder;
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
@@ -28,17 +27,19 @@ use prometheus::labels;
 
 /// Branch on vendor and send requests to vendors
 #[tracing::instrument(skip(
-    kyc_request_builder,
     db_pool,
     ff_client,
     idology_client,
     socure_client,
     twilio_client,
-    experian_client
+    experian_client,
+    idv_data,
+    tenant_vendor_control
 ))]
 pub async fn send_idv_request(
     request: VerificationRequest,
-    kyc_request_builder: KycRequestBuilder<'_>,
+    tenant_vendor_control: &TenantVendorControl,
+    idv_data: IdvData,
     onboarding_id: &OnboardingId,
     db_pool: &DbPool,
     is_production: bool,
@@ -74,7 +75,7 @@ pub async fn send_idv_request(
     // still TODO: traitfy the ff logic shared by these requests
     let result = match request.vendor_api {
         VendorAPI::IdologyExpectID => {
-            let request = kyc_request_builder.build_idology_request();
+            let request = tenant_vendor_control.build_idology_request(idv_data);
             send_idology_idv_request(
                 request,
                 is_production,
@@ -84,13 +85,11 @@ pub async fn send_idv_request(
             )
             .await?
         }
-        VendorAPI::TwilioLookupV2 => {
-            send_twilio_lookupv2_request(kyc_request_builder.idv_data(), twilio_client).await?
-        }
+        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client).await?,
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(
                 onboarding_id,
-                kyc_request_builder.idv_data(),
+                idv_data,
                 is_production,
                 db_pool,
                 socure_client,
@@ -100,7 +99,7 @@ pub async fn send_idv_request(
         }
         // TODO finish this
         VendorAPI::ExperianPreciseID => {
-            let request = kyc_request_builder.build_experian_request();
+            let request = tenant_vendor_control.build_experian_request(idv_data);
             send_experian_idv_request(
                 request,
                 is_production,
@@ -422,10 +421,10 @@ pub async fn make_idv_request(
     let data =
         build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
             .await?;
-    let kyc_request_builder = KycRequestBuilder::new(data, tenant_vendor_control);
     let vendor_response = send_idv_request(
         request,
-        kyc_request_builder,
+        tenant_vendor_control,
+        data,
         onboarding_id,
         db_pool,
         is_production,
@@ -686,9 +685,8 @@ mod tests {
             });
         }
         let tvc = TenantVendorControl::default();
-        let kyc_request = KycRequestBuilder::new(IdvData { ..Default::default() }, &tvc);
         send_idology_idv_request(
-            kyc_request.build_idology_request(),
+            tvc.build_idology_request(IdvData::default()),
             is_production,
             ob_configuration_key,
             &mock_api,

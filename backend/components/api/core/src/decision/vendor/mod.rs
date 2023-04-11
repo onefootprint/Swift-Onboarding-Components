@@ -9,7 +9,6 @@ use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, 
 use self::tenant_vendor_control::TenantVendorControl;
 
 pub mod build_request;
-pub mod idv_request;
 pub mod make_request;
 pub mod tenant_vendor_control;
 pub mod vendor_result;
