@@ -76,14 +76,25 @@ impl TenantVendorControl {
     ) -> ApiResult<Self> {
         // Check if this tenant has specific IDology credentials, if not, fall back to default creds from state
         // In the future we'll error here
-        let idology_credentials = if let Some(id_creds) =
+        let db_idology_creds =
             Self::get_tenant_idology_credentials(&vendor_control, enclave_client, tenant_e_private_key)
                 .await
-                .map_err(crate::decision::Error::from)?
-        {
-            id_creds
-        } else {
-            IdologyCredentials::from(config)
+                .map_err(crate::decision::Error::from);
+
+        let idology_credentials = match db_idology_creds {
+            Ok(Some(id_creds)) => id_creds,
+            Ok(None) => {
+                tracing::info!(
+                    msg = "did not find idology creds, falling back to state",
+                    "tenant_vendor_control"
+                );
+                IdologyCredentials::from(config)
+            }
+            Err(e) => {
+                // updating these credentials is a manual process and therefore error prone
+                tracing::error!(msg="error decrypting idology credentials from tenant_vendor_control", err=?e, "tenant_vendor_control",);
+                IdologyCredentials::from(config)
+            }
         };
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
