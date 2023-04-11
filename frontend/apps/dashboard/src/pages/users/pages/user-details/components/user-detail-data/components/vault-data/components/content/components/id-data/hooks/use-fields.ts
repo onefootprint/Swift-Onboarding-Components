@@ -72,7 +72,7 @@ const useFields = (user: User, vault: Vault, isDecrypting: boolean) => {
         ...getData(IdDI.ssn9, [RoleScope.decryptSsn9]),
       },
       {
-        ...getData(IdDI.ssn4, [RoleScope.decryptSsn4]),
+        ...getData(IdDI.ssn4, [RoleScope.decryptSsn4, RoleScope.decryptSsn9]),
       },
       {
         ...getData(IdDI.dob, [RoleScope.decryptDob]),

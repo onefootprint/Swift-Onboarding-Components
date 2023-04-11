@@ -35,11 +35,11 @@ const Field = ({
   const showTooltip = disabled;
 
   const getTooltip = () => {
-    if (!hasPermission || !canAccess) {
-      return t('not-allowed');
-    }
     if (!hasValue) {
       return t('empty');
+    }
+    if (!hasPermission || !canAccess) {
+      return t('not-allowed');
     }
     return undefined;
   };

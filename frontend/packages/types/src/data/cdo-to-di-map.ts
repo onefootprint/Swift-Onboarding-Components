@@ -19,9 +19,10 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.lastName],
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
-  [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
+  [CollectedKycDataOption.ssn9]: [IdDI.ssn9, IdDI.ssn4],
   [CollectedKycDataOption.fullAddress]: [
     IdDI.addressLine1,
+    IdDI.addressLine2,
     IdDI.city,
     IdDI.state,
     IdDI.zip,
