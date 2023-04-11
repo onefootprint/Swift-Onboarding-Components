@@ -153,6 +153,7 @@ const BaseDialog = ({
           </DialogContainer>
         </div>
       </FocusTrap>
+      <Overlay />
     </Portal>
   ) : null;
 };
@@ -174,13 +175,14 @@ const DialogContainer = styled(Fade)<{
     overflow: hidden;
     justify-content: stretch;
     top: ${theme.spacing[9]};
+    transform: translateX(-50%);
+    left: 50%;
     max-height: calc(100vh - ${theme.spacing[9]} * 2);
     isolation: isolate;
     left: 50%;
 
     ${isConfirmation &&
     `
-      transform: translate(-50%, -50%);
       top: 50%;
       left: 50%;
       max-width: 90%;

@@ -19,6 +19,7 @@ enum TabName {
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
+
   const [tab, setTab] = useQueryState<TabName>({
     query: 'tab',
     defaultValue: TabName.onboardingConfigs,

@@ -3,6 +3,7 @@ import { Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 
+import IntroDialog from './components/intro-dialog';
 import UsersTable from './components/users-table/users-table';
 import useUsers from './hooks/use-users';
 
@@ -30,6 +31,7 @@ const Users = () => {
           totalNumResults={response.meta.count}
         />
       )}
+      <IntroDialog />
     </>
   );
 };
