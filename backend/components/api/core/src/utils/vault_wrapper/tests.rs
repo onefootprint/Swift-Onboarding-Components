@@ -239,45 +239,125 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 }
 
 #[db_test]
-fn test_cant_add_business_data_to_person(conn: &mut TestPgConn) {
-    let uv = fixtures::vault::create_person(conn, true);
+fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
+    let bv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
-    // Can add person data
-    let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let update = vec![
-        (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
-        (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+    struct Test {
+        update: Vec<(DataIdentifier, PiiString)>,
+        is_allowed: bool,
+    }
+
+    // Apply a series of updates in order. Some of the updates are allowed, others are not
+    let tests = vec![
+        Test {
+            update: vec![
+                (BDK::Name.into(), PiiString::new("Acme Inc".to_owned())),
+                (BDK::Dba.into(), PiiString::new("Acme".to_owned())),
+            ],
+            is_allowed: true,
+        },
+        // Allowed to replace name
+        Test {
+            update: vec![
+                (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
+                (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
+            ],
+            is_allowed: true,
+        },
+        // Allowed to add tin
+        Test {
+            update: vec![(BDK::Tin.into(), PiiString::new("121231234".to_owned()))],
+            is_allowed: true,
+        },
+        // Allowed to add beneficial owners
+        Test {
+            update: vec![(
+                BDK::BeneficialOwners.into(),
+                PiiString::new(
+                    serde_json::ser::to_string(&serde_json::json!([
+                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                        {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
+                    ]))
+                    .unwrap(),
+                ),
+            )],
+            is_allowed: true,
+        },
+        // Allowed to update all remaining info
+        Test {
+            update: vec![
+                (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
+                (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
+                (BDK::Website.into(), PiiString::new("onefootprint.com".to_owned())),
+                (BDK::PhoneNumber.into(), PiiString::new("+14155555555".to_owned())),
+                (BDK::Tin.into(), PiiString::new("12-1231234".to_owned())),
+                (BDK::CorporationType.into(), PiiString::new("llc".to_owned())),
+                (BDK::AddressLine1.into(), PiiString::new("1 Fp Way".to_owned())),
+                (BDK::AddressLine2.into(), PiiString::new("Unit 1".to_owned())),
+                (BDK::City.into(), PiiString::new("San Francisco".to_owned())),
+                (BDK::State.into(), PiiString::new("CA".to_owned())),
+                (BDK::Zip.into(), PiiString::new("94117".to_owned())),
+                (BDK::Country.into(), PiiString::new("US".to_owned())),
+                // And custom data!
+                (
+                    KvDataKey::test_data("flerp".to_owned()).into(),
+                    PiiString::new("blerp".to_owned()),
+                ),
+            ],
+            is_allowed: true,
+        },
+        // Can't add personal data
+        Test {
+            update: vec![
+                (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
+                (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+            ],
+            is_allowed: false,
+        },
     ];
-    uvw.add_person_data_test(conn, update).unwrap();
 
-    // Can't add business data
-    let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let update = vec![(BDK::Name.into(), PiiString::new("Business".to_owned()))];
-    assert!(uvw.add_person_data_test(conn, update).is_err());
+    // Test subsequent updates to see if they are allowed.
+    // Failed updates shouldn't make any changes to the DB so should act as no-ops
+    for (i, test) in tests.into_iter().enumerate() {
+        let Test { update, is_allowed } = test;
+        let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
+        let result = uvw.add_business_data_test(conn, update);
+        assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
+    }
 }
 
 #[db_test]
-fn test_cant_add_person_data_to_business(conn: &mut TestPgConn) {
-    let uv = fixtures::vault::create_business(conn);
+fn test_bvw_replace_dba(conn: &mut TestPgConn) {
+    let bv = fixtures::vault::create_business(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sb = fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
 
-    // Can add business data
-    let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &su.id).unwrap();
-    let update = vec![(BDK::Name.into(), PiiString::new("Business".to_owned()))];
-    uvw.add_business_data_test(conn, update).unwrap();
-
-    // Can't add person data
-    let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &su.id).unwrap();
-    let update = vec![
-        (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
-        (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
+    let updates = vec![
+        // Name with DBA
+        vec![
+            (BDK::Name.into(), PiiString::new("Flerp Inc".to_owned())),
+            (BDK::Dba.into(), PiiString::new("Flerp".to_owned())),
+        ],
+        // Name without DBA should wipe name
+        vec![(BDK::Name.into(), PiiString::new("Derp Inc".to_owned()))],
     ];
-    assert!(uvw.add_business_data_test(conn, update).is_err());
+
+    for update in updates {
+        let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
+        bvw.add_business_data_test(conn, update.clone()).unwrap();
+        // Make sure fields are set
+        let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
+        for (di, _) in update {
+            assert!(bvw.has_field(di));
+        }
+    }
+    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
+    // We should have cleared out dba in the last update
+    assert!(!bvw.has_field(BDK::Dba));
 }
 
 #[db_test]
@@ -311,6 +391,18 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
                 (IDK::FirstName.into(), PiiString::new("Merp".to_owned())),
                 (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
             ],
+            su_id: &su.id,
+            is_allowed: true,
+        },
+        // Allowed to add email
+        Test {
+            update: vec![(IDK::Email.into(), PiiString::new("flerp@1fp.com".to_owned()))],
+            su_id: &su.id,
+            is_allowed: true,
+        },
+        // Allowed to add phone
+        Test {
+            update: vec![(IDK::PhoneNumber.into(), PiiString::new("+14154444444".to_owned()))],
             su_id: &su.id,
             is_allowed: true,
         },
@@ -380,9 +472,36 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
                 (IDK::State.into(), PiiString::new("CA".to_owned())),
                 (IDK::Zip.into(), PiiString::new("94117".to_owned())),
                 (IDK::Country.into(), PiiString::new("US".to_owned())),
+                // And custom data!
+                (
+                    KvDataKey::test_data("flerp".into()).into(),
+                    PiiString::new("blerp".to_owned()),
+                ),
             ],
             su_id: &su.id,
             is_allowed: true,
+        },
+        // Can add investor profile
+        Test {
+            update: vec![
+                (IPK::Occupation.into(), PiiString::new("Penguin".to_owned())),
+                (IPK::AnnualIncome.into(), PiiString::new("s50k_to100k".to_owned())),
+                (IPK::NetWorth.into(), PiiString::new("s100k_to250k".to_owned())),
+                (
+                    IPK::InvestmentGoals.into(),
+                    PiiString::new("[\"buy_a_home\"]".to_owned()),
+                ),
+                (IPK::RiskTolerance.into(), PiiString::new("aggressive".to_owned())),
+                (IPK::Declarations.into(), PiiString::new("[]".to_owned())),
+            ],
+            su_id: &su.id,
+            is_allowed: true,
+        },
+        // Can't add business data
+        Test {
+            update: vec![(BDK::Name.into(), PiiString::new("Acme Inc".to_owned()))],
+            su_id: &su.id,
+            is_allowed: false,
         },
     ];
 
@@ -490,16 +609,16 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
 
     for update in updates {
         let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-        uvw.add_person_data_test(conn, update).unwrap();
+        uvw.add_person_data_test(conn, update.clone()).unwrap();
+        // Make sure fields are set
+        let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
+        for (di, _) in update {
+            assert!(uvw.has_field(di));
+        }
     }
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
-    assert!(uvw.has_field(IDK::AddressLine1));
     // We should have cleared out line2 in the last update
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     assert!(!uvw.has_field(IDK::AddressLine2));
-    assert!(uvw.has_field(IDK::City));
-    assert!(uvw.has_field(IDK::State));
-    assert!(uvw.has_field(IDK::Zip));
-    assert!(uvw.has_field(IDK::Country));
 }
 
 #[db_test]
