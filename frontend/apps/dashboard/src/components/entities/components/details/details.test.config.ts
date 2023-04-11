@@ -212,6 +212,13 @@ export const withLiveness = (entity = entityFixture, response = []) =>
     response,
   });
 
+export const withAnnotations = (entity = entityFixture, response = []) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/annotations`,
+    response,
+  });
+
 export const withBusinessOwners = (entity = entityFixture) =>
   mockRequest({
     method: 'get',

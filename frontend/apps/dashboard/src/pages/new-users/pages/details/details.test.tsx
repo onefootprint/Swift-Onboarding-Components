@@ -14,6 +14,7 @@ import {
   decryptFields,
   entityFixture,
   getTextByRow,
+  withAnnotations,
   withDecrypt,
   withEntity,
   withEntityError,
@@ -43,8 +44,8 @@ describe('<Details />', () => {
     });
     withRiskSignals();
     withTimeline();
-
     withLiveness();
+    withAnnotations();
   });
 
   afterAll(() => {

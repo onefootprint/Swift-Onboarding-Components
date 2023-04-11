@@ -1,5 +1,6 @@
 import useEntityVault from '../../../hooks/use-entity-vault';
 import useEntity from './use-entity';
+import useEntityAnnotations from './use-entity-annotations';
 import useEntityId from './use-entity-id';
 import useEntityLiveness from './use-entity-liveness';
 import useEntityRiskSignals from './use-entity-risk-signals';
@@ -12,6 +13,7 @@ const useEntityInitialData = () => {
   const entityVaultQuery = useEntityVault(id, entityQuery.data);
   const entityRiskSignalsQuery = useEntityRiskSignals(id);
   const entityLivenessQuery = useEntityLiveness(id);
+  const entityAnnotations = useEntityAnnotations(id);
   const isLoadingVault = entityVaultQuery.isLoading && !entityQuery.isError;
 
   return {
@@ -21,6 +23,7 @@ const useEntityInitialData = () => {
       entityTimelineQuery.isLoading ||
       entityRiskSignalsQuery.isLoading ||
       entityLivenessQuery.isLoading ||
+      entityAnnotations.isLoading ||
       isLoadingVault,
   };
 };

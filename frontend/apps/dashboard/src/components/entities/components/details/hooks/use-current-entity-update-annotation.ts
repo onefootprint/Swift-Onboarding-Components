@@ -4,7 +4,7 @@ import {
   UpdateAnnotationRequest,
   UpdateAnnotationResponse,
 } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useEntityId from './use-entity-id';
@@ -28,6 +28,7 @@ const updateAnnotation = async (
 };
 
 const useCurrentEntityUpdateAnnotation = () => {
+  const queryClient = useQueryClient();
   const { authHeaders } = useSession();
   const showErrorToast = useRequestErrorToast();
   const id = useEntityId();
@@ -36,6 +37,9 @@ const useCurrentEntityUpdateAnnotation = () => {
     (updateAnnotationRequest: UpdateAnnotationRequest) =>
       updateAnnotation(authHeaders, updateAnnotationRequest, id),
     {
+      onSuccess: () => {
+        queryClient.refetchQueries();
+      },
       onError: showErrorToast,
     },
   );

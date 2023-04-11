@@ -3,7 +3,8 @@ import { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
-import useUserId from '../../../../../../../../hooks/use-user-id/use-user-id';
+import useEntityId from '@/entity/hooks/use-entity-id';
+
 import ManualReviewForm, {
   ManualReviewFormData,
 } from './components/manual-review-form';
@@ -11,7 +12,7 @@ import useSubmitReview from './hooks/use-submit-review';
 
 export type ManualReviewDialogProps = {
   open: boolean;
-  onClose: (isComplete?: boolean) => void;
+  onClose: () => void;
   status: ReviewStatus;
 };
 
@@ -20,16 +21,16 @@ const ManualReviewDialog = ({
   onClose,
   status,
 }: ManualReviewDialogProps) => {
-  const { t } = useTranslation('pages.user-details.manual-review');
+  const { t } = useTranslation('pages.entity.manual-review');
   const showRequestErrorToast = useRequestErrorToast();
   const submitReviewMutation = useSubmitReview();
-  const footprintUserId = useUserId();
+  const entityId = useEntityId();
 
   const handleSubmit = (data: ManualReviewFormData) => {
     const { isPinned, note } = data;
     submitReviewMutation.mutate(
       {
-        entityId: footprintUserId,
+        entityId,
         status,
         annotation: {
           isPinned,
@@ -38,7 +39,7 @@ const ManualReviewDialog = ({
       },
       {
         onSuccess: () => {
-          onClose(true);
+          onClose();
         },
         onError: showRequestErrorToast,
       },

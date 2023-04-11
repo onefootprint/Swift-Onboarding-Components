@@ -1,7 +1,7 @@
 import { ReviewStatus } from '../data';
 
 export type SubmitReviewRequest = {
-  footprintUserId: string;
+  entityId: string;
   annotation: {
     isPinned: boolean;
     note: string;

@@ -771,6 +771,40 @@
           "disclaimer": "Please note that all data attribute access are logged for security reasons."
         }
       },
+      "manual-review": {
+        "status": {
+          "pass": "Verified",
+          "fail": "Failed"
+        },
+        "button": {
+          "review": "Review user",
+          "mark-as-verified": "Mark as Verified",
+          "mark-as-failed": "Mark as Failed"
+        },
+        "dropdown": {
+          "mark-as": "Mark user as {{status}}",
+          "keep-as": "Keep user as {{status}}"
+        },
+        "dialog": {
+          "title": "Review",
+          "complete": "Complete",
+          "cancel": "Cancel",
+          "form": {
+            "prompt": "Why are you marking this user as {{status}}?",
+            "note": {
+              "label": "Note",
+              "placeholder": "Type here...",
+              "errors": {
+                "required": "A note is required"
+              }
+            },
+            "toggle": {
+              "label": "Pin note to the top of the page"
+            },
+            "disclaimer": "Please note that this action will be logged for security reasons."
+          }
+        }
+      },
       "risks": {
         "cta": "See details",
         "empty-state": "No risk signals",

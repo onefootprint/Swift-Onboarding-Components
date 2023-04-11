@@ -6,6 +6,7 @@ import {
   Breadcrumb,
   DeviceInsights,
   Header,
+  PinnedNotes,
   RiskSignals,
   Vault,
 } from './components';
@@ -20,6 +21,9 @@ const Content = () => (
     </Box>
     <Box sx={{ marginBottom: 5 }}>
       <Divider />
+    </Box>
+    <Box sx={{ marginBottom: 5 }}>
+      <PinnedNotes />
     </Box>
     <Box sx={{ marginBottom: 9 }}>
       <Vault />

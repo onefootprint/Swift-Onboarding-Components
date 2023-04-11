@@ -263,6 +263,13 @@ export const withDecrypt = (
     },
   });
 
+export const withAnnotations = (entity = entityFixture, response = []) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/annotations`,
+    response,
+  });
+
 export const getTextByRow = ({
   name,
   value,

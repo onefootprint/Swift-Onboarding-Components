@@ -8,6 +8,8 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
+import ManualReview from './components/manual-review';
+
 type HeaderProps = WithEntityProps;
 
 const Header = ({ entity }: HeaderProps) => {
@@ -34,7 +36,9 @@ const Header = ({ entity }: HeaderProps) => {
           </Typography>
           <CodeInline isPrivate>{entity.id}</CodeInline>
         </Row>
-        <Row id={HEADER_ACTIONS_ID} />
+        <Row id={HEADER_ACTIONS_ID}>
+          <ManualReview />
+        </Row>
       </SubHeader>
     </HeaderContainer>
   );

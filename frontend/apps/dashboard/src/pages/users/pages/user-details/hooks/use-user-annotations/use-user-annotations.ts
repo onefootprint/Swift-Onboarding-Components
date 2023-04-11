@@ -7,10 +7,11 @@ import {
   PinnedAnnotation,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession from 'src/hooks/use-session';
+import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const getPinnedAnnotations = async (
-  { authHeaders, userId }: GetPinnedAnnotationsRequest,
+  { entityId: userId }: GetPinnedAnnotationsRequest,
+  authHeaders: AuthHeaders,
   dateFormatFn: (date: Date) => string,
 ) => {
   const response = await request<GetPinnedAnnotationsResponse>({
@@ -34,7 +35,12 @@ const useUserAnnotations = (userId: string) => {
 
   return useQuery<PinnedAnnotation[], RequestError>(
     ['user', userId, 'annotations'],
-    () => getPinnedAnnotations({ authHeaders, userId }, formatDateWithTime),
+    () =>
+      getPinnedAnnotations(
+        { entityId: userId },
+        authHeaders,
+        formatDateWithTime,
+      ),
     {
       enabled: !!userId,
     },

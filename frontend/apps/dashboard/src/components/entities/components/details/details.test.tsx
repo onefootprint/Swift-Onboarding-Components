@@ -16,6 +16,7 @@ import {
   decryptFields,
   entityFixture,
   getTextByRow,
+  withAnnotations,
   withBusinessOwners,
   withEntity,
   withEntityDecrypt,
@@ -48,6 +49,7 @@ describe('<Details />', () => {
     withTimeline();
     withBusinessOwners();
     withLiveness();
+    withAnnotations();
   });
 
   afterAll(() => {

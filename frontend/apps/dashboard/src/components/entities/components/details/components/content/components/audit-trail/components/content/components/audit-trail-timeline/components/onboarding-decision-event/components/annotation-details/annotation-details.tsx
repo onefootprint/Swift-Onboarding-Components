@@ -9,8 +9,7 @@ import { Drawer, LinkButton, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useCurrentEntity from '@/entity/hooks/use-current-entity';
-import useUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
+import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
 
 type AnnotationDetailsProps = {
   data: OnboardingDecisionEventData;
@@ -27,24 +26,16 @@ const AnnotationDetails = ({
   const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
-  const entityQuery = useCurrentEntity();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
-  const updateMutation = useUpdateAnnotation();
+  const updateMutation = useCurrentEntityUpdateAnnotation();
 
   const handlePinNoteChange = (annotationId: string) => () => {
     const newIsNotePinned = !isNotePinned;
-    updateMutation.mutate(
-      {
-        isPinned: newIsNotePinned,
-        annotationId,
-      },
-      {
-        onSuccess: () => {
-          entityQuery.refetch();
-        },
-      },
-    );
+    updateMutation.mutate({
+      isPinned: newIsNotePinned,
+      annotationId,
+    });
     setIsNotePinned(newIsNotePinned);
   };
 
