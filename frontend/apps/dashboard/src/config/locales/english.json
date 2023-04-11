@@ -714,6 +714,16 @@
       }
     },
     "entity": {
+      "banner": {
+        "cta": "See audit trail",
+        "incomplete": {
+          "header": "User dropped off before providing all information."
+        },
+        "manual-review": {
+          "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
+          "failed-needs-review": "This user could not be verified and needs to be manually reviewed."
+        }
+      },
       "breadcrumb": {
         "title": "{{kind}} details breadcrumb",
         "details": "Details",

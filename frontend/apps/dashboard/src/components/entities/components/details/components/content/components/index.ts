@@ -1,4 +1,5 @@
 export { default as AuditTrail } from './audit-trail';
+export { default as Banner } from './banner';
 export { default as Breadcrumb } from './breadcrumb';
 export { default as DeviceInsights } from './device-insights';
 export { default as Header } from './header';

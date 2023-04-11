@@ -3,6 +3,7 @@ import React from 'react';
 
 import {
   AuditTrail,
+  Banner,
   Breadcrumb,
   DeviceInsights,
   Header,
@@ -13,6 +14,9 @@ import {
 
 const Content = () => (
   <Box as="section" testID="entity-content">
+    <Box sx={{ marginBottom: 7 }}>
+      <Banner />
+    </Box>
     <Box sx={{ marginBottom: 7 }}>
       <Breadcrumb />
     </Box>

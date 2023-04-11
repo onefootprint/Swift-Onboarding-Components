@@ -5,10 +5,11 @@ import styled, { css } from 'styled-components';
 type SectionProps = {
   title: string;
   children: React.ReactNode;
+  id?: string;
 };
 
-const Section = ({ children, title }: SectionProps) => (
-  <section aria-label={title}>
+const Section = ({ children, title, id }: SectionProps) => (
+  <section aria-label={title} id={id}>
     <Header>
       <Typography as="h2" variant="label-1">
         {title}
