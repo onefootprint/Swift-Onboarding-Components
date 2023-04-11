@@ -33,6 +33,8 @@ describe('<Invite />', () => {
     renderInvite({ id, onComplete });
     await waitFor(() => {
       screen.getByTestId('onboarding-invite-content');
+    });
+    await waitFor(() => {
       screen.getByRole('button', { name: 'Complete' });
     });
   };

@@ -251,7 +251,7 @@ export const withLiveness = (
     response,
   });
 
-export const withEntityDecrypt = (
+export const withDecrypt = (
   entityId: string,
   decryptedData: Partial<Record<DataIdentifier, VaultValue>>,
 ) =>
