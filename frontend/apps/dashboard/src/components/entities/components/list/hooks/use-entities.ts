@@ -35,7 +35,7 @@ const useEntities = (kind: EntityKind) => {
   const filters = useFilters();
   const { requestParams } = filters;
   const query = useQuery(
-    ['entities', requestParams],
+    ['entities', kind, requestParams],
     () => getEntities(authHeaders, { ...requestParams, kind }),
     {
       enabled: filters.isReady,
