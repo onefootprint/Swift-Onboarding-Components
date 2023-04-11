@@ -5,7 +5,7 @@ use thiserror::Error;
 pub enum UserError {
     #[error("Sandbox data must be provided for sandbox users")]
     SandboxMismatch,
-    #[error("User vault already has {0}")]
+    #[error("Cannot replace {0} in vault")]
     CannotReplaceData(DataIdentifier),
     #[error("Cannot add {0} when user vault already has full data")]
     PartialUpdateNotAllowed(CollectedDataOption),

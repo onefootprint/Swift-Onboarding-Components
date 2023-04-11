@@ -84,3 +84,5 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
 
 
 # TODO test when secondary BO one-clicks
+
+# Test starting KYB from a one-clicked KYC user

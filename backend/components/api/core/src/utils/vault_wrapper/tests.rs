@@ -279,12 +279,64 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
                 PiiString::new(
                     serde_json::ser::to_string(&serde_json::json!([
                         {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                    ]))
+                    .unwrap(),
+                ),
+            )],
+            is_allowed: true,
+        },
+        // Allowed to update beneficial owners
+        Test {
+            update: vec![(
+                BDK::BeneficialOwners.into(),
+                PiiString::new(
+                    serde_json::ser::to_string(&serde_json::json!([
+                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
                         {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
                     ]))
                     .unwrap(),
                 ),
             )],
             is_allowed: true,
+        },
+        // Allowed to replace with KYCed BOs
+        Test {
+            update: vec![(
+                BDK::KycedBeneficialOwners.into(),
+                PiiString::new(
+                    serde_json::ser::to_string(&serde_json::json!([
+                        {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+                        {"first_name": "Franklin", "last_name": "Frog", "email": "franklin@onefootprint.com", "phone_number": "+14154444444", "ownership_stake": 30},
+                    ]))
+                    .unwrap(),
+                ),
+            )],
+            is_allowed: true,
+        },
+        // After this, can't update either KYCed BOs or replace with regular BOs
+        Test {
+            update: vec![(
+                BDK::KycedBeneficialOwners.into(),
+                PiiString::new(
+                    serde_json::ser::to_string(&serde_json::json!([
+                        {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+                    ]))
+                    .unwrap(),
+                ),
+            )],
+            is_allowed: false,
+        },
+        Test {
+            update: vec![(
+                BDK::BeneficialOwners.into(),
+                PiiString::new(
+                    serde_json::ser::to_string(&serde_json::json!([
+                        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                    ]))
+                    .unwrap(),
+                ),
+            )],
+            is_allowed: false,
         },
         // Allowed to update all remaining info
         Test {
@@ -323,14 +375,14 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     // Failed updates shouldn't make any changes to the DB so should act as no-ops
     for (i, test) in tests.into_iter().enumerate() {
         let Test { update, is_allowed } = test;
-        let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
-        let result = uvw.add_business_data_test(conn, update);
+        let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
+        let result = bvw.add_business_data_test(conn, update.clone());
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
 
 #[db_test]
-fn test_bvw_replace_dba(conn: &mut TestPgConn) {
+fn test_bvw_replacements(conn: &mut TestPgConn) {
     let bv = fixtures::vault::create_business(conn);
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
@@ -344,6 +396,26 @@ fn test_bvw_replace_dba(conn: &mut TestPgConn) {
         ],
         // Name without DBA should wipe name
         vec![(BDK::Name.into(), PiiString::new("Derp Inc".to_owned()))],
+        // BOs
+        vec![(
+            BDK::BeneficialOwners.into(),
+            PiiString::new(
+                serde_json::ser::to_string(&serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+                ]))
+                .unwrap(),
+            ),
+        )],
+        // Replace with fully-KYCed BOs
+        vec![(
+            BDK::KycedBeneficialOwners.into(),
+            PiiString::new(
+                serde_json::ser::to_string(&serde_json::json!([
+                    {"first_name": "Piip", "last_name": "Penguin", "email": "piip@onefootprint.com", "phone_number": "+14155555555", "ownership_stake": 50},
+                ]))
+                .unwrap(),
+            ),
+        )],
     ];
 
     for update in updates {
@@ -358,6 +430,7 @@ fn test_bvw_replace_dba(conn: &mut TestPgConn) {
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     // We should have cleared out dba in the last update
     assert!(!bvw.has_field(BDK::Dba));
+    assert!(!bvw.has_field(BDK::BeneficialOwners));
 }
 
 #[db_test]

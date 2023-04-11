@@ -14,8 +14,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind,
-    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier, Fingerprints, FingerprintScopeKind, FingerprintRequest,
+    CollectedDataOption, DataLifetimeKind, ScopedVaultId, IdentityDataKind as IDK, DataRequest,
+    Fingerprints, FingerprintScopeKind, FingerprintRequest, BusinessDataKind as BDK
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -29,14 +29,21 @@ impl<Type> VaultWrapper<Type> {
     /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
     /// These invariants are also a function of the data in the vault at the time
     pub fn validate_request(&self, request: DataRequest<Fingerprints>) -> ApiResult<ValidatedDataRequest> {
-        // Don't allow replacing a committed phone/email yet
-        let irreplaceable_idks = vec![IDK::PhoneNumber, IDK::Email];
-        for idk in irreplaceable_idks {
-            let update_has_idk = request.keys().any(|id| id == &DataIdentifier::from(idk));
-            let vault_already_has_idk = self.portable.get(idk).is_some();
-            if update_has_idk && vault_already_has_idk {
+        // Don't allow replacing some pieces of info
+        let irreplaceable_dis = vec![(IDK::PhoneNumber.into(), true), (IDK::Email.into(), false), (BDK::KycedBeneficialOwners.into(), true)];
+        for (di, check_portable_and_speculative) in irreplaceable_dis {
+            let update_has_di = request.keys().any(|x| x == &di);
+            let vault_already_has_di = if check_portable_and_speculative {
+                // Some fields we are not allowed to update as soon as they are set on the vault,
+                // whether speculative or portablized
+                self.get(di.clone()).is_some()
+            } else {
+                // Other fields we only cannot replace if they are portablized
+                self.portable.get(di.clone()).is_some()
+            };
+            if update_has_di && vault_already_has_di {
                 // We don't currently support adding a phone/email
-                return Err(UserError::CannotReplaceData(idk.into()).into());
+                return Err(UserError::CannotReplaceData(di).into());
             }
         }
 
@@ -80,7 +87,7 @@ impl ValidatedDataRequest {
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
-        let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.data_identifiers().unwrap_or_default().into_iter().filter_map(|di| DataLifetimeKind::try_from(di).ok()));
+        let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.parent().options()).flat_map(|cdo| cdo.data_identifiers().unwrap_or_default().into_iter().filter_map(|di| DataLifetimeKind::try_from(di).ok()));
         let added_kinds = self.data.iter().map(|nvd| DataLifetimeKind::from(nvd.kind.clone()));
         let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
