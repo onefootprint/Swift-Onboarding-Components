@@ -1,4 +1,4 @@
-import type { FootprintAppearanceParams } from '../footprint-js.types';
+import type { FootprintAppearance } from '../footprint-js.types';
 
 export const getURL = (params: {
   fontSrc?: string;
@@ -28,7 +28,7 @@ export const getAppearanceStyles = ({
   fontSrc,
   variables = {},
   rules = {},
-}: FootprintAppearanceParams = {}) => {
+}: FootprintAppearance = {}) => {
   const getVariables = () =>
     Object.keys(variables).length
       ? encodeURIComponent(JSON.stringify(variables))

@@ -7,7 +7,6 @@ vanillaIntegration(footprint);
 export type {
   Footprint,
   FootprintAppearance,
-  FootprintAppearanceParams,
   FootprintAppearanceRules,
   FootprintAppearanceTheme,
   FootprintAppearanceVariables,

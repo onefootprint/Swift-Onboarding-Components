@@ -6,13 +6,6 @@ export type FootprintShowParams = {
   onCanceled: () => void;
 };
 
-export type FootprintAppearanceParams = {
-  fontSrc?: string;
-  rules?: FootprintAppearanceRules;
-  theme?: FootprintAppearanceTheme;
-  variables?: FootprintAppearanceVariables;
-};
-
 export type FootprintAppearanceVariables = Partial<{
   // globals
   borderRadius: CSS.Property.BorderRadius;
