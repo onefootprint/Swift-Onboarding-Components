@@ -99,6 +99,50 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     )
 
 
-# TODO test when secondary BO one-clicks
+def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
+    # Create two users onboarded onto the default OB config
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    primary_bo = bifrost.run()
+    assert primary_bo.fp_id
+    assert not primary_bo.fp_bid
 
-# Test starting KYB from a one-clicked KYC user
+    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    secondary_bo = bifrost.run()
+    assert secondary_bo.fp_id
+    assert not secondary_bo.fp_bid
+
+    # Onboard the primary_bo onto the KYB sandbox config
+    bifrost = BifrostClient(
+        kyb_sandbox_ob_config,
+        twilio,
+        override_inherit_phone_number=primary_bo.client.data["id.phone_number"],
+    )
+    primary_bo = bifrost.run()
+    assert primary_bo.fp_id
+    assert primary_bo.fp_bid
+    # Assert we only had business requirements to satisfy - identity data filled out in previous
+    # onboarding
+    assert len(primary_bo.client.handled_requirements) == 1
+    assert primary_bo.client.handled_requirements[0]["kind"] == "collect_business_data"
+
+    # TODO For now, we are returning the secondary BO tokens via API. In the future, we should
+    # send this directly to the user's phone
+    token = primary_bo.client.put_business_response["tokens"][0]
+    secondary_bo_token = BusinessOwnerAuth(token)
+
+    # Then, onboard the secondary_bo as a BO of primary_bo's business
+    bifrost = BifrostClient(
+        kyb_sandbox_ob_config,
+        twilio,
+        override_ob_config_auth=secondary_bo_token,
+        override_inherit_phone_number=secondary_bo.client.data["id.phone_number"],
+    )
+    secondary_bo = bifrost.run()
+    assert secondary_bo.fp_id
+    assert secondary_bo.fp_bid
+    # Assert we had no requirements to satisfy - business filled out by primary_bo, and identity
+    # filled out in previous onboarding
+    assert not secondary_bo.client.handled_requirements
+
+    # fp_bid should be the same for each business owner
+    assert primary_bo.fp_bid == secondary_bo.fp_bid

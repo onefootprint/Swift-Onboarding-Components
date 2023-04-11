@@ -7,6 +7,7 @@ from tests.utils import (
     multipart_file,
     _sandbox_email,
     _gen_random_ssn,
+    inherit_user,
     create_basic_sandbox_user,
     get,
     post,
@@ -22,7 +23,12 @@ class BifrostClient:
     """
 
     def __init__(
-        self, ob_config, twilio, sandbox_suffix=None, override_ob_config_auth=None
+        self,
+        ob_config,
+        twilio,
+        sandbox_suffix=None,
+        override_ob_config_auth=None,
+        override_inherit_phone_number=None,
     ):
         """
         Creates a BifrostClient associated with a specific ob config and a specific user with
@@ -36,12 +42,19 @@ class BifrostClient:
         # Generate all default data up front. Pluck from it to satisfy requirements
         # Now, we do the old init_for_onboarding in the constructor
 
-        user = create_basic_sandbox_user(
-            twilio,
-            ob_config_auth=override_ob_config_auth or self.ob_config.key,
-            suffix=sandbox_suffix,
-        )
-        self.auth_token = user.auth_token
+        ob_config_auth = override_ob_config_auth or self.ob_config.key
+        if override_inherit_phone_number:
+            auth = inherit_user(twilio, override_inherit_phone_number, ob_config_auth)
+            self.auth_token = auth
+            phone_number = override_inherit_phone_number
+        else:
+            user = create_basic_sandbox_user(
+                twilio,
+                ob_config_auth=ob_config_auth,
+                suffix=sandbox_suffix,
+            )
+            self.auth_token = user.auth_token
+            phone_number = user.phone_number
 
         self.data = {
             **ID_DATA,
@@ -51,8 +64,8 @@ class BifrostClient:
                 "example_pdf.pdf", "application/pdf"
             ),
             "id.ssn9": _gen_random_ssn(),
-            "id.phone_number": user.phone_number,
-            "id.email": _sandbox_email(user.phone_number),
+            "id.phone_number": phone_number,
+            "id.email": _sandbox_email(phone_number),
         }
 
         # After running bifrost, this will be the list of requirements satisfied
