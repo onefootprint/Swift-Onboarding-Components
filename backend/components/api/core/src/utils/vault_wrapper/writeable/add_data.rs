@@ -153,7 +153,10 @@ mod test {
         utils::vault_wrapper::{Business, Person, WriteableVw},
     };
     use db::TxnPgConn;
-    use newtypes::{DataIdentifier, DataRequest, Fingerprint, ParseOptions, PiiString};
+    use newtypes::{
+        DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, IdentityDataKind,
+        ParseOptions, PiiString,
+    };
     use std::collections::HashMap;
 
     impl WriteableVw<Person> {
@@ -166,12 +169,25 @@ mod test {
             let data = HashMap::from_iter(data.into_iter());
             let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
             let fingerprints = request
-                .keys()
-                .filter_map(|di| match di {
-                    DataIdentifier::Id(idk) => Some(idk),
+                .iter()
+                .filter_map(|(di, pii)| match di {
+                    DataIdentifier::Id(idk) => Some((idk, pii)),
                     _ => None,
                 })
-                .map(|idk| ((*idk).into(), Fingerprint(vec![])))
+                .map(|(idk, pii)| {
+                    let scope = if *idk == IdentityDataKind::PhoneNumber {
+                        FingerprintScopeKind::Global
+                    } else {
+                        FingerprintScopeKind::Tenant
+                    };
+                    // for testing: we just do a regular hash
+                    let fingerprint = Fingerprint(crypto::sha256(pii.leak().as_bytes()).to_vec());
+                    FingerprintRequest {
+                        kind: (*idk).into(),
+                        fingerprint,
+                        scope,
+                    }
+                })
                 .collect();
             let request = request.manual_fingerprints(fingerprints);
             self.put_person_data(conn, request)?;
@@ -188,7 +204,7 @@ mod test {
         ) -> ApiResult<()> {
             let data = HashMap::from_iter(data.into_iter());
             let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
-            let request = request.manual_fingerprints(HashMap::new());
+            let request = request.no_fingerprints();
             self.put_business_data(conn, request)?;
             Ok(())
         }

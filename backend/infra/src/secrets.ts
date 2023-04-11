@@ -17,7 +17,8 @@ export interface StaticSecrets {
   elasticApmAgentKey: aws.ssm.Parameter;
   traceOtelConfig: aws.ssm.Parameter;
   enclaveUserSecretKey: aws.ssm.Parameter;
-  enclaveSealedIkek: aws.ssm.Parameter;
+  enclaveSealedEncIkek: aws.ssm.Parameter;
+  enclaveSealedHmacIkek: aws.ssm.Parameter;
   dbPassword: pulumi.Output<string>;
   jbDbPassword: pulumi.Output<string>;
   cookieSessionKey: aws.ssm.Parameter;
@@ -255,9 +256,13 @@ export async function LoadSecrets(
       `fractionalIdologyPassword-${stack}`,
       secretConstants.idology.fractionalPassword,
     ),
-    enclaveSealedIkek: createSecretParameter(
+    enclaveSealedEncIkek: createSecretParameter(
       `enclaveSealedIkek-${stack}`,
-      enclaveKeyDescriptor.sealedIkek.hexValue,
+      enclaveKeyDescriptor.sealedEncIkek.hexValue,
+    ),
+    enclaveSealedHmacIkek: createSecretParameter(
+      `enclaveSealedHmacIkek-${stack}`,
+      enclaveKeyDescriptor.sealedHmacIkek.hexValue,
     ),
     grafanaPrometheusPushAuth: createSecretParameter(
       `grafanaPrometheusPushAuth-${stack}`,

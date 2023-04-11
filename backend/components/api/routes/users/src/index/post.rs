@@ -51,7 +51,9 @@ pub async fn post(
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
             let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
-            let request = request.build_fingerprints(&state.hmac_client).await?;
+            let request = request
+                .build_tenant_fingerprints(state.as_ref(), &tenant_id)
+                .await?;
             Some((targets, request))
         } else {
             None

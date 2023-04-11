@@ -14,7 +14,7 @@ pub use tracing_actix_web::TracingLogger;
 pub mod config;
 pub mod metrics;
 pub mod prometheus;
-pub mod signed_hash;
+pub mod fingerprinter;
 pub mod telemetry;
 
 pub mod auth;

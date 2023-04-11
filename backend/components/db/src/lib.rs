@@ -128,7 +128,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             // if the connection has been running for a while (10min) we can drop it
             // and force the pool to build a new one
             if created > CONNECTION_RECYCLE_MAX_AGES_SECS {
-                tracing::info!(
+                tracing::debug!(
                     db.pool.recycled_secs_ago = recycled,
                     "db_pool.pre_recycle.drop_stale"
                 );
@@ -138,7 +138,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             }
 
             // log the pre recycle event
-            tracing::info!(
+            tracing::debug!(
                 db.pool.recycle_count = metrics.recycle_count,
                 db.pool.created_secs_ago = created,
                 db.pool.recycled_secs_ago = recycled,
@@ -149,7 +149,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
         .post_create(Hook::sync_fn(move |_, metrics| {
             let now = std::time::Instant::now();
             let created = now.duration_since(metrics.created).as_secs();
-            tracing::info!(db.pool.created_secs_ago = created, "db_pool.post_create");
+            tracing::debug!(db.pool.created_secs_ago = created, "db_pool.post_create");
             Ok(())
         }))
         .post_recycle(Hook::sync_fn(move |_, metrics| {
@@ -157,7 +157,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             let recycled = metrics.recycled.map(|d| now.duration_since(d).as_secs());
             let created = now.duration_since(metrics.created).as_secs();
 
-            tracing::info!(
+            tracing::debug!(
                 db.pool.recycle_count = metrics.recycle_count,
                 db.pool.created_secs_ago = created,
                 db.pool.recycled_secs_ago = recycled,

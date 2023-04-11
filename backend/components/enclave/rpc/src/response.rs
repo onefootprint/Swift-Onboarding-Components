@@ -115,12 +115,19 @@ impl Debug for FnDecryptionSingle {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct HmacSignature {
+    pub results: Vec<HmacSignatureSingle>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct HmacSignatureSingle {
     pub signature: Vec<u8>,
 }
-impl Debug for HmacSignature {
+
+impl Debug for HmacSignatureSingle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("HmacSignature")
             .field("signature", &"<omitted>")

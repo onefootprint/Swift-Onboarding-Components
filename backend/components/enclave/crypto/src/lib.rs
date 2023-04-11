@@ -16,6 +16,9 @@ pub use zeroize;
 pub use pem;
 pub use serde_cbor;
 
+mod clean_data;
+pub use self::clean_data::*;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Bad key")]

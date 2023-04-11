@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::errors::ApiResult;
@@ -46,7 +44,7 @@ pub async fn post_validate_inner(
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
     request.assert_no_business_data()?;
-    let request = request.manual_fingerprints(HashMap::new()); // No fingerprints to check speculatively
+    let request = request.no_fingerprints(); // No fingerprints to check speculatively
 
     let uvw = state
         .db_pool
@@ -97,7 +95,9 @@ pub async fn put_inner(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
-    let request = request.build_fingerprints(&state.hmac_client).await?;
+    let request = request
+        .build_tenant_fingerprints(state.as_ref(), &tenant_id)
+        .await?;
 
     state
         .db_pool

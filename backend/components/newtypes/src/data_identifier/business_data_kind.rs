@@ -95,4 +95,8 @@ impl BusinessDataKind {
     pub fn searchable() -> Vec<Self> {
         vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Tin]
     }
+
+    pub fn is_searchable(&self) -> bool {
+        Self::searchable().contains(self)
+    }
 }

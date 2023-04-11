@@ -1,16 +1,25 @@
+use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CollectedDataOption, DataIdentifier, DataLifetimeKind, Error, Fingerprint, Fingerprinter,
-    IdentityDataKind as IDK, PiiString, Validate, VdKind,
+    CollectedDataOption, DataIdentifier, DataLifetimeKind, Error, Fingerprint, FingerprintScopeKind,
+    IdentityDataKind as IDK, PiiString, TenantId, Validate, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
-use futures::TryFutureExt;
 use itertools::Itertools;
 use std::clone::Clone;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use strum::IntoEnumIterator;
 
 type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
-pub type Fingerprints = HashMap<DataLifetimeKind, Fingerprint>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FingerprintRequest {
+    pub kind: DataLifetimeKind,
+    pub fingerprint: Fingerprint,
+    pub scope: FingerprintScopeKind,
+}
+
+pub type Fingerprints = HashSet<FingerprintRequest>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -142,26 +151,62 @@ impl<T> DataRequest<T> {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new DataRequest with the Fingerprints populated.
     /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
-    pub async fn build_fingerprints<F: Fingerprinter>(
+    pub async fn build_tenant_fingerprints<F: Fingerprinter>(
+        self,
+        fingerprinter: &F,
+        tenant_id: &TenantId,
+    ) -> Result<DataRequest<Fingerprints>, F::Error> {
+        let (data, dlks): (Vec<_>, Vec<DataLifetimeKind>) = self
+            .data
+            .iter()
+            .filter_map(|(di, pii)| {
+                let dlk: DataLifetimeKind = di.clone().try_into().ok()?;
+                di.is_fingerprintable().then_some((((di, tenant_id), pii), dlk))
+            })
+            .unzip();
+
+        let fingerprints = fingerprinter.compute_fingerprints(data.as_slice()).await?;
+
+        let fingerprints = dlks
+            .into_iter()
+            .zip(fingerprints)
+            .map(|(kind, fingerprint)| FingerprintRequest {
+                kind,
+                fingerprint,
+                scope: FingerprintScopeKind::Tenant,
+            })
+            .collect();
+
+        let request = DataRequest {
+            data: self.data,
+            fingerprints,
+        };
+        Ok(request)
+    }
+
+    pub async fn build_global_fingerprints<F: Fingerprinter>(
         self,
         fingerprinter: &F,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let data = self.data.clone().into_iter();
-        let fut_fingerprints = data
-            .filter_map(|(di, pii)| {
-                let dlk: DataLifetimeKind = di.clone().try_into().ok()?;
-                di.is_fingerprintable().then_some((di, pii, dlk))
-            })
-            .map(|(di, pii, dlk)| {
-                let pii = pii.clean_for_fingerprint();
-                fingerprinter
-                    .compute_fingerprint(di, pii)
-                    .map_ok(move |sh_data| (dlk, sh_data))
-            });
-        let fingerprints = futures::future::try_join_all(fut_fingerprints)
-            .await?
+        let data_to_fingerprint = GlobalFingerprintKind::iter()
+            .filter_map(|g| self.data.get(&g.data_identifier()).map(|pii| (g, pii)))
+            .collect::<Vec<_>>();
+
+        let global_fingperprints = fingerprinter
+            .compute_fingerprints(data_to_fingerprint.as_slice())
+            .await?;
+
+        let fingerprints = data_to_fingerprint
             .into_iter()
+            .map(|(g, _)| g.data_lifetime_kind())
+            .zip(global_fingperprints)
+            .map(|(kind, fingerprint)| FingerprintRequest {
+                fingerprint,
+                kind,
+                scope: FingerprintScopeKind::Global,
+            })
             .collect();
+
         let request = DataRequest {
             data: self.data,
             fingerprints,
@@ -174,6 +219,13 @@ impl<T> DataRequest<T> {
         DataRequest {
             data: self.data,
             fingerprints,
+        }
+    }
+
+    pub fn no_fingerprints(self) -> DataRequest<Fingerprints> {
+        DataRequest {
+            data: self.data,
+            fingerprints: HashSet::new(),
         }
     }
 }

@@ -4,8 +4,8 @@ use crate::{
     config::Config,
     enclave_client::EnclaveClient,
     errors::ApiError,
+    fingerprinter::AwsHmacClient,
     s3,
-    signed_hash::SignedHashClient,
     utils::{email::SendgridClient, twilio::TwilioClient},
     GIT_HASH,
 };
@@ -23,7 +23,7 @@ use workos::{ApiKey, WorkOs};
 #[derive(Clone)]
 pub struct State {
     pub config: Config,
-    pub hmac_client: SignedHashClient,
+    pub aws_hmac_client: AwsHmacClient,
     pub workos_client: Arc<WorkOs>,
     pub twilio_client: TwilioClient,
     pub sendgrid_client: SendgridClient,
@@ -82,7 +82,7 @@ impl State {
             client: aws_sdk_s3::Client::new(&shared_config),
         };
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
-        let hmac_client = SignedHashClient {
+        let hmac_client = AwsHmacClient {
             client: kms_client,
             key_id: config.signing_root_key_id.clone(),
         };
@@ -192,7 +192,7 @@ impl State {
         State {
             config,
             enclave_client,
-            hmac_client,
+            aws_hmac_client: hmac_client,
             workos_client: Arc::new(workos_client),
             twilio_client,
             sendgrid_client,

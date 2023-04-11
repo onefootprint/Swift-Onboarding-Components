@@ -79,7 +79,7 @@ pub async fn post(
     let secret_key = SecretApiKey::generate(is_live);
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
-    let sh_key = secret_key.fingerprint(&state.hmac_client).await?;
+    let sh_key = secret_key.fingerprint(state.as_ref()).await?;
     let e_key = secret_key.seal_to(&tenant.public_key)?;
     let new_key = state
         .db_pool

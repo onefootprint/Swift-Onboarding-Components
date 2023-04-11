@@ -19,6 +19,7 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
 use newtypes::PiiString;
+use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -48,7 +49,7 @@ where
         timestamp_gte,
     } = filters.into_inner();
 
-    let (fingerprints, fp_id) = parse_search(&state, search).await?;
+    let (fingerprints, fp_id) = parse_search(&state, search, &tenant.id).await?;
 
     let tenant_id = tenant.id.clone();
     let query_params = ScopedVaultListQueryParams {
@@ -131,6 +132,7 @@ pub async fn get(
 async fn parse_search(
     state: &State,
     search: Option<PiiString>,
+    tenant_id: &TenantId,
 ) -> ApiResult<(Option<Vec<Fingerprint>>, Option<FpId>)> {
     // TODO clean phone number or email
     let Some(search) = search else {
@@ -153,7 +155,7 @@ async fn parse_search(
             .collect_vec();
         let fut_fingerprints = tokenized
             .into_iter()
-            .map(|s| compute_fingerprint_for_search(state, s));
+            .map(|s| compute_fingerprint_for_search(state, s, tenant_id));
         let fingerprints = futures::future::try_join_all(fut_fingerprints)
             .await?
             .into_iter()
@@ -167,12 +169,16 @@ async fn parse_search(
 async fn compute_fingerprint_for_search(
     state: &State,
     search: PiiString,
+    tenant_id: &TenantId,
 ) -> Result<Vec<Fingerprint>, ApiError> {
     let searchable_idks = IDK::searchable().into_iter().map(DataIdentifier::from);
     let searchable_bdks = BDK::searchable().into_iter().map(DataIdentifier::from);
-    let searchable = searchable_idks.chain(searchable_bdks);
-    let fut_fingerprints = searchable.map(|kind| state.compute_fingerprint(kind, search.clone()));
-    let fingerprints = futures::future::try_join_all(fut_fingerprints).await?;
+    let searchable = searchable_idks
+        .chain(searchable_bdks)
+        .map(|di| (di, &search))
+        .collect::<Vec<_>>();
 
-    Ok(fingerprints)
+    state
+        .compute_fingerprints_opts(searchable.as_slice(), tenant_id.clone(), true)
+        .await
 }

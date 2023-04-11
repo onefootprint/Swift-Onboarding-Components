@@ -41,6 +41,12 @@ pub enum DataLifetimeKind {
 
 crate::util::impl_enum_string_diesel!(DataLifetimeKind);
 
+impl DataLifetimeKind {
+    pub fn globally_unique(&self) -> bool {
+        matches!(self, Self::Id(IdentityDataKind::PhoneNumber))
+    }
+}
+
 impl From<DataLifetimeKind> for DataIdentifier {
     fn from(value: DataLifetimeKind) -> Self {
         match value {

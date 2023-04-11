@@ -11,6 +11,8 @@ pub enum EnclaveError {
     Enclave(#[from] enclave_proxy::EnclaveError),
     #[error("invalid enclave decrypt response")]
     InvalidEnclaveDecryptResponse,
+    #[error("invalid enclave fingerprint response")]
+    InvalidEnclaveFingerprintResponse,
     #[error("cannot decode decrypted result from utf8 error: {0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("crypto error: {0}")]

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
@@ -32,7 +30,7 @@ pub async fn post_validate(
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
     request.assert_no_id_data()?;
-    let request = request.manual_fingerprints(HashMap::new()); // No fingerprints to check speculatively
+    let request = request.no_fingerprints(); // No fingerprints to check speculatively
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -68,10 +66,11 @@ pub async fn put(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
-    let request = request.build_fingerprints(&state.hmac_client).await?;
     let scoped_business_id = user_auth
         .scoped_business_id()
         .ok_or(UserError::NotAllowedWithoutBusiness)?;
+
+    let request = request.build_global_fingerprints(state.as_ref()).await?;
 
     let (secondary_bos, sv) = state
         .db_pool

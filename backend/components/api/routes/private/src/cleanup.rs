@@ -4,7 +4,8 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind, PhoneNumber, TenantId};
+use newtypes::fingerprinter::GlobalFingerprintKind;
+use newtypes::{PhoneNumber, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -62,15 +63,13 @@ async fn post(
     }
 
     // Use e164 with suffix to compute fingerprint
-    let di = DataIdentifier::from(IdentityDataKind::PhoneNumber);
-    let sh_data = state
-        .compute_fingerprint(di, phone_number.e164_with_suffix())
+    let uv = state
+        .find_portable_vault_by_fingerprint(
+            GlobalFingerprintKind::PhoneNumber,
+            &phone_number.e164_with_suffix(),
+        )
         .await?;
 
-    let uv = state
-        .db_pool
-        .db_query(move |conn| Vault::find_portable(conn, &sh_data))
-        .await??;
     let user_vault_id = if let Some(uv) = uv {
         uv.id
     } else {

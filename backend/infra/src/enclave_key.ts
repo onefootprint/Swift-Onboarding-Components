@@ -8,7 +8,8 @@ import { SealedIkek } from './sealed_ikek';
 export interface EnclaveKeyDescriptor {
   rootKeyId: pulumi.Output<string>;
   rootKeyArn: pulumi.Output<string>;
-  sealedIkek: SealedIkek;
+  sealedEncIkek: SealedIkek;
+  sealedHmacIkek: SealedIkek;
   enclaveKmsCredentials: EnclaveKmsCredentials;
 }
 
@@ -64,9 +65,18 @@ export async function Initialize(
     description: `enclave master root key for ${pulumi.getStack()}-default-region`,
   });
 
-  // generate our sealed enclave ikek
-  const sealedIkek = new SealedIkek(
+  // Generate our sealed enclave ikeks
+
+  // For encryption
+  const sealedEncIkek = new SealedIkek(
     `enclave_master_root_key_sealed_ikek`,
+    { rootKeyId: rootKey.keyId },
+    { parent: rootKey },
+  );
+
+  // For HMAC signing
+  const sealedHmacIkek = new SealedIkek(
+    `enclave_master_root_key_sealed_ikek_hmac`,
     { rootKeyId: rootKey.keyId },
     { parent: rootKey },
   );
@@ -91,7 +101,8 @@ export async function Initialize(
   return {
     rootKeyId: rootKey.id,
     rootKeyArn: rootKey.arn,
-    sealedIkek,
+    sealedEncIkek,
+    sealedHmacIkek,
     enclaveKmsCredentials: {
       access_key_id: enclaveUserKey.id,
       access_secret_key: pulumi.secret(enclaveUserKey.secret),

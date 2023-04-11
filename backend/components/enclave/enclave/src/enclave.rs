@@ -1,8 +1,11 @@
-use crypto::{aead::ScopedSealingKey, seal::SealedChaCha20Poly1305DataKey};
+use crypto::{
+    aead::ScopedSealingKey, clean_and_hash_data_for_fingerprinting, seal::SealedChaCha20Poly1305DataKey,
+};
 use once_cell::sync::Lazy;
 use rpc::{
-    EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, SealedIkek, SealedIkekId,
+    DecryptThenSignRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
+    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
+    GeneratedSealedDataKey, HmacSignature, HmacSignatureSingle, SealedIkek, SealedIkekId, SignRequest,
 };
 use std::collections::HashMap;
 use thiserror::Error;
@@ -81,7 +84,7 @@ pub type KekCache = HashMap<SealedIkekId, Ikek>;
 
 static GLOBAL_KEK_CACHE: Lazy<RwLock<KekCache>> = Lazy::new(|| RwLock::new(KekCache::new()));
 
-pub async fn load_ikek(kms_creds: KmsCredentials, sealed_ikek: SealedIkek) -> Result<Ikek, Error> {
+pub async fn load_ikek<P>(kms_creds: KmsCredentials, sealed_ikek: SealedIkek<P>) -> Result<Ikek, Error> {
     log_info_t("in load_key");
 
     let cache = GLOBAL_KEK_CACHE.read().await;
@@ -108,7 +111,7 @@ pub async fn load_ikek(kms_creds: KmsCredentials, sealed_ikek: SealedIkek) -> Re
     }
 
     log_info_t("before load_key kms_decrypt");
-    let ikek_key_bytes = kms_decrypt(kms_creds, sealed_ikek.0).await?;
+    let ikek_key_bytes = kms_decrypt(kms_creds, sealed_ikek.bytes).await?;
     log_info_t("decrypted kek");
 
     let ikek = Ikek {
@@ -178,21 +181,71 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecr
 pub async fn handle_hmac_sign(request: EnvelopeHmacSignRequest) -> Result<HmacSignature, Error> {
     let EnvelopeHmacSignRequest {
         kms_creds,
-        sealed_key,
-        data,
-        scope,
+        requests,
         sealed_ikek,
     } = request;
 
+    // load our root signing key
     let ikek = load_ikek(kms_creds, sealed_ikek).await?;
+    let root_signing_key_sha256 = ikek.key.sha256();
 
-    let root_signing_key = ikek.key.unseal_bytes(sealed_key)?;
+    // compute the signatures
+    let results = requests
+        .iter()
+        .map(|SignRequest { scope, data }| {
+            // our scoped key is H(H(scope) || H(root_signing_key))
+            let h = crypto::sha256;
+            let scoped_key = h(&[h(scope), root_signing_key_sha256].concat());
 
-    // our scoped key is SHA256(scope || root_signing_key)
-    let scoped_key = crypto::sha256(&vec![scope, root_signing_key].concat());
-    let signature = crypto::hmac_sha256_sign(&scoped_key, &data)?;
+            // use the scoped key to sign the data
+            let signature = crypto::hmac_sha256_sign(&scoped_key, data)?;
 
-    Ok(HmacSignature { signature })
+            Ok(HmacSignatureSingle { signature })
+        })
+        .collect::<Result<Vec<HmacSignatureSingle>, Error>>()?;
+
+    Ok(HmacSignature { results })
+}
+
+pub async fn handle_decrypt_then_hmac_sign(
+    request: EnvelopeDecryptThenHmacSignRequest,
+) -> Result<HmacSignature, Error> {
+    let EnvelopeDecryptThenHmacSignRequest {
+        kms_creds,
+        signing_ikek,
+        sealing_ikek,
+        requests,
+        sealed_key,
+    } = request;
+
+    let sealing_ikek = load_ikek(kms_creds.clone(), sealing_ikek).await?;
+    let data_private_key = sealing_ikek.key.unseal_bytes(sealed_key)?;
+
+    let signing_ikek = load_ikek(kms_creds, signing_ikek).await?;
+    let root_signing_key_sha256 = signing_ikek.key.sha256();
+
+    let results: Vec<HmacSignatureSingle> = requests
+        .into_iter()
+        .map(|r| {
+            let DecryptThenSignRequest { sealed_data, scope } = r;
+            // first decrypt the data
+            let result =
+                crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&data_private_key, sealed_data)?;
+
+            let data = clean_and_hash_data_for_fingerprinting(&result.0);
+
+            // our scoped key is H(H(scope) || H(root_signing_key))
+            let h = crypto::sha256;
+            let scoped_key = h(&[h(&scope), root_signing_key_sha256].concat());
+
+            // use the scoped key to sign the data
+            let signature = crypto::hmac_sha256_sign(&scoped_key, &data)?;
+
+            Ok(HmacSignatureSingle { signature })
+        })
+        .collect::<Result<Vec<_>, Error>>()?;
+
+    Ok(HmacSignature { results })
 }
 
 /// Main Enclave KMS decrypt function

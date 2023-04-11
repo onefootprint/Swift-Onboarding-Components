@@ -60,7 +60,7 @@ async fn post(
     // here because they're async
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
     let secret_api_key = SecretApiKey::generate(is_live);
-    let sh_secret_api_key = secret_api_key.fingerprint(&state.hmac_client).await?;
+    let sh_secret_api_key = secret_api_key.fingerprint(state.as_ref()).await?;
 
     let (tenant, rb, auth_token, api_key) = state
         .db_pool

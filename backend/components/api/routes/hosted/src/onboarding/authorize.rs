@@ -114,6 +114,8 @@ pub async fn post(
         }
     }
 
+    let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
+
     // Kickoff KYB
     if let Some(biz_ob) = biz_ob {
         // TODO: also check ob_config here to ensure this is a single-KYC flow
@@ -125,11 +127,12 @@ pub async fn post(
         }
     }
 
-    let (validation_token, status, su, decision_timestamp, manual_review, ob_configuration_id) = state
+    let (validation_token, status, su, decision_timestamp, manual_review, ob_config) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Return status as well
             let (ob, scoped_user, manual_review, _) = Onboarding::get(conn, &ob_id)?;
+            let ob_config = ObConfiguration::get_by_onboarding_id(conn, &ob.id)?;
 
             let status: OnboardingStatus = ob.status;
             // we shouldn't have many cases that need to fall back to Utc::now
@@ -142,7 +145,7 @@ pub async fn post(
                 scoped_user,
                 timestamp,
                 manual_review,
-                ob.ob_configuration_id,
+                ob_config,
             ))
         })
         .await??;
@@ -154,18 +157,41 @@ pub async fn post(
             footprint_user_id: su.fp_id.clone(),
             timestamp: decision_timestamp,
             status,
-            onboarding_configuration_id: ob_configuration_id,
+            onboarding_configuration_id: ob_config.id.clone(),
             requires_manual_review: manual_review.is_some(),
         });
 
         state.webhook_service_client.send_event_to_tenant_non_blocking(
             WebhookApp {
-                id: su.tenant_id,
+                id: su.tenant_id.clone(),
                 is_live: su.is_live,
             },
             wh_event,
             None,
         );
+    }
+
+    // If this user is onboarding to the tenant for the first time, create tenant-scoped fingerprints
+    if should_run_kyc_checks {
+        let sv_user_id = su.id.clone();
+
+        let (uvw, bvw) = state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let uvw = VaultWrapper::build_for_tenant(conn, &sv_user_id)?;
+                let bvw = sv_biz_id
+                    .map(|id| VaultWrapper::build_for_tenant(conn, &id))
+                    .transpose()?;
+
+                Ok((uvw, bvw))
+            })
+            .await??;
+
+        uvw.create_authorized_fingerprints(state.clone(), ob_config.clone())
+            .await?;
+        if let Some(bvw) = bvw {
+            bvw.create_authorized_fingerprints(state, ob_config).await?;
+        }
     }
 
     Ok(Json(ResponseData {

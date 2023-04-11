@@ -20,6 +20,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
+use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
     SessionAuthToken, VaultId, VaultPublicKey,
@@ -74,10 +75,18 @@ pub async fn post(
             let keypair = state.enclave_client.generate_sealed_keypair().await?;
             let di = DataIdentifier::from(IDK::PhoneNumber);
             let phone_number = challenge_state.phone_number_e164_with_suffix.clone();
-            let sh_phone_number = state.compute_fingerprint(di, phone_number).await?;
+            let global_sh_phone_number = state
+                .compute_fingerprint(GlobalFingerprintKind::PhoneNumber, &phone_number)
+                .await?;
+            let tenant_sh_phone_number = state
+                .compute_fingerprint((&di, &ob_pk_auth.tenant().id), &phone_number)
+                .await?;
+            let legacy_sh_phone_number = state.compute_legacy_fingerprint(di, &phone_number).await?;
             let context = SmsContext {
                 challenge_state,
-                sh_phone_number,
+                global_sh_phone_number,
+                tenant_sh_phone_number,
+                legacy_sh_phone_number,
                 keypair,
             };
             ChallengeData::Sms(context)
@@ -175,7 +184,10 @@ fn validate_biometric_challenge(
 
 struct SmsContext {
     challenge_state: PhoneChallengeState,
-    sh_phone_number: Fingerprint,
+    global_sh_phone_number: Fingerprint,
+    tenant_sh_phone_number: Fingerprint,
+    // TODO: remove this post fingerprint
+    legacy_sh_phone_number: Fingerprint,
     keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
 }
 
@@ -188,7 +200,13 @@ fn validate_sms_challenge(
     if context.challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     }
-    let existing_user = Vault::find_portable(conn, &context.sh_phone_number)?;
+    let existing_user = Vault::find_portable(
+        conn,
+        &[
+            context.global_sh_phone_number.clone(),
+            context.legacy_sh_phone_number,
+        ],
+    )?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
@@ -198,7 +216,8 @@ fn validate_sms_challenge(
                 context.keypair,
                 ob_config,
                 context.challenge_state.phone_number_e164_with_suffix,
-                context.sh_phone_number,
+                context.global_sh_phone_number,
+                context.tenant_sh_phone_number,
             )?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }

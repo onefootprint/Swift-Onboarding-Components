@@ -1,12 +1,15 @@
 use crypto::{aead::SealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
-    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, EnclavePayload,
-    EnvelopeDecryptRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKey, KmsCredentials, RpcPayload, RpcRequest, SealedIkek,
+    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest,
+    EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
+    FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
+    GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
+    SignRequest, Signing,
 };
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, PiiBytes, PiiString, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
+    fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString,
+    SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
 
 use crate::{config::Config, errors::enclave::EnclaveError};
@@ -14,7 +17,8 @@ use crate::{config::Config, errors::enclave::EnclaveError};
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
     client: ProxyHttpClient,
-    sealed_ikek: SealedIkek,
+    sealed_enc_ikek: SealedIkek<Sealing>,
+    sealed_hmac_ikek: SealedIkek<Signing>,
     kms_creds: KmsCredentials,
 }
 
@@ -24,8 +28,11 @@ impl EnclaveClient {
     #[allow(clippy::expect_used)]
     /// initialize a new enclave client with a pool of connections
     pub async fn new(config: Config) -> Self {
-        let sealed_ikek = hex::decode(&config.enclave_config.enclave_sealed_ikek_hex)
-            .expect("invalid sealed IKEK hex bytes");
+        let sealed_enc_ikek = hex::decode(&config.enclave_config.enclave_sealed_enc_ikek_hex)
+            .expect("invalid sealed ENC IKEK hex bytes");
+
+        let sealed_hmac_ikek = hex::decode(&config.enclave_config.enclave_sealed_hmac_ikek_hex)
+            .expect("invalid sealed ENC IKEK hex bytes");
 
         let kms_creds = KmsCredentials {
             key_id: config.enclave_config.enclave_aws_access_key_id.clone(),
@@ -42,7 +49,8 @@ impl EnclaveClient {
 
         Self {
             client,
-            sealed_ikek: SealedIkek(sealed_ikek),
+            sealed_enc_ikek: SealedIkek::<Sealing>::new(sealed_enc_ikek),
+            sealed_hmac_ikek: SealedIkek::<Signing>::new(sealed_hmac_ikek),
             kms_creds,
         }
     }
@@ -50,9 +58,9 @@ impl EnclaveClient {
     /// send the request to the enclave
     #[tracing::instrument(skip_all)]
     async fn send(&self, req: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
-        tracing::info!("sending enclave request");
+        tracing::debug!("sending enclave request");
         let response = self.client.send_request(req).await?;
-        tracing::info!("got enclave response");
+        tracing::debug!("got enclave response");
 
         Ok(response)
     }
@@ -76,7 +84,7 @@ impl EnclaveClient {
         let req =
             enclave_proxy::RpcRequest::new(RpcPayload::GenerateDataKeypair(GenerateDataKeypairRequest {
                 kms_creds: self.kms_creds.clone(),
-                sealed_ikek: self.sealed_ikek.clone(),
+                sealed_ikek: self.sealed_enc_ikek.clone(),
             }));
 
         let response = self.send(req).await?;
@@ -199,7 +207,7 @@ impl EnclaveClient {
         let num_requests = requests.len();
         let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
             kms_creds: self.kms_creds.clone(),
-            sealed_ikek: self.sealed_ikek.clone(),
+            sealed_ikek: self.sealed_enc_ikek.clone(),
             sealed_key: crypto::aead::AeadSealedBytes(sealed_key.0.clone()),
             requests,
         }));
@@ -215,6 +223,93 @@ impl EnclaveClient {
             .into_iter()
             .map(|r| PiiBytes::new(r.data))
             .collect();
+        Ok(results)
+    }
+
+    /// Requests the enclave to fingerprint
+    pub async fn batch_fingerprint<S: FingerprintScopable + Send + Sync>(
+        &self,
+        data: &[(S, &PiiString)],
+    ) -> Result<Vec<Fingerprint>, EnclaveError> {
+        // we hash the data once simply to shorten the payload length we send to the enclave
+        // and build our list of request to send for fingerprinting in the enclave
+        let requests = data
+            .iter()
+            .map(|(di, pii)| {
+                (
+                    di,
+                    crypto::clean_and_hash_data_for_fingerprinting(pii.leak().as_bytes()),
+                )
+            })
+            .map(|(di, data)| SignRequest {
+                scope: di.scope().bytes(),
+                data: data.to_vec(),
+            })
+            .collect_vec();
+
+        let num_requests = requests.len();
+
+        // envelope the requests
+        let req = enclave_proxy::RpcRequest::new(RpcPayload::HmacSign(EnvelopeHmacSignRequest {
+            kms_creds: self.kms_creds.clone(),
+            sealed_ikek: self.sealed_hmac_ikek.clone(),
+            requests,
+        }));
+
+        let response = self.send(req).await?;
+        let response = HmacSignature::try_from(response)?;
+        if response.results.len() != num_requests {
+            return Err(EnclaveError::InvalidEnclaveFingerprintResponse);
+        }
+
+        let results = response
+            .results
+            .into_iter()
+            .map(|r| Fingerprint(r.signature))
+            .collect();
+
+        Ok(results)
+    }
+
+    /// Requests the enclave to fingerprint sealed data (which it decrypts first)
+    pub async fn batch_fingerprint_sealed<S: FingerprintScopable + Send + Sync>(
+        &self,
+        sealed_key: &EncryptedVaultPrivateKey,
+        sealed_data: Vec<(S, EciesP256Sha256AesGcmSealed)>,
+    ) -> Result<Vec<Fingerprint>, EnclaveError> {
+        let requests = sealed_data
+            .into_iter()
+            .map(|(di, sealed_data)| DecryptThenSignRequest {
+                scope: di.scope().bytes(),
+                sealed_data,
+            })
+            .collect_vec();
+
+        let num_requests = requests.len();
+
+        // envelope the requests
+        let req = enclave_proxy::RpcRequest::new(RpcPayload::DecryptThenHmacSign(
+            EnvelopeDecryptThenHmacSignRequest {
+                kms_creds: self.kms_creds.clone(),
+                sealing_ikek: self.sealed_enc_ikek.clone(),
+                signing_ikek: self.sealed_hmac_ikek.clone(),
+                requests,
+                sealed_key: crypto::aead::AeadSealedBytes(sealed_key.0.clone()),
+            },
+        ));
+
+        let response = self.send(req).await?;
+        let response = HmacSignature::try_from(response)?;
+        if response.results.len() != num_requests {
+            return Err(EnclaveError::InvalidEnclaveFingerprintResponse);
+        }
+
+        let results = response
+            .results
+            .into_iter()
+            .map(|r| Fingerprint(r.signature))
+            .collect();
+
         Ok(results)
     }
 }

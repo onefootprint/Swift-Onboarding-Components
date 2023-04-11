@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::str::FromStr;
 
 use crate::auth::user::{UserAuthContext, UserAuthScope};
@@ -11,6 +10,7 @@ use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use newtypes::email::Email;
+
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -33,7 +33,7 @@ pub async fn post_validate(
     };
     let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_business_data()?;
-    let request = request.manual_fingerprints(HashMap::new()); // No fingerprints to check speculatively
+    let request = request.no_fingerprints(); // No fingerprints to check speculatively
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -61,12 +61,13 @@ pub async fn put(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
-    let request = request.build_fingerprints(&state.hmac_client).await?;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
     let email_is_live = email.as_ref().map(|e| e.is_live());
+
+    let request = request.build_global_fingerprints(state.as_ref()).await?;
 
     let new_contact_info = state
         .db_pool

@@ -51,7 +51,7 @@ impl FromRequest for SecretTenantAuthContext {
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {
-            let sh_api_key = tenant_sk_input?.fingerprint(&state.hmac_client).await?;
+            let sh_api_key = tenant_sk_input?.fingerprint(state.as_ref()).await?;
 
             let (api_key, tenant, role) = state
                 .db_pool

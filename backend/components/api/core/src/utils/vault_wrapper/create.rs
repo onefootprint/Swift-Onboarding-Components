@@ -9,10 +9,13 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::{DataIdentifier, DataRequest, Fingerprint, PhoneNumber, SealedVaultBytes};
+use newtypes::{
+    DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, PhoneNumber,
+    SealedVaultBytes,
+};
 use newtypes::{IdentityDataKind as IDK, PiiString, VaultKind};
 use newtypes::{Locked, ParseOptions};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub struct NewPhoneNumberArgs {
@@ -28,7 +31,8 @@ impl VaultWrapper<Person> {
         keypair: VaultKeyPair,
         ob_config: ObConfiguration,
         phone_number: PiiString,
-        sh_phone_number: Fingerprint,
+        global_sh_phone_number: Fingerprint,
+        tenant_sh_phone_number: Fingerprint,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
         // Verify that the ob config is_live matches the user vault
         let phone_number_parsed = PhoneNumber::parse(phone_number.clone())?;
@@ -55,8 +59,18 @@ impl VaultWrapper<Person> {
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
         let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
-        let request =
-            request.manual_fingerprints(HashMap::from_iter([(IDK::PhoneNumber.into(), sh_phone_number)]));
+        let request = request.manual_fingerprints(HashSet::from_iter([
+            FingerprintRequest {
+                kind: IDK::PhoneNumber.into(),
+                fingerprint: global_sh_phone_number,
+                scope: FingerprintScopeKind::Global,
+            },
+            FingerprintRequest {
+                kind: IDK::PhoneNumber.into(),
+                fingerprint: tenant_sh_phone_number,
+                scope: FingerprintScopeKind::Tenant,
+            },
+        ]));
         let new_ci = uvw.put_person_data(conn, request)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault

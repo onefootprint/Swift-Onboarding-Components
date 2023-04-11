@@ -8,10 +8,11 @@ pub use config::Config;
 pub use rpc::Error as EnclaveError;
 use rpc::WireMessage;
 pub use rpc::{
-    DataTransform, DecryptRequest, EnclavePayload, EnclaveResponse, EnvelopeDecryptRequest,
-    EnvelopeHmacSignRequest, FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
-    SealedIkek,
+    DataTransform, DecryptRequest, DecryptThenSignRequest, EnclavePayload, EnclaveResponse,
+    EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest, FnDecryption,
+    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
+    GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
+    SignRequest, Signing,
 };
 
 use pool::{Stream, StreamConnection};

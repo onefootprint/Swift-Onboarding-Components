@@ -74,7 +74,8 @@ pub async fn vault_pii(
                     .create(conn)?;
                     // TODO could technically now support vaulting any kind of data instead of just custom. Just need to fingerprint data too
                     let data = DataRequest::clean_and_validate(custom, ParseOptions::for_non_portable())?;
-                    let data = data.manual_fingerprints(HashMap::new());
+                    // TODO: fingerprint tenant scoped data here
+                    let data = data.no_fingerprints();
                     uvw.put_person_data(conn, data)?;
                 }
 

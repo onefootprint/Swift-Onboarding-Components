@@ -15,7 +15,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataLifetimeKind,
-    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier, Fingerprints,
+    ScopedVaultId, IdentityDataKind as IDK, DataRequest, DataIdentifier, Fingerprints, FingerprintScopeKind, FingerprintRequest,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -97,16 +97,19 @@ impl ValidatedDataRequest {
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = self.fingerprints
             .into_iter()
-            .map(|(kind, sh_data)| -> ApiResult<_> {
-                Ok(NewFingerprint {
-                    kind: kind.clone(),
-                    sh_data,
-                    lifetime_id: vds
+            .map(|FingerprintRequest { kind, fingerprint, scope }| -> ApiResult<_> {
+                let vd = vds
                         .iter()
                         .find(|vd| DataLifetimeKind::from(vd.kind.clone()) == kind)
-                        .map(|vd| vd.lifetime_id.clone())
-                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?,
-                    is_unique: false,
+                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?;
+
+                Ok(NewFingerprint {
+                    kind: kind.clone(),
+                    sh_data: fingerprint,
+                    lifetime_id: vd.lifetime_id.clone(),
+                    is_unique: scope == FingerprintScopeKind::Global && kind.globally_unique(),
+                    scope,
+                    version: newtypes::FingerprintVersion::current()
                 })
             })
             .collect::<ApiResult<_>>()?;

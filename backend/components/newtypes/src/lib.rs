@@ -37,9 +37,6 @@ use serde::ser::SerializeMap;
 mod auth_token;
 pub use self::auth_token::*;
 
-pub mod fingerprint;
-pub use self::fingerprint::*;
-
 pub mod map_container;
 pub mod secret_api_key;
 
@@ -59,6 +56,9 @@ pub use uuid::Uuid;
 
 pub mod proxy_token;
 pub use self::proxy_token::*;
+
+pub mod fingerprinter;
+pub use self::fingerprinter::Fingerprinter;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

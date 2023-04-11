@@ -1,11 +1,12 @@
 use std::fmt::Debug;
 
+use async_trait::async_trait;
 pub use derive_more::{From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::{Fingerprint, Fingerprinter, SealedVaultBytes, VaultPublicKey};
+use crate::{Fingerprint, SealedVaultBytes, VaultPublicKey};
 
 /// A secret api key wrapper around a string
 #[derive(
@@ -13,6 +14,13 @@ use crate::{Fingerprint, Fingerprinter, SealedVaultBytes, VaultPublicKey};
 )]
 #[serde(transparent)]
 pub struct SecretApiKey(String);
+
+#[async_trait]
+pub trait ApiKeyFingerprinter {
+    type Error: From<crate::Error>;
+
+    async fn sign_raw_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error>;
+}
 
 impl SecretApiKey {
     /// prefixed on LIVE keys
@@ -46,8 +54,8 @@ impl SecretApiKey {
     }
 
     /// create fingerprint of the api key
-    pub async fn fingerprint<F: Fingerprinter>(&self, f: &F) -> Result<Fingerprint, F::Error> {
-        f.sign_data(self.0.as_bytes()).await
+    pub async fn fingerprint<F: ApiKeyFingerprinter>(&self, f: &F) -> Result<Fingerprint, F::Error> {
+        f.sign_raw_data(self.0.as_bytes()).await
     }
 }
 

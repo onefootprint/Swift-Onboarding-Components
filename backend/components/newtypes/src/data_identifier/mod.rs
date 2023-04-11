@@ -47,7 +47,7 @@ pub use self::{
 };
 use crate::{
     api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
-    KvDataKey, PiiString, SaltedFingerprint,
+    KvDataKey, PiiString,
 };
 use crypto::sha256;
 pub use derive_more::Display;
@@ -56,6 +56,7 @@ use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::hash::Hash;
 use std::str::FromStr;
+use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 
 #[derive(
@@ -214,12 +215,30 @@ impl DataIdentifier {
     /// Returns true if the DI can be fingerprinted. Will automatically fingerprint non-document
     /// data with these types when added to the vault
     pub fn is_fingerprintable(&self) -> bool {
-        matches!(self, Self::Id(_) | Self::Business(_))
+        match self {
+            DataIdentifier::Id(idk) => idk.is_searchable(),
+            DataIdentifier::Business(bdk) => bdk.is_searchable(),
+
+            DataIdentifier::Custom(_)
+            | DataIdentifier::IdDocument(_)
+            | DataIdentifier::Selfie(_)
+            | DataIdentifier::InvestorProfile(_)
+            | DataIdentifier::Document(_) => false,
+        }
+    }
+
+    /// collect fingerprintable DIs
+    pub fn fingerprintable() -> Vec<Self> {
+        IdentityDataKind::iter()
+            .map(DataIdentifier::from)
+            .chain(BusinessDataKind::iter().map(DataIdentifier::from))
+            .filter(Self::is_fingerprintable)
+            .collect()
     }
 }
 
-impl SaltedFingerprint for DataIdentifier {
-    fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
+impl DataIdentifier {
+    pub fn legacy_salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         let self_name = match self {
             // For legacy fingerprints, continue to serialize IDKs without the id. prefix
             // TODO migrate legacy fingerprints
@@ -275,7 +294,7 @@ mod tests {
 
         // Test BDK
         let pii = PiiString::from("Flerp Inc");
-        let fingerprint = DataIdentifier::from(BusinessDataKind::Name).salt_pii_to_sign(&pii);
+        let fingerprint = DataIdentifier::from(BusinessDataKind::Name).legacy_salt_pii_to_sign(&pii);
         let expected_fp: [u8; 32] = [
             161, 180, 84, 228, 16, 240, 168, 166, 132, 47, 102, 90, 177, 221, 216, 47, 58, 232, 38, 0, 21,
             97, 124, 207, 95, 137, 134, 230, 44, 218, 231, 233,
@@ -284,7 +303,7 @@ mod tests {
 
         // Test IDK
         let pii = PiiString::from("Flerp");
-        let fingerprint = DataIdentifier::from(IdentityDataKind::FirstName).salt_pii_to_sign(&pii);
+        let fingerprint = DataIdentifier::from(IdentityDataKind::FirstName).legacy_salt_pii_to_sign(&pii);
         let expected_fp: [u8; 32] = [
             39, 250, 148, 126, 130, 246, 176, 70, 122, 112, 252, 248, 186, 199, 185, 181, 224, 174, 161, 75,
             8, 233, 182, 46, 163, 49, 48, 54, 115, 229, 30, 135,

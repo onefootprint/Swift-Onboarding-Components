@@ -7,6 +7,8 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::count_distinct;
 use diesel::prelude::*;
 use diesel::Queryable;
+use newtypes::FingerprintScopeKind;
+use newtypes::FingerprintVersion;
 use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +28,10 @@ pub struct Fingerprint {
     /// For rows with is_unique, a db-level constraint enforces that no two rows have the same
     /// fingerprint for the same kind
     pub is_unique: bool,
+    /// Version of the fingerprint schema
+    pub version: FingerprintVersion,
+    /// scope to which fingerprint was created for
+    pub scope: FingerprintScopeKind,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -35,6 +41,8 @@ pub struct NewFingerprint {
     pub kind: DataLifetimeKind,
     pub lifetime_id: DataLifetimeId,
     pub is_unique: bool,
+    pub version: FingerprintVersion,
+    pub scope: FingerprintScopeKind,
 }
 
 pub type IsUnique = bool;

@@ -51,6 +51,12 @@ pub struct ScopedSealingKey {
     key: ChaCha20Poly1305KeyBytes,
 }
 
+impl ScopedSealingKey {
+    pub fn sha256(&self) -> [u8; 32] {
+        crate::sha256(&self.key)
+    }
+}
+
 // hide the key from debug prints
 impl Debug for ScopedSealingKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

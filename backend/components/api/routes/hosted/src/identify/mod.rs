@@ -4,6 +4,7 @@ pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::fingerprinter::GlobalFingerprintKind;
 pub mod signup_challenge;
 pub mod verify;
 use crate::errors::ApiError;
@@ -12,8 +13,8 @@ use crate::State;
 use chrono::{DateTime, Duration, Utc};
 use db::models::vault::Vault;
 use newtypes::email::Email;
-use newtypes::{DataIdentifier, VaultId};
-use newtypes::{Fingerprinter, PiiString};
+use newtypes::PiiString;
+use newtypes::{VaultId};
 use newtypes::{IdentityDataKind, PhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
@@ -92,22 +93,15 @@ async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: &Identifier,
 ) -> Result<Option<Vault>, ApiError> {
-    let (idk, data) = match identifier {
-        Identifier::PhoneNumber(phone_number) => {
-            (IdentityDataKind::PhoneNumber, phone_number.e164_with_suffix())
-        }
-        Identifier::Email(email) => (IdentityDataKind::Email, PiiString::from(email.clone())),
+    let (scope, data) = match identifier {
+        Identifier::PhoneNumber(phone_number) => (
+            GlobalFingerprintKind::PhoneNumber,
+            phone_number.e164_with_suffix(),
+        ),
+        Identifier::Email(email) => (GlobalFingerprintKind::Email, PiiString::from(email.clone())),
     };
 
-    let sh_data = state
-        .compute_fingerprint(DataIdentifier::from(idk), data.clean_for_fingerprint())
-        .await?;
-    // TODO should we only look for verified emails?
-    let existing_user = state
-        .db_pool
-        .db_query(move |conn| Vault::find_portable(conn, &sh_data))
-        .await??;
-    Ok(existing_user)
+    state.find_portable_vault_by_fingerprint(scope, &data).await
 }
 
 #[tracing::instrument(skip(state))]

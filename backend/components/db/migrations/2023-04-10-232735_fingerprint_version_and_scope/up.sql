@@ -1,0 +1,6 @@
+ALTER TABLE fingerprint
+    ADD COLUMN version TEXT NOT NULL DEFAULT 'v0',
+    ADD COLUMN scope TEXT NOT NULL DEFAULT 'global';
+
+ALTER TABLE fingerprint ALTER COLUMN version DROP DEFAULT;
+ALTER TABLE fingerprint ALTER COLUMN scope DROP DEFAULT;

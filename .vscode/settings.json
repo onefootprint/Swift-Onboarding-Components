@@ -37,6 +37,7 @@
     "pinpointemail",
     "pulumi",
     "repr",
+    "scopable",
     "sqlx",
     "Tailscale",
     "testkey",

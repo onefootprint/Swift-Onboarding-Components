@@ -143,6 +143,8 @@ table! {
         kind -> Text,
         lifetime_id -> Text,
         is_unique -> Bool,
+        version -> Text,
+        scope -> Text,
     }
 }
 
