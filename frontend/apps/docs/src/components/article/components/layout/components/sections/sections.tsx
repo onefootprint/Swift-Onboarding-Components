@@ -21,7 +21,7 @@ const Sections = ({ sections }: SectionsProps) => {
 
   useEffect(() => {
     scrollSpy();
-    setActiveSection(sections[0].id);
+    setActiveSection(sections.length ? sections[0].id : null);
   }, [sections]);
 
   useEffect(() => {
