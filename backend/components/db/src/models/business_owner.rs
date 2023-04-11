@@ -40,7 +40,7 @@ impl BusinessOwner {
             user_vault_id: Some(user_vault_id),
             business_vault_id,
             kind: BusinessOwnerKind::Primary,
-            link_id: BoLinkId::generate(),
+            link_id: BoLinkId::generate(BusinessOwnerKind::Primary),
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)

@@ -2,7 +2,7 @@ pub use derive_more::{Add, Display, From, FromStr, Into};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::VaultKind;
+use crate::{BusinessOwnerKind, VaultKind};
 
 /// This macro generates an Id type that wraps a string
 macro_rules! define_newtype_id {
@@ -315,8 +315,15 @@ impl BoLinkId {
     const LENGTH: usize = 22;
     const PREFIX: &str = "bo_link";
 
-    pub fn generate() -> Self {
-        Self(generate_random_id(Self::PREFIX, Self::LENGTH))
+    pub fn generate(kind: BusinessOwnerKind) -> Self {
+        match kind {
+            // All primary BOs will have a fixed link ID
+            BusinessOwnerKind::Primary => Self(format!("{}_primary", Self::PREFIX)),
+            // All secondary BOs have a randomly-generated link ID.
+            // Could theoretically just use the index of the BO to link, but that gives us less
+            // protection against accidentally changing the BOs
+            BusinessOwnerKind::Secondary => Self(generate_random_id(Self::PREFIX, Self::LENGTH)),
+        }
     }
 }
 

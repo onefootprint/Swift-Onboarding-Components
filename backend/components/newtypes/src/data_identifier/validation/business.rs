@@ -1,7 +1,7 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::email::Email;
-use crate::{BoLinkId, BusinessDataKind as BDK, PhoneNumber, PiiString};
+use crate::{BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, PhoneNumber, PiiString};
 use crate::{NtResult, Validate};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -102,7 +102,8 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         // BO in the DB
         let bos_with_id = bos
             .into_iter()
-            .map(|bo| {
+            .enumerate()
+            .map(|(i, bo)| {
                 let KycedBusinessOwnerData {
                     link_id: _,
                     first_name,
@@ -111,9 +112,13 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
                     phone_number,
                     ownership_stake,
                 } = bo;
+                let kind = if i == 0 {
+                    BusinessOwnerKind::Primary
+                } else {
+                    BusinessOwnerKind::Secondary
+                };
                 KycedBusinessOwnerData {
-                    // TODO weird becuase the primary BO's link_id won't match
-                    link_id: BoLinkId::generate(),
+                    link_id: BoLinkId::generate(kind),
                     first_name,
                     last_name,
                     email,

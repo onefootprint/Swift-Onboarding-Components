@@ -15,7 +15,6 @@ use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerData;
-use newtypes::BusinessOwnerKind as BoKind;
 use newtypes::FpId;
 use newtypes::KycedBusinessOwnerData;
 use paperclip::actix::{api_v2_operation, get, web};
@@ -86,16 +85,9 @@ pub async fn get(
             let kyced_bos: Vec<KycedBusinessOwnerData> = kyced_bos.deserialize()?;
             kyced_bos
                 .into_iter()
-                .enumerate()
-                .map(|(i, vault_bo)| {
+                .map(|vault_bo| {
                     let ownership_stake = Some(vault_bo.ownership_stake);
-                    // This is horrible - the primary BO's link_id doesn't match between the vault and DB
-                    // So, we just match the first vault_bo with the primary BO from the DB
-                    let bo = if i == 0 {
-                        bos.iter().find(|bo| bo.0.kind == BoKind::Primary).cloned()
-                    } else {
-                        bos.iter().find(|bo| bo.0.link_id == vault_bo.link_id).cloned()
-                    };
+                    let bo = bos.iter().find(|bo| bo.0.link_id == vault_bo.link_id).cloned();
                     (ownership_stake, bo)
                 })
                 .collect()
