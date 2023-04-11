@@ -4,6 +4,9 @@ from tests.auth import BusinessOwnerAuth
 from tests.utils import (
     get,
     create_ob_config,
+    inherit_user,
+    challenge_user,
+    identify_verify,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -44,7 +47,6 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Check the business information for the hosted bifrost flow associated with the secondary BO's
     # token
     body = get("hosted/business", None, secondary_bo_token)
-    print(body)
     assert body["name"] == primary_bo.client.data["business.name"]
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
@@ -80,7 +82,21 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     assert body[1]["status"] == "pass"
     assert body[1]["ownership_stake"] == 30
 
-    # TODO test can't reuse secondary BO token for other user but can reuse for same user
+    # Should be able to use the BO token in identify flow for same user
+    inherit_user(
+        twilio, secondary_bo.client.data["id.phone_number"], secondary_bo_token
+    )
+
+    # But not for a different user
+    phone_number = primary_bo.client.data["id.phone_number"]
+    challenge_token = challenge_user(phone_number)
+    identify_verify(
+        twilio,
+        phone_number,
+        challenge_token,
+        ob_config_auth=secondary_bo_token,
+        expected_error="This business owner has already started KYC",
+    )
 
 
 # TODO test when secondary BO one-clicks

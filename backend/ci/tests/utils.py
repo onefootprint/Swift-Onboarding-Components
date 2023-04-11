@@ -125,7 +125,20 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def inherit_user(twilio, phone_number, tenant_pk):
+def inherit_user(twilio, phone_number, ob_config_auth):
+    challenge_token = challenge_user(phone_number)
+
+    # Log in as the user
+    return identify_verify(
+        twilio,
+        phone_number,
+        challenge_token,
+        ob_config_auth=ob_config_auth,
+        expected_kind="user_inherited",
+    )
+
+
+def challenge_user(phone_number):
     identifier = dict(phone_number=phone_number)
     # Support sandbox phone numbers being passed in
     real_phone_number = phone_number.split("#")[0]
@@ -153,19 +166,7 @@ def inherit_user(twilio, phone_number, tenant_pk):
         return body["challenge_data"]["challenge_token"]
 
     try_until_success(identify, 5)
-    challenge_token = try_until_success(challenge, 20)
-
-    # Log in as the user
-    return try_until_success(
-        lambda: identify_verify(
-            twilio,
-            real_phone_number,
-            challenge_token,
-            ob_config_auth=tenant_pk,
-            expected_kind="user_inherited",
-        ),
-        5,
-    )
+    return try_until_success(challenge, 20)
 
 
 def identify_verify(
@@ -174,32 +175,42 @@ def identify_verify(
     challenge_token,
     ob_config_auth=None,
     expected_kind="user_created",
+    expected_error=None,
 ):
-    messages = twilio.messages.list(to=phone_number, limit=6)
+    def inner():
+        real_phone_number = phone_number.split("#")[0]
+        messages = twilio.messages.list(to=real_phone_number, limit=10)
 
-    last_error = None
-    for message in messages:
-        try:
-            code = str(re.search("\\d{6}", message.body).group(0))
-        except:
-            # No code in this message, move on to the next
-            continue
+        last_error = None
+        for message in messages:
+            try:
+                code = str(re.search("\\d{6}", message.body).group(0))
+            except Exception as e:
+                # No code in this message, move on to the next
+                continue
 
-        try:
-            data = {
-                "challenge_response": code,
-                "challenge_kind": "sms",
-                "challenge_token": challenge_token,
-            }
-            args = [ob_config_auth] if ob_config_auth else []
-            body = post("hosted/identify/verify", data, *args)
-            assert body["kind"] == expected_kind
-            return FpAuth(body["auth_token"])
-        except HttpError as e:
-            last_error = e
-    if last_error:
-        raise last_error
-    assert False, "Didn't find correct code for identify"
+            try:
+                data = {
+                    "challenge_response": code,
+                    "challenge_kind": "sms",
+                    "challenge_token": challenge_token,
+                }
+                args = [ob_config_auth] if ob_config_auth else []
+                body = post("hosted/identify/verify", data, *args)
+                assert body["kind"] == expected_kind
+                return FpAuth(body["auth_token"])
+            except HttpError as e:
+                if "Incorrect PIN code" not in str(e):
+                    print(e)
+                if expected_error and expected_error in str(e):
+                    # The specific error we expected to see was returned from verify - we can exit
+                    return
+                last_error = e
+        if last_error:
+            raise last_error
+        assert False, "Didn't find correct code for identify"
+
+    return try_until_success(inner, 5)
 
 
 def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> BasicUser:
@@ -209,7 +220,7 @@ def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> Basic
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = dict(phone_number=sandbox_phone_number)
-        body = post("hosted/identify/signup_challenge", data)
+        body = post("hosted/identify/signup_challenge", data, ob_config_auth)
         return body["challenge_data"]["challenge_token"]
 
     challenge_token = try_until_success(
@@ -217,11 +228,8 @@ def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> Basic
     )  # Rate limiting may take a while
 
     # Respond to the challenge and create the sandbox user
-    auth_token = try_until_success(
-        lambda: identify_verify(
-            twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
-        ),
-        5,
+    auth_token = identify_verify(
+        twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
     )
 
     return BasicUser(
