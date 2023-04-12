@@ -41,6 +41,29 @@ pub async fn vault_pii(
         let principal = auth.actor().into();
         let insight = CreateInsightEvent::from(insights.clone());
 
+        // build the update request
+        // filter out data types we don't yet support
+        // TODO: support document ingress too
+        let data: HashMap<_, _> = values
+            .into_iter()
+            .filter_map(|(di, value)| match di {
+                DataIdentifier::Selfie(_) | DataIdentifier::IdDocument(_) | DataIdentifier::Document(_) => {
+                    None
+                }
+                DataIdentifier::InvestorProfile(_)
+                | DataIdentifier::Business(_)
+                | DataIdentifier::Id(_)
+                | DataIdentifier::Custom(_) => Some((di, value)),
+            })
+            .collect();
+
+        // skip empty ingress
+        if data.is_empty() {
+            continue;
+        }
+        let data = DataRequest::clean_and_validate(data, ParseOptions::for_non_portable())?;
+        let data = data.build_tenant_fingerprints(state, &tenant_id).await?;
+
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
@@ -48,36 +71,16 @@ pub async fn vault_pii(
                 // TODO what happens if we want to vault data in a business vault?
                 let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_user.id)?;
 
-                // vault the custom data
-                let custom: HashMap<_, _> = values
-                    .iter()
-                    .filter_map(|(di, value)| match di {
-                        DataIdentifier::Selfie(_)
-                        | DataIdentifier::Id(_)
-                        | DataIdentifier::IdDocument(_)
-                        | DataIdentifier::InvestorProfile(_)
-                        | DataIdentifier::Business(_)
-                        | DataIdentifier::Document(_) => None,
-                        DataIdentifier::Custom(k) => Some((k.clone().into(), value.clone())),
-                    })
-                    .collect();
-
-                if !custom.is_empty() {
-                    NewAccessEvent {
-                        scoped_vault_id: scoped_user.id.clone(),
-                        reason: None,
-                        principal,
-                        insight,
-                        kind: AccessEventKind::Update,
-                        targets: custom.keys().cloned().collect(),
-                    }
-                    .create(conn)?;
-                    // TODO could technically now support vaulting any kind of data instead of just custom. Just need to fingerprint data too
-                    let data = DataRequest::clean_and_validate(custom, ParseOptions::for_non_portable())?;
-                    // TODO: fingerprint tenant scoped data here
-                    let data = data.no_fingerprints();
-                    uvw.put_person_data(conn, data)?;
+                NewAccessEvent {
+                    scoped_vault_id: scoped_user.id.clone(),
+                    reason: None,
+                    principal,
+                    insight,
+                    kind: AccessEventKind::Update,
+                    targets: data.keys().cloned().collect(),
                 }
+                .create(conn)?;
+                uvw.put_person_data(conn, data)?;
 
                 Ok(())
             })
