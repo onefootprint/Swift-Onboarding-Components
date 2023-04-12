@@ -1,7 +1,7 @@
 use actix_web::{web, FromRequest};
 use api_core::auth::AuthError;
 use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::State;
+use api_core::{decision, State};
 use crypto::hex;
 use futures_util::Future;
 use paperclip::actix::Apiv2Header;
@@ -10,9 +10,11 @@ use std::pin::Pin;
 
 #[api_v2_operation(description = "Handles Middesk webhooks.", tags(Private))]
 #[post("/webhooks/middesk/handle_webhook")]
-async fn handle_webhook(webhook_signature: MiddeskWebhookSignature) -> JsonApiResponse<EmptyResponse> {
-    let request = webhook_signature.request;
-    tracing::info!("Received webhook from Middesk: {:?}", request);
+async fn handle_webhook(
+    webhook_signature: MiddeskWebhookSignature,
+    state: web::Data<State>,
+) -> JsonApiResponse<EmptyResponse> {
+    decision::vendor::make_request::handle_middesk_webhook(&state.db_pool, webhook_signature.request).await?;
 
     EmptyResponse::ok().json()
 }

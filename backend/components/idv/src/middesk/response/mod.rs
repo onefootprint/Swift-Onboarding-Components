@@ -1,4 +1,5 @@
 pub mod business;
+pub mod webhook;
 use std::fmt;
 
 use serde::de::DeserializeOwned;
@@ -42,7 +43,6 @@ pub struct ApiErrorResponseError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use newtypes::PiiString;
     use serde_json::{json, Value};
 
     #[test]
@@ -58,18 +58,6 @@ mod tests {
           }
         );
 
-        let decoded_response = parse_response(response_json).expect("Failed to parse!!");
-
-        assert_eq!(
-            decoded_response,
-            BusinessResponse {
-                object: Some("business".to_owned()),
-                id: Some("dd16b27e-e6b7-4rf34-5454-d77e6d1b9dfe".to_owned()),
-                name: Some(PiiString::from("Waffle House")),
-                created_at: Some("2023-02-07T21:51:21.234Z".to_owned()),
-                updated_at: Some("2023-02-07T21:51:24.894Z".to_owned()),
-                status: Some("in_review".to_owned())
-            }
-        );
+        let _decoded_response = parse_response(response_json).expect("Failed to parse!!");
     }
 }

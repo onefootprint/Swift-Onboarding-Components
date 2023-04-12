@@ -1,10 +1,14 @@
-use crate::PgConn;
+use crate::schema::{decision_intent, verification_request};
 use crate::{schema::verification_result, DbError};
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{ScrubbedJsonValue, SealedVaultBytes, VerificationRequestId, VerificationResultId};
+use newtypes::{ScrubbedJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
+
+use super::decision_intent::DecisionIntent;
+use super::verification_request::VerificationRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[diesel(table_name = verification_result)]
@@ -59,5 +63,26 @@ impl VerificationResult {
             .values(new_verification_results)
             .get_results(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_by_response_id(
+        conn: &mut PgConn,
+        vendor_api: VendorAPI,
+        id: &str,
+    ) -> DbResult<Option<(VerificationRequest, VerificationResult, DecisionIntent)>> {
+        let res = verification_request::table
+            .filter(verification_request::vendor_api.eq(vendor_api))
+            .inner_join(verification_result::table)
+            .filter(
+                verification_result::response
+                    .retrieve_by_path_as_text(vec!["id"])
+                    .eq(id),
+            )
+            .inner_join(decision_intent::table)
+            .get_result(conn)
+            .optional()?;
+
+        Ok(res)
     }
 }

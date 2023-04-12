@@ -1,10 +1,13 @@
 #![allow(clippy::too_many_arguments)]
 use super::tenant_vendor_control::TenantVendorControl;
+use super::vendor_result::VendorResult;
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
+
+use db::models::verification_result::VerificationResult;
 use db::DbPool;
 use db::{
     models::{
@@ -17,15 +20,15 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::middesk::response::business::BusinessResponse;
-use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
+use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::middesk::{self, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
-use newtypes::{BusinessData, DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI};
+use newtypes::{BusinessData, DocVData, IdvData, ObConfigurationKey, PiiJsonValue, PiiString, VendorAPI};
 use prometheus::labels;
 
-/// Branch on vendor and send requests to vendors
 #[tracing::instrument(skip(
     db_pool,
     ff_client,
@@ -623,6 +626,65 @@ async fn send_middesk_call(
             parsed_response: parsed,
         })
     }
+}
+
+pub async fn handle_middesk_webhook(db_pool: &DbPool, res: serde_json::Value) -> Result<(), ApiError> {
+    match middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)? {
+        middesk::response::webhook::MiddeskWebhookResponse::BusinessUpdate(b) => {
+            handle_middesk_business_response(db_pool, b, res).await
+        }
+    }
+}
+
+pub async fn handle_middesk_business_response(
+    db_pool: &DbPool,
+    middesk_response: MiddeskBusinessUpdateWebhookResponse,
+    raw_res: serde_json::Value,
+) -> Result<(), ApiError> {
+    let business_id =
+        middesk_response
+            .business_id()
+            .ok_or(idv::Error::from(middesk::Error::ExpectedFieldMissing(
+                "business_id".to_owned(),
+            )))?;
+
+    let _vendor_res = db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            // Lookup the VRes for the POST /business call we made so we can associate this webhook with a particular scoped_vault
+            let (create_business_vreq, _, di) =
+                VerificationResult::get_by_response_id(conn, VendorAPI::MiddeskCreateBusiness, &business_id)?
+                    .ok_or(idv::Error::from(middesk::Error::CreateBusinessResultNotFound(
+                        business_id,
+                    )))?;
+
+            // Create a VerificationRequest + VerificationResult for the webhook response
+            let vreq = VerificationRequest::create(
+                conn,
+                &create_business_vreq.scoped_vault_id,
+                &di.id,
+                VendorAPI::MiddeskBusinessUpdateWebhook,
+            )?;
+
+            let uv = VerificationRequest::get_user_vault(conn, vreq.id.clone())?;
+
+            let vendor_response = VendorResponse {
+                response: ParsedResponse::MiddeskBusinessUpdateWebhook(middesk_response),
+                raw_response: PiiJsonValue::new(raw_res),
+            };
+            let vr = (vreq.clone(), vendor_response.clone());
+
+            let verification_result =
+                verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
+
+            Ok(VendorResult {
+                response: vendor_response,
+                verification_result_id: verification_result.id,
+                verification_request_id: vreq.id,
+            })
+        })
+        .await?;
+
+    Ok(())
 }
 
 #[cfg(test)]

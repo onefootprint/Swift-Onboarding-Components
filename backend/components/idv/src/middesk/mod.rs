@@ -29,6 +29,14 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
     #[error("url error: {0}")]
     RequestUrlError(#[from] url::ParseError),
+    #[error("expected field missing: {0}")]
+    ExpectedFieldMissing(String),
+    #[error("VerificationResult not found for business_id: {0}")]
+    CreateBusinessResultNotFound(String),
+    #[error("Malformed webhook response")]
+    MalformedWebhookResponse,
+    #[error("Unexpected webhook type: {0}")]
+    UnexpectedWebhookType(String),
 }
 
 #[derive(Debug, thiserror::Error)]

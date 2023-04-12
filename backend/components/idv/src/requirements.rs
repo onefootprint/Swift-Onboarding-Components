@@ -77,6 +77,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IdologyPa => idology_pa_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::MiddeskCreateBusiness => false,
+        VendorAPI::MiddeskBusinessUpdateWebhook => false,
     }
 }
 
@@ -100,6 +101,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::SocureIDPlus => true,
         VendorAPI::ExperianPreciseID => true,
         VendorAPI::MiddeskCreateBusiness => false,
+        VendorAPI::MiddeskBusinessUpdateWebhook => false,
     }
 }
 

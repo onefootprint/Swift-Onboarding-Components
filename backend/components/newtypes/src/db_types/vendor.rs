@@ -74,6 +74,7 @@ pub enum VendorAPI {
     SocureIDPlus,
     ExperianPreciseID,
     MiddeskCreateBusiness,
+    MiddeskBusinessUpdateWebhook,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -89,6 +90,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IdologyPa => Self::Idology,
             VendorAPI::ExperianPreciseID => Self::Experian,
             VendorAPI::MiddeskCreateBusiness => Self::Middesk,
+            VendorAPI::MiddeskBusinessUpdateWebhook => Self::Middesk,
         }
     }
 }
@@ -112,6 +114,7 @@ impl VendorAPI {
             VendorAPI::IdologyPa => false,
             VendorAPI::ExperianPreciseID => false,
             VendorAPI::MiddeskCreateBusiness => false,
+            VendorAPI::MiddeskBusinessUpdateWebhook => false,
         }
     }
 }

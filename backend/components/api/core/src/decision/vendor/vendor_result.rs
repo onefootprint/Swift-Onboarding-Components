@@ -73,6 +73,11 @@ impl VendorResult {
                         newtypes::VendorAPI::MiddeskCreateBusiness => {
                             ParsedResponse::from_middesk_create_business(decrypted_response.into_leak())?
                         }
+                        newtypes::VendorAPI::MiddeskBusinessUpdateWebhook => {
+                            ParsedResponse::from_middesk_business_update_webhook(
+                                decrypted_response.into_leak(),
+                            )?
+                        }
                     };
                     let res = VendorResult {
                         response: VendorResponse {

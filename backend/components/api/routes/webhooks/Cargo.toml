@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 api_core = { path = "../../core" }
 crypto = { path = "../../../enclave/crypto" }
+idv = { path = "../../../idv" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 paperclip = { workspace = true }
