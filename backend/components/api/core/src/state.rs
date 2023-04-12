@@ -103,16 +103,6 @@ impl State {
         let idology_client = IdologyClient::new(
             config.idology_config.username.clone().into(),
             config.idology_config.password.clone().into(),
-            config
-                .idology_config
-                .fractional_username
-                .clone()
-                .map(|i| i.into()),
-            config
-                .idology_config
-                .fractional_password
-                .clone()
-                .map(|i| i.into()),
         )
         .expect("failed to build idology client");
 

@@ -1,4 +1,6 @@
+use crate::config::Config;
 use crate::decision::vendor;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
@@ -25,7 +27,6 @@ use db::{
 };
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
-use idv::idology::pa::IdologyCredentials;
 use idv::{
     idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     VendorResponse,
@@ -46,6 +47,7 @@ pub(crate) struct WatchlistCheckTask {
         dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error> + Send + Sync,
     >,
     webhook_client: Box<dyn WebhookClient + Send + Sync>,
+    config: Config,
 }
 
 impl WatchlistCheckTask {
@@ -59,6 +61,7 @@ impl WatchlistCheckTask {
                 + Sync,
         >,
         webhook_client: Box<dyn WebhookClient + Send + Sync>,
+        config: Config,
     ) -> Self {
         Self {
             db_pool,
@@ -66,6 +69,7 @@ impl WatchlistCheckTask {
             enclave_client,
             idology_client,
             webhook_client,
+            config,
         }
     }
 }
@@ -128,6 +132,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     &vreq,
                     &svid,
                     &tenant_id,
+                    &self.config,
                 )
                 .await?
             };
@@ -276,13 +281,6 @@ impl WatchlistCheckTask {
         Ok(vendor_result.response)
     }
 
-    fn credentials_for_tenant(tenant_id: &TenantId) -> IdologyCredentials {
-        match tenant_id.to_string().as_str() {
-            "org_PtnIJT4VR35BS9xy0wITgF" => IdologyCredentials::Fractional,
-            _ => IdologyCredentials::Footprint,
-        }
-    }
-
     #[allow(clippy::borrowed_box)]
     async fn make_vendor_call(
         db_pool: &DbPool,
@@ -295,6 +293,7 @@ impl WatchlistCheckTask {
         vreq: &VerificationRequest,
         sv_id: &ScopedVaultId,
         tenant_id: &TenantId,
+        config: &Config,
     ) -> Result<VendorResponse, TaskError> {
         let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
             db_pool,
@@ -303,12 +302,11 @@ impl WatchlistCheckTask {
         )
         .await?;
 
-        let credentials = Self::credentials_for_tenant(tenant_id);
+        let tenant_vendor_control =
+            TenantVendorControl::new(tenant_id.clone(), db_pool, enclave_client, config).await?;
+
         let res = idology_client
-            .make_request(IdologyPaRequest {
-                idv_data,
-                credentials,
-            })
+            .make_request(tenant_vendor_control.build_idology_pa_request(idv_data))
             .await?;
 
         let vendor_response = VendorResponse {

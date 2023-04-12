@@ -1,3 +1,4 @@
+use crate::config::Config;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::enclave_client::EnclaveClient;
 use crate::task::ExecuteTask;
@@ -37,7 +38,7 @@ async fn non_live_vault(db_pool: TestDbPool) {
     let onboarding_status = OnboardingStatus::Pass;
     let idks = full_vault();
 
-    let (sv, task, mock_pa_client, enclave_client, mock_webhook_client) =
+    let (sv, task, mock_pa_client, enclave_client, mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     // RUN
@@ -48,6 +49,7 @@ async fn non_live_vault(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await
     .unwrap();
@@ -70,7 +72,7 @@ async fn non_active_onboarding_test_case(db_pool: TestDbPool, onboarding_status:
     let is_live = true;
     let idks = full_vault();
 
-    let (sv, task, mock_pa_client, enclave_client, mock_webhook_client) =
+    let (sv, task, mock_pa_client, enclave_client, mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     // RUN
@@ -81,6 +83,7 @@ async fn non_active_onboarding_test_case(db_pool: TestDbPool, onboarding_status:
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await
     .unwrap();
@@ -117,7 +120,7 @@ async fn insufficient_data_in_vault(db_pool: TestDbPool) {
     let onboarding_status = OnboardingStatus::Pass;
     let idks = vec![IDK::FirstName, IDK::LastName];
 
-    let (sv, task, mock_pa_client, enclave_client, mut mock_webhook_client) =
+    let (sv, task, mock_pa_client, enclave_client, mut mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     expect_webhook(
@@ -134,6 +137,7 @@ async fn insufficient_data_in_vault(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await
     .unwrap();
@@ -153,7 +157,7 @@ async fn vendor_error(db_pool: TestDbPool) {
     let onboarding_status = OnboardingStatus::Pass;
     let idks = full_vault();
 
-    let (sv, task, mut mock_pa_client, enclave_client, mock_webhook_client) =
+    let (sv, task, mut mock_pa_client, enclave_client, mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     mock_pa_client
@@ -169,6 +173,7 @@ async fn vendor_error(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await;
 
@@ -189,7 +194,7 @@ async fn vendor_hit(db_pool: TestDbPool) {
     let onboarding_status = OnboardingStatus::Pass;
     let idks = full_vault();
 
-    let (sv, task, mut mock_pa_client, enclave_client, mut mock_webhook_client) =
+    let (sv, task, mut mock_pa_client, enclave_client, mut mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     mock_pa_client
@@ -207,6 +212,7 @@ async fn vendor_hit(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await
     .unwrap();
@@ -228,7 +234,7 @@ async fn vendor_no_hit(db_pool: TestDbPool) {
     let onboarding_status = OnboardingStatus::Pass;
     let idks = full_vault();
 
-    let (sv, task, mut mock_pa_client, enclave_client, mut mock_webhook_client) =
+    let (sv, task, mut mock_pa_client, enclave_client, mut mock_webhook_client, config) =
         setup(&db_pool, is_live, onboarding_status, idks).await;
 
     mock_pa_client
@@ -246,6 +252,7 @@ async fn vendor_no_hit(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        config,
     )
     .await
     .unwrap();
@@ -279,7 +286,8 @@ async fn non_portable_vault(db_pool: TestDbPool) {
         .unwrap();
 
     let mut mock_pa_client = MockPaClient::new();
-    let enclave_client = StateWithMockEnclave::init().await.state.enclave_client.clone();
+    let state = &StateWithMockEnclave::init().await.state;
+    let enclave_client = state.enclave_client.clone();
     let mut mock_webhook_client = MockWebhookClient::new();
 
     mock_pa_client
@@ -297,6 +305,7 @@ async fn non_portable_vault(db_pool: TestDbPool) {
         mock_pa_client,
         enclave_client,
         mock_webhook_client,
+        state.config.clone(),
     )
     .await
     .unwrap();
@@ -319,7 +328,14 @@ async fn setup(
     is_live: bool,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
-) -> (ScopedVault, Task, MockPaClient, EnclaveClient, MockWebhookClient) {
+) -> (
+    ScopedVault,
+    Task,
+    MockPaClient,
+    EnclaveClient,
+    MockWebhookClient,
+    Config,
+) {
     let (_tenant, _onboarding, _uv, sv, task) = db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (tenant, onboarding, uv, sv) = crate::tests::fixtures::lib::create_user_and_onboarding(
@@ -335,7 +351,8 @@ async fn setup(
         .unwrap();
 
     let mock_idology_api_call = MockPaClient::new();
-    let enclave_client = StateWithMockEnclave::init().await.state.enclave_client.clone();
+    let state = &StateWithMockEnclave::init().await.state;
+    let enclave_client = state.enclave_client.clone();
     let mock_webhook_client = MockWebhookClient::new();
 
     (
@@ -344,6 +361,7 @@ async fn setup(
         mock_idology_api_call,
         enclave_client,
         mock_webhook_client,
+        state.config.clone(),
     )
 }
 
@@ -354,6 +372,7 @@ async fn run_task(
     mock_pa_client: MockPaClient,
     enclave_client: EnclaveClient,
     mock_webhook_client: MockWebhookClient,
+    config: Config,
 ) -> Result<(), TaskError> {
     let db_pool: &DbPool = test_db_pool;
     // TODO: make trait + mock webhooks
@@ -365,6 +384,7 @@ async fn run_task(
         enclave_client,
         Box::new(mock_pa_client),
         Box::new(mock_webhook_client),
+        config,
     );
     let args = WatchlistCheckArgs {
         scoped_vault_id: svid.clone(),

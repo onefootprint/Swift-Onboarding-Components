@@ -1,4 +1,4 @@
-use newtypes::{IdvData, PiiJsonValue};
+use newtypes::{vendor_credentials::IdologyCredentials, IdvData, PiiJsonValue};
 
 use self::response::PaResponse;
 
@@ -8,11 +8,6 @@ pub mod response;
 pub struct IdologyPaRequest {
     pub idv_data: IdvData,
     pub credentials: IdologyCredentials,
-}
-
-pub enum IdologyCredentials {
-    Footprint,
-    Fractional,
 }
 
 #[derive(Clone)]
@@ -25,7 +20,10 @@ pub struct IdologyPaAPIResponse {
 mod test {
     use newtypes::{IdvData, PiiString};
 
-    use crate::idology::{client::IdologyClient, expectid::response::Restriction, fixtures};
+    use crate::{
+        footprint_http_client::FootprintVendorHttpClient,
+        idology::{expectid::response::Restriction, fixtures, standalone_pa},
+    };
 
     use super::*;
 
@@ -33,10 +31,8 @@ mod test {
     #[tokio::test]
     async fn test_standalone_pa() {
         let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
-        let username = test_data.username.clone();
-        let password = test_data.password.clone();
 
-        let client = IdologyClient::new(username, password, None, None).unwrap();
+        let client = FootprintVendorHttpClient::new().unwrap();
 
         let idv_data = IdvData {
             first_name: Some(PiiString::from(test_data.first_name.clone())),
@@ -45,14 +41,20 @@ mod test {
             zip: Some(PiiString::from(test_data.zip.clone())),
             ..Default::default()
         };
+        let credentials = IdologyCredentials {
+            username: test_data.username.clone(),
+            password: test_data.password.clone(),
+        };
 
-        let res = client
-            .standalone_pa(IdologyPaRequest {
+        let res = standalone_pa(
+            &client,
+            IdologyPaRequest {
                 idv_data,
-                credentials: IdologyCredentials::Footprint,
-            })
-            .await
-            .unwrap();
+                credentials,
+            },
+        )
+        .await
+        .unwrap();
         let parsed_response = response::parse_response(res).unwrap();
         assert_eq!(
             Restriction {

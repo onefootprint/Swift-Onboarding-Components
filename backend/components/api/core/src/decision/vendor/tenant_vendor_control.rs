@@ -5,7 +5,10 @@ use db::{
     models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl},
     DbPool, DbResult,
 };
-use idv::{experian::ExperianCrossCoreRequest, idology::IdologyExpectIDRequest};
+use idv::{
+    experian::ExperianCrossCoreRequest,
+    idology::{pa::IdologyPaRequest, IdologyExpectIDRequest},
+};
 use newtypes::{
     vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
     EncryptedVaultPrivateKey, IdvData, PiiString, TenantId, Vendor, VendorAPI,
@@ -63,6 +66,13 @@ impl TenantVendorControl {
         ExperianCrossCoreRequest {
             idv_data,
             credentials: self.experian_credentials(),
+        }
+    }
+
+    pub fn build_idology_pa_request(&self, idv_data: IdvData) -> IdologyPaRequest {
+        IdologyPaRequest {
+            idv_data,
+            credentials: self.idology_credentials(),
         }
     }
 }

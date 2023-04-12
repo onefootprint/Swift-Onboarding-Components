@@ -24,6 +24,7 @@ use tokio_retry::{
 };
 
 use self::common::request::{IdologyRequestData, Request};
+use self::pa::IdologyPaRequest;
 use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
 
 pub struct IdologyExpectIDRequest {
@@ -118,6 +119,36 @@ pub async fn poll_scan_verify_results_request(
     })
 }
 
+pub async fn standalone_pa(
+    fp_http_client: &FootprintVendorHttpClient,
+    request: IdologyPaRequest,
+) -> Result<serde_json::Value, IdologyError::Error> {
+    let IdologyPaRequest {
+        idv_data,
+        credentials,
+    } = request;
+
+    let url = "https://web.idologylive.com/api/pa-standalone.svc";
+    let req_data = pa::request::RequestData::try_from(idv_data)?;
+    let req_list = Request::new(
+        credentials.username,
+        credentials.password,
+        IdologyRequestData::Pa(req_data),
+    );
+    let response = fp_http_client
+        .client
+        .post(url)
+        .query(&req_list)
+        .send()
+        .await
+        .map_err(|err| IdologyError::ReqwestError::SendError(err.to_string()))?;
+
+    let idology_response = response
+        .json::<serde_json::Value>()
+        .await
+        .map_err(IdologyError::ReqwestError::InternalError)?;
+    Ok(idology_response)
+}
 /// Scan onboarding
 /// As of 2023-01-06, acc to their API docs, we don't need to poll /shrug
 #[tracing::instrument(skip_all)]
@@ -180,13 +211,8 @@ mod test {
             password: test_data.password.clone(),
         };
         // TODO: remove as Part of migrating away from clients with credentials per vendor
-        let legacy_idology_client = IdologyClient::new(
-            credentials.username.clone(),
-            credentials.password.clone(),
-            None,
-            None,
-        )
-        .unwrap();
+        let legacy_idology_client =
+            IdologyClient::new(credentials.username.clone(), credentials.password.clone()).unwrap();
         // ////////////
         // Send to ExpectID
         // ////////////
@@ -268,13 +294,9 @@ mod test {
             document_type: Some(test_data.scan_document_type),
         };
 
-        let client = super::client::IdologyClient::new(
-            test_data.username.clone(),
-            test_data.password.clone(),
-            None,
-            None,
-        )
-        .unwrap();
+        let client =
+            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
+                .unwrap();
 
         let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
 
@@ -307,13 +329,9 @@ mod test {
             document_type: Some(test_data.scan_document_type),
         };
 
-        let client = super::client::IdologyClient::new(
-            test_data.username.clone(),
-            test_data.password.clone(),
-            None,
-            None,
-        )
-        .unwrap();
+        let client =
+            super::client::IdologyClient::new(test_data.username.clone(), test_data.password.clone())
+                .unwrap();
 
         let scan_ob_res = send_scan_onboarding_request(&client, docv_data).await.unwrap();
         let ParsedResponse::IDologyScanOnboarding(scan_ob_response) = scan_ob_res.response else {

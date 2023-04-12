@@ -3,7 +3,6 @@ use idv::{
     experian::{self, ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     footprint_http_client::FootprintVendorHttpClient,
     idology::{
-        client::IdologyClient,
         pa::{IdologyPaAPIResponse, IdologyPaRequest},
         IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
     },
@@ -76,12 +75,14 @@ impl VendorAPIResponse for IdologyExpectIDAPIResponse {
 /// Idology Impl - PA
 /// ////////////////
 #[async_trait]
-impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error> for IdologyClient {
+impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>
+    for FootprintVendorHttpClient
+{
     async fn make_request(
         &self,
         request: IdologyPaRequest,
     ) -> Result<IdologyPaAPIResponse, idv::idology::error::Error> {
-        let raw_response = self.standalone_pa(request).await?; // TODO: this should return PiiJsonValue itself
+        let raw_response = idv::idology::standalone_pa(self, request).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::pa::response::parse_response(raw_response.clone())?;
 
         parsed_response.response.validate()?;
