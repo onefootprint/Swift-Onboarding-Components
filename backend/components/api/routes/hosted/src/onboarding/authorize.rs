@@ -77,7 +77,13 @@ pub async fn post(
                 ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
             }
             let bizob = biz_ob
-                .map(|b| b.update(c, OnboardingUpdate::is_authorized()))
+                .map(|b| {
+                    if b.authorized_at.is_none() {
+                        b.update(c, OnboardingUpdate::is_authorized())
+                    } else {
+                        Ok(b)
+                    }
+                })
                 .transpose()?;
 
             Ok((ob_info, bizob, tenant))
