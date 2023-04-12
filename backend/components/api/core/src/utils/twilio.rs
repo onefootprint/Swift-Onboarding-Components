@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use crate::{
-    errors::{challenge::ChallengeError, ApiError},
+    errors::{challenge::ChallengeError, ApiError, ApiResult},
     State,
 };
 use chrono::{Duration, Utc};
@@ -39,12 +39,45 @@ impl TwilioClient {
     }
 
     #[tracing::instrument(skip_all)]
+    /// Rate limits sending messages to the destination phone number and then spawns an async task
+    /// to send the message_body
+    async fn send_message(
+        &self,
+        state: &State,
+        message_body: String,
+        destination: &PhoneNumber,
+        rate_limit_scope: &str,
+    ) -> ApiResult<()> {
+        RateLimit {
+            state,
+            phone_number: destination,
+            period: self.duration_between_challenges,
+            scope: rate_limit_scope,
+        }
+        .enforce_and_update()
+        .await?;
+        // spawn this async so we return immediately
+        let client = self.client.clone();
+        let destination_clone = destination.clone();
+
+        tokio::spawn(async move {
+            let _ = client
+                .send_message(destination_clone.e164().leak(), message_body)
+                .await
+                .map_err(|err| {
+                    tracing::error!(error=?err, "twilio error");
+                });
+        });
+        Ok(())
+    }
+
+    #[tracing::instrument(skip_all)]
     pub async fn send_challenge(
         &self,
         state: &State,
         tenant_name: Option<String>,
         destination: &PhoneNumber,
-    ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
+    ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = if let Some(tenant_name) = tenant_name {
             format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", tenant_name, &code)
@@ -52,28 +85,8 @@ impl TwilioClient {
             format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", &code)
         };
 
-        RateLimit {
-            state,
-            phone_number: destination,
-            period: self.duration_between_challenges,
-            scope: rate_limit::SMS_CHALLENGE,
-        }
-        .enforce_and_update()
-        .await?;
-
-        // spawn this async so we return immediately
-        let client = self.client.clone();
-        let destination_clone = destination.clone();
-
-        tokio::spawn(async move {
-            let _ = client
-                .clone()
-                .send_message(destination_clone.e164().leak(), message_body)
-                .await
-                .map_err(|err| {
-                    tracing::error!(error=?err, "twilio error");
-                });
-        });
+        self.send_message(state, message_body, destination, rate_limit::SMS_CHALLENGE)
+            .await?;
 
         Ok((
             PhoneChallengeState {
@@ -90,31 +103,11 @@ impl TwilioClient {
         state: &State,
         destination: &PhoneNumber,
         url: String,
-    ) -> Result<SecondsBeforeRetry, ApiError> {
+    ) -> ApiResult<SecondsBeforeRetry> {
         let message_body = format!("Continue account verification using this link: {}", url);
 
-        RateLimit {
-            state,
-            phone_number: destination,
-            period: self.duration_between_challenges,
-            scope: rate_limit::D2P_LINK,
-        }
-        .enforce_and_update()
-        .await?;
-
-        // spawn this async so we return immediately
-        let client = self.client.clone();
-        let destination = destination.clone();
-
-        tokio::spawn(async move {
-            let _ = client
-                .clone()
-                .send_message(destination.e164().leak(), message_body)
-                .await
-                .map_err(|err| {
-                    tracing::error!(error=?err, "twilio error");
-                });
-        });
+        self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
+            .await?;
 
         Ok(self.duration_between_challenges)
     }
