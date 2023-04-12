@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import createTagList from 'src/utils/create-tag-list';
+import CdoTagList from 'src/components/cdo-tag-list';
 import styled, { css } from 'styled-components';
 
 type DataCollectedEventHeaderProps = {
@@ -14,11 +14,11 @@ const DataCollectedEventHeader = ({
   data,
   isFromOtherOrg,
 }: DataCollectedEventHeaderProps) => {
-  const { t, allT } = useTranslation(
+  const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.data-collected-event',
   );
   const { attributes } = data;
-  const attributeLabels = attributes.map(attr => allT(`cdo.${attr}`));
+  // const attributeLabels = attributes.map(attr => allT(`cdo.${attr}`));
 
   return (
     <Container data-testid="data-collected-event-header">
@@ -29,7 +29,7 @@ const DataCollectedEventHeader = ({
       >
         {isFromOtherOrg ? t('title-from-other-org') : t('title')}
       </Typography>
-      {createTagList(attributeLabels)}
+      <CdoTagList cdos={attributes} />
     </Container>
   );
 };
