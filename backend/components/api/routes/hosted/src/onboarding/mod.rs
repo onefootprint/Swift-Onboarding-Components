@@ -7,7 +7,11 @@ use crate::{
         vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
     },
 };
-use api_core::errors::{business::BusinessError, ApiResult};
+use api_core::{
+    auth::user::CheckedUserAuthContext,
+    errors::{business::BusinessError, ApiResult},
+    State,
+};
 use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
@@ -20,7 +24,10 @@ use db::{
     DbError, PgConn,
 };
 use itertools::Itertools;
-use newtypes::{DataIdentifierDiscriminant, OnboardingId, ScopedVaultId, SessionAuthToken, VaultId};
+use newtypes::{
+    DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, OnboardingId,
+    PiiString, ScopedVaultId, SessionAuthToken, VaultId,
+};
 use paperclip::actix::web;
 
 pub mod authorize;
@@ -62,19 +69,61 @@ fn create_onboarding_validation_token(
 }
 
 #[tracing::instrument(skip_all)]
-pub fn get_requirements(
+pub async fn get_requirements(
+    state: &State,
+    user_auth: CheckedUserAuthContext,
+) -> ApiResult<(
+    Vec<OnboardingRequirement>,
+    AuthedOnboardingInfo,
+    CheckedUserAuthContext,
+)> {
+    // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
+    let (uvw, ob_info, user_auth) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let ob_info = user_auth.assert_onboarding(conn)?;
+            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&ob_info.scoped_user.id))?;
+            Ok((uvw, ob_info, user_auth))
+        })
+        .await??;
+    let declarations = uvw
+        .decrypt_unchecked(&state.enclave_client, &[IPK::Declarations.into()])
+        .await?
+        .remove(&IPK::Declarations.into());
+
+    let (requirements, ob_info, user_auth) = state
+        .db_pool
+        .db_query(|conn| -> ApiResult<_> {
+            let scoped_business_id = user_auth.scoped_business_id();
+            let requirements = get_requirements_inner(conn, uvw, &ob_info, scoped_business_id, declarations)?;
+            Ok((requirements, ob_info, user_auth))
+        })
+        .await??;
+    Ok((requirements, ob_info, user_auth))
+}
+
+#[tracing::instrument(skip_all)]
+fn get_requirements_inner(
     conn: &mut PgConn,
+    uvw: VaultWrapper<Person>,
     ob_info: &AuthedOnboardingInfo,
     scoped_business_id: Option<ScopedVaultId>,
-) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
-    let ob_config_id = &ob_info.ob_config.id;
+    declarations: Option<PiiString>,
+) -> ApiResult<Vec<OnboardingRequirement>> {
     let scoped_user_id = &ob_info.scoped_user.id;
 
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(scoped_user_id))?;
-    let (onboarding, _, _, _) = Onboarding::get(conn, (&uvw.vault.id, ob_config_id))?;
     let missing_id_fields = uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Id);
     let missing_ip_fields =
         uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::InvestorProfile);
+    let missing_finra_compliance_doc = if let Some(declarations) = declarations {
+        let declarations: Vec<Declaration> = declarations.deserialize()?;
+        // The finra compliance doc is missing if any of the declarations require a doc and we don't
+        // yet have one on file
+        declarations.iter().any(|d| d.requires_finra_compliance_doc())
+            && !uvw.has_field(DocumentKind::FinraComplianceLetter)
+    } else {
+        false
+    };
 
     // Fetch missing business fields
     let missing_business_fields = if ob_info.ob_config.must_collect_business() {
@@ -116,9 +165,12 @@ pub fn get_requirements(
         (!missing_id_fields.is_empty()).then_some(OnboardingRequirement::CollectData {
             missing_attributes: missing_id_fields,
         }),
-        (!missing_ip_fields.is_empty()).then_some(OnboardingRequirement::CollectInvestorProfile {
-            missing_attributes: missing_ip_fields,
-        }),
+        (!missing_ip_fields.is_empty() || missing_finra_compliance_doc).then_some(
+            OnboardingRequirement::CollectInvestorProfile {
+                missing_attributes: missing_ip_fields,
+                missing_document: missing_finra_compliance_doc,
+            },
+        ),
         (!missing_business_fields.is_empty()).then_some(OnboardingRequirement::CollectBusinessData {
             missing_attributes: missing_business_fields,
         }),
@@ -132,9 +184,9 @@ pub fn get_requirements(
     .chain(document_request_requirements)
     .collect();
 
-    tracing::info!(onboarding_id=%onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
+    tracing::info!(onboarding_id=%ob_info.onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
 
-    Ok((requirements, onboarding))
+    Ok(requirements)
 }
 
 /// This function gets all the fields the User needs to authorize the Tenant having access to.

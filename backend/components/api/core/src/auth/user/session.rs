@@ -217,13 +217,16 @@ impl ParsedUserSession {
 /// A shorthand for the commonly used ParsedUserSession context
 pub type UserAuthContext = SessionContext<ParsedUserSession>;
 
+/// A shorthand for the commonly used UserSession context
+pub type CheckedUserAuthContext = SessionContext<UserSession>;
+
 impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
     pub fn check_permissions<T>(
         self,
         requested_permissions: Vec<T>,
-    ) -> Result<SessionContext<UserSession>, AuthError>
+    ) -> Result<CheckedUserAuthContext, AuthError>
     where
         T: Into<UserAuthScopeDiscriminant>,
     {

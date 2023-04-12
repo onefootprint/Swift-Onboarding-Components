@@ -16,6 +16,7 @@ pub enum OnboardingRequirement {
     /// There is missing investor profile data that must be collected
     CollectInvestorProfile {
         missing_attributes: Vec<CollectedDataOption>,
+        missing_document: bool,
     },
     /// There is missing business data that must be collected
     CollectBusinessData {

@@ -16,7 +16,6 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
-use db::models::tenant::Tenant;
 use db::models::verification_request::VerificationRequest;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
@@ -55,27 +54,22 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
-    let (ob_info, biz_ob, tenant) = state
+    // Verify there are no unmet requirements
+    let (requirements, ob_info, user_auth) = get_requirements(&state, user_auth).await?;
+    if !requirements.is_empty() {
+        let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
+        return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
+    }
+
+    // Mark the obs for the person and business as authorized
+    let (ob_info, biz_ob) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
-            let ob_info = user_auth.assert_onboarding(c)?;
-            // Verify there are no unmet requirements
-            let scoped_business_id = user_auth.scoped_business_id();
-            let (requirements, _) = get_requirements(c, &ob_info, scoped_business_id)?;
-
-            if !requirements.is_empty() {
-                let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
-                return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
-            }
-            let biz_ob = user_auth.business_onboarding(c)?;
-            let tenant = Tenant::get(c, &ob_info.scoped_user.id)?;
-
-            // Mark as authorized
             let ob = Onboarding::lock(c, &ob_info.onboarding.id)?;
-
             if ob.authorized_at.is_none() {
                 ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
             }
+            let biz_ob = user_auth.business_onboarding(c)?;
             let bizob = biz_ob
                 .map(|b| {
                     if b.authorized_at.is_none() {
@@ -86,13 +80,13 @@ pub async fn post(
                 })
                 .transpose()?;
 
-            Ok((ob_info, bizob, tenant))
+            Ok((ob_info, bizob))
         })
         .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", tenant.id.as_str()));
-    span.record("tenant_name", &format!("{:?}", tenant.id.as_str()));
+    span.record("tenant_id", &format!("{:?}", ob_info.tenant.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", ob_info.tenant.id.as_str()));
     span.record("onboarding_id", &format!("{}", ob_info.onboarding.id));
     span.record("scoped_use_id", &format!("{}", ob_info.scoped_user.id));
     span.record(
@@ -100,7 +94,7 @@ pub async fn post(
         &format!("{}", ob_info.onboarding.ob_configuration_id),
     );
     let tenant_vendor_control = TenantVendorControl::new(
-        tenant.id.clone(),
+        ob_info.tenant.id.clone(),
         &state.db_pool,
         &state.enclave_client,
         &state.config,

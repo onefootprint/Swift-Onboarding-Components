@@ -1,3 +1,4 @@
+import json
 import pytest
 from tests.utils import (
     put,
@@ -83,62 +84,78 @@ def test_put_ip_info_incomplete_data(incomplete_client):
     )
 
 
-class TestDocuments:
-    def test_invalid_upload(self, incomplete_client):
-        res = post(
-            "/hosted/user/upload/document.finra_compliance_letter",
-            None,
-            incomplete_client.auth_token,
-            files=multipart_file("example_txt.txt", "text/plain"),
-            status_code=400,
-        )
-        assert "image upload error: invalid file type" == res["error"]["message"]
+def test_document_requirement(incomplete_client):
+    auth_token = incomplete_client.auth_token
 
-    def test_valid_upload(self, incomplete_client, sandbox_tenant):
-        user = incomplete_client.run()
+    requirements = incomplete_client.get_requirements()
+    req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
+    assert not req["missing_document"]
 
-        res = post(
-            f"/users/{user.fp_id}/vault/document/decrypt",
-            {
-                "kind": "document.finra_compliance_letter",
-                "reason": "show me",
-            },
-            sandbox_tenant.sk.key,
-            raw_response=True,
-        )
-        assert "application/pdf" == res.headers["content-type"]
-        assert file_contents("example_pdf.pdf") == res.content
+    # When we add a specific declaration, we should now have a missing requirement
+    data = {**IP_DATA, "investor_profile.declarations": '["affiliated_with_us_broker"]'}
+    put("hosted/user/vault", data, auth_token)
+    requirements = incomplete_client.get_requirements()
+    req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
+    assert req["missing_document"]
 
-        timeline = get(f"/entities/{user.fp_id}/timeline", None, sandbox_tenant.sk.key)
-        doc_upload_events = [
-            e for e in timeline if e["event"]["kind"] == "document_uploaded"
-        ]
-        assert len(doc_upload_events) == 1
-        assert (
-            "document.finra_compliance_letter"
-            == doc_upload_events[0]["event"]["data"]["identifier"]
-        )
 
-    # Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
-    def test_reupload(self, sandbox_tenant, investor_profile_ob_config, twilio):
-        bifrost = BifrostClient(investor_profile_ob_config, twilio)
-        # First upload one document
-        bifrost.handle_ip_doc()
-        # Then change the document and run again
-        bifrost.data["document.finra_compliance_letter"] = multipart_file(
-            "example_pdf2.pdf", "application/pdf"
-        )
-        user = bifrost.run()
+def test_invalid_doc_upload(incomplete_client):
+    res = post(
+        "/hosted/user/upload/document.finra_compliance_letter",
+        None,
+        incomplete_client.auth_token,
+        files=multipart_file("example_txt.txt", "text/plain"),
+        status_code=400,
+    )
+    assert "image upload error: invalid file type" == res["error"]["message"]
 
-        res = post(
-            f"/users/{user.fp_id}/vault/document/decrypt",
-            {
-                "kind": "document.finra_compliance_letter",
-                "reason": "show me",
-            },
-            sandbox_tenant.sk.key,
-            raw_response=True,
-        )
 
-        assert file_contents("example_pdf2.pdf") == res.content
-        assert file_contents("example_pdf.pdf") != res.content
+def test_valid_doc_upload(incomplete_client, sandbox_tenant):
+    user = incomplete_client.run()
+
+    res = post(
+        f"/users/{user.fp_id}/vault/document/decrypt",
+        {
+            "kind": "document.finra_compliance_letter",
+            "reason": "show me",
+        },
+        sandbox_tenant.sk.key,
+        raw_response=True,
+    )
+    assert "application/pdf" == res.headers["content-type"]
+    assert file_contents("example_pdf.pdf") == res.content
+
+    timeline = get(f"/entities/{user.fp_id}/timeline", None, sandbox_tenant.sk.key)
+    doc_upload_events = [
+        e for e in timeline if e["event"]["kind"] == "document_uploaded"
+    ]
+    assert len(doc_upload_events) == 1
+    assert (
+        "document.finra_compliance_letter"
+        == doc_upload_events[0]["event"]["data"]["identifier"]
+    )
+
+
+# Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
+def test_doc_reupload(sandbox_tenant, investor_profile_ob_config, twilio):
+    bifrost = BifrostClient(investor_profile_ob_config, twilio)
+    # First upload one document
+    bifrost.handle_ip_doc()
+    # Then change the document and run again
+    bifrost.data["document.finra_compliance_letter"] = multipart_file(
+        "example_pdf2.pdf", "application/pdf"
+    )
+    user = bifrost.run()
+
+    res = post(
+        f"/users/{user.fp_id}/vault/document/decrypt",
+        {
+            "kind": "document.finra_compliance_letter",
+            "reason": "show me",
+        },
+        sandbox_tenant.sk.key,
+        raw_response=True,
+    )
+
+    assert file_contents("example_pdf2.pdf") == res.content
+    assert file_contents("example_pdf.pdf") != res.content

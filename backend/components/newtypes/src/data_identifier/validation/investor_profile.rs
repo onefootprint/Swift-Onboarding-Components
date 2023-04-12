@@ -71,9 +71,15 @@ enum RiskTolerance {
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
-enum Declaration {
+pub enum Declaration {
     AffiliatedWithUsBroker,
     SeniorExecutive,
     SeniorPoliticalFigure,
     FamilyOfPoliticalFigure,
+}
+
+impl Declaration {
+    pub fn requires_finra_compliance_doc(&self) -> bool {
+        matches!(self, Self::AffiliatedWithUsBroker | Self::SeniorExecutive)
+    }
 }
