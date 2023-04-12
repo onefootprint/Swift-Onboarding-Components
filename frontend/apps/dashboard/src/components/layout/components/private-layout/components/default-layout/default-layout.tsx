@@ -73,15 +73,13 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
             <Tabs variant="pill">
               {routes.map(({ href, Icon, text }) => (
                 <Tab
+                  key={href}
                   as={Link}
                   href={href}
-                  key={href}
                   selected={router.pathname.startsWith(href)}
+                  icon={Icon}
                 >
-                  <>
-                    <Icon />
-                    {text}
-                  </>
+                  {text}
                 </Tab>
               ))}
             </Tabs>

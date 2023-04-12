@@ -2,7 +2,7 @@ import { IcoCode16, IcoFileText16, IcoSettings16 } from '@onefootprint/icons';
 import { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import { Tab, TabListProps, Tabs } from '.';
+import { Tab, Tabs, TabsProps } from '.';
 
 export default {
   title: 'Components/Tabs',
@@ -19,7 +19,7 @@ export default {
   },
 } as ComponentMeta<typeof Tabs>;
 
-const Template: Story<TabListProps> = ({ variant }: TabListProps) => (
+const Template: Story<TabsProps> = ({ variant }: TabsProps) => (
   <Tabs variant={variant}>
     <Tab href="/ipsum" selected as="button" onClick={console.log}>
       <IcoFileText16 />

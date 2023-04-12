@@ -13,7 +13,7 @@ const Examples = () => {
   const [animatedList] = useAutoAnimate<HTMLDivElement>();
   return (
     <>
-      <Tabs>
+      <Tabs variant="underlined">
         {Object.values(options).map(option => (
           <Tab
             key={option.name}

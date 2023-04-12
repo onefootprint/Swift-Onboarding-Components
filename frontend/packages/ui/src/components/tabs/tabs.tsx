@@ -1,24 +1,37 @@
-import React from 'react';
+import { motion } from 'framer-motion';
+import React, { useId, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
+import TabContext from './components/context';
 
-export type TabListProps = {
+export type TabsProps = {
+  variant: 'pill' | 'underlined';
   children: React.ReactNode;
-  variant?: 'pill' | 'underlined';
 };
 
-const TabList = ({ children, variant = 'underlined' }: TabListProps) => (
-  <Container
-    aria-orientation="horizontal"
-    data-variant={variant}
-    role="tablist"
-  >
-    {children}
-  </Container>
-);
+const Tabs = ({ variant = 'underlined', children }: TabsProps) => {
+  const layoutId = useId();
+  const contextValues = useMemo(
+    () => ({ layoutId, variant }),
+    [layoutId, variant],
+  );
 
-const Container = styled.nav`
+  return (
+    <TabContext.Provider value={contextValues}>
+      <Container
+        aria-orientation="horizontal"
+        data-variant={variant}
+        role="tablist"
+        layout
+      >
+        {children}
+      </Container>
+    </TabContext.Provider>
+  );
+};
+
+const Container = styled(motion.nav)`
   ${({ theme }) => css`
     display: flex;
 
@@ -28,40 +41,10 @@ const Container = styled.nav`
       border: unset;
       cursor: pointer;
       text-decoration: none;
-      transition: 0.1s background-color;
     }
 
     &[data-variant='pill'] {
       gap: ${theme.spacing[3]};
-
-      a,
-      button {
-        ${createFontStyles('body-4')};
-        border-radius: ${theme.borderRadius.large};
-        color: ${theme.color.primary};
-        display: flex;
-        gap: ${theme.spacing[2]};
-        justify-content: center;
-        padding: ${theme.spacing[2]} ${theme.spacing[4]};
-
-        &[data-selected='true'] {
-          background: ${theme.backgroundColor.accent};
-          color: ${theme.color.quinary};
-
-          svg path {
-            fill: ${theme.color.quinary};
-          }
-        }
-
-        svg {
-          position: relative;
-          top: ${theme.spacing[1]};
-
-          path {
-            fill: ${theme.color.primary};
-          }
-        }
-      }
     }
 
     &[data-variant='underlined'] {
@@ -75,18 +58,9 @@ const Container = styled.nav`
         color: ${theme.color.tertiary};
         margin: 0;
         padding: 0 0 ${theme.spacing[3]} 0;
-
-        &[data-selected='true'] {
-          color: ${theme.color.accent};
-          border-color: ${theme.color.accent};
-        }
-
-        svg {
-          display: none;
-        }
       }
     }
   `}
 `;
 
-export default TabList;
+export default Tabs;

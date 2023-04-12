@@ -2,8 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import TabItem from './tab';
-import TabList, { TabListProps } from './tabs';
+import Tab from './components/tab';
+import Tabs, { TabsProps } from './tabs';
 
 Object.defineProperty(window, 'location', {
   value: {
@@ -14,25 +14,25 @@ Object.defineProperty(window, 'location', {
 
 const defaultChildren = (
   <>
-    <TabItem href="/lorem" selected>
+    <Tab href="/lorem" selected>
       Users
-    </TabItem>
-    <TabItem href="/ipsum">Security logs</TabItem>
+    </Tab>
+    <Tab href="/ipsum">Security logs</Tab>
   </>
 );
 
 describe('<Tabs />', () => {
-  const renderTab = ({ children = defaultChildren }: Partial<TabListProps>) =>
-    customRender(<TabList variant="pill">{children}</TabList>);
+  const renderTab = ({ children = defaultChildren }: Partial<TabsProps>) =>
+    customRender(<Tabs variant="pill">{children}</Tabs>);
 
   it('should render the tab items', () => {
     renderTab({
       children: (
         <>
-          <TabItem href="/lorem" selected>
+          <Tab href="/lorem" selected>
             Users
-          </TabItem>
-          <TabItem href="/ipsum">Settings</TabItem>
+          </Tab>
+          <Tab href="/ipsum">Settings</Tab>
         </>
       ),
     });
@@ -45,10 +45,10 @@ describe('<Tabs />', () => {
       renderTab({
         children: (
           <>
-            <TabItem href="/lorem" selected>
+            <Tab href="/lorem" selected>
               Users
-            </TabItem>
-            <TabItem href="/ipsum">Security logs</TabItem>
+            </Tab>
+            <Tab href="/ipsum">Security logs</Tab>
           </>
         ),
       });
@@ -63,7 +63,7 @@ describe('<Tabs />', () => {
     it('should trigger  onClick event', async () => {
       const onClickMockFn = jest.fn();
       renderTab({
-        children: <TabItem onClick={onClickMockFn}>Users</TabItem>,
+        children: <Tab onClick={onClickMockFn}>Users</Tab>,
       });
       const firstTab = screen.getByRole('tab', { name: 'Users' });
       await userEvent.click(firstTab);
