@@ -7,6 +7,7 @@ from tests.utils import (
     inherit_user,
     challenge_user,
     identify_verify,
+    try_until_success,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -39,18 +40,24 @@ def primary_bo(kyb_sandbox_ob_config, twilio):
 
 
 def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
-    # TODO For now, we are returning the secondary BO tokens via API. In the future, we should
-    # send this directly to the user's phone
-    token = primary_bo.client.put_business_response["tokens"][0]
+    # Extract the link sent to the secondary BO's phone number and verify it contains references to
+    # the business and the BO that invited them
+    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
+    business_name = primary_bo.client.data["business.name"]
+    (sms_body, token) = extract_bo_session_sms(
+        twilio, bos[1]["phone_number"], business_name
+    )
+    assert bos[0]["first_name"] in sms_body
+    assert bos[0]["last_name"] in sms_body
+    assert primary_bo.client.data["business.name"] in sms_body
     secondary_bo_token = BusinessOwnerAuth(token)
 
     # Check the business information for the hosted bifrost flow associated with the secondary BO's
     # token
     body = get("hosted/business", None, secondary_bo_token)
-    assert body["name"] == primary_bo.client.data["business.name"]
+    assert body["name"] == business_name
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
-    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
     assert body["invited"]["email"] == bos[1]["email"]
     assert body["invited"]["phone_number"] == bos[1]["phone_number"]
 
@@ -125,9 +132,14 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     assert len(primary_bo.client.handled_requirements) == 1
     assert primary_bo.client.handled_requirements[0]["kind"] == "collect_business_data"
 
-    # TODO For now, we are returning the secondary BO tokens via API. In the future, we should
-    # send this directly to the user's phone
-    token = primary_bo.client.put_business_response["tokens"][0]
+    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
+    business_name = primary_bo.client.data["business.name"]
+    (sms_body, token) = extract_bo_session_sms(
+        twilio, bos[1]["phone_number"], business_name
+    )
+    assert bos[0]["first_name"] in sms_body
+    assert bos[0]["last_name"] in sms_body
+    assert primary_bo.client.data["business.name"] in sms_body
     secondary_bo_token = BusinessOwnerAuth(token)
 
     # Then, onboard the secondary_bo as a BO of primary_bo's business
@@ -146,3 +158,22 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
 
     # fp_bid should be the same for each business owner
     assert primary_bo.fp_bid == secondary_bo.fp_bid
+
+
+def extract_bo_session_sms(twilio, phone_number, business_name):
+    def inner():
+        real_phone_number = phone_number.split("#")[0]
+        messages = twilio.messages.list(to=real_phone_number, limit=10)
+        message = next(
+            m
+            for m in messages
+            if f"invited you to verify your identify as a beneficial owner of {business_name}"
+            in m.body
+        )
+        # TODO update this to extract the token from the real URL once we have a URL
+        token = message.body.split("Continue here: ")[1].split(
+            "\n\nSent via Footprint"
+        )[0]
+        return (message.body, token)
+
+    return try_until_success(inner, 5)

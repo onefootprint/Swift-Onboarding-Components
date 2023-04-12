@@ -10,4 +10,10 @@ pub enum BusinessError {
     NoName,
     #[error("This business doesn't have associated BOs")]
     NoBos,
+    #[error("Not allowed to have multiple BOs")]
+    TooManyBos,
+    #[error("Not allowed to have KYCed and non-KYCed BOs")]
+    KycedAndNonKycedBos,
+    #[error("BO not found with link_id")]
+    BoNotFound,
 }

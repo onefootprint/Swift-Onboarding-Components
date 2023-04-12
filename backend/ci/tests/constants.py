@@ -65,14 +65,14 @@ ID_DATA = {
 }
 
 BUSINESS_DATA = {
-    "business.name": "Foobar Inc",
+    "business.name": "Foobar Inc",  # We'll add a random suffix to this
     "business.dba": "Barfoo Inc",
     "business.website": "https://foobar.com",
     "business.phone_number": PHONE_NUMBER,
-    "business.address_line1": "1 Footprint Way",
-    "business.city": "Enclave",
-    "business.state": "NY",
-    "business.zip": "10009",
+    "business.address_line1": "1 Hayes St",
+    "business.city": "SF",
+    "business.state": "CA",
+    "business.zip": "94117",
     "business.country": "US",
     "business.tin": "121231234",
     "business.beneficial_owners": json.dumps(
@@ -87,14 +87,14 @@ BUSINESS_DATA = {
                 "first_name": "Piip",
                 "last_name": "Penguin",
                 "email": "piip@onefootprint.com",
-                "phone_number": "+14155555555",
+                "phone_number": "+14255555555",
                 "ownership_stake": 50,
             },
             {
                 "first_name": "Franklin",
                 "last_name": "Frog",
                 "email": "franklin@onefootprint.com",
-                "phone_number": "+14144444444",
+                "phone_number": "+14254444444",
                 "ownership_stake": 30,
             },
         ]

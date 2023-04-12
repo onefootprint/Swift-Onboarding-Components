@@ -6,10 +6,10 @@ use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::errors::business::BusinessError;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::ApiError;
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
@@ -72,9 +72,7 @@ pub async fn get(
         // Non-kyced BOs in the vault
         (Some(vault_bos), None) => {
             if bos.len() > 1 {
-                return Err(ApiError::AssertionError(
-                    "Not allowed to have multiple BOs".to_owned(),
-                ));
+                return Err(BusinessError::TooManyBos.into());
             }
             let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;
             let ownership: Vec<_> = vault_bos.into_iter().map(|bo| bo.ownership_stake).collect();
@@ -96,16 +94,12 @@ pub async fn get(
         // exists but the user abandoned before providing info on each BO in the vault
         (None, None) => {
             if bos.len() > 1 {
-                return Err(ApiError::AssertionError(
-                    "Not allowed to have multiple BOs".to_owned(),
-                ));
+                return Err(BusinessError::TooManyBos.into());
             }
             zip_max_n(vec![], bos).collect()
         }
         (Some(_), Some(_)) => {
-            return Err(ApiError::AssertionError(
-                "Not allowed to have KYCed and non-KYCed BOs".to_owned(),
-            ));
+            return Err(BusinessError::KycedAndNonKycedBos.into());
         }
     };
 

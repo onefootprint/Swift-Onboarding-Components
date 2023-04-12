@@ -1,11 +1,10 @@
 import json
 from typing import NamedTuple, Optional
 from tests.types import Tenant
-from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS
+from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS, EMAIL
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
     multipart_file,
-    _sandbox_email,
     _gen_random_ssn,
     inherit_user,
     create_basic_sandbox_user,
@@ -56,16 +55,18 @@ class BifrostClient:
             self.auth_token = user.auth_token
             phone_number = user.phone_number
 
+        suffix = phone_number.split("#")[-1]
         self.data = {
             **ID_DATA,
             **BUSINESS_DATA,
             **IP_DATA,
+            "business.name": f'{BUSINESS_DATA["business.name"]} {suffix}',
             "document.finra_compliance_letter": multipart_file(
                 "example_pdf.pdf", "application/pdf"
             ),
             "id.ssn9": _gen_random_ssn(),
             "id.phone_number": phone_number,
-            "id.email": _sandbox_email(phone_number),
+            "id.email": f"{EMAIL}#{suffix}",
         }
 
         # After running bifrost, this will be the list of requirements satisfied

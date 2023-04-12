@@ -1,4 +1,4 @@
-pub use derive_more::{Add, Display, From, FromStr, Into};
+pub use derive_more::{Add, From, FromStr, Into};
 use regex::Regex;
 use serde_with::DeserializeFromStr;
 

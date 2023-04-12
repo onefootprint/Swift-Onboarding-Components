@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
 mod index;
+mod utils;
 mod vault;
 
 pub fn routes(config: &mut web::ServiceConfig) {

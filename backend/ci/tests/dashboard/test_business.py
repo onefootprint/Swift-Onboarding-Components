@@ -28,7 +28,10 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
         sandbox_tenant.sk.key,
     )
     assert set(body["attributes"]) == populated_business_data
-    assert body["decrypted_attributes"] == {"business.name": "Foobar Inc"}
+    assert (
+        body["decrypted_attributes"]["business.name"]
+        == primary_bo.client.data["business.name"]
+    )
 
 
 def test_get_business_owners(sandbox_tenant, primary_bo):
@@ -77,7 +80,8 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
         fields=fields_to_decrypt,
         reason="Doing a business hecking decrypt",
     )
-    expected_data = {**BUSINESS_DATA}
+
+    expected_data = primary_bo.client.data
     expected_data["business.phone_number"] = expected_data[
         "business.phone_number"
     ].replace(" ", "")

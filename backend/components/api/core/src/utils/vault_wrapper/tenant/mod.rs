@@ -27,5 +27,5 @@ pub struct TenantUvw {
     // Maybe in the future we move the typed parameterization to the WriteableVw
     uvw: VaultWrapper<Person>,
     pub scoped_vault_id: ScopedVaultId,
-    onboarding: Option<OnboardingAndConfig>,
+    pub onboarding: Option<OnboardingAndConfig>,
 }

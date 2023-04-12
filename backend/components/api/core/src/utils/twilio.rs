@@ -104,13 +104,38 @@ impl TwilioClient {
         destination: &PhoneNumber,
         url: String,
     ) -> ApiResult<SecondsBeforeRetry> {
-        let message_body = format!("Continue account verification using this link: {}", url);
+        let message_body = format!(
+            "Continue account verification using this link: {}. Sent via Footprint",
+            url
+        );
 
         self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
             .await?;
 
         Ok(self.duration_between_challenges)
     }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
+        let message_body = format!(
+            "{} invited you to verify your identify as a beneficial owner of {}. Continue here: {}\n\nSent via Footprint",
+            info.inviter.leak(),
+            info.business_name.leak(),
+            info.url.leak()
+        );
+
+        self.send_message(state, message_body, info.destination, rate_limit::BO_SESSION)
+            .await?;
+
+        Ok(())
+    }
+}
+
+pub struct BoSessionSmsInfo<'a> {
+    pub destination: &'a PhoneNumber,
+    pub inviter: &'a PiiString,
+    pub business_name: &'a PiiString,
+    pub url: PiiString,
 }
 
 /// Phone number challenge in-progress state
@@ -124,6 +149,7 @@ pub struct PhoneChallengeState {
 mod rate_limit {
     use super::*;
 
+    pub const BO_SESSION: &str = "bo_session";
     pub const D2P_LINK: &str = "d2p_session";
     pub const SMS_CHALLENGE: &str = "sms_challenge";
 

@@ -200,8 +200,6 @@ def identify_verify(
                 assert body["kind"] == expected_kind
                 return FpAuth(body["auth_token"])
             except HttpError as e:
-                if "Incorrect PIN code" not in str(e):
-                    print(e)
                 if expected_error and expected_error in str(e):
                     # The specific error we expected to see was returned from verify - we can exit
                     return
@@ -308,12 +306,6 @@ def _random_sandbox_phone(suffix=None):
     suffix = suffix or "sandbox"
     seed = _gen_random_n_digit_number(10)
     return f"{PHONE_NUMBER}#{suffix}{seed}"
-
-
-def _sandbox_email(phone_number):
-    # Extract the suffix from an already generated sandbox phone number
-    suffix = phone_number.split("#")[-1]
-    return f"{EMAIL}#{suffix}"
 
 
 def _gen_random_ssn():
