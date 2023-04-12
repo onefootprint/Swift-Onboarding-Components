@@ -14,7 +14,7 @@ pub enum Error {
     ParseError(#[from] phonenumber::ParseError),
 }
 
-#[derive(Clone, DeserializeFromStr)]
+#[derive(Clone, DeserializeFromStr, Eq, PartialEq, Hash)]
 pub struct PhoneNumber {
     number: phonenumber::PhoneNumber,
     pub sandbox_suffix: String,

@@ -103,6 +103,12 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         {
             return Err(Error::SandboxNotAllowed);
         }
+        if bos.iter().map(|bo| &bo.phone_number).unique().count() != bos.len() {
+            return Err(Error::NonUniqueBusinessOwners);
+        }
+        if bos.iter().map(|bo| &bo.email).unique().count() != bos.len() {
+            return Err(Error::NonUniqueBusinessOwners);
+        }
         // TODO make sure unique set of emails + phones
         // Create a BoID for each Kyced BO item. This ID will be used to link the JSON BO to the
         // BO in the DB
@@ -257,6 +263,25 @@ mod test {
             "email": "piip@onefootprint.com",
             "phone_number": "+14155555555#sandbox",
             "ownership_stake": 90
+        }]);
+
+        let input_str = serde_json::ser::to_string(&input).unwrap();
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        assert!(result.is_err());
+
+        // Test duplicate phones
+        let input = json!([{
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "email": "piip@onefootprint.com",
+            "phone_number": "+14155555555",
+            "ownership_stake": 50
+        }, {
+            "first_name": "Franklin",
+            "last_name": "Frog",
+            "email": "franklin@onefootprint.com",
+            "phone_number": "+14155555555", // same phone number
+            "ownership_stake": 25
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();

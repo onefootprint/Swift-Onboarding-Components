@@ -37,6 +37,8 @@ pub enum Error {
     CannotParseJson(#[from] serde_json::Error),
     #[error("The business owners' ownership stakes must not sum to more than 100%")]
     BusinessOwnersStakeAbove100,
+    #[error("Contact info for business owners must be unique")]
+    NonUniqueBusinessOwners,
     #[error("Invalid phone or email")]
     SandboxNotAllowed,
     #[error("Couldn't parse as host. Should not include URL scheme or path")]
