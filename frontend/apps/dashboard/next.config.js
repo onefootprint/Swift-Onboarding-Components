@@ -24,8 +24,8 @@ const ProdContentSecurityPolicy = `
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' vercel.live https://app.svix.com;
-  img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net;
+  frame-src 'self' vercel.live https://app.svix.com calendly.com;
+  img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
