@@ -49,6 +49,7 @@ const useFieldsets = (): Fieldset => {
         { di: InvestorProfileDI.netWorth },
         { di: InvestorProfileDI.investmentGoals },
         { di: InvestorProfileDI.riskTolerance },
+        { di: DocumentDI.finraComplianceLetter },
         { di: InvestorProfileDI.declarations },
         { di: DocumentDI.finraComplianceLetter },
       ],

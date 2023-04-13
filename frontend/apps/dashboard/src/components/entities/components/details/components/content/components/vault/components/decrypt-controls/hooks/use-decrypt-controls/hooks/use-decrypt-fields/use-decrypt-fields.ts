@@ -29,9 +29,8 @@ const useDecryptFields = () => {
           fields: diFields,
           reason,
         })
-        .then(response => {
-          onSuccess?.(transformResponseToVaultFormat(response));
-        })
+        .then(transformResponseToVaultFormat)
+        .then(onSuccess)
         .catch(onError);
     }
   };

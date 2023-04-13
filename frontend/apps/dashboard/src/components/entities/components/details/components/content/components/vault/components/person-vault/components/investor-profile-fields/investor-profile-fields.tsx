@@ -105,6 +105,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               )
             }
           />
+          <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
         </FieldSection>
       </Column>
     </Grid>

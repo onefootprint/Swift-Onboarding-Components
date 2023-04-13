@@ -12,6 +12,7 @@ import {
   DataIdentifier,
   DecisionSourceKind,
   DecisionStatus,
+  DocumentDI,
   Entity,
   EntityKind,
   EntityStatus,
@@ -54,6 +55,7 @@ export const entityFixture: Entity = {
     InvestorProfileDI.riskTolerance,
     InvestorProfileDI.investmentGoals,
     InvestorProfileDI.declarations,
+    DocumentDI.finraComplianceLetter,
   ],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   onboarding: {

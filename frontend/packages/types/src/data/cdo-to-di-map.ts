@@ -47,7 +47,6 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
 
   // Documents
   [CollectedDocumentDataOption.document]: [
-    DocumentDI.finraComplianceLetter,
     DocumentDI.passport,
     DocumentDI.driversLicenseBack,
     DocumentDI.driversLicenseFront,
@@ -60,6 +59,7 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
 
   // Investor Profile
   [CollectedInvestorProfileDataOption.investorProfile]: [
+    DocumentDI.finraComplianceLetter,
     ...Object.values(InvestorProfileDI).map(value => value),
   ],
 };

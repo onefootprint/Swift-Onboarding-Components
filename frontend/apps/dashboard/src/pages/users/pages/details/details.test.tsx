@@ -1,11 +1,13 @@
 import {
+  createFileSaverSpy,
   createUseRouterSpy,
   customRender,
   screen,
+  userEvent,
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import { IdDI, InvestorProfileDI } from '@onefootprint/types';
+import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -32,8 +34,11 @@ afterAll(() => {
 });
 
 const useRouterSpy = createUseRouterSpy();
+const fileSaverSpy = createFileSaverSpy();
 
 describe('<Details />', () => {
+  const fileSaverMock = fileSaverSpy();
+
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({
@@ -459,6 +464,13 @@ describe('<Details />', () => {
             container,
           });
           expect(declarations).toBeInTheDocument();
+
+          const finra = getTextByRow({
+            name: 'Finra compliance letter',
+            value: '•••••••••',
+            container,
+          });
+          expect(finra).toBeInTheDocument();
         });
 
         describe('when clicking on the decrypt button', () => {
@@ -472,6 +484,7 @@ describe('<Details />', () => {
               [InvestorProfileDI.investmentGoals]:
                 '["grow_long_term_wealth","save_for_retirement","buy_a_home","support_loved_ones","pay_off_debt","start_my_own_business"]',
               [InvestorProfileDI.declarations]: '["affiliated_with_us_broker"]',
+              [DocumentDI.finraComplianceLetter]: 'base64',
             });
           });
 
@@ -554,6 +567,21 @@ describe('<Details />', () => {
               });
               expect(declarations).toBeInTheDocument();
             });
+
+            await waitFor(() => {
+              const finra = getTextByRow({
+                name: 'Finra compliance letter',
+                value: 'Download',
+                container,
+              });
+              expect(finra).toBeInTheDocument();
+            });
+
+            const finraDownload = within(container).getByRole('button', {
+              name: 'Download',
+            });
+            await userEvent.click(finraDownload);
+            expect(fileSaverMock).toHaveBeenCalled();
           });
         });
       });
