@@ -31,7 +31,7 @@ INSERT INTO data_lifetime(vault_id, scoped_vault_id, created_at, portablized_at,
 
 -- Selfie
 INSERT INTO data_lifetime(vault_id, scoped_vault_id, created_at, portablized_at, deactivated_at, created_seqno, portablized_seqno, deactivated_seqno, kind)
-    SELECT dl.vault_id, dl.scoped_vault_id, dl.created_at, dl.portablized_at, dl.deactivated_at, dl.created_seqno, dl.portablized_seqno, dl.deactivated_seqno, 'document.driver_license_selfie'
+    SELECT dl.vault_id, dl.scoped_vault_id, dl.created_at, dl.portablized_at, dl.deactivated_at, dl.created_seqno, dl.portablized_seqno, dl.deactivated_seqno, 'document.drivers_license_selfie'
     FROM identity_document doc INNER JOIN data_lifetime dl ON dl.id = doc.lifetime_id
     WHERE doc.document_type = 'driver_license' AND doc.selfie_image_s3_url IS NOT NULL;
 
@@ -90,7 +90,7 @@ INSERT INTO document_data(lifetime_id, kind, mime_type, filename, s3_url, e_data
         END,
         'image/png',
         'back.png', -- change
-        doc.front_image_s3_url,
+        doc.back_image_s3_url,
         doc.e_data_key
     FROM identity_document doc
     INNER JOIN data_lifetime existing_dl
@@ -112,10 +112,15 @@ INSERT INTO document_data(lifetime_id, kind, mime_type, filename, s3_url, e_data
 INSERT INTO document_data(lifetime_id, kind, mime_type, filename, s3_url, e_data_key)
     SELECT
         dl.id,
-        'selfie',
+        CASE
+            WHEN document_type = 'id_card' THEN 'id_card_selfie' -- change
+            WHEN document_type = 'passport' THEN 'passport_selfie' -- change
+            WHEN document_type = 'driver_license' THEN 'drivers_license_selfie' -- change
+            ELSE 'blerp'
+        END,
         'image/png',
         'selfie.png',
-        doc.front_image_s3_url,
+        doc.selfie_image_s3_url,
         doc.e_data_key
     FROM identity_document doc
     INNER JOIN data_lifetime existing_dl
@@ -147,11 +152,18 @@ CREATE TABLE IF NOT EXISTS data_lifetime_backup AS SELECT * FROM data_lifetime W
 ALTER TABLE data_lifetime_backup ADD CONSTRAINT data_lifetime_backup_pk PRIMARY KEY (id);
 SELECT diesel_manage_updated_at('data_lifetime_backup');
 
-DELETE FROM data_lifetime WHERE id IN (SELECT lifetime_id FROM identity_document); 
+COMMIT;
+-- This is a hack - for some reason, running the following inside of the same transaction where we delete from data_lifetime makes
+-- postgres triggers unhappy. So we escape the txn for a bit
 
 -- Migrate the identity_document table
+ALTER table identity_document  DROP COLUMN lifetime_id;
+
+BEGIN;
+
+DELETE FROM data_lifetime WHERE id IN (SELECT lifetime_id FROM identity_document_backup); 
+
 ALTER table identity_document 
-    DROP COLUMN lifetime_id,
     DROP COLUMN front_image_s3_url,
     DROP COLUMN back_image_s3_url,
     DROP COLUMN selfie_image_s3_url;
@@ -176,6 +188,30 @@ ALTER TABLE identity_document
         FOREIGN KEY(selfie_lifetime_id) 
         REFERENCES data_lifetime(id)
         DEFERRABLE INITIALLY DEFERRED;
+
+
+-- Actually backfill the identity_document table with the newly created lifetimes for the front, back, and selfie document_datas
+UPDATE identity_document
+    SET front_lifetime_id = doc.lifetime_id -- change
+    FROM identity_document_backup backup
+        INNER JOIN document_data doc
+        ON doc.s3_url = backup.front_image_s3_url -- change
+    WHERE backup.id = identity_document.id;
+
+UPDATE identity_document
+    SET back_lifetime_id = doc.lifetime_id -- change
+    FROM identity_document_backup backup
+        INNER JOIN document_data doc
+        ON doc.s3_url = backup.back_image_s3_url -- change
+    WHERE backup.id = identity_document.id;
+
+UPDATE identity_document
+    SET selfie_lifetime_id = doc.lifetime_id -- change
+    FROM identity_document_backup backup
+        INNER JOIN document_data doc
+        ON doc.s3_url = backup.selfie_image_s3_url -- change
+    WHERE backup.id = identity_document.id;
+
 
 -- delete old access logs
 DELETE FROM access_event where ARRAY_TO_STRING(targets, '||') LIKE 'id_document.%' OR ARRAY_TO_STRING(targets, '||') LIKE 'selfie.%';
