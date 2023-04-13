@@ -143,6 +143,7 @@ export async function CreateDB(
     engineVersion: db.engineVersion,
     performanceInsightsEnabled: true,
     dbParameterGroupName: instanceParameterGroupName,
+    autoMinorVersionUpgrade: false,
   });
 
   const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
@@ -152,6 +153,7 @@ export async function CreateDB(
     engineVersion: db.engineVersion,
     performanceInsightsEnabled: true,
     dbParameterGroupName: instanceParameterGroupName,
+    autoMinorVersionUpgrade: false,
   });
 
   const {
