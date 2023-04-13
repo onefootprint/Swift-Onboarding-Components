@@ -35,6 +35,7 @@ export { default as Drawer } from './drawer';
 export { default as Dropdown } from './dropdown';
 export * from './empty-state';
 export { default as EmptyState } from './empty-state';
+export { default as Fade } from './fade';
 export * from './filters';
 export { default as Filters } from './filters';
 export * from './footprint-button';

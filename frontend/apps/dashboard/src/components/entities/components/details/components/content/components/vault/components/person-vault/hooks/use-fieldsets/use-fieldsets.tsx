@@ -54,6 +54,15 @@ const useFieldsets = (): Fieldset => {
         { di: DocumentDI.finraComplianceLetter },
       ],
     },
+    documents: {
+      title: t('documents.title'),
+      iconComponent: IcoDollar24,
+      fields: [
+        { di: DocumentDI.driversLicenseFront },
+        { di: DocumentDI.idCardFront },
+        { di: DocumentDI.passport },
+      ],
+    },
   };
 };
 

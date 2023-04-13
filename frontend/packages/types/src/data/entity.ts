@@ -1,5 +1,5 @@
 import CdoToDiMap from './cdo-to-di-map';
-import { DataIdentifier, InvestorProfileDI } from './di';
+import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
 import { Onboarding } from './onboarding';
 import { VaultValue } from './vault';
 
@@ -34,6 +34,19 @@ export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);
   return values.some(investorProfileDi =>
     entity.attributes.some(attribute => attribute === investorProfileDi),
+  );
+};
+
+export const hasEntityDocuments = (entity: Entity) => {
+  const values = Object.values(DocumentDI);
+  return values.some(documentDI =>
+    entity.attributes.some(
+      attribute =>
+        attribute === documentDI &&
+        // this is a little bit hacky for now, but finra compliance belongs to the investor profile CDO in theory
+        // however in the backend, is part of the documentCDO
+        documentDI !== DocumentDI.finraComplianceLetter,
+    ),
   );
 };
 

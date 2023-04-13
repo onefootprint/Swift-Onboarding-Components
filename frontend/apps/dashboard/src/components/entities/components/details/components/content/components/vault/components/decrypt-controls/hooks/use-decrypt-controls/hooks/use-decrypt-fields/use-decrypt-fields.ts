@@ -1,7 +1,7 @@
 import { EntityVault } from '@onefootprint/types';
 
 import type { DiField } from '../../../../../decrypt-machine';
-import useDecryptText from './hooks/use-decrypt-text';
+import useDecryptText from './hooks/use-decrypt';
 import transformResponseToVaultFormat from './utils/transform-response-to-vault-format';
 
 type DecryptPayload = {

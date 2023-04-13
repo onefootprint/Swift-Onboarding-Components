@@ -3,7 +3,7 @@ import { DecryptRequest, DecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const decryptTextFields = async (
+const decrypt = async (
   { userId, fields, reason }: DecryptRequest,
   authHeaders: AuthHeaders,
 ) => {
@@ -19,11 +19,9 @@ const decryptTextFields = async (
   return response.data;
 };
 
-const useDecryptTextFields = () => {
+const useDecrypt = () => {
   const { authHeaders } = useSession();
-  return useMutation((data: DecryptRequest) =>
-    decryptTextFields(data, authHeaders),
-  );
+  return useMutation((data: DecryptRequest) => decrypt(data, authHeaders));
 };
 
-export default useDecryptTextFields;
+export default useDecrypt;

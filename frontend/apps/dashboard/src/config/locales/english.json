@@ -57,12 +57,11 @@
     "investor_profile.declarations": "Declaration(s)",
     "investor_profile.compliance_letter": "Finra compliance letter",
     "document.finra_compliance_letter": "Finra compliance letter",
-    "id_document.passport": "Passport",
-    "id_document.id_card": "ID card",
-    "id_document.driver_license": "Driver's License",
-    "selfie.passport": "Selfie",
-    "selfie.id_card": "Selfie",
-    "selfie.driver_license": "Selfie",
+    "document.passport": "Passport",
+    "document.id_card_front": "ID card",
+    "document.id_card_back": "ID card back",
+    "document.id_card_selfie": "ID card selfie",
+    "document.driver_license_front": "Driver's License",
     "business.name": "Name",
     "business.dba": "Doing Business As",
     "business.website": "Website",
@@ -689,6 +688,9 @@
         },
         "address": {
           "title": "Address data"
+        },
+        "documents": {
+          "title": "ID documents & Selfie"
         },
         "investor-profile": {
           "title": "Investor profile data",

@@ -1,6 +1,4 @@
-import { DecryptedIdDoc } from './decrypted-id-doc';
 import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
-import IdDocDI from './id-doc-data-attribute';
 
 export type VaultEncryptedData = null;
 
@@ -12,16 +10,16 @@ export type VaultObjectData<T = Object> = T;
 
 export type VaultArrayData<T = any> = Array<T>;
 
-export type VaultIdDocumentData = DecryptedIdDoc[];
-
 export type VaultDocumentData = { name: string; content: Blob };
+
+export type VaultImageData = { name: string; src: string };
 
 export type VaultValue =
   | VaultTextData
   | VaultObjectData
   | VaultArrayData
-  | VaultIdDocumentData
   | VaultDocumentData
+  | VaultImageData
   | VaultEncryptedData
   | VaultEmptyData;
 
@@ -36,20 +34,13 @@ export type VaultId = Partial<
   Record<IdDI, VaultTextData | VaultEncryptedData | VaultEmptyData>
 >;
 
-export type VaultIdDocument = Partial<
-  Record<IdDocDI, VaultIdDocumentData | VaultEncryptedData | VaultEmptyData>
->;
-
 export type VaultDocument = Partial<
   Record<DocumentDI, VaultDocumentData | VaultEncryptedData | VaultEmptyData>
 >;
 
-export type Vault = {
-  id: VaultId;
-  idDoc: VaultIdDocument;
-  investorProfile: VaultInvestorProfile;
-  document: VaultDocument;
-};
+export type VaultImage = Partial<
+  Record<DocumentDI, VaultImageData | VaultEncryptedData | VaultEmptyData>
+>;
 
 export const isVaultDataEncrypted = (data: any): data is VaultEncryptedData =>
   data === null;
@@ -63,18 +54,17 @@ export const isVaultDataDecrypted = (data: any): data is VaultEncryptedData =>
 export const isVaultDataText = (data: any): data is VaultTextData =>
   typeof data === 'string';
 
-export const isVaultDataIdDocument = (
-  data: any,
-): data is VaultIdDocumentData => {
-  if (!Array.isArray(data)) return false;
-  return data.every(
-    item => typeof item.front === 'string' && typeof item.status === 'string',
-  );
-};
-
 export const isVaultDataDocument = (data: any): data is VaultDocumentData => {
   if (typeof data !== 'object') return false;
   if (typeof data?.name !== 'string' || typeof data?.content !== 'object') {
+    return false;
+  }
+  return true;
+};
+
+export const isVaultDataImage = (data: any): data is VaultImageData => {
+  if (typeof data !== 'object') return false;
+  if (typeof data?.name !== 'string' || typeof data?.src !== 'string') {
     return false;
   }
   return true;

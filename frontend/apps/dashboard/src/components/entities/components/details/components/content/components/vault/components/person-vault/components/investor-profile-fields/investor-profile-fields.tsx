@@ -97,13 +97,18 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
           <Field
             di={InvestorProfileDI.declarations}
             entity={entity}
-            renderValue={(value, isValueDecrypted) =>
-              !isValueDecrypted ? (
-                <FieldOrPlaceholder data={value} />
-              ) : (
-                <FieldOrPlaceholder data={t(`declarations.options.${value}`)} />
-              )
-            }
+            renderValue={value => {
+              if (Array.isArray(value)) {
+                return (
+                  <FieldOrPlaceholder
+                    data={createStringList(
+                      value.map(option => t(`declarations.options.${option}`)),
+                    )}
+                  />
+                );
+              }
+              return <FieldOrPlaceholder data={value} />;
+            }}
           />
           <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
         </FieldSection>

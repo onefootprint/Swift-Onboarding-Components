@@ -1,21 +1,31 @@
 import type {
   DataIdentifier,
   VaultDocumentData,
+  VaultImageData,
   VaultValue,
 } from '@onefootprint/types';
 import { DocumentDI } from '@onefootprint/types';
 import { base64StringToBlob } from 'blob-util';
 import kebabCase from 'lodash/kebabCase';
 
-type Output = Partial<Record<DocumentDI, VaultDocumentData>>;
+type Output = Partial<Record<DocumentDI, VaultDocumentData | VaultImageData>>;
 
 const pdfs = [DocumentDI.finraComplianceLetter];
+const images = [
+  DocumentDI.driversLicenseBack,
+  DocumentDI.driversLicenseFront,
+  DocumentDI.driversLicenseSelfie,
+  DocumentDI.idCardBack,
+  DocumentDI.idCardFront,
+  DocumentDI.idCardSelfie,
+  DocumentDI.passport,
+  DocumentDI.passportSelfie,
+];
 
 const parseDocuments = (
   input: Partial<Record<DataIdentifier, VaultValue>>,
 ): Output => {
   const output: Output = {};
-
   pdfs.forEach(async di => {
     const value = input[di];
     if (typeof value === 'string') {
@@ -25,6 +35,15 @@ const parseDocuments = (
         content: new Blob([blob], {
           type: 'application/pdf',
         }),
+      };
+    }
+  });
+  images.forEach(async di => {
+    const value = input[di];
+    if (typeof value === 'string') {
+      output[di] = {
+        name: kebabCase(di),
+        src: `data:image/jpg;base64,${value}`,
       };
     }
   });

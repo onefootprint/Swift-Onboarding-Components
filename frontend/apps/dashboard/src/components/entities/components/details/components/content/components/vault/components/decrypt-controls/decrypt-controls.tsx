@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Box, Button, Portal, Tooltip } from '@onefootprint/ui';
 import React from 'react';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 
+import useEntityVault from '@/entities/hooks/use-entity-vault';
 import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_SELECTOR, VAULT_FORM_ID } from '@/entity/constants';
 

@@ -1,9 +1,14 @@
-import { Entity, hasEntityInvestorProfile } from '@onefootprint/types';
+import {
+  Entity,
+  hasEntityDocuments,
+  hasEntityInvestorProfile,
+} from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
+import DocumentsFields from './components/document-fields';
 import InvestorProfileFields from './components/investor-profile-fields';
 import useFieldsets from './hooks/use-fieldsets';
 
@@ -12,7 +17,8 @@ type PersonVaultProps = {
 };
 
 const PersonVault = ({ entity }: PersonVaultProps) => {
-  const { basic, address, identity, investorProfile } = useFieldsets();
+  const { basic, address, identity, investorProfile, documents } =
+    useFieldsets();
 
   return (
     <Grid>
@@ -40,6 +46,18 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           footer={<RiskSignalsOverview type="address" />}
         />
       </Address>
+      {hasEntityDocuments(entity) ? (
+        <Documents>
+          <Fieldset
+            fields={documents.fields}
+            iconComponent={documents.iconComponent}
+            title={documents.title}
+            footer={<RiskSignalsOverview type="document" />}
+          >
+            <DocumentsFields />
+          </Fieldset>
+        </Documents>
+      ) : null}
       {hasEntityInvestorProfile(entity) ? (
         <InvestorProfile>
           <Fieldset
@@ -63,6 +81,7 @@ const Grid = styled.div`
     grid-template-areas:
       'basic address'
       'identity address'
+      'documents documents'
       'investor-profile investor-profile';
   `}
 `;
@@ -77,6 +96,10 @@ const Address = styled.div`
 
 const Identity = styled.div`
   grid-area: identity;
+`;
+
+const Documents = styled.div`
+  grid-area: documents;
 `;
 
 const InvestorProfile = styled.div`
