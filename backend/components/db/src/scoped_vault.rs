@@ -10,6 +10,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
+use newtypes::PiiString;
 use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::{Fingerprint, FpId, TenantId};
@@ -21,7 +22,7 @@ pub struct ScopedVaultListQueryParams {
     /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
     pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
-    pub fingerprints: Option<Vec<Fingerprint>>,
+    pub search: Option<(PiiString, Vec<Fingerprint>)>,
     pub fp_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
@@ -39,7 +40,9 @@ pub fn list_authorized_for_tenant_query<'a>(
     // Filter out onboardings that haven't been explicitly authorized by the user - these should
     // not be visible in the dashboard since the tenant doesn't have permissions to view anything
     // about the user
-    use crate::schema::{data_lifetime, fingerprint, manual_review, onboarding, scoped_vault, vault};
+    use crate::schema::{
+        data_lifetime, fingerprint, manual_review, onboarding, scoped_vault, vault, vault_data,
+    };
     let mut query = scoped_vault::table
         .filter(scoped_vault::tenant_id.eq(params.tenant_id.clone()))
         .filter(scoped_vault::is_live.eq(params.is_live))
@@ -137,7 +140,7 @@ pub fn list_authorized_for_tenant_query<'a>(
         query = query.filter(scoped_vault::vault_id.eq_any(uv_ids))
     }
 
-    if let Some(fingerprints) = params.fingerprints {
+    if let Some((search, fingerprints)) = params.search {
         // We have to basically replicate the DataLifetime::get_active inside a SQL query -
         // fingerprints for a piece of data for a given tenant A should be visible if either:
         // - the data is not portablized but was added by tenant A
@@ -147,27 +150,35 @@ pub fn list_authorized_for_tenant_query<'a>(
         let owned_scoped_vault_ids = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(params.tenant_id))
             .select(scoped_vault::id);
-        let matching_speculative_v_ids: Vec<VaultId> = fingerprint::table
-            .inner_join(data_lifetime::table)
+        let matching_speculative_v_ids: Vec<VaultId> = data_lifetime::table
+            .left_join(fingerprint::table)
+            .left_join(vault_data::table)
             // Active, non-portablized lifetimes that were added by this tenant
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(data_lifetime::portablized_seqno.is_null())
             .filter(data_lifetime::scoped_vault_id.eq_any(owned_scoped_vault_ids))
-            // Matching fingerprint
-            .filter(fingerprint::sh_data.eq_any(&fingerprints))
+            // Matching data or fingerprint
+            .filter(
+                vault_data::p_data.ilike(format!("%{}%", search.leak()))
+                    .or(fingerprint::sh_data.eq_any(&fingerprints))
+            )
             // Specifically get the matching vault_id (the scoped_vault_id might belong to another tenant)
             .select(data_lifetime::vault_id)
             // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
             // scoped_vault table... So, we have to actually execute the subquery
             .get_results(conn)?;
 
-        let matching_portable_v_ids = fingerprint::table
-            .inner_join(data_lifetime::table)
+        let matching_portable_v_ids = data_lifetime::table
+            .left_join(fingerprint::table)
+            .left_join(vault_data::table)
             // Active, PORTABLE lifetimes
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(not(data_lifetime::portablized_seqno.is_null()))
-            // Matching fingerprint
-            .filter(fingerprint::sh_data.eq_any(fingerprints))
+            // Matching data or fingerprint
+            .filter(
+                vault_data::p_data.ilike(format!("%{}%", search.leak()))
+                    .or(fingerprint::sh_data.eq_any(fingerprints))
+            )
             // Specifically get the matching vault_id (the scoped_vault_id might belong to another tenant)
             .select(data_lifetime::vault_id);
         query = query.filter(

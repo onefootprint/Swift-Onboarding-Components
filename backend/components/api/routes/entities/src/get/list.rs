@@ -49,7 +49,7 @@ where
         timestamp_gte,
     } = filters.into_inner();
 
-    let (fingerprints, fp_id) = parse_search(&state, search, &tenant.id).await?;
+    let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
 
     let tenant_id = tenant.id.clone();
     let query_params = ScopedVaultListQueryParams {
@@ -58,7 +58,7 @@ where
         is_live: auth.is_live()?,
         requires_manual_review,
         statuses,
-        fingerprints,
+        search,
         fp_id,
         timestamp_lte,
         timestamp_gte,
@@ -133,25 +133,25 @@ async fn parse_search(
     state: &State,
     search: Option<PiiString>,
     tenant_id: &TenantId,
-) -> ApiResult<(Option<Vec<Fingerprint>>, Option<FpId>)> {
+) -> ApiResult<(Option<(PiiString, Vec<Fingerprint>)>, Option<FpId>)> {
     // TODO clean phone number or email
     let Some(search) = search else {
         return Ok((None, None));
     };
 
     // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
-    if search.leak().starts_with("fp_id_") {
+    if search.leak().starts_with("fp_id_") || search.leak().starts_with("fp_bid_") {
         let fp_id = Some(FpId::from(search.leak_to_string()));
         Ok((None, fp_id))
     } else {
-        let search = search.clean_for_fingerprint();
-        // Tokenize the search string by splitting on `\s`. This handles cases like a user typing in a full name
-        let tokenized = search
+        let search_str = search.clean_for_fingerprint();
+        // Tokenize the search_str string by splitting on `\s`. This handles cases like a user typing in a full name
+        let tokenized = search_str
             .clone()
             .leak()
             .split(' ')
             .map(PiiString::from)
-            .chain([search]) // Re-add the full search token
+            .chain([search_str]) // Re-add the full search_str token
             .collect_vec();
         let fut_fingerprints = tokenized
             .into_iter()
@@ -162,7 +162,7 @@ async fn parse_search(
             .flatten()
             .collect();
 
-        Ok((Some(fingerprints), None))
+        Ok((Some((search, fingerprints)), None))
     }
 }
 

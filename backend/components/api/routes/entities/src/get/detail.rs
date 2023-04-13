@@ -35,7 +35,7 @@ where
         only_billable: false,
         requires_manual_review: None,
         statuses: vec![],
-        fingerprints: None,
+        search: None,
         fp_id: Some(fp_id.into_inner()),
         timestamp_lte: None,
         timestamp_gte: None,
