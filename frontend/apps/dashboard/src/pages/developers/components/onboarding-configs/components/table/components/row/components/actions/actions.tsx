@@ -1,12 +1,9 @@
-import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { OnboardingConfig, RoleScope } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
-import Link from 'next/link';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
-import styled from 'styled-components';
 
 import EditName, { EditNameHandler } from './components/edit-name';
 import Status, { StatusHandler } from './components/status';
@@ -16,7 +13,7 @@ type ActionsProps = {
 };
 
 const Actions = ({ onboardingConfig }: ActionsProps) => {
-  const { name, isLive, key, status } = onboardingConfig;
+  const { name, status } = onboardingConfig;
   const { t } = useTranslation('pages.developers.onboarding-configs.actions');
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
@@ -47,15 +44,6 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
           >
             {t('edit-name.cta')}
           </Dropdown.Item>
-          {isLive ? null : (
-            <TestLink
-              href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
-              target="_blank"
-              onClick={event => event.stopPropagation()}
-            >
-              <Dropdown.Item>{t('test')}</Dropdown.Item>
-            </TestLink>
-          )}
           <Dropdown.Item
             onSelect={handleToggleStatus}
             onClick={event => event.stopPropagation()}
@@ -82,10 +70,5 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
     </Box>
   );
 };
-
-const TestLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-`;
 
 export default Actions;

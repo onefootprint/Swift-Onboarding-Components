@@ -1164,7 +1164,6 @@
         "actions": {
           "aria-label": "Open actions for onboarding config {{name}}",
           "not-allowed": "You're not allowed to manage onboarding configs",
-          "test": "Test onboarding",
           "status": {
             "label": "Status",
             "enable": "Enable",

@@ -1,7 +1,10 @@
+import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import { OnboardingConfig } from '@onefootprint/types';
-import { Badge, CodeInline } from '@onefootprint/ui';
+import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
+import useOrgSession from 'src/hooks/use-org-session';
 
 import isKybOnboardingConfig from '../../../../utils/is-kyb-onboarding-config';
 import Actions from './components/actions';
@@ -15,10 +18,25 @@ const Row = ({ onboardingConfig }: RowProps) => {
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt } = onboardingConfig;
   const isKyb = isKybOnboardingConfig(onboardingConfig);
+  const { sandbox } = useOrgSession();
 
   return (
     <>
-      <td>{name}</td>
+      <td>
+        {sandbox.isSandbox ? (
+          <LinkButton
+            href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
+            iconComponent={IcoArrowTopRight24}
+            target="_blank"
+            size="compact"
+            onClick={event => event.stopPropagation()}
+          >
+            {name}
+          </LinkButton>
+        ) : (
+          name
+        )}
+      </td>
       <td>{isKyb ? t('type.kyb') : t('type.kyc')}</td>
       <td>
         <CodeInline truncate>{key}</CodeInline>
