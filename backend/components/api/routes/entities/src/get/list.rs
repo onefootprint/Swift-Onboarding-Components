@@ -87,7 +87,7 @@ where
         .map(|(sv, _)| sv.ordering_id);
 
     // Serialize results
-    let entities_fut = scoped_vaults
+    let entities = scoped_vaults
         .into_iter()
         .take(page_size)
         .map(|(sv, _)| {
@@ -100,13 +100,8 @@ where
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
-        // TODO one day we will probably want to batch enclave reqs to decrypt business.name or
-        // store business.name unencrypted in the vault
-        .map(|(sv, vw, ob)| serialize_entity(&state, sv, vw, ob));
-    let entities = futures::future::join_all(entities_fut)
-        .await
-        .into_iter()
-        .collect::<ApiResult<_>>()?;
+        .map(|(sv, vw, ob)| serialize_entity(sv, vw, ob))
+        .collect();
     Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
 }
 

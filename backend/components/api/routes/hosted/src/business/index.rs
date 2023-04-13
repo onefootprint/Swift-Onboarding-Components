@@ -63,18 +63,14 @@ pub struct BasicBusinessInfo {
 }
 
 pub async fn decrypt_basic_business_info(state: &State, bvw: &TenantUvw) -> ApiResult<BasicBusinessInfo> {
-    let mut bvw_data = bvw
-        .decrypt_unchecked(
-            &state.enclave_client,
-            &[BDK::Name.into(), BDK::KycedBeneficialOwners.into()],
-        )
-        .await?;
-
-    let business_name = bvw_data.remove(&BDK::Name.into()).ok_or(BusinessError::NoName)?;
-    let bos: Vec<KycedBusinessOwnerData> = bvw_data
+    let bos: Vec<KycedBusinessOwnerData> = bvw
+        .decrypt_unchecked(&state.enclave_client, &[BDK::KycedBeneficialOwners.into()])
+        .await?
         .remove(&BDK::KycedBeneficialOwners.into())
         .ok_or(BusinessError::NoBos)?
         .deserialize()?;
+    let business_name = bvw.get_p_data(BDK::Name).ok_or(BusinessError::NoName)?.clone();
+
     // TODO: could this differ from the actual primary BO's first name + last name?
     // I don't think so by the client, but maybe on the backend we should compare and enforce
     let primary_bo = bos.get(0).ok_or(BusinessError::NoBos)?.clone();

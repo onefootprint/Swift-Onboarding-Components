@@ -11,6 +11,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::DocumentKind;
 use newtypes::IsDataIdentifierDiscriminant;
+use newtypes::PiiString;
 use newtypes::SealedVaultBytes;
 
 impl VaultWrapper<Person> {
@@ -57,6 +58,7 @@ impl<Type> VaultWrapper<Type> {
         self.populated_dis().contains(&id.into())
     }
 
+    /// Get the VaultData row for the provided id, if exists
     pub fn get<T>(&self, id: T) -> Option<&VaultData>
     where
         T: Into<DataIdentifier> + Clone,
@@ -64,6 +66,7 @@ impl<Type> VaultWrapper<Type> {
         self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
     }
 
+    /// Get the VaultedData (encrypted or plaintext) for the provided id, if exists
     pub fn get_data<T>(&self, id: T) -> Option<VaultedData>
     where
         T: Into<DataIdentifier> + Clone,
@@ -71,11 +74,22 @@ impl<Type> VaultWrapper<Type> {
         self.get(id).map(|v| v.data())
     }
 
+    /// Get the encrypted data for the provided data identifier.
+    /// Returns None if the id doesn't exist in the vault
     pub fn get_e_data<T>(&self, id: T) -> Option<&SealedVaultBytes>
     where
         T: Into<DataIdentifier> + Clone,
     {
         self.get(id).map(|v| &v.e_data)
+    }
+
+    /// Get the plaintext data for the provided data identifier.
+    /// Returns None if the id doesn't exist in the vault or the id is encrypted
+    pub fn get_p_data<T>(&self, id: T) -> Option<&PiiString>
+    where
+        T: Into<DataIdentifier> + Clone,
+    {
+        self.get(id).and_then(|v| v.p_data.as_ref())
     }
 
     pub fn missing_fields(

@@ -53,7 +53,7 @@ where
             Ok((sv, ob, vw))
         })
         .await??;
-    let result = serialize_entity(&state, sv, &vw, ob).await?;
+    let result = serialize_entity(sv, &vw, ob);
     ResponseData::ok(result).json()
 }
 
