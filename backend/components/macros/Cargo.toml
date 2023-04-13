@@ -1,14 +1,15 @@
 [package]
- name = "macros"
- version = "0.1.0"
- edition = "2021"
+name = "macros"
+version = "0.1.0"
+edition = "2021"
 
- [lib]
- proc-macro = true
+[lib]
+proc-macro = true
+doctest = false
 
- [dependencies]
- proc-macro2 = "1.0.40"
- syn = { version = "1.0.98", features = ["full"] }
- quote = "1.0.20"
- test-case-core = {version = "3.0.0" }
- proc-macro-error = "1.0"
+[dependencies]
+proc-macro2 = "1.0.40"
+syn = { version = "1.0.98", features = ["full"] }
+quote = "1.0.20"
+test-case-core = {version = "3.0.0" }
+proc-macro-error = "1.0"

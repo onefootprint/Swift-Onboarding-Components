@@ -4,6 +4,9 @@ version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
 
+[lib]
+doctest = false
+
 [dependencies]
 base64 = { workspace = true }
 serde = { workspace = true }
