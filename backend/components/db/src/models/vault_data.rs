@@ -2,7 +2,6 @@ use crate::schema::vault_data;
 use crate::DbError;
 use crate::DbResult;
 use crate::HasLifetime;
-use crate::HasSealedIdentityData;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
@@ -111,8 +110,19 @@ impl HasLifetime for VaultData {
     }
 }
 
-impl HasSealedIdentityData for VaultData {
-    fn e_data(&self) -> &SealedVaultBytes {
-        &self.e_data
+impl VaultData {
+    pub fn data(&self) -> VaultedData {
+        if let Some(p_data) = self.p_data.as_ref() {
+            VaultedData::NonPrivate(p_data)
+        } else {
+            VaultedData::Sealed(&self.e_data)
+        }
     }
+}
+
+pub enum VaultedData<'a> {
+    /// Data that is stored encrypted
+    Sealed(&'a SealedVaultBytes),
+    /// Data that is generally not considered private so is stored in plaintext in the DB
+    NonPrivate(&'a PiiString),
 }

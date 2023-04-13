@@ -4,7 +4,10 @@ use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
+use db::models::vault_data::VaultedData;
+use either::Either;
 use enclave_proxy::DataTransform;
+use itertools::Itertools;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, PhoneNumber, PiiString, SealedVaultDataKey};
 use std::collections::HashMap;
 
@@ -27,14 +30,19 @@ impl<Type> VaultWrapper<Type> {
             return Err(UserError::CannotDecrypt(di.clone()).into());
         }
 
-        let data = ids
+        // Since some vault data is already in plaintext, separate by data that needs to be decrypted
+        let (e_data, p_data): (_, Vec<_>) = ids
             .iter()
-            .filter_map(|id| self.get_e_data(id.clone()).map(|e_data| (id.clone(), e_data)))
-            .collect();
+            .filter_map(|id| self.get_data(id.clone()).map(|data| (id.clone(), data)))
+            .partition_map(|(id, data)| match data {
+                VaultedData::Sealed(e_data) => Either::Left((id, e_data)),
+                VaultedData::NonPrivate(p_data) => Either::Right((id, p_data.clone())),
+            });
 
-        let results = enclave_client
-            .batch_decrypt_to_piistring(data, &self.vault.e_private_key, DataTransform::Identity)
+        let decrypted_results = enclave_client
+            .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key, DataTransform::Identity)
             .await?;
+        let results = decrypted_results.into_iter().chain(p_data.into_iter()).collect();
         Ok(results)
     }
 }

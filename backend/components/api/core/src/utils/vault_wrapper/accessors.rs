@@ -3,13 +3,15 @@ use db::models::document_data::DocumentData;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
-use db::HasSealedIdentityData;
+use db::models::vault_data::VaultData;
+use db::models::vault_data::VaultedData;
 use itertools::Itertools;
+use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::DocumentKind;
 use newtypes::IsDataIdentifierDiscriminant;
-use newtypes::{CollectedDataOption, SealedVaultBytes};
+use newtypes::SealedVaultBytes;
 
 impl VaultWrapper<Person> {
     /// Return speculative identity_documents if exist, otherwise portable. There should only be one
@@ -55,18 +57,25 @@ impl<Type> VaultWrapper<Type> {
         self.populated_dis().contains(&id.into())
     }
 
-    pub fn get<T>(&self, id: T) -> Option<&dyn HasSealedIdentityData>
+    pub fn get<T>(&self, id: T) -> Option<&VaultData>
     where
         T: Into<DataIdentifier> + Clone,
     {
         self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
     }
 
+    pub fn get_data<T>(&self, id: T) -> Option<VaultedData>
+    where
+        T: Into<DataIdentifier> + Clone,
+    {
+        self.get(id).map(|v| v.data())
+    }
+
     pub fn get_e_data<T>(&self, id: T) -> Option<&SealedVaultBytes>
     where
         T: Into<DataIdentifier> + Clone,
     {
-        self.get(id).map(|v| v.e_data())
+        self.get(id).map(|v| &v.e_data)
     }
 
     pub fn missing_fields(

@@ -33,8 +33,8 @@ impl TenantUvw {
                         self.uvw
                             .get(id.clone())
                             .and_then(|data| {
-                                EciesP256Sha256AesGcmSealed::from_bytes(data.e_data().as_ref())
-                                    .map(|ed| (data.lifetime_id(), ed))
+                                EciesP256Sha256AesGcmSealed::from_bytes(data.e_data.as_ref())
+                                    .map(|ed| (&data.lifetime_id, ed))
                                     .ok()
                             })
                             .map(|(dl_id, e_data)| ((dl_kind, dl_id), ((id, tenant_id), e_data)))

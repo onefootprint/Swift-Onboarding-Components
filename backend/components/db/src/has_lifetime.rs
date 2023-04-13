@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use itertools::Itertools;
-use newtypes::{DataLifetimeId, SealedVaultBytes, VaultId};
+use newtypes::{DataLifetimeId, VaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
@@ -48,10 +48,4 @@ pub trait HasLifetime {
             .into_group_map();
         Ok(results)
     }
-}
-
-/// Implemented by all models that hold identity data: PhoneNumber, Email, and UserVaultData
-/// // TODO rename this
-pub trait HasSealedIdentityData: HasLifetime {
-    fn e_data(&self) -> &SealedVaultBytes;
 }

@@ -4,7 +4,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::vault_data::VaultData;
-use db::{HasLifetime, HasSealedIdentityData};
+use db::HasLifetime;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DocumentKind;
@@ -124,16 +124,13 @@ impl<Type> VwData<Type> {
     /// Dispatch queries for a piece of data with a given identifier to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub fn get<T>(&self, id: T) -> Option<&dyn HasSealedIdentityData>
+    pub fn get<T>(&self, id: T) -> Option<&VaultData>
     where
         T: Into<DataIdentifier>,
     {
         let di = id.into();
         let vdk = di.try_into().ok()?;
-        self.vd
-            .iter()
-            .find(|d| d.kind == vdk)
-            .map(|vd| vd as &dyn HasSealedIdentityData)
+        self.vd.iter().find(|d| d.kind == vdk)
     }
 
     fn get_lifetime<T>(&self, id: T) -> Option<&DataLifetime>
