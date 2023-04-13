@@ -25,19 +25,45 @@ const OnboardingConfigs = () => {
           <Wrapper>
             <Create onCreate={refetch} />
             {data?.length === 0 && (
-              <Wave
-                initial={{
-                  opacity: 0.1,
-                  width: 0,
-                  height: 0,
-                }}
-                animate={{
-                  opacity: 0,
-                  width: 120,
-                  height: 120,
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeOut' }}
-              />
+              <>
+                {/* Pass same condition to border to avoid flash-appear in edge case */}
+                <Border data-visible={data?.length === 0} />
+                <Wave
+                  initial={{
+                    opacity: 0.2,
+                    width: 0,
+                    height: 0,
+                  }}
+                  animate={{
+                    opacity: 0,
+                    width: 140,
+                    height: 140,
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: 'easeOut',
+                  }}
+                />
+                <Wave
+                  initial={{
+                    opacity: 0.2,
+                    width: 0,
+                    height: 0,
+                  }}
+                  animate={{
+                    opacity: 0,
+                    width: 140,
+                    height: 140,
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: 'easeOut',
+                    delay: 3,
+                  }}
+                />
+              </>
             )}
           </Wrapper>
         </SectionHeader>
@@ -62,6 +88,33 @@ const Wave = styled(motion.span)`
     border-radius: ${theme.borderRadius.full};
     background: ${theme.color.accent};
     z-index: -1;
+    pointer-events: none;
+    user-select: none;
+  `}
+`;
+
+const Border = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-width: ${theme.borderWidth[1]};
+    border-style: solid;
+    border-radius: ${theme.borderRadius.default};
+    pointer-events: none;
+    isolation: isolate;
+    overflow: hidden;
+
+    &[data-visible='true'] {
+      border-color: ${theme.color.accent};
+    }
+
+    &[data-visible='false'] {
+      border-color: ${theme.borderColor.transparent};
+    }
   `}
 `;
 

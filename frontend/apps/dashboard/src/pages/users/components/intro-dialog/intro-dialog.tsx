@@ -7,7 +7,7 @@ import { useTimeout } from 'usehooks-ts';
 
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
-const TIME_TO_SHOW_DIALOG = 2500;
+const TIME_TO_SHOW_DIALOG = 1000;
 
 const IntroDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
