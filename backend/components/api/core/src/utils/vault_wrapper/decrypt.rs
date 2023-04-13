@@ -27,15 +27,14 @@ impl<Type> VaultWrapper<Type> {
             return Err(UserError::CannotDecrypt(di.clone()).into());
         }
 
-        let (ids, e_datas): (Vec<_>, _) = ids
+        let data = ids
             .iter()
             .filter_map(|id| self.get_e_data(id.clone()).map(|e_data| (id.clone(), e_data)))
-            .unzip();
+            .collect();
 
-        let decrypted_results = enclave_client
-            .batch_decrypt_to_piistring(e_datas, &self.vault.e_private_key, DataTransform::Identity)
+        let results = enclave_client
+            .batch_decrypt_to_piistring(data, &self.vault.e_private_key, DataTransform::Identity)
             .await?;
-        let results: HashMap<_, _> = ids.into_iter().zip(decrypted_results).collect();
         Ok(results)
     }
 }

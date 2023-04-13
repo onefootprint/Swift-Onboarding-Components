@@ -279,20 +279,19 @@ impl ProxyConfig {
             .into_iter()
             .map(|header| (header.name, PiiString::from(header.value)))
             .chain({
-                let secret_header_values = secret_headers.iter().map(|sh| &sh.e_data).collect();
-                let unsealed_secret_header_values = state
+                let secret_header_values = secret_headers
+                    .iter()
+                    .map(|sh| (sh.name.clone(), &sh.e_data))
+                    .collect();
+                state
                     .enclave_client
                     .batch_decrypt_to_piistring(
                         secret_header_values,
                         &auth.tenant().e_private_key,
                         enclave_proxy::DataTransform::Identity,
                     )
-                    .await?;
-
-                secret_headers
+                    .await?
                     .into_iter()
-                    .zip(unsealed_secret_header_values)
-                    .map(|(sh, pii)| (sh.name, pii))
             });
 
         // decrypt and parse the client tls creds if available

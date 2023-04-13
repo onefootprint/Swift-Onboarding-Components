@@ -11,6 +11,8 @@ use newtypes::{
     fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString,
     SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
+use std::collections::HashMap;
+use std::hash::Hash;
 
 use crate::{config::Config, errors::enclave::EnclaveError};
 
@@ -146,20 +148,23 @@ impl EnclaveClient {
         sealed_key: &EncryptedVaultPrivateKey,
         transform: DataTransform,
     ) -> Result<PiiString, EnclaveError> {
-        self.batch_decrypt_to_piistring(vec![sealed_data], sealed_key, transform)
+        let result = self
+            .batch_decrypt_to_piistring(vec![((), sealed_data)], sealed_key, transform)
             .await?
             .into_iter()
             .next()
-            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)
+            .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)?;
+        Ok(result.1)
     }
 
     /// Decrypts the provided list of SealedVaultBytes into PiiStrings
-    pub async fn batch_decrypt_to_piistring(
+    pub async fn batch_decrypt_to_piistring<T: Eq + Hash>(
         &self,
-        sealed_data: Vec<&SealedVaultBytes>,
+        data: Vec<(T, &SealedVaultBytes)>,
         sealed_key: &EncryptedVaultPrivateKey,
         transform: DataTransform,
-    ) -> Result<Vec<PiiString>, EnclaveError> {
+    ) -> Result<HashMap<T, PiiString>, EnclaveError> {
+        let (ids, sealed_data): (Vec<_>, Vec<_>) = data.into_iter().unzip();
         let sealed_data: Vec<_> = sealed_data
             .iter()
             .map(|b| EciesP256Sha256AesGcmSealed::from_bytes(b.as_ref()))
@@ -169,7 +174,8 @@ impl EnclaveClient {
             .await?
             .into_iter()
             .map(PiiString::try_from)
-            .collect::<Result<_, _>>()?;
+            .collect::<Result<Vec<_>, _>>()?;
+        let results = ids.into_iter().zip(results.into_iter()).collect();
         Ok(results)
     }
 
