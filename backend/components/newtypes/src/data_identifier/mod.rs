@@ -134,6 +134,16 @@ impl DataIdentifier {
             Self::IdDocument(_) | Self::Selfie(_) => None,
         }
     }
+
+    /// When true, stores the value of the identifier in plaintext
+    /// We really don't want to accidentally add a plain-text-able DI, so we have a test that
+    /// breaks if you add a new type and a constraint in the DB that only certain vault_data rows
+    /// can have plaintext values.
+    /// Only add a new plaintext DI if you are 100% positive that this data doesn't need to be
+    /// encrypted.
+    pub fn store_plaintext(&self) -> bool {
+        matches!(self, Self::Business(BusinessDataKind::Name))
+    }
 }
 
 impl Validate for DataIdentifier {
@@ -309,5 +319,31 @@ mod tests {
             8, 233, 182, 46, 163, 49, 48, 54, 115, 229, 30, 135,
         ];
         assert_eq!(fingerprint, expected_fp)
+    }
+
+    #[test]
+    fn test_store_plaintext() {
+        // We really don't want to accidentally add a plain-text-able DI, so we have a test that
+        // breaks if you add a new type.
+        // Only add a new plaintext DI if you are 100% positive that this data doesn't need to be
+        // encrypted
+        use itertools::Itertools;
+
+        let dis = [
+            InvestorProfileKind::iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
+            IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            DocumentKind::iter().map(DataIdentifier::from).collect_vec(),
+            vec![KvDataKey::test_data("hayes valley".to_owned()).into()],
+        ]
+        .into_iter()
+        .flatten()
+        .collect_vec();
+        let plaintext_types = vec![DataIdentifier::Business(BusinessDataKind::Name)];
+        assert!(dis
+            .iter()
+            .all(|di| di.store_plaintext() == plaintext_types.contains(di)));
     }
 }

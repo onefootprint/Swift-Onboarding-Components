@@ -1,4 +1,5 @@
 use crate::schema::vault_data;
+use crate::DbError;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::HasSealedIdentityData;
@@ -6,8 +7,10 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
+use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultId;
@@ -25,12 +28,16 @@ pub struct VaultData {
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
     pub kind: VdKind,
+    /// Encrypted pii data
     pub e_data: SealedVaultBytes,
+    /// Plaintext data, only stored for certain data types
+    pub p_data: Option<PiiString>,
 }
 
 pub struct NewVaultData {
     pub kind: VdKind,
     pub e_data: SealedVaultBytes,
+    pub p_data: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -39,6 +46,7 @@ pub struct NewUserVaultDataRow {
     pub lifetime_id: DataLifetimeId,
     pub kind: VdKind,
     pub e_data: SealedVaultBytes,
+    pub p_data: Option<PiiString>,
 }
 
 impl VaultData {
@@ -50,6 +58,16 @@ impl VaultData {
         data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
+        // One more sanity check that we don't store plaintext data where not desired
+        if let Some(d) = data
+            .iter()
+            .find(|d| DataIdentifier::from(d.kind.clone()).store_plaintext() != d.p_data.is_some())
+        {
+            return Err(DbError::ValidationError(format!(
+                "Cannot store {} in plaintext",
+                d.kind
+            )));
+        }
         // Make a DataLifetime row for each of the new pieces of data being inserted
         let lifetimes = DataLifetime::bulk_create(
             conn,
@@ -67,6 +85,7 @@ impl VaultData {
                 lifetime_id: lifetime.id,
                 kind: new_vd.kind,
                 e_data: new_vd.e_data,
+                p_data: new_vd.p_data,
             })
             .collect();
         let results = diesel::insert_into(vault_data::table)

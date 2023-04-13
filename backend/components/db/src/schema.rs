@@ -668,6 +668,7 @@ table! {
         lifetime_id -> Text,
         kind -> Text,
         e_data -> Bytea,
+        p_data -> Nullable<Text>,
     }
 }
 

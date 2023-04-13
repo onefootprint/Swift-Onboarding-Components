@@ -31,22 +31,27 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         NewVaultData {
             kind: IDK::FirstName.into(),
             e_data: SealedVaultBytes(vec![1]),
+            p_data: None,
         },
         NewVaultData {
             kind: IDK::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
+            p_data: None,
         },
         NewVaultData {
             kind: IDK::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
+            p_data: None,
         },
         NewVaultData {
             kind: IDK::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
+            p_data: None,
         },
         NewVaultData {
             kind: IDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
+            p_data: None,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -114,14 +119,17 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         NewVaultData {
             kind: BDK::Name.into(),
             e_data: SealedVaultBytes(vec![1]),
+            p_data: Some(PiiString::from("Acme Inc")),
         },
         NewVaultData {
             kind: BDK::Website.into(),
             e_data: SealedVaultBytes(vec![2]),
+            p_data: None,
         },
         NewVaultData {
             kind: BDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![3]),
+            p_data: None,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

@@ -1,0 +1,1 @@
+ALTER TABLE vault_data DROP COLUMN p_data;

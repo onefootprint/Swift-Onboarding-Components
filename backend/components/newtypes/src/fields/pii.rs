@@ -1,6 +1,7 @@
 use crate::Base64Data;
 
 use super::api_schema_helper::string_api_data_type_alias;
+use diesel::{sql_types::Text, AsExpression};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -9,9 +10,29 @@ use std::{
 };
 
 /// Represents a string that hides PII
-#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
+#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema, AsExpression)]
+#[diesel(sql_type = Text)]
 #[serde(transparent)]
 pub struct PiiString(String);
+
+impl diesel::serialize::ToSql<Text, diesel::pg::Pg> for PiiString {
+    fn to_sql<'b>(
+        &'b self,
+        out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>,
+    ) -> diesel::serialize::Result {
+        <String as diesel::serialize::ToSql<Text, diesel::pg::Pg>>::to_sql(
+            &self.leak_to_string(),
+            &mut out.reborrow(),
+        )
+    }
+}
+
+impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for PiiString {
+    fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
+        let str = String::from_sql(value)?;
+        Ok(Self::from_str(&str)?)
+    }
+}
 
 /// Represents a Vec<u8> that hides PII
 #[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
