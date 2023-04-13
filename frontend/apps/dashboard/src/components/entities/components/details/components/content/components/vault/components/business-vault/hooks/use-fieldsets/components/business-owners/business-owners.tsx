@@ -1,46 +1,27 @@
-import { Box } from '@onefootprint/ui';
+import { Entity } from '@onefootprint/types';
 import React from 'react';
 import { Error } from 'src/components';
 
-import useEntityId from '@/entity/hooks/use-entity-id';
-
-import { FieldProps } from '../../../../../field';
 import Content from './components/content';
 import Loading from './components/loading';
 import useBusinessOwners from './hooks/use-business-owners.ts';
 
-export type BusinessOwnersProps = FieldProps;
+export type BusinessOwnersProps = {
+  entity: Entity;
+};
 
-const BusinessOwners = ({
-  canDecrypt,
-  disabled,
-  label,
-  name,
-  showCheckbox,
-  value,
-}: FieldProps) => {
-  const id = useEntityId();
-  const { isLoading, error, data } = useBusinessOwners(id);
-
-  return (
-    <Box key={name}>
-      <>
-        {isLoading && <Loading />}
-        {error && <Error error={error} />}
-        {data && data.length > 0 && (
-          <Content
-            businessOwners={data}
-            canDecrypt={canDecrypt}
-            disabled={disabled}
-            label={label}
-            name={name}
-            showCheckbox={showCheckbox}
-            value={value}
-          />
-        )}
-      </>
-    </Box>
-  );
+const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
+  const { isLoading, error, data } = useBusinessOwners(entity.id);
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (error) {
+    return <Error error={error} />;
+  }
+  if (data) {
+    return <Content businessOwners={data} entity={entity} />;
+  }
+  return null;
 };
 
 export default BusinessOwners;

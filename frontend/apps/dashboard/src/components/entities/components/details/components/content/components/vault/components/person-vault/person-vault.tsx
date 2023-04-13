@@ -46,7 +46,8 @@ const Grid = styled.div`
     grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
       'basic address'
-      'identity address';
+      'identity address'
+      'investor-profile investor-profile';
   `}
 `;
 

@@ -1,20 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
-import { DataIdentifier, isVaultDataEncrypted } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
-import React from 'react';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
-import usePermissions from 'src/hooks/use-permissions';
+import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
+import useField from '../../hooks/use-field';
 import useForm from '../../hooks/use-form';
 import { DiField } from '../../vault.types';
 import { useDecryptControls } from '../decrypt-controls';
 import Field from '../field';
 
 export type FieldsetProps = WithEntityProps & {
+  children?: React.ReactNode;
   fields: DiField[];
   footer?: React.ReactNode;
   iconComponent: Icon;
@@ -22,33 +21,19 @@ export type FieldsetProps = WithEntityProps & {
 };
 
 const Fieldset = ({
+  children,
   entity,
   fields,
   footer,
   iconComponent: IconComponent,
   title,
 }: FieldsetProps) => {
-  const { t, allT } = useTranslation('pages.entity.fieldset');
+  const { t } = useTranslation('pages.entity.fieldset');
   const decrypt = useDecryptControls();
-  const entityVault = useEntityVault(entity.id, entity);
-  const { isAdmin, scopes } = usePermissions();
   const form = useForm();
   const dis = fields.map(field => field.di);
-
-  const canDecryptDI = (di: DataIdentifier) => {
-    const canAccess = !!entity.onboarding?.canAccessAttributes.includes(di);
-    const hasDecryptRole = scopes.some(scope =>
-      entity.onboarding?.canAccessPermissions.includes(scope),
-    );
-    return canAccess && (isAdmin || hasDecryptRole);
-  };
-
-  const canSelectDI = (di: DataIdentifier) => {
-    const value = entityVault.data?.[di];
-    return canDecryptDI(di) && isVaultDataEncrypted(value);
-  };
-
-  const selectableFields = dis.filter(canSelectDI);
+  const getFieldProps = useField(entity);
+  const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(form.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
@@ -62,32 +47,10 @@ const Fieldset = ({
 
   const renderField = (field: DiField) => {
     const { di, renderCustomField } = field;
-    const canDecrypt = canDecryptDI(di);
-    const disabled = !canSelectDI(di);
-    const label = allT(`di.${di}`);
-    const name = di;
-    const showCheckbox = decrypt.inProgress;
-    const value = entityVault.data?.[di];
-
     return renderCustomField ? (
-      renderCustomField({
-        canDecrypt,
-        disabled,
-        label,
-        name,
-        showCheckbox,
-        value,
-      })
+      <Fragment key={di}>{renderCustomField({ entity, di })}</Fragment>
     ) : (
-      <Field
-        canDecrypt={canDecrypt}
-        disabled={!canSelectDI(di)}
-        key={di}
-        label={allT(`di.${di}`)}
-        name={di}
-        showCheckbox={decrypt.inProgress}
-        value={entityVault.data?.[di]}
-      />
+      <Field key={di} di={di} entity={entity} />
     );
   };
 
@@ -108,7 +71,7 @@ const Fieldset = ({
             </LinkButton>
           )}
         </Header>
-        <Content>{fields.map(renderField)}</Content>
+        <Content>{children || fields.map(renderField)}</Content>
       </Box>
       {footer && <Footer>{footer}</Footer>}
     </Container>

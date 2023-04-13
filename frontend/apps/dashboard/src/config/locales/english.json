@@ -691,7 +691,62 @@
           "title": "Address data"
         },
         "investor-profile": {
-          "title": "Investor profile data"
+          "title": "Investor profile data",
+          "occupation": {
+            "title": "What's your occupation?"
+          },
+          "brokerage-firm": {
+            "title": "Are you employed by a brokerage firm?"
+          },
+          "annual-income": {
+            "title": "What's your annual income?",
+            "options": {
+              "lt50k": "Under $50,000",
+              "s50k_to100k": "$50,000 - $100,000",
+              "s100k_to250k": "$100,000 - $250,000",
+              "s250k_to500k": "$250,000 - $500,000",
+              "gt500k": "$500,000+"
+            }
+          },
+          "net-worth": {
+            "title": "What's your net worth?",
+            "options": {
+              "lt50k": "Under $50,000",
+              "s50k_to100k": "$50,000 - $100,000",
+              "s100k_to250k": "$100,000 - $250,000",
+              "s250k_to500k": "$250,000 - $500,000",
+              "s500k_to1m": "$500,000 - $1,000,000",
+              "gt1m": "$1,000,000+"
+            }
+          },
+          "investment-goals": {
+            "title": "What are your investment goals?",
+            "options": {
+              "grow_long_term_wealth": "Grow long-term wealth",
+              "save_for_retirement": "Save for retirement",
+              "support_loved_ones": "Support my loved ones",
+              "buy_a_home": "Buy a home",
+              "pay_off_debt": "Pay off debt",
+              "start_my_own_business": "Start my own business"
+            }
+          },
+          "risk-tolerance": {
+            "title": "How would you describe your risk tolerance?",
+            "options": {
+              "conservative": "Conservative",
+              "moderate": "Moderate",
+              "aggressive": "Aggressive"
+            }
+          },
+          "declarations": {
+            "title": "Do any of the following apply to you or a member of your immediate family?",
+            "options": {
+              "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
+              "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
+              "senior_political_figure": "I'm a senior political figure",
+              "family_of_political_figure": "I'm a family member or relative of a senior political figure"
+            }
+          }
         },
         "id-documents-and-selfie": {
           "title": "ID documents & Selfie"

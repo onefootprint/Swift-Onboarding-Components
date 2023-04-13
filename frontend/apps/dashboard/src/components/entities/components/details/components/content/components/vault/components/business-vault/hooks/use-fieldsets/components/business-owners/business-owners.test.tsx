@@ -4,7 +4,6 @@ import {
   screen,
   waitFor,
 } from '@onefootprint/test-utils';
-import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import BusinessOwners, { BusinessOwnersProps } from './business-owners';
@@ -26,23 +25,9 @@ describe('<BusinessOwners />', () => {
   });
 
   const renderBusinessOwners = ({
-    canDecrypt = true,
-    disabled = false,
-    label = 'Business Owner',
-    name = BusinessDI.beneficialOwners,
-    showCheckbox = false,
-    value = null,
+    entity = entityFixture,
   }: Partial<BusinessOwnersProps>) =>
-    customRender(
-      <BusinessOwners
-        canDecrypt={canDecrypt}
-        disabled={disabled}
-        label={label}
-        name={name}
-        showCheckbox={showCheckbox}
-        value={value}
-      />,
-    );
+    customRender(<BusinessOwners entity={entity} />);
 
   describe("when the request to fetch the BO's fails", () => {
     beforeEach(() => {

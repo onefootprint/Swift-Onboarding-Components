@@ -1,9 +1,9 @@
 import { Icon } from '@onefootprint/icons';
 import {
   DataIdentifier,
+  Entity,
   VaultEmptyData,
   VaultEncryptedData,
-  VaultValue,
 } from '@onefootprint/types';
 
 export type FormData = Partial<
@@ -13,12 +13,8 @@ export type FormData = Partial<
 export type DiField = {
   di: DataIdentifier;
   renderCustomField?: (options: {
-    canDecrypt: boolean;
-    disabled: boolean;
-    label: string;
-    name: DataIdentifier;
-    showCheckbox: boolean;
-    value: VaultValue;
+    entity: Entity;
+    di: DataIdentifier;
   }) => React.ReactNode;
 };
 

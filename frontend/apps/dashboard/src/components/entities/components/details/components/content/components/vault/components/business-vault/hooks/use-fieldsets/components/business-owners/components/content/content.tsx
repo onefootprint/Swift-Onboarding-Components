@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  BusinessDI,
   BusinessOwner,
+  Entity,
   isVaultDataEmpty,
   isVaultDataEncrypted,
-  VaultValue,
 } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
@@ -13,24 +14,19 @@ import StatusBadge from 'src/components/status-badge';
 import getFullName from 'src/utils/get-full-name';
 import styled, { css } from 'styled-components';
 
-import Field, { FieldProps } from '../../../../../../../field';
+import useField from '../../../../../../../../hooks/use-field';
+import Field from '../../../../../../../field';
 import isVaultDataBusinessOwner from './utils/is-vault-data-business-owner';
 
-export type ContentProps = FieldProps & {
+export type ContentProps = {
   businessOwners: BusinessOwner[];
-  value: VaultValue;
+  entity: Entity;
 };
 
-const BusinessOwnersField = ({
-  businessOwners,
-  canDecrypt,
-  disabled,
-  label,
-  name,
-  showCheckbox,
-  value,
-}: ContentProps) => {
+const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   const { t } = useTranslation('pages.business.vault.bos');
+  const field = useField(entity);
+  const { label, value } = field(BusinessDI.beneficialOwners);
 
   const renderValue = (index: number) => {
     if (
@@ -82,18 +78,14 @@ const BusinessOwnersField = ({
             hideCheckbox={index !== 0}
           >
             <Field
-              canDecrypt={canDecrypt}
-              disabled={disabled}
+              entity={entity}
+              di={BusinessDI.beneficialOwners}
               hint={t(
                 businessOwner.kind === 'primary'
                   ? 'hint.primary'
                   : 'hint.secondary',
                 { stake: businessOwner.ownershipStake },
               )}
-              label={label}
-              name={name}
-              showCheckbox={showCheckbox}
-              value={value}
               renderValue={() => renderValue(index)}
               renderLabel={() => renderLabel(businessOwner)}
             />

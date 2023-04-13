@@ -1,41 +1,34 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  DataIdentifier,
-  isVaultDataDecrypted,
-  VaultValue,
-} from '@onefootprint/types';
+import { DataIdentifier, Entity } from '@onefootprint/types';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FieldOrPlaceholder } from 'src/components';
 import styled, { css } from 'styled-components';
 
+import useField from '../../hooks/use-field';
+
 export type FieldProps = {
-  canDecrypt: boolean;
-  disabled: boolean;
-  label: string;
-  name: DataIdentifier;
-  showCheckbox: boolean;
-  value: VaultValue;
+  di: DataIdentifier;
+  entity: Entity;
   hint?: string;
-  renderValue?: () => React.ReactNode;
   renderLabel?: () => React.ReactNode;
+  renderValue?: () => React.ReactNode;
 };
 
-const Field = ({
-  canDecrypt,
-  disabled,
-  label,
-  name,
-  showCheckbox,
-  value,
-  hint,
-  renderValue,
-  renderLabel,
-}: FieldProps) => {
+const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
   const { t } = useTranslation('pages.entity.decrypt');
   const { register } = useFormContext();
-  const isDataDecrypted = isVaultDataDecrypted(value);
+  const field = useField(entity);
+  const {
+    canDecrypt,
+    disabled,
+    isDecrypted,
+    label,
+    name,
+    showCheckbox,
+    value,
+  } = field(di);
 
   return (
     <Container role="row" aria-label={label}>
@@ -43,7 +36,7 @@ const Field = ({
         <Tooltip disabled={canDecrypt} position="right" text={t('not-allowed')}>
           <Box>
             <Checkbox
-              checked={isDataDecrypted || undefined}
+              checked={isDecrypted || undefined}
               {...register(name)}
               disabled={disabled}
               label={label}
