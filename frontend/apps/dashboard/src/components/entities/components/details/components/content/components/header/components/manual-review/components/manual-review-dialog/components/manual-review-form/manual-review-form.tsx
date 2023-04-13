@@ -21,7 +21,7 @@ type ManualReviewFormProps = {
 };
 
 const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
-  const { t } = useTranslation('pages.user-details.manual-review');
+  const { t } = useTranslation('pages.entity.manual-review');
   const {
     register,
     handleSubmit,

@@ -21,7 +21,7 @@ type ReasonFormProps = {
 
 const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
   const [showCustomReason, setShowCustomReason] = useState(false);
-  const { t } = useTranslation('pages.user-details.decrypt.reason-dialog');
+  const { t } = useTranslation('pages.entity.decrypt.reason-dialog');
   const {
     control,
     register,

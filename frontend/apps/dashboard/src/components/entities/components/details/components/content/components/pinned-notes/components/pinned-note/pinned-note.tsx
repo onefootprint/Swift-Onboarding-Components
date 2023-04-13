@@ -10,7 +10,7 @@ export type PinnedNoteProps = {
 };
 
 const PinnedNote = ({ note, author }: PinnedNoteProps) => {
-  const { t } = useTranslation('pages.user-details.pinned-notes');
+  const { t } = useTranslation('pages.entity.pinned-notes');
 
   return note.length > 0 ? (
     <Container>

@@ -12,7 +12,7 @@ export type CountProps = {
 };
 
 const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
-  const { t } = useTranslation('pages.user-details.user-info.risks');
+  const { t } = useTranslation('pages.entity.risks');
   const hasHighRisks = high.length > 0;
   const hasMediumRisks = medium.length > 0;
   const hasLowRisks = low.length > 0;
@@ -26,7 +26,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
         <Trans
           components={{ a: <Intensity data-level="low" /> }}
           count={low.length}
-          i18nKey="pages.user-details.user-info.risks.low"
+          i18nKey="pages.entity.risks.low"
         />
       </Typography>
     );
@@ -38,7 +38,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
         <Trans
           components={{ a: <Intensity data-level="medium" /> }}
           count={medium.length}
-          i18nKey="pages.user-details.user-info.risks.medium"
+          i18nKey="pages.entity.risks.medium"
         />
       </Typography>
     );
@@ -50,7 +50,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
         <Trans
           components={{ a: <Intensity data-level="high" /> }}
           count={high.length}
-          i18nKey="pages.user-details.user-info.risks.high"
+          i18nKey="pages.entity.risks.high"
         />
       </Typography>
     );
@@ -66,7 +66,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
             c: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.user-details.user-info.risks.low-medium-high"
+          i18nKey="pages.entity.risks.low-medium-high"
           values={{
             lowCount: low.length,
             mediumCount: medium.length,
@@ -86,7 +86,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
             b: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.user-details.user-info.risks.low-medium"
+          i18nKey="pages.entity.risks.low-medium"
           values={{ lowCount: low.length, mediumCount: medium.length }}
         />
       </Typography>
@@ -102,7 +102,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
             b: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.user-details.user-info.risks.low-high"
+          i18nKey="pages.entity.risks.low-high"
           values={{ lowCount: low.length, highCount: high.length }}
         />
       </Typography>
@@ -118,7 +118,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
             b: <Intensity data-level="medium" />,
           }}
           count={high.length}
-          i18nKey="pages.user-details.user-info.risks.medium-high"
+          i18nKey="pages.entity.risks.medium-high"
           values={{ mediumCount: medium.length, highCount: high.length }}
         />
       </Typography>

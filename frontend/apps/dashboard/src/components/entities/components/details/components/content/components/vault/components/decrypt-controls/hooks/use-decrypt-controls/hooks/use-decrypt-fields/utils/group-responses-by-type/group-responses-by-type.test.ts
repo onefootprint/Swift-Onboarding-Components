@@ -1,3 +1,5 @@
+import { BusinessDI, IdDI } from '@onefootprint/types';
+
 import groupResponsesByType from './group-responses-by-type';
 
 describe('groupResponsesByType', () => {
@@ -5,46 +7,46 @@ describe('groupResponsesByType', () => {
     expect(
       groupResponsesByType([
         {
-          'business.state': 'CT',
-          'business.city': 'West Haven',
-          'business.zip': '06516',
-          'business.tin': '124412142',
-          'business.beneficial_owners':
+          [BusinessDI.state]: 'CT',
+          [BusinessDI.city]: 'West Haven',
+          [BusinessDI.zip]: '06516',
+          [BusinessDI.tin]: '124412142',
+          [BusinessDI.beneficialOwners]:
             '[{"first_name":"Jane","last_name":"Doe","ownership_stake":25}]',
-          'business.name': 'Acme Bank',
-          'business.address_line1': '14 Linda Street',
-          'business.country': 'US',
+          [BusinessDI.name]: 'Acme Bank',
+          [BusinessDI.addressLine1]: '14 Linda Street',
+          [BusinessDI.country]: 'US',
         },
       ]),
     ).toEqual({
       text: {
-        'business.state': 'CT',
-        'business.city': 'West Haven',
-        'business.zip': '06516',
-        'business.tin': '124412142',
-        'business.beneficial_owners':
+        [BusinessDI.state]: 'CT',
+        [BusinessDI.city]: 'West Haven',
+        [BusinessDI.zip]: '06516',
+        [BusinessDI.tin]: '124412142',
+        [BusinessDI.beneficialOwners]:
           '[{"first_name":"Jane","last_name":"Doe","ownership_stake":25}]',
-        'business.name': 'Acme Bank',
-        'business.address_line1': '14 Linda Street',
-        'business.country': 'US',
+        [BusinessDI.name]: 'Acme Bank',
+        [BusinessDI.addressLine1]: '14 Linda Street',
+        [BusinessDI.country]: 'US',
       },
     });
 
     expect(
       groupResponsesByType([
         {
-          'id.phone_number': '+17077190993',
-          'id.email': 'jane@acme.com',
-          'id.first_name': 'Jane',
-          'id.last_name': 'Doe',
+          [IdDI.phoneNumber]: '+17077190993',
+          [IdDI.email]: 'jane@acme.com',
+          [IdDI.firstName]: 'Jane',
+          [IdDI.lastName]: 'Doe',
         },
       ]),
     ).toEqual({
       text: {
-        'id.phone_number': '+17077190993',
-        'id.email': 'jane@acme.com',
-        'id.first_name': 'Jane',
-        'id.last_name': 'Doe',
+        [IdDI.phoneNumber]: '+17077190993',
+        [IdDI.email]: 'jane@acme.com',
+        [IdDI.firstName]: 'Jane',
+        [IdDI.lastName]: 'Doe',
       },
     });
   });

@@ -1,6 +1,6 @@
 import {
   CollectedDataOption,
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -10,7 +10,6 @@ import {
   DataIdentifier,
   DocumentDI,
   IdDI,
-  IdDocDI,
   InvestorProfileDI,
 } from './di';
 
@@ -46,24 +45,21 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKybDataOption.website]: [BusinessDI.website],
   [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
 
-  // Id Documents
-  [CollectedIdDocumentDataOption.document]: [
-    IdDocDI.driverLicense,
-    IdDocDI.passport,
-    IdDocDI.idCard,
+  // Documents
+  [CollectedDocumentDataOption.document]: [
+    DocumentDI.finraComplianceLetter,
+    DocumentDI.passport,
+    DocumentDI.driversLicenseBack,
+    DocumentDI.driversLicenseFront,
+    DocumentDI.idCardBack,
+    DocumentDI.idCardFront,
   ],
-  [CollectedIdDocumentDataOption.documentAndSelfie]: [
-    IdDocDI.driverLicense,
-    IdDocDI.passport,
-    IdDocDI.idCard,
-    IdDocDI.selfieDriverLicense,
-    IdDocDI.selfieIdCard,
-    IdDocDI.selfiePassport,
+  [CollectedDocumentDataOption.documentAndSelfie]: [
+    ...Object.values(DocumentDI).map(value => value),
   ],
 
   // Investor Profile
   [CollectedInvestorProfileDataOption.investorProfile]: [
-    DocumentDI.finraComplianceLetter,
     ...Object.values(InvestorProfileDI).map(value => value),
   ],
 };

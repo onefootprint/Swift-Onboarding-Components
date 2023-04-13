@@ -145,15 +145,6 @@
     "terms-and-conditions": {
       "text": "By continuing you agree to our <a1>Terms of Service</a1> and <a2>Privacy Policy</a2>."
     },
-    "manual-review-banner": {
-      "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
-      "failed-needs-review": "This user could not be verified and needs to be manually reviewed.",
-      "see-timeline": "See timeline"
-    },
-    "incomplete-banner": {
-      "header": "User dropped off before providing all information.",
-      "see-timeline": "See audit trail"
-    },
     "sandbox-banner": {
       "title": "You're in sandbox mode. To activate your account,",
       "form": "schedule a call",
@@ -383,347 +374,6 @@
       },
       "logged-as": "Logged in as"
     },
-    "users": {
-      "page-title": "Footprint | Users",
-      "header": {
-        "title": "Users"
-      },
-      "filters": {
-        "status": {
-          "label": "Status",
-          "options": {
-            "verified": "Verified",
-            "failed": "Failed",
-            "incomplete": "Incomplete",
-            "vault_only": "Vault"
-          }
-        },
-        "date-range": {
-          "label": "Date range"
-        }
-      },
-      "table": {
-        "aria-label": "Users table",
-        "search": {
-          "placeholder": "Search (exact match)..."
-        },
-        "empty-state": "No users found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "Status",
-          "email": "Email",
-          "ssn": "SSN",
-          "phone-number": "Phone number",
-          "start": "Date"
-        }
-      }
-    },
-    "user-details": {
-      "page-title": "Footprint | User details",
-      "breadcrumb": {
-        "title": "User details breadcrumb",
-        "users": "Users",
-        "details": "Details"
-      },
-      "empty-state": {
-        "title": "Oops! User couldn't be found.",
-        "description": "We're sorry, but it looks like the user you're looking for doesn't exist.",
-        "cta": "Go back to users",
-        "image": {
-          "alt": "A penguin playing with his phone"
-        }
-      },
-      "pinned-notes": {
-        "title": "Pinned note",
-        "title-by-author": " from {{author}}"
-      },
-      "user-info": {
-        "cta": {
-          "select-all": "Select all",
-          "deselect-all": "Deselect all"
-        },
-        "decrypt": {
-          "not-allowed": "You're not allowed to decrypt data",
-          "empty": "This field was not filled in, so it cannot be decrypted"
-        },
-        "basic": {
-          "title": "Basic data"
-        },
-        "identity": {
-          "title": "Identity data"
-        },
-        "address": {
-          "title": "Address data"
-        },
-        "id-doc": {
-          "title": "ID documents",
-          "title-with-selfie": "ID documents & Selfie",
-          "success-flag": "Successful",
-          "not-allowed": "You 're not allowed to decrypt ID documents",
-          "id-doc-images": {
-            "show": "Show",
-            "hide": "Hide"
-          },
-          "preview": {
-            "tabs": {
-              "successful-uploads": "Successful uploads",
-              "failed-uploads": "Failed uploads"
-            },
-            "segment-control": "Switch between ID document and selfie images",
-            "front-alt": "Front image of the ID Doc",
-            "back-alt": "Back image of the ID Doc"
-          }
-        },
-        "investor-profile": {
-          "title": "Investor profile",
-          "occupation": {
-            "title": "What's your occupation?"
-          },
-          "brokerage-firm": {
-            "title": "Are you employed by a brokerage firm?"
-          },
-          "annual-income": {
-            "title": "What's your annual income?",
-            "options": {
-              "lt50k": "Under $50,000",
-              "s50k_to100k": "$50,000 - $100,000",
-              "s100k_to250k": "$100,000 - $250,000",
-              "s250k_to500k": "$250,000 - $500,000",
-              "gt500k": "$500,000+"
-            }
-          },
-          "net-worth": {
-            "title": "What's your net worth?",
-            "options": {
-              "lt50k": "Under $50,000",
-              "s50k_to100k": "$50,000 - $100,000",
-              "s100k_to250k": "$100,000 - $250,000",
-              "s250k_to500k": "$250,000 - $500,000",
-              "s500k_to1m": "$500,000 - $1,000,000",
-              "gt1m": "$1,000,000+"
-            }
-          },
-          "investment-goals": {
-            "title": "What are your investment goals?",
-            "options": {
-              "grow_long_term_wealth": "Grow long-term wealth",
-              "save_for_retirement": "Save for retirement",
-              "support_loved_ones": "Support my loved ones",
-              "buy_a_home": "Buy a home",
-              "pay_off_debt": "Pay off debt",
-              "start_my_own_business": "Start my own business"
-            }
-          },
-          "risk-tolerance": {
-            "title": "How would you describe your risk tolerance?",
-            "options": {
-              "conservative": "Conservative",
-              "moderate": "Moderate",
-              "aggressive": "Aggressive"
-            }
-          },
-          "declarations": {
-            "title": "Do any of the following apply to you or a member of your immediate family?",
-            "options": {
-              "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
-              "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
-              "senior_political_figure": "I'm a senior political figure",
-              "family_of_political_figure": "I'm a family member or relative of a senior political figure"
-            }
-          }
-        },
-        "risks": {
-          "cta": "See details",
-          "empty-state": "No risk signals",
-          "low_one": "{{count}} <a>Low</a> risk signal",
-          "low_other": "{{count}} <a>Low</a> risk signals",
-          "medium_one": "{{count}} <a>Medium</a> risk signal",
-          "medium_other": "{{count}} <a>Medium</a> risk signals",
-          "high_one": "{{count}} <a>High</a> risk signal",
-          "high_other": "{{count}} <a>High</a> risk signals",
-          "low-medium": "{{mediumCount}} <a>Medium</a> and {{lowCount}} <b>Low</b> risk signals",
-          "low-high": "{{highCount}} <a>High</a> and {{lowCount}} <b>Low</b> risk signals",
-          "medium-high": "{{highCount}} <a>High</a> and {{mediumCount}} <b>Medium</b> risk signals",
-          "low-medium-high": "{{highCount}} <a>High</a>, {{mediumCount}} <b>Medium</b> and {{lowCount}} <c>Low</c> risk signals",
-          "list-dialog": {
-            "title": "Identity data's risk signal",
-            "description": "Select a risk signal"
-          }
-        }
-      },
-      "manual-review": {
-        "status": {
-          "pass": "Verified",
-          "fail": "Failed"
-        },
-        "button": {
-          "review": "Review user",
-          "mark-as-verified": "Mark as Verified",
-          "mark-as-failed": "Mark as Failed"
-        },
-        "dropdown": {
-          "mark-as": "Mark user as {{status}}",
-          "keep-as": "Keep user as {{status}}"
-        },
-        "dialog": {
-          "title": "Review",
-          "complete": "Complete",
-          "cancel": "Cancel",
-          "form": {
-            "prompt": "Why are you marking this user as {{status}}?",
-            "note": {
-              "label": "Note",
-              "placeholder": "Type here...",
-              "errors": {
-                "required": "A note is required"
-              }
-            },
-            "toggle": {
-              "label": "Pin note to the top of the page"
-            },
-            "disclaimer": "Please note that this action will be logged for security reasons."
-          }
-        }
-      },
-      "decrypt": {
-        "errors": {
-          "min-selected": {
-            "title": "Uh-oh!",
-            "description": "You need to select at least one field to continue."
-          }
-        },
-        "controls": {
-          "start": "Decrypt data",
-          "next": "Continue",
-          "cancel": "Cancel",
-          "not-allowed": "You're not allowed to decrypt data"
-        },
-        "reason-dialog": {
-          "title": "Decrypt data",
-          "description": "Why are you decrypting this data?",
-          "form": {
-            "reason": {
-              "label": "Reason",
-              "placeholder": "Select...",
-              "errors": {
-                "required": "A reason is needed"
-              },
-              "options": {
-                "customer-support-inquiry": "Responding to customer support inquiry",
-                "customer-communication": "Sending communication to customer",
-                "customer-verification": "Verifying customer identity",
-                "auditor-review": "Auditor review",
-                "transation-over-5k": "Transaction over $5k",
-                "change-of-direct-deposit": "Change of direct deposit",
-                "other": "Other"
-              }
-            },
-            "custom-reason": {
-              "placeholder": "Type the reason here...",
-              "errors": {
-                "required": "A reason is needed"
-              }
-            }
-          },
-          "disclaimer": "Please note that all data attribute access are logged for security reasons."
-        }
-      },
-      "risk-signals": {
-        "title": "Risk signals",
-        "empty-state": "No risk signals found",
-        "severity": {
-          "low": "Low",
-          "medium": "Medium",
-          "high": "High",
-          "info": "Info"
-        },
-        "table": {
-          "aria-label": "Risk signals",
-          "empty-state": "No risk signals found",
-          "header": {
-            "severity": "Severity",
-            "scopes": "Scopes",
-            "note": "Note"
-          }
-        },
-        "filters": {
-          "severity": {
-            "label": "Severity"
-          },
-          "scope": {
-            "label": "Scope"
-          }
-        },
-        "details": {
-          "overview": {
-            "title": "Overview",
-            "severity": "Severity",
-            "scopes": "Scopes",
-            "description": "Description"
-          }
-        }
-      },
-      "audit-trail": {
-        "title": "Audit trail",
-        "empty": "No entries",
-        "timeline": {
-          "liveness-event": {
-            "success-title": "Liveness check succeeded",
-            "skipped-title": "Liveness check skipped",
-            "attested-by": "Attested by {{attestations}}",
-            "ip-address": "{{ipAddress}} (IP Address)"
-          },
-          "id-doc-uploaded-event": {
-            "title": "Collected "
-          },
-          "kyc-data-collected-event": {
-            "title": "Collected ",
-            "title-from-other-org": "Collected (from other companies) "
-          },
-          "onboarding-decision-event": {
-            "verified-by-footprint": "Verified by Footprint",
-            "not-verified-by-footprint": "Could not be verified by Footprint",
-            "verified-by-firm-employee": "Verified by Footprint Risk Ops",
-            "not-verified-by-firm-employee": "Could not be verified by Footprint Risk Ops",
-            "verified": "Verified",
-            "not-verified": "Failed",
-            "decision-status": {
-              "pass": "Verified",
-              "fail": "Failed",
-              "step_up_required": "Step up required"
-            },
-            "with": " with ",
-            "org-overwrite": {
-              "title": "Marked as {{decision}} by {{user}}",
-              "see-details": "See details",
-              "drawer": {
-                "title": "Review details",
-                "decision": "Decision",
-                "reviewer": "Reviewer",
-                "date": "Date",
-                "note": "Note",
-                "pin-note": "Pin note to the top of the page"
-              }
-            }
-          },
-          "abandoned-event": {
-            "title": "User dropped off before providing all information"
-          },
-          "watchlist-check-event": {
-            "title": "Watchlist check performed",
-            "status": {
-              "pass": "User was not found on a watchlist",
-              "fail": "User was found on a watchlist"
-            },
-            "reason-codes": {
-              "watchlist_hit_ofac": "User was found on OFAC watchlist",
-              "watchlist_hit_pep": "User was found on PEP watchlist"
-            }
-          }
-        }
-      }
-    },
     "entities": {
       "filters": {
         "status": {
@@ -749,6 +399,10 @@
           "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
           "failed-needs-review": "This user could not be verified and needs to be manually reviewed."
         }
+      },
+      "pinned-notes": {
+        "title": "Pinned note",
+        "title-by-author": " from {{author}}"
       },
       "breadcrumb": {
         "title": "{{kind}} details breadcrumb",
@@ -1002,7 +656,7 @@
         }
       }
     },
-    "new-users": {
+    "users": {
       "page-title": "Footprint | Users",
       "header": {
         "title": "Users"
@@ -1021,7 +675,7 @@
         }
       }
     },
-    "new-user": {
+    "user": {
       "page-title": "Footprint | User",
       "header": {
         "title": "User"
@@ -1035,6 +689,12 @@
         },
         "address": {
           "title": "Address data"
+        },
+        "investor-profile": {
+          "title": "Investor profile data"
+        },
+        "id-documents-and-selfie": {
+          "title": "ID documents & Selfie"
         }
       }
     },

@@ -5,11 +5,9 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import { BusinessDI, EntityKind } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
-
-import { HEADER_ACTIONS_ID } from '@/entity/constants';
 
 import Details from './details';
 import {
@@ -17,9 +15,8 @@ import {
   entityFixture,
   getTextByRow,
   withAnnotations,
-  withBusinessOwners,
+  withDecrypt,
   withEntity,
-  withEntityDecrypt,
   withEntityError,
   withLiveness,
   withRiskSignals,
@@ -40,14 +37,13 @@ describe('<Details />', () => {
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({
-      pathname: `/entities/${entityFixture.id}`,
+      pathname: `/users/${entityFixture.id}`,
       query: {
         id: entityFixture.id,
       },
     });
     withRiskSignals();
     withTimeline();
-    withBusinessOwners();
     withLiveness();
     withAnnotations();
   });
@@ -57,12 +53,7 @@ describe('<Details />', () => {
   });
 
   const renderDetails = () => {
-    customRender(
-      <>
-        <div id={HEADER_ACTIONS_ID} />
-        <Details kind={EntityKind.business} listPath="/entities" />
-      </>,
-    );
+    customRender(<Details />);
   };
 
   const renderDetailsAndWaitData = async () => {
@@ -81,7 +72,7 @@ describe('<Details />', () => {
     });
   };
 
-  describe('when the request to fetch the entities succeeds', () => {
+  describe('when the request to fetch the users succeeds', () => {
     beforeEach(() => {
       withEntity();
     });
@@ -89,93 +80,120 @@ describe('<Details />', () => {
     it('should show a breadcrumb, with an option to return to the list pages', async () => {
       await renderDetailsAndWaitData();
 
-      const breadcrumb = screen.getByLabelText('Business details breadcrumb');
+      const breadcrumb = screen.getByLabelText('User details breadcrumb');
       expect(breadcrumb).toBeInTheDocument();
 
-      const listLink = screen.getByRole('link', { name: 'Businesses' });
+      const listLink = screen.getByRole('link', { name: 'Users' });
       expect(listLink).toBeInTheDocument();
-      expect(listLink.getAttribute('href')).toEqual('/entities');
+      expect(listLink.getAttribute('href')).toEqual('/users');
     });
 
     it('should show a header with the entity status, start and id', async () => {
       await renderDetailsAndWaitData();
 
-      const header = screen.getByRole('banner', { name: 'Business info' });
+      const header = screen.getByRole('banner', { name: 'User info' });
       expect(header).toBeInTheDocument();
 
       const status = within(header).getByText('Verified');
       expect(status).toBeInTheDocument();
 
-      const start = within(header).getByText('3/27/23, 2:43 PM');
+      const start = within(header).getByText('3/29/23, 11:07 PM');
       expect(start).toBeInTheDocument();
 
-      const id = within(header).getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD');
+      const id = within(header).getByText('fp_id_wL6XIWe26cRinucZrRK1yn');
       expect(id).toBeInTheDocument();
     });
 
+    // TODO: Add vault data
+    // https://linear.app/footprint/issue/FP-3505/add-user-vault-tests
     describe('vault', () => {
       describe('basic data section', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
-
           const container = screen.getByRole('group', {
             name: 'Basic data',
           });
 
-          const name = getTextByRow({
-            name: 'Name',
+          const firstName = getTextByRow({
+            name: 'First name',
             value: '•••••••••',
             container,
           });
-          expect(name).toBeInTheDocument();
+          expect(firstName).toBeInTheDocument();
 
-          const dba = getTextByRow({
-            name: 'Doing Business As',
+          const lastName = getTextByRow({
+            name: 'Last name',
             value: '•••••••••',
             container,
           });
-          expect(dba).toBeInTheDocument();
+          expect(lastName).toBeInTheDocument();
 
-          const tin = getTextByRow({
-            name: 'Taxpayer Identification Number (TIN)',
+          const email = getTextByRow({
+            name: 'Email',
             value: '•••••••••',
             container,
           });
-          expect(tin).toBeInTheDocument();
+          expect(email).toBeInTheDocument();
+
+          const phoneNumber = getTextByRow({
+            name: 'Phone number',
+            value: '•••••••••',
+            container,
+          });
+          expect(phoneNumber).toBeInTheDocument();
         });
 
         describe('when clicking on the decrypt button', () => {
           beforeEach(() => {
-            withEntityDecrypt(entityFixture.id, {
-              [BusinessDI.name]: 'Acme Inc.',
-              [BusinessDI.doingBusinessAs]: 'Acme',
-              [BusinessDI.tin]: '12-3456789',
+            withDecrypt(entityFixture.id, {
+              [IdDI.firstName]: 'Jane',
+              [IdDI.lastName]: 'Doe',
+              [IdDI.email]: 'jane.doe@acme.com',
+              [IdDI.phoneNumber]: '12-3456789',
             });
           });
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields(['Name', 'Doing Business As']);
+            await decryptFields(['First name', 'Email', 'Phone number']);
             const container = screen.getByRole('group', {
               name: 'Basic data',
             });
 
             await waitFor(() => {
-              const name = getTextByRow({
-                name: 'Name',
-                value: 'Acme Inc.',
+              const firstName = getTextByRow({
+                name: 'First name',
+                value: 'Jane',
                 container,
               });
-              expect(name).toBeInTheDocument();
+              expect(firstName).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const dba = getTextByRow({
-                name: 'Doing Business As',
-                value: 'Acme',
+              const lastName = getTextByRow({
+                name: 'Last name',
+                value: 'Doe',
                 container,
               });
-              expect(dba).toBeInTheDocument();
+              expect(lastName).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const email = getTextByRow({
+                name: 'Email',
+                value: 'jane.doe@acme.com',
+                container,
+              });
+              expect(email).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const phoneNumber = getTextByRow({
+                name: 'Phone number',
+                value: '12-3456789',
+                container,
+              });
+              expect(phoneNumber).toBeInTheDocument();
             });
           });
         });
@@ -184,9 +202,8 @@ describe('<Details />', () => {
       describe('address section', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
-
           const container = screen.getByRole('group', {
-            name: 'Registered business address',
+            name: 'Address data',
           });
 
           await waitFor(() => {
@@ -237,12 +254,12 @@ describe('<Details />', () => {
 
         describe('when clicking on the decrypt button', () => {
           beforeEach(() => {
-            withEntityDecrypt(entityFixture.id, {
-              [BusinessDI.country]: 'US',
-              [BusinessDI.addressLine1]: '14 Linda Street',
-              [BusinessDI.city]: 'West Haven',
-              [BusinessDI.zip]: '06516',
-              [BusinessDI.state]: 'CT',
+            withDecrypt(entityFixture.id, {
+              [IdDI.country]: 'US',
+              [IdDI.addressLine1]: '14 Linda Street',
+              [IdDI.city]: 'West Haven',
+              [IdDI.zip]: '06516',
+              [IdDI.state]: 'CT',
             });
           });
 
@@ -257,7 +274,7 @@ describe('<Details />', () => {
             ]);
 
             const container = screen.getByRole('group', {
-              name: 'Registered business address',
+              name: 'Address data',
             });
 
             await waitFor(() => {
@@ -308,89 +325,80 @@ describe('<Details />', () => {
         });
       });
 
-      describe('BOs section', () => {
-        it('should display the stake of each beneficial owner', async () => {
+      describe('identity data section', () => {
+        it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();
-          await waitFor(() => {
-            screen.getByTestId('business-owners-content');
-          });
           const container = screen.getByRole('group', {
-            name: 'Beneficial owners',
+            name: 'Identity data',
           });
 
-          await waitFor(() => {
-            const primary = within(container).getByText(
-              'Owns 50% of the business & submitted the business information',
-            );
-            expect(primary).toBeInTheDocument();
+          const ssn9 = getTextByRow({
+            name: 'SSN (Full)',
+            value: '•••••••••',
+            container,
           });
+          expect(ssn9).toBeInTheDocument();
 
-          await waitFor(() => {
-            const secondary = within(container).getByText(
-              'Owns 50% of the business',
-            );
-            expect(secondary).toBeInTheDocument();
+          const ssn4 = getTextByRow({
+            name: 'SSN (Last 4)',
+            value: '•••••••••',
+            container,
           });
-        });
+          expect(ssn4).toBeInTheDocument();
 
-        it('should display a status and a link to check a beneficial owner', async () => {
-          await renderDetailsAndWaitData();
-          await waitFor(() => {
-            screen.getByTestId('business-owners-content');
+          const dob = getTextByRow({
+            name: 'Date of birth',
+            value: '•••••••••',
+            container,
           });
-
-          const container = screen.getByRole('group', {
-            name: 'Beneficial owners',
-          });
-
-          await waitFor(() => {
-            const status = within(container).getByText('Verified');
-            expect(status).toBeInTheDocument();
-          });
-
-          await waitFor(() => {
-            const link = within(container).getByText('View profile');
-            expect(link).toBeInTheDocument();
-          });
-
-          await waitFor(() => {
-            const link = within(container).getByRole('link', {
-              name: 'View profile',
-            }) as HTMLAnchorElement;
-            const url = link.href.endsWith(
-              '/users/detail?footprint_user_id=fp_id_XW3pNYPpV4Niup1PgFZBg6',
-            );
-            expect(url).toBeTruthy();
-          });
+          expect(dob).toBeInTheDocument();
         });
 
         describe('when clicking on the decrypt button', () => {
           beforeEach(() => {
-            withEntityDecrypt(entityFixture.id, {
-              [BusinessDI.beneficialOwners]:
-                '[{"first_name":"Jack","last_name":"Johnson","ownership_stake":50},{"first_name":"Billy","last_name":"Jackson","email":"billy@onefootprint.com","ownership_stake":50}]',
+            withDecrypt(entityFixture.id, {
+              [IdDI.ssn4]: '6578',
+              [IdDI.ssn9]: '123456578',
+              [IdDI.dob]: '1967-09-29',
             });
           });
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await waitFor(() => {
-              screen.getByTestId('business-owners-content');
-            });
-            await decryptFields(['Beneficial owner']);
-
+            await decryptFields([
+              'SSN (Full)',
+              'SSN (Last 4)',
+              'Date of birth',
+            ]);
             const container = screen.getByRole('group', {
-              name: 'Beneficial owners',
+              name: 'Identity data',
             });
 
             await waitFor(() => {
-              const primary = within(container).getByText('Jack Johnson');
-              expect(primary).toBeInTheDocument();
+              const ssn9 = getTextByRow({
+                name: 'SSN (Full)',
+                value: '123456578',
+                container,
+              });
+              expect(ssn9).toBeInTheDocument();
             });
 
             await waitFor(() => {
-              const secondary = within(container).getByText('Billy Jackson');
-              expect(secondary).toBeInTheDocument();
+              const ssn4 = getTextByRow({
+                name: 'SSN (Last 4)',
+                value: '6578',
+                container,
+              });
+              expect(ssn4).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const dob = getTextByRow({
+                name: 'Date of birth',
+                value: '1967-09-29',
+                container,
+              });
+              expect(dob).toBeInTheDocument();
             });
           });
         });
@@ -437,13 +445,27 @@ describe('<Details />', () => {
         });
         const ip = getTextByRow({
           name: 'IP address',
-          value: '67.243.21.56',
+          value: '73.222.157.30',
           container,
         });
 
         expect(ip).toBeInTheDocument();
       });
 
+      it('should show the biometrics', async () => {
+        await renderDetailsAndWaitData();
+
+        const container = screen.getByRole('region', {
+          name: 'Device insights',
+        });
+        const ip = getTextByRow({
+          name: 'Biometrics',
+          value: 'Verified',
+          container,
+        });
+
+        expect(ip).toBeInTheDocument();
+      });
       it('should show the region', async () => {
         await renderDetailsAndWaitData();
 
@@ -452,7 +474,7 @@ describe('<Details />', () => {
         });
         const region = getTextByRow({
           name: 'Region',
-          value: 'New York, NY',
+          value: 'San Francisco, CA',
           container,
         });
 
@@ -476,7 +498,7 @@ describe('<Details />', () => {
     });
   });
 
-  describe('when the request to fetch the entity fails', () => {
+  describe('when the request to fetch the users fails', () => {
     beforeEach(() => {
       withEntityError();
     });

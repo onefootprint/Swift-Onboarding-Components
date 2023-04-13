@@ -1,12 +1,3 @@
-export enum IdDocDI {
-  driverLicense = 'id_document.driver_license',
-  idCard = 'id_document.id_card',
-  passport = 'id_document.passport',
-  selfieDriverLicense = 'selfie.driver_license',
-  selfiePassport = 'selfie.passport',
-  selfieIdCard = 'selfie.id_card',
-}
-
 export enum BusinessDI {
   name = 'business.name',
   doingBusinessAs = 'business.dba',
@@ -50,19 +41,21 @@ export enum IdDI {
 
 export enum DocumentDI {
   finraComplianceLetter = 'document.finra_compliance_letter',
+  passport = 'document.passport',
+  passportSelfie = 'document.passport_selfie',
+  driversLicenseFront = 'document.drivers_license_front',
+  driversLicenseBack = 'document.drivers_license_back',
+  driversLicenseSelfie = 'document.drivers_license_selfie',
+  idCardFront = 'document.id_card_front',
+  idCardBack = 'document.id_card_back',
+  idCardSelfie = 'document.id_card_selfie',
 }
 
 export const DataIdentifierKeys = [
-  ...Object.values(IdDocDI),
   ...Object.values(BusinessDI),
   ...Object.values(InvestorProfileDI),
   ...Object.values(IdDI),
   ...Object.values(DocumentDI),
 ];
 
-export type DataIdentifier =
-  | IdDocDI
-  | InvestorProfileDI
-  | IdDI
-  | BusinessDI
-  | DocumentDI;
+export type DataIdentifier = InvestorProfileDI | IdDI | BusinessDI | DocumentDI;

@@ -1,11 +1,9 @@
-import { DecryptTextResponse, isVaultDataText } from '@onefootprint/types';
+import { DecryptResponse, isVaultDataText } from '@onefootprint/types';
 import unary from 'lodash/fp/unary';
-
-type DecryptResponse = DecryptTextResponse;
 
 export const isTextResponse = (
   response: DecryptResponse,
-): response is DecryptTextResponse => {
+): response is DecryptResponse => {
   if (typeof response !== 'object') return false;
   return Object.values(response).every(unary(isVaultDataText));
 };

@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedDataOption,
   CollectedDocumentDataOption,
-  CollectedIdDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -31,8 +30,7 @@ const order: CollectedDataOption[] = [
   CollectedKybDataOption.beneficialOwners,
   CollectedInvestorProfileDataOption.investorProfile,
   CollectedDocumentDataOption.document,
-  CollectedIdDocumentDataOption.document,
-  CollectedIdDocumentDataOption.documentAndSelfie,
+  CollectedDocumentDataOption.documentAndSelfie,
 ];
 
 const CdoTagList = ({ cdos }: CdoTagListProps) => {

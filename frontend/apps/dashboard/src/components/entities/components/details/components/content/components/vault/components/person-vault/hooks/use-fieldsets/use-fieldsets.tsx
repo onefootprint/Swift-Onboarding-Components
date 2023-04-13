@@ -5,7 +5,7 @@ import { IdDI } from '@onefootprint/types';
 import type { Fieldset } from '../../../../vault.types';
 
 const useFieldsets = (): Fieldset => {
-  const { t } = useTranslation('pages.new-user.vault');
+  const { t } = useTranslation('pages.user.vault');
   return {
     basic: {
       title: t('basic.title'),

@@ -1,10 +1,4 @@
-import {
-  BusinessDI,
-  DocumentDI,
-  IdDI,
-  IdDocDI,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { DataIdentifier } from '@onefootprint/types';
 
 import type { FormData } from '../../vault.types';
 
@@ -31,26 +25,16 @@ export enum Guard {
 
 export enum Action {
   assignFields = 'assignFields',
-  assignText = 'assignText',
-  assignIdDocument = 'assignIdDocument',
-  assignDocument = 'assignDocument',
+  assignDI = 'assignDI',
   assignReason = 'assignReason',
 }
 
-export type TextField = IdDI | InvestorProfileDI | BusinessDI;
-
-export type IdDocumentField = IdDocDI;
-
-// For now, finraCompliance isn't officialy part of the investor profile CDO, but the idea in a long term
-// is to have it there.
-export type DocumentField = DocumentDI.finraComplianceLetter;
+export type DiField = DataIdentifier;
 
 export type Context = {
   reason?: string;
   fields?: FormData;
-  textFields?: TextField[];
-  idDocumentFields?: IdDocumentField[];
-  documentFields?: DocumentField[];
+  diFields?: DiField[];
 };
 
 export type MachineEvents =

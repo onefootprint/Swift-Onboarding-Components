@@ -1,13 +1,13 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { DecryptTextRequest, DecryptTextResponse } from '@onefootprint/types';
+import { DecryptRequest, DecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 const decryptTextFields = async (
-  { userId, fields, reason }: DecryptTextRequest,
+  { userId, fields, reason }: DecryptRequest,
   authHeaders: AuthHeaders,
 ) => {
-  const response = await requestWithoutCaseConverter<DecryptTextResponse>({
+  const response = await requestWithoutCaseConverter<DecryptResponse>({
     method: 'POST',
     url: `/entities/${userId}/vault/decrypt`,
     data: {
@@ -21,7 +21,7 @@ const decryptTextFields = async (
 
 const useDecryptTextFields = () => {
   const { authHeaders } = useSession();
-  return useMutation((data: DecryptTextRequest) =>
+  return useMutation((data: DecryptRequest) =>
     decryptTextFields(data, authHeaders),
   );
 };

@@ -42,9 +42,9 @@ const useDecryptControls = () => {
       onError?: (error: unknown) => void;
     },
   ) => {
-    const { reason, textFields, idDocumentFields, documentFields } = context;
+    const { reason, diFields } = context;
     decryptFields(
-      { reason, textFields, idDocumentFields, documentFields, userId },
+      { reason, diFields, userId },
       {
         onSuccess: results => {
           send(Event.decryptSucceeded);

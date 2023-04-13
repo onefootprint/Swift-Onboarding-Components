@@ -47,7 +47,6 @@ export * from './risk-signal';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export * from './role';
 export * from './rolebinding';
-export * from './scoped-user';
 export * from './timeline';
 export * from './user-data';
 export { default as UserDataAttribute } from './user-data-attribute';

@@ -48,10 +48,8 @@ const getEntityStatus = (entity: Entity): EntityStatus => {
   if (!entity.isPortable) {
     return EntityStatus.vaultOnly;
   }
-  if (entity.onboarding?.isAuthorized && entity.onboarding?.status) {
-    return entity.onboarding.status as unknown as EntityStatus;
-  }
-  return EntityStatus.incomplete;
+  return (entity.onboarding?.status ||
+    EntityStatus.incomplete) as unknown as EntityStatus;
 };
 
 const getEntityManualReview = (entity: Entity) => {

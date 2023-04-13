@@ -1,7 +1,7 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import {
   CollectedDataOption,
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -32,10 +32,10 @@ describe('<CdoTagList />', () => {
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
       CollectedKybDataOption.beneficialOwners,
-      CollectedIdDocumentDataOption.documentAndSelfie,
+      CollectedDocumentDataOption.documentAndSelfie,
       CollectedKycDataOption.phoneNumber,
       CollectedKycDataOption.email,
-      CollectedIdDocumentDataOption.document,
+      CollectedDocumentDataOption.document,
       CollectedKycDataOption.ssn9,
       CollectedInvestorProfileDataOption.investorProfile,
       CollectedKycDataOption.dob,

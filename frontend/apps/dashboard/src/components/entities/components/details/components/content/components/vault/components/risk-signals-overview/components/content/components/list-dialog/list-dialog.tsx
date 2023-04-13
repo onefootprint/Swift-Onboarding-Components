@@ -15,9 +15,7 @@ export type ListDialogProps = {
 
 const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
   const filters = useRiskSignalsOverviewFilters();
-  const { t } = useTranslation(
-    'pages.user-details.user-info.risks.list-dialog',
-  );
+  const { t } = useTranslation('pages.entity.risks.list-dialog');
 
   const [open, setOpen] = useState(false);
   const columns = [

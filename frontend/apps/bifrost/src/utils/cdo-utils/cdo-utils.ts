@@ -1,14 +1,14 @@
 import {
   CollectedDataOption,
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
 export const isDocCdo = (data: CollectedDataOption) =>
-  Object.values(CollectedIdDocumentDataOption).includes(
-    data as CollectedIdDocumentDataOption,
+  Object.values(CollectedDocumentDataOption).includes(
+    data as CollectedDocumentDataOption,
   );
 
 export const isInvestorProfileCdo = (data: CollectedDataOption) =>

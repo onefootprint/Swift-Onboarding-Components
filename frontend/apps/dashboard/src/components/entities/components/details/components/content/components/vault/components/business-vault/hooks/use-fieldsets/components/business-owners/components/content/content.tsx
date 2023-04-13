@@ -10,7 +10,7 @@ import Link from 'next/link';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';
-import getFullName from 'src/utils/get-full-name-data';
+import getFullName from 'src/utils/get-full-name';
 import styled, { css } from 'styled-components';
 
 import Field, { FieldProps } from '../../../../../../../field';

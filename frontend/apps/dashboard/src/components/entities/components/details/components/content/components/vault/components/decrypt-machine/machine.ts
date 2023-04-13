@@ -9,7 +9,7 @@ import {
   MachineStates,
   State,
 } from './types';
-import { getDocumentFields, getIdDocumentFields, getTextFields } from './utils';
+import getDiFields from './utils/get-di-fields';
 
 export const createDecryptStateMachine = () =>
   createMachine<Context, MachineEvents, MachineStates>(
@@ -33,12 +33,7 @@ export const createDecryptStateMachine = () =>
             [Event.submittedFields]: [
               {
                 target: State.confirmingReason,
-                actions: [
-                  Action.assignFields,
-                  Action.assignText,
-                  Action.assignIdDocument,
-                  Action.assignDocument,
-                ],
+                actions: [Action.assignFields, Action.assignDI],
                 cond: Guard.hasAtLeastOneFieldSelected,
               },
             ],
@@ -72,15 +67,8 @@ export const createDecryptStateMachine = () =>
       guards: {
         [Guard.hasAtLeastOneFieldSelected]: (context, event) => {
           if (event.type === Event.submittedFields) {
-            const textFields = getTextFields(event.payload.fields);
-            const idDocumentFields = getIdDocumentFields(event.payload.fields);
-            const documentFields = getDocumentFields(event.payload.fields);
-
-            return (
-              textFields.length > 0 ||
-              idDocumentFields.length > 0 ||
-              documentFields.length > 0
-            );
+            const dis = getDiFields(event.payload.fields);
+            return dis.length > 0;
           }
           return false;
         },
@@ -91,21 +79,9 @@ export const createDecryptStateMachine = () =>
             context.fields = event.payload.fields;
           }
         },
-        [Action.assignText]: (context, event) => {
+        [Action.assignDI]: (context, event) => {
           if (event.type === Event.submittedFields) {
-            context.textFields = getTextFields(event.payload.fields);
-          }
-        },
-        [Action.assignIdDocument]: (context, event) => {
-          if (event.type === Event.submittedFields) {
-            context.idDocumentFields = getIdDocumentFields(
-              event.payload.fields,
-            );
-          }
-        },
-        [Action.assignDocument]: (context, event) => {
-          if (event.type === Event.submittedFields) {
-            context.documentFields = getDocumentFields(event.payload.fields);
+            context.diFields = getDiFields(event.payload.fields);
           }
         },
         [Action.assignReason]: (context, event) => {

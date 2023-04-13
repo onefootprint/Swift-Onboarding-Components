@@ -1,5 +1,5 @@
 import {
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -10,13 +10,13 @@ export type MachineContext = {
   name?: string;
   kycCollect?: {
     ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-    [CollectedIdDocumentDataOption.document]: boolean;
-    [CollectedIdDocumentDataOption.documentAndSelfie]: boolean;
+    [CollectedDocumentDataOption.document]: boolean;
+    [CollectedDocumentDataOption.documentAndSelfie]: boolean;
     [CollectedInvestorProfileDataOption.investorProfile]: boolean;
   };
   kycAccess?: Record<
     | CollectedKycDataOption
-    | CollectedIdDocumentDataOption
+    | CollectedDocumentDataOption
     | CollectedInvestorProfileDataOption,
     boolean
   >;
@@ -49,8 +49,8 @@ export type MachineEvents =
       type: 'kycCollectSubmitted';
       payload: {
         ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-        [CollectedIdDocumentDataOption.document]: boolean;
-        [CollectedIdDocumentDataOption.documentAndSelfie]: boolean;
+        [CollectedDocumentDataOption.document]: boolean;
+        [CollectedDocumentDataOption.documentAndSelfie]: boolean;
         [CollectedInvestorProfileDataOption.investorProfile]: boolean;
       };
     }
@@ -58,7 +58,7 @@ export type MachineEvents =
       type: 'kycAccessSubmitted';
       payload: Record<
         | CollectedKycDataOption
-        | CollectedIdDocumentDataOption
+        | CollectedDocumentDataOption
         | CollectedInvestorProfileDataOption,
         boolean
       >;
@@ -76,7 +76,7 @@ export type MachineEvents =
         allKybData: boolean;
         kycAccess: Record<
           | CollectedKycDataOption
-          | CollectedIdDocumentDataOption
+          | CollectedDocumentDataOption
           | CollectedInvestorProfileDataOption,
           boolean
         >;

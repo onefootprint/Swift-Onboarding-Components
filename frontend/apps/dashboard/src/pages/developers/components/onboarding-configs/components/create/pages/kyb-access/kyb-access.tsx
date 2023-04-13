@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -19,7 +19,7 @@ type FormData = {
   allKybData: boolean;
 } & Record<
   | CollectedKycDataOption
-  | CollectedIdDocumentDataOption
+  | CollectedDocumentDataOption
   | CollectedInvestorProfileDataOption,
   boolean
 >;
@@ -50,10 +50,10 @@ const KybAccess = () => {
     },
   });
 
-  const idDocAccess = watch(CollectedIdDocumentDataOption.document);
+  const idDocAccess = watch(CollectedDocumentDataOption.document);
   const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.checked) {
-      setValue(CollectedIdDocumentDataOption.documentAndSelfie, false);
+      setValue(CollectedDocumentDataOption.documentAndSelfie, false);
     }
   };
 
@@ -108,24 +108,24 @@ const KybAccess = () => {
               {...register(CollectedKycDataOption.ssn9)}
             />
           )}
-          {kycCollect?.[CollectedIdDocumentDataOption.document] && (
+          {kycCollect?.[CollectedDocumentDataOption.document] && (
             <Box>
               <Checkbox
                 label={allT('cdo.document')}
-                {...register(CollectedIdDocumentDataOption.document, {
+                {...register(CollectedDocumentDataOption.document, {
                   onChange: handleDocumentChange,
                 })}
               />
               <AnimatedContainer
                 isExpanded={
                   !!kycCollect?.[
-                    CollectedIdDocumentDataOption.documentAndSelfie
+                    CollectedDocumentDataOption.documentAndSelfie
                   ] && !!idDocAccess
                 }
               >
                 <Checkbox
                   label={allT('cdo.selfie')}
-                  {...register(CollectedIdDocumentDataOption.documentAndSelfie)}
+                  {...register(CollectedDocumentDataOption.documentAndSelfie)}
                 />
               </AnimatedContainer>
             </Box>

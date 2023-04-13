@@ -1,5 +1,5 @@
 import {
-  CollectedIdDocumentDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
@@ -13,7 +13,7 @@ const getDefaultKycAccess = (
   const defaultValues: Partial<
     Record<
       | CollectedKycDataOption
-      | CollectedIdDocumentDataOption
+      | CollectedDocumentDataOption
       | CollectedInvestorProfileDataOption,
       boolean
     >
@@ -27,10 +27,10 @@ const getDefaultKycAccess = (
       kycCollect?.ssnKind === CollectedKycDataOption.ssn4,
     [CollectedKycDataOption.ssn9]:
       kycCollect?.ssnKind === CollectedKycDataOption.ssn9,
-    [CollectedIdDocumentDataOption.document]:
-      !!kycCollect?.[CollectedIdDocumentDataOption.document],
-    [CollectedIdDocumentDataOption.documentAndSelfie]:
-      !!kycCollect?.[CollectedIdDocumentDataOption.documentAndSelfie],
+    [CollectedDocumentDataOption.document]:
+      !!kycCollect?.[CollectedDocumentDataOption.document],
+    [CollectedDocumentDataOption.documentAndSelfie]:
+      !!kycCollect?.[CollectedDocumentDataOption.documentAndSelfie],
     [CollectedInvestorProfileDataOption.investorProfile]:
       !!kycCollect?.[CollectedInvestorProfileDataOption.investorProfile],
   };
@@ -39,7 +39,7 @@ const getDefaultKycAccess = (
     Object.entries(kycAccess).forEach(entry => {
       const key = entry[0] as
         | CollectedKycDataOption
-        | CollectedIdDocumentDataOption;
+        | CollectedDocumentDataOption;
       const value = entry[1] as boolean;
       defaultValues[key] = value;
     });

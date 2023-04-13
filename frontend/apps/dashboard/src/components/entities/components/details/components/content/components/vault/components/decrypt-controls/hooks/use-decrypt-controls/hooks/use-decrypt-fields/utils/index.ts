@@ -1,20 +1,13 @@
 import {
-  DecryptDocumentResponse,
-  DecryptIdDocumentResponse,
-  DecryptTextResponse,
+  DecryptResponse,
   EntityVault,
   isVaultDataText,
 } from '@onefootprint/types';
 import unary from 'lodash/fp/unary';
 
-type DecryptResponse =
-  | DecryptIdDocumentResponse
-  | DecryptTextResponse
-  | DecryptDocumentResponse;
-
 export const isTextResponse = (
   response: DecryptResponse,
-): response is DecryptTextResponse => {
+): response is DecryptResponse => {
   if (typeof response !== 'object') return false;
   return Object.values(response).every(unary(isVaultDataText));
 };
@@ -31,9 +24,8 @@ export const groupByType = (responses: DecryptResponse[]) => {
   return result;
 };
 
-const transformToStoreInVault = (responseByType: {
-  text: DecryptTextResponse;
-}) => responseByType;
+const transformToStoreInVault = (responseByType: { text: DecryptResponse }) =>
+  responseByType;
 
 // TODO: Add support for Document and IDdocument
 // https://linear.app/footprint/issue/FP-3364/vault-transformation-add-document-id-doc-support
