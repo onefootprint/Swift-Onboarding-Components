@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Banner } from '@onefootprint/ui';
+import { Banner, Typography } from '@onefootprint/ui';
+import Link from 'next/link';
 import React from 'react';
 import ContactForm from 'src/components/contact-form';
 import useOrgSession from 'src/hooks/use-org-session';
@@ -11,7 +12,7 @@ const SandboxBanner = () => {
 
   return sandbox.isSandbox ? (
     <SandboxBannerContainer>
-      <Banner variant="warning">
+      <StyledBanner variant="warning">
         {t('title')}
         {sandbox.canToggle ? (
           <button
@@ -22,9 +23,20 @@ const SandboxBanner = () => {
             {t('toggle')}
           </button>
         ) : (
-          <ContactForm>{t('activate')}</ContactForm>
+          <>
+            <Link href="mailto:eli@onefootprint.com">
+              <button type="button">{t('contact-us')}</button>
+            </Link>
+            <Typography variant="body-2" color="warning" sx={{ marginLeft: 2 }}>
+              {t('or')}
+            </Typography>
+            <ContactForm>{t('form')}</ContactForm>
+            <Typography variant="body-2" color="warning">
+              .
+            </Typography>
+          </>
         )}
-      </Banner>
+      </StyledBanner>
     </SandboxBannerContainer>
   ) : null;
 };
@@ -42,6 +54,16 @@ const SandboxBannerContainer = styled.div`
         opacity: 0.7;
       }
     }
+  `};
+`;
+
+const StyledBanner = styled(Banner)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: ${theme.spacing[1]};
   `};
 `;
 

@@ -155,8 +155,10 @@
       "see-timeline": "See audit trail"
     },
     "sandbox-banner": {
-      "title": "You're in sandbox mode.",
-      "activate": "Contact us to activate your account",
+      "title": "You're in sandbox mode. To activate your account,",
+      "form": "schedule a call",
+      "contact-us": "contact us",
+      "or": "or",
       "toggle": "Turn sandbox mode off",
       "contact-us-dialog": {
         "title": "Activate account",
