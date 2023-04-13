@@ -23,7 +23,7 @@ use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
 use newtypes::{
-    DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, OnboardingId, ScopedVaultId,
+    DocumentKind, DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, OnboardingId, ScopedVaultId,
     SealedVaultDataKey, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -94,8 +94,10 @@ pub async fn post(
 
     // Encrypt the image using the UserVault
     let sealed_front = IdentityDocument::seal_with_data_key(request.front_image.leak(), &data_key)?;
+
     // ////////////////////
     // Save to s3
+    // TODO: normalize this with the other DocumentData types so we have a single "upload mechanism" for all bifrost file uploads
     // //////////////////
     let bucket = &state.config.document_s3_bucket.clone();
     let mut s3_upload_futures = vec![];
@@ -192,20 +194,72 @@ pub async fn post(
     let identity_document = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
-            IdentityDocument::create(
+            // temporary: for compatibility with the new document kinds
+            // Create a document record on the VW for each image type
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
+
+            let front = if let Some(front_path) = s3_path_front_image {
+                Some(
+                    uvw.put_document(
+                        conn,
+                        DocumentKind::from_id_doc_kind(request.document_type),
+                        "image/png".to_string(),
+                        format!("{}_front.png", request.document_type),
+                        e_data_key.clone(),
+                        front_path,
+                    )?
+                    .lifetime_id,
+                )
+            } else {
+                None
+            };
+
+            let back = if let Some(back_path) = s3_path_back_image {
+                Some(
+                    uvw.put_document(
+                        conn,
+                        DocumentKind::from_id_doc_kind_back(request.document_type),
+                        "image/png".to_string(),
+                        format!("{}_back.png", request.document_type),
+                        e_data_key.clone(),
+                        back_path,
+                    )?
+                    .lifetime_id,
+                )
+            } else {
+                None
+            };
+
+            let selfie = if let Some(selfie) = s3_path_selfie_image {
+                Some(
+                    uvw.put_document(
+                        conn,
+                        DocumentKind::from_id_doc_kind_selfie(request.document_type),
+                        "image/png".to_string(),
+                        format!("{}.png", request.document_type),
+                        e_data_key.clone(),
+                        selfie,
+                    )?
+                    .lifetime_id,
+                )
+            } else {
+                None
+            };
+
+            let id_doc = IdentityDocument::create(
                 conn,
                 doc_request_id,
-                &uv.id,
-                s3_path_front_image,
-                s3_path_back_image,
-                s3_path_selfie_image,
                 // TODO: should be from vendor response
                 request.document_type,
                 request.country_code.clone(),
-                &su_id,
-                e_data_key,
+                e_data_key.clone(),
+                front,
+                back,
+                selfie,
             )
-            .map_err(ApiError::from)
+            .map_err(ApiError::from)?;
+
+            Ok(id_doc)
         })
         .await?;
 

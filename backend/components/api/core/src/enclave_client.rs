@@ -1,4 +1,9 @@
-use crypto::{aead::SealingKey, hex, seal::EciesP256Sha256AesGcmSealed};
+use crypto::{
+    aead::{AeadSealedBytes, SealingKey},
+    hex,
+    seal::EciesP256Sha256AesGcmSealed,
+};
+use db::models::document_data::DocumentData;
 use enclave_proxy::{
     http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest,
     EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
@@ -6,6 +11,7 @@ use enclave_proxy::{
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
     SignRequest, Signing,
 };
+use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString,
@@ -14,7 +20,7 @@ use newtypes::{
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::{config::Config, errors::enclave::EnclaveError};
+use crate::{config::Config, errors::enclave::EnclaveError, s3::S3Client, ApiError};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
@@ -22,6 +28,9 @@ pub struct EnclaveClient {
     sealed_enc_ikek: SealedIkek<Sealing>,
     sealed_hmac_ikek: SealedIkek<Signing>,
     kms_creds: KmsCredentials,
+    /// an s3 client is initialized soley for fetching and decrypting
+    /// large objects that are stored in s3
+    s3_client: S3Client,
 }
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
@@ -49,11 +58,17 @@ impl EnclaveClient {
         )
         .expect("failed to build enclave http proxy client");
 
+        let shared_config = aws_config::from_env().load().await;
+        let s3_client = crate::s3::S3Client {
+            client: aws_sdk_s3::Client::new(&shared_config),
+        };
+
         Self {
             client,
             sealed_enc_ikek: SealedIkek::<Sealing>::new(sealed_enc_ikek),
             sealed_hmac_ikek: SealedIkek::<Signing>::new(sealed_hmac_ikek),
             kms_creds,
+            s3_client,
         }
     }
 
@@ -317,5 +332,52 @@ impl EnclaveClient {
             .collect();
 
         Ok(results)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn decrypt_document(
+        &self,
+        e_private_key: &EncryptedVaultPrivateKey,
+        document: &DocumentData,
+    ) -> Result<PiiBytes, ApiError> {
+        self.batch_decrypt_documents(e_private_key, &[document])
+            .await?
+            .into_iter()
+            .next()
+            .ok_or(ApiError::AssertionError(
+                "unexpected number of decrypted documents".into(),
+            ))
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn batch_decrypt_documents(
+        &self,
+        e_private_key: &EncryptedVaultPrivateKey,
+        documents: &[&DocumentData],
+    ) -> Result<Vec<PiiBytes>, ApiError> {
+        let get_futures = documents.iter().map(|doc| {
+            self.s3_client
+                .get_object_from_s3_url(&doc.s3_url)
+                .map_err(ApiError::from)
+        });
+
+        let document_bytes = futures::future::try_join_all(get_futures).await?;
+        let sealed_keys = documents
+            .iter()
+            .map(|doc| doc.e_data_key.to_owned())
+            .collect::<Vec<_>>();
+        let sealing_keys = self
+            .decrypt_sealed_vault_data_key(sealed_keys.as_slice(), e_private_key)
+            .await?;
+        let decrypted_document_bytes = document_bytes
+            .into_iter()
+            .zip(sealing_keys)
+            .map(|(bytes, key)| {
+                key.unseal_bytes(AeadSealedBytes(bytes.to_vec()))
+                    .map(PiiBytes::new)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(decrypted_document_bytes)
     }
 }

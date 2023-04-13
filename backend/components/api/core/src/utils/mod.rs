@@ -4,7 +4,6 @@ pub mod email;
 pub mod email_domain;
 pub mod file_upload;
 pub mod headers;
-pub mod identity_document;
 pub mod large_json;
 pub mod liveness;
 pub mod magic_link;

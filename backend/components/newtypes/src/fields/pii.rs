@@ -51,6 +51,10 @@ impl PiiBytes {
     pub fn into_leak(self) -> Vec<u8> {
         self.0
     }
+
+    pub fn into_leak_base64_pii(self) -> PiiString {
+        PiiString::from(self.into_leak_base64().to_string_standard().0)
+    }
 }
 
 /// Like PiiString, but scrubs the serde::Serialize implementation

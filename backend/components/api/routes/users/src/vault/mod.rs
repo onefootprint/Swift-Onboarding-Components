@@ -85,6 +85,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(put)
         .service(get)
         .service(post)
-        .service(document::get)
         .service(document::post_decrypt);
 }

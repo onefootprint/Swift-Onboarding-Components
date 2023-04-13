@@ -1,5 +1,5 @@
 use db::models::{document_request::DocumentRequest, identity_document::IdentityDocument};
-use newtypes::DataIdentifier;
+use newtypes::{DataIdentifier, DocumentKind};
 
 use crate::utils::db2api::DbToApi;
 
@@ -23,7 +23,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
             timestamp: created_at,
             status,
             document_type,
-            document_identifier: DataIdentifier::IdDocument(document_type),
+            document_identifier: DataIdentifier::Document(DocumentKind::from_id_doc_kind(document_type)),
             selfie_collected: should_collect_selfie,
         }
     }

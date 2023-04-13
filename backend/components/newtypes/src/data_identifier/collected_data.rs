@@ -75,7 +75,7 @@ impl CollectedData {
             Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
                 DataIdentifierDiscriminant::Id
             }
-            Self::Document => DataIdentifierDiscriminant::IdDocument,
+            Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
         }
     }
@@ -117,8 +117,10 @@ pub enum CollectedDataOption {
     PartialAddress,
     Email,
     PhoneNumber,
-    Document,          // Represents IdDocKind's
-    DocumentAndSelfie, // Represents IdDocKind's
+
+    // these correspond to Identity documents + selfie
+    Document,
+    DocumentAndSelfie,
 
     // TODO: maybe nest these
     BusinessName,

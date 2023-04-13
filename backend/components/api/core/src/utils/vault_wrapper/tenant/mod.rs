@@ -4,7 +4,6 @@ pub mod checks;
 mod decrypt;
 mod decrypt_request;
 pub mod document;
-pub mod identity_document;
 
 use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;

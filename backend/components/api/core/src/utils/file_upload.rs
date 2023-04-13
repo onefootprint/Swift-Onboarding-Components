@@ -8,7 +8,6 @@ use futures_util::StreamExt as _;
 use mime::Mime;
 use reqwest::header::CONTENT_LENGTH;
 
-
 pub struct FileUpload {
     pub bytes: Bytes,
     pub mime_type: String,

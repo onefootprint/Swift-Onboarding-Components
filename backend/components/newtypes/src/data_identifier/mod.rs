@@ -12,7 +12,6 @@
 //!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
 //! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
 //!    a wrapper around a free-form string.
-//! - `IdDocKind` represents the type of an identity document.
 //!
 //! `DataLifetimeKind` is a tangential identifier. It mostly intersects with the types represented by
 //! `DataIdentifier`, but its purpose is more targeted: `DataLifetimeKind` is purely used in the `kind`
@@ -89,8 +88,6 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
 pub enum DataIdentifier {
     Id(IdentityDataKind),
     Custom(KvDataKey),
-    IdDocument(IdDocKind),
-    Selfie(IdDocKind),
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
@@ -118,8 +115,6 @@ impl DataIdentifier {
             Self::Business(s) => s.is_optional(),
             Self::InvestorProfile(s) => s.is_optional(),
             Self::Document(s) => s.is_optional(),
-            // TODO
-            Self::IdDocument(_) | Self::Selfie(_) => false,
         }
     }
 
@@ -130,8 +125,6 @@ impl DataIdentifier {
             Self::Business(s) => s.parent(),
             Self::InvestorProfile(s) => s.parent(),
             Self::Document(s) => s.parent(),
-            // TODO
-            Self::IdDocument(_) | Self::Selfie(_) => None,
         }
     }
 
@@ -154,10 +147,6 @@ impl Validate for DataIdentifier {
             Self::Business(s) => s.validate(value, for_bifrost),
             Self::InvestorProfile(s) => s.validate(value, for_bifrost),
             Self::Document(s) => s.validate(value, for_bifrost),
-            // TODO
-            Self::IdDocument(_) | Self::Selfie(_) => Err(crate::Error::Custom(
-                "Cannot use to validate id doc or selfie".to_owned(),
-            )),
         }
     }
 }
@@ -170,8 +159,6 @@ impl std::fmt::Display for DataIdentifier {
         let suffix = match self {
             Self::Id(s) => s.to_string(),
             Self::Custom(s) => s.to_string(),
-            Self::IdDocument(s) => s.to_string(),
-            Self::Selfie(s) => s.to_string(),
             Self::Business(s) => s.to_string(),
             Self::InvestorProfile(s) => s.to_string(),
             Self::Document(s) => s.to_string(),
@@ -201,12 +188,6 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminant::Custom => {
                 Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminant::IdDocument => {
-                Self::IdDocument(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
-            DataIdentifierDiscriminant::Selfie => {
-                Self::Selfie(IdDocKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
-            }
             DataIdentifierDiscriminant::Business => {
                 Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
@@ -230,8 +211,6 @@ impl DataIdentifier {
             DataIdentifier::Business(bdk) => bdk.is_searchable(),
 
             DataIdentifier::Custom(_)
-            | DataIdentifier::IdDocument(_)
-            | DataIdentifier::Selfie(_)
             | DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Document(_) => false,
         }
@@ -272,8 +251,6 @@ mod tests {
     #[test_case(DataIdentifier::Id(IdentityDataKind::Email) => "id.email")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
-    #[test_case(DataIdentifier::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
-    #[test_case(DataIdentifier::Selfie(IdDocKind::IdCard) => "selfie.id_card")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
@@ -286,8 +263,6 @@ mod tests {
     #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
-    #[test_case("id_document.driver_license" => DataIdentifier::IdDocument(IdDocKind::DriverLicense))]
-    #[test_case("selfie.passport" => DataIdentifier::Selfie(IdDocKind::Passport))]
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]

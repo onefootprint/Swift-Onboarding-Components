@@ -216,7 +216,7 @@ impl WriteableVw<Person> {
     // Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
     //  so the logic around deactivating/portabalizing DL's is a little divergent here
     pub fn put_document(
-        self,
+        &self,
         conn: &mut TxnPgConn,
         kind: DocumentKind,
         mime_type: String,

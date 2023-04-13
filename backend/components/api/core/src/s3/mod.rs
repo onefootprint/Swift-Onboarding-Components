@@ -13,6 +13,12 @@ pub struct S3Client {
     pub client: aws_sdk_s3::Client,
 }
 
+impl std::fmt::Debug for S3Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("S3Client")
+    }
+}
+
 /// Thin wrapper around the base AWS SDK client so that we can add some type safety, custom errors, tracing etc
 ///
 /// How does this work?

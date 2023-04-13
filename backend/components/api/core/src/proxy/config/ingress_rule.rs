@@ -76,12 +76,10 @@ impl TryFrom<&str> for IngressRule {
         let proxy_token = ProxyToken::parse(proxy_token)?;
 
         // only allow ingress custom data for now
-        // TODO: support non-portable ID vaulting
+        // TODO: support non-portable ID vaulting (FP-3414)
         match proxy_token.identifier {
             DataIdentifier::Custom(_) => {}
-            DataIdentifier::Selfie(_)
-            | DataIdentifier::Id(_)
-            | DataIdentifier::IdDocument(_)
+            DataIdentifier::Id(_)
             | DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Business(_)
             | DataIdentifier::Document(_) => return Err(VaultProxyError::CannotProxyVaultNonCustomData)?,

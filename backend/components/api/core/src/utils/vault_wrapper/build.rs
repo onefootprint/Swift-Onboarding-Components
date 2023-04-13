@@ -4,7 +4,6 @@ use super::VwArgs;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
-use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::HasLifetime;
@@ -18,11 +17,10 @@ impl<Type> VaultWrapper<Type> {
         user_vault: Vault,
         seqno: Option<DataLifetimeSeqno>,
         vd: Vec<VaultData>,
-        identity_documents: Vec<IdentityDocumentAndRequest>,
         documents: Vec<DocumentData>,
         lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<Self> {
-        let (portable, speculative) = VwData::partition(vd, identity_documents, documents, lifetimes)?;
+        let (portable, speculative) = VwData::partition(vd, documents, lifetimes)?;
         let result = Self {
             vault: user_vault,
             portable,
@@ -48,10 +46,9 @@ impl<Type> VaultWrapper<Type> {
         // Fetch all the data related to the active lifetimes
         // Split into portable + speculative data
         let data = VaultData::get_for(conn, &active_lifetime_ids)?;
-        let identity_documents = IdentityDocumentAndRequest::get_for(conn, &active_lifetime_ids)?;
         let documents = DocumentData::get_for(conn, &active_lifetime_ids)?;
 
-        let result = Self::build_internal(uv, seqno, data, identity_documents, documents, active_lifetimes)?;
+        let result = Self::build_internal(uv, seqno, data, documents, active_lifetimes)?;
         Ok(result)
     }
 }

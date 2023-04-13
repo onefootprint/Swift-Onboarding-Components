@@ -1,6 +1,6 @@
 use crate::{
-    BusinessDataKind, ConversionError, DataIdentifier, DocumentKind, IdDocKind, IdentityDataKind,
-    InvestorProfileKind, KvDataKey, VdKind,
+    BusinessDataKind, ConversionError, DataIdentifier, DocumentKind, IdentityDataKind, InvestorProfileKind,
+    KvDataKey, VdKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -33,7 +33,6 @@ use strum_macros::AsRefStr;
 pub enum DataLifetimeKind {
     Id(IdentityDataKind),
     Custom(KvDataKey),
-    IdDocument(IdDocKind),
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
@@ -53,7 +52,6 @@ impl From<DataLifetimeKind> for DataIdentifier {
             DataLifetimeKind::Business(b) => Self::Business(b),
             DataLifetimeKind::Id(b) => Self::Id(b),
             DataLifetimeKind::Custom(k) => Self::Custom(k),
-            DataLifetimeKind::IdDocument(k) => Self::IdDocument(k),
             DataLifetimeKind::InvestorProfile(k) => Self::InvestorProfile(k),
             DataLifetimeKind::Document(k) => Self::Document(k),
         }
@@ -68,10 +66,8 @@ impl TryFrom<DataIdentifier> for DataLifetimeKind {
             DataIdentifier::Business(b) => Ok(Self::Business(b)),
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
-            DataIdentifier::IdDocument(k) => Ok(Self::IdDocument(k)),
             DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
             DataIdentifier::Document(k) => Ok(Self::Document(k)),
-            _ => Err(ConversionError::Error(value)),
         }
     }
 }
@@ -97,12 +93,6 @@ impl From<IdentityDataKind> for DataLifetimeKind {
 impl From<KvDataKey> for DataLifetimeKind {
     fn from(value: KvDataKey) -> Self {
         Self::Custom(value)
-    }
-}
-
-impl From<IdDocKind> for DataLifetimeKind {
-    fn from(value: IdDocKind) -> Self {
-        Self::IdDocument(value)
     }
 }
 
@@ -153,7 +143,6 @@ mod tests {
     #[test_case(DataLifetimeKind::Id(IdentityDataKind::Email) => "id.email")]
     #[test_case(DataLifetimeKind::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
     #[test_case(DataLifetimeKind::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
-    #[test_case(DataLifetimeKind::IdDocument(IdDocKind::IdCard) => "id_document.id_card")]
     #[test_case(DataLifetimeKind::Business(BusinessDataKind::AddressLine1) => "business.address_line1")]
     #[test_case(DataLifetimeKind::Business(BusinessDataKind::Website) => "business.website")]
     fn test_to_string(identifier: DataLifetimeKind) -> String {
@@ -165,7 +154,7 @@ mod tests {
     #[test_case("custom.flerp" => DataLifetimeKind::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
     #[test_case("custom.hello.today.there." => DataLifetimeKind::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("custom." => DataLifetimeKind::Custom(KvDataKey::escape_hatch("".to_owned())))]
-    #[test_case("id_document.driver_license" => DataLifetimeKind::IdDocument(IdDocKind::DriverLicense))]
+    #[test_case("document.drivers_license_front" => DataLifetimeKind::Document(DocumentKind::DriversLicenseFront))]
     #[test_case("business.address_line1" => DataLifetimeKind::Business(BusinessDataKind::AddressLine1))]
     #[test_case("business.website" => DataLifetimeKind::Business(BusinessDataKind::Website))]
     fn test_from_str(input: &str) -> DataLifetimeKind {

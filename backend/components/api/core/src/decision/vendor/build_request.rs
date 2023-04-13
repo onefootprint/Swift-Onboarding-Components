@@ -1,13 +1,13 @@
 use crate::enclave_client::EnclaveClient;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business};
 use crate::{errors::ApiError, State};
-use crypto::aead::AeadSealedBytes;
+
 use db::DbPool;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
-use newtypes::{DocVData, Base64Data, PiiString, DataIdentifier, BusinessData, BusinessOwnerData, BoData};
+use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BusinessOwnerData, BoData};
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
 
@@ -67,42 +67,33 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     let (doc, ref_id, uvw) = state
         .db_pool
         .db_query(
-            move |conn| -> Result<(IdentityDocument, Option<String>, VaultWrapper<_>), ApiError> {
+            move |conn| -> Result<(IdentityDocument, Option<String>, _), ApiError> {
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
-                let uvw = VaultWrapper::build(conn, VwArgs::Idv(request))?;
+                let uvw = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
                 Ok((doc, ref_id.ref_id, uvw))
             },
         )
-        .await??;
+        .await??;        
 
-    let images = crate::utils::vault_wrapper::identity_document::fetch_image(state, doc).await?;
-    let unsealed_key = uvw.decrypt_data_keys(state, vec![images.e_data_key]).await?.pop();
-    let Some(key) = unsealed_key else {
-        return Err(ApiError::AssertionError("Could not decrypt data key".into()));
-    };
-    
-    // Decrypt
-    let front = Base64Data(key.unseal_bytes(AeadSealedBytes(images.front_image.0))?);
-    let mut back: Option<Base64Data> = None;
-    if let Some(b) = images.back_image {
-        back = Some(Base64Data(key.unseal_bytes(AeadSealedBytes(b.0))?));
+    // decrypt the images and make sure we have at least a front image
+    let decrypted_documents = uvw.decrypt_id_doc_documents(state, &doc).await?;
+
+    if decrypted_documents.front.is_none() {
+        return Err(ApiError::AssertionError("Missing at least front part of document".into()))
     }
-    let mut selfie: Option<Base64Data> = None;
-    if let Some(b) = images.selfie_image {
-        selfie = Some(Base64Data(key.unseal_bytes(AeadSealedBytes(b.0))?));
-    }
+
     // Get the reference id for idology
     let parsed_reference_id = parse_reference_id_for_scan_verify(ref_id)?;
     
     Ok(DocVData {
         reference_id: parsed_reference_id,
-        front_image: Some(PiiString::from(front.to_string_standard().0)),
-        back_image: back.map(|b| PiiString::from(b.to_string_standard().0)),
-        selfie_image: selfie.map(|b| PiiString::from(b.to_string_standard().0)),
-        country_code: Some(images.document_country.into()),
-        document_type: Some(images.document_type),
+        front_image: decrypted_documents.front.map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted_documents.back.map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
+        country_code: Some(doc.country_code.into()),
+        document_type: Some(doc.document_type),
     })
 }
 

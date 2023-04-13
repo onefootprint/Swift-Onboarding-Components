@@ -10,6 +10,7 @@ use db::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::DataIdentifier;
+use newtypes::DocumentKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
@@ -774,10 +775,20 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         (custom_key2.clone().into(), PiiString::from("FLERP")),
     ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_person_data_test(conn, update).unwrap();
 
-    // Also add an identity document
-    let id_doc = fixtures::identity_document::create(conn, &uv.id, &su.id);
+    // add an identity document
+    let _ = uvw
+        .put_document(
+            conn,
+            DocumentKind::DriversLicenseFront,
+            "image/png".into(),
+            "filename.png".into(),
+            newtypes::SealedVaultDataKey(vec![0x01]),
+            "test".into(),
+        )
+        .unwrap();
+
+    uvw.add_person_data_test(conn, update).unwrap();
 
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
@@ -800,7 +811,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         custom_key1.into(),
         custom_key2.into(),
         // Assert identity doc DL is not portable
-        id_doc.document_type.into(),
+        DocumentKind::DriversLicenseFront.into(),
         IPK::AnnualIncome.into(),
         IPK::NetWorth.into(),
         IPK::InvestmentGoals.into(),

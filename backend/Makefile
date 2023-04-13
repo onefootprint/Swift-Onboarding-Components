@@ -99,6 +99,7 @@ package-api: api-release
 
 stop-local:
 	@killall enclave || echo "no enclave running"
+	@killall enclave_proxy || echo "no enclave running"
 	@killall api_server || echo "no fpc running"
 
 run-enclave-local: stop-local

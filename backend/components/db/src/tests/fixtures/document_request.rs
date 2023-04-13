@@ -77,15 +77,13 @@ pub fn create(
     if opts.collected_doc_opts.id_doc_collected {
         let id1 = IdentityDocument::create(
             conn,
-            doc_request.id.clone(),
-            &opts.user_vault_id,
-            None,
-            None,
-            None,
+            doc_request.id.clone(),            
             newtypes::IdDocKind::DriverLicense,
-            "USA".into(),
-            &opts.scoped_user_id,
+            "USA".into(),            
             SealedVaultDataKey(vec![]),
+            None,
+            None,
+            None,
         )
         .unwrap();
 

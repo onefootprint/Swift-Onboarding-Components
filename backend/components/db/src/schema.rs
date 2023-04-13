@@ -86,6 +86,26 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    data_lifetime_backup (id) {
+        id -> Text,
+        _created_at -> Nullable<Timestamptz>,
+        _updated_at -> Nullable<Timestamptz>,
+        vault_id -> Nullable<Text>,
+        scoped_vault_id -> Nullable<Text>,
+        created_at -> Nullable<Timestamptz>,
+        portablized_at -> Nullable<Timestamptz>,
+        deactivated_at -> Nullable<Timestamptz>,
+        created_seqno -> Nullable<Int8>,
+        portablized_seqno -> Nullable<Int8>,
+        deactivated_seqno -> Nullable<Int8>,
+        kind -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     decision_intent (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -174,15 +194,34 @@ table! {
     identity_document (id) {
         id -> Text,
         request_id -> Text,
-        front_image_s3_url -> Nullable<Text>,
-        back_image_s3_url -> Nullable<Text>,
         document_type -> Text,
         country_code -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         e_data_key -> Bytea,
-        lifetime_id -> Text,
+        front_lifetime_id -> Nullable<Text>,
+        back_lifetime_id -> Nullable<Text>,
+        selfie_lifetime_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    identity_document_backup (id) {
+        id -> Text,
+        request_id -> Nullable<Text>,
+        front_image_s3_url -> Nullable<Text>,
+        back_image_s3_url -> Nullable<Text>,
+        document_type -> Nullable<Text>,
+        country_code -> Nullable<Text>,
+        created_at -> Nullable<Timestamptz>,
+        _created_at -> Nullable<Timestamptz>,
+        _updated_at -> Nullable<Timestamptz>,
+        e_data_key -> Nullable<Bytea>,
+        lifetime_id -> Nullable<Text>,
         selfie_image_s3_url -> Nullable<Text>,
     }
 }
@@ -757,7 +796,6 @@ joinable!(document_request -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
-joinable!(identity_document -> data_lifetime (lifetime_id));
 joinable!(identity_document -> document_request (request_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
@@ -810,12 +848,14 @@ allow_tables_to_appear_in_same_query!(
     business_owner,
     contact_info,
     data_lifetime,
+    data_lifetime_backup,
     decision_intent,
     document_data,
     document_request,
     fingerprint,
     fingerprint_visit_event,
     identity_document,
+    identity_document_backup,
     insight_event,
     liveness_event,
     manual_review,

@@ -1,198 +1,70 @@
-use std::collections::{HashMap, HashSet};
+
 
 /// Decrypt document data for a footprint user
 ///   2022-11-28: We do not support PUT operations (interested customers should use custom vault for document data they wish to store)
-use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
+use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantSessionAuth, Either};
 
 use crate::errors::ApiError;
-use crate::types::{JsonApiResponse, ResponseData};
+
 
 use crate::utils::headers::InsightHeaders;
-use crate::utils::identity_document::{create_user_facing_status_for_documents, IdDocumentData};
-use crate::utils::vault_wrapper::identity_document::DecryptDocumentResult;
-use crate::utils::vault_wrapper::{DecryptRequest, TenantUvw, VaultWrapper};
+
+
+use crate::utils::vault_wrapper::{DecryptRequest, VaultWrapper};
 use crate::State;
 
+use actix_web::HttpResponse;
 use api_wire_types::{
-    DecryptIdentityDocumentRequest, DecryptIdentityDocumentResponse, GetIdentityDocumentForDecryptResponse,
-    ImageData,
+    DecryptDocumentRequest,
 };
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
-use db::PgConn;
-use itertools::Itertools;
-use newtypes::{DataIdentifier, FpId, IdDocKind, IdentityDocumentId};
+
+
+use newtypes::{DocumentKind, FpId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
-use strum::IntoEnumIterator;
 
-#[api_v2_operation(
-    description = "Checks existence if items in the document vault.",
-    tags(Vault, Preview, Users)
-)]
-#[actix::get("/users/{footprint_user_id}/vault/identity/document")]
-pub async fn get(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    tenant_auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetIdentityDocumentForDecryptResponse> {
-    let tenant_auth = tenant_auth.check_guard(TenantGuard::Read)?;
-    let footprint_user_id = path.into_inner();
-    let tenant_id = tenant_auth.tenant().id.clone();
-    let is_live = tenant_auth.is_live()?;
 
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            Ok(uvw)
-        })
-        .await??;
-
-    let targets = IdDocKind::iter().map(DataIdentifier::IdDocument).collect_vec();
-    uvw.check_ob_config_access(&targets)?;
-
-    // TODO migrate this to a list instead of a hashmap
-    let response = GetIdentityDocumentForDecryptResponse::from(HashMap::from_iter(
-        available_images_from_uvw(&uvw).into_iter().map(|d| (d, true)),
-    ));
-    ResponseData::ok(response).json()
-}
-
-#[api_v2_operation(
-    description = "Decrypts images in the document vault.",
-    tags(Vault, Preview, Users)
-)]
-#[actix::post("/users/{footprint_user_id}/vault/identity/document/decrypt")]
+#[api_v2_operation(description = "Decrypts document in the vault.", tags(Vault, Preview, Users))]
+#[actix::post("/users/{fp_id}/vault/document/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FpId>,
-    request: Json<DecryptIdentityDocumentRequest>,
+    request: Json<DecryptDocumentRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
-) -> JsonApiResponse<DecryptIdentityDocumentResponse> {
-    let DecryptIdentityDocumentRequest {
-        document_type,
-        document_identifier,
-        reason,
-        include_selfie,
-    } = request.into_inner();
+) -> actix_web::Result<HttpResponse, ApiError> {
+    let DecryptDocumentRequest { kind, reason } = request.into_inner();
+    let kind = DocumentKind::try_from(kind)?;
 
-    // To maintain backwards compatibility while the frontend migrates to use only DataIdentifiers,
-    // have some magic parsing of the identifier
-    let document_type = match (document_type, document_identifier) {
-        (Some(doc_type), None) => doc_type,
-        (None, Some(DataIdentifier::IdDocument(doc_kind))) => doc_kind,
-        (None, Some(_)) => {
-            return Err(ApiError::AssertionError(
-                "Can only provide id_document identifiers".to_owned(),
-            ))
-        }
-        (Some(_), Some(_)) | (None, None) => {
-            return Err(ApiError::AssertionError(
-                "Must provide either doucment_type or document_identifier".to_owned(),
-            ))
-        }
-    };
-
-    let targets = [
-        Some(DataIdentifier::IdDocument(document_type)),
-        include_selfie.then_some(DataIdentifier::Selfie(document_type)),
-    ]
-    .into_iter()
-    .flatten()
-    .collect_vec();
-
-    let auth = auth.check_guard(CanDecrypt::new(targets.clone()))?;
-
-    let footprint_user_id = path.into_inner();
+    let auth = auth.check_guard(CanDecrypt::single(kind))?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
+    let fp_id = path.into_inner();
 
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = ScopedVault::get(conn, (&footprint_user_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
             Ok(uvw)
         })
         .await??;
-
-    // Small hack to not actually request to decrypt the selfie if it doesn't exist in the vault.
-    // It's hard for the frontend to tell right now if there's a selfie associated with a document,
-    // so the frontend always requests include_selfie=true
-    // Hopefully we'll clean up the document decrypt API soon
-    let include_selfie = include_selfie && uvw.has_field(DataIdentifier::Selfie(document_type));
-    let targets = [
-        Some(DataIdentifier::IdDocument(document_type)),
-        include_selfie.then_some(DataIdentifier::Selfie(document_type)),
-    ]
-    .into_iter()
-    .flatten()
-    .collect_vec();
-
-    // Important to check requester has access. TODO is there a better way to have type safety here?
-    // Can we put in decrypt_document?
-    uvw.check_ob_config_access(&targets)?;
 
     let req = DecryptRequest {
         reason,
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
     };
-    // As of 2022-11-28: It's possible a user has more than 1 document of a given document_type
-    let decrypted_docs = uvw
-        .decrypt_identity_document(&state, document_type, include_selfie, req)
-        .await?;
+    let doc = uvw
+        .decrypt_document(&state, kind, req)
+        .await?
+        .ok_or(ApiError::ResourceNotFound)?;
 
-    let images = state
-        .db_pool
-        .db_query(move |conn| create_image_data(conn, decrypted_docs))
-        .await??;
-
-    let res = DecryptIdentityDocumentResponse {
-        document_type,
-        document_identifier: DataIdentifier::IdDocument(document_type),
-        images,
-    };
-
-    ResponseData::ok(res).json()
-}
-
-/// Splitting out since we may in the future want to filter on things like
-/// expired/is_valid etc
-fn available_images_from_uvw(uvw: &TenantUvw) -> HashSet<IdDocKind> {
-    uvw.identity_documents().iter().map(|i| i.document_type).collect()
-}
-
-fn create_image_data(
-    conn: &mut PgConn,
-    decrypted_docs: Vec<DecryptDocumentResult>,
-) -> Result<Vec<ImageData>, ApiError> {
-    // We create the status just based on whether or not the upload was successful
-    let mut status_map: HashMap<IdentityDocumentId, IdDocumentData> =
-        create_user_facing_status_for_documents(
-            conn,
-            decrypted_docs.iter().map(|d| &d.identity_document_id).collect(),
-        )?;
-
-    let images = decrypted_docs
-        .into_iter()
-        .filter_map(|doc| {
-            status_map
-                .remove(&doc.identity_document_id)
-                .map(|(_, _, status, uploaded_at)| ImageData {
-                    front: doc.front.into_leak_base64().to_string_standard().0,
-                    back: doc.back.map(|p| p.into_leak_base64().to_string_standard().0),
-                    selfie: doc.selfie.map(|p| p.into_leak_base64().to_string_standard().0),
-                    status,
-                    uploaded_at,
-                })
-        })
-        .collect();
-
-    Ok(images)
+    Ok(HttpResponse::Ok()
+        .content_type(doc.document.mime_type)
+        .body(doc.plaintext.into_leak()))
 }

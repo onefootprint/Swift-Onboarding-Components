@@ -1,6 +1,5 @@
-use super::{Person, VaultWrapper};
+use super::{VaultWrapper};
 use db::models::document_data::DocumentData;
-use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
@@ -14,17 +13,6 @@ use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::PiiString;
 use newtypes::SealedVaultBytes;
 
-impl VaultWrapper<Person> {
-    /// Return speculative identity_documents if exist, otherwise portable. There should only be one
-    pub fn identity_documents(&self) -> &[IdentityDocumentAndRequest] {
-        // TODO but do we support portable ID docs?
-        if !self.speculative.identity_documents.is_empty() {
-            &self.speculative.identity_documents
-        } else {
-            &self.portable.identity_documents
-        }
-    }
-}
 
 impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)

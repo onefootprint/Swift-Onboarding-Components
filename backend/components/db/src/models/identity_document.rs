@@ -1,19 +1,19 @@
-use crate::schema::{data_lifetime, document_request, identity_document};
+use crate::schema::{document_request, identity_document};
 use crate::PgConn;
-use crate::{DbResult, HasLifetime, TxnPgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
+
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DataLifetimeKind, DocumentRequestId, IdDocKind, IdentityDocumentId,
-    ScopedVaultId, SealedVaultDataKey, VaultId,
+    Base64Data, DataLifetimeId, DocumentRequestId, IdDocKind, IdentityDocumentId, ScopedVaultId,
+    SealedVaultDataKey, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
-use super::data_lifetime::DataLifetime;
 use super::document_request::DocumentRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -21,16 +21,101 @@ use super::document_request::DocumentRequest;
 pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
-    pub front_image_s3_url: Option<String>,
-    pub back_image_s3_url: Option<String>,
     pub document_type: IdDocKind,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub e_data_key: SealedVaultDataKey,
-    pub lifetime_id: DataLifetimeId,
-    pub selfie_image_s3_url: Option<String>,
+    pub front_lifetime_id: Option<DataLifetimeId>,
+    pub back_lifetime_id: Option<DataLifetimeId>,
+    pub selfie_lifetime_id: Option<DataLifetimeId>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[diesel(table_name = identity_document)]
+pub struct NewIdentityDocument {
+    pub request_id: DocumentRequestId,
+    pub document_type: IdDocKind,
+    pub country_code: String,
+    pub created_at: DateTime<Utc>,
+    pub e_data_key: SealedVaultDataKey,
+    pub front_lifetime_id: Option<DataLifetimeId>,
+    pub back_lifetime_id: Option<DataLifetimeId>,
+    pub selfie_lifetime_id: Option<DataLifetimeId>,
+}
+
+impl IdentityDocument {
+    #[allow(clippy::too_many_arguments)]
+    #[tracing::instrument(skip_all)]
+    pub fn create(
+        conn: &mut TxnPgConn,
+        request_id: DocumentRequestId,
+        document_type: IdDocKind,
+        country_code: String,
+        e_data_key: SealedVaultDataKey,
+        front_lifetime_id: Option<DataLifetimeId>,
+        back_lifetime_id: Option<DataLifetimeId>,
+        selfie_lifetime_id: Option<DataLifetimeId>,
+    ) -> DbResult<Self> {
+        let new = NewIdentityDocument {
+            request_id,
+            document_type,
+            country_code,
+            created_at: Utc::now(),
+            e_data_key,
+            front_lifetime_id,
+            back_lifetime_id,
+            selfie_lifetime_id,
+        };
+        let result = diesel::insert_into(identity_document::table)
+            .values(new)
+            .get_result::<IdentityDocument>(conn.conn())?;
+        Ok(result)
+    }
+
+    /// Get the identity document, and the associated document request
+    #[tracing::instrument(skip_all)]
+    pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
+        let res: (Self, DocumentRequest) = identity_document::table
+            .filter(identity_document::id.eq(id))
+            .inner_join(document_request::table)
+            .select((identity_document::all_columns, document_request::all_columns))
+            .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_bulk_with_requests(
+        conn: &mut PgConn,
+        ids: Vec<&IdentityDocumentId>,
+    ) -> DbResult<HashMap<IdentityDocumentId, (Self, DocumentRequest)>> {
+        let results = identity_document::table
+            .inner_join(document_request::table)
+            .filter(identity_document::id.eq_any(ids))
+            .get_results::<(Self, DocumentRequest)>(conn)?
+            .into_iter()
+            .map(|e| (e.0.id.clone(), e))
+            .collect();
+
+        Ok(results)
+    }
+
+    /// Get all the documents collected for a given onboarding
+    #[tracing::instrument(skip_all)]
+    pub fn get_for_scoped_vault_id(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Vec<Self>> {
+        let results = identity_document::table
+            .inner_join(document_request::table)
+            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
+            .select(identity_document::all_columns)
+            .get_results(conn)?;
+
+        Ok(results)
+    }
 }
 
 impl IdentityDocument {
@@ -60,170 +145,5 @@ impl IdentityDocument {
             "documents/encrypted/{}/{}/{}",
             user_vault_id, image_type, document_request_id
         )
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = identity_document)]
-pub struct NewIdentityDocument {
-    pub request_id: DocumentRequestId,
-    pub front_image_s3_url: Option<String>,
-    pub back_image_s3_url: Option<String>,
-    pub selfie_image_s3_url: Option<String>,
-    pub document_type: IdDocKind,
-    pub country_code: String,
-    pub created_at: DateTime<Utc>,
-    pub e_data_key: SealedVaultDataKey,
-    pub lifetime_id: DataLifetimeId,
-}
-
-impl IdentityDocument {
-    #[allow(clippy::too_many_arguments)]
-    #[tracing::instrument(skip_all)]
-    pub fn create(
-        conn: &mut TxnPgConn,
-        request_id: DocumentRequestId,
-        uv_id: &VaultId,
-        front_image_s3_url: Option<String>,
-        back_image_s3_url: Option<String>,
-        selfie_image_s3_url: Option<String>,
-        document_type: IdDocKind,
-        country_code: String,
-        su_id: &ScopedVaultId,
-        e_data_key: SealedVaultDataKey,
-    ) -> DbResult<Self> {
-        let seqno = DataLifetime::get_next_seqno(conn)?;
-        let lifetime =
-            DataLifetime::create(conn, uv_id, su_id, DataLifetimeKind::from(document_type), seqno)?;
-        let new = NewIdentityDocument {
-            request_id,
-            front_image_s3_url,
-            back_image_s3_url,
-            selfie_image_s3_url,
-            document_type,
-            country_code,
-            created_at: Utc::now(),
-            e_data_key,
-            lifetime_id: lifetime.id,
-        };
-        let result = diesel::insert_into(identity_document::table)
-            .values(new)
-            .get_result::<IdentityDocument>(conn.conn())?;
-        Ok(result)
-    }
-
-    /// Get the identity document, and the associated document request
-    #[tracing::instrument(skip_all)]
-    pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
-        let res: (Self, DocumentRequest) = identity_document::table
-            .filter(identity_document::id.eq(id))
-            .inner_join(document_request::table)
-            .select((identity_document::all_columns, document_request::all_columns))
-            .get_result(conn)?;
-
-        Ok(res)
-    }
-
-    /// Get all the documents collected for a given onboarding
-    #[tracing::instrument(skip_all)]
-    pub fn get_for_scoped_vault_id(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Vec<Self>> {
-        let results = identity_document::table
-            .inner_join(data_lifetime::table)
-            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
-            .select(identity_document::all_columns)
-            .get_results(conn)?;
-
-        Ok(results)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn get_bulk_with_requests(
-        conn: &mut PgConn,
-        ids: Vec<&IdentityDocumentId>,
-    ) -> DbResult<HashMap<IdentityDocumentId, (Self, DocumentRequest)>> {
-        let results = identity_document::table
-            .inner_join(document_request::table)
-            .filter(identity_document::id.eq_any(ids))
-            .get_results::<(Self, DocumentRequest)>(conn)?
-            .into_iter()
-            .map(|e| (e.0.id.clone(), e))
-            .collect();
-
-        Ok(results)
-    }
-}
-
-pub type SaturatedIdentityDocumentTimelineEvent = (IdentityDocument, DocumentRequest);
-
-/// The status of an identity document is often needed in conjunction with the document itself,
-/// so we use IdentityDocumentAndRequest in various places (like when we build a UVWs)
-#[derive(Debug, Clone, derive_more::Deref)]
-pub struct IdentityDocumentAndRequest {
-    #[deref]
-    pub identity_document: IdentityDocument,
-    pub document_request: DocumentRequest,
-}
-
-impl HasLifetime for IdentityDocumentAndRequest {
-    fn lifetime_id(&self) -> &DataLifetimeId {
-        &self.lifetime_id
-    }
-
-    fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
-    where
-        Self: Sized,
-    {
-        let results = identity_document::table
-            .filter(identity_document::lifetime_id.eq_any(lifetime_ids))
-            .inner_join(document_request::table)
-            .select((identity_document::all_columns, document_request::all_columns))
-            .get_results::<(IdentityDocument, DocumentRequest)>(conn)?
-            .into_iter()
-            .map(|(doc, req)| IdentityDocumentAndRequest {
-                identity_document: doc,
-                document_request: req,
-            })
-            .collect();
-        Ok(results)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-    use crate::{test_helpers::test_db_pool, DbError};
-
-    #[tokio::test]
-    async fn test_create() -> Result<(), DbError> {
-        let db_pool = test_db_pool();
-
-        db_pool
-            .db_transaction(|conn| -> Result<(), DbError> {
-                let id_doc = IdentityDocument::create(
-                    conn,
-                    DocumentRequestId::from(String::from("dr_id")),
-                    &VaultId::from(String::from("uv_id")),
-                    Some("s3_123".to_string()),
-                    Some("s3_345".to_string()),
-                    Some("s3_678".to_string()),
-                    IdDocKind::IdCard,
-                    "usa".to_string(),
-                    &ScopedVaultId::from("su_123".to_string()),
-                    SealedVaultDataKey::default(),
-                )?;
-
-                let (id_doc_from_db, _) = IdentityDocument::get(conn.conn(), &id_doc.id)?;
-                assert_eq!(&id_doc.id, &id_doc_from_db.id);
-
-                Ok(())
-            })
-            .await
-            .ok();
-
-        Ok(())
     }
 }

@@ -2,7 +2,6 @@ use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
-use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use itertools::Itertools;
@@ -15,8 +14,6 @@ use std::marker::PhantomData;
 #[derive(Clone, Debug)]
 pub(super) struct VwData<Type> {
     pub(super) vd: Vec<VaultData>,
-    // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
-    pub(super) identity_documents: Vec<IdentityDocumentAndRequest>,
     pub(super) documents: Vec<DocumentData>,
     // A map of all of the DataLifetimes for this data.
     lifetimes: HashMap<DataLifetimeId, DataLifetime>,
@@ -26,7 +23,6 @@ pub(super) struct VwData<Type> {
 impl<Type> VwData<Type> {
     pub(super) fn partition(
         vd: Vec<VaultData>,
-        identity_documents: Vec<IdentityDocumentAndRequest>,
         documents: Vec<DocumentData>,
         all_lifetimes: Vec<DataLifetime>,
     ) -> ApiResult<(Self, Self)> {
@@ -45,8 +41,6 @@ impl<Type> VwData<Type> {
                 .partition(|d| speculative_lifetime_ids.contains(d.lifetime_id()))
         }
         let (portable_vd, speculative_vd) = partition(vd, &speculative_lifetime_ids);
-        let (portable_identity_documents, speculative_identity_documents) =
-            partition(identity_documents, &speculative_lifetime_ids);
         let (portable_documents, speculative_documents) = partition(documents, &speculative_lifetime_ids);
 
         // TODO some runtime checks that business vaults don't have id data and vice versa
@@ -58,13 +52,11 @@ impl<Type> VwData<Type> {
 
         let portable = Self::build(
             portable_vd,
-            portable_identity_documents,
             portable_documents,
             &all_lifetimes,
         );
         let speculative = Self::build(
             speculative_vd,
-            speculative_identity_documents,
             speculative_documents,
             &all_lifetimes,
         );
@@ -73,13 +65,11 @@ impl<Type> VwData<Type> {
 
     fn build(
         vd: Vec<VaultData>,
-        identity_documents: Vec<IdentityDocumentAndRequest>,
         documents: Vec<DocumentData>,
         all_lifetimes: &[DataLifetime],
     ) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
             vd.iter().map(|d| d.lifetime_id()).collect(),
-            identity_documents.iter().map(|d| d.lifetime_id()).collect(),
             documents.iter().map(|d| d.lifetime_id()).collect(),
         ];
         let lifetime_ids: HashSet<_> = lifetime_ids.into_iter().flatten().collect();
@@ -94,7 +84,6 @@ impl<Type> VwData<Type> {
 
         Self {
             vd,
-            identity_documents,
             documents,
             lifetimes,
             phantom: PhantomData,
@@ -103,22 +92,8 @@ impl<Type> VwData<Type> {
 
     pub fn populated_dis(&self) -> Vec<DataIdentifier> {
         let vds = self.vd.iter().map(|vd| vd.kind.clone().into()).collect_vec();
-        let id_docs = self
-            .identity_documents
-            .iter()
-            .flat_map(|i| {
-                if i.selfie_image_s3_url.is_some() {
-                    vec![
-                        DataIdentifier::IdDocument(i.document_type),
-                        DataIdentifier::Selfie(i.document_type),
-                    ]
-                } else {
-                    vec![DataIdentifier::IdDocument(i.document_type)]
-                }
-            })
-            .collect_vec();
         let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
-        [vds, id_docs, docs].into_iter().flatten().unique().collect()
+        [vds, docs].into_iter().flatten().unique().collect()
     }
 
     /// Dispatch queries for a piece of data with a given identifier to the underlying data

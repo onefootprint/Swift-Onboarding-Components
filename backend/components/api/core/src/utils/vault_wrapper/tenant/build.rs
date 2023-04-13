@@ -3,7 +3,6 @@ use super::{Person, VaultWrapper};
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
-use db::models::identity_document::IdentityDocumentAndRequest;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -42,7 +41,6 @@ impl VaultWrapper<Person> {
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // VaultWrapper for each User
         let vds = VaultData::bulk_get(conn, &active_lifetime_list)?;
-        let identity_document_map = IdentityDocumentAndRequest::bulk_get(conn, &active_lifetime_list)?;
         let scoped_vault_ids = users.iter().map(|(sv, _)| &sv.id).collect();
         let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_vault_ids)?;
 
@@ -60,7 +58,6 @@ impl VaultWrapper<Person> {
                     // speculative data for ScopedUser A will show for ScopedUser B within the same
                     // tenant
                     vds.get(&uv_id).cloned().unwrap_or_default(),
-                    identity_document_map.get(&uv_id).cloned().unwrap_or_default(),
                     vec![], // Don't currently support multi-get for Documents
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )?;

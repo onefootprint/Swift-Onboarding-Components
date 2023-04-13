@@ -2,7 +2,6 @@ use crate::{
     auth::session::AuthSessionData,
     auth::user::{AuthedOnboardingInfo, ValidateUserToken},
     utils::{
-        self,
         session::AuthSession,
         vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
     },
@@ -214,7 +213,7 @@ pub fn get_fields_to_authorize(
         if ob_config.can_access_selfie() {
             selfie_collected = identity_documents
                 .iter()
-                .any(utils::identity_document::id_doc_collected_selfie);
+                .any(|doc| doc.selfie_lifetime_id.is_some());
         }
     }
 

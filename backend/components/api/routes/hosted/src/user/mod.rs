@@ -30,6 +30,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token::get)
         .service(email::verify::post)
         .service(consent::post)
-        .service(upload::post)
-        .service(upload::document_decrypt);
+        .service(upload::post);
 }
