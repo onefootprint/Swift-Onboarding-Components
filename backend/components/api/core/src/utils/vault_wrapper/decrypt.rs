@@ -45,6 +45,21 @@ impl<Type> VaultWrapper<Type> {
         let results = decrypted_results.into_iter().chain(p_data.into_iter()).collect();
         Ok(results)
     }
+
+    /// Util to decrypt a DataIdentifier WITHOUT checking permissions or making an access event.
+    pub async fn decrypt_unchecked_single(
+        &self,
+        enclave_client: &EnclaveClient,
+        id: DataIdentifier,
+    ) -> ApiResult<Option<PiiString>> {
+        let result = self
+            .decrypt_unchecked(enclave_client, &[id])
+            .await?
+            .into_iter()
+            .next()
+            .map(|(_, pii)| pii);
+        Ok(result)
+    }
 }
 
 // TODO should we gate these permissions somehow? Make access events in these?
@@ -64,9 +79,8 @@ impl VaultWrapper<Person> {
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
         let e164 = self
-            .decrypt_unchecked(&state.enclave_client, &[IDK::PhoneNumber.into()])
+            .decrypt_unchecked_single(&state.enclave_client, IDK::PhoneNumber.into())
             .await?
-            .remove(&IDK::PhoneNumber.into())
             .ok_or(ApiError::NoPhoneNumberForVault)?;
         let phone_number = PhoneNumber::parse(e164)?;
         Ok(phone_number)

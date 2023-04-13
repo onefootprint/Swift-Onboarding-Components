@@ -64,9 +64,8 @@ pub struct BasicBusinessInfo {
 
 pub async fn decrypt_basic_business_info(state: &State, bvw: &TenantUvw) -> ApiResult<BasicBusinessInfo> {
     let bos: Vec<KycedBusinessOwnerData> = bvw
-        .decrypt_unchecked(&state.enclave_client, &[BDK::KycedBeneficialOwners.into()])
+        .decrypt_unchecked_single(&state.enclave_client, BDK::KycedBeneficialOwners.into())
         .await?
-        .remove(&BDK::KycedBeneficialOwners.into())
         .ok_or(BusinessError::NoBos)?
         .deserialize()?;
     let business_name = bvw.get_p_data(BDK::Name).ok_or(BusinessError::NoName)?.clone();

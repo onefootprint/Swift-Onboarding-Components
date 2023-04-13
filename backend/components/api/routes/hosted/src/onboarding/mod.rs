@@ -87,9 +87,8 @@ pub async fn get_requirements(
         })
         .await??;
     let declarations = uvw
-        .decrypt_unchecked(&state.enclave_client, &[IPK::Declarations.into()])
-        .await?
-        .remove(&IPK::Declarations.into());
+        .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
+        .await?;
 
     let (requirements, ob_info, user_auth) = state
         .db_pool
