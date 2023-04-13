@@ -22,7 +22,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = ({ from, to }) => {
+const Template: Story = ({ from, to, onClick }) => {
   const [isVisible, setisVisible] = useState(false);
 
   return (
@@ -35,7 +35,7 @@ const Template: Story = ({ from, to }) => {
       }}
     >
       <Button onClick={() => setisVisible(!isVisible)}>Trigger</Button>
-      <Fade isVisible={isVisible} from={from} to={to}>
+      <Fade isVisible={isVisible} from={from} to={to} onClick={onClick}>
         <div
           style={{
             backgroundColor: 'red',
@@ -54,4 +54,5 @@ export const Default = Template.bind({});
 Default.args = {
   from: 'left',
   to: 'right',
+  onClick: () => alert('I was clicked'),
 };

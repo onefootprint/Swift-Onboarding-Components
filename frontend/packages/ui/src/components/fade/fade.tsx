@@ -10,6 +10,7 @@ type FadeProps = {
   role?: AriaRole;
   testID?: string;
   to: 'left' | 'right' | 'top' | 'bottom' | 'center';
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 const Fade = forwardRef<HTMLDivElement, FadeProps>(
@@ -23,6 +24,7 @@ const Fade = forwardRef<HTMLDivElement, FadeProps>(
       role,
       testID,
       to,
+      onClick,
     },
     ref,
   ) => {
@@ -87,6 +89,7 @@ const Fade = forwardRef<HTMLDivElement, FadeProps>(
       <AnimatePresence>
         {isVisible && (
           <motion.div
+            onClick={onClick}
             animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
             aria-label={ariaLabel}
             className={className}
