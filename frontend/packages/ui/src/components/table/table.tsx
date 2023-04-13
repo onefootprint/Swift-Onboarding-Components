@@ -151,10 +151,12 @@ const TableContainer = styled.table`
 
       &:first-child {
         border-top-left-radius: ${theme.borderRadius.default};
+        padding-left: ${theme.spacing[6]};
       }
 
       &:last-child {
         border-top-right-radius: ${theme.borderRadius.default};
+        padding-right: ${theme.spacing[6]};
       }
     }
 
@@ -188,6 +190,16 @@ const TableContainer = styled.table`
           &:last-child {
             border-bottom-right-radius: ${theme.borderRadius.default};
           }
+        }
+      }
+
+      td {
+        &:first-child {
+          padding-left: ${theme.spacing[6]};
+        }
+
+        &:last-child {
+          padding-right: ${theme.spacing[6]};
         }
       }
     }
