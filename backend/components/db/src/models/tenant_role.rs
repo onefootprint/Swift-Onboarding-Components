@@ -111,7 +111,16 @@ impl TenantRole {
         };
         let result = diesel::insert_into(tenant_role::table)
             .values(new)
-            .get_result(conn)?;
+            .get_result(conn)
+            .map_err(DbError::from)
+            .map_err(|e| {
+                if e.is_unique_constraint_violation() {
+                    // There's already a role with this name at this tenant
+                    DbError::TenantRoleAlreadyExists
+                } else {
+                    e
+                }
+            })?;
         Ok(result)
     }
 
@@ -193,7 +202,16 @@ impl TenantRole {
             // Don't allow updating an immutable role
             .filter(tenant_role::is_immutable.eq(false))
             .set(update)
-            .load(conn.conn())?;
+            .load(conn.conn())
+            .map_err(DbError::from)
+            .map_err(|e| {
+                if e.is_unique_constraint_violation() {
+                    // There's already a role with this name at this tenant
+                    DbError::TenantRoleAlreadyExists
+                } else {
+                    e
+                }
+            })?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
