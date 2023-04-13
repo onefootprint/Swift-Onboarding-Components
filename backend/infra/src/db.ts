@@ -115,7 +115,7 @@ export async function CreateDB(
     databaseName,
     storageEncrypted: true,
     dbSubnetGroupName: subnet.name,
-    engineVersion: '14.3',
+    engineVersion: '14.5',
     allowMajorVersionUpgrade: false,
     engine: EngineType.AuroraPostgresql,
     engineMode: 'provisioned',
