@@ -1,6 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoBuilding24, IcoFileText224, IcoUsers24 } from '@onefootprint/icons';
-import { IdDI } from '@onefootprint/types';
+import {
+  IcoBuilding24,
+  IcoDollar24,
+  IcoFileText224,
+  IcoUsers24,
+} from '@onefootprint/icons';
+import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 
 import type { Fieldset } from '../../../../vault.types';
 
@@ -32,6 +37,20 @@ const useFieldsets = (): Fieldset => {
         { di: IdDI.city },
         { di: IdDI.zip },
         { di: IdDI.state },
+      ],
+    },
+    investorProfile: {
+      title: t('investor-profile.title'),
+      iconComponent: IcoDollar24,
+      fields: [
+        { di: InvestorProfileDI.occupation },
+        { di: InvestorProfileDI.employedByBrokerageFirm },
+        { di: InvestorProfileDI.annualIncome },
+        { di: InvestorProfileDI.netWorth },
+        { di: InvestorProfileDI.investmentGoals },
+        { di: InvestorProfileDI.riskTolerance },
+        { di: InvestorProfileDI.declarations },
+        { di: DocumentDI.finraComplianceLetter },
       ],
     },
   };

@@ -1,5 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DataIdentifier, Entity } from '@onefootprint/types';
+import {
+  DataIdentifier,
+  Entity,
+  isVaultDataDecrypted,
+  VaultValue,
+} from '@onefootprint/types';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,7 +18,10 @@ export type FieldProps = {
   entity: Entity;
   hint?: string;
   renderLabel?: () => React.ReactNode;
-  renderValue?: () => React.ReactNode;
+  renderValue?: (
+    value: VaultValue,
+    isValueDecrypted: boolean,
+  ) => React.ReactNode;
 };
 
 const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
@@ -49,7 +57,7 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
           {renderLabel ? (
             renderLabel()
           ) : (
-            <Typography variant="body-3" color="tertiary">
+            <Typography variant="body-3" color="tertiary" as="label">
               {label}
             </Typography>
           )}
@@ -60,7 +68,11 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
           )}
         </LabelContainer>
       )}
-      {renderValue ? renderValue() : <FieldOrPlaceholder data={value} />}
+      {renderValue ? (
+        renderValue(value, isVaultDataDecrypted(value))
+      ) : (
+        <FieldOrPlaceholder data={value} />
+      )}
     </Container>
   );
 };

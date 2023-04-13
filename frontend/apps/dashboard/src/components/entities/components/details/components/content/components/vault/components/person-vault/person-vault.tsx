@@ -1,12 +1,18 @@
+import { Entity, hasEntityInvestorProfile } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
+import InvestorProfileFields from './components/investor-profile-fields';
 import useFieldsets from './hooks/use-fieldsets';
 
-const PersonVault = () => {
-  const { basic, address, identity } = useFieldsets();
+type PersonVaultProps = {
+  entity: Entity;
+};
+
+const PersonVault = ({ entity }: PersonVaultProps) => {
+  const { basic, address, identity, investorProfile } = useFieldsets();
 
   return (
     <Grid>
@@ -34,13 +40,23 @@ const PersonVault = () => {
           footer={<RiskSignalsOverview type="address" />}
         />
       </Address>
+      {hasEntityInvestorProfile(entity) ? (
+        <InvestorProfile>
+          <Fieldset
+            fields={investorProfile.fields}
+            iconComponent={investorProfile.iconComponent}
+            title={investorProfile.title}
+          >
+            <InvestorProfileFields />
+          </Fieldset>
+        </InvestorProfile>
+      ) : null}
     </Grid>
   );
 };
 
 const Grid = styled.div`
   ${({ theme }) => css`
-    display: grid;
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
@@ -61,6 +77,10 @@ const Address = styled.div`
 
 const Identity = styled.div`
   grid-area: identity;
+`;
+
+const InvestorProfile = styled.div`
+  grid-area: investor-profile;
 `;
 
 export default PersonVault;

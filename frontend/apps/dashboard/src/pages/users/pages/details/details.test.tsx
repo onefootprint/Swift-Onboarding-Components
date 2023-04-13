@@ -5,7 +5,7 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import { IdDI } from '@onefootprint/types';
+import { IdDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -399,6 +399,160 @@ describe('<Details />', () => {
                 container,
               });
               expect(dob).toBeInTheDocument();
+            });
+          });
+        });
+      });
+
+      describe('investor profile data section', () => {
+        it('should display the encrypted data', async () => {
+          await renderDetailsAndWaitData();
+          const container = screen.getByRole('group', {
+            name: 'Investor profile data',
+          });
+
+          const occupation = getTextByRow({
+            name: 'Occupation',
+            value: '•••••••••',
+            container,
+          });
+          expect(occupation).toBeInTheDocument();
+
+          const employeedByBrokerageFirm = getTextByRow({
+            name: 'Employed by brokerage firm?',
+            value: '•••••••••',
+            container,
+          });
+          expect(employeedByBrokerageFirm).toBeInTheDocument();
+
+          const annualIncome = getTextByRow({
+            name: 'Annual income',
+            value: '•••••••••',
+            container,
+          });
+          expect(annualIncome).toBeInTheDocument();
+
+          const netWorth = getTextByRow({
+            name: 'Net worth',
+            value: '•••••••••',
+            container,
+          });
+          expect(netWorth).toBeInTheDocument();
+
+          const investmentGoals = getTextByRow({
+            name: 'Investment goals',
+            value: '•••••••••',
+            container,
+          });
+          expect(investmentGoals).toBeInTheDocument();
+
+          const riskTolerance = getTextByRow({
+            name: 'Risk tolerance',
+            value: '•••••••••',
+            container,
+          });
+          expect(riskTolerance).toBeInTheDocument();
+
+          const declarations = getTextByRow({
+            name: 'Declaration(s)',
+            value: '•••••••••',
+            container,
+          });
+          expect(declarations).toBeInTheDocument();
+        });
+
+        describe('when clicking on the decrypt button', () => {
+          beforeEach(() => {
+            withDecrypt(entityFixture.id, {
+              [InvestorProfileDI.occupation]: 'Engineer',
+              [InvestorProfileDI.employedByBrokerageFirm]: 'Yes',
+              [InvestorProfileDI.annualIncome]: 'gt500k',
+              [InvestorProfileDI.riskTolerance]: 'moderate',
+              [InvestorProfileDI.netWorth]: 'lt50k',
+              [InvestorProfileDI.investmentGoals]:
+                '["grow_long_term_wealth","save_for_retirement","buy_a_home","support_loved_ones","pay_off_debt","start_my_own_business"]',
+              [InvestorProfileDI.declarations]: '["affiliated_with_us_broker"]',
+            });
+          });
+
+          it('should allow to decrypt the data', async () => {
+            await renderDetailsAndWaitData();
+            await decryptFields([
+              'Occupation',
+              'Employed by brokerage firm?',
+              'Annual income',
+              'Net worth',
+              'Investment goals',
+              'Risk tolerance',
+              'Declaration(s)',
+            ]);
+            const container = screen.getByRole('group', {
+              name: 'Investor profile data',
+            });
+
+            await waitFor(() => {
+              const occupation = getTextByRow({
+                name: 'Occupation',
+                value: 'Engineer',
+                container,
+              });
+              expect(occupation).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const employeedByBrokerageFirm = getTextByRow({
+                name: 'Employed by brokerage firm?',
+                value: 'Yes',
+                container,
+              });
+              expect(employeedByBrokerageFirm).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const annualIncome = getTextByRow({
+                name: 'Annual income',
+                value: '$500,000+',
+                container,
+              });
+              expect(annualIncome).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const netWorth = getTextByRow({
+                name: 'Net worth',
+                value: 'Under $50,000',
+                container,
+              });
+              expect(netWorth).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const investmentGoals = getTextByRow({
+                name: 'Investment goals',
+                value:
+                  'Grow long-term wealth, save for retirement, buy a home, support my loved ones, pay off debt and start my own business',
+                container,
+              });
+              expect(investmentGoals).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const riskTolerance = getTextByRow({
+                name: 'Risk tolerance',
+                value: 'Moderate',
+                container,
+              });
+              expect(riskTolerance).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const declarations = getTextByRow({
+                name: 'Declaration(s)',
+                value:
+                  'Affiliated or work with the us registered broker-dealer or finra',
+                container,
+              });
+              expect(declarations).toBeInTheDocument();
             });
           });
         });

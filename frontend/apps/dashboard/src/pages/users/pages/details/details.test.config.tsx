@@ -16,6 +16,7 @@ import {
   EntityKind,
   EntityStatus,
   IdDI,
+  InvestorProfileDI,
   Liveness,
   LivenessSource,
   OnboardingStatus,
@@ -46,6 +47,13 @@ export const entityFixture: Entity = {
     IdDI.state,
     IdDI.city,
     IdDI.zip,
+    InvestorProfileDI.occupation,
+    InvestorProfileDI.employedByBrokerageFirm,
+    InvestorProfileDI.annualIncome,
+    InvestorProfileDI.netWorth,
+    InvestorProfileDI.riskTolerance,
+    InvestorProfileDI.investmentGoals,
+    InvestorProfileDI.declarations,
   ],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   onboarding: {
@@ -280,7 +288,7 @@ export const getTextByRow = ({
   container: HTMLElement;
 }) => {
   const row = within(container).getByRole('row', { name });
-  return within(row).getByText(value);
+  return within(row).getByText(value, { exact: false });
 };
 
 export const decryptFields = async (fields: string[]) => {

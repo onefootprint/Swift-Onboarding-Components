@@ -1,5 +1,5 @@
 import CdoToDiMap from './cdo-to-di-map';
-import { DataIdentifier } from './di';
+import { DataIdentifier, InvestorProfileDI } from './di';
 import { Onboarding } from './onboarding';
 import { VaultValue } from './vault';
 
@@ -28,6 +28,13 @@ export type Entity = {
   startTimestamp: string;
   status: EntityStatus;
   decryptedAttributes: EntityVault;
+};
+
+export const hasEntityInvestorProfile = (entity: Entity) => {
+  const values = Object.values(InvestorProfileDI);
+  return values.some(investorProfileDi =>
+    entity.attributes.some(attribute => attribute === investorProfileDi),
+  );
 };
 
 export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
