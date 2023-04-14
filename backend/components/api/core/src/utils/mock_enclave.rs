@@ -1,9 +1,9 @@
+use crate::State;
 use actix_web::dev::ServerHandle;
 use envconfig::Envconfig;
-use std::{collections::HashMap, time::Duration};
+use once_cell::sync::Lazy;
+use std::{collections::HashMap, sync::Mutex, time::Duration};
 use tokio::task::JoinHandle;
-
-use crate::State;
 
 #[allow(unused)]
 pub struct StateWithMockEnclave {
@@ -22,11 +22,20 @@ impl Drop for StateWithMockEnclave {
     }
 }
 
+static PP_LOCK: Lazy<Mutex<()>> = Lazy::new(Mutex::default);
+
 impl StateWithMockEnclave {
+    fn unused_ports() -> (u16, u16) {
+        let _g = PP_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        (
+            portpicker::pick_unused_port().expect("no free ports"),
+            portpicker::pick_unused_port().expect("no free ports"),
+        )
+    }
+
     /// initializes a new enclave proxy on random port
     pub async fn init() -> StateWithMockEnclave {
-        let enclave_port = portpicker::pick_unused_port().expect("no free ports");
-
+        let (enclave_port, port) = Self::unused_ports();
         let h1 = tokio::spawn(async move {
             let enclave_config = enclave::Config {
                 port: enclave_port,
@@ -35,7 +44,6 @@ impl StateWithMockEnclave {
             enclave::run(enclave_config).await.expect("enclave crashed");
         });
 
-        let port = portpicker::pick_unused_port().expect("no free ports");
         let mut config = enclave_proxy::Config::init_from_hashmap(&HashMap::new()).unwrap();
         config.port = port;
         config.enclave_port = enclave_port;

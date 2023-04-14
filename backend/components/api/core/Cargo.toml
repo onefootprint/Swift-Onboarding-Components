@@ -90,6 +90,7 @@ billing = { path = "../../billing"}
 
 
 sentry-tracing = { workspace = true }
+once_cell = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }
