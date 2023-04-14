@@ -24,7 +24,8 @@ use feature_flag::LaunchDarklyFeatureFlagClient;
 
 /// A user-specific session. Permissions for the session are defined by the set of scopes.
 /// IMPORTANT: Purposefully doesn't implement TryFrom<AuthSessionData> or HeaderName to prevent
-/// users from using this in an actix extractor. The ParsableUserSession
+/// users from using this in an actix extractor. UserAuthContext below should be used as the
+/// extractor
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct UserSession {
     pub user_vault_id: VaultId,

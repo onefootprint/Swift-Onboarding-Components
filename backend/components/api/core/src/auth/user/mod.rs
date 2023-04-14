@@ -26,8 +26,6 @@ pub enum UserAuthScope {
     OrgOnboarding,
     Business(ScopedVaultId),
     BasicProfile,
-    ExtendedProfile,
-    SensitiveProfile,
     Handoff,
 }
 
