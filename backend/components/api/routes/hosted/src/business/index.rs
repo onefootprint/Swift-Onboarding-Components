@@ -18,8 +18,8 @@ use paperclip::actix::{self, api_v2_operation, web};
 )]
 #[actix::get("/hosted/business")]
 pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonApiResponse<HostedBusiness> {
-    let bv_id = business_auth.data.bo.business_vault_id;
-    let ob_config_id = business_auth.data.ob_config.id;
+    let bv_id = business_auth.bo.business_vault_id.clone();
+    let ob_config_id = business_auth.ob_config.id.clone();
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -36,7 +36,7 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
     } = decrypt_basic_business_info(&state, &bvw).await?;
 
     let invited_bo = secondary_bos
-        .remove(&business_auth.data.bo.link_id)
+        .remove(&business_auth.bo.link_id)
         .ok_or(BusinessError::NoBos)?;
 
     let inviter = Inviter {

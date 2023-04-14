@@ -73,7 +73,7 @@ pub async fn get_requirements(
     user_auth: CheckedUserObAuthContext,
 ) -> ApiResult<(Vec<OnboardingRequirement>, CheckedUserObAuthContext)> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let su_id = user_auth.data.scoped_user.id.clone();
+    let su_id = user_auth.scoped_user.id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -90,7 +90,7 @@ pub async fn get_requirements(
         .db_query(|conn| -> ApiResult<_> {
             let scoped_business_id = user_auth.scoped_business_id();
             let requirements =
-                get_requirements_inner(conn, uvw, &user_auth.data, scoped_business_id, declarations)?;
+                get_requirements_inner(conn, uvw, &user_auth, scoped_business_id, declarations)?;
             Ok((requirements, user_auth))
         })
         .await??;

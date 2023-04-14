@@ -18,7 +18,7 @@ pub async fn get(
 
     let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
     let uv_id = user_auth.user_vault_id().clone();
-    let ob_config = user_auth.data.ob_config.clone();
+    let ob_config = user_auth.ob_config.clone();
     let fields_to_authorize = state
         .db_pool
         .db_query(move |conn| get_fields_to_authorize(conn, &uv_id, &ob_config))

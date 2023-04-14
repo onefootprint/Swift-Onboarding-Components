@@ -1,7 +1,3 @@
-use super::SessionContext;
-use crate::errors::ApiResult;
-use async_trait::async_trait;
-use db::{models::vault::Vault, DbPool};
 use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Schema;
 
@@ -40,22 +36,6 @@ pub enum UserAuthScope {
 }
 
 /// A helper trait to extract a user vault id on combined types
-#[async_trait]
 pub trait UserAuth {
     fn user_vault_id(&self) -> &VaultId;
-
-    async fn user_vault(&self, pool: &DbPool) -> ApiResult<Vault> {
-        let uv_id = self.user_vault_id().clone();
-        let result = pool.db_query(move |conn| Vault::get(conn, &uv_id)).await??;
-        Ok(result)
-    }
-}
-
-impl<A> UserAuth for SessionContext<A>
-where
-    A: UserAuth,
-{
-    fn user_vault_id(&self) -> &VaultId {
-        self.data.user_vault_id()
-    }
 }

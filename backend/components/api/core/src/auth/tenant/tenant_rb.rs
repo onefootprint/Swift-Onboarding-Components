@@ -101,7 +101,7 @@ pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
 impl CanCheckTenantGuard for TenantRbAuthContext {
     fn role(&self) -> &TenantRole {
-        &self.data.0.tenant_role
+        &self.0.tenant_role
     }
 
     fn token_scopes(&self) -> Vec<TenantScope> {
@@ -123,7 +123,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
             .and_then(|v| v.trim().parse::<bool>().ok());
 
         // error if the tenant is sandbox-restricted but is requesting live data
-        let is_sandbox_restricted = self.data.tenant().sandbox_restricted;
+        let is_sandbox_restricted = self.tenant().sandbox_restricted;
         if is_sandbox_restricted && is_live == Some(true) {
             return Err(AuthError::SandboxRestricted.into());
         }
@@ -137,17 +137,17 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     }
 
     fn rolebinding(&self) -> Option<&TenantRolebinding> {
-        Some(&self.data.tenant_rolebinding)
+        Some(&self.tenant_rolebinding)
     }
 
     fn actor(&self) -> AuthActor {
-        AuthActor::from(self.data.tenant_user.id.clone())
+        AuthActor::from(self.tenant_user.id.clone())
     }
 }
 
 impl GetFirmEmployee for TenantRbAuthContext {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {
-        let tenant_user = self.data.0.tenant_user.clone();
+        let tenant_user = self.0.tenant_user.clone();
         if !tenant_user.is_firm_employee {
             // TODO should we hide these errors with 404s?
             return Err(AuthError::NotFirmEmployee.into());

@@ -3,15 +3,17 @@ use crate::auth::AuthError;
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use chrono::{DateTime, Utc};
+use derive_more::Deref;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::Apiv2Security;
 use std::{marker::PhantomData, pin::Pin};
 
 /// Abstract Session Context Type
-#[derive(Debug, Clone, Apiv2Security)]
+#[derive(Debug, Clone, Apiv2Security, Deref)]
 #[openapi(apiKey, description = "Session authentication key")]
 pub struct SessionContext<T> {
+    #[deref]
     pub data: T,
     pub auth_token: SessionAuthToken,
     pub headers: MaskedHeaderMap,

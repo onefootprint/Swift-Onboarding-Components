@@ -49,7 +49,7 @@ impl UserSession {
 
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
     /// session, if exists
-    pub(super) fn scoped_user_id(&self) -> Option<ScopedVaultId> {
+    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
         self.scopes
             .iter()
             .filter_map(|x| match x {
@@ -57,14 +57,6 @@ impl UserSession {
                 _ => None,
             })
             .next()
-    }
-}
-
-impl CheckedUserAuthContext {
-    /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
-    /// session, if exists
-    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        self.data.scoped_user_id()
     }
 }
 
@@ -122,7 +114,7 @@ impl UserAuthContext {
         T: IsGuardMet<UserAuthScope>,
     {
         let requested_permission_str = format!("{}", guard);
-        if guard.is_met(&self.data.0.scopes) {
+        if guard.is_met(&self.0.scopes) {
             Ok(self.map(|d| d.0))
         } else {
             Err(AuthError::MissingUserPermission(requested_permission_str))

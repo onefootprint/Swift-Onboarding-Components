@@ -113,7 +113,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
 
 impl GetFirmEmployee for FirmEmployeeAuthContext {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {
-        let tu = &self.data.0.tenant_user;
+        let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {
             // TODO should we hide these errors with 404s?
             return Err(AuthError::NotFirmEmployee.into());
@@ -128,12 +128,12 @@ impl AllowSessionUpdate for ParsedFirmEmployeeAuth {}
 
 impl CanCheckTenantGuard for FirmEmployeeAuthContext {
     fn role(&self) -> &TenantRole {
-        &self.data.0.role
+        &self.0.role
     }
 
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
-        let extra_permissions_for_user = if self.data.0.is_risk_ops {
+        let extra_permissions_for_user = if self.0.is_risk_ops {
             RISK_OPS_PERMISSIONS.to_vec()
         } else {
             vec![]
@@ -162,7 +162,7 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
             .and_then(|v| v.trim().parse::<bool>().ok());
 
         // error if the tenant is sandbox-restricted but is requesting live data
-        let is_sandbox_restricted = self.data.tenant.sandbox_restricted;
+        let is_sandbox_restricted = self.tenant.sandbox_restricted;
         if is_sandbox_restricted && is_live == Some(true) {
             return Err(AuthError::SandboxRestricted.into());
         }
@@ -172,7 +172,7 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
     }
 
     fn tenant(&self) -> &Tenant {
-        &self.data.tenant
+        &self.tenant
     }
 
     fn rolebinding(&self) -> Option<&TenantRolebinding> {
@@ -180,7 +180,7 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
     }
 
     fn actor(&self) -> AuthActor {
-        AuthActor::FirmEmployee(self.data.tenant_user.id.clone())
+        AuthActor::FirmEmployee(self.tenant_user.id.clone())
     }
 }
 

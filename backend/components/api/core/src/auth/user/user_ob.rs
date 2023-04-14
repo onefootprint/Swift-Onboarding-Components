@@ -98,7 +98,7 @@ impl UserObAuthContext {
         T: IsGuardMet<UserAuthScope>,
     {
         let requested_permission_str = format!("{}", guard);
-        if guard.is_met(&self.data.0.user_session.scopes) {
+        if guard.is_met(&self.0.user_session.scopes) {
             Ok(self.map(|d| d.0))
         } else {
             Err(AuthError::MissingUserPermission(requested_permission_str))
@@ -110,8 +110,7 @@ impl CheckedUserObAuthContext {
     /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
     /// exists
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        self.data
-            .user_session
+        self.user_session
             .scopes
             .iter()
             .filter_map(|x| match x {

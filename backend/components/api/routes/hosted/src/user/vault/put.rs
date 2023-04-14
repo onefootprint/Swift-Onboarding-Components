@@ -36,7 +36,7 @@ pub async fn post_validate(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.data.scoped_user.id)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
             Ok(uvw)
         })
         .await??;
@@ -71,7 +71,7 @@ pub async fn put(
     let new_contact_info = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.data.scoped_user.id)?;
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
             // Enforce that sandbox emails/phones are used for sandbox users
             if let Some(is_live) = email_is_live {
                 if is_live != uvw.vault().is_live {

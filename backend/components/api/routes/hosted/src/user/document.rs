@@ -44,11 +44,11 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
-    let (uv, db_document_request, auth_info, user_consent) = state
+    let (uv, db_document_request, user_auth, user_consent) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
-            let db_document_request = DbDocumentRequest::lock_active(conn, &user_auth.data.scoped_user.id)
+            let db_document_request = DbDocumentRequest::lock_active(conn, &user_auth.scoped_user.id)
                 .map_err(|e| {
                     if e.is_not_found() {
                         ApiError::from(OnboardingError::NoPendingDocumentRequestFound)
@@ -61,9 +61,9 @@ pub async fn post(
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
             let uv = Vault::get(conn, user_auth.user_vault_id())?;
 
-            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.data.onboarding.id)?;
+            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding.id)?;
 
-            Ok((uv, db_document_request, user_auth.data, user_consent))
+            Ok((uv, db_document_request, user_auth, user_consent))
         })
         .await?;
 
@@ -163,7 +163,7 @@ pub async fn post(
             handle_s3_upload_error(
                 &state,
                 db_document_request.id.clone(),
-                auth_info.scoped_user.id.clone(),
+                user_auth.scoped_user.id.clone(),
             )
             .await?;
 
@@ -185,8 +185,8 @@ pub async fn post(
 
     // write a identity_document
     let doc_request_id = db_document_request.id.clone();
-    let su_id = auth_info.scoped_user.id.clone();
-    let suid = auth_info.scoped_user.id.clone();
+    let su_id = user_auth.scoped_user.id.clone();
+    let suid = user_auth.scoped_user.id.clone();
     let identity_document = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
@@ -267,7 +267,7 @@ pub async fn post(
     // TODO: generate fixture data for identity documents
     let ff_client = &state.feature_flag_client;
     let should_initiate_reqs =
-        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &auth_info.scoped_user.tenant_id)
+        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &user_auth.scoped_user.tenant_id)
             .await?
             .is_none();
     // TODO: more vendors!
@@ -281,9 +281,9 @@ pub async fn post(
     // Save Verification Requests and run our vendor requests
     if should_initiate_reqs {
         // Save our verification request
-        let su_id = auth_info.scoped_user.id.clone();
+        let su_id = user_auth.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
-        let ob_id = auth_info.onboarding.id.clone();
+        let ob_id = user_auth.onboarding.id.clone();
         let (document_verification_request, doc_request) = state
             .db_pool
             .db_transaction(
@@ -319,17 +319,17 @@ pub async fn post(
         // Make our request!
         handle_scan_onboarding_request(
             &state,
-            &auth_info.onboarding.id,
+            &user_auth.onboarding.id,
             doc_request,
             document_verification_request,
-            auth_info.scoped_user.id.clone(),
-            auth_info.scoped_user.vault_id.clone(),
+            user_auth.scoped_user.id.clone(),
+            user_auth.scoped_user.vault_id.clone(),
             identity_document.id.clone(),
         )
         .await?;
     } else {
         // mark as complete if we are testing
-        let su_id = auth_info.scoped_user.id.clone();
+        let su_id = user_auth.scoped_user.id.clone();
         state
             .db_pool
             .db_query(move |conn| -> Result<(), ApiError> {

@@ -19,7 +19,7 @@ pub async fn get(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<TokenResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::BasicProfile))?;
-    let scopes = user_auth.data.scopes.iter().map(|x| x.into()).collect();
+    let scopes = user_auth.scopes.iter().map(|x| x.into()).collect();
 
     Ok(Json(ResponseData::ok(TokenResponse {
         user_vault_id: user_auth.user_vault_id().clone(),

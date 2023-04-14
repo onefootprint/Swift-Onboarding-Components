@@ -39,7 +39,7 @@ pub async fn post(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.data.scoped_user.id)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

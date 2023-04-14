@@ -27,7 +27,7 @@ pub async fn handler(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    if UserAuthGuard::Handoff.is_met(&user_auth.data.scopes) {
+    if UserAuthGuard::Handoff.is_met(&user_auth.scopes) {
         // Don't allow making a handoff token with an existing handoff token. This allows subverting
         // token expiry by constantly just making a new one
         return Err(AuthError::CannotCreateMultipleHandoffTokens.into());

@@ -63,7 +63,7 @@ pub async fn post(
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
     let should_create_new_business_vault =
-        ob_config.must_collect_business() && !UserAuthGuard::Business.is_met(&user_auth.data.scopes);
+        ob_config.must_collect_business() && !UserAuthGuard::Business.is_met(&user_auth.scopes);
     let new_business_keypair = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         Some(state.enclave_client.generate_sealed_keypair().await?)

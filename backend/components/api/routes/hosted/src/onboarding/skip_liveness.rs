@@ -25,7 +25,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let onboarding = Onboarding::lock(conn, &user_auth.data.onboarding.id)?;
+            let onboarding = Onboarding::lock(conn, &user_auth.onboarding.id)?;
             if onboarding.is_complete() {
                 return Err(OnboardingError::AlreadyCompleted.into());
             }

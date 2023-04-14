@@ -62,7 +62,7 @@ pub async fn post(
     }
 
     // Mark the obs for the person and business as authorized
-    let ob_id = user_auth.data.onboarding.id.clone();
+    let ob_id = user_auth.onboarding.id.clone();
     let (biz_ob, user_auth) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
@@ -86,16 +86,16 @@ pub async fn post(
         .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", user_auth.data.tenant.id.as_str()));
-    span.record("tenant_name", &format!("{:?}", user_auth.data.tenant.id.as_str()));
-    span.record("onboarding_id", &format!("{}", user_auth.data.onboarding.id));
-    span.record("scoped_use_id", &format!("{}", user_auth.data.scoped_user.id));
+    span.record("tenant_id", &format!("{:?}", user_auth.tenant.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", user_auth.tenant.id.as_str()));
+    span.record("onboarding_id", &format!("{}", user_auth.onboarding.id));
+    span.record("scoped_use_id", &format!("{}", user_auth.scoped_user.id));
     span.record(
         "ob_configuration_id",
-        &format!("{}", user_auth.data.onboarding.ob_configuration_id),
+        &format!("{}", user_auth.onboarding.ob_configuration_id),
     );
     let tenant_vendor_control = TenantVendorControl::new(
-        user_auth.data.tenant.id.clone(),
+        user_auth.tenant.id.clone(),
         &state.db_pool,
         &state.enclave_client,
         &state.config,
@@ -103,12 +103,12 @@ pub async fn post(
     .await?;
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
-    let should_run_kyc_checks = user_auth.data.onboarding.idv_reqs_initiated_at.is_none();
+    let should_run_kyc_checks = user_auth.onboarding.idv_reqs_initiated_at.is_none();
 
     // Run KYC checks
-    let ob_id = user_auth.data.onboarding.id.clone();
+    let ob_id = user_auth.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, &user_auth.data, biz_ob.clone(), tenant_vendor_control).await;
+        let engine_result = run_kyc(&state, &user_auth, biz_ob.clone(), tenant_vendor_control).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
