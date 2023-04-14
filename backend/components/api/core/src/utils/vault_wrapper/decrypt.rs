@@ -1,11 +1,11 @@
 use super::{Person, VaultWrapper};
 use crate::enclave_client::EnclaveClient;
-use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use db::models::document_data::DocumentData;
 use db::models::vault_data::VaultedData;
+use derive_more::{Deref, DerefMut};
 use either::Either;
 use enclave_proxy::DataTransform;
 use itertools::Itertools;
@@ -13,6 +13,14 @@ use newtypes::{
     DataIdentifier, IdentityDataKind as IDK, PhoneNumber, PiiBytes, PiiString, SealedVaultDataKey,
 };
 use std::collections::HashMap;
+
+#[derive(Deref, DerefMut)]
+pub struct DecryptUncheckedResult {
+    #[deref]
+    #[deref_mut]
+    pub results: HashMap<DataIdentifier, PiiString>,
+    pub decrypted_dis: Vec<DataIdentifier>,
+}
 
 impl<Type> VaultWrapper<Type> {
     /// Util to decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
@@ -25,25 +33,17 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         ids: &[DataIdentifier],
-    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
-        if let Some(di) = ids.iter().find(|di| match di {
-            // exhaustive match to capture addition of new data identifiers
-            DataIdentifier::Id(_)
-            | DataIdentifier::Custom(_)
-            | DataIdentifier::Business(_)
-            | DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Document(_) => false,
-        }) {
-            return Err(UserError::CannotDecrypt(di.clone()).into());
-        }
-
-        let (documents_kinds, remaining_ids): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| {
-            if let DataIdentifier::Document(kind) = di {
-                either::Either::Left(kind)
-            } else {
-                either::Either::Right(di)
-            }
+    ) -> ApiResult<DecryptUncheckedResult> {
+        // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
+        let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| match di {
+            DataIdentifier::Document(kind) => either::Either::Left(kind),
+            _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
+                VaultedData::Sealed(e_data) => Either::Left((di.clone(), e_data)),
+                VaultedData::NonPrivate(p_data) => Either::Right((di.clone(), p_data.clone())),
+            })),
         });
+        let (e_data, p_data): (_, Vec<_>) = remaining_dis.into_iter().flatten().partition_map(|x| x);
+
         // special case decrypt documents
         let documents: HashMap<DataIdentifier, PiiString> = {
             let document_datas: Vec<&DocumentData> = documents_kinds
@@ -64,27 +64,29 @@ impl<Type> VaultWrapper<Type> {
                 .zip(decrypted_documents)
                 .collect()
         };
-        // decrypt remaining data items
-        let remaining: HashMap<DataIdentifier, PiiString> = {
-            // Since some vault data is already in plaintext, separate by data that needs to be decrypted
-            let (e_data, p_data): (_, Vec<_>) = remaining_ids
-                .into_iter()
-                .filter_map(|id| self.get_data(id.clone()).map(|data| (id.clone(), data)))
-                .partition_map(|(id, data)| match data {
-                    VaultedData::Sealed(e_data) => Either::Left((id, e_data)),
-                    VaultedData::NonPrivate(p_data) => Either::Right((id, p_data.clone())),
-                });
 
-            let decrypted_results = enclave_client
-                .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key, DataTransform::Identity)
-                .await?;
-            decrypted_results.into_iter().chain(p_data.into_iter()).collect()
+        // decrypt remaining e_data
+        let text = enclave_client
+            .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key, DataTransform::Identity)
+            .await?;
+
+        // Don't make access events for the DIs that are already in plaintext
+        let decrypted_dis = ids
+            .iter()
+            .filter(|di| !p_data.iter().any(|(d, _)| &d == di))
+            .cloned()
+            .collect();
+        let results = documents
+            .into_iter()
+            .chain(text.into_iter())
+            .chain(p_data.into_iter())
+            .collect();
+
+        let result = DecryptUncheckedResult {
+            results,
+            decrypted_dis,
         };
-
-        let mut combined = remaining;
-        combined.extend(documents);
-
-        Ok(combined)
+        Ok(result)
     }
 
     /// Util to decrypt a DataIdentifier WITHOUT checking permissions or making an access event.
@@ -96,6 +98,7 @@ impl<Type> VaultWrapper<Type> {
         let result = self
             .decrypt_unchecked(enclave_client, &[id])
             .await?
+            .results
             .into_iter()
             .next()
             .map(|(_, pii)| pii);

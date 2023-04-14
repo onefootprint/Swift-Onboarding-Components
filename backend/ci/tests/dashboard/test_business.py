@@ -94,5 +94,7 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     for field in fields_to_decrypt:
         assert body[field] == expected_data.get(field)
 
+    # Check the access event - but never expect business.name since it's stored in plaintext
     access_event = latest_access_event_for(primary_bo.fp_bid, sandbox_tenant.sk)
-    assert set(access_event["targets"]) == set(fields_to_decrypt)
+    expected_access_event_fields = set(fields_to_decrypt) - {"business.name"}
+    assert set(access_event["targets"]) == expected_access_event_fields

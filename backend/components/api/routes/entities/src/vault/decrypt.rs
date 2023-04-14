@@ -75,7 +75,7 @@ pub async fn post_inner(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
     };
-    let mut results = uvw.decrypt(&state, &fields, Some(req)).await?;
+    let mut results = uvw.decrypt(&state, &fields, req).await?;
     // Is this step necessary? Every key is present in the response if it was in the request?
     let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di))));
     let out = DecryptResponse { map: results };

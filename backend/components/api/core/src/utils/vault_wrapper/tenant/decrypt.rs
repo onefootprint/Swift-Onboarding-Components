@@ -42,15 +42,13 @@ impl TenantUvw {
     pub async fn decrypt(
         &self,
         state: &State,
-        ids: &[DataIdentifier],
-        req: Option<DecryptRequest>,
+        dis: &[DataIdentifier],
+        req: DecryptRequest,
     ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
-        self.check_ob_config_access(ids)?;
-        let results = self.uvw.decrypt_unchecked(&state.enclave_client, ids).await?;
-        if let Some(req) = req {
-            req.create_access_event(state, self.scoped_vault_id.clone(), ids.to_vec())
-                .await?;
-        }
-        Ok(results)
+        self.check_ob_config_access(dis)?;
+        let results = self.uvw.decrypt_unchecked(&state.enclave_client, dis).await?;
+        req.create_access_event(state, self.scoped_vault_id.clone(), results.decrypted_dis)
+            .await?;
+        Ok(results.results)
     }
 }

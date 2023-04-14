@@ -58,7 +58,7 @@ pub async fn detokenize(
             insight: CreateInsightEvent::from(insight.clone()),
         };
         let results = uvw
-            .decrypt(state, &targets, Some(req))
+            .decrypt(state, &targets, req)
             .await?
             .into_iter()
             .map(|(identifier, v)| {
