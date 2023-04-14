@@ -2,6 +2,7 @@ import { media } from '@onefootprint/ui';
 import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import useAppContext from '../../hooks/use-app-context';
 import useSandboxMode from '../../hooks/use-sandbox-mode';
 import FootprintFooter from './components/footprint-footer';
 import NavigationHeaderContainer from './components/navigation-header/components/navigation-header-container';
@@ -12,28 +13,14 @@ import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
 
-type Config = {
-  header: {
-    hideClose?: boolean;
-    hideSandboxBanner?: boolean;
-  };
-  footer: {
-    hideFooter?: boolean;
-    footerVariant?: 'modal' | 'mobile';
-  };
-  container: {
-    hasBorderRadius?: boolean;
-  };
-};
-
 type IdvLayoutProps = {
-  config: Config;
-  onClose: () => void;
   children: React.ReactNode;
 };
 
-const IdvLayout = ({ children, config, onClose }: IdvLayoutProps) => {
-  const { header, footer, container } = config;
+const IdvLayout = ({ children }: IdvLayoutProps) => {
+  const {
+    layout: { header, footer, container },
+  } = useAppContext();
   const { isSandbox } = useSandboxMode();
   const shouldShowSandboxBanner = isSandbox && !header.hideSandboxBanner;
 
@@ -59,8 +46,6 @@ const IdvLayout = ({ children, config, onClose }: IdvLayoutProps) => {
         <NavigationHeaderContainer
           top={shouldShowSandboxBanner ? sandboxBannerHeight : undefined}
           containerId={LAYOUT_CONTAINER_ID}
-          onClose={onClose}
-          hideClose={header.hideClose}
         />
       </Header>
       <Body>{children}</Body>

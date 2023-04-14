@@ -6,6 +6,7 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
 
+import AppContextProvider from './components/app-context-provider';
 import Layout from './components/layout';
 import { MachineProvider } from './components/machine-provider';
 import { GOOGLE_MAPS_KEY } from './config/contants';
@@ -15,24 +16,28 @@ import useExtendedAppearance from './hooks/use-extended-appearance';
 import { IdvProps } from './idv.types';
 import Router from './pages/router';
 
-const App = ({ config, appearance, layout, onClose, onComplete }: IdvProps) => {
-  const { tenantPk, bootstrapData } = config;
+const App = ({ data, appearance, layout, callbacks }: IdvProps) => {
+  const { tenantPk, bootstrapData } = data;
   useExtendedAppearance(appearance);
 
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <I18nextProvider i18n={configureI18next()}>
-          <MachineProvider tenantPk={tenantPk} bootstrapData={bootstrapData}>
-            <DesignSystemProvider
-              theme={appearance.theme ? theme[appearance.theme] : theme.light}
-            >
-              <GlobalStyle />
-              <Layout config={layout} onClose={onClose}>
-                <Router onComplete={onComplete} />
-              </Layout>
-            </DesignSystemProvider>
-          </MachineProvider>
+          <AppContextProvider layout={layout} callbacks={callbacks}>
+            <MachineProvider tenantPk={tenantPk} bootstrapData={bootstrapData}>
+              <DesignSystemProvider
+                theme={
+                  appearance?.theme ? theme[appearance.theme] : theme.light
+                }
+              >
+                <GlobalStyle />
+                <Layout>
+                  <Router />
+                </Layout>
+              </DesignSystemProvider>
+            </MachineProvider>
+          </AppContextProvider>
         </I18nextProvider>
       </QueryClientProvider>
       <Script

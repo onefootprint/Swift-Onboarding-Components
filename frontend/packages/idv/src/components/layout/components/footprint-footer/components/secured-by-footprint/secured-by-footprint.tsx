@@ -5,9 +5,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const SecuredByFootprint = () => {
-  const { t } = useTranslation(
-    'components.footprint-footer.secured-by-footprint',
-  );
+  const { t } = useTranslation('components.layout.footprint-footer');
 
   return (
     <Container>

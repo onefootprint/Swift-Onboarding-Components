@@ -14,7 +14,7 @@ type FootprintFooterProps = {
 type Link = { label: string; href: string };
 
 const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
-  const { t } = useTranslation('components.footprint-footer.links');
+  const { t } = useTranslation('components.layout.footprint-footer');
   const [state] = useIdvMachine();
   const { tenantPk } = state.context;
 
@@ -24,7 +24,7 @@ const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
       href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
     },
     {
-      label: t('privacy'),
+      label: t('privacy-policy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];

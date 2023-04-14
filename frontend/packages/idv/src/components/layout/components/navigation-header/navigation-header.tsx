@@ -2,9 +2,9 @@ import { Portal } from '@onefootprint/ui';
 import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import useAppContext from '../../../../hooks/use-app-context';
 import { HEADER_TITLE_DEFAULT_ID } from '../../../header-title';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from '../../constants';
-import { useCloseButtonOptions } from './components/close-button-options-provider';
 import HeaderContent from './components/header-content';
 import NavigationBackButton from './components/navigation-back-button';
 import NavigationCloseButton from './components/navigation-close-button';
@@ -13,7 +13,10 @@ import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
 import { NavigationHeaderProps } from './types';
 
 const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
-  const { hideClose, onClose } = useCloseButtonOptions();
+  const {
+    layout: { canClose },
+    callbacks: { onClose },
+  } = useAppContext();
   const isStatic = content?.kind === 'static';
   const staticTitle = isStatic ? content?.title : undefined;
   const [dynamicTitle, setDynamicTitle] = useState<string | undefined>();
@@ -81,7 +84,8 @@ const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
     intersectionObserver.observe(headerTitle);
   };
 
-  const shouldShowClose = button?.variant === 'close' && !hideClose;
+  const shouldShowClose =
+    button?.variant === 'close' && !!canClose && !!onClose;
   const shouldShowBack = button?.variant === 'back' && !shouldShowClose;
 
   return (
@@ -92,7 +96,6 @@ const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
             <NavigationCloseButton
               confirmClose={button?.confirmClose}
               onClose={onClose}
-              hide={hideClose}
             />
           )}
           {shouldShowBack && <NavigationBackButton onBack={button?.onBack} />}

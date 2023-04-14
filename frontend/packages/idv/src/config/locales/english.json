@@ -23,13 +23,56 @@
         "privacy-policy": "Privacy",
         "secured-by-footprint": "Secured by Footprint"
       }
+    },
+    "sandbox-outcome-footer": {
+      "outcome": "Test outcome:",
+      "testID": "Test ID:"
     }
   },
   "pages": {
+    "config-invalid": {
+      "title": "Integration incorrectly configured",
+      "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this website."
+    },
+    "sandbox-outcome": {
+      "title": "Select test outcome",
+      "subtitle": "Select the outcome you want to test.",
+      "outcome": {
+        "options": {
+          "success": {
+            "title": "Success",
+            "description": "User will be fully verified."
+          },
+          "manual-review": {
+            "title": "Manual review",
+            "description": "User will need to be manually reviewed."
+          },
+          "fail": {
+            "title": "Fail",
+            "description": "User will not be validated."
+          }
+        }
+      },
+      "test-id": {
+        "label": "Test ID",
+        "placeholder": "Enter test ID",
+        "hint": "Test ID helps you create different user onboardings with your email and phone number. Do not use spaces or #.",
+        "errors": {
+          "required": "Test ID is required"
+        }
+      },
+      "cta": "Continue"
+    },
     "error": {
       "title": "Oops! An error occurred.",
       "description": "We're sorry. Please restart the onboarding.",
       "cta": "Restart"
+    },
+    "complete": {
+      "title": "Submission completed!",
+      "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",
+      "subtitle": "Thanks for using Footprint to verify your identity.",
+      "cta": "Return to site"
     }
   }
 }

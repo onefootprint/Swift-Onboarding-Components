@@ -4,31 +4,24 @@ import styled, { css } from 'styled-components';
 
 import { NAVIGATION_HEADER_PORTAL_ID } from '../../constants';
 import useContainerHasScroll from '../../hooks/use-container-has-scroll';
-import { CloseButtonOptionsProvider } from '../close-button-options-provider';
 
 type NavigationHeaderContainerProps = {
   top?: number;
   containerId: string;
-  onClose?: () => void;
-  hideClose?: boolean;
 };
 
 const NavigationHeaderContainer = ({
   top,
   containerId,
-  onClose,
-  hideClose,
 }: NavigationHeaderContainerProps) => {
   const hasScroll = useContainerHasScroll(containerId);
 
   return (
-    <CloseButtonOptionsProvider onClose={onClose} hideClose={hideClose}>
-      <Header
-        style={{ top }}
-        hasScroll={hasScroll}
-        id={NAVIGATION_HEADER_PORTAL_ID}
-      />
-    </CloseButtonOptionsProvider>
+    <Header
+      style={{ top }}
+      hasScroll={hasScroll}
+      id={NAVIGATION_HEADER_PORTAL_ID}
+    />
   );
 };
 

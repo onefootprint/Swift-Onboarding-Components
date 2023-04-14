@@ -13,11 +13,24 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignAuthToken: 'identifyCompleted';
+    assignEmail: 'identifyCompleted';
+    assignInitContext: 'initContextUpdated';
+    assignSandboxOutcome: 'sandboxOutcomeSubmitted';
+    assignUserFound: 'identifyCompleted';
+    assignValidationToken: 'onboardingCompleted';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'complete' | 'expired' | 'init';
+  matchesStates:
+    | 'complete'
+    | 'configInvalid'
+    | 'expired'
+    | 'identify'
+    | 'init'
+    | 'onboarding'
+    | 'sandboxOutcome';
   tags: never;
 }

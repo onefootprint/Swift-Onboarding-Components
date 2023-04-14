@@ -1,21 +1,25 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js/src/footprint-js.types';
 
+// TODO: optional props?
 export type IdvProps = {
-  config: Config;
-  appearance: FootprintAppearance;
-  layout: LayoutConfig;
-  onClose: () => void;
-  onComplete: () => void;
+  data: IdvData;
+  layout: IdvLayout;
+  callbacks: IdvCallbacks;
+  appearance?: FootprintAppearance;
 };
 
-export type Config = {
+export type IdvCallbacks = {
+  onClose: () => void;
+  onComplete: (validationToken: string, delay?: number) => void;
+};
+
+export type IdvData = {
   tenantPk: string;
   bootstrapData?: BootstrapData;
 };
 
-export type LayoutConfig = {
+export type IdvLayout = {
   header: {
-    hideClose?: boolean;
     hideSandboxBanner?: boolean;
   };
   footer: {
@@ -25,6 +29,7 @@ export type LayoutConfig = {
   container: {
     hasBorderRadius?: boolean;
   };
+  canClose?: boolean;
 };
 
 export type BootstrapData = {

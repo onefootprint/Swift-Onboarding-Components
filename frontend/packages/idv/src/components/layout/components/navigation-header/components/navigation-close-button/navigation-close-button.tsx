@@ -10,21 +10,15 @@ type NavigationCloseButtonProps = Omit<
   'variant'
 > & {
   onClose?: () => void;
-  hide?: boolean;
 };
 const NavigationCloseButton = ({
   onClose,
   confirmClose,
-  hide,
 }: NavigationCloseButtonProps) => {
   const { t } = useTranslation(
     'components.layout.navigation-header.close-button',
   );
   const confirmationDialog = useConfirmationDialog();
-
-  if (hide) {
-    return null;
-  }
 
   const handleClick = () => {
     if (!confirmClose) {
