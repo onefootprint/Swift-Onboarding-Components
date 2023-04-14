@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthGuard};
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::TelemetryHeaders;
@@ -19,7 +19,7 @@ pub async fn post(
     telemetry_headers: TelemetryHeaders,
     request: Json<FingerprintVisitRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let FingerprintVisitRequest {
         visitor_id,

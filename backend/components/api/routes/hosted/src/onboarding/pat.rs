@@ -2,6 +2,7 @@
 //! https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-02.html
 
 use actix_web::HttpResponseBuilder;
+use api_core::auth::Any;
 use db::models::{
     insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, user_timeline::UserTimeline,
 };
@@ -15,7 +16,7 @@ use reqwest::{header::AUTHORIZATION, StatusCode};
 use web::HttpResponse;
 
 use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant},
+    auth::user::{UserAuth, UserAuthContext},
     errors::{ApiError, ApiResult},
     types::EmptyResponse,
     utils::headers::InsightHeaders,
@@ -70,7 +71,7 @@ async fn authorize_privacy_pass(
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
-    let user_auth = user_auth.check_permissions::<UserAuthScopeDiscriminant>(vec![])?;
+    let user_auth = user_auth.check_guard(Any)?;
     let scoped_user_id = user_auth
         .scoped_user_id()
         .ok_or_else(|| ApiError::AssertionError("User not initialized for privacy pass".into()))?;

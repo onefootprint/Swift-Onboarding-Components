@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuthContext, UserAuthGuard};
 use crate::business::utils::send_secondary_bo_links;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
@@ -21,7 +21,7 @@ pub async fn post_validate(
     user_auth: UserAuthContext,
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
@@ -53,7 +53,7 @@ pub async fn put(
     request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::Business])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;

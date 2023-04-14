@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScopeDiscriminant;
+use crate::auth::user::UserAuthGuard;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
@@ -22,7 +22,7 @@ pub async fn post(
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let ConsentRequest {
         consent_language_text,

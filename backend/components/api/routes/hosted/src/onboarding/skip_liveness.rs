@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuthContext, UserAuthGuard};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
@@ -19,7 +19,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     state
         .db_pool

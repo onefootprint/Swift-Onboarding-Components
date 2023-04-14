@@ -1,10 +1,11 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthContext};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 
 use crate::utils::db2api::DbToApi;
 use crate::State;
 
+use api_core::auth::user::UserAuthGuard;
 use api_wire_types::hosted::{HostedAuthorizedOrgs, HostedUserOnboardingInfo};
 use api_wire_types::InsightEvent;
 use db::models::onboarding::Onboarding;
@@ -23,7 +24,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<AuthorizedOrgsResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::BasicProfile)?;
 
     let (scoped_users, mut obs) = state
         .db_pool

@@ -1,8 +1,9 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::user::UserAuthGuard;
 use db::models::liveness_event::LivenessEvent;
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -18,7 +19,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<LivenessResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::BasicProfile)?;
 
     let creds = state
         .db_pool

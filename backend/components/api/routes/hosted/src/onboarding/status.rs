@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScopeDiscriminant;
+use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
 use crate::onboarding::{get_fields_to_authorize, get_requirements};
 use crate::types::response::ResponseData;
@@ -14,7 +14,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let (requirements, ob_info, _) = get_requirements(&state, user_auth).await?;
     let uv_id = ob_info.user_vault_id.clone();

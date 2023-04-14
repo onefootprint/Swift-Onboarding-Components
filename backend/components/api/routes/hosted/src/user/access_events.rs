@@ -1,8 +1,9 @@
-use crate::auth::user::{UserAuthContext, UserAuthScope};
+use crate::auth::user::UserAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::user::UserAuthGuard;
 use db::access_event::AccessEventListItemForUser;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -19,7 +20,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<AccessEventResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::BasicProfile)?;
 
     // TODO paginate the response when there are too many results
     let results = AccessEventListItemForUser::get(&state.db_pool, user_auth.data.user_vault_id)

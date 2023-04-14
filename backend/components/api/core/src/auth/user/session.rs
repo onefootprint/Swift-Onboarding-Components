@@ -11,12 +11,12 @@ use itertools::Itertools;
 use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Security;
 
-use super::{UserAuthScope, UserAuthScopeDiscriminant};
+use super::{UserAuthGuard, UserAuthScope};
 use crate::{
     auth::{
         session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         user::UserAuth,
-        AuthError, SessionContext,
+        AuthError, IsGuardMet, SessionContext,
     },
     errors::{ApiError, ApiResult},
 };
@@ -29,7 +29,7 @@ use feature_flag::LaunchDarklyFeatureFlagClient;
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct UserSession {
     pub user_vault_id: VaultId,
-    scopes: Vec<UserAuthScope>,
+    pub scopes: Vec<UserAuthScope>,
 }
 
 // Allow calling SessionContext<T>::update for T=UserSession
@@ -43,31 +43,16 @@ impl UserSession {
         })
     }
 
-    pub fn has_scope(&self, scope: &UserAuthScopeDiscriminant) -> bool {
-        self.scopes
-            .iter()
-            .map(UserAuthScopeDiscriminant::from)
-            .contains(scope)
-    }
-
     pub fn add_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
-        let new_scope_kinds = new_scopes
-            .iter()
-            .map(UserAuthScopeDiscriminant::from)
-            .collect_vec();
+        let new_scope_kinds = new_scopes.iter().map(UserAuthGuard::from).collect_vec();
         let new_scopes = self.scopes
             .into_iter()
             // Filter out any old scope of the same type
-            .filter(|x| !new_scope_kinds.contains(&UserAuthScopeDiscriminant::from(x)))
+            .filter(|x| !new_scope_kinds.contains(&UserAuthGuard::from(x)))
             // And replace it with the new scope
             .chain(new_scopes.into_iter())
             .collect();
         Self::make(self.user_vault_id, new_scopes)
-    }
-
-    /// Allow introspection into the scopes on this auth token without exposing scope metadata
-    pub fn scopes(&self) -> Vec<UserAuthScopeDiscriminant> {
-        self.scopes.iter().map(|x| x.into()).collect()
     }
 }
 
@@ -80,7 +65,7 @@ pub struct AuthedOnboardingInfo {
     pub tenant: Tenant,
 }
 
-impl SessionContext<UserSession> {
+impl CheckedUserAuthContext {
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
     /// session, if exists
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -134,7 +119,7 @@ impl SessionContext<UserSession> {
 
     /// Fetch the onboarding info associated with this user token, if it exists
     pub fn onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<AuthedOnboardingInfo>> {
-        if !self.data.has_scope(&UserAuthScopeDiscriminant::OrgOnboarding) {
+        if !UserAuthGuard::OrgOnboarding.is_met(&self.data.scopes) {
             // If there is no Onboarding scope on this auth token, the Onboarding won't exist
             return Ok(None);
         }
@@ -163,7 +148,7 @@ impl SessionContext<UserSession> {
     pub fn assert_onboarding(&self, conn: &mut PgConn) -> ApiResult<AuthedOnboardingInfo> {
         let info = self
             .onboarding(conn)?
-            .ok_or_else(|| AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboarding].into()))?;
+            .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
         Ok(info)
     }
 }
@@ -209,12 +194,6 @@ impl ExtractableAuthSession for ParsedUserSession {
     }
 }
 
-impl ParsedUserSession {
-    fn are_permissions_met(&self, requested_permissions: &[UserAuthScopeDiscriminant]) -> bool {
-        requested_permissions.is_empty() || requested_permissions.iter().any(|s| self.0.has_scope(s))
-    }
-}
-
 /// A shorthand for the commonly used ParsedUserSession context
 pub type UserAuthContext = SessionContext<ParsedUserSession>;
 
@@ -224,18 +203,15 @@ pub type CheckedUserAuthContext = SessionContext<UserSession>;
 impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
-    pub fn check_permissions<T>(
-        self,
-        requested_permissions: Vec<T>,
-    ) -> Result<CheckedUserAuthContext, AuthError>
+    pub fn check_guard<T>(self, guard: T) -> Result<CheckedUserAuthContext, AuthError>
     where
-        T: Into<UserAuthScopeDiscriminant>,
+        T: IsGuardMet<UserAuthScope>,
     {
-        let requested_permissions: Vec<_> = requested_permissions.into_iter().map(|x| x.into()).collect();
-        if self.data.are_permissions_met(&requested_permissions) {
+        let requested_permission_str = format!("{}", guard);
+        if guard.is_met(&self.data.0.scopes) {
             Ok(self.map(|d| d.0))
         } else {
-            Err(AuthError::MissingScope(requested_permissions.into()))
+            Err(AuthError::MissingUserPermission(requested_permission_str))
         }
     }
 }

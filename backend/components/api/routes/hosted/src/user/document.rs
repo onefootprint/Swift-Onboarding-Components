@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant, UserSession};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthGuard, UserSession};
 use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
@@ -42,7 +42,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let (uv, db_document_request, auth_info, user_consent) = state
         .db_pool
@@ -363,7 +363,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let response = get_inner(&state.db_pool, user_auth).await?;
 

@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
+    auth::user::{UserAuth, UserAuthContext},
     errors::{challenge::ChallengeError, ApiError},
     types::{response::ResponseData, EmptyResponse},
     utils::{
@@ -9,6 +9,7 @@ use crate::{
     },
     State,
 };
+use api_core::auth::{user::UserAuthGuard, IsGuardMet};
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
@@ -50,7 +51,7 @@ pub async fn init_post(
     user_auth: UserAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::Handoff))?;
 
     let user_vault_id = user_auth.user_vault_id().clone();
     let creds = state
@@ -110,7 +111,7 @@ pub async fn complete_post(
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::Handoff))?;
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;

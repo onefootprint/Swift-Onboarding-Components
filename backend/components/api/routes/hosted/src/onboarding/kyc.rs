@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuthContext, UserAuthGuard};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 use newtypes::RequirementStatus;
 use paperclip::actix::{self, api_v2_operation, Apiv2Schema};
@@ -13,7 +13,7 @@ pub struct StatusResponse {
 #[api_v2_operation(tags(Hosted), description = "Check the status of KYC checks for a user")]
 #[actix::get("/hosted/onboarding/kyc")]
 pub async fn get(user_auth: UserAuthContext) -> JsonApiResponse<StatusResponse> {
-    user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let response = StatusResponse {
         status: RequirementStatus::Complete,

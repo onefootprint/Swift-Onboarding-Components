@@ -1,7 +1,6 @@
-use crate::auth::user::{AuthedOnboardingInfo, UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{AuthedOnboardingInfo, UserAuthContext, UserAuthGuard};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
-
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{self, file_upload};
 use crate::State;
@@ -24,7 +23,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let ua = user_auth.clone();
     let (auth_info, public_key) = state
         .db_pool

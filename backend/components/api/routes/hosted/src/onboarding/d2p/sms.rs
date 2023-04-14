@@ -1,8 +1,9 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthContext};
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
+use api_core::auth::user::UserAuthGuard;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -26,7 +27,7 @@ pub async fn handler(
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<D2pSmsResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Handoff)?;
 
     let uvw = state
         .db_pool

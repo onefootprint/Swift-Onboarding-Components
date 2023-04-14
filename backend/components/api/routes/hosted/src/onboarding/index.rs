@@ -2,14 +2,15 @@ use super::create_onboarding_validation_token;
 use crate::auth::session::UpdateSession;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthGuard;
 use crate::auth::user::UserAuthScope;
-use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
+use api_core::auth::IsGuardMet;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -39,15 +40,15 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let user_auth2 = user_auth.clone();
     let (scoped_user, ob_config) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = user_auth2.scoped_user(conn)?.ok_or_else(|| {
-                AuthError::MissingScope(vec![UserAuthScopeDiscriminant::OrgOnboardingInit].into())
-            })?;
+            let scoped_user = user_auth2
+                .scoped_user(conn)?
+                .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
             let ob_configuration_id = scoped_user
                 .ob_configuration_id
                 .as_ref()
@@ -61,7 +62,7 @@ pub async fn post(
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
     let should_create_new_business_vault =
-        ob_config.must_collect_business() && !user_auth.data.has_scope(&UserAuthScopeDiscriminant::Business);
+        ob_config.must_collect_business() && !UserAuthGuard::Business.is_met(&user_auth.data.scopes);
     let new_business_keypair = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         Some(state.enclave_client.generate_sealed_keypair().await?)

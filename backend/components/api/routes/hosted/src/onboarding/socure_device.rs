@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuthContext, UserAuthGuard};
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
@@ -17,7 +17,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 

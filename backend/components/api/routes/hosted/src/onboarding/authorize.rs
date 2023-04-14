@@ -1,6 +1,6 @@
 use crate::auth::user::AuthedOnboardingInfo;
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScopeDiscriminant;
+use crate::auth::user::UserAuthGuard;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -52,7 +52,7 @@ pub async fn post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
     let session_key = state.session_sealing_key.clone();
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
     let (requirements, ob_info, user_auth) = get_requirements(&state, user_auth).await?;

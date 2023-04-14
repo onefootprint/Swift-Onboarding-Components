@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use crate::auth::user::{UserAuthContext, UserAuthScope};
+use crate::auth::user::UserAuthContext;
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
@@ -9,11 +7,12 @@ use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::user::UserAuthGuard;
 use newtypes::email::Email;
-
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use std::str::FromStr;
 
 #[api_v2_operation(
     description = "Checks if provided vault data is valid before adding it to the vault",
@@ -26,7 +25,7 @@ pub async fn post_validate(
     user_auth: UserAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let opts = ParseOptions {
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
@@ -57,7 +56,7 @@ pub async fn put(
     request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;

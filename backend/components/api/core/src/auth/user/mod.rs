@@ -12,11 +12,12 @@ pub use email_verify::*;
 mod validate_user;
 use strum::EnumDiscriminants;
 pub use validate_user::*;
+mod guard;
 
 #[derive(
     serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
 )]
-#[strum_discriminants(name(UserAuthScopeDiscriminant))]
+#[strum_discriminants(name(UserAuthGuard))]
 #[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display))]
 #[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]

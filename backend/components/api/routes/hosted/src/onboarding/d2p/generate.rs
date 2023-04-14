@@ -1,11 +1,12 @@
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::{UserAuthScope, UserAuthScopeDiscriminant};
+use crate::auth::user::{UserAuthGuard, UserAuthScope};
 use crate::auth::AuthError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
+use api_core::auth::IsGuardMet;
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
 use chrono::{Duration, Utc};
 use newtypes::D2pSessionStatus;
@@ -25,8 +26,8 @@ pub async fn handler(
     request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
-    if user_auth.data.has_scope(&UserAuthScopeDiscriminant::Handoff) {
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    if UserAuthGuard::Handoff.is_met(&user_auth.data.scopes) {
         // Don't allow making a handoff token with an existing handoff token. This allows subverting
         // token expiry by constantly just making a new one
         return Err(AuthError::CannotCreateMultipleHandoffTokens.into());
