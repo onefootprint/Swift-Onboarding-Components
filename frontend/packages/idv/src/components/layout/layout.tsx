@@ -22,8 +22,6 @@ const IdvLayout = ({ children }: IdvLayoutProps) => {
     layout: { header, footer, container },
   } = useAppContext();
   const { isSandbox } = useSandboxMode();
-  const shouldShowSandboxBanner = isSandbox && !header.hideSandboxBanner;
-
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
 
   const measuredRef = useCallback((handler: SandboxBannerHandler) => {
@@ -42,16 +40,22 @@ const IdvLayout = ({ children }: IdvLayoutProps) => {
       hasBorderRadius={!!container.hasBorderRadius}
     >
       <Header id={LAYOUT_HEADER_ID}>
-        {shouldShowSandboxBanner && <SandboxBanner ref={measuredRef} />}
+        {isSandbox && (
+          <SandboxBanner
+            ref={measuredRef}
+            hideOnDesktop={header.hideDesktopSandboxBanner}
+          />
+        )}
         <NavigationHeaderContainer
-          top={shouldShowSandboxBanner ? sandboxBannerHeight : undefined}
+          top={sandboxBannerHeight}
           containerId={LAYOUT_CONTAINER_ID}
         />
       </Header>
       <Body>{children}</Body>
-      {footer.hideFooter ? null : (
-        <FootprintFooter variant={footer.footerVariant} />
-      )}
+      <FootprintFooter
+        variant={footer.footerVariant}
+        hideOnDesktop={footer.hideDesktopFooter}
+      />
     </Container>
   );
 };

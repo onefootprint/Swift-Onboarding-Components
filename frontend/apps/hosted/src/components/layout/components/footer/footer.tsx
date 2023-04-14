@@ -1,6 +1,6 @@
 import { SecuredByFootprint } from '@onefootprint/footprint-elements';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -51,6 +51,10 @@ const Container = styled.footer`
     align-items: center;
     justify-content: space-between;
     margin: ${theme.spacing[7]} 0 ${theme.spacing[5]};
+
+    ${media.greaterThan('md')`
+      padding: 0 ${theme.spacing[11]};
+    `}
   `};
 `;
 

@@ -13,29 +13,29 @@ const Root = () => {
     console.log('completed');
   };
 
-  const data = {
-    tenantPk: 'ob_test_tFKxgkVoZrFTEU05tnSVtW',
-    bootstrapData: {
-      email: 'email',
-      phoneNumber: 'phone',
-    },
-  };
-
-  const layout = {
-    header: {
-      hideSandboxBanner: true,
-    },
-    footer: {
-      hideFooter: true,
-    },
-    container: {
-      hasBorderRadius: true,
-    },
-    canClose: false,
-  };
-
   return (
-    <Idv data={data} layout={layout} callbacks={{ onClose, onComplete }} />
+    <Idv
+      data={{
+        tenantPk: 'ob_test_tFKxgkVoZrFTEU05tnSVtW',
+        bootstrapData: {
+          email: 'email',
+          phoneNumber: 'phone',
+        },
+      }}
+      layout={{
+        header: {
+          hideDesktopSandboxBanner: true,
+        },
+        footer: {
+          hideDesktopFooter: true,
+        },
+        container: {
+          hasBorderRadius: true,
+        },
+        canClose: false,
+      }}
+      callbacks={{ onClose, onComplete }}
+    />
   );
 };
 

@@ -1,6 +1,5 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js/src/footprint-js.types';
 
-// TODO: optional props?
 export type IdvProps = {
   data: IdvData;
   layout: IdvLayout;
@@ -20,10 +19,10 @@ export type IdvData = {
 
 export type IdvLayout = {
   header: {
-    hideSandboxBanner?: boolean;
+    hideDesktopSandboxBanner?: boolean;
   };
   footer: {
-    hideFooter?: boolean;
+    hideDesktopFooter?: boolean;
     footerVariant?: 'modal' | 'mobile';
   };
   container: {
