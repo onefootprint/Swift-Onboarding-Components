@@ -8,4 +8,5 @@ pub enum RuleSetName {
     ExperianRules,
     Test(String),
     MiddeskBaseRules,
+    BosMustPassKycRules,
 }

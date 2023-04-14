@@ -56,11 +56,12 @@ impl FeatureVector for KybFeatureVector {
         &self,
         _ff_client: &impl feature_flag::FeatureFlagClient,
     ) -> ApiResult<OnboardingRulesDecisionOutput> {
-        let middesk_rules: Vec<Box<dyn EvaluateRuleSet<MiddeskFeatures>>> =
-            vec![Box::new(kyb_rules::middesk_base_rule_set())];
+        let middesk_rules: Vec<Box<dyn EvaluateRuleSet<KybFeatureVector>>> = vec![
+            Box::new(kyb_rules::middesk_base_rule_set()),
+            Box::new(kyb_rules::bos_pass_kyc_rule_set()),
+        ];
 
-        let eval_result =
-            rule::rules_engine::evaluate_onboarding_rules(middesk_rules, &self.middesk_features);
+        let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);
 
         let decision_status = if eval_result.triggered {
             DecisionStatus::Fail

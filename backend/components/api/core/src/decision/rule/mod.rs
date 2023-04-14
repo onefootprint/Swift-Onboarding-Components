@@ -41,4 +41,5 @@ pub enum RuleName {
     NoTinMatch,
     NoBusinessNameMatch,
     NoBusinessAddressMatch,
+    BoNonPassingKyc,
 }

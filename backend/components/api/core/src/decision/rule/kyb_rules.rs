@@ -1,18 +1,36 @@
-use crate::decision::features::kyb_features::MiddeskFeatures;
+use crate::decision::features::kyb_features::KybFeatureVector;
 
 use super::{
     rule_set::{Rule, RuleSet},
     RuleName, RuleSetName,
 };
-use newtypes::FootprintReasonCode;
+use newtypes::{DecisionStatus, FootprintReasonCode};
 
-pub fn middesk_base_rule_set() -> RuleSet<MiddeskFeatures> {
+pub fn bos_pass_kyc_rule_set() -> RuleSet<KybFeatureVector> {
+    let rules = vec![Rule {
+        rule: {
+            |f: &KybFeatureVector| {
+                f.bo_obds.iter().any(|o| o.status != DecisionStatus::Pass) || f.bo_obds.is_empty()
+                // is_empty should be validated elsewhere, but extra check doesn't hurt here
+            }
+        },
+        name: RuleName::BoNonPassingKyc,
+    }];
+
+    RuleSet {
+        rules,
+        name: RuleSetName::BosMustPassKycRules,
+    }
+}
+
+pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
     let rules = vec![
         // Based on Middek's Default Auto Approval policy
         Rule {
             rule: {
-                |f: &MiddeskFeatures| {
-                    f.footprint_reason_codes
+                |f: &KybFeatureVector| {
+                    f.middesk_features
+                        .footprint_reason_codes
                         .contains(&FootprintReasonCode::BusinessNameWatchlistHit)
                 }
             },
@@ -20,14 +38,18 @@ pub fn middesk_base_rule_set() -> RuleSet<MiddeskFeatures> {
         },
         Rule {
             rule: {
-                |f: &MiddeskFeatures| !f.footprint_reason_codes.contains(&FootprintReasonCode::TinMatch)
+                |f: &KybFeatureVector| {
+                    !f.middesk_features
+                        .footprint_reason_codes
+                        .contains(&FootprintReasonCode::TinMatch)
+                }
             },
             name: RuleName::NoTinMatch,
         },
         Rule {
             rule: {
-                |f: &MiddeskFeatures| {
-                    !f.footprint_reason_codes.iter().any(|rc| {
+                |f: &KybFeatureVector| {
+                    !f.middesk_features.footprint_reason_codes.iter().any(|rc| {
                         vec![
                             FootprintReasonCode::BusinessNameMatch,
                             FootprintReasonCode::BusinessNameSimilarMatch,
@@ -40,8 +62,8 @@ pub fn middesk_base_rule_set() -> RuleSet<MiddeskFeatures> {
         },
         Rule {
             rule: {
-                |f: &MiddeskFeatures| {
-                    !f.footprint_reason_codes.iter().any(|rc| {
+                |f: &KybFeatureVector| {
+                    !f.middesk_features.footprint_reason_codes.iter().any(|rc| {
                         vec![
                             FootprintReasonCode::BusinessAddressMatch,
                             FootprintReasonCode::BusinessAddressCloseMatch,
@@ -64,16 +86,21 @@ pub fn middesk_base_rule_set() -> RuleSet<MiddeskFeatures> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::decision::rule::rules_engine;
+    use crate::decision::{features::kyb_features::MiddeskFeatures, rule::rules_engine};
     use newtypes::VerificationResultId;
     use std::str::FromStr;
     use test_case::test_case;
 
-    fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> MiddeskFeatures {
-        MiddeskFeatures {
-            footprint_reason_codes: fp_reason_codes,
-            verification_result_id: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d")
+    fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> KybFeatureVector {
+        KybFeatureVector {
+            middesk_features: MiddeskFeatures {
+                footprint_reason_codes: fp_reason_codes,
+                verification_result_id: VerificationResultId::from_str(
+                    "a5971b52-1b44-4c3a-a83f-a96796f8774d",
+                )
                 .unwrap(),
+            },
+            bo_obds: vec![],
         }
     }
 
@@ -82,8 +109,7 @@ mod tests {
     #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameSimilarMatch, FootprintReasonCode::BusinessAddressDoesNotMatch]) => true)]
     #[test_case(middesk_features(vec![FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch]) => true)]
     #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch, FootprintReasonCode::BusinessNameWatchlistHit]) => true)]
-    fn test_idology_base_rule_set(middesk_features: MiddeskFeatures) -> bool {
-        rules_engine::evaluate_onboarding_rules(vec![Box::new(middesk_base_rule_set())], &middesk_features)
-            .triggered
+    fn test_middesk_base_rule_set(kyb_fv: KybFeatureVector) -> bool {
+        rules_engine::evaluate_onboarding_rules(vec![Box::new(middesk_base_rule_set())], &kyb_fv).triggered
     }
 }
