@@ -24,6 +24,7 @@ const Tabs = ({ variant = 'underlined', children }: TabsProps) => {
         data-variant={variant}
         role="tablist"
         layout
+        layoutRoot
       >
         {children}
       </Container>
