@@ -3,7 +3,10 @@ use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
 use crate::{
-    decision::onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+    decision::{
+        onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+        rule::{self, kyb_rules, rule_set::EvaluateRuleSet},
+    },
     errors::ApiResult,
 };
 
@@ -53,20 +56,27 @@ impl FeatureVector for KybFeatureVector {
         &self,
         _ff_client: &impl feature_flag::FeatureFlagClient,
     ) -> ApiResult<OnboardingRulesDecisionOutput> {
-        // TODO: real impl with rules
-        let decision_status = if let Some(yo) = self.bo_obds.first() {
-            yo.status
-        } else {
-            DecisionStatus::Fail
-        };
+        let middesk_rules: Vec<Box<dyn EvaluateRuleSet<MiddeskFeatures>>> =
+            vec![Box::new(kyb_rules::middesk_base_rule_set())];
 
-        Ok(OnboardingRulesDecisionOutput {
+        let eval_result =
+            rule::rules_engine::evaluate_onboarding_rules(middesk_rules, &self.middesk_features);
+
+        let decision_status = if eval_result.triggered {
+            DecisionStatus::Fail
+        } else {
+            DecisionStatus::Pass
+        };
+        let create_manual_review = decision_status == DecisionStatus::Fail;
+
+        let output = OnboardingRulesDecisionOutput {
             decision_status,
-            should_commit: false,        // never commit business data for now
-            create_manual_review: false, // TODO:
-            rules_triggered: vec![],     // TODO:
-            rules_not_triggered: vec![], // TODO:
-        })
+            should_commit: false, // never commit business data for now
+            create_manual_review,
+            rules_triggered: eval_result.rules_triggered,
+            rules_not_triggered: eval_result.rules_not_triggered,
+        };
+        Ok(output)
     }
 
     fn verification_results(&self) -> Vec<newtypes::VerificationResultId> {

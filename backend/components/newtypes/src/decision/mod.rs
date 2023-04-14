@@ -7,4 +7,5 @@ pub enum RuleSetName {
     IdologyConservativeFailingRules,
     ExperianRules,
     Test(String),
+    MiddeskBaseRules,
 }
