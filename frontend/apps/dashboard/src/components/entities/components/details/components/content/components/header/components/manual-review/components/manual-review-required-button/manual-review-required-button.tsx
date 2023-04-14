@@ -1,8 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { EntityStatus, ReviewStatus } from '@onefootprint/types';
+import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 type ManualReviewRequiredButtonProps = {
   status: EntityStatus;
@@ -14,13 +16,18 @@ const ManualReviewRequiredButton = ({
   onOpenDialog,
 }: ManualReviewRequiredButtonProps) => {
   const { t } = useTranslation('pages.entity.manual-review');
+  const { kind } = useEntityContext();
   const pass = t(`status.${ReviewStatus.pass}`);
   const fail = t(`status.${ReviewStatus.fail}`);
 
   return (
     <Dropdown.Root>
       <DropdownTrigger>
-        <Button size="small">{t('button.review')}</Button>
+        <Button size="small">
+          {kind === EntityKind.person
+            ? t('button.review-person')
+            : t('button.review-business')}
+        </Button>
       </DropdownTrigger>
       <Dropdown.Portal>
         <DropdownContent align="end">

@@ -469,7 +469,8 @@
           "fail": "Failed"
         },
         "button": {
-          "review": "Review user",
+          "review-person": "Review user",
+          "review-business": "Review business",
           "mark-as-verified": "Mark as Verified",
           "mark-as-failed": "Mark as Failed"
         },
