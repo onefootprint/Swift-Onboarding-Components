@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 use newtypes::PiiString;
 use serde::{Deserialize, Serialize};
 
-// TODO: mark certain fields as PII
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BusinessResponse {
     pub object: Option<String>,
@@ -30,7 +29,7 @@ pub struct BusinessResponse {
     pub industry_classification: Option<IndustryClassification>,
     pub liens: Option<serde_json::Value>, // premium feature we aren't using
     pub tags: Option<Vec<String>>,
-    pub fmcsa_registrations: Option<FmcsaRegistration>,
+    pub fmcsa_registrations: Option<Vec<FmcsaRegistration>>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -337,4 +336,19 @@ pub struct FmcsaRegistration {
     pub dba_name: Option<String>,
     pub source: Option<Source>,
     pub addresses: Option<Vec<String>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_deser() {
+        let br: BusinessResponse =
+            serde_json::from_value(crate::test_fixtures::middesk_business_response()).unwrap();
+        assert_eq!(
+            "bankruptcies".to_owned(),
+            br.review.unwrap().tasks.unwrap().pop().unwrap().key.unwrap()
+        );
+    }
 }
