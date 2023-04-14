@@ -1,5 +1,5 @@
 use super::TenantUvw;
-use crate::auth::tenant::{CanDecrypt, IsGuardMet, TenantGuardDsl};
+use crate::auth::{tenant::TenantGuardDsl, CanDecrypt, IsGuardMet};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, TenantScope};
 

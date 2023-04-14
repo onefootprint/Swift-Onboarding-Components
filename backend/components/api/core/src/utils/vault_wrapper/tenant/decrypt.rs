@@ -1,6 +1,6 @@
 use super::{DecryptRequest, TenantUvw};
-use crate::auth::tenant::{CanDecrypt, IsGuardMet};
 use crate::auth::AuthError;
+use crate::auth::{CanDecrypt, IsGuardMet};
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, PiiString, TenantScope};

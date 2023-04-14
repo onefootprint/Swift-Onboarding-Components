@@ -6,9 +6,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{self, file_upload};
 use crate::State;
 use actix_multipart::Multipart;
-
 use actix_web::HttpRequest;
-
 use db::models::vault::Vault;
 use newtypes::{DataIdentifier, DocumentKind, VaultPublicKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};

@@ -1,9 +1,10 @@
-use crate::auth::tenant::{CanDecrypt, CheckTenantGuard, SecretTenantAuthContext};
+use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantSessionAuth, Either};
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapper};
 use crate::{errors::ApiError, State};
+use api_core::auth::CanDecrypt;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;

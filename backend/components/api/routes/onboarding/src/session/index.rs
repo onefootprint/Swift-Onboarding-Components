@@ -1,9 +1,8 @@
 use crate::auth::ob_config::OnboardingSession;
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::Any;
-use crate::auth::tenant::SecretTenantAuthContext;
-
 use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::Any;
 
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;

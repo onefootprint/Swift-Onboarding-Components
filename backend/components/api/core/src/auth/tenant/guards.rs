@@ -1,11 +1,10 @@
 use super::{CanCheckTenantGuard, IsGuardMet, TenantAuth};
-use crate::auth::Either;
+use crate::auth::{CanDecrypt, Either};
 use db::models::tenant_role::TenantRole;
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use newtypes::{CollectedDataOption as CDO, DataIdentifier, TenantScope};
 use std::collections::HashSet;
-use std::fmt;
 use strum::Display;
 
 /// Represents a simple permission that is required to execute an HTTP handler.
@@ -37,75 +36,13 @@ impl TenantGuard {
     }
 }
 
-impl IsGuardMet for TenantGuard {
+impl IsGuardMet<TenantScope> for TenantGuard {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         token_scopes.contains(&self.granting_scope())
     }
 }
 
-/// Represents a permission that is met if either its Left or Right permission is met
-pub struct Or<Left, Right>(pub(crate) Left, pub(crate) Right);
-
-impl<Left, Right> fmt::Display for Or<Left, Right>
-where
-    Left: IsGuardMet,
-    Right: IsGuardMet,
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Or<{},{}>", self.0, self.1)
-    }
-}
-
-impl<Left, Right> IsGuardMet for Or<Left, Right>
-where
-    Left: IsGuardMet,
-    Right: IsGuardMet,
-{
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
-        self.0.is_met(token_scopes) || self.1.is_met(token_scopes)
-    }
-}
-
-/// Represents a permisison that is always met, no matter the scopes of the tenant auth token
-pub struct Any;
-
-impl fmt::Display for Any {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Any")
-    }
-}
-
-impl IsGuardMet for Any {
-    fn is_met(self, _token_scopes: &[TenantScope]) -> bool {
-        true
-    }
-}
-
-/// Represents a permission that is only met when the tenant auth token contains a scope that allows
-/// decrypting the provided attributes
-pub struct CanDecrypt(Vec<DataIdentifier>);
-
-impl CanDecrypt {
-    pub fn new<T>(l: Vec<T>) -> Self
-    where
-        DataIdentifier: From<T>,
-    {
-        Self(l.into_iter().map(DataIdentifier::from).collect())
-    }
-
-    #[allow(unused)]
-    pub fn single<T: Into<DataIdentifier>>(k: T) -> Self {
-        Self(vec![k.into()])
-    }
-}
-
-impl fmt::Display for CanDecrypt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "CanDecrypt<{:?}>", self.0)
-    }
-}
-
-impl IsGuardMet for CanDecrypt {
+impl IsGuardMet<TenantScope> for CanDecrypt {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         let (identifiers, other): (Vec<_>, Vec<_>) = self.0.into_iter().partition_map(|di| match di {
             // Id and Business data permissions are handled with CDOs
@@ -179,8 +116,9 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::{Any, CanDecrypt, TenantGuard as TG};
+    use super::{CanDecrypt, TenantGuard as TG};
     use crate::auth::tenant::{IsGuardMet, TenantGuardDsl};
+    use crate::auth::Any;
     use newtypes::{
         BusinessDataKind as BDK, CollectedDataOption as CDO, DataIdentifier as DI, DocumentKind,
         IdentityDataKind as IDK, KvDataKey, TenantScope as TS,
@@ -253,14 +191,14 @@ mod test {
     #[test_case(&[TS::Decrypt(CDO::Ssn9)], Any => true)]
     /// Test that the token_scopes associated with an authentication method gives access to perform
     /// the requested_permission
-    fn test_is_permission_met<T: IsGuardMet>(token_scopes: &[TS], requested_permission: T) -> bool {
+    fn test_is_permission_met<T: IsGuardMet<TS>>(token_scopes: &[TS], requested_permission: T) -> bool {
         requested_permission.is_met(token_scopes)
     }
 
     #[test_case(TG::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
     #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<[Id(Ssn9), Id(FirstName)]>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
-    fn test_display<T: IsGuardMet>(t: T) -> String {
+    fn test_display<T: IsGuardMet<TS>>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
         format!("{}", t)
     }

@@ -8,10 +8,12 @@ pub mod session;
 pub use session::SessionContext;
 mod either;
 pub use self::either::Either;
+mod guard;
 pub mod ob_config;
 pub mod protected_custodian;
 pub mod tenant;
 pub mod user;
+pub use guard::*;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
