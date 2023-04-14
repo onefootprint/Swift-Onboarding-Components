@@ -7,6 +7,8 @@ use crate::{
     errors::ApiResult,
 };
 
+use super::middesk;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MiddeskFeatures {
     pub verification_result_id: VerificationResultId,
@@ -15,10 +17,10 @@ pub struct MiddeskFeatures {
 
 impl MiddeskFeatures {
     pub fn new(
-        _result: MiddeskBusinessUpdateWebhookResponse,
+        result: MiddeskBusinessUpdateWebhookResponse,
         verification_result_id: VerificationResultId,
     ) -> Self {
-        let footprint_reason_codes = vec![];
+        let footprint_reason_codes = middesk::reason_codes(&result);
 
         Self {
             verification_result_id,
@@ -71,8 +73,15 @@ impl FeatureVector for KybFeatureVector {
         vec![self.middesk_features.verification_result_id.clone()]
     }
 
-    fn reason_codes(&self, _visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
-        // TODO:
-        vec![]
+    fn reason_codes(&self, visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+        if visible_vendor_apis.contains(&VendorAPI::MiddeskBusinessUpdateWebhook) {
+            self.middesk_features
+                .footprint_reason_codes
+                .iter()
+                .map(|r| (r.clone(), vec![Vendor::Middesk]))
+                .collect()
+        } else {
+            vec![]
+        }
     }
 }

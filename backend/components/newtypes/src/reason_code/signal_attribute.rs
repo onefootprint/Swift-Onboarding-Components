@@ -35,4 +35,11 @@ pub enum SignalScope {
     IpAddress,
     Document,
     Selfie,
+
+    BusinessAddress,
+    BusinessName,
+    BusinessPhoneNumber,
+    BusinessWebsite,
+    BusinessTin,
+    BeneficialOwners,
 }

@@ -451,7 +451,183 @@ footprint_reason_code_enum! {
         InputPhoneNumberMatchesInputState,
 
         #[note = "Area code matches located state", severity = SignalSeverity::Info, scopes =  vec![SignalScope::Address, SignalScope::PhoneNumber], description = "The area code for the phone number input matches any address in the located address history for the identity."]
-        InputPhoneNumberMatchesLocatedStateHistory
+        InputPhoneNumberMatchesLocatedStateHistory,
+
+        //
+        //
+        // ~~~~~~~~~ KYB ~~~~~~~~~~~
+        //
+        //
+
+        // ~~~~~~~~~ Business Name ~~~~~~~~~~~
+
+        #[note = "Business name matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName], description = "The input business name matches the located business's name"]
+        BusinessNameMatch,
+
+        #[note = "Business name is similar", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName], description = "The input business name is similar to the located business's name"]
+        BusinessNameSimilarMatch,
+
+        #[note = "Alternate business name found", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName], description = "The located business goes by an alternate name"]
+        BusinessNameAlternateMatch,
+
+        #[note = "Business name does not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessName], description = "The input business name did not match"]
+        BusinessNameDoesNotMatch,
+
+        #[note = "DBA matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName], description = "The input business DBA (Doing Business As) matches the located business's DBA"]
+        BusinessDbaMatch,
+
+        #[note = "DBA is similar", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName], description = "The input business DBA (Doing Business As) is similar to the located business's DBA"]
+        BusinessDbaSimilarMatch,
+
+        #[note = "Alternate DBA found", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName], description = "The located business goes by an alternate DBA (Doing Business As)"]
+        BusinessDbaAlternateMatch,
+
+        #[note = "DBA name does not match", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName], description = "The input business DBA (Doing Business As) did not match"]
+        BusinessDbaDoesNotMatch,
+
+        #[note = "No watchlist hits", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName], description = "No watchlist matches found for the business"]
+        BusinessNameNoWatchlistHits,
+
+        #[note = "Watchlist hit", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessName], description = "One or more potential watchlist matches found for the business"]
+        BusinessNameWatchlistHit, // TODO: make a variant per list like we do with KYC watchlist hits
+
+        // ~~~~~~~~ Business Phone Number ~~~~~~~~~~~~~~
+
+        #[note = "Phone number matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessPhoneNumber], description = "The input business phone number matches the located business's phone number"]
+        BusinessPhoneNumberMatch,
+
+        #[note = "Phone number does not match", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessPhoneNumber], description = "The input business phone number did not match"]
+        BusinessPhoneNumberDoesNotMatch,
+
+        // ~~~~~~~~ Business Website ~~~~~~~~~~~~~~
+
+        #[note = "Website online", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessWebsite], description = "The input business website was online"]
+        BusinessWebsiteOnline,
+
+        #[note = "Website offline", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessWebsite], description = "The input business website was offline"]
+        BusinessWebsiteOffline,
+
+        #[note = "Website verified", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessWebsite], description = "Successfully found entity details on the input business website"]
+        BusinessWebsiteVerified,
+
+        #[note = "Website unverified", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessWebsite], description = "Unable to find entity details on the input business website"]
+        BusinessWebsiteUnverified,
+
+        #[note = "Website is parking page", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessWebsite], description = "The input business website has been purchased but has no content"]
+        BusinessWebsiteParkingPage,
+
+        // ~~~~~~~~~ TIN ~~~~~~~~~~~
+        #[note = "TIN matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessTin], description = "The intput TIN and business name match IRS records"]
+        TinMatch,
+
+        #[note = "TIN not found", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessTin], description = "IRS doe not have a record of the input TIN"]
+        TinNotFound,
+
+        #[note = "TIN invalid", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessTin], description = "TIN is invalid"]
+        TinInvalid,
+
+        #[note = "TIN does not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessTin], description = "The input TIN is associated with a different business name"]
+        TinDoesNotMatch,
+
+        // ~~~~~~~~~ BusinessAddress ~~~~~~~~~~~
+
+        #[note = "Business address matches", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address matches the located business's address"]
+        BusinessAddressMatch,
+
+        #[note = "Business address is close", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address is within close proximity to the located business's address"]
+        BusinessAddressCloseMatch,
+
+        #[note = "Business address is similar", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address is similar to the located business's address"]
+        BusinessAddressSimilarMatch,
+
+        #[note = "Business address incompletely matches", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address partially matches the located business's address"]
+        BusinessAddressIncompleteMatch,
+
+        #[note = "Business address does not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address did not match"]
+        BusinessAddressDoesNotMatch,
+
+        #[note = "Business address is commercial", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address is commercial"]
+        BusinessAddressCommercial,
+
+        #[note = "Business address is residential", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessAddress], description = "The input business address is residential"]
+        BusinessAddressResidential,
+
+        #[note = "Business address is deliverable", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessAddress], description = "The USPS is able to deliver mail to the input business address"]
+        BusinessAddressDeliverable,
+
+        #[note = "Business address is undeliverable", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessAddress], description = "The USPS is unable to deliver mail to the input business address"]
+        BusinessAddressNotDeliverable,
+
+        // ~~~~~~~~~ Business Owners ~~~~~~~~~~~
+
+        #[note = "Beneficial owners match", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BeneficialOwners], description = "The input beneficial owners match the located business"]
+        BeneficialOwnersMatch,
+
+        #[note = "Beneficial owners partially match", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BeneficialOwners], description = "The input beneficial owners partially match the located business"]
+        BeneficialOwnersPartialMatch,
+
+        #[note = "Beneficial owners do not match", severity = SignalSeverity::High, scopes =  vec![SignalScope::BeneficialOwners], description = "The input beneficial owners do not match"]
+        BeneficialOwnersDoNotMatch,
+
+        // ~~~~~~~~~ Secretary of State Filings ~~~~~~~~~~~
+        #[note = "Found active SOS filing", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An active Secretary of State filing was found for the business"]
+        SosActiveFilingFound,
+
+        #[note = "Found SOS filing with no status", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "A Secretary of State filing with no status provided was found for the business"]
+        SosFilingNoStatus,
+
+        #[note = "Found inactive SOS filing", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An inactive Secretary of State filing was found for the business"]
+        SosFilingPartiallyActive,
+
+        #[note = "No active SOS filing", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "No active Secretary of State filing was found for the business"]
+        SosFilingNoActiveFound,
+
+        #[note = "No SOS filing found", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "No Secretary of State filing was found for the business"]
+        SosFilingNotFound,
+
+        #[note = "Found active domestic SOS filing", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An active domestic Secretary of State filing was found for the business"]
+        SosDomesticActiveFilingFound,
+
+        #[note = "Found domestic SOS filing with no status", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "A domestic Secretary of State filing with no status provided was found for the business"]
+        SosDomesticFilingNoStatus,
+
+        #[note = "Found inactive domestic SOS filing", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An inactive domestic Secretary of State filing was found for the business"]
+        SosDomesticFilingPartiallyActive,
+
+        #[note = "No domestic SOS filings found", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "No domestic Secretary of State filing was found for the business"]
+        SosDomesticFilingNotFound,
+
+        #[note = "Domestic SOS status is Good Standing", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Good Standing"]
+        SosDomesticFilingStatusGoodStanding,
+
+        #[note = "Domestic SOS status is Pending Active", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Pending Active"]
+        SosDomesticFilingStatusPendingActive,
+
+        #[note = "Domestic SOS status is Pending Inactive", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Pending Inactive"]
+        SosDomesticFilingStatusPendingInactive,
+
+        #[note = "Domestic SOS status is Not Provided by State", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Not Provided by State"]
+        SosDomesticFilingStatusNotProvidedByState,
+
+        #[note = "Domestic SOS status is Not in Good Standing", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Not in Good Standing"]
+        SosDomesticFilingStatusNotInGoodStanding,
+
+        #[note = "Domestic SOS status is Dissolved", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The domestic Secretary of State filing found for the business has status Dissolved"]
+        SosDomesticFilingStatusDissolved,
+
+        #[note = "Found active SOS filing in business's state", severity = SignalSeverity::Info, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An active Secretary of State filing was found for the business in the state of the input business address"]
+        SosBusinessAddressActiveFilingFound,
+
+        #[note = "SOS filing status unavailable in business's state", severity = SignalSeverity::Low, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "The state of the input business address does not make Secretary of State filing status available"]
+        SosBusinessAddressFilingStatusNotAvailable,
+
+        #[note = "Found inactive SOS filing in business's state", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "An inactive Secretary of State filing was found for the business in the state of the input business address"]
+        SosBusinessAddressInactiveFilingFound,
+
+        #[note = "No SOS filing found in business's state", severity = SignalSeverity::Medium, scopes =  vec![SignalScope::BusinessName, SignalScope::BusinessAddress, SignalScope::BeneficialOwners], description = "No Secretary of State filing was found for the business in the state of the input business address"]
+        SosBusinessAddressFilingNotFound
+
+
     }
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
