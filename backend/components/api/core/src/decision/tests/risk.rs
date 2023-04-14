@@ -1,9 +1,7 @@
+use crate::decision::onboarding::FeatureVector;
 use crate::decision::{
-    features::idology_expectid::IDologyFeatures,
-    features::kyc_features::FeatureVector,
-    risk::{evaluate_onboarding_rules, OnboardingRulesDecisionOutput},
-    rule::onboarding_rules,
-    rule::RuleName,
+    features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
+    onboarding::OnboardingRulesDecisionOutput, rule::onboarding_rules, rule::RuleName,
 };
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
@@ -71,7 +69,7 @@ fn test_evaluate_onboarding_rules(
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     };
 
-    let feature_vector = FeatureVector {
+    let feature_vector = KycFeatureVector {
         idology_features: Some(idology_features),
         ..Default::default()
     };
@@ -92,5 +90,5 @@ fn test_evaluate_onboarding_rules(
         .return_once(move |_| should_use_conservative_rules);
 
     // function under test
-    evaluate_onboarding_rules(&feature_vector, &mock_ff_client).unwrap()
+    feature_vector.evaluate(&mock_ff_client).unwrap()
 }

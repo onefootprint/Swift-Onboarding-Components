@@ -43,6 +43,7 @@ use self::rule::RuleSetName;
 ////////////////////////
 pub mod engine;
 pub(self) mod features;
+pub mod onboarding;
 pub mod risk;
 pub mod rule;
 #[cfg(test)]

@@ -1,11 +1,11 @@
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
-use crate::decision::risk::OnboardingRulesDecisionOutput;
 use crate::decision::vendor;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
+use api_core::decision::onboarding::OnboardingRulesDecisionOutput;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
@@ -200,7 +200,7 @@ async fn make_decision(
     let (rules_output, features) =
         decision::engine::calculate_decision(vendor_requests.completed_requests, &state.feature_flag_client)?;
 
-    decision::engine::make_onboarding_decision(
+    decision::engine::save_onboarding_decision(
         &state.db_pool,
         &state.feature_flag_client,
         &ob.id,

@@ -1,12 +1,15 @@
 #![allow(clippy::too_many_arguments)]
 use super::tenant_vendor_control::TenantVendorControl;
-use super::vendor_result::VendorResult;
+
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
+use crate::decision::engine;
+use crate::decision::features::kyb_features::KybFeatureVector;
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
 
+use db::models::onboarding::Onboarding;
 use db::models::verification_result::VerificationResult;
 use db::DbPool;
 use db::{
@@ -628,16 +631,21 @@ async fn send_middesk_call(
     }
 }
 
-pub async fn handle_middesk_webhook(db_pool: &DbPool, res: serde_json::Value) -> Result<(), ApiError> {
+pub async fn handle_middesk_webhook(
+    db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
+    res: serde_json::Value,
+) -> Result<(), ApiError> {
     match middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)? {
         middesk::response::webhook::MiddeskWebhookResponse::BusinessUpdate(b) => {
-            handle_middesk_business_response(db_pool, b, res).await
+            handle_middesk_business_response(db_pool, ff_client, b, res).await
         }
     }
 }
 
 pub async fn handle_middesk_business_response(
     db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
     middesk_response: MiddeskBusinessUpdateWebhookResponse,
     raw_res: serde_json::Value,
 ) -> Result<(), ApiError> {
@@ -648,7 +656,9 @@ pub async fn handle_middesk_business_response(
                 "business_id".to_owned(),
             )))?;
 
-    let _vendor_res = db_pool
+    let mr = middesk_response.clone();
+
+    let (vres_id, ob) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Lookup the VRes for the POST /business call we made so we can associate this webhook with a particular scoped_vault
             let (create_business_vreq, _, di) =
@@ -668,23 +678,24 @@ pub async fn handle_middesk_business_response(
             let uv = VerificationRequest::get_user_vault(conn, vreq.id.clone())?;
 
             let vendor_response = VendorResponse {
-                response: ParsedResponse::MiddeskBusinessUpdateWebhook(middesk_response),
+                response: ParsedResponse::MiddeskBusinessUpdateWebhook(mr),
                 raw_response: PiiJsonValue::new(raw_res),
             };
-            let vr = (vreq.clone(), vendor_response.clone());
+            let vr = (vreq, vendor_response);
 
             let verification_result =
                 verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
-            Ok(VendorResult {
-                response: vendor_response,
-                verification_result_id: verification_result.id,
-                verification_request_id: vreq.id,
-            })
+            let (ob, _, _, _) = Onboarding::get(conn, (&create_business_vreq.scoped_vault_id, &uv.id))?;
+
+            Ok((verification_result.id, ob))
         })
         .await?;
 
-    Ok(())
+    let bo_obds = vec![]; // TODO: query for bo OBDs
+    let fv = KybFeatureVector::new(middesk_response, vres_id, bo_obds);
+
+    engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
 }
 
 #[cfg(test)]

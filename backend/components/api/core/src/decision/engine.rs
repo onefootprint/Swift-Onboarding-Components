@@ -7,8 +7,8 @@ use crate::{
 };
 
 use super::{
-    features::kyc_features::FeatureVector,
-    risk::OnboardingRulesDecisionOutput,
+    features::kyc_features::KycFeatureVector,
+    onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
     vendor::{
         make_request::VerificationRequestWithVendorResponse, tenant_vendor_control::TenantVendorControl,
         vendor_result::VendorResult, vendor_trait::VendorAPICall, verification_result,
@@ -97,8 +97,21 @@ pub async fn run(
         .chain(completed_oustanding_vendor_responses.into_iter())
         .collect();
 
+    let fv = features::kyc_features::create_features(all_vendor_results);
+    make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+}
+
+pub async fn make_onboarding_decision<T>(
+    ob: &Onboarding,
+    fv: T,
+    ff_client: &impl FeatureFlagClient,
+    db_pool: &DbPool,
+) -> ApiResult<()>
+where
+    T: FeatureVector,
+{
     // Calculate output from rules + features
-    let (rules_output, features) = calculate_decision(all_vendor_results, ff_client)?;
+    let rules_output = fv.evaluate(ff_client)?;
 
     // Log decision output
     tracing::info!(
@@ -110,10 +123,11 @@ pub async fn run(
        scoped_user_id=%ob.scoped_vault_id,
        ob_configuration_id=%ob.ob_configuration_id,
        "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
+       // TODO: differentiate KYB vs KYC here
     );
 
     // Save/action/emit risk signals for the decision
-    make_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, features, true).await
+    save_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, fv, true).await
 }
 
 pub async fn save_vendor_responses(
@@ -291,28 +305,30 @@ pub async fn make_vendor_requests(
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
     ff_client: &impl FeatureFlagClient,
-) -> ApiResult<(OnboardingRulesDecisionOutput, FeatureVector)> {
+) -> ApiResult<(OnboardingRulesDecisionOutput, KycFeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
-    let features = features::kyc_features::create_features(vendor_results);
+    let fv = features::kyc_features::create_features(vendor_results);
+    let decision = fv.evaluate(ff_client)?;
 
-    let decision = risk::evaluate_onboarding_rules(&features, ff_client)?;
-
-    Ok((decision, features))
+    Ok((decision, fv))
 }
 
 /// Create and save an onboarding decision
-pub async fn make_onboarding_decision(
+pub async fn save_onboarding_decision<T>(
     db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
     onboarding_id: &OnboardingId,
     rules_output: OnboardingRulesDecisionOutput,
-    features: FeatureVector,
+    fv: T,
     assert_is_first_decision_for_onboarding: bool,
-) -> ApiResult<()> {
+) -> ApiResult<()>
+where
+    T: FeatureVector,
+{
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
         onboarding_id.clone(),
-        features,
+        fv,
         db_pool,
         ff_client,
         rules_output,
