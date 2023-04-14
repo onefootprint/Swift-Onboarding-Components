@@ -119,6 +119,9 @@ impl CheckedUserAuthContext {
 
     /// Fetch the onboarding info associated with this user token, if it exists
     pub fn onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<AuthedOnboardingInfo>> {
+        // Even though we could technically fetch the onboarding via the OrgOnboardingInit scope,
+        // we only want to look for it after the POST /hosted/onboarding API has been called
+        // TODO this could just rely upon whether the onboarding exists?
         if !UserAuthGuard::OrgOnboarding.is_met(&self.data.scopes) {
             // If there is no Onboarding scope on this auth token, the Onboarding won't exist
             return Ok(None);

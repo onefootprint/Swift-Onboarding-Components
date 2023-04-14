@@ -95,6 +95,7 @@ def ob_session_token(tenant):
     return OnboardingSessionToken(body["session_token"])
 
 
+# TODO: a lot of these tests must be run in a specific order
 class TestBifrost:
     @pytest.mark.parametrize(
         "identifier", [dict(email=EMAIL), dict(phone_number=PHONE_NUMBER)]
@@ -299,6 +300,33 @@ class TestBifrost:
         # Shouldn't be able to add a second biometric credential
         post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
         post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
+
+    @pytest.mark.parametrize(
+        "fields_to_decrypt,expected_success",
+        [
+            (["id.first_name", "id.last_name", "id.dob"], True),
+            (["id.ssn9"], False),
+            (["business.address_line1"], False),
+            (["custom.flerp"], False),
+        ],
+    )
+    def test_decrypt(self, auth_token, fields_to_decrypt, expected_success):
+        data = dict(fields=fields_to_decrypt)
+        expected_status = 200 if expected_success else 401
+        body = post(
+            "hosted/user/vault/decrypt",
+            data,
+            auth_token,
+            status_code=expected_status,
+        )
+        expected_data = {
+            "id.first_name": "Flerp2",
+            "id.last_name": "Derp2",
+            "id.dob": "1995-12-25",
+        }
+        if expected_success:
+            for k in fields_to_decrypt:
+                assert body[k] == expected_data.get(k)
 
     def test_onboarding_authorize(self, tenant, auth_token, sandbox_tenant):
         post("hosted/onboarding/authorize", None, auth_token)

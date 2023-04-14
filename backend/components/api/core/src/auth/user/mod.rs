@@ -18,16 +18,23 @@ mod guard;
     serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
 )]
 #[strum_discriminants(name(UserAuthGuard))]
-#[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display))]
+#[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display, Hash))]
 #[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {
     SignUp,
-    OrgOnboardingInit { id: ScopedVaultId },
+    OrgOnboardingInit {
+        id: ScopedVaultId,
+    },
     OrgOnboarding,
     Business(ScopedVaultId),
+    // We don't currently issue a token with this - was for my1fp
     BasicProfile,
     Handoff,
+
+    /// This scope should never be issued to a token - it is used to gate certain actions that
+    /// should never be done by a user
+    Never,
 }
 
 /// A helper trait to extract a user vault id on combined types
