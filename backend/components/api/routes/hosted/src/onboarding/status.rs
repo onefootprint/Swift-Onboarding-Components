@@ -1,10 +1,10 @@
-use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
 use crate::onboarding::{get_fields_to_authorize, get_requirements};
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::user::{UserAuth, UserObAuthContext};
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -12,13 +12,13 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
-    let (requirements, ob_info, _) = get_requirements(&state, user_auth).await?;
-    let uv_id = ob_info.user_vault_id.clone();
-    let ob_config = ob_info.ob_config.clone();
+    let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
+    let uv_id = user_auth.user_vault_id().clone();
+    let ob_config = user_auth.data.ob_config.clone();
     let fields_to_authorize = state
         .db_pool
         .db_query(move |conn| get_fields_to_authorize(conn, &uv_id, &ob_config))
@@ -28,7 +28,8 @@ pub async fn get(
     // This is kinda hacky, but belce and argoff discussed doing this for now
     let auth_fields = requirements.is_empty().then_some(fields_to_authorize);
 
-    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_info.ob_config, ob_info.tenant));
+    let ob_config =
+        api_wire_types::OnboardingConfiguration::from_db((user_auth.data.ob_config, user_auth.data.tenant));
 
     ResponseData::ok(OnboardingStatusResponse {
         requirements,

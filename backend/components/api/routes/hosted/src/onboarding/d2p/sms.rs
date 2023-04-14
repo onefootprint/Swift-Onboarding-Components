@@ -32,16 +32,15 @@ pub async fn handler(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let su = user_auth.scoped_user(conn)?;
-            let uv_id = user_auth.user_vault_id();
-            let args = if let Some(ref su) = su {
+            let su_id = user_auth.scoped_user_id();
+            let args = if let Some(su_id) = su_id.as_ref() {
                 // If the auth token is during an onboarding session, create a UVW that sees all
                 // speculative data for the tenant in order to see a speculative phone number
                 // that was added by this tenant.
-                VwArgs::Tenant(&su.id)
+                VwArgs::Tenant(su_id)
             } else {
                 // Otherwise, create a UVW that only sees portable data
-                VwArgs::Vault(uv_id)
+                VwArgs::Vault(user_auth.user_vault_id())
             };
             let uvw = VaultWrapper::build(conn, args)?;
             Ok(uvw)

@@ -1,5 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthGuard, UserSession};
-use crate::auth::SessionContext;
+use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
@@ -7,6 +6,7 @@ use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
+use api_core::auth::user::{UserAuth, UserObAuthContext};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
@@ -18,7 +18,7 @@ use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
-use db::{DbError, DbPool, DbResult, PgConn};
+use db::{DbError, DbResult, PgConn};
 use futures::TryFutureExt;
 use idv::ParsedResponse;
 use newtypes::idology::IdologyImageCaptureErrors;
@@ -39,7 +39,7 @@ const NUM_RETRIES: i64 = 3;
 #[actix::post("/hosted/user/document")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
@@ -47,12 +47,8 @@ pub async fn post(
     let (uv, db_document_request, auth_info, user_consent) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let Some(auth_info) = user_auth.onboarding(conn)? else {
-                return Err(ApiError::from(OnboardingError::NoOnboarding))
-            };
-
             // If there's no pending doc requests, nothing to do here
-            let db_document_request = DbDocumentRequest::lock_active(conn, &auth_info.scoped_user.id)
+            let db_document_request = DbDocumentRequest::lock_active(conn, &user_auth.data.scoped_user.id)
                 .map_err(|e| {
                     if e.is_not_found() {
                         ApiError::from(OnboardingError::NoPendingDocumentRequestFound)
@@ -65,9 +61,9 @@ pub async fn post(
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
             let uv = Vault::get(conn, user_auth.user_vault_id())?;
 
-            let user_consent = UserConsent::latest_for_onboarding(conn, &auth_info.onboarding.id)?;
+            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.data.onboarding.id)?;
 
-            Ok((uv, db_document_request, auth_info, user_consent))
+            Ok((uv, db_document_request, user_auth.data, user_consent))
         })
         .await?;
 
@@ -361,41 +357,26 @@ pub async fn post(
 #[actix::get("/hosted/user/document/status")]
 pub async fn get(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
-    let response = get_inner(&state.db_pool, user_auth).await?;
-
-    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
-    // otherwise, we'll pass through the status
-    ResponseData::ok(response).json()
-}
-
-pub async fn get_inner(
-    db_pool: &DbPool,
-    user_auth: SessionContext<UserSession>,
-) -> Result<DocumentResponse, ApiError> {
-    let scoped_user_id = db_pool
-        .db_query(move |conn| -> Result<ScopedVaultId, ApiError> {
-            let Some(auth_info) = user_auth.onboarding(conn)? else {
-        return Err(ApiError::from(OnboardingError::NoOnboarding))
-    };
-            Ok(auth_info.scoped_user.id)
-        })
+    let (status, errors) = state
+        .db_pool
+        .db_query(move |conn| construct_get_response(conn, user_auth.data.scoped_user.id))
         .await??;
 
-    let (status, errors) = db_pool
-        .db_query(move |conn| construct_get_response(conn, scoped_user_id))
-        .await??;
-
-    Ok(DocumentResponse {
+    let response = DocumentResponse {
         status,
         errors,
         // TODO: Remove these fields
         front_image_error: None,
         back_image_error: None,
-    })
+    };
+
+    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
+    // otherwise, we'll pass through the status
+    ResponseData::ok(response).json()
 }
 
 /// Based on the current and previous requests, map to our API response

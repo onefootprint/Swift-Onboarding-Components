@@ -1,10 +1,10 @@
-use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthGuard;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
+use api_core::auth::user::UserObAuthContext;
 use api_wire_types::hosted::consent::ConsentRequest;
 use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
@@ -18,11 +18,12 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 #[actix::post("/hosted/user/consent")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let ob_id = user_auth.data.onboarding.id;
 
     let ConsentRequest {
         consent_language_text,
@@ -31,17 +32,10 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let ob_info = user_auth.assert_onboarding(conn)?;
-
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
-            let _user_consent = UserConsent::create(
-                conn,
-                Utc::now(),
-                ob_info.onboarding.id,
-                insight_event.id,
-                consent_language_text,
-            )?;
+            let _user_consent =
+                UserConsent::create(conn, Utc::now(), ob_id, insight_event.id, consent_language_text)?;
 
             Ok(())
         })

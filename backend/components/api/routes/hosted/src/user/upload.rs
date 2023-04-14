@@ -1,4 +1,4 @@
-use crate::auth::user::{AuthedOnboardingInfo, UserAuthContext, UserAuthGuard};
+use crate::auth::user::UserAuthGuard;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -6,8 +6,9 @@ use crate::utils::{self, file_upload};
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
+use api_core::auth::user::{UserAuth, UserObAuthContext};
 use db::models::vault::Vault;
-use newtypes::{DataIdentifier, DocumentKind, VaultPublicKey};
+use newtypes::{DataIdentifier, DocumentKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
@@ -16,7 +17,7 @@ const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
 #[actix::post("/hosted/user/upload/{document_identifier}")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     document_identifier: web::Path<DataIdentifier>,
     mut payload: Multipart,
     request: HttpRequest,
@@ -24,17 +25,11 @@ pub async fn post(
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-    let ua = user_auth.clone();
-    let (auth_info, public_key) = state
+    utils::vault_wrapper::checks::pre_add_data_checks(&user_auth)?;
+    let uv_id = user_auth.user_vault_id().clone();
+    let uv = state
         .db_pool
-        .db_query(
-            move |conn| -> Result<(AuthedOnboardingInfo, VaultPublicKey), ApiError> {
-                //For now, only allow doc uploads during Bifrost
-                let auth_info = ua.assert_onboarding(conn)?;
-                let uv = Vault::get(conn, &auth_info.scoped_user.id)?;
-                Ok((auth_info, uv.public_key))
-            },
-        )
+        .db_query(move |conn| Vault::get(conn, &uv_id))
         .await??;
 
     let file = file_upload::handle_file_upload(
@@ -49,17 +44,16 @@ pub async fn post(
         &state,
         &file,
         kind,
-        &public_key,
-        &auth_info.user_vault_id,
-        &auth_info.scoped_user.id,
+        &uv.public_key,
+        &uv.id,
+        &user_auth.data.scoped_user.id,
     )
     .await?;
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user_id = utils::vault_wrapper::checks::pre_add_data_checks(&user_auth, conn)?;
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user_id)?;
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.data.scoped_user.id)?;
             let doc = uvw.put_document(conn, kind, file.mime_type, file.filename, e_data_key, s3_url)?;
             Ok(doc)
         })

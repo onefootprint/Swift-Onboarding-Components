@@ -1,7 +1,7 @@
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
-use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserObAuthContext;
 use api_core::auth::CanDecrypt;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -31,7 +31,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptRequest>,
     // is it worth having an OnboardingAuth that only extracts if onboarding is present
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
 ) -> JsonApiResponse<DecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
@@ -39,8 +39,7 @@ pub async fn post(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let ob = user_auth.assert_onboarding(conn)?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &ob.scoped_user.id)?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.data.scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

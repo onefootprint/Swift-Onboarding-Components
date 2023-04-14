@@ -247,27 +247,6 @@ impl Onboarding {
         Ok(result)
     }
 
-    // TODO generify lock functions to use OnboardingIdentifier.
-    // It is difficult because we can't call .for_update() on boxed queries
-    #[tracing::instrument(skip_all)]
-    pub fn lock_by_config(
-        conn: &mut TxnPgConn,
-        vault_id: &VaultId,
-        ob_configuration_id: &ObConfigurationId,
-    ) -> DbResult<Option<Locked<Onboarding>>> {
-        let su_ids = scoped_vault::table
-            .filter(scoped_vault::vault_id.eq(vault_id))
-            .select(scoped_vault::id);
-        let result = onboarding::table
-            .filter(onboarding::scoped_vault_id.eq_any(su_ids))
-            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
-            .for_no_key_update()
-            .first(conn.conn())
-            .optional()?;
-        let result = result.map(Locked::new);
-        Ok(result)
-    }
-
     #[tracing::instrument(skip_all)]
     pub fn lock_for_tenant(
         conn: &mut TxnPgConn,

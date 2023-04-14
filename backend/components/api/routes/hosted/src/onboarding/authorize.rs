@@ -1,5 +1,3 @@
-use crate::auth::user::AuthedOnboardingInfo;
-use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthGuard;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
@@ -10,6 +8,8 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
+use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -48,24 +48,25 @@ pub struct CommitResponse {
 )]
 #[actix::post("/hosted/onboarding/authorize")]
 pub async fn post(
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
-    let (requirements, ob_info, user_auth) = get_requirements(&state, user_auth).await?;
+    let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
     if !requirements.is_empty() {
         let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
         return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
     }
 
     // Mark the obs for the person and business as authorized
-    let (ob_info, biz_ob) = state
+    let ob_id = user_auth.data.onboarding.id.clone();
+    let (biz_ob, user_auth) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
-            let ob = Onboarding::lock(c, &ob_info.onboarding.id)?;
+            let ob = Onboarding::lock(c, &ob_id)?;
             if ob.authorized_at.is_none() {
                 ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
             }
@@ -80,21 +81,21 @@ pub async fn post(
                 })
                 .transpose()?;
 
-            Ok((ob_info, bizob))
+            Ok((bizob, user_auth))
         })
         .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", ob_info.tenant.id.as_str()));
-    span.record("tenant_name", &format!("{:?}", ob_info.tenant.id.as_str()));
-    span.record("onboarding_id", &format!("{}", ob_info.onboarding.id));
-    span.record("scoped_use_id", &format!("{}", ob_info.scoped_user.id));
+    span.record("tenant_id", &format!("{:?}", user_auth.data.tenant.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", user_auth.data.tenant.id.as_str()));
+    span.record("onboarding_id", &format!("{}", user_auth.data.onboarding.id));
+    span.record("scoped_use_id", &format!("{}", user_auth.data.scoped_user.id));
     span.record(
         "ob_configuration_id",
-        &format!("{}", ob_info.onboarding.ob_configuration_id),
+        &format!("{}", user_auth.data.onboarding.ob_configuration_id),
     );
     let tenant_vendor_control = TenantVendorControl::new(
-        ob_info.tenant.id.clone(),
+        user_auth.data.tenant.id.clone(),
         &state.db_pool,
         &state.enclave_client,
         &state.config,
@@ -102,12 +103,12 @@ pub async fn post(
     .await?;
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
-    let should_run_kyc_checks = ob_info.onboarding.idv_reqs_initiated_at.is_none();
+    let should_run_kyc_checks = user_auth.data.onboarding.idv_reqs_initiated_at.is_none();
 
     // Run KYC checks
-    let ob_id = ob_info.onboarding.id.clone();
+    let ob_id = user_auth.data.onboarding.id.clone();
     if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, ob_info, biz_ob.clone(), tenant_vendor_control).await;
+        let engine_result = run_kyc(&state, &user_auth.data, biz_ob.clone(), tenant_vendor_control).await;
         // We always want to return a validation to the client if the DE fails.
         // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
         match engine_result {
@@ -205,7 +206,7 @@ pub async fn post(
 
 async fn run_kyc(
     state: &State,
-    ob_info: AuthedOnboardingInfo,
+    ob_info: &UserObSession,
     biz_ob: Option<Onboarding>, // TODO: remove from run_kyc and setup fixtures in run_kyb instead
     tenant_vendor_control: TenantVendorControl,
 ) -> Result<(), ApiError> {
@@ -258,7 +259,8 @@ async fn run_kyc(
             .await?;
 
         decision::engine::run(
-            ob_info.onboarding,
+            // TODO don't pass in ob because it could be stale
+            ob_info.onboarding.clone(),
             &state.db_pool,
             &state.enclave_client,
             state.config.service_config.is_production(),

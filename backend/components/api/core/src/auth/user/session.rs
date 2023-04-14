@@ -1,12 +1,4 @@
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingIdentifier},
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-    },
-    PgConn,
-};
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Security;
@@ -18,7 +10,7 @@ use crate::{
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::{ApiError, ApiResult},
+    errors::ApiError,
 };
 use feature_flag::LaunchDarklyFeatureFlagClient;
 
@@ -54,23 +46,11 @@ impl UserSession {
             .collect();
         Self::make(self.user_vault_id, new_scopes)
     }
-}
 
-#[derive(Debug)]
-pub struct AuthedOnboardingInfo {
-    pub user_vault_id: VaultId,
-    pub onboarding: Onboarding,
-    pub scoped_user: ScopedVault,
-    pub ob_config: ObConfiguration,
-    pub tenant: Tenant,
-}
-
-impl CheckedUserAuthContext {
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
     /// session, if exists
-    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        self.data
-            .scopes
+    pub(super) fn scoped_user_id(&self) -> Option<ScopedVaultId> {
+        self.scopes
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::OrgOnboardingInit { id } => Some(id.clone()),
@@ -78,81 +58,13 @@ impl CheckedUserAuthContext {
             })
             .next()
     }
+}
 
-    /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
-    /// exists
-    pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        self.data
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::Business(id) => Some(id.clone()),
-                _ => None,
-            })
-            .next()
-    }
-
-    /// Extracts the business onboarding from the `UserAuthScope::Business` scope on this session,
-    /// if exists
-    pub fn business_onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<Onboarding>> {
-        let Some(sb_id) = self.scoped_business_id() else {
-            return Ok(None);
-        };
-        let identifier = OnboardingIdentifier::ScopedBusinessId {
-            sb_id: &sb_id,
-            vault_id: self.user_vault_id(),
-        };
-        let (ob, _, _, _) = Onboarding::get(conn, identifier)?;
-        Ok(Some(ob))
-    }
-
-    /// Fetch the scoped_user info
-    pub fn scoped_user(&self, conn: &mut PgConn) -> ApiResult<Option<ScopedVault>> {
-        let Some(scoped_user_id) = self.scoped_user_id() else {
-            return Ok(None);
-        };
-
-        // Confirm that the scoped_user in the auth token belongs to the user
-        let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &self.data.user_vault_id))?;
-        Ok(Some(scoped_user))
-    }
-
-    /// Fetch the onboarding info associated with this user token, if it exists
-    pub fn onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<AuthedOnboardingInfo>> {
-        // Even though we could technically fetch the onboarding via the OrgOnboardingInit scope,
-        // we only want to look for it after the POST /hosted/onboarding API has been called
-        // TODO this could just rely upon whether the onboarding exists?
-        if !UserAuthGuard::OrgOnboarding.is_met(&self.data.scopes) {
-            // If there is no Onboarding scope on this auth token, the Onboarding won't exist
-            return Ok(None);
-        }
-
-        let Some(scoped_user_id) = self.scoped_user_id() else {
-            return Ok(None);
-        };
-
-        // Confirm that the onboarding in the auth token belongs to the user
-        let (onboarding, scoped_user, _, _) =
-            Onboarding::get(conn, (&scoped_user_id, &self.data.user_vault_id))?;
-        // Confirm that the ob config is active
-        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &onboarding.ob_configuration_id)?;
-        let info = AuthedOnboardingInfo {
-            user_vault_id: self.data.user_vault_id.clone(),
-            onboarding,
-            scoped_user,
-            ob_config,
-            tenant,
-        };
-        Ok(Some(info))
-    }
-
-    /// Assert that the onboarding info exists for this user auth token and return it.
-    /// Useful as a shorthand for endpoints along the onboarding flow
-    pub fn assert_onboarding(&self, conn: &mut PgConn) -> ApiResult<AuthedOnboardingInfo> {
-        let info = self
-            .onboarding(conn)?
-            .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
-        Ok(info)
+impl CheckedUserAuthContext {
+    /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
+    /// session, if exists
+    pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
+        self.data.scoped_user_id()
     }
 }
 
@@ -167,15 +79,14 @@ impl UserAuth for UserSession {
 /// Notably, this struct isn't very useful since the entire nested UserSession is hidden. If you
 /// want to do something useful, you likely have to enforce permissions by calling
 /// `check_permissions`, which will give you the more useful nested UserSession
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Security)]
-#[serde(transparent)]
+#[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
     in = "header",
     name = "X-Fp-Authorization",
     description = "Auth token for user"
 )]
-pub struct ParsedUserSession(UserSession);
+pub struct ParsedUserSession(pub(super) UserSession);
 
 impl ExtractableAuthSession for ParsedUserSession {
     fn header_names() -> Vec<&'static str> {

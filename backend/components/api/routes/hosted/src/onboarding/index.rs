@@ -42,20 +42,21 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
-    let user_auth2 = user_auth.clone();
+    let scoped_user_id = user_auth
+        .scoped_user_id()
+        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
+    let uv_id = user_auth.user_vault_id().clone();
     let (scoped_user, ob_config) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_user = user_auth2
-                .scoped_user(conn)?
-                .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
-            let ob_configuration_id = scoped_user
+            let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
+            let ob_configuration_id = su
                 .ob_configuration_id
                 .as_ref()
                 .ok_or(OnboardingError::NonPortableScopedUser)?;
             // Check that the ob configuration is still active
             let (ob_config, _) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
-            Ok((scoped_user, ob_config))
+            Ok((su, ob_config))
         })
         .await??;
 

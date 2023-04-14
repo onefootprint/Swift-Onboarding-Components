@@ -1,8 +1,9 @@
-use crate::auth::user::{UserAuthContext, UserAuthGuard};
+use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use actix_web::web::Json;
+use api_core::auth::user::UserObAuthContext;
 use api_wire_types::hosted::socure_device::SocureDeviceSessionIdRequest;
 use db::models::socure_device_session::SocureDeviceSession;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -14,19 +15,18 @@ use paperclip::actix::{self, api_v2_operation, web};
 #[actix::post("/hosted/onboarding/sds")] // TODO: unsure if we want a clear name like /socure_device_session_id/ or if we want to at least mildly obfuscate this
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
+    let ob_id = user_auth.data.onboarding.id;
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let ob_info = user_auth.assert_onboarding(conn)?;
-
-            SocureDeviceSession::create(conn, device_session_id, ob_info.onboarding.id)?;
+            SocureDeviceSession::create(conn, device_session_id, ob_id)?;
 
             Ok(())
         })

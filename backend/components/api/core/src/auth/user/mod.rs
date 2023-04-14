@@ -13,6 +13,8 @@ mod validate_user;
 use strum::EnumDiscriminants;
 pub use validate_user::*;
 mod guard;
+mod user_ob;
+pub use user_ob::*;
 
 #[derive(
     serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,

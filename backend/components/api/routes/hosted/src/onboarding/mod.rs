@@ -1,13 +1,13 @@
 use crate::{
     auth::session::AuthSessionData,
-    auth::user::{AuthedOnboardingInfo, ValidateUserToken},
+    auth::user::ValidateUserToken,
     utils::{
         session::AuthSession,
         vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
     },
 };
 use api_core::{
-    auth::user::CheckedUserAuthContext,
+    auth::user::{CheckedUserObAuthContext, UserObSession},
     errors::{business::BusinessError, ApiResult},
     State,
 };
@@ -70,41 +70,38 @@ fn create_onboarding_validation_token(
 #[tracing::instrument(skip_all)]
 pub async fn get_requirements(
     state: &State,
-    user_auth: CheckedUserAuthContext,
-) -> ApiResult<(
-    Vec<OnboardingRequirement>,
-    AuthedOnboardingInfo,
-    CheckedUserAuthContext,
-)> {
+    user_auth: CheckedUserObAuthContext,
+) -> ApiResult<(Vec<OnboardingRequirement>, CheckedUserObAuthContext)> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let (uvw, ob_info, user_auth) = state
+    let su_id = user_auth.data.scoped_user.id.clone();
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let ob_info = user_auth.assert_onboarding(conn)?;
-            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&ob_info.scoped_user.id))?;
-            Ok((uvw, ob_info, user_auth))
+            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su_id))?;
+            Ok(uvw)
         })
         .await??;
     let declarations = uvw
         .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
         .await?;
 
-    let (requirements, ob_info, user_auth) = state
+    let (requirements, user_auth) = state
         .db_pool
         .db_query(|conn| -> ApiResult<_> {
             let scoped_business_id = user_auth.scoped_business_id();
-            let requirements = get_requirements_inner(conn, uvw, &ob_info, scoped_business_id, declarations)?;
-            Ok((requirements, ob_info, user_auth))
+            let requirements =
+                get_requirements_inner(conn, uvw, &user_auth.data, scoped_business_id, declarations)?;
+            Ok((requirements, user_auth))
         })
         .await??;
-    Ok((requirements, ob_info, user_auth))
+    Ok((requirements, user_auth))
 }
 
 #[tracing::instrument(skip_all)]
 fn get_requirements_inner(
     conn: &mut PgConn,
     uvw: VaultWrapper<Person>,
-    ob_info: &AuthedOnboardingInfo,
+    ob_info: &UserObSession,
     scoped_business_id: Option<ScopedVaultId>,
     declarations: Option<PiiString>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
