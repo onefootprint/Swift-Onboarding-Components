@@ -195,30 +195,6 @@
           }
         }
       }
-    },
-    "first-config": {
-      "dialog": {
-        "heading": "Welcome to Footprint!",
-        "title": "Let's get started by setting up your account",
-        "subtitle": "Follow these 3 simple steps to start, but feel free to reach out to us too if you need any help in the process.",
-        "step-1": {
-          "number": "1",
-          "title": "Create an onboarding config",
-          "subtitle": "You can do this from the 'Developers' tab"
-        },
-        "step-2": {
-          "number": "2",
-          "title": "Integrate this config in your product",
-          "subtitle": "Find all the details in our documentation"
-        },
-        "step-3": {
-          "number": "3",
-          "title": "Review your onboarded users",
-          "subtitle": "Find them on the 'Users' tab"
-        },
-        "cta": "Go to onboarding configurations",
-        "cancel": "Cancel"
-      }
     }
   },
   "pages": {
@@ -377,6 +353,30 @@
       "logged-as": "Logged in as"
     },
     "entities": {
+      "intro": {
+        "dialog": {
+          "heading": "Welcome to Footprint!",
+          "title": "Let's get started by setting up your account",
+          "subtitle": "Follow these 3 simple steps to start, but feel free to reach out to us too if you need any help in the process.",
+          "step-1": {
+            "number": "1",
+            "title": "Create an onboarding config",
+            "subtitle": "You can do this from the 'Developers' tab"
+          },
+          "step-2": {
+            "number": "2",
+            "title": "Integrate this config in your product",
+            "subtitle": "Find all the details in our documentation"
+          },
+          "step-3": {
+            "number": "3",
+            "title": "Review your onboarded users",
+            "subtitle": "Find them on the 'Users' tab"
+          },
+          "cta": "Go to onboarding configurations",
+          "cancel": "Cancel"
+        }
+      },
       "filters": {
         "status": {
           "label": "Status",

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import useFilters from '../../hooks/use-filters';
+import IntroDialog from './components/intro-dialog';
 import useEntities from './hooks/use-entities';
 import Provider from './hooks/use-entities-context';
 
@@ -59,6 +60,7 @@ const List = ({ children, title, kind, basePath }: ListProps) => {
           totalNumResults={response.meta.count}
         />
       )}
+      {kind === EntityKind.person ? <IntroDialog /> : null}
     </Provider>
   );
 };
