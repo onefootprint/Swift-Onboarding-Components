@@ -119,7 +119,13 @@
     "phone_number": "Phone number",
     "identity": "Identity",
     "ip_address": "IP Address",
-    "document": "Document"
+    "document": "Document",
+    "business_address": "Registered business address",
+    "business_name": "Business name",
+    "business_phone_number": "Business phone number",
+    "business_website": "Business website",
+    "business_tin": "Taxpayer Identification Number (TIN)",
+    "beneficial_owners": "Business beneficial owners"
   },
   "components": {
     "timeline": {
