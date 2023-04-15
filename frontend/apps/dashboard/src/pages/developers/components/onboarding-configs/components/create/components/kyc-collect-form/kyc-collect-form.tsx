@@ -35,7 +35,7 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
   const { kycCollect } = state.context;
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
-      ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn4,
+      ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn9,
       [CollectedDocumentDataOption.document]: kycCollect
         ? kycCollect[CollectedDocumentDataOption.document]
         : false,

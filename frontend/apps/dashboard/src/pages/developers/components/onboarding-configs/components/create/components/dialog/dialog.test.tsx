@@ -188,9 +188,7 @@ describe('<CreateConfig />', () => {
         within(collectedData).getByText('Date of birth'),
       ).toBeInTheDocument();
       expect(within(collectedData).getByText('Address')).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('SSN (Last 4)'),
-      ).toBeInTheDocument();
+      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
 
       // Select SSN (Full) option
       const ssnFullOption = screen.getByLabelText('SSN (Full)');
@@ -328,13 +326,11 @@ describe('<CreateConfig />', () => {
       expect(address).toBeInTheDocument();
       expect(address.checked).toBeTruthy();
 
-      const ssnLast4 = screen.getByLabelText(
-        'SSN (Last 4)',
-      ) as HTMLInputElement;
-      expect(ssnLast4).toBeInTheDocument();
-      expect(ssnLast4.checked).toBeTruthy();
-      await userEvent.click(ssnLast4);
-      expect(ssnLast4.checked).toBeFalsy();
+      const ssnFull = screen.getByLabelText('SSN (Full)') as HTMLInputElement;
+      expect(ssnFull).toBeInTheDocument();
+      expect(ssnFull.checked).toBeTruthy();
+      await userEvent.click(ssnFull);
+      expect(ssnFull.checked).toBeFalsy();
     });
 
     it('should show document if only document was collected', async () => {
