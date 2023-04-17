@@ -1,0 +1,27 @@
+{
+  "name": "@onefootprint/my-mobile",
+  "version": "1.0.0",
+  "scripts": {
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "lint": "eslint src --fix",
+    "dev:mobile": "expo start --dev-client",
+    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@onefootprint/ui-mobile": "*",
+    "expo-camera": "~13.2.1",
+    "expo-splash-screen": "~0.18.1",
+    "expo-status-bar": "~1.4.4",
+    "expo": "~48.0.11",
+    "react-native-app-clip": "^0.1.2",
+    "react-native": "0.71.6",
+    "react": "18.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "eslint-config-footprint": "*"
+  },
+  "private": true
+}

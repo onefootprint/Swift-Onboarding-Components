@@ -11,6 +11,7 @@
     "predev": "yarn install && yarn build:packages",
     "dev": "turbo run dev --parallel --concurrency 30 --continue",
     "dev:storybook": "turbo run dev:storybook --concurrency 30",
+    "dev:mobile": "turbo run dev:mobile --concurrency 30",
     "build:packages": "turbo run build --filter=./packages/*",
     "format": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
