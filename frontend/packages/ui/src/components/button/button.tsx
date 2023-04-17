@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import Box from '../box';
 import LoadingIndicator from '../loading-indicator';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
@@ -40,6 +41,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const sxStyles = useSX(sx);
 
+    // The button can be in a loading state (showing the spinner) or a non-loading state (showing the button text).
+    // For non-loading state, keep the button text as a direct child in order for tests to be able get the button by text.
+    // For loading buttons, the texts are kept hidden, but not removed, so that the button size doesn't change, and
+    // we can wrap the text in a Box component since we don't need to get the button by text when it's in loading state.
     return (
       <ButtonContainer
         className="fp-button"
@@ -58,14 +63,24 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         variant={variant}
       >
-        {loading ? (
+        {!loading ? (
+          children
+        ) : (
+          <Box as="span" sx={{ visibility: 'hidden' }}>
+            {children}
+          </Box>
+        )}
+        <Box
+          sx={{
+            visibility: loading ? 'visible' : 'hidden',
+            position: 'absolute',
+          }}
+        >
           <LoadingIndicator
             aria-label={loadingAriaLabel}
             color={variant === 'primary' ? 'quinary' : 'primary'}
           />
-        ) : (
-          children
-        )}
+        </Box>
       </ButtonContainer>
     );
   },
@@ -91,6 +106,7 @@ const ButtonContainer = styled.button<{
       cursor: pointer;
       display: flex;
       height: ${button.size[size].height};
+      position: relative;
       justify-content: center;
       outline-offset: ${theme.spacing[2]};
       padding: 0 ${button.size[size].paddingHorizontal};
