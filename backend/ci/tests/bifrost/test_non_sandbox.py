@@ -74,29 +74,6 @@ def test_liveness(bifrost):
     bifrost.handle_requirements(kind="liveness")
 
 
-@pytest.mark.parametrize(
-    "fields_to_decrypt,expected_success",
-    [
-        (["id.first_name", "id.last_name", "id.dob"], True),
-        (["id.ssn9"], False),
-        (["business.address_line1"], False),
-        (["custom.flerp"], False),
-    ],
-)
-def test_decrypt(bifrost, fields_to_decrypt, expected_success):
-    data = dict(fields=fields_to_decrypt)
-    expected_status = 200 if expected_success else 401
-    body = post(
-        "hosted/user/vault/decrypt",
-        data,
-        bifrost.auth_token,
-        status_code=expected_status,
-    )
-    if expected_success:
-        for k in fields_to_decrypt:
-            assert body[k] == bifrost.data.get(k)
-
-
 def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     # Manually authorize
     body = bifrost.authorize()

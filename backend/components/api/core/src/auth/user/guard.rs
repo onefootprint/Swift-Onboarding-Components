@@ -18,19 +18,16 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
             .iter()
             .map(|di| match di {
                 DataIdentifier::Id(id) => match id {
+                    IDK::City | IDK::State | IDK::Country | IDK::Zip | IDK::FirstName | IDK::LastName => {
+                        UserAuthGuard::SignUp
+                    }
                     IDK::AddressLine1
                     | IDK::AddressLine2
-                    | IDK::City
-                    | IDK::State
-                    | IDK::Country
-                    | IDK::Zip
-                    | IDK::FirstName
-                    | IDK::LastName
                     | IDK::Dob
-                    | IDK::Ssn4
                     | IDK::PhoneNumber
-                    | IDK::Email => UserAuthGuard::SignUp,
-                    IDK::Ssn9 => UserAuthGuard::Never,
+                    | IDK::Email
+                    | IDK::Ssn4
+                    | IDK::Ssn9 => UserAuthGuard::SensitiveProfile,
                 },
                 // We don't allow decrypting business data with a user auth token right now - we
                 // theoretically could, but we just don't support portable businesses yet

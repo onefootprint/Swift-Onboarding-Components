@@ -10,8 +10,7 @@ from tests.utils import (
     override_webauthn_challenge,
     get,
     post,
-    _b64_decode,
-    _b64_encode,
+    inherit_user_biometric,
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -108,43 +107,9 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     assert body["user_found"]
     assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 
-    # Initiate a biometric challenge
-    phone_number = sandbox_user.client.data["id.phone_number"].split("#")[0]
-    scrubbed_phone_number = f"+1 (***) ***-**{phone_number[-2:]}"
-    data = dict(
-        identifier=identifier,
-        preferred_challenge_kind="biometric",
-    )
-    body = post("hosted/identify/login_challenge", data)
-    assert body["challenge_data"]["scrubbed_phone_number"] == scrubbed_phone_number
-    assert body["challenge_data"]["challenge_kind"] == "biometric"
-    assert body["challenge_data"]["biometric_challenge_json"]
+    # Inherit the user via biometric
+    auth_token = inherit_user_biometric(sandbox_user)
 
-    # do webauthn
-    chal = json.loads(body["challenge_data"]["biometric_challenge_json"])
-    chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
-
-    attestation = sandbox_user.client.webauthn_device.get(chal, TEST_URL)
-    attestation["rawId"] = _b64_encode(attestation["rawId"])
-    attestation["id"] = _b64_encode(attestation["id"])
-    attestation["response"]["authenticatorData"] = _b64_encode(
-        attestation["response"]["authenticatorData"]
-    )
-    attestation["response"]["signature"] = _b64_encode(
-        attestation["response"]["signature"]
-    )
-    attestation["response"]["userHandle"] = _b64_encode(
-        attestation["response"]["userHandle"]
-    )
-    attestation["response"]["clientDataJSON"] = _b64_encode(
-        attestation["response"]["clientDataJSON"]
-    )
-
-    # Log in as the user
-    data = {
-        "challenge_response": json.dumps(attestation),
-        "challenge_kind": "biometric",
-        "challenge_token": body["challenge_data"]["challenge_token"],
-    }
-    body = post("hosted/identify/verify", data, sandbox_user.client.ob_config.key)
-    assert body["kind"] == "user_inherited"
+    # Should be able to use the auth token - for now, have to POST
+    post("hosted/onboarding", None, auth_token)
+    get("hosted/onboarding/status", None, auth_token)

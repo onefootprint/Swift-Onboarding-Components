@@ -96,11 +96,11 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
-    challenge_token = challenge_user(phone_number)
+    challenge_data = challenge_user(phone_number, "sms")
     identify_verify(
         twilio,
         phone_number,
-        challenge_token,
+        challenge_data["challenge_token"],
         ob_config_auth=secondary_bo_token,
         expected_error="This business owner has already started KYC",
     )

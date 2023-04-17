@@ -3,7 +3,7 @@ use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::{ApiError, ApiResult};
-use crate::identify::{ChallengeData, ChallengeState};
+use crate::identify::{ChallengeData, ChallengeDataKind, ChallengeState};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
@@ -69,6 +69,7 @@ pub async fn post(
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
     // Generate fingerprints and keypairs async if needed
+    let challenge_kind = ChallengeDataKind::from(&challenge_state.data);
     let challenge_data = match challenge_state.data {
         ChallengeData::Sms(challenge_state) => {
             // TODO this keypair won't always be used... but helps to generate this proactively.
@@ -133,14 +134,20 @@ pub async fn post(
                 None
             };
 
+            let elevated_scope = matches!(challenge_kind, ChallengeDataKind::Biometric)
+                .then_some(UserAuthScope::SensitiveProfile);
             // Create the auth token for this user
-            let token_scopes = bo_scope
-                .into_iter()
-                .chain([
-                    UserAuthScope::SignUp,
-                    UserAuthScope::OrgOnboardingInit { id: su.id },
-                ])
-                .collect();
+            let token_scopes = [
+                Some(UserAuthScope::SignUp),
+                Some(UserAuthScope::OrgOnboardingInit { id: su.id }),
+                // Business owner scope, if any
+                bo_scope,
+                // Higher permissions to view sensitive datas if authed with biometric
+                elevated_scope,
+            ]
+            .into_iter()
+            .flatten()
+            .collect();
             let duration = Duration::minutes(30);
 
             // Create the auth session and save it in the database

@@ -5,6 +5,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::fingerprinter::GlobalFingerprintKind;
+use strum::EnumDiscriminants;
 pub mod signup_challenge;
 pub mod verify;
 use crate::errors::ApiError;
@@ -14,7 +15,7 @@ use chrono::{DateTime, Duration, Utc};
 use db::models::vault::Vault;
 use newtypes::email::Email;
 use newtypes::PiiString;
-use newtypes::{VaultId};
+use newtypes::VaultId;
 use newtypes::{IdentityDataKind, PhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
@@ -71,7 +72,9 @@ pub enum Identifier {
     PhoneNumber(PhoneNumber),
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumDiscriminants)]
+#[strum_discriminants(name(ChallengeDataKind))]
+#[strum_discriminants(vis(pub))]
 pub enum ChallengeData<PhoneChallengeT = PhoneChallengeState> {
     Sms(PhoneChallengeT),
     Biometric(BiometricChallengeState),

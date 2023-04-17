@@ -28,6 +28,7 @@ pub enum UserAuthScope {
     Business(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
+    SensitiveProfile,
     Handoff,
 
     /// This scope should never be issued to a token - it is used to gate certain actions that

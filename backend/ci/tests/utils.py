@@ -126,19 +126,54 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 
 def inherit_user(twilio, phone_number, ob_config_auth):
-    challenge_token = challenge_user(phone_number)
+    challenge_data = challenge_user(phone_number, "sms")
 
     # Log in as the user
     return identify_verify(
         twilio,
         phone_number,
-        challenge_token,
+        challenge_data["challenge_token"],
         ob_config_auth=ob_config_auth,
         expected_kind="user_inherited",
     )
 
 
-def challenge_user(phone_number):
+def inherit_user_biometric(user):
+    phone_number = user.client.data["id.phone_number"]
+    challenge_data = challenge_user(phone_number, "biometric")
+
+    # do webauthn
+    chal = json.loads(challenge_data["biometric_challenge_json"])
+    chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
+
+    attestation = user.client.webauthn_device.get(chal, TEST_URL)
+    attestation["rawId"] = _b64_encode(attestation["rawId"])
+    attestation["id"] = _b64_encode(attestation["id"])
+    attestation["response"]["authenticatorData"] = _b64_encode(
+        attestation["response"]["authenticatorData"]
+    )
+    attestation["response"]["signature"] = _b64_encode(
+        attestation["response"]["signature"]
+    )
+    attestation["response"]["userHandle"] = _b64_encode(
+        attestation["response"]["userHandle"]
+    )
+    attestation["response"]["clientDataJSON"] = _b64_encode(
+        attestation["response"]["clientDataJSON"]
+    )
+
+    # Log in as the user
+    data = {
+        "challenge_response": json.dumps(attestation),
+        "challenge_kind": "biometric",
+        "challenge_token": challenge_data["challenge_token"],
+    }
+    body = post("hosted/identify/verify", data, user.client.ob_config.key)
+    assert body["kind"] == "user_inherited"
+    return FpAuth(body["auth_token"])
+
+
+def challenge_user(phone_number, challenge_kind="sms"):
     identifier = dict(phone_number=phone_number)
     # Support sandbox phone numbers being passed in
     real_phone_number = phone_number.split("#")[0]
@@ -154,7 +189,7 @@ def challenge_user(phone_number):
     def challenge():
         data = dict(
             identifier=identifier,
-            preferred_challenge_kind="sms",
+            preferred_challenge_kind=challenge_kind,
         )
         body = post("hosted/identify/login_challenge", data)
         last_two = real_phone_number[-2:]
@@ -162,8 +197,8 @@ def challenge_user(phone_number):
             body["challenge_data"]["scrubbed_phone_number"]
             == f"+1 (***) ***-**{last_two}"
         )
-        assert body["challenge_data"]["challenge_kind"] == "sms"
-        return body["challenge_data"]["challenge_token"]
+        assert body["challenge_data"]["challenge_kind"] == challenge_kind
+        return body["challenge_data"]
 
     try_until_success(identify, 5)
     return try_until_success(challenge, 20)
