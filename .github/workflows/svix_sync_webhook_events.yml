@@ -8,13 +8,22 @@ on:
         type: environment
         required: true
 
+  #
+  # NOTE: for now we are auto-deploying once prod deploys!
+  #
+  workflow_run:
+    workflows: ['Backend Deploy Production']
+    types:
+      - completed
+
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   svix_event_sync:
     runs-on: beast
-    environment: ${{ inputs.environment }}
+    # by default deploy to production as triggered
+    environment: ${{ inputs.environment || "production" }}
     steps:
       - uses: actions/checkout@v3
 

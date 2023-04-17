@@ -47,5 +47,5 @@ def test_webhook_e2e(sandbox_tenant, twilio):
         )
     body = response.json()
 
-    assert body["footprint_user_id"] == user.fp_id
+    assert body["fp_id"] == user.fp_id
     assert body["status"] == "pass"

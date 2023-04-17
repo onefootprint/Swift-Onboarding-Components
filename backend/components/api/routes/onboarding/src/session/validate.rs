@@ -51,11 +51,10 @@ pub async fn post(
         })
         .await??;
 
-    // Support a version of the API that is backwards-compatible for some tenants that integrated
-    // with an old version
-    let use_legacy_serialization = auth.tenant().pinned_api_version.map(|v| v <= 1) == Some(true);
     let (footprint_user_id, status, requires_manual_review, onboarding_configuration_id, timestamp) =
-        if use_legacy_serialization {
+        // Support a version of the API that is backwards-compatible for some tenants that integrated
+        // with an old version
+        if auth.tenant().uses_legacy_serialization() {
             (
                 Some(user_ob.1.fp_id.clone()),
                 Some(user_ob.0.status),

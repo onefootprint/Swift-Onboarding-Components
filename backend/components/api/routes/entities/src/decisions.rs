@@ -101,7 +101,8 @@ pub async fn post(
         state.webhook_service_client.send_event_to_tenant_non_blocking(
             scoped_vault.webhook_app(),
             WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
-                footprint_user_id: fp_id_clone,
+                fp_id: fp_id_clone.clone(),
+                footprint_user_id: auth.tenant().uses_legacy_serialization().then_some(fp_id_clone),
                 timestamp: decision.created_at,
                 new_status: status.into(),
             }),

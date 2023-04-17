@@ -34,7 +34,12 @@ mod payloads {
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct OnboardingCompletedPayload {
-        pub footprint_user_id: FpId,
+        /// the footprint id of the entity that completed onboarding
+        pub fp_id: FpId,
+        /// deprecated (replaced by fp_id)        
+        #[schemars(skip)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         pub status: OnboardingStatus,
         pub requires_manual_review: bool,
@@ -43,14 +48,24 @@ mod payloads {
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct OnboardingStatusChangedPayload {
-        pub footprint_user_id: FpId,
+        /// the footprint id of the entity that completed onboarding
+        pub fp_id: FpId,
+        /// deprecated (replaced by fp_id)        
+        #[schemars(skip)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         pub new_status: OnboardingStatus,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
     pub struct WatchlistCheckCompletedPayload {
-        pub footprint_user_id: FpId,
+        /// the footprint id of the entity that completed onboarding
+        pub fp_id: FpId,
+        /// deprecated (replaced by fp_id)        
+        #[schemars(skip)]
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         pub status: WatchlistCheckStatusKind,
         pub error: Option<WatchlistCheckError>,

@@ -14,6 +14,7 @@ use async_trait::async_trait;
 use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndMaybeResult;
@@ -84,7 +85,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         // If we create a new watchlist_check, we either:
         //  - Create it with state Pending and a decision_intent and verification_request at the same time
         //  - Create it with state NotNeeded or Error and no decision_intent/verification_request, meaning no vendor call is to be made
-        let (sv, uvw, (wc, vr)) = self
+        let (tenant, sv, uvw, (wc, vr)) = self
             .db_pool
             .db_transaction(move |conn| -> Result<_, TaskError> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
@@ -92,6 +93,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 let sv = ScopedVault::get(conn, &sv_id)?;
                 let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
                 let existing_wc = WatchlistCheckTask::get_existing_watchlist_check(conn, &task_id)?;
+                let tenant = Tenant::get(conn, &sv.tenant_id)?;
 
                 let wc = if let Some(wc) = existing_wc {
                     wc
@@ -108,7 +110,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     WatchlistCheckTask::create_new_watchlist_check(conn, &sv_id, &task_id, &sv, &ob, &uvw)?
                 };
 
-                Ok((sv, uvw, wc))
+                Ok((tenant, sv, uvw, wc))
             })
             .await?;
 
@@ -181,7 +183,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
             let wh_event =
                 WebhookEvent::WatchlistCheckCompleted(webhooks::events::WatchlistCheckCompletedPayload {
-                    footprint_user_id: sv.fp_id.clone(),
+                    fp_id: sv.fp_id.clone(),
+                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
                     timestamp: Utc::now(),
                     status: wc.status,
                     error,

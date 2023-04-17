@@ -40,6 +40,14 @@ pub struct Tenant {
     pub pinned_api_version: Option<i32>,
 }
 
+impl Tenant {
+    /// Support a version of the API that is backwards-compatible for some tenants that integrated
+    /// Namely: `footprint_user_id` vs the new `fp_id` api format
+    pub fn uses_legacy_serialization(&self) -> bool {
+        self.pinned_api_version.map(|v| v <= 1) == Some(true)
+    }
+}
+
 pub enum TenantIdentifier<'a> {
     Id(&'a TenantId),
     ScopedVaultId(&'a ScopedVaultId),
