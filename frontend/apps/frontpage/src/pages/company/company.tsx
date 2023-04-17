@@ -80,6 +80,13 @@ const Company = () => {
       twitter: 'https://twitter.com/clodoan',
     },
     {
+      name: 'D M Raisul Ahsan',
+      avatarSrc: '/team/member-ahsan.png',
+      role: 'Product Engineer',
+      linkedin: 'https://www.linkedin.com/in/raisulahsan/',
+      twitter: 'https://twitter.com/ahsan_raisul',
+    },
+    {
       name: 'Dave Argoff',
       avatarSrc: '/team/member-dave.png',
       role: 'Engineering',
