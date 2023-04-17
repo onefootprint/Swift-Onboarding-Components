@@ -31,7 +31,7 @@ def test_webhook_e2e(sandbox_tenant, twilio):
     channels = (
         [EXPECTED_SERVER_VERSION_GIT_HASH] if EXPECTED_SERVER_VERSION_GIT_HASH else None
     )
-    svix.endpoint.create(
+    endpoint = svix.endpoint.create(
         app.id, EndpointIn(url=hooky_url, version=1, channels=channels)
     )
 
@@ -49,3 +49,6 @@ def test_webhook_e2e(sandbox_tenant, twilio):
 
     assert body["fp_id"] == user.fp_id
     assert body["status"] == "pass"
+
+    # cleanup
+    svix.endpoint.delete(app.id, endpoint.id)
