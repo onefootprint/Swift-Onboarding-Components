@@ -213,11 +213,17 @@ def identify_verify(
 
 def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> BasicUser:
     sandbox_phone_number = _random_sandbox_phone(suffix)
-    phone_number = sandbox_phone_number.split("#")[0]
+    auth_token = create_user(twilio, sandbox_phone_number, ob_config_auth)
+    return BasicUser(
+        auth_token=auth_token,
+        phone_number=sandbox_phone_number,
+    )
 
+
+def create_user(twilio, phone_number, ob_config_auth=None) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
-        data = dict(phone_number=sandbox_phone_number)
+        data = dict(phone_number=phone_number)
         body = post("hosted/identify/signup_challenge", data, ob_config_auth)
         return body["challenge_data"]["challenge_token"]
 
@@ -225,14 +231,9 @@ def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> Basic
         initiate_challenge, 20
     )  # Rate limiting may take a while
 
-    # Respond to the challenge and create the sandbox user
-    auth_token = identify_verify(
+    # Respond to the challenge and create the user
+    return identify_verify(
         twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
-    )
-
-    return BasicUser(
-        auth_token=auth_token,
-        phone_number=sandbox_phone_number,
     )
 
 
@@ -280,14 +281,13 @@ def create_ob_config(tenant, name, must_collect_data, can_access_data):
 def clean_up_user(phone_number, email):
     # cleanup live user
     post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)
-    identifier = {"email": email}
-    data = dict(
-        identifier=identifier,
-        preferred_challenge_kind="sms",
-    )
-    body = post("hosted/identify", data)
-    assert not body["user_found"]
-    assert not body["available_challenge_kinds"]
+
+    # Make sure the user doesn't exist after cleanup
+    for identifier in [dict(email=email), dict(phone_number=phone_number)]:
+        data = dict(identifier=identifier)
+        body = post("hosted/identify", data)
+        assert not body["user_found"]
+        assert not body["available_challenge_kinds"]
 
 
 def get_requirement_from_requirements(kind, requirements):

@@ -16,7 +16,13 @@ def user_with_documents(doc_request_sandbox_ob_config, twilio):
     with document info as well
     """
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
-    return bifrost.run()
+    user = bifrost.run()
+    doc_requirement = next(
+        r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
+    )
+    assert doc_requirement["should_collect_selfie"]
+
+    return user
 
 
 def test_tenant_decrypt(sandbox_user):

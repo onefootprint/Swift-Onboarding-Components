@@ -122,7 +122,7 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     bifrost = BifrostClient(
         kyb_sandbox_ob_config,
         twilio,
-        override_inherit_phone_number=primary_bo.client.data["id.phone_number"],
+        override_inherit_phone=primary_bo.client.data["id.phone_number"],
     )
     primary_bo = bifrost.run()
     assert primary_bo.fp_id
@@ -147,7 +147,7 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
         kyb_sandbox_ob_config,
         twilio,
         override_ob_config_auth=secondary_bo_token,
-        override_inherit_phone_number=secondary_bo.client.data["id.phone_number"],
+        override_inherit_phone=secondary_bo.client.data["id.phone_number"],
     )
     secondary_bo = bifrost.run()
     assert secondary_bo.fp_id

@@ -9,6 +9,7 @@ from tests.utils import (
     inherit_user,
     create_basic_sandbox_user,
     get,
+    create_user,
     post,
     put,
     override_webauthn_challenge,
@@ -27,7 +28,8 @@ class BifrostClient:
         twilio,
         sandbox_suffix=None,
         override_ob_config_auth=None,
-        override_inherit_phone_number=None,
+        override_inherit_phone=None,
+        override_create_phone=None,
     ):
         """
         Creates a BifrostClient associated with a specific ob config and a specific user with
@@ -42,11 +44,17 @@ class BifrostClient:
         # Now, we do the old init_for_onboarding in the constructor
 
         ob_config_auth = override_ob_config_auth or self.ob_config.key
-        if override_inherit_phone_number:
-            auth = inherit_user(twilio, override_inherit_phone_number, ob_config_auth)
+        if override_inherit_phone:
+            # Inherit the sandbox/prod user
+            auth = inherit_user(twilio, override_inherit_phone, ob_config_auth)
             self.auth_token = auth
-            phone_number = override_inherit_phone_number
+            phone_number = override_inherit_phone
+        elif override_create_phone:
+            # Create a user with the given phone number
+            self.auth_token = create_user(twilio, override_create_phone, ob_config_auth)
+            phone_number = override_create_phone
         else:
+            # Create a sandbox user
             user = create_basic_sandbox_user(
                 twilio,
                 ob_config_auth=ob_config_auth,
@@ -55,39 +63,50 @@ class BifrostClient:
             self.auth_token = user.auth_token
             phone_number = user.phone_number
 
-        suffix = phone_number.split("#")[-1]
+        is_sandbox = "#" in phone_number
+        if is_sandbox:
+            suffix = phone_number.split("#")[-1]
+            business_name = f'{BUSINESS_DATA["business.name"]} {suffix}'
+            email = f"{EMAIL}#{suffix}"
+        else:
+            business_name = BUSINESS_DATA["business.name"]
+            email = EMAIL
         self.data = {
             **ID_DATA,
             **BUSINESS_DATA,
             **IP_DATA,
-            "business.name": f'{BUSINESS_DATA["business.name"]} {suffix}',
             "document.finra_compliance_letter": multipart_file(
                 "example_pdf.pdf", "application/pdf"
             ),
             "id.ssn9": _gen_random_ssn(),
+            "business.name": business_name,
             "id.phone_number": phone_number,
-            "id.email": f"{EMAIL}#{suffix}",
+            "id.email": email,
         }
 
         # After running bifrost, this will be the list of requirements satisfied
         self.handled_requirements = []
 
-        # Initialize the onboarding
-        post("hosted/onboarding", None, self.auth_token)
+        # Keep track of biometric credentials created
+        self.webauthn_device = SoftWebauthnDevice()
 
-    def get_requirements(self):
-        return get("hosted/onboarding/status", None, self.auth_token)["requirements"]
+        # Initialize the onboarding
+        self.initialize_onboarding()
+
+    def initialize_onboarding(self):
+        return post("hosted/onboarding", None, self.auth_token)
+
+    def get_status(self):
+        return get("hosted/onboarding/status", None, self.auth_token)
 
     def handle_requirements(self, kind=None):
         """
         Handle all onboarding requirements.
         If `kind` is provided, will only handle the requested requirement
         """
-        requirements = self.get_requirements()
+        requirements = self.get_status()["requirements"]
         requirements_to_handle = (
-            requirements
-            if not kind
-            else next(i for i in requirements if i["kind"] == kind)
+            requirements if not kind else [i for i in requirements if i["kind"] == kind]
         )
 
         self.handled_requirements = requirements_to_handle
@@ -120,6 +139,7 @@ class BifrostClient:
             di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
+        post("/hosted/user/vault/validate", data, self.auth_token)
         put("/hosted/user/vault", data, self.auth_token)
 
     def handle_collect_business(self, requirement):
@@ -131,6 +151,7 @@ class BifrostClient:
             di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
+        post("/hosted/business/vault/validate", data, self.auth_token)
         body = put("/hosted/business/vault", data, self.auth_token)
         # TODO don't save this here after we stop returning the secondary BO auth tokens
         self.put_business_response = body
@@ -163,22 +184,27 @@ class BifrostClient:
 
         post("hosted/user/document", data, self.auth_token)
 
+        # Check the status of uploading the doc
+        body = get(f"hosted/user/document/status", None, self.auth_token)
+        assert body["status"]["kind"] == "complete"
+        assert not body["errors"]
+        assert not body["front_image_error"]
+        assert not body["back_image_error"]
+
     def handle_liveness(self):
         """Register the biometric credential"""
-        webauthn_device = SoftWebauthnDevice()
         body = post("hosted/user/biometric/init", None, self.auth_token)
         chal_token = body["challenge_token"]
         chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
-        attestation = webauthn_device.create(chal, TEST_URL)
+        attestation = self.webauthn_device.create(chal, TEST_URL)
         attestation = override_webauthn_attestation(attestation)
         data = dict(
             challenge_token=chal_token, device_response_json=json.dumps(attestation)
         )
         post("hosted/user/biometric", data, self.auth_token)
 
-    def authorize(self):
-        body = post("hosted/onboarding/authorize", None, self.auth_token)
-        return body["validation_token"]
+    def authorize(self, **kwargs):
+        return post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
 
     def validate(self, validation_token):
         # Use the SK of the tenant that owns the ob config
@@ -194,7 +220,7 @@ class BifrostClient:
         Simulates all bifrost logic of satisfying requirements and authorizing.
         """
         self.handle_requirements()
-        validation_token = self.authorize()
+        validation_token = self.authorize()["validation_token"]
         (fp_id, fp_bid) = self.validate(validation_token)
 
         return User(
