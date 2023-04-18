@@ -27,6 +27,40 @@
     "sandbox-outcome-footer": {
       "outcome": "Test outcome:",
       "testID": "Test ID:"
+    },
+    "login-challenge": {
+      "sms": {
+        "title-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "title-without-phone": "Enter the 6-digit code sent to your phone.",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      },
+      "biometric": {
+        "verification": {
+          "loading": "Waiting...",
+          "success": "Success!",
+          "cta": "Launch biometrics",
+          "cta-retry": "Retry biometrics"
+        }
+      },
+      "challenge-picker": {
+        "sms": "SMS",
+        "biometric": "Biometric",
+        "aria-label": "Select a login challenge type."
+      }
+    },
+    "sms-challenge-verification": {
+      "error": "Incorrect code",
+      "verifying": "Verifying...",
+      "success": "Success!",
+      "resend-button": {
+        "cta": "Resend code",
+        "disabled": "Please wait {{seconds}} seconds to resend it..."
+      }
     }
   },
   "pages": {
