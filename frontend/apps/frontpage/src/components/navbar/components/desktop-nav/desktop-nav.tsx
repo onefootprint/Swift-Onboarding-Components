@@ -34,14 +34,8 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
         })}
       </MainNav>
       <SecondaryNav>
-        <Login href={`${DASHBOARD_BASE_URL}/login`} prefetch>
-          {t('login')}
-        </Login>
-        <LinkButton
-          href={`${DASHBOARD_BASE_URL}/sign-up`}
-          size="compact"
-          prefetch
-        >
+        <Login href={`${DASHBOARD_BASE_URL}/login`}>{t('login')}</Login>
+        <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`} size="compact">
           {t('sign-up')}
         </LinkButton>
       </SecondaryNav>
