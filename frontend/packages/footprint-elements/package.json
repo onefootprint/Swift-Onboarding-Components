@@ -26,7 +26,7 @@
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@tanstack/react-query": "^4.26.0",
+    "@tanstack/react-query": "^4.29.3",
     "@xstate/react": "^3.2.1",
     "base64url": "^3.0.1",
     "browser-image-compression": "^2.0.0",
@@ -37,13 +37,13 @@
     "postmate": "^1.5.2",
     "qrcode.react": "^3.1.0",
     "react-hook-form": "^7.43.5",
-    "react-i18next": "^12.0.0",
+    "react-i18next": "^12.2.0",
     "react-image-file-resizer": "^0.4.8",
     "styled-media-query": "^2.1.2",
     "use-places-autocomplete": "^4.0.0",
     "use-resize-observer": "^9.1.0",
     "usehooks-ts": "2.7.2",
-    "xstate": "^4.35.1"
+    "xstate": "^4.37.1"
   },
   "devDependencies": {
     "@onefootprint/test-utils": "*",

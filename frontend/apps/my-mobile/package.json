@@ -10,16 +10,25 @@
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "dependencies": {
+    "@onefootprint/request": "*",
+    "@onefootprint/types": "*",
     "@onefootprint/ui-mobile": "*",
+    "@tanstack/react-query": "^4.29.3",
+    "@xstate/react": "^3.2.1",
     "expo-camera": "~13.2.1",
     "expo-splash-screen": "~0.18.1",
     "expo-status-bar": "~1.4.4",
     "expo": "~48.0.11",
+    "i18next": "^22.0.4",
+    "react-i18next": "^12.2.0",
     "react-native-app-clip": "^0.1.2",
     "react-native": "0.71.6",
-    "react": "18.2.0"
+    "react": "18.2.0",
+    "xstate": "^4.37.1"
   },
   "devDependencies": {
+    "@onefootprint/jest-presets": "*",
+    "@onefootprint/test-utils": "*",
     "@babel/core": "^7.20.0",
     "eslint-config-footprint": "*"
   },
