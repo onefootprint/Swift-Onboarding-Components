@@ -18,8 +18,8 @@ const Root = () => {
       data={{
         tenantPk: 'ob_test_tFKxgkVoZrFTEU05tnSVtW',
         bootstrapData: {
-          email: 'email',
-          phoneNumber: 'phone',
+          email: 'belce@onefootprint.com',
+          phoneNumber: '+16504600700',
         },
       }}
       layout={{

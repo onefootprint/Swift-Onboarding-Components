@@ -5,7 +5,7 @@ import HeaderTitle from '../../../../../../components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 
 const Header = () => {
-  const { t } = useTranslation('pages.email-identification.header');
+  const { t } = useTranslation('pages.identify.email-identification.header');
   return (
     <>
       <NavigationHeader button={{ variant: 'close' }} />

@@ -10,7 +10,7 @@ import useIdentifyMachine from '../../hooks/use-identify-machine';
 import LoginWithDifferentAccount from './components/login-with-different-account';
 
 const BootstrapChallenge = () => {
-  const { t } = useTranslation('pages.bootstrap-challenge');
+  const { t } = useTranslation('pages.identify.bootstrap-challenge');
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,

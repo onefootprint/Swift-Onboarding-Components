@@ -28,6 +28,9 @@
       "outcome": "Test outcome:",
       "testID": "Test ID:"
     },
+    "legal-footer": {
+      "label": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+    },
     "login-challenge": {
       "sms": {
         "title-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
