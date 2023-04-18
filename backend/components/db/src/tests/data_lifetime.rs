@@ -3,7 +3,7 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, IdentityDataKind, ScopedVaultId, TenantId, VaultId, DocumentKind,
+    DataLifetimeId, DataLifetimeSeqno, DocumentKind, IdentityDataKind, ScopedVaultId, TenantId, VaultId,
 };
 use std::collections::HashSet;
 
@@ -99,8 +99,15 @@ impl TestData {
             IdentityDataKind::PhoneNumber,
         );
         // For different user
-        let lifetime5 =
-            fixtures::data_lifetime::build(conn, &uv2_id, &su2_id, seqno1, None, None, DocumentKind::Passport);
+        let lifetime5 = fixtures::data_lifetime::build(
+            conn,
+            &uv2_id,
+            &su2_id,
+            seqno1,
+            None,
+            None,
+            DocumentKind::Passport,
+        );
         let lifetime6 = fixtures::data_lifetime::build(
             conn,
             &uv2_id,
@@ -152,7 +159,7 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
     // View for tenant 1
     let mut results =
-        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t_id)
+        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t_id, None)
             .unwrap();
     assert_eq!(
         ids(results.remove(&c.uv_id).unwrap()),
@@ -166,7 +173,7 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConn) {
 
     // View for tenant 2
     let mut results =
-        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t2_id)
+        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t2_id, None)
             .unwrap();
     assert_eq!(
         ids(results.remove(&c.uv_id).unwrap()),
@@ -174,6 +181,95 @@ fn test_get_bulk_active_for_tenant(conn: &mut TestPgConn) {
     );
     assert_eq!(ids(results.remove(&c.uv2_id).unwrap()), ids(vec![&c.lifetime6])); // lifetime6 visible from other tenant bc portable
     assert!(results.is_empty()); // No other results
+}
+
+#[db_test]
+fn test_get_bulk_active_for_tenant_seqno(conn: &mut TestPgConn) {
+    let c = TestData::build(conn);
+
+    let tests = vec![
+        (Some(c.seqno0), (vec![], vec![]), (vec![], vec![])), // Nothing exists
+        (
+            Some(c.seqno1),
+            (
+                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3],
+                vec![&c.lifetime5, &c.lifetime6],
+            ),
+            (vec![&c.lifetime4], vec![]),
+        ), // 1,2,3 added for (t1, uv1), 5,6 added for (t1, uv2), 4 added for (t2, uv1)
+        (
+            Some(c.seqno3),
+            (
+                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3],
+                vec![&c.lifetime5, &c.lifetime6],
+            ),
+            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
+        ), // 2,6 portabalized
+        (
+            Some(c.seqno4),
+            (
+                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3, &c.lifetime4],
+                vec![&c.lifetime5, &c.lifetime6],
+            ),
+            (vec![&c.lifetime4, &c.lifetime2, &c.lifetime3], vec![&c.lifetime6]),
+        ), // 3,4 portabalized
+        (
+            Some(c.seqno5),
+            (
+                vec![&c.lifetime1, &c.lifetime2, &c.lifetime4],
+                vec![&c.lifetime5, &c.lifetime6],
+            ),
+            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
+        ), // 3 deactivated
+        (
+            None,
+            (
+                vec![&c.lifetime1, &c.lifetime2, &c.lifetime4],
+                vec![&c.lifetime5, &c.lifetime6],
+            ),
+            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
+        ),
+    ];
+    for test in tests {
+        let (seqno, (t1_u1_expected, t1_u2_expected), (t2_u1_expected, t2_u2_expected)) = test;
+
+        let mut t1_results = DataLifetime::get_bulk_active_for_tenant(
+            conn,
+            vec![&c.uv_id, &c.uv2_id, &c.uvx_id],
+            &c.t_id,
+            seqno,
+        )
+        .unwrap();
+
+        // View for tenant 1
+        assert_eq!(
+            ids(t1_u1_expected),
+            ids(t1_results.remove(&c.uv_id).unwrap_or_default())
+        );
+        assert_eq!(
+            ids(t1_u2_expected),
+            ids(t1_results.remove(&c.uv2_id).unwrap_or_default())
+        );
+        assert!(t1_results.is_empty()); // No other results
+
+        // View for tenant 2
+        let mut t2_results = DataLifetime::get_bulk_active_for_tenant(
+            conn,
+            vec![&c.uv_id, &c.uv2_id, &c.uvx_id],
+            &c.t2_id,
+            seqno,
+        )
+        .unwrap();
+        assert_eq!(
+            ids(t2_u1_expected),
+            ids(t2_results.remove(&c.uv_id).unwrap_or_default())
+        );
+        assert_eq!(
+            ids(t2_u2_expected),
+            ids(t2_results.remove(&c.uv2_id).unwrap_or_default())
+        );
+        assert!(t2_results.is_empty()); // No other results
+    }
 }
 
 #[db_test]

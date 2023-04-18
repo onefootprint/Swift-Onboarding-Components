@@ -294,18 +294,41 @@ impl DataLifetime {
         conn: &mut PgConn,
         vault_ids: Vec<&VaultId>,
         tenant_id: &TenantId,
+        seqno: Option<DataLifetimeSeqno>,
     ) -> DbResult<HashMap<VaultId, Vec<Self>>> {
         use crate::schema::scoped_vault;
-        let q_is_portable = not(data_lifetime::portablized_seqno.is_null());
-        let q_belongs_to_tenant = scoped_vault::tenant_id.eq(tenant_id);
-        let query = data_lifetime::table
+
+        let mut query = data_lifetime::table
             .left_join(scoped_vault::table)
             // Get data belonging to these users that is not deactivated
-            .filter(data_lifetime::vault_id.eq_any(vault_ids))
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            // Fetch all rows that are either portable
-            // OR belong to this tenant
-            .filter(q_is_portable.or(q_belongs_to_tenant));
+            .filter(data_lifetime::vault_id.eq_any(vault_ids)).into_boxed();
+
+        if let Some(seqno) = seqno {
+            // created
+            query = query.filter(data_lifetime::created_seqno.le(seqno));
+            // belongs to tenant or is portabalized
+            query = query.filter(
+                scoped_vault::tenant_id
+                    .eq(tenant_id)
+                    .or(not(data_lifetime::portablized_seqno.is_null())
+                        .and(data_lifetime::portablized_seqno.le(seqno))),
+            );
+            // not deactivated
+            query = query.filter(
+                data_lifetime::deactivated_seqno
+                    .is_null()
+                    .or(data_lifetime::deactivated_seqno.gt(seqno)),
+            );
+        } else {
+            // belongs to tenant or is portabalized
+            query = query.filter(
+                scoped_vault::tenant_id
+                    .eq(tenant_id)
+                    .or(not(data_lifetime::portablized_seqno.is_null())),
+            );
+            // not deactivated
+            query = query.filter(data_lifetime::deactivated_seqno.is_null());
+        };
 
         let results: Vec<Self> = query.select(data_lifetime::all_columns).get_results(conn)?;
         let uv_id_to_lifetimes = results

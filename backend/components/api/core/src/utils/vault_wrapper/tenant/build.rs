@@ -10,7 +10,7 @@ use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use db::PgConn;
-use newtypes::{ScopedVaultId, TenantId};
+use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
@@ -27,15 +27,16 @@ impl<Type> VaultWrapper<Type> {
     // In order to minimize database queries, we would like to be able to bulk fetch
     // various data elements for a set of Users.
     // Note: it is possible that there are multiple scoped users for each user vault
-    #[tracing::instrument(skip_all)]
+    // #[tracing::instrument(skip_all)]
     pub fn multi_get_for_tenant(
         conn: &mut PgConn,
         users: Vec<(ScopedVault, Vault)>,
         tenant_id: &TenantId,
+        seqno: Option<DataLifetimeSeqno>,
     ) -> ApiResult<HashMap<ScopedVaultId, TenantUvw<Type>>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let uv_id_to_active_lifetimes =
-            DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id)?;
+            DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id, seqno)?;
         let active_lifetime_list: Vec<_> = uv_id_to_active_lifetimes.values().flatten().collect();
 
         // For each data source, fetch data _for all users_ in the `user_vaults` list.

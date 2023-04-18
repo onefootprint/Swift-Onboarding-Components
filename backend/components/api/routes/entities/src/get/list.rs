@@ -80,7 +80,7 @@ pub async fn get(
             )?;
             let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
             let vws: HashMap<ScopedVaultId, TenantUvw> =
-                VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id)?;
+                VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id, None)?;
             let scoped_user_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
             Ok((scoped_vaults, obs, vws, count))
