@@ -1,6 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
-import { BootstrapData } from '../../../idv.types';
+import { BootstrapData } from '../../../types';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowSandboxOutcome from './utils/should-show-sandbox-outcome';

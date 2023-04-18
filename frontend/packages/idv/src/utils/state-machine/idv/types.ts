@@ -1,7 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
 
-import { BootstrapData } from '../../../idv.types';
+import { BootstrapData } from '../../../types';
 
 export type MachineContext = {
   // Inputs

@@ -1,0 +1,24 @@
+import request from '@onefootprint/request';
+import {
+  IdentifyVerifyRequest,
+  IdentifyVerifyResponse,
+} from '@onefootprint/types';
+import { useMutation } from '@tanstack/react-query';
+
+import { ONBOARDING_CONFIG_KEY_HEADER } from '../../../config/contants';
+
+const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
+  const response = await request<IdentifyVerifyResponse>({
+    method: 'POST',
+    url: '/hosted/identify/verify',
+    data: payload,
+    headers: payload.tenantPk
+      ? { [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk }
+      : {},
+  });
+  return response.data;
+};
+
+const useIdentifyVerify = () => useMutation(identifyVerifyRequest);
+
+export default useIdentifyVerify;

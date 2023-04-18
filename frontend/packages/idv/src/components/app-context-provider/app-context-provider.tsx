@@ -1,6 +1,6 @@
 import constate from 'constate';
 
-import { IdvCallbacks, IdvLayout } from '../../idv.types';
+import { IdvCallbacks, IdvLayout } from '../../types';
 
 type AppContextArgs = {
   layout: IdvLayout;

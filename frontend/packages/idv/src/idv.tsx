@@ -10,8 +10,8 @@ import { MachineProvider } from './components/machine-provider';
 import { GOOGLE_MAPS_KEY } from './config/contants';
 import configureI18next from './config/initializers/react-i18next';
 import useExtendedAppearance from './hooks/use-extended-appearance';
-import { IdvProps } from './idv.types';
 import Router from './pages/router';
+import { IdvProps } from './types';
 
 const App = ({ data, appearance, layout, callbacks }: IdvProps) => {
   const { tenantPk, bootstrapData } = data;

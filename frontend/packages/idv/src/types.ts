@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js/src/footprint-js.types';
+import { FootprintAppearance } from '@onefootprint/footprint-js';
 
 export type IdvProps = {
   data: IdvData;
