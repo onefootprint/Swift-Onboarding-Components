@@ -31,7 +31,7 @@ pub async fn post(
     request: Option<Json<RawDataRequest>>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_wire_types::NewUser>>, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let principal = auth.actor().into();
     let insight = CreateInsightEvent::from(insight);
@@ -88,5 +88,7 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped_user))))
+    Ok(Json(ResponseData::ok(api_wire_types::NewUser::from_db(
+        scoped_user,
+    ))))
 }
