@@ -25,7 +25,7 @@ use super::serialize_entity;
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
-    tags(Entities, Private)
+    tags(Entities, Preview)
 )]
 #[get("/entities")]
 pub async fn get(

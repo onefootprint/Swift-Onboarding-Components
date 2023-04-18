@@ -18,7 +18,7 @@ use super::serialize_entity;
 
 #[api_v2_operation(
     description = "View details of a specific entity (business or user)",
-    tags(Entities, Private)
+    tags(Entities, Preview)
 )]
 #[get("/entities/{fp_id}")]
 pub async fn get(
