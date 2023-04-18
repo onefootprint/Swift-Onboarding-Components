@@ -19,11 +19,13 @@ pub use user_ob::*;
 #[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display, Hash))]
 #[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]
+// WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
     SignUp,
     OrgOnboardingInit {
         id: ScopedVaultId,
     },
+    /// DEPRECATED. Waiting for all auth tokens with this scope to expire in prod before removing
     OrgOnboarding,
     Business(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp

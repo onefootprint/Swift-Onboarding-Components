@@ -110,6 +110,5 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     # Inherit the user via biometric
     auth_token = inherit_user_biometric(sandbox_user)
 
-    # Should be able to use the auth token - for now, have to POST
-    post("hosted/onboarding", None, auth_token)
+    # Should be able to use the auth token
     get("hosted/onboarding/status", None, auth_token)

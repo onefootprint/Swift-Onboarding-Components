@@ -98,7 +98,7 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            let business_scope = if let Some(new_business_keypair) = new_business_keypair {
+            if let Some(new_business_keypair) = new_business_keypair {
                 let (public_key, e_private_key) = new_business_keypair;
                 let args = NewVaultArgs {
                     public_key,
@@ -120,19 +120,11 @@ pub async fn post(
                     insight_event: insight_event.clone(),
                 };
                 Onboarding::get_or_create(conn, ob_create_args)?;
-                Some(UserAuthScope::Business(sb.id))
-            } else {
-                None
-            };
-
-            // Update the auth session in the DB to have the OrgOnboarding scope and potentially
-            // business scope, giving permission to perform other operations in onboarding.
-            let new_scopes = vec![UserAuthScope::OrgOnboarding]
-                .into_iter()
-                .chain(business_scope.into_iter())
-                .collect();
-            let data = user_auth.data.clone().add_scopes(new_scopes);
-            user_auth.update_session(conn, &session_key, data)?;
+                // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
+                let new_scope = UserAuthScope::Business(sb.id);
+                let data = user_auth.data.clone().add_scopes(vec![new_scope]);
+                user_auth.update_session(conn, &session_key, data)?;
+            }
 
             // If the user has already onboarded onto this same ob config, return a validation token
             let validation_token = ob

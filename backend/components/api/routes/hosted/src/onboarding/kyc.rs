@@ -13,7 +13,7 @@ pub struct StatusResponse {
 #[api_v2_operation(tags(Hosted), description = "Check the status of KYC checks for a user")]
 #[actix::get("/hosted/onboarding/kyc")]
 pub async fn get(user_auth: UserAuthContext) -> JsonApiResponse<StatusResponse> {
-    user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let response = StatusResponse {
         status: RequirementStatus::Complete,

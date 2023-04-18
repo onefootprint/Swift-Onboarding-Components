@@ -8,9 +8,6 @@ def biometric_sandbox_user_auth(sandbox_user):
     auth token for sandbox_user from logging in via biometric credential
     """
     auth_token = inherit_user_biometric(sandbox_user)
-    # This is weird - we have to POST /hosted/onboarding in order to give the auth token
-    # OrgOnboarding scope. TODO Let's rm this scope
-    post("hosted/onboarding", None, auth_token)
     return auth_token
 
 
@@ -53,6 +50,7 @@ def test_decrypt_biometric(
     sandbox_user, biometric_sandbox_user_auth, fields_to_decrypt, expected_success
 ):
     data = dict(fields=fields_to_decrypt)
+    # TODO should we 403 for insufficient perms rather than 401?
     expected_status = 200 if expected_success else 401
     body = post(
         "hosted/user/vault/decrypt",

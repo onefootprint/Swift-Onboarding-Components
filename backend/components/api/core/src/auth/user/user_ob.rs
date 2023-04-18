@@ -58,15 +58,8 @@ impl ExtractableAuthSession for ParsedUserObSession {
         let user_session =
             <ParsedUserSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
-        // Even though we could technically fetch the onboarding via the OrgOnboardingInit scope,
-        // we only want to look for it after the POST /hosted/onboarding API has been called
-        // TODO this could just rely upon whether the onboarding exists?
-        if !UserAuthGuard::OrgOnboarding.is_met(&user_session.scopes) {
-            // If there is no Onboarding scope on this auth token, the Onboarding won't exist
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
-        }
         let Some(scoped_user_id) = user_session.scoped_user_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
+            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
         };
 
         // Confirm that the onboarding in the auth token belongs to the user

@@ -42,7 +42,7 @@ pub async fn post(
     user_auth: UserObAuthContext,
     request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let (uv, db_document_request, user_auth, user_consent) = state
         .db_pool
@@ -359,7 +359,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserObAuthContext,
 ) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let (status, errors) = state
         .db_pool

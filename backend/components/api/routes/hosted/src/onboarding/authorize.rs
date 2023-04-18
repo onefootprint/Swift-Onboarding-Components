@@ -52,7 +52,7 @@ pub async fn post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
     let session_key = state.session_sealing_key.clone();
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     // Verify there are no unmet requirements
     let (requirements, user_auth) = get_requirements(&state, user_auth).await?;

@@ -14,7 +14,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserObAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
 
     let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
     let uv_id = user_auth.user_vault_id().clone();
