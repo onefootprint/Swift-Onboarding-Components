@@ -39,6 +39,7 @@
     "react-hook-form": "^7.43.5",
     "react-i18next": "^12.2.0",
     "react-image-file-resizer": "^0.4.8",
+    "react-use-measure": "^2.1.1",
     "styled-media-query": "^2.1.2",
     "use-places-autocomplete": "^4.0.0",
     "use-resize-observer": "^9.1.0",
@@ -46,8 +47,8 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
-    "@onefootprint/test-utils": "*",
     "@onefootprint/jest-presets": "*",
+    "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "@storybook/addon-actions": "^6.5.15",
     "@storybook/addon-essentials": "^6.5.15",

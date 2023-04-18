@@ -1,5 +1,7 @@
 import { media } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
+import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
 import FootprintFooter from '../footprint-footer';
@@ -14,6 +16,8 @@ type LayoutProps = {
   hasBorderRadius?: boolean;
 };
 
+const SHIMMER_HEIGHT = '296px';
+
 const Layout = ({
   children,
   footerVariant,
@@ -21,6 +25,7 @@ const Layout = ({
   hasBorderRadius = false,
 }: LayoutProps) => {
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
+  const [refBody, { height: bodyHeight }] = useMeasure();
 
   const measuredRef = useCallback((handler: SandboxBannerHandler) => {
     if (!handler) {
@@ -34,20 +39,30 @@ const Layout = ({
 
   return (
     <Container id={LAYOUT_CONTAINER_ID} hasBorderRadius={hasBorderRadius}>
-      <Header id={LAYOUT_HEADER_ID}>
-        {isSandbox && <SandboxBanner ref={measuredRef} />}
-        <NavigationHeaderContainer
-          top={isSandbox ? sandboxBannerHeight : undefined}
-          containerId={LAYOUT_CONTAINER_ID}
-        />
-      </Header>
-      <Body>{children}</Body>
-      <FootprintFooter variant={footerVariant} />
+      <DialogContent>
+        <Header id={LAYOUT_HEADER_ID}>
+          {isSandbox && <SandboxBanner ref={measuredRef} />}
+          <NavigationHeaderContainer
+            top={isSandbox ? sandboxBannerHeight : undefined}
+            containerId={LAYOUT_CONTAINER_ID}
+          />
+        </Header>
+        <Body
+          animate={{ height: bodyHeight || SHIMMER_HEIGHT }}
+          transition={{
+            duration: 0.15,
+            type: 'spring',
+          }}
+        >
+          <BodyContent ref={refBody}>{children}</BodyContent>
+        </Body>
+        <FootprintFooter variant={footerVariant} />
+      </DialogContent>
     </Container>
   );
 };
 
-const Container = styled.div<{ hasBorderRadius: boolean }>`
+const Container = styled(motion.div)<{ hasBorderRadius: boolean }>`
   ${({ theme }) => css`
     background: ${theme.components.bifrost.dialog.bg};
     display: flex;
@@ -58,7 +73,7 @@ const Container = styled.div<{ hasBorderRadius: boolean }>`
     position: relative;
 
     ${media.greaterThan('md')`
-      height: unset;
+      height: auto;
       margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
       max-height: calc(100vh - (2 * ${theme.spacing[9]}));
       max-width: 480px;
@@ -74,16 +89,22 @@ const Container = styled.div<{ hasBorderRadius: boolean }>`
     `}
 `;
 
-const Body = styled.div`
+const Body = styled(motion.div)`
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
+
+const BodyContent = styled.span`
   ${({ theme }) => css`
-    flex: 1 0 auto;
-    padding: ${theme.spacing[5]};
     display: flex;
     flex-direction: column;
-    position: relative;
+    box-sizing: content-box;
+    padding: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      padding: 0 ${theme.spacing[7]} ${theme.spacing[7]};
+      padding: 0 ${theme.spacing[7]} ${theme.spacing[8]}; 
     `}
   `}
 `;
@@ -94,6 +115,17 @@ const Header = styled.div`
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};
+    flex: 0;
+  `}
+`;
+
+const DialogContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  ${media.greaterThan('md')`
+    height: auto;
   `}
 `;
 

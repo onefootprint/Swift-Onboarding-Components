@@ -51,6 +51,7 @@ const FootprintFooterContainer = styled.footer<{ variant: 'modal' | 'mobile' }>`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    flex: 0;
   `}
 
   ${({ variant, theme }) =>
