@@ -50,24 +50,12 @@ impl<Type> VwData<Type> {
             return Err(ApiError::AssertionError("Found portable custom data".to_owned()));
         }
 
-        let portable = Self::build(
-            portable_vd,
-            portable_documents,
-            &all_lifetimes,
-        );
-        let speculative = Self::build(
-            speculative_vd,
-            speculative_documents,
-            &all_lifetimes,
-        );
+        let portable = Self::build(portable_vd, portable_documents, &all_lifetimes);
+        let speculative = Self::build(speculative_vd, speculative_documents, &all_lifetimes);
         Ok((portable, speculative))
     }
 
-    fn build(
-        vd: Vec<VaultData>,
-        documents: Vec<DocumentData>,
-        all_lifetimes: &[DataLifetime],
-    ) -> Self {
+    fn build(vd: Vec<VaultData>, documents: Vec<DocumentData>, all_lifetimes: &[DataLifetime]) -> Self {
         let lifetime_ids: Vec<Vec<_>> = vec![
             vd.iter().map(|d| d.lifetime_id()).collect(),
             documents.iter().map(|d| d.lifetime_id()).collect(),

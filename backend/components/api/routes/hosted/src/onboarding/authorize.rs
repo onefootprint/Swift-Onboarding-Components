@@ -11,6 +11,9 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::TenantUvw;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
@@ -187,9 +190,9 @@ pub async fn post(
         let (uvw, bvw) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
-                let uvw = VaultWrapper::build_for_tenant(conn, &sv_user_id)?;
+                let uvw: TenantUvw<Person> = VaultWrapper::build_for_tenant(conn, &sv_user_id)?;
                 let bvw = sv_biz_id
-                    .map(|id| VaultWrapper::build_for_tenant(conn, &id))
+                    .map(|id| VaultWrapper::<Business>::build_for_tenant(conn, &id))
                     .transpose()?;
 
                 Ok((uvw, bvw))

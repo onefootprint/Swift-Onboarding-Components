@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use crate::auth::tenant::TenantAuth;
 
 use crate::errors::ApiResult;
-
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::DecryptRequest;
+use crate::utils::vault_wrapper::TenantUvw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 
@@ -45,7 +45,7 @@ pub async fn detokenize(
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-                let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+                let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
                 // TODO how do we check perms for custom data? feels like always allowed, only gated
                 // by tenant_role. I think this will break rn
                 Ok((uvw, scoped_user))

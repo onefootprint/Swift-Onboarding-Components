@@ -8,7 +8,7 @@ use crate::{errors::ApiResult, State};
 
 use super::TenantUvw;
 
-impl TenantUvw {
+impl<Type> TenantUvw<Type> {
     /// This creates fingerprints scoped to the tenant for data
     /// that the tenant has access to
     pub async fn create_authorized_fingerprints(

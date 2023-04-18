@@ -6,7 +6,7 @@ use itertools::Itertools;
 use newtypes::{DataIdentifier, PiiString, TenantScope};
 use std::collections::HashMap;
 
-impl TenantUvw {
+impl<Type> TenantUvw<Type> {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
     pub fn check_ob_config_access(&self, ids: &[DataIdentifier]) -> ApiResult<()> {

@@ -8,7 +8,7 @@ pub mod document;
 use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;
 
-use super::{Person, VaultWrapper};
+use super::{Any, VaultWrapper};
 use newtypes::ScopedVaultId;
 
 use derive_more::Deref;
@@ -19,12 +19,9 @@ pub mod fingerprint;
 /// This UVW variant contains all of the functionality to decrypt information on the vault
 #[derive(Deref)]
 // TODO Rename to TenantVw
-pub struct TenantUvw {
+pub struct TenantUvw<Type = Any> {
     #[deref]
-    // TODO this is really strange that we wrap VaultWrapper<Person> since this is used to hold business vaults too.
-    // The behavior of the VW doesn't materially branch on VaultWrapper or TenantVw, only on WriteableVw.
-    // Maybe in the future we move the typed parameterization to the WriteableVw
-    uvw: VaultWrapper<Person>,
+    uvw: VaultWrapper<Type>,
     pub scoped_vault_id: ScopedVaultId,
     pub onboarding: Option<OnboardingAndConfig>,
 }

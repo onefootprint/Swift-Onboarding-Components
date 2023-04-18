@@ -1,5 +1,5 @@
 use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business, TenantUvw};
 use crate::{errors::ApiError, State};
 
 use db::DbPool;
@@ -71,7 +71,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
-                let uvw = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
+                let uvw: TenantUvw<Person> = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
                 Ok((doc, ref_id.ref_id, uvw))
             },
         )

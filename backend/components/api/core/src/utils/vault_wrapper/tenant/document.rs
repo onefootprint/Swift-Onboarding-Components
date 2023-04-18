@@ -19,7 +19,7 @@ pub struct DecryptedIdentityDocuments {
     pub selfie: Option<PiiBytes>,
 }
 
-impl TenantUvw {
+impl<Type> TenantUvw<Type> {
     pub async fn decrypt_document(
         &self,
         state: &State,

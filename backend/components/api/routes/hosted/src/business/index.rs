@@ -5,7 +5,7 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::errors::business::BusinessError;
 use api_core::types::ResponseData;
-use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::{Business, VaultWrapper};
 use api_core::{auth::ob_config::BoSessionAuth, utils::vault_wrapper::TenantUvw};
 use api_wire_types::hosted::business::{HostedBusiness, Invited, Inviter};
 use db::models::onboarding::Onboarding;
@@ -62,7 +62,10 @@ pub struct BasicBusinessInfo {
     pub secondary_bos: HashMap<BoLinkId, KycedBusinessOwnerData>,
 }
 
-pub async fn decrypt_basic_business_info(state: &State, bvw: &TenantUvw) -> ApiResult<BasicBusinessInfo> {
+pub async fn decrypt_basic_business_info(
+    state: &State,
+    bvw: &TenantUvw<Business>,
+) -> ApiResult<BasicBusinessInfo> {
     let bos: Vec<KycedBusinessOwnerData> = bvw
         .decrypt_unchecked_single(&state.enclave_client, BDK::KycedBeneficialOwners.into())
         .await?

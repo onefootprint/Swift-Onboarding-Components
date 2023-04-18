@@ -5,6 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::utils::vault_wrapper::TenantUvw;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -50,7 +51,7 @@ pub async fn post_validate_inner(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
@@ -10,6 +12,7 @@ use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::utils::vault_wrapper::TenantUvw;
 use api_wire_types::ListEntitiesRequest;
 use db::models::onboarding::Onboarding;
 use db::scoped_vault::ScopedVaultListQueryParams;
@@ -17,6 +20,7 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
 use newtypes::PiiString;
+use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -75,7 +79,8 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let vws = VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id)?;
+            let vws: HashMap<ScopedVaultId, TenantUvw> =
+                VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id)?;
             let scoped_user_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
             Ok((scoped_vaults, obs, vws, count))

@@ -13,9 +13,9 @@ type EntityListResponse = Vec<EntityDetailResponse>;
 
 /// Shared logic to map info on an entity into its serialized form.
 /// Pulled out since we do some special logic to decrypt certain attributes
-fn serialize_entity(
+fn serialize_entity<Type>(
     sv: ScopedVault,
-    vw: &TenantUvw,
+    vw: &TenantUvw<Type>,
     ob: Option<SerializableOnboardingInfo>,
 ) -> api_wire_types::Entity {
     // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized

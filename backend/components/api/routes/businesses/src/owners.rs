@@ -9,6 +9,8 @@ use crate::State;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::TenantUvw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::business_owner::BusinessOwner;
@@ -41,7 +43,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let vw: TenantUvw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let bos = sv
                 .ob_configuration_id
                 .as_ref()

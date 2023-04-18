@@ -9,6 +9,7 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::utils::vault_wrapper::TenantUvw;
 use db::models::onboarding::Onboarding;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::FpId;
@@ -48,7 +49,7 @@ pub async fn get(
             let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let vw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let vw: TenantUvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let ob = Onboarding::get_for_scoped_users(conn, vec![&sv.id])?.remove(&sv.id);
 
             Ok((sv, ob, vw))

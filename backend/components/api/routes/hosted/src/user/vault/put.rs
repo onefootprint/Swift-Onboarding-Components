@@ -7,6 +7,7 @@ use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
+use api_core::utils::vault_wrapper::TenantUvw;
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
@@ -36,7 +37,7 @@ pub async fn post_validate(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
+            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

@@ -5,6 +5,7 @@ use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapper};
 use crate::{errors::ApiError, State};
 use api_core::auth::CanDecrypt;
+use api_core::utils::vault_wrapper::TenantUvw;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -66,7 +67,7 @@ pub async fn post_inner(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })
         .await??;
