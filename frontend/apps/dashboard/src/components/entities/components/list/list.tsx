@@ -27,7 +27,7 @@ const List = ({ children, title, kind, basePath }: ListProps) => {
 
   const handleRowClick = (entity: Entity) => {
     router.push({
-      pathname: `/${basePath}/${entity.id}`,
+      pathname: `${basePath}/${entity.id}`,
       query: filters.query,
     });
   };
