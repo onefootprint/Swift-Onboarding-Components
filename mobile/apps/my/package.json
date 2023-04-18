@@ -1,20 +1,19 @@
 {
-  "name": "@onefootprint/my-mobile",
+  "name": "@onefootprint/my",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "scripts": {
     "android": "expo run:android",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev:mobile": "expo start --dev-client",
+    "dev": "expo start --dev-client",
     "ios": "expo run:ios",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch",
+    "test": "jest --coverage",
     "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@onefootprint/request": "*",
-    "@onefootprint/types": "*",
-    "@onefootprint/ui-mobile": "*",
+    "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.29.3",
     "@xstate/react": "^3.2.1",
     "expo": "~48.0.11",
@@ -32,7 +31,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@onefootprint/test-utils-mobile": "*",
+    "@onefootprint/test-utils": "*",
+    "@types/react": "^18.0.37",
     "eslint-config-footprint": "*"
   },
   "jest": {

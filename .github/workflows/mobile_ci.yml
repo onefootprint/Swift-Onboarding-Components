@@ -1,0 +1,150 @@
+name: Mobile CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'mobile/**'
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/*.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_REMOTE_ONLY: true
+
+jobs:
+  install-dependencies:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: mobile/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install node_modules if not cached
+        working-directory: ./mobile
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Restore yarn dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: mobile/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Lint
+        working-directory: ./mobile
+        run: yarn lint
+
+  format:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Restore yarn dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: mobile/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Prettier
+        working-directory: ./mobile
+        run: yarn format
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Restore yarn dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: mobile/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Tests
+        working-directory: ./mobile
+        run: yarn test
+
+  typecheck:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Restore yarn dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: mobile/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Typecheck
+        working-directory: ./mobile
+        run: yarn typecheck

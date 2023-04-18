@@ -1,4 +1,4 @@
-import { renderHook } from '@onefootprint/test-utils-mobile';
+import { renderHook } from '@onefootprint/test-utils';
 
 import useParseHandoffUrl from './use-parse-handoff-url';
 import mockUrl from './use-parse-handoff-url.test.config';

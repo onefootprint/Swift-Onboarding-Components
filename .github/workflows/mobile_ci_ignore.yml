@@ -1,0 +1,58 @@
+name: Mobile CI (skip)
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'mobile/**'
+  pull_request:
+    paths-ignore:
+      - 'mobile/**'
+      - '.github/workflows/*.yml'
+
+jobs:
+  install-dependencies:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
+  typecheck:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
+  format:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - run: echo "Not required"
