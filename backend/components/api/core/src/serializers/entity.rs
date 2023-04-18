@@ -1,10 +1,21 @@
-use super::UserDetail;
 use crate::utils::db2api::DbToApi;
+use db::models::onboarding::SerializableOnboardingInfo;
 use db::models::scoped_vault::ScopedVault;
+use newtypes::{DataIdentifier, PiiString, VaultKind};
+use std::collections::HashMap;
 
-impl DbToApi<UserDetail> for api_wire_types::Entity {
+pub type EntityDetail = (
+    Vec<DataIdentifier>,
+    Option<SerializableOnboardingInfo>,
+    ScopedVault,
+    bool,
+    VaultKind,
+    HashMap<DataIdentifier, PiiString>,
+);
+
+impl DbToApi<EntityDetail> for api_wire_types::Entity {
     fn from_db(
-        (attributes, onboarding_info, scoped_vault, is_portable, vault_kind, decrypted_attributes): UserDetail,
+        (attributes, onboarding_info, scoped_vault, is_portable, vault_kind, decrypted_attributes): EntityDetail,
     ) -> Self {
         let ScopedVault {
             fp_id,

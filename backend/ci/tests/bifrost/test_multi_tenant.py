@@ -127,9 +127,9 @@ def test_cant_see_speculative_fingerprints(
         data = dict(search=search_query)
 
         # sandbox_tenant should be able to search for the user from its new name
-        body = get(f"/users", data, sandbox_tenant.sk.key)
+        body = get(f"/entities", data, sandbox_tenant.sk.key)
         assert [i for i in body["data"] if i["id"] == fp_id]
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
-        body = get(f"/users", data, foo_sandbox_tenant.sk.key)
+        body = get(f"/entities", data, foo_sandbox_tenant.sk.key)
         assert not len(body["data"])

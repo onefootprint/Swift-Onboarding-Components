@@ -2,9 +2,10 @@ use newtypes::input::deserialize_stringified_list;
 
 use crate::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub struct ListUsersRequest {
+pub struct ListEntitiesRequest {
+    pub kind: Option<VaultKind>,
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     pub statuses: Vec<OnboardingStatusFilter>,
@@ -15,10 +16,4 @@ pub struct ListUsersRequest {
     pub timestamp_gte: Option<DateTime<Utc>>,
 }
 
-export_schema!(ListUsersRequest);
-
-#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub struct ListEntitiesRequest {
-    pub kind: Option<VaultKind>,
-}
+export_schema!(ListEntitiesRequest);

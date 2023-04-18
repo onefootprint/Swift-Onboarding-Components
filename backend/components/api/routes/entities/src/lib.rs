@@ -8,8 +8,6 @@ mod risk_signals;
 mod timeline;
 pub mod vault;
 
-pub use get::{detail::get_entity, list::get_entities};
-
 pub use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {

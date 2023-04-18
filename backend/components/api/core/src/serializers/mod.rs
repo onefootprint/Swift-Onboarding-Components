@@ -19,7 +19,5 @@ mod risk_signal;
 mod secret_api_key;
 mod user;
 mod user_timeline;
-mod watchlist_check;
 mod validate;
-
-pub use user::UserDetail;
+mod watchlist_check;

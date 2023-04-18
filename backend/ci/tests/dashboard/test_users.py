@@ -134,7 +134,7 @@ def test_get_users_detail_doc(
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
 
-    res = get(f"users/{user.fp_id}", None, tenant.sk.key)
+    res = get(f"entities/{user.fp_id}", None, tenant.sk.key)
     assert "document.drivers_license_front" in res["attributes"]
     assert "document.drivers_license_back" in res["attributes"]
     assert "document.drivers_license_selfie" in res["attributes"]

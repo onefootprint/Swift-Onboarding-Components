@@ -5,10 +5,8 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::get::EntityDetailResponse;
-use crate::serializers::UserDetail;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::onboarding::Onboarding;
@@ -18,14 +16,16 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 use super::serialize_entity;
 
-pub async fn get_entity<T>(
+#[api_v2_operation(
+    description = "View details of a specific entity (business or user)",
+    tags(Entities, Private)
+)]
+#[get("/entities/{fp_id}")]
+pub async fn get(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<T>
-where
-    T: DbToApi<UserDetail>,
-{
+) -> JsonApiResponse<EntityDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -56,18 +56,4 @@ where
         .await??;
     let result = serialize_entity(sv, &vw, ob);
     ResponseData::ok(result).json()
-}
-
-#[api_v2_operation(
-    description = "View details of a specific entity (business or user)",
-    tags(Entities, Private)
-)]
-#[get("/entities/{fp_id}")]
-pub async fn get(
-    state: web::Data<State>,
-    fp_id: web::Path<FpId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<EntityDetailResponse> {
-    let result = get_entity(state, fp_id, auth).await?;
-    Ok(result)
 }
