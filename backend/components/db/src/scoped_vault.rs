@@ -13,6 +13,7 @@ use newtypes::OnboardingStatusFilter;
 use newtypes::PiiString;
 use newtypes::VaultId;
 use newtypes::VaultKind;
+use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId};
 
 #[derive(Debug, Clone, Default)]
@@ -27,6 +28,7 @@ pub struct ScopedVaultListQueryParams {
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub requires_manual_review: Option<bool>,
+    pub watchlist_hit: Option<bool>,
     pub kind: Option<VaultKind>,
 }
 
@@ -42,6 +44,7 @@ pub fn list_authorized_for_tenant_query<'a>(
     // about the user
     use crate::schema::{
         data_lifetime, fingerprint, manual_review, onboarding, scoped_vault, vault, vault_data,
+        watchlist_check,
     };
     let mut query = scoped_vault::table
         .filter(scoped_vault::tenant_id.eq(params.tenant_id.clone()))
@@ -79,6 +82,20 @@ pub fn list_authorized_for_tenant_query<'a>(
             .select(onboarding::scoped_vault_id)
             .distinct();
         if requires_manual_review {
+            query = query.filter(scoped_vault::id.eq_any(matching_ids))
+        } else {
+            query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
+        }
+    }
+
+    // Filter on whether user has a watchlist hit
+    if let Some(watchlist_hit) = params.watchlist_hit {
+        // TODO there's no way to dismiss watchlist hits from the list that matches this
+        let matching_ids = watchlist_check::table
+            .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
+            .select(watchlist_check::scoped_vault_id)
+            .distinct();
+        if watchlist_hit {
             query = query.filter(scoped_vault::id.eq_any(matching_ids))
         } else {
             query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))

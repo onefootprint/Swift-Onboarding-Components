@@ -9,7 +9,7 @@ pub struct ListUsersRequest {
     #[serde(deserialize_with = "deserialize_stringified_list")]
     pub statuses: Vec<OnboardingStatusFilter>,
     pub requires_manual_review: Option<bool>,
-    #[serde(alias = "fingerprint")] // backwards compatibility until we update frontend
+    pub watchlist_hit: Option<bool>,
     pub search: Option<PiiString>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,

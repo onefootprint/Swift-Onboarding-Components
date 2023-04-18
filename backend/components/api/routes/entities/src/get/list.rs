@@ -44,6 +44,7 @@ where
     let ListUsersRequest {
         statuses,
         requires_manual_review,
+        watchlist_hit,
         search,
         timestamp_lte,
         timestamp_gte,
@@ -57,6 +58,7 @@ where
         only_billable: false,
         is_live: auth.is_live()?,
         requires_manual_review,
+        watchlist_hit,
         statuses,
         search,
         fp_id,

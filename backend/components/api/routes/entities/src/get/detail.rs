@@ -34,6 +34,7 @@ where
         is_live: auth.is_live()?,
         only_billable: false,
         requires_manual_review: None,
+        watchlist_hit: None,
         statuses: vec![],
         search: None,
         fp_id: Some(fp_id.into_inner()),
