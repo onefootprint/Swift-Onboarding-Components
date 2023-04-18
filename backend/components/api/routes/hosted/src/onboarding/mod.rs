@@ -33,7 +33,6 @@ pub mod authorize;
 pub mod d2p;
 pub mod fingerprint_visit;
 pub mod index;
-pub mod kyc;
 pub mod pat;
 pub mod skip_liveness;
 pub mod socure_device;
@@ -44,7 +43,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::post)
         .service(authorize::post)
         .service(status::get)
-        .service(kyc::get)
         .service(skip_liveness::post)
         .service(fingerprint_visit::post)
         .service(pat::get)
