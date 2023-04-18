@@ -106,6 +106,22 @@
           "cta": "Login with a different account"
         }
       },
+      "email-identification": {
+        "header": {
+          "title": "Hey there! 👋",
+          "subtitle": "Enter your email to get started."
+        },
+        "form": {
+          "email": {
+            "label": "Email",
+            "placeholder": "your.email@email.com",
+            "errors": {
+              "required": "Email is required"
+            }
+          },
+          "cta": "Continue"
+        }
+      },
       "challenge": {
         "title": {
           "new-user": "Verify your phone number",

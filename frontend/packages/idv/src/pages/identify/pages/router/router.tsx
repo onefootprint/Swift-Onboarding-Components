@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import BootstrapChallenge from '../bootstrap-challenge';
 import Challenge from '../challenge';
+import EmailIdentification from '../email-identification';
 import InitBootstrap from '../init-bootstrap';
 
 export type DonePayload = {
@@ -42,9 +43,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('bootstrapChallenge')) {
     return <BootstrapChallenge />;
   }
-  // if (state.matches('emailIdentification')) {
-  //   return <EmailIdentification />;
-  // }
+  if (state.matches('emailIdentification')) {
+    return <EmailIdentification />;
+  }
   // if (state.matches('phoneIdentification')) {
   //   return <PhoneIdentification />;
   // }

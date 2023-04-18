@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import useIdvMachine from 'src/hooks/use-idv-machine';
 import styled, { css } from 'styled-components';
 
+import { useIdvMachine } from '../machine-provider';
 import parseSuffix from './utils/parse-suffix';
 
 const SandboxOutcomeFooter = () => {
