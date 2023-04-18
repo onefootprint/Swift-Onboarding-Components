@@ -105,6 +105,21 @@
           "missing-phone": "Don't have access to this phone number?",
           "cta": "Login with a different account"
         }
+      },
+      "challenge": {
+        "title": {
+          "new-user": "Verify your phone number",
+          "existing-user": "Welcome back! 🎉"
+        },
+        "signup-challenge": {
+          "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+          "toast": {
+            "success": {
+              "title": "Success",
+              "description": "We sent you a new code."
+            }
+          }
+        }
       }
     },
     "error": {

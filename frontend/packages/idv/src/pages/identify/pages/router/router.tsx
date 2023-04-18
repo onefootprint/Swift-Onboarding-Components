@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import BootstrapChallenge from '../bootstrap-challenge';
+import Challenge from '../challenge';
 import InitBootstrap from '../init-bootstrap';
 
 export type DonePayload = {
@@ -47,9 +48,9 @@ const Router = ({ onDone }: RouterProps) => {
   // if (state.matches('phoneIdentification')) {
   //   return <PhoneIdentification />;
   // }
-  // if (state.matches('challenge')) {
-  //   return <Challenge />;
-  // }
+  if (state.matches('challenge')) {
+    return <Challenge />;
+  }
   return null;
 };
 
