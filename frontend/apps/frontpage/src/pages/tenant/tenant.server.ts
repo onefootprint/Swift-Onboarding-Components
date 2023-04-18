@@ -1,13 +1,14 @@
 import type { GetServerSideProps } from 'next';
 
-const baseUrl = process.env.API_BASE_URL;
+import { API_BASE_URL } from '../../config/constants';
 
 const getServerSideProps: GetServerSideProps = async context => {
+  console.log('tenant request', API_BASE_URL);
   const obKey = context.query['ob-key'];
   if (!obKey) {
     return { notFound: true };
   }
-  const response = await fetch(`${baseUrl}/org/onboarding_config`, {
+  const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
     headers: {
       'X-Onboarding-Config-Key': obKey as string,
     },
