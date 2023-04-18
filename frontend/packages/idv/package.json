@@ -19,6 +19,7 @@
     "@onefootprint/dev-tools": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
+    "@onefootprint/footprint-elements": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
