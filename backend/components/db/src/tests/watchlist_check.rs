@@ -21,7 +21,7 @@ use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
 
 #[db_test]
-fn test_get_requests_and_results_for_onboarding(conn: &mut TestPgConn) {
+fn test_watchlist_check(conn: &mut TestPgConn) {
     // SETUP
     let tenant = fixtures::tenant::create(conn);
     let tenant_id = tenant.id.clone();

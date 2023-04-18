@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
 use diesel::{
-    dsl::{count, count_star},
+    dsl::{count, count_star, not},
     prelude::*,
 };
 use newtypes::{
@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     schema::{onboarding, scoped_vault, task, vault, watchlist_check},
-    DbResult, PgConn,
+    DbResult, PgConn, TxnPgConn,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
@@ -32,6 +32,7 @@ pub struct WatchlistCheck {
     pub reason_codes: Option<Vec<FootprintReasonCode>>,
     pub completed_at: Option<DateTime<Utc>>,
     pub status_details: WatchlistCheckStatus,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -57,9 +58,25 @@ struct UpdateWatchlistCheck {
 }
 
 impl WatchlistCheck {
+    /// Deactivate the old completed WatchlistCheck for this user since we are only allowed to have
+    /// one active, completed WatchlistCheck at a time
+    fn deactivate_old(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        timestamp: DateTime<Utc>,
+    ) -> DbResult<()> {
+        diesel::update(watchlist_check::table)
+            .filter(watchlist_check::scoped_vault_id.eq(scoped_vault_id))
+            .filter(watchlist_check::deactivated_at.is_null())
+            .filter(not(watchlist_check::completed_at.is_null()))
+            .set(watchlist_check::deactivated_at.eq(timestamp))
+            .execute(conn)?;
+        Ok(())
+    }
+
     #[tracing::instrument(skip_all)]
     pub fn create(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         scoped_vault_id: ScopedVaultId,
         task_id: TaskId,
         decision_intent_id: Option<DecisionIntentId>,
@@ -71,6 +88,9 @@ impl WatchlistCheck {
             WatchlistCheckStatus::Pending => None,
             _ => Some(timestamp),
         };
+        if let Some(completed_at) = completed_at {
+            Self::deactivate_old(conn, &scoped_vault_id, completed_at)?;
+        }
         let new_watchlist_check = NewWatchlistCheck {
             created_at: timestamp,
             scoped_vault_id,
@@ -83,7 +103,8 @@ impl WatchlistCheck {
 
         let res = diesel::insert_into(watchlist_check::table)
             .values(new_watchlist_check)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
+
         Ok(res)
     }
 
@@ -99,13 +120,16 @@ impl WatchlistCheck {
 
     #[tracing::instrument(skip_all)]
     pub fn update(
-        conn: &mut PgConn,
-        id: &WatchlistCheckId,
+        self,
+        conn: &mut TxnPgConn,
         status: WatchlistCheckStatus,
         logic_git_hash: Option<String>,
         reason_codes: Option<Vec<FootprintReasonCode>>,
         completed_at: Option<DateTime<Utc>>,
     ) -> DbResult<Self> {
+        if let Some(completed_at) = completed_at {
+            Self::deactivate_old(conn, &self.scoped_vault_id, completed_at)?;
+        }
         let update = UpdateWatchlistCheck {
             status: status.into(),
             logic_git_hash,
@@ -114,9 +138,9 @@ impl WatchlistCheck {
             status_details: status,
         };
         let result = diesel::update(watchlist_check::table)
-            .filter(watchlist_check::id.eq(id))
+            .filter(watchlist_check::id.eq(&self.id))
             .set(update)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
 
         Ok(result)
     }
@@ -210,6 +234,9 @@ impl WatchlistCheck {
 
     #[cfg(test)]
     pub fn create_for_test(conn: &mut PgConn, new_watchlist_check: NewWatchlistCheck) -> DbResult<Self> {
+        if let Some(completed_at) = new_watchlist_check.completed_at {
+            Self::deactivate_old(conn, &new_watchlist_check.scoped_vault_id, completed_at)?;
+        }
         let res = diesel::insert_into(watchlist_check::table)
             .values(new_watchlist_check)
             .get_result(conn)?;

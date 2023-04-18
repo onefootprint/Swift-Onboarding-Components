@@ -761,6 +761,7 @@ table! {
         reason_codes -> Nullable<Array<Text>>,
         completed_at -> Nullable<Timestamptz>,
         status_details -> Jsonb,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

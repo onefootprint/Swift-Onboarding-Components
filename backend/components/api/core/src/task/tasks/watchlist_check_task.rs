@@ -18,7 +18,6 @@ use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndMaybeResult;
-use db::DbResult;
 use db::{
     models::{
         decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
@@ -26,6 +25,7 @@ use db::{
     },
     DbError, DbPool, PgConn,
 };
+use db::{DbResult, TxnPgConn};
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::{
@@ -141,18 +141,10 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
             let pa_res = PaResponse::try_from(vendor_response.response)?;
             let (status, reason_codes) = Self::calculate_decision(pa_res)?;
+            let version = Some(crate::GIT_HASH.to_string());
             self.db_pool
-                .db_query(move |conn| {
-                    WatchlistCheck::update(
-                        conn,
-                        &wc.id,
-                        status,
-                        Some(crate::GIT_HASH.to_string()),
-                        reason_codes,
-                        Some(Utc::now()),
-                    )
-                })
-                .await??
+                .db_transaction(move |conn| wc.update(conn, status, version, reason_codes, Some(Utc::now())))
+                .await?
         } else {
             // else we have a watchlist_check that doesn't need a vendor call because it is NotNeed or Error
             wc
@@ -224,7 +216,7 @@ impl WatchlistCheckTask {
     }
 
     pub fn create_new_watchlist_check(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
         task_id: &TaskId,
         sv: &ScopedVault,

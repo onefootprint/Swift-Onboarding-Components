@@ -90,9 +90,10 @@ pub fn list_authorized_for_tenant_query<'a>(
 
     // Filter on whether user has a watchlist hit
     if let Some(watchlist_hit) = params.watchlist_hit {
-        // TODO there's no way to dismiss watchlist hits from the list that matches this
         let matching_ids = watchlist_check::table
             .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
+            .filter(watchlist_check::deactivated_at.is_null())
+            .filter(not(watchlist_check::completed_at.is_null()))
             .select(watchlist_check::scoped_vault_id)
             .distinct();
         if watchlist_hit {
