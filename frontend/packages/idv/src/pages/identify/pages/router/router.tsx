@@ -1,7 +1,9 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
+import BootstrapChallenge from '../bootstrap-challenge';
+import InitBootstrap from '../init-bootstrap';
 
 export type DonePayload = {
   authToken: string;
@@ -33,12 +35,12 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
-  // if (state.matches('initBootstrap')) {
-  //   return <InitBootstrap />;
-  // }
-  // if (state.matches('bootstrapChallenge')) {
-  //   return <BootstrapChallenge />;
-  // }
+  if (state.matches('initBootstrap')) {
+    return <InitBootstrap />;
+  }
+  if (state.matches('bootstrapChallenge')) {
+    return <BootstrapChallenge />;
+  }
   // if (state.matches('emailIdentification')) {
   //   return <EmailIdentification />;
   // }

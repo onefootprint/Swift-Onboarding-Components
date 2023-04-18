@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { ONBOARDING_CONFIG_KEY_HEADER } from '../../../config/contants';
+import { ONBOARDING_CONFIG_KEY_HEADER } from '../../../config/constants';
 
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const response = await request<GetOnboardingConfigResponse>({

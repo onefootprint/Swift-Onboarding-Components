@@ -2,8 +2,7 @@ import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useIdentifyMachine from '@/identify/hooks/use-identify-machine';
-
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 import { getCanChallengeBiometrics } from '../../utils/biometrics';
 import LoginBiometricChallenge from './components/biometric';
 import LoginChallengeSegmentedControl from './components/challenge-picker';

@@ -2,9 +2,8 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
 import React, { useState } from 'react';
 
-import { useIdentifyVerify, useLoginChallenge } from '@/identify/api-hooks';
-import useIdentifyMachine from '@/identify/hooks/use-identify-machine';
-
+import { useIdentifyVerify, useLoginChallenge } from '../../../../api-hooks';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import { getBiometricChallengeResponse } from '../../../../utils/biometrics';
 import Verification from './components/verification';
 

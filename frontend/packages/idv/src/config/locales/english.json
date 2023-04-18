@@ -97,6 +97,16 @@
       },
       "cta": "Continue"
     },
+    "identify": {
+      "bootstrap-challenge": {
+        "title": "Welcome back!",
+        "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}.",
+        "login-with-different-account": {
+          "missing-phone": "Don't have access to this phone number?",
+          "cta": "Login with a different account"
+        }
+      }
+    },
     "error": {
       "title": "Oops! An error occurred.",
       "description": "We're sorry. Please restart the onboarding.",

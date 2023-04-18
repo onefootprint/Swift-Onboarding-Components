@@ -7,7 +7,7 @@ import { createGlobalStyle } from 'styled-components';
 import AppContextProvider from './components/app-context-provider';
 import Layout from './components/layout';
 import { MachineProvider } from './components/machine-provider';
-import { GOOGLE_MAPS_KEY } from './config/contants';
+import { GOOGLE_MAPS_KEY } from './config/constants';
 import configureI18next from './config/initializers/react-i18next';
 import useExtendedAppearance from './hooks/use-extended-appearance';
 import Router from './pages/router';

@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { ONBOARDING_CONFIG_KEY_HEADER } from '../../../config/contants';
+import { ONBOARDING_CONFIG_KEY_HEADER } from '../../../config/constants';
 
 const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
   const response = await request<IdentifyVerifyResponse>({

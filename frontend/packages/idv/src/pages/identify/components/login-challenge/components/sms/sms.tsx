@@ -9,8 +9,7 @@ import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useIdentifyVerify, useLoginChallenge } from '@/identify/api-hooks';
-
+import { useIdentifyVerify, useLoginChallenge } from '../../../../api-hooks';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
 import SmsChallengeVerification from '../../../sms-challenge-verification';
