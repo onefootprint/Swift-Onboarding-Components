@@ -6,6 +6,7 @@ import BootstrapChallenge from '../bootstrap-challenge';
 import Challenge from '../challenge';
 import EmailIdentification from '../email-identification';
 import InitBootstrap from '../init-bootstrap';
+import PhoneIdentification from '../phone-identification';
 
 export type DonePayload = {
   authToken: string;
@@ -46,9 +47,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('emailIdentification')) {
     return <EmailIdentification />;
   }
-  // if (state.matches('phoneIdentification')) {
-  //   return <PhoneIdentification />;
-  // }
+  if (state.matches('phoneIdentification')) {
+    return <PhoneIdentification />;
+  }
   if (state.matches('challenge')) {
     return <Challenge />;
   }

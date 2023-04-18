@@ -122,6 +122,24 @@
           "cta": "Continue"
         }
       },
+      "phone-identification": {
+        "title": "Hey there! 👋",
+        "subtitle": "Enter your phone number to proceed.",
+        "email-card": {
+          "cta": "Change"
+        },
+        "form": {
+          "phone": {
+            "label": "Phone number",
+            "placeholder": "(123) 123-1234",
+            "errors": {
+              "required": "Phone number cannot be empty",
+              "pattern": "Phone number is invalid"
+            }
+          },
+          "cta": "Continue"
+        }
+      },
       "challenge": {
         "title": {
           "new-user": "Verify your phone number",
