@@ -39,7 +39,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         vec!["X-Onboarding-Session-Token"]
     }
 
-    fn try_from(
+    fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: LaunchDarklyFeatureFlagClient,

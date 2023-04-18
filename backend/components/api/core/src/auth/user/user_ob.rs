@@ -49,13 +49,14 @@ impl ExtractableAuthSession for ParsedUserObSession {
         vec!["X-Fp-Authorization"]
     }
 
-    fn try_from(
+    fn try_load_session(
         value: AuthSessionData,
         conn: &mut PgConn,
         ff_client: LaunchDarklyFeatureFlagClient,
     ) -> Result<Self, ApiError> {
         // Since this is derived from a user session, we just grab all the user info
-        let user_session = <ParsedUserSession as ExtractableAuthSession>::try_from(value, conn, ff_client)?.0;
+        let user_session =
+            <ParsedUserSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
         // Even though we could technically fetch the onboarding via the OrgOnboardingInit scope,
         // we only want to look for it after the POST /hosted/onboarding API has been called

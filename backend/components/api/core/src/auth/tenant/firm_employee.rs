@@ -77,7 +77,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(
+    fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         ff_client: LaunchDarklyFeatureFlagClient,

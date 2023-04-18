@@ -85,7 +85,7 @@ impl ExtractableAuthSession for ParsedUserSession {
         vec!["X-Fp-Authorization"]
     }
 
-    fn try_from(
+    fn try_load_session(
         value: AuthSessionData,
         _: &mut PgConn,
         _: LaunchDarklyFeatureFlagClient,

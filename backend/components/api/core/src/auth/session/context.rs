@@ -83,8 +83,8 @@ where
             let parsed_session_data = state
                 .db_pool
                 .db_query(move |conn| {
-                    T::try_from(raw_session_data, conn, ff_client)
-                        .map_err(|_| AuthError::InvalidHeader(allowed_headers))
+                    T::try_load_session(raw_session_data, conn, ff_client)
+                        .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, format!("{:?}", e)))
                 })
                 .await??;
             Ok(Self {

@@ -22,7 +22,7 @@ impl ExtractableAuthSession for WorkOsSession {
         vec!["X-Fp-Dashboard-Authorization"]
     }
 
-    fn try_from(
+    fn try_load_session(
         auth_session: AuthSessionData,
         _: &mut PgConn,
         _: LaunchDarklyFeatureFlagClient,

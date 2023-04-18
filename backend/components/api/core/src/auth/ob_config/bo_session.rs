@@ -42,7 +42,7 @@ impl ExtractableAuthSession for ParsedBoSession {
         vec!["X-Kyb-Bo-Token"]
     }
 
-    fn try_from(
+    fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: LaunchDarklyFeatureFlagClient,
