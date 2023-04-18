@@ -1,13 +1,15 @@
 {
   "name": "@onefootprint/my-mobile",
+  "private": true,
   "version": "1.0.0",
   "scripts": {
     "android": "expo run:android",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "dev:mobile": "expo start --dev-client",
     "ios": "expo run:ios",
     "lint": "eslint src --fix",
-    "dev:mobile": "expo start --dev-client",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
+    "test:watch": "jest --watch",
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
     "@onefootprint/request": "*",
@@ -15,22 +17,28 @@
     "@onefootprint/ui-mobile": "*",
     "@tanstack/react-query": "^4.29.3",
     "@xstate/react": "^3.2.1",
+    "expo": "~48.0.11",
     "expo-camera": "~13.2.1",
+    "expo-linking": "~4.0.1",
     "expo-splash-screen": "~0.18.1",
     "expo-status-bar": "~1.4.4",
-    "expo": "~48.0.11",
     "i18next": "^22.0.4",
-    "react-i18next": "^12.2.0",
-    "react-native-app-clip": "^0.1.2",
-    "react-native": "0.71.6",
+    "jest-expo": "^48.0.2",
     "react": "18.2.0",
+    "react-i18next": "^12.2.0",
+    "react-native": "0.71.6",
+    "react-native-app-clip": "^0.1.2",
     "xstate": "^4.37.1"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
-    "@onefootprint/test-utils": "*",
     "@babel/core": "^7.20.0",
+    "@onefootprint/test-utils-mobile": "*",
     "eslint-config-footprint": "*"
   },
-  "private": true
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ]
+  }
 }
