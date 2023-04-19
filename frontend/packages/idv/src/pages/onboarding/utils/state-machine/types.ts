@@ -13,13 +13,13 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
-      type: 'onboardingInitialized';
+      type: 'initialized';
       payload: {
         validationToken?: string;
       };
     }
   | {
-      type: 'onboardingRequirementsCompleted';
+      type: 'requirementsCompleted';
     }
   | {
       type: 'authorized';

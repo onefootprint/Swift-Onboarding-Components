@@ -11,11 +11,20 @@ import ConfigInvalid from '../config-invalid';
 import Error from '../error';
 import Identify from '../identify';
 import Init from '../init';
+import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
 
 const Router = () => {
   const [state, send] = useIdvMachine();
-  const { device, bootstrapData, config, sandboxSuffix } = state.context;
+  const {
+    device,
+    bootstrapData,
+    config,
+    sandboxSuffix,
+    userFound,
+    authToken,
+    email,
+  } = state.context;
   const observeCollector = useObserveCollector();
   useLogStateMachine('idv', state);
 
@@ -40,6 +49,19 @@ const Router = () => {
           identifierSuffix={sandboxSuffix}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
+          }}
+        />
+      )}
+      {state.matches('onboarding') && (
+        <Onboarding
+          userFound={userFound}
+          device={device}
+          config={config}
+          authToken={authToken}
+          email={email}
+          sandboxSuffix={sandboxSuffix}
+          onDone={payload => {
+            send({ type: 'onboardingCompleted', payload });
           }}
         />
       )}

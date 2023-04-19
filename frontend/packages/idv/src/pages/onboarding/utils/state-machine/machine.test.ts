@@ -51,10 +51,10 @@ describe('Onboarding Machine Tests', () => {
       sandboxSuffix: 'sandboxTest',
     });
     let { state } = machine;
-    expect(state.value).toBe('initOnboarding');
+    expect(state.value).toBe('init');
 
     state = machine.send({
-      type: 'onboardingInitialized',
+      type: 'initialized',
       payload: {
         validationToken: 'token',
       },
@@ -91,13 +91,13 @@ describe('Onboarding Machine Tests', () => {
   it('completes the onboarding flow from scratch', () => {
     const machine = createMachine({});
     let { state } = machine;
-    expect(state.value).toBe('initOnboarding');
+    expect(state.value).toBe('init');
 
     state = machine.send({
-      type: 'onboardingInitialized',
+      type: 'initialized',
       payload: {},
     });
-    expect(state.value).toEqual('onboardingRequirements');
+    expect(state.value).toEqual('requirements');
     expect(state.context).toEqual({
       userFound: true,
       device: testDevice,
@@ -107,7 +107,7 @@ describe('Onboarding Machine Tests', () => {
     });
 
     state = machine.send({
-      type: 'onboardingRequirementsCompleted',
+      type: 'requirementsCompleted',
     });
     expect(state.value).toEqual('authorize');
     expect(state.context).toEqual({

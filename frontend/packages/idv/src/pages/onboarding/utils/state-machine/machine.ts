@@ -30,7 +30,7 @@ const createOnboardingMachine = ({
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'initOnboarding',
+      initial: 'init',
       context: {
         userFound,
         device,
@@ -40,9 +40,9 @@ const createOnboardingMachine = ({
         sandboxSuffix,
       },
       states: {
-        initOnboarding: {
+        init: {
           on: {
-            onboardingInitialized: [
+            initialized: [
               // TODO: Replace this with the one below. For now, for the demo, we are unconditionally
               // showing the authorize screen everytime the user signs-in even if they previously onboarded.
               // {
@@ -56,14 +56,14 @@ const createOnboardingMachine = ({
                 actions: ['assignValidationToken'],
               },
               {
-                target: 'onboardingRequirements',
+                target: 'requirements',
               },
             ],
           },
         },
-        onboardingRequirements: {
+        requirements: {
           on: {
-            onboardingRequirementsCompleted: {
+            requirementsCompleted: {
               target: 'authorize',
             },
           },

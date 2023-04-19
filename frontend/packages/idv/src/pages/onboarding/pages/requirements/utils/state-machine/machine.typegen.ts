@@ -3,7 +3,9 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
+    '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
+    'xstate.stop': { type: 'xstate.stop' };
   };
   invokeSrcNameMap: {};
   missingImplementations: {
@@ -13,11 +15,22 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignValidationToken: 'authorized' | 'initialized';
+    assignRequirements: 'onboardingRequirementsReceived';
+    markCollectedKycData: 'requirementCompleted' | 'xstate.stop';
+    startDataCollection: '';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'authorize' | 'init' | 'requirements' | 'success';
+  matchesStates:
+    | 'additionalInfoRequired'
+    | 'checkRequirements'
+    | 'idDoc'
+    | 'investorProfile'
+    | 'kybData'
+    | 'kycData'
+    | 'router'
+    | 'success'
+    | 'transfer';
   tags: never;
 }

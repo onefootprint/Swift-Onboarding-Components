@@ -4,7 +4,8 @@ import React, { useEffect } from 'react';
 
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Authorize from '../authorize/authorize';
-import InitOnboarding from '../init-onboarding';
+import Init from '../init-onboarding';
+import Requirements from '../requirements';
 
 export type DonePayload = {
   validationToken?: string;
@@ -15,9 +16,17 @@ type RouterProps = {
 };
 
 const Router = ({ onDone }: RouterProps) => {
-  const [state] = useOnboardingMachine();
+  const [state, send] = useOnboardingMachine();
   const isDone = state.matches('success');
-  const { validationToken } = state.context;
+  const {
+    validationToken,
+    userFound,
+    device,
+    config,
+    authToken,
+    email,
+    sandboxSuffix,
+  } = state.context;
   useLogStateMachine('onboarding', state);
 
   useEffect(() => {
@@ -27,26 +36,26 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
-  if (state.matches('initOnboarding')) {
-    return <InitOnboarding />;
+  if (state.matches('init')) {
+    return <Init />;
   }
-  // if (state.matches('onboardingRequirements')) {
-  //   return (
-  //     <OnboardingRequirements
-  //       userFound={!!userFound}
-  //       device={device}
-  //       config={config}
-  //       authToken={authToken}
-  //       email={email}
-  //       sandboxSuffix={sandboxSuffix}
-  //       onDone={() => {
-  //         send({
-  //           type: 'onboardingRequirementsCompleted',
-  //         });
-  //       }}
-  //     />
-  //   );
-  // }
+  if (state.matches('requirements')) {
+    return (
+      <Requirements
+        userFound={!!userFound}
+        device={device}
+        config={config}
+        authToken={authToken}
+        email={email}
+        sandboxSuffix={sandboxSuffix}
+        onDone={() => {
+          send({
+            type: 'requirementsCompleted',
+          });
+        }}
+      />
+    );
+  }
   if (state.matches('authorize')) {
     return (
       <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>

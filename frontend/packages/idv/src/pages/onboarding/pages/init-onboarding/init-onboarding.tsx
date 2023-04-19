@@ -23,7 +23,7 @@ const InitOnboarding = () => {
       {
         onSuccess: ({ validationToken }) => {
           send({
-            type: 'onboardingInitialized',
+            type: 'initialized',
             payload: {
               validationToken,
             },
