@@ -4,7 +4,7 @@ module.exports = {
   randomize: true,
   cacheDirectory: './.jest-cache',
   testRunner: 'jest-circus/runner',
-  testTimeout: 45000,
+  testTimeout: 30000,
   resetMocks: false,
   moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',
