@@ -79,7 +79,13 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
     }
     # confirm they didn't auth identity_document
     get_user_resp = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
-    assert not get_user_resp["onboarding"]["can_access_identity_document_images"]
+    assert (
+        not "decrypt.document" in get_user_resp["onboarding"]["can_access_permissions"]
+    )
+    assert (
+        not "decrypt.document_and_selfie"
+        in get_user_resp["onboarding"]["can_access_permissions"]
+    )
 
     post(
         f"users/{sandbox_user.fp_id}/vault/decrypt",

@@ -19,10 +19,6 @@ pub struct Onboarding {
     // TODO deprecate these
     /// DEPRECATED
     pub can_access_data: Vec<CollectedDataOption>,
-    /// DEPRECATED
-    pub can_access_data_attributes: Vec<IdentityDataKind>,
-    /// DEPRECATED
-    pub can_access_identity_document_images: bool,
 }
 
 export_schema!(Onboarding);
