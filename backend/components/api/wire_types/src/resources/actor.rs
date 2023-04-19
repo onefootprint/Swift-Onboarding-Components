@@ -10,5 +10,4 @@ pub enum Actor {
     ApiKey { name: String },
 }
 
-export_schema!(OnboardingDecision);
 export_schema!(Actor);

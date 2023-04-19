@@ -66,7 +66,6 @@ export const entityFixture: Entity = {
     requiresManualReview: false,
     status: OnboardingStatus.pass,
     timestamp: '2023-03-29T23:07:46.866954Z',
-    isLivenessSkipped: true,
     insightEvent: {
       timestamp: '2023-03-29T23:07:46.850237Z',
       ipAddress: '73.222.157.30',
@@ -101,19 +100,6 @@ export const entityFixture: Entity = {
       CollectedInvestorProfileDataOption.investorProfile,
     ],
     canAccessAttributes: [],
-    latestDecision: {
-      id: 'decision_0tNR5dWi8JAdbRP7DO9xxC',
-      status: DecisionStatus.pass,
-      timestamp: new Date('2023-03-29T23:08:36.755235Z'),
-      source: {
-        kind: DecisionSourceKind.footprint,
-      },
-      vendors: [],
-      obConfiguration: {
-        mustCollectData: [],
-        mustCollectIdentityDocument: false,
-      },
-    },
   },
   decryptedAttributes: {},
 };

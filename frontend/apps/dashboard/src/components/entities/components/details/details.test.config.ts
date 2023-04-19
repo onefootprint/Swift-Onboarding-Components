@@ -51,7 +51,6 @@ export const entityFixture: Entity = {
     requiresManualReview: false,
     status: OnboardingStatus.pass,
     timestamp: '2023-03-27T14:43:47.446874Z',
-    isLivenessSkipped: false,
     insightEvent: {
       timestamp: '2023-04-03T17:42:30.799202Z',
       ipAddress: '67.243.21.56',

@@ -15,6 +15,8 @@ pub struct OnboardingDecision {
     pub vendors: Option<Vec<Vendor>>,
 }
 
+export_schema!(OnboardingDecision);
+
 /// ObConfiguration serialization used inside of an OnboardingDecision
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]

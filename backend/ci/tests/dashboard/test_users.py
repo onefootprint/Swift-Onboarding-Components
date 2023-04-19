@@ -245,9 +245,11 @@ def test_override_onboarding_decision(sandbox_user):
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "pass"
-    latest_decision = onboarding["latest_decision"]
-    assert latest_decision["status"] == onboarding["status"]
-    assert latest_decision["source"]["kind"] == "footprint"
+
+    event_kinds = dict(kinds="onboarding_decision")
+    events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
+    event = events[-1]["event"]
+    assert event["data"]["decision"]["source"]["kind"] == "footprint"
 
     test_note = "This is a test note. Flerp derp"
     decision_data = dict(
@@ -265,10 +267,10 @@ def test_override_onboarding_decision(sandbox_user):
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "fail"
     # Assert the latest decision is a manual decision
-    latest_decision = onboarding["latest_decision"]
-    assert latest_decision["status"] == onboarding["status"]
-    assert latest_decision["source"]["kind"] == "organization"
-    assert "@onefootprint.com" in latest_decision["source"]["member"]
+    events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
+    event = events[-1]["event"]
+    assert event["data"]["decision"]["source"]["kind"] == "organization"
+    assert "@onefootprint.com" in event["data"]["decision"]["source"]["member"]
 
     # Assert that the annotation is pinned
     pinned_annotations = get(

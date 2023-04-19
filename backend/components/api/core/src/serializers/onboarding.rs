@@ -1,13 +1,10 @@
 use db::models::onboarding::{Onboarding, OnboardingAndConfig, SerializableOnboardingInfo};
 use newtypes::DataIdentifier;
-use newtypes::LivenessSource;
 
 use crate::utils::db2api::DbToApi;
 
 impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db(
-        (onboarding, config, (_, liveness_event), insight, manual_review, latest_decision): SerializableOnboardingInfo,
-    ) -> Self {
+    fn from_db((onboarding, config, insight, manual_review): SerializableOnboardingInfo) -> Self {
         let Onboarding {
             id,
             start_timestamp,
@@ -45,12 +42,8 @@ impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
             requires_manual_review: manual_review.is_some(),
             status,
             timestamp: start_timestamp,
-            is_liveness_skipped: liveness_event
-                .map(|s| matches!(s.liveness_source, LivenessSource::Skipped))
-                .unwrap_or_default(),
             insight_event: api_wire_types::InsightEvent::from_db(insight),
             can_access_permissions: can_decrypt_scopes,
-            latest_decision: latest_decision.map(api_wire_types::OnboardingDecision::from_db),
             // TODO deprecate
             can_access_data,
             can_access_data_attributes,

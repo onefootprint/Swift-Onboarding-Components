@@ -13,7 +13,6 @@ pub struct Onboarding {
     pub requires_manual_review: bool,
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
-    pub is_liveness_skipped: bool,
     pub insight_event: InsightEvent,
     /// Represents the permissions that this approved onboarding gives to tenant users.
     pub can_access_permissions: Vec<TenantScope>,
@@ -24,8 +23,6 @@ pub struct Onboarding {
     pub can_access_data_attributes: Vec<IdentityDataKind>,
     /// DEPRECATED
     pub can_access_identity_document_images: bool,
-
-    pub latest_decision: Option<OnboardingDecision>,
 }
 
 export_schema!(Onboarding);

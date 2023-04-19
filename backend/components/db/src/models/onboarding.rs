@@ -1,21 +1,19 @@
 use super::insight_event::CreateInsightEvent;
-use super::liveness_event::LivenessEvent;
 use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
-use crate::actor::{self, SaturatedActor};
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
-use crate::{DbError, DbResult, TxnPgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingDecisionId, OnboardingId,
-    ScopedVaultId, TenantId, TenantScope, VaultId,
+    DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId,
+    TenantScope, VaultId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -159,27 +157,10 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
     }
 }
 
-type OnboardingInfo<TDecision> = (
-    Onboarding,
-    ObConfiguration,
-    (ScopedVault, Option<LivenessEvent>),
-    InsightEvent,
-    Option<ManualReview>,
-    Option<TDecision>,
-);
-
 #[derive(Clone)]
 pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
-fn map_ob_info<T, U, Fn>(i: OnboardingInfo<T>, f: Fn) -> DbResult<OnboardingInfo<U>>
-where
-    Fn: FnOnce(T) -> DbResult<U>,
-{
-    let u = i.5.map(f).transpose()?;
-    Ok((i.0, i.1, i.2, i.3, i.4, u))
-}
-
-pub type SerializableOnboardingInfo = OnboardingInfo<(OnboardingDecision, SaturatedActor)>;
+pub type SerializableOnboardingInfo = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
 pub type BasicOnboardingInfo<ObT = Onboarding> =
@@ -302,52 +283,20 @@ impl Onboarding {
         conn: &mut PgConn,
         scoped_vault_ids: Vec<&ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableOnboardingInfo>> {
-        use crate::schema::{
-            insight_event, liveness_event, manual_review, ob_configuration, onboarding_decision,
-        };
-        let result: Vec<OnboardingInfo<OnboardingDecision>> = onboarding::table
+        use crate::schema::{insight_event, manual_review, ob_configuration};
+        let results: Vec<SerializableOnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
-            // TODO return all liveness events
-            .inner_join(scoped_vault::table.left_join(liveness_event::table))
             .inner_join(insight_event::table)
             // Only fetch active manual review for this onboarding
             .left_join(manual_review::table.on(
                 manual_review::onboarding_id.eq(onboarding::id)
                 .and(manual_review::completed_at.is_null())
             ))
-            // Only fetch active onboarding decisions for this onboarding
-            .left_join(onboarding_decision::table.on(
-                onboarding_decision::onboarding_id.eq(onboarding::id)
-                .and(onboarding_decision::deactivated_at.is_null())
-            ))
             .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
-            .order_by(onboarding::scoped_vault_id)
             .load(conn)?;
 
-        let onboarding_decisions: Vec<OnboardingDecision> =
-            result.clone().into_iter().flat_map(|t| t.5).collect();
-        let onboarding_decision_to_saturated_actor: HashMap<OnboardingDecisionId, SaturatedActor> =
-            actor::saturate_actors(conn, onboarding_decisions)?
-                .into_iter()
-                .map(|o| (o.0.id.clone(), o.1))
-                .collect();
-
-        let obs = result
-            .into_iter()
-            .map(|i| {
-                map_ob_info(i, |decision| {
-                    let actor = onboarding_decision_to_saturated_actor
-                        .get(&decision.id)
-                        .ok_or(DbError::RelatedObjectNotFound)?
-                        .clone();
-                    Ok((decision, actor))
-                })
-            })
-            .collect::<DbResult<Vec<_>>>()?;
-
-        // Turn the Vec of OnboardingInfo into a hashmap of OnboadringId -> Vec<OnboardingInfo>
-        // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_vault_id
-        let result_map = obs
+        // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableOnboardingInfo>
+        let result_map = results
             .into_iter()
             .map(|ob| (ob.0.scoped_vault_id.clone(), ob))
             .collect();
