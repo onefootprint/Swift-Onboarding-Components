@@ -49,7 +49,7 @@ export const useStore = create<UserSessionState>()(
       },
     }),
     {
-      version: 9,
+      version: 10,
       name: 'dashboard-storage',
     },
   ),
