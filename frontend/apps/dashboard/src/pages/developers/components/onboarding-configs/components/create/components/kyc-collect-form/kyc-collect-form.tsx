@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
@@ -7,9 +8,9 @@ import {
 import { Box, Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import CdoTagList from 'src/components/cdo-tag-list';
 import styled, { css } from 'styled-components';
 
-import TagList from '../../../tag-list';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import AnimatedContainer from '../animated-container';
 import { useOnboardingConfigMachine } from '../machine-provider';
@@ -51,25 +52,25 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
   const investorProfile = watch(
     CollectedInvestorProfileDataOption.investorProfile,
   );
-  const collectedDataTags = [
-    allT('cdo.email'),
-    allT('cdo.phone_number'),
-    allT('cdo.name'),
-    allT('cdo.dob'),
-    allT('cdo.full_address'),
+  const collectedData: CollectedDataOption[] = [
+    CollectedKycDataOption.email,
+    CollectedKycDataOption.phoneNumber,
+    CollectedKycDataOption.name,
+    CollectedKycDataOption.dob,
+    CollectedKycDataOption.fullAddress,
   ];
-  collectedDataTags.push(
+  collectedData.push(
     ssnKind === CollectedKycDataOption.ssn4
-      ? allT('cdo.ssn4')
-      : allT('cdo.ssn9'),
+      ? CollectedKycDataOption.ssn4
+      : CollectedKycDataOption.ssn9,
   );
   if (idDoc && selfie) {
-    collectedDataTags.push(allT('cdo.document_and_selfie'));
+    collectedData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (idDoc) {
-    collectedDataTags.push(allT('cdo.document'));
+    collectedData.push(CollectedDocumentDataOption.document);
   }
   if (investorProfile) {
-    collectedDataTags.push(allT('cdo.investor_profile'));
+    collectedData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -101,7 +102,7 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
     >
       <Section>
         <Typography variant="label-3">{t('collected-data')}</Typography>
-        <TagList testID="collected-data" items={collectedDataTags} />
+        <CdoTagList testID="collected-data" cdos={collectedData} disableSort />
       </Section>
       <Section>
         <Typography variant="label-3">{t('ssn')}</Typography>

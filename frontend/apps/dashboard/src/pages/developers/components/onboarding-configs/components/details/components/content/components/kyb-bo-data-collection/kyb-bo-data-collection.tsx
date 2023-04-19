@@ -1,10 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption, OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 import { Field } from 'src/components';
+import CdoTagList from 'src/components/cdo-tag-list';
 import { isKybCdo } from 'src/pages/developers/components/onboarding-configs/utils/is-kyb-onboarding-config';
-
-import TagList from '../../../../../tag-list';
 
 type KybBoDataCollectionProps = {
   onboardingConfig: OnboardingConfig;
@@ -13,25 +12,28 @@ type KybBoDataCollectionProps = {
 const KybBoDataCollection = ({
   onboardingConfig,
 }: KybBoDataCollectionProps) => {
-  const { t, allT } = useTranslation(
+  const { t } = useTranslation(
     'pages.developers.onboarding-configs.details.kyb-bo-data-collection',
   );
 
-  const collectedKycDataTags = onboardingConfig.mustCollectData
-    .filter(data => !isKybCdo(data))
-    .map((data: CollectedDataOption) => allT(`cdo.${data}`));
-  const accessKycDataTags = onboardingConfig.canAccessData
-    .filter(data => !isKybCdo(data))
-    .map((data: CollectedDataOption) => allT(`cdo.${data}`));
+  const collectedKycDataTags = onboardingConfig.mustCollectData.filter(
+    data => !isKybCdo(data),
+  );
+  const accessKycDataTags = onboardingConfig.canAccessData.filter(
+    data => !isKybCdo(data),
+  );
 
   return (
     <>
       <Field label={t('collected-data')}>
-        <TagList testID="kyb-bo-collected-data" items={collectedKycDataTags} />
+        <CdoTagList
+          testID="kyb-bo-collected-data"
+          cdos={collectedKycDataTags}
+        />
       </Field>
       <Field label={t('accessed-data')}>
         {accessKycDataTags.length > 0 ? (
-          <TagList testID="kyb-bo-accessed-data" items={accessKycDataTags} />
+          <CdoTagList testID="kyb-bo-accessed-data" cdos={accessKycDataTags} />
         ) : (
           t('none')
         )}

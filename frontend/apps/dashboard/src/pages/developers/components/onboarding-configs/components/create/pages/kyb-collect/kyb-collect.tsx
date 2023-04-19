@@ -3,9 +3,9 @@ import { CollectedKybDataOption } from '@onefootprint/types';
 import { Checkbox, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import CdoTagList from 'src/components/cdo-tag-list';
 import styled, { css } from 'styled-components';
 
-import TagList from '../../../tag-list';
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getFormIdForState from '../../utils/get-form-id-for-state';
@@ -43,17 +43,17 @@ const KybCollect = () => {
 
   const website = watch(CollectedKybDataOption.website);
   const phoneNumber = watch(CollectedKybDataOption.phoneNumber);
-  const collectedDataTags = [
-    allT('cdo.business_name'),
-    allT('cdo.business_tin'),
-    allT('cdo.business_address'),
-    allT('cdo.business_beneficial_owners'),
+  const collectedData: CollectedKybDataOption[] = [
+    CollectedKybDataOption.name,
+    CollectedKybDataOption.tin,
+    CollectedKybDataOption.address,
+    CollectedKybDataOption.beneficialOwners,
   ];
   if (website) {
-    collectedDataTags.push(allT('cdo.business_website'));
+    collectedData.push(CollectedKybDataOption.website);
   }
   if (phoneNumber) {
-    collectedDataTags.push(allT('cdo.business_phone_number'));
+    collectedData.push(CollectedKybDataOption.phoneNumber);
   }
 
   return (
@@ -66,7 +66,11 @@ const KybCollect = () => {
       >
         <Section>
           <Typography variant="label-3">{t('collected-data')}</Typography>
-          <TagList testID="collected-data" items={collectedDataTags} />
+          <CdoTagList
+            testID="collected-data"
+            cdos={collectedData}
+            disableSort
+          />
         </Section>
         <Section>
           <Typography variant="label-3" color="tertiary">

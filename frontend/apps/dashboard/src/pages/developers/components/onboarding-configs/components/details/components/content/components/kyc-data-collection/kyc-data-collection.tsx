@@ -1,34 +1,29 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption, OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 import { Field } from 'src/components';
-
-import TagList from '../../../../../tag-list';
+import CdoTagList from 'src/components/cdo-tag-list';
 
 type KycDataCollectionProps = {
   onboardingConfig: OnboardingConfig;
 };
 
 const KycDataCollection = ({ onboardingConfig }: KycDataCollectionProps) => {
-  const { allT, t } = useTranslation(
+  const { t } = useTranslation(
     'pages.developers.onboarding-configs.details.kyc-data-collection',
   );
 
-  const collectedDataTags = onboardingConfig.mustCollectData.map(
-    (data: CollectedDataOption) => allT(`cdo.${data}`),
-  );
-  const accessDataTags = onboardingConfig.canAccessData.map(
-    (data: CollectedDataOption) => allT(`cdo.${data}`),
-  );
+  const collectedDataTags = onboardingConfig.mustCollectData;
+  const accessDataTags = onboardingConfig.canAccessData;
 
   return (
     <>
       <Field label={t('collected-data')}>
-        <TagList testID="kyc-collected-data" items={collectedDataTags} />
+        <CdoTagList testID="kyc-collected-data" cdos={collectedDataTags} />
       </Field>
       <Field label={t('accessed-data')}>
         {accessDataTags.length > 0 ? (
-          <TagList testID="kyc-accessed-data" items={accessDataTags} />
+          <CdoTagList testID="kyc-accessed-data" cdos={accessDataTags} />
         ) : (
           t('none')
         )}

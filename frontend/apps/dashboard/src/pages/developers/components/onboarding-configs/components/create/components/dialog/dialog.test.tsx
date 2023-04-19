@@ -190,17 +190,17 @@ describe('<CreateConfig />', () => {
       expect(within(collectedData).getByText('Address')).toBeInTheDocument();
       expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
 
-      // Select SSN (Full) option
-      const ssnFullOption = screen.getByLabelText('SSN (Full)');
-      await userEvent.click(ssnFullOption);
-      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
-
       // Select SSN (Last 4) option
       const ssnLast4Option = screen.getByLabelText('SSN (Last 4)');
       await userEvent.click(ssnLast4Option);
       expect(
         within(collectedData).getByText('SSN (Last 4)'),
       ).toBeInTheDocument();
+
+      // Select SSN (Full) option
+      const ssnFullOption = screen.getByLabelText('SSN (Full)');
+      await userEvent.click(ssnFullOption);
+      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
 
       // Select ID Document
       const idDocumentOption = screen.getByLabelText('ID Document');
