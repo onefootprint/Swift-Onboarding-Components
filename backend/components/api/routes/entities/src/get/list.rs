@@ -12,9 +12,10 @@ use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantUvw;
 use api_wire_types::ListEntitiesRequest;
-use db::models::onboarding::Onboarding;
+use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -24,8 +25,6 @@ use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
-
-use super::serialize_entity;
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
@@ -69,7 +68,7 @@ pub async fn get(
         timestamp_gte,
         kind,
     };
-    let (scoped_vaults, mut obs, vws, count) = state
+    let (scoped_vaults, mut infos, vws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_vaults = db::scoped_vault::list_authorized_for_tenant(
@@ -81,9 +80,9 @@ pub async fn get(
             let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
             let vws: HashMap<ScopedVaultId, TenantUvw> =
                 VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id, None)?;
-            let scoped_user_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
-            let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids.clone())?;
-            Ok((scoped_vaults, obs, vws, count))
+            let scoped_vault_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
+            let infos = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;
+            Ok((scoped_vaults, infos, vws, count))
         })
         .await??;
 
@@ -101,12 +100,12 @@ pub async fn get(
             let vw = vws
                 .get(&sv.id)
                 .ok_or_else(|| ApiError::AssertionError("VW not found".to_owned()))?;
-            let ob = obs.remove(&sv.id);
-            Ok((sv, vw, ob))
+            let info = infos.remove(&sv.id);
+            Ok((sv, vw, info))
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
-        .map(|(sv, vw, ob)| serialize_entity(sv, vw, ob))
+        .map(|(sv, vw, info)| api_wire_types::Entity::from_db((sv, vw, info)))
         .collect();
     Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
 }

@@ -9,13 +9,12 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantUvw;
-use db::models::onboarding::Onboarding;
+use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
-
-use super::serialize_entity;
 
 #[api_v2_operation(
     description = "View details of a specific entity (business or user)",
@@ -43,18 +42,18 @@ pub async fn get(
         timestamp_gte: None,
         kind: None,
     };
-    let (sv, ob, vw) = state
+    let (sv, info, vw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
             let vw: TenantUvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let ob = Onboarding::get_for_scoped_users(conn, vec![&sv.id])?.remove(&sv.id);
+            let info = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?.remove(&sv.id);
 
-            Ok((sv, ob, vw))
+            Ok((sv, info, vw))
         })
         .await??;
-    let result = serialize_entity(sv, &vw, ob);
+    let result = api_wire_types::Entity::from_db((sv, &vw, info));
     ResponseData::ok(result).json()
 }

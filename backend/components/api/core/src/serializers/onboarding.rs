@@ -1,10 +1,13 @@
-use db::models::onboarding::{Onboarding, OnboardingAndConfig, SerializableOnboardingInfo};
+use db::models::{
+    onboarding::{Onboarding, OnboardingAndConfig},
+    scoped_vault::SerializableEntity,
+};
 use newtypes::DataIdentifier;
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<SerializableOnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db((onboarding, config, insight, manual_review): SerializableOnboardingInfo) -> Self {
+impl DbToApi<SerializableEntity> for api_wire_types::Onboarding {
+    fn from_db((onboarding, config, insight, manual_review): SerializableEntity) -> Self {
         let Onboarding {
             id,
             start_timestamp,

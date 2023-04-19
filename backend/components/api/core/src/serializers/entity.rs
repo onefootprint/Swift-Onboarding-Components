@@ -1,33 +1,43 @@
-use crate::utils::db2api::DbToApi;
-use db::models::onboarding::SerializableOnboardingInfo;
-use db::models::scoped_vault::ScopedVault;
-use newtypes::{DataIdentifier, PiiString, VaultKind};
+use crate::utils::{
+    db2api::DbToApi,
+    vault_wrapper::{Any, TenantUvw},
+};
+use db::models::{
+    scoped_vault::{ScopedVault, SerializableEntity},
+    vault::Vault,
+};
+use newtypes::{BusinessDataKind as BDK, DataIdentifier};
 use std::collections::HashMap;
 
-pub type EntityDetail = (
-    Vec<DataIdentifier>,
-    Option<SerializableOnboardingInfo>,
-    ScopedVault,
-    bool,
-    VaultKind,
-    HashMap<DataIdentifier, PiiString>,
-);
+pub type EntityDetail<'a> = (ScopedVault, &'a TenantUvw<Any>, Option<SerializableEntity>);
 
-impl DbToApi<EntityDetail> for api_wire_types::Entity {
-    fn from_db(
-        (attributes, onboarding_info, scoped_vault, is_portable, vault_kind, decrypted_attributes): EntityDetail,
-    ) -> Self {
+impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
+    fn from_db((sv, vw, onboarding_info): EntityDetail) -> Self {
+        // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
+        let attributes = vw.get_visible_populated_fields();
+
+        // Don't require any permissions to decrypt business name - always show it in plaintext
+        let plaintext_dis: Vec<DataIdentifier> = vec![BDK::Name.into()];
+        let decrypted_attributes: HashMap<_, _> = plaintext_dis
+            .into_iter()
+            .flat_map(|di| vw.get_p_data(di.clone()).map(|p_data| (di, p_data.clone())))
+            .collect();
+
+        let Vault {
+            is_portable, kind, ..
+        } = vw.vault.clone();
+
         let ScopedVault {
             fp_id,
             start_timestamp,
             ordering_id,
             ..
-        } = scoped_vault;
+        } = sv;
 
         api_wire_types::Entity {
             id: fp_id,
             is_portable,
-            kind: vault_kind,
+            kind,
             attributes,
             start_timestamp,
             onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),

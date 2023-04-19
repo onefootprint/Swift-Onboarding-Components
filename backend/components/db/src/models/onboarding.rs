@@ -2,7 +2,6 @@ use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
-use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
@@ -160,8 +159,6 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
 #[derive(Clone)]
 pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
-pub type SerializableOnboardingInfo = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
-
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
 pub type BasicOnboardingInfo<ObT = Onboarding> =
     (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
@@ -276,31 +273,6 @@ impl Onboarding {
             .collect();
 
         Ok(results)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn get_for_scoped_users(
-        conn: &mut PgConn,
-        scoped_vault_ids: Vec<&ScopedVaultId>,
-    ) -> DbResult<HashMap<ScopedVaultId, SerializableOnboardingInfo>> {
-        use crate::schema::{insight_event, manual_review, ob_configuration};
-        let results: Vec<SerializableOnboardingInfo> = onboarding::table
-            .inner_join(ob_configuration::table)
-            .inner_join(insight_event::table)
-            // Only fetch active manual review for this onboarding
-            .left_join(manual_review::table.on(
-                manual_review::onboarding_id.eq(onboarding::id)
-                .and(manual_review::completed_at.is_null())
-            ))
-            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
-            .load(conn)?;
-
-        // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableOnboardingInfo>
-        let result_map = results
-            .into_iter()
-            .map(|ob| (ob.0.scoped_vault_id.clone(), ob))
-            .collect();
-        Ok(result_map)
     }
 
     #[tracing::instrument(skip_all)]

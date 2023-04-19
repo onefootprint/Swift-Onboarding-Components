@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::schema::scoped_vault;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
@@ -7,8 +9,10 @@ use diesel::{Insertable, Queryable};
 use newtypes::{FpId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
 use serde::{Deserialize, Serialize};
 
+use super::insight_event::InsightEvent;
+use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
-use super::tenant::Tenant;
+use super::onboarding::Onboarding;
 use super::vault::Vault;
 
 /// Creates a unique identifier specific to each onboarding configuration.
@@ -95,6 +99,8 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for ScopedVaultIdentifier<'a
     }
 }
 
+pub type SerializableEntity = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
+
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
     #[tracing::instrument(skip_all)]
@@ -162,20 +168,6 @@ impl ScopedVault {
         Ok(ob)
     }
 
-    /// get scoped_users by a specific user vault
-    #[tracing::instrument(skip_all)]
-    pub fn list_for_user_vault(
-        conn: &mut PgConn,
-        vault_id: &VaultId,
-    ) -> DbResult<Vec<(ScopedVault, Tenant)>> {
-        use crate::schema::tenant;
-        let results = scoped_vault::table
-            .inner_join(tenant::table)
-            .filter(scoped_vault::vault_id.eq(vault_id))
-            .get_results(conn)?;
-        Ok(results)
-    }
-
     #[tracing::instrument(skip_all)]
     pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
         let mut query = scoped_vault::table.into_boxed();
@@ -208,5 +200,30 @@ impl ScopedVault {
         }
         let result = query.first(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn bulk_get_serializable_info(
+        conn: &mut PgConn,
+        ids: Vec<&ScopedVaultId>,
+    ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
+        use crate::schema::{insight_event, manual_review, ob_configuration, onboarding};
+        let results: Vec<SerializableEntity> = onboarding::table
+            .inner_join(ob_configuration::table)
+            .inner_join(insight_event::table)
+            // Only fetch active manual review for this onboarding
+            .left_join(manual_review::table.on(
+                manual_review::onboarding_id.eq(onboarding::id)
+                .and(manual_review::completed_at.is_null())
+            ))
+            .filter(onboarding::scoped_vault_id.eq_any(ids))
+            .load(conn)?;
+
+        // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableEntity>
+        let result_map = results
+            .into_iter()
+            .map(|ob| (ob.0.scoped_vault_id.clone(), ob))
+            .collect();
+        Ok(result_map)
     }
 }
