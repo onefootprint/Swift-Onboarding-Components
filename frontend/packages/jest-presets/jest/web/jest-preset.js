@@ -2,8 +2,9 @@ process.env.TZ = 'UTC';
 
 module.exports = {
   randomize: true,
+  cacheDirectory: './.jest-cache',
   testRunner: 'jest-circus/runner',
-  testTimeout: 60000,
+  testTimeout: 45000,
   resetMocks: false,
   moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',

@@ -10,6 +10,7 @@ packages/ui-emails/.react-email/
 
 # testing
 coverage
+.jest-cache
 
 # build
 .next/

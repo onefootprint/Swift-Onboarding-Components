@@ -42,7 +42,7 @@
         "^build"
       ],
       "outputs": [
-        "coverage/**"
+        ".jest-cache/**"
       ]
     },
     "start": {
