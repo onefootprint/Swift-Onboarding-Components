@@ -12,8 +12,8 @@ const useCanDecrypt = (entity: Entity) => {
   if (isAdmin) {
     return true;
   }
-  const { canAccessAttributes, canAccessPermissions } = entity.onboarding;
-  if (canAccessAttributes.length === 0 || canAccessPermissions.length === 0) {
+  const { canAccessPermissions } = entity.onboarding;
+  if (canAccessPermissions.length === 0) {
     return false;
   }
   return canAccessPermissions.some(scope => scopes.includes(scope));

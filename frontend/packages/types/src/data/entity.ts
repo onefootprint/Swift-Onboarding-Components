@@ -1,4 +1,3 @@
-import CdoToDiMap from './cdo-to-di-map';
 import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
 import { Onboarding } from './onboarding';
 import { VaultValue } from './vault';
@@ -54,14 +53,6 @@ export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
   ...entity,
   requiresManualReview: getEntityManualReview(entity),
   status: getEntityStatus(entity),
-  onboarding: entity.onboarding
-    ? {
-        ...entity.onboarding,
-        canAccessAttributes: getEntityOnboardingCanAccessAttributes(
-          entity.onboarding,
-        ),
-      }
-    : undefined,
 });
 
 const getEntityStatus = (entity: Entity): EntityStatus => {
@@ -77,10 +68,3 @@ const getEntityManualReview = (entity: Entity) => {
   const requiresManualReview = !!entity.onboarding?.requiresManualReview;
   return requiresManualReview && userStatus !== EntityStatus.incomplete;
 };
-
-const getEntityOnboardingCanAccessAttributes = (
-  onboarding: Onboarding,
-): DataIdentifier[] =>
-  onboarding.canAccessData
-    .map(collectDataOption => CdoToDiMap[collectDataOption])
-    .flat();

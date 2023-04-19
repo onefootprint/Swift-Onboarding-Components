@@ -1,7 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import {
   BusinessDI,
-  CollectedKybDataOption,
   CollectedKycDataOption,
   Entity,
   EntityKind,
@@ -64,20 +63,6 @@ export const entitiesFixture: Entity[] = [
         RoleScope.decryptBusinessPhoneNumber,
         RoleScope.decryptBusinessWebsite,
       ],
-      canAccessData: [
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.dob,
-        CollectedKycDataOption.ssn9,
-        CollectedKycDataOption.fullAddress,
-        CollectedKycDataOption.email,
-        CollectedKycDataOption.phoneNumber,
-        CollectedKybDataOption.name,
-        CollectedKybDataOption.tin,
-        CollectedKybDataOption.address,
-        CollectedKybDataOption.phoneNumber,
-        CollectedKybDataOption.website,
-      ],
-      canAccessAttributes: [],
     },
     requiresManualReview: false,
     status: EntityStatus.pass,

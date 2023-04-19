@@ -1,9 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  CdoToDiMap,
+  CollectedDataOption,
   DataIdentifier,
   Entity,
   isVaultDataDecrypted,
   isVaultDataEncrypted,
+  RoleScope,
 } from '@onefootprint/types';
 import usePermissions from 'src/hooks/use-permissions';
 
@@ -11,30 +14,49 @@ import useEntityVault from '@/entities/hooks/use-entity-vault';
 
 import { useDecryptControls } from '../components/decrypt-controls';
 
+const canScopesDecrypt = (scopes: RoleScope[], di: DataIdentifier) => {
+  if (scopes.includes(RoleScope.admin)) {
+    return true;
+  }
+  // See if any scope grants permissions to decrypt the DI
+  return scopes.some(s => {
+    // Decrypt permissions always have a CDO after the dot
+    const cdo = s.split('decrypt.')[1];
+    if (!cdo) {
+      return false;
+    }
+    return CdoToDiMap[cdo as CollectedDataOption].includes(di);
+  });
+};
+
 const useField = (entity: Entity) => {
   const { t } = useTranslation('di');
-  const { isAdmin, scopes } = usePermissions();
+  const { scopes } = usePermissions();
   const entityVault = useEntityVault(entity.id, entity);
   const decryptControls = useDecryptControls();
   const showCheckbox = decryptControls.inProgress;
 
-  const canDecrypt = (di: DataIdentifier) => {
-    const canAccess = !!entity.onboarding?.canAccessAttributes.includes(di);
-    const hasDecryptRole = scopes.some(scope =>
-      entity.onboarding?.canAccessPermissions.includes(scope),
+  const canDecryptField = (di: DataIdentifier) => {
+    // In order to be able to decrypt a given DI, it must be
+    // (1) decryptable by the tenant, represented by canAccessPermissions on an approved onboarding AND
+    // (2) decryptable by the authed user, represented by the scopes for the authed user
+    const canTenantDecrypt = canScopesDecrypt(
+      entity.onboarding?.canAccessPermissions || [],
+      di,
     );
-    return canAccess && (isAdmin || hasDecryptRole);
+    const canUserDecrypt = canScopesDecrypt(scopes, di);
+    return canTenantDecrypt && canUserDecrypt;
   };
 
   const canSelect = (di: DataIdentifier) => {
     const value = entityVault.data?.[di];
-    return canDecrypt(di) && isVaultDataEncrypted(value);
+    return canDecryptField(di) && isVaultDataEncrypted(value);
   };
 
   const getProps = (di: DataIdentifier) => {
     const value = entityVault.data?.[di];
     return {
-      canDecrypt: canDecrypt(di),
+      canDecrypt: canDecryptField(di),
       canSelect: canSelect(di),
       disabled: !canSelect(di),
       label: t(di),

@@ -7,7 +7,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
-  CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   DataIdentifier,
   DecisionSourceKind,
@@ -90,16 +89,6 @@ export const entityFixture: Entity = {
       RoleScope.decryptPhoneNumber,
       RoleScope.decryptInvestorProfile,
     ],
-    canAccessData: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.ssn9,
-      CollectedKycDataOption.fullAddress,
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.phoneNumber,
-      CollectedInvestorProfileDataOption.investorProfile,
-    ],
-    canAccessAttributes: [],
   },
   decryptedAttributes: {},
 };
