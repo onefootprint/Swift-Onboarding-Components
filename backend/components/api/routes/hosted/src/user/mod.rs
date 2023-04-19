@@ -1,7 +1,6 @@
 use paperclip::actix::web;
 
 mod access_events;
-mod authorized_orgs;
 mod biometric;
 mod consent;
 mod document;
@@ -16,7 +15,6 @@ mod tests;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
-        .service(authorized_orgs::get)
         .service(vault::put::put)
         .service(vault::put::post_validate)
         .service(vault::decrypt::post)
