@@ -77,7 +77,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 Footprint lets you search across all of your users' vaults by specific fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
 
 ```bash
-curl -X POST https://api.onefootprint.com/users?fingerprint=10014 \
+curl https://api.onefootprint.com/users?search=Smith \
   	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
 
@@ -85,9 +85,7 @@ curl -X POST https://api.onefootprint.com/users?fingerprint=10014 \
 {
   "data": [
     {
-      "footprint_user_id": "fp_id_XyEJ6CF7UNl6K2ymIq8YQS",
-      "start_timestamp": "2022-08-26T17:19:55.048883Z",
-      "is_portable": false
+      "id": "fp_id_XyEJ6CF7UNl6K2ymIq8YQS"
     }
   ],
   "meta": {
@@ -99,43 +97,46 @@ curl -X POST https://api.onefootprint.com/users?fingerprint=10014 \
 
 ## Create "Standalone" user vaults
 
-The first step is to create a new vault for one of your users:
+In some circumstances, you may need to vault PII user data for users that did not onboard through Footprint's KYC/IDV flow. In this case, Footprint supports the concept of "Standalone" user vaults.
+
+Standalone Footprint user vaults can store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make searchable. Unstructured data are custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
+
+The first step is to create a new vault for one of your users. You may optionally initialize it with any data you already have for the user:
 
 ```bash
 curl https://api.onefootprint.com/users \
 	-X POST \
+	-d '{
+		    "id.first_name": "Jane",
+		    "id.last_name": "Joe",
+		    "id.dob": "1988-12-30",
+			"id.ssn9": "12-121-1212",
+			"custom.cc4": "4242"
+		}' \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
 ```json
 {
-  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr",
-  "start_timestamp": "2022-08-26T14:05:35.200031Z",
-  "is_portable": false
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
 }
 ```
 
-Save this `footprint_user_id`, associate it with the corresponding user in your database.
+Save this `id` and associate it with the corresponding user in your database.
 
 <inline-alert variant='info'>This value is safe to store in plaintext!</inline-alert>
 
 ### Update a standalone user vault
 
-In some circumstances, you may need to vault PII user data for users that did not onboard through Footprint's KYC/IDV flow. In this case, Footprint supports the concept of "Standalone" user vaults.
-
-Standalone Footprint user vaults can store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make searchable. Unstructured data are custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
+With the `id` given from creating a user, you may always update and add new data to your standalone vaults:
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
 	-X PUT \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
-		    "id.first_name": "Jane",
-		    "id.last_name": "Joe"
-		    "id.dob": "1988-12-30",
-			"id.ssn9": "12-121-1212",
-			"custom.ach_account": "111122224444",
-			"custom.cc4": "4242"
+		    "id.email": "jane@acmebank.com",
+			"custom.ach_account": "111122224444"
 		}'
 ```
 
