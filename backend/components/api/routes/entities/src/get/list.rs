@@ -68,7 +68,7 @@ pub async fn get(
         timestamp_gte,
         kind,
     };
-    let (scoped_vaults, mut infos, vws, count) = state
+    let (scoped_vaults, mut entities, vws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_vaults = db::scoped_vault::list_authorized_for_tenant(
@@ -81,8 +81,8 @@ pub async fn get(
             let vws: HashMap<ScopedVaultId, TenantUvw> =
                 VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id, None)?;
             let scoped_vault_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
-            let infos = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;
-            Ok((scoped_vaults, infos, vws, count))
+            let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;
+            Ok((scoped_vaults, entities, vws, count))
         })
         .await??;
 
@@ -100,12 +100,14 @@ pub async fn get(
             let vw = vws
                 .get(&sv.id)
                 .ok_or_else(|| ApiError::AssertionError("VW not found".to_owned()))?;
-            let info = infos.remove(&sv.id);
-            Ok((sv, vw, info))
+            let entity = entities
+                .remove(&sv.id)
+                .ok_or_else(|| ApiError::AssertionError("Entity info not found".to_owned()))?;
+            Ok((vw, entity))
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
-        .map(|(sv, vw, info)| api_wire_types::Entity::from_db((sv, vw, info)))
+        .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw)))
         .collect();
     Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
 }

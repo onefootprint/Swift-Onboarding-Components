@@ -9,10 +9,11 @@ use db::models::{
 use newtypes::{BusinessDataKind as BDK, DataIdentifier};
 use std::collections::HashMap;
 
-pub type EntityDetail<'a> = (ScopedVault, &'a TenantUvw<Any>, Option<SerializableEntity>);
+pub type EntityDetail<'a> = (SerializableEntity, &'a TenantUvw<Any>);
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
-    fn from_db((sv, vw, onboarding_info): EntityDetail) -> Self {
+    fn from_db((entity, vw): EntityDetail) -> Self {
+        let (sv, watchlist_check, onboarding_info) = entity;
         // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
         let attributes = vw.get_visible_populated_fields();
 
@@ -40,6 +41,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             kind,
             attributes,
             start_timestamp,
+            watchlist_check: watchlist_check.map(api_wire_types::WatchlistCheck::from_db),
             onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
             ordering_id,
             decrypted_attributes,

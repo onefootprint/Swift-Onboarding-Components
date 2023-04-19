@@ -42,18 +42,20 @@ pub async fn get(
         timestamp_gte: None,
         kind: None,
     };
-    let (sv, info, vw) = state
+    let (entity, vw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
             let vw: TenantUvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let info = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?.remove(&sv.id);
+            let entity = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?
+                .remove(&sv.id)
+                .ok_or(ApiError::ResourceNotFound)?;
 
-            Ok((sv, info, vw))
+            Ok((entity, vw))
         })
         .await??;
-    let result = api_wire_types::Entity::from_db((sv, &vw, info));
+    let result = api_wire_types::Entity::from_db((entity, &vw));
     ResponseData::ok(result).json()
 }

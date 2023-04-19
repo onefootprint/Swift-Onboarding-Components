@@ -13,6 +13,7 @@ pub struct Entity {
     /// The list of attributes populated on this vault.
     pub attributes: Vec<DataIdentifier>,
     pub start_timestamp: DateTime<Utc>,
+    pub watchlist_check: Option<WatchlistCheck>,
     pub onboarding: Option<Onboarding>,
     pub ordering_id: i64,
     pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,

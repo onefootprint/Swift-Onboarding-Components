@@ -1,9 +1,9 @@
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::vault::Vault;
 use crate::schema;
+use crate::schema::scoped_vault::BoxedQuery;
 use crate::DbResult;
 use crate::PgConn;
-use crate::{errors::DbError, schema::scoped_vault::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::pg::Pg;
@@ -209,10 +209,7 @@ pub fn list_authorized_for_tenant_query<'a>(
     Ok(query)
 }
 
-pub fn count_authorized_for_tenant(
-    conn: &mut PgConn,
-    params: ScopedVaultListQueryParams,
-) -> Result<i64, DbError> {
+pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
     let count = list_authorized_for_tenant_query(conn, params)?
         .count()
         .get_result(conn)?;
@@ -225,7 +222,7 @@ pub fn list_authorized_for_tenant(
     params: ScopedVaultListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(ScopedVault, Vault)>, DbError> {
+) -> DbResult<Vec<(ScopedVault, Vault)>> {
     let mut scoped_vaults = list_authorized_for_tenant_query(conn, params)?
         .order_by(schema::scoped_vault::ordering_id.desc())
         .limit(page_size);

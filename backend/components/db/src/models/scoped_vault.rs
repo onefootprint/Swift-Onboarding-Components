@@ -4,6 +4,7 @@ use crate::schema::scoped_vault;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{FpId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
@@ -14,6 +15,7 @@ use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
 use super::onboarding::Onboarding;
 use super::vault::Vault;
+use super::watchlist_check::WatchlistCheck;
 
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
@@ -99,7 +101,12 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for ScopedVaultIdentifier<'a
     }
 }
 
-pub type SerializableEntity = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
+pub type SerializableOnboarding = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
+pub type SerializableEntity = (
+    ScopedVault,
+    Option<WatchlistCheck>,
+    Option<SerializableOnboarding>,
+);
 
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
@@ -207,23 +214,29 @@ impl ScopedVault {
         conn: &mut PgConn,
         ids: Vec<&ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
-        use crate::schema::{insight_event, manual_review, ob_configuration, onboarding};
-        let results: Vec<SerializableEntity> = onboarding::table
-            .inner_join(ob_configuration::table)
-            .inner_join(insight_event::table)
-            // Only fetch active manual review for this onboarding
-            .left_join(manual_review::table.on(
-                manual_review::onboarding_id.eq(onboarding::id)
-                .and(manual_review::completed_at.is_null())
-            ))
-            .filter(onboarding::scoped_vault_id.eq_any(ids))
+        use crate::schema::{insight_event, manual_review, ob_configuration, onboarding, watchlist_check};
+        let results: Vec<SerializableEntity> = scoped_vault::table
+            .left_join(
+                watchlist_check::table.on(watchlist_check::scoped_vault_id
+                    .eq(scoped_vault::id)
+                    .and(watchlist_check::deactivated_at.is_null())
+                    .and(not(watchlist_check::completed_at.is_null()))),
+            )
+            .left_join(
+                onboarding::table
+                .inner_join(ob_configuration::table)
+                .inner_join(insight_event::table)
+                // Only fetch active manual review for this onboarding
+                .left_join(manual_review::table.on(
+                    manual_review::onboarding_id.eq(onboarding::id)
+                    .and(manual_review::completed_at.is_null())
+                )),
+            )
+            .filter(scoped_vault::id.eq_any(ids))
             .load(conn)?;
 
         // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableEntity>
-        let result_map = results
-            .into_iter()
-            .map(|ob| (ob.0.scoped_vault_id.clone(), ob))
-            .collect();
+        let result_map = results.into_iter().map(|ob| (ob.0.id.clone(), ob)).collect();
         Ok(result_map)
     }
 }
