@@ -90,6 +90,11 @@ class BifrostClient:
         # Keep track of biometric credentials created
         self.webauthn_device = SoftWebauthnDevice()
 
+        # Add email data before even initializing the onboarding, which we do on the client side
+        email_data = {"id.email": self.data["id.email"]}
+        post("/hosted/user/vault/validate", email_data, self.auth_token)
+        put("/hosted/user/vault", email_data, self.auth_token)
+
         # Initialize the onboarding
         self.initialize_onboarding()
 
