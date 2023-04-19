@@ -1,0 +1,22 @@
+{
+  "name": "@onefootprint/request",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint src --fix",
+    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "eslint-config-footprint": "*",
+    "tsconfig": "*",
+    "typescript": "4.9.5"
+  },
+  "dependencies": {
+    "axios": "^1.2.1",
+    "axios-case-converter": "^0.9.0"
+  }
+}

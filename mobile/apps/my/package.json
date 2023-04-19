@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@onefootprint/ui": "*",
+    "@onefootprint/request": "*",
     "@tanstack/react-query": "^4.29.3",
     "@xstate/react": "^3.2.1",
     "expo": "~48.0.11",
