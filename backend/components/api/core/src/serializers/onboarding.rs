@@ -14,10 +14,7 @@ impl DbToApi<SerializableEntity> for api_wire_types::Onboarding {
             ..
         } = onboarding.clone();
         let db::models::ob_configuration::ObConfiguration {
-            id: config_id,
-            name,
-            can_access_data,
-            ..
+            id: config_id, name, ..
         } = config.clone();
 
         let status = onboarding.status;
@@ -33,8 +30,6 @@ impl DbToApi<SerializableEntity> for api_wire_types::Onboarding {
             timestamp: start_timestamp,
             insight_event: api_wire_types::InsightEvent::from_db(insight),
             can_access_permissions: can_decrypt_scopes,
-            // TODO deprecate
-            can_access_data,
         }
     }
 }

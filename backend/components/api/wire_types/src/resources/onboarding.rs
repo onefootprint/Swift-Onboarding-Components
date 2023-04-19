@@ -16,9 +16,6 @@ pub struct Onboarding {
     pub insight_event: InsightEvent,
     /// Represents the permissions that this approved onboarding gives to tenant users.
     pub can_access_permissions: Vec<TenantScope>,
-    // TODO deprecate these
-    /// DEPRECATED
-    pub can_access_data: Vec<CollectedDataOption>,
 }
 
 export_schema!(Onboarding);
