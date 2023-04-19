@@ -40,10 +40,9 @@ const useField = (entity: Entity) => {
     // In order to be able to decrypt a given DI, it must be
     // (1) decryptable by the tenant, represented by canAccessPermissions on an approved onboarding AND
     // (2) decryptable by the authed user, represented by the scopes for the authed user
-    const canTenantDecrypt = canScopesDecrypt(
-      entity.onboarding?.canAccessPermissions || [],
-      di,
-    );
+    const canTenantDecrypt =
+      canScopesDecrypt(entity.onboarding?.canAccessPermissions || [], di) ||
+      !entity.isPortable;
     const canUserDecrypt = canScopesDecrypt(scopes, di);
     return canTenantDecrypt && canUserDecrypt;
   };
