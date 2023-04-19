@@ -2,8 +2,8 @@ use crate::*;
 
 /// Newly created user
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
-pub struct NewUser {
+pub struct User {
     pub id: FpId,
 }
 
-export_schema!(NewUser);
+export_schema!(User);

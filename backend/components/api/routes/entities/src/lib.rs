@@ -1,3 +1,4 @@
+use api_core::*;
 use paperclip::actix::web;
 
 mod annotations;
@@ -8,7 +9,7 @@ mod risk_signals;
 mod timeline;
 pub mod vault;
 
-pub use api_core::*;
+pub use get::list::parse_search;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);

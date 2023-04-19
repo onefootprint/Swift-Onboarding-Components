@@ -17,3 +17,11 @@ pub struct ListEntitiesRequest {
 }
 
 export_schema!(ListEntitiesRequest);
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct SearchUsersRequest {
+    pub search: Option<PiiString>,
+}
+
+export_schema!(SearchUsersRequest);

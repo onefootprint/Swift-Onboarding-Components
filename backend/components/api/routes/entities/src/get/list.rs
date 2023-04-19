@@ -112,7 +112,7 @@ pub async fn get(
 
 /// Given a search string and fp_id, parse into the list of fingerprints and fp_id by which to query
 /// for ScopedVaults
-async fn parse_search(
+pub async fn parse_search(
     state: &State,
     search: Option<PiiString>,
     tenant_id: &TenantId,
