@@ -145,12 +145,12 @@ export const editIngressVaulting = async (
 ) => {
   await clickOnEdit(container);
 
-  newData.ingressSettings.rules.forEach(rule => {
+  newData.ingressSettings.rules.forEach(async rule => {
     const tokenField = within(container).getByLabelText('Token');
-    userEvent.type(tokenField, rule.token);
+    await userEvent.type(tokenField, rule.token);
 
     const targetField = within(container).getByLabelText('Target');
-    userEvent.type(targetField, rule.target);
+    await userEvent.type(targetField, rule.target);
   });
 
   const saveButton = screen.getByRole('button', {
