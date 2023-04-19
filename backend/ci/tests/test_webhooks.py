@@ -26,11 +26,14 @@ def test_webhook_e2e(sandbox_tenant, twilio):
         )
     )
     assert app.id == app_id  # ensure that we're creating app id's in svix properly
+    print(f"APP ID: {app.id}")
 
     hooky_url = create_hooky_url()
     channels = (
         [EXPECTED_SERVER_VERSION_GIT_HASH] if EXPECTED_SERVER_VERSION_GIT_HASH else None
     )
+    endpoints = svix.endpoint.list(app_id)
+    print(f"Num endpoints: {len(endpoints.data)}")
     endpoint = svix.endpoint.create(
         app.id, EndpointIn(url=hooky_url, version=1, channels=channels)
     )

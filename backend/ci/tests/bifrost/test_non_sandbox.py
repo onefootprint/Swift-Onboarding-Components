@@ -39,7 +39,7 @@ def test_onboarding_init(bifrost):
     req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
 
     collect_data_req = req("collect_data")
-    expected_data = set(bifrost.ob_config.must_collect_data) - {"phone_number"}
+    expected_data = set(bifrost.ob_config.must_collect_data) - {"phone_number", "email"}
     assert set(collect_data_req["missing_attributes"]) == expected_data
 
     # requirements are non-null, so we expect this to be None

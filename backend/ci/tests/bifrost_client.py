@@ -90,10 +90,12 @@ class BifrostClient:
         # Keep track of biometric credentials created
         self.webauthn_device = SoftWebauthnDevice()
 
-        # Add email data before even initializing the onboarding, which we do on the client side
-        email_data = {"id.email": self.data["id.email"]}
-        post("/hosted/user/vault/validate", email_data, self.auth_token)
-        put("/hosted/user/vault", email_data, self.auth_token)
+        # Add email data before even initializing the onboarding, which we do on the client side.
+        # Inherited users will already have an email
+        if not override_inherit_phone:
+            email_data = {"id.email": self.data["id.email"]}
+            post("/hosted/user/vault/validate", email_data, self.auth_token)
+            put("/hosted/user/vault", email_data, self.auth_token)
 
         # Initialize the onboarding
         self.initialize_onboarding()
@@ -141,11 +143,7 @@ class BifrostClient:
         Operates on collect_data or collect_investor_profile requirement
         """
         dis_to_provide = [
-            di
-            for cdo in requirement["missing_attributes"]
-            for di in CDO_TO_DIS[cdo]
-            # Fix for now since we already send the email as soon as the user is created
-            if di != "id.email"
+            di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/user/vault/validate", data, self.auth_token)
