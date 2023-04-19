@@ -141,7 +141,11 @@ class BifrostClient:
         Operates on collect_data or collect_investor_profile requirement
         """
         dis_to_provide = [
-            di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
+            di
+            for cdo in requirement["missing_attributes"]
+            for di in CDO_TO_DIS[cdo]
+            # Fix for now since we already send the email as soon as the user is created
+            if di != "id.email"
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/user/vault/validate", data, self.auth_token)
