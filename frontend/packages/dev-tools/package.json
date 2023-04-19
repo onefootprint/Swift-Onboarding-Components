@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
-    "test": "jest --coverage",
+    "test": "jest --ci --bail ",
     "test:watch": "jest --watch",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

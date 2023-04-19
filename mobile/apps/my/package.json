@@ -9,7 +9,7 @@
     "ios": "expo run:ios",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch",
-    "test": "jest --coverage",
+    "test": "jest --ci --bail ",
     "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ process.env.TZ = 'UTC';
 module.exports = {
   randomize: true,
   testRunner: 'jest-circus/runner',
-  testTimeout: 90000,
+  testTimeout: 60000,
   resetMocks: false,
   moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',

@@ -8,7 +8,7 @@
   "scripts": {
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "jest --coverage",
+    "test": "jest --ci --bail ",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",

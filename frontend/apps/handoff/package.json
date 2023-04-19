@@ -7,7 +7,7 @@
     "build": "next build",
     "build:analyze": "ANALYZE=true yarn build",
     "start": "next start -p 3005",
-    "test": "jest --coverage",
+    "test": "jest --ci --bail ",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
