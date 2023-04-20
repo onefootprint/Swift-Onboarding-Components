@@ -16,10 +16,8 @@ const IcoCheck16 = ({ color = 'primary', className, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M12.39 3.986a.646.646 0 1 1 .914.914l-7.107 7.107a.646.646 0 0 1-.914 0L2.7 9.422a.646.646 0 1 1 .913-.913l2.128 2.127 6.65-6.65Z"
+        d="M12.831 3.8a.646.646 0 0 0-.444.196l-6.645 6.646-2.126-2.127a.646.646 0 1 0-.913.913l2.582 2.583a.646.646 0 0 0 .913 0L13.3 4.909a.646.646 0 0 0-.469-1.109Z"
         fill={theme.color[color]}
-        stroke={theme.color[color]}
-        strokeWidth={0.5}
       />
     </svg>
   );

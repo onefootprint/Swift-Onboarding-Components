@@ -16,11 +16,10 @@ const IcoActivity24 = ({ color = 'primary', className, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M4.75 11.75h3.5l2-7 3.5 14.5 2-7.5h3.5"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.265 4a.75.75 0 0 1 .714.574l2.807 11.63 1.24-4.647A.75.75 0 0 1 15.75 11h3.5a.75.75 0 0 1 0 1.5h-2.924l-1.851 6.943a.75.75 0 0 1-1.454-.017L10.189 7.694l-1.218 4.262a.75.75 0 0 1-.721.544h-3.5a.75.75 0 0 1 0-1.5h2.934L9.53 4.544A.75.75 0 0 1 10.265 4Z"
+        fill={theme.color[color]}
       />
     </svg>
   );
