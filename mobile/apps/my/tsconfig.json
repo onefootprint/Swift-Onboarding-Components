@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@/app-clip/*": ["./src/domains/app-clip/*"],
     },
   }
 }

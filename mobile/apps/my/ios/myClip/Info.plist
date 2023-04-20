@@ -33,7 +33,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.4.12</string>
+    <string>1.4.18</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
     <key>UILaunchStoryboardName</key>

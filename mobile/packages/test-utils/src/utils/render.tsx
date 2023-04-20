@@ -33,14 +33,12 @@ type WrapperProps = {
 };
 
 export const Wrapper = ({ children }: WrapperProps) => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  </React.StrictMode>
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
 export const customRender = (Component?: React.ReactNode) => {
   throwOnConsoleErrors();
-  return render(<Wrapper>{Component}</Wrapper>);
+  render(<Wrapper>{Component}</Wrapper>);
 };
 
 export const customRenderHook = (render: (initialProps: any) => any) => {

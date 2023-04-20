@@ -280,9 +280,8 @@
 						ProvisioningStyle = Manual;
 					};
 					C2026E83BD7E47F4AAE20FB9 = {
-						DevelopmentTeam = 5F264K8AG4;
 						LastSwiftMigration = 1250;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -617,9 +616,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = myClip/myClip.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5F264K8AG4;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = myClip/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
@@ -640,9 +639,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = myClip/myClip.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5F264K8AG4;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = myClip/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";

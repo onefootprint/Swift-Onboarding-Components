@@ -11,6 +11,8 @@
 		<string>appclips:handoff.preview.onefootprint.com</string>
 		<string>appclips:handoff.onefootprint.com</string>
 	</array>
+	<key>com.apple.developer.devicecheck.appattest-environment</key>
+	<string>development</string>
 	<key>com.apple.developer.on-demand-install-capable</key>
 	<true/>
 	<key>com.apple.developer.parent-application-identifiers</key>
