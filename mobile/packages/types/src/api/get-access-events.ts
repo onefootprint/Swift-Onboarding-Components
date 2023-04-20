@@ -1,0 +1,11 @@
+import { AccessEvent } from '../data/access-event';
+
+export type GetAccessEventsRequest = {
+  cursor?: number;
+  search?: string;
+  targets?: string[];
+  timestamp_gte?: string; // from
+  timestamp_lte?: string; // to
+};
+
+export type GetAccessEventsResponse = AccessEvent[];

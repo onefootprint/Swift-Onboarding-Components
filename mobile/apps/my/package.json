@@ -13,21 +13,22 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@onefootprint/ui": "*",
     "@onefootprint/request": "*",
+    "@onefootprint/types": "*",
+    "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.29.3",
     "@xstate/react": "^3.2.1",
-    "expo": "~48.0.11",
     "expo-camera": "~13.2.1",
     "expo-linking": "~4.0.1",
     "expo-splash-screen": "~0.18.1",
     "expo-status-bar": "~1.4.4",
+    "expo": "~48.0.11",
     "i18next": "^22.0.4",
     "jest-expo": "^48.0.2",
-    "react": "18.2.0",
     "react-i18next": "^12.2.0",
-    "react-native": "0.71.6",
     "react-native-app-clip": "^0.1.2",
+    "react-native": "0.71.6",
+    "react": "18.2.0",
     "xstate": "^4.37.1"
   },
   "devDependencies": {
