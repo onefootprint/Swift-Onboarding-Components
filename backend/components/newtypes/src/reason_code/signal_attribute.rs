@@ -19,6 +19,7 @@ use strum::Display;
 /// Represents the granularity of data attributes that could be alerted on by a data vendor
 /// NOTE: this is not the same as "data attributes we can collect from a user". Please see `DataAttribute` for that
 pub enum SignalScope {
+    // TODO: split into FN/LN
     Name,
     Dob,
     Ssn,
@@ -31,7 +32,6 @@ pub enum SignalScope {
     Email,
     PhoneNumber,
 
-    Identity,
     IpAddress,
     Document,
     Selfie,

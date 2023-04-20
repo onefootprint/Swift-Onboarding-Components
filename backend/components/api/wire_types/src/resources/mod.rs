@@ -78,3 +78,6 @@ pub use self::watchlist_check::*;
 
 pub mod business_owner;
 pub use self::business_owner::*;
+
+pub mod field_validations;
+pub use self::field_validations::*;
