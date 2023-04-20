@@ -20,4 +20,10 @@ pub enum BusinessError {
     PrimaryBoNotFound,
     #[error("Primary BO has no Vault")]
     PrimaryBoHasNoVault,
+    #[error("One or more BOs have not completed onboarding")]
+    BoOnboardingNotComplete,
+    #[error("BO vault does not have FirstName")]
+    BoVaultMissingFirstName,
+    #[error("BO vault does not have LastName")]
+    BoVaultMissingLastName,
 }

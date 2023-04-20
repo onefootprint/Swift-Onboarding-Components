@@ -25,7 +25,6 @@ pub struct Address {
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
 pub struct Person {
     pub name: PiiString,
-    pub email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
@@ -62,7 +61,6 @@ impl From<BusinessData> for BusinessRequest {
                 .into_iter()
                 .map(|bo| Person {
                     name: PiiString::from(format!("{} {}", bo.first_name.leak(), bo.last_name.leak())),
-                    email: bo.email,
                 })
                 .collect(),
             website: data.website_url.map(|url| Website { url }),
@@ -102,12 +100,10 @@ mod tests {
                 BoData {
                     first_name: PiiString::from("Marvin"),
                     last_name: PiiString::from("Gaye"),
-                    email: Some(PiiString::from("marvin@gaye.com")),
                 },
                 BoData {
                     first_name: PiiString::from("Miles"),
                     last_name: PiiString::from("Davis"),
-                    email: None,
                 },
             ],
         };
@@ -127,11 +123,9 @@ mod tests {
                 people: vec![
                     Person {
                         name: PiiString::from("Marvin Gaye"),
-                        email: Some(PiiString::from("marvin@gaye.com"))
                     },
                     Person {
                         name: PiiString::from("Miles Davis"),
-                        email: None,
                     }
                 ],
                 website: Some(Website {

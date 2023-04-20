@@ -90,7 +90,6 @@ mod tests {
             business_owners: vec![BoData {
                 first_name: PiiString::from("Jane".to_owned()),
                 last_name: PiiString::from("Match".to_owned()),
-                email: None,
             }],
         };
 

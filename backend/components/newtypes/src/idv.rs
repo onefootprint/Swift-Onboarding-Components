@@ -65,7 +65,6 @@ impl IdvData {
 pub struct BoData {
     pub first_name: PiiString,
     pub last_name: PiiString,
-    pub email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -88,8 +87,6 @@ impl From<BusinessOwnerData> for BoData {
         Self {
             first_name: value.first_name,
             last_name: value.last_name,
-            // TODO populate other BO data
-            email: None,
         }
     }
 }
