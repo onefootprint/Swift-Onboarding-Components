@@ -4,10 +4,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { ContactFormData, FormField } from '../contact-form.types';
+import { ContactDialogData, FormField } from '../../contact-dialog.types';
 
 type FormProps = {
-  onSubmit: (data: ContactFormData) => void;
+  onSubmit: (data: ContactDialogData) => void;
 };
 
 const Form = ({ onSubmit }: FormProps) => {
@@ -16,7 +16,7 @@ const Form = ({ onSubmit }: FormProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ContactFormData>();
+  } = useForm<ContactDialogData>();
   const getNameHint = () =>
     errors[FormField.name] ? t('name.errors.required') : undefined;
   const getEmailHint = () =>

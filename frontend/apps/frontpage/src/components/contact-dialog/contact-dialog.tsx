@@ -2,9 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Box, Dialog, InlineAlert, useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import { ContactFormData } from '../contact-form.types';
-import Form from '../form';
-import useContactForm from '../hooks/use-contact-form';
+import Form from './components/form';
+import { ContactDialogData } from './contact-dialog.types';
+import useContactForm from './hooks/use-contact-form';
 
 type ContactDialogProps = {
   url: string;
@@ -17,7 +17,7 @@ const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
   const submitFormMutation = useContactForm();
   const formId = 'support-dialog-id';
   const toast = useToast();
-  const handleSubmit = (data: ContactFormData) => {
+  const handleSubmit = (data: ContactDialogData) => {
     submitFormMutation.mutate(
       { url, data },
       {

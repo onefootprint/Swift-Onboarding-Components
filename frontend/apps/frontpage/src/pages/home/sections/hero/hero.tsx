@@ -12,10 +12,10 @@ import {
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import ContactDialog from 'src/components/contact-dialog';
 import LinkingButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
-import ContactForm from '../../../../components/contact-form';
 import HeroBackground from './components/background';
 import DemoVideo from './components/demo-video';
 
@@ -31,6 +31,8 @@ const DynamicMobileIllustration = dynamic(
 );
 
 const DEMO_LINK = 'https://www.youtube.com/embed/ylHZgcW3fyI?autoplay=1';
+const GET_FORM_URL =
+  'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const containerMotion = {
   hidden: { opacity: 0.8 },
@@ -46,6 +48,15 @@ const containerMotion = {
 const Hero = () => {
   const { t } = useTranslation('pages.home.hero');
   const [isDemoVisible, setDemoVisible] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+
+  const handleClickTrigger = () => {
+    setShowDialog(true);
+  };
+
+  const handleClose = () => {
+    setShowDialog(false);
+  };
 
   const toggleDemo = () => {
     setDemoVisible(!isDemoVisible);
@@ -85,11 +96,18 @@ const Hero = () => {
                 <LinkingButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
                   {t('primary-button')}
                 </LinkingButton>
-                <ContactForm>
-                  <Button type="button" variant="secondary">
-                    {t('secondary-button')}
-                  </Button>
-                </ContactForm>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleClickTrigger}
+                >
+                  {t('secondary-button')}
+                </Button>
+                <ContactDialog
+                  url={GET_FORM_URL}
+                  open={showDialog}
+                  onClose={handleClose}
+                />
               </Row>
               <WatchDemoContainer>
                 <LinkButton
@@ -150,8 +168,8 @@ const Content = styled.div`
 `;
 
 const ImagesContainer = styled.div`
-  position: relative; 
-  width 100%;
+  position: relative;
+  width: 100%;
   z-index: 2;
 `;
 

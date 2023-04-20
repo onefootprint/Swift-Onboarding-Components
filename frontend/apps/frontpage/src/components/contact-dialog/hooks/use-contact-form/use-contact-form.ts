@@ -1,10 +1,10 @@
 import request from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
-import type { ContactFormData } from '../../contact-form.types';
+import type { ContactDialogData } from '../../contact-dialog.types';
 
 export type ContactFormRequest = {
-  data: ContactFormData;
+  data: ContactDialogData;
   url: string;
 };
 

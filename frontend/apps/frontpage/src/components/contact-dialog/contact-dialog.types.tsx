@@ -1,4 +1,4 @@
-export type ContactFormData = {
+export type ContactDialogData = {
   [FormField.name]: string;
   [FormField.email]: string;
   [FormField.message]: string;
