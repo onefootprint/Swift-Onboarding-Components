@@ -37,6 +37,16 @@ export const withOnboardingConfigs = (data = onboardingConfigsFixture) =>
     },
   });
 
+export const withEntities = () =>
+  mockRequest({
+    method: 'get',
+    path: '/entities',
+    response: {
+      data: [],
+      meta: {},
+    },
+  });
+
 export const withOnboardingConfigsError = () =>
   mockRequest({
     method: 'get',

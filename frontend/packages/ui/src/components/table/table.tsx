@@ -139,6 +139,7 @@ const TableContainer = styled.table`
     border: 1px solid ${theme.borderColor.tertiary};
     table-layout: fixed;
     text-align: left;
+    overflow: hidden;
     width: 100%;
 
     th {

@@ -790,6 +790,23 @@
     },
     "developers": {
       "page-title": "Footprint | Developers",
+      "dialog-test-onboarding": {
+        "heading": "Test onboarding configuration",
+        "title": "One last recommendation:",
+        "subtitle": "Test your onboarding configuration to see how it looks and feels",
+        "step-1": {
+          "number": "1",
+          "title": "Go through your new onboarding configuration",
+          "subtitle": "You'll create a new user and see how the onboarding process will look like in your product."
+        },
+        "step-2": {
+          "number": "2",
+          "title": "See onboarded users' details",
+          "subtitle": "When users complete onboardings, they will appear on the 'Users' page. You can select a specific user and decrypt their data afterwards."
+        },
+        "cta": "Test onboarding configuration",
+        "cancel": "Cancel"
+      },
       "header": {
         "title": "Developers",
         "subtitle": {

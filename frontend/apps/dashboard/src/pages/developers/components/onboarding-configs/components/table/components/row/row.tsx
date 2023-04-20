@@ -5,9 +5,11 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
+import styled from 'styled-components';
 
 import isKybOnboardingConfig from '../../../../utils/is-kyb-onboarding-config';
 import Actions from './components/actions';
+import IntroDialog from './components/intro-dialog';
 
 export type RowProps = {
   onboardingConfig: OnboardingConfig;
@@ -24,15 +26,18 @@ const Row = ({ onboardingConfig }: RowProps) => {
     <>
       <td>
         {sandbox.isSandbox ? (
-          <LinkButton
-            href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
-            iconComponent={IcoArrowTopRight24}
-            target="_blank"
-            size="compact"
-            onClick={event => event.stopPropagation()}
-          >
-            {name}
-          </LinkButton>
+          <IndicatorContainer>
+            <LinkButton
+              href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
+              iconComponent={IcoArrowTopRight24}
+              target="_blank"
+              size="compact"
+              onClick={event => event.stopPropagation()}
+            >
+              {name}
+            </LinkButton>
+            <IntroDialog />
+          </IndicatorContainer>
         ) : (
           name
         )}
@@ -56,5 +61,10 @@ const Row = ({ onboardingConfig }: RowProps) => {
     </>
   );
 };
+
+const IndicatorContainer = styled.div`
+  position: relative;
+  width: fit-content;
+`;
 
 export default Row;

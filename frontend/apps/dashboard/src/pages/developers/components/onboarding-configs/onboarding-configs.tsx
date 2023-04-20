@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Box } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
 import Head from 'next/head';
 import React from 'react';
 import SectionHeader from 'src/components/section-header';
+import WaveAnimation from 'src/components/wave-animation/wave-animation';
 import styled, { css } from 'styled-components';
 
 import Create from './components/create';
@@ -26,43 +26,8 @@ const OnboardingConfigs = () => {
             <Create onCreate={refetch} />
             {data?.length === 0 && (
               <>
-                {/* Pass same condition to border to avoid flash-appear in edge case */}
-                <Border data-visible={data?.length === 0} />
-                <Wave
-                  initial={{
-                    opacity: 0.2,
-                    width: 0,
-                    height: 0,
-                  }}
-                  animate={{
-                    opacity: 0,
-                    width: 140,
-                    height: 140,
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: 'easeOut',
-                  }}
-                />
-                <Wave
-                  initial={{
-                    opacity: 0.2,
-                    width: 0,
-                    height: 0,
-                  }}
-                  animate={{
-                    opacity: 0,
-                    width: 140,
-                    height: 140,
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: 'easeOut',
-                    delay: 3,
-                  }}
-                />
+                <Divider />
+                <WaveAnimation width={140} />
               </>
             )}
           </Wrapper>
@@ -79,21 +44,7 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const Wave = styled(motion.span)`
-  ${({ theme }) => css`
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: ${theme.borderRadius.full};
-    background: ${theme.color.accent};
-    z-index: -1;
-    pointer-events: none;
-    user-select: none;
-  `}
-`;
-
-const Border = styled.div`
+const Divider = styled.div`
   ${({ theme }) => css`
     position: absolute;
     box-sizing: border-box;
@@ -104,17 +55,10 @@ const Border = styled.div`
     border-width: ${theme.borderWidth[1]};
     border-style: solid;
     border-radius: ${theme.borderRadius.default};
+    border-color: ${theme.color.accent};
     pointer-events: none;
     isolation: isolate;
     overflow: hidden;
-
-    &[data-visible='true'] {
-      border-color: ${theme.color.accent};
-    }
-
-    &[data-visible='false'] {
-      border-color: ${theme.borderColor.transparent};
-    }
   `}
 `;
 

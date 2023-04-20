@@ -11,6 +11,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import OnboardingConfigs from './onboarding-configs';
 import {
   onboardingConfigsFixture,
+  withEntities,
   withOnboardingConfigs,
   withOnboardingConfigsError,
 } from './onboarding-configs.test.config';
@@ -45,6 +46,7 @@ describe('<OnboardingConfigs />', () => {
         tab: 'onboarding-configs',
       },
     });
+    withEntities();
   });
 
   describe('when the request to fetch the proxy configs succeeds', () => {
