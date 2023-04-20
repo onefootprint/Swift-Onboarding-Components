@@ -18,6 +18,7 @@ mod writeable;
 
 pub use args::VwArgs;
 pub use create::*;
+pub use decrypt::DecryptedBusinessOwners;
 pub use tenant::*;
 pub use writeable::*;
 

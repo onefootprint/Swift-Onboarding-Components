@@ -1,10 +1,13 @@
-use crate::{schema::business_owner, DbError, DbResult, PgConn, TxnPgConn};
+use crate::{
+    schema::{business_owner, vault},
+    DbError, DbResult, PgConn, TxnPgConn,
+};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, VaultId};
 
-use super::{onboarding::Onboarding, scoped_vault::ScopedVault};
+use super::{onboarding::Onboarding, scoped_vault::ScopedVault, vault::Vault};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
@@ -28,6 +31,8 @@ struct NewBusinessOwnerRow {
     kind: BusinessOwnerKind,
     link_id: BoLinkId,
 }
+
+pub type UserData = (ScopedVault, Vault, Onboarding);
 
 impl BusinessOwner {
     #[tracing::instrument(skip(conn))]
@@ -72,12 +77,13 @@ impl BusinessOwner {
         conn: &mut PgConn,
         bv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(Self, (ScopedVault, Onboarding))>> {
+    ) -> DbResult<Vec<(Self, Option<UserData>)>> {
         use crate::schema::{onboarding, scoped_vault};
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
-            .inner_join(
+            .left_join(
                 scoped_vault::table
+                    .inner_join(vault::table)
                     .inner_join(onboarding::table)
                     .on(scoped_vault::vault_id.nullable()
                     .eq(business_owner::user_vault_id)

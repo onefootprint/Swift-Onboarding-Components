@@ -21,3 +21,4 @@ mod user;
 mod user_timeline;
 mod validate;
 mod watchlist_check;
+pub use business_owner::BusinessOwnerInfo;

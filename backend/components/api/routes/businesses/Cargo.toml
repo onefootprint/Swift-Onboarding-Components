@@ -17,3 +17,4 @@ actix-web = { workspace = true }
 paperclip = { workspace = true }
 serde_json = { workspace = true }
 itertools = { workspace = true }
+either = { workspace = true }
