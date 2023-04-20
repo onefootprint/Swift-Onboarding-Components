@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
 use db::{models::session::Session, PgConn};
-use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata};
+use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata, HasSessionKind, SessionKind};
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::errors::ApiError;
@@ -11,10 +11,22 @@ pub struct RateLimitRecord {
     pub sent_at: DateTime<Utc>,
 }
 
+impl HasSessionKind for RateLimitRecord {
+    fn session_kind(&self) -> SessionKind {
+        SessionKind::RateLimit
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct HandoffRecord {
     pub status: D2pSessionStatus,
     pub meta: Option<HandoffMetadata>,
+}
+
+impl HasSessionKind for HandoffRecord {
+    fn session_kind(&self) -> SessionKind {
+        SessionKind::Handoff
+    }
 }
 
 pub struct JsonSession<C>
@@ -45,7 +57,7 @@ impl From<JsonSessionKey> for AuthTokenHash {
 
 impl<C> JsonSession<C>
 where
-    C: Serialize + DeserializeOwned,
+    C: Serialize + DeserializeOwned + HasSessionKind,
 {
     pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> Result<Option<Self>, ApiError> {
         let session = Session::get(conn, key.into().0.into())?;
@@ -66,8 +78,9 @@ where
         data: &C,
         expires_at: DateTime<Utc>,
     ) -> Result<(), ApiError> {
+        let kind = data.session_kind();
         let data = serde_json::to_vec(data)?;
-        Session::update_or_create(conn, key.into().0.into(), data, expires_at)?;
+        Session::update_or_create(conn, key.into().0.into(), data, kind, expires_at)?;
         Ok(())
     }
 }

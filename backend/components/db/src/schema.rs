@@ -493,6 +493,7 @@ table! {
         _updated_at -> Timestamptz,
         expires_at -> Timestamptz,
         data -> Bytea,
+        kind -> Nullable<Text>,
     }
 }
 

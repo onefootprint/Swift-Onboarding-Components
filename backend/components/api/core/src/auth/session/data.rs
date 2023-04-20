@@ -1,5 +1,5 @@
 use crypto::aead::ScopedSealingKey;
-use newtypes::SealedSessionBytes;
+use newtypes::{HasSessionKind, SealedSessionBytes, SessionKind};
 use serde::{Deserialize, Serialize};
 
 impl AuthSessionData {
@@ -45,5 +45,20 @@ pub enum AuthSessionData {
 impl From<crate::auth::ob_config::BoSession> for AuthSessionData {
     fn from(value: crate::auth::ob_config::BoSession) -> Self {
         Self::BusinessOwner(value)
+    }
+}
+
+impl HasSessionKind for AuthSessionData {
+    fn session_kind(&self) -> SessionKind {
+        match self {
+            Self::WorkOs(_) => SessionKind::WorkOs,
+            Self::TenantRb(_) => SessionKind::TenantRb,
+            Self::FirmEmployee(_) => SessionKind::FirmEmployee,
+            Self::User(_) => SessionKind::User,
+            Self::EmailVerify(_) => SessionKind::EmailVerify,
+            Self::ValidateUserToken(_) => SessionKind::ValidateUserToken,
+            Self::OnboardingSession(_) => SessionKind::OnboardingSession,
+            Self::BusinessOwner(_) => SessionKind::BusinessOwner,
+        }
     }
 }
