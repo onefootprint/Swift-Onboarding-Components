@@ -59,7 +59,7 @@ impl ExtractableAuthSession for ParsedUserObSession {
             <ParsedUserSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
         let Some(scoped_user_id) = user_session.scoped_user_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
+            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
         };
 
         // Confirm that the onboarding in the auth token belongs to the user

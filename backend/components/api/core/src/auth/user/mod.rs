@@ -22,11 +22,10 @@ pub use user_ob::*;
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
     SignUp,
-    OrgOnboardingInit {
+    #[serde(alias = "OrgOnboardingInit")] // for backcompat with old versions of code
+    OrgOnboarding {
         id: ScopedVaultId,
     },
-    /// DEPRECATED. Waiting for all auth tokens with this scope to expire in prod before removing
-    OrgOnboarding,
     Business(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
@@ -41,4 +40,34 @@ pub enum UserAuthScope {
 /// A helper trait to extract a user vault id on combined types
 pub trait UserAuth {
     fn user_vault_id(&self) -> &VaultId;
+}
+
+#[cfg(test)]
+mod test {
+    use newtypes::ScopedVaultId;
+
+    use super::UserAuthScope;
+
+    #[test]
+    fn test_backcompat() {
+        // Should be able to deserialize old OrgOnboardingInit into OrgOnboarding
+        let legacy_value_str = "[\"SignUp\", {\"OrgOnboardingInit\": {\"id\": \"FLERP\"}}]";
+        let legacy_value: Vec<UserAuthScope> = serde_json::de::from_str(legacy_value_str).unwrap();
+        let expected_parsed = vec![
+            UserAuthScope::SignUp,
+            UserAuthScope::OrgOnboarding {
+                id: ScopedVaultId::test_data("FLERP".to_owned()),
+            },
+        ];
+        assert_eq!(legacy_value, expected_parsed);
+
+        // Obviously should be able to deserialize OrgOnboarding into OrgOnboarding
+        let modern_value_str = "[\"SignUp\",{\"OrgOnboarding\":{\"id\":\"FLERP\"}}]";
+        let modern_value: Vec<UserAuthScope> = serde_json::de::from_str(modern_value_str).unwrap();
+        assert_eq!(modern_value, expected_parsed);
+
+        // When serializing, should serialize into OrgOnboarding rather than OrgOnboardingInit
+        let serialized = serde_json::ser::to_string(&legacy_value).unwrap();
+        assert_eq!(serialized, modern_value_str)
+    }
 }

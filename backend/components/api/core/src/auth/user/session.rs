@@ -47,13 +47,13 @@ impl UserSession {
         Self::make(self.user_vault_id, new_scopes)
     }
 
-    /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboardingInit` scope on this
+    /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboarding` scope on this
     /// session, if exists
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
         self.scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::OrgOnboardingInit { id } => Some(id.clone()),
+                UserAuthScope::OrgOnboarding { id } => Some(id.clone()),
                 _ => None,
             })
             .next()

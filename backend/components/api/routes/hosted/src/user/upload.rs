@@ -24,7 +24,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     utils::vault_wrapper::checks::pre_add_data_checks(&user_auth)?;
     let uv_id = user_auth.user_vault_id().clone();
     let uv = state

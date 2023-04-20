@@ -22,7 +22,7 @@ pub async fn post(
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let ob_id = user_auth.data.onboarding.id;
 
     let ConsentRequest {

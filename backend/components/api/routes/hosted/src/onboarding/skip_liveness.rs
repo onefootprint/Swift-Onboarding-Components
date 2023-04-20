@@ -20,7 +20,7 @@ pub async fn post(
     user_auth: UserObAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboardingInit)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     state
         .db_pool

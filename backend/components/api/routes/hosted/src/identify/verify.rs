@@ -139,7 +139,7 @@ pub async fn post(
             // Create the auth token for this user
             let token_scopes = [
                 Some(UserAuthScope::SignUp),
-                Some(UserAuthScope::OrgOnboardingInit { id: su.id }),
+                Some(UserAuthScope::OrgOnboarding { id: su.id }),
                 // Business owner scope, if any
                 bo_scope,
                 // Higher permissions to view sensitive datas if authed with biometric
