@@ -1,5 +1,6 @@
+import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Footer from './components/footer';
 import SandboxBanner from './components/sandbox-banner';
@@ -20,13 +21,18 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
+  justify-content: space-between;
 `;
 
 const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
+  ${({ theme }) => css`
+    #layout-container {
+      ${media.greaterThan('md')`
+        border: 1px solid ${theme.borderColor.tertiary};
+        box-shadow: ${theme.elevation[1]};
+      `}
+    }
+  `}
 `;
 
 export default Layout;

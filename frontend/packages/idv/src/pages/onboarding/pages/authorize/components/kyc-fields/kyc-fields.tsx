@@ -54,7 +54,7 @@ type KycFieldsProps = {
 };
 
 const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
-  const { t } = useTranslation('pages.authorize');
+  const { t } = useTranslation('pages.onboarding.authorize');
 
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
     [CollectedKycDataOption.name]: t('data-labels.name'),

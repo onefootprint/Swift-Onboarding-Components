@@ -18,7 +18,7 @@ export type FormProps = {
 };
 
 const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
-  const { t } = useTranslation('pages.phone-identification.form');
+  const { t } = useTranslation('pages.identify.phone-identification.form');
   const {
     setValue,
     register,

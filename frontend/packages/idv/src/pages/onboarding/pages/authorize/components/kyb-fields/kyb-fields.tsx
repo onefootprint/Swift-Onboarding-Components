@@ -28,7 +28,7 @@ type KybFieldsProps = {
 };
 
 const KybFields = ({ data, showTitle }: KybFieldsProps) => {
-  const { t } = useTranslation('pages.authorize');
+  const { t } = useTranslation('pages.onboarding.authorize');
 
   const collectedKybDataOptionLabels: Record<CollectedKybDataOption, string> = {
     [CollectedKybDataOption.name]: t('data-labels.business-name'),

@@ -8,7 +8,7 @@ import NavigationHeader from '../../../../../../components/layout/components/nav
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const AdditionalInfoRequired = () => {
-  const { t } = useTranslation('pages.additional-info-required');
+  const { t } = useTranslation('pages.onboarding.additional-info-required');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {

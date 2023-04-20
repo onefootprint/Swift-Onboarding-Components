@@ -1,5 +1,7 @@
 import { media } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
+import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
 import useAppContext from '../../hooks/use-app-context';
@@ -12,6 +14,7 @@ import SandboxBanner, {
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
+const SHIMMER_HEIGHT = '296px';
 
 type IdvLayoutProps = {
   children: React.ReactNode;
@@ -23,6 +26,7 @@ const IdvLayout = ({ children }: IdvLayoutProps) => {
   } = useAppContext();
   const { isSandbox } = useSandboxMode();
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
+  const [refBody, { height: bodyHeight }] = useMeasure();
 
   const measuredRef = useCallback((handler: SandboxBannerHandler) => {
     if (!handler) {
@@ -39,28 +43,38 @@ const IdvLayout = ({ children }: IdvLayoutProps) => {
       id={LAYOUT_CONTAINER_ID}
       hasBorderRadius={!!container.hasBorderRadius}
     >
-      <Header id={LAYOUT_HEADER_ID}>
-        {isSandbox && (
-          <SandboxBanner
-            ref={measuredRef}
-            hideOnDesktop={header.hideDesktopSandboxBanner}
+      <DialogContent>
+        <Header id={LAYOUT_HEADER_ID}>
+          {isSandbox && (
+            <SandboxBanner
+              ref={measuredRef}
+              hideOnDesktop={header.hideDesktopSandboxBanner}
+            />
+          )}
+          <NavigationHeaderContainer
+            top={sandboxBannerHeight}
+            containerId={LAYOUT_CONTAINER_ID}
           />
-        )}
-        <NavigationHeaderContainer
-          top={sandboxBannerHeight}
-          containerId={LAYOUT_CONTAINER_ID}
+        </Header>
+        <Body
+          animate={{ height: bodyHeight || SHIMMER_HEIGHT }}
+          transition={{
+            duration: 0.15,
+            type: 'spring',
+          }}
+        >
+          <BodyContent ref={refBody}>{children}</BodyContent>
+        </Body>
+        <FootprintFooter
+          variant={footer.footerVariant}
+          hideOnDesktop={footer.hideDesktopFooter}
         />
-      </Header>
-      <Body>{children}</Body>
-      <FootprintFooter
-        variant={footer.footerVariant}
-        hideOnDesktop={footer.hideDesktopFooter}
-      />
+      </DialogContent>
     </Container>
   );
 };
 
-const Container = styled.div<{ hasBorderRadius: boolean }>`
+const Container = styled(motion.div)<{ hasBorderRadius: boolean }>`
   ${({ theme }) => css`
     background: ${theme.components.bifrost.dialog.bg};
     display: flex;
@@ -71,7 +85,7 @@ const Container = styled.div<{ hasBorderRadius: boolean }>`
     position: relative;
 
     ${media.greaterThan('md')`
-      height: unset;
+      height: auto;
       margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
       max-height: calc(100vh - (2 * ${theme.spacing[9]}));
       max-width: 480px;
@@ -87,16 +101,22 @@ const Container = styled.div<{ hasBorderRadius: boolean }>`
     `}
 `;
 
-const Body = styled.div`
+const Body = styled(motion.div)`
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
+
+const BodyContent = styled.span`
   ${({ theme }) => css`
-    flex: 1 0 auto;
-    padding: ${theme.spacing[5]};
     display: flex;
     flex-direction: column;
-    position: relative;
+    box-sizing: content-box;
+    padding: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      padding: 0 ${theme.spacing[7]} ${theme.spacing[7]};
+      padding: 0 ${theme.spacing[7]} ${theme.spacing[8]}; 
     `}
   `}
 `;
@@ -107,6 +127,16 @@ const Header = styled.div`
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};
+  `}
+`;
+
+const DialogContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  ${media.greaterThan('md')`
+    height: auto;
   `}
 `;
 

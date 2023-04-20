@@ -2,7 +2,7 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
-import { DesignSystemProvider, media } from '@onefootprint/ui';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import React from 'react';
@@ -31,20 +31,6 @@ const App = ({ Component, pageProps }: AppProps) => (
 
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
-    #__next {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    #layout-container {
-      ${media.greaterThan('md')`
-        border: 1px solid ${theme.borderColor.tertiary};
-        box-shadow: ${theme.elevation[1]};
-      `}
-    }
-
     body {
       background-color: ${theme.backgroundColor.primary};
       overflow: hidden;

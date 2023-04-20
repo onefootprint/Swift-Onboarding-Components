@@ -27,7 +27,7 @@ import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
 import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 
 const Authorize = () => {
-  const { t } = useTranslation('pages.authorize');
+  const { t } = useTranslation('pages.onboarding.authorize');
   const [state, send] = useOnboardingMachine();
   const {
     authToken,

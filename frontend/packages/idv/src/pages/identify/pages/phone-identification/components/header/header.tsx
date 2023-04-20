@@ -6,7 +6,7 @@ import NavigationHeader from '../../../../../../components/layout/components/nav
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const Header = () => {
-  const { t } = useTranslation('pages.phone-identification');
+  const { t } = useTranslation('pages.identify.phone-identification');
   const [, send] = useIdentifyMachine();
 
   const handleNavToPrevPage = () => {

@@ -8,8 +8,8 @@ import { useEffectOnce } from 'usehooks-ts';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';
 
-const InitOnboarding = () => {
-  const { t } = useTranslation('pages.init-onboarding');
+const Init = () => {
+  const { t } = useTranslation('pages.onboarding.init');
   const [state, send] = useOnboardingMachine();
   const { authToken } = state.context;
   const onboardingMutation = useOnboarding();
@@ -74,4 +74,4 @@ const Container = styled.div`
   `}
 `;
 
-export default InitOnboarding;
+export default Init;

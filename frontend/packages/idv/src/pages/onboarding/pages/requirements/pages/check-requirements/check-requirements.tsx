@@ -16,7 +16,7 @@ import styled, { css } from 'styled-components';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const CheckRequirements = () => {
-  const { t } = useTranslation('pages.check-onboarding-requirements');
+  const { t } = useTranslation('pages.onboarding.check-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken },

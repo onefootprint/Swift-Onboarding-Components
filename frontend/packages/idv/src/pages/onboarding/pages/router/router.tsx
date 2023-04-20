@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Authorize from '../authorize/authorize';
-import Init from '../init-onboarding';
+import Init from '../init';
 import Requirements from '../requirements';
 
 export type DonePayload = {
