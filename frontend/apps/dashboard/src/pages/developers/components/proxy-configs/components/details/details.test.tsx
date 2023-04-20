@@ -1,5 +1,4 @@
 import {
-  act,
   createFileSaverSpy,
   createUseRouterSpy,
   customRender,
