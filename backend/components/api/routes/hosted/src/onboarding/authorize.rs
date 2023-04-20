@@ -11,7 +11,9 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::enclave_client::EnclaveClient;
 use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::TenantUvw;
 use chrono::Utc;
@@ -20,12 +22,12 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::verification_request::VerificationRequest;
+use db::DbPool;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
 use newtypes::VendorAPI;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-use tracing::{field, instrument};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
 use webhooks::WebhookClient;
@@ -36,15 +38,6 @@ pub struct CommitResponse {
     validation_token: SessionAuthToken,
 }
 
-#[instrument(
-        fields(
-            tenant_id=field::Empty,
-            tenant_name=field::Empty,
-            onboarding=field::Empty,
-            ob_configuration_id=field::Empty,
-        ),
-        skip_all
-)]
 #[api_v2_operation(
     tags(Hosted, Bifrost),
     description = "Finish onboarding the user. Processes the collected data and returns the validation token that can be exchanged for a permanent Footprint user token."
@@ -126,8 +119,9 @@ pub async fn post(
 
     // Kickoff KYB
     if let Some(biz_ob) = biz_ob {
-        // TODO: also check ob_config here to ensure this is a single-KYC flow
-        if biz_ob.idv_reqs_initiated_at.is_none() {
+        let should_run_kyb = should_run_kyb(&state.db_pool, &state.enclave_client, &biz_ob).await?;
+        tracing::info!(should_run_kyb, "should_run_kyb");
+        if should_run_kyb {
             let kyb_res = run_kyb(&state, biz_ob).await;
             if let Err(e) = kyb_res {
                 tracing::error!(error=%e, "Error kicking off KYB")
@@ -324,4 +318,57 @@ async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
     .await?;
 
     Ok(())
+}
+
+#[tracing::instrument(skip(db_pool, enclave_client))]
+async fn should_run_kyb(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    biz_ob: &Onboarding,
+) -> ApiResult<bool> {
+    let svid = biz_ob.scoped_vault_id.clone();
+    let ob_config_id = biz_ob.ob_configuration_id.clone();
+
+    let bvw = db_pool
+        .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
+        .await??;
+
+    let dbo = bvw
+        .decrypt_business_owners(db_pool, enclave_client, Some(ob_config_id))
+        .await?;
+
+    let bo_kyc_is_complete = match dbo {
+        DecryptedBusinessOwners::KYBStart {
+            primary_bo: _,
+            primary_bo_vault: _,
+        } => {
+            tracing::info!(?biz_ob, "[should_run_kyb] KYBStart");
+            false
+        }
+        // For Single-KYC KYB, only need the primary BO to have completed KYC
+        DecryptedBusinessOwners::SingleKYC {
+            primary_bo: _,
+            primary_bo_vault,
+            primary_bo_data: _,
+            secondary_bos: _,
+        } => {
+            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, "[should_run_kyb] SingleKYC");
+            primary_bo_vault.2.status.has_decision()
+        }
+        // For Multi-KYC KYB, we need the primary BO and all secondary BOs to have completed KYC
+        DecryptedBusinessOwners::MultiKYC {
+            primary_bo: _,
+            primary_bo_vault,
+            primary_bo_data: _,
+            secondary_bos,
+        } => {
+            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, ?secondary_bos, "[should_run_kyb] MultiKYC");
+            primary_bo_vault.2.status.has_decision()
+                && secondary_bos
+                    .into_iter()
+                    .all(|b| b.2.map(|d| d.2.status.has_decision()).unwrap_or(false))
+        }
+    };
+
+    Ok(bo_kyc_is_complete && biz_ob.idv_reqs_initiated_at.is_none())
 }

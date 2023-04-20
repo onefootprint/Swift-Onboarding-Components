@@ -47,6 +47,15 @@ impl OnboardingStatus {
             OnboardingStatus::Pending => true,
         }
     }
+
+    pub fn has_decision(&self) -> bool {
+        match self {
+            OnboardingStatus::Pass => true,
+            OnboardingStatus::Fail => true,
+            OnboardingStatus::Incomplete => false,
+            OnboardingStatus::Pending => false,
+        }
+    }
 }
 
 crate::util::impl_enum_str_diesel!(OnboardingStatus);
