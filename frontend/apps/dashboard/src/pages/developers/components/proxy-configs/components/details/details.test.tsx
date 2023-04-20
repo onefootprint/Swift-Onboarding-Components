@@ -170,11 +170,10 @@ describe('<Details />', () => {
         const editFieldset = screen.getByRole('group', {
           name: 'Basic configuration',
         });
-        await act(async () =>
-          waitFor(async () => {
-            await editBasicConfiguration(editFieldset, newData);
-          }),
-        );
+
+        await waitFor(async () => {
+          await editBasicConfiguration(editFieldset, newData);
+        });
         await waitFor(() => {
           const feedback = screen.getByText(
             'Vault proxy configuration updated',
@@ -210,11 +209,10 @@ describe('<Details />', () => {
         const editFieldset = screen.getByRole('group', {
           name: 'Ingress vaulting',
         });
-        await act(async () =>
-          waitFor(async () => {
-            await editIngressVaulting(editFieldset, newData);
-          }),
-        );
+
+        await waitFor(async () => {
+          await editIngressVaulting(editFieldset, newData);
+        });
         await waitFor(() => {
           const feedback = screen.getByText(
             'Vault proxy configuration updated',
