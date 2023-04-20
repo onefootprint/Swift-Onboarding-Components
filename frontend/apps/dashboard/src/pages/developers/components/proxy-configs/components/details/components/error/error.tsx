@@ -10,6 +10,7 @@ type ErrorProps = {
 
 const Error = ({ message }: ErrorProps) => {
   const { t } = useTranslation('notifications');
+
   return (
     <ErrorContainer>
       <EmptyState

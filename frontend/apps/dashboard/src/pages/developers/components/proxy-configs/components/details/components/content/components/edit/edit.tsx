@@ -1,4 +1,4 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { ProxyConfigDetails } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
@@ -22,10 +22,14 @@ const Edit = ({ proxyConfig, children, title, Form }: EditProps) => {
   const { allT } = useTranslation();
   const [show, setShow] = useState(false);
   const proxyConfigMutation = useUpdateProxyConfigs();
+  const showErrorToast = useRequestErrorToast();
 
   const handleSubmit = (formData: FormData) => {
     const payload = createPayload(proxyConfig.id, formData);
-    proxyConfigMutation.mutate(payload, { onSuccess: () => setShow(false) });
+    proxyConfigMutation.mutate(payload, {
+      onError: showErrorToast,
+      onSettled: () => setShow(false),
+    });
   };
 
   return show ? (
