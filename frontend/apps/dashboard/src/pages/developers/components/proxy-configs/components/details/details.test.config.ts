@@ -129,7 +129,7 @@ export const editBasicConfiguration = async (
   const saveButton = screen.getByRole('button', {
     name: 'Save',
   });
-  act(async () => {
+  await act(async () => {
     await userEvent.click(saveButton);
   });
 };
@@ -159,7 +159,7 @@ export const editIngressVaulting = async (
   const saveButton = screen.getByRole('button', {
     name: 'Save',
   });
-  act(async () => {
+  await act(async () => {
     await userEvent.click(saveButton);
   });
 };
