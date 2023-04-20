@@ -1,5 +1,4 @@
 import {
-  act,
   mockRequest,
   screen,
   userEvent,
@@ -129,9 +128,7 @@ export const editBasicConfiguration = async (
   const saveButton = screen.getByRole('button', {
     name: 'Save',
   });
-  await act(async () => {
-    await userEvent.click(saveButton);
-  });
+  await userEvent.click(saveButton);
 };
 
 export const editIngressVaulting = async (
@@ -159,7 +156,5 @@ export const editIngressVaulting = async (
   const saveButton = screen.getByRole('button', {
     name: 'Save',
   });
-  await act(async () => {
-    await userEvent.click(saveButton);
-  });
+  await userEvent.click(saveButton);
 };
