@@ -29,7 +29,7 @@ pub async fn post_validate(
     let su_id = user_auth
         .data
         .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
+        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
     // TODO re-add - not very important for now
     // pre_add_data_checks(&user_auth)?;
     let opts = ParseOptions {
@@ -65,7 +65,7 @@ pub async fn put(
     let su_id = user_auth
         .data
         .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboardingInit].into()))?;
+        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
     // TODO re-add - not very important for now
     // pre_add_data_checks(&user_auth)?;
     let request = request
