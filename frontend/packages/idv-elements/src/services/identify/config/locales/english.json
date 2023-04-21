@@ -1,0 +1,104 @@
+{
+  "components": {
+    "sandbox-outcome-footer": {
+      "outcome": "Test outcome:",
+      "testID": "Test ID:"
+    },
+    "legal-footer": {
+      "label": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+    },
+    "login-challenge": {
+      "sms": {
+        "title-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "title-without-phone": "Enter the 6-digit code sent to your phone.",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      },
+      "biometric": {
+        "verification": {
+          "loading": "Waiting...",
+          "success": "Success!",
+          "cta": "Launch biometrics",
+          "cta-retry": "Retry biometrics"
+        }
+      },
+      "challenge-picker": {
+        "sms": "SMS",
+        "biometric": "Biometric",
+        "aria-label": "Select a login challenge type."
+      }
+    },
+    "sms-challenge-verification": {
+      "error": "Incorrect code",
+      "verifying": "Verifying...",
+      "success": "Success!",
+      "resend-button": {
+        "cta": "Resend code",
+        "disabled": "Please wait {{seconds}} seconds to resend it..."
+      }
+    }
+  },
+  "pages": {
+    "bootstrap-challenge": {
+      "title": "Welcome back!",
+      "subtitle": "We found a Footprint account with the information you provided to {{tenantName}}.",
+      "login-with-different-account": {
+        "missing-phone": "Don't have access to this phone number?",
+        "cta": "Login with a different account"
+      }
+    },
+    "email-identification": {
+      "header": {
+        "title": "Hey there! 👋",
+        "subtitle": "Enter your email to get started."
+      },
+      "form": {
+        "email": {
+          "label": "Email",
+          "placeholder": "your.email@email.com",
+          "errors": {
+            "required": "Email is required"
+          }
+        },
+        "cta": "Continue"
+      }
+    },
+    "phone-identification": {
+      "title": "Hey there! 👋",
+      "subtitle": "Enter your phone number to proceed.",
+      "email-card": {
+        "cta": "Change"
+      },
+      "form": {
+        "phone": {
+          "label": "Phone number",
+          "placeholder": "(123) 123-1234",
+          "errors": {
+            "required": "Phone number cannot be empty",
+            "pattern": "Phone number is invalid"
+          }
+        },
+        "cta": "Continue"
+      }
+    },
+    "challenge": {
+      "title": {
+        "new-user": "Verify your phone number",
+        "existing-user": "Welcome back! 🎉"
+      },
+      "signup-challenge": {
+        "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      }
+    }
+  }
+}

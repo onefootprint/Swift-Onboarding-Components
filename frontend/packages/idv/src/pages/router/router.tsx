@@ -2,6 +2,7 @@ import {
   useLogStateMachine,
   useObserveCollector,
 } from '@onefootprint/dev-tools';
+import { Identify } from '@onefootprint/idv-elements';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -9,7 +10,6 @@ import useIdvMachine from '../../hooks/use-idv-machine';
 import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Error from '../error';
-import Identify from '../identify';
 import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
