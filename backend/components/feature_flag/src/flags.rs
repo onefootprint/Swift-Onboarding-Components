@@ -1,5 +1,5 @@
 use newtypes::decision::RuleSetName;
-use newtypes::{ObConfigurationKey, OrgMemberEmail, TenantId};
+use newtypes::{ObConfigurationKey, OrgMemberEmail, PiiString, TenantId};
 use serde_json::json;
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
@@ -28,6 +28,10 @@ pub enum BoolFlag<'a> {
     DisableAllScanOnboarding,
     #[strum(to_string = "DisableAllSocureIdvCalls")]
     DisableAllSocure,
+    #[strum(to_string = "CanCleanUpPhoneNumber")]
+    CanCleanUpPhoneNumber(&'a PiiString),
+    #[strum(to_string = "CanCleanUpTenant")]
+    CanCleanUpTenant(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -49,6 +53,8 @@ impl<'a> BoolFlag<'a> {
             Self::EnableSocureInNonProd(k) => Some(k.to_string()),
             Self::DisableAllScanOnboarding => None,
             Self::DisableAllSocure => None,
+            Self::CanCleanUpPhoneNumber(k) => Some(k.leak_to_string()),
+            Self::CanCleanUpTenant(k) => Some(k.to_string()),
         }
     }
 
@@ -66,6 +72,8 @@ impl<'a> BoolFlag<'a> {
             Self::EnableExperianInNonProd(_) => false,
             Self::DisableAllScanOnboarding => false,
             Self::DisableAllSocure => false,
+            Self::CanCleanUpPhoneNumber(_) => false,
+            Self::CanCleanUpTenant(_) => false,
         }
     }
 }
