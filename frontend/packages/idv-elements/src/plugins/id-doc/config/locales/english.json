@@ -1,0 +1,141 @@
+{
+  "global": {
+    "errors": {}
+  },
+  "components": {
+    "media-errors": {
+      "not-found": "We couldn't find a camera on your device. Please use another device.",
+      "already-in-use": "Another application is using your camera, please close the other application and try again.",
+      "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
+      "camera-permissions": "camera",
+      "other-error": "There was an error accessing your camera. Please try again."
+    },
+    "missing-permissions": {
+      "title": "Allow access to your {{permissionName}}",
+      "subtitle": "This lets you submit photos of your documents, and we can use them to verify your identity.",
+      "cta": "Open settings to give camera permissions"
+    },
+    "id-doc-photo-prompt": {
+      "title": "Submit your {{type}} ({{side}})",
+      "subtitle": "Upload or take a photo of the {{side}} of your {{type}}.",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "animation-back-side": {
+        "first": "Front image captured",
+        "second": "Now the back side"
+      },
+      "take-photo": {
+        "title": "Take photo",
+        "take": "Take photo",
+        "retake": "Take another photo"
+      },
+      "upload-photo": {
+        "title": "Upload photo",
+        "reupload": "Upload another photo"
+      },
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-document": {
+          "title": "Get the whole document in the photo",
+          "description": "We recommend that you place your document on a flat surface."
+        }
+      }
+    },
+    "selfie-consent": {
+      "title": "Footprint needs to collect and use your biometric data",
+      "subtitle": "By clicking \"Agree\", you agree that Footprint will collect biometric data from your selfie and identity document.",
+      "cta": "Agree",
+      "footer": "Please refer to our <a>Privacy Policy</a> for more details about how we handle and retain your biometric data."
+    }
+  },
+  "pages": {
+    "country-and-type-selection": {
+      "title": "Scan or upload your ID",
+      "subtitle": "We need some more information about your identity.",
+      "form": {
+        "country": "Issuing country",
+        "type": {
+          "passport": {
+            "title": "Passport",
+            "description": "Photo page",
+            "value": "passport"
+          },
+          "idCard": {
+            "title": "Identity card",
+            "description": "Front & Back",
+            "value": "idCard"
+          },
+          "driversLicense": {
+            "title": "Driver's license",
+            "description": "Front & Back",
+            "value": "driversLicense"
+          }
+        },
+        "cta": "Continue"
+      }
+    },
+    "selfie-photo-prompt": {
+      "title": "Take a selfie",
+      "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "cta": "Take photo",
+      "animation-selfie": {
+        "first-text": "Back image captured",
+        "second-text": "Now we need a selfie"
+      },
+      "animation-selfie-from-passport": {
+        "first-text": "Document image captured",
+        "second-text": "Now we need a selfie"
+      },
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-face": {
+          "title": "Make sure your face is clearly visible and centered",
+          "description": "You should face the camera directly and capture your whole head."
+        }
+      }
+    },
+    "selfie-photo": {
+      "camera": {
+        "instructions": "Center your face in the area",
+        "take": "Take photo"
+      },
+      "preview": {
+        "retake": "Retake",
+        "confirm": "Use photo"
+      }
+    },
+    "processing-documents": {
+      "title": "Processing your documents",
+      "subtitle": "This should only take a few seconds.",
+      "loading": "Analyzing...",
+      "success": "Document successfully collected!",
+      "error": "An error occurred."
+    },
+    "error": {
+      "title": "We couldn't process your images",
+      "description": "Please submit new images.",
+      "description-with-errors": "Please submit new images considering:",
+      "cta": "Resubmit images"
+    },
+    "failure": {
+      "title": "Document couldn't be verified",
+      "subtitle": "We'll review your identity and reach out to you shortly."
+    }
+  }
+}

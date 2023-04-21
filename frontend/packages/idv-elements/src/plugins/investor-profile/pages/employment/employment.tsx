@@ -1,0 +1,77 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
+import { InvestorProfileDI } from '@onefootprint/types';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
+import { GenericTransition } from '../../../../components';
+import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
+import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
+import useSyncData from '../../hooks/use-sync-data';
+import useSyncErrorToast from '../../hooks/use-sync-error-toast';
+import { EmploymentData } from '../../utils/state-machine/types';
+import EmploymentForm from './components/employment-form';
+
+const Employment = () => {
+  const [state, send] = useInvestorProfileMachine();
+  const { authToken, showTransition, data } = state.context;
+  const { mutation, syncData } = useSyncData();
+  const { allT } = useTranslation('pages.employment');
+  const showToast = useSyncErrorToast();
+  // Only show the animation if this is the first time we are rendering this page
+  // If user saved data, and navigated prev to this page, don't animate again
+  const hasCollectedData = Object.keys(data).length > 0;
+  const [showAnimation, setShowAnimation] = useState(
+    showTransition && !hasCollectedData,
+  );
+
+  const handleSubmit = (employmentData: EmploymentData) => {
+    syncData({
+      authToken,
+      data: employmentData,
+      speculative: true,
+      onSuccess: () => {
+        send({
+          type: 'employmentSubmitted',
+          payload: {
+            ...employmentData,
+          },
+        });
+      },
+      onError: showToast,
+    });
+  };
+
+  return showAnimation ? (
+    <AnimationContainer>
+      <GenericTransition
+        firstIcon={IcoUser40}
+        secondIcon={IcoDollar40}
+        firstText={allT('components.transition-animation.source')}
+        secondText={allT('components.transition-animation.destination')}
+        timeout={5500}
+        onAnimationEnd={() => setShowAnimation(false)}
+      />
+    </AnimationContainer>
+  ) : (
+    <>
+      <InvestorProfileNavigationHeader />
+      <EmploymentForm
+        isLoading={mutation.isLoading}
+        onSubmit={handleSubmit}
+        defaultValues={{
+          [InvestorProfileDI.occupation]: data?.[InvestorProfileDI.occupation],
+        }}
+      />
+    </>
+  );
+};
+
+const AnimationContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+export default Employment;
