@@ -4,12 +4,15 @@ export default airplane.task(
   {
     slug: 'shadow_run_de_cron',
     name: 'Cron Shadow Run Decision Engine',
-    schedules: {
-      every_four_hours: {
-        cron: '0 */4 * * *',
-        description: 'Runs every 4 hours',
-      },
-    },
+    schedules:
+      process.env.AIRPLANE_ENV_SLUG === 'prod'
+        ? {
+            every_four_hours: {
+              cron: '0 */4 * * *',
+              description: 'Runs every 4 hours',
+            },
+          }
+        : {},
   },
   async _ => {
     const TEST_CASES = [
