@@ -17,7 +17,7 @@ export const PII_COST = 0.03;
 export const DATA_VAULTING_INITIAL_VALUE = 500;
 export const DATA_VAULTING_DELTA = 500;
 export const DATA_VAULTING_MINIMUM_VALUE = 500;
-export const DATA_VAULTING_COST = 0.02;
+export const DATA_VAULTING_COST = 0.03;
 
 export const VAULT_PROXY_INITIAL_VALUE = 500;
 export const VAULT_PROXY_DELTA = 500;

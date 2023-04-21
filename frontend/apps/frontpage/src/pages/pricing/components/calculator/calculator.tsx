@@ -105,7 +105,7 @@ const Calculator = () => {
           value={dataVaultingValue}
           onChange={setDataVaultingValue}
         >
-          {t('rows.custom-data-vaulting')}
+          {t('rows.non-identity-data-vaulting')}
         </Row>
         <Row
           units={`(${t('units.persons')} / ${t('units.month')})`}

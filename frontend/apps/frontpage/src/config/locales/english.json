@@ -511,8 +511,8 @@
           "pii-storage": {
             "title": "PII Storage"
           },
-          "custom-data-vaulting": {
-            "title": "Custom Data Vaulting",
+          "non-identity-data-vaulting": {
+            "title": "Non-identity data vaulting",
             "details": "Unlimited tokens & decryptions"
           },
           "vault-proxy": {
@@ -571,7 +571,7 @@
           "kyc": "KYC",
           "kyb": "KYB",
           "pii-storage": "PII storage",
-          "custom-data-vaulting": "Custom data vaulting",
+          "non-identity-data-vaulting": "Non-identity data vaulting",
           "vault-proxy": "Vault proxy",
           "drivers-license-scan": "Driver's license scan",
           "total": "Total cost",

@@ -21,9 +21,11 @@ const AddOns = () => {
           unitFirst={t('units.verification')}
         />
         <FeatureRow
-          title={t('core-plan.price-table.custom-data-vaulting.title')}
-          details={t('core-plan.price-table.custom-data-vaulting.details')}
-          cost={0.02}
+          title={t('core-plan.price-table.non-identity-data-vaulting.title')}
+          details={t(
+            'core-plan.price-table.non-identity-data-vaulting.details',
+          )}
+          cost={0.03}
           unitFirst={t('units.person')}
           unitSecond={t('units.month')}
         />
