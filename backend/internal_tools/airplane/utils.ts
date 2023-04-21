@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Client } from 'pg';
 
 export async function protected_custodian_api_call(
   authToken,
@@ -21,4 +22,16 @@ export async function protected_custodian_api_call(
       throw error;
     }
   }
+}
+
+export async function pg_query(dbUrl, query) {
+  // TODO: pooling in future
+  const client = new Client({
+    connectionString: dbUrl,
+  });
+  await client.connect();
+  const res = await client.query(query);
+  await client.end();
+
+  return res.rows;
 }
