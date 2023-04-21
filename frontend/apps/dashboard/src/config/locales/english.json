@@ -32,6 +32,11 @@
     "incomplete": "Incomplete",
     "pending": "Pending"
   },
+  "id_document": {
+    "id_card": "ID card",
+    "driver_license": "Driver's license",
+    "passport": "Passport"
+  },
   "di": {
     "id.name": "Name",
     "id.phone_number": "Phone number",

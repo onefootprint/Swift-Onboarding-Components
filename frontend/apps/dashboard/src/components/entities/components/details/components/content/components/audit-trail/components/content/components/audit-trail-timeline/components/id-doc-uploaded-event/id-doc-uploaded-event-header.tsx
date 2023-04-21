@@ -18,7 +18,7 @@ const IdDocUploadedEventHeader = ({ data }: IdDocUploadedEventHeaderProps) => {
   return (
     <Container>
       <Typography variant="label-3">{t('title')}</Typography>
-      <Tag>{allT(`di.id_document.${data.documentType}`)}</Tag>
+      <Tag>{allT(`id_document.${data.documentType}`)}</Tag>
     </Container>
   );
 };
