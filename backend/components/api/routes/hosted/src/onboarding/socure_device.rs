@@ -19,7 +19,7 @@ pub async fn post(
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-    let ob_id = user_auth.data.onboarding.id;
+    let ob_id = user_auth.onboarding()?.id.clone();
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 

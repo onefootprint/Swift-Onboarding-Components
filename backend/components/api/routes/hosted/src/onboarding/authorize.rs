@@ -58,7 +58,7 @@ pub async fn post(
     }
 
     // Mark the obs for the person and business as authorized
-    let ob_id = user_auth.onboarding.id.clone();
+    let ob_id = user_auth.onboarding()?.id.clone();
     let (biz_ob, user_auth) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
@@ -82,16 +82,16 @@ pub async fn post(
         .await?;
 
     let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", user_auth.tenant.id.as_str()));
-    span.record("tenant_name", &format!("{:?}", user_auth.tenant.id.as_str()));
-    span.record("onboarding_id", &format!("{}", user_auth.onboarding.id));
+    span.record("tenant_id", &format!("{:?}", user_auth.tenant()?.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
+    span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
     span.record("scoped_use_id", &format!("{}", user_auth.scoped_user.id));
     span.record(
         "ob_configuration_id",
-        &format!("{}", user_auth.onboarding.ob_configuration_id),
+        &format!("{}", user_auth.onboarding()?.ob_configuration_id),
     );
     let tenant_vendor_control = TenantVendorControl::new(
-        user_auth.tenant.id.clone(),
+        user_auth.tenant()?.id.clone(),
         &state.db_pool,
         &state.enclave_client,
         &state.config,
@@ -99,10 +99,10 @@ pub async fn post(
     .await?;
     // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
     // but if we do, we should no-op and succeed
-    let should_run_kyc_checks = user_auth.onboarding.idv_reqs_initiated_at.is_none();
+    let should_run_kyc_checks = user_auth.onboarding()?.idv_reqs_initiated_at.is_none();
 
     // Run KYC checks
-    let ob_id = user_auth.onboarding.id.clone();
+    let ob_id = user_auth.onboarding()?.id.clone();
     if should_run_kyc_checks {
         let engine_result = run_kyc(&state, &user_auth, biz_ob.clone(), tenant_vendor_control).await;
         // We always want to return a validation to the client if the DE fails.
@@ -158,7 +158,7 @@ pub async fn post(
         let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
             fp_id: su.fp_id.clone(),
             footprint_user_id: user_auth
-                .tenant
+                .tenant()?
                 .uses_legacy_serialization()
                 .then(|| su.fp_id.clone()),
             timestamp: decision_timestamp,
@@ -224,12 +224,12 @@ async fn run_kyc(
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod IDV requests and instead just create fixture data for this user
         // TODO create more business fixture data
-        decision::utils::setup_test_fixtures(state, ob_info.onboarding.id.clone(), biz_ob, fixture_decision)
-            .await?;
+        let ob_id = ob_info.onboarding()?.id.clone();
+        decision::utils::setup_test_fixtures(state, ob_id, biz_ob, fixture_decision).await?;
     } else {
         // Run KYC + produce a decision
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending
-        let ob = ob_info.onboarding.clone();
+        let ob = ob_info.onboarding()?.clone();
         let scoped_user_id = ob_info.scoped_user.id.clone();
         let tenant_vendor_control2 = tenant_vendor_control.clone();
 
@@ -261,7 +261,7 @@ async fn run_kyc(
 
         decision::engine::run(
             // TODO don't pass in ob because it could be stale
-            ob_info.onboarding.clone(),
+            ob_info.onboarding()?.clone(),
             &state.db_pool,
             &state.enclave_client,
             state.config.service_config.is_production(),

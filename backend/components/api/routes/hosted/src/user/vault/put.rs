@@ -5,8 +5,8 @@ use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::user::{UserAuthContext, UserAuthGuard};
-use api_core::auth::AuthError;
+use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
+use api_core::utils::vault_wrapper::checks::pre_add_data_checks;
 use api_core::utils::vault_wrapper::TenantUvw;
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
@@ -22,16 +22,11 @@ use std::str::FromStr;
 pub async fn post_validate(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    let su_id = user_auth
-        .data
-        .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
-    // TODO re-add - not very important for now
-    // pre_add_data_checks(&user_auth)?;
+    pre_add_data_checks(&user_auth)?;
     let opts = ParseOptions {
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
@@ -39,12 +34,10 @@ pub async fn post_validate(
     let request = request.into_inner().clean_and_validate(opts)?;
     request.assert_no_business_data()?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
-    let uvw = state
+    let su_id = user_auth.data.scoped_user.id;
+    let uvw: TenantUvw = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &su_id)?;
-            Ok(uvw)
-        })
+        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &su_id))
         .await??;
     uvw.validate_request(request)?;
 
@@ -59,15 +52,11 @@ pub async fn post_validate(
 pub async fn put(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
-    user_auth: UserAuthContext,
+    user_auth: UserObAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    let su_id = user_auth
-        .data
-        .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
-    // TODO re-add - not very important for now
-    // pre_add_data_checks(&user_auth)?;
+    pre_add_data_checks(&user_auth)?;
+    let su_id = user_auth.data.scoped_user.id;
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;

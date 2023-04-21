@@ -19,7 +19,7 @@ fn test_construct_get_response_pending(conn: &mut TestPgConn) {
     let su_id = dr_opts.scoped_user_id.clone();
     db_fixtures::document_request::create(conn, dr_opts);
 
-    let (status, errors) = construct_get_response(conn, su_id).unwrap();
+    let (status, errors) = construct_get_response(conn, &su_id).unwrap();
     assert_eq!(status, DocumentResponseStatus::Pending);
     assert_eq!(errors, vec![]);
 }
@@ -53,7 +53,7 @@ fn test_construct_get_response_with_errors(conn: &mut TestPgConn) {
     };
     db_fixtures::document_request::create(conn, dr2_opts);
 
-    let (status, errors) = construct_get_response(conn, su_id).unwrap();
+    let (status, errors) = construct_get_response(conn, &su_id).unwrap();
     assert_eq!(status, DocumentResponseStatus::Error);
     assert_eq!(
         errors,
@@ -92,7 +92,7 @@ fn test_construct_get_response_with_capture_errors(conn: &mut TestPgConn) {
     };
     db_fixtures::document_request::create(conn, dr2_opts);
 
-    let (status, errors) = construct_get_response(conn, su_id).unwrap();
+    let (status, errors) = construct_get_response(conn, &su_id).unwrap();
     assert_eq!(status, DocumentResponseStatus::Error);
     assert_eq!(errors, vec![DocumentImageError::ImageError])
 }
@@ -120,7 +120,7 @@ fn test_construct_get_response_retry_limit_exceeded_failed(conn: &mut TestPgConn
     upload_failed_opts.desired_status = DocumentRequestStatus::UploadFailed;
     db_fixtures::document_request::create(conn, upload_failed_opts);
 
-    let (status, errors) = construct_get_response(conn, su_id).unwrap();
+    let (status, errors) = construct_get_response(conn, &su_id).unwrap();
     assert_eq!(status, DocumentResponseStatus::RetryLimitExceeded);
     assert_eq!(errors, vec![])
 }

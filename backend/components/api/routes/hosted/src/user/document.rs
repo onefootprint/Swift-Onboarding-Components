@@ -61,7 +61,7 @@ pub async fn post(
             let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
             let uv = Vault::get(conn, user_auth.user_vault_id())?;
 
-            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding.id)?;
+            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding()?.id)?;
 
             Ok((uv, db_document_request, user_auth, user_consent))
         })
@@ -283,7 +283,7 @@ pub async fn post(
         // Save our verification request
         let su_id = user_auth.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
-        let ob_id = user_auth.onboarding.id.clone();
+        let ob_id = user_auth.onboarding()?.id.clone();
         let (document_verification_request, doc_request) = state
             .db_pool
             .db_transaction(
@@ -319,7 +319,7 @@ pub async fn post(
         // Make our request!
         handle_scan_onboarding_request(
             &state,
-            &user_auth.onboarding.id,
+            &user_auth.onboarding()?.id,
             doc_request,
             document_verification_request,
             user_auth.scoped_user.id.clone(),
@@ -363,7 +363,7 @@ pub async fn get(
 
     let (status, errors) = state
         .db_pool
-        .db_query(move |conn| construct_get_response(conn, user_auth.data.scoped_user.id))
+        .db_query(move |conn| construct_get_response(conn, &user_auth.scoped_user.id))
         .await??;
 
     let response = DocumentResponse {
@@ -382,13 +382,13 @@ pub async fn get(
 /// Based on the current and previous requests, map to our API response
 pub fn construct_get_response(
     conn: &mut PgConn,
-    scoped_user_id: ScopedVaultId,
+    scoped_user_id: &ScopedVaultId,
 ) -> Result<(DocumentResponseStatus, Vec<DocumentImageError>), ApiError> {
     // Get the latest document request for the scoped user, and the previous result (for errors).
     // We don't just stash the errors on the document request because with multiple vendors, we'll need
     // to handle each set of errors appropriately
     let (current_request, previous_request, previous_request_verification_result) =
-        DbDocumentRequest::get_latest_with_previous_request_and_result(conn, &scoped_user_id)?;
+        DbDocumentRequest::get_latest_with_previous_request_and_result(conn, scoped_user_id)?;
     let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
 
     let should_return_errors = matches!(

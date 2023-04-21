@@ -105,9 +105,9 @@ fn get_requirements_inner(
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let scoped_user_id = &ob_info.scoped_user.id;
 
-    let missing_id_fields = uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Id);
+    let missing_id_fields = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
     let missing_ip_fields =
-        uvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::InvestorProfile);
+        uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::InvestorProfile);
     let missing_finra_compliance_doc = if let Some(declarations) = declarations {
         let declarations: Vec<Declaration> = declarations.deserialize()?;
         // The finra compliance doc is missing if any of the declarations require a doc and we don't
@@ -119,10 +119,10 @@ fn get_requirements_inner(
     };
 
     // Fetch missing business fields
-    let missing_business_fields = if ob_info.ob_config.must_collect_business() {
+    let missing_business_fields = if ob_info.ob_config()?.must_collect_business() {
         let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-        bvw.missing_fields(&ob_info.ob_config, DataIdentifierDiscriminant::Business)
+        bvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Business)
     } else {
         vec![]
     };
@@ -131,7 +131,7 @@ fn get_requirements_inner(
     // In various places in the codebase, we will determine if a DocumentRequest should be created
     //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
     //      we will create a DocumentRequest row.
-    let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding.id)?;
+    let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding()?.id)?;
 
     let doc_request_result = DocumentRequest::get_active(conn, scoped_user_id);
     // Handle not finding an active request differently than other db errors
@@ -177,7 +177,7 @@ fn get_requirements_inner(
     .chain(document_request_requirements)
     .collect();
 
-    tracing::info!(onboarding_id=%ob_info.onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
+    tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
 
     Ok(requirements)
 }
