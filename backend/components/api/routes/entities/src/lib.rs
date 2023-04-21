@@ -3,6 +3,7 @@ use paperclip::actix::web;
 
 mod annotations;
 mod decisions;
+mod field_validations;
 mod get;
 mod liveness;
 mod risk_signals;
@@ -23,5 +24,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(liveness::get)
         .service(timeline::get)
         .service(risk_signals::get)
+        .service(field_validations::get)
         .service(risk_signals::get_detail);
 }

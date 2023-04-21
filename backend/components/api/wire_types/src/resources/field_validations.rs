@@ -22,12 +22,12 @@ pub struct FieldValidation {
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "snake_case")]
 pub struct GetFieldValidationResponse {
-    pub email: FieldValidation,
-    pub phone: FieldValidation,
-    pub name: FieldValidation,
-    pub address: FieldValidation,
-    pub dob: FieldValidation,
-    pub ssn: FieldValidation,
+    pub email: Option<FieldValidation>,
+    pub phone: Option<FieldValidation>,
+    pub name: Option<FieldValidation>,
+    pub address: Option<FieldValidation>,
+    pub dob: Option<FieldValidation>,
+    pub ssn: Option<FieldValidation>,
 }
 
 export_schema!(GetFieldValidationResponse);
