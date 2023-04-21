@@ -108,13 +108,13 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
         <Typography variant="label-3">{t('ssn')}</Typography>
         <OptionsContainer>
           <Radio
-            value={CollectedKycDataOption.ssn4}
-            label={allT('cdo.ssn4')}
+            value={CollectedKycDataOption.ssn9}
+            label={allT('cdo.ssn9')}
             {...register('ssnKind')}
           />
           <Radio
-            value={CollectedKycDataOption.ssn9}
-            label={allT('cdo.ssn9')}
+            value={CollectedKycDataOption.ssn4}
+            label={allT('cdo.ssn4')}
             {...register('ssnKind')}
           />
         </OptionsContainer>
