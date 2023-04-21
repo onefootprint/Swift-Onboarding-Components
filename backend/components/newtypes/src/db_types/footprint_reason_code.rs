@@ -853,7 +853,9 @@ impl FootprintReasonCode {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema, Hash,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum SignalSeverity {
     Info,

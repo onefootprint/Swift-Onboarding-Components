@@ -43,3 +43,30 @@ pub enum SignalScope {
     BusinessTin,
     BeneficialOwners,
 }
+
+impl SignalScope {
+    pub fn is_for_person(&self) -> bool {
+        match self {
+            SignalScope::Name => true,
+            SignalScope::Dob => true,
+            SignalScope::Ssn => true,
+            SignalScope::Address => true,
+            SignalScope::StreetAddress => true,
+            SignalScope::City => true,
+            SignalScope::State => true,
+            SignalScope::Zip => true,
+            SignalScope::Country => true,
+            SignalScope::Email => true,
+            SignalScope::PhoneNumber => true,
+            SignalScope::IpAddress => true,
+            SignalScope::Document => true,
+            SignalScope::Selfie => true,
+            SignalScope::BusinessAddress => false,
+            SignalScope::BusinessName => false,
+            SignalScope::BusinessPhoneNumber => false,
+            SignalScope::BusinessWebsite => false,
+            SignalScope::BusinessTin => false,
+            SignalScope::BeneficialOwners => false,
+        }
+    }
+}

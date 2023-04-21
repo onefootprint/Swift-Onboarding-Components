@@ -87,6 +87,7 @@ actix-multipart = "0.5.0"
 
 webhooks = { path = "../../webhooks"}
 billing = { path = "../../billing"}
+rand = { version = "0.8 " }
 
 
 sentry-tracing = { workspace = true }
@@ -97,6 +98,6 @@ test-case = { workspace = true }
 enclave = { path = "../../enclave/enclave"}
 macros = { path = "../../macros" }
 portpicker = "0.1.1"
-rand = { version = "0.8 " }
+
 tokio-test = "0.4.2"
 mockall = { workspace = true }
