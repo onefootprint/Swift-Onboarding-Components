@@ -1,7 +1,7 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { DeviceSignals } from '@onefootprint/footprint-elements';
 import React, { useEffect } from 'react';
 
+import DeviceSignals from '../../../../components/device-signals';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Authorize from '../authorize/authorize';
 import Init from '../init';

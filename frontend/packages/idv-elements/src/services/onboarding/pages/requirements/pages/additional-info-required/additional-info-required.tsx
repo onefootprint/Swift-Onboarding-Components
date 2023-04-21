@@ -4,11 +4,11 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/header-title';
-import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import NavigationHeader from '../../../../../../components/navigation-header';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const AdditionalInfoRequired = () => {
-  const { t } = useTranslation('pages.onboarding.additional-info-required');
+  const { t } = useTranslation('pages.additional-info-required');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {

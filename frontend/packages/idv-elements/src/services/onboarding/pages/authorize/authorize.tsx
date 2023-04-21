@@ -11,14 +11,14 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
+import NavigationHeader from '../../../../components/navigation-header';
+import { useOnboardingMachine } from '../../components/machine-provider';
 import {
   isDocCdo,
   isInvestorProfileCdo,
   isKybCdo,
   isKycCdo,
-} from '../../../../utils/cdo-utils';
-import { useOnboardingMachine } from '../../components/machine-provider';
+} from '../../utils/cdo-utils';
 import Button from './components/button/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
@@ -27,7 +27,7 @@ import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
 import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 
 const Authorize = () => {
-  const { t } = useTranslation('pages.onboarding.authorize');
+  const { t } = useTranslation('pages.authorize');
   const [state, send] = useOnboardingMachine();
   const {
     authToken,

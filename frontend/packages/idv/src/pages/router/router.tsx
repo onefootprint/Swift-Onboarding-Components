@@ -2,7 +2,7 @@ import {
   useLogStateMachine,
   useObserveCollector,
 } from '@onefootprint/dev-tools';
-import { Identify } from '@onefootprint/idv-elements';
+import { Identify, Onboarding } from '@onefootprint/idv-elements';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -11,7 +11,6 @@ import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Error from '../error';
 import Init from '../init';
-import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
 
 const Router = () => {

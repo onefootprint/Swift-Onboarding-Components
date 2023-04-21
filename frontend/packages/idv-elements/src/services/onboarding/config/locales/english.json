@@ -1,0 +1,59 @@
+{
+  "components": {},
+  "pages": {
+    "init": {
+      "error": {
+        "title": "Uh-oh!",
+        "description": "There was an error while completing this request. Please contact the site admin."
+      }
+    },
+    "check-requirements": {
+      "error": {
+        "title": "Uh-oh!",
+        "description": "There was an error while completing this request. Please contact the site admin."
+      }
+    },
+    "additional-info-required": {
+      "title": "Additional data is required",
+      "subtitle": "In addition to the data we already have on you, {{tenantName}} requires some more information to verify your identity.",
+      "cta": "Continue"
+    },
+    "authorize": {
+      "title": "Authorize access",
+      "subtitle": "{{tenantName}} will be able to securely view the following data:",
+      "cta": "Authorize",
+      "footer": "By clicking \"Authorize\", you acknowledge {{tenantName}}'s <a>privacy policy</a>.",
+      "onboarding-complete-error": {
+        "title": "An error occurred",
+        "description": "An error occurred while completing onboarding. Please try again."
+      },
+      "kyc": {
+        "title": "Your personal data"
+      },
+      "kyb": {
+        "title": "Your business data"
+      },
+      "data-labels": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone number",
+        "ssn4": "SSN (last 4)",
+        "ssn9": "SSN",
+        "dob": "Date of birth",
+        "address-full": "Address",
+        "address-partial": "Country & Zip Code",
+        "id-card": "ID Card",
+        "passport": "Passport",
+        "driversLicense": "Driver's License",
+        "selfie": "Selfie",
+        "business-name": "Business name",
+        "business-tin": "TIN",
+        "business-address": "Registered address",
+        "business-beneficial-owners": "Beneficial owners",
+        "business-website": "Website",
+        "business-phone-number": "Phone number",
+        "investor-profile": "Investor profile"
+      }
+    }
+  }
+}

@@ -1,14 +1,14 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import React, { useEffect } from 'react';
+
+import DeviceSignals from '../../../../../../components/device-signals';
 import {
   CollectKybData,
   CollectKycData,
-  DeviceSignals,
   IdDoc,
   InvestorProfile,
   Transfer,
-} from '@onefootprint/footprint-elements';
-import React, { useEffect } from 'react';
-
+} from '../../../../../../plugins';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from '../additional-info-required';
 import CheckRequirements from '../check-requirements';
