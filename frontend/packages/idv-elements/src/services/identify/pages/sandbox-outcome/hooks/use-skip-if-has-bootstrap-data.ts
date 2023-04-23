@@ -1,10 +1,10 @@
 import { useEffectOnce } from 'usehooks-ts';
 
-import useIdvMachine from '../../../hooks/use-idv-machine';
+import { useIdentifyMachine } from '../../../components/identify-machine-provider';
 import parseSuffix from '../utils/parse-suffix';
 
 const useSkipIfHasBootstrapData = () => {
-  const [state, send] = useIdvMachine();
+  const [state, send] = useIdentifyMachine();
 
   useEffectOnce(() => {
     const { bootstrapData } = state.context;

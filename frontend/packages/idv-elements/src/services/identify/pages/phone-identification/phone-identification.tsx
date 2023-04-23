@@ -19,7 +19,7 @@ type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
 const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { phoneNumber, email, identifierSuffix },
+    identify: { phoneNumber, email, sandboxSuffix: identifierSuffix },
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;

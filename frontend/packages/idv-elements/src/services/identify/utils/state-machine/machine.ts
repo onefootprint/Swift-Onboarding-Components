@@ -3,19 +3,19 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData, MachineContext, MachineEvents } from './types';
+import shouldBootstrap from './utils/should-bootstrap';
+import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
   device: DeviceInfo;
   bootstrapData?: BootstrapData;
   config?: OnboardingConfig;
-  identifierSuffix?: string;
 };
 
 const createIdentifyMachine = ({
   device,
   bootstrapData,
   config,
-  identifierSuffix,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -26,17 +26,45 @@ const createIdentifyMachine = ({
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: bootstrapData ? 'initBootstrap' : 'emailIdentification',
+      initial: 'init',
       context: {
         device,
         bootstrapData: bootstrapData ?? {},
         config,
-        identify: {
-          identifierSuffix,
-        },
+        identify: {},
         challenge: {},
       },
       states: {
+        init: {
+          always: [
+            {
+              target: 'sandboxOutcome',
+              cond: shouldSelectSandboxOutcome,
+            },
+            {
+              target: 'initBootstrap',
+              cond: shouldBootstrap,
+            },
+            {
+              target: 'emailIdentification',
+            },
+          ],
+        },
+        sandboxOutcome: {
+          on: {
+            sandboxOutcomeSubmitted: [
+              {
+                target: 'initBootstrap',
+                actions: ['assignSandboxOutcome'],
+                cond: shouldBootstrap,
+              },
+              {
+                target: 'emailIdentification',
+                actions: ['assignSandboxOutcome'],
+              },
+            ],
+          },
+        },
         // New bootstrap transitions (not used in this machine for now)
         initBootstrap: {
           on: {
@@ -152,6 +180,10 @@ const createIdentifyMachine = ({
     },
     {
       actions: {
+        assignSandboxOutcome: assign((context, event) => {
+          context.identify.sandboxSuffix = event.payload.sandboxSuffix;
+          return context;
+        }),
         assignEmail: assign((context, event) => {
           const { email } = event.payload;
           if (!email) {
@@ -198,7 +230,7 @@ const createIdentifyMachine = ({
         reset: assign(context => {
           // Don't allow resetting the identifier suffix
           context.identify = {
-            identifierSuffix: context.identify.identifierSuffix,
+            sandboxSuffix: context.identify.sandboxSuffix,
           };
           context.challenge = {};
           return context;

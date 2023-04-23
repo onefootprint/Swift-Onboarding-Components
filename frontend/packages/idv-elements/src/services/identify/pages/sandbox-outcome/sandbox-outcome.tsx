@@ -5,9 +5,9 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../components/header-title';
-import NavigationHeader from '../../components/layout/components/navigation-header';
-import useIdvMachine from '../../hooks/use-idv-machine';
+import HeaderTitle from '../../../../components/header-title';
+import NavigationHeader from '../../../../components/navigation-header';
+import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
 import parseTestID from './utils/parse-suffix';
 
@@ -25,7 +25,8 @@ type FormData = {
 const SandboxOutcome = () => {
   const { t } = useTranslation('pages.sandbox-outcome');
   useSkipIfHasBootstrapData();
-  const [state, send] = useIdvMachine();
+  const [state, send] = useIdentifyMachine();
+  const { bootstrapData } = state.context;
   const {
     control,
     register,
@@ -34,7 +35,7 @@ const SandboxOutcome = () => {
   } = useForm<FormData>({
     defaultValues: {
       outcome: Outcomes.success,
-      testID: parseTestID(state.context.bootstrapData?.email),
+      testID: parseTestID(bootstrapData?.email),
     },
   });
 

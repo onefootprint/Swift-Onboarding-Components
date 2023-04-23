@@ -19,7 +19,7 @@ type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { email, identifierSuffix },
+    identify: { email, sandboxSuffix: identifierSuffix },
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;

@@ -16,7 +16,7 @@ export interface Typegen0 {
     assignAuthToken: 'identifyCompleted';
     assignEmail: 'identifyCompleted';
     assignInitContext: 'initContextUpdated';
-    assignSandboxOutcome: 'sandboxOutcomeSubmitted';
+    assignSandboxOutcome: 'identifyCompleted';
     assignUserFound: 'identifyCompleted';
     assignValidationToken: 'onboardingCompleted';
     resetContext: 'reset';
@@ -30,7 +30,6 @@ export interface Typegen0 {
     | 'expired'
     | 'identify'
     | 'init'
-    | 'onboarding'
-    | 'sandboxOutcome';
+    | 'onboarding';
   tags: never;
 }

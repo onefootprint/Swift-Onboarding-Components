@@ -13,7 +13,7 @@ const mockUseIdentifierSuffix = (identifierSuffix: string) =>
     {
       context: {
         identify: {
-          identifierSuffix,
+          sandboxSuffix: identifierSuffix,
         },
       },
     },

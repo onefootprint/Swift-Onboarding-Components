@@ -12,13 +12,7 @@ type IdentifyProps = Partial<IdentifyMachineArgs> & {
   onDone: (payload: DonePayload) => void;
 };
 
-const Identify = ({
-  device,
-  bootstrapData,
-  config,
-  identifierSuffix,
-  onDone,
-}: IdentifyProps) => {
+const Identify = ({ device, bootstrapData, config, onDone }: IdentifyProps) => {
   if (!device) {
     throw new Error('Missing identify page props');
   }
@@ -30,7 +24,6 @@ const Identify = ({
           device={device}
           bootstrapData={bootstrapData}
           config={config}
-          identifierSuffix={identifierSuffix}
         >
           <Router onDone={onDone} />
         </IdentifyMachineProvider>

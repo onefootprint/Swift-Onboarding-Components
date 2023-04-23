@@ -23,7 +23,7 @@ export type MachineIdentifyContext = {
   email?: string;
   userFound?: boolean;
   successfulIdentifier?: Identifier;
-  identifierSuffix?: string;
+  sandboxSuffix?: string;
 };
 
 export type MachineChallengeContext = {
@@ -33,6 +33,12 @@ export type MachineChallengeContext = {
 };
 
 export type MachineEvents =
+  | {
+      type: 'sandboxOutcomeSubmitted';
+      payload: {
+        sandboxSuffix: string;
+      };
+    }
   | {
       type: 'bootstrapDataInvalid';
     }

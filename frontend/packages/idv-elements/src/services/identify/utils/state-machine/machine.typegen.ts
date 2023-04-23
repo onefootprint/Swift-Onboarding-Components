@@ -18,6 +18,7 @@ export interface Typegen0 {
     assignEmail: 'identified' | 'identifyFailed';
     assignHasSyncablePassKey: 'identified';
     assignPhone: 'identified' | 'identifyFailed';
+    assignSandboxOutcome: 'sandboxOutcomeSubmitted';
     assignSuccessfulIdentifier: 'identified';
     assignUserFound: 'identified';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
@@ -29,8 +30,10 @@ export interface Typegen0 {
     | 'bootstrapChallenge'
     | 'challenge'
     | 'emailIdentification'
+    | 'init'
     | 'initBootstrap'
     | 'phoneIdentification'
+    | 'sandboxOutcome'
     | 'success';
   tags: never;
 }

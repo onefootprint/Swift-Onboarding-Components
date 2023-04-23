@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
   CollectedKycDataOption,
@@ -7,10 +6,11 @@ import {
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
+import { BootstrapData } from './types';
 
 describe('Identify Machine Tests', () => {
-  const getOnboardingConfig = (isLive?: boolean): OnboardingConfig => ({
-    isLive: isLive ?? true,
+  const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
+    isLive,
     createdAt: 'date',
     id: 'id',
     key: 'key',
@@ -23,12 +23,15 @@ describe('Identify Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
   });
 
-  const createMachine = (deviceInfo: DeviceInfo, identifierSuffix?: string) => {
+  const createMachine = (isLive?: boolean, bootstrapData?: BootstrapData) => {
     const machine = interpret(
       createIdentifyMachine({
-        device: deviceInfo,
-        config: getOnboardingConfig(),
-        identifierSuffix,
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+        config: getOnboardingConfig(isLive),
+        bootstrapData,
       }),
     );
     machine.start();
@@ -37,13 +40,7 @@ describe('Identify Machine Tests', () => {
 
   describe('with existing account', () => {
     it('successfully ids the user from email', () => {
-      const machine = createMachine(
-        {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
-        '#test1',
-      );
+      const machine = createMachine();
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -66,7 +63,6 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         userFound: true,
         successfulIdentifier: { email: 'belce@onefootprint.com' },
-        identifierSuffix: '#test1',
       });
       expect(state.context.challenge).toEqual({
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
@@ -76,10 +72,7 @@ describe('Identify Machine Tests', () => {
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -126,10 +119,7 @@ describe('Identify Machine Tests', () => {
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -191,10 +181,7 @@ describe('Identify Machine Tests', () => {
 
   describe('with new user', () => {
     it('registers new phone', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -249,13 +236,7 @@ describe('Identify Machine Tests', () => {
     });
 
     it('editing email while registering phone', () => {
-      const machine = createMachine(
-        {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
-        '#test1',
-      );
+      const machine = createMachine();
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -274,7 +255,6 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: false,
-        identifierSuffix: '#test1',
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('phoneIdentification');
@@ -283,9 +263,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'identifyReset',
       });
-      expect(state.context.identify).toEqual({
-        identifierSuffix: '#test1',
-      });
+      expect(state.context.identify).toEqual({});
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('emailIdentification');
     });
@@ -293,10 +271,7 @@ describe('Identify Machine Tests', () => {
 
   describe('biometric challenge', () => {
     it('successfully completes', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let state = machine.send({
         type: 'identified',
@@ -334,10 +309,7 @@ describe('Identify Machine Tests', () => {
     });
 
     it('falls back to sms challenge', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let state = machine.send({
         type: 'identified',
@@ -383,10 +355,7 @@ describe('Identify Machine Tests', () => {
 
   describe('sms challenge', () => {
     it('successfully completes after resending the code', () => {
-      const machine = createMachine({
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
+      const machine = createMachine();
 
       let state = machine.send({
         type: 'identified',
@@ -421,6 +390,57 @@ describe('Identify Machine Tests', () => {
         authToken: 'authToken',
       });
       expect(state.value).toEqual('success');
+    });
+  });
+
+  describe('in sandbox mode', () => {
+    it('without bootstrap data', () => {
+      const machine = createMachine(false);
+
+      let { state } = machine;
+      expect(state.value).toEqual('sandboxOutcome');
+
+      state = machine.send({
+        type: 'sandboxOutcomeSubmitted',
+        payload: {
+          sandboxSuffix: 'suffix',
+        },
+      });
+      expect(state.value).toEqual('emailIdentification');
+      expect(state.context.identify).toEqual({
+        sandboxSuffix: 'suffix',
+      });
+    });
+
+    it('with bootstrap data', () => {
+      const machine = createMachine(false, {
+        email: 'piip@onefootprint.com',
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('sandboxOutcome');
+
+      state = machine.send({
+        type: 'sandboxOutcomeSubmitted',
+        payload: {
+          sandboxSuffix: 'suffix',
+        },
+      });
+
+      expect(state.value).toEqual('initBootstrap');
+      expect(state.context.bootstrapData).toEqual({
+        email: 'piip@onefootprint.com',
+      });
+      expect(state.context.identify).toEqual({
+        sandboxSuffix: 'suffix',
+      });
+
+      state = machine.send({
+        type: 'identifyReset',
+      });
+      expect(state.context.identify).toEqual({
+        sandboxSuffix: 'suffix',
+      });
     });
   });
 });

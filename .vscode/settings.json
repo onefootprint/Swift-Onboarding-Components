@@ -103,7 +103,8 @@
   ],
   "rust-analyzer.rustfmt.overrideCommand": null,
   "search.exclude": {
-    "**/target/": true
+    "**/target/": true,
+    "**/.jest-cache/**": true,
   },
   "eslint.workingDirectories": [
     "./frontend"

@@ -11,7 +11,6 @@ import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Error from '../error';
 import Init from '../init';
-import SandboxOutcome from '../sandbox-outcome';
 
 const Router = () => {
   const [state, send] = useIdvMachine();
@@ -39,13 +38,11 @@ const Router = () => {
     >
       {state.matches('init') && <Init />}
       {state.matches('configInvalid') && <ConfigInvalid />}
-      {state.matches('sandboxOutcome') && <SandboxOutcome />}
       {state.matches('identify') && (
         <Identify
           device={device}
           bootstrapData={bootstrapData}
           config={config}
-          identifierSuffix={sandboxSuffix}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}

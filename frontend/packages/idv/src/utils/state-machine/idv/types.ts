@@ -29,17 +29,12 @@ export type MachineEvents =
       type: 'configRequestFailed';
     }
   | {
-      type: 'sandboxOutcomeSubmitted';
-      payload: {
-        sandboxSuffix: string;
-      };
-    }
-  | {
       type: 'identifyCompleted';
       payload: {
         authToken: string;
         userFound: boolean;
         email?: string;
+        sandboxSuffix?: string;
       };
     }
   | {

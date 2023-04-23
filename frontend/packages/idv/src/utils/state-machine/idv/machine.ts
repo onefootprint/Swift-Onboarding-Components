@@ -3,7 +3,6 @@ import { assign, createMachine } from 'xstate';
 import { BootstrapData } from '../../../types';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
-import shouldShowSandboxOutcome from './utils/should-show-sandbox-outcome';
 
 export type IdvMachineArgs = {
   tenantPk: string;
@@ -39,12 +38,6 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
             },
             initContextUpdated: [
               {
-                target: 'sandboxOutcome',
-                actions: ['assignInitContext'],
-                cond: (context, event) =>
-                  shouldShowSandboxOutcome(context, event),
-              },
-              {
                 target: 'identify',
                 actions: ['assignInitContext'],
                 cond: (context, event) => isContextReady(context, event),
@@ -55,20 +48,17 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
             ],
           },
         },
-        sandboxOutcome: {
-          on: {
-            sandboxOutcomeSubmitted: {
-              target: 'identify',
-              actions: ['assignSandboxOutcome'],
-            },
-          },
-        },
         identify: {
           on: {
             identifyCompleted: [
               {
                 target: 'onboarding',
-                actions: ['assignAuthToken', 'assignUserFound', 'assignEmail'],
+                actions: [
+                  'assignAuthToken',
+                  'assignUserFound',
+                  'assignEmail',
+                  'assignSandboxOutcome',
+                ],
               },
             ],
           },

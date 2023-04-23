@@ -7,11 +7,13 @@ import Challenge from '../challenge';
 import EmailIdentification from '../email-identification';
 import InitBootstrap from '../init-bootstrap';
 import PhoneIdentification from '../phone-identification';
+import SandboxOutcome from '../sandbox-outcome';
 
 export type DonePayload = {
   authToken: string;
   userFound: boolean;
   email?: string;
+  sandboxSuffix?: string;
 };
 
 type RouterProps = {
@@ -38,6 +40,9 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
+  if (state.matches('sandboxOutcome')) {
+    return <SandboxOutcome />;
+  }
   if (state.matches('initBootstrap')) {
     return <InitBootstrap />;
   }
