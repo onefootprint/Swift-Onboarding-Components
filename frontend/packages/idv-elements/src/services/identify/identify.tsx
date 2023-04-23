@@ -12,24 +12,17 @@ type IdentifyProps = Partial<IdentifyMachineArgs> & {
   onDone: (payload: DonePayload) => void;
 };
 
-const Identify = ({ device, bootstrapData, config, onDone }: IdentifyProps) => {
-  if (!device) {
-    throw new Error('Missing identify page props');
-  }
-
-  return (
-    <I18nextProvider i18n={configureI18next()}>
-      <QueryClientProvider client={queryClient}>
-        <IdentifyMachineProvider
-          device={device}
-          bootstrapData={bootstrapData}
-          config={config}
-        >
-          <Router onDone={onDone} />
-        </IdentifyMachineProvider>
-      </QueryClientProvider>
-    </I18nextProvider>
-  );
-};
+const Identify = ({ bootstrapData, tenantPk, onDone }: IdentifyProps) => (
+  <I18nextProvider i18n={configureI18next()}>
+    <QueryClientProvider client={queryClient}>
+      <IdentifyMachineProvider
+        bootstrapData={bootstrapData}
+        tenantPk={tenantPk}
+      >
+        <Router onDone={onDone} />
+      </IdentifyMachineProvider>
+    </QueryClientProvider>
+  </I18nextProvider>
+);
 
 export default Identify;

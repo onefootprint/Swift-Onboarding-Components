@@ -24,7 +24,7 @@ const useGetOnboardingConfig = (
     onSuccess?: (response: GetOnboardingConfigResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
-) => {
+) =>
   useQuery(
     ['get-onboarding-config', tenantPk],
     () => getOnboardingConfig({ tenantPk }),
@@ -34,6 +34,5 @@ const useGetOnboardingConfig = (
       onError: options.onError,
     },
   );
-};
 
 export default useGetOnboardingConfig;

@@ -1,18 +1,64 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useObserveCollector } from '@onefootprint/dev-tools';
+import { DeviceInfo, useDeviceInfo, useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import {
+  CollectedDataOptionLabels,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import useGetOnboardingConfig from '../../../../hooks/api/org/get-onboarding-config';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';
 
 const Init = () => {
   const { t } = useTranslation('pages.onboarding.init');
   const [state, send] = useOnboardingMachine();
-  const { authToken } = state.context;
+  const { authToken, tenantPk } = state.context;
   const onboardingMutation = useOnboarding();
+  const observeCollector = useObserveCollector();
+
+  useDeviceInfo((device: DeviceInfo) => {
+    observeCollector.setAppContext({
+      device,
+    });
+    send({
+      type: 'initContextUpdated',
+      payload: {
+        device,
+      },
+    });
+  });
+
+  useGetOnboardingConfig(tenantPk, {
+    onSuccess: (config: OnboardingConfig) => {
+      observeCollector.setAppContext({
+        config,
+      });
+      send({
+        type: 'initContextUpdated',
+        payload: {
+          config: {
+            ...config,
+            mustCollectData: config.mustCollectData.map(
+              (attr: string) => CollectedDataOptionLabels[attr],
+            ),
+            canAccessData: config.canAccessData.map(
+              (attr: string) => CollectedDataOptionLabels[attr],
+            ),
+          },
+        },
+      });
+    },
+    onError: () => {
+      send({
+        type: 'configRequestFailed',
+      });
+    },
+  });
 
   useEffectOnce(() => {
     if (!authToken || onboardingMutation.isLoading) {
@@ -23,9 +69,9 @@ const Init = () => {
       {
         onSuccess: ({ validationToken }) => {
           send({
-            type: 'initialized',
+            type: 'initContextUpdated',
             payload: {
-              validationToken,
+              validationToken: validationToken ?? '',
             },
           });
         },

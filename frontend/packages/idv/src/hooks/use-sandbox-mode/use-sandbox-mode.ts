@@ -1,10 +1,16 @@
-import useIdvMachine from '../use-idv-machine/use-idv-machine';
+import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
+
+import useIdvMachine from '../use-idv-machine';
 
 const useSandboxMode = () => {
   const [state] = useIdvMachine();
-  const { config } = state.context;
+  const { tenantPk } = state.context;
 
-  return { isSandbox: config?.isLive === false };
+  const result = useGetOnboardingConfig(tenantPk);
+  if (result.isLoading) {
+    return false;
+  }
+  return result.data?.isLive === false;
 };
 
 export default useSandboxMode;

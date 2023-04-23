@@ -15,7 +15,7 @@ const BootstrapChallenge = () => {
   const {
     bootstrapData,
     identify: { successfulIdentifier },
-    config,
+    onboarding: { config },
   } = state.context;
 
   const showMissingPhoneLabel =

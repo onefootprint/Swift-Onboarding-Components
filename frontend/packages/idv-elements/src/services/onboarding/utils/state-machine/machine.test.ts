@@ -26,19 +26,17 @@ describe('Onboarding Machine Tests', () => {
 
   const createMachine = ({
     userFound = true,
-    device = testDevice,
-    config = testOnboardingConfig,
     authToken = 'token',
-    email = 'belce@onefootprint.com',
+    tenantPk = 'pk',
+    userData = { email: 'belce@onefootprint.com' },
     sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
-        device,
-        config,
+        tenantPk,
+        userData,
         authToken,
-        email,
         sandboxSuffix,
       }),
     );
@@ -54,19 +52,22 @@ describe('Onboarding Machine Tests', () => {
     expect(state.value).toBe('init');
 
     state = machine.send({
-      type: 'initialized',
+      type: 'initContextUpdated',
       payload: {
+        device: testDevice,
+        config: testOnboardingConfig,
         validationToken: 'token',
       },
     });
     expect(state.value).toEqual('authorize');
     expect(state.context).toEqual({
       validationToken: 'token',
+      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      email: 'belce@onefootprint.com',
+      userData: { email: 'belce@onefootprint.com' },
       sandboxSuffix: 'sandboxTest',
     });
 
@@ -76,16 +77,22 @@ describe('Onboarding Machine Tests', () => {
         validationToken: 'token',
       },
     });
-    expect(state.value).toEqual('success');
+    expect(state.value).toEqual('authorized');
     expect(state.context).toEqual({
+      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      email: 'belce@onefootprint.com',
+      userData: { email: 'belce@onefootprint.com' },
       sandboxSuffix: 'sandboxTest',
       validationToken: 'token',
     });
+
+    state = machine.send({
+      type: 'close',
+    });
+    expect(state.value).toEqual('complete');
   });
 
   it('completes the onboarding flow from scratch', () => {
@@ -94,16 +101,22 @@ describe('Onboarding Machine Tests', () => {
     expect(state.value).toBe('init');
 
     state = machine.send({
-      type: 'initialized',
-      payload: {},
+      type: 'initContextUpdated',
+      payload: {
+        device: testDevice,
+        config: testOnboardingConfig,
+        validationToken: '',
+      },
     });
     expect(state.value).toEqual('requirements');
     expect(state.context).toEqual({
+      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      email: 'belce@onefootprint.com',
+      userData: { email: 'belce@onefootprint.com' },
+      validationToken: '',
     });
 
     state = machine.send({
@@ -111,11 +124,13 @@ describe('Onboarding Machine Tests', () => {
     });
     expect(state.value).toEqual('authorize');
     expect(state.context).toEqual({
+      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      email: 'belce@onefootprint.com',
+      userData: { email: 'belce@onefootprint.com' },
+      validationToken: '',
     });
 
     state = machine.send({
@@ -124,13 +139,14 @@ describe('Onboarding Machine Tests', () => {
         validationToken: 'token',
       },
     });
-    expect(state.value).toEqual('success');
+    expect(state.value).toEqual('authorized');
     expect(state.context).toEqual({
+      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      email: 'belce@onefootprint.com',
+      userData: { email: 'belce@onefootprint.com' },
       validationToken: 'token',
     });
   });

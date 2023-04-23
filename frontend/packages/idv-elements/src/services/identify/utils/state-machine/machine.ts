@@ -1,21 +1,18 @@
-import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData, MachineContext, MachineEvents } from './types';
+import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
 import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
-  device: DeviceInfo;
   bootstrapData?: BootstrapData;
-  config?: OnboardingConfig;
+  tenantPk?: string;
 };
 
 const createIdentifyMachine = ({
-  device,
   bootstrapData,
-  config,
+  tenantPk,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -28,14 +25,33 @@ const createIdentifyMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        device,
         bootstrapData: bootstrapData ?? {},
-        config,
+        onboarding: {
+          tenantPk,
+        },
         identify: {},
         challenge: {},
       },
       states: {
         init: {
+          on: {
+            configRequestFailed: {
+              target: 'configInvalid',
+            },
+            initContextUpdated: [
+              {
+                target: 'initialized',
+                actions: ['assignInitContext'],
+                cond: (context, event) => isContextReady(context, event),
+              },
+              {
+                target: 'init',
+                actions: ['assignInitContext'],
+              },
+            ],
+          },
+        },
+        initialized: {
           always: [
             {
               target: 'sandboxOutcome',
@@ -173,6 +189,9 @@ const createIdentifyMachine = ({
             },
           },
         },
+        configInvalid: {
+          type: 'final',
+        },
         success: {
           type: 'final',
         },
@@ -180,6 +199,14 @@ const createIdentifyMachine = ({
     },
     {
       actions: {
+        assignInitContext: assign((context, event) => {
+          const { device, config } = event.payload;
+          context.device = device !== undefined ? device : context.device;
+          context.onboarding.config =
+            config !== undefined ? config : context.onboarding.config;
+
+          return context;
+        }),
         assignSandboxOutcome: assign((context, event) => {
           context.identify.sandboxSuffix = event.payload.sandboxSuffix;
           return context;

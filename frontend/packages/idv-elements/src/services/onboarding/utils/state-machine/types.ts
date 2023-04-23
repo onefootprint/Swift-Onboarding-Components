@@ -1,22 +1,28 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig, UserData } from '@onefootprint/types';
 
 export type MachineContext = {
-  userFound: boolean;
-  config: OnboardingConfig;
-  device: DeviceInfo;
-  email?: string;
+  tenantPk: string;
   sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
+  userData: UserData;
+  config?: OnboardingConfig;
+  device?: DeviceInfo;
+  userFound?: boolean;
   validationToken?: string;
 };
 
 export type MachineEvents =
   | {
-      type: 'initialized';
+      type: 'initContextUpdated';
       payload: {
         validationToken?: string;
+        config?: OnboardingConfig;
+        device?: DeviceInfo;
       };
+    }
+  | {
+      type: 'configRequestFailed';
     }
   | {
       type: 'requirementsCompleted';
@@ -26,4 +32,7 @@ export type MachineEvents =
       payload: {
         validationToken: string;
       };
+    }
+  | {
+      type: 'close';
     };

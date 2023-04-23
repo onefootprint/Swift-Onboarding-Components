@@ -10,10 +10,15 @@ export type BootstrapData = {
   phoneNumber?: string;
 };
 
-export type MachineContext = {
+export type OnboardingContext = {
+  tenantPk?: string;
   config?: OnboardingConfig;
-  device: DeviceInfo;
+};
+
+export type MachineContext = {
   bootstrapData: BootstrapData;
+  device?: DeviceInfo;
+  onboarding: OnboardingContext;
   identify: MachineIdentifyContext;
   challenge: MachineChallengeContext;
 };
@@ -33,6 +38,16 @@ export type MachineChallengeContext = {
 };
 
 export type MachineEvents =
+  | {
+      type: 'configRequestFailed';
+    }
+  | {
+      type: 'initContextUpdated';
+      payload: {
+        config?: OnboardingConfig;
+        device?: DeviceInfo;
+      };
+    }
   | {
       type: 'sandboxOutcomeSubmitted';
       payload: {

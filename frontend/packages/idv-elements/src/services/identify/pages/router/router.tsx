@@ -5,6 +5,7 @@ import useIdentifyMachine from '../../hooks/use-identify-machine';
 import BootstrapChallenge from '../bootstrap-challenge';
 import Challenge from '../challenge';
 import EmailIdentification from '../email-identification';
+import Init from '../init';
 import InitBootstrap from '../init-bootstrap';
 import PhoneIdentification from '../phone-identification';
 import SandboxOutcome from '../sandbox-outcome';
@@ -40,6 +41,9 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
+  if (state.matches('init')) {
+    return <Init />;
+  }
   if (state.matches('sandboxOutcome')) {
     return <SandboxOutcome />;
   }

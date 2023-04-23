@@ -7,21 +7,17 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
-import Complete from '../complete';
-import ConfigInvalid from '../config-invalid';
 import Error from '../error';
-import Init from '../init';
 
 const Router = () => {
   const [state, send] = useIdvMachine();
   const {
-    device,
     bootstrapData,
-    config,
+    tenantPk,
     sandboxSuffix,
-    userFound,
     authToken,
     email,
+    userFound,
   } = state.context;
   const observeCollector = useObserveCollector();
   useLogStateMachine('idv', state);
@@ -36,13 +32,10 @@ const Router = () => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('init') && <Init />}
-      {state.matches('configInvalid') && <ConfigInvalid />}
       {state.matches('identify') && (
         <Identify
-          device={device}
           bootstrapData={bootstrapData}
-          config={config}
+          tenantPk={tenantPk}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
@@ -51,17 +44,17 @@ const Router = () => {
       {state.matches('onboarding') && (
         <Onboarding
           userFound={userFound}
-          device={device}
-          config={config}
+          tenantPk={tenantPk}
           authToken={authToken}
-          email={email}
+          userData={{
+            email,
+          }}
           sandboxSuffix={sandboxSuffix}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
           }}
         />
       )}
-      {state.matches('complete') && <Complete />}
     </ErrorBoundary>
   );
 };

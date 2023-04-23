@@ -13,15 +13,14 @@ type OnboardingProps = Partial<OnboardingMachineArgs> & {
 };
 
 const Onboarding = ({
-  userFound,
-  device,
-  config,
+  tenantPk,
   authToken,
-  email,
+  userData,
   sandboxSuffix,
+  userFound,
   onDone,
 }: OnboardingProps) => {
-  if (!device || !config || !authToken) {
+  if (!tenantPk || !authToken) {
     throw new Error('Missing onboarding props');
   }
 
@@ -29,11 +28,10 @@ const Onboarding = ({
     <I18nextProvider i18n={configureI18next()}>
       <QueryClientProvider client={queryClient}>
         <OnboardingMachineProvider
-          userFound={!!userFound}
-          device={device}
-          config={config}
+          userFound={userFound}
+          tenantPk={tenantPk}
           authToken={authToken}
-          email={email}
+          userData={userData}
           sandboxSuffix={sandboxSuffix}
         >
           <Router onDone={onDone} />

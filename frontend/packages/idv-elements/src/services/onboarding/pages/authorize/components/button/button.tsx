@@ -15,9 +15,12 @@ type ButtonProps = {
 const Button = ({ isLoading, onClick }: ButtonProps) => {
   const { t } = useTranslation('pages.onboarding.authorize');
   const [state] = useOnboardingMachine();
-  const {
-    config: { orgName: tenantName, privacyPolicyUrl },
-  } = state.context;
+  const { config } = state.context;
+
+  if (!config) {
+    return null;
+  }
+  const { orgName: tenantName, privacyPolicyUrl } = config;
 
   return (
     <ButtonContainer>

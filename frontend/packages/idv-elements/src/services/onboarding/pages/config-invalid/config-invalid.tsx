@@ -3,7 +3,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-import NavigationHeader from '../../components/layout/components/navigation-header';
+import NavigationHeader from '../../../../components/navigation-header';
 
 const ConfigInvalid = () => {
   const { t } = useTranslation('pages.config-invalid');

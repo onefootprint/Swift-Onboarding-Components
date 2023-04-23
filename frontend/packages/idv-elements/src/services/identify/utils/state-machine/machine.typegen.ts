@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignAvailableChallengeKinds: 'identified';
     assignEmail: 'identified' | 'identifyFailed';
     assignHasSyncablePassKey: 'identified';
+    assignInitContext: 'initContextUpdated';
     assignPhone: 'identified' | 'identifyFailed';
     assignSandboxOutcome: 'sandboxOutcomeSubmitted';
     assignSuccessfulIdentifier: 'identified';
@@ -29,9 +30,11 @@ export interface Typegen0 {
   matchesStates:
     | 'bootstrapChallenge'
     | 'challenge'
+    | 'configInvalid'
     | 'emailIdentification'
     | 'init'
     | 'initBootstrap'
+    | 'initialized'
     | 'phoneIdentification'
     | 'sandboxOutcome'
     | 'success';

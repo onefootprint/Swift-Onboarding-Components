@@ -4,9 +4,12 @@ import { ChallengeKind } from '@onefootprint/types';
 import { MachineChallengeContext } from '../state-machine';
 
 const getCanChallengeBiometrics = (
-  device: DeviceInfo,
   challengeContext: MachineChallengeContext,
+  device?: DeviceInfo,
 ) => {
+  if (!device) {
+    return false;
+  }
   const hasAvailableBiometricChallenge =
     challengeContext.availableChallengeKinds?.includes(ChallengeKind.biometric);
   if (!hasAvailableBiometricChallenge) {

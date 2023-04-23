@@ -1,27 +1,28 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Box, LinkButton } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import HeaderTitle from '../../components/header-title';
-import NavigationHeader from '../../components/layout/components/navigation-header';
-import useAppContext from '../../hooks/use-app-context';
-import useIdvMachine from '../../hooks/use-idv-machine';
+import HeaderTitle from '../../../../components/header-title';
+import NavigationHeader from '../../../../components/navigation-header';
+import { useOnboardingMachine } from '../../components/machine-provider';
 import { isKybCdo } from '../../utils/cdo-utils';
 import ConfettiAnimation from './confetti/confetti';
 
 const CLOSE_DELAY = 6000;
 
-const Complete = () => {
+const Authorized = () => {
   const { t } = useTranslation('pages.complete');
-  const [state] = useIdvMachine();
+  const [state] = useOnboardingMachine();
+  // TODO: belce
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { validationToken, config } = state.context;
-  const {
-    callbacks: { onComplete, onClose },
-    layout: { canClose },
-  } = useAppContext();
+  // const {
+  //   callbacks: { onComplete, onClose },
+  //   layout: { canClose },
+  // } = useAppContext();
   const [showConfetti, setShowConfetti] = useState(true);
   const hasKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
 
@@ -29,10 +30,12 @@ const Complete = () => {
     handleComplete(CLOSE_DELAY);
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleComplete = (closeDelay?: number) => {
-    if (validationToken) {
-      onComplete(validationToken, closeDelay);
-    }
+    // TODO: belce
+    // if (validationToken) {
+    //   onComplete(validationToken, closeDelay);
+    // }
   };
 
   const handleCompleteAnimation = () => {
@@ -54,11 +57,12 @@ const Complete = () => {
           subtitle={hasKyb ? t('subtitle-with-kyb') : t('subtitle')}
         />
         <Box />
-        {canClose && onClose && (
+        {/* TODO: belce */}
+        {/* {canClose && onClose && (
           <LinkButton sx={{ marginTop: 7 }} onClick={onClose}>
             {t('cta')}
           </LinkButton>
-        )}
+        )} */}
       </Container>
     </>
   );
@@ -72,4 +76,4 @@ const Container = styled.div`
   position: relative;
 `;
 
-export default Complete;
+export default Authorized;

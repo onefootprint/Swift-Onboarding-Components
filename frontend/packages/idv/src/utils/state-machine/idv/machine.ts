@@ -2,14 +2,18 @@ import { assign, createMachine } from 'xstate';
 
 import { BootstrapData } from '../../../types';
 import { MachineContext, MachineEvents } from './types';
-import isContextReady from './utils/is-context-ready';
 
 export type IdvMachineArgs = {
+  authToken?: string;
   tenantPk: string;
   bootstrapData?: BootstrapData;
 };
 
-const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
+const createIdvMachine = ({
+  authToken,
+  tenantPk,
+  bootstrapData,
+}: IdvMachineArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -21,6 +25,7 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
+        authToken,
         tenantPk,
         bootstrapData,
       },
@@ -32,21 +37,19 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
       },
       states: {
         init: {
-          on: {
-            configRequestFailed: {
-              target: 'configInvalid',
+          always: [
+            {
+              target: 'identify',
+              cond: context => !context.authToken,
             },
-            initContextUpdated: [
-              {
-                target: 'identify',
-                actions: ['assignInitContext'],
-                cond: (context, event) => isContextReady(context, event),
-              },
-              {
-                actions: ['assignInitContext'],
-              },
-            ],
-          },
+            {
+              target: 'onboarding',
+              cond: context => !!context.tenantPk,
+            },
+            {
+              target: 'complete',
+            },
+          ],
         },
         identify: {
           on: {
@@ -88,13 +91,6 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
           tenantPk: context.tenantPk,
           bootstrapData: context.bootstrapData,
         })),
-        assignInitContext: assign((context, event) => {
-          const { device, config } = event.payload;
-          context.device = device !== undefined ? device : context.device;
-          context.config = config !== undefined ? config : context.config;
-
-          return context;
-        }),
         assignSandboxOutcome: assign((context, event) => ({
           ...context,
           sandboxSuffix: event.payload.sandboxSuffix,
@@ -107,10 +103,13 @@ const createIdvMachine = ({ tenantPk, bootstrapData }: IdvMachineArgs) =>
           ...context,
           email: event.payload.email,
         })),
-        assignAuthToken: assign((context, event) => ({
-          ...context,
-          authToken: event.payload.authToken,
-        })),
+        assignAuthToken: assign((context, event) => {
+          const { authToken: newAuthToken } = event.payload;
+          if (newAuthToken) {
+            context.authToken = newAuthToken;
+          }
+          return context;
+        }),
         assignValidationToken: assign((context, event) => ({
           ...context,
           validationToken: event.payload.validationToken,

@@ -35,7 +35,6 @@
     "i18next": "^22.0.4",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",
-    "lottie-react": "^2.4.0",
     "react-error-boundary": "^4.0.3",
     "react-hook-form": "^7.43.5",
     "react-i18next": "^12.2.0",

@@ -21,7 +21,7 @@ const Sms = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { phoneNumber, successfulIdentifier },
-    config,
+    onboarding: { config },
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();

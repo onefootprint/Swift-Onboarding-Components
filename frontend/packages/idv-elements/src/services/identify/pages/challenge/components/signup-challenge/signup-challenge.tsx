@@ -21,7 +21,7 @@ const SignupChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, email, phoneNumber },
-    config,
+    onboarding: { config },
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();

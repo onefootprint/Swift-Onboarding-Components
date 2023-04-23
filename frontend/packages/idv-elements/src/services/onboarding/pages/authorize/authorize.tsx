@@ -29,15 +29,24 @@ import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 const Authorize = () => {
   const { t } = useTranslation('pages.authorize');
   const [state, send] = useOnboardingMachine();
-  const {
-    authToken,
-    config: { orgName: tenantName, canAccessData },
-  } = state.context;
+  const { authToken, config } = state.context;
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const toast = useToast();
   const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>(
     [],
   );
+
+  const statusQuery = useGetOnboardingStatus(authToken, {
+    onSuccess: ({ fieldsToAuthorize }) => {
+      setCollectedIdDocTypes(fieldsToAuthorize?.identityDocumentTypes ?? []);
+    },
+  });
+
+  if (!config) {
+    return null;
+  }
+
+  const { orgName: tenantName, canAccessData } = config;
   const kycData = canAccessData.filter(
     data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
   ) as (
@@ -49,12 +58,6 @@ const Authorize = () => {
     isKybCdo(data),
   ) as CollectedKybDataOption[];
   const hasBothSections = kycData.length > 0 && kybData.length > 0;
-
-  const statusQuery = useGetOnboardingStatus(authToken, {
-    onSuccess: ({ fieldsToAuthorize }) => {
-      setCollectedIdDocTypes(fieldsToAuthorize?.identityDocumentTypes ?? []);
-    },
-  });
 
   if (statusQuery.isLoading) {
     return <Loading />;

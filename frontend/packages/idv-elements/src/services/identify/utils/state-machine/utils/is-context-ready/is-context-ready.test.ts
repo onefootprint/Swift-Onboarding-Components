@@ -25,9 +25,13 @@ describe('isContextReady', () => {
           type: 'mobile',
           hasSupportForWebauthn: true,
         },
-        config: { ...testOnboardingConfig },
+        onboarding: {
+          tenantPk: 'pk',
+          config: { ...testOnboardingConfig },
+        },
         bootstrapData: {},
-        tenantPk: 'pk',
+        identify: {},
+        challenge: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -38,9 +42,13 @@ describe('isContextReady', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
-        config: { ...testOnboardingConfig },
+        onboarding: {
+          tenantPk: 'pk',
+          config: { ...testOnboardingConfig },
+        },
         bootstrapData: {},
-        tenantPk: 'pk',
+        identify: {},
+        challenge: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -58,8 +66,12 @@ describe('isContextReady', () => {
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
+        onboarding: {
+          tenantPk: 'pk',
+        },
         bootstrapData: {},
-        tenantPk: 'pk',
+        identify: {},
+        challenge: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',

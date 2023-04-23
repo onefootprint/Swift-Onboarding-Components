@@ -24,7 +24,7 @@ const IdvLayout = ({ children }: IdvLayoutProps) => {
   const {
     layout: { header, footer, container },
   } = useAppContext();
-  const { isSandbox } = useSandboxMode();
+  const isSandbox = useSandboxMode();
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 

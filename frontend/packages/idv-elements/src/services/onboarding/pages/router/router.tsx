@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import DeviceSignals from '../../../../components/device-signals';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Authorize from '../authorize/authorize';
+import Authorized from '../authorized';
+import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import Requirements from '../requirements';
 
@@ -17,14 +19,14 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
-  const isDone = state.matches('success');
+  const isDone = state.matches('complete');
   const {
     validationToken,
     userFound,
     device,
     config,
     authToken,
-    email,
+    userData,
     sandboxSuffix,
   } = state.context;
   useLogStateMachine('onboarding', state);
@@ -39,6 +41,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('init')) {
     return <Init />;
   }
+  if (state.matches('configInvalid')) {
+    return <ConfigInvalid />;
+  }
   if (state.matches('requirements')) {
     return (
       <Requirements
@@ -46,7 +51,7 @@ const Router = ({ onDone }: RouterProps) => {
         device={device}
         config={config}
         authToken={authToken}
-        email={email}
+        email={userData.email}
         sandboxSuffix={sandboxSuffix}
         onDone={() => {
           send({
@@ -62,6 +67,9 @@ const Router = ({ onDone }: RouterProps) => {
         <Authorize />
       </DeviceSignals>
     );
+  }
+  if (state.matches('authorized')) {
+    return <Authorized />;
   }
   return null;
 };

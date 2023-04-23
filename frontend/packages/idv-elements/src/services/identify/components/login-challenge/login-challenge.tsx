@@ -13,7 +13,7 @@ const LoginChallenge = () => {
   const { device, challenge } = state.context;
   const [selectedChallengeKind, setSelectedChallengeKind] =
     useState<ChallengeKind>(ChallengeKind.sms);
-  const canChallengeBiometrics = getCanChallengeBiometrics(device, challenge);
+  const canChallengeBiometrics = getCanChallengeBiometrics(challenge, device);
 
   if (!canChallengeBiometrics) {
     return <LoginSmsChallenge />;

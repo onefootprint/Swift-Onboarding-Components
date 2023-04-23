@@ -9,12 +9,10 @@ export type MachineContext = {
   bootstrapData?: BootstrapData;
   // Generated
   authToken?: string;
-  device?: DeviceInfo;
-  config?: OnboardingConfig;
-  userFound?: boolean;
   email?: string;
   validationToken?: string;
   sandboxSuffix?: string;
+  userFound?: boolean;
 };
 
 export type MachineEvents =

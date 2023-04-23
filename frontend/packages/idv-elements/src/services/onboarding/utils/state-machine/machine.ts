@@ -1,25 +1,23 @@
-import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import { UserData } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
+import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
-  userFound: boolean;
-  device: DeviceInfo;
-  config: OnboardingConfig;
+  tenantPk: string;
   authToken: string;
-  email?: string;
+  userData?: UserData;
   sandboxSuffix?: string; // only if in sandbox mode
+  userFound?: boolean;
 };
 
 const createOnboardingMachine = ({
-  userFound,
-  device,
+  tenantPk,
   authToken,
-  config,
-  email,
+  userData,
   sandboxSuffix,
+  userFound,
 }: OnboardingMachineArgs) =>
   createMachine(
     {
@@ -32,31 +30,35 @@ const createOnboardingMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        userFound,
-        device,
+        tenantPk,
         authToken,
-        config,
-        email,
+        userData: userData ?? {},
         sandboxSuffix,
+        userFound,
       },
       states: {
         init: {
           on: {
-            initialized: [
-              // TODO: Replace this with the one below. For now, for the demo, we are unconditionally
-              // showing the authorize screen everytime the user signs-in even if they previously onboarded.
-              // {
-              //   target: 'success',
-              //   cond: (context, event) => !!event.payload.validationToken,
-              //   actions: ['assignValidationToken'],
-              // },
+            configRequestFailed: {
+              target: 'configInvalid',
+            },
+            initContextUpdated: [
+              // TODO: For now, for the demo, we are unconditionally showing the authorize screen
+              // every time the user signs-in even if they previously onboarded.
               {
                 target: 'authorize',
-                cond: (context, event) => !!event.payload.validationToken,
-                actions: ['assignValidationToken'],
+                cond: (context, event) =>
+                  isContextReady(context, event) &&
+                  !!event.payload.validationToken,
+                actions: ['assignInitContext', 'assignValidationToken'],
               },
               {
                 target: 'requirements',
+                cond: (context, event) => isContextReady(context, event),
+                actions: ['assignInitContext', 'assignValidationToken'],
+              },
+              {
+                actions: ['assignInitContext', 'assignValidationToken'],
               },
             ],
           },
@@ -71,18 +73,35 @@ const createOnboardingMachine = ({
         authorize: {
           on: {
             authorized: {
-              target: 'success',
+              target: 'authorized',
               actions: ['assignValidationToken'],
             },
           },
         },
-        success: {
+        configInvalid: {
+          type: 'final',
+        },
+        authorized: {
+          on: {
+            close: {
+              target: 'complete',
+            },
+          },
+        },
+        complete: {
           type: 'final',
         },
       },
     },
     {
       actions: {
+        assignInitContext: assign((context, event) => {
+          const { device, config } = event.payload;
+          context.device = device !== undefined ? device : context.device;
+          context.config = config !== undefined ? config : context.config;
+
+          return context;
+        }),
         assignValidationToken: assign((context, event) => ({
           ...context,
           validationToken: event.payload.validationToken,

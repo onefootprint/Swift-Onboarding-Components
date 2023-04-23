@@ -1,3 +1,4 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
   CollectedKycDataOption,
@@ -23,14 +24,15 @@ describe('Identify Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
   });
 
-  const createMachine = (isLive?: boolean, bootstrapData?: BootstrapData) => {
+  const getDevice = (): DeviceInfo => ({
+    type: 'mobile',
+    hasSupportForWebauthn: true,
+  });
+
+  const createMachine = (bootstrapData?: BootstrapData) => {
     const machine = interpret(
       createIdentifyMachine({
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
-        config: getOnboardingConfig(isLive),
+        tenantPk: 'pk',
         bootstrapData,
       }),
     );
@@ -43,6 +45,15 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -75,6 +86,15 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -122,6 +142,15 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -184,6 +213,15 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -239,6 +277,15 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -272,8 +319,15 @@ describe('Identify Machine Tests', () => {
   describe('biometric challenge', () => {
     it('successfully completes', () => {
       const machine = createMachine();
-
       let state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
+
+      state = machine.send({
         type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
@@ -310,8 +364,14 @@ describe('Identify Machine Tests', () => {
 
     it('falls back to sms challenge', () => {
       const machine = createMachine();
-
       let state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
+      state = machine.send({
         type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
@@ -356,8 +416,18 @@ describe('Identify Machine Tests', () => {
   describe('sms challenge', () => {
     it('successfully completes after resending the code', () => {
       const machine = createMachine();
+      let { state } = machine;
+      expect(state.value).toEqual('init');
 
-      let state = machine.send({
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(),
+        },
+      });
+
+      state = machine.send({
         type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
@@ -395,9 +465,17 @@ describe('Identify Machine Tests', () => {
 
   describe('in sandbox mode', () => {
     it('without bootstrap data', () => {
-      const machine = createMachine(false);
-
+      const machine = createMachine();
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(false),
+        },
+      });
       expect(state.value).toEqual('sandboxOutcome');
 
       state = machine.send({
@@ -413,11 +491,19 @@ describe('Identify Machine Tests', () => {
     });
 
     it('with bootstrap data', () => {
-      const machine = createMachine(false, {
+      const machine = createMachine({
         email: 'piip@onefootprint.com',
       });
-
       let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(false),
+        },
+      });
       expect(state.value).toEqual('sandboxOutcome');
 
       state = machine.send({

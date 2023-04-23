@@ -13,7 +13,7 @@ const Biometric = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier },
-    config,
+    onboarding: { config },
   } = state.context;
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();

@@ -13,11 +13,18 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignValidationToken: 'authorized' | 'initialized';
+    assignInitContext: 'initContextUpdated';
+    assignValidationToken: 'authorized' | 'initContextUpdated';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'authorize' | 'init' | 'requirements' | 'success';
+  matchesStates:
+    | 'authorize'
+    | 'authorized'
+    | 'complete'
+    | 'configInvalid'
+    | 'init'
+    | 'requirements';
   tags: never;
 }

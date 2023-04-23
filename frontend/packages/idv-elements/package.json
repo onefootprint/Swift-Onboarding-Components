@@ -37,6 +37,7 @@
     "i18next": "^22.0.4",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",
+    "lottie-react": "^2.4.0",
     "postmate": "^1.5.2",
     "qrcode.react": "^3.1.0",
     "react-hook-form": "^7.43.5",
