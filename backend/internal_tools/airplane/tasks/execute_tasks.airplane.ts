@@ -17,6 +17,16 @@ export default airplane.task(
       FPC_PRIVATE_PROECTED_TOKEN: { config: 'FPC_PRIVATE_PROECTED_TOKEN' },
       API_URL: { config: 'API_URL' },
     },
+    schedules:
+      process.env.AIRPLANE_ENV_SLUG === 'prod'
+        ? {
+            every_hour: {
+              cron: '0 */1 * * *',
+              description: 'Runs every hour',
+              paramValues: { num_tasks: 50 },
+            },
+          }
+        : {},
   },
   async params => {
     return await protected_custodian_api_call(
