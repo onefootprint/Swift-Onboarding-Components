@@ -21,7 +21,6 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'authorize'
-    | 'authorized'
     | 'complete'
     | 'configInvalid'
     | 'init'

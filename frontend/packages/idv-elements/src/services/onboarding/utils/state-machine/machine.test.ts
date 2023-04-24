@@ -77,7 +77,7 @@ describe('Onboarding Machine Tests', () => {
         validationToken: 'token',
       },
     });
-    expect(state.value).toEqual('authorized');
+    expect(state.value).toEqual('complete');
     expect(state.context).toEqual({
       tenantPk: 'pk',
       userFound: true,
@@ -88,11 +88,6 @@ describe('Onboarding Machine Tests', () => {
       sandboxSuffix: 'sandboxTest',
       validationToken: 'token',
     });
-
-    state = machine.send({
-      type: 'close',
-    });
-    expect(state.value).toEqual('complete');
   });
 
   it('completes the onboarding flow from scratch', () => {
@@ -139,7 +134,7 @@ describe('Onboarding Machine Tests', () => {
         validationToken: 'token',
       },
     });
-    expect(state.value).toEqual('authorized');
+    expect(state.value).toEqual('complete');
     expect(state.context).toEqual({
       tenantPk: 'pk',
       userFound: true,

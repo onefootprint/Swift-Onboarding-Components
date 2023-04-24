@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import DeviceSignals from '../../../../components/device-signals';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Authorize from '../authorize/authorize';
-import Authorized from '../authorized';
 import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import Requirements from '../requirements';
@@ -67,9 +66,6 @@ const Router = ({ onDone }: RouterProps) => {
         <Authorize />
       </DeviceSignals>
     );
-  }
-  if (state.matches('authorized')) {
-    return <Authorized />;
   }
   return null;
 };

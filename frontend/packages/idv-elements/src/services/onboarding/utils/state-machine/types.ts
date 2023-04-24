@@ -34,7 +34,4 @@ export type MachineEvents =
       payload: {
         validationToken: string;
       };
-    }
-  | {
-      type: 'close';
     };

@@ -79,20 +79,13 @@ const createOnboardingMachine = ({
         authorize: {
           on: {
             authorized: {
-              target: 'authorized',
+              target: 'complete',
               actions: ['assignValidationToken'],
             },
           },
         },
         configInvalid: {
           type: 'final',
-        },
-        authorized: {
-          on: {
-            close: {
-              target: 'complete',
-            },
-          },
         },
         complete: {
           type: 'final',

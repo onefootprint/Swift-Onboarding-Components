@@ -11,7 +11,8 @@ import useSendFingerprintPage from './hooks/use-send-fingerprint-page';
 
 type FingerprintProps = SDKIntegrationProps;
 
-if (!FINGERPRINT_API_KEY) {
+const IS_TEST = typeof jest !== 'undefined';
+if (!FINGERPRINT_API_KEY && !IS_TEST) {
   console.warn(
     'Fingerprint API key is not available. Skipping Fingerprint SDK initialization',
   );

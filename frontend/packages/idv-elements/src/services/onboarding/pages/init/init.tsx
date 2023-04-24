@@ -15,7 +15,7 @@ import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';
 
 const Init = () => {
-  const { t } = useTranslation('pages.onboarding.init');
+  const { t } = useTranslation('pages.init');
   const [state, send] = useOnboardingMachine();
   const { authToken, tenantPk } = state.context;
   const onboardingMutation = useOnboarding();

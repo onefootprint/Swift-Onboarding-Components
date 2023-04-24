@@ -1,4 +1,4 @@
-export { default as GenericTransition } from './animations/generic-transition';
+export * from './animations';
 export { default as AppErrorBoundary } from './app-error-boundary';
 export { default as DeviceSignals } from './device-signals';
 export { default as FootprintProvider } from './footprint-provider';

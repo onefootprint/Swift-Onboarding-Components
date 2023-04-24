@@ -1,23 +1,26 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Box, LinkButton } from '@onefootprint/ui';
+import {
+  ConfettiAnimation,
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/idv-elements';
+import { Box, LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
-import { useOnboardingMachine } from '../../components/machine-provider';
-import { isKybCdo } from '../../utils/cdo-utils';
-import ConfettiAnimation from './confetti/confetti';
+import useIdvMachine from '../../hooks/use-idv-machine';
+import useIsKyb from './hooks/use-is-kyb';
 
 const CLOSE_DELAY = 6000;
 
-const Authorized = () => {
+const Complete = () => {
   const { t } = useTranslation('pages.complete');
-  const [state] = useOnboardingMachine();
-  const { validationToken, config, onClose, onComplete } = state.context;
+  const [state] = useIdvMachine();
+  const { isLoading, isKyb } = useIsKyb();
+  const { validationToken, onClose, onComplete } = state.context;
   const [showConfetti, setShowConfetti] = useState(true);
-  const hasKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
 
   useEffectOnce(() => {
     if (validationToken) {
@@ -28,6 +31,10 @@ const Authorized = () => {
   const handleCompleteAnimation = () => {
     setShowConfetti(false);
   };
+
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <>
@@ -41,7 +48,7 @@ const Authorized = () => {
         <HeaderTitle
           sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
           title={t('title')}
-          subtitle={hasKyb ? t('subtitle-with-kyb') : t('subtitle')}
+          subtitle={isKyb ? t('subtitle-with-kyb') : t('subtitle')}
         />
         <Box />
         {onClose && (
@@ -62,4 +69,4 @@ const Container = styled.div`
   position: relative;
 `;
 
-export default Authorized;
+export default Complete;

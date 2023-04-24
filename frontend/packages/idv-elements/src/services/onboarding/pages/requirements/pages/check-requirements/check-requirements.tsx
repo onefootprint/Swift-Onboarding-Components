@@ -16,7 +16,7 @@ import useGetOnboardingStatus from '../../../authorize/hooks/use-get-onboarding-
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const CheckRequirements = () => {
-  const { t } = useTranslation('pages.onboarding.check-requirements');
+  const { t } = useTranslation('pages.check-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken },
