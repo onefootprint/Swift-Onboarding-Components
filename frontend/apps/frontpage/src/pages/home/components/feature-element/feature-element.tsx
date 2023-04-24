@@ -6,17 +6,31 @@ type FeatureElementType = {
   title: React.ReactNode;
   body: React.ReactNode;
   children: React.ReactNode;
+  colorTheme?: 'light' | 'dark';
 };
 
-const FeatureElement = ({ children, title, body }: FeatureElementType) => (
+const FeatureElement = ({
+  children,
+  title,
+  body,
+  colorTheme = 'light',
+}: FeatureElementType) => (
   <Container>
     <TitleContainer>
       {children}
-      <Typography as="h3" color="primary" variant="label-2">
+      <Typography
+        as="h3"
+        color={colorTheme === 'dark' ? 'quinary' : 'primary'}
+        variant="label-2"
+      >
         {title}
       </Typography>
     </TitleContainer>
-    <Typography as="p" color="secondary" variant="body-2">
+    <Typography
+      as="p"
+      color={colorTheme === 'dark' ? 'quinary' : 'secondary'}
+      variant="body-2"
+    >
       {body}
     </Typography>
   </Container>

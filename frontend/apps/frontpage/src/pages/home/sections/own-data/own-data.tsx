@@ -18,6 +18,7 @@ import StripedBackground from '../../components/layout/striped-background';
 const DynamicDesktopIllustration = dynamic(
   () => import('./components/desktop-illustration'),
 );
+
 const DynamicTabletIllustration = dynamic(
   () => import('./components/tablet-illustration'),
 );

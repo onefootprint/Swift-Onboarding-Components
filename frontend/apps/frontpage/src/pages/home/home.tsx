@@ -8,10 +8,10 @@ import Accurate from './sections/accurate';
 import Customizable from './sections/customizable';
 import EverythingYouNeed from './sections/everything-you-need';
 import Hero from './sections/hero';
-import IdentityWallet from './sections/identity-wallet';
 import NewApproach from './sections/new-approach';
 import OwnData from './sections/own-data';
 import PenguinBanner from './sections/penguin-banner';
+import VaultProxy from './sections/vault-proxy';
 
 const NewHome = () => {
   const { t } = useTranslation('pages.home');
@@ -21,14 +21,17 @@ const NewHome = () => {
       <Hero />
       <SectionSpacer data-type="big" />
       <NewApproach />
-      <SectionSpacer />
-      <Customizable />
+
       <SectionSpacer />
       <Accurate />
       <SectionSpacer />
       <OwnData />
       <SectionSpacer />
-      <IdentityWallet />
+      <VaultProxy />
+      {/* <SectionSpacer /> */}
+      {/* <IdentityWallet /> */}
+      <SectionSpacer />
+      <Customizable />
       <SectionSpacer />
       <EverythingYouNeed />
       <PenguinBanner />

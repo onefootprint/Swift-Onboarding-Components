@@ -307,6 +307,25 @@
           "alt": "image of footprint's process for decrypting data"
         }
       },
+      "vault-proxy": {
+        "tag": "New",
+        "title": "Vault Proxy",
+        "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself",
+        "features": {
+          "feature-1": {
+            "title": "Enhanced security",
+            "body": "By using Footprint's single API for vaulting both PII data and custom data, you simplify your data management and minimize the amount of sensitive data stored on your systems, reducing the risk of data breaches and other security incidents."
+          },
+          "feature-2": {
+            "title": "Reduced liability",
+            "body": "By offloading the responsibility of securely storing and managing sensitive data to us, you minimize your exposure to security risks and demonstrate compliance with data privacy regulations."
+          },
+          "feature-3": {
+            "title": "Less money and time",
+            "body": "Protect your sensitive data with our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
+          }
+        }
+      },
       "identity-wallet": {
         "title": "An identity wallet built for transparency",
         "subtitle": "One third of people admit to aborting sign-up due to worry over how their data will be stored. Footprint reduces this by giving people peace of mind over how their data will be handled.",
