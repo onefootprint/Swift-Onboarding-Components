@@ -100,21 +100,21 @@ curl -X POST https://api.onefootprint.com/onboarding/session/validate \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
 ```
 
-Footprint will give you some information from this onboarding session. We’ll also give you a `footprint_user_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`
+Footprint will give you some information from this onboarding session. We’ll also give you a `fp_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`
 
 ```json
 {
-  "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
-  "status": "pass",
-  "requires_manual_review": false,
-  "timestamp": "2022-07-30T05:39:33.723Z",
-  "onboarding_configuration_id": "ob_config_id_k5y4WLMfhtlXlGeFpl5tD9KGtjZilNf"
+  "user": {
+    "fp_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+    "status": "pass",
+    "requires_manual_review": false
+  }
 }
 ```
 
 <inline-alert variant="info">
-  Save the `footprint_user_id` in your database tied to the individual user. It
-  is the identifier you will send to request any user-specific information.
+  Save the `fp_id` in your database tied to the individual user. It is the
+  identifier you will send to request any user-specific information.
 </inline-alert>
 
 ### Check the onboarding decision status
