@@ -1,3 +1,5 @@
+import theme from '@onefootprint/design-tokens';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -10,10 +12,12 @@ import Wallet from './domains/wallet';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <View style={styles.container}>
-      {isClip() ? <AppClip /> : <Wallet />}
-      <StatusBar />
-    </View>
+    <DesignSystemProvider theme={theme.light}>
+      <View style={styles.container}>
+        {isClip() ? <AppClip /> : <Wallet />}
+        <StatusBar />
+      </View>
+    </DesignSystemProvider>
   </QueryClientProvider>
 );
 

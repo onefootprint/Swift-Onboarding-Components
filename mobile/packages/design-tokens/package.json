@@ -1,0 +1,34 @@
+{
+  "name": "@onefootprint/design-tokens",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "require": "./src/index.ts",
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint src --fix",
+    "typecheck": "yarn tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/color": "^3.0.3",
+    "color": "^4.2.3",
+    "csstype": "^3.1.1",
+    "eslint-config-footprint": "*",
+    "polished": "^4.2.2",
+    "style-dictionary": "^3.7.1",
+    "token-transformer": "^0.0.27",
+    "typescript": "4.9.5"
+  }
+}
