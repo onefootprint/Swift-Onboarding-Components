@@ -6,7 +6,7 @@ const useSandboxMode = () => {
   const [state] = useIdvMachine();
   const { tenantPk } = state.context;
 
-  const result = useGetOnboardingConfig(tenantPk);
+  const result = useGetOnboardingConfig(tenantPk ?? '');
   if (result.isLoading) {
     return false;
   }

@@ -8,15 +8,14 @@ import useSandboxMode from './hooks/use-sandbox-mode';
 type IdvLayoutProps = {
   children: React.ReactNode;
   options: IdvLayout;
-  onClose: () => void;
 };
 
-const AppLayout = ({ children, options, onClose }: IdvLayoutProps) => {
+const AppLayout = ({ children, options }: IdvLayoutProps) => {
   const isSandbox = useSandboxMode();
   const [state] = useIdvMachine();
-  const { tenantPk } = state.context;
+  const { tenantPk, onClose } = state.context;
 
-  return (
+  return tenantPk ? (
     <Layout
       tenantPk={tenantPk}
       isSandbox={isSandbox}
@@ -25,7 +24,7 @@ const AppLayout = ({ children, options, onClose }: IdvLayoutProps) => {
     >
       {children}
     </Layout>
-  );
+  ) : null;
 };
 
 export default AppLayout;

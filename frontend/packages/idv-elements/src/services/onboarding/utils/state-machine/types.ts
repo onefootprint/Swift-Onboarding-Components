@@ -10,6 +10,8 @@ export type MachineContext = {
   device?: DeviceInfo;
   userFound?: boolean;
   validationToken?: string;
+  onClose?: () => void;
+  onComplete?: (validationToken: string, delay?: number) => void;
 };
 
 export type MachineEvents =

@@ -4,6 +4,7 @@ import {
   Identify,
   Onboarding,
 } from '@onefootprint/idv-elements';
+import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
@@ -11,12 +12,13 @@ import useIdvMachine from '../../hooks/use-idv-machine';
 const Router = () => {
   const [state, send] = useIdvMachine();
   const {
-    bootstrapData,
+    userData,
     tenantPk,
     sandboxSuffix,
     authToken,
-    email,
     userFound,
+    onClose,
+    onComplete,
   } = state.context;
   useLogStateMachine('idv', state);
 
@@ -28,7 +30,10 @@ const Router = () => {
     >
       {state.matches('identify') && (
         <Identify
-          bootstrapData={bootstrapData}
+          bootstrapData={{
+            email: userData?.[UserDataAttribute.email],
+            phoneNumber: userData?.[UserDataAttribute.phoneNumber],
+          }}
           tenantPk={tenantPk}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
@@ -40,10 +45,10 @@ const Router = () => {
           userFound={userFound}
           tenantPk={tenantPk}
           authToken={authToken}
-          userData={{
-            email,
-          }}
+          userData={userData}
           sandboxSuffix={sandboxSuffix}
+          onClose={onClose}
+          onComplete={onComplete}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
           }}

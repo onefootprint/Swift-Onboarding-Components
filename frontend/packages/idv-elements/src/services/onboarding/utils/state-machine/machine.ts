@@ -10,6 +10,8 @@ export type OnboardingMachineArgs = {
   userData?: UserData;
   sandboxSuffix?: string; // only if in sandbox mode
   userFound?: boolean;
+  onClose?: () => void;
+  onComplete?: (validationToken: string, delay?: number) => void;
 };
 
 const createOnboardingMachine = ({
@@ -18,6 +20,8 @@ const createOnboardingMachine = ({
   userData,
   sandboxSuffix,
   userFound,
+  onClose,
+  onComplete,
 }: OnboardingMachineArgs) =>
   createMachine(
     {
@@ -35,6 +39,8 @@ const createOnboardingMachine = ({
         userData: userData ?? {},
         sandboxSuffix,
         userFound,
+        onClose,
+        onComplete,
       },
       states: {
         init: {

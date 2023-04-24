@@ -1,4 +1,5 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js';
+import { UserData } from '@onefootprint/types';
 
 export type IdvProps = {
   data: IdvData;
@@ -8,13 +9,14 @@ export type IdvProps = {
 };
 
 export type IdvCallbacks = {
-  onClose: () => void;
-  onComplete: (validationToken: string, delay?: number) => void;
+  onClose?: () => void;
+  onComplete?: (validationToken: string, delay?: number) => void;
 };
 
 export type IdvData = {
-  tenantPk: string;
-  bootstrapData?: BootstrapData;
+  authToken?: string;
+  tenantPk?: string;
+  userData?: UserData;
 };
 
 export type IdvLayout = {
@@ -28,10 +30,4 @@ export type IdvLayout = {
   container: {
     hasBorderRadius?: boolean;
   };
-  canClose?: boolean;
-};
-
-export type BootstrapData = {
-  email?: string;
-  phoneNumber?: string;
 };

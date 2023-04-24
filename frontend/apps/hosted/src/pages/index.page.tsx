@@ -1,14 +1,11 @@
 import Idv from '@onefootprint/idv';
+import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
 /*
   TODO: CONTENTS BELOW ARE PLACEHOLDERS ONLY
 */
 const Root = () => {
-  const onClose = () => {
-    console.log('closed');
-  };
-
   const onComplete = () => {
     console.log('completed');
   };
@@ -17,9 +14,9 @@ const Root = () => {
     <Idv
       data={{
         tenantPk: 'ob_test_tFKxgkVoZrFTEU05tnSVtW',
-        bootstrapData: {
-          email: 'belce@onefootprint.com',
-          phoneNumber: '+16504600700',
+        userData: {
+          [UserDataAttribute.email]: 'belce@onefootprint.com',
+          [UserDataAttribute.phoneNumber]: '+16504600700',
         },
       }}
       layout={{
@@ -32,9 +29,8 @@ const Root = () => {
         container: {
           hasBorderRadius: true,
         },
-        canClose: false,
       }}
-      callbacks={{ onClose, onComplete }}
+      callbacks={{ onComplete }}
     />
   );
 };

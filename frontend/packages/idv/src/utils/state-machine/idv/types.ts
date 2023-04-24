@@ -1,15 +1,15 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
-
-import { BootstrapData } from '../../../types';
+import { OnboardingConfig, UserData } from '@onefootprint/types';
 
 export type MachineContext = {
   // Inputs
-  tenantPk: string;
-  bootstrapData?: BootstrapData;
-  // Generated
+  tenantPk?: string;
   authToken?: string;
-  email?: string;
+  // TODO: belce migrate this to use new DIs
+  userData?: UserData;
+  onClose?: () => void;
+  onComplete?: (validationToken: string, delay?: number) => void;
+  // Generated
   validationToken?: string;
   sandboxSuffix?: string;
   userFound?: boolean;

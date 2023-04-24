@@ -13,15 +13,21 @@ import Router from './pages/router';
 import { IdvProps } from './types';
 
 const App = ({ data, appearance, layout, callbacks }: IdvProps) => {
-  const { tenantPk, bootstrapData } = data;
+  const { tenantPk, userData, authToken } = data;
   useExtendedAppearance(appearance);
 
   return (
     <>
       <I18nextProvider i18n={configureI18next()}>
-        <MachineProvider tenantPk={tenantPk} bootstrapData={bootstrapData}>
+        <MachineProvider
+          tenantPk={tenantPk}
+          userData={userData}
+          authToken={authToken}
+          onComplete={callbacks.onComplete}
+          onClose={callbacks.onClose}
+        >
           <GlobalStyle />
-          <Layout options={layout} onClose={callbacks.onClose}>
+          <Layout options={layout}>
             <Router />
           </Layout>
         </MachineProvider>

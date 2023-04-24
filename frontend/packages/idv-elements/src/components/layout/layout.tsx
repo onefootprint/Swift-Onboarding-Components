@@ -21,7 +21,7 @@ type LayoutProps = {
   tenantPk: string;
   isSandbox?: boolean;
   options: LayoutOptions;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 const Layout = ({

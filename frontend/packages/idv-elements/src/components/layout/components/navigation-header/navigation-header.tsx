@@ -13,10 +13,7 @@ import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
 import { NavigationHeaderProps } from './types';
 
 const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
-  const {
-    layout: { canClose },
-    onClose,
-  } = useLayoutOptions();
+  const { onClose } = useLayoutOptions();
   const isStatic = content?.kind === 'static';
   const staticTitle = isStatic ? content?.title : undefined;
   const [dynamicTitle, setDynamicTitle] = useState<string | undefined>();
@@ -84,8 +81,7 @@ const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
     intersectionObserver.observe(headerTitle);
   };
 
-  const shouldShowClose =
-    button?.variant === 'close' && !!canClose && !!onClose;
+  const shouldShowClose = button?.variant === 'close' && !!onClose;
   const shouldShowBack = button?.variant === 'back' && !shouldShowClose;
 
   return (

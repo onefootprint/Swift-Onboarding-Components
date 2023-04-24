@@ -9,5 +9,4 @@ export type LayoutOptions = {
   container: {
     hasBorderRadius?: boolean;
   };
-  canClose?: boolean;
 };

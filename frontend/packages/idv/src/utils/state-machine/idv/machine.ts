@@ -1,18 +1,22 @@
+import { UserData, UserDataAttribute } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { BootstrapData } from '../../../types';
 import { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
   authToken?: string;
-  tenantPk: string;
-  bootstrapData?: BootstrapData;
+  tenantPk?: string;
+  userData?: UserData;
+  onClose?: () => void;
+  onComplete?: (validationToken: string, delay?: number) => void;
 };
 
 const createIdvMachine = ({
   authToken,
   tenantPk,
-  bootstrapData,
+  userData,
+  onClose,
+  onComplete,
 }: IdvMachineArgs) =>
   createMachine(
     {
@@ -27,7 +31,9 @@ const createIdvMachine = ({
       context: {
         authToken,
         tenantPk,
-        bootstrapData,
+        userData,
+        onClose,
+        onComplete,
       },
       on: {
         reset: {
@@ -89,7 +95,6 @@ const createIdvMachine = ({
       actions: {
         resetContext: assign(context => ({
           tenantPk: context.tenantPk,
-          bootstrapData: context.bootstrapData,
         })),
         assignSandboxOutcome: assign((context, event) => ({
           ...context,
@@ -101,7 +106,10 @@ const createIdvMachine = ({
         })),
         assignEmail: assign((context, event) => ({
           ...context,
-          email: event.payload.email,
+          userData: {
+            ...userData,
+            [UserDataAttribute.email]: event.payload.email,
+          },
         })),
         assignAuthToken: assign((context, event) => {
           const { authToken: newAuthToken } = event.payload;

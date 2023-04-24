@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Box } from '@onefootprint/ui';
+import { Box, LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
@@ -15,27 +15,15 @@ const CLOSE_DELAY = 6000;
 const Authorized = () => {
   const { t } = useTranslation('pages.complete');
   const [state] = useOnboardingMachine();
-  // TODO: belce
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { validationToken, config } = state.context;
-  // const {
-  //   callbacks: { onComplete, onClose },
-  //   layout: { canClose },
-  // } = useAppContext();
+  const { validationToken, config, onClose, onComplete } = state.context;
   const [showConfetti, setShowConfetti] = useState(true);
   const hasKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
 
   useEffectOnce(() => {
-    handleComplete(CLOSE_DELAY);
+    if (validationToken) {
+      onComplete?.(validationToken, CLOSE_DELAY);
+    }
   });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleComplete = (closeDelay?: number) => {
-    // TODO: belce
-    // if (validationToken) {
-    //   onComplete(validationToken, closeDelay);
-    // }
-  };
 
   const handleCompleteAnimation = () => {
     setShowConfetti(false);
@@ -56,12 +44,11 @@ const Authorized = () => {
           subtitle={hasKyb ? t('subtitle-with-kyb') : t('subtitle')}
         />
         <Box />
-        {/* TODO: belce */}
-        {/* {canClose && onClose && (
+        {onClose && (
           <LinkButton sx={{ marginTop: 7 }} onClick={onClose}>
             {t('cta')}
           </LinkButton>
-        )} */}
+        )}
       </Container>
     </>
   );
