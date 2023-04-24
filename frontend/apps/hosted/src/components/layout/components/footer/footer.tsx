@@ -1,5 +1,5 @@
-import { SecuredByFootprint } from '@onefootprint/footprint-elements';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
+import { SecuredByFootprint } from '@onefootprint/idv-elements';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';

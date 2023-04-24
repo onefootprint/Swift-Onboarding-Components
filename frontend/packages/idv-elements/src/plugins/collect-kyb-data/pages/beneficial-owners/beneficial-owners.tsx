@@ -3,7 +3,7 @@ import { BusinessDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import HeaderTitle from '../../../../components/header-title';
+import { HeaderTitle } from '../../../../components';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';

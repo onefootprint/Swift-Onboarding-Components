@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FootprintNavigationHeader from '../../../../components/navigation-header';
+import { NavigationHeader as FootprintNavigationHeader } from '../../../../components';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import getCurrentStepFromMissingAttributes from './utils/current-step-from-missing-attributes';
 
@@ -21,7 +21,7 @@ const NavigationHeader = () => {
     <FootprintNavigationHeader
       button={{
         confirmClose: shouldShowCloseButton,
-        onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
+        onBack: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',
       }}
     />

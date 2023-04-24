@@ -2,8 +2,7 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../header-title';
-import NavigationHeader from '../navigation-header';
+import { HeaderTitle, NavigationHeader } from '../layout';
 
 type ConfirmCollectedDataProps = {
   title: string;
@@ -25,7 +24,7 @@ const ConfirmCollectedData = ({
   children,
 }: ConfirmCollectedDataProps) => (
   <>
-    <NavigationHeader button={{ variant: 'back', onClick: onClickPrev }} />
+    <NavigationHeader button={{ variant: 'back', onBack: onClickPrev }} />
     <Container>
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>

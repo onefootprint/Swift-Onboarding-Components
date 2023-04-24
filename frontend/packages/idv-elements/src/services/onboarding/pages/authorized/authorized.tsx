@@ -5,8 +5,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import HeaderTitle from '../../../../components/header-title';
-import NavigationHeader from '../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import { isKybCdo } from '../../utils/cdo-utils';
 import ConfettiAnimation from './confetti/confetti';

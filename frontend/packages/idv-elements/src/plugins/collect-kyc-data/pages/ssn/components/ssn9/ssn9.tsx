@@ -6,9 +6,8 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../../components/header-title';
+import { HeaderTitle, NavigationHeader } from '../../../../../../components';
 import InfoBox from '../../../../../../components/info-box';
-import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { SSN9Information } from '../../../../utils/data-types';
 

@@ -1,8 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import HeaderTitle from '../../../../../../components/header-title';
-import NavigationHeader from '../../../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../../../components';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const Header = () => {
@@ -18,7 +17,7 @@ const Header = () => {
       <NavigationHeader
         button={{
           variant: 'back',
-          onClick: handleNavToPrevPage,
+          onBack: handleNavToPrevPage,
         }}
       />
       <HeaderTitle

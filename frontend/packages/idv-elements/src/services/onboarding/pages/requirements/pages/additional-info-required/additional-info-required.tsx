@@ -3,8 +3,7 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../../components/header-title';
-import NavigationHeader from '../../../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../../../components';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
 const AdditionalInfoRequired = () => {

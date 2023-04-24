@@ -8,8 +8,7 @@ import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import HeaderTitle from '../../../../../../components/header-title';
-import NavigationHeader from '../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../../../components';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useSyncEmail from '../../../../hooks/use-sync-email';
 

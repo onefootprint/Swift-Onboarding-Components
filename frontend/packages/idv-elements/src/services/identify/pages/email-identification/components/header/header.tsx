@@ -1,8 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import HeaderTitle from '../../../../../../components/header-title';
-import NavigationHeader from '../../../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../../../components';
 
 const Header = () => {
   const { t } = useTranslation('pages.email-identification.header');

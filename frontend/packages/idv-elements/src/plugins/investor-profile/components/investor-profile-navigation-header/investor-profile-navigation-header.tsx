@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FootprintNavigationHeader from '../../../../components/navigation-header';
+import { NavigationHeader } from '../../../../components';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 
 const InvestorProfileNavigationHeader = () => {
@@ -12,10 +12,10 @@ const InvestorProfileNavigationHeader = () => {
   };
 
   return (
-    <FootprintNavigationHeader
+    <NavigationHeader
       button={{
         confirmClose: shouldShowCloseButton,
-        onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
+        onBack: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',
       }}
     />

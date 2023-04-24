@@ -5,8 +5,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../components/header-title';
-import NavigationHeader from '../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
 import parseTestID from './utils/parse-suffix';

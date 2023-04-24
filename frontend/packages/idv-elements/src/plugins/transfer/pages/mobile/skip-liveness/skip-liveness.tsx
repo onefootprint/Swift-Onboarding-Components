@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import NavigationHeader from '../../../../../components/navigation-header';
+import { NavigationHeader } from '../../../../../components';
 import { useSkipLiveness } from '../../../../../hooks';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 

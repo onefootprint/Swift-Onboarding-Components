@@ -3,8 +3,7 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import HeaderTitle from '../../../../components/header-title';
-import NavigationHeader from '../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BasicInformation as BasicInformationData } from '../../utils/data-types';

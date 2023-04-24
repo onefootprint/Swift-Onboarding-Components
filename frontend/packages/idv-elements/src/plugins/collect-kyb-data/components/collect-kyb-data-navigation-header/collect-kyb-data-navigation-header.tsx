@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FootprintNavigationHeader from '../../../../components/navigation-header';
+import { NavigationHeader } from '../../../../components';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const CollectKybDataNavigationHeader = () => {
@@ -12,10 +12,10 @@ const CollectKybDataNavigationHeader = () => {
   };
 
   return (
-    <FootprintNavigationHeader
+    <NavigationHeader
       button={{
         confirmClose: shouldShowCloseButton,
-        onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
+        onBack: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',
       }}
     />

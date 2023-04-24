@@ -32,9 +32,7 @@ const IdDocFrontPhoto = () => {
 
   return (
     <>
-      <NavigationHeader
-        button={{ variant: 'back', onClick: handleClickBack }}
-      />{' '}
+      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />{' '}
       <IdDocPhotoPrompt
         iconComponent={IcoIdFront40}
         showGuidelines

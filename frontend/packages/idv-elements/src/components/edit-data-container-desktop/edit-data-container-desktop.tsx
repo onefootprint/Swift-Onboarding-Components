@@ -2,7 +2,7 @@ import { Divider } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import NavigationHeader from '../navigation-header';
+import { NavigationHeader } from '../layout';
 
 type EditDataContainerDesktopProps = {
   title: string;
@@ -17,7 +17,7 @@ const EditDataContainerDesktop = ({
 }: EditDataContainerDesktopProps) => (
   <>
     <NavigationHeader
-      button={{ variant: 'back', onClick: onClickPrev }}
+      button={{ variant: 'back', onBack: onClickPrev }}
       content={{ kind: 'static', title }}
     />
     <StyledDivider />

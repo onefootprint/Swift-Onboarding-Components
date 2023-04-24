@@ -2,8 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../components/header-title';
-import NavigationHeader from '../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import LegalFooter from '../../components/legal-footer';
 import LoginChallenge from '../../components/login-challenge';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

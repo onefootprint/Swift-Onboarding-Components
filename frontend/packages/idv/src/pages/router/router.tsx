@@ -1,13 +1,12 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
 import {
-  useLogStateMachine,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
-import { Identify, Onboarding } from '@onefootprint/idv-elements';
+  AppErrorBoundary,
+  Identify,
+  Onboarding,
+} from '@onefootprint/idv-elements';
 import React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
-import Error from '../error';
 
 const Router = () => {
   const [state, send] = useIdvMachine();
@@ -19,15 +18,10 @@ const Router = () => {
     email,
     userFound,
   } = state.context;
-  const observeCollector = useObserveCollector();
   useLogStateMachine('idv', state);
 
   return (
-    <ErrorBoundary
-      FallbackComponent={Error}
-      onError={(error, stack) => {
-        observeCollector.logError('error', error, { stack });
-      }}
+    <AppErrorBoundary
       onReset={() => {
         send({ type: 'reset' });
       }}
@@ -55,7 +49,7 @@ const Router = () => {
           }}
         />
       )}
-    </ErrorBoundary>
+    </AppErrorBoundary>
   );
 };
 

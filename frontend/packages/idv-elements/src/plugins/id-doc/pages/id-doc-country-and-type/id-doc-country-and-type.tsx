@@ -22,8 +22,7 @@ import {
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { NavigationHeader } from '../../../../components';
-import HeaderTitle from '../../../../components/header-title';
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useIdDocMachine } from '../../components/machine-provider';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
 

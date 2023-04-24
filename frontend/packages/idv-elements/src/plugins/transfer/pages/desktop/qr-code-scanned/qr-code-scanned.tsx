@@ -3,8 +3,7 @@ import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../components/header-title';
-import NavigationHeader from '../../../../../components/navigation-header';
+import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import { useGetD2PStatus } from '../../../../../hooks';
 import useCancelD2P from '../../../hooks/desktop/use-cancel-d2p';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';

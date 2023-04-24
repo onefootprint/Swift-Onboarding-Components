@@ -20,8 +20,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import { FootprintProvider } from 'src/components';
-import NavigationHeaderContainer from 'src/components/navigation-header/components/navigation-header-container';
+import { FootprintProvider, Layout } from 'src/components';
 
 import { CollectKycDataProps } from './collect-kyc-data.types';
 import CollectKycData from './index';
@@ -57,8 +56,17 @@ describe('Collect KYC Data', () => {
             <DesignSystemProvider theme={themes.light}>
               <FootprintProvider client={null as any}>
                 <ToastProvider>
-                  <NavigationHeaderContainer containerId="layout-container" />
-                  <CollectKycData context={context} onDone={onDone} />
+                  <Layout
+                    tenantPk="pk"
+                    options={{
+                      header: {},
+                      footer: {},
+                      container: {},
+                    }}
+                    onClose={() => {}}
+                  >
+                    <CollectKycData context={context} onDone={onDone} />
+                  </Layout>
                 </ToastProvider>
               </FootprintProvider>
             </DesignSystemProvider>

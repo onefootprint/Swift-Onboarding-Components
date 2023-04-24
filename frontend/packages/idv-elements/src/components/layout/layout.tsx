@@ -4,26 +4,34 @@ import React, { useCallback, useState } from 'react';
 import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
-import FootprintFooter from '../footprint-footer';
-import NavigationHeaderContainer from '../navigation-header/components/navigation-header-container';
-import SandboxBanner, { SandboxBannerHandler } from '../sandbox-banner';
+import FootprintFooter from './components/footprint-footer';
+import LayoutOptionsProvider from './components/layout-options-provider/layout-options-provider';
+import NavigationHeaderContainer from './components/navigation-header/components/navigation-header-container';
+import SandboxBanner, {
+  SandboxBannerHandler,
+} from './components/sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
+import { LayoutOptions } from './types';
+
+export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
+const SHIMMER_HEIGHT = '296px';
 
 type LayoutProps = {
   children: React.ReactNode;
-  footerVariant: 'modal' | 'mobile';
+  tenantPk: string;
   isSandbox?: boolean;
-  hasBorderRadius?: boolean;
+  options: LayoutOptions;
+  onClose: () => void;
 };
-
-const SHIMMER_HEIGHT = '296px';
 
 const Layout = ({
   children,
-  footerVariant,
+  tenantPk,
   isSandbox,
-  hasBorderRadius = false,
+  options,
+  onClose,
 }: LayoutProps) => {
+  const { header, footer, container } = options;
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 
@@ -38,27 +46,41 @@ const Layout = ({
   }, []);
 
   return (
-    <Container id={LAYOUT_CONTAINER_ID} hasBorderRadius={hasBorderRadius}>
-      <DialogContent>
-        <Header id={LAYOUT_HEADER_ID}>
-          {isSandbox && <SandboxBanner ref={measuredRef} />}
-          <NavigationHeaderContainer
-            top={isSandbox ? sandboxBannerHeight : undefined}
-            containerId={LAYOUT_CONTAINER_ID}
+    <LayoutOptionsProvider layout={options} onClose={onClose}>
+      <Container
+        id={LAYOUT_CONTAINER_ID}
+        hasBorderRadius={!!container.hasBorderRadius}
+      >
+        <DialogContent>
+          <Header id={LAYOUT_HEADER_ID}>
+            {isSandbox && (
+              <SandboxBanner
+                ref={measuredRef}
+                hideOnDesktop={header.hideDesktopSandboxBanner}
+              />
+            )}
+            <NavigationHeaderContainer
+              top={sandboxBannerHeight}
+              containerId={LAYOUT_CONTAINER_ID}
+            />
+          </Header>
+          <Body
+            animate={{ height: bodyHeight || SHIMMER_HEIGHT }}
+            transition={{
+              duration: 0.15,
+              type: 'spring',
+            }}
+          >
+            <BodyContent ref={refBody}>{children}</BodyContent>
+          </Body>
+          <FootprintFooter
+            variant={footer.footerVariant}
+            hideOnDesktop={footer.hideDesktopFooter}
+            tenantPk={tenantPk}
           />
-        </Header>
-        <Body
-          animate={{ height: bodyHeight || SHIMMER_HEIGHT }}
-          transition={{
-            duration: 0.15,
-            type: 'spring',
-          }}
-        >
-          <BodyContent ref={refBody}>{children}</BodyContent>
-        </Body>
-        <FootprintFooter variant={footerVariant} />
-      </DialogContent>
-    </Container>
+        </DialogContent>
+      </Container>
+    </LayoutOptionsProvider>
   );
 };
 
@@ -115,7 +137,6 @@ const Header = styled.div`
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};
-    flex: 0;
   `}
 `;
 
