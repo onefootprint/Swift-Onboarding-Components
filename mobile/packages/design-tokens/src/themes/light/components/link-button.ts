@@ -38,23 +38,23 @@ const linkButton: LinkButton = {
   },
   size: {
     default: {
-      height: t.linkButtonSizingDefault,
+      height: `${t.linkButtonSizingDefault}px`,
       typography: t.linkButtonTypographyDefault,
     },
     compact: {
-      height: t.linkButtonSizingCompact,
+      height: `${t.linkButtonSizingCompact}px`,
       typography: t.linkButtonTypographyCompact,
     },
     tiny: {
-      height: t.linkButtonSizingTiny,
+      height: `${t.linkButtonSizingTiny}px`,
       typography: t.linkButtonTypographyTiny,
     },
     xTiny: {
-      height: t.linkButtonSizingXTiny,
+      height: `${t.linkButtonSizingXTiny}px`,
       typography: t.linkButtonTypographyXTiny,
     },
     xxTiny: {
-      height: t.linkButtonSizingXxTiny,
+      height: `${t.linkButtonSizingXxTiny}px`,
       typography: t.linkButtonTypographyXxTiny,
     },
   },
