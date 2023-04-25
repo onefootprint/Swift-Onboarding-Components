@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavigationHeader } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const CollectKybDataNavigationHeader = () => {

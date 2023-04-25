@@ -4,7 +4,8 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, InfoBox } from '../../../../components';
+import InfoBox from '../../../../components/info-box';
+import HeaderTitle from '../../../../components/layout/components/header-title';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
