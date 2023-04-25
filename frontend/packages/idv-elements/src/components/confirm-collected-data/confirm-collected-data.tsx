@@ -2,7 +2,8 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../layout';
+import HeaderTitle from '../layout/components/header-title';
+import NavigationHeader from '../layout/components/navigation-header';
 
 type ConfirmCollectedDataProps = {
   title: string;

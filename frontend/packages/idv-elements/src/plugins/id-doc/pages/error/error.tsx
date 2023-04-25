@@ -4,7 +4,8 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 

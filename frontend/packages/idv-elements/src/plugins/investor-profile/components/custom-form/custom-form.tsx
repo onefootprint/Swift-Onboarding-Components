@@ -2,7 +2,7 @@ import { media } from '@onefootprint/ui';
 import React, { FormHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
 import ContinueButton from './components/continue-button';
 import Error from './components/error';
 

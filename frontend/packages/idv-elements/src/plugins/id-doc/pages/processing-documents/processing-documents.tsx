@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import Error from './components/error';
 import Loading from './components/loading/loading';

@@ -12,8 +12,7 @@ import {
   OnboardingConfig,
   UserData,
 } from '@onefootprint/types';
-import { DesignSystemProvider } from '@onefootprint/ui';
-import ToastProvider from '@onefootprint/ui/src/components/toast/toast-provider';
+import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
   QueryCache,
   QueryClient,

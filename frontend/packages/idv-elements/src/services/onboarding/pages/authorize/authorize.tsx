@@ -10,7 +10,8 @@ import { Divider, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import {
   isDocCdo,

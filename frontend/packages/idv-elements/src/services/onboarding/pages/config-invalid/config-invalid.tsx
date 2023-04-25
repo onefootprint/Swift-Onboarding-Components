@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 
 const ConfigInvalid = () => {
   const { t } = useTranslation('pages.config-invalid');

@@ -4,7 +4,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../../components';
+import HeaderTitle from '../../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
 import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';

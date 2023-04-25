@@ -2,7 +2,8 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import LoginChallenge from '../../components/login-challenge';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import SignupChallenge from './components/signup-challenge';

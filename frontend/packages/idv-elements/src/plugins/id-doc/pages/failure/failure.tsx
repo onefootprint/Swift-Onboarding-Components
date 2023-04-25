@@ -2,7 +2,8 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import styled from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 
 const Failure = () => {
   const { t } = useTranslation('pages.failure');

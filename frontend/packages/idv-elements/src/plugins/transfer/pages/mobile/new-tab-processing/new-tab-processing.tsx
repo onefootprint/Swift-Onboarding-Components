@@ -3,7 +3,8 @@ import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle, NavigationHeader } from '../../../../../components';
+import HeaderTitle from '../../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import useCancelNewTab from '../../../hooks/mobile/use-cancel-new-tab';
 import useNewTabStatusUpdate from '../../../hooks/mobile/use-new-tab-status-update';
 

@@ -12,15 +12,15 @@ import {
   OnboardingConfig,
   UserData,
 } from '@onefootprint/types';
-import { DesignSystemProvider } from '@onefootprint/ui';
-import ToastProvider from '@onefootprint/ui/src/components/toast/toast-provider';
+import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
   QueryCache,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import { FootprintProvider, Layout } from 'src/components';
+import FootprintProvider from 'src/components/footprint-provider';
+import { Layout } from 'src/components/layout';
 
 import { CollectKycDataProps } from './collect-kyc-data.types';
 import CollectKycData from './index';
