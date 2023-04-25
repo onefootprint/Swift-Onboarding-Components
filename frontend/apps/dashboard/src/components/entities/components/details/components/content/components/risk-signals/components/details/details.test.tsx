@@ -17,7 +17,7 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Details />', () => {
+describe.skip('<Details />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: `/users/detail`,

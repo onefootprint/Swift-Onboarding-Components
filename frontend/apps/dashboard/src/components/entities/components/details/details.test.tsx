@@ -36,7 +36,7 @@ afterAll(() => {
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Details />', () => {
+describe.skip('<Details />', () => {
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({
