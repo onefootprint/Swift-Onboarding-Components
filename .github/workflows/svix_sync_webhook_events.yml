@@ -23,7 +23,7 @@ jobs:
   svix_event_sync:
     runs-on: beast
     # by default deploy to production as triggered
-    environment: ${{ inputs.environment || "production" }}
+    environment: ${{ inputs.environment || production }}
     steps:
       - uses: actions/checkout@v3
 
