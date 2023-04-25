@@ -95,6 +95,27 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    /// List the set of businesses belonging to this user onboarded onto the provided ob config
+    pub fn list_businesses(
+        conn: &mut PgConn,
+        uv_id: &VaultId,
+        ob_config_id: &ObConfigurationId,
+    ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Onboarding))>> {
+        use crate::schema::{onboarding, scoped_vault};
+        let result = business_owner::table
+            .inner_join(
+                scoped_vault::table
+                    .on(scoped_vault::vault_id.eq(business_owner::business_vault_id))
+                    .inner_join(onboarding::table),
+            )
+            .filter(business_owner::user_vault_id.eq(uv_id))
+            // Only get the ScopedVault for the businesses that onboarded onto the
+            // same ob config
+            .filter(scoped_vault::ob_configuration_id.eq(ob_config_id))
+            .get_results(conn)?;
+        Ok(result)
+    }
+
     pub fn get(conn: &mut PgConn, id: &BoId) -> DbResult<Self> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))

@@ -64,7 +64,7 @@ pub async fn post(
     // we should display to the client an ability to select the business they want to use
     let should_create_new_business_vault =
         ob_config.must_collect_business() && !UserAuthGuard::Business.is_met(&user_auth.scopes);
-    let new_business_keypair = if should_create_new_business_vault {
+    let maybe_new_biz_keypair = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         Some(state.enclave_client.generate_sealed_keypair().await?)
     } else {
@@ -98,38 +98,51 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            if let Some(new_business_keypair) = new_business_keypair {
-                let (public_key, e_private_key) = new_business_keypair;
-                let args = NewVaultArgs {
-                    public_key,
-                    e_private_key,
-                    is_live: user_vault.is_live,
-                    is_portable: true,
-                    kind: VaultKind::Business,
+            let is_business_authorized = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
+                let existing_businesses =
+                    BusinessOwner::list_businesses(conn, &user_vault.id, &ob_config.id)?;
+                let (sb, ob) = if let Some(existing) = existing_businesses.into_iter().next() {
+                    // If the user has already started onboarding their business onto this exact
+                    // ob config, we should locate it.
+                    // Note, this isn't quite portablizing the business since we only locate it
+                    // when onboarding onto the exact same ob config
+                    existing.1
+                } else {
+                    let (public_key, e_private_key) = maybe_new_biz_keypair;
+                    let args = NewVaultArgs {
+                        public_key,
+                        e_private_key,
+                        is_live: user_vault.is_live,
+                        is_portable: true,
+                        kind: VaultKind::Business,
+                    };
+                    let business_vault = Vault::create(conn, args)?;
+                    BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
+                    let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
+                        ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
+                    })?;
+                    let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
+                    let ob_create_args = OnboardingCreateArgs {
+                        scoped_vault_id: sb.id.clone(),
+                        ob_configuration_id: ob_config.id.clone(),
+                        insight_event: insight_event.clone(),
+                    };
+                    let (ob, _) = Onboarding::get_or_create(conn, ob_create_args)?;
+                    (sb, ob)
                 };
-                // TODO don't create a business vault for this onboarding if is authorized
-                let business_vault = Vault::create(conn, args)?;
-                BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
-                let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
-                    ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
-                })?;
-                let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
-                let ob_create_args = OnboardingCreateArgs {
-                    scoped_vault_id: sb.id.clone(),
-                    ob_configuration_id: ob_config.id.clone(),
-                    insight_event: insight_event.clone(),
-                };
-                Onboarding::get_or_create(conn, ob_create_args)?;
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
                 let new_scope = UserAuthScope::Business(sb.id);
                 let data = user_auth.data.clone().add_scopes(vec![new_scope]);
                 user_auth.update_session(conn, &session_key, data)?;
-            }
+                ob.authorized_at.is_some()
+            } else {
+                true
+            };
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token = ob
-                .authorized_at
-                .map(|_| create_onboarding_validation_token(conn, &session_key, ob.id))
+            let is_user_authorized = ob.authorized_at.is_some();
+            let validation_token = (is_user_authorized && is_business_authorized)
+                .then(|| create_onboarding_validation_token(conn, &session_key, ob.id))
                 .transpose()?;
 
             Ok(validation_token)

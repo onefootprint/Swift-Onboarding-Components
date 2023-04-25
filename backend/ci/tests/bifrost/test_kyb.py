@@ -122,3 +122,17 @@ def test_put_business_vault_not_authorized(sandbox_tenant, twilio):
     auth_token = bifrost.auth_token
     # Can't hit PUT /hosted/business/vault without a business vault
     put("hosted/business/vault", {}, auth_token, status_code=401)
+
+
+def test_one_click_kyb(kyb_sandbox_ob_config, twilio):
+    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    user = bifrost.run()
+
+    phone_number = bifrost.data["id.phone_number"]
+    bifrost2 = BifrostClient(
+        kyb_sandbox_ob_config, twilio, override_inherit_phone=phone_number
+    )
+    user2 = bifrost2.run()
+    assert user.fp_id == user2.fp_id
+    assert user.fp_bid
+    assert user.fp_bid == user2.fp_bid
