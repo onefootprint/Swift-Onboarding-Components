@@ -26,24 +26,23 @@ import { CollectKycDataProps } from './collect-kyc-data.types';
 import CollectKycData from './index';
 import { withUserVault, withUserVaultValidate } from './index.test.config';
 
-const useRouterSpy = createUseRouterSpy();
-
-const queryCache = new QueryCache();
-const queryClient = new QueryClient({
-  queryCache,
-  logger: {
-    log: () => {},
-    warn: () => {},
-    error: () => {},
-  },
-  defaultOptions: {
-    queries: {
-      retry: false,
+describe('<CollectKycData />', () => {
+  const useRouterSpy = createUseRouterSpy();
+  const queryCache = new QueryCache();
+  const queryClient = new QueryClient({
+    queryCache,
+    logger: {
+      log: () => {},
+      warn: () => {},
+      error: () => {},
     },
-  },
-});
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
 
-describe('Collect KYC Data', () => {
   beforeEach(() => {
     queryCache.clear();
   });
@@ -56,15 +55,7 @@ describe('Collect KYC Data', () => {
             <DesignSystemProvider theme={themes.light}>
               <FootprintProvider client={null as any}>
                 <ToastProvider>
-                  <Layout
-                    tenantPk="pk"
-                    options={{
-                      header: {},
-                      footer: {},
-                      container: {},
-                    }}
-                    onClose={() => {}}
-                  >
+                  <Layout tenantPk="pk">
                     <CollectKycData context={context} onDone={onDone} />
                   </Layout>
                 </ToastProvider>

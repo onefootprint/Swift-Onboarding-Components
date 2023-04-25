@@ -4,7 +4,7 @@ import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { GenericTransition } from '../../../../components';
+import GenericTransition from '../../../../components/animations/generic-transition';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

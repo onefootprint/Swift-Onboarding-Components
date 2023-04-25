@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavigationHeader } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 
 const InvestorProfileNavigationHeader = () => {

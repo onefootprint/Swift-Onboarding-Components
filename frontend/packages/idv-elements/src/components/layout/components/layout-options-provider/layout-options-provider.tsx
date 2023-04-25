@@ -4,7 +4,7 @@ import { LayoutOptions } from '../../types';
 
 // TODO: belce: explore converting this to a hook that can be called from children instead
 type LayoutOptionsArgs = {
-  layout: LayoutOptions;
+  layout?: LayoutOptions;
   onClose?: () => void;
 };
 
