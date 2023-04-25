@@ -23,7 +23,7 @@ const VaultProxy = () => {
   const { t } = useTranslation('pages.home.vault-proxy');
 
   return (
-    <Background>
+    <Background id="vault-proxy">
       <StyledContainer>
         <Header>
           <Typography as="h2" variant="display-1" color="quinary">
@@ -68,11 +68,11 @@ const VaultProxy = () => {
 const Background = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.tertiary};
-    padding: ${theme.spacing[11]} 0 0 0;
+    padding: ${theme.spacing[13]} 0 ${theme.spacing[10]} 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[6]};
     width: 100%;
     text-align: center;
     overflow: hidden;

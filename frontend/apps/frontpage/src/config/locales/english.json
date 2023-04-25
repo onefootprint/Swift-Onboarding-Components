@@ -308,9 +308,8 @@
         }
       },
       "vault-proxy": {
-        "tag": "New",
         "title": "Vault Proxy",
-        "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself",
+        "subtitle": "Send PII and card data from Footprint to third parties without decrypting it",
         "features": {
           "feature-1": {
             "title": "Enhanced security",
@@ -324,6 +323,10 @@
             "title": "Less money and time",
             "body": "Protect your sensitive data with our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
           }
+        },
+        "illustration": {
+          "third-party": "Third party services",
+          "your-app": "Your application"
         }
       },
       "identity-wallet": {
