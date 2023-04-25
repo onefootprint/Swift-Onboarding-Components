@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 import FootprintFooter from '../footprint-footer';
 import NavigationHeaderContainer from '../navigation-header/components/navigation-header-container';
 import SandboxBanner, { SandboxBannerHandler } from '../sandbox-banner';
+import FullHeightContainer from './components/full-height-container';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 type LayoutProps = {
@@ -38,7 +39,10 @@ const Layout = ({
   }, []);
 
   return (
-    <Container id={LAYOUT_CONTAINER_ID} hasBorderRadius={hasBorderRadius}>
+    <FullHeightContainer
+      id={LAYOUT_CONTAINER_ID}
+      hasBorderRadius={hasBorderRadius}
+    >
       <DialogContent>
         <Header id={LAYOUT_HEADER_ID}>
           {isSandbox && <SandboxBanner ref={measuredRef} />}
@@ -58,36 +62,9 @@ const Layout = ({
         </Body>
         <FootprintFooter variant={footerVariant} />
       </DialogContent>
-    </Container>
+    </FullHeightContainer>
   );
 };
-
-const Container = styled(motion.div)<{ hasBorderRadius: boolean }>`
-  ${({ theme }) => css`
-    background: ${theme.components.bifrost.dialog.bg};
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    margin: 0;
-    overflow-y: auto;
-    position: relative;
-
-    ${media.greaterThan('md')`
-      height: auto;
-      margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
-      max-height: calc(100vh - (2 * ${theme.spacing[9]}));
-      max-width: 480px;
-    `}
-  `}
-
-  ${({ hasBorderRadius, theme }) =>
-    hasBorderRadius &&
-    css`
-      ${media.greaterThan('md')`
-      border-radius: ${theme.components.bifrost.dialog.borderRadius};
-    `}
-    `}
-`;
 
 const Body = styled(motion.div)`
   flex: 1 0 auto;

@@ -51,11 +51,9 @@ const GlobalStyle = createGlobalStyle`
     }
 
     #__next {
-      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0 0 ${theme.spacing[11]} 0;
     }
   `}`;
 

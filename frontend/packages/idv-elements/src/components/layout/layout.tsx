@@ -5,7 +5,8 @@ import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
 import FootprintFooter from './components/footprint-footer';
-import LayoutOptionsProvider from './components/layout-options-provider/layout-options-provider';
+import FullHeightContainer from './components/full-height-container';
+import LayoutOptionsProvider from './components/layout-options-provider';
 import NavigationHeaderContainer from './components/navigation-header/components/navigation-header-container';
 import SandboxBanner, {
   SandboxBannerHandler,
@@ -47,7 +48,7 @@ const Layout = ({
 
   return (
     <LayoutOptionsProvider layout={options} onClose={onClose}>
-      <Container
+      <FullHeightContainer
         id={LAYOUT_CONTAINER_ID}
         hasBorderRadius={!!container?.hasBorderRadius}
       >
@@ -79,37 +80,10 @@ const Layout = ({
             tenantPk={tenantPk}
           />
         </DialogContent>
-      </Container>
+      </FullHeightContainer>
     </LayoutOptionsProvider>
   );
 };
-
-const Container = styled(motion.div)<{ hasBorderRadius: boolean }>`
-  ${({ theme }) => css`
-    background: ${theme.components.bifrost.dialog.bg};
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    margin: 0;
-    overflow-y: auto;
-    position: relative;
-
-    ${media.greaterThan('md')`
-      height: auto;
-      margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
-      max-height: calc(100vh - (2 * ${theme.spacing[9]}));
-      max-width: 480px;
-    `}
-  `}
-
-  ${({ hasBorderRadius, theme }) =>
-    hasBorderRadius &&
-    css`
-      ${media.greaterThan('md')`
-      border-radius: ${theme.components.bifrost.dialog.borderRadius};
-    `}
-    `}
-`;
 
 const Body = styled(motion.div)`
   flex: 1 0 auto;
