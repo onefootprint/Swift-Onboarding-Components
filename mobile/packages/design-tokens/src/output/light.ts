@@ -125,35 +125,35 @@ export const elevationDialog =
   '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
 export const fontFamilyDefault = 'DM Sans';
 export const fontFamilyCode = 'Source Code Pro';
-export const typographyDisplay1 = '600 60px/76px "DM Sans"';
-export const typographyDisplay2 = '600 40px/52px "DM Sans"';
-export const typographyDisplay3 = '600 28px/36px "DM Sans"';
-export const typographyDisplay4 = '400 21px/32px "DM Sans"';
-export const typographyHeading1 = '600 24px/32px "DM Sans"';
-export const typographyHeading2 = '600 21px/32px "DM Sans"';
-export const typographyHeading3 = '600 19px/28px "DM Sans"';
-export const typographyBody1 = '400 17px/28px "DM Sans"';
-export const typographyBody2 = '400 16px/24px "DM Sans"';
-export const typographyBody3 = '400 15px/20px "DM Sans"';
-export const typographyBody4 = '400 14px/20px "DM Sans"';
-export const typographyLabel1 = '500 17px/28px "DM Sans"';
-export const typographyLabel2 = '500 16px/24px "DM Sans"';
-export const typographyLabel3 = '500 15px/20px "DM Sans"';
-export const typographyLabel4 = '500 14px/20px "DM Sans"';
-export const typographyCaption1 = '500 13px/16px "DM Sans"';
-export const typographyCaption2 = '400 13px/16px "DM Sans"';
-export const typographyCaption3 = '500 12px/16px "DM Sans"';
-export const typographyCaption4 = '400 12px/16px "DM Sans"';
+export const typographyDisplay1 = '600 60px/76px "DMSans_700Bold';
+export const typographyDisplay2 = '600 40px/52px "DMSans_700Bold';
+export const typographyDisplay3 = '600 28px/36px "DMSans_700Bold';
+export const typographyDisplay4 = '400 21px/32px "DMSans_700Bold';
+export const typographyHeading1 = '600 24px/32px "DMSans_700Bold"';
+export const typographyHeading2 = '600 21px/32px "DMSans_700Bold"';
+export const typographyHeading3 = '600 19px/28px "DMSans_700Bold"';
+export const typographyBody1 = '400 17px/28px "DMSans_400Regular"';
+export const typographyBody2 = '400 16px/24px "DMSans_400Regular"';
+export const typographyBody3 = '400 15px/20px "DMSans_400Regular"';
+export const typographyBody4 = '400 14px/20px "DMSans_400Regular"';
+export const typographyLabel1 = '500 17px/28px "DMSans_500Medium"';
+export const typographyLabel2 = '500 16px/24px "DMSans_500Medium"';
+export const typographyLabel3 = '500 15px/20px "DMSans_500Medium"';
+export const typographyLabel4 = '500 14px/20px "DMSans_500Medium"';
+export const typographyCaption1 = '500 13px/16px "DMSans_500Medium"';
+export const typographyCaption2 = '400 13px/16px "DMSans_400Regular"';
+export const typographyCaption3 = '500 12px/16px "DMSans_500Medium"';
+export const typographyCaption4 = '400 12px/16px "DMSans_400Regular"';
 export const typographySnippet1 = '400 16px/24px "Source Code Pro"';
 export const typographySnippet2 = '400 14px/20px "Source Code Pro"';
-export const typographyHeaderTitle = '500 16px/24px "DM Sans"';
-export const typographyBodyTitle = '600 19px/28px "DM Sans"';
-export const typographyBodySubtitle = '400 16px/24px "DM Sans"';
-export const typographyBodyLabelDefault = '500 16px/24px "DM Sans"';
-export const typographyBodyLabelCompact = '500 15px/20px "DM Sans"';
-export const typographyBodyBodyDefault = '400 16px/24px "DM Sans"';
-export const typographyBodyBodyCompact = '400 15px/20px "DM Sans"';
-export const typographyBodyBodyTiny = '400 14px/20px "DM Sans"';
+export const typographyHeaderTitle = '500 16px/24px "DMSans_500Medium"';
+export const typographyBodyTitle = '600 19px/28px "DMSans_700Bold"';
+export const typographyBodySubtitle = '400 16px/24px "DMSans_400Regular"';
+export const typographyBodyLabelDefault = '500 16px/24px "DMSans_500Medium"';
+export const typographyBodyLabelCompact = '500 15px/20px "DMSans_500Medium"';
+export const typographyBodyBodyDefault = '400 16px/24px "DMSans_400Regular"';
+export const typographyBodyBodyCompact = '400 15px/20px "DMSans_400Regular"';
+export const typographyBodyBodyTiny = '400 14px/20px "DMSans_400Regular"';
 export const borderRadiusFull = 100;
 export const borderRadiusLarge = 16;
 export const borderRadiusDefault = 6;
@@ -214,11 +214,11 @@ export const linkButtonSizingCompact = 20;
 export const linkButtonSizingTiny = 20;
 export const linkButtonSizingXTiny = 16;
 export const linkButtonSizingXxTiny = 16;
-export const linkButtonTypographyDefault = '500 16px/24px "DM Sans"';
-export const linkButtonTypographyCompact = '500 15px/20px "DM Sans"';
-export const linkButtonTypographyTiny = '500 14px/20px "DM Sans"';
-export const linkButtonTypographyXTiny = '500 13px/16px "DM Sans"';
-export const linkButtonTypographyXxTiny = '500 12px/16px "DM Sans"';
+export const linkButtonTypographyDefault = '500 16px/24px "DMSans_500Medium"';
+export const linkButtonTypographyCompact = '500 15px/20px "DMSans_500Medium"';
+export const linkButtonTypographyTiny = '500 14px/20px "DMSans_500Medium"';
+export const linkButtonTypographyXTiny = '500 13px/16px "DMSans_500Medium"';
+export const linkButtonTypographyXxTiny = '500 12px/16px "DMSans_500Medium"';
 export const iconButtonBorderWidth = 1;
 export const iconButtonHeightLarge = 40;
 export const iconButtonHeightDefault = 32;
@@ -267,9 +267,9 @@ export const googleButtonBorderRadius = 6;
 export const googleButtonSpacingPaddingsHorizontalLarge = 24;
 export const googleButtonSpacingPaddingsHorizontalDefault = 24;
 export const googleButtonSpacingPaddingsHorizontalCompact = 24;
-export const googleButtonTypographyLarge = '500 17px/28px "DM Sans"';
-export const googleButtonTypographyDefault = '500 16px/24px "DM Sans"';
-export const googleButtonTypographyCompact = '500 15px/20px "DM Sans"';
+export const googleButtonTypographyLarge = '500 17px/28px "DMSans_500Medium"';
+export const googleButtonTypographyDefault = '500 16px/24px "DMSans_500Medium"';
+export const googleButtonTypographyCompact = '500 15px/20px "DMSans_500Medium"';
 export const buttonBorderWidth = '1px';
 export const buttonElevationInitial = '0px 0px 0px 0px rgb(0, 0, 0)';
 export const buttonElevationHover = '0px 0px 0px 0px rgb(0, 0, 0)';
@@ -288,7 +288,7 @@ export const fpButtonLoadingIcon = '#ffffff';
 export const fpButtonHeight = 48;
 export const fpButtonBorderRadius = 6;
 export const fpButtonSpacingPaddingsHorizontal = 24;
-export const fpButtonTypography = '500 17px/28px "DM Sans"';
+export const fpButtonTypography = '500 17px/28px "DMSans_500Medium"';
 export const dialogHeaderBg = '#FFFFFF';
 export const dialogHeaderText = '#000000';
 export const dialogHeaderIcon = '#000000';
@@ -320,9 +320,9 @@ export const confirmationDialogElevation =
   '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
 export const confirmationDialogBorderRadius = 6;
 export const confirmationDialogTypographyHeaderTitle =
-  '500 16px/24px "DM Sans"';
+  '500 16px/24px "DMSans_500Medium"';
 export const confirmationDialogTypographyBodyBodyDefault =
-  '400 16px/24px "DM Sans"';
+  '400 16px/24px "DMSans_400Regular"';
 export const buttonsPrimaryInitialBg = '#0e1438';
 export const buttonsPrimaryInitialText = '#ffffff';
 export const buttonsPrimaryInitialBorder = '#d4d4d400';
@@ -362,10 +362,10 @@ export const buttonsSpacingPaddingsHorizontalLarge = '24px';
 export const buttonsSpacingPaddingsHorizontalDefault = '24px';
 export const buttonsSpacingPaddingsHorizontalCompact = '24px';
 export const buttonsSpacingPaddingsHorizontalSmall = '12px';
-export const buttonsTypographyLarge = '500 17px/28px "DM Sans"';
-export const buttonsTypographyDefault = '500 16px/24px "DM Sans"';
-export const buttonsTypographyCompact = '500 15px/20px "DM Sans"';
-export const buttonsTypographySmall = '500 14px/20px "DM Sans"';
+export const buttonsTypographyLarge = '500 17px/28px "DMSans_500Medium"';
+export const buttonsTypographyDefault = '500 16px/24px "DMSans_500Medium"';
+export const buttonsTypographyCompact = '500 15px/20px "DMSans_500Medium"';
+export const buttonsTypographySmall = '500 14px/20px "DMSans_500Medium"';
 export const bifrostDialogHeaderBg = '#FFFFFF';
 export const bifrostDialogHeaderText = '#000000';
 export const bifrostDialogHeaderIcon = '#000000';
@@ -382,17 +382,24 @@ export const bifrostDialogFooterBorder = '#e2e2e2';
 export const bifrostDialogElevation =
   '0px 1px 4px 0px rgba(0, 0, 0, 0.12156862745098039)';
 export const bifrostDialogBorderRadius = 6;
-export const bifrostDialogTypographyHeaderTitle = '500 16px/24px "DM Sans"';
-export const bifrostDialogTypographyBodyTitle = '600 19px/28px "DM Sans"';
-export const bifrostDialogTypographyBodySubtitle = '400 16px/24px "DM Sans"';
+export const bifrostDialogTypographyHeaderTitle =
+  '500 16px/24px "DMSans_500Medium"';
+export const bifrostDialogTypographyBodyTitle =
+  '600 19px/28px "DMSans_500Bold"';
+export const bifrostDialogTypographyBodySubtitle =
+  '400 16px/24px "DMSans_400Regular"';
 export const bifrostDialogTypographyBodyLabelDefault =
-  '500 16px/24px "DM Sans"';
+  '500 16px/24px "DMSans_500Medium"';
 export const bifrostDialogTypographyBodyLabelCompact =
-  '500 15px/20px "DM Sans"';
-export const bifrostDialogTypographyBodyBodyDefault = '400 16px/24px "DM Sans"';
-export const bifrostDialogTypographyBodyBodyCompact = '400 15px/20px "DM Sans"';
-export const bifrostDialogTypographyBodyBodyTiny = '400 14px/20px "DM Sans"';
-export const bifrostDialogTypographyFooterFooter = '500 13px/16px "DM Sans"';
+  '500 15px/20px "DMSans_500Medium"';
+export const bifrostDialogTypographyBodyBodyDefault =
+  '400 16px/24px "DMSans_400Regular"';
+export const bifrostDialogTypographyBodyBodyCompact =
+  '400 15px/20px "DMSans_400Regular"';
+export const bifrostDialogTypographyBodyBodyTiny =
+  '400 14px/20px "DMSans_400Regular"';
+export const bifrostDialogTypographyFooterFooter =
+  '500 13px/16px "DMSans_500Medium"';
 export const baseInputsBaseBg = '#ffffff';
 export const baseInputsBaseBgHover = '#ffffff';
 export const baseInputsBaseBgDisabled = '#f7f7f7';
@@ -475,14 +482,18 @@ export const baseInputsSpacingPaddingsHorizontalDefault = 16;
 export const baseInputsSpacingPaddingsHorizontalCompact = 16;
 export const baseInputsSpacingPaddingsVerticalDefault = 10;
 export const baseInputsSpacingPaddingsVerticalCompact = 6;
-export const baseInputsTypographyDefaultLabel = '500 14px/20px "DM Sans"';
+export const baseInputsTypographyDefaultLabel =
+  '500 14px/20px "DMSans_500Medium"';
 export const baseInputsTypographyDefaultInputContent =
-  '400 15px/20px "DM Sans"';
-export const baseInputsTypographyDefaultHint = '500 13px/16px "DM Sans"';
-export const baseInputsTypographyCompactLabel = '500 13px/16px "DM Sans"';
+  '400 15px/20px "DMSans_400Regular"';
+export const baseInputsTypographyDefaultHint =
+  '500 13px/16px "DMSans_500Medium"';
+export const baseInputsTypographyCompactLabel =
+  '500 13px/16px "DMSans_500Medium"';
 export const baseInputsTypographyCompactInputContent =
-  '400 14px/20px "DM Sans"';
-export const baseInputsTypographyCompactHint = '500 13px/16px "DM Sans"';
+  '400 14px/20px "DMSans_400Regular"';
+export const baseInputsTypographyCompactHint =
+  '500 13px/16px "DMSans_500Medium"';
 export const baseInputsElevationFocus =
   '0px 0px 0px 4px rgba(74, 36, 219, 0.12156862745098039)';
 export const baseInputsElevationFocusError =

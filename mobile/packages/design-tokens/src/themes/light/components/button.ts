@@ -1,5 +1,5 @@
-import type { Button } from '../../types/components';
 import * as t from '../../../output/light';
+import type { Button } from '../../types/components';
 
 const button: Button = {
   global: {

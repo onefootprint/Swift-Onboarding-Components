@@ -1,10 +1,10 @@
 import * as CSS from 'csstype';
 
-type VariantStyles = Partial<{
+type VariantStyles = {
   bg: CSS.Property.Background;
   color: CSS.Property.Color;
   borderColor: CSS.Property.BorderColor;
-}>;
+};
 
 type Variant = VariantStyles & {
   hover: VariantStyles;

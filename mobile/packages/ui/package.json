@@ -7,11 +7,14 @@
     "typecheck": "yarn tsc --noEmit",
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/styled-components": "^5.1.26",
+    "@onefootprint/test-utils": "*",
     "@types/react": "^18.0.37",
+    "@types/styled-components": "^5.1.26",
+    "jest-expo": "^48.0.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",
     "typescript": "^4.9.5"
@@ -22,5 +25,11 @@
     "react": "^18.2.0",
     "react-native": "^0.71.6",
     "styled-components": "^5.3.8"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ]
   }
 }

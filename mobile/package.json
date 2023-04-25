@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
+    "dev:packages": "turbo run dev --filter=./packages/*",
     "build:packages": "turbo run build --filter=./packages/*",
     "predev": "yarn install && yarn build:packages"
   },
