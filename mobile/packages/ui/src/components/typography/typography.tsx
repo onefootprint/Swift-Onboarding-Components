@@ -41,10 +41,12 @@ const StyledText = styled.Text<{
   variant: FontVariant;
   center: boolean;
 }>`
-  ${({ theme, color, variant }) => css`
-    /* font: ${theme.typography[variant]}; */
-    color: ${theme.color[color]};
-  `}
+  ${({ theme, color, variant }) => {
+    return css`
+      font: ${theme.typography[variant]};
+      color: ${theme.color[color]};
+    `;
+  }}
 
   ${({ center }) =>
     center &&

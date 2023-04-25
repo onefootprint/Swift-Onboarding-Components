@@ -125,10 +125,10 @@ export const elevationDialog =
   '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
 export const fontFamilyDefault = 'DM Sans';
 export const fontFamilyCode = 'Source Code Pro';
-export const typographyDisplay1 = '600 60px/76px "DMSans_700Bold';
-export const typographyDisplay2 = '600 40px/52px "DMSans_700Bold';
-export const typographyDisplay3 = '600 28px/36px "DMSans_700Bold';
-export const typographyDisplay4 = '400 21px/32px "DMSans_700Bold';
+export const typographyDisplay1 = '600 60px/76px "DMSans_700Bold"';
+export const typographyDisplay2 = '600 40px/52px "DMSans_700Bold"';
+export const typographyDisplay3 = '600 28px/36px "DMSans_700Bold"';
+export const typographyDisplay4 = '400 21px/32px "DMSans_400Regular"';
 export const typographyHeading1 = '600 24px/32px "DMSans_700Bold"';
 export const typographyHeading2 = '600 21px/32px "DMSans_700Bold"';
 export const typographyHeading3 = '600 19px/28px "DMSans_700Bold"';
