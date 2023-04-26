@@ -51,6 +51,7 @@ const getStories = () => {
   return {
     "./components/box.stories.tsx": require("../components/box.stories.tsx"),
     "./components/button.stories.tsx": require("../components/button.stories.tsx"),
+    "./components/dismiss-keyboard.stories.tsx": require("../components/dismiss-keyboard.stories.tsx"),
     "./components/link-button.stories.tsx": require("../components/link-button.stories.tsx"),
     "./components/loading-indicator.stories.tsx": require("../components/loading-indicator.stories.tsx"),
     "./components/typography.stories.tsx": require("../components/typography.stories.tsx"),
