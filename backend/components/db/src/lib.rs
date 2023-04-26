@@ -193,11 +193,11 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     // we clean up afterwards.
 
     use schema::{
-        access_event, annotation, business_owner, contact_info, data_lifetime, document_request, fingerprint,
-        fingerprint_visit_event, identity_document, liveness_event, manual_review, onboarding,
-        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_vault,
-        socure_device_session, user_timeline, vault, vault_data, verification_request, verification_result,
-        webauthn_credential, document_data
+        access_event, annotation, business_owner, contact_info, data_lifetime, document_data,
+        document_request, fingerprint, fingerprint_visit_event, identity_document, liveness_event,
+        manual_review, onboarding, onboarding_decision, onboarding_decision_verification_result_junction,
+        risk_signal, scoped_vault, socure_device_session, user_timeline, vault, vault_data,
+        verification_request, verification_result, watchlist_check, webauthn_credential,
     };
     let mut deleted_rows = 0;
 
@@ -285,6 +285,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(liveness_event::table)
             .filter(liveness_event::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(watchlist_check::table)
+            .filter(watchlist_check::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         let dr_ids = document_request::table
