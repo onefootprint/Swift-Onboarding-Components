@@ -9,7 +9,7 @@ import SecuredByFootprint from '../secured-by-footprint';
 type FootprintFooterProps = {
   variant?: 'modal' | 'mobile';
   hideOnDesktop?: boolean;
-  tenantPk: string;
+  tenantPk?: string;
 };
 
 type Link = { label: string; href: string };
@@ -23,14 +23,17 @@ const FootprintFooter = ({
 
   const links: Link[] = [
     {
-      label: t('what-is-this'),
-      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
-    },
-    {
       label: t('privacy-policy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];
+
+  if (tenantPk) {
+    links.unshift({
+      label: t('what-is-this'),
+      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
+    });
+  }
 
   return (
     <FootprintFooterContainer variant={variant} hideOnDesktop={!!hideOnDesktop}>

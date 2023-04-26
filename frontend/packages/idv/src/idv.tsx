@@ -23,8 +23,8 @@ const App = ({ data, appearance, layout, callbacks }: IdvProps) => {
           tenantPk={tenantPk}
           userData={userData}
           authToken={authToken}
-          onComplete={callbacks.onComplete}
-          onClose={callbacks.onClose}
+          onComplete={callbacks?.onComplete}
+          onClose={callbacks?.onClose}
         >
           <GlobalStyle />
           <Layout options={layout}>

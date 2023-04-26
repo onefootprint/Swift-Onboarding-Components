@@ -7,7 +7,7 @@ import useSandboxMode from './hooks/use-sandbox-mode';
 
 type IdvLayoutProps = {
   children: React.ReactNode;
-  options: IdvLayout;
+  options?: IdvLayout;
 };
 
 const AppLayout = ({ children, options }: IdvLayoutProps) => {

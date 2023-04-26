@@ -3,8 +3,8 @@ import { UserData } from '@onefootprint/types';
 
 export type IdvProps = {
   data: IdvData;
-  layout: IdvLayout;
-  callbacks: IdvCallbacks;
+  layout?: IdvLayout;
+  callbacks?: IdvCallbacks;
   appearance?: FootprintAppearance;
 };
 

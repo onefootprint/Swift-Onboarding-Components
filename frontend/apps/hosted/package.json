@@ -26,7 +26,6 @@
     "@onefootprint/ui": "*",
     "@sentry/nextjs": "^7.28.1",
     "@tanstack/react-query": "^4.29.3",
-    "@xstate/react": "^3.2.1",
     "axios": "^1.2.1",
     "axios-case-converter": "^0.9.0",
     "next": "13.2.4",
@@ -47,7 +46,10 @@
     "i18next": "^22.0.4",
     "react-i18next": "^12.2.0",
     "tsconfig": "*",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "@xstate/react": "^3.2.1",
+    "xstate": "^4.37.1",
+    "constate": "^3.3.2"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

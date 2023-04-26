@@ -33,32 +33,35 @@ const Init = () => {
     });
   });
 
-  useGetOnboardingConfig(tenantPk, {
-    onSuccess: (config: OnboardingConfig) => {
-      observeCollector.setAppContext({
-        config,
-      });
-      send({
-        type: 'initContextUpdated',
-        payload: {
-          config: {
-            ...config,
-            mustCollectData: config.mustCollectData.map(
-              (attr: string) => CollectedDataOptionLabels[attr],
-            ),
-            canAccessData: config.canAccessData.map(
-              (attr: string) => CollectedDataOptionLabels[attr],
-            ),
+  useGetOnboardingConfig(
+    { tenantPk },
+    {
+      onSuccess: (config: OnboardingConfig) => {
+        observeCollector.setAppContext({
+          config,
+        });
+        send({
+          type: 'initContextUpdated',
+          payload: {
+            config: {
+              ...config,
+              mustCollectData: config.mustCollectData.map(
+                (attr: string) => CollectedDataOptionLabels[attr],
+              ),
+              canAccessData: config.canAccessData.map(
+                (attr: string) => CollectedDataOptionLabels[attr],
+              ),
+            },
           },
-        },
-      });
+        });
+      },
+      onError: () => {
+        send({
+          type: 'configRequestFailed',
+        });
+      },
     },
-    onError: () => {
-      send({
-        type: 'configRequestFailed',
-      });
-    },
-  });
+  );
 
   useEffectOnce(() => {
     if (!authToken || onboardingMutation.isLoading) {

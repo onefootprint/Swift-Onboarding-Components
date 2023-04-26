@@ -10,32 +10,10 @@
     }
   },
   "pages": {
-    "complete": {
-      "title": "Completed",
-      "subtitle": {
-        "with-countdown": "This page will close in {{seconds}} seconds...",
-        "without-countdown": "Please continue on your computer."
-      }
-    },
-    "expired": {
-      "title": "Session expired",
-      "subtitle": {
-        "mobile": "For security reasons, this session has timed out. Please go back to the previous page.",
-        "desktop": "For security reasons, this link has timed out. Please go back to your computer to generate a new link."
-      },
-      "cta": "Go back"
-    },
-    "canceled": {
-      "title": "Session canceled",
-      "subtitle": {
-        "mobile": "Please return to the previous page.",
-        "desktop": "Please go back to your computer."
-      }
-    },
-    "error": {
-      "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please restart this tab.",
-      "cta": "Restart"
+    "bo-kyc-intro": {
+      "title": "A business you own is being verified",
+      "subtitle": "{{otherBoName}} is verifying {{businessName}}, and you were identified as a beneficial owner. In order to successfully verify your business, we need to verify your identity first.",
+      "cta": "Verify your identity"
     }
   }
 }

@@ -19,7 +19,7 @@ const SHIMMER_HEIGHT = '296px';
 
 type LayoutProps = {
   children: React.ReactNode;
-  tenantPk: string;
+  tenantPk?: string;
   isSandbox?: boolean;
   options?: LayoutOptions;
   onClose?: () => void;

@@ -17,12 +17,17 @@ type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
 const FullHeightContainer = forwardRef<
   HTMLDivElement,
   FullHeightContainerProps
->(({ hasBorderRadius, children }, ref) => {
+>(({ id, hasBorderRadius, children }, ref) => {
   const viewportHeight = use100vh();
   const height = viewportHeight ? `${viewportHeight}px` : '100vh';
 
   return (
-    <Container ref={ref} hasBorderRadius={!!hasBorderRadius} height={height}>
+    <Container
+      id={id}
+      ref={ref}
+      hasBorderRadius={!!hasBorderRadius}
+      height={height}
+    >
       {children}
     </Container>
   );

@@ -1,37 +1,37 @@
 import Idv from '@onefootprint/idv';
-import { UserDataAttribute } from '@onefootprint/types';
+import { AppErrorBoundary } from '@onefootprint/idv-elements';
+import { useLayoutOptions } from '@onefootprint/idv-elements/src/components/layout/components/layout-options-provider';
 import React from 'react';
+import useHostedMachine from 'src/hooks/use-hosted-machine';
 
-/*
-  TODO: CONTENTS BELOW ARE PLACEHOLDERS ONLY
-*/
+import BoKycIntro from './bo-kyc-intro';
+import Init from './init';
+
 const Root = () => {
-  const onComplete = () => {
-    console.log('completed');
-  };
+  const [state, send] = useHostedMachine();
+  const { businessBoKycData, onboardingConfig } = state.context;
+  const { invited } = businessBoKycData || {};
+  const { key } = onboardingConfig || {};
+  const { layout } = useLayoutOptions();
 
   return (
-    <Idv
-      data={{
-        tenantPk: 'ob_test_tFKxgkVoZrFTEU05tnSVtW',
-        userData: {
-          [UserDataAttribute.email]: 'belce@onefootprint.com',
-          [UserDataAttribute.phoneNumber]: '+16504600700',
-        },
+    <AppErrorBoundary
+      onReset={() => {
+        send({ type: 'reset' });
       }}
-      layout={{
-        header: {
-          hideDesktopSandboxBanner: true,
-        },
-        footer: {
-          hideDesktopFooter: true,
-        },
-        container: {
-          hasBorderRadius: true,
-        },
-      }}
-      callbacks={{ onComplete }}
-    />
+    >
+      {state.matches('init') && <Init />}
+      {state.matches('boKycIntro') && <BoKycIntro />}
+      {state.matches('idv') && (
+        <Idv
+          data={{
+            tenantPk: key,
+            userData: invited,
+          }}
+          layout={layout}
+        />
+      )}
+    </AppErrorBoundary>
   );
 };
 

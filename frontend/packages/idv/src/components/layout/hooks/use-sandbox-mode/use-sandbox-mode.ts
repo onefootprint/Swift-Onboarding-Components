@@ -4,9 +4,9 @@ import useIdvMachine from '../../../../hooks/use-idv-machine';
 
 const useSandboxMode = () => {
   const [state] = useIdvMachine();
-  const { tenantPk } = state.context;
+  const { tenantPk = '' } = state.context;
 
-  const result = useGetOnboardingConfig(tenantPk ?? '');
+  const result = useGetOnboardingConfig({ tenantPk });
   if (result.isLoading) {
     return false;
   }

@@ -1,3 +1,4 @@
+import { LayoutOptionsProvider } from '@onefootprint/idv-elements';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -10,11 +11,25 @@ type LayoutProps = {
 };
 
 const Layout = ({ children }: LayoutProps) => (
-  <Container>
-    <SandboxBanner />
-    <Content>{children}</Content>
-    <Footer />
-  </Container>
+  <LayoutOptionsProvider
+    layout={{
+      header: {
+        hideDesktopSandboxBanner: true,
+      },
+      footer: {
+        hideDesktopFooter: true,
+      },
+      container: {
+        hasBorderRadius: true,
+      },
+    }}
+  >
+    <Container>
+      <SandboxBanner />
+      <Content>{children}</Content>
+      <Footer />
+    </Container>
+  </LayoutOptionsProvider>
 );
 
 const Container = styled.div`

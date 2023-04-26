@@ -12,7 +12,7 @@ const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
     method: 'GET',
     url: '/org/onboarding_config',
     headers: {
-      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
+      [ONBOARDING_CONFIG_KEY_HEADER]: 'tenantPk' in payload && payload.tenantPk,
     },
   });
   return response.data;

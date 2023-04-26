@@ -6,6 +6,8 @@ export * from './authorized-org';
 export * from './beneficial-owner';
 export * from './biometric-login-challenge-json';
 export * from './biometric-register-challenge-json';
+export * from './bootstrap-data';
+export * from './business-bo-kyc-data';
 export * from './business-data';
 export { default as BusinessDataAttribute } from './business-data-attribute';
 export * from './business-owner';
