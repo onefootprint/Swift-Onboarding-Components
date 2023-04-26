@@ -17,31 +17,26 @@ type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
 const FullHeightContainer = forwardRef<
   HTMLDivElement,
   FullHeightContainerProps
->(({ style, hasBorderRadius, children }, ref) => {
-  const height = use100vh();
-  const styleWithRealHeight = {
-    ...style,
-    height: height ? `${height}px` : '100vh',
-  };
+>(({ hasBorderRadius, children }, ref) => {
+  const viewportHeight = use100vh();
+  const height = viewportHeight ? `${viewportHeight}px` : '100vh';
+
   return (
-    <Container
-      ref={ref}
-      style={styleWithRealHeight}
-      hasBorderRadius={!!hasBorderRadius}
-    >
+    <Container ref={ref} hasBorderRadius={!!hasBorderRadius} height={height}>
       {children}
     </Container>
   );
 });
 
-const Container = styled.div<{ hasBorderRadius: boolean }>`
-  ${({ theme }) => css`
+const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
+  ${({ theme, height }) => css`
     background: ${theme.components.bifrost.dialog.bg};
     display: flex;
     flex-direction: column;
     margin: 0;
     overflow-y: auto;
     position: relative;
+    height: ${height};
 
     ${media.greaterThan('md')`
       height: auto;
