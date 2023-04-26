@@ -1,3 +1,4 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
   ApiKey,
@@ -23,6 +24,7 @@ const revealApiKey = async (
 
 const useRevealKey = (apiKey: ApiKey) => {
   const updateApiCache = useUpdateApiKeyCache();
+  const showRequestError = useRequestErrorToast();
   const { authHeaders } = useSession();
 
   const mutation = useMutation(
@@ -31,6 +33,7 @@ const useRevealKey = (apiKey: ApiKey) => {
       onSuccess: response => {
         updateApiCache(response);
       },
+      onError: showRequestError,
     },
   );
 
