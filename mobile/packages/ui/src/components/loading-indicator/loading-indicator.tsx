@@ -1,6 +1,6 @@
-import React from 'react';
-import { useTheme } from '@onefootprint/styled';
 import type { Color } from '@onefootprint/design-tokens';
+import { useTheme } from '@onefootprint/styled';
+import React from 'react';
 import { ActivityIndicator } from 'react-native';
 
 export type LoadingIndicatorProps = {

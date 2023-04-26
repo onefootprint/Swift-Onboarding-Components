@@ -1,9 +1,10 @@
+import styled, { css } from '@onefootprint/styled';
 import * as React from 'react';
-import { GestureResponderEvent, Text, View } from 'react-native';
-import styled, { css, useTheme } from '@onefootprint/styled';
-import type { ButtonSize, ButtonVariant } from './button.types';
-import { Pressable } from '../pressable';
+import { GestureResponderEvent, Text } from 'react-native';
+
 import { LoadingIndicator } from '../loading-indicator';
+import { Pressable } from '../pressable';
+import type { ButtonSize, ButtonVariant } from './button.types';
 
 export type ButtonProps = {
   children: string;
@@ -17,8 +18,8 @@ export type ButtonProps = {
 
 const Button = ({
   children,
-  disabled,
-  loading,
+  disabled = false,
+  loading = false,
   loadingAriaLabel,
   size = 'default',
   variant = 'primary',
@@ -37,27 +38,20 @@ const Button = ({
           {children}
         </ButtonText>
       ) : (
-        <View style={{ opacity: 0 }}>
-          <Text>{children}</Text>
-        </View>
+        <HiddenButtonText>{children}</HiddenButtonText>
       )}
-      <View
-        style={{
-          position: 'absolute',
-          opacity: loading ? 1 : 0,
-        }}
-      >
+      <LoandingIndicatorContainer loading={loading}>
         <LoadingIndicator
           aria-label={loadingAriaLabel}
           color={variant === 'primary' ? 'quinary' : 'primary'}
         />
-      </View>
+      </LoandingIndicatorContainer>
     </ButtonContainer>
   );
 };
 
 const ButtonContainer = styled(Pressable)<{
-  loading?: boolean;
+  loading: boolean;
   size: ButtonSize;
   variant: ButtonVariant;
 }>`
@@ -93,7 +87,7 @@ const ButtonContainer = styled(Pressable)<{
 const ButtonText = styled(Text)<{
   variant: ButtonVariant;
   size: ButtonSize;
-  disabled?: boolean;
+  disabled: boolean;
 }>`
   ${({ theme, size, disabled, variant }) => {
     const { button } = theme.components;
@@ -102,6 +96,21 @@ const ButtonText = styled(Text)<{
       color: ${disabled
         ? button.variant[variant].disabled.color
         : button.variant[variant].color};
+    `;
+  }}
+`;
+
+const HiddenButtonText = styled(Text)`
+  opacity: 0;
+`;
+
+const LoandingIndicatorContainer = styled.View<{
+  loading: boolean;
+}>`
+  ${({ loading }) => {
+    return css`
+      position: absolute;
+      opacity: ${loading ? 1 : 0};
     `;
   }}
 `;

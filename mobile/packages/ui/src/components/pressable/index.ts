@@ -1,1 +1,1 @@
-export { default as Pressable, type PressableProps } from './pressable';
+export { type PressableProps, default as Pressable } from './pressable';

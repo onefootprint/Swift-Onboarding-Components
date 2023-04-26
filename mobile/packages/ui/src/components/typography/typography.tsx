@@ -1,6 +1,6 @@
 import { Color, FontVariant } from '@onefootprint/design-tokens';
-import React from 'react';
 import styled, { css } from '@onefootprint/styled';
+import React from 'react';
 import { TextProps } from 'react-native';
 
 export type TypographyProps = {

@@ -1,4 +1,4 @@
 export {
-  default as LoadingIndicator,
   type LoadingIndicatorProps,
+  default as LoadingIndicator,
 } from './loading-indicator';

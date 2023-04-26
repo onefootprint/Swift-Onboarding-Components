@@ -1,15 +1,19 @@
+import type { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { View, Text, GestureResponderEvent } from 'react-native';
+import { GestureResponderEvent, Text } from 'react-native';
+
 import { Pressable } from '../pressable';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
-import styled, { css } from '@onefootprint/styled';
+
+type IconPosition = 'left' | 'right';
 
 export type LinkButtonProps = {
   'aria-label'?: string;
-  //   iconComponent?: Icon;
-  //   iconPosition?: IconPosition;
   children: string;
   disabled?: boolean;
+  iconComponent?: Icon;
+  iconPosition?: IconPosition;
   onPress?: (event: GestureResponderEvent) => void;
   size?: LinkButtonSize;
   variant?: LinkButtonVariant;
@@ -17,39 +21,46 @@ export type LinkButtonProps = {
 
 const LinkButton = ({
   'aria-label': ariaLabel,
-  //   iconComponent: Icon,
-  //   iconPosition = 'right',
   children,
   disabled = false,
+  iconComponent: Icon,
+  iconPosition = 'right',
   onPress,
   size = 'default',
   variant = 'default',
 }: LinkButtonProps) => {
-  //   const renderedIcon = Icon && (
-  //     <Icon color={variant === 'default' ? 'accent' : 'error'} />
-  //   );
+  const renderedIcon = Icon && (
+    <Icon color={variant === 'default' ? 'accent' : 'error'} />
+  );
 
   return (
-    <LinkButtonContainer disabled={disabled} onPress={onPress} size={size}>
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <ButtonText variant={variant} size={size}>
-          {children}
-        </ButtonText>
-      </View>
+    <LinkButtonContainer
+      aria-label={ariaLabel || children}
+      disabled={disabled}
+      onPress={onPress}
+      size={size}
+    >
+      {iconPosition === 'left' && renderedIcon}
+      <ButtonText variant={variant} size={size}>
+        {children}
+      </ButtonText>
+      {iconPosition === 'right' && renderedIcon}
     </LinkButtonContainer>
   );
 };
 
-const LinkButtonContainer = styled(Pressable)<{
-  size: LinkButtonSize;
-}>`
+const LinkButtonContainer = styled(Pressable)<{ size: LinkButtonSize }>`
   ${({ theme, size }) => {
     const { linkButton } = theme.components;
 
     return css`
       align-items: center;
+      align-items: center;
       background: transparent;
-      height: ${linkButton.size[size].height}px;
+      flex-direction: row;
+      gap: ${theme.spacing[2]};
+      height: ${linkButton.size[size].height};
+      justify-content: center;
     `;
   }}
 `;

@@ -4,11 +4,12 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "typecheck": "yarn tsc --noEmit",
-    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
-    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external react react-native",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "test:watch": "jest --watch"
+    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react react-native",
+    "lint": "eslint src --fix",
+    "test:watch": "jest --watch",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@onefootprint/test-utils": "*",
@@ -22,6 +23,7 @@
   "dependencies": {
     "@onefootprint/styled": "*",
     "@onefootprint/design-tokens": "*",
+    "@onefootprint/icons": "*",
     "react": "^18.2.0",
     "react-native": "^0.71.6",
     "styled-components": "^5.3.8"

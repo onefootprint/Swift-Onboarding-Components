@@ -1,4 +1,4 @@
 export {
-  default as DesignSystemProvider,
   type DesignSystemProviderProps,
+  default as DesignSystemProvider,
 } from './design-system-provider';

@@ -1,1 +1,1 @@
-export { default as LinkButton, type LinkButtonProps } from './link-button';
+export { type LinkButtonProps, default as LinkButton } from './link-button';

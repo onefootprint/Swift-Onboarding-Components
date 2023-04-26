@@ -1,6 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react-native';
 import { LinkButton } from '@onefootprint/ui';
+import { IcoUser16, icos } from '@onefootprint/icons';
 
 const LinkButtonMeta: ComponentMeta<typeof LinkButton> = {
   title: 'LinkButton',
@@ -12,6 +13,16 @@ const LinkButtonMeta: ComponentMeta<typeof LinkButton> = {
     },
     children: {
       control: 'text',
+    },
+    iconComponent: {
+      control: 'select',
+      options: Object.keys(icos),
+    },
+    iconPosition: {
+      control: 'select',
+      description: 'Where the Icon should be placed',
+      options: ['left', 'right'],
+      table: { defaultValue: { summary: 'right' } },
     },
     variant: {
       control: 'select',
@@ -31,11 +42,15 @@ const LinkButtonMeta: ComponentMeta<typeof LinkButton> = {
     disabled: false,
     size: 'default',
     variant: 'default',
+    iconComponent: IcoUser16,
   },
 };
 
-export default LinkButtonMeta;
-
 type LinkButtonStory = ComponentStory<typeof LinkButton>;
 
-export const Basic: LinkButtonStory = args => <LinkButton {...args} />;
+export const Basic: LinkButtonStory = ({ iconComponent: Icon, ...props }) => {
+  const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
+  return <LinkButton {...props} iconComponent={SelectedIcon} />;
+};
+
+export default LinkButtonMeta;
