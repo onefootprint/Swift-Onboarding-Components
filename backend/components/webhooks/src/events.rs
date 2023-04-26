@@ -33,6 +33,7 @@ mod payloads {
     use super::*;
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[schemars(example = "OnboardingCompletedPayload::example")]
     pub struct OnboardingCompletedPayload {
         /// the footprint id of the entity that completed onboarding
         pub fp_id: FpId,
@@ -47,6 +48,8 @@ mod payloads {
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[schemars(example = "OnboardingStatusChangedPayload::example")]
+
     pub struct OnboardingStatusChangedPayload {
         /// the footprint id of the entity that completed onboarding
         pub fp_id: FpId,
@@ -59,6 +62,8 @@ mod payloads {
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[schemars(example = "WatchlistCheckCompletedPayload::example")]
+
     pub struct WatchlistCheckCompletedPayload {
         /// the footprint id of the entity that completed onboarding
         pub fp_id: FpId,
@@ -69,6 +74,46 @@ mod payloads {
         pub timestamp: DateTime<Utc>,
         pub status: WatchlistCheckStatusKind,
         pub error: Option<WatchlistCheckError>,
+    }
+}
+
+mod examples {
+    use super::*;
+
+    impl OnboardingCompletedPayload {
+        pub fn example() -> Self {
+            OnboardingCompletedPayload {
+                fp_id: FpId::test_data("fp_id_xyz".into()),
+                footprint_user_id: None,
+                timestamp: Utc::now(),
+                status: Default::default(),
+                requires_manual_review: false,
+                onboarding_configuration_id: ObConfigurationId::test_data("ob_config_id_abc".into()),
+            }
+        }
+    }
+
+    impl OnboardingStatusChangedPayload {
+        pub fn example() -> Self {
+            OnboardingStatusChangedPayload {
+                fp_id: FpId::test_data("fp_id_xyz".into()),
+                footprint_user_id: None,
+                timestamp: Utc::now(),
+                new_status: Default::default(),
+            }
+        }
+    }
+
+    impl WatchlistCheckCompletedPayload {
+        pub fn example() -> Self {
+            WatchlistCheckCompletedPayload {
+                fp_id: FpId::test_data("fp_id_xyz".into()),
+                footprint_user_id: None,
+                timestamp: Utc::now(),
+                status: Default::default(),
+                error: None,
+            }
+        }
     }
 }
 

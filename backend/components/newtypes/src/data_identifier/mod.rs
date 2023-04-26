@@ -51,7 +51,7 @@ use crate::{
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+use itertools::Itertools;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::hash::Hash;
 use std::str::FromStr;
@@ -72,12 +72,11 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
     EnumDiscriminants,
     SerializeDisplay,
     DeserializeFromStr,
-    JsonSchema,
 )]
 #[strum_discriminants(
     name(DataIdentifierDiscriminant),
     vis(pub),
-    derive(strum_macros::EnumString),
+    derive(strum_macros::EnumString, strum_macros::EnumIter),
     strum(serialize_all = "snake_case")
 )]
 #[strum(serialize_all = "snake_case")]
@@ -167,6 +166,51 @@ impl std::fmt::Display for DataIdentifier {
     }
 }
 
+impl schemars::JsonSchema for DataIdentifier {
+    fn schema_name() -> String {
+        "DataIdentifier".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        let dis = DataIdentifierDiscriminant::iter()
+            .flat_map(|kind| match kind {
+                DataIdentifierDiscriminant::Custom => {
+                    vec![DataIdentifier::Custom(KvDataKey::from("*".to_string()))]
+                }
+                DataIdentifierDiscriminant::Id => {
+                    IdentityDataKind::iter().map(DataIdentifier::from).collect_vec()
+                }
+                DataIdentifierDiscriminant::Business => {
+                    BusinessDataKind::iter().map(DataIdentifier::from).collect_vec()
+                }
+                DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()
+                    .map(DataIdentifier::from)
+                    .collect_vec(),
+                DataIdentifierDiscriminant::Document => {
+                    DocumentKind::iter().map(DataIdentifier::from).collect_vec()
+                }
+            })
+            .map(|id| serde_json::Value::String(id.to_string()))
+            .collect_vec();
+
+        schemars::_private::apply_metadata(
+            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
+                instance_type: Some(schemars::schema::InstanceType::String.into()),
+                enum_values: Some(dis),
+                ..Default::default()
+            }),
+            schemars::schema::Metadata {
+                description: Some("Represents the kind of data.".to_owned()),
+                examples: vec![serde_json::Value::String(
+                    DataIdentifier::Id(IdentityDataKind::Ssn9).to_string(),
+                )],
+
+                ..Default::default()
+            },
+        )
+    }
+}
+
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
 /// We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
@@ -209,10 +253,9 @@ impl DataIdentifier {
         match self {
             DataIdentifier::Id(idk) => idk.is_searchable(),
             DataIdentifier::Business(bdk) => bdk.is_searchable(),
-
-            DataIdentifier::Custom(_)
-            | DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Document(_) => false,
+            DataIdentifier::Custom(_) | DataIdentifier::InvestorProfile(_) | DataIdentifier::Document(_) => {
+                false
+            }
         }
     }
 
@@ -245,6 +288,7 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use itertools::Itertools;
     use test_case::test_case;
 
     #[test_case(DataIdentifier::Id(IdentityDataKind::PhoneNumber) => "id.phone_number")]
@@ -304,7 +348,7 @@ mod tests {
         // encrypted
         use itertools::Itertools;
 
-        let dis = [
+        let dis: Vec<DataIdentifier> = [
             InvestorProfileKind::iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
@@ -320,5 +364,24 @@ mod tests {
         assert!(dis
             .iter()
             .all(|di| di.store_plaintext() == plaintext_types.contains(di)));
+    }
+
+    #[test]
+    #[ignore]
+    fn enumerate_test() {
+        let dis: Vec<DataIdentifier> = [
+            InvestorProfileKind::iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
+            IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            DocumentKind::iter().map(DataIdentifier::from).collect_vec(),
+        ]
+        .into_iter()
+        .flatten()
+        .collect_vec();
+
+        let json = serde_json::to_string_pretty(&dis).unwrap();
+        println!("{json}")
     }
 }

@@ -1,5 +1,6 @@
 use crate::*;
 
+export_schema!(DataIdentifier);
 export_schema!(AccessEventKind);
 export_schema!(CollectedDataOption);
 export_schema!(TenantScope);

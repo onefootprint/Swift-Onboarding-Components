@@ -1,8 +1,9 @@
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use strum::{Display, EnumIter, IntoEnumIterator};
 use strum_macros::{AsRefStr, EnumString};
 
 use crate::DecisionStatus;
@@ -10,19 +11,19 @@ use crate::DecisionStatus;
 /// The status of the onboarding
 #[derive(
     Debug,
-    Display,
     Clone,
     Copy,
     PartialEq,
     Eq,
     Deserialize,
     Serialize,
-    EnumString,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
     FromSqlRow,
     AsExpression,
+    EnumIter,
+    EnumString,
+    Display,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -97,5 +98,31 @@ impl From<DecisionStatus> for OnboardingStatus {
             DecisionStatus::Fail => OnboardingStatus::Fail,
             DecisionStatus::Pass => OnboardingStatus::Pass,
         }
+    }
+}
+
+impl schemars::JsonSchema for OnboardingStatus {
+    fn schema_name() -> String {
+        "OnboardingStatus".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        let all = OnboardingStatus::iter()
+            .map(|s| serde_json::Value::String(s.to_string()))
+            .collect_vec();
+
+        schemars::_private::apply_metadata(
+            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
+                instance_type: Some(schemars::schema::InstanceType::String.into()),
+                enum_values: Some(all),
+                ..Default::default()
+            }),
+            schemars::schema::Metadata {
+                description: Some("Represents status of an onboarding.".to_owned()),
+                default: Some(serde_json::Value::String(Self::default().to_string())),
+                examples: vec![serde_json::Value::String(Self::default().to_string())],
+                ..Default::default()
+            },
+        )
     }
 }
