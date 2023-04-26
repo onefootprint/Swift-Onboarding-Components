@@ -1,6 +1,7 @@
 import { Icon } from '@onefootprint/icons';
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useHover } from 'usehooks-ts';
 
 import Typography from '../../../typography';
 
@@ -29,6 +30,9 @@ const RadioSelectOption = ({
     onClick();
   };
 
+  const optionRef = useRef(null);
+  const isHovered = useHover(optionRef);
+
   return (
     <Option
       aria-label={title}
@@ -37,8 +41,10 @@ const RadioSelectOption = ({
       onClick={handleClick}
       selected={selected}
       type="button"
+      ref={optionRef}
+      hovered={isHovered}
     >
-      <IconContainer selected={selected}>
+      <IconContainer selected={selected} hovered={isHovered}>
         <IconComponent color={selected ? 'quinary' : undefined} />
       </IconContainer>
       <OptionLabel>
@@ -53,34 +59,8 @@ const RadioSelectOption = ({
   );
 };
 
-const IconContainer = styled.div<{ selected?: boolean }>`
-  ${({ theme, selected }) => css`
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: 50%;
-    border: 1px solid ${theme.borderColor.tertiary};
-    background: ${theme.backgroundColor.primary};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    ${selected &&
-    css`
-      border: 0;
-      background: ${theme.backgroundColor.accent};
-    `}
-  `}
-`;
-
-const OptionLabel = styled.div`
-  ${({ theme }) => css`
-    margin-left: ${theme.spacing[4]};
-  `}
-`;
-
-const Option = styled.button<{ selected?: boolean }>`
-  ${({ theme, selected }) => css`
+const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
+  ${({ theme, selected, hovered }) => css`
     background: none;
     text-align: left;
     cursor: pointer;
@@ -88,33 +68,59 @@ const Option = styled.button<{ selected?: boolean }>`
     border: 1px solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[5]};
     display: flex;
+    flex-direction: row;
     justify-content: left;
-    align-items: center;
-
-    &:first-child {
-      border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default}
-        0 0;
-    }
-
-    &:last-child {
-      border-radius: 0 0 ${theme.borderRadius.default}
-        ${theme.borderRadius.default};
-    }
-
-    &:first-child:last-child {
-      border-radius: ${theme.borderRadius.default};
-    }
-
-    &:not(:first-child) {
-      margin-top: -1px; // because of the borders
-    }
+    align-items: flex-start;
+    border-radius: ${theme.borderRadius.default};
+    gap: ${theme.spacing[4]};
+    transition: all 0.2s ease-out;
 
     ${selected &&
     css`
       z-index: 1;
       background-color: #4a24db14;
-      border: 1px solid ${theme.borderColor.secondary};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
     `}
+
+    ${hovered &&
+    !selected &&
+    css`
+      background-color: ${theme.backgroundColor.secondary};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+    `}
+  `}
+`;
+
+const IconContainer = styled.div<{ selected?: boolean; hovered?: boolean }>`
+  ${({ theme, selected, hovered }) => css`
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: ${theme.borderRadius.full};
+    background-color: ${theme.backgroundColor.secondary};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease-out;
+    margin-top: ${theme.spacing[1]};
+
+    ${selected &&
+    css`
+      border: 0;
+      background-color: ${theme.backgroundColor.accent};
+    `}
+
+    ${hovered &&
+    !selected &&
+    css`
+      background-color: ${theme.backgroundColor.senary};
+    `}
+  `}
+`;
+
+const OptionLabel = styled.div`
+  ${({ theme }) => css`
+    padding: 0 ${theme.spacing[1]};
   `}
 `;
 

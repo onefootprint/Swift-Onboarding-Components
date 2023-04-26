@@ -1,5 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import media from 'styled-media-query';
 
 import RadioSelectOption, {
   RadioSelectOptionFields,
@@ -34,9 +35,16 @@ const RadioSelect = ({ options, value, onChange, testID }: RadioSelectProps) =>
   ) : null;
 
 const OptionsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: left;
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: ${theme.spacing[3]};
+
+    ${media.greaterThan(`medium`)`
+      gap: ${theme.spacing[3]};
+    `}
+  `}
 `;
 
 export default RadioSelect;
