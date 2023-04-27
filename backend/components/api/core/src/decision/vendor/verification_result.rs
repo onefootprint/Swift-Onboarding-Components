@@ -4,7 +4,10 @@ use crate::{enclave_client::EnclaveClient, errors::ApiError};
 use chrono::Utc;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::{
-    models::verification_result::{NewVerificationResult, VerificationResult},
+    models::{
+        verification_request::VerificationRequest,
+        verification_result::{NewVerificationResult, VerificationResult},
+    },
     DbError, PgConn,
 };
 use enclave_proxy::DataTransform;
@@ -32,6 +35,35 @@ pub fn save_verification_results(
                 response: scrubbed_json,
                 timestamp: now,
                 e_response: Some(e_response),
+                is_error: false,
+            })
+        })
+        .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;
+
+    Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
+}
+
+/// Save a verification result for an errored VRes, encrypting the response payload in the process (if we got one back)
+/// For requests with no response payload, we will notate on VRes that the request was an error
+pub fn save_error_verification_results(
+    conn: &mut PgConn,
+    vendor_responses_with_errors: &[(VerificationRequest, Option<serde_json::Value>)],
+    user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
+) -> Result<Vec<VerificationResult>, ApiError> {
+    let now = Utc::now();
+    let new_verification_results: Vec<NewVerificationResult> = vendor_responses_with_errors
+        .iter()
+        .map(|(req, response)| {
+            // TODO: should just make response optional for is_error
+            let r = response.clone().unwrap_or(serde_json::json!(""));
+            let e_response = encrypt_verification_result_response(&r.clone().into(), user_vault_public_key)?;
+
+            Ok(NewVerificationResult {
+                request_id: req.id.clone(),
+                response: ScrubbedJsonValue(r),
+                timestamp: now,
+                e_response: Some(e_response),
+                is_error: true,
             })
         })
         .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;

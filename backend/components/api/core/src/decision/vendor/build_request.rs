@@ -55,6 +55,19 @@ pub async fn build_idv_data_from_verification_request(
     Ok(request)
 }
 
+pub async fn bulk_build_data_from_requests(
+    db_pool: &DbPool, // TODO: migrate to PgConn
+    enclave_client: &EnclaveClient,
+    requests: Vec<VerificationRequest>,
+)-> Result<Vec<(VerificationRequest, IdvData)>, ApiError> {
+    let data_futs = requests.iter().map(|r| build_idv_data_from_verification_request(db_pool, enclave_client, r.clone()));
+    let res: Vec<IdvData> = futures::future::join_all(data_futs).await.into_iter().collect::<ApiResult<Vec<IdvData>>>()?;
+
+    let zipped = requests.into_iter().zip(res.into_iter()).collect();
+
+    Ok(zipped)
+
+}
 
 /// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors
 #[allow(dead_code)]

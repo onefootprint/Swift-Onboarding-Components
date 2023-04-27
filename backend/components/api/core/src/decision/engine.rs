@@ -10,8 +10,11 @@ use super::{
     features::kyc_features::KycFeatureVector,
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
     vendor::{
-        make_request::VerificationRequestWithVendorResponse, tenant_vendor_control::TenantVendorControl,
-        vendor_result::VendorResult, vendor_trait::VendorAPICall, verification_result,
+        make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
+        tenant_vendor_control::TenantVendorControl,
+        vendor_result::VendorResult,
+        vendor_trait::VendorAPICall,
+        verification_result,
     },
     *,
 };
@@ -78,16 +81,20 @@ pub async fn run(
     )
     .await?;
 
+    let has_critical_error = !vendor_results.critical_errors.is_empty();
+    let error_message = format!("{:?}", vendor_results.all_errors());
     // We want to always save the successful results even if some request has a hard error
-    let completed_oustanding_vendor_responses =
-        save_vendor_responses(db_pool, &vendor_results.successful, &ob.id).await?;
+    let completed_oustanding_vendor_responses = save_vendor_responses(
+        db_pool,
+        &vendor_results.successful,
+        vendor_results.all_errors_with_parsable_requests(),
+        &ob.id,
+    )
+    .await?;
 
     // If required vendor calls failed, we cannot proceed with decisioning but we don't want to send a hard error to Bifrost so we short circuit here
-    if !vendor_results.critical_errors.is_empty() {
-        tracing::error!(
-            errors = format!("{:?}", vendor_results.all_errors()),
-            "VendorRequestsFailed"
-        );
+    if has_critical_error {
+        tracing::error!(errors = error_message, "VendorRequestsFailed");
         return Ok(());
     }
 
@@ -133,15 +140,21 @@ where
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
     vendor_responses: &[VerificationRequestWithVendorResponse],
+    vendor_error_responses: Vec<(VerificationRequest, Option<serde_json::Value>)>,
     onboarding_id: &OnboardingId,
 ) -> ApiResult<Vec<VendorResult>> {
     let obid = onboarding_id.clone();
 
     let responses = vendor_responses.to_owned();
     let results = db_pool
-        .db_query(move |conn| -> ApiResult<Vec<VendorResult>> {
+        .db_transaction(move |conn| -> ApiResult<Vec<VendorResult>> {
             let uv = Vault::get(conn, &obid)?;
             let vres = verification_result::save_verification_results(conn, &responses, &uv.public_key)?;
+            verification_result::save_error_verification_results(
+                conn,
+                &vendor_error_responses,
+                &uv.public_key,
+            )?; // Match on errors that are parsable
 
             let mut verification_results: HashMap<VerificationRequestId, VerificationResult> =
                 vres.into_iter().map(|vr| (vr.request_id.clone(), vr)).collect();
@@ -162,7 +175,7 @@ pub async fn save_vendor_responses(
                 .collect::<Result<Vec<VendorResult>, _>>()?;
             Ok(results)
         })
-        .await??;
+        .await?;
     Ok(results)
 }
 
@@ -215,8 +228,8 @@ pub async fn get_latest_verification_requests_and_results(
 
 pub struct VendorResults {
     pub successful: Vec<VerificationRequestWithVendorResponse>,
-    pub non_critical_errors: Vec<ApiError>,
-    pub critical_errors: Vec<ApiError>,
+    pub non_critical_errors: Vec<VerificationRequestWithVendorError>,
+    pub critical_errors: Vec<VerificationRequestWithVendorError>,
 }
 
 impl VendorResults {
@@ -224,28 +237,60 @@ impl VendorResults {
         self.critical_errors
             .iter()
             .chain(self.non_critical_errors.iter())
+            .map(|(_, e)| e)
+            .collect()
+    }
+
+    pub fn all_errors_with_parsable_requests(&self) -> Vec<(VerificationRequest, Option<serde_json::Value>)> {
+        self.critical_errors
+            .iter()
+            .map(Self::construct_requests_with_responses_for_verification_result)
+            .chain(
+                self.non_critical_errors
+                    .iter()
+                    .map(Self::construct_requests_with_responses_for_verification_result),
+            )
             .collect()
     }
 }
 
+impl VendorResults {
+    fn construct_requests_with_responses_for_verification_result(
+        v: &VerificationRequestWithVendorError,
+    ) -> (VerificationRequest, Option<serde_json::Value>) {
+        match v {
+            (req, ApiError::VendorRequestFailed(ve)) => match &ve.error {
+                idv::Error::IDologyError(idv::idology::error::Error::ParsableAPIError(e)) => {
+                    (req.clone(), Some(e.response.clone()))
+                }
+                // TODO: non-ideal to have empty json, should make response optional
+                _ => (req.clone(), None),
+            },
+            (req, _) => (req.clone(), None),
+        }
+    }
+}
+
 fn partition_vendor_errors(
-    raw_results: Vec<Result<VerificationRequestWithVendorResponse, ApiError>>,
+    raw_results: Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>,
 ) -> VendorResults {
     // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
 
-    let (successful, errors): (Vec<VerificationRequestWithVendorResponse>, Vec<ApiError>) =
-        raw_results.into_iter().partition_map(|r| match r {
-            Ok(vr) => Either::Left(vr),
-            Err(e) => Either::Right(e),
-        });
+    let (successful, errors): (
+        Vec<VerificationRequestWithVendorResponse>,
+        Vec<VerificationRequestWithVendorError>,
+    ) = raw_results.into_iter().partition_map(|r| match r {
+        Ok(vr) => Either::Left(vr),
+        Err(e) => Either::Right(e),
+    });
 
-    let (critical_errors, non_critical_errors) = errors.into_iter().partition(|e| {
+    let (critical_errors, non_critical_errors) = errors.into_iter().partition(|(_, e)| {
         match e {
-            &ApiError::VendorRequestFailed(vendor_api) => {
-                if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api) {
+            ApiError::VendorRequestFailed(vendor_api_error) => {
+                if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api_error.vendor_api) {
                     true
                 } else {
-                    tracing::warn!(vendor_api=%vendor_api, "Vendor request failed, but not bailing out of decision engine run");
+                    tracing::warn!(vendor_api=%&vendor_api_error.vendor_api, "Vendor request failed, but not bailing out of decision engine run");
                     false
                 }
             }

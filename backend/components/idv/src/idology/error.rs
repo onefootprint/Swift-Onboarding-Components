@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -26,11 +26,20 @@ pub enum Error {
     ScanVerifyDocumentSubmissionNotSuccessful,
     #[error("Credentials for tenant not configured")]
     CredentialsNotFound,
+    #[error("Parsable APIError {0}")]
+    ParsableAPIError(Box<ParsableAPIError>),
 }
 
 impl Error {
     pub fn should_retry_request(&self) -> bool {
         matches!(&self, Error::DocumentResultsNotReady | Error::ReqwestError(_))
+    }
+
+    pub fn into_parsable_error(self, response: serde_json::Value) -> Self {
+        Self::ParsableAPIError(Box::new(ParsableAPIError {
+            error: self,
+            response,
+        }))
     }
 }
 
@@ -118,5 +127,21 @@ impl From<String> for RequestError {
                 }
             }
         }
+    }
+}
+
+/// In the case that we have errors that get returned in a deserializable json response,
+/// we still want to save these as VerificationResults.
+///
+/// This struct wraps `Error` so that we can propagate the json up and save.
+#[derive(Debug)]
+pub struct ParsableAPIError {
+    pub error: Error,
+    pub response: serde_json::Value,
+}
+
+impl Display for ParsableAPIError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.error)
     }
 }

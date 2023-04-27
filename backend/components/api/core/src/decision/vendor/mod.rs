@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     errors::{ApiError, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper},
@@ -50,4 +52,16 @@ pub fn get_vendor_apis_for_verification_requests(
         ));
     } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
     Ok(vendor_apis)
+}
+
+#[derive(Debug)]
+pub struct VendorAPIError {
+    pub vendor_api: VendorAPI,
+    pub error: idv::Error,
+}
+
+impl Display for VendorAPIError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.error)
+    }
 }

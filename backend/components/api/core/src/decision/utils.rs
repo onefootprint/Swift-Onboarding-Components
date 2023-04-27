@@ -142,7 +142,8 @@ pub async fn setup_test_fixtures(
             )?;
 
             // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
-            let result = VerificationResult::create(conn, request.id, raw_response.into(), e_response)?;
+            let result =
+                VerificationResult::create(conn, request.id, raw_response.into(), e_response, false)?;
             // If the decision is a pass, mark all data as verified for the onboarding
             let seqno = if decision_status == DecisionStatus::Pass {
                 let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;

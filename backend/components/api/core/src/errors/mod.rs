@@ -4,7 +4,7 @@ use actix_web::{
 };
 
 use db::errors::DbError;
-use newtypes::{ErrorMessage, Uuid, VendorAPI};
+use newtypes::{ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -20,7 +20,10 @@ pub mod tenant;
 pub mod user;
 pub mod workos;
 
-use crate::types::error::{ApiResponseError, FpResponseErrorInfo};
+use crate::{
+    decision::vendor::VendorAPIError,
+    types::error::{ApiResponseError, FpResponseErrorInfo},
+};
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
 
@@ -98,7 +101,7 @@ pub enum ApiError {
     #[error("{0}")]
     PrivacyPassError(#[from] privacy_pass::Error),
     #[error("Vendor request failed {0}")]
-    VendorRequestFailed(VendorAPI),
+    VendorRequestFailed(VendorAPIError),
     #[error("One or more vendor requests failed")]
     VendorRequestsFailed,
     #[error("{0}")]

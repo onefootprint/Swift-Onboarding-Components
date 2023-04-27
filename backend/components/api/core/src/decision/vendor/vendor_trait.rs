@@ -48,7 +48,10 @@ impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idol
         let raw_response = idv::idology::verify_expectid(self, request).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::expectid::response::parse_response(raw_response.clone())?;
 
-        parsed_response.response.validate()?;
+        parsed_response
+            .response
+            .validate()
+            .map_err(|e| e.into_parsable_error(raw_response.clone()))?;
 
         Ok(IdologyExpectIDAPIResponse {
             raw_response: PiiJsonValue::new(raw_response),
@@ -85,7 +88,10 @@ impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::
         let raw_response = idv::idology::standalone_pa(self, request).await?; // TODO: this should return PiiJsonValue itself
         let parsed_response = idv::idology::pa::response::parse_response(raw_response.clone())?;
 
-        parsed_response.response.validate()?;
+        parsed_response
+            .response
+            .validate()
+            .map_err(|e| e.into_parsable_error(raw_response.clone()))?;
 
         Ok(IdologyPaAPIResponse {
             raw_response: PiiJsonValue::new(raw_response),

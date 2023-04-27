@@ -77,9 +77,9 @@ pub fn create(
     if opts.collected_doc_opts.id_doc_collected {
         let id1 = IdentityDocument::create(
             conn,
-            doc_request.id.clone(),            
+            doc_request.id.clone(),
             newtypes::IdDocKind::DriverLicense,
-            "USA".into(),            
+            "USA".into(),
             SealedVaultDataKey(vec![]),
             None,
             None,
@@ -110,6 +110,7 @@ pub fn create(
                         .leak_to_vec()
                         .unwrap(),
                 ),
+                false,
             )
             .expect("VerificationResult failed to create");
             let update = DocumentRequestUpdate::idv_reqs_initiated();

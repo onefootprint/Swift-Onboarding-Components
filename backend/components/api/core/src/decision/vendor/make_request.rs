@@ -62,9 +62,9 @@ pub async fn send_idv_request(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
-) -> Result<VendorResponse, idv::Error> {
+) -> Result<VendorResponse, VendorAPIError> {
     // still TODO: traitfy the ff logic shared by these requests
-    let result = match request.vendor_api {
+    match request.vendor_api {
         VendorAPI::IdologyExpectID => {
             let request = tenant_vendor_control.build_idology_request(idv_data);
             send_idology_idv_request(
@@ -74,9 +74,9 @@ pub async fn send_idv_request(
                 idology_client,
                 ff_client,
             )
-            .await?
+            .await
         }
-        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client).await?,
+        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client).await,
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(
                 idv_data,
@@ -86,9 +86,8 @@ pub async fn send_idv_request(
                 socure_client,
                 ff_client,
             )
-            .await?
+            .await
         }
-        // TODO finish this
         VendorAPI::ExperianPreciseID => {
             let request = tenant_vendor_control.build_experian_request(idv_data);
             send_experian_idv_request(
@@ -98,15 +97,17 @@ pub async fn send_idv_request(
                 experian_client,
                 ff_client,
             )
-            .await?
+            .await
         }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);
-            return Err(idv::Error::AssertionError(err));
+            Err(idv::Error::AssertionError(err))
         }
-    };
-
-    Ok(result)
+    }
+    .map_err(|e| VendorAPIError {
+        vendor_api: request.vendor_api,
+        error: e,
+    })
 }
 
 /// Send a request to vendors for document verification
@@ -241,6 +242,7 @@ pub async fn send_idology_idv_request(
     }
 }
 
+#[derive(Clone)]
 pub struct SocureData {
     pub device_session_id: Option<String>,
     pub ip_address: Option<PiiString>,
@@ -374,8 +376,9 @@ pub async fn send_scan_onboarding_docv_request(
 pub async fn make_idv_request(
     request: VerificationRequest,
     onboarding_id: &OnboardingId,
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    data: IdvData,
+    socure_data: SocureData,
+    ob_configuration_key: ObConfigurationKey,
     is_production: bool,
     ff_client: &impl FeatureFlagClient,
     idology_client: &impl VendorAPICall<
@@ -391,38 +394,12 @@ pub async fn make_idv_request(
         idv::experian::error::Error,
     >,
     tenant_vendor_control: &TenantVendorControl,
-) -> Result<VendorResponse, ApiError> {
-    let data =
-        build_request::build_idv_data_from_verification_request(db_pool, enclave_client, request.clone())
-            .await?;
-
-    let obid = onboarding_id.clone();
-
-    let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
-        .db_query(
-            move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
-                let socure_device_session_id =
-                    SocureDeviceSession::latest_for_onboarding(conn, &obid)?.map(|d| d.device_session_id);
-
-                let ip_address = InsightEvent::get_by_onboarding_id(conn, &obid)?
-                    .ip_address
-                    .map(PiiString::from);
-
-                let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
-
-                Ok((socure_device_session_id, ip_address, ob_configuration_key))
-            },
-        )
-        .await??;
-    let socure_data = SocureData {
-        device_session_id: socure_device_session_id,
-        ip_address,
-    };
-
+) -> Result<VendorResponse, VendorAPIError> {
+    let vendor_api = request.vendor_api;
     tracing::info!(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
-        vendor_api = request.vendor_api.clone().to_string(),
+        vendor_api = vendor_api.clone().to_string(),
         scoped_user_id = %request.scoped_vault_id,
         onboarding_id = %onboarding_id,
     );
@@ -441,6 +418,7 @@ pub async fn make_idv_request(
         experian_client,
     )
     .await?;
+
     Ok(vendor_response)
 }
 
@@ -483,6 +461,7 @@ pub async fn make_docv_request(
 }
 
 pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
+pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
 
 #[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
@@ -505,15 +484,42 @@ pub async fn make_vendor_requests(
         idv::experian::error::Error,
     >,
     tenant_vendor_control: TenantVendorControl,
-) -> Result<Vec<Result<VerificationRequestWithVendorResponse, ApiError>>, ApiError> {
-    let raw_futures_with_vendors = requests.into_iter().map(|r| {
+) -> Result<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>, ApiError>
+{
+    let requests_with_data =
+        build_request::bulk_build_data_from_requests(db_pool, enclave_client, requests).await?;
+
+    let obid = onboarding_id.clone();
+
+    let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
+        .db_query(
+            move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
+                let socure_device_session_id =
+                    SocureDeviceSession::latest_for_onboarding(conn, &obid)?.map(|d| d.device_session_id);
+
+                let ip_address = InsightEvent::get_by_onboarding_id(conn, &obid)?
+                    .ip_address
+                    .map(PiiString::from);
+
+                let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
+
+                Ok((socure_device_session_id, ip_address, ob_configuration_key))
+            },
+        )
+        .await??;
+    let socure_data = SocureData {
+        device_session_id: socure_device_session_id,
+        ip_address,
+    };
+    let raw_futures_with_vendors = requests_with_data.into_iter().map(|(r, data)| {
         (
             r.clone(),
             make_idv_request(
                 r,
                 onboarding_id,
-                db_pool,
-                enclave_client,
+                data,
+                socure_data.clone(),
+                ob_configuration_key.clone(),
                 is_production,
                 ff_client,
                 idology_client,
@@ -530,16 +536,20 @@ pub async fn make_vendor_requests(
     let results = raw_results
         .into_iter()
         .enumerate()
-        .map(|(idx, res)| match res {
-            Ok(vr) => Ok((reqs[idx].clone(), vr)),
-            Err(ref e) => {
-                let vendor_api = reqs[idx].vendor_api;
-                tracing::warn!(
-                    vendor_api = %vendor_api,
-                    err = format!("{:?}", e),
-                    "VerificationRequest failed"
-                );
-                Err(ApiError::VendorRequestFailed(vendor_api))
+        .map(|(idx, res)| {
+            let log_msg = "VerificationRequest failed";
+
+            match res {
+                Ok(vr) => Ok((reqs[idx].clone(), vr)),
+                Err(e) => {
+                    tracing::warn!(
+                        vendor_api = %e.vendor_api,
+                        err = format!("{:?}", e.error),
+                        log_msg
+                    );
+
+                    Err((reqs[idx].clone(), ApiError::VendorRequestFailed(e)))
+                }
             }
         })
         .collect();

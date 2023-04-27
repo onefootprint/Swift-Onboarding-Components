@@ -117,8 +117,13 @@ async fn make_vendor_calls(
         return Err(ApiError::VendorRequestsFailed);
     }
 
-    let vendor_results =
-        decision::engine::save_vendor_responses(&state.db_pool, &vendor_results.successful, &ob.id).await?;
+    let vendor_results = decision::engine::save_vendor_responses(
+        &state.db_pool,
+        &vendor_results.successful,
+        vendor_results.all_errors_with_parsable_requests(),
+        &ob.id,
+    )
+    .await?;
 
     let (rules_output, _) =
         crate::decision::engine::calculate_decision(vendor_results.clone(), &state.feature_flag_client)?;

@@ -21,6 +21,7 @@ pub struct VerificationResult {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
+    pub is_error: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -32,6 +33,7 @@ pub struct NewVerificationResult {
     pub response: ScrubbedJsonValue,
     pub timestamp: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
+    pub is_error: bool,
 }
 
 impl VerificationResult {
@@ -42,12 +44,14 @@ impl VerificationResult {
         // To be removed once we are finished testing
         response: ScrubbedJsonValue,
         e_response: SealedVaultBytes,
+        is_error: bool,
     ) -> Result<VerificationResult, DbError> {
         let new_result = NewVerificationResult {
             request_id,
             response,
             timestamp: Utc::now(),
             e_response: Some(e_response),
+            is_error,
         };
         let result = diesel::insert_into(verification_result::table)
             .values(new_result)

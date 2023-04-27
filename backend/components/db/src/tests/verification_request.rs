@@ -49,6 +49,7 @@ fn test_get_requests_and_results_for_onboarding(conn: &mut TestPgConn, input_req
                         req.id.clone(),
                         json!({"yo": "sup"}).into(),
                         SealedVaultBytes(PiiJsonValue::from(json!({"yo": "sup"})).leak_to_vec().unwrap()),
+                        false,
                     )
                     .unwrap();
 
