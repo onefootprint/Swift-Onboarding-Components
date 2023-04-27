@@ -18,4 +18,5 @@ export type MachineEvents =
         onboardingConfig?: OnboardingConfig;
       };
     }
-  | { type: 'introductionCompleted' };
+  | { type: 'introductionCompleted' }
+  | { type: 'idvCompleted' };

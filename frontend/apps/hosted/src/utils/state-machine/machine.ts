@@ -43,7 +43,16 @@ export const createHostedMachine = () =>
             },
           },
         },
-        idv: {},
+        idv: {
+          on: {
+            idvCompleted: {
+              target: 'complete',
+            },
+          },
+        },
+        complete: {
+          type: 'final',
+        },
       },
     },
     {

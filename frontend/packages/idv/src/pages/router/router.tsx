@@ -5,11 +5,15 @@ import {
   Onboarding,
 } from '@onefootprint/idv-elements';
 import { UserDataAttribute } from '@onefootprint/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
 
-const Router = () => {
+type RouterProps = {
+  onDone?: (validationToken: string) => void;
+};
+
+const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
   const {
     userData,
@@ -17,10 +21,19 @@ const Router = () => {
     sandboxSuffix,
     authToken,
     userFound,
+    validationToken,
     onClose,
     onComplete,
   } = state.context;
   useLogStateMachine('idv', state);
+  const isDone = state.matches('complete');
+
+  useEffect(() => {
+    if (isDone && validationToken) {
+      onDone?.(validationToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDone, onDone]);
 
   return (
     <AppErrorBoundary

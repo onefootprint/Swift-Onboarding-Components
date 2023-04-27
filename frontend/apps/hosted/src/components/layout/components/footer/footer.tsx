@@ -1,23 +1,36 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import { SecuredByFootprint } from '@onefootprint/idv-elements';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled, { css } from 'styled-components';
 
 type Link = { label: string; href: string };
 
 const Footer = () => {
+  const { t } = useTranslation('components.layout.footer');
+  const [state] = useHostedMachine();
+  const { tenantPk } = state.context;
+
   const links: Link[] = [
     {
-      label: 'Privacy',
+      label: t('links.privacy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
     {
-      label: 'Terms',
+      label: t('links.terms'),
       href: 'https://onefootprint.com/terms-of-service',
     },
   ];
+
+  if (tenantPk) {
+    links.unshift({
+      label: t('links.what-is-this'),
+      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
+    });
+  }
 
   return (
     <Container>

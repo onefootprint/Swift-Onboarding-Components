@@ -1,5 +1,4 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -19,18 +18,16 @@ const FootprintFooter = ({
   hideOnDesktop,
   tenantPk,
 }: FootprintFooterProps) => {
-  const { t } = useTranslation('components.layout.footprint-footer');
-
   const links: Link[] = [
     {
-      label: t('privacy-policy'),
+      label: 'Privacy Policy',
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];
 
   if (tenantPk) {
     links.unshift({
-      label: t('what-is-this'),
+      label: "What's this?",
       href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
     });
   }

@@ -1,19 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Banner, media } from '@onefootprint/ui';
 import React from 'react';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
-
-import useSandboxMode from './hooks/use-sandbox-mode';
 
 const SandboxBanner = () => {
   const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('components.layout.sandbox-banner');
 
-  return isSandbox ? (
+  return (
     <SandboxBannerContainer>
-      <Banner variant="warning">{t('title')}</Banner>
+      {isSandbox && <Banner variant="warning">{t('title')}</Banner>}
     </SandboxBannerContainer>
-  ) : null;
+  );
 };
 
 const SandboxBannerContainer = styled.div`

@@ -4,9 +4,8 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Avatar } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
+import useIsKyb from 'src/utils/is-kyb';
 import styled, { css } from 'styled-components';
-
-import useIsKyb from '../../utils/is-kyb';
 
 const Header = () => {
   const { t } = useTranslation('pages.intro.header');

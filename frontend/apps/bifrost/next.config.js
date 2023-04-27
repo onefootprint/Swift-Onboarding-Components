@@ -2,7 +2,7 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io;; 
+  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

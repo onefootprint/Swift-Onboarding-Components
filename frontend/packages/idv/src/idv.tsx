@@ -28,7 +28,7 @@ const App = ({ data, appearance, layout, callbacks }: IdvProps) => {
         >
           <GlobalStyle />
           <Layout options={layout}>
-            <Router />
+            <Router onDone={callbacks?.onComplete} />
           </Layout>
         </MachineProvider>
       </I18nextProvider>

@@ -11,8 +11,8 @@ import { isKybCdo } from 'src/utils/cdo-utils';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
-import ConfettiAnimation from './confetti/confetti';
+import useBifrostMachine from '../../hooks/use-bifrost-machine';
+import ConfettiAnimation from './confetti';
 
 const CLOSE_DELAY = 6000;
 

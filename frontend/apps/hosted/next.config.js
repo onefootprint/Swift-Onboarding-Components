@@ -2,14 +2,14 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com maps.googleapis.com; 
+  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com maps.googleapis.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
   worker-src 'self' blob:;
 `;
@@ -26,6 +26,10 @@ const securityHeaders = [
   {
     key: 'X-XSS-Protection',
     value: '1; mode=block',
+  },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), publickey-credentials-get=*',
   },
   {
     key: 'X-Content-Type-Options',
@@ -57,6 +61,8 @@ module.exports = {
     ];
   },
   transpilePackages: [
+    '@onefootprint/idv-elements',
+    '@onefootprint/idv',
     '@onefootprint/ui',
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
