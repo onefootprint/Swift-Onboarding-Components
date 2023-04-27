@@ -2,7 +2,7 @@ pub use self::payloads::{
     OnboardingCompletedPayload, OnboardingStatusChangedPayload, WatchlistCheckCompletedPayload,
 };
 use chrono::{DateTime, Utc};
-use newtypes::{FpId, ObConfigurationId, OnboardingStatus};
+use newtypes::{FpId, OnboardingStatus};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, EnumMessage};
@@ -44,7 +44,6 @@ mod payloads {
         pub timestamp: DateTime<Utc>,
         pub status: OnboardingStatus,
         pub requires_manual_review: bool,
-        pub onboarding_configuration_id: ObConfigurationId,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
@@ -88,7 +87,6 @@ mod examples {
                 timestamp: Utc::now(),
                 status: Default::default(),
                 requires_manual_review: false,
-                onboarding_configuration_id: ObConfigurationId::test_data("ob_config_id_abc".into()),
             }
         }
     }

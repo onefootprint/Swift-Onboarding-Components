@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::events::*;
 use chrono::Utc;
-use newtypes::{FpId, ObConfigurationId, OnboardingStatus};
+use newtypes::{FpId, OnboardingStatus};
 use schemars::{gen::SchemaSettings, JsonSchema};
 use strum::{EnumMessage, IntoEnumIterator};
 
@@ -14,7 +14,6 @@ fn test_raw() {
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,
         requires_manual_review: false,
-        onboarding_configuration_id: ObConfigurationId::default(),
     });
 
     assert_eq!(evt.event_type().as_str(), "footprint.onboarding.completed");

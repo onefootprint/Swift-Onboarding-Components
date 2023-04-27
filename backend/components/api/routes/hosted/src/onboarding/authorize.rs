@@ -163,7 +163,6 @@ pub async fn post(
                 .then(|| su.fp_id.clone()),
             timestamp: decision_timestamp,
             status,
-            onboarding_configuration_id: ob_config.id.clone(),
             requires_manual_review: manual_review.is_some(),
         });
 
