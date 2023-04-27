@@ -9,7 +9,7 @@ on:
   pull_request:
     paths-ignore:
       - 'frontend/**'
-      - '.github/workflows/*.yml'
+      - '.github/workflows/frontend_ci_ignore.yml'
 
 jobs:
   install-dependencies:
