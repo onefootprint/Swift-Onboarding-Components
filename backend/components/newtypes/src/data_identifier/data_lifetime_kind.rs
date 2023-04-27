@@ -1,6 +1,6 @@
 use crate::{
-    BusinessDataKind, ConversionError, DataIdentifier, DocumentKind, IdentityDataKind, InvestorProfileKind,
-    KvDataKey, VdKind,
+    BusinessDataKind, ConversionError, CreditCardInfo, DataIdentifier, DocumentKind, IdentityDataKind,
+    InvestorProfileKind, KvDataKey, VdKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -36,6 +36,7 @@ pub enum DataLifetimeKind {
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
+    CreditCard(CreditCardInfo),
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeKind);
@@ -54,6 +55,7 @@ impl From<DataLifetimeKind> for DataIdentifier {
             DataLifetimeKind::Custom(k) => Self::Custom(k),
             DataLifetimeKind::InvestorProfile(k) => Self::InvestorProfile(k),
             DataLifetimeKind::Document(k) => Self::Document(k),
+            DataLifetimeKind::CreditCard(k) => Self::CreditCard(k),
         }
     }
 }
@@ -68,6 +70,7 @@ impl TryFrom<DataIdentifier> for DataLifetimeKind {
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
             DataIdentifier::Document(k) => Ok(Self::Document(k)),
+            DataIdentifier::CreditCard(k) => Ok(Self::CreditCard(k)),
         }
     }
 }
@@ -79,6 +82,7 @@ impl From<VdKind> for DataLifetimeKind {
             VdKind::Id(x) => Self::Id(x),
             VdKind::Custom(x) => Self::Custom(x),
             VdKind::InvestorProfile(x) => Self::InvestorProfile(x),
+            VdKind::CreditCard(x) => Self::CreditCard(x),
         }
     }
 }

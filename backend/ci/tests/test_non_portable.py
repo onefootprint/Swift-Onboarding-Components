@@ -1,6 +1,6 @@
 import pytest
 from tests.utils import post, get, put
-from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA
+from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
 class TestNonPortableVaultApi:
@@ -55,6 +55,7 @@ def test_vault_create_write_decrypt(tenant):
         "id.email": EMAIL,
         "custom.hi": "bye",
         **ID_DATA,
+        **CREDIT_CARD_DATA,
     }
     body = post("users/", initial_data, tenant.sk.key)
     user = body
@@ -82,21 +83,22 @@ def test_vault_create_write_decrypt(tenant):
     assert response["custom.insurance_id"] == False
 
     # decrypt the data
+    fields_to_check = [
+        "id.first_name",
+        "id.zip",
+        "custom.ach_account_number",
+        "custom.cc4",
+        "credit_card.hayes.exp_month",
+        "credit_card.valley.cvc",
+    ]
     data = dict(
         reason="test",
-        fields=[
-            "id.first_name",
-            "id.zip",
-            "custom.ach_account_number",
-            "custom.cc4",
-        ],
+        fields=fields_to_check,
     )
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
     data = body
-    assert data["id.first_name"] == "Piip"
-    assert data["id.zip"] == "10009"
-    assert data["custom.ach_account_number"] == "123467890"
-    assert data["custom.cc4"] == "4242"
+    for f in fields_to_check:
+        assert data[f] == all_data[f]
 
     # verify access events created
     body = get(
@@ -108,9 +110,4 @@ def test_vault_create_write_decrypt(tenant):
     assert access_events[0]["kind"] == "decrypt"
 
     events = set(access_events[0]["targets"])
-    assert events == {
-        "id.first_name",
-        "id.zip",
-        "custom.ach_account_number",
-        "custom.cc4",
-    }
+    assert events == set(fields_to_check)

@@ -47,13 +47,12 @@ pub async fn vault_pii(
         let data: HashMap<_, _> = values
             .into_iter()
             .filter_map(|(di, value)| match di {
-                DataIdentifier::Document(_) => {
-                    None
-                },
+                DataIdentifier::Document(_) => None,
                 DataIdentifier::InvestorProfile(_)
                 | DataIdentifier::Business(_)
                 | DataIdentifier::Id(_)
-                | DataIdentifier::Custom(_) => Some((di, value)),
+                | DataIdentifier::Custom(_)
+                | DataIdentifier::CreditCard(_) => Some((di, value)),
             })
             .collect();
 

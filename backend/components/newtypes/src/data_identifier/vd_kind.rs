@@ -5,7 +5,8 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
 use crate::{
-    BusinessDataKind as BDK, DataIdentifier, IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey,
+    BusinessDataKind as BDK, CreditCardInfo as CCI, DataIdentifier, IdentityDataKind as IDK,
+    InvestorProfileKind as IPK, KvDataKey,
 };
 
 #[derive(
@@ -36,6 +37,7 @@ pub enum VdKind {
     Business(BDK),
     Custom(KvDataKey),
     InvestorProfile(IPK),
+    CreditCard(CCI),
 }
 
 crate::util::impl_enum_string_diesel!(VdKind);
@@ -48,6 +50,7 @@ impl From<VdKind> for DataIdentifier {
             VdKind::Id(b) => Self::Id(b),
             VdKind::Custom(k) => Self::Custom(k),
             VdKind::InvestorProfile(k) => Self::InvestorProfile(k),
+            VdKind::CreditCard(k) => Self::CreditCard(k),
         }
     }
 }
@@ -61,7 +64,8 @@ impl TryFrom<DataIdentifier> for VdKind {
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
-            _ => Err(ConversionError::Error(value)),
+            DataIdentifier::CreditCard(k) => Ok(Self::CreditCard(k)),
+            DataIdentifier::Document(_) => Err(ConversionError::Error(value)),
         }
     }
 }
@@ -90,6 +94,12 @@ impl From<IPK> for VdKind {
     }
 }
 
+impl From<CCI> for VdKind {
+    fn from(value: CCI) -> Self {
+        Self::CreditCard(value)
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum ConversionError {
     #[error("Cannot convert from DataIdentifier: {0}")]
@@ -100,7 +110,6 @@ pub enum ConversionError {
 
 impl std::fmt::Display for VdKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // Temporarily make sure we don't serialize a phone/email since they aren't stored in the VaultData table
         let di = DataIdentifier::from(self.clone());
         di.fmt(f)
     }

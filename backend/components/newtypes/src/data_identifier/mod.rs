@@ -30,6 +30,7 @@
 
 mod business_data_kind;
 mod collected_data;
+mod credit_card;
 mod data_lifetime_kind;
 mod document_kind;
 mod id_doc_kind;
@@ -40,11 +41,11 @@ mod validation;
 mod vd_kind;
 
 pub use self::{
-    business_data_kind::*, collected_data::*, data_lifetime_kind::*, document_kind::*, id_doc_kind::*,
-    identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
-    vd_kind::*,
+    business_data_kind::*, collected_data::*, credit_card::*, data_lifetime_kind::*, document_kind::*,
+    id_doc_kind::*, identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError,
+    validation::*, vd_kind::*,
 };
-use crate::{util::impl_enum_string_diesel, EnumDotNotationError, KvDataKey, PiiString};
+use crate::{util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString};
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -88,6 +89,7 @@ pub enum DataIdentifier {
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
+    CreditCard(CreditCardInfo),
 }
 
 /// Contains all of the functionality that each nested type of DataIdentifier must provide
@@ -110,6 +112,7 @@ impl DataIdentifier {
             Self::Business(s) => s.is_optional(),
             Self::InvestorProfile(s) => s.is_optional(),
             Self::Document(s) => s.is_optional(),
+            Self::CreditCard(s) => s.is_optional(),
         }
     }
 
@@ -120,6 +123,7 @@ impl DataIdentifier {
             Self::Business(s) => s.parent(),
             Self::InvestorProfile(s) => s.parent(),
             Self::Document(s) => s.parent(),
+            Self::CreditCard(s) => s.parent(),
         }
     }
 
@@ -142,6 +146,7 @@ impl Validate for DataIdentifier {
             Self::Business(s) => s.validate(value, for_bifrost),
             Self::InvestorProfile(s) => s.validate(value, for_bifrost),
             Self::Document(s) => s.validate(value, for_bifrost),
+            Self::CreditCard(s) => s.validate(value, for_bifrost),
         }
     }
 }
@@ -157,6 +162,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::Business(s) => s.to_string(),
             Self::InvestorProfile(s) => s.to_string(),
             Self::Document(s) => s.to_string(),
+            Self::CreditCard(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -182,6 +188,14 @@ impl DataIdentifier {
                 DataIdentifierDiscriminant::Document => {
                     DocumentKind::iter().map(DataIdentifier::from).collect_vec()
                 }
+                DataIdentifierDiscriminant::CreditCard => CreditCardDataKind::iter()
+                    .map(|k| {
+                        DataIdentifier::from(CreditCardInfo {
+                            alias: AliasId::from("*".to_owned()),
+                            kind: k,
+                        })
+                    })
+                    .collect_vec(),
             })
             .map(|id| serde_json::Value::String(id.to_string()))
             .collect_vec()
@@ -263,6 +277,9 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminant::Document => {
                 Self::Document(DocumentKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            DataIdentifierDiscriminant::CreditCard => {
+                Self::CreditCard(CreditCardInfo::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
@@ -275,9 +292,10 @@ impl DataIdentifier {
         match self {
             DataIdentifier::Id(idk) => idk.is_searchable(),
             DataIdentifier::Business(bdk) => bdk.is_searchable(),
-            DataIdentifier::Custom(_) | DataIdentifier::InvestorProfile(_) | DataIdentifier::Document(_) => {
-                false
-            }
+            DataIdentifier::Custom(_)
+            | DataIdentifier::InvestorProfile(_)
+            | DataIdentifier::Document(_)
+            | DataIdentifier::CreditCard(_) => false,
         }
     }
 
@@ -320,6 +338,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
+    #[test_case(DataIdentifier::CreditCard(CreditCardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CreditCardDataKind::ExpMonth}) => "credit_card.hayesvalley.exp_month")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -332,6 +351,7 @@ mod tests {
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
+    #[test_case("credit_card.hayesvalley.exp_month" => DataIdentifier::CreditCard(CreditCardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CreditCardDataKind::ExpMonth}))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
@@ -377,7 +397,7 @@ mod tests {
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
             BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
             DocumentKind::iter().map(DataIdentifier::from).collect_vec(),
-            vec![KvDataKey::test_data("hayes valley".to_owned()).into()],
+            vec![KvDataKey::from("hayes valley".to_owned()).into()],
         ]
         .into_iter()
         .flatten()

@@ -161,6 +161,7 @@ define_newtype_id!(
     "Identifier for an unstructured key-value data row"
 );
 
+define_newtype_id!(AliasId, String, "Represents the alias for a piece of named data");
 define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data");
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
 define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
