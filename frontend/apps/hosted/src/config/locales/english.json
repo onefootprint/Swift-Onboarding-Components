@@ -10,10 +10,25 @@
     }
   },
   "pages": {
-    "bo-kyc-intro": {
-      "title": "A business you own is being verified",
-      "subtitle": "{{otherBoName}} is verifying {{businessName}}, and you were identified as a beneficial owner. In order to successfully verify your business, we need to verify your identity first.",
-      "cta": "Verify your identity"
+    "intro": {
+      "header": {
+        "bo-kyc": {
+          "title": "{{tenantName}} wants to verify your business",
+          "subtitle": "{{otherBoName}} is verifying {{businessName}}, and you were identified as a beneficial owner. In order to successfully verify your business, we need to verify your identity first."
+        },
+        "kyb": {
+          "title": "{{tenantName}} wants to verify your business",
+          "subtitle": "{{tenantName}} needs to collect some business and personal information to confirm your identity."
+        },
+        "kyc": {
+          "title": "{{tenantName}} wants to verify your identity",
+          "subtitle": "{{tenantName}} needs to collect some personal information to confirm your identity."
+        }
+      },
+      "cta": {
+        "kyb": "Verify your business",
+        "kyc": "Verify your identity"
+      }
     }
   }
 }

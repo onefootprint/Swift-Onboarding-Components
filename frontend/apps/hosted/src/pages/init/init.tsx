@@ -5,28 +5,20 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
-import useGetAuthToken from './hooks/use-get-auth-token';
 import useGetBusiness from './hooks/use-get-business';
+import useUrlParams from './hooks/use-url-params';
 
 const Init = () => {
-  const [state, send] = useHostedMachine();
-  const { authToken = '' } = state.context;
+  const [, send] = useHostedMachine();
   const showRequestError = useRequestErrorToast();
-
-  useGetAuthToken(token => {
-    send({
-      type: 'initContextUpdated',
-      payload: {
-        authToken: token,
-      },
-    });
-  });
+  const { authToken = '', tenantPk = '' } = useUrlParams();
 
   useGetBusiness(authToken, {
     onSuccess: (data: BusinessResponse) => {
       send({
         type: 'initContextUpdated',
         payload: {
+          authToken,
           businessBoKycData: { ...data },
         },
       });
@@ -35,12 +27,14 @@ const Init = () => {
   });
 
   useGetOnboardingConfig(
-    { kybBoAuthToken: authToken },
+    { kybBoAuthToken: authToken, tenantPk },
     {
       onSuccess: onboardingConfig => {
         send({
           type: 'initContextUpdated',
           payload: {
+            authToken,
+            tenantPk: onboardingConfig.key,
             onboardingConfig,
           },
         });

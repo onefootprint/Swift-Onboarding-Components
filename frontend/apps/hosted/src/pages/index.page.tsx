@@ -4,8 +4,8 @@ import { useLayoutOptions } from '@onefootprint/idv-elements/src/components/layo
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
-import BoKycIntro from './bo-kyc-intro';
 import Init from './init';
+import Intro from './intro';
 
 const Root = () => {
   const [state, send] = useHostedMachine();
@@ -21,7 +21,7 @@ const Root = () => {
       }}
     >
       {state.matches('init') && <Init />}
-      {state.matches('boKycIntro') && <BoKycIntro />}
+      {state.matches('intro') && <Intro />}
       {state.matches('idv') && (
         <Idv
           data={{

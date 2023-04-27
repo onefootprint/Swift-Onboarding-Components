@@ -24,6 +24,7 @@ describe('isContextReady', () => {
   };
 
   const testBusinessBoKycData: BusinessBoKycData = {
+    name: 'biz',
     inviter: {
       [UserDataAttribute.firstName]: 'firstName',
       [UserDataAttribute.lastName]: 'lastName',
@@ -38,6 +39,7 @@ describe('isContextReady', () => {
     it('when all data is in the machine context', () => {
       const context: MachineContext = {
         authToken: 'token',
+        tenantPk: 'pk',
         businessBoKycData: testBusinessBoKycData,
         onboardingConfig: testOnboardingConfig,
       };
@@ -50,7 +52,7 @@ describe('isContextReady', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
-        authToken: 'token',
+        tenantPk: 'pk',
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',

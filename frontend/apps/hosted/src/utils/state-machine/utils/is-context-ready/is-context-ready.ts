@@ -5,14 +5,16 @@ const isContextReady = (context: MachineContext, event: MachineEvents) => {
     return false;
   }
   const authToken = context.authToken || event.payload.authToken;
-  const business = context.businessBoKycData || event.payload.businessBoKycData;
+  const tenantPk = context.tenantPk || event.payload.tenantPk;
+  const businessBoKycData =
+    context.businessBoKycData || event.payload.businessBoKycData;
   const onboardingConfig =
     context.onboardingConfig || event.payload.onboardingConfig;
 
-  return (
-    authToken !== undefined &&
-    business !== undefined &&
-    onboardingConfig !== undefined
+  // We are either in full bifrost mode or just doing a KYC on a BO
+  return !!(
+    (authToken && businessBoKycData && onboardingConfig && tenantPk) ||
+    (tenantPk && onboardingConfig)
   );
 };
 

@@ -26,7 +26,7 @@ export const createHostedMachine = () =>
           on: {
             initContextUpdated: [
               {
-                target: 'boKycIntro',
+                target: 'intro',
                 actions: ['assignInitContext'],
                 cond: (context, event) => isContextReady(context, event),
               },
@@ -36,7 +36,7 @@ export const createHostedMachine = () =>
             ],
           },
         },
-        boKycIntro: {
+        intro: {
           on: {
             introductionCompleted: {
               target: 'idv',
@@ -50,8 +50,10 @@ export const createHostedMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context, event) => {
-          const { authToken, businessBoKycData, onboardingConfig } =
+          const { tenantPk, authToken, businessBoKycData, onboardingConfig } =
             event.payload;
+          context.tenantPk =
+            tenantPk !== undefined ? tenantPk : context.tenantPk;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
           context.businessBoKycData =
