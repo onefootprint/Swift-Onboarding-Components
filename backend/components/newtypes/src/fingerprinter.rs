@@ -40,6 +40,13 @@ impl<'a> FingerprintScope<'a> {
     }
 }
 
+// Implement an identity FingerprintScopable so a raw FingerprintScope can be passed into any generic fn
+impl<'a> FingerprintScopable for FingerprintScope<'a> {
+    fn scope(&self) -> FingerprintScope {
+        self.clone()
+    }
+}
+
 pub trait FingerprintScopable {
     fn scope(&self) -> FingerprintScope;
 }

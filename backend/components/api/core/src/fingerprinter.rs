@@ -1,12 +1,13 @@
+use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::types::Blob;
 use crypto::sha256;
 use db::models::vault::Vault;
 use futures::future::try_join_all;
 use newtypes::{
-    fingerprinter::{FingerprintScopable, Fingerprinter, GlobalFingerprintKind},
+    fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, PiiString,
+    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
 };
 
 use crate::{errors::kms::KmsSignError, ApiError, State};
@@ -105,27 +106,48 @@ impl Fingerprinter for State {
 }
 
 impl State {
-    /// This is a helper function for finding portable vault
-    /// by using fingerprinted data
+    /// This is a helper function for finding vaults by using fingerprinted data.
     /// Currently it fallbacks to legacy fingerprints if lookup fails (we can simplify once we migrate)
+    /// If t_id is provided, we will also look up users by tenant-scoped fingerprints.
     #[tracing::instrument(skip(self))]
-    pub async fn find_portable_vault_by_fingerprint(
+    pub async fn find_vault(
         &self,
-        kind: GlobalFingerprintKind,
-        data: &PiiString,
+        identifier: &IdentifyId,
+        t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
-        let sh_data = self.compute_fingerprint(kind, data).await?;
+        let idk = identifier.idk();
+        let (scopes, data) = match identifier {
+            IdentifyId::PhoneNumber(phone_number) => (
+                vec![
+                    Some(GlobalFingerprintKind::PhoneNumber.scope()),
+                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)),
+                ],
+                phone_number.e164_with_suffix(),
+            ),
+            IdentifyId::Email(email) => (
+                vec![
+                    Some(GlobalFingerprintKind::Email.scope()),
+                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
+                ],
+                PiiString::from(email.clone()),
+            ),
+        };
+
+        let fps: Vec<_> = scopes
+            .into_iter()
+            .flatten()
+            .zip(std::iter::repeat(&data))
+            .collect();
+        let sh_datas = self.compute_fingerprints(&fps).await?;
 
         let existing_user = self
             .db_pool
-            .db_query(|conn| Vault::find_portable(conn, &[sh_data]))
+            .db_query(move |conn| Vault::find_portable(conn, &sh_datas))
             .await??;
 
         // Legacy fingerprint support (todo: remove once migration complete)
         let existing_user = if existing_user.is_none() {
-            let sh_data = self
-                .compute_legacy_fingerprint(kind.data_identifier(), data)
-                .await?;
+            let sh_data = self.compute_legacy_fingerprint(idk.into(), &data).await?;
 
             self.db_pool
                 .db_query(|conn| Vault::find_portable(conn, &[sh_data]))

@@ -3,8 +3,9 @@ pub mod identify;
 pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::utils::twilio::PhoneChallengeState;
+use api_wire_types::IdentifyId;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::fingerprinter::GlobalFingerprintKind;
+use newtypes::TenantId;
 use strum::EnumDiscriminants;
 pub mod signup_challenge;
 pub mod verify;
@@ -12,11 +13,8 @@ use crate::errors::ApiError;
 use crate::utils::challenge::ChallengeToken;
 use crate::State;
 use chrono::{DateTime, Duration, Utc};
-use db::models::vault::Vault;
-use newtypes::email::Email;
-use newtypes::PiiString;
+use newtypes::IdentityDataKind;
 use newtypes::VaultId;
-use newtypes::{IdentityDataKind, PhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
@@ -65,13 +63,6 @@ pub struct ChallengeState {
     data: ChallengeData,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Identifier {
-    Email(Email),
-    PhoneNumber(PhoneNumber),
-}
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumDiscriminants)]
 #[strum_discriminants(name(ChallengeDataKind))]
 #[strum_discriminants(vis(pub))]
@@ -92,28 +83,13 @@ impl ChallengeState {
 }
 
 #[tracing::instrument(skip(state))]
-async fn get_user_by_identifier(
-    state: &web::Data<State>,
-    identifier: &Identifier,
-) -> Result<Option<Vault>, ApiError> {
-    let (scope, data) = match identifier {
-        Identifier::PhoneNumber(phone_number) => (
-            GlobalFingerprintKind::PhoneNumber,
-            phone_number.e164_with_suffix(),
-        ),
-        Identifier::Email(email) => (GlobalFingerprintKind::Email, PiiString::from(email.clone())),
-    };
-
-    state.find_portable_vault_by_fingerprint(scope, &data).await
-}
-
-#[tracing::instrument(skip(state))]
 async fn get_user_challenge_context(
     state: &web::Data<State>,
-    identifier: &Identifier,
+    identifier: &IdentifyId,
+    t_id: Option<&TenantId>,
 ) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
     // Look up existing user vault by identifier
-    let existing_user = if let Some(existing_user) = get_user_by_identifier(state, identifier).await? {
+    let existing_user = if let Some(existing_user) = state.find_vault(identifier, t_id).await? {
         existing_user
     } else {
         return Ok(None);

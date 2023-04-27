@@ -47,10 +47,7 @@ impl<Type> TenantUvw<Type> {
             .batch_fingerprint_sealed(&self.uvw.vault.e_private_key, sealed_data_to_fingerprint)
             .await?;
 
-        let fingerprints: Vec<_> = data_lifetime_kinds_and_ids
-            .into_iter()
-            .zip(fingerprints)
-            .collect();
+        let fingerprints = data_lifetime_kinds_and_ids.into_iter().zip(fingerprints);
 
         let fingerprints = fingerprints
             .into_iter()

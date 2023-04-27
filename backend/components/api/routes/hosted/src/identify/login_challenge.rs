@@ -1,4 +1,4 @@
-use super::{BiometricChallengeState, ChallengeKind, Identifier, UserChallengeData};
+use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
 use crate::identify::get_user_challenge_context;
@@ -9,6 +9,7 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
+use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
@@ -18,7 +19,7 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct LoginChallengeRequest {
-    identifier: Identifier,
+    identifier: IdentifyId,
     preferred_challenge_kind: ChallengeKind,
 }
 
@@ -39,6 +40,8 @@ pub async fn post(
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
+    let tenant = ob_context.as_ref().map(|obc| obc.tenant());
+
     // clean phone number
     let LoginChallengeRequest {
         identifier,
@@ -48,11 +51,10 @@ pub async fn post(
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
     let twilio_client = &state.twilio_client;
 
-    // find the tenant
-
     // Look up existing user vault by identifier
+    let t_id = tenant.map(|t| &t.id);
     let (uvw, creds, _) =
-        if let Some(user_challenge_context) = get_user_challenge_context(&state, &identifier).await? {
+        if let Some(user_challenge_context) = get_user_challenge_context(&state, &identifier, t_id).await? {
             user_challenge_context
         } else {
             // The user vault doesn't exist. Just return that the user wasn't found
@@ -76,7 +78,7 @@ pub async fn post(
             (challenge_data, 0, Some(challenge.challenge_json))
         }
         ChallengeKind::Sms => {
-            let tenant_name = ob_context.map(|obc| obc.tenant().name.clone());
+            let tenant_name = tenant.map(|t| t.name.clone());
             let (challenge_state, time_before_retry_s) = twilio_client
                 .send_challenge(&state, tenant_name, &phone_number)
                 .await?;

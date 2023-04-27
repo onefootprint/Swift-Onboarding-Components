@@ -2,10 +2,10 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::PhoneNumber;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -46,12 +46,8 @@ async fn post(
     }
 
     // Use e164 with suffix to compute fingerprint
-    let uv = state
-        .find_portable_vault_by_fingerprint(
-            GlobalFingerprintKind::PhoneNumber,
-            &phone_number.e164_with_suffix(),
-        )
-        .await?;
+    let id = IdentifyId::PhoneNumber(phone_number);
+    let uv = state.find_vault(&id, None).await?;
 
     let user_vault_id = if let Some(uv) = uv {
         uv.id
