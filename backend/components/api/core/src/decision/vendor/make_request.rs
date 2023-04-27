@@ -591,10 +591,17 @@ pub async fn make_kyb_request(
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
     let vr = (vreq.clone(), vendor_response.clone());
+    let sv_id = vreq.scoped_vault_id.clone();
+    let di_id = vreq.decision_intent_id.ok_or(DbError::ObjectNotFound)?;
     let verification_result = db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
-            verification_result::save_verification_result(conn, &vr, &uv.public_key)
+            let vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
+
+            // Create vreq for anticipated business.updated webhook
+            let _vreq =
+                VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::MiddeskBusinessUpdateWebhook)?;
+            Ok(vres)
         })
         .await??;
 
@@ -677,21 +684,29 @@ pub async fn handle_middesk_business_response(
                         business_id,
                     )))?;
 
-            // Create a VerificationRequest + VerificationResult for the webhook response
-            let vreq = VerificationRequest::create(
-                conn,
-                &create_business_vreq.scoped_vault_id,
-                &di.id,
-                VendorAPI::MiddeskBusinessUpdateWebhook,
-            )?;
+            let vreqs = VerificationRequest::list_by_decision_intent_id(conn, &di.id)?;
+            let outstanding_webhook_vreqs: Vec<_> = vreqs
+                .into_iter()
+                .filter(|(vreq, vres, _)| {
+                    vreq.vendor_api == VendorAPI::MiddeskBusinessUpdateWebhook && vres.is_none()
+                })
+                .collect();
+            if outstanding_webhook_vreqs.len() != 1 {
+                Err(idv::Error::from(
+                    middesk::Error::UnexpectedNumberOfOutstandingWebhookVreqs(
+                        outstanding_webhook_vreqs.len(),
+                    ),
+                ))?;
+            }
+            let webhook_vreq = outstanding_webhook_vreqs[0].0.clone();
 
-            let uv = VerificationRequest::get_user_vault(conn, vreq.id.clone())?;
+            let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
 
             let vendor_response = VendorResponse {
                 response: ParsedResponse::MiddeskBusinessUpdateWebhook(mr),
                 raw_response: PiiJsonValue::new(raw_res),
             };
-            let vr = (vreq, vendor_response);
+            let vr = (webhook_vreq, vendor_response);
 
             let verification_result =
                 verification_result::save_verification_result(conn, &vr, &uv.public_key)?;

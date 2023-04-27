@@ -37,6 +37,8 @@ pub enum Error {
     MalformedWebhookResponse,
     #[error("Unexpected webhook type: {0}")]
     UnexpectedWebhookType(String),
+    #[error("expected 1 outstanding webhook vreq but {0} found")]
+    UnexpectedNumberOfOutstandingWebhookVreqs(usize),
 }
 
 #[derive(Debug, thiserror::Error)]
