@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub enum FingerprintScope<'a> {
     /// Searchable across all tenants
-    Global(DataIdentifier),
+    Global(GlobalFingerprintKind),
     /// Searchable within a tenant
     Tenant(&'a DataIdentifier, &'a TenantId),
 }
@@ -25,7 +25,9 @@ impl<'a> FingerprintScope<'a> {
     /// convert into bytes for fingerprinting
     pub fn bytes(&self) -> Vec<u8> {
         match self {
-            FingerprintScope::Global(di) => crypto::sha256(di.to_string().as_bytes()).to_vec(),
+            FingerprintScope::Global(s) => {
+                crypto::sha256(s.data_identifier().to_string().as_bytes()).to_vec()
+            }
             FingerprintScope::Tenant(di, tenant_id) => crypto::sha256(
                 &[
                     crypto::sha256(di.to_string().as_bytes()),
@@ -38,17 +40,9 @@ impl<'a> FingerprintScope<'a> {
     }
 }
 
-/// a trick to prevent external crates from implementing this trait
-/// This lets us enforce what can be `FingerprintScopable`
-mod private {
-    pub trait Sealed {}
-}
-
-pub trait FingerprintScopable: private::Sealed {
+pub trait FingerprintScopable {
     fn scope(&self) -> FingerprintScope;
 }
-
-impl<'a> private::Sealed for (&'a DataIdentifier, &'a TenantId) {}
 
 impl<'a> FingerprintScopable for (&'a DataIdentifier, &'a TenantId) {
     fn scope(&self) -> FingerprintScope {
@@ -66,11 +60,9 @@ pub enum GlobalFingerprintKind {
     Tin,
 }
 
-impl private::Sealed for GlobalFingerprintKind {}
 impl FingerprintScopable for GlobalFingerprintKind {
     fn scope(&self) -> FingerprintScope {
-        let di = self.data_identifier();
-        FingerprintScope::Global(di)
+        FingerprintScope::Global(*self)
     }
 }
 impl GlobalFingerprintKind {
