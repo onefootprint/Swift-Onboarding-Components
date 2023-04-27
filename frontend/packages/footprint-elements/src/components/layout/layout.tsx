@@ -12,8 +12,7 @@ import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
 
 type LayoutProps = {
   children: React.ReactNode;
-  footerVariant: 'modal' | 'mobile';
-  isSandbox?: boolean;
+  hasSandboxBanner?: boolean;
   hasBorderRadius?: boolean;
 };
 
@@ -21,8 +20,7 @@ const SHIMMER_HEIGHT = '296px';
 
 const Layout = ({
   children,
-  footerVariant,
-  isSandbox,
+  hasSandboxBanner,
   hasBorderRadius = false,
 }: LayoutProps) => {
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
@@ -45,9 +43,9 @@ const Layout = ({
     >
       <DialogContent>
         <Header id={LAYOUT_HEADER_ID}>
-          {isSandbox && <SandboxBanner ref={measuredRef} />}
+          {hasSandboxBanner && <SandboxBanner ref={measuredRef} />}
           <NavigationHeaderContainer
-            top={isSandbox ? sandboxBannerHeight : undefined}
+            top={hasSandboxBanner ? sandboxBannerHeight : undefined}
             containerId={LAYOUT_CONTAINER_ID}
           />
         </Header>
@@ -60,7 +58,7 @@ const Layout = ({
         >
           <BodyContent ref={refBody}>{children}</BodyContent>
         </Body>
-        <FootprintFooter variant={footerVariant} />
+        <FootprintFooter />
       </DialogContent>
     </FullHeightContainer>
   );

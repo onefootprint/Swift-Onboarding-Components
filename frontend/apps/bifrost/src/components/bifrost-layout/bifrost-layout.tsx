@@ -12,7 +12,7 @@ const BifrostLayout = ({ children }: LayoutProps) => {
   const { isSandbox } = useSandboxMode();
 
   return (
-    <Layout isSandbox={isSandbox} footerVariant="modal" hasBorderRadius>
+    <Layout hasSandboxBanner={isSandbox} hasBorderRadius>
       {children}
     </Layout>
   );

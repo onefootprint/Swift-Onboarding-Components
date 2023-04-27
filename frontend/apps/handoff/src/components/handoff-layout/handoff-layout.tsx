@@ -12,11 +12,7 @@ type LayoutProps = {
 const HandoffLayout = ({ children }: LayoutProps) => {
   const { isSandbox } = useSandboxMode();
 
-  return (
-    <Layout isSandbox={isSandbox} footerVariant="mobile">
-      {children}
-    </Layout>
-  );
+  return <Layout hasSandboxBanner={isSandbox}>{children}</Layout>;
 };
 
 export default HandoffLayout;

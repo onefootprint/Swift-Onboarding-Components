@@ -1,19 +1,21 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import SecuredByFootprint from '../secured-by-footprint';
+import FooterActions from './footer-actions';
+import { Link } from './footer-actions/footer-actions';
 
-type FootprintFooterProps = {
-  variant?: 'modal' | 'mobile';
-};
-
-type Link = { label: string; href: string };
-
-const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
+const FootprintFooter = () => {
   const router = useRouter();
+  const [shouldShowLinks, setShouldShowLinks] = useState(false);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setShouldShowLinks(true);
+  }, [router.isReady]);
 
   const links: Link[] = [
     {
@@ -29,46 +31,39 @@ const FootprintFooter = ({ variant = 'modal' }: FootprintFooterProps) => {
   ];
 
   return (
-    <FootprintFooterContainer variant={variant}>
+    <FootprintFooterContainer>
       <SecuredByFootprint />
-      <LinksContainer>
-        {links.map(({ href, label }) => (
-          <li key={label}>
-            <a href={href} target="_blank" rel="noreferrer">
-              <Typography variant="caption-1" color="secondary" as="span">
-                {label}
-              </Typography>
-            </a>
-          </li>
-        ))}
-      </LinksContainer>
+      {shouldShowLinks ? (
+        <>
+          <LinksContainer>
+            {links.map(({ href, label }) => (
+              <li key={label}>
+                <a href={href} target="_blank" rel="noreferrer">
+                  <Typography variant="caption-1" color="secondary" as="span">
+                    {label}
+                  </Typography>
+                </a>
+              </li>
+            ))}
+          </LinksContainer>
+          <ActionsWrapper>
+            <FooterActions links={links} />
+          </ActionsWrapper>
+        </>
+      ) : null}
     </FootprintFooterContainer>
   );
 };
 
-const FootprintFooterContainer = styled.footer<{ variant: 'modal' | 'mobile' }>`
+const FootprintFooterContainer = styled.footer`
   ${({ theme }) => css`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     flex: 0;
+    background-color: ${theme.backgroundColor.secondary};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
-
-  ${({ variant, theme }) =>
-    variant === 'modal' &&
-    css`
-      background-color: ${theme.backgroundColor.secondary};
-      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      flex-direction: row;
-    `}
-
-  ${({ variant, theme }) =>
-    variant === 'mobile' &&
-    css`
-      gap: ${theme.spacing[4]};
-      align-items: center;
-      flex-direction: column;
-    `}
 `;
 
 const LinksContainer = styled.ul`
@@ -77,6 +72,10 @@ const LinksContainer = styled.ul`
     display: flex;
     justify-content: center;
     gap: ${theme.spacing[2]};
+
+    ${media.lessThan('sm')`
+      display: none;
+    `}
 
     li {
       &:not(:last-child) {
@@ -96,6 +95,12 @@ const LinksContainer = styled.ul`
       }
     }
   `}
+`;
+
+const ActionsWrapper = styled.div`
+  ${media.greaterThan('sm')`
+    display: none;
+`}
 `;
 
 export default FootprintFooter;
