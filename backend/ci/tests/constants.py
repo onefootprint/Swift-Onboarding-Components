@@ -111,11 +111,11 @@ IP_DATA = {
 }
 
 CREDIT_CARD_DATA = {
-    "credit_card.hayes.number": "1234-1234-1234-1234",
+    "credit_card.hayes.number": "4428680502681658",
     "credit_card.hayes.exp_month": "12",
     "credit_card.hayes.exp_year": "2025",
     "credit_card.hayes.cvc": "123",
-    "credit_card.hayes.last4": "1234",
+    "credit_card.hayes.last4": "1658",
     "credit_card.valley.cvc": "098",
 }
 

@@ -1,11 +1,9 @@
 use std::str::FromStr;
-
-use crate::{
-    AliasId, CollectedData, DataIdentifier, EnumDotNotationError, IsDataIdentifierDiscriminant, Validate,
-};
+use crate::{AliasId, CollectedData, DataIdentifier, EnumDotNotationError, IsDataIdentifierDiscriminant};
 use paperclip::actix::Apiv2Schema;
 use strum::EnumIter;
 use strum_macros::{Display, EnumString};
+
 #[derive(
     Debug, Display, Clone, Copy, Apiv2Schema, PartialEq, Eq, Ord, PartialOrd, Hash, EnumString, EnumIter,
 )]
@@ -17,6 +15,7 @@ pub enum CreditCardDataKind {
     Cvc,
     Last4,
 }
+
 #[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Ord, PartialOrd, Hash)]
 pub struct CreditCardInfo {
     pub alias: AliasId,
@@ -38,13 +37,6 @@ impl TryFrom<DataIdentifier> for CreditCardInfo {
                 "Can't convert into CreditCardInfo".to_owned(),
             )),
         }
-    }
-}
-
-impl Validate for CreditCardInfo {
-    fn validate(&self, value: crate::PiiString, _for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
-        // TODO
-        Ok(value)
     }
 }
 

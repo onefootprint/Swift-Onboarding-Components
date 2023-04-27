@@ -31,6 +31,7 @@ either = { workspace = true }
 mime = "0.3.16"
 futures-util = { workspace = true }
 futures = { workspace = true }
+card-validate = "2.3"
 
 # diesel
 diesel = { workspace = true }

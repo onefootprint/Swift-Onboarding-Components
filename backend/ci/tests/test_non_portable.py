@@ -29,6 +29,11 @@ class TestNonPortableVaultApi:
                 "12-1234567",
                 "Cannot add to this type of vault",
             ),
+            (
+                "credit_card.flerp.number",
+                "4026123412341233",
+                "InvalidLuhn",
+            ),
         ],
     )
     def test_data_validation(self, tenant, key, value, expected_error):

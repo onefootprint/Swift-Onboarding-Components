@@ -2172,6 +2172,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "card-validate"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6894706eb61c98c868965ca508ea1a13c68d293acb68a85db1ba327e7c55b31c"
+dependencies = [
+ "lazy_static",
+ "regex",
+]
+
+[[package]]
 name = "cargo-lock"
 version = "8.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4586,6 +4596,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64 0.13.0",
+ "card-validate",
  "chrono",
  "crypto",
  "derive_more",

@@ -1,12 +1,13 @@
 use crate::{NtResult, PiiString};
 
 mod business;
+mod credit_card;
 mod identity;
 mod investor_profile;
 mod utils;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
-pub use investor_profile::{Declaration};
+pub use investor_profile::Declaration;
 
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
@@ -46,6 +47,14 @@ pub enum Error {
     UrlParseError(#[from] url::ParseError),
     #[error("Invalid host. Should be a domain")]
     InvalidHost,
+    #[error("{0}")]
+    CreditCardError(String),
+    #[error("Invalid month")]
+    InvalidMonth,
+    #[error("Invalid year")]
+    InvalidYear,
+    #[error("{0}")]
+    CannotParseInt(#[from] std::num::ParseIntError),
 }
 
 pub(super) type VResult<T> = Result<T, Error>;
