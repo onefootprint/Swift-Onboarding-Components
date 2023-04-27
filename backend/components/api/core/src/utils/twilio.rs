@@ -48,6 +48,10 @@ impl TwilioClient {
         destination: &PhoneNumber,
         rate_limit_scope: &str,
     ) -> ApiResult<()> {
+        if destination.is_fixture_phone_number() {
+            // Don't rate limit or send SMS messages to the fixture phone number
+            return Ok(());
+        }
         RateLimit {
             state,
             phone_number: destination,
@@ -78,7 +82,13 @@ impl TwilioClient {
         tenant_name: Option<String>,
         destination: &PhoneNumber,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
-        let code = crypto::random::gen_rand_n_digit_code(6);
+        let code = if destination.is_fixture_phone_number() {
+            // For our one fixture number in sandbox mode, we want the 2fac code to be fixed
+            // to make it easy to test
+            "000000".to_owned()
+        } else {
+            crypto::random::gen_rand_n_digit_code(6)
+        };
         let message_body = if let Some(tenant_name) = tenant_name {
             format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", tenant_name, &code)
         } else {

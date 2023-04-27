@@ -218,6 +218,7 @@ fn validate_sms_challenge(
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
+            // TODO Don't make global fingerprints for fixture number
             let (uv, _) = VaultWrapper::create_user_vault(
                 conn,
                 context.keypair,

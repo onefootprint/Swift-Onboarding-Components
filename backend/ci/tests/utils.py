@@ -9,7 +9,7 @@ import os
 
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from tests.auth import DashboardAuth, FpAuth
-from tests.constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER, TEST_URL
+from tests.constants import CUSTODIAN_AUTH, TEST_URL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(TEST_URL, path)
 

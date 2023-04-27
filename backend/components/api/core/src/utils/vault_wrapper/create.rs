@@ -59,18 +59,24 @@ impl VaultWrapper<Person> {
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
         let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
-        let request = request.manual_fingerprints(HashSet::from_iter([
-            FingerprintRequest {
-                kind: IDK::PhoneNumber.into(),
-                fingerprint: global_sh_phone_number,
-                scope: FingerprintScopeKind::Global,
-            },
-            FingerprintRequest {
-                kind: IDK::PhoneNumber.into(),
-                fingerprint: tenant_sh_phone_number,
-                scope: FingerprintScopeKind::Tenant,
-            },
-        ]));
+        let request = request.manual_fingerprints(HashSet::from_iter(
+            [
+                // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise
+                // these test users' data will become portable across tenants
+                (!phone_number_parsed.is_fixture_phone_number()).then_some(FingerprintRequest {
+                    kind: IDK::PhoneNumber.into(),
+                    fingerprint: global_sh_phone_number,
+                    scope: FingerprintScopeKind::Global,
+                }),
+                Some(FingerprintRequest {
+                    kind: IDK::PhoneNumber.into(),
+                    fingerprint: tenant_sh_phone_number,
+                    scope: FingerprintScopeKind::Tenant,
+                }),
+            ]
+            .into_iter()
+            .flatten(),
+        ));
         let new_ci = uvw.put_person_data(conn, request)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault

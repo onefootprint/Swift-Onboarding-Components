@@ -29,6 +29,8 @@ impl Debug for PhoneNumber {
 }
 
 impl PhoneNumber {
+    const FIXTURE_PHONE_NUMBER: &str = "+15555550100";
+
     pub fn parse(number: PiiString) -> NtResult<Self> {
         let (number, sandbox_suffix) = super::sandbox::split_sandbox_parts(number.leak())?;
         let number = phonenumber::parse(None, number).map_err(Error::from)?;
@@ -41,6 +43,11 @@ impl PhoneNumber {
 
     pub fn is_live(&self) -> bool {
         self.sandbox_suffix.is_empty()
+    }
+
+    /// Returns true for the SINGLE fake, fixture phone number we provide
+    pub fn is_fixture_phone_number(&self) -> bool {
+        !self.is_live() && self.e164().leak() == Self::FIXTURE_PHONE_NUMBER
     }
 
     // Maybe make two versions of e164: one with sandbox and one without
@@ -119,19 +126,18 @@ mod tests {
     #[test_case("+55 (12) 12345-1234#derp" => "+5512123451234#derp".to_owned(); "brazil sandbox")]
     #[test_case("+47 123 12 123#test_1" => "+4712312123#test_1".to_owned(); "norway sandbox")]
     fn test_parse(number: &str) -> String {
-        PhoneNumber::parse(number.into())
-            .unwrap()
-            .e164_with_suffix()
-            .leak_to_string()
+        let phone_number = PhoneNumber::parse(number.into()).unwrap();
+        assert!(!phone_number.is_fixture_phone_number());
+        phone_number.e164_with_suffix().leak_to_string()
     }
 
     #[test_case("+1-415-123-1234" => "+1 (***) ***-**34".to_owned(); "US")]
     #[test_case("+55 (12) 12345-1234" => "+55 (**) *****-**34".to_owned(); "brazil")]
     #[test_case("+47 913 12 123" => "+47 *** ** *23".to_owned(); "norway")]
     fn test_leak_formatted_last_two(number: &str) -> String {
-        PhoneNumber::parse(number.into())
-            .unwrap()
-            .leak_formatted_last_two()
+        let phone_number = PhoneNumber::parse(number.into()).unwrap();
+        assert!(!phone_number.is_fixture_phone_number());
+        phone_number.leak_formatted_last_two()
     }
 
     #[test]
@@ -143,5 +149,18 @@ mod tests {
         let phone_number = PhoneNumber::parse("+1-123-123-1234".into()).unwrap();
         assert_eq!(phone_number.e164_with_suffix().leak(), "+11231231234");
         assert!(phone_number.is_live());
+    }
+
+    #[test]
+    fn test_fixture_number() {
+        let phone_number = PhoneNumber::parse("+1-555-555-0100#sandbox".into()).unwrap();
+        assert!(!phone_number.is_live());
+        assert!(phone_number.is_fixture_phone_number());
+
+        // Same number non-sandbox should not be considered the fixture phone number - we don't
+        // want to allow using this phone number in prod
+        let phone_number = PhoneNumber::parse("+1-555-555-0100".into()).unwrap();
+        assert!(phone_number.is_live());
+        assert!(!phone_number.is_fixture_phone_number());
     }
 }

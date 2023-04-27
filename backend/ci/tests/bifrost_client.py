@@ -159,9 +159,7 @@ class BifrostClient:
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/business/vault/validate", data, self.auth_token)
-        body = put("/hosted/business/vault", data, self.auth_token)
-        # TODO don't save this here after we stop returning the secondary BO auth tokens
-        self.put_business_response = body
+        put("/hosted/business/vault", data, self.auth_token)
 
     def handle_ip_doc(self):
         """Some special logic to upload a document for certain investor profile options"""
