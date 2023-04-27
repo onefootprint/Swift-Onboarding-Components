@@ -21,7 +21,7 @@ use newtypes::ObConfigurationId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
-    tags(Organization, Preview),
+    tags(Organization, Private),
     description = " Uses tenant public key auth to return information about the tenant."
 )]
 #[get("/org/onboarding_config")]
@@ -37,7 +37,7 @@ pub fn get_bifrost(
 }
 
 #[api_v2_operation(
-    tags(Organization, Preview),
+    tags(Organization, Private),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
 #[get("/org/onboarding_configs")]
@@ -78,7 +78,7 @@ async fn get_list(
 }
 
 #[api_v2_operation(
-    tags(Organization, Preview),
+    tags(Organization, Private),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
 #[get("/org/onboarding_configs/{id}")]

@@ -21,7 +21,7 @@ use newtypes::{DocumentKind, FpId};
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
-#[api_v2_operation(description = "Decrypts document in the vault.", tags(Vault, Preview, Users))]
+#[api_v2_operation(description = "Decrypts document in the vault.", tags(Vault, Private, Users))]
 #[actix::post("/users/{fp_id}/vault/document/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,

@@ -12,7 +12,7 @@ use paperclip::actix::patch;
 use paperclip::actix::{self, api_v2_operation, web::Json};
 
 #[api_v2_operation(
-    tags(Organization, OrgSettings, Preview),
+    tags(Organization, OrgSettings, Private),
     description = "Returns basic info about the authed tenant"
 )]
 #[actix::get("/org")]
@@ -28,7 +28,7 @@ pub async fn get(
 }
 
 #[api_v2_operation(
-    tags(Organization, OrgSettings, Preview),
+    tags(Organization, OrgSettings, Private),
     description = "Updates the basic information for the tenant"
 )]
 #[patch("/org")]

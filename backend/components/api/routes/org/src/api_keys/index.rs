@@ -19,7 +19,7 @@ type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretAp
 
 #[api_v2_operation(
     description = "Lists the tenant's secret API keys",
-    tags(Organization, Preview)
+    tags(Organization, Private)
 )]
 #[actix::get("/org/api_keys")]
 pub async fn get(
@@ -66,7 +66,7 @@ pub struct CreateApiKeyRequest {
 
 #[api_v2_operation(
     description = "Generates a new secret tenant api key.",
-    tags(Organization, Preview)
+    tags(Organization, Private)
 )]
 #[actix::post("/org/api_keys")]
 pub async fn post(
@@ -108,7 +108,7 @@ pub struct UpdateApiKeyRequest {
 
 #[api_v2_operation(
     description = "Generates a new secret tenant api key.",
-    tags(Organization, Preview)
+    tags(Organization, Private)
 )]
 #[patch("/org/api_keys/{id}")]
 pub async fn patch(
