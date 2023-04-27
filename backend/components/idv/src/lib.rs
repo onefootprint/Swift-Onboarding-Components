@@ -143,4 +143,6 @@ pub enum Error {
     ConversionError(String),
     #[error("Middesk error: {0}")]
     MiddeskError(#[from] middesk::Error),
+    #[error("Assertion error: {0}")]
+    AssertionError(String),
 }
