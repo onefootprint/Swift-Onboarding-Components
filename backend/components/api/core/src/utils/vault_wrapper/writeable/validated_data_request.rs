@@ -14,7 +14,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataLifetimeKind, ScopedVaultId, IdentityDataKind as IDK, DataRequest,
+    CollectedDataOption, DataIdentifier, ScopedVaultId, IdentityDataKind as IDK, DataRequest,
     Fingerprints, FingerprintScopeKind, FingerprintRequest, BusinessDataKind as BDK
 };
 
@@ -88,8 +88,8 @@ impl ValidatedDataRequest {
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
-        let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.parent().options()).flat_map(|cdo| cdo.data_identifiers().unwrap_or_default().into_iter().filter_map(|di| DataLifetimeKind::try_from(di).ok()));
-        let added_kinds = self.data.iter().map(|nvd| DataLifetimeKind::from(nvd.kind.clone()));
+        let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.parent().options()).flat_map(|cdo| cdo.data_identifiers().unwrap_or_default());
+        let added_kinds = self.data.iter().map(|nvd| DataIdentifier::from(nvd.kind.clone()));
         let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
             // fields in the CDO. For example, address line 2
@@ -108,7 +108,7 @@ impl ValidatedDataRequest {
             .map(|FingerprintRequest { kind, fingerprint, scope }| -> ApiResult<_> {
                 let vd = vds
                         .iter()
-                        .find(|vd| DataLifetimeKind::from(vd.kind.clone()) == kind)
+                        .find(|vd| DataIdentifier::from(vd.kind.clone()) == kind)
                         .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?;
 
                 Ok(NewFingerprint {
@@ -130,7 +130,7 @@ impl ValidatedDataRequest {
                 *count > 1 && 
                 // not all DLKs we 1) fingerprint and 2) we expect to be unique
                     match kind {
-                        DataLifetimeKind::Id(k) => k.should_have_unique_fingerprint(),
+                        DataIdentifier::Id(k) => k.should_have_unique_fingerprint(),
                         _ => false
                     }
                 }

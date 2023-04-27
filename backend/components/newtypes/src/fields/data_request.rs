@@ -1,7 +1,7 @@
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CollectedDataOption, DataIdentifier, DataLifetimeKind, Error, Fingerprint, FingerprintScopeKind,
-    IdentityDataKind as IDK, PiiString, TenantId, Validate, VdKind,
+    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK,
+    PiiString, TenantId, Validate, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
@@ -14,7 +14,7 @@ type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FingerprintRequest {
-    pub kind: DataLifetimeKind,
+    pub kind: DataIdentifier,
     pub fingerprint: Fingerprint,
     pub scope: FingerprintScopeKind,
 }
@@ -156,18 +156,18 @@ impl<T> DataRequest<T> {
         fingerprinter: &F,
         tenant_id: &TenantId,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let (data, dlks): (Vec<_>, Vec<DataLifetimeKind>) = self
+        let (data, dis): (Vec<_>, Vec<DataIdentifier>) = self
             .data
             .iter()
             .filter_map(|(di, pii)| {
-                let dlk: DataLifetimeKind = di.clone().try_into().ok()?;
-                di.is_fingerprintable().then_some((((di, tenant_id), pii), dlk))
+                di.is_fingerprintable()
+                    .then_some((((di, tenant_id), pii), di.clone()))
             })
             .unzip();
 
         let fingerprints = fingerprinter.compute_fingerprints(data.as_slice()).await?;
 
-        let fingerprints = dlks
+        let fingerprints = dis
             .into_iter()
             .zip(fingerprints)
             .map(|(kind, fingerprint)| FingerprintRequest {
@@ -198,7 +198,7 @@ impl<T> DataRequest<T> {
 
         let fingerprints = data_to_fingerprint
             .into_iter()
-            .map(|(g, _)| g.data_lifetime_kind())
+            .map(|(g, _)| g.data_identifier())
             .zip(global_fingperprints)
             .map(|(kind, fingerprint)| FingerprintRequest {
                 fingerprint,

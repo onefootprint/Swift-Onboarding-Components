@@ -7,7 +7,6 @@ use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
@@ -73,7 +72,7 @@ impl VaultData {
             user_vault_id,
             scoped_user_id,
             data.iter()
-                .map(|d| DataLifetimeKind::from(d.kind.clone()))
+                .map(|d| DataIdentifier::from(d.kind.clone()))
                 .collect(),
             seqno,
         )?;

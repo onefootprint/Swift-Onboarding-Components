@@ -7,7 +7,6 @@ use async_trait::async_trait;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
-use crate::DataLifetimeKind;
 use crate::{
     BusinessDataKind as BDK, DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
 };
@@ -77,17 +76,13 @@ impl GlobalFingerprintKind {
         Self::iter().map(|s| s.data_identifier()).collect()
     }
 
-    pub fn data_lifetime_kind(&self) -> DataLifetimeKind {
-        match self {
-            GlobalFingerprintKind::PhoneNumber => DataLifetimeKind::from(IDK::PhoneNumber),
-            GlobalFingerprintKind::Email => DataLifetimeKind::from(IDK::Email),
-            GlobalFingerprintKind::Ssn9 => DataLifetimeKind::from(IDK::Ssn9),
-            GlobalFingerprintKind::Tin => DataLifetimeKind::from(BDK::Tin),
-        }
-    }
-
     pub fn data_identifier(&self) -> DataIdentifier {
-        DataIdentifier::from(self.data_lifetime_kind())
+        match self {
+            GlobalFingerprintKind::PhoneNumber => DataIdentifier::from(IDK::PhoneNumber),
+            GlobalFingerprintKind::Email => DataIdentifier::from(IDK::Email),
+            GlobalFingerprintKind::Ssn9 => DataIdentifier::from(IDK::Ssn9),
+            GlobalFingerprintKind::Tin => DataIdentifier::from(BDK::Tin),
+        }
     }
 }
 

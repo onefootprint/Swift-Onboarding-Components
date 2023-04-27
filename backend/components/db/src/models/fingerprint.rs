@@ -9,7 +9,7 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::FingerprintScopeKind;
 use newtypes::FingerprintVersion;
-use newtypes::{DataLifetimeId, DataLifetimeKind, Fingerprint as FingerprintData, FingerprintId};
+use newtypes::{DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
 use crate::{DbResult, TxnPgConn};
@@ -23,7 +23,7 @@ pub struct Fingerprint {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
-    pub kind: DataLifetimeKind,
+    pub kind: DataIdentifier,
     pub lifetime_id: DataLifetimeId,
     /// For rows with is_unique, a db-level constraint enforces that no two rows have the same
     /// fingerprint for the same kind
@@ -38,7 +38,7 @@ pub struct Fingerprint {
 #[diesel(table_name = fingerprint)]
 pub struct NewFingerprint {
     pub sh_data: FingerprintData,
-    pub kind: DataLifetimeKind,
+    pub kind: DataIdentifier,
     pub lifetime_id: DataLifetimeId,
     pub is_unique: bool,
     pub version: FingerprintVersion,
@@ -46,7 +46,7 @@ pub struct NewFingerprint {
 }
 
 pub type IsUnique = bool;
-pub type DuplicateExistingFingerprintsByDLK = HashMap<DataLifetimeKind, i64>;
+pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
 impl Fingerprint {
     #[tracing::instrument(skip_all)]
     pub fn bulk_create(
@@ -74,8 +74,8 @@ impl Fingerprint {
     fn bulk_check_if_exists(
         conn: &mut PgConn,
         sh_datas: Vec<FingerprintData>,
-    ) -> DbResult<Vec<(DataLifetimeKind, i64)>> {
-        let res: Vec<(DataLifetimeKind, i64)> = fingerprint::table
+    ) -> DbResult<Vec<(DataIdentifier, i64)>> {
+        let res: Vec<(DataIdentifier, i64)> = fingerprint::table
             .filter(fingerprint::sh_data.eq_any(sh_datas))
             .inner_join(data_lifetime::table)
             .group_by(fingerprint::kind)

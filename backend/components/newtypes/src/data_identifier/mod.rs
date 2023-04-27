@@ -8,14 +8,10 @@
 //!   "identity data." This is the set of data that shows up on your virtual, Footprint ID card. It is the
 //!   set of data that we send to be verified by our KYC data vendors.
 //!    - TODO need to update this
-//!    - Identity data is stored inside of a handful of different tables. `UvdKind` is a subset of
+//!    - Identity data is stored inside of a handful of different tables. `VdKind` is a subset of
 //!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
 //! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
 //!    a wrapper around a free-form string.
-//!
-//! `DataLifetimeKind` is a tangential identifier. It mostly intersects with the types represented by
-//! `DataIdentifier`, but its purpose is more targeted: `DataLifetimeKind` is purely used in the `kind`
-//! column of the `DataLifetime` table since all pieces of data are associated with a lifetime.
 //!
 //! `CollectedData` and `CollectedDataOption` are also tangential - they are used in onboarding
 //! configurations to specify the set of dentity data that needs to be collected, and in permissions
@@ -31,7 +27,6 @@
 mod business_data_kind;
 mod collected_data;
 mod credit_card;
-mod data_lifetime_kind;
 mod document_kind;
 mod id_doc_kind;
 mod identity_data_kind;
@@ -41,9 +36,9 @@ mod validation;
 mod vd_kind;
 
 pub use self::{
-    business_data_kind::*, collected_data::*, credit_card::*, data_lifetime_kind::*, document_kind::*,
-    id_doc_kind::*, identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError,
-    validation::*, vd_kind::*,
+    business_data_kind::*, collected_data::*, credit_card::*, document_kind::*, id_doc_kind::*,
+    identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
+    vd_kind::*,
 };
 use crate::{util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString};
 use crypto::sha256;
@@ -135,6 +130,10 @@ impl DataIdentifier {
     /// encrypted.
     pub fn store_plaintext(&self) -> bool {
         matches!(self, Self::Business(BusinessDataKind::Name))
+    }
+
+    pub fn globally_unique(&self) -> bool {
+        matches!(self, Self::Id(IdentityDataKind::PhoneNumber))
     }
 }
 

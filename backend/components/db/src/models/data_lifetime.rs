@@ -5,7 +5,7 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::sql_types::Int8;
 use itertools::Itertools;
-use newtypes::DataLifetimeKind;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -73,7 +73,7 @@ pub struct DataLifetime {
     pub created_seqno: DataLifetimeSeqno,
     pub portablized_seqno: Option<DataLifetimeSeqno>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
-    pub kind: DataLifetimeKind,
+    pub kind: DataIdentifier,
 }
 
 #[derive(Clone, Insertable)]
@@ -86,7 +86,7 @@ struct NewDataLifetime {
     scoped_vault_id: ScopedVaultId,
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
-    kind: DataLifetimeKind,
+    kind: DataIdentifier,
 }
 
 #[derive(Default, AsChangeset)]
@@ -136,7 +136,7 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
         scoped_vault_id: &ScopedVaultId,
-        kinds: Vec<DataLifetimeKind>,
+        kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewDataLifetime> = kinds
@@ -161,7 +161,7 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
         scoped_vault_id: &ScopedVaultId,
-        kind: DataLifetimeKind,
+        kind: DataIdentifier,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
         let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno)?
@@ -236,7 +236,7 @@ impl DataLifetime {
     pub fn bulk_deactivate_speculative(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
-        kinds: Vec<DataLifetimeKind>,
+        kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let update = DataLifetimeUpdate {

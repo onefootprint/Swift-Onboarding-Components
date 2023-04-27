@@ -1,7 +1,7 @@
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{fingerprint::NewFingerprint, ob_configuration::ObConfiguration};
 use itertools::Itertools;
-use newtypes::{DataLifetimeKind, FingerprintScopeKind, FingerprintVersion};
+use newtypes::{FingerprintScopeKind, FingerprintVersion};
 use paperclip::actix::web;
 
 use crate::{errors::ApiResult, State};
@@ -27,18 +27,14 @@ impl<Type> TenantUvw<Type> {
             .iter()
             .filter(|di| di.is_fingerprintable())
             .filter_map(|id| {
-                DataLifetimeKind::try_from(id.to_owned())
-                    .ok()
-                    .and_then(|dl_kind| {
-                        self.uvw
-                            .get(id.clone())
-                            .and_then(|data| {
-                                EciesP256Sha256AesGcmSealed::from_bytes(data.e_data.as_ref())
-                                    .map(|ed| (&data.lifetime_id, ed))
-                                    .ok()
-                            })
-                            .map(|(dl_id, e_data)| ((dl_kind, dl_id), ((id, tenant_id), e_data)))
+                self.uvw
+                    .get(id.clone())
+                    .and_then(|data| {
+                        EciesP256Sha256AesGcmSealed::from_bytes(data.e_data.as_ref())
+                            .map(|ed| (&data.lifetime_id, ed))
+                            .ok()
                     })
+                    .map(|(dl_id, e_data)| ((id, dl_id), ((id, tenant_id), e_data)))
             })
             .unzip();
 
@@ -52,7 +48,7 @@ impl<Type> TenantUvw<Type> {
         let fingerprints = fingerprints
             .into_iter()
             .map(|((kind, lifetime_id), sh_data)| NewFingerprint {
-                kind,
+                kind: kind.clone(),
                 sh_data,
                 lifetime_id: lifetime_id.to_owned(),
                 is_unique: false,
