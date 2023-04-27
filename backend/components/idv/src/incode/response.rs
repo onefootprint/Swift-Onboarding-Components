@@ -1,5 +1,7 @@
 use newtypes::PiiString;
 
+use super::APIResponseToIncodeError;
+
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OnboardingStartResponse {
@@ -34,11 +36,84 @@ pub struct OnboardingStartResponse {
     pub error: Option<Error>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+impl APIResponseToIncodeError for OnboardingStartResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
+/// Common Error struct that will occur across multiple Incode endpoints
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Error {
     pub timestamp: i64,
     pub status: i32,
     pub error: String,
     pub message: String,
     pub path: String,
+}
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "IncodeAPIResponseError {}: {} in {}>",
+            self.error, self.message, self.path
+        )
+    }
+}
+
+/// Response we get back from adding a document image
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddSideResponse {
+    pub classification: Option<bool>,
+    pub correct_glare: Option<bool>,
+    pub correct_sharpness: Option<bool>,
+    pub country_code: Option<String>,
+    pub glare: Option<i32>,
+    pub horizontal_resolution: Option<i32>,
+    pub issue_name: Option<String>,
+    pub issue_year: Option<i32>,
+    pub readability: Option<bool>,
+    pub session_status: Option<String>,
+    pub sharpness: Option<i32>,
+    pub type_of_id: Option<String>,
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl APIResponseToIncodeError for AddSideResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
+/// Response we get from telling Incode to process the image
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProcessIdResponse {
+    pub success: Option<bool>,
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl APIResponseToIncodeError for ProcessIdResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
+/// Response from fetch scores
+// TODO!
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchScoresResponse {
+    pub id_validation: Option<serde_json::Value>,
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl APIResponseToIncodeError for FetchScoresResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
 }

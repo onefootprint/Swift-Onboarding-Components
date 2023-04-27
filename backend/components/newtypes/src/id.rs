@@ -115,6 +115,16 @@ define_newtype_id!(IdentityDataId, String, "Identifier for user identity data ro
 define_newtype_id!(ScopedVaultId, String, "Identifier for an ScopedUser");
 define_newtype_id!(OnboardingId, String, "Identifier for an OnboardingLink");
 define_newtype_id!(FpId, String, "Identifier for a ScopedUser");
+define_newtype_id!(
+    IncodeConfigurationId,
+    String,
+    "ConfigurationId for incode requests"
+);
+define_newtype_id!(
+    IncodeSessionId,
+    String,
+    "Session id representing a verification session on incode"
+);
 impl_verified_prefix_for_nt_id!(FpId, "fp_id_");
 
 define_newtype_id!(

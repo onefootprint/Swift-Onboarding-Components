@@ -10,4 +10,8 @@ pub enum Error {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to incode api: {0}")]
     SendError(String),
+    #[error("Unauthorized")]
+    Unauthorized,
+    #[error("Incode API Error: {0}")]
+    APIResponseError(super::response::Error),
 }

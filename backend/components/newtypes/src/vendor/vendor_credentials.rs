@@ -1,12 +1,13 @@
 use crate::PiiString;
 
 /// credentials for idology
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct IdologyCredentials {
     pub username: PiiString,
     pub password: PiiString,
 }
 
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ExperianCredentialBuilder {
     pub auth_username: PiiString,
     pub auth_password: PiiString,
@@ -14,6 +15,12 @@ pub struct ExperianCredentialBuilder {
     pub auth_client_secret: PiiString,
     pub cross_core_username: PiiString,
     pub cross_core_password: PiiString,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct IncodeCredentials {
+    pub api_key: PiiString,
+    pub client_id: PiiString,
 }
 
 /// The bulk of experian credentials are shared across requests for different tenants
@@ -33,7 +40,7 @@ impl ExperianCredentialBuilder {
 }
 #[allow(unused)]
 /// credentials for experian
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ExperianCredentials {
     pub subscriber_code: PiiString,
     pub auth_username: PiiString,

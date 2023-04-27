@@ -15,7 +15,7 @@ use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
     experian::cross_core::client::ExperianClientAdapter, fingerprintjs::client::FingerprintJSClient,
     footprint_http_client::FootprintVendorHttpClient, idology::client::IdologyClient,
-    incode::client::IncodeClient, middesk::client::MiddeskClient, socure::client::SocureClient,
+    middesk::client::MiddeskClient, socure::client::SocureClient,
 };
 use newtypes::PiiString;
 use workos::{ApiKey, WorkOs};
@@ -43,8 +43,6 @@ pub struct State {
     pub billing_client: billing::BillingClient,
     pub experian_client: ExperianClientAdapter,
     pub fingerprintjs_client: FingerprintJSClient,
-    #[allow(unused)]
-    pub incode_client: IncodeClient,
     pub middesk_client: MiddeskClient,
     pub footprint_vendor_http_client: FootprintVendorHttpClient,
 }
@@ -141,9 +139,6 @@ impl State {
         let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
             .expect("failed to build fingerprint client");
 
-        let incode_client = IncodeClient::new(config.incode.api_key.clone(), config.incode.client_id.clone())
-            .expect("failed to build fingerprint client");
-
         let middesk_client = MiddeskClient::new(config.middesk_config.middesk_sandbox_api_key.clone(), true)
             .expect("failed to build middesk client");
 
@@ -198,7 +193,6 @@ impl State {
             billing_client,
             experian_client,
             fingerprintjs_client,
-            incode_client,
             middesk_client,
             footprint_vendor_http_client,
         }

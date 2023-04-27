@@ -8,18 +8,22 @@ use db::{
 use idv::{
     experian::ExperianCrossCoreRequest,
     idology::{pa::IdologyPaRequest, IdologyExpectIDRequest},
+    incode::client::IncodeClientAdapter,
 };
 use newtypes::{
-    vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
+    vendor_credentials::{
+        ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
+    },
     EncryptedVaultPrivateKey, IdvData, PiiString, TenantId, Vendor, VendorAPI,
 };
 
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate
 pub struct TenantVendorControl {
     vendor_control: Option<DbTenantVendorControl>,
     idology_credentials: IdologyCredentials,
     experian_credentials: ExperianCredentials,
+    incode_credentials: IncodeCredentials,
     enabled_vendor_apis: Vec<VendorAPI>,
 }
 
@@ -51,6 +55,10 @@ impl TenantVendorControl {
         self.experian_credentials.clone()
     }
 
+    pub fn incode_credentials(&self) -> IncodeCredentials {
+        self.incode_credentials.clone()
+    }
+
     pub fn enabled_vendor_apis(&self) -> Vec<VendorAPI> {
         self.enabled_vendor_apis.clone()
     }
@@ -74,6 +82,14 @@ impl TenantVendorControl {
             idv_data,
             credentials: self.idology_credentials(),
         }
+    }
+
+    // As of 2023-04-25, we re-use a single set of credentials for Incode
+    pub fn build_incode_client_adapter(&self, is_production: bool) -> ApiResult<IncodeClientAdapter> {
+        let res =
+            IncodeClientAdapter::new(is_production, self.incode_credentials()).map_err(idv::Error::from)?;
+
+        Ok(res)
     }
 }
 
@@ -119,6 +135,9 @@ impl TenantVendorControl {
         let experian_credentials =
             experian_credential_builder.build_with_subscriber_code(experian_subscriber_code);
 
+        // As of 2023-04-25, we only have a single set of incode credentials
+        let incode_credentials = IncodeCredentials::from(config);
+
         // stash the enabled APIs on TVC
         let enabled_vendor_apis = Self::get_enabled_vendor_apis(&vendor_control);
 
@@ -128,6 +147,7 @@ impl TenantVendorControl {
             idology_credentials,
             experian_credentials,
             enabled_vendor_apis,
+            incode_credentials,
         };
 
         Ok(control)
@@ -224,34 +244,21 @@ impl TenantVendorControl {
     }
 }
 
-impl std::default::Default for TenantVendorControl {
-    fn default() -> Self {
-        Self {
-            vendor_control: None,
-            idology_credentials: IdologyCredentials {
-                username: PiiString::from(""),
-                password: PiiString::from(""),
-            },
-            experian_credentials: ExperianCredentials {
-                subscriber_code: PiiString::from(""),
-                auth_username: PiiString::from(""),
-                auth_password: PiiString::from(""),
-                auth_client_id: PiiString::from(""),
-                auth_client_secret: PiiString::from(""),
-                cross_core_username: PiiString::from(""),
-                cross_core_password: PiiString::from(""),
-            },
-            enabled_vendor_apis: vec![],
-        }
-    }
-}
-
 // Default credentials (for now) are found on State
 impl From<&Config> for IdologyCredentials {
     fn from(config: &Config) -> Self {
         IdologyCredentials {
             username: config.idology_config.username.clone().into(),
             password: config.idology_config.password.clone().into(),
+        }
+    }
+}
+
+impl From<&Config> for IncodeCredentials {
+    fn from(config: &Config) -> Self {
+        IncodeCredentials {
+            api_key: config.incode.api_key.clone(),
+            client_id: config.incode.client_id.clone(),
         }
     }
 }

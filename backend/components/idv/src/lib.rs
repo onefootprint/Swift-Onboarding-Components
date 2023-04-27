@@ -129,6 +129,8 @@ pub enum Error {
     TwilioRequestError(#[from] ::twilio::error::Error),
     #[error("Twilio error: {0}")]
     TwilioError(#[from] twilio::Error),
+    #[error("Incode error: {0}")]
+    IncodeError(#[from] incode::error::Error),
     #[error("Not implemented")]
     NotImplemented,
     #[error("Socure error: {0}")]

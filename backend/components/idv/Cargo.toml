@@ -34,3 +34,5 @@ mockall = "0.9.1"
 dotenv = { workspace = true }
 macros = { path = "../macros" }
 tracing-test = "0.2.3"
+image = "0.24.6"
+base64 = {workspace = true}
