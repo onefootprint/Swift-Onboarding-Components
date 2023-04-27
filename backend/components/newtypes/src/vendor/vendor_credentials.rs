@@ -50,3 +50,8 @@ pub struct ExperianCredentials {
     pub cross_core_username: PiiString,
     pub cross_core_password: PiiString,
 }
+
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct ComplyAdvantageCredentials {
+    pub api_key: PiiString,
+}

@@ -17,6 +17,7 @@ use newtypes::PiiJsonValue;
 
 use socure::response::SocureIDPlusResponse;
 
+pub mod comply_advantage;
 pub mod experian;
 pub mod fingerprintjs;
 pub mod footprint_http_client;
