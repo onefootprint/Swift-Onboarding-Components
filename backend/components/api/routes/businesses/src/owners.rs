@@ -22,7 +22,7 @@ type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
 
 #[api_v2_operation(
     description = "Gets the beneficial owners of a business.",
-    tags(Entities, Preview)
+    tags(Businesses, Preview)
 )]
 #[get("/businesses/{fp_id}/owners")]
 pub async fn get(

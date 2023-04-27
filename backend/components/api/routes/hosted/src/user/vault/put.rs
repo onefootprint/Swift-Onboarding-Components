@@ -44,10 +44,7 @@ pub async fn post_validate(
     EmptyResponse::ok().json()
 }
 
-#[api_v2_operation(
-    description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data.",
-    tags(Hosted, Vault, Users)
-)]
+#[api_v2_operation(description = "Updates data in a user vault", tags(Hosted, Vault, Users))]
 #[actix::put("/hosted/user/vault")]
 pub async fn put(
     state: web::Data<State>,

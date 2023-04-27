@@ -63,10 +63,7 @@ pub async fn post_validate(
     Ok(result)
 }
 
-#[api_v2_operation(
-    description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data, but `id.` data can only be specified for user vaults created via API.",
-    tags(Vault, PublicApi, Users)
-)]
+#[api_v2_operation(description = "Updates data in a user vault", tags(Vault, PublicApi, Users))]
 #[actix::put("/users/{footprint_user_id}/vault")]
 pub async fn put(
     state: web::Data<State>,

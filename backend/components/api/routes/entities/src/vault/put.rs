@@ -61,7 +61,7 @@ pub async fn post_validate_inner(
 }
 
 #[api_v2_operation(
-    description = "Updates data in a user vault. Can be used to update `id.` data or `custom.` data, but `id.` data can only be specified for user vaults created via API.",
+    description = "Updates data in a user vault",
     tags(Vault, PublicApi, Entities)
 )]
 #[actix::put("/entities/{fp_id}/vault")]

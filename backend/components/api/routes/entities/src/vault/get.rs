@@ -29,7 +29,7 @@ flat_api_object_map_type!(
 
 #[api_v2_operation(
     description = "Given a list of fields, checks for their existence in the vault without decrypting them.",
-    tags(Preview, Vault, Entities)
+    tags(Vault, Entities, Preview)
 )]
 #[actix::get("/entities/{fp_id}/vault")]
 pub async fn get(
