@@ -50,7 +50,7 @@ class Endpoint:
             .get("$ref")
             for (_, resp) in self.path_info.get("responses", {}).items()
         ]
-        response_types = [
+        other_response_types = [
             resp.get("content", {})
             .get("application/json", {})
             .get("schema", {})
@@ -60,7 +60,7 @@ class Endpoint:
             .get("$ref", {})
             for (_, resp) in self.path_info.get("responses", {}).items()
         ]
-        all_types = response_types + [request_type]
+        all_types = response_types + other_response_types + [request_type]
         return [unquote(t) for t in all_types if t]
 
     def serialize(self):
