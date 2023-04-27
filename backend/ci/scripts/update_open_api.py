@@ -92,7 +92,6 @@ def get_apis(open_api_spec, tag):
     for endpoint in endpoints:
         if endpoint.identifying_tag == tag:
             paths_dict[endpoint.url][endpoint.method] = endpoint.serialize()
-            print(endpoint.serialize())
             used_entity_refs |= set(endpoint.schemas)
     # Create the final list of all schemas used by the matching endpoints
     used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]

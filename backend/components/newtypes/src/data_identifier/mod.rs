@@ -44,14 +44,12 @@ pub use self::{
     identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
     vd_kind::*,
 };
-use crate::{
-    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, EnumDotNotationError,
-    KvDataKey, PiiString,
-};
+use crate::{util::impl_enum_string_diesel, EnumDotNotationError, KvDataKey, PiiString};
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
+use paperclip::v2::models::DataType;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::hash::Hash;
 use std::str::FromStr;
@@ -91,8 +89,6 @@ pub enum DataIdentifier {
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
 }
-
-string_api_data_type_alias!(DataIdentifier);
 
 /// Contains all of the functionality that each nested type of DataIdentifier must provide
 pub trait IsDataIdentifierDiscriminant:
@@ -166,13 +162,10 @@ impl std::fmt::Display for DataIdentifier {
     }
 }
 
-impl schemars::JsonSchema for DataIdentifier {
-    fn schema_name() -> String {
-        "DataIdentifier".to_owned()
-    }
-
-    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        let dis = DataIdentifierDiscriminant::iter()
+impl DataIdentifier {
+    /// List of permissible DataIdentifiers to be rendered in documentation
+    fn api_examples() -> Vec<serde_json::Value> {
+        DataIdentifierDiscriminant::iter()
             .flat_map(|kind| match kind {
                 DataIdentifierDiscriminant::Custom => {
                     vec![DataIdentifier::Custom(KvDataKey::from("*".to_string()))]
@@ -191,12 +184,20 @@ impl schemars::JsonSchema for DataIdentifier {
                 }
             })
             .map(|id| serde_json::Value::String(id.to_string()))
-            .collect_vec();
+            .collect_vec()
+    }
+}
 
+impl schemars::JsonSchema for DataIdentifier {
+    fn schema_name() -> String {
+        "DataIdentifier".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
         schemars::_private::apply_metadata(
             schemars::schema::Schema::Object(schemars::schema::SchemaObject {
                 instance_type: Some(schemars::schema::InstanceType::String.into()),
-                enum_values: Some(dis),
+                enum_values: Some(Self::api_examples()),
                 ..Default::default()
             }),
             schemars::schema::Metadata {
@@ -210,6 +211,27 @@ impl schemars::JsonSchema for DataIdentifier {
         )
     }
 }
+
+impl paperclip::v2::schema::Apiv2Schema for DataIdentifier {
+    fn name() -> Option<String> {
+        Some("DataIdentifier".to_string())
+    }
+
+    fn description() -> &'static str {
+        "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items."
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        use paperclip::v2::models::DefaultSchemaRaw;
+        DefaultSchemaRaw {
+            name: Some("DataIdentifier".into()),
+            data_type: Some(DataType::String),
+            enum_: Self::api_examples(),
+            ..Default::default()
+        }
+    }
+}
+impl paperclip::actix::OperationModifier for DataIdentifier {}
 
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
 /// We serialize DIs as `prefix.suffix`

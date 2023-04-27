@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::*;
 
 /// Details for a specific Entity
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, Apiv2Schema)]
 #[schemars(rename_all = "camelCase")]
 pub struct Entity {
     pub id: FpId,
