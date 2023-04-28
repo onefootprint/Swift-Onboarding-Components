@@ -17,7 +17,9 @@ export enum CollectedKybDataOption {
   address = 'business_address',
   phoneNumber = 'business_phone_number',
   website = 'business_website',
+  corporationType = 'business_corporation_type',
   beneficialOwners = 'business_beneficial_owners',
+  kycedBeneficialOwners = 'business_kyced_beneficial_owners',
 }
 
 export enum CollectedKycDataOption {
@@ -67,6 +69,8 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   business_phone_number: CollectedKybDataOption.phoneNumber,
   business_website: CollectedKybDataOption.website,
   business_beneficial_owners: CollectedKybDataOption.beneficialOwners,
+  business_kyced_beneficial_owners:
+    CollectedKybDataOption.kycedBeneficialOwners,
   investor_profile: CollectedInvestorProfileDataOption.investorProfile,
 };
 
@@ -85,8 +89,14 @@ export const CollectedKybDataOptionToRequiredAttributes: Record<
   ],
   [CollectedKybDataOption.phoneNumber]: [BusinessDataAttribute.phoneNumber],
   [CollectedKybDataOption.website]: [BusinessDataAttribute.website],
+  [CollectedKybDataOption.corporationType]: [
+    BusinessDataAttribute.corporationType,
+  ],
   [CollectedKybDataOption.beneficialOwners]: [
     BusinessDataAttribute.beneficialOwners,
+  ],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [
+    BusinessDataAttribute.kycedBeneficialOwners,
   ],
 };
 

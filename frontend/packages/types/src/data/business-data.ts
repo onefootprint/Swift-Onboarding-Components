@@ -8,7 +8,10 @@ export type BusinessData = Partial<{
   [BusinessDataAttribute.tin]: string;
   [BusinessDataAttribute.website]: string;
   [BusinessDataAttribute.phoneNumber]: string;
+  [BusinessDataAttribute.corporationType]: string;
   [BusinessDataAttribute.beneficialOwners]: BeneficialOwner[];
+  // TODO
+  [BusinessDataAttribute.kycedBeneficialOwners]: BeneficialOwner[];
   [BusinessDataAttribute.addressLine1]: string;
   [BusinessDataAttribute.addressLine2]: string;
   [BusinessDataAttribute.city]: string;

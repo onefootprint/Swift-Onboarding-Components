@@ -100,7 +100,9 @@
     "business_address": "Registered business address",
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
+    "business_corporation_type": "Business corporation type",
     "business_beneficial_owners": "Business beneficial owners",
+    "business_kyced_beneficial_owners": "Business beneficial owners (Fully-KYCed)",
     "investor_profile": "Investor profile"
   },
   "vendor": {
@@ -1001,7 +1003,8 @@
             "description": "You can customize the verification flow by choosing optional fields to collect.",
             "collected-data": "Collected data",
             "optional": "Optionally required",
-            "beneficial-owner-warning": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
+            "beneficial-owner-warning": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.",
+            "kyced-beneficial-owners": "Fully KYC all beneficial owners"
           },
           "kyb-bo-collect-form": {
             "title": "KYC of a Beneficial owner",

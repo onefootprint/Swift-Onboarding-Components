@@ -49,6 +49,7 @@ pub enum TenantScope {
     ManualReview,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
+    /// TODO: Should probably also add a DecryptAll here
     Decrypt(CollectedDataOption),
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,

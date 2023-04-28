@@ -38,7 +38,9 @@ const iconForAttribute: Record<
   [CollectedKybDataOption.address]: IcoBuilding16,
   [CollectedKybDataOption.phoneNumber]: IcoPhone16,
   [CollectedKybDataOption.website]: IcoStore16,
+  [CollectedKybDataOption.corporationType]: IcoStore16,
   [CollectedKybDataOption.beneficialOwners]: IcoStore16,
+  [CollectedKybDataOption.kycedBeneficialOwners]: IcoStore16,
   [CollectedInvestorProfileDataOption.investorProfile]: IcoDollar16,
 };
 
