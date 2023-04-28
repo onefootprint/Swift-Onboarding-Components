@@ -1,12 +1,16 @@
+use std::pin::Pin;
+
 use crate::business::index::{decrypt_basic_business_info, BasicBusinessInfo};
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::business::BusinessError;
+use api_core::utils::email::BoInviteEmailInfo;
 use api_core::utils::session::AuthSession;
 use api_core::{auth::ob_config::BoSession, utils::twilio::BoSessionSmsInfo};
 use db::models::business_owner::BusinessOwner;
+use db::models::tenant::Tenant;
 use futures::FutureExt;
 use newtypes::{BusinessOwnerKind, PiiString, ScopedVaultId};
 use rand::Rng;
@@ -14,6 +18,7 @@ use rand::Rng;
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 pub(super) async fn send_secondary_bo_links(
     state: &State,
+    tenant: &Tenant,
     sb_id: ScopedVaultId,
     secondary_bos: Vec<BusinessOwner>,
 ) -> ApiResult<()> {
@@ -79,20 +84,32 @@ pub(super) async fn send_secondary_bo_links(
             let bo_data = secondary_bos_from_vault
                 .get(&l_id)
                 .ok_or(BusinessError::BoNotFound)?;
-            let info = BoSessionSmsInfo {
+            let url = PiiString::new(format!("{}?r={}#{}", base_url, r, token));
+            let sms = BoSessionSmsInfo {
                 destination: &bo_data.phone_number,
                 inviter: &inviter,
                 business_name: &business_name,
-                url: PiiString::new(format!("{}?r={}#{}", base_url, r, token)),
+                url: url.clone(),
             };
-            Ok(info)
+            let email = BoInviteEmailInfo {
+                to_email: bo_data.email.to_piistring(),
+                inviter: &inviter,
+                business_name: &business_name,
+                logo_url: tenant.logo_url.clone(),
+                url,
+            };
+            Ok((sms, email))
         })
         .collect::<ApiResult<Vec<_>>>()?;
 
-    let send_sms_futs = bo_sms_info
-        .into_iter()
-        .map(|info| state.twilio_client.send_bo_session(state, info));
-    futures::future::join_all(send_sms_futs)
+    let futs = bo_sms_info.into_iter().flat_map(|(sms, email)| {
+        let sms = state.twilio_client.send_bo_session(state, sms);
+        let email = state.sendgrid_client.send_business_owner_invite(email);
+        let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
+            vec![Box::pin(sms), Box::pin(email)];
+        v
+    });
+    futures::future::join_all(futs)
         .await
         .into_iter()
         .collect::<ApiResult<_>>()?;

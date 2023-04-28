@@ -1,7 +1,7 @@
-use crate::auth::session::AuthSessionData;
 use crate::auth::user::EmailVerifySession;
 use crate::errors::ApiError;
 use crate::State;
+use crate::{auth::session::AuthSessionData, errors::ApiResult};
 use crypto::random::gen_random_alphanumeric_code;
 use newtypes::{ContactInfoId, PiiString};
 use paperclip::actix::web;
@@ -60,10 +60,19 @@ struct SendgridErrorFieldAndMessage {
     message: String,
 }
 
+pub struct BoInviteEmailInfo<'a> {
+    pub to_email: PiiString,
+    pub inviter: &'a PiiString,
+    pub business_name: &'a PiiString,
+    pub logo_url: Option<String>,
+    pub url: PiiString,
+}
+
 impl SendgridClient {
     const DASHBOARD_INVITE_TEMPLATE_ID: &str = "d-74de0508a7834a2494c499d2a70c41ba";
     const EMAIL_VERIFY_TEMPLATE_ID: &str = "d-c558e640dad04726a31e6710c7ffc57c";
     const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
+    const KYC_BUSINESS_OWNER_TEMPLATE_ID: &str = "d-104270bd3b7c4c62a6ed95e295c7822b";
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
 
     pub fn new(api_key: String) -> Self {
@@ -71,7 +80,7 @@ impl SendgridClient {
         Self { api_key, client }
     }
 
-    pub async fn send_magic_link_email(&self, to_email: String, curl_url: String) -> Result<(), ApiError> {
+    pub async fn send_magic_link_email(&self, to_email: String, curl_url: String) -> ApiResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
         self.send_template(to_email, Self::MAGIC_LINK_TEMPLATE_ID, template_data)
             .await
@@ -94,9 +103,33 @@ impl SendgridClient {
             .await
     }
 
-    pub async fn send_email_verify_email(&self, to_email: String, curl_url: String) -> Result<(), ApiError> {
+    pub async fn send_email_verify_email(&self, to_email: String, curl_url: String) -> ApiResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
         self.send_template(to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
+            .await
+    }
+
+    pub async fn send_business_owner_invite<'a>(&self, info: BoInviteEmailInfo<'a>) -> ApiResult<()> {
+        let BoInviteEmailInfo {
+            to_email,
+            inviter,
+            business_name,
+            logo_url,
+            url,
+        } = info;
+        let d = HashMap::from_iter(
+            vec![
+                Some(("recipient_email".to_string(), to_email.leak_to_string())),
+                Some(("inviter".to_string(), inviter.leak_to_string())),
+                Some(("business_name".to_string(), business_name.leak_to_string())),
+                Some(("flow_url".to_string(), url.leak_to_string())),
+                // TODO need to handle no logo
+                logo_url.map(|u| ("logo_url".to_string(), u)),
+            ]
+            .into_iter()
+            .flatten(),
+        );
+        self.send_template(to_email.leak_to_string(), Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
             .await
     }
 
@@ -105,8 +138,9 @@ impl SendgridClient {
         &self,
         to_email: String,
         template_id: &str,
+        // TODO make this PiiString so we don't accidentally log
         template_data: HashMap<String, String>,
-    ) -> Result<(), ApiError> {
+    ) -> ApiResult<()> {
         let req = SendgridTemplateRequest {
             personalizations: vec![SendgridPersonalization {
                 to: vec![SendgridEmail { email: to_email }],

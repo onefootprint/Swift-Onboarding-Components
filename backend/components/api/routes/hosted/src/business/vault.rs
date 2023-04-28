@@ -75,7 +75,8 @@ pub async fn put(
         })
         .await?;
 
-    send_secondary_bo_links(&state, sb_id, secondary_bos).await?;
+    let tenant = user_auth.tenant()?;
+    send_secondary_bo_links(&state, tenant, sb_id, secondary_bos).await?;
 
     ResponseData::ok(EmptyResponse {}).json()
 }
