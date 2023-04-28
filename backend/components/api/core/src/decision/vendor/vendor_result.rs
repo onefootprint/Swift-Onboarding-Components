@@ -78,6 +78,7 @@ impl VendorResult {
                                 decrypted_response.into_leak(),
                             )?
                         }
+                        newtypes::VendorAPI::MiddeskTinRetriedWebhook => todo!(),
                     };
                     let res = VendorResult {
                         response: VendorResponse {

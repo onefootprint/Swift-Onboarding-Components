@@ -41,4 +41,22 @@ impl MiddeskBusinessUpdateWebhookResponse {
             .and_then(|d| d.object.as_ref())
             .and_then(|o| o.id.clone())
     }
+
+    pub fn has_tin_error(&self) -> bool {
+        self.data
+            .as_ref()
+            .and_then(|d| d.object.as_ref())
+            .and_then(|o| o.review.as_ref())
+            .and_then(|r| r.tasks.as_ref())
+            .and_then(|ts| {
+                ts.iter().find(|t| {
+                    if let (Some(key), Some(status)) = (&t.key, &t.status) {
+                        key == "tin" && status == "failure"
+                    } else {
+                        false
+                    }
+                })
+            })
+            .is_some()
+    }
 }

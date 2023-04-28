@@ -80,6 +80,7 @@ impl KycFeatureVector {
             VendorAPI::IdologyPa => None,
             VendorAPI::MiddeskCreateBusiness => None,
             VendorAPI::MiddeskBusinessUpdateWebhook => None,
+            VendorAPI::MiddeskTinRetriedWebhook => None,
         }
     }
 

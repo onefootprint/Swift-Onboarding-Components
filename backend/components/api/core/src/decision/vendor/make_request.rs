@@ -674,6 +674,10 @@ pub async fn handle_middesk_business_response(
             )))?;
 
     let mr = middesk_response.clone();
+    let has_tin_error = mr.has_tin_error();
+    if has_tin_error {
+        tracing::error!(business_id = business_id, "Middesk TIN failure Error");
+    }
 
     let (vres_id, ob) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -711,16 +715,35 @@ pub async fn handle_middesk_business_response(
             let verification_result =
                 verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
+            // if the IRS is unavailable, then we need to wait for a `tin.retried` webhook from Middesk
+            if has_tin_error {
+                // Create vreq for anticipated `tin.retried` webhook
+                let di_id = create_business_vreq
+                    .decision_intent_id
+                    .ok_or(DbError::ObjectNotFound)?;
+
+                let _vreq = VerificationRequest::create(
+                    conn,
+                    &create_business_vreq.scoped_vault_id,
+                    &di_id,
+                    VendorAPI::MiddeskTinRetriedWebhook,
+                )?;
+            }
+
             let (ob, _, _, _) = Onboarding::get(conn, (&create_business_vreq.scoped_vault_id, &uv.id))?;
 
             Ok((verification_result.id, ob))
         })
         .await?;
 
-    let bo_obds = vec![]; // TODO: query for bo OBDs
-    let fv = KybFeatureVector::new(middesk_response, vres_id, bo_obds);
+    if !has_tin_error {
+        let bo_obds = vec![]; // TODO: query for bo OBDs
+        let fv = KybFeatureVector::new(middesk_response, vres_id, bo_obds);
 
-    engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+        engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+    } else {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
