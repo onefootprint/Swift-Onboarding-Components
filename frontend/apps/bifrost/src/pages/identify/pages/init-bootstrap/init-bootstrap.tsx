@@ -9,7 +9,7 @@ import useIdentifyMachine from '../../hooks/use-identify-machine';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
-  const { bootstrapData } = state.context;
+  const { bootstrapData, config } = state.context;
   const identifyMutation = useIdentify();
   const idSuffix = useIdentifierSuffix();
 
@@ -20,6 +20,7 @@ const InitBootstrap = () => {
         const identifier = { phoneNumber: idSuffix.append(phoneNumber) };
         const phoneIdentify = await identifyMutation.mutateAsync({
           identifier,
+          tenantPk: config?.key,
         });
 
         if (phoneIdentify.userFound) {
@@ -40,6 +41,7 @@ const InitBootstrap = () => {
         const identifier = { email: idSuffix.append(email) };
         const emailIdentify = await identifyMutation.mutateAsync({
           identifier,
+          tenantPk: config?.key,
         });
 
         if (emailIdentify.userFound) {

@@ -20,6 +20,7 @@ const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email },
+    config,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -30,7 +31,7 @@ const EmailIdentification = () => {
     const emailFromForm = formData[UserDataAttribute.email];
     const emailWithSuffix = idSuffix.append(emailFromForm);
     identifyMutation.mutate(
-      { identifier: { email: emailWithSuffix } },
+      { identifier: { email: emailWithSuffix }, tenantPk: config?.key },
       {
         onSuccess: ({
           userFound,

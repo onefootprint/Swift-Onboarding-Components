@@ -20,6 +20,7 @@ const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { phoneNumber, email, sandboxSuffix: identifierSuffix },
+    onboarding: { tenantPk },
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -31,7 +32,10 @@ const PhoneIdentification = () => {
     const phoneNumberWithSuffix = idSuffix.append(phoneFromForm);
     // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(
-      { identifier: { phoneNumber: phoneNumberWithSuffix } },
+      {
+        identifier: { phoneNumber: phoneNumberWithSuffix },
+        tenantPk,
+      },
       {
         onSuccess: ({
           userFound,

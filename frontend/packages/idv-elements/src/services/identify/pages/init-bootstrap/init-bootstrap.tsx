@@ -9,7 +9,10 @@ import validateBootstrapData from './utils/validate-bootstrap-data';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
-  const { bootstrapData } = state.context;
+  const {
+    bootstrapData,
+    onboarding: { tenantPk },
+  } = state.context;
   const identifyMutation = useIdentify();
   const idSuffix = useIdentifierSuffix();
 
@@ -20,6 +23,7 @@ const InitBootstrap = () => {
         const identifier = { phoneNumber: idSuffix.append(phoneNumber) };
         const phoneIdentify = await identifyMutation.mutateAsync({
           identifier,
+          tenantPk,
         });
 
         if (phoneIdentify.userFound) {
@@ -40,6 +44,7 @@ const InitBootstrap = () => {
         const identifier = { email: idSuffix.append(email) };
         const emailIdentify = await identifyMutation.mutateAsync({
           identifier,
+          tenantPk,
         });
 
         if (emailIdentify.userFound) {
