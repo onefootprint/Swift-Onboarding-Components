@@ -170,10 +170,7 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
             if f"invited you to verify your identify as a beneficial owner of {business_name}"
             in m.body
         )
-        # TODO update this to extract the token from the real URL once we have a URL
-        token = message.body.split("Continue here: ")[1].split(
-            "\n\nSent via Footprint"
-        )[0]
+        token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return (message.body, token)
 
     return try_until_success(inner, 5)
