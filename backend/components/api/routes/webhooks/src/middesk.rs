@@ -17,6 +17,7 @@ async fn handle_webhook(
     decision::vendor::make_request::handle_middesk_webhook(
         &state.db_pool,
         &state.feature_flag_client,
+        &state.middesk_client,
         webhook_signature.request,
     )
     .await?;

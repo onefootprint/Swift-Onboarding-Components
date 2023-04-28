@@ -79,6 +79,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::MiddeskCreateBusiness => false,
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
+        VendorAPI::MiddeskGetBusiness => false,
     }
 }
 
@@ -104,6 +105,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::MiddeskCreateBusiness => false,
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
+        VendorAPI::MiddeskGetBusiness => false,
     }
 }
 

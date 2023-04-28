@@ -6,7 +6,10 @@ use idv::{
         pa::{IdologyPaAPIResponse, IdologyPaRequest},
         IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
     },
-    middesk::{client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
+    middesk::{
+        client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse,
+        MiddeskGetBusinessRequest, MiddeskGetBusinessResponse,
+    },
     socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
     ParsedResponse,
@@ -257,5 +260,37 @@ impl VendorAPIResponse for MiddeskCreateBusinessResponse {
 
     fn parsed_response(self) -> ParsedResponse {
         ParsedResponse::MiddeskCreateBusiness(self.parsed_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>
+    for MiddeskClient
+{
+    async fn make_request(
+        &self,
+        request: MiddeskGetBusinessRequest,
+    ) -> Result<MiddeskGetBusinessResponse, idv::middesk::Error> {
+        let raw_response = self.get_business(request.business_id).await?;
+        let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
+
+        Ok(MiddeskGetBusinessResponse {
+            raw_response: PiiJsonValue::new(raw_response),
+            parsed_response,
+        })
+    }
+}
+
+impl VendorAPIResponse for MiddeskGetBusinessResponse {
+    fn vendor_api(self) -> VendorAPI {
+        VendorAPI::MiddeskGetBusiness
+    }
+
+    fn raw_response(self) -> PiiJsonValue {
+        self.raw_response
+    }
+
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::MiddeskGetBusiness(self.parsed_response)
     }
 }

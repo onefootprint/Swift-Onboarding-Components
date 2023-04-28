@@ -7,7 +7,7 @@ use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
 use middesk::response::business::BusinessResponse;
-use middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 
 use idology::expectid::response::ExpectIDResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
@@ -44,7 +44,9 @@ pub enum ParsedResponse {
     SocureIDPlus(SocureIDPlusResponse),
     ExperianPreciseID(CrossCoreAPIResponse),
     MiddeskCreateBusiness(BusinessResponse),
+    MiddeskGetBusiness(BusinessResponse),
     MiddeskBusinessUpdateWebhook(MiddeskBusinessUpdateWebhookResponse),
+    MiddeskTinRetriedWebhook(MiddeskTinRetriedWebhookResponse),
 }
 
 impl ParsedResponse {
@@ -112,6 +114,11 @@ impl ParsedResponse {
     ) -> Result<Self, crate::Error> {
         let parsed: MiddeskBusinessUpdateWebhookResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::MiddeskBusinessUpdateWebhook(parsed))
+    }
+
+    pub fn from_middesk_tin_retried_webhook(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: MiddeskTinRetriedWebhookResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::MiddeskTinRetriedWebhook(parsed))
     }
 }
 

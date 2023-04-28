@@ -61,6 +61,24 @@ impl MiddeskClient {
 
         response::decode_response::<serde_json::Value>(response).await
     }
+
+    #[allow(unused)]
+    pub async fn get_business(&self, business_id: String) -> Result<serde_json::Value, Error> {
+        let url = Url::parse(self.base_url.as_str())
+            .map_err(Error::RequestUrlError)?
+            .join(&format!("businesses/{}", business_id))
+            .map_err(Error::RequestUrlError)?;
+
+        let response = self
+            .client
+            .get(url)
+            .timeout(Duration::from_secs(5))
+            .send()
+            .await
+            .map_err(MiddeskReqwestError::from)?;
+
+        response::decode_response::<serde_json::Value>(response).await
+    }
 }
 
 #[cfg(test)]

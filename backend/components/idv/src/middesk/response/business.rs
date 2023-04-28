@@ -11,7 +11,7 @@ pub struct BusinessResponse {
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
     pub status: Option<String>,
-    pub tin: Option<serde_json::Value>,
+    pub tin: Option<Tin>,
     pub formation: Option<Formation>,
     pub registrations: Option<Vec<Registration>>,
     pub names: Option<Vec<Name>>,
@@ -30,6 +30,19 @@ pub struct BusinessResponse {
     pub liens: Option<serde_json::Value>, // premium feature we aren't using
     pub tags: Option<Vec<String>>,
     pub fmcsa_registrations: Option<Vec<FmcsaRegistration>>,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
+pub struct Tin {
+    pub object: Option<String>,
+    pub updated_at: Option<DateTime<Utc>>,
+    pub id: Option<String>,
+    pub business_id: Option<String>,
+    pub name: Option<String>,
+    pub tin: Option<PiiString>,
+    pub mismatch: Option<bool>,
+    pub unknown: Option<bool>,
+    pub verified: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]

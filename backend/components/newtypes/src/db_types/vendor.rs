@@ -74,6 +74,7 @@ pub enum VendorAPI {
     SocureIDPlus,
     ExperianPreciseID,
     MiddeskCreateBusiness,
+    MiddeskGetBusiness,
     MiddeskBusinessUpdateWebhook,
     MiddeskTinRetriedWebhook,
 }
@@ -93,6 +94,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::MiddeskCreateBusiness => Self::Middesk,
             VendorAPI::MiddeskBusinessUpdateWebhook => Self::Middesk,
             VendorAPI::MiddeskTinRetriedWebhook => Self::Middesk,
+            VendorAPI::MiddeskGetBusiness => Self::Middesk,
         }
     }
 }
@@ -118,6 +120,7 @@ impl VendorAPI {
             VendorAPI::MiddeskCreateBusiness => false,
             VendorAPI::MiddeskBusinessUpdateWebhook => false,
             VendorAPI::MiddeskTinRetriedWebhook => false,
+            VendorAPI::MiddeskGetBusiness => false,
         }
     }
 }

@@ -17,6 +17,16 @@ pub struct MiddeskCreateBusinessResponse {
     pub parsed_response: BusinessResponse,
 }
 
+pub struct MiddeskGetBusinessRequest {
+    pub business_id: String,
+}
+
+#[derive(Clone)]
+pub struct MiddeskGetBusinessResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: BusinessResponse,
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("error building reqwest client: {0}")]

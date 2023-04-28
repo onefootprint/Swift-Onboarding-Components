@@ -1,10 +1,12 @@
-use super::business::BusinessResponse;
+use super::business::{BusinessResponse, Tin};
 use crate::middesk::Error;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[allow(clippy::large_enum_variant)]
 pub enum MiddeskWebhookResponse {
     BusinessUpdate(MiddeskBusinessUpdateWebhookResponse),
+    TinRetried(MiddeskTinRetriedWebhookResponse),
 }
 
 pub fn parse_webhook(v: serde_json::Value) -> Result<MiddeskWebhookResponse, Error> {
@@ -12,6 +14,9 @@ pub fn parse_webhook(v: serde_json::Value) -> Result<MiddeskWebhookResponse, Err
     let res = match type_ {
         "business.updated" => Some(MiddeskWebhookResponse::BusinessUpdate(serde_json::from_value::<
             MiddeskBusinessUpdateWebhookResponse,
+        >(v.clone())?)),
+        "tin.retried" => Some(MiddeskWebhookResponse::TinRetried(serde_json::from_value::<
+            MiddeskTinRetriedWebhookResponse,
         >(v.clone())?)),
         _ => None,
     };
@@ -26,11 +31,11 @@ pub struct MiddeskBusinessUpdateWebhookResponse {
     #[serde(rename(serialize = "type"))]
     pub type_: Option<String>,
     pub created_at: Option<DateTime<Utc>>,
-    pub data: Option<Data>,
+    pub data: Option<BusinessData>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Data {
+pub struct BusinessData {
     pub object: Option<BusinessResponse>,
 }
 
@@ -58,5 +63,30 @@ impl MiddeskBusinessUpdateWebhookResponse {
                 })
             })
             .is_some()
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct MiddeskTinRetriedWebhookResponse {
+    pub object: Option<String>,
+    pub id: Option<String>,
+    pub account_id: Option<String>,
+    #[serde(rename(serialize = "type"))]
+    pub type_: Option<String>,
+    pub created_at: Option<DateTime<Utc>>,
+    pub data: Option<TinData>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct TinData {
+    pub object: Option<Tin>,
+}
+
+impl MiddeskTinRetriedWebhookResponse {
+    pub fn business_id(&self) -> Option<String> {
+        self.data
+            .as_ref()
+            .and_then(|d| d.object.as_ref())
+            .and_then(|t| t.business_id.clone())
     }
 }
