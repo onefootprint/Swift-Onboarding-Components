@@ -6,9 +6,9 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
+import InitShimmer from '../../../../components/init-shimmer';
 import useGetOnboardingConfig from '../../../../hooks/api/org/get-onboarding-config';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
-import InitShimmer from '../../components/init-shimmer';
 
 const Init = () => {
   const [state, send] = useIdentifyMachine();

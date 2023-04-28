@@ -1,74 +1,60 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
+import Idv from '@onefootprint/idv';
 import {
-  useLogStateMachine,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
+  AppErrorBoundary,
+  Layout,
+  useFootprintProvider,
+} from '@onefootprint/idv-elements';
+import { IdDI } from '@onefootprint/types';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 
-import AuthenticationSuccess from './authentication-success';
-import Complete from './complete';
-import ConfigInvalid from './config-invalid';
-import Error from './error';
-import Identify from './identify';
 import Init from './init';
-import Onboarding from './onboarding';
-import SandboxOutcome from './sandbox-outcome';
 
 const Root = () => {
+  const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
-  const {
-    device,
-    bootstrapData,
-    config,
-    sandboxSuffix,
-    userFound,
-    authToken,
-    email,
-  } = state.context;
-  const observeCollector = useObserveCollector();
+  const tenantPk = useTenantPublicKey();
+  const { bootstrapData } = state.context;
   useLogStateMachine('bifrost', state);
 
+  const router = useRouter();
+  const searchParams = new URLSearchParams(router.asPath);
+  const fontSrc = searchParams.get('font_src') ?? undefined;
+  const variables = searchParams.get('tokens') ?? undefined;
+  const rules = searchParams.get('rules') ?? undefined;
+  const appearance = { fontSrc, rules, variables };
+
   return (
-    <ErrorBoundary
-      FallbackComponent={Error}
-      onError={(error, stack) => {
-        observeCollector.logError('error', error, { stack });
-      }}
+    <AppErrorBoundary
       onReset={() => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('init') && <Init />}
-      {state.matches('configInvalid') && <ConfigInvalid />}
-      {state.matches('sandboxOutcome') && <SandboxOutcome />}
-      {state.matches('identify') && (
-        <Identify
-          device={device}
-          bootstrapData={bootstrapData}
-          config={config}
-          identifierSuffix={sandboxSuffix}
-          onDone={payload => {
-            send({ type: 'identifyCompleted', payload });
-          }}
-        />
-      )}
-      {state.matches('onboarding') && (
-        <Onboarding
-          userFound={userFound}
-          device={device}
-          config={config}
-          authToken={authToken}
-          email={email}
-          sandboxSuffix={sandboxSuffix}
-          onDone={payload => {
-            send({ type: 'onboardingCompleted', payload });
-          }}
-        />
-      )}
-      {state.matches('authenticationSuccess') && <AuthenticationSuccess />}
-      {state.matches('complete') && <Complete />}
-    </ErrorBoundary>
+      <Layout
+        options={{ hasDesktopBorderRadius: true }}
+        appearance={appearance}
+        tenantPk={tenantPk}
+        onClose={footprint.close}
+      >
+        {state.matches('init') && <Init />}
+        {state.matches('idv') && (
+          <Idv
+            tenantPk={tenantPk}
+            data={{
+              [IdDI.email]: bootstrapData?.email,
+              [IdDI.phoneNumber]: bootstrapData?.phoneNumber,
+            }}
+            onComplete={validationToken =>
+              send({ type: 'idvCompleted', payload: { validationToken } })
+            }
+            onClose={footprint.close}
+          />
+        )}
+      </Layout>
+    </AppErrorBoundary>
   );
 };
 

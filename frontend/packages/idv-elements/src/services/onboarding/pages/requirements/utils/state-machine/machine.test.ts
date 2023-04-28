@@ -5,11 +5,6 @@ import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
 
-/*
-  TODO:
-  - add tests for kyb and investorProfile
-*/
-
 describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
     createOnboardingRequirementsMachine(args);

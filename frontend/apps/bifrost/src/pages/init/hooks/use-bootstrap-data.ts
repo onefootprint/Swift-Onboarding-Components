@@ -1,8 +1,8 @@
 import {
   FootprintInternalEvent,
   useFootprintProvider,
-} from '@onefootprint/footprint-elements';
-import { BootstrapData } from 'src/hooks/use-bifrost-machine';
+} from '@onefootprint/idv-elements';
+import { BootstrapData } from '@onefootprint/types';
 import { useEffectOnce } from 'usehooks-ts';
 
 const WAITING_USER_DATA_TIME = 500;
@@ -15,14 +15,20 @@ const useBootstrapData = (
   const waitBootstrapDataOrStart = () => {
     const expirationTimeout = setTimeout(() => {
       unsubscribe();
-      onSuccess({ email: undefined, phoneNumber: undefined });
+      onSuccess({
+        email: undefined,
+        phoneNumber: undefined,
+      });
     }, WAITING_USER_DATA_TIME);
 
     const unsubscribe = footprintProvider.on(
       FootprintInternalEvent.bootstrapDataReceived,
       data => {
         clearTimeout(expirationTimeout);
-        onSuccess({ email: data.email, phoneNumber: data.phoneNumber });
+        onSuccess({
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+        });
       },
     );
   };

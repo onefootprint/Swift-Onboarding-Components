@@ -1,8 +1,8 @@
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import InitShimmer from '../../../../components/init-shimmer';
 import { useIdentify } from '../../api-hooks';
-import InitShimmer from '../../components/init-shimmer';
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import validateBootstrapData from './utils/validate-bootstrap-data';

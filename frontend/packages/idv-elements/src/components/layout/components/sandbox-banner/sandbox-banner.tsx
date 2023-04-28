@@ -10,7 +10,6 @@ type SandboxBannerProps = {
   hideOnDesktop?: boolean;
 };
 
-// TODO: belce translations for this file
 const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
   ({ hideOnDesktop }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);

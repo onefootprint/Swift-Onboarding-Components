@@ -1,6 +1,6 @@
 import { renderHook } from '@onefootprint/test-utils';
 import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
-import { BifrostMachine } from 'src/utils/state-machine/bifrost';
+import { BifrostMachine } from 'src/utils/state-machine';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
 import useSandboxMode from './use-sandbox-mode';

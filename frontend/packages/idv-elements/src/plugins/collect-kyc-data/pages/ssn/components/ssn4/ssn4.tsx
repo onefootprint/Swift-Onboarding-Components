@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { SSN4Information } from '../../../../utils/data-types';
 

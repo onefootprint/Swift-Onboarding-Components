@@ -8,11 +8,6 @@ import {
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
 
-/*
-  TODO: 
-  - Add doing-business-as
-*/
-
 const createCollectKybDataMachine = () =>
   createMachine(
     {

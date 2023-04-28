@@ -1,7 +1,7 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import BifrostMachine from '../../utils/state-machine/bifrost/machine';
+import BifrostMachine from '../../utils/state-machine/machine';
 
 const useLocalBifrostMachine = () => useMachine(BifrostMachine);
 

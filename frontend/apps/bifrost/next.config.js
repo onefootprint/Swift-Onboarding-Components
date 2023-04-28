@@ -61,7 +61,8 @@ module.exports = {
     ];
   },
   transpilePackages: [
-    '@onefootprint/footprint-elements',
+    '@onefootprint/idv-elements',
+    '@onefootprint/idv',
     '@onefootprint/ui',
     '@onefootprint/design-tokens',
     '@onefootprint/icons',

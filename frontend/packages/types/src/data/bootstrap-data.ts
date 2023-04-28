@@ -1,4 +1,4 @@
 export type BootstrapData = {
-  email: string;
-  phoneNumber: string;
+  email?: string;
+  phoneNumber?: string;
 };

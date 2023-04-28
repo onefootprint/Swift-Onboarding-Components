@@ -5,7 +5,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useSyncEmail from '../../../../hooks/use-sync-email';
 

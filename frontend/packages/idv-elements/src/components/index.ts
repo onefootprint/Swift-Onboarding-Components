@@ -6,4 +6,5 @@ export * from './footprint-provider';
 export { default as configureFootprint } from './footprint-provider/adapters';
 export * from './info-box';
 export { default as InfoBox } from './info-box';
+export { default as InitShimmer } from './init-shimmer';
 export * from './layout';

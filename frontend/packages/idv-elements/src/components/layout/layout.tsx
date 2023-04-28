@@ -1,4 +1,3 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
@@ -23,7 +22,7 @@ const SHIMMER_HEIGHT = '296px';
 type LayoutProps = {
   children: React.ReactNode;
   options?: LayoutOptions;
-  appearance?: FootprintAppearance;
+  appearance?: Record<string, any>;
   tenantPk?: string;
   onClose?: () => void;
 };

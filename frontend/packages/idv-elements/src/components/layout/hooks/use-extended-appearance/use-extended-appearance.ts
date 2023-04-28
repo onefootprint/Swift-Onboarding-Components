@@ -1,11 +1,10 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
 import { useEffectOnce } from 'usehooks-ts';
 
 import createAppearanceRules from './utils/create-appearance-rules';
 import createAppearanceVariables from './utils/create-appearance-variables';
 import createStyle from './utils/create-style';
 
-const useExtendedAppearance = (appearance?: FootprintAppearance) => {
+const useExtendedAppearance = (appearance?: Record<string, any>) => {
   const { fontSrc, rules, variables } = appearance || {};
 
   useEffectOnce(() => {
