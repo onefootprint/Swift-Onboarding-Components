@@ -11,7 +11,7 @@ import useIdvMachine from '../../hooks/use-idv-machine';
 import Complete from '../complete';
 
 type RouterProps = {
-  onDone?: (validationToken: string) => void;
+  onDone?: (validationToken?: string) => void;
 };
 
 const Router = ({ onDone }: RouterProps) => {
@@ -22,6 +22,7 @@ const Router = ({ onDone }: RouterProps) => {
     sandboxSuffix,
     authToken,
     userFound,
+    isTransfer,
     validationToken,
     onClose,
     onComplete,
@@ -30,7 +31,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('complete');
 
   useEffect(() => {
-    if (isDone && validationToken) {
+    if (isDone) {
       onDone?.(validationToken);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,6 +64,7 @@ const Router = ({ onDone }: RouterProps) => {
           // TODO: generalize this more in the next iteration
           data={data}
           sandboxSuffix={sandboxSuffix}
+          isTransfer={isTransfer}
           onClose={onClose}
           onComplete={onComplete}
           onDone={payload => {
@@ -70,7 +72,7 @@ const Router = ({ onDone }: RouterProps) => {
           }}
         />
       )}
-      {state.matches('complete') && <Complete />}
+      {state.matches('complete') && !isTransfer && <Complete />}
     </AppErrorBoundary>
   );
 };

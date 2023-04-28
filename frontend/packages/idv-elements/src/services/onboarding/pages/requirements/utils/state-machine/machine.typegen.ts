@@ -29,6 +29,7 @@ export interface Typegen0 {
     | 'investorProfile'
     | 'kybData'
     | 'kycData'
+    | 'liveness'
     | 'router'
     | 'success'
     | 'transfer';

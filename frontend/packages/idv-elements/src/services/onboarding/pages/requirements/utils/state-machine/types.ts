@@ -24,6 +24,7 @@ export type MachineContext = {
     authToken: string;
     email?: string;
     sandboxSuffix?: string; // only if in sandbox mode
+    isTransfer?: boolean;
   };
   startedDataCollection: boolean;
   collectedKycData?: boolean; // Used to determine if we should show a transition animation between kyc data and investor profile plugins

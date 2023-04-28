@@ -16,7 +16,8 @@
   "dependencies": {
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
-    "@onefootprint/footprint-elements": "*",
+    "@onefootprint/idv-elements": "*",
+    "@onefootprint/idv": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",

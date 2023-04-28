@@ -1,8 +1,5 @@
-import {
-  HeaderTitle,
-  NavigationHeader,
-} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
+import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import React from 'react';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';

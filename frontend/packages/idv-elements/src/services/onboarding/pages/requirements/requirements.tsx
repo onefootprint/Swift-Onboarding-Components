@@ -15,6 +15,7 @@ const Requirements = ({
   config,
   email,
   sandboxSuffix,
+  isTransfer,
   onDone,
 }: RequirementsProps) => {
   if (!device || !authToken || !config) {
@@ -29,6 +30,7 @@ const Requirements = ({
       config={config}
       email={email}
       sandboxSuffix={sandboxSuffix}
+      isTransfer={isTransfer}
     >
       <Router onDone={onDone} />
     </RequirementsMachineProvider>

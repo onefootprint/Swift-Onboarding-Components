@@ -18,6 +18,7 @@ const Onboarding = ({
   data,
   sandboxSuffix,
   userFound,
+  isTransfer,
   onDone,
 }: OnboardingProps) => {
   if (!tenantPk || !authToken) {
@@ -32,6 +33,7 @@ const Onboarding = ({
           tenantPk={tenantPk}
           authToken={authToken}
           data={data}
+          isTransfer={isTransfer}
           sandboxSuffix={sandboxSuffix}
         >
           <Router onDone={onDone} />

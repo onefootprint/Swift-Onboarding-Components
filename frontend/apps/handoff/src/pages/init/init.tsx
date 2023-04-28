@@ -5,18 +5,16 @@ import {
   useGetOnboardingStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
-} from '@onefootprint/footprint-elements';
-import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
+} from '@onefootprint/idv-elements';
 import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
-import convertRequirements from 'src/utils/convert-requirements';
 import styled from 'styled-components';
 
 const Init = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken } = state.context;
+  const { authToken = '' } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const observeCollector = useObserveCollector();
 
@@ -52,7 +50,7 @@ const Init = () => {
   // Fetch the status only once when the authToken has been parsed from url
   useGetD2PStatus({
     refetchInterval: false,
-    authToken: authToken ?? '',
+    authToken,
     options: {
       onSuccess: (data: GetD2PResponse) => {
         const { meta } = data;
@@ -73,25 +71,12 @@ const Init = () => {
     },
   });
 
-  useDeviceInfo((device: DeviceInfo) => {
-    observeCollector.setAppContext({
-      device,
-    });
-    send({
-      type: 'initContextUpdated',
-      payload: {
-        device,
-      },
-    });
-  });
-
-  useGetOnboardingStatus(authToken ?? '', {
-    onSuccess: ({ obConfiguration, requirements }) => {
+  useGetOnboardingStatus(authToken, {
+    onSuccess: ({ obConfiguration }) => {
       send({
         type: 'initContextUpdated',
         payload: {
           onboardingConfig: obConfiguration,
-          requirements: convertRequirements(requirements),
         },
       });
     },

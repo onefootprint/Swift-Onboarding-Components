@@ -1,8 +1,5 @@
-import {
-  HeaderTitle,
-  NavigationHeader,
-} from '@onefootprint/footprint-elements';
 import { useTranslation } from '@onefootprint/hooks';
+import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';

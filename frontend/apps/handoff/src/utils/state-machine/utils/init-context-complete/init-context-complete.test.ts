@@ -21,13 +21,8 @@ describe('initContextComplete', () => {
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
       const context: MachineContext = {
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
         authToken: 'token',
         opener: 'mobile',
-        requirements: {},
         onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
@@ -41,16 +36,12 @@ describe('initContextComplete', () => {
       const context: MachineContext = {
         authToken: 'token',
         opener: 'mobile',
-        requirements: {},
         onboardingConfig: TestOnboardingConfig,
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
         payload: {
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-          },
+          onboardingConfig: TestOnboardingConfig,
         },
       };
       expect(initContextComplete(context, event)).toEqual(true);
@@ -63,10 +54,6 @@ describe('initContextComplete', () => {
       const event: MachineEvents = {
         type: 'initContextUpdated',
         payload: {
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-          },
           onboardingConfig: TestOnboardingConfig,
         },
       };

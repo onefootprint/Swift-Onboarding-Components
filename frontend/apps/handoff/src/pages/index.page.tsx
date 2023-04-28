@@ -1,29 +1,23 @@
+import { useLogStateMachine } from '@onefootprint/dev-tools';
+import Idv from '@onefootprint/idv';
 import {
-  useLogStateMachine,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
-import {
-  DeviceSignals,
-  IdDoc,
-  Liveness,
+  AppErrorBoundary,
+  Layout,
   useGetD2PStatus,
-} from '@onefootprint/footprint-elements';
+} from '@onefootprint/idv-elements';
 import { GetD2PResponse } from '@onefootprint/types';
 import React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
 import Canceled from './canceled';
-import CheckRequirements from './check-requirements';
 import Complete from './complete';
-import Error from './error';
 import Expired from './expired';
 import Init from './init';
 
 const Root = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken, device, requirements } = state.context;
-  const observeCollector = useObserveCollector();
+  const { authToken, onboardingConfig } = state.context;
+  const tenantPk = onboardingConfig?.key;
   useLogStateMachine('handoff', state);
 
   useGetD2PStatus({
@@ -50,52 +44,28 @@ const Root = () => {
   });
 
   return (
-    <ErrorBoundary
-      FallbackComponent={Error}
-      onError={(error, stack) => {
-        observeCollector.logError('error', error, { stack });
-      }}
+    <AppErrorBoundary
       onReset={() => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('init') && <Init />}
-      {state.matches('complete') && <Complete />}
-      {state.matches('canceled') && <Canceled />}
-      {state.matches('expired') && <Expired />}
-      {state.matches('checkRequirements') && <CheckRequirements />}
-      {state.matches('liveness') && !!authToken && !!device && (
-        <DeviceSignals page="liveness" fpAuthToken={authToken}>
-          <Liveness
-            context={{
-              authToken,
-              device,
-            }}
-            onDone={() => {
-              send({ type: 'requirementCompleted' });
+      <Layout tenantPk={tenantPk}>
+        {state.matches('init') && <Init />}
+        {state.matches('idv') && (
+          <Idv
+            tenantPk={tenantPk}
+            authToken={authToken}
+            isTransfer
+            onComplete={() => {
+              send({ type: 'idvCompleted' });
             }}
           />
-        </DeviceSignals>
-      )}
-      {state.matches('idDoc') && !!authToken && !!device && (
-        <DeviceSignals page="id-doc" fpAuthToken={authToken}>
-          <IdDoc
-            context={{
-              authToken,
-              device,
-              customData: {
-                shouldCollectIdDoc: requirements?.missingIdDoc,
-                shouldCollectSelfie: requirements?.missingSelfie,
-                shouldCollectConsent: requirements?.missingConsent,
-              },
-            }}
-            onDone={() => {
-              send({ type: 'requirementCompleted' });
-            }}
-          />
-        </DeviceSignals>
-      )}
-    </ErrorBoundary>
+        )}
+        {state.matches('complete') && <Complete />}
+        {state.matches('canceled') && <Canceled />}
+        {state.matches('expired') && <Expired />}
+      </Layout>
+    </AppErrorBoundary>
   );
 };
 

@@ -14,20 +14,11 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignInitContext: 'initContextUpdated';
-    assignRequirements: 'requirementsReceived';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates:
-    | 'canceled'
-    | 'checkRequirements'
-    | 'complete'
-    | 'expired'
-    | 'idDoc'
-    | 'init'
-    | 'liveness'
-    | 'router';
+  matchesStates: 'canceled' | 'complete' | 'expired' | 'idv' | 'init';
   tags: never;
 }

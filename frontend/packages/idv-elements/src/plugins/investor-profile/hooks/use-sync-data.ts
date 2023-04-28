@@ -32,6 +32,7 @@ const useSyncData = () => {
         data,
         authToken,
         speculative,
+        allowExtraFields: true,
       },
       {
         onSuccess,

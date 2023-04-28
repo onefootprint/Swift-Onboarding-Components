@@ -9,6 +9,7 @@ export type MachineContext = {
   config?: OnboardingConfig;
   device?: DeviceInfo;
   userFound?: boolean;
+  isTransfer?: boolean;
   validationToken?: string;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;

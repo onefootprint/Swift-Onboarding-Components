@@ -47,7 +47,7 @@ export const createHandoffMachine = () =>
                 description:
                   'Only transition to next state if all required info is collected',
                 actions: ['assignInitContext'],
-                target: 'router',
+                target: 'idv',
                 cond: (context, event) => initContextComplete(context, event),
               },
               {
@@ -61,41 +61,10 @@ export const createHandoffMachine = () =>
             ],
           },
         },
-        router: {
-          always: [
-            {
-              target: 'liveness',
-              cond: context => !!context.requirements?.missingLiveness,
-            },
-            {
-              target: 'idDoc',
-              cond: context => !!context.requirements?.missingIdDoc,
-            },
-            {
+        idv: {
+          on: {
+            idvCompleted: {
               target: 'complete',
-            },
-          ],
-        },
-
-        liveness: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
-        },
-        idDoc: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
-        },
-        checkRequirements: {
-          on: {
-            requirementsReceived: {
-              target: 'router',
-              actions: ['assignRequirements'],
             },
           },
         },
@@ -113,10 +82,7 @@ export const createHandoffMachine = () =>
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const { device, authToken, opener, onboardingConfig, requirements } =
-            event.payload;
-
-          context.device = device !== undefined ? device : context.device;
+          const { authToken, opener, onboardingConfig } = event.payload;
           context.opener = opener !== undefined ? opener : context.opener;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
@@ -124,15 +90,7 @@ export const createHandoffMachine = () =>
             onboardingConfig !== undefined
               ? onboardingConfig
               : context.onboardingConfig;
-          context.requirements =
-            requirements !== undefined ? requirements : context.requirements;
 
-          return context;
-        }),
-        assignRequirements: assign((context, event) => {
-          context.requirements = {
-            ...event.payload,
-          };
           return context;
         }),
         resetContext: assign(() => ({})),

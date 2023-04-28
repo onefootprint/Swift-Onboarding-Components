@@ -10,6 +10,7 @@ export type OnboardingMachineArgs = {
   data?: IdDIData; // TODO: generalize this more in the next iteration
   sandboxSuffix?: string; // only if in sandbox mode
   userFound?: boolean;
+  isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
 };
@@ -20,6 +21,7 @@ const createOnboardingMachine = ({
   data = {},
   sandboxSuffix,
   userFound,
+  isTransfer,
   onClose,
   onComplete,
 }: OnboardingMachineArgs) =>
@@ -39,6 +41,7 @@ const createOnboardingMachine = ({
         data,
         sandboxSuffix,
         userFound,
+        isTransfer,
         onClose,
         onComplete,
       },
@@ -71,9 +74,15 @@ const createOnboardingMachine = ({
         },
         requirements: {
           on: {
-            requirementsCompleted: {
-              target: 'authorize',
-            },
+            requirementsCompleted: [
+              {
+                target: 'authorize',
+                cond: context => !context.isTransfer,
+              },
+              {
+                target: 'complete',
+              },
+            ],
           },
         },
         authorize: {

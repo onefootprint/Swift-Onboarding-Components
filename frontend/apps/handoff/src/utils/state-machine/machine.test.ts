@@ -51,87 +51,11 @@ describe('handoff state machine', () => {
     state = machine.send({
       type: 'initContextUpdated',
       payload: {
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
-      },
-    });
-    expect(state.context.device).toEqual({
-      type: 'mobile',
-      hasSupportForWebauthn: true,
-    });
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'initContextUpdated',
-      payload: {
         onboardingConfig: TestOnboardingConfig,
       },
     });
     expect(state.context.onboardingConfig).toEqual(TestOnboardingConfig);
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'initContextUpdated',
-      payload: {
-        requirements: {
-          missingIdDoc: true,
-        },
-      },
-    });
-    expect(state.context.requirements).toEqual({
-      missingIdDoc: true,
-    });
-    expect(state.value).toBe('idDoc');
-  });
-
-  it('checks for requirements after each step', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'initContextUpdated',
-      payload: {
-        authToken: 'token',
-        opener: 'mobile',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
-        onboardingConfig: TestOnboardingConfig,
-        requirements: {
-          missingIdDoc: true,
-        },
-      },
-    });
-    expect(state.value).toBe('idDoc');
-
-    state = machine.send({
-      type: 'requirementCompleted',
-    });
-    expect(state.value).toBe('checkRequirements');
-
-    state = machine.send({
-      type: 'requirementsReceived',
-      payload: {
-        missingLiveness: true,
-      },
-    });
-    expect(state.value).toBe('liveness');
-
-    state = machine.send({
-      type: 'requirementCompleted',
-    });
-    expect(state.value).toBe('checkRequirements');
-
-    state = machine.send({
-      type: 'requirementsReceived',
-      payload: {},
-    });
-    expect(state.value).toBe('complete');
+    expect(state.value).toBe('idv');
   });
 
   it('transitions to expired if received error payload', () => {
@@ -145,22 +69,10 @@ describe('handoff state machine', () => {
       payload: {
         authToken: 'token',
         opener: 'mobile',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
         onboardingConfig: TestOnboardingConfig,
-        requirements: {
-          missingIdDoc: true,
-          missingConsent: true,
-          missingSelfie: true,
-        },
       },
     });
-    expect(state.context.requirements?.missingIdDoc).toBe(true);
-    expect(state.context.requirements?.missingConsent).toBe(true);
-    expect(state.context.requirements?.missingSelfie).toBe(true);
-    expect(state.value).toBe('idDoc');
+    expect(state.value).toBe('idv');
 
     state = machine.send({
       type: 'statusReceived',
@@ -182,18 +94,10 @@ describe('handoff state machine', () => {
       payload: {
         authToken: 'token',
         opener: 'mobile',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
         onboardingConfig: TestOnboardingConfig,
-        requirements: {
-          missingLiveness: true,
-        },
       },
     });
-    expect(state.context.requirements?.missingLiveness).toBe(true);
-    expect(state.value).toBe('liveness');
+    expect(state.value).toBe('idv');
 
     state = machine.send({
       type: 'statusReceived',
@@ -215,18 +119,10 @@ describe('handoff state machine', () => {
       payload: {
         authToken: 'token',
         opener: 'mobile',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
-        },
         onboardingConfig: TestOnboardingConfig,
-        requirements: {
-          missingIdDoc: true,
-        },
       },
     });
-    expect(state.context.requirements?.missingIdDoc).toBe(true);
-    expect(state.value).toBe('idDoc');
+    expect(state.value).toBe('idv');
 
     state = machine.send({
       type: 'statusReceived',

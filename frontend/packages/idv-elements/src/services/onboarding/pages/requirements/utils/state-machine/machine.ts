@@ -12,6 +12,7 @@ export type OnboardingRequirementsMachineArgs = {
   authToken: string;
   email?: string;
   sandboxSuffix?: string; // only if in sandbox mode
+  isTransfer?: boolean;
 };
 
 const defaultRequirements: Requirements = {
@@ -29,6 +30,7 @@ const createOnboardingRequirementsMachine = ({
   config,
   email,
   sandboxSuffix,
+  isTransfer,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
@@ -48,6 +50,7 @@ const createOnboardingRequirementsMachine = ({
           config,
           email,
           sandboxSuffix,
+          isTransfer,
         },
         requirements: { ...defaultRequirements },
         startedDataCollection: false,
@@ -107,6 +110,13 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         transfer: {
+          on: {
+            requirementCompleted: {
+              target: 'checkRequirements',
+            },
+          },
+        },
+        liveness: {
           on: {
             requirementCompleted: {
               target: 'checkRequirements',

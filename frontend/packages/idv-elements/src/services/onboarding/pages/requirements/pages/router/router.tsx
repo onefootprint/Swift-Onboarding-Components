@@ -7,6 +7,7 @@ import {
   CollectKycData,
   IdDoc,
   InvestorProfile,
+  Liveness,
   Transfer,
 } from '../../../../../../plugins';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -29,7 +30,7 @@ const Router = ({ onDone }: RouterProps) => {
       device,
     },
     collectedKycData,
-    requirements: { liveness, idDoc, selfie, kycData, kybData },
+    requirements: { liveness, idDoc, selfie, consent, kycData, kybData },
   } = state.context;
   const isDone = state.matches('success');
 
@@ -133,6 +134,19 @@ const Router = ({ onDone }: RouterProps) => {
       </DeviceSignals>
     );
   }
+  if (state.matches('liveness')) {
+    return (
+      <DeviceSignals page="liveness" fpAuthToken={authToken}>
+        <Liveness
+          context={{
+            authToken,
+            device,
+          }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
+    );
+  }
   if (state.matches('idDoc')) {
     return (
       <DeviceSignals page="id-doc" fpAuthToken={authToken}>
@@ -143,6 +157,7 @@ const Router = ({ onDone }: RouterProps) => {
             customData: {
               shouldCollectIdDoc: idDoc,
               shouldCollectSelfie: selfie,
+              shouldCollectConsent: consent,
             },
           }}
           onDone={handleRequirementCompleted}

@@ -1,9 +1,9 @@
+import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import {
   HeaderTitle,
   NavigationHeader,
   useUpdateD2PStatus,
-} from '@onefootprint/footprint-elements';
-import { useCountdown, useTranslation } from '@onefootprint/hooks';
+} from '@onefootprint/idv-elements';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';

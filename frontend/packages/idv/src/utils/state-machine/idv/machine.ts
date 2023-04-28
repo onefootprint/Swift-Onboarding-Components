@@ -8,17 +8,12 @@ export type IdvMachineArgs = {
   authToken?: string;
   tenantPk?: string;
   data?: IdvData;
+  isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
 };
 
-const createIdvMachine = ({
-  authToken,
-  tenantPk,
-  data,
-  onClose,
-  onComplete,
-}: IdvMachineArgs) =>
+const createIdvMachine = (args: IdvMachineArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -30,11 +25,7 @@ const createIdvMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        authToken,
-        tenantPk,
-        data,
-        onClose,
-        onComplete,
+        ...args,
       },
       on: {
         reset: {

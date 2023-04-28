@@ -28,6 +28,7 @@ const Router = ({ onDone }: RouterProps) => {
     authToken,
     data,
     sandboxSuffix,
+    isTransfer,
   } = state.context;
   useLogStateMachine('onboarding', state);
 
@@ -38,37 +39,33 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
-  if (state.matches('init')) {
-    return <Init />;
-  }
-  if (state.matches('configInvalid')) {
-    return <ConfigInvalid />;
-  }
-  if (state.matches('requirements')) {
-    return (
-      <Requirements
-        userFound={!!userFound}
-        device={device}
-        config={config}
-        authToken={authToken}
-        email={data[IdDI.email]}
-        sandboxSuffix={sandboxSuffix}
-        onDone={() => {
-          send({
-            type: 'requirementsCompleted',
-          });
-        }}
-      />
-    );
-  }
-  if (state.matches('authorize')) {
-    return (
-      <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>
-        <Authorize />
-      </DeviceSignals>
-    );
-  }
-  return null;
+  return (
+    <>
+      {state.matches('init') && <Init />}
+      {state.matches('configInvalid') && <ConfigInvalid />}
+      {state.matches('requirements') && (
+        <Requirements
+          userFound={!!userFound}
+          device={device}
+          config={config}
+          authToken={authToken}
+          email={data[IdDI.email]}
+          sandboxSuffix={sandboxSuffix}
+          isTransfer={isTransfer}
+          onDone={() => {
+            send({
+              type: 'requirementsCompleted',
+            });
+          }}
+        />
+      )}
+      {state.matches('authorize') && (
+        <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>
+          <Authorize />
+        </DeviceSignals>
+      )}
+    </>
+  );
 };
 
 export default Router;

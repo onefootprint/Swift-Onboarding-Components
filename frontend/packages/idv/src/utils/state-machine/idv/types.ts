@@ -8,6 +8,7 @@ export type MachineContext = {
   tenantPk?: string;
   authToken?: string;
   data?: IdvData;
+  isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
   // Generated

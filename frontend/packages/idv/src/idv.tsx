@@ -10,13 +10,21 @@ import configureI18next from './config/initializers/react-i18next';
 import Router from './pages/router';
 import { IdvProps } from './types';
 
-const App = ({ authToken, tenantPk, data, onComplete, onClose }: IdvProps) => (
+const App = ({
+  authToken,
+  tenantPk,
+  data,
+  isTransfer,
+  onComplete,
+  onClose,
+}: IdvProps) => (
   <>
     <I18nextProvider i18n={configureI18next()}>
       <MachineProvider
         tenantPk={tenantPk}
         data={data}
         authToken={authToken}
+        isTransfer={isTransfer}
         onComplete={onComplete}
         onClose={onClose}
       >

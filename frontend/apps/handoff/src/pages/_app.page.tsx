@@ -9,7 +9,6 @@ import Head from 'next/head';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
-import HandoffLayout from '../components/handoff-layout';
 import MachineProvider from '../components/machine-provider';
 import { SHOW_APP_CLIP_BANNER } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
@@ -34,9 +33,7 @@ const App = ({ Component, pageProps }: AppProps) => (
         <MachineProvider>
           <DesignSystemProvider theme={themes.light}>
             <GlobalStyle />
-            <HandoffLayout>
-              <Component {...pageProps} />
-            </HandoffLayout>
+            <Component {...pageProps} />
           </DesignSystemProvider>
         </MachineProvider>
       </ObserveCollectorProvider>

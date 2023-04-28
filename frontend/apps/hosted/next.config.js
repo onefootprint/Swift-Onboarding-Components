@@ -28,8 +28,12 @@ const securityHeaders = [
     value: '1; mode=block',
   },
   {
+    key: 'X-Frame-Options',
+    value: 'SAMEORIGIN',
+  },
+  {
     key: 'Permissions-Policy',
-    value: 'camera=(), publickey-credentials-get=*',
+    value: 'camera=(), publickey-credentials-get=*, geolocation=()',
   },
   {
     key: 'X-Content-Type-Options',
