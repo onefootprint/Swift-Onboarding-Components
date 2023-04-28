@@ -23,6 +23,7 @@ url = lambda path: "{}/{}".format(TEST_URL, path)
 TWILIO_API_KEY = get_secret("TWILIO_API_KEY")
 TWILIO_ACCOUNT_SID = get_secret("TWILIO_ACCOUNT_SID")
 TWILIO_API_KEY_SECRET = get_secret("TWILIO_API_KEY_SECRET")
+FIXTURE_PHONE_NUMBER = "+15555550100"
 PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
 SCRUBBED_PHONE_NUMBER = f"+1 (***) ***-**{PHONE_NUMBER[-2:]}"
 EMAIL = "footprint.user.dev@gmail.com"

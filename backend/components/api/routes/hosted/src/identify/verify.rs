@@ -211,6 +211,7 @@ fn validate_sms_challenge(
         conn,
         &[
             context.global_sh_phone_number.clone(),
+            context.tenant_sh_phone_number.clone(),
             context.legacy_sh_phone_number,
         ],
     )?;

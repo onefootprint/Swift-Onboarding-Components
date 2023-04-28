@@ -9,7 +9,7 @@ import os
 
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from tests.auth import DashboardAuth, FpAuth
-from tests.constants import CUSTODIAN_AUTH, TEST_URL, PHONE_NUMBER
+from tests.constants import CUSTODIAN_AUTH, TEST_URL, PHONE_NUMBER, FIXTURE_PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(TEST_URL, path)
 
@@ -126,7 +126,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 
 def inherit_user(twilio, phone_number, ob_config_auth):
-    challenge_data = challenge_user(phone_number, "sms")
+    challenge_data = challenge_user(phone_number, ob_config_auth, "sms")
 
     # Log in as the user
     return identify_verify(
@@ -140,7 +140,9 @@ def inherit_user(twilio, phone_number, ob_config_auth):
 
 def inherit_user_biometric(user):
     phone_number = user.client.data["id.phone_number"]
-    challenge_data = challenge_user(phone_number, "biometric")
+    challenge_data = challenge_user(
+        phone_number, user.client.ob_config.key, "biometric"
+    )
 
     # do webauthn
     chal = json.loads(challenge_data["biometric_challenge_json"])
@@ -173,7 +175,7 @@ def inherit_user_biometric(user):
     return FpAuth(body["auth_token"])
 
 
-def challenge_user(phone_number, challenge_kind="sms"):
+def challenge_user(phone_number, ob_config_auth, challenge_kind="sms"):
     identifier = dict(phone_number=phone_number)
     # Support sandbox phone numbers being passed in
     real_phone_number = phone_number.split("#")[0]
@@ -182,7 +184,7 @@ def challenge_user(phone_number, challenge_kind="sms"):
         data = dict(
             identifier=identifier,
         )
-        body = post("hosted/identify", data)
+        body = post("hosted/identify", data, ob_config_auth)
         assert body["user_found"]
         assert body["available_challenge_kinds"]
 
@@ -191,7 +193,7 @@ def challenge_user(phone_number, challenge_kind="sms"):
             identifier=identifier,
             preferred_challenge_kind=challenge_kind,
         )
-        body = post("hosted/identify/login_challenge", data)
+        body = post("hosted/identify/login_challenge", data, ob_config_auth)
         last_two = real_phone_number[-2:]
         assert (
             body["challenge_data"]["scrubbed_phone_number"]
@@ -212,8 +214,23 @@ def identify_verify(
     expected_kind="user_created",
     expected_error=None,
 ):
+    def verify(code):
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+        }
+        args = [ob_config_auth] if ob_config_auth else []
+        body = post("hosted/identify/verify", data, *args)
+        assert body["kind"] == expected_kind
+        return FpAuth(body["auth_token"])
+
+    real_phone_number = phone_number.split("#")[0]
+    if real_phone_number == FIXTURE_PHONE_NUMBER:
+        # The code for the fixture number in sandbox is fixed
+        return verify("000000")
+
     def inner():
-        real_phone_number = phone_number.split("#")[0]
         messages = twilio.messages.list(to=real_phone_number, limit=10)
 
         last_error = None
@@ -225,15 +242,7 @@ def identify_verify(
                 continue
 
             try:
-                data = {
-                    "challenge_response": code,
-                    "challenge_kind": "sms",
-                    "challenge_token": challenge_token,
-                }
-                args = [ob_config_auth] if ob_config_auth else []
-                body = post("hosted/identify/verify", data, *args)
-                assert body["kind"] == expected_kind
-                return FpAuth(body["auth_token"])
+                return verify(code)
             except HttpError as e:
                 if expected_error and expected_error in str(e):
                     # The specific error we expected to see was returned from verify - we can exit
