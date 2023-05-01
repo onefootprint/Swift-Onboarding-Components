@@ -100,13 +100,20 @@ impl VerificationRequest {
 
     /// Based on VerificationRequests for the onboarding, get VerificationResults
     #[tracing::instrument(skip_all)]
-    pub fn get_latest_requests_and_results_for_scoped_user(
+    pub fn get_latest_requests_and_successful_results_for_scoped_user(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
             .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
-            .left_join(verification_result::table)
+            .left_join(
+                verification_result::table.on(verification_result::request_id.eq(verification_request::id)),
+            )
+            .filter(
+                verification_result::id
+                    .is_null()
+                    .or(verification_result::is_error.eq(false)),
+            )
             .order((
                 verification_request::vendor_api,
                 verification_request::uvw_snapshot_seqno.desc(),
@@ -187,7 +194,7 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list_by_decision_intent_id(
+    pub fn list_successful_by_decision_intent_id(
         conn: &mut PgConn,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)>> {
@@ -196,6 +203,7 @@ impl VerificationRequest {
                 .left_join(verification_result::table)
                 .inner_join(decision_intent::table)
                 .filter(decision_intent::id.eq(decision_intent_id))
+                .filter(verification_result::is_error.eq(false))
                 .get_results(conn)?;
 
         Ok(res)

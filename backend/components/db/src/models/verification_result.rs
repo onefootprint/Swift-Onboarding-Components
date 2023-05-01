@@ -70,7 +70,7 @@ impl VerificationResult {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_by_response_id(
+    pub fn get_successful_by_response_id(
         conn: &mut PgConn,
         vendor_api: VendorAPI,
         id: &str,
@@ -78,6 +78,7 @@ impl VerificationResult {
         let res = verification_request::table
             .filter(verification_request::vendor_api.eq(vendor_api))
             .inner_join(verification_result::table)
+            .filter(verification_result::is_error.eq(false))
             .filter(
                 verification_result::response
                     .retrieve_by_path_as_text(vec!["id"])

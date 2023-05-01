@@ -101,6 +101,8 @@ impl RiskSignal {
         let vrs = verification_request::table
             .inner_join(verification_result::table)
             .filter(verification_result::id.eq_any(vr_ids))
+            // don't include Vres that are errors
+            .filter(verification_result::is_error.eq(false))
             .filter(verification_request::vendor.eq_any(&signal.vendors))
             .get_results(conn)?;
         Ok((signal, vrs))

@@ -198,7 +198,7 @@ impl WatchlistCheckTask {
         let existing_watchlist_check = WatchlistCheck::get_by_task_id(conn, task_id)?;
         let wc = if let Some(wc) = existing_watchlist_check {
             let req = if let Some(di) = wc.decision_intent_id.as_ref() {
-                VerificationRequest::list_by_decision_intent_id(conn, di)?.pop()
+                VerificationRequest::list_successful_by_decision_intent_id(conn, di)?.pop()
             } else {
                 None
             };

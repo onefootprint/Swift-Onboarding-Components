@@ -400,7 +400,8 @@ async fn get_data(
         .db_query(move |conn| {
             let wc = WatchlistCheck::_get_by_svid(conn, &svid).unwrap();
             let vreqs =
-                VerificationRequest::get_latest_requests_and_results_for_scoped_user(conn, svid).unwrap();
+                VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, svid)
+                    .unwrap();
 
             let ut = UserTimeline::get_by_event_data_id(conn, wc.id.to_string()).unwrap();
 

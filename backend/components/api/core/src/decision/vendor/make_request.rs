@@ -698,13 +698,16 @@ pub async fn handle_middesk_business_response(
     let (vres_id, ob) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Lookup the VRes for the POST /business call we made so we can associate this webhook with a particular scoped_vault
-            let (create_business_vreq, _, di) =
-                VerificationResult::get_by_response_id(conn, VendorAPI::MiddeskCreateBusiness, &business_id)?
-                    .ok_or(idv::Error::from(middesk::Error::CreateBusinessResultNotFound(
-                        business_id,
-                    )))?;
+            let (create_business_vreq, _, di) = VerificationResult::get_successful_by_response_id(
+                conn,
+                VendorAPI::MiddeskCreateBusiness,
+                &business_id,
+            )?
+            .ok_or(idv::Error::from(middesk::Error::CreateBusinessResultNotFound(
+                business_id,
+            )))?;
 
-            let vreqs = VerificationRequest::list_by_decision_intent_id(conn, &di.id)?;
+            let vreqs = VerificationRequest::list_successful_by_decision_intent_id(conn, &di.id)?;
             let outstanding_webhook_vreqs: Vec<_> = vreqs
                 .into_iter()
                 .filter(|(vreq, vres, _)| {
@@ -794,13 +797,16 @@ pub async fn handle_middesk_tin_retried_response(
     let (uv, ob, get_business_vreq) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Lookup the VRes for the POST /business call we made so we can associate this webhook with a particular scoped_vault
-            let (create_business_vreq, _, di) =
-                VerificationResult::get_by_response_id(conn, VendorAPI::MiddeskCreateBusiness, &bizid)?
-                    .ok_or(idv::Error::from(middesk::Error::CreateBusinessResultNotFound(
-                        bizid,
-                    )))?;
+            let (create_business_vreq, _, di) = VerificationResult::get_successful_by_response_id(
+                conn,
+                VendorAPI::MiddeskCreateBusiness,
+                &bizid,
+            )?
+            .ok_or(idv::Error::from(middesk::Error::CreateBusinessResultNotFound(
+                bizid,
+            )))?;
 
-            let vreqs = VerificationRequest::list_by_decision_intent_id(conn, &di.id)?;
+            let vreqs = VerificationRequest::list_successful_by_decision_intent_id(conn, &di.id)?;
             let outstanding_webhook_vreqs: Vec<_> = vreqs
                 .into_iter()
                 .filter(|v| v.0.vendor_api == VendorAPI::MiddeskTinRetriedWebhook && v.1.is_none())
