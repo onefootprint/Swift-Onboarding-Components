@@ -2,11 +2,13 @@ import React from 'react';
 
 import BaseDialog, {
   AllButtons,
- DialogHeaderIcon,  NoButtons,
+  DialogHeaderIcon,
+  NoButtons,
   OnlyButtons,
   OnlyPrimaryButton,
   PrimaryAndLinkButtons,
-  Size } from './components/base-dialog';
+  Size,
+} from './components/base-dialog';
 
 export type DialogProps = {
   children?: React.ReactNode;

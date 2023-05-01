@@ -107,14 +107,13 @@ export default {
   },
 } as Meta;
 
-
 const Template: Story<DialogProps> = ({
   children,
   onClose,
   headerIcon: {
     component: HeaderIconComponent = IcoClose24,
     onClick: onHeaderIconClick = onClose,
-    ariaLabel: headerIconAriaLabel =  'Close',
+    ariaLabel: headerIconAriaLabel = 'Close',
   } = {
     component: IcoClose24,
     onClick: onClose,
@@ -205,7 +204,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
   headerIcon: {
     component: HeaderIconComponent = IcoClose24,
     onClick: onHeaderIconClick = onClose,
-    ariaLabel: headerIconAriaLabel =  'Close',
+    ariaLabel: headerIconAriaLabel = 'Close',
   } = {
     component: IcoClose24,
     onClick: onClose,
@@ -231,7 +230,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
         headerIcon={{
           component: SelectedIcon,
           onClick: onHeaderIconClick,
-          ariaLabel: headerIconAriaLabel
+          ariaLabel: headerIconAriaLabel,
         }}
         onClose={() => {
           setOpen(false);
