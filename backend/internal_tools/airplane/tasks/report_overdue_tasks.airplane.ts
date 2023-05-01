@@ -27,7 +27,7 @@ export default airplane.task(
         *
       from task
       where 
-        scheduled_for + interval '2 hour' < now()
+        scheduled_for + interval '5 hour' < now()
         and task.status not in ('failed', 'completed')
     `;
 
