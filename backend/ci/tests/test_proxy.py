@@ -371,3 +371,132 @@ class TestVaultProxy:
             sandbox_tenant.sk.key,
             status_code=404,
         )
+
+    def test_ingress_non_custom(self, sandbox_tenant):
+        # create the vault
+        body = post("users/", None, sandbox_tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
+        # post data to it
+        data = {
+            "id.first_name": "Bob",
+            "id.last_name": "Boberto",
+            "id.dob": "1990-12-12",
+            "id.ssn9": "121-12-1212",
+            "custom.test_field": "hello world",
+            **ID_DATA,
+        }
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+        # specify the ditto server
+        ditto_url = "https://ditto.footprint.dev"
+
+        # send the proxy request
+        # ditto will simulate this data for the proxy to ingress vault
+        data = {
+            "data": {
+                "date_of_birth": "1950-01-01",
+                "card_number": "42424242424242",
+                "card_cvc": 4242,
+            }
+        }
+
+        response = _make_request(
+            method=requests.post,
+            path="proxy",
+            data=data,
+            params=None,
+            status_code=200,
+            auths=[
+                sandbox_tenant.sk.key,
+                ProxyDestinationHeader(ditto_url),
+                ProxyAccessReason("test reason"),
+                ProxyTokenAssignment(fp_id),
+                ProxyIngressRule(
+                    "credit_card.primary.number=$.data.card_number,credit_card.primary.cvc=$.data.card_cvc,id.dob=$.data.date_of_birth"
+                ),
+                ProxyIngressContentType("json"),
+            ],
+            files=None,
+        )
+
+        result = response.json()
+        assert result["data"]["card_number"] == f"{fp_id}.credit_card.primary.number"
+        assert result["data"]["card_cvc"] == f"{fp_id}.credit_card.primary.cvc"
+        assert result["data"]["date_of_birth"] == f"{fp_id}.id.dob"
+
+        data = dict(
+            reason="test",
+            fields=[
+                "id.ssn9",
+                "id.dob",
+                "credit_card.primary.number",
+                "credit_card.primary.cvc",
+            ],
+        )
+        response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        assert response["id.ssn9"] == "121121212"
+        assert response["id.dob"] == "1950-01-01"
+        assert response["credit_card.primary.number"] == "42424242424242"
+        assert response["credit_card.primary.cvc"] == "4242"
+
+    def test_ingress_document(self, sandbox_tenant):
+        # create the vault
+        body = post("users/", None, sandbox_tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
+        # post data to it
+        data = {
+            **ID_DATA,
+        }
+        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+        # specify the ditto server
+        ditto_url = "https://ditto.footprint.dev"
+
+        # send the proxy request
+        # ditto will simulate this data for the proxy to ingress vault
+        from .image_fixtures import test_image
+
+        data = {
+            "data": {
+                "id_card": test_image,
+            }
+        }
+
+        response = _make_request(
+            method=requests.post,
+            path="proxy",
+            data=data,
+            params=None,
+            status_code=200,
+            auths=[
+                sandbox_tenant.sk.key,
+                ProxyDestinationHeader(ditto_url),
+                ProxyAccessReason("test reason"),
+                ProxyTokenAssignment(fp_id),
+                ProxyIngressRule("document.drivers_license_front=$.data.id_card"),
+                ProxyIngressContentType("json"),
+            ],
+            files=None,
+        )
+
+        result = response.json()
+        assert result["data"]["id_card"] == f"{fp_id}.document.drivers_license_front"
+
+        data = dict(
+            reason="test",
+            fields=[
+                "document.drivers_license_front",
+            ],
+        )
+        response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        assert response["document.drivers_license_front"] == test_image
+
+
+### Tests to do ###
+# - ingress biz data

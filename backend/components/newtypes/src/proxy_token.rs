@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use itertools::Itertools;
 
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::SerializeDisplay;
 
 use crate::{DataIdentifier, FpId, PrefixId};
 
@@ -24,18 +24,13 @@ use crate::{DataIdentifier, FpId, PrefixId};
 ///
 /// Future work: support filters / transformations, i.e: :: <fp_id>.id.last_name | uppercase ::
 ///
-#[derive(Debug, Clone, PartialEq, Eq, Hash, DeserializeFromStr, SerializeDisplay)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SerializeDisplay)]
 pub struct ProxyToken {
     pub fp_id: FpId,
     pub identifier: DataIdentifier,
 }
 
 impl ProxyToken {
-    /// parses a string into a single Proxy Token
-    pub fn parse(raw: &str) -> Result<Self, crate::Error> {
-        Self::parse_global(raw, None)
-    }
-
     /// parses a string into a single Proxy Token with support for a global footprint user id
     /// in the case where just an identifier is specified
     pub fn parse_global(raw: &str, global_fp_id: Option<FpId>) -> Result<Self, crate::Error> {
@@ -60,14 +55,6 @@ impl ProxyToken {
     }
 }
 
-impl FromStr for ProxyToken {
-    type Err = crate::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::parse(s)
-    }
-}
-
 impl std::fmt::Display for ProxyToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         format!("{}.{}", self.fp_id, self.identifier).fmt(f)
@@ -80,7 +67,7 @@ impl paperclip::v2::schema::Apiv2Schema for ProxyToken {
     }
 
     fn description() -> &'static str {
-        "String of format '<fp_id>.<data_kind>.<attribute_name>'"
+        "String of format '<fp_id>.<data_kind>.<attribute_name>' or '<data_kind>.<attribute_name>' if `fp_id` specified as a header"
     }
 
     fn required() -> bool {

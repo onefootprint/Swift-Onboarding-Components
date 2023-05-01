@@ -93,7 +93,7 @@ pub async fn vault_pii(
                     targets: data
                         .keys()
                         .cloned()
-                        .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind.clone())))
+                        .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
                         .collect(),
                 }
                 .create(conn)?;

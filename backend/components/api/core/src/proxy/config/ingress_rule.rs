@@ -1,6 +1,9 @@
 use std::str::FromStr;
 
-use crate::errors::{proxy::VaultProxyError, ApiError};
+use crate::{
+    errors::{proxy::VaultProxyError, ApiError},
+    utils::headers::get_header,
+};
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::{DataIdentifier, FpId, ProxyToken, ProxyTokenError};
@@ -59,12 +62,14 @@ impl IngressRule {
     }
 }
 
-impl TryFrom<&str> for IngressRule {
+impl TryFrom<(&str, Option<FpId>)> for IngressRule {
     type Error = ApiError;
 
     /// <proxy_token> + '=' + <target>
-    /// Example fp_id_abc.custom.credit_card_number=$.data.card.number
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    /// Examples:
+    ///     - fp_id_abc.custom.credit_card_number=$.data.card.number
+    ///     - custom.credit_card_number=$.data.card.number
+    fn try_from((value, global_fp_id): (&str, Option<FpId>)) -> Result<Self, Self::Error> {
         let components: Vec<&str> = value.split('=').collect();
 
         if components.len() != 2 {
@@ -73,18 +78,7 @@ impl TryFrom<&str> for IngressRule {
         let proxy_token = components[0].trim();
         let target = components[1].trim().to_string();
 
-        let proxy_token = ProxyToken::parse(proxy_token)?;
-
-        match proxy_token.identifier {
-            DataIdentifier::Custom(_) => {}
-            DataIdentifier::Id(_)
-            | DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Business(_)
-            | DataIdentifier::CreditCard(_) => {}
-            DataIdentifier::Document(_) => {
-                return Err(VaultProxyError::IngressDocumentVaultProxyingNotSupported)?
-            }
-        }
+        let proxy_token = ProxyToken::parse_global(proxy_token, global_fp_id)?;
 
         Ok(Self { proxy_token, target })
     }
@@ -96,18 +90,28 @@ impl TryFrom<&HeaderMap> for ParsedIngressRules {
     type Error = ApiError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
+        let global_fp_id =
+            get_header(super::proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FpId::from);
+
         let result = headers
-            .iter()
-            .filter(|(n, _v)| n.as_str() == IngressRule::INGRESS_RULE_HEADER)
-            .map(|(_n, value)| {
+            .get_all(IngressRule::INGRESS_RULE_HEADER)
+            .map(|value| {
                 let value = value
                     .to_str()
                     .map_err(|_| VaultProxyError::InvalidIngressRuleHeader)?;
-                let rule = IngressRule::try_from(value)?;
-                Ok(rule)
-            })
-            .collect::<Result<Vec<_>, ApiError>>();
+                // support HTTP1.1 where multi-header values are CSV
+                let rules = value
+                    .split(',')
+                    .map(|value_split| IngressRule::try_from((value_split, global_fp_id.clone())))
+                    .collect::<Result<Vec<_>, _>>()?;
 
-        Ok(Self(result?))
+                Ok(rules)
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?
+            .into_iter()
+            .flatten()
+            .collect();
+
+        Ok(Self(result))
     }
 }
