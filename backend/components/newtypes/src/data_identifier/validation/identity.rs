@@ -2,7 +2,7 @@ use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
-use chrono::{Datelike, NaiveDate};
+use chrono::{Datelike, NaiveDate, Utc};
 use std::str::FromStr;
 
 impl Validate for IDK {
@@ -30,8 +30,17 @@ impl Validate for IDK {
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
-    if for_bifrost && date.year() < 1900 {
-        return Err(Error::ImprobableDob);
+    if for_bifrost {
+        if date.year() < 1900 {
+            return Err(Error::ImprobableDob);
+        }
+
+        let today = Utc::now().naive_utc().date();
+        let age = (today - date).num_days() / 365;
+
+        if age <= 13 {
+            return Err(Error::ImprobableDob);
+        }
     }
     Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
 }
@@ -123,6 +132,9 @@ mod test {
     }
 
     #[test_case(Dob, "1876-12-25" => None)]
+    // too young
+    #[test_case(Dob, "2015-01-01" => None)]
+    #[test_case(Dob, "2009-01-01" => Some("2009-01-01".to_owned()))]
     #[test_case(Dob, "1976-12-25" => Some("1976-12-25".to_owned()))]
     #[test_case(FirstName, "" => None)]
     #[test_case(LastName, "" => None)]

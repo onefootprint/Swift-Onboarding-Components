@@ -91,7 +91,11 @@ impl KycFeatureVector {
         mut reason_codes: Vec<FootprintReasonCode>,
     ) -> Vec<FootprintReasonCode> {
         // Add in info codes ONLY if we've located the identity
-        if !reason_codes.contains(&FootprintReasonCode::IdNotLocated) {
+        if !(reason_codes.contains(&FootprintReasonCode::IdNotLocated)
+            // Idology considers this a "restricted match" and doesn't return additional qualifiers so 
+            // we shouldn't infer anything about "info" codes here
+            || reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert))
+        {
             FootprintReasonCode::iter().for_each(|r| {
                 if let Some(info_code) = r.to_info_code() {
                     if !reason_codes.contains(&r) {
