@@ -21,7 +21,8 @@
           "$(AppIdentifierPrefix)undefined.Clip"
         ]
       },
-      "bundleIdentifier": "com.onefootprint.my"
+      "bundleIdentifier": "com.onefootprint.my",
+      "usesNonExemptEncryption": "false"
     },
     "android": {
       "adaptiveIcon": {

@@ -31,7 +31,7 @@
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
-      appClipInvocationURLString = "https://handoff.preview.onefootprint.com?r=141#tok_m3dH0PQxVdQ0f8FI9MopC2wiOvkwZrsRWq"
+      appClipInvocationURLString = "https://handoff.preview.onefootprint.com?r=766#tok_ztScyAaCXJkW6RY5N1gBQCAowNcmXBC5Po"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -60,7 +60,7 @@
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
-      appClipInvocationURLString = "https://handoff.preview.onefootprint.com?r=141#tok_m3dH0PQxVdQ0f8FI9MopC2wiOvkwZrsRWq"
+      appClipInvocationURLString = "https://handoff.preview.onefootprint.com?r=766#tok_ztScyAaCXJkW6RY5N1gBQCAowNcmXBC5Po"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"

@@ -1,21 +1,21 @@
-import styled from '@onefootprint/styled';
-import { Button, Typography } from '@onefootprint/ui';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { View } from 'react-native';
+
+import Login from './screens/login';
+
+const Stack = createNativeStackNavigator();
 
 const Wallet = () => (
-  <View>
-    <Button onPress={() => {}} disabled>
-      Button
-    </Button>
-    <Text variant="body-4">Hello World</Text>
-  </View>
+  <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Home"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  </NavigationContainer>
 );
-
-const Text = styled(Typography)`
-  font-size: 48px;
-  margin-top: 24px;
-  color: red;
-`;
 
 export default Wallet;

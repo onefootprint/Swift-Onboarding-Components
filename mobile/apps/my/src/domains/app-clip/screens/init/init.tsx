@@ -1,6 +1,6 @@
 import { D2PStatusUpdate } from '@onefootprint/types';
+import { Container, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
-import { Text } from 'react-native';
 
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 import useParseHandoffUrl from './hooks/use-parse-handoff-url';
@@ -28,7 +28,11 @@ const Init = ({ onSuccess, onError }) => {
     onError,
   });
 
-  return <Text>AppClip</Text>;
+  return (
+    <Container center>
+      <LoadingIndicator />
+    </Container>
+  );
 };
 
 export default Init;

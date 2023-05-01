@@ -1,12 +1,14 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import styled, { css } from '@onefootprint/styled';
 import * as React from 'react';
 import { GestureResponderEvent, Text } from 'react-native';
 
+import { Box, BoxProps } from '../box';
 import { LoadingIndicator } from '../loading-indicator';
 import { Pressable } from '../pressable';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
-export type ButtonProps = {
+export type ButtonProps = BoxProps & {
   children: string;
   disabled?: boolean;
   loading?: boolean;
@@ -24,29 +26,32 @@ const Button = ({
   size = 'default',
   variant = 'primary',
   onPress,
+  ...props
 }: ButtonProps) => {
   return (
-    <ButtonContainer
-      disabled={disabled}
-      loading={loading}
-      onPress={onPress}
-      size={size}
-      variant={variant}
-    >
-      {!loading ? (
-        <ButtonText variant={variant} disabled={disabled} size={size}>
-          {children}
-        </ButtonText>
-      ) : (
-        <HiddenButtonText>{children}</HiddenButtonText>
-      )}
-      <LoandingIndicatorContainer loading={loading}>
-        <LoadingIndicator
-          aria-label={loadingAriaLabel}
-          color={variant === 'primary' ? 'quinary' : 'primary'}
-        />
-      </LoandingIndicatorContainer>
-    </ButtonContainer>
+    <Box {...props}>
+      <ButtonContainer
+        disabled={disabled}
+        loading={loading}
+        onPress={onPress}
+        size={size}
+        variant={variant}
+      >
+        {!loading ? (
+          <ButtonText variant={variant} disabled={disabled} size={size}>
+            {children}
+          </ButtonText>
+        ) : (
+          <HiddenButtonText>{children}</HiddenButtonText>
+        )}
+        <LoandingIndicatorContainer loading={loading}>
+          <LoadingIndicator
+            aria-label={loadingAriaLabel}
+            color={variant === 'primary' ? 'quinary' : 'primary'}
+          />
+        </LoandingIndicatorContainer>
+      </ButtonContainer>
+    </Box>
   );
 };
 
@@ -59,7 +64,6 @@ const ButtonContainer = styled(Pressable)<{
     const { button } = theme.components;
 
     return css`
-      display: inline;
       align-items: center;
       background-color: ${button.variant[variant].bg};
       border-color: ${button.variant[variant].borderColor};

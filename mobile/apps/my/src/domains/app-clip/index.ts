@@ -1,1 +1,1 @@
-export { default } from './app-clip';
+export { default } from './screens/router';

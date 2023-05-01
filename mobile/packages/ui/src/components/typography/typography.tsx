@@ -1,9 +1,12 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { Color, FontVariant } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { TextProps } from 'react-native';
 
-export type TypographyProps = {
+import { Box, BoxProps } from '../box';
+
+export type TypographyProps = BoxProps & {
   style?: TextProps['style'];
   center?: boolean;
   children: React.ReactNode;
@@ -14,25 +17,28 @@ export type TypographyProps = {
 };
 
 const Typography = ({
-  style,
   center = false,
   children,
   color = 'primary',
   ellipsizeMode,
   numberOfLines,
+  style,
   variant,
+  ...props
 }: TypographyProps) => {
   return (
-    <StyledText
-      style={style}
-      center={center}
-      color={color}
-      ellipsizeMode={ellipsizeMode}
-      numberOfLines={numberOfLines}
-      variant={variant}
-    >
-      {children}
-    </StyledText>
+    <Box {...props}>
+      <StyledText
+        center={center}
+        color={color}
+        ellipsizeMode={ellipsizeMode}
+        numberOfLines={numberOfLines}
+        style={style}
+        variant={variant}
+      >
+        {children}
+      </StyledText>
+    </Box>
   );
 };
 

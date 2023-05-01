@@ -26,6 +26,7 @@ module.exports = {
         exceptions: [],
       },
     ],
+    'global-require': 'off',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     'react/display-name': 'off',

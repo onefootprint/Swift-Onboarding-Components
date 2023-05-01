@@ -1,9 +1,4 @@
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_700Bold,
-  useFonts,
-} from '@expo-google-fonts/dm-sans';
+import { useFonts } from '@expo-google-fonts/dm-sans';
 import theme from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -21,9 +16,9 @@ SplashScreen.preventAutoHideAsync();
 
 const App = () => {
   const [fontsLoaded] = useFonts({
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_700Bold,
+    DMSans_400Regular: require('../assets/fonts/DMSans-Regular.otf'),
+    DMSans_500Medium: require('../assets/fonts/DMSans-Medium.otf'),
+    DMSans_700Bold: require('../assets/fonts/DMSans-Bold.otf'),
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -48,8 +43,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F2',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 

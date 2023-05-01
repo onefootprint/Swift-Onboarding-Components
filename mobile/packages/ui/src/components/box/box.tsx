@@ -31,6 +31,7 @@ export type BoxProps = Omit<
   | 'borderTopRightRadius'
   | 'borderTopStartRadius'
 > & {
+  center?: boolean;
   testID?: string;
   children?: React.ReactNode;
 } & {
@@ -80,6 +81,7 @@ const Box = ({ children, ...props }: BoxProps) => {
 const Container = styled.View<BoxProps>`
   ${({ theme, ...props }) =>
     css`
+      ${props.center && 'justify-content: center; align-items: center;'}
       ${(Object.keys(props) as Array<keyof BoxProps>)
         .map(prop => {
           if (prop.startsWith('margin') || prop.startsWith('padding')) {

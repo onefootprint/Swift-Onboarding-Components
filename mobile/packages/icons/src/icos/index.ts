@@ -1,5 +1,13 @@
 /**
  * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
  */
+export { default as IcoBuilding24 } from './ico-building-24';
 export { default as IcoCheck24 } from './ico-check-24';
+export { default as IcoCheckCircle40 } from './ico-check-circle-40';
+export { default as IcoFaceid40 } from './ico-faceid-40';
+export { default as IcoFileText216 } from './ico-file-text-2-16';
+export { default as IcoFootprint24 } from './ico-footprint-24';
+export { default as IcoInfo16 } from './ico-info-16';
+export { default as IcoShield40 } from './ico-shield-40';
 export { default as IcoUser16 } from './ico-user-16';
+export { default as LogoFpDefault } from './logo-fp-default-colored';
