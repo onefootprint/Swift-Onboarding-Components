@@ -17,18 +17,33 @@ export default {
       },
       description: 'The header text of the dialog',
     },
-    closeIconComponent: {
+    headerIconComponent: {
       control: 'select',
       description: 'Close icon',
       options: Object.keys(icos),
     },
-    closeAriaLabel: {
+    headerIconAriaLabel: {
       control: 'text',
       table: {
         type: { summary: 'string', required: false },
         defaultValue: { summary: 'Close' },
       },
       description: 'The aria label for the close button',
+    },
+    headerIconOnClick: {
+      control: 'function',
+      description:
+        'Function called when the user clicks on the header icon (usually dialog close action, but not always)',
+      table: {
+        type: { summary: 'function', required: false },
+      },
+    },
+    onClose: {
+      control: 'function',
+      description: 'Function called when the user closes the dialog',
+      table: {
+        type: { summary: 'function', required: false },
+      },
     },
     children: {
       control: 'text',
@@ -50,13 +65,6 @@ export default {
       table: {
         type: { summary: 'string', required: false },
         defaultValue: { summary: 'false' },
-      },
-    },
-    onClose: {
-      control: 'function',
-      description: 'Function called when the user requests to close the dialog',
-      table: {
-        type: { summary: 'function', required: false },
       },
     },
     size: {
@@ -99,10 +107,19 @@ export default {
   },
 } as Meta;
 
+
 const Template: Story<DialogProps> = ({
   children,
-  closeIconComponent: CloseIconComponent,
   onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel =  'Close',
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+    ariaLabel: 'Close',
+  },
   open: initialOpen,
   primaryButton = { label: 'Primary' },
   secondaryButton = { label: 'Secondary' },
@@ -113,14 +130,21 @@ const Template: Story<DialogProps> = ({
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
   const SelectedIcon =
-    typeof CloseIconComponent === 'string'
-      ? icos[CloseIconComponent]
-      : CloseIconComponent;
+    typeof HeaderIconComponent === 'string'
+      ? icos[HeaderIconComponent]
+      : HeaderIconComponent;
 
   return (
     <>
       <Dialog
-        closeIconComponent={SelectedIcon}
+        headerIcon={{
+          component: SelectedIcon,
+          onClick: () => {
+            setOpen(false);
+            onHeaderIconClick();
+          },
+          ariaLabel: headerIconAriaLabel,
+        }}
         linkButton={undefined}
         onClose={() => {
           setOpen(false);
@@ -146,8 +170,13 @@ const Template: Story<DialogProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   children: 'Content',
-  closeAriaLabel: 'Close',
-  closeIconComponent: IcoClose24,
+  headerIcon: {
+    component: IcoClose24,
+    onClick: () => {
+      console.log('close');
+    },
+    ariaLabel: 'Close',
+  },
   onClose: () => {
     console.log('close');
   },
@@ -172,8 +201,16 @@ Base.args = {
 
 const OnlyPrimaryTemplate: Story<DialogProps> = ({
   children,
-  closeIconComponent: CloseIconComponent,
   onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel =  'Close',
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+    ariaLabel: 'Close',
+  },
   open: initialOpen,
   primaryButton = { label: 'Primary' },
   size,
@@ -183,15 +220,19 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
   const SelectedIcon =
-    typeof CloseIconComponent === 'string'
-      ? icos[CloseIconComponent]
-      : CloseIconComponent;
+    typeof HeaderIconComponent === 'string'
+      ? icos[HeaderIconComponent]
+      : HeaderIconComponent;
 
   return (
     <>
       <Dialog
-        closeIconComponent={SelectedIcon}
         linkButton={undefined}
+        headerIcon={{
+          component: SelectedIcon,
+          onClick: onHeaderIconClick,
+          ariaLabel: headerIconAriaLabel
+        }}
         onClose={() => {
           setOpen(false);
           onClose();
@@ -242,6 +283,7 @@ const LinkTemplate: Story<DialogProps> = ({
     <>
       <Dialog
         title={title}
+        headerIcon={{}}
         onClose={() => {
           setOpen(false);
           onClose();

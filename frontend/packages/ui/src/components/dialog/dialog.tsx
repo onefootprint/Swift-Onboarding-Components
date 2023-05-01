@@ -1,19 +1,16 @@
-import { Icon } from '@onefootprint/icons';
 import React from 'react';
 
 import BaseDialog, {
   AllButtons,
-  NoButtons,
+ DialogHeaderIcon,  NoButtons,
   OnlyButtons,
   OnlyPrimaryButton,
   PrimaryAndLinkButtons,
-  Size,
-} from './components/base-dialog';
+  Size } from './components/base-dialog';
 
 export type DialogProps = {
   children?: React.ReactNode;
-  closeAriaLabel?: string;
-  closeIconComponent?: Icon;
+  headerIcon?: DialogHeaderIcon;
   onClose: () => void;
   open?: boolean;
   size?: Size;

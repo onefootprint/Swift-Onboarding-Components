@@ -123,9 +123,12 @@ const DialogContent = ({ hideKyb, onClose, onCreate }: DialogContentProps) => {
       size="compact"
       testID="onboarding-configs-create-dialog"
       title={t('title')}
-      closeAriaLabel={isFirstStep ? allT('close') : allT('back')}
-      closeIconComponent={isFirstStep ? IcoClose24 : IcoChevronLeftBig24}
-      onClose={isFirstStep || isComplete ? onClose : handleBack}
+      headerIcon={{
+        component: isFirstStep ? IcoClose24 : IcoChevronLeftBig24,
+        onClick: isFirstStep || isComplete ? onClose : handleBack,
+        ariaLabel: isFirstStep ? allT('close') : allT('back'),
+      }}
+      onClose={isFirstStep || isComplete ? onClose : confirmBeforeClosing}
       open
       primaryButton={{
         form: getFormIdForState(state.value),

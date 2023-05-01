@@ -42,6 +42,7 @@ const ReasonDialog = ({
         onClick: onClose,
         disabled: loading,
       }}
+      headerIcon={{ onClick: loading ? noop : onClose }}
       onClose={loading ? noop : onClose}
       open={open}
     >

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import { CreateProxyConfigRequest } from '@onefootprint/types';
-import { Dialog as FPDialog } from '@onefootprint/ui';
+import { Dialog as FPDialog, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 
 import type { FormData } from '@/proxy-configs/proxy-configs.types';
@@ -19,6 +19,7 @@ type DialogProps = {
 const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
   const { t, allT } = useTranslation('pages.proxy-configs.create.form');
   const mutation = useCreateProxyConfig();
+  const confirmationDialog = useConfirmationDialog();
   const [stepIndex, setStepIndex] = useState(0);
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === steps.length - 1;
@@ -43,14 +44,31 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
     }
   };
 
+  const confirmBeforeClosing = () => {
+    confirmationDialog.open({
+      title: allT('confirm.title'),
+      description: allT('confirm.description'),
+      primaryButton: {
+        label: allT('confirm.cta'),
+        onClick: onClose,
+      },
+      secondaryButton: {
+        label: allT('confirm.cancel'),
+      },
+    });
+  };
+
   const handleSubmit = (formData: CreateProxyConfigRequest) => {
     mutation.mutate(formData, { onSuccess: onClose });
   };
 
   return (
     <FPDialog
-      closeIconComponent={isFirstStep ? IcoClose24 : IcoChevronLeftBig24}
-      onClose={isFirstStep ? onClose : goBack}
+      headerIcon={{
+        component: isFirstStep ? IcoClose24 : IcoChevronLeftBig24,
+        onClick: isFirstStep ? onClose : goBack,
+      }}
+      onClose={isFirstStep ? onClose : confirmBeforeClosing}
       open={open}
       size="compact"
       title={t('title')}
@@ -66,7 +84,7 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
       secondaryButton={{
         disabled: mutation.isLoading,
         label: allT('cancel'),
-        onClick: onClose,
+        onClick: isFirstStep ? onClose : confirmBeforeClosing,
       }}
     >
       <FormWizard

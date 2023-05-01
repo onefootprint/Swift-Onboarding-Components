@@ -1,3 +1,5 @@
+import { Icon } from '@onefootprint/icons';
+
 export type DialogButton = {
   disabled?: boolean;
   form?: string;
@@ -6,6 +8,12 @@ export type DialogButton = {
   loadingAriaLabel?: string;
   onClick?: (dataSubmitted?: any) => void;
   type?: 'button' | 'submit' | 'reset';
+};
+
+export type DialogHeaderIcon = {
+  component?: Icon;
+  onClick?: () => void;
+  ariaLabel?: string;
 };
 
 export type DialogLinkButton = {

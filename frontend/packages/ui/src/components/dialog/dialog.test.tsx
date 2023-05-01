@@ -10,8 +10,7 @@ import Dialog, { DialogProps } from './dialog';
 
 describe('<Dialog />', () => {
   const renderDialog = ({
-    closeIconComponent,
-    closeAriaLabel = 'Close',
+    headerIcon = {},
     title = 'Title',
     onClose = jest.fn(),
     primaryButton = {
@@ -30,8 +29,7 @@ describe('<Dialog />', () => {
       // as this is a test file, it's okay
       // @ts-ignore
       <Dialog
-        closeAriaLabel={closeAriaLabel}
-        closeIconComponent={closeIconComponent}
+        headerIcon={headerIcon}
         linkButton={linkButton}
         onClose={onClose}
         open={open}
@@ -74,7 +72,6 @@ describe('<Dialog />', () => {
       const onCloseMockFn = jest.fn();
       renderDialog({
         open: true,
-        closeAriaLabel: 'Close',
         onClose: onCloseMockFn,
       });
       const closeButton = screen.getByRole('button', { name: 'Close' });

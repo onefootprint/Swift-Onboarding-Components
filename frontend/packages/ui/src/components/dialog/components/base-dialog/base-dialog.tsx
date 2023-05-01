@@ -1,4 +1,4 @@
-import { IcoClose24, Icon } from '@onefootprint/icons';
+import { IcoClose24 } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
@@ -20,6 +20,7 @@ import Typography from '../../../typography';
 import ScrollArea from '../scroll-area';
 import {
   AllButtons,
+  DialogHeaderIcon,
   NoButtons,
   OnlyButtons,
   OnlyPrimaryButton,
@@ -29,8 +30,7 @@ import {
 
 type BaseDialogProps = {
   children?: React.ReactNode;
-  closeAriaLabel?: string;
-  closeIconComponent?: Icon;
+  headerIcon?: DialogHeaderIcon;
   onClose: () => void;
   open?: boolean;
   size?: Size;
@@ -54,10 +54,17 @@ const DEFAULT_WIDTH = 800;
 
 const BaseDialog = ({
   children,
-  closeAriaLabel = 'Close',
-  closeIconComponent: CloseIcon = IcoClose24,
-  linkButton = undefined,
   onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel = 'Close',
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+    ariaLabel: 'Close',
+  },
+  linkButton = undefined,
   open,
   primaryButton,
   secondaryButton = undefined,
@@ -97,8 +104,11 @@ const BaseDialog = ({
           >
             <Header>
               <CloseContainer>
-                <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-                  <CloseIcon />
+                <IconButton
+                  aria-label={headerIconAriaLabel}
+                  onClick={onHeaderIconClick}
+                >
+                  <HeaderIconComponent />
                 </IconButton>
               </CloseContainer>
               <Typography variant="label-2">{title}</Typography>

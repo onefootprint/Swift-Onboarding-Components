@@ -25,16 +25,18 @@ const IntroDialog = () => {
     }
   }, TIME_TO_SHOW_DIALOG);
 
+  const onClose = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
     <>
       {shouldShowIntroDialog && <WaveAnimation width={140} />}
       <Dialog
         title={t('heading')}
         open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-        }}
         size="compact"
+        onClose={onClose}
         primaryButton={{
           label: t('cta'),
           onClick: () => {

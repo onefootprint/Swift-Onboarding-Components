@@ -22,13 +22,15 @@ const IntroDialog = () => {
     }
   }, TIME_TO_SHOW_DIALOG);
 
+  const onClose = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
     <Dialog
       title={t('dialog.heading')}
       open={isDialogOpen}
-      onClose={() => {
-        setIsDialogOpen(false);
-      }}
+      onClose={onClose}
       size="compact"
       primaryButton={{
         label: t('dialog.cta'),
