@@ -1,20 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Layout, useLayoutOptions } from '@onefootprint/idv-elements';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
-import useIsKyb from 'src/utils/is-kyb';
 import styled, { css } from 'styled-components';
 
 import Header from './components/header';
+import useIsKyb from './utils/is-kyb';
 
 const Intro = () => {
   const { t } = useTranslation('pages.intro');
-  const { layout } = useLayoutOptions();
-  const { isSandbox } = useSandboxMode();
-  const [state, send] = useHostedMachine();
-  const { onboardingConfig } = state.context;
+  const [, send] = useHostedMachine();
   const isKyb = useIsKyb();
 
   const handleClick = () => {
@@ -24,18 +19,12 @@ const Intro = () => {
   };
 
   return (
-    <Layout
-      tenantPk={onboardingConfig?.key}
-      options={layout}
-      isSandbox={isSandbox}
-    >
-      <Container>
-        <Header />
-        <Button fullWidth onClick={handleClick}>
-          {isKyb ? t('cta.kyb') : t('cta.kyc')}
-        </Button>
-      </Container>
-    </Layout>
+    <Container>
+      <Header />
+      <Button fullWidth onClick={handleClick}>
+        {isKyb ? t('cta.kyb') : t('cta.kyc')}
+      </Button>
+    </Container>
   );
 };
 

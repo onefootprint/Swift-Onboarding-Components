@@ -20,7 +20,6 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
 import { CollectKybDataProps } from './collect-kyb-data.types';
@@ -28,6 +27,7 @@ import CollectKybData from './index';
 import {
   withBusinessVault,
   withBusinessVaultValidate,
+  withOnboardingConfig,
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
@@ -57,10 +57,6 @@ describe('<CollectKybData />', () => {
         public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
       },
     });
-    withBusinessVaultValidate();
-    withBusinessVault();
-    withUserVaultValidate();
-    withUserVault();
   });
 
   const getOnboardingConfig = (
@@ -108,139 +104,149 @@ describe('<CollectKybData />', () => {
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.light}>
-              <FootprintProvider client={null as any}>
-                <ToastProvider>
-                  <Layout tenantPk="pk">
-                    <CollectKybData context={context} onDone={onDone} />
-                  </Layout>
-                </ToastProvider>
-              </FootprintProvider>
+              <ToastProvider>
+                <Layout>
+                  <CollectKybData context={context} onDone={onDone} />
+                </Layout>
+              </ToastProvider>
             </DesignSystemProvider>
           </QueryClientProvider>
         </ObserveCollectorProvider>
       </React.StrictMode>,
     );
 
-  it('takes user through all of the pages', async () => {
-    const onDone = jest.fn();
-
-    renderPlugin({
-      context: getContext(
-        [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
-        [CollectedKybDataOption.beneficialOwners],
-      ),
-      onDone,
+  describe('when there are missing attribute', () => {
+    beforeEach(() => {
+      withOnboardingConfig();
+      withBusinessVaultValidate();
+      withBusinessVault();
+      withUserVaultValidate();
+      withUserVault();
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText("Let's get to know your business!", { exact: false }),
-      ).toBeInTheDocument();
-    });
+    it('takes user through all of the pages', async () => {
+      const onDone = jest.fn();
 
-    let submitButton = screen.getByRole('button', { name: 'Continue' });
-    expect(submitButton).toBeInTheDocument();
-    userEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Who are the beneficial owners?'),
-      ).toBeInTheDocument();
-    });
-
-    let firstName = screen.getByLabelText('First name');
-    expect(firstName).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Jane')).toBeInTheDocument();
-    await userEvent.type(firstName, 'John');
-
-    let lastName = screen.getByLabelText('Last name');
-    expect(lastName).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Doe')).toBeInTheDocument();
-    await userEvent.type(lastName, 'Doe');
-
-    let ownershipStake = screen.getByLabelText('Ownership stake (%)');
-    expect(ownershipStake).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('25')).toBeInTheDocument();
-    await userEvent.type(ownershipStake, '50');
-
-    submitButton = screen.getByRole('button', { name: 'Continue' });
-    expect(submitButton).toBeInTheDocument();
-    userEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Confirm your business data'),
-      ).toBeInTheDocument();
-    });
-
-    firstName = screen.getByText('John');
-    expect(firstName).toBeInTheDocument();
-
-    lastName = screen.getByText('Doe');
-    expect(lastName).toBeInTheDocument();
-
-    ownershipStake = screen.getByText('50%');
-    expect(ownershipStake).toBeInTheDocument();
-
-    submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
-    expect(submitButton).toBeInTheDocument();
-    await userEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Basic Data')).toBeInTheDocument();
-    });
-
-    firstName = screen.getByLabelText('First name');
-    expect(firstName).toBeInTheDocument();
-    expect(firstName).toHaveValue('John');
-    expect(firstName).toBeDisabled();
-
-    lastName = screen.getByLabelText('Last name');
-    expect(lastName).toBeInTheDocument();
-    expect(lastName).toHaveValue('Doe');
-    expect(lastName).toBeDisabled();
-
-    submitButton = screen.getByRole('button', { name: 'Continue' });
-    expect(submitButton).toBeInTheDocument();
-    userEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          'What are the last 4 digits of your Social Security Number?',
+      renderPlugin({
+        context: getContext(
+          [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
+          [CollectedKybDataOption.beneficialOwners],
         ),
-      ).toBeInTheDocument();
-    });
+        onDone,
+      });
 
-    const ssn4 = screen.getByLabelText('SSN (last 4)');
-    expect(ssn4).toBeInTheDocument();
-    await userEvent.type(ssn4, '1234');
+      await waitFor(() => {
+        expect(
+          screen.getByText("Let's get to know your business!", {
+            exact: false,
+          }),
+        ).toBeInTheDocument();
+      });
 
-    submitButton = screen.getByRole('button', { name: 'Continue' });
-    expect(submitButton).toBeInTheDocument();
-    await userEvent.click(submitButton);
+      let submitButton = screen.getByRole('button', { name: 'Continue' });
+      expect(submitButton).toBeInTheDocument();
+      userEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Confirm your personal data'),
-      ).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(
+          screen.getByText('Who are the beneficial owners?'),
+        ).toBeInTheDocument();
+      });
 
-    firstName = screen.getByText('John');
-    expect(firstName).toBeInTheDocument();
+      let firstName = screen.getByLabelText('First name');
+      expect(firstName).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Jane')).toBeInTheDocument();
+      await userEvent.type(firstName, 'John');
 
-    lastName = screen.getByText('Doe');
-    expect(lastName).toBeInTheDocument();
+      let lastName = screen.getByLabelText('Last name');
+      expect(lastName).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Doe')).toBeInTheDocument();
+      await userEvent.type(lastName, 'Doe');
 
-    const ssn = screen.getByText('1234');
-    expect(ssn).toBeInTheDocument();
+      let ownershipStake = screen.getByLabelText('Ownership stake (%)');
+      expect(ownershipStake).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('25')).toBeInTheDocument();
+      await userEvent.type(ownershipStake, '50');
 
-    submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
-    expect(submitButton).toBeInTheDocument();
-    await userEvent.click(submitButton);
+      submitButton = screen.getByRole('button', { name: 'Continue' });
+      expect(submitButton).toBeInTheDocument();
+      userEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(onDone).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm your business data'),
+        ).toBeInTheDocument();
+      });
+
+      firstName = screen.getByText('John');
+      expect(firstName).toBeInTheDocument();
+
+      lastName = screen.getByText('Doe');
+      expect(lastName).toBeInTheDocument();
+
+      ownershipStake = screen.getByText('50%');
+      expect(ownershipStake).toBeInTheDocument();
+
+      submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
+      expect(submitButton).toBeInTheDocument();
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Basic Data')).toBeInTheDocument();
+      });
+
+      firstName = screen.getByLabelText('First name');
+      expect(firstName).toBeInTheDocument();
+      expect(firstName).toHaveValue('John');
+      expect(firstName).toBeDisabled();
+
+      lastName = screen.getByLabelText('Last name');
+      expect(lastName).toBeInTheDocument();
+      expect(lastName).toHaveValue('Doe');
+      expect(lastName).toBeDisabled();
+
+      submitButton = screen.getByRole('button', { name: 'Continue' });
+      expect(submitButton).toBeInTheDocument();
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'What are the last 4 digits of your Social Security Number?',
+          ),
+        ).toBeInTheDocument();
+      });
+
+      const ssn4 = screen.getByLabelText('SSN (last 4)');
+      expect(ssn4).toBeInTheDocument();
+      await userEvent.type(ssn4, '1234');
+
+      submitButton = screen.getByRole('button', { name: 'Continue' });
+      expect(submitButton).toBeInTheDocument();
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm your personal data'),
+        ).toBeInTheDocument();
+      });
+
+      firstName = screen.getByText('John');
+      expect(firstName).toBeInTheDocument();
+
+      lastName = screen.getByText('Doe');
+      expect(lastName).toBeInTheDocument();
+
+      const ssn = screen.getByText('1234');
+      expect(ssn).toBeInTheDocument();
+
+      submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
+      expect(submitButton).toBeInTheDocument();
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
     });
   });
 });

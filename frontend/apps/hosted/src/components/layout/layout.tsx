@@ -1,6 +1,7 @@
-import { LayoutOptionsProvider } from '@onefootprint/idv-elements';
+import { Layout as AppLayout } from '@onefootprint/idv-elements';
 import { media } from '@onefootprint/ui';
 import React from 'react';
+import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled, { css } from 'styled-components';
 
 import Footer from './components/footer';
@@ -10,21 +11,29 @@ type LayoutProps = {
   children: React.ReactNode;
 };
 
-const Layout = ({ children }: LayoutProps) => (
-  <LayoutOptionsProvider
-    layout={{
-      hideDesktopSandboxBanner: true,
-      hideDesktopFooter: true,
-      hasDesktopBorderRadius: true,
-    }}
-  >
+const Layout = ({ children }: LayoutProps) => {
+  const [state] = useHostedMachine();
+  const { onboardingConfig } = state.context;
+
+  return (
     <Container>
       <SandboxBanner />
-      <Content>{children}</Content>
+      <Content>
+        <AppLayout
+          tenantPk={onboardingConfig?.key}
+          options={{
+            hideDesktopSandboxBanner: true,
+            hideDesktopFooter: true,
+            hasDesktopBorderRadius: true,
+          }}
+        >
+          {children}
+        </AppLayout>
+      </Content>
       <Footer />
     </Container>
-  </LayoutOptionsProvider>
-);
+  );
+};
 
 const Container = styled.div`
   display: flex;

@@ -24,7 +24,11 @@ import { Layout } from 'src/components/layout';
 
 import { CollectKycDataProps } from './collect-kyc-data.types';
 import CollectKycData from './index';
-import { withUserVault, withUserVaultValidate } from './index.test.config';
+import {
+  withOnboardingConfig,
+  withUserVault,
+  withUserVaultValidate,
+} from './index.test.config';
 
 describe('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();
@@ -45,6 +49,12 @@ describe('<CollectKycData />', () => {
 
   beforeEach(() => {
     queryCache.clear();
+    useRouterSpy({
+      pathname: '/',
+      query: {
+        public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
+      },
+    });
   });
 
   const renderPlugin = ({ context, onDone }: CollectKycDataProps) =>
@@ -55,7 +65,7 @@ describe('<CollectKycData />', () => {
             <DesignSystemProvider theme={themes.light}>
               <FootprintProvider client={null as any}>
                 <ToastProvider>
-                  <Layout tenantPk="pk">
+                  <Layout>
                     <CollectKycData context={context} onDone={onDone} />
                   </Layout>
                 </ToastProvider>
@@ -102,17 +112,9 @@ describe('<CollectKycData />', () => {
     },
   });
 
-  beforeEach(() => {
-    useRouterSpy({
-      pathname: '/',
-      query: {
-        public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
-      },
-    });
-  });
-
   describe('when there are missing attributes', () => {
     beforeEach(() => {
+      withOnboardingConfig();
       withUserVaultValidate();
       withUserVault();
     });

@@ -1,9 +1,11 @@
+import { FootprintAppearance } from '@onefootprint/footprint-js';
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
 import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
+import useGetOnboardingConfig from '../../hooks/api/org/get-onboarding-config';
 import FootprintFooter from './components/footprint-footer';
 import FullHeightContainer from './components/full-height-container';
 import LayoutOptionsProvider from './components/layout-options-provider';
@@ -12,6 +14,7 @@ import SandboxBanner, {
   SandboxBannerHandler,
 } from './components/sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
+import useExtendedAppearance from './hooks/use-extended-appearance';
 import { LayoutOptions } from './types';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
@@ -19,17 +22,17 @@ const SHIMMER_HEIGHT = '296px';
 
 type LayoutProps = {
   children: React.ReactNode;
-  tenantPk?: string;
-  isSandbox?: boolean;
   options?: LayoutOptions;
+  appearance?: FootprintAppearance;
+  tenantPk?: string;
   onClose?: () => void;
 };
 
 const Layout = ({
   children,
-  tenantPk,
-  isSandbox,
   options = {},
+  tenantPk = '',
+  appearance,
   onClose,
 }: LayoutProps) => {
   const {
@@ -37,6 +40,12 @@ const Layout = ({
     hideDesktopFooter,
     hasDesktopBorderRadius,
   } = options;
+
+  useExtendedAppearance(appearance);
+  const configQuery = useGetOnboardingConfig({ tenantPk });
+  const { data: onboardingConfig } = configQuery;
+  const isSandbox = onboardingConfig && !onboardingConfig.isLive;
+
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 
@@ -51,7 +60,7 @@ const Layout = ({
   }, []);
 
   return (
-    <LayoutOptionsProvider layout={options} onClose={onClose}>
+    <LayoutOptionsProvider options={options} onClose={onClose}>
       <FullHeightContainer
         id={LAYOUT_CONTAINER_ID}
         hasBorderRadius={!!hasDesktopBorderRadius}

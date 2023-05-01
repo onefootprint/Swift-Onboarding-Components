@@ -1,7 +1,5 @@
 export { default as HeaderTitle } from './components/header-title';
 export * from './components/header-title';
-export * from './components/layout-options-provider';
-export { default as LayoutOptionsProvider } from './components/layout-options-provider';
 export { default as NavigationHeader } from './components/navigation-header';
 export * from './components/navigation-header';
 export { default as SandboxBanner } from './components/sandbox-banner';

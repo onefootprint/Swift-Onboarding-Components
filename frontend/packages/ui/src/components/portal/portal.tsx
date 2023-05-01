@@ -22,7 +22,10 @@ const Portal = ({ children, selector, removeContent }: PortalProps) => {
     setMounted(true);
   }, [selector, removeContent]);
 
-  return mounted ? createPortal(children, ref.current as Element) : null;
+  if (!ref.current || !mounted) {
+    return null;
+  }
+  return createPortal(children, ref.current as Element);
 };
 
 export default Portal;

@@ -1,5 +1,4 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import * as footprint from 'src/components/footprint-provider';
 
 export const withUserVaultValidate = () => {
   mockRequest({
@@ -24,19 +23,24 @@ export const withUserVault = () =>
     },
   });
 
-// This needs to be mocked here and in the test itself as it is a esModule
-jest.mock('src/components/footprint-provider', () => ({
-  __esModule: true,
-  ...jest.requireActual('src/components/footprint-provider'),
-}));
+export const onboardingConfigFixture = {
+  id: 'ob_config_id_18RIzpIPRAL3pYlnO4Cgeb',
+  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
+  name: 'Acme Bank',
+  org_name: 'Acme Bank',
+  logo_url: null,
+  must_collect_data: ['name', 'dob'],
+  can_access_data: ['dob'],
+  is_live: true,
+  created_at: '2022-07-20T01:52:36.984290Z',
+  status: 'enabled',
+};
 
-const mockUseFootprintProvider = () =>
-  jest.spyOn(footprint, 'useFootprintProvider').mockImplementation(() => ({
-    cancel: jest.fn(),
-    close: jest.fn(),
-    complete: jest.fn(),
-    on: jest.fn(),
-    load: jest.fn(),
-  }));
-
-export default mockUseFootprintProvider;
+export const withOnboardingConfig = (data = onboardingConfigFixture) =>
+  mockRequest({
+    method: 'get',
+    path: '/org/onboarding_config',
+    response: {
+      data,
+    },
+  });

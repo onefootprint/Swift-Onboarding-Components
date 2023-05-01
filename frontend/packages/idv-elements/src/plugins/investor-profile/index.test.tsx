@@ -15,11 +15,14 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
 import InvestorProfile from './index';
-import { withUserVault, withUserVaultValidate } from './index.test.config';
+import {
+  withOnboardingConfig,
+  withUserVault,
+  withUserVaultValidate,
+} from './index.test.config';
 import { InvestorProfileProps } from './investor-profile.types';
 
 describe('<InvestorProfile />', () => {
@@ -47,6 +50,7 @@ describe('<InvestorProfile />', () => {
         public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
       },
     });
+    withOnboardingConfig();
     withUserVaultValidate();
     withUserVault();
   });
@@ -66,13 +70,11 @@ describe('<InvestorProfile />', () => {
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.light}>
-              <FootprintProvider client={null as any}>
-                <ToastProvider>
-                  <Layout tenantPk="pk">
-                    <InvestorProfile context={getContext()} onDone={onDone} />
-                  </Layout>
-                </ToastProvider>
-              </FootprintProvider>
+              <ToastProvider>
+                <Layout>
+                  <InvestorProfile context={getContext()} onDone={onDone} />
+                </Layout>
+              </ToastProvider>
             </DesignSystemProvider>
           </QueryClientProvider>
         </ObserveCollectorProvider>
