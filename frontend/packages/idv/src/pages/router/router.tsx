@@ -8,6 +8,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
+import Complete from '../complete';
 
 type RouterProps = {
   onDone?: (validationToken: string) => void;
@@ -67,6 +68,7 @@ const Router = ({ onDone }: RouterProps) => {
           }}
         />
       )}
+      {state.matches('complete') && <Complete />}
     </AppErrorBoundary>
   );
 };

@@ -4,7 +4,6 @@ import { useLayoutOptions } from '@onefootprint/idv-elements/src/components/layo
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
-import Complete from './complete';
 import Init from './init';
 import Intro from './intro';
 
@@ -37,7 +36,6 @@ const Root = () => {
           }}
         />
       )}
-      {state.matches('complete') && <Complete />}
     </AppErrorBoundary>
   );
 };
