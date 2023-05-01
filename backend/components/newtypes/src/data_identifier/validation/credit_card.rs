@@ -1,24 +1,24 @@
 use super::{Error, VResult};
-use crate::{CreditCardDataKind as CCDK, CreditCardInfo as CCI, PiiString};
+use crate::{CardDataKind as CDK, CardInfo as CI, PiiString};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 
-impl Validate for CCI {
+impl Validate for CI {
     fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
         let Self { alias: _, kind } = self;
         let result = match kind {
-            CCDK::Number => validate_cc_number(value)?,
-            CCDK::ExpMonth => validate_cc_month(value)?,
-            CCDK::ExpYear => validate_cc_year(value)?,
-            CCDK::Cvc => validate_cc_cvc(value)?,
-            CCDK::Last4 => validate_cc_last4(value)?,
+            CDK::Number => validate_cc_number(value)?,
+            CDK::ExpMonth => validate_cc_month(value)?,
+            CDK::ExpYear => validate_cc_year(value)?,
+            CDK::Cvc => validate_cc_cvc(value)?,
+            CDK::Last4 => validate_cc_last4(value)?,
         };
         Ok(result)
     }
 }
 
 fn validate_cc_number(value: PiiString) -> VResult<PiiString> {
-    CardValidate::from(value.leak()).map_err(|e| Error::CreditCardError(format!("{:?}", e)))?;
+    CardValidate::from(value.leak()).map_err(|e| Error::CardError(format!("{:?}", e)))?;
     Ok(value)
 }
 
@@ -59,8 +59,8 @@ fn validate_cc_last4(value: PiiString) -> VResult<PiiString> {
 
 #[cfg(test)]
 mod test {
-    use super::CCDK::*;
-    use super::{CCDK, CCI};
+    use super::CDK::*;
+    use super::{CDK, CI};
     use crate::PiiString;
     use crate::{AliasId, Validate};
     use test_case::test_case;
@@ -83,9 +83,9 @@ mod test {
     #[test_case(Last4, "123" => None)]
     #[test_case(Last4, "1234" => Some("1234".to_owned()))]
     #[test_case(Last4, "12-" => None)]
-    fn test_clean_and_validate_field_not_bifrost(kind: CCDK, pii: &str) -> Option<String> {
+    fn test_clean_and_validate_field_not_bifrost(kind: CDK, pii: &str) -> Option<String> {
         let alias = AliasId::from("flerp".to_owned());
-        CCI { alias, kind }
+        CI { alias, kind }
             .validate(PiiString::new(pii.to_owned()), false)
             .ok()
             .map(|pii| pii.leak_to_string())

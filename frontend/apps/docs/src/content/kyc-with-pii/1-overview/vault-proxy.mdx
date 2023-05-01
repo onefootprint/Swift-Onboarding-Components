@@ -199,18 +199,22 @@ The above token would extract `4242424242424` from the following response object
   "data": {
     "card": {
       "number": "4242424242424",
-      "exp": "04/24"
+      "expiration": {
+        "month": "04",
+        "year": "25"
+      }
     },
     "processor": "amex"
   }
 }
 ```
 
-| More examples                                                                  |
-| ------------------------------------------------------------------------------ |
-| `fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card.number=$.data.card.number`     |
-| `fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card.exp=$.data.card.expiration`    |
-| `fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card.cvc=$.data.card.security_code` |
+| More examples                                                                     |
+| --------------------------------------------------------------------------------- |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.number=$.data.card.number`              |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.exp_month=$.data.card.expiration.month` |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.exp_year=$.data.card.expiration.year`   |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.cvc=$.data.card.security_code`          |
 
 # Header and Configuration Reference
 

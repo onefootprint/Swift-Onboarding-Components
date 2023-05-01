@@ -48,7 +48,7 @@ pub enum Error {
     #[error("Invalid host. Should be a domain")]
     InvalidHost,
     #[error("{0}")]
-    CreditCardError(String),
+    CardError(String),
     #[error("Invalid month")]
     InvalidMonth,
     #[error("Invalid year")]

@@ -30,7 +30,7 @@ class TestNonPortableVaultApi:
                 "Cannot add to this type of vault",
             ),
             (
-                "credit_card.flerp.number",
+                "card.flerp.number",
                 "4026123412341233",
                 "InvalidLuhn",
             ),
@@ -93,8 +93,8 @@ def test_vault_create_write_decrypt(tenant):
         "id.zip",
         "custom.ach_account_number",
         "custom.cc4",
-        "credit_card.hayes.exp_month",
-        "credit_card.valley.cvc",
+        "card.hayes.exp_month",
+        "card.valley.cvc",
     ]
     data = dict(
         reason="test",

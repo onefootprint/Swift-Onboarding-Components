@@ -57,7 +57,7 @@ pub async fn vault_pii(
             | DataIdentifier::Business(_)
             | DataIdentifier::Id(_)
             | DataIdentifier::Custom(_)
-            | DataIdentifier::CreditCard(_) => Either::Left((di, value)),
+            | DataIdentifier::Card(_) => Either::Left((di, value)),
         });
 
         let data: HashMap<_, _> = data.into_iter().collect();

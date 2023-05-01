@@ -415,7 +415,7 @@ class TestVaultProxy:
                 ProxyAccessReason("test reason"),
                 ProxyTokenAssignment(fp_id),
                 ProxyIngressRule(
-                    "credit_card.primary.number=$.data.card_number,credit_card.primary.cvc=$.data.card_cvc,id.dob=$.data.date_of_birth"
+                    "card.primary.number=$.data.card_number,card.primary.cvc=$.data.card_cvc,id.dob=$.data.date_of_birth"
                 ),
                 ProxyIngressContentType("json"),
             ],
@@ -423,8 +423,8 @@ class TestVaultProxy:
         )
 
         result = response.json()
-        assert result["data"]["card_number"] == f"{fp_id}.credit_card.primary.number"
-        assert result["data"]["card_cvc"] == f"{fp_id}.credit_card.primary.cvc"
+        assert result["data"]["card_number"] == f"{fp_id}.card.primary.number"
+        assert result["data"]["card_cvc"] == f"{fp_id}.card.primary.cvc"
         assert result["data"]["date_of_birth"] == f"{fp_id}.id.dob"
 
         data = dict(
@@ -432,15 +432,15 @@ class TestVaultProxy:
             fields=[
                 "id.ssn9",
                 "id.dob",
-                "credit_card.primary.number",
-                "credit_card.primary.cvc",
+                "card.primary.number",
+                "card.primary.cvc",
             ],
         )
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["id.ssn9"] == "121121212"
         assert response["id.dob"] == "1950-01-01"
-        assert response["credit_card.primary.number"] == "42424242424242"
-        assert response["credit_card.primary.cvc"] == "4242"
+        assert response["card.primary.number"] == "42424242424242"
+        assert response["card.primary.cvc"] == "4242"
 
     def test_ingress_document(self, sandbox_tenant):
         # create the vault

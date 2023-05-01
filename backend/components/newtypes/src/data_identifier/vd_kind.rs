@@ -5,7 +5,7 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
 use crate::{
-    BusinessDataKind as BDK, CreditCardInfo as CCI, DataIdentifier, IdentityDataKind as IDK,
+    BusinessDataKind as BDK, CardInfo as CCI, DataIdentifier, IdentityDataKind as IDK,
     InvestorProfileKind as IPK, KvDataKey,
 };
 
@@ -37,7 +37,7 @@ pub enum VdKind {
     Business(BDK),
     Custom(KvDataKey),
     InvestorProfile(IPK),
-    CreditCard(CCI),
+    Card(CCI),
 }
 
 crate::util::impl_enum_string_diesel!(VdKind);
@@ -50,7 +50,7 @@ impl From<VdKind> for DataIdentifier {
             VdKind::Id(b) => Self::Id(b),
             VdKind::Custom(k) => Self::Custom(k),
             VdKind::InvestorProfile(k) => Self::InvestorProfile(k),
-            VdKind::CreditCard(k) => Self::CreditCard(k),
+            VdKind::Card(k) => Self::Card(k),
         }
     }
 }
@@ -64,7 +64,7 @@ impl TryFrom<DataIdentifier> for VdKind {
             DataIdentifier::Id(b) => Ok(Self::Id(b)),
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
-            DataIdentifier::CreditCard(k) => Ok(Self::CreditCard(k)),
+            DataIdentifier::Card(k) => Ok(Self::Card(k)),
             DataIdentifier::Document(_) => Err(ConversionError::Error(value)),
         }
     }
@@ -96,7 +96,7 @@ impl From<IPK> for VdKind {
 
 impl From<CCI> for VdKind {
     fn from(value: CCI) -> Self {
-        Self::CreditCard(value)
+        Self::Card(value)
     }
 }
 

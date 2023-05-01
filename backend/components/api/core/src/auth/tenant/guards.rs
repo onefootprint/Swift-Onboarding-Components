@@ -69,7 +69,7 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
                 Right(token_scopes.contains(&TenantScope::Decrypt(CDO::DocumentAndSelfie)))
             }
             // Don't allow decrypting credit card info yet since we don't have a corresponding CDO permission
-            DataIdentifier::CreditCard(_) => Right(false),
+            DataIdentifier::Card(_) => Right(false),
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different

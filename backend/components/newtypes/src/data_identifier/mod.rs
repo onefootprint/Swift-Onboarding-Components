@@ -84,7 +84,7 @@ pub enum DataIdentifier {
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentKind),
-    CreditCard(CreditCardInfo),
+    Card(CardInfo),
 }
 
 /// Contains all of the functionality that each nested type of DataIdentifier must provide
@@ -107,7 +107,7 @@ impl DataIdentifier {
             Self::Business(s) => s.is_optional(),
             Self::InvestorProfile(s) => s.is_optional(),
             Self::Document(s) => s.is_optional(),
-            Self::CreditCard(s) => s.is_optional(),
+            Self::Card(s) => s.is_optional(),
         }
     }
 
@@ -118,7 +118,7 @@ impl DataIdentifier {
             Self::Business(s) => s.parent(),
             Self::InvestorProfile(s) => s.parent(),
             Self::Document(s) => s.parent(),
-            Self::CreditCard(s) => s.parent(),
+            Self::Card(s) => s.parent(),
         }
     }
 
@@ -145,7 +145,7 @@ impl Validate for DataIdentifier {
             Self::Business(s) => s.validate(value, for_bifrost),
             Self::InvestorProfile(s) => s.validate(value, for_bifrost),
             Self::Document(s) => s.validate(value, for_bifrost),
-            Self::CreditCard(s) => s.validate(value, for_bifrost),
+            Self::Card(s) => s.validate(value, for_bifrost),
         }
     }
 }
@@ -161,7 +161,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::Business(s) => s.to_string(),
             Self::InvestorProfile(s) => s.to_string(),
             Self::Document(s) => s.to_string(),
-            Self::CreditCard(s) => s.to_string(),
+            Self::Card(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -187,9 +187,9 @@ impl DataIdentifier {
                 DataIdentifierDiscriminant::Document => {
                     DocumentKind::iter().map(DataIdentifier::from).collect_vec()
                 }
-                DataIdentifierDiscriminant::CreditCard => CreditCardDataKind::iter()
+                DataIdentifierDiscriminant::Card => CardDataKind::iter()
                     .map(|k| {
-                        DataIdentifier::from(CreditCardInfo {
+                        DataIdentifier::from(CardInfo {
                             alias: AliasId::from("*".to_owned()),
                             kind: k,
                         })
@@ -276,8 +276,8 @@ impl FromStr for DataIdentifier {
             DataIdentifierDiscriminant::Document => {
                 Self::Document(DocumentKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
-            DataIdentifierDiscriminant::CreditCard => {
-                Self::CreditCard(CreditCardInfo::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            DataIdentifierDiscriminant::Card => {
+                Self::Card(CardInfo::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
         };
         Ok(result)
@@ -294,7 +294,7 @@ impl DataIdentifier {
             DataIdentifier::Custom(_)
             | DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Document(_)
-            | DataIdentifier::CreditCard(_) => false,
+            | DataIdentifier::Card(_) => false,
         }
     }
 
@@ -337,7 +337,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
-    #[test_case(DataIdentifier::CreditCard(CreditCardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CreditCardDataKind::ExpMonth}) => "credit_card.hayesvalley.exp_month")]
+    #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.exp_month")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -350,7 +350,7 @@ mod tests {
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
-    #[test_case("credit_card.hayesvalley.exp_month" => DataIdentifier::CreditCard(CreditCardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CreditCardDataKind::ExpMonth}))]
+    #[test_case("card.hayesvalley.exp_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
