@@ -4,9 +4,10 @@ import styled, { css } from 'styled-components';
 
 type OverlayProps = {
   isVisible?: boolean;
+  className?: string;
 };
 
-const Overlay = ({ isVisible = true }: OverlayProps) => (
+const Overlay = ({ isVisible = true, className }: OverlayProps) => (
   <AnimatePresence>
     {isVisible ? (
       <OverlayLayer
@@ -16,6 +17,7 @@ const Overlay = ({ isVisible = true }: OverlayProps) => (
           transition: { duration: 0.2, ease: 'easeInOut' },
         }}
         exit={{ opacity: 0 }}
+        className={className}
       />
     ) : null}
   </AnimatePresence>
@@ -23,17 +25,14 @@ const Overlay = ({ isVisible = true }: OverlayProps) => (
 
 const OverlayLayer = styled(motion.div)`
   ${({ theme }) => css`
-    align-items: center;
-    background: rgba(0, 0, 0, 0.3);
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    left: 0;
     position: fixed;
+    background: rgba(0, 0, 0, 0.3);
+    height: 100vh;
+    width: 100vw;
+    left: 0;
     top: 0;
-    width: 100%;
-    z-index: ${theme.zIndex.overlay};
     user-select: none;
+    z-index: ${theme.zIndex.overlay};
   `}
 `;
 

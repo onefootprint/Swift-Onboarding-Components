@@ -11,7 +11,7 @@ import {
 import media from '../../../../utils/media';
 import Box from '../../../box';
 import Button from '../../../button';
-import Fade from '../../../fade/fade';
+import Fade from '../../../fade';
 import IconButton from '../../../icon-button';
 import LinkButton from '../../../link-button';
 import Overlay from '../../../overlay';
@@ -46,8 +46,9 @@ type BaseDialogProps = {
   | NoButtons
 );
 
+const CONFIRMATION_DELTA_WIDTH = 32;
 const SMALL_WIDTH = 343;
-const MEDIUM_WIDTH = 500;
+const COMPACT_WIDTH = 500;
 const LARGE_WIDTH = 650;
 const DEFAULT_WIDTH = 800;
 
@@ -79,7 +80,6 @@ const BaseDialog = ({
     <Portal selector="#footprint-portal">
       <FocusTrap>
         <div>
-          <Overlay isVisible={open} />
           <DialogContainer
             role="dialog"
             aria-label={title}
@@ -153,7 +153,7 @@ const BaseDialog = ({
           </DialogContainer>
         </div>
       </FocusTrap>
-      <Overlay />
+      <StyledOverlay isVisible={open} isConfirmation={isConfirmation} />
     </Portal>
   ) : null;
 };
@@ -174,19 +174,21 @@ const DialogContainer = styled(Fade)<{
     z-index: ${theme.zIndex.dialog};
     overflow: hidden;
     justify-content: stretch;
-    top: ${theme.spacing[9]};
-    transform: translateX(-50%);
-    left: 50%;
     max-height: calc(100vh - ${theme.spacing[9]} * 2);
     isolation: isolate;
+    /* !important is needed to override the transform from the Fade component */
+    transform: translateX(-50%) !important;
+    top: ${theme.spacing[9]};
     left: 50%;
 
     ${isConfirmation &&
     `
+      // !important is needed to override the transform from the Fade component 
+      transform: translate(-50%, -50%) !important;
       top: 50%;
-      left: 50%;
       max-width: 90%;
-    `}
+      z-index: ${theme.zIndex.confirmationDialog};
+    `};
 
     ${isResponsive &&
     media.lessThan('sm')`
@@ -199,27 +201,32 @@ const DialogContainer = styled(Fade)<{
     `};
   `}
 
-  ${({ size }) => {
+  ${({ size, isConfirmation }) => {
     if (size === 'small') {
       return css`
-        width: ${SMALL_WIDTH}px;
-        left: calc(50% - ${SMALL_WIDTH / 2}px);
+        width: ${isConfirmation
+          ? SMALL_WIDTH - CONFIRMATION_DELTA_WIDTH
+          : SMALL_WIDTH}px;
       `;
     }
     if (size === 'compact') {
       return css`
-        width: ${MEDIUM_WIDTH}px;
-        left: calc(50% - ${MEDIUM_WIDTH / 2}px);
+        width: ${isConfirmation
+          ? COMPACT_WIDTH - CONFIRMATION_DELTA_WIDTH
+          : COMPACT_WIDTH}px;
       `;
     }
     if (size === 'default') {
       return css`
-        width: ${LARGE_WIDTH}px;
-        left: calc(50% - ${LARGE_WIDTH / 2}px);
+        width: ${isConfirmation
+          ? DEFAULT_WIDTH - CONFIRMATION_DELTA_WIDTH
+          : DEFAULT_WIDTH}px;
       `;
     }
     return css`
-      width: ${DEFAULT_WIDTH}px;
+      width: ${isConfirmation
+        ? LARGE_WIDTH - CONFIRMATION_DELTA_WIDTH
+        : LARGE_WIDTH}px;
     `;
   }}
 `;
@@ -265,6 +272,15 @@ const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[4]};
+  `}
+`;
+
+const StyledOverlay = styled(Overlay)<{ isConfirmation: boolean }>`
+  ${({ theme, isConfirmation }) => css`
+    ${isConfirmation &&
+    `
+      z-index: ${theme.zIndex.confirmationOverlay};
+    `};
   `}
 `;
 

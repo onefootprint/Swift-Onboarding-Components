@@ -118,7 +118,7 @@ const Sheet = styled.div`
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
-    z-index: ${theme.zIndex.overlay + 10};
+    z-index: ${theme.zIndex.bottomSheet};
     align-self: end;
     transition: all 0.2s linear;
 

@@ -23,6 +23,7 @@ describe('<Dialog />', () => {
     testID,
     open,
     children = 'content',
+    isConfirmation,
   }: Partial<DialogProps>) =>
     customRender(
       // we need to ignore ts-lint given the constraints we have
@@ -39,6 +40,7 @@ describe('<Dialog />', () => {
         size={size}
         testID={testID}
         title={title}
+        isConfirmation={isConfirmation}
       >
         {children}
       </Dialog>,
@@ -130,32 +132,32 @@ describe('<Dialog />', () => {
 
     describe('sizes', () => {
       it('should render the right width when is compact', async () => {
-        renderDialog({ open: true, size: 'compact' });
+        renderDialog({ open: true, size: 'compact', isConfirmation: false });
+        const dialog = screen.getByRole('dialog');
         await waitFor(() => {
-          const dialog = screen.getByRole('dialog');
           expect(dialog).toHaveStyle({
             width: '500px',
           });
         });
       });
+    });
 
-      it('should render the right width when is default', async () => {
-        renderDialog({ open: true, size: 'default' });
+    it('should render the right width when is large', async () => {
+      renderDialog({ open: true, size: 'large', isConfirmation: false });
+      await waitFor(() => {
         const dialog = screen.getByRole('dialog');
-        await waitFor(() => {
-          expect(dialog).toHaveStyle({
-            width: '650px',
-          });
+        expect(dialog).toHaveStyle({
+          width: '650px',
         });
       });
+    });
 
-      it('should render the right width when is large', async () => {
-        renderDialog({ open: true, size: 'large' });
-        await waitFor(() => {
-          const dialog = screen.getByRole('dialog');
-          expect(dialog).toHaveStyle({
-            width: '800px',
-          });
+    it('should render the right width when is default', async () => {
+      renderDialog({ open: true, size: 'default', isConfirmation: false });
+      const dialog = screen.getByRole('dialog');
+      await waitFor(() => {
+        expect(dialog).toHaveStyle({
+          width: '800px',
         });
       });
     });
