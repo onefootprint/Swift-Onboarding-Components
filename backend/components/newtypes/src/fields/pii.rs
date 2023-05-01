@@ -34,6 +34,13 @@ impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for PiiString {
     }
 }
 
+impl PiiString {
+    /// try to decode a pii string that is base64
+    pub fn try_decode_base64(&self) -> Result<PiiBytes, base64::DecodeError> {
+        Ok(PiiBytes(Base64Data::from_str_standard(self.leak())?.0))
+    }
+}
+
 /// Represents a Vec<u8> that hides PII
 #[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
 #[serde(transparent)]

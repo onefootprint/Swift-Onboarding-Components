@@ -31,6 +31,12 @@ pub struct DataRequest<T> {
 }
 
 impl<T> DataRequest<T> {
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+}
+
+impl<T> DataRequest<T> {
     pub fn decompose(self) -> (DataIdentifierRequest, T) {
         (self.data, self.fingerprints)
     }
