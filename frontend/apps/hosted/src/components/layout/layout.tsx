@@ -13,15 +13,9 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => (
   <LayoutOptionsProvider
     layout={{
-      header: {
-        hideDesktopSandboxBanner: true,
-      },
-      footer: {
-        hideDesktopFooter: true,
-      },
-      container: {
-        hasBorderRadius: true,
-      },
+      hideDesktopSandboxBanner: true,
+      hideDesktopFooter: true,
+      hasDesktopBorderRadius: true,
     }}
   >
     <Container>

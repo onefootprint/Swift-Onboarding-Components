@@ -10,6 +10,7 @@ const useSandboxMode = () => {
   if (result.isLoading) {
     return false;
   }
+
   return result.data?.isLive === false;
 };
 

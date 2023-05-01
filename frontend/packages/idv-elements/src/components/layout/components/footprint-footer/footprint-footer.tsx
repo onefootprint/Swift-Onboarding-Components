@@ -4,20 +4,16 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SecuredByFootprint from '../secured-by-footprint';
+import FooterActions from './components/footer-actions';
 
 type FootprintFooterProps = {
-  variant?: 'modal' | 'mobile';
   hideOnDesktop?: boolean;
   tenantPk?: string;
 };
 
 type Link = { label: string; href: string };
 
-const FootprintFooter = ({
-  variant = 'modal',
-  hideOnDesktop,
-  tenantPk,
-}: FootprintFooterProps) => {
+const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
   const links: Link[] = [
     {
       label: 'Privacy Policy',
@@ -33,8 +29,9 @@ const FootprintFooter = ({
   }
 
   return (
-    <FootprintFooterContainer variant={variant} hideOnDesktop={!!hideOnDesktop}>
+    <FootprintFooterContainer hideOnDesktop={hideOnDesktop}>
       <SecuredByFootprint />
+
       <LinksContainer>
         {links.map(({ href, label }) => (
           <li key={label}>
@@ -46,35 +43,24 @@ const FootprintFooter = ({
           </li>
         ))}
       </LinksContainer>
+      <ActionsWrapper>
+        <FooterActions links={links} />
+      </ActionsWrapper>
     </FootprintFooterContainer>
   );
 };
 
 const FootprintFooterContainer = styled.footer<{
-  variant: 'modal' | 'mobile';
-  hideOnDesktop: boolean;
+  hideOnDesktop?: boolean;
 }>`
   ${({ theme }) => css`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    flex: 0;
+    background-color: ${theme.backgroundColor.secondary};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
-
-  ${({ variant, theme }) =>
-    variant === 'modal' &&
-    css`
-      background-color: ${theme.backgroundColor.secondary};
-      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      flex-direction: row;
-    `}
-
-  ${({ variant, theme }) =>
-    variant === 'mobile' &&
-    css`
-      gap: ${theme.spacing[4]};
-      align-items: center;
-      flex-direction: column;
-    `}
 
   ${({ hideOnDesktop }) =>
     !!hideOnDesktop &&
@@ -91,6 +77,10 @@ const LinksContainer = styled.ul`
     display: flex;
     justify-content: center;
     gap: ${theme.spacing[2]};
+
+    ${media.lessThan('sm')`
+      display: none;
+    `}
 
     li {
       &:not(:last-child) {
@@ -109,6 +99,12 @@ const LinksContainer = styled.ul`
         text-decoration: underline;
       }
     }
+  `}
+`;
+
+const ActionsWrapper = styled.div`
+  ${media.greaterThan('sm')`
+    display: none;
   `}
 `;
 

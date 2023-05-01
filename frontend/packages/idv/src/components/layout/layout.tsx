@@ -15,7 +15,7 @@ const AppLayout = ({ children, options }: IdvLayoutProps) => {
   const [state] = useIdvMachine();
   const { tenantPk, onClose } = state.context;
 
-  return tenantPk ? (
+  return (
     <Layout
       tenantPk={tenantPk}
       isSandbox={isSandbox}
@@ -24,7 +24,7 @@ const AppLayout = ({ children, options }: IdvLayoutProps) => {
     >
       {children}
     </Layout>
-  ) : null;
+  );
 };
 
 export default AppLayout;

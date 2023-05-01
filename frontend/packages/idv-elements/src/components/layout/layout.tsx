@@ -29,10 +29,14 @@ const Layout = ({
   children,
   tenantPk,
   isSandbox,
-  options,
+  options = {},
   onClose,
 }: LayoutProps) => {
-  const { header, footer, container } = options || {};
+  const {
+    hideDesktopSandboxBanner,
+    hideDesktopFooter,
+    hasDesktopBorderRadius,
+  } = options;
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 
@@ -50,14 +54,14 @@ const Layout = ({
     <LayoutOptionsProvider layout={options} onClose={onClose}>
       <FullHeightContainer
         id={LAYOUT_CONTAINER_ID}
-        hasBorderRadius={!!container?.hasBorderRadius}
+        hasBorderRadius={!!hasDesktopBorderRadius}
       >
         <DialogContent>
           <Header id={LAYOUT_HEADER_ID}>
             {isSandbox && (
               <SandboxBanner
                 ref={measuredRef}
-                hideOnDesktop={header?.hideDesktopSandboxBanner}
+                hideOnDesktop={hideDesktopSandboxBanner}
               />
             )}
             <NavigationHeaderContainer
@@ -75,8 +79,7 @@ const Layout = ({
             <BodyContent ref={refBody}>{children}</BodyContent>
           </Body>
           <FootprintFooter
-            variant={footer?.footerVariant}
-            hideOnDesktop={footer?.hideDesktopFooter}
+            hideOnDesktop={hideDesktopFooter}
             tenantPk={tenantPk}
           />
         </DialogContent>

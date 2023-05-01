@@ -20,14 +20,7 @@ export type IdvData = {
 };
 
 export type IdvLayout = {
-  header: {
-    hideDesktopSandboxBanner?: boolean;
-  };
-  footer: {
-    hideDesktopFooter?: boolean;
-    footerVariant?: 'modal' | 'mobile';
-  };
-  container: {
-    hasBorderRadius?: boolean;
-  };
+  hideDesktopSandboxBanner?: boolean;
+  hideDesktopFooter?: boolean;
+  hasDesktopBorderRadius?: boolean;
 };
