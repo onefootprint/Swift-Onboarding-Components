@@ -53,8 +53,8 @@ pub enum VaultProxyError {
     FailedToParseIngressBodyJson(#[from] serde_json::Error),
     #[error("cannot vault restricted identity data")]
     CannotVaultIdentityDataForPortableVaultViaProxy,
-    #[error("cannot proxy vault id documents")]
-    CannotProxyVaultNonCustomData,
+    #[error("cannot proxy vault documents")]
+    IngressDocumentVaultProxyingNotSupported,
     #[error("invalid pem file: {0}")]
     PemError(#[from] crypto::pem::PemError),
     #[error("invalid proxy token: {0}")]
