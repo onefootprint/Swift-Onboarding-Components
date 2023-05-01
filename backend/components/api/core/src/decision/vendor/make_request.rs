@@ -3,8 +3,7 @@ use super::tenant_vendor_control::TenantVendorControl;
 
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
-use crate::decision::engine;
-use crate::decision::features::kyb_features::KybFeatureVector;
+use crate::decision::{self};
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
 use crate::{errors::ApiError, State};
@@ -662,14 +661,16 @@ pub async fn handle_middesk_webhook(
         MiddeskGetBusinessResponse,
         idv::middesk::Error,
     >,
+    enclave_client: &EnclaveClient,
     res: serde_json::Value,
 ) -> Result<(), ApiError> {
     match middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)? {
         middesk::response::webhook::MiddeskWebhookResponse::BusinessUpdate(b) => {
-            handle_middesk_business_response(db_pool, ff_client, b, res).await
+            handle_middesk_business_response(db_pool, ff_client, enclave_client, b, res).await
         }
         middesk::response::webhook::MiddeskWebhookResponse::TinRetried(r) => {
-            handle_middesk_tin_retried_response(db_pool, middesk_client, r, res).await
+            handle_middesk_tin_retried_response(db_pool, ff_client, enclave_client, middesk_client, r, res)
+                .await
         }
     }
 }
@@ -677,6 +678,7 @@ pub async fn handle_middesk_webhook(
 pub async fn handle_middesk_business_response(
     db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
+    enclave_client: &EnclaveClient,
     middesk_response: MiddeskBusinessUpdateWebhookResponse,
     raw_res: serde_json::Value,
 ) -> Result<(), ApiError> {
@@ -751,10 +753,19 @@ pub async fn handle_middesk_business_response(
         .await?;
 
     if !has_tin_error {
-        let bo_obds = vec![]; // TODO: query for bo OBDs
-        let fv = KybFeatureVector::new(middesk_response, vres_id, bo_obds);
+        let business_response = middesk_response.business_response().ok_or(idv::Error::from(
+            middesk::Error::ExpectedFieldMissing("business".to_owned()),
+        ))?;
 
-        engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+        decision::biz_risk::make_kyb_decision(
+            db_pool,
+            ff_client,
+            enclave_client,
+            &ob,
+            business_response,
+            &vres_id,
+        )
+        .await
     } else {
         Ok(())
     }
@@ -762,6 +773,8 @@ pub async fn handle_middesk_business_response(
 
 pub async fn handle_middesk_tin_retried_response(
     db_pool: &DbPool,
+    ff_client: &impl FeatureFlagClient,
+    enclave_client: &EnclaveClient,
     middesk_client: &impl VendorAPICall<
         MiddeskGetBusinessRequest,
         MiddeskGetBusinessResponse,
@@ -778,7 +791,7 @@ pub async fn handle_middesk_tin_retried_response(
             )))?;
     let mr = middesk_response.clone();
     let bizid = business_id.clone();
-    let (uv, get_business_vreq) = db_pool
+    let (uv, ob, get_business_vreq) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Lookup the VRes for the POST /business call we made so we can associate this webhook with a particular scoped_vault
             let (create_business_vreq, _, di) =
@@ -802,6 +815,7 @@ pub async fn handle_middesk_tin_retried_response(
             let webhook_vreq = outstanding_webhook_vreqs[0].0.clone();
 
             let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
+            let (ob, _, _, _) = Onboarding::get(conn, (&create_business_vreq.scoped_vault_id, &uv.id))?;
 
             let vendor_response = VendorResponse {
                 response: ParsedResponse::MiddeskTinRetriedWebhook(mr),
@@ -822,7 +836,7 @@ pub async fn handle_middesk_tin_retried_response(
                 VendorAPI::MiddeskGetBusiness,
             )?;
 
-            Ok((uv, get_business_vreq))
+            Ok((uv, ob, get_business_vreq))
         })
         .await?;
 
@@ -833,20 +847,26 @@ pub async fn handle_middesk_tin_retried_response(
 
     let vendor_response = VendorResponse {
         response: get_business_res.clone().parsed_response(),
-        raw_response: get_business_res.raw_response(),
+        raw_response: get_business_res.clone().raw_response(),
     };
 
     // TODO: refactor code sites where we save a single vres to share a common func
     let vr = (get_business_vreq.clone(), vendor_response.clone());
-    let _vres = db_pool
+    let vres = db_pool
         .db_query(move |conn| -> ApiResult<_> {
             verification_result::save_verification_result(conn, &vr, &uv.public_key)
         })
         .await??;
 
-    // TODO: make KybFV and run DE here
-
-    Ok(())
+    decision::biz_risk::make_kyb_decision(
+        db_pool,
+        ff_client,
+        enclave_client,
+        &ob,
+        &get_business_res.parsed_response,
+        &vres.id,
+    )
+    .await
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 #![allow(clippy::enum_variant_names)]
+use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::business::Task;
-use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use newtypes::FootprintReasonCode;
 use std::str::FromStr;
 use strum::Display;
@@ -494,12 +494,10 @@ pub enum Error {
     MissingField(String),
 }
 
-pub fn reason_codes(middesk_res: &MiddeskBusinessUpdateWebhookResponse) -> Vec<FootprintReasonCode> {
-    middesk_res
-        .data
+pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReasonCode> {
+    business_response
+        .review
         .as_ref()
-        .and_then(|d| d.object.as_ref())
-        .and_then(|o| o.review.as_ref())
         .and_then(|r| r.tasks.as_ref())
         .map(|ts| {
             ts.iter()

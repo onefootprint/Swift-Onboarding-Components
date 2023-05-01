@@ -1,5 +1,5 @@
 use api_wire_types::hosted::onboarding_requirement::OnboardingRequirementDiscriminant;
-use newtypes::{output::Csv, CollectedDataOption};
+use newtypes::{output::Csv, CollectedDataOption, OnboardingId};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -32,4 +32,10 @@ pub enum OnboardingError {
     AlreadyCompleted,
     #[error("User consent not found for onboarding")]
     UserConsentNotFound,
+    #[error("Business Owner has not been set in Business vault yet")]
+    BusinessOwnersNotSet,
+    #[error("Expected BO to have an Onboarding but it was not found")]
+    MissingBoOnboarding,
+    #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
+    MissingBoOnboardingDecision(Csv<OnboardingId>),
 }

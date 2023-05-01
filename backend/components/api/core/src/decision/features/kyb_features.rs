@@ -1,5 +1,5 @@
 use db::models::onboarding_decision::OnboardingDecision;
-use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::middesk::response::business::BusinessResponse;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
 use crate::{
@@ -19,14 +19,11 @@ pub struct MiddeskFeatures {
 }
 
 impl MiddeskFeatures {
-    pub fn new(
-        result: MiddeskBusinessUpdateWebhookResponse,
-        verification_result_id: VerificationResultId,
-    ) -> Self {
-        let footprint_reason_codes = middesk::reason_codes(&result);
+    pub fn new(business_response: &BusinessResponse, verification_result_id: &VerificationResultId) -> Self {
+        let footprint_reason_codes = middesk::reason_codes(business_response);
 
         Self {
-            verification_result_id,
+            verification_result_id: verification_result_id.clone(),
             footprint_reason_codes,
         }
     }
@@ -40,8 +37,8 @@ pub struct KybFeatureVector {
 
 impl KybFeatureVector {
     pub fn new(
-        middesk_business_response: MiddeskBusinessUpdateWebhookResponse,
-        verification_result_id: VerificationResultId,
+        middesk_business_response: &BusinessResponse,
+        verification_result_id: &VerificationResultId,
         bo_obds: Vec<OnboardingDecision>,
     ) -> KybFeatureVector {
         Self {

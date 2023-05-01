@@ -18,6 +18,7 @@ async fn handle_webhook(
         &state.db_pool,
         &state.feature_flag_client,
         &state.middesk_client,
+        &state.enclave_client,
         webhook_signature.request,
     )
     .await?;

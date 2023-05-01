@@ -19,7 +19,7 @@ use mockall::automock;
 use newtypes::{PiiJsonValue, VendorAPI};
 
 pub trait VendorAPIResponse {
-    fn vendor_api(self) -> VendorAPI;
+    fn vendor_api(self) -> VendorAPI; // TODO: make these &self
     fn raw_response(self) -> PiiJsonValue;
     fn parsed_response(self) -> ParsedResponse;
     // TODO: to_structured_pg_table or whatnot

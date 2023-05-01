@@ -177,6 +177,15 @@ impl OnboardingDecision {
     }
 
     #[tracing::instrument(skip_all)]
+    pub fn bulk_get_active(conn: &mut PgConn, onboarding_ids: &[OnboardingId]) -> DbResult<Vec<Self>> {
+        let res = onboarding_decision::table
+            .filter(onboarding_decision::onboarding_id.eq_any(onboarding_ids))
+            .filter(onboarding_decision::deactivated_at.is_null())
+            .get_results(conn)?;
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
     pub fn list_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
         let result = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))

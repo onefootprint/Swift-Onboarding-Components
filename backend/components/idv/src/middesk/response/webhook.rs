@@ -64,6 +64,10 @@ impl MiddeskBusinessUpdateWebhookResponse {
             })
             .is_some()
     }
+
+    pub fn business_response(&self) -> Option<&BusinessResponse> {
+        self.data.as_ref().and_then(|d| d.object.as_ref())
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
