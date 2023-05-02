@@ -21,6 +21,7 @@ export type MachineContext = {
     boolean
   >;
   kybCollect?: {
+    [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
     [CollectedKybDataOption.website]: boolean;
     [CollectedKybDataOption.phoneNumber]: boolean;
   };
@@ -66,6 +67,7 @@ export type MachineEvents =
   | {
       type: 'kybCollectSubmitted';
       payload: {
+        [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
         [CollectedKybDataOption.website]: boolean;
         [CollectedKybDataOption.phoneNumber]: boolean;
       };

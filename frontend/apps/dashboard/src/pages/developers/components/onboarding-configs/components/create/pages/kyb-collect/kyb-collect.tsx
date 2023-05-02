@@ -4,6 +4,7 @@ import { Checkbox, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import CdoTagList from 'src/components/cdo-tag-list';
+import useSession from 'src/hooks/use-session/use-session';
 import styled, { css } from 'styled-components';
 
 import FormTitle from '../../components/form-title';
@@ -11,6 +12,7 @@ import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = {
+  [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
   [CollectedKybDataOption.website]: boolean;
   [CollectedKybDataOption.phoneNumber]: boolean;
 };
@@ -20,9 +22,15 @@ const KybCollect = () => {
     'pages.developers.onboarding-configs.create.kyb-collect-form',
   );
   const [state, send] = useOnboardingConfigMachine();
+  const {
+    data: { user },
+  } = useSession();
   const { kybCollect } = state.context;
   const { register, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
+      [CollectedKybDataOption.kycedBeneficialOwners]: kybCollect
+        ? kybCollect[CollectedKybDataOption.kycedBeneficialOwners]
+        : false,
       [CollectedKybDataOption.website]: kybCollect
         ? kybCollect[CollectedKybDataOption.website]
         : false,
@@ -41,14 +49,22 @@ const KybCollect = () => {
     });
   };
 
+  const kycedBeneficialOwners = watch(
+    CollectedKybDataOption.kycedBeneficialOwners,
+  );
   const website = watch(CollectedKybDataOption.website);
   const phoneNumber = watch(CollectedKybDataOption.phoneNumber);
   const collectedData: CollectedKybDataOption[] = [
     CollectedKybDataOption.name,
     CollectedKybDataOption.tin,
     CollectedKybDataOption.address,
-    CollectedKybDataOption.beneficialOwners,
   ];
+  // Always collect BOs, but optionally allow fully KYCing the BOs
+  if (kycedBeneficialOwners) {
+    collectedData.push(CollectedKybDataOption.kycedBeneficialOwners);
+  } else {
+    collectedData.push(CollectedKybDataOption.beneficialOwners);
+  }
   if (website) {
     collectedData.push(CollectedKybDataOption.website);
   }
@@ -77,6 +93,13 @@ const KybCollect = () => {
             {t('optional')}
           </Typography>
           <OptionsContainer data-testid="kyb-collect-form-options">
+            {/* Long term, all KYB configs will KYC all BOs. For now, just a flag for employees */}
+            {user?.isFirmEmployee && (
+              <Checkbox
+                label={t('kyced-beneficial-owners')}
+                {...register(CollectedKybDataOption.kycedBeneficialOwners)}
+              />
+            )}
             <Checkbox
               label={allT('cdo.business_website')}
               {...register(CollectedKybDataOption.website)}

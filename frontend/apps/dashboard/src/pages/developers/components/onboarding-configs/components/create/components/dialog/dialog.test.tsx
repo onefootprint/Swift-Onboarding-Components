@@ -6,6 +6,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
@@ -19,6 +20,8 @@ describe('<CreateConfig />', () => {
     onClose: jest.fn(),
     onCreate: jest.fn(),
   };
+
+  beforeEach(asAdminUserFirmEmployee);
 
   const renderDialog = ({
     open = defaultOptions.open,
@@ -534,6 +537,43 @@ describe('<CreateConfig />', () => {
       expect(phoneNumber.checked).toBeFalsy();
       await userEvent.click(phoneNumber);
       expect(phoneNumber.checked).toBeTruthy();
+
+      const kycBos = within(options).getByLabelText(
+        'Fully KYC all beneficial owners',
+      ) as HTMLInputElement;
+      expect(kycBos).toBeInTheDocument();
+      expect(kycBos.checked).toBeFalsy();
+      await userEvent.click(kycBos);
+      expect(kycBos.checked).toBeTruthy();
+    });
+
+    describe('when non-firm-employee', () => {
+      beforeEach(asAdminUser);
+
+      it('should not display option to KYC all BOs', async () => {
+        renderDialog();
+
+        // Advance to data collection screen
+        const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
+        await userEvent.click(kyb);
+        const nextButton = screen.getByRole('button', { name: 'Next' });
+        await userEvent.click(nextButton);
+        const nameInput = screen.getByLabelText(
+          'Onboarding configuration name',
+        );
+        await userEvent.type(nameInput, 'Test name');
+        await userEvent.click(nextButton);
+
+        // Make sure we don't see fully-KYCed option
+        expect(
+          screen.getByTestId(getFormIdForState('kybCollect')),
+        ).toBeInTheDocument();
+
+        const options = screen.getByTestId('kyb-collect-form-options');
+        expect(
+          within(options).queryByLabelText('Fully KYC all beneficial owners'),
+        ).not.toBeInTheDocument();
+      });
     });
 
     it('should go back to name form', async () => {

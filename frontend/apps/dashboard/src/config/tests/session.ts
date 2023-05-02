@@ -55,6 +55,20 @@ export const asAdminUser = () => {
   });
 };
 
+export const asAdminUserFirmEmployee = () => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: {
+        ...baseUser,
+        isFirmEmployee: true,
+      },
+      org: baseOrg,
+      meta: baseMeta,
+    },
+  });
+};
+
 export const asAdminUserInSandbox = () => {
   useStore.setState({
     data: {
