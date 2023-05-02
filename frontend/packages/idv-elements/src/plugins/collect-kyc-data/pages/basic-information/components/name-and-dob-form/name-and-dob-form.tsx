@@ -1,4 +1,4 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -9,7 +9,11 @@ import CtaButton from '../cta-button';
 import DobField from '../dob-field';
 import NameFields from '../name-fields';
 
-type FormData = NameAndDobInformation;
+type FormData = {
+  firstName: string;
+  lastName: string;
+  dob: string;
+};
 
 type NameAndDobFormProps = {
   isLoading: boolean;
@@ -25,26 +29,24 @@ const NameAndDobForm = ({
   const [state] = useCollectKycDataMachine();
   const { data, fixedData } = state.context;
   const hasFixedName =
-    fixedData?.[UserDataAttribute.firstName] !== undefined &&
-    fixedData?.[UserDataAttribute.lastName] !== undefined;
+    fixedData?.[IdDI.firstName] !== undefined &&
+    fixedData?.[IdDI.lastName] !== undefined;
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.firstName]: hasFixedName
-        ? fixedData?.[UserDataAttribute.firstName]
-        : data[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: hasFixedName
-        ? fixedData?.[UserDataAttribute.lastName]
-        : data[UserDataAttribute.lastName],
-      [UserDataAttribute.dob]: data[UserDataAttribute.dob],
+      firstName: hasFixedName
+        ? fixedData?.[IdDI.firstName]
+        : data[IdDI.firstName],
+      lastName: hasFixedName ? fixedData?.[IdDI.lastName] : data[IdDI.lastName],
+      dob: data[IdDI.dob],
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [UserDataAttribute.firstName]: formData[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: formData[UserDataAttribute.lastName],
-      [UserDataAttribute.dob]: formData[UserDataAttribute.dob],
+      [IdDI.firstName]: formData.firstName,
+      [IdDI.lastName]: formData.lastName,
+      [IdDI.dob]: formData.dob,
     };
     onSubmit(basicInformation);
   };

@@ -1,6 +1,5 @@
 import {
   CollectedKycDataOption,
-  CollectedKycDataOptionToRequiredAttributes,
   UserData,
   UserDataAttribute,
 } from '@onefootprint/types';
@@ -22,6 +21,32 @@ const SSN_ATTRIBUTES = [
   CollectedKycDataOption.ssn9,
   CollectedKycDataOption.ssn4,
 ];
+
+const CollectedKycDataOptionToRequiredAttributes: Record<
+  CollectedKycDataOption,
+  UserDataAttribute[]
+> = {
+  [CollectedKycDataOption.name]: [
+    UserDataAttribute.firstName,
+    UserDataAttribute.lastName,
+  ],
+  [CollectedKycDataOption.dob]: [UserDataAttribute.dob],
+  [CollectedKycDataOption.ssn4]: [UserDataAttribute.ssn4],
+  [CollectedKycDataOption.ssn9]: [UserDataAttribute.ssn9],
+  [CollectedKycDataOption.fullAddress]: [
+    UserDataAttribute.addressLine1,
+    UserDataAttribute.city,
+    UserDataAttribute.state,
+    UserDataAttribute.zip,
+    UserDataAttribute.country,
+  ],
+  [CollectedKycDataOption.partialAddress]: [
+    UserDataAttribute.zip,
+    UserDataAttribute.country,
+  ],
+  [CollectedKycDataOption.email]: [UserDataAttribute.email],
+  [CollectedKycDataOption.phoneNumber]: [UserDataAttribute.phoneNumber],
+};
 
 // An attribute is missing if
 // (1) it must be collected for this onboarding session AND

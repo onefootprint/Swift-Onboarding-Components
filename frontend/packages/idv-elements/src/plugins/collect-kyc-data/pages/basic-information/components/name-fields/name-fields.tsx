@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
 import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -21,30 +20,22 @@ const NameFields = ({ isDisabled }: NameFieldsProps) => {
         <TextInput
           data-private
           disabled={isDisabled}
-          hasError={!!errors[UserDataAttribute.firstName]}
-          hint={
-            errors[UserDataAttribute.firstName]
-              ? t('first-name.error')
-              : undefined
-          }
+          hasError={!!errors.firstName}
+          hint={errors.firstName ? t('first-name.error') : undefined}
           label={t('first-name.label')}
           placeholder={t('first-name.placeholder')}
-          {...register(UserDataAttribute.firstName, { required: true })}
+          {...register('firstName', { required: true })}
         />
       </Grid.Column>
       <Grid.Column col={6}>
         <TextInput
           data-private
           disabled={isDisabled}
-          hasError={!!errors[UserDataAttribute.lastName]}
-          hint={
-            errors[UserDataAttribute.firstName]
-              ? t('last-name.error')
-              : undefined
-          }
+          hasError={!!errors.lastName}
+          hint={errors.firstName ? t('last-name.error') : undefined}
           label={t('last-name.label')}
           placeholder={t('last-name.placeholder')}
-          {...register(UserDataAttribute.lastName, { required: true })}
+          {...register('lastName', { required: true })}
         />
       </Grid.Column>
     </Grid.Row>

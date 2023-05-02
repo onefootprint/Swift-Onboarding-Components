@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -16,8 +16,8 @@ const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
   const { data } = state.context;
 
   const identity = [];
-  const ssn9 = data[UserDataAttribute.ssn9];
-  const ssn4 = data[UserDataAttribute.ssn4];
+  const ssn9 = data[IdDI.ssn9];
+  const ssn4 = data[IdDI.ssn4];
   if (ssn9) {
     identity.push({
       text: t('identity.ssn9'),

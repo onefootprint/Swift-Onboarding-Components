@@ -4,7 +4,7 @@ import {
   Identify,
   Onboarding,
 } from '@onefootprint/idv-elements';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
@@ -17,7 +17,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
   const {
-    userData,
+    data,
     tenantPk,
     sandboxSuffix,
     authToken,
@@ -44,9 +44,10 @@ const Router = ({ onDone }: RouterProps) => {
     >
       {state.matches('identify') && (
         <Identify
+          // TODO: generalize this in the next iteratin
           bootstrapData={{
-            email: userData?.[UserDataAttribute.email],
-            phoneNumber: userData?.[UserDataAttribute.phoneNumber],
+            email: data?.[IdDI.email] as string,
+            phoneNumber: data?.[IdDI.phoneNumber] as string,
           }}
           tenantPk={tenantPk}
           onDone={payload => {
@@ -59,7 +60,8 @@ const Router = ({ onDone }: RouterProps) => {
           userFound={userFound}
           tenantPk={tenantPk}
           authToken={authToken}
-          userData={userData}
+          // TODO: generalize this more in the next iteration
+          data={data}
           sandboxSuffix={sandboxSuffix}
           onClose={onClose}
           onComplete={onComplete}

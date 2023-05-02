@@ -1,5 +1,6 @@
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary } from '@onefootprint/idv-elements';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
@@ -10,6 +11,7 @@ const Root = () => {
   const [state, send] = useHostedMachine();
   const { businessBoKycData, onboardingConfig } = state.context;
   const { invited } = businessBoKycData || {};
+  const { email, phoneNumber } = invited || {};
   const { key } = onboardingConfig || {};
 
   return (
@@ -23,7 +25,10 @@ const Root = () => {
       {state.matches('idv') && (
         <Idv
           tenantPk={key}
-          userData={invited}
+          data={{
+            [IdDI.email]: email,
+            [IdDI.phoneNumber]: phoneNumber,
+          }}
           onComplete={() => {
             send({ type: 'idvCompleted' });
           }}

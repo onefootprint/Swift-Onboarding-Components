@@ -1,12 +1,13 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig, UserData } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
+
+import { IdvData } from '../../../types';
 
 export type MachineContext = {
   // Inputs
   tenantPk?: string;
   authToken?: string;
-  // TODO: belce migrate this to use new DIs
-  userData?: UserData;
+  data?: IdvData;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
   // Generated

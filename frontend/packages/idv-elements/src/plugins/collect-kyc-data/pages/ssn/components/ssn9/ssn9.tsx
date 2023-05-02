@@ -1,6 +1,6 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoLock24, IcoShield24 } from '@onefootprint/icons';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,11 +12,13 @@ import NavigationHeader from '../../../../../../components/layout/components/nav
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { SSN9Information } from '../../../../utils/data-types';
 
-type FormData = SSN9Information;
+type FormData = {
+  ssn9: string;
+};
 
 type SSN9Props = {
   isMutationLoading: boolean;
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: SSN9Information) => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
   hideHeader?: boolean;
@@ -41,14 +43,20 @@ const SSN9 = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.ssn9]: data[UserDataAttribute.ssn9],
+      ssn9: data[IdDI.ssn9],
     },
   });
+
+  const onSubmitFormData = (formData: FormData) => {
+    onSubmit({
+      [IdDI.ssn9]: formData.ssn9,
+    });
+  };
 
   return (
     <>
       {!hideHeader && <NavigationHeader />}
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmitFormData)}>
         {!hideHeader && (
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         )}
@@ -60,8 +68,8 @@ const SSN9 = ({
           mask={inputMasks.ssn}
           placeholder={t('form.placeholder')}
           type="tel"
-          value={getValues(UserDataAttribute.ssn9)}
-          {...register(UserDataAttribute.ssn9, {
+          value={getValues('ssn9')}
+          {...register('ssn9', {
             required: true,
             // Numbers with all zeros in any digit group (000-##-####, ###-00-####, ###-##-0000) are not allowed.
             // Numbers with 666 or 900–999 in the first digit group are not allowed.

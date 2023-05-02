@@ -1,5 +1,4 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,13 +17,13 @@ const DobField = () => {
   return (
     <TextInput
       data-private
-      hasError={!!errors[UserDataAttribute.dob]}
-      hint={errors[UserDataAttribute.dob] ? t('error') : undefined}
+      hasError={!!errors.dob}
+      hint={errors.dob ? t('error') : undefined}
       label={t('label')}
       mask={inputMasks.dob}
       placeholder={t('placeholder')}
-      value={getValues(UserDataAttribute.dob)}
-      {...register(UserDataAttribute.dob, {
+      value={getValues('dob')}
+      {...register('dob', {
         required: true,
         validate: validateDob,
       })}

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
-import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -14,7 +14,7 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data, missingAttributes, receivedEmail } = state.context;
-  const email = data[UserDataAttribute.email];
+  const email = data[IdDI.email];
   if (
     !missingAttributes.includes(CollectedKycDataOption.email) ||
     receivedEmail

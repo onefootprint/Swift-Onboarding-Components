@@ -1,4 +1,4 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -8,7 +8,10 @@ import { NameInformation } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import NameFields from '../name-fields';
 
-type FormData = NameInformation;
+type FormData = {
+  firstName: string;
+  lastName: string;
+};
 
 type NameFormProps = {
   isLoading: boolean;
@@ -20,24 +23,22 @@ const NameForm = ({ isLoading, ctaLabel, onSubmit }: NameFormProps) => {
   const [state] = useCollectKycDataMachine();
   const { data, fixedData } = state.context;
   const hasFixedName =
-    fixedData?.[UserDataAttribute.firstName] !== undefined &&
-    fixedData?.[UserDataAttribute.lastName] !== undefined;
+    fixedData?.[IdDI.firstName] !== undefined &&
+    fixedData?.[IdDI.lastName] !== undefined;
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.firstName]: hasFixedName
-        ? fixedData?.[UserDataAttribute.firstName]
-        : data[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: hasFixedName
-        ? fixedData?.[UserDataAttribute.lastName]
-        : data[UserDataAttribute.lastName],
+      firstName: hasFixedName
+        ? fixedData?.[IdDI.firstName]
+        : data[IdDI.firstName],
+      lastName: hasFixedName ? fixedData?.[IdDI.lastName] : data[IdDI.lastName],
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [UserDataAttribute.firstName]: formData[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: formData[UserDataAttribute.lastName],
+      [IdDI.firstName]: formData.firstName,
+      [IdDI.lastName]: formData.lastName,
     };
     onSubmit(basicInformation);
   };

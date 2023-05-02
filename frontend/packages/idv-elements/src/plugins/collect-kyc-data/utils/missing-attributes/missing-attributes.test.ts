@@ -1,4 +1,4 @@
-import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import {
   hasMissingAttributes,
@@ -19,15 +19,15 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.partialAddress], {
-          [UserDataAttribute.city]: 'Enclave',
+          [IdDI.city]: 'Enclave',
         }),
       ).toEqual(false);
       expect(
         isMissingBasicAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.lastName]: 'Dogru',
+            [IdDI.firstName]: 'Belce',
+            [IdDI.lastName]: 'Dogru',
           },
         ),
       ).toEqual(false);
@@ -38,7 +38,7 @@ describe('MissingAttributesUtils', () => {
         isMissingResidentialAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [UserDataAttribute.firstName]: undefined,
+            [IdDI.firstName]: undefined,
           },
         ),
       ).toEqual(true);
@@ -46,7 +46,7 @@ describe('MissingAttributesUtils', () => {
         isMissingResidentialAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [UserDataAttribute.firstName]: 'Belce',
+            [IdDI.firstName]: 'Belce',
           },
         ),
       ).toEqual(true);
@@ -77,18 +77,18 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
-          [UserDataAttribute.zip]: '94117',
-          [UserDataAttribute.country]: 'US',
+          [IdDI.zip]: '94117',
+          [IdDI.country]: 'US',
         }),
       ).toEqual(false);
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [UserDataAttribute.addressLine1]: '94117',
-          [UserDataAttribute.addressLine2]: undefined,
-          [UserDataAttribute.city]: 'Enclave',
-          [UserDataAttribute.state]: 'NY',
-          [UserDataAttribute.zip]: '94117',
-          [UserDataAttribute.country]: 'US',
+          [IdDI.addressLine1]: '94117',
+          [IdDI.addressLine2]: undefined,
+          [IdDI.city]: 'Enclave',
+          [IdDI.state]: 'NY',
+          [IdDI.zip]: '94117',
+          [IdDI.country]: 'US',
         }),
       ).toEqual(false);
     });
@@ -102,22 +102,22 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [UserDataAttribute.zip]: '94107',
-          [UserDataAttribute.country]: 'US',
+          [IdDI.zip]: '94107',
+          [IdDI.country]: 'US',
         }),
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
-          [UserDataAttribute.zip]: '94117',
-          [UserDataAttribute.country]: undefined,
+          [IdDI.zip]: '94117',
+          [IdDI.country]: undefined,
         }),
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute(
           [CollectedKycDataOption.dob, CollectedKycDataOption.partialAddress],
           {
-            [UserDataAttribute.zip]: '94117',
-            [UserDataAttribute.country]: undefined,
+            [IdDI.zip]: '94117',
+            [IdDI.country]: undefined,
           },
         ),
       ).toEqual(true);
@@ -135,7 +135,7 @@ describe('MissingAttributesUtils', () => {
     it('should return false if the user has SSN', () => {
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
-          [UserDataAttribute.ssn9]: '000000',
+          [IdDI.ssn9]: '000000',
         }),
       ).toEqual(false);
     });
@@ -143,7 +143,7 @@ describe('MissingAttributesUtils', () => {
     it('should return false if the user has last 4 digits of SSN', () => {
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
-          [UserDataAttribute.ssn4]: '000000',
+          [IdDI.ssn4]: '000000',
         }),
       ).toEqual(false);
     });
@@ -157,12 +157,12 @@ describe('MissingAttributesUtils', () => {
       );
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
-          [UserDataAttribute.ssn9]: '0000000',
+          [IdDI.ssn9]: '0000000',
         }),
       ).toEqual(true);
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
-          [UserDataAttribute.ssn4]: '0000',
+          [IdDI.ssn4]: '0000',
         }),
       ).toEqual(true);
     });
@@ -178,9 +178,9 @@ describe('MissingAttributesUtils', () => {
         hasMissingAttributes(
           [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
           {
-            [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.lastName]: 'Dogru',
-            [UserDataAttribute.ssn4]: '0000',
+            [IdDI.firstName]: 'Belce',
+            [IdDI.lastName]: 'Dogru',
+            [IdDI.ssn4]: '0000',
           },
         ),
       ).toEqual(false);
@@ -195,9 +195,9 @@ describe('MissingAttributesUtils', () => {
             CollectedKycDataOption.fullAddress,
           ],
           {
-            [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.lastName]: 'Dogru',
-            [UserDataAttribute.ssn4]: '0000',
+            [IdDI.firstName]: 'Belce',
+            [IdDI.lastName]: 'Dogru',
+            [IdDI.ssn4]: '0000',
           },
         ),
       ).toEqual(true);

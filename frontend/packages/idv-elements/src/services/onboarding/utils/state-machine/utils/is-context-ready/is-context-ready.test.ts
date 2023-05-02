@@ -27,7 +27,7 @@ describe('isContextReady', () => {
           hasSupportForWebauthn: true,
         },
         config: { ...testOnboardingConfig },
-        userData: {},
+        data: {},
         tenantPk: 'pk',
         validationToken: '',
       };
@@ -42,7 +42,7 @@ describe('isContextReady', () => {
       const context: MachineContext = {
         authToken: 'token',
         config: { ...testOnboardingConfig },
-        userData: {},
+        data: {},
         tenantPk: 'pk',
       };
       const event: MachineEvents = {
@@ -63,7 +63,7 @@ describe('isContextReady', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
         authToken: 'token',
-        userData: {},
+        data: {},
         tenantPk: 'pk',
       };
       const event: MachineEvents = {

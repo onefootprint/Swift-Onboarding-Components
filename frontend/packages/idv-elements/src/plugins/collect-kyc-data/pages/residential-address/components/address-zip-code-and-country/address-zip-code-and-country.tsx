@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { CountryCode, IdDI } from '@onefootprint/types';
 import { Button, CountrySelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -14,8 +14,8 @@ import CountryField from '../country-field';
 import ZipField from '../zip-field';
 
 type FormData = {
-  [UserDataAttribute.country]: CountrySelectOption;
-  [UserDataAttribute.zip]: string;
+  country: CountrySelectOption;
+  zip: string;
 };
 
 export type AddressZipCodeAndCountryProps = {
@@ -39,25 +39,23 @@ const AddressZipCodeAndCountry = ({
   const { t: cta } = useTranslation('pages.cta');
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.country]: getInitialCountry(
-        data[UserDataAttribute.country],
-      ),
-      [UserDataAttribute.zip]: data[UserDataAttribute.zip],
+      country: getInitialCountry(data[IdDI.country] as CountryCode),
+      zip: data[IdDI.zip],
     },
   });
   const { watch, handleSubmit, setFocus, setValue } = methods;
-  const country = watch(UserDataAttribute.country);
+  const country = watch('country');
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      zip: formData.zip,
-      country: formData.country.value,
+      [IdDI.zip]: formData.zip,
+      [IdDI.country]: formData.country.value,
     });
   };
 
   const handleCountryChange = () => {
-    setValue(UserDataAttribute.zip, '');
-    setFocus(UserDataAttribute.zip);
+    setValue('zip', '');
+    setFocus('zip');
   };
 
   return (

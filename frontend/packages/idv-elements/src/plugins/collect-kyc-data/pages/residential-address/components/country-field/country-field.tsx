@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
 import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -16,7 +15,7 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
     <Controller
       data-private
       control={control}
-      name={UserDataAttribute.country}
+      name="country"
       render={({ field }) => (
         <CountrySelect
           label={t('label')}

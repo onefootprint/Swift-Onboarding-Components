@@ -1,4 +1,4 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -35,7 +35,7 @@ const createCollectKycDataMachine = () =>
                   // If email was passed into initial context, no need to collect again
                   isMissingEmailAttribute(event.payload.missingAttributes, {
                     ...context.data,
-                    email: event.payload.email,
+                    [IdDI.email]: event.payload.email,
                   }),
               },
               {
@@ -356,7 +356,7 @@ const createCollectKycDataMachine = () =>
           context.authToken = authToken;
           context.userFound = userFound;
           context.missingAttributes = [...missingAttributes];
-          context.data[UserDataAttribute.email] = email;
+          context.data[IdDI.email] = email;
           context.receivedEmail = !!email;
           context.sandboxSuffix = sandboxSuffix;
           context.config = config;
@@ -364,7 +364,8 @@ const createCollectKycDataMachine = () =>
           return context;
         }),
         assignEmail: assign((context, event) => {
-          context.data.email = event.payload.email;
+          context.data = context.data || {};
+          context.data[IdDI.email] = event.payload.email;
           return context;
         }),
         assignBasicInformation: assign((context, event) => {

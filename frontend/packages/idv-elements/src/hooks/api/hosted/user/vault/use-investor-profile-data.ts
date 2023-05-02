@@ -41,6 +41,7 @@ const investorProfileData = async (payload: UserDataRequest) => {
       [ALLOW_EXTRA_FIELDS_HEADER]: payload.speculative ? true : undefined,
     },
   });
+
   return response.data;
 };
 

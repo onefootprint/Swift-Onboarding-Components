@@ -1,14 +1,11 @@
-import {
-  UserData,
-  UserDataAttribute,
-  UserDataResponse,
-} from '@onefootprint/types';
+import { IdDI, UserDataResponse } from '@onefootprint/types';
 
-import { useUserData } from '../../../hooks';
+import useUserData from '../../../hooks/api/hosted/user/vault/use-user-data';
+import { KycData } from '../types';
 
 type SyncDataArgs = {
   authToken?: string;
-  data: UserData;
+  data: KycData;
   speculative?: boolean;
   onSuccess?: (data: UserDataResponse) => void;
   onError?: (error: unknown) => void;
@@ -31,10 +28,10 @@ const useSyncData = () => {
 
     const requestData = { ...data };
     // DOB is accepted by the backend in a different format
-    const dobData = data[UserDataAttribute.dob];
+    const dobData = data[IdDI.dob];
     if (dobData) {
       const [month, day, year] = dobData.split('/');
-      requestData[UserDataAttribute.dob] = `${year}-${month}-${day}`;
+      requestData[IdDI.dob] = `${year}-${month}-${day}`;
     }
 
     userDataMutation.mutate(

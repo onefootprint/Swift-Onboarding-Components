@@ -3,7 +3,6 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { CollectKycDataProps } from './collect-kyc-data.types';
 import {
   MachineProvider,
   useCollectKycDataMachine,
@@ -11,6 +10,7 @@ import {
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
+import { CollectKycDataProps } from './types';
 
 const i18n = configureI18next();
 

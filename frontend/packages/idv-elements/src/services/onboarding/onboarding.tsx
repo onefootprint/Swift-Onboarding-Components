@@ -15,7 +15,7 @@ type OnboardingProps = Partial<OnboardingMachineArgs> & {
 const Onboarding = ({
   tenantPk,
   authToken,
-  userData,
+  data,
   sandboxSuffix,
   userFound,
   onDone,
@@ -31,7 +31,7 @@ const Onboarding = ({
           userFound={userFound}
           tenantPk={tenantPk}
           authToken={authToken}
-          userData={userData}
+          data={data}
           sandboxSuffix={sandboxSuffix}
         >
           <Router onDone={onDone} />

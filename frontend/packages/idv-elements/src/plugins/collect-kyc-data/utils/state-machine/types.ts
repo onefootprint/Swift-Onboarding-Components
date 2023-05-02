@@ -1,10 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedKycDataOption,
-  OnboardingConfig,
-  UserData,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
+import { KycData } from '../../types';
 import {
   BasicInformation,
   ResidentialAddress,
@@ -13,7 +10,7 @@ import {
 
 export type OnboardingData = {
   missingAttributes: CollectedKycDataOption[];
-  data: UserData;
+  data: KycData;
   validationToken?: string;
 };
 
@@ -25,10 +22,10 @@ export type MachineContext = {
   config?: OnboardingConfig;
   receivedEmail?: boolean; // Whether received non-empty email from initial context
   sandboxSuffix?: string; // only if in sandbox mode
-  fixedData?: UserData;
+  fixedData?: KycData;
   // Machine generated
   missingAttributes: CollectedKycDataOption[];
-  data: UserData;
+  data: KycData;
 };
 
 export type MachineEvents =
@@ -42,7 +39,7 @@ export type MachineEvents =
         email?: string;
         sandboxSuffix?: string;
         config: OnboardingConfig;
-        fixedData?: UserData;
+        fixedData?: KycData;
       };
     }
   | {

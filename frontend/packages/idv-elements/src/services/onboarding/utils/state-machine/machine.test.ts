@@ -1,5 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createOnboardingMachine, { OnboardingMachineArgs } from './machine';
@@ -28,14 +32,14 @@ describe('Onboarding Machine Tests', () => {
     userFound = true,
     authToken = 'token',
     tenantPk = 'pk',
-    userData = { email: 'belce@onefootprint.com' },
+    data = { [IdDI.email]: 'belce@onefootprint.com' },
     sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
         tenantPk,
-        userData,
+        data,
         authToken,
         sandboxSuffix,
       }),
@@ -67,7 +71,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      userData: { email: 'belce@onefootprint.com' },
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
       sandboxSuffix: 'sandboxTest',
     });
 
@@ -84,7 +88,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      userData: { email: 'belce@onefootprint.com' },
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
       sandboxSuffix: 'sandboxTest',
       validationToken: 'token',
     });
@@ -110,7 +114,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      userData: { email: 'belce@onefootprint.com' },
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: '',
     });
 
@@ -124,7 +128,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      userData: { email: 'belce@onefootprint.com' },
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: '',
     });
 
@@ -141,7 +145,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      userData: { email: 'belce@onefootprint.com' },
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: 'token',
     });
   });

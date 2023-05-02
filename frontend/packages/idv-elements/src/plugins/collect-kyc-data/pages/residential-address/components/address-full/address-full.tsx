@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { CountryCode, IdDI } from '@onefootprint/types';
 import {
   AddressInput,
   Button,
@@ -25,12 +25,12 @@ import CountryField from '../country-field';
 import ZipField from '../zip-field';
 
 type FormData = {
-  [UserDataAttribute.addressLine1]: string;
-  [UserDataAttribute.addressLine2]: string;
-  [UserDataAttribute.city]: string;
-  [UserDataAttribute.state]: string | SelectOption;
-  [UserDataAttribute.country]: CountrySelectOption;
-  [UserDataAttribute.zip]: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string | SelectOption;
+  country: CountrySelectOption;
+  zip: string;
 };
 
 export type AddressFullProps = {
@@ -52,14 +52,12 @@ const AddressFull = ({
   const { t: cta } = useTranslation('pages.cta');
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.country]: getInitialCountry(
-        data[UserDataAttribute.country],
-      ),
-      [UserDataAttribute.state]: getInitialState(data[UserDataAttribute.state]),
-      [UserDataAttribute.city]: data[UserDataAttribute.city],
-      [UserDataAttribute.zip]: data[UserDataAttribute.zip],
-      [UserDataAttribute.addressLine1]: data[UserDataAttribute.addressLine1],
-      [UserDataAttribute.addressLine2]: data[UserDataAttribute.addressLine2],
+      country: getInitialCountry(data[IdDI.country] as CountryCode),
+      state: getInitialState(data[IdDI.state]),
+      city: data[IdDI.city],
+      zip: data[IdDI.zip],
+      addressLine1: data[IdDI.addressLine1],
+      addressLine2: data[IdDI.addressLine2],
     },
   });
   const {
@@ -71,16 +69,16 @@ const AddressFull = ({
     setFocus,
     setValue,
   } = methods;
-  const country = watch(UserDataAttribute.country);
+  const country = watch('country');
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      address_line1: formData.address_line1,
-      address_line2: formData.address_line2,
-      city: formData.city,
-      zip: formData.zip,
-      country: formData.country.value,
-      state:
+      [IdDI.addressLine1]: formData.addressLine1,
+      [IdDI.addressLine2]: formData.addressLine2,
+      [IdDI.city]: formData.city,
+      [IdDI.zip]: formData.zip,
+      [IdDI.country]: formData.country.value,
+      [IdDI.state]:
         typeof formData.state === 'object'
           ? formData.state.value
           : formData.state,
@@ -88,12 +86,12 @@ const AddressFull = ({
   };
 
   const handleCountryChange = () => {
-    setFocus(UserDataAttribute.addressLine1);
-    setValue(UserDataAttribute.addressLine1, '');
-    setValue(UserDataAttribute.addressLine2, '');
-    setValue(UserDataAttribute.city, '');
-    setValue(UserDataAttribute.state, '');
-    setValue(UserDataAttribute.zip, '');
+    setFocus('addressLine1');
+    setValue('addressLine1', '');
+    setValue('addressLine2', '');
+    setValue('city', '');
+    setValue('state', '');
+    setValue('zip', '');
   };
 
   const handleAddressSelect = async (
@@ -103,13 +101,13 @@ const AddressFull = ({
       const formattedStreetAddress =
         prediction?.structured_formatting.main_text;
       if (formattedStreetAddress) {
-        setValue(UserDataAttribute.addressLine1, formattedStreetAddress);
+        setValue('addressLine1', formattedStreetAddress);
       }
 
       const result = await getAddressComponent(prediction);
       if (result) {
         if (result.city) {
-          setValue(UserDataAttribute.city, result.city);
+          setValue('city', result.city);
         }
         if (result.state) {
           if (country.value === 'US') {
@@ -117,14 +115,14 @@ const AddressFull = ({
               stateOption => stateOption.label === result.state,
             );
             if (possibleState) {
-              setValue(UserDataAttribute.state, possibleState);
+              setValue('state', possibleState);
             }
           } else {
-            setValue(UserDataAttribute.state, result.state);
+            setValue('state', result.state);
           }
         }
         if (result.zip) {
-          setValue(UserDataAttribute.zip, result.zip);
+          setValue('zip', result.zip);
         }
       }
     }
@@ -142,15 +140,12 @@ const AddressFull = ({
           <AddressInput
             data-private
             country={country.value}
-            hasError={!!errors[UserDataAttribute.addressLine1]}
-            hint={
-              errors[UserDataAttribute.addressLine1] &&
-              t('form.address-line-1.error')
-            }
+            hasError={!!errors.addressLine1}
+            hint={errors.addressLine1 && t('form.address-line-1.error')}
             label={t('form.address-line-1.label')}
             onSelect={handleAddressSelect}
             placeholder={t('form.address-line-1.placeholder')}
-            {...register(UserDataAttribute.addressLine1, {
+            {...register('addressLine1', {
               required: true,
               pattern: /^(?!p\.?o\.?\s?box).*$/i,
             })}
@@ -160,18 +155,18 @@ const AddressFull = ({
             autoComplete="address-line2"
             label={t('form.address-line-2.label')}
             placeholder={t('form.address-line-2.placeholder')}
-            {...register(UserDataAttribute.addressLine2)}
+            {...register('addressLine2')}
           />
           <Grid.Row>
             <Grid.Column col={6}>
               <TextInput
                 data-private
                 autoComplete="address-level2"
-                hasError={!!errors[UserDataAttribute.city]}
-                hint={errors[UserDataAttribute.city] && t('form.city.error')}
+                hasError={!!errors.city}
+                hint={errors.city && t('form.city.error')}
                 label={t('form.city.label')}
                 placeholder={t('form.city.placeholder')}
-                {...register(UserDataAttribute.city, { required: true })}
+                {...register('city', { required: true })}
               />
             </Grid.Column>
             <Grid.Column col={6}>
@@ -181,7 +176,7 @@ const AddressFull = ({
           {country.value === 'US' ? (
             <Controller
               control={control}
-              name={UserDataAttribute.state}
+              name="state"
               rules={{ required: true }}
               render={({ field, fieldState: { error } }) => {
                 const value =
@@ -207,11 +202,11 @@ const AddressFull = ({
             <TextInput
               data-private
               autoComplete="address-level1"
-              hasError={!!errors[UserDataAttribute.state]}
-              hint={errors[UserDataAttribute.state] && t('form.state.error')}
+              hasError={!!errors.state}
+              hint={errors.state && t('form.state.error')}
               label={t('form.state.label')}
               placeholder={t('form.state.placeholder')}
-              {...register(UserDataAttribute.state)}
+              {...register('state')}
             />
           )}
           <Button type="submit" fullWidth loading={isMutationLoading}>

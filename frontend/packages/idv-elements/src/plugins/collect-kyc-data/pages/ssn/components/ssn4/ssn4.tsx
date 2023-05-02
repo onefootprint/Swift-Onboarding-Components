@@ -1,5 +1,5 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,11 +10,13 @@ import NavigationHeader from '../../../../../../components/layout/components/nav
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { SSN4Information } from '../../../../utils/data-types';
 
-type FormData = SSN4Information;
+type FormData = {
+  ssn4: string;
+};
 
 type SSN4Props = {
   isMutationLoading: boolean;
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: SSN4Information) => void;
   ctaLabel?: string;
   hideHeader?: boolean;
 };
@@ -37,14 +39,20 @@ const SSN4 = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.ssn4]: data[UserDataAttribute.ssn4],
+      ssn4: data[IdDI.ssn4],
     },
   });
+
+  const onSubmitFormData = (formData: FormData) => {
+    onSubmit({
+      [IdDI.ssn4]: formData.ssn4,
+    });
+  };
 
   return (
     <>
       {!hideHeader && <NavigationHeader />}
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmitFormData)}>
         {!hideHeader && (
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         )}
@@ -56,8 +64,8 @@ const SSN4 = ({
           mask={inputMasks.lastFourSsn}
           placeholder={t('form.placeholder')}
           type="tel"
-          value={getValues(UserDataAttribute.ssn4)}
-          {...register(UserDataAttribute.ssn4, {
+          value={getValues('ssn4')}
+          {...register('ssn4', {
             required: true,
             // 0000 is not allowed, has to be 4 digits long
             pattern: /^((?!(0000))\d{4})$/,

@@ -1,11 +1,13 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig, UserData } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
+
+import { KycData } from '../../../../plugins/collect-kyc-data/types';
 
 export type MachineContext = {
   tenantPk: string;
   sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
-  userData: UserData;
+  data: KycData; // TODO: generalize this more in the next iteration
   config?: OnboardingConfig;
   device?: DeviceInfo;
   userFound?: boolean;

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -68,7 +68,7 @@ const Confirm = () => {
 
     syncEmail({
       authToken,
-      email: data[UserDataAttribute.email],
+      email: data[IdDI.email],
       sandboxSuffix,
       speculative: false,
       onSuccess: handleSyncData,

@@ -1,13 +1,13 @@
-import { UserData } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import { KycData } from '../../../../plugins/collect-kyc-data/types';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
   tenantPk: string;
   authToken: string;
-  userData?: UserData;
+  data?: KycData; // TODO: generalize this more in the next iteration
   sandboxSuffix?: string; // only if in sandbox mode
   userFound?: boolean;
   onClose?: () => void;
@@ -17,7 +17,7 @@ export type OnboardingMachineArgs = {
 const createOnboardingMachine = ({
   tenantPk,
   authToken,
-  userData,
+  data = {},
   sandboxSuffix,
   userFound,
   onClose,
@@ -36,7 +36,7 @@ const createOnboardingMachine = ({
       context: {
         tenantPk,
         authToken,
-        userData: userData ?? {},
+        data,
         sandboxSuffix,
         userFound,
         onClose,

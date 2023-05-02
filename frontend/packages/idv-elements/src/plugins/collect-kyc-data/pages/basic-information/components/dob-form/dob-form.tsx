@@ -1,4 +1,4 @@
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -8,7 +8,9 @@ import { DobInformation } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import DobField from '../dob-field';
 
-type FormData = DobInformation;
+type FormData = {
+  dob: string;
+};
 
 type DobFormProps = {
   isLoading: boolean;
@@ -22,13 +24,13 @@ const DobForm = ({ isLoading, onSubmit, ctaLabel }: DobFormProps) => {
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.dob]: data[UserDataAttribute.dob],
+      dob: data[IdDI.dob],
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [UserDataAttribute.dob]: formData[UserDataAttribute.dob],
+      [IdDI.dob]: formData.dob,
     };
     onSubmit(basicInformation);
   };

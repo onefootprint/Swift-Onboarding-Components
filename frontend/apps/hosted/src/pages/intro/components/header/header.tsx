@@ -1,6 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from '@onefootprint/idv-elements';
-import { UserDataAttribute } from '@onefootprint/types';
 import { Avatar } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -14,10 +13,7 @@ const Header = () => {
   const isKyb = useIsKyb();
 
   const { name: businessName, inviter } = businessBoKycData || {};
-  const otherBoName = [
-    inviter?.[UserDataAttribute.firstName],
-    inviter?.[UserDataAttribute.lastName],
-  ].join(' ');
+  const otherBoName = [inviter?.firstName, inviter?.lastName].join(' ');
   const tenantName = onboardingConfig?.orgName ?? '';
 
   return (

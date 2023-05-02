@@ -1,8 +1,8 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedKycDataOption,
+  IdDI,
   OnboardingConfig,
-  UserDataAttribute,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -73,9 +73,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.fullAddress,
         CollectedKycDataOption.ssn9,
       ]);
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
       expect(context.receivedEmail).toEqual(true);
       expect(context.sandboxSuffix).toEqual('sandboxTest');
       expect(state.value).toEqual('basicInformation');
@@ -84,14 +82,14 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       expect(state.value).toEqual('residentialAddress');
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
+      expect(context.data[IdDI.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
@@ -102,25 +100,25 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Diffie',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Diffie',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Diffie');
+      expect(context.data[IdDI.firstName]).toEqual('Diffie');
       expect(state.value).toEqual('residentialAddress');
 
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'US', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'US', [IdDI.zip]: '94107' },
         },
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data.country).toEqual('US');
-      expect(context.data.zip).toEqual('94107');
+      expect(context.data[IdDI.country]).toEqual('US');
+      expect(context.data[IdDI.zip]).toEqual('94107');
 
       // Navigate to prev
       state = machine.send({
@@ -130,22 +128,22 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'TR', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'TR', [IdDI.zip]: '94107' },
         },
       });
       context = state.context;
-      expect(context.data.country).toEqual('TR');
-      expect(context.data.zip).toEqual('94107');
+      expect(context.data[IdDI.country]).toEqual('TR');
+      expect(context.data[IdDI.zip]).toEqual('94107');
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
@@ -174,14 +172,14 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
+      expect(context.data[IdDI.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
@@ -192,23 +190,23 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto2',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto2',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto2');
+      expect(context.data[IdDI.firstName]).toEqual('Otto2');
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
@@ -254,9 +252,7 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('basicInformation');
       context = state.context;
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
 
       // Navigate to prev
       state = machine.send({
@@ -271,22 +267,20 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('basicInformation');
       context = state.context;
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
 
       state = machine.send({
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       expect(state.value).toEqual('residentialAddress');
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
+      expect(context.data[IdDI.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
@@ -297,25 +291,25 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Diffie',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Diffie',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
       context = state.context;
-      expect(context.data[UserDataAttribute.firstName]).toEqual('Diffie');
+      expect(context.data[IdDI.firstName]).toEqual('Diffie');
       expect(state.value).toEqual('residentialAddress');
 
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'US', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'US', [IdDI.zip]: '94107' },
         },
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data.country).toEqual('US');
-      expect(context.data.zip).toEqual('94107');
+      expect(context.data[IdDI.country]).toEqual('US');
+      expect(context.data[IdDI.zip]).toEqual('94107');
 
       // Navigate to prev
       state = machine.send({
@@ -325,22 +319,22 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'TR', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'TR', [IdDI.zip]: '94107' },
         },
       });
       context = state.context;
-      expect(context.data.country).toEqual('TR');
-      expect(context.data.zip).toEqual('94107');
+      expect(context.data[IdDI.country]).toEqual('TR');
+      expect(context.data[IdDI.zip]).toEqual('94107');
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
@@ -373,9 +367,7 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
 
       // Navigate to prev
       state = machine.send({
@@ -390,18 +382,16 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('ssn');
       context = state.context;
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       // Navigate to prev
@@ -412,11 +402,11 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
@@ -443,20 +433,18 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.email,
         CollectedKycDataOption.ssn9,
       ]);
-      expect(context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(context.data[IdDI.email]).toEqual('piip@onefootprint.com');
       expect(context.receivedEmail).toBe(true);
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
       context = state.context;
-      expect(context.data.ssn9).toEqual('101010101');
+      expect(context.data[IdDI.ssn9]).toEqual('101010101');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
@@ -504,8 +492,8 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
@@ -513,14 +501,14 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'US', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'US', [IdDI.zip]: '94107' },
         },
       });
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
 
@@ -551,39 +539,39 @@ describe('Collect KYC Data Machine Tests', () => {
           email: 'new-email',
         },
       });
-      expect(state.context.data[UserDataAttribute.email]).toEqual('new-email');
+      expect(state.context.data[IdDI.email]).toEqual('new-email');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.lastName]: 'Dogru',
+            [IdDI.firstName]: 'Belce',
+            [IdDI.lastName]: 'Dogru',
           },
         },
       });
-      expect(state.context.data[UserDataAttribute.firstName]).toEqual('Belce');
-      expect(state.context.data[UserDataAttribute.lastName]).toEqual('Dogru');
+      expect(state.context.data[IdDI.firstName]).toEqual('Belce');
+      expect(state.context.data[IdDI.lastName]).toEqual('Dogru');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'TR', zip: '00000' },
+          residentialAddress: { [IdDI.country]: 'TR', [IdDI.zip]: '00000' },
         },
       });
-      expect(state.context.data.country).toEqual('TR');
-      expect(state.context.data.zip).toEqual('00000');
+      expect(state.context.data[IdDI.country]).toEqual('TR');
+      expect(state.context.data[IdDI.zip]).toEqual('00000');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '99999999',
+          [IdDI.ssn9]: '99999999',
         },
       });
-      expect(state.context.data[UserDataAttribute.ssn9]).toEqual('99999999');
+      expect(state.context.data[IdDI.ssn9]).toEqual('99999999');
       expect(state.value).toEqual('confirm');
     });
 
@@ -623,8 +611,8 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Otto',
-            [UserDataAttribute.lastName]: 'Footprint',
+            [IdDI.firstName]: 'Otto',
+            [IdDI.lastName]: 'Footprint',
           },
         },
       });
@@ -632,14 +620,14 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'US', zip: '94107' },
+          residentialAddress: { [IdDI.country]: 'US', [IdDI.zip]: '94107' },
         },
       });
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '101010101',
+          [IdDI.ssn9]: '101010101',
         },
       });
 
@@ -653,44 +641,40 @@ describe('Collect KYC Data Machine Tests', () => {
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data[UserDataAttribute.email]).toEqual(
-        'piip@onefootprint.com',
-      );
+      expect(state.context.data[IdDI.email]).toEqual('piip@onefootprint.com');
 
       state = machine.send({
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'NEW',
-            [UserDataAttribute.lastName]: 'NAME',
+            [IdDI.firstName]: 'NEW',
+            [IdDI.lastName]: 'NAME',
           },
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data[UserDataAttribute.firstName]).toEqual('Otto');
-      expect(state.context.data[UserDataAttribute.lastName]).toEqual(
-        'Footprint',
-      );
+      expect(state.context.data[IdDI.firstName]).toEqual('Otto');
+      expect(state.context.data[IdDI.lastName]).toEqual('Footprint');
 
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'TR', zip: '02118' },
+          residentialAddress: { [IdDI.country]: 'TR', [IdDI.zip]: '02118' },
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data.country).toEqual('US');
-      expect(state.context.data.zip).toEqual('94107');
+      expect(state.context.data[IdDI.country]).toEqual('US');
+      expect(state.context.data[IdDI.zip]).toEqual('94107');
 
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn4: '9999',
+          [IdDI.ssn4]: '9999',
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data[UserDataAttribute.ssn9]).toEqual('101010101');
-      expect(state.context.data[UserDataAttribute.ssn4]).toBeUndefined();
+      expect(state.context.data[IdDI.ssn9]).toEqual('101010101');
+      expect(state.context.data[IdDI.ssn4]).toBeUndefined();
 
       // The following actions on desktop should take the user to edit states
       state = machine.send({
@@ -703,7 +687,7 @@ describe('Collect KYC Data Machine Tests', () => {
           email: 'new-email',
         },
       });
-      expect(state.context.data[UserDataAttribute.email]).toEqual('new-email');
+      expect(state.context.data[IdDI.email]).toEqual('new-email');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
@@ -723,13 +707,13 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'basicInformationSubmitted',
         payload: {
           basicInformation: {
-            [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.lastName]: 'Dogru',
+            [IdDI.firstName]: 'Belce',
+            [IdDI.lastName]: 'Dogru',
           },
         },
       });
-      expect(state.context.data[UserDataAttribute.firstName]).toEqual('Belce');
-      expect(state.context.data[UserDataAttribute.lastName]).toEqual('Dogru');
+      expect(state.context.data[IdDI.firstName]).toEqual('Belce');
+      expect(state.context.data[IdDI.lastName]).toEqual('Dogru');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
@@ -748,11 +732,11 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'residentialAddressSubmitted',
         payload: {
-          residentialAddress: { country: 'TR', zip: '00000' },
+          residentialAddress: { [IdDI.country]: 'TR', [IdDI.zip]: '00000' },
         },
       });
-      expect(state.context.data.country).toEqual('TR');
-      expect(state.context.data.zip).toEqual('00000');
+      expect(state.context.data[IdDI.country]).toEqual('TR');
+      expect(state.context.data[IdDI.zip]).toEqual('00000');
       expect(state.value).toBe('confirm');
 
       state = machine.send({
@@ -772,10 +756,10 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'ssnSubmitted',
         payload: {
-          ssn9: '99999999',
+          [IdDI.ssn9]: '99999999',
         },
       });
-      expect(state.context.data[UserDataAttribute.ssn9]).toEqual('99999999');
+      expect(state.context.data[IdDI.ssn9]).toEqual('99999999');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({

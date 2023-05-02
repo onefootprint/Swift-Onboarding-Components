@@ -1,9 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import {
-  OnboardingConfig,
-  UserData,
-  UserDataAttribute,
-} from '@onefootprint/types';
+import { IdDI, OnboardingConfig } from '@onefootprint/types';
 import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,7 +17,9 @@ type EmailCollectProps = {
   ctaLabel?: string;
 };
 
-type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
+type FormData = {
+  email: string;
+};
 
 const EmailCollect = ({
   hideHeader,
@@ -42,7 +40,7 @@ const EmailCollect = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.email]: data[UserDataAttribute.email],
+      email: data[IdDI.email],
     },
   });
 
@@ -90,8 +88,8 @@ const EmailCollect = ({
             hint={errors.email?.message}
             label={t('email.label')}
             placeholder={t('email.placeholder')}
-            defaultValue={getValues(UserDataAttribute.email)}
-            {...register(UserDataAttribute.email, {
+            defaultValue={getValues('email')}
+            {...register('email', {
               required: {
                 value: true,
                 message: t('email.errors.required'),

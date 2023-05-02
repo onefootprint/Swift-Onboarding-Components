@@ -1,9 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import {
-  UserDataAttribute,
-  UserDataRequest,
-  UserDataResponse,
-} from '@onefootprint/types';
+import { IdDI, UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../config/constants';
@@ -19,19 +15,21 @@ const userDataRequest = async (payload: UserDataRequest) => {
     method = 'PUT';
     url = '/hosted/user/vault';
   }
-  // Transform the data into the format expected by the API
+
   const data = Object.fromEntries(
     Object.entries(payload.data)
       // Don't send null values
       .filter(e => !!e[1])
-      // Don't send email or phone number to this endpoint
-      .filter(
-        e =>
-          e[0] !== UserDataAttribute.phoneNumber &&
-          e[0] !== UserDataAttribute.email,
-      )
-      .map(([k, v]) => [`id.${k}`, v]),
+      .filter(e => e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email)
+      .map(([k, v]) => {
+        // The backend expects stringified objects/arrays
+        if (typeof v === 'object') {
+          return [k, JSON.stringify(v)];
+        }
+        return [k, v];
+      }),
   );
+
   const response = await requestWithoutCaseConverter<UserDataResponse>({
     method,
     url,

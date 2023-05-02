@@ -2,7 +2,6 @@ import {
   BusinessBoKycData,
   CollectedKycDataOption,
   OnboardingConfig,
-  UserDataAttribute,
 } from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
@@ -26,12 +25,12 @@ describe('isContextReady', () => {
   const testBusinessBoKycData: BusinessBoKycData = {
     name: 'biz',
     inviter: {
-      [UserDataAttribute.firstName]: 'firstName',
-      [UserDataAttribute.lastName]: 'lastName',
+      firstName: 'firstName',
+      lastName: 'lastName',
     },
     invited: {
-      [UserDataAttribute.email]: 'email',
-      [UserDataAttribute.phoneNumber]: 'phoneNumber',
+      email: 'email',
+      phoneNumber: 'phoneNumber',
     },
   };
 

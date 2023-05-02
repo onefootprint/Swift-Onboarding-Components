@@ -1,4 +1,6 @@
-import { UserData, UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
+
+import { KycData } from '../types';
 
 export type BasicInformation =
   | NameInformation
@@ -6,18 +8,13 @@ export type BasicInformation =
   | DobInformation;
 
 export type NameInformation = Required<
-  Pick<UserData, UserDataAttribute.firstName | UserDataAttribute.lastName>
+  Pick<KycData, IdDI.firstName | IdDI.lastName>
 >;
 
-export type DobInformation = Required<Pick<UserData, UserDataAttribute.dob>>;
+export type DobInformation = Required<Pick<KycData, IdDI.dob>>;
 
 export type NameAndDobInformation = Required<
-  Pick<
-    UserData,
-    | UserDataAttribute.firstName
-    | UserDataAttribute.lastName
-    | UserDataAttribute.dob
-  >
+  Pick<KycData, IdDI.firstName | IdDI.lastName | IdDI.dob>
 >;
 
 export type ResidentialAddress =
@@ -25,27 +22,21 @@ export type ResidentialAddress =
   | ResidentialAddressFull;
 
 export type ResidentialZipCodeAndCountry = Required<
-  Pick<UserData, UserDataAttribute.country | UserDataAttribute.zip>
+  Pick<KycData, IdDI.country | IdDI.zip>
 >;
 
 export type ResidentialAddressFull = Required<
   Pick<
-    UserData,
-    | UserDataAttribute.country
-    | UserDataAttribute.addressLine1
-    | UserDataAttribute.addressLine2
-    | UserDataAttribute.city
-    | UserDataAttribute.zip
-    | UserDataAttribute.state
+    KycData,
+    | IdDI.country
+    | IdDI.addressLine1
+    | IdDI.addressLine2
+    | IdDI.city
+    | IdDI.zip
+    | IdDI.state
   >
 >;
 
-export type SSN4Information = {
-  [UserDataAttribute.ssn4]: string;
-};
-
-export type SSN9Information = {
-  [UserDataAttribute.ssn9]: string;
-};
-
+export type SSN4Information = Pick<KycData, IdDI.ssn4>;
+export type SSN9Information = Pick<KycData, IdDI.ssn9>;
 export type SSNInformation = SSN4Information | SSN9Information;

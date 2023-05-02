@@ -1,11 +1,19 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { UserDataRequest, UserDataResponse } from '@onefootprint/types';
+import { InvestorProfileData, UserData } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
 } from '../../../../../config/constants';
+
+type UserDataRequest = {
+  data: UserData | InvestorProfileData;
+  authToken: string;
+  speculative?: boolean;
+};
+
+type UserDataResponse = { data: string };
 
 const investorProfileData = async (payload: UserDataRequest) => {
   let method;

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -17,7 +17,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
 
   const basicInfo = [];
 
-  const firstName = data[UserDataAttribute.firstName];
+  const firstName = data[IdDI.firstName];
   if (firstName) {
     basicInfo.push({
       text: t('basic-info.first-name'),
@@ -25,7 +25,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const lastName = data[UserDataAttribute.lastName];
+  const lastName = data[IdDI.lastName];
   if (lastName) {
     basicInfo.push({
       text: t('basic-info.last-name'),
@@ -33,7 +33,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const dob = data[UserDataAttribute.dob];
+  const dob = data[IdDI.dob];
   if (dob) {
     basicInfo.push({
       text: t('basic-info.dob'),

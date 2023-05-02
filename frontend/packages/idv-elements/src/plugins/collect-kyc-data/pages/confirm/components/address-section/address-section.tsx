@@ -1,7 +1,7 @@
 import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -18,12 +18,12 @@ const AddressSection = ({ onEdit }: AddressSectionProps) => {
   const { data } = state.context;
 
   const address = [];
-  const addressLine1 = data[UserDataAttribute.addressLine1];
-  const addressLine2 = data[UserDataAttribute.addressLine2];
-  const city = data[UserDataAttribute.city];
-  const stateName = data[UserDataAttribute.state];
-  const country = data[UserDataAttribute.country];
-  const zip = data[UserDataAttribute.zip];
+  const addressLine1 = data[IdDI.addressLine1];
+  const addressLine2 = data[IdDI.addressLine2];
+  const city = data[IdDI.city];
+  const stateName = data[IdDI.state];
+  const country = data[IdDI.country];
+  const zip = data[IdDI.zip];
   const hasFullAddress = addressLine1 && city && stateName && country && zip;
   const hasCountryAndZip = country && zip;
   if (hasFullAddress) {

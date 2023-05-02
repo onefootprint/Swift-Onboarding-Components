@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import DeviceSignals from '../../../../components/device-signals';
@@ -25,7 +26,7 @@ const Router = ({ onDone }: RouterProps) => {
     device,
     config,
     authToken,
-    userData,
+    data,
     sandboxSuffix,
   } = state.context;
   useLogStateMachine('onboarding', state);
@@ -50,7 +51,7 @@ const Router = ({ onDone }: RouterProps) => {
         device={device}
         config={config}
         authToken={authToken}
-        email={userData.email}
+        email={data[IdDI.email]}
         sandboxSuffix={sandboxSuffix}
         onDone={() => {
           send({
