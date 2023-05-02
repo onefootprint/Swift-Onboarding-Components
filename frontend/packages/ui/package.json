@@ -37,7 +37,7 @@
     "google-libphonenumber": "^3.2.29",
     "json2mq": "^0.2.0",
     "lodash": "^4.17.21",
-    "react-day-picker": "^8.3.0",
+    "react-day-picker": "8.3.0",
     "react-device-detect": "^2.2.3",
     "react-highlight-words": "^0.18.0",
     "react-hook-form": "^7.43.5",
