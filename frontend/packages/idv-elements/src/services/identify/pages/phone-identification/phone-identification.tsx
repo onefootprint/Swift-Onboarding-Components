@@ -1,9 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import {
-  IdentifyResponse,
-  UserData,
-  UserDataAttribute,
-} from '@onefootprint/types';
+import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import { useIdentify } from '../../api-hooks';
@@ -14,7 +10,9 @@ import EmailPreview from './components/email-preview';
 import Form from './components/form';
 import Header from './components/header';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.phoneNumber>>;
+type FormData = {
+  phoneNumber: string;
+};
 
 const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
@@ -28,7 +26,7 @@ const PhoneIdentification = () => {
   const idSuffix = useIdentifierSuffix();
 
   const handleSubmit = (formData: FormData) => {
-    const phoneFromForm = formData[UserDataAttribute.phoneNumber];
+    const phoneFromForm = formData.phoneNumber;
     const phoneNumberWithSuffix = idSuffix.append(phoneFromForm);
     // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(

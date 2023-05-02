@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
 import { Button, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,7 +7,7 @@ import styled, { css } from 'styled-components';
 import PHONE_REGEX from './constants';
 
 type FormData = {
-  [UserDataAttribute.phoneNumber]: string;
+  phoneNumber: string;
 };
 
 export type FormProps = {
@@ -27,13 +26,11 @@ const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.phoneNumber]: defaultPhone,
+      phoneNumber: defaultPhone,
     },
   });
-  const hasError = !!errors[UserDataAttribute.phoneNumber];
-  const hint = hasError
-    ? errors[UserDataAttribute.phoneNumber]?.message
-    : undefined;
+  const hasError = !!errors.phoneNumber;
+  const hint = hasError ? errors.phoneNumber?.message : undefined;
 
   return (
     <StyledForm onSubmit={handleSubmit(onSubmit)}>
@@ -44,10 +41,10 @@ const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
         label={t('phone.label')}
         placeholder={t('phone.placeholder')}
         onReset={() => {
-          setValue(UserDataAttribute.phoneNumber, '');
+          setValue('phoneNumber', '');
         }}
-        value={getValues(UserDataAttribute.phoneNumber)}
-        {...register(UserDataAttribute.phoneNumber, {
+        value={getValues('phoneNumber')}
+        {...register('phoneNumber', {
           required: {
             value: true,
             message: t('phone.errors.required'),

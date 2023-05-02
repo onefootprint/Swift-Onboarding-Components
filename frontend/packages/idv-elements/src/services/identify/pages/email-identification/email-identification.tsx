@@ -1,9 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import {
-  IdentifyResponse,
-  UserData,
-  UserDataAttribute,
-} from '@onefootprint/types';
+import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import { useIdentify } from '../../api-hooks';
@@ -14,7 +10,9 @@ import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import EmailIdentificationForm from './components/form';
 import EmailIdentificationHeader from './components/header';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
+type FormData = {
+  email: string;
+};
 
 const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
@@ -28,7 +26,7 @@ const EmailIdentification = () => {
   const idSuffix = useIdentifierSuffix();
 
   const handleSubmit = (formData: FormData) => {
-    const emailFromForm = formData[UserDataAttribute.email];
+    const emailFromForm = formData.email;
     const emailWithSuffix = idSuffix.append(emailFromForm);
     identifyMutation.mutate(
       { identifier: { email: emailWithSuffix }, tenantPk },

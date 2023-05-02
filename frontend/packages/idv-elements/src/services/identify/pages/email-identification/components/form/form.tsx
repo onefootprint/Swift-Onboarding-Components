@@ -1,10 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserData, UserDataAttribute } from '@onefootprint/types';
 import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-export type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
+export type FormData = {
+  email: string;
+};
 
 export type FormProps = {
   defaultEmail?: string;
@@ -20,8 +21,8 @@ const Form = ({ defaultEmail, isLoading, onSubmit }: FormProps) => {
     getValues,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { email: defaultEmail } });
-  const hasError = !!errors[UserDataAttribute.email];
-  const hint = hasError ? errors[UserDataAttribute.email]?.message : undefined;
+  const hasError = !!errors.email;
+  const hint = hasError ? errors.email?.message : undefined;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -33,8 +34,8 @@ const Form = ({ defaultEmail, isLoading, onSubmit }: FormProps) => {
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"
-          defaultValue={getValues(UserDataAttribute.email)}
-          {...register(UserDataAttribute.email, {
+          defaultValue={getValues('email')}
+          {...register('email', {
             required: {
               value: true,
               message: t('email.errors.required'),
