@@ -58,9 +58,15 @@ pub mod declare_map_container {
                         ..Default::default()
                     };
                     schema.data_type = Some(DataType::Object);
+                    // This isn't any json-schema standard, but to give more information on what
+                    // this dictionary object looks like, serialize a '<key>' and '<value>'
+                    // property to display the respective schemas
                     schema
                         .properties
-                        .insert("<key>".into(), Box::new(<$value>::raw_schema()));
+                        .insert("<key>".into(), Box::new(<$key>::raw_schema()));
+                    schema
+                        .properties
+                        .insert("<value>".into(), Box::new(<$value>::raw_schema()));
 
                     schema.name = Self::name();
                     schema
