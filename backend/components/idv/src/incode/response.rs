@@ -2,7 +2,7 @@ use newtypes::PiiString;
 
 use super::APIResponseToIncodeError;
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OnboardingStartResponse {
     // token: String. Up to 256 characters. Internal JWT token used for the future subsequent calls.
@@ -62,7 +62,7 @@ impl std::fmt::Display for Error {
 }
 
 /// Response we get back from adding a document image
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AddSideResponse {
     pub classification: Option<bool>,
@@ -88,7 +88,7 @@ impl APIResponseToIncodeError for AddSideResponse {
 }
 
 /// Response we get from telling Incode to process the image
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProcessIdResponse {
     pub success: Option<bool>,
@@ -104,7 +104,7 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 
 /// Response from fetch scores
 // TODO!
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
     pub id_validation: Option<serde_json::Value>,

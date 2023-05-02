@@ -38,6 +38,7 @@ pub enum Vendor {
     Experian,
     Twilio,
     Middesk,
+    Incode,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -77,6 +78,11 @@ pub enum VendorAPI {
     MiddeskGetBusiness,
     MiddeskBusinessUpdateWebhook,
     MiddeskTinRetriedWebhook,
+    IncodeStartOnboarding,
+    IncodeAddFront,
+    IncodeAddBack,
+    IncodeProcessId,
+    IncodeFetchScores,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -95,6 +101,11 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::MiddeskBusinessUpdateWebhook => Self::Middesk,
             VendorAPI::MiddeskTinRetriedWebhook => Self::Middesk,
             VendorAPI::MiddeskGetBusiness => Self::Middesk,
+            VendorAPI::IncodeStartOnboarding => Self::Incode,
+            VendorAPI::IncodeAddFront => Self::Incode,
+            VendorAPI::IncodeAddBack => Self::Incode,
+            VendorAPI::IncodeProcessId => Self::Incode,
+            VendorAPI::IncodeFetchScores => Self::Incode,
         }
     }
 }
@@ -121,6 +132,11 @@ impl VendorAPI {
             VendorAPI::MiddeskBusinessUpdateWebhook => false,
             VendorAPI::MiddeskTinRetriedWebhook => false,
             VendorAPI::MiddeskGetBusiness => false,
+            VendorAPI::IncodeStartOnboarding => false,
+            VendorAPI::IncodeAddFront => false,
+            VendorAPI::IncodeAddBack => false,
+            VendorAPI::IncodeProcessId => false,
+            VendorAPI::IncodeFetchScores => true,
         }
     }
 }

@@ -2,7 +2,9 @@ use crate::{enclave_client::EnclaveClient, errors::ApiError};
 
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use idv::{ParsedResponse, VendorResponse};
-use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes, VerificationRequestId, VerificationResultId};
+use newtypes::{
+    EncryptedVaultPrivateKey, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
+};
 
 use super::verification_result::decrypt_verification_result_response;
 
@@ -42,47 +44,8 @@ impl VendorResult {
             .zip(decrypted_responses.into_iter())
             .map(
                 |((request, result, _e), decrypted_response)| -> Result<VendorResult, ApiError> {
-                    let parsed_response = match request.vendor_api {
-                        newtypes::VendorAPI::IdologyExpectID => {
-                            ParsedResponse::from_idology_expectid_response(decrypted_response.into_leak())?
-                            // TODO: these should use e_response
-                        }
-                        newtypes::VendorAPI::IdologyScanVerifySubmission => {
-                            ParsedResponse::from_idology_scan_verify_submission(
-                                decrypted_response.into_leak(),
-                            )?
-                        }
-                        newtypes::VendorAPI::IdologyScanVerifyResults => {
-                            ParsedResponse::from_idology_scan_verify_results(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::TwilioLookupV2 => {
-                            ParsedResponse::from_twilio_lookupv2_response(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::SocureIDPlus => {
-                            ParsedResponse::from_socure_idplus_response(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::IdologyScanOnboarding => {
-                            ParsedResponse::from_idology_scan_onboarding(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::IdologyPa => {
-                            ParsedResponse::from_idology_pa(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::ExperianPreciseID => {
-                            ParsedResponse::from_experian_cross_core(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::MiddeskCreateBusiness => {
-                            ParsedResponse::from_middesk_create_business(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::MiddeskBusinessUpdateWebhook => {
-                            ParsedResponse::from_middesk_business_update_webhook(
-                                decrypted_response.into_leak(),
-                            )?
-                        }
-                        newtypes::VendorAPI::MiddeskTinRetriedWebhook => {
-                            ParsedResponse::from_middesk_tin_retried_webhook(decrypted_response.into_leak())?
-                        }
-                        newtypes::VendorAPI::MiddeskGetBusiness => todo!(),
-                    };
+                    let parsed_response =
+                        deserialize_from_vendor_api(decrypted_response.into_leak(), request.vendor_api)?;
                     let res = VendorResult {
                         response: VendorResponse {
                             response: parsed_response,
@@ -97,4 +60,40 @@ impl VendorResult {
             )
             .collect()
     }
+}
+
+/// Not all
+fn deserialize_from_vendor_api(
+    raw_response: serde_json::Value,
+    vendor_api: VendorAPI,
+) -> Result<ParsedResponse, ApiError> {
+    let res = match vendor_api {
+        VendorAPI::IdologyExpectID => ParsedResponse::from_idology_expectid_response(raw_response)?,
+        VendorAPI::IdologyScanVerifySubmission => {
+            ParsedResponse::from_idology_scan_verify_submission(raw_response)?
+        }
+        VendorAPI::IdologyScanVerifyResults => {
+            ParsedResponse::from_idology_scan_verify_results(raw_response)?
+        }
+        VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,
+        VendorAPI::SocureIDPlus => ParsedResponse::from_socure_idplus_response(raw_response)?,
+        VendorAPI::IdologyScanOnboarding => ParsedResponse::from_idology_scan_onboarding(raw_response)?,
+        VendorAPI::IdologyPa => ParsedResponse::from_idology_pa(raw_response)?,
+        VendorAPI::ExperianPreciseID => ParsedResponse::from_experian_cross_core(raw_response)?,
+        VendorAPI::MiddeskCreateBusiness => ParsedResponse::from_middesk_create_business(raw_response)?,
+        VendorAPI::MiddeskBusinessUpdateWebhook => {
+            ParsedResponse::from_middesk_business_update_webhook(raw_response)?
+        }
+        VendorAPI::MiddeskTinRetriedWebhook => {
+            ParsedResponse::from_middesk_tin_retried_webhook(raw_response)?
+        }
+        VendorAPI::MiddeskGetBusiness => todo!(),
+        VendorAPI::IncodeStartOnboarding => todo!(),
+        VendorAPI::IncodeAddFront => todo!(),
+        VendorAPI::IncodeAddBack => todo!(),
+        VendorAPI::IncodeProcessId => todo!(),
+        VendorAPI::IncodeFetchScores => todo!(),
+    };
+
+    Ok(res)
 }

@@ -82,6 +82,11 @@ impl KycFeatureVector {
             VendorAPI::MiddeskBusinessUpdateWebhook => None,
             VendorAPI::MiddeskTinRetriedWebhook => None,
             VendorAPI::MiddeskGetBusiness => None,
+            VendorAPI::IncodeStartOnboarding => None,
+            VendorAPI::IncodeAddFront => None,
+            VendorAPI::IncodeAddBack => None,
+            VendorAPI::IncodeProcessId => None,
+            VendorAPI::IncodeFetchScores => None,
         }
     }
 

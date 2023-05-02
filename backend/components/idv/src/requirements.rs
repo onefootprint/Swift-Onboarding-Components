@@ -80,6 +80,11 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
         VendorAPI::MiddeskGetBusiness => false,
+        VendorAPI::IncodeStartOnboarding => false,
+        VendorAPI::IncodeAddFront => false,
+        VendorAPI::IncodeAddBack => false,
+        VendorAPI::IncodeProcessId => false,
+        VendorAPI::IncodeFetchScores => false,
     }
 }
 
@@ -106,6 +111,11 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
         VendorAPI::MiddeskGetBusiness => false,
+        VendorAPI::IncodeStartOnboarding => false,
+        VendorAPI::IncodeAddFront => false,
+        VendorAPI::IncodeAddBack => false,
+        VendorAPI::IncodeProcessId => false,
+        VendorAPI::IncodeFetchScores => false,
     }
 }
 

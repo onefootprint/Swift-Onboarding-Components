@@ -6,6 +6,7 @@ use std::fmt::Debug;
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
+use incode::response::{AddSideResponse, FetchScoresResponse, OnboardingStartResponse, ProcessIdResponse};
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 
@@ -47,6 +48,11 @@ pub enum ParsedResponse {
     MiddeskGetBusiness(BusinessResponse),
     MiddeskBusinessUpdateWebhook(MiddeskBusinessUpdateWebhookResponse),
     MiddeskTinRetriedWebhook(MiddeskTinRetriedWebhookResponse),
+    IncodeOnboardingStart(OnboardingStartResponse),
+    IncodeAddFront(AddSideResponse),
+    IncodeAddBack(AddSideResponse),
+    IncodeFetchScores(FetchScoresResponse),
+    IncodeProcessId(ProcessIdResponse),
 }
 
 impl ParsedResponse {
