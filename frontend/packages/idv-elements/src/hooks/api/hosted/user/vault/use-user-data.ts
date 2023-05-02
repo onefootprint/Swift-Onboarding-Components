@@ -19,8 +19,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
   const data = Object.fromEntries(
     Object.entries(payload.data)
       // Don't send null values
-      .filter(e => !!e[1])
-      .filter(e => e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email)
+      .filter(e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email)
       .map(([k, v]) => {
         // The backend expects stringified objects/arrays
         if (typeof v === 'object') {

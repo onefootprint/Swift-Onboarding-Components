@@ -1,6 +1,6 @@
 import { InvestorProfileData, UserDataResponse } from '@onefootprint/types';
 
-import { useInvestorProfileData } from '../../../hooks';
+import { useUserData } from '../../../hooks';
 
 type SyncDataArgs = {
   authToken?: string;
@@ -11,7 +11,7 @@ type SyncDataArgs = {
 };
 
 const useSyncData = () => {
-  const investorProfileDataMutation = useInvestorProfileData();
+  const investorProfileDataMutation = useUserData();
 
   const syncData = ({
     authToken,

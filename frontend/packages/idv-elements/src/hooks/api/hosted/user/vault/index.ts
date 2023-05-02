@@ -1,2 +1,1 @@
-export { default as useInvestorProfileData } from './use-investor-profile-data';
-export { default as useUserData } from './use-user-data';
+export { default } from './use-user-data';
