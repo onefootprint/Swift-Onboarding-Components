@@ -15,7 +15,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifier, ScopedVaultId, IdentityDataKind as IDK, DataRequest,
-    Fingerprints, FingerprintRequest, BusinessDataKind as BDK
+    Fingerprints, FingerprintScopeKind, FingerprintRequest, BusinessDataKind as BDK
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -115,7 +115,7 @@ impl ValidatedDataRequest {
                     kind: kind.clone(),
                     sh_data: fingerprint,
                     lifetime_id: vd.lifetime_id.clone(),
-                    is_unique: kind.globally_unique(),
+                    is_unique: scope == FingerprintScopeKind::Global && kind.globally_unique(),
                     scope,
                     version: newtypes::FingerprintVersion::current()
                 })
