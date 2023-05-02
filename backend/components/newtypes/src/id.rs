@@ -160,6 +160,7 @@ define_newtype_id!(
     String,
     "Identifier for an unstructured key-value data row"
 );
+define_newtype_id!(AppearanceId, String, "Identifier for an appearance");
 
 define_newtype_id!(AliasId, String, "Represents the alias for a piece of named data");
 define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data");

@@ -37,6 +37,19 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    appearance (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        data -> Jsonb,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     business_owner (id) {
         id -> Text,
         user_vault_id -> Nullable<Text>,
@@ -308,6 +321,7 @@ table! {
         created_at -> Timestamptz,
         must_collect_data -> Array<Text>,
         can_access_data -> Array<Text>,
+        appearance_id -> Nullable<Text>,
     }
 }
 
@@ -790,6 +804,7 @@ table! {
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_vault (scoped_vault_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
+joinable!(appearance -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
 joinable!(data_lifetime -> vault (vault_id));
@@ -804,6 +819,7 @@ joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
+joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
@@ -848,6 +864,7 @@ joinable!(webauthn_credential -> vault (vault_id));
 allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
+    appearance,
     business_owner,
     contact_info,
     data_lifetime,

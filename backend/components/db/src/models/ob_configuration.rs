@@ -8,8 +8,8 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::OnboardingId;
 use newtypes::{ApiKeyStatus, DataIdentifierDiscriminant};
+use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +29,7 @@ pub struct ObConfiguration {
     pub created_at: DateTime<Utc>,
     pub must_collect_data: Vec<CDO>,
     pub can_access_data: Vec<CDO>,
+    pub appearance_id: Option<AppearanceId>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
