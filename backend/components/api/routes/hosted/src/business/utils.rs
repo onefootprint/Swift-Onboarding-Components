@@ -89,12 +89,14 @@ pub(super) async fn send_secondary_bo_links(
                 destination: &bo_data.phone_number,
                 inviter: &inviter,
                 business_name: &business_name,
+                org_name: &tenant.name,
                 url: url.clone(),
             };
             let email = BoInviteEmailInfo {
                 to_email: bo_data.email.to_piistring(),
                 inviter: &inviter,
                 business_name: &business_name,
+                org_name: &tenant.name,
                 logo_url: tenant.logo_url.clone(),
                 url,
             };

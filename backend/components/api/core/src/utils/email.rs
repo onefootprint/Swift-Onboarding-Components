@@ -63,7 +63,10 @@ struct SendgridErrorFieldAndMessage {
 pub struct BoInviteEmailInfo<'a> {
     pub to_email: PiiString,
     pub inviter: &'a PiiString,
+    /// The name of the business being verified
     pub business_name: &'a PiiString,
+    /// The tenant name
+    pub org_name: &'a str,
     pub logo_url: Option<String>,
     pub url: PiiString,
 }
@@ -114,6 +117,7 @@ impl SendgridClient {
             to_email,
             inviter,
             business_name,
+            org_name,
             logo_url,
             url,
         } = info;
@@ -123,6 +127,7 @@ impl SendgridClient {
                 Some(("inviter".to_string(), inviter.leak_to_string())),
                 Some(("business_name".to_string(), business_name.leak_to_string())),
                 Some(("flow_url".to_string(), url.leak_to_string())),
+                Some(("org_name".to_string(), org_name.to_string())),
                 // TODO need to handle no logo
                 logo_url.map(|u| ("logo_url".to_string(), u)),
             ]

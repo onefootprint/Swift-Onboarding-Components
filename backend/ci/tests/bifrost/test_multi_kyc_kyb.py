@@ -167,7 +167,7 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
         message = next(
             m
             for m in messages
-            if f"invited you to verify your identify as a beneficial owner of {business_name}"
+            if f"is verifying {business_name}, and you were identified as a beneficial owner."
             in m.body
         )
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
