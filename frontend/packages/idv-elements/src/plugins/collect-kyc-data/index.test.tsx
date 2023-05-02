@@ -7,7 +7,11 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDIData,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
   QueryCache,
@@ -25,7 +29,7 @@ import {
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
-import { CollectKycDataContext, CollectKycDataProps, KycData } from './types';
+import { CollectKycDataContext, CollectKycDataProps } from './types';
 
 describe('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();
@@ -92,7 +96,7 @@ describe('<CollectKycData />', () => {
 
   const getContext = (
     attributes?: CollectedKycDataOption[],
-    fixedData?: KycData,
+    fixedData?: IdDIData,
   ): PluginContext<CollectKycDataContext> => ({
     authToken: 'token',
     customData: {

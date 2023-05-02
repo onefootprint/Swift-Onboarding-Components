@@ -1,16 +1,14 @@
 import {
   CollectedKycDataOption,
-  IdDI,
+  IdDIData,
   OnboardingConfig,
 } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
-export type KycData = Partial<Record<IdDI, string>>;
-
 export type CollectKycDataContext = {
   missingAttributes: CollectedKycDataOption[];
-  fixedData?: KycData;
+  fixedData?: IdDIData;
   email?: string; // TODO: remove
   userFound: boolean;
   sandboxSuffix?: string; // only if in sandbox mode

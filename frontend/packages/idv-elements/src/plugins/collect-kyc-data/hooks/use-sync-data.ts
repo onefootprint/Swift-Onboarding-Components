@@ -1,11 +1,10 @@
-import { IdDI, UserDataResponse } from '@onefootprint/types';
+import { IdDI, IdDIData, UserDataResponse } from '@onefootprint/types';
 
 import useUserData from '../../../hooks/api/hosted/user/vault/use-user-data';
-import { KycData } from '../types';
 
 type SyncDataArgs = {
   authToken?: string;
-  data: KycData;
+  data: IdDIData;
   speculative?: boolean;
   onSuccess?: (data: UserDataResponse) => void;
   onError?: (error: unknown) => void;

@@ -2,9 +2,8 @@ import {
   CollectedKycDataOption,
   CollectedKycDataOptionToRequiredAttributes,
   IdDI,
+  IdDIData,
 } from '@onefootprint/types';
-
-import { KycData } from '../../types';
 
 // The list of CollectedKycDataOption that may be input on the basic info screen
 const BASIC_ATTRIBUTES = [
@@ -30,7 +29,7 @@ const SSN_ATTRIBUTES = [
 export const isMissing = (
   attributes: CollectedKycDataOption[],
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) =>
   attributes
     .filter(option => mustCollect.includes(option))
@@ -39,29 +38,29 @@ export const isMissing = (
 
 export const isMissingEmailAttribute = (
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) =>
   mustCollect.includes(CollectedKycDataOption.email) &&
   !collectedData?.[IdDI.email];
 
 export const isMissingBasicAttribute = (
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingResidentialAttribute = (
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) => isMissing(RESIDENTIAL_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingSsnAttribute = (
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
   mustCollect: CollectedKycDataOption[],
-  collectedData?: KycData,
+  collectedData?: IdDIData,
 ) =>
   mustCollect.some(option =>
     CollectedKycDataOptionToRequiredAttributes[option].some(

@@ -1,13 +1,13 @@
+import { IdDIData } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { KycData } from '../../../../plugins/collect-kyc-data/types';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
   tenantPk: string;
   authToken: string;
-  data?: KycData; // TODO: generalize this more in the next iteration
+  data?: IdDIData; // TODO: generalize this more in the next iteration
   sandboxSuffix?: string; // only if in sandbox mode
   userFound?: boolean;
   onClose?: () => void;
