@@ -116,6 +116,7 @@ mod test {
         // TODO find_by_phone_number and find_by_email
     }
 
+    #[ignore] // note: we realized that these update triggers are actually quite dangerous, and we dont use them.
     #[tokio::test]
     async fn test_diesel_manage_updated_at_trigger_present_on_all_tables() {
         #[derive(QueryableByName, Debug)]
