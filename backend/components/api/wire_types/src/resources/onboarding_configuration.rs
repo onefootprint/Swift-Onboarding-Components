@@ -16,6 +16,8 @@ pub struct OnboardingConfiguration {
     pub is_live: bool,
     pub created_at: DateTime<Utc>,
     pub status: ApiKeyStatus,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub appearance: Option<serde_json::Value>,
 }
 
 export_schema!(OnboardingConfiguration);

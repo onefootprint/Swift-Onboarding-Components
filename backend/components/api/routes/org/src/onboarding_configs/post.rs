@@ -131,7 +131,7 @@ pub async fn post(
         .await??;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, tenant)),
+        api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None)),
     )))
 }
 

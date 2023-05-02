@@ -1,3 +1,4 @@
+use crate::{schema::appearance, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{AppearanceId, TenantId};
@@ -16,3 +17,13 @@ pub struct Appearance {
 }
 
 // We don't yet have codepaths to add appearances - we will just do it manually in the DB
+
+impl Appearance {
+    pub fn get(conn: &mut PgConn, id: &AppearanceId, t_id: &TenantId) -> DbResult<Self> {
+        let result = appearance::table
+            .filter(appearance::id.eq(id))
+            .filter(appearance::tenant_id.eq(t_id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+}

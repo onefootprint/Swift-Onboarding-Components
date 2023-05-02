@@ -14,6 +14,7 @@ use crate::State;
 use api_core::types::JsonApiResponse;
 use chrono::DateTime;
 use chrono::Utc;
+use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
@@ -26,12 +27,25 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 )]
 #[get("/org/onboarding_config")]
 pub fn get_bifrost(
+    state: web::Data<State>,
     ob_pk_auth: ObConfigAuth,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
+    let appearance_id = ob_pk_auth.ob_config().appearance_id.clone();
+    let tenant_id = ob_pk_auth.tenant().id.clone();
+    let appearance = if let Some(appearance_id) = appearance_id {
+        let appearance = state
+            .db_pool
+            .db_query(move |conn| Appearance::get(conn, &appearance_id, &tenant_id))
+            .await??;
+        Some(appearance)
+    } else {
+        None
+    };
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db((
             ob_pk_auth.ob_config().clone(),
             ob_pk_auth.tenant().clone(),
+            appearance,
         )),
     )))
 }
@@ -71,8 +85,7 @@ async fn get_list(
     let configs = configs
         .into_iter()
         .take(page_size)
-        .map(|x| (x, tenant.clone()))
-        .map(api_wire_types::OnboardingConfiguration::from_db)
+        .map(|obc| api_wire_types::OnboardingConfiguration::from_db((obc, tenant.clone(), None)))
         .collect::<Vec<api_wire_types::OnboardingConfiguration>>();
     Ok(Json(CursorPaginatedResponse::ok(configs, cursor, Some(count))))
 }
@@ -92,11 +105,11 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let config = state
+    let (obc, tenant) = state
         .db_pool
         .db_query(move |conn| ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live)))
         .await??;
 
-    let result = api_wire_types::OnboardingConfiguration::from_db(config);
+    let result = api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None));
     ResponseData::ok(result).json()
 }

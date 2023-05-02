@@ -48,6 +48,6 @@ async fn patch(
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((result, tenant)),
+        api_wire_types::OnboardingConfiguration::from_db((result, tenant, None)),
     )))
 }

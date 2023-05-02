@@ -31,6 +31,7 @@ pub async fn get(
     let ob_config = api_wire_types::OnboardingConfiguration::from_db((
         user_auth.ob_config()?.clone(),
         user_auth.tenant()?.clone(),
+        None,
     ));
 
     ResponseData::ok(OnboardingStatusResponse {

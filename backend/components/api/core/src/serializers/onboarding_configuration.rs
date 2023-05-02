@@ -1,9 +1,9 @@
-use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
+use db::models::{appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant};
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfiguration {
-    fn from_db((ob_config, tenant): (ObConfiguration, Tenant)) -> Self {
+impl DbToApi<(ObConfiguration, Tenant, Option<Appearance>)> for api_wire_types::OnboardingConfiguration {
+    fn from_db((ob_config, tenant, appearance): (ObConfiguration, Tenant, Option<Appearance>)) -> Self {
         let ObConfiguration {
             id,
             key,
@@ -21,6 +21,7 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
             privacy_policy_url,
             ..
         } = tenant;
+        let appearance = appearance.map(|a| a.data);
         Self {
             id,
             key,
@@ -33,6 +34,7 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
             is_live,
             created_at,
             status,
+            appearance,
         }
     }
 }
