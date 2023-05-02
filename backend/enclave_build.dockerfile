@@ -8,7 +8,7 @@
 #       source container will start from scratch, cherry-picking only its
 #       required run-time dependencies from here.
 
-FROM alpine:latest
+FROM alpine:3.17.3
 
 ARG USER
 ARG USER_ID
@@ -18,6 +18,8 @@ ARG CTR_HOME
 
 # Force Rust dynamic linking against the Alpine-default musl libc.
 ENV RUSTFLAGS="-C target-feature=-crt-static"
+
+RUN apk update
 
 # Install system dependencies / packages.
 RUN apk add \    
