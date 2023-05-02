@@ -1,5 +1,5 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
-import { BusinessData, BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import { Button, PhoneInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,21 +8,18 @@ import styled, { css } from 'styled-components';
 import { BasicData } from '../../../../utils/state-machine/types';
 import PHONE_REGEX from './constants';
 
-type FormData = BasicData;
+type FormData = {
+  name: string;
+  tin: string;
+  doingBusinessAs?: string;
+  phoneNumber?: string;
+  website?: string;
+};
 
-type OptionalFields =
-  | BusinessDataAttribute.phoneNumber
-  | BusinessDataAttribute.website;
+type OptionalFields = BusinessDI.phoneNumber | BusinessDI.website;
 
 export type BasicDataFormProps = {
-  defaultValues?: Pick<
-    BusinessData,
-    | BusinessDataAttribute.name
-    | BusinessDataAttribute.doingBusinessAs
-    | BusinessDataAttribute.tin
-    | BusinessDataAttribute.phoneNumber
-    | BusinessDataAttribute.website
-  >;
+  defaultValues?: Partial<FormData>;
   optionalFields?: OptionalFields[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
@@ -48,32 +45,29 @@ const BasicDataForm = ({
   });
   const inputMasks = useInputMask('en-US');
 
-  const tinErrors = errors[BusinessDataAttribute.tin];
+  const tinErrors = errors.tin;
   const hasTinError = !!tinErrors;
   const tinHint = hasTinError ? tinErrors?.message : undefined;
 
-  const phoneNumberErrors = errors[BusinessDataAttribute.phoneNumber];
+  const phoneNumberErrors = errors.phoneNumber;
   const hasPhoneNumberError = !!phoneNumberErrors;
   const phoneNumberHint = hasPhoneNumberError
     ? phoneNumberErrors?.message
     : undefined;
 
-  const websiteErrors = errors[BusinessDataAttribute.website];
+  const websiteErrors = errors.website;
   const hasWebsiteError = !!websiteErrors;
   const websiteHint = hasWebsiteError ? websiteErrors?.message : undefined;
 
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
-      [BusinessDataAttribute.name]: formData[BusinessDataAttribute.name],
-      [BusinessDataAttribute.doingBusinessAs]: formData[
-        BusinessDataAttribute.doingBusinessAs
-      ]
-        ? formData[BusinessDataAttribute.doingBusinessAs]
+      [BusinessDI.name]: formData.name,
+      [BusinessDI.doingBusinessAs]: formData.doingBusinessAs
+        ? formData.doingBusinessAs
         : undefined,
-      [BusinessDataAttribute.tin]: formData[BusinessDataAttribute.tin],
-      [BusinessDataAttribute.phoneNumber]:
-        formData[BusinessDataAttribute.phoneNumber],
-      [BusinessDataAttribute.website]: formData[BusinessDataAttribute.website],
+      [BusinessDI.tin]: formData.tin,
+      [BusinessDI.phoneNumber]: formData.phoneNumber,
+      [BusinessDI.website]: formData.website,
     };
     onSubmit(basicData);
   };
@@ -82,32 +76,28 @@ const BasicDataForm = ({
     <Form onSubmit={handleSubmit(onSubmitFormData)}>
       <TextInput
         data-private
-        hasError={!!errors[BusinessDataAttribute.name]}
-        hint={
-          errors[BusinessDataAttribute.name]
-            ? t('business-name.error')
-            : undefined
-        }
+        hasError={!!errors.name}
+        hint={errors.name ? t('business-name.error') : undefined}
         label={t('business-name.label')}
         placeholder={t('business-name.placeholder')}
-        {...register(BusinessDataAttribute.name, { required: true })}
+        {...register('name', { required: true })}
       />
       <TextInput
         data-private
-        hasError={!!errors[BusinessDataAttribute.doingBusinessAs]}
+        hasError={!!errors.doingBusinessAs}
         label={t('doing-business-as.label')}
         placeholder={t('doing-business-as.placeholder')}
-        {...register(BusinessDataAttribute.doingBusinessAs)}
+        {...register('doingBusinessAs')}
       />
       <TextInput
         data-private
         hasError={hasTinError}
         hint={tinHint}
         mask={inputMasks.tin}
-        value={getValues(BusinessDataAttribute.tin)}
+        value={getValues('tin')}
         label={t('tin.label')}
         placeholder={t('tin.placeholder')}
-        {...register(BusinessDataAttribute.tin, {
+        {...register('tin', {
           required: {
             value: true,
             message: t('tin.errors.required'),
@@ -118,7 +108,7 @@ const BasicDataForm = ({
           },
         })}
       />
-      {optionalFields?.includes(BusinessDataAttribute.website) && (
+      {optionalFields?.includes(BusinessDI.website) && (
         <TextInput
           data-private
           hasError={hasWebsiteError}
@@ -126,8 +116,8 @@ const BasicDataForm = ({
           label={t('website.label')}
           placeholder={t('website.placeholder')}
           type="url"
-          defaultValue={getValues(BusinessDataAttribute.website)}
-          {...register(BusinessDataAttribute.website, {
+          defaultValue={getValues('website')}
+          {...register('website', {
             required: {
               value: true,
               message: t('website.errors.required'),
@@ -135,7 +125,7 @@ const BasicDataForm = ({
           })}
         />
       )}
-      {optionalFields?.includes(BusinessDataAttribute.phoneNumber) && (
+      {optionalFields?.includes(BusinessDI.phoneNumber) && (
         <PhoneInput
           data-private
           hasError={hasPhoneNumberError}
@@ -143,10 +133,10 @@ const BasicDataForm = ({
           label={t('phone-number.label')}
           placeholder={t('phone-number.placeholder')}
           onReset={() => {
-            setValue(BusinessDataAttribute.phoneNumber, undefined);
+            setValue('phoneNumber', undefined);
           }}
-          value={getValues(BusinessDataAttribute.phoneNumber)}
-          {...register(BusinessDataAttribute.phoneNumber, {
+          value={getValues('phoneNumber')}
+          {...register('phoneNumber', {
             required: {
               value: true,
               message: t('phone-number.errors.required'),

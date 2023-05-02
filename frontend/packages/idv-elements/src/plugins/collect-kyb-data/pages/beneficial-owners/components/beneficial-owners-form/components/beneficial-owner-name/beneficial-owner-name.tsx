@@ -1,13 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessDataAttribute,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { BeneficialOwnersData } from '../../../../../../utils/state-machine/types';
+import { FormData } from '../../types';
 
 type BeneficialOwnerNameProps = {
   index: number;
@@ -18,18 +15,14 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<BeneficialOwnersData>();
+  } = useFormContext<FormData>();
 
   const firstNameErrors =
-    errors[BusinessDataAttribute.beneficialOwners]?.[index]?.[
-      BeneficialOwnerDataAttribute.firstName
-    ];
+    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.firstName];
   const hasFirstNameError = !!firstNameErrors;
 
   const lastNameErrors =
-    errors[BusinessDataAttribute.beneficialOwners]?.[index]?.[
-      BeneficialOwnerDataAttribute.lastName
-    ];
+    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.lastName];
   const hasLastNameError = !!lastNameErrors;
 
   return (
@@ -42,7 +35,7 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
           label={t('first-name.label')}
           placeholder={t('first-name.placeholder')}
           {...register(
-            `${BusinessDataAttribute.beneficialOwners}.${index}.${BeneficialOwnerDataAttribute.firstName}`,
+            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.firstName}`,
             { required: true },
           )}
         />
@@ -55,7 +48,7 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
           label={t('last-name.label')}
           placeholder={t('last-name.placeholder')}
           {...register(
-            `${BusinessDataAttribute.beneficialOwners}.${index}.${BeneficialOwnerDataAttribute.lastName}`,
+            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.lastName}`,
             { required: true },
           )}
         />

@@ -1,10 +1,10 @@
-import { BusinessData, BusinessDataResponse } from '@onefootprint/types';
+import { BusinessDataResponse, BusinessDIData } from '@onefootprint/types';
 
 import { useBusinessData } from '../../../hooks';
 
 type SyncDataArgs = {
   authToken?: string;
-  data: BusinessData;
+  data: BusinessDIData;
   speculative?: boolean;
   onSuccess?: (data: BusinessDataResponse) => void;
   onError?: (error: unknown) => void;

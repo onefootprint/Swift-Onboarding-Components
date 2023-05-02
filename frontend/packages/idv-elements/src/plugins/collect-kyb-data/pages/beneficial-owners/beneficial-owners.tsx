@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -57,8 +57,7 @@ const BeneficialOwners = ({
   };
 
   const defaultValues = {
-    [BusinessDataAttribute.beneficialOwners]:
-      data?.[BusinessDataAttribute.beneficialOwners],
+    beneficialOwners: data?.[BusinessDI.beneficialOwners],
   };
 
   return (

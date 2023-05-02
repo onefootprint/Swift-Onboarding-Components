@@ -1,7 +1,7 @@
 import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -22,12 +22,12 @@ const BusinessAddressSection = ({ onEdit }: BusinessAddressSectionProps) => {
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
 
-  const addressLine1 = data[BusinessDataAttribute.addressLine1];
-  const addressLine2 = data[BusinessDataAttribute.addressLine2];
-  const city = data[BusinessDataAttribute.city];
-  const stateName = data[BusinessDataAttribute.state];
-  const country = data[BusinessDataAttribute.country];
-  const zip = data[BusinessDataAttribute.zip];
+  const addressLine1 = data[BusinessDI.addressLine1];
+  const addressLine2 = data[BusinessDI.addressLine2];
+  const city = data[BusinessDI.city];
+  const stateName = data[BusinessDI.state];
+  const country = data[BusinessDI.country];
+  const zip = data[BusinessDI.zip];
 
   if (
     !addressLine1 &&

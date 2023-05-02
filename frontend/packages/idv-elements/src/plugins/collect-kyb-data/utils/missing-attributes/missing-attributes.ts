@@ -1,14 +1,8 @@
 import {
-  BusinessData,
+  BusinessDIData,
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
-
-/*
-  TODO:
-  - add unit tests for these utils
-  - add utils for doing-business-as, website, phone number
-*/
 
 const BASIC_DATA_ATTRIBUTES = [
   CollectedKybDataOption.name,
@@ -24,7 +18,7 @@ const BENEFICIAL_OWNER_ATTRIBUTES = [CollectedKybDataOption.beneficialOwners];
 const isMissing = (
   attributes: CollectedKybDataOption[],
   mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessData,
+  collectedData?: BusinessDIData,
 ) =>
   attributes
     .filter(option => mustCollect.includes(option))
@@ -33,22 +27,22 @@ const isMissing = (
 
 export const isMissingBasicDataAttribute = (
   mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessData,
+  collectedData?: BusinessDIData,
 ) => isMissing(BASIC_DATA_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingBusinessAddressAttribute = (
   mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessData,
+  collectedData?: BusinessDIData,
 ) => isMissing(BUSINESS_ADDRESS_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingBeneficialOwnerAttribute = (
   mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessData,
+  collectedData?: BusinessDIData,
 ) => isMissing(BENEFICIAL_OWNER_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
   mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessData,
+  collectedData?: BusinessDIData,
 ) =>
   mustCollect.some(option =>
     CollectedKybDataOptionToRequiredAttributes[option].some(

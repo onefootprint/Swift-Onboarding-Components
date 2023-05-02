@@ -1,9 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessDataAttribute,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import {
@@ -21,7 +18,7 @@ const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
 
-  const beneficialOwners = data[BusinessDataAttribute.beneficialOwners] ?? [];
+  const beneficialOwners = data[BusinessDI.beneficialOwners] ?? [];
   if (!beneficialOwners.length) {
     return null;
   }

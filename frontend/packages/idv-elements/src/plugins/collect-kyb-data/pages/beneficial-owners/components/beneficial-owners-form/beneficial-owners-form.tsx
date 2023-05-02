@@ -1,10 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessData,
-  BusinessDataAttribute,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
 import { Button, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
@@ -14,11 +10,10 @@ import { BeneficialOwnersData } from '../../../../utils/state-machine/types';
 import AddButton from './components/add-button';
 import BeneficialOwnerFields from './components/beneficial-owner-fields';
 import FormInvalidError from './components/form-invalid-error';
-
-type FormData = BeneficialOwnersData;
+import { FormData } from './types';
 
 export type BeneficialOwnersFormProps = {
-  defaultValues?: Pick<BusinessData, BusinessDataAttribute.beneficialOwners>;
+  defaultValues?: Partial<FormData>;
   isLoading: boolean;
   onSubmit: (data: BeneficialOwnersData) => void;
   ctaLabel?: string;
@@ -33,9 +28,7 @@ const BeneficialOwnersForm = ({
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t, allT } = useTranslation('pages.beneficial-owners.form');
   const toast = useToast();
-  const defaultBeneficialOwnersData = defaultValues?.[
-    BusinessDataAttribute.beneficialOwners
-  ] ?? [
+  const defaultBeneficialOwnersData = defaultValues?.beneficialOwners ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
@@ -46,9 +39,7 @@ const BeneficialOwnersForm = ({
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [BusinessDataAttribute.beneficialOwners]: [
-        ...defaultBeneficialOwnersData,
-      ],
+      beneficialOwners: [...defaultBeneficialOwnersData],
     },
   });
 
@@ -59,12 +50,11 @@ const BeneficialOwnersForm = ({
   } = methods;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: BusinessDataAttribute.beneficialOwners,
+    name: 'beneficialOwners',
     rules: { minLength: 1 },
   });
   const shouldShowError =
-    !!errors?.[BusinessDataAttribute.beneficialOwners] &&
-    errors?.[BusinessDataAttribute.beneficialOwners]?.[0];
+    !!errors?.beneficialOwners && errors?.beneficialOwners?.[0];
 
   const handleAddMore = () => {
     append({
@@ -80,7 +70,7 @@ const BeneficialOwnersForm = ({
   };
 
   const onSubmitFormData = (formData: FormData) => {
-    const totalOwnershipStake = formData[BusinessDataAttribute.beneficialOwners]
+    const totalOwnershipStake = formData.beneficialOwners
       .map(bo => Number(bo[BeneficialOwnerDataAttribute.ownershipStake]))
       .reduce((acc, curr) => acc + curr, 0);
 
@@ -94,7 +84,7 @@ const BeneficialOwnersForm = ({
       return;
     }
 
-    const beneficialOwners = formData[BusinessDataAttribute.beneficialOwners]
+    const beneficialOwners = formData.beneficialOwners
       .filter(
         (bo, index) =>
           bo[BeneficialOwnerDataAttribute.firstName] &&
@@ -110,7 +100,7 @@ const BeneficialOwnersForm = ({
           bo[BeneficialOwnerDataAttribute.ownershipStake],
         ),
       }));
-    onSubmit({ [BusinessDataAttribute.beneficialOwners]: beneficialOwners });
+    onSubmit({ [BusinessDI.beneficialOwners]: beneficialOwners });
   };
 
   return (

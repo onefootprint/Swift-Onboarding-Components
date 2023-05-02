@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -55,13 +55,11 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
   };
 
   const defaultValues = {
-    [BusinessDataAttribute.name]: data?.[BusinessDataAttribute.name],
-    [BusinessDataAttribute.doingBusinessAs]:
-      data?.[BusinessDataAttribute.doingBusinessAs],
-    [BusinessDataAttribute.tin]: data?.[BusinessDataAttribute.tin],
-    [BusinessDataAttribute.phoneNumber]:
-      data?.[BusinessDataAttribute.phoneNumber],
-    [BusinessDataAttribute.website]: data?.[BusinessDataAttribute.website],
+    name: data?.[BusinessDI.name],
+    doingBusinessAs: data?.[BusinessDI.doingBusinessAs],
+    tin: data?.[BusinessDI.tin],
+    phoneNumber: data?.[BusinessDI.phoneNumber],
+    website: data?.[BusinessDI.website],
   };
 
   return (
@@ -78,10 +76,7 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
       )}
       <BasicDataForm
         defaultValues={defaultValues}
-        optionalFields={[
-          BusinessDataAttribute.website,
-          BusinessDataAttribute.phoneNumber,
-        ]}
+        optionalFields={[BusinessDI.website, BusinessDI.phoneNumber]}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}

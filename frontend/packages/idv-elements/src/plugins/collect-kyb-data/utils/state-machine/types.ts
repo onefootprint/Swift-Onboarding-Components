@@ -1,36 +1,34 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  BusinessData,
-  BusinessDataAttribute,
+  BusinessDI,
+  BusinessDIData,
   CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingConfig,
 } from '@onefootprint/types';
 
 export type BasicData = Required<
-  Pick<BusinessData, BusinessDataAttribute.name | BusinessDataAttribute.tin>
+  Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>
 > &
   Pick<
-    BusinessData,
-    | BusinessDataAttribute.doingBusinessAs
-    | BusinessDataAttribute.phoneNumber
-    | BusinessDataAttribute.website
+    BusinessDIData,
+    BusinessDI.doingBusinessAs | BusinessDI.phoneNumber | BusinessDI.website
   >;
 
 export type BusinessAddressData = Required<
   Pick<
-    BusinessData,
-    | BusinessDataAttribute.addressLine1
-    | BusinessDataAttribute.addressLine2
-    | BusinessDataAttribute.city
-    | BusinessDataAttribute.state
-    | BusinessDataAttribute.country
-    | BusinessDataAttribute.zip
+    BusinessDIData,
+    | BusinessDI.addressLine1
+    | BusinessDI.addressLine2
+    | BusinessDI.city
+    | BusinessDI.state
+    | BusinessDI.country
+    | BusinessDI.zip
   >
 >;
 
 export type BeneficialOwnersData = Required<
-  Pick<BusinessData, BusinessDataAttribute.beneficialOwners>
+  Pick<BusinessDIData, BusinessDI.beneficialOwners>
 >;
 
 export type MachineContext = {
@@ -43,7 +41,7 @@ export type MachineContext = {
   userFound?: boolean;
   email?: string;
   // Machine generated
-  data: BusinessData;
+  data: BusinessDIData;
 };
 
 export type MachineEvents =

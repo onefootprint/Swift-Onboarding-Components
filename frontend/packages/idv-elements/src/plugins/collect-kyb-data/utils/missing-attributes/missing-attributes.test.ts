@@ -1,6 +1,6 @@
 import {
   BeneficialOwnerDataAttribute,
-  BusinessDataAttribute,
+  BusinessDI,
   CollectedKybDataOption,
 } from '@onefootprint/types';
 
@@ -23,7 +23,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.name], {
-        [BusinessDataAttribute.name]: 'Acme',
+        [BusinessDI.name]: 'Acme',
       }),
     ).toBe(false);
 
@@ -33,7 +33,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.tin], {
-        [BusinessDataAttribute.tin]: '123456789',
+        [BusinessDI.tin]: '123456789',
       }),
     ).toBe(false);
 
@@ -42,7 +42,7 @@ describe('MissingAttributes tests', () => {
     );
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.website], {
-        [BusinessDataAttribute.website]: 'https://acme.com',
+        [BusinessDI.website]: 'https://acme.com',
       }),
     ).toBe(false);
 
@@ -52,7 +52,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.phoneNumber], {
-        [BusinessDataAttribute.phoneNumber]: '1234567890',
+        [BusinessDI.phoneNumber]: '1234567890',
       }),
     ).toBe(false);
 
@@ -78,8 +78,8 @@ describe('MissingAttributes tests', () => {
           CollectedKybDataOption.beneficialOwners,
         ],
         {
-          [BusinessDataAttribute.name]: 'Acme',
-          [BusinessDataAttribute.phoneNumber]: '1234567890',
+          [BusinessDI.name]: 'Acme',
+          [BusinessDI.phoneNumber]: '1234567890',
         },
       ),
     ).toBe(true);
@@ -95,10 +95,10 @@ describe('MissingAttributes tests', () => {
           CollectedKybDataOption.beneficialOwners,
         ],
         {
-          [BusinessDataAttribute.name]: 'Acme',
-          [BusinessDataAttribute.tin]: '123456789',
-          [BusinessDataAttribute.website]: 'https://acme.com',
-          [BusinessDataAttribute.phoneNumber]: '1234567890',
+          [BusinessDI.name]: 'Acme',
+          [BusinessDI.tin]: '123456789',
+          [BusinessDI.website]: 'https://acme.com',
+          [BusinessDI.phoneNumber]: '1234567890',
         },
       ),
     ).toBe(false);
@@ -115,29 +115,29 @@ describe('MissingAttributes tests', () => {
 
     expect(
       isMissingBusinessAddressAttribute([CollectedKybDataOption.address], {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Suite 1',
-        [BusinessDataAttribute.city]: 'San Francisco',
-        [BusinessDataAttribute.state]: 'CA',
-        [BusinessDataAttribute.zip]: '94105',
-        [BusinessDataAttribute.country]: 'US',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Suite 1',
+        [BusinessDI.city]: 'San Francisco',
+        [BusinessDI.state]: 'CA',
+        [BusinessDI.zip]: '94105',
+        [BusinessDI.country]: 'US',
       }),
     ).toBe(false);
 
     expect(
       isMissingBusinessAddressAttribute([CollectedKybDataOption.address], {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.city]: 'San Francisco',
-        [BusinessDataAttribute.state]: 'CA',
-        [BusinessDataAttribute.zip]: '94105',
-        [BusinessDataAttribute.country]: 'US',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.city]: 'San Francisco',
+        [BusinessDI.state]: 'CA',
+        [BusinessDI.zip]: '94105',
+        [BusinessDI.country]: 'US',
       }),
     ).toBe(false);
 
     expect(
       isMissingBusinessAddressAttribute([CollectedKybDataOption.address], {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Suite 1',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Suite 1',
       }),
     ).toBe(true);
 
@@ -145,8 +145,8 @@ describe('MissingAttributes tests', () => {
       isMissingBusinessAddressAttribute(
         [CollectedKybDataOption.name, CollectedKybDataOption.address],
         {
-          [BusinessDataAttribute.addressLine1]: '123 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Suite 1',
+          [BusinessDI.addressLine1]: '123 Main St',
+          [BusinessDI.addressLine2]: 'Suite 1',
         },
       ),
     ).toBe(true);
@@ -167,7 +167,7 @@ describe('MissingAttributes tests', () => {
       isMissingBeneficialOwnerAttribute(
         [CollectedKybDataOption.beneficialOwners],
         {
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -187,7 +187,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       hasMissingAttributes([], {
-        [BusinessDataAttribute.name]: 'Acme',
+        [BusinessDI.name]: 'Acme',
       }),
     ).toBe(false);
 
@@ -195,7 +195,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       hasMissingAttributes([CollectedKybDataOption.name], {
-        [BusinessDataAttribute.name]: 'Acme',
+        [BusinessDI.name]: 'Acme',
       }),
     ).toBe(false);
 
@@ -203,7 +203,7 @@ describe('MissingAttributes tests', () => {
 
     expect(
       hasMissingAttributes([CollectedKybDataOption.tin], {
-        [BusinessDataAttribute.tin]: '123456789',
+        [BusinessDI.tin]: '123456789',
       }),
     ).toBe(false);
 
@@ -211,19 +211,19 @@ describe('MissingAttributes tests', () => {
 
     expect(
       hasMissingAttributes([CollectedKybDataOption.address], {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Suite 1',
-        [BusinessDataAttribute.city]: 'San Francisco',
-        [BusinessDataAttribute.state]: 'CA',
-        [BusinessDataAttribute.zip]: '94105',
-        [BusinessDataAttribute.country]: 'US',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Suite 1',
+        [BusinessDI.city]: 'San Francisco',
+        [BusinessDI.state]: 'CA',
+        [BusinessDI.zip]: '94105',
+        [BusinessDI.country]: 'US',
       }),
     ).toBe(false);
 
     expect(
       hasMissingAttributes([CollectedKybDataOption.address], {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Suite 1',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Suite 1',
       }),
     ).toBe(true);
 
@@ -252,17 +252,17 @@ describe('MissingAttributes tests', () => {
           CollectedKybDataOption.beneficialOwners,
         ],
         {
-          [BusinessDataAttribute.name]: 'Acme',
-          [BusinessDataAttribute.tin]: '123456789',
-          [BusinessDataAttribute.website]: 'https://acme.com',
-          [BusinessDataAttribute.phoneNumber]: '1234567890',
-          [BusinessDataAttribute.addressLine1]: '123 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Suite 1',
-          [BusinessDataAttribute.city]: 'San Francisco',
-          [BusinessDataAttribute.state]: 'CA',
-          [BusinessDataAttribute.zip]: '94105',
-          [BusinessDataAttribute.country]: 'US',
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.name]: 'Acme',
+          [BusinessDI.tin]: '123456789',
+          [BusinessDI.website]: 'https://acme.com',
+          [BusinessDI.phoneNumber]: '1234567890',
+          [BusinessDI.addressLine1]: '123 Main St',
+          [BusinessDI.addressLine2]: 'Suite 1',
+          [BusinessDI.city]: 'San Francisco',
+          [BusinessDI.state]: 'CA',
+          [BusinessDI.zip]: '94105',
+          [BusinessDI.country]: 'US',
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',

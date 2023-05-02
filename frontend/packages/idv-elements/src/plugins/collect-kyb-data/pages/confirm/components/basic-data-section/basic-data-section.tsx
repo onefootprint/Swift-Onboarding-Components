@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
@@ -17,7 +17,7 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
 
   const basicInfo = [];
 
-  const name = data[BusinessDataAttribute.name];
+  const name = data[BusinessDI.name];
   if (name) {
     basicInfo.push({
       text: t('business-name'),
@@ -25,7 +25,7 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     });
   }
 
-  const tin = data[BusinessDataAttribute.tin];
+  const tin = data[BusinessDI.tin];
   if (tin) {
     basicInfo.push({
       text: t('tin'),
@@ -33,7 +33,7 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     });
   }
 
-  const website = data[BusinessDataAttribute.website];
+  const website = data[BusinessDI.website];
   if (website) {
     basicInfo.push({
       text: t('website'),
@@ -41,7 +41,7 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     });
   }
 
-  const phone = data[BusinessDataAttribute.phoneNumber];
+  const phone = data[BusinessDI.phoneNumber];
   if (phone) {
     basicInfo.push({
       text: t('phone-number'),

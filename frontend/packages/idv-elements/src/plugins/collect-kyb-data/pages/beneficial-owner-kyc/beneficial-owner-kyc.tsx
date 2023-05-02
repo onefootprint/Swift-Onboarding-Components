@@ -1,6 +1,6 @@
 import {
   BeneficialOwnerDataAttribute,
-  BusinessDataAttribute,
+  BusinessDI,
   IdDI,
 } from '@onefootprint/types';
 import React from 'react';
@@ -29,8 +29,7 @@ const BeneficialOwnerKyc = () => {
     });
   };
 
-  const primaryBeneficialOwner =
-    data?.[BusinessDataAttribute.beneficialOwners]?.[0];
+  const primaryBeneficialOwner = data?.[BusinessDI.beneficialOwners]?.[0];
   const fixedData = primaryBeneficialOwner
     ? {
         [IdDI.firstName]:

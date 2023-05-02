@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -59,14 +59,12 @@ const BusinessAddress = ({
   };
 
   const defaultValues = {
-    [BusinessDataAttribute.addressLine1]:
-      data?.[BusinessDataAttribute.addressLine1],
-    [BusinessDataAttribute.addressLine2]:
-      data?.[BusinessDataAttribute.addressLine2],
-    [BusinessDataAttribute.city]: data?.[BusinessDataAttribute.city],
-    [BusinessDataAttribute.state]: data?.[BusinessDataAttribute.state],
-    [BusinessDataAttribute.zip]: data?.[BusinessDataAttribute.zip],
-    [BusinessDataAttribute.country]: data?.[BusinessDataAttribute.country],
+    addressLine1: data?.[BusinessDI.addressLine1],
+    addressLine2: data?.[BusinessDI.addressLine2],
+    city: data?.[BusinessDI.city],
+    state: data?.[BusinessDI.state],
+    zip: data?.[BusinessDI.zip],
+    country: data?.[BusinessDI.country],
   };
 
   return (

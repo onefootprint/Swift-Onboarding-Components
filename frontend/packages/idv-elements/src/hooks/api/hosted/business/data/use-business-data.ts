@@ -21,11 +21,10 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
       .filter(e => !!e[1])
       .map(([k, v]) => {
         // The backend expects stringified objects/arrays
-        const keyWithPrefix = `business.${k}`;
         if (typeof v === 'object') {
-          return [keyWithPrefix, JSON.stringify(v)];
+          return [k, JSON.stringify(v)];
         }
-        return [keyWithPrefix, v];
+        return [k, v];
       }),
   );
 

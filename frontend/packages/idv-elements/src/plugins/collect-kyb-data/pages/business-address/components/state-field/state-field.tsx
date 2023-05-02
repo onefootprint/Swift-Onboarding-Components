@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute, CountryCode } from '@onefootprint/types';
+import { CountryCode } from '@onefootprint/types';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -20,7 +20,7 @@ const StateField = ({ countryCode }: StateFieldProps) => {
   return countryCode === 'US' ? (
     <Controller
       control={control}
-      name={BusinessDataAttribute.state}
+      name="state"
       rules={{ required: true }}
       render={({ field, fieldState: { error } }) => {
         const value = typeof field.value === 'object' ? field.value : undefined;
@@ -45,11 +45,11 @@ const StateField = ({ countryCode }: StateFieldProps) => {
     <TextInput
       data-private
       autoComplete="address-level1"
-      hasError={!!errors[BusinessDataAttribute.state]}
-      hint={errors[BusinessDataAttribute.state] && t('form.state.error')}
+      hasError={!!errors.state}
+      hint={errors.state && t('form.state.error')}
       label={t('form.state.label')}
       placeholder={t('form.state.placeholder')}
-      {...register(BusinessDataAttribute.state)}
+      {...register('state')}
     />
   );
 };

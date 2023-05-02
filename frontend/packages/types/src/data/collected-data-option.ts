@@ -1,5 +1,4 @@
-import BusinessDataAttribute from './business-data-attribute';
-import { IdDI } from './di';
+import { BusinessDI, IdDI } from './di';
 
 export type CollectedDataOption =
   | CollectedKybDataOption
@@ -76,27 +75,23 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
 
 export const CollectedKybDataOptionToRequiredAttributes: Record<
   CollectedKybDataOption,
-  BusinessDataAttribute[]
+  BusinessDI[]
 > = {
-  [CollectedKybDataOption.name]: [BusinessDataAttribute.name],
-  [CollectedKybDataOption.tin]: [BusinessDataAttribute.tin],
+  [CollectedKybDataOption.name]: [BusinessDI.name],
+  [CollectedKybDataOption.tin]: [BusinessDI.tin],
   [CollectedKybDataOption.address]: [
-    BusinessDataAttribute.addressLine1,
-    BusinessDataAttribute.city,
-    BusinessDataAttribute.state,
-    BusinessDataAttribute.zip,
-    BusinessDataAttribute.country,
+    BusinessDI.addressLine1,
+    BusinessDI.city,
+    BusinessDI.state,
+    BusinessDI.zip,
+    BusinessDI.country,
   ],
-  [CollectedKybDataOption.phoneNumber]: [BusinessDataAttribute.phoneNumber],
-  [CollectedKybDataOption.website]: [BusinessDataAttribute.website],
-  [CollectedKybDataOption.corporationType]: [
-    BusinessDataAttribute.corporationType,
-  ],
-  [CollectedKybDataOption.beneficialOwners]: [
-    BusinessDataAttribute.beneficialOwners,
-  ],
+  [CollectedKybDataOption.phoneNumber]: [BusinessDI.phoneNumber],
+  [CollectedKybDataOption.website]: [BusinessDI.website],
+  [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
+  [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
   [CollectedKybDataOption.kycedBeneficialOwners]: [
-    BusinessDataAttribute.kycedBeneficialOwners,
+    BusinessDI.kycedBeneficialOwners,
   ],
 };
 

@@ -1,7 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   BeneficialOwnerDataAttribute,
-  BusinessDataAttribute,
+  BusinessDI,
   CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingConfig,
@@ -74,14 +74,12 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send('basicDataSubmitted', {
       payload: {
-        [BusinessDataAttribute.name]: 'Acme Inc.',
-        [BusinessDataAttribute.tin]: '123-3243423',
+        [BusinessDI.name]: 'Acme Inc.',
+        [BusinessDI.tin]: '123-3243423',
       },
     });
-    expect(state.context.data[BusinessDataAttribute.name]).toEqual('Acme Inc.');
-    expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
-      '123-3243423',
-    );
+    expect(state.context.data[BusinessDI.name]).toEqual('Acme Inc.');
+    expect(state.context.data[BusinessDI.tin]).toEqual('123-3243423');
 
     expect(state.value).toEqual('businessAddress');
     state = machine.send({
@@ -90,32 +88,28 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('basicData');
     state = machine.send('basicDataSubmitted', {
       payload: {
-        [BusinessDataAttribute.name]: 'Acme Inc.',
-        [BusinessDataAttribute.tin]: '123-3243423',
+        [BusinessDI.name]: 'Acme Inc.',
+        [BusinessDI.tin]: '123-3243423',
       },
     });
     expect(state.value).toEqual('businessAddress');
 
     state = machine.send('businessAddressSubmitted', {
       payload: {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Apt 1',
-        [BusinessDataAttribute.city]: 'New York',
-        [BusinessDataAttribute.state]: 'NY',
-        [BusinessDataAttribute.country]: 'USA',
-        [BusinessDataAttribute.zip]: '023123',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Apt 1',
+        [BusinessDI.city]: 'New York',
+        [BusinessDI.state]: 'NY',
+        [BusinessDI.country]: 'USA',
+        [BusinessDI.zip]: '023123',
       },
     });
-    expect(state.context.data[BusinessDataAttribute.addressLine1]).toEqual(
-      '123 Main St',
-    );
-    expect(state.context.data[BusinessDataAttribute.addressLine2]).toEqual(
-      'Apt 1',
-    );
-    expect(state.context.data[BusinessDataAttribute.city]).toEqual('New York');
-    expect(state.context.data[BusinessDataAttribute.state]).toEqual('NY');
-    expect(state.context.data[BusinessDataAttribute.country]).toEqual('USA');
-    expect(state.context.data[BusinessDataAttribute.zip]).toEqual('023123');
+    expect(state.context.data[BusinessDI.addressLine1]).toEqual('123 Main St');
+    expect(state.context.data[BusinessDI.addressLine2]).toEqual('Apt 1');
+    expect(state.context.data[BusinessDI.city]).toEqual('New York');
+    expect(state.context.data[BusinessDI.state]).toEqual('NY');
+    expect(state.context.data[BusinessDI.country]).toEqual('USA');
+    expect(state.context.data[BusinessDI.zip]).toEqual('023123');
 
     expect(state.value).toEqual('beneficialOwners');
     state = machine.send({
@@ -124,19 +118,19 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
     state = machine.send('businessAddressSubmitted', {
       payload: {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Apt 1',
-        [BusinessDataAttribute.city]: 'New York',
-        [BusinessDataAttribute.state]: 'NY',
-        [BusinessDataAttribute.country]: 'USA',
-        [BusinessDataAttribute.zip]: '023123',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Apt 1',
+        [BusinessDI.city]: 'New York',
+        [BusinessDI.state]: 'NY',
+        [BusinessDI.country]: 'USA',
+        [BusinessDI.zip]: '023123',
       },
     });
     expect(state.value).toEqual('beneficialOwners');
 
     state = machine.send('beneficialOwnersSubmitted', {
       payload: {
-        [BusinessDataAttribute.beneficialOwners]: [
+        [BusinessDI.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doey',
@@ -152,7 +146,7 @@ describe('Collect KYB Data Machine Tests', () => {
         ],
       },
     });
-    expect(state.context.data[BusinessDataAttribute.beneficialOwners]).toEqual([
+    expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
       {
         [BeneficialOwnerDataAttribute.firstName]: 'John',
         [BeneficialOwnerDataAttribute.lastName]: 'Doey',
@@ -174,7 +168,7 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('beneficialOwners');
     state = machine.send('beneficialOwnersSubmitted', {
       payload: {
-        [BusinessDataAttribute.beneficialOwners]: [
+        [BusinessDI.beneficialOwners]: [
           {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doey',
@@ -223,25 +217,21 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send('businessAddressSubmitted', {
       payload: {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Apt 1',
-        [BusinessDataAttribute.city]: 'New York',
-        [BusinessDataAttribute.state]: 'NY',
-        [BusinessDataAttribute.country]: 'USA',
-        [BusinessDataAttribute.zip]: '023123',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Apt 1',
+        [BusinessDI.city]: 'New York',
+        [BusinessDI.state]: 'NY',
+        [BusinessDI.country]: 'USA',
+        [BusinessDI.zip]: '023123',
       },
     });
 
-    expect(state.context.data[BusinessDataAttribute.addressLine1]).toEqual(
-      '123 Main St',
-    );
-    expect(state.context.data[BusinessDataAttribute.addressLine2]).toEqual(
-      'Apt 1',
-    );
-    expect(state.context.data[BusinessDataAttribute.city]).toEqual('New York');
-    expect(state.context.data[BusinessDataAttribute.state]).toEqual('NY');
-    expect(state.context.data[BusinessDataAttribute.country]).toEqual('USA');
-    expect(state.context.data[BusinessDataAttribute.zip]).toEqual('023123');
+    expect(state.context.data[BusinessDI.addressLine1]).toEqual('123 Main St');
+    expect(state.context.data[BusinessDI.addressLine2]).toEqual('Apt 1');
+    expect(state.context.data[BusinessDI.city]).toEqual('New York');
+    expect(state.context.data[BusinessDI.state]).toEqual('NY');
+    expect(state.context.data[BusinessDI.country]).toEqual('USA');
+    expect(state.context.data[BusinessDI.zip]).toEqual('023123');
 
     expect(state.value).toEqual('confirm');
     state = machine.send({
@@ -250,12 +240,12 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
     state = machine.send('businessAddressSubmitted', {
       payload: {
-        [BusinessDataAttribute.addressLine1]: '123 Main St',
-        [BusinessDataAttribute.addressLine2]: 'Apt 1',
-        [BusinessDataAttribute.city]: 'New York',
-        [BusinessDataAttribute.state]: 'NY',
-        [BusinessDataAttribute.country]: 'USA',
-        [BusinessDataAttribute.zip]: '023123',
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Apt 1',
+        [BusinessDI.city]: 'New York',
+        [BusinessDI.state]: 'NY',
+        [BusinessDI.country]: 'USA',
+        [BusinessDI.zip]: '023123',
       },
     });
     expect(state.value).toEqual('confirm');
@@ -281,23 +271,23 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send('introductionCompleted');
       state = machine.send('basicDataSubmitted', {
         payload: {
-          [BusinessDataAttribute.name]: 'Acme Inc.',
-          [BusinessDataAttribute.tin]: '123-3243423',
+          [BusinessDI.name]: 'Acme Inc.',
+          [BusinessDI.tin]: '123-3243423',
         },
       });
       state = machine.send('businessAddressSubmitted', {
         payload: {
-          [BusinessDataAttribute.addressLine1]: '123 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Apt 1',
-          [BusinessDataAttribute.city]: 'New York',
-          [BusinessDataAttribute.state]: 'NY',
-          [BusinessDataAttribute.country]: 'USA',
-          [BusinessDataAttribute.zip]: '023123',
+          [BusinessDI.addressLine1]: '123 Main St',
+          [BusinessDI.addressLine2]: 'Apt 1',
+          [BusinessDI.city]: 'New York',
+          [BusinessDI.state]: 'NY',
+          [BusinessDI.country]: 'USA',
+          [BusinessDI.zip]: '023123',
         },
       });
       state = machine.send('beneficialOwnersSubmitted', {
         payload: {
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.lastName]: 'Doey',
@@ -328,45 +318,39 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send({
         type: 'basicDataSubmitted',
         payload: {
-          [BusinessDataAttribute.name]: 'New Biz.',
-          [BusinessDataAttribute.tin]: '999999999',
+          [BusinessDI.name]: 'New Biz.',
+          [BusinessDI.tin]: '999999999',
         },
       });
-      expect(state.context.data[BusinessDataAttribute.name]).toEqual(
-        'New Biz.',
-      );
-      expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
-        '999999999',
-      );
+      expect(state.context.data[BusinessDI.name]).toEqual('New Biz.');
+      expect(state.context.data[BusinessDI.tin]).toEqual('999999999');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
         type: 'businessAddressSubmitted',
         payload: {
-          [BusinessDataAttribute.addressLine1]: '222 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Apt 2',
-          [BusinessDataAttribute.city]: 'Boston',
-          [BusinessDataAttribute.state]: 'MA',
-          [BusinessDataAttribute.country]: 'US',
-          [BusinessDataAttribute.zip]: '023123',
+          [BusinessDI.addressLine1]: '222 Main St',
+          [BusinessDI.addressLine2]: 'Apt 2',
+          [BusinessDI.city]: 'Boston',
+          [BusinessDI.state]: 'MA',
+          [BusinessDI.country]: 'US',
+          [BusinessDI.zip]: '023123',
         },
       });
-      expect(state.context.data[BusinessDataAttribute.addressLine1]).toEqual(
+      expect(state.context.data[BusinessDI.addressLine1]).toEqual(
         '222 Main St',
       );
-      expect(state.context.data[BusinessDataAttribute.addressLine2]).toEqual(
-        'Apt 2',
-      );
-      expect(state.context.data[BusinessDataAttribute.city]).toEqual('Boston');
-      expect(state.context.data[BusinessDataAttribute.state]).toEqual('MA');
-      expect(state.context.data[BusinessDataAttribute.country]).toEqual('US');
-      expect(state.context.data[BusinessDataAttribute.zip]).toEqual('023123');
+      expect(state.context.data[BusinessDI.addressLine2]).toEqual('Apt 2');
+      expect(state.context.data[BusinessDI.city]).toEqual('Boston');
+      expect(state.context.data[BusinessDI.state]).toEqual('MA');
+      expect(state.context.data[BusinessDI.country]).toEqual('US');
+      expect(state.context.data[BusinessDI.zip]).toEqual('023123');
       expect(state.value).toEqual('confirm');
 
       state = machine.send({
         type: 'beneficialOwnersSubmitted',
         payload: {
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'Jake',
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -382,9 +366,7 @@ describe('Collect KYB Data Machine Tests', () => {
           ],
         },
       });
-      expect(
-        state.context.data[BusinessDataAttribute.beneficialOwners],
-      ).toEqual([
+      expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'Jake',
           [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -421,23 +403,23 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send('introductionCompleted');
       state = machine.send('basicDataSubmitted', {
         payload: {
-          [BusinessDataAttribute.name]: 'Acme Inc.',
-          [BusinessDataAttribute.tin]: '123-3243423',
+          [BusinessDI.name]: 'Acme Inc.',
+          [BusinessDI.tin]: '123-3243423',
         },
       });
       state = machine.send('businessAddressSubmitted', {
         payload: {
-          [BusinessDataAttribute.addressLine1]: '123 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Apt 1',
-          [BusinessDataAttribute.city]: 'New York',
-          [BusinessDataAttribute.state]: 'NY',
-          [BusinessDataAttribute.country]: 'USA',
-          [BusinessDataAttribute.zip]: '023123',
+          [BusinessDI.addressLine1]: '123 Main St',
+          [BusinessDI.addressLine2]: 'Apt 1',
+          [BusinessDI.city]: 'New York',
+          [BusinessDI.state]: 'NY',
+          [BusinessDI.country]: 'USA',
+          [BusinessDI.zip]: '023123',
         },
       });
       state = machine.send('beneficialOwnersSubmitted', {
         payload: {
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.lastName]: 'Doey',
@@ -460,47 +442,39 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send({
         type: 'basicDataSubmitted',
         payload: {
-          [BusinessDataAttribute.name]: 'New Biz.',
-          [BusinessDataAttribute.tin]: '999999999',
+          [BusinessDI.name]: 'New Biz.',
+          [BusinessDI.tin]: '999999999',
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data[BusinessDataAttribute.name]).toEqual(
-        'Acme Inc.',
-      );
-      expect(state.context.data[BusinessDataAttribute.tin]).toEqual(
-        '123-3243423',
-      );
+      expect(state.context.data[BusinessDI.name]).toEqual('Acme Inc.');
+      expect(state.context.data[BusinessDI.tin]).toEqual('123-3243423');
 
       state = machine.send({
         type: 'businessAddressSubmitted',
         payload: {
-          [BusinessDataAttribute.addressLine1]: '222 Main St',
-          [BusinessDataAttribute.addressLine2]: 'Apt 2',
-          [BusinessDataAttribute.city]: 'Boston',
-          [BusinessDataAttribute.state]: 'MA',
-          [BusinessDataAttribute.country]: 'US',
-          [BusinessDataAttribute.zip]: '023123',
+          [BusinessDI.addressLine1]: '222 Main St',
+          [BusinessDI.addressLine2]: 'Apt 2',
+          [BusinessDI.city]: 'Boston',
+          [BusinessDI.state]: 'MA',
+          [BusinessDI.country]: 'US',
+          [BusinessDI.zip]: '023123',
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(state.context.data[BusinessDataAttribute.addressLine1]).toEqual(
+      expect(state.context.data[BusinessDI.addressLine1]).toEqual(
         '123 Main St',
       );
-      expect(state.context.data[BusinessDataAttribute.addressLine2]).toEqual(
-        'Apt 1',
-      );
-      expect(state.context.data[BusinessDataAttribute.city]).toEqual(
-        'New York',
-      );
-      expect(state.context.data[BusinessDataAttribute.state]).toEqual('NY');
-      expect(state.context.data[BusinessDataAttribute.country]).toEqual('USA');
-      expect(state.context.data[BusinessDataAttribute.zip]).toEqual('023123');
+      expect(state.context.data[BusinessDI.addressLine2]).toEqual('Apt 1');
+      expect(state.context.data[BusinessDI.city]).toEqual('New York');
+      expect(state.context.data[BusinessDI.state]).toEqual('NY');
+      expect(state.context.data[BusinessDI.country]).toEqual('USA');
+      expect(state.context.data[BusinessDI.zip]).toEqual('023123');
 
       state = machine.send({
         type: 'beneficialOwnersSubmitted',
         payload: {
-          [BusinessDataAttribute.beneficialOwners]: [
+          [BusinessDI.beneficialOwners]: [
             {
               [BeneficialOwnerDataAttribute.firstName]: 'Jake',
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',
@@ -517,9 +491,7 @@ describe('Collect KYB Data Machine Tests', () => {
         },
       });
       expect(state.value).toEqual('confirm');
-      expect(
-        state.context.data[BusinessDataAttribute.beneficialOwners],
-      ).toEqual([
+      expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
           [BeneficialOwnerDataAttribute.lastName]: 'Doey',

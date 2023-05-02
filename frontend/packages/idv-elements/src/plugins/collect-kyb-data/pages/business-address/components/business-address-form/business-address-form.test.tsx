@@ -8,7 +8,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import BusinessAddressForm, {
@@ -89,12 +89,12 @@ describe('<BusinessAddressForm />', () => {
 
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        [BusinessDataAttribute.addressLine1]: '123 Main St.',
-        [BusinessDataAttribute.addressLine2]: 'APT 123.',
-        [BusinessDataAttribute.city]: 'Brooklyn',
-        [BusinessDataAttribute.state]: 'AL',
-        [BusinessDataAttribute.zip]: '10001',
-        [BusinessDataAttribute.country]: 'US',
+        [BusinessDI.addressLine1]: '123 Main St.',
+        [BusinessDI.addressLine2]: 'APT 123.',
+        [BusinessDI.city]: 'Brooklyn',
+        [BusinessDI.state]: 'AL',
+        [BusinessDI.zip]: '10001',
+        [BusinessDI.country]: 'US',
       });
     });
   });
@@ -108,12 +108,12 @@ describe('<BusinessAddressForm />', () => {
   it('renders default values', () => {
     renderBusinessAddressForm({
       defaultValues: {
-        [BusinessDataAttribute.addressLine1]: '123 Main St.',
-        [BusinessDataAttribute.addressLine2]: 'APT 123.',
-        [BusinessDataAttribute.city]: 'Brooklyn',
-        [BusinessDataAttribute.state]: 'NY',
-        [BusinessDataAttribute.zip]: '10001',
-        [BusinessDataAttribute.country]: 'US',
+        addressLine1: '123 Main St.',
+        addressLine2: 'APT 123.',
+        city: 'Brooklyn',
+        state: 'NY',
+        zip: '10001',
+        country: 'US',
       },
     });
     expect(screen.getByDisplayValue('123 Main St.')).toBeInTheDocument();

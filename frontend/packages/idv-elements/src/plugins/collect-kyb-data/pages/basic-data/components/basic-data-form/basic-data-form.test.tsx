@@ -4,7 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { BusinessDataAttribute } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
 import BasicDataForm, { BasicDataFormProps } from './basic-data-form';
@@ -34,10 +34,7 @@ describe('<BasicDataForm />', () => {
     const onSubmit = jest.fn();
     renderForm({
       onSubmit,
-      optionalFields: [
-        BusinessDataAttribute.phoneNumber,
-        BusinessDataAttribute.website,
-      ],
+      optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
     });
 
     const name = screen.getByLabelText('Business name');
@@ -65,10 +62,10 @@ describe('<BasicDataForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        name: 'Acme Inc.',
-        tin: '12-9876543',
-        phoneNumber: '6594539494',
-        website: 'www.acme.com',
+        [BusinessDI.name]: 'Acme Inc.',
+        [BusinessDI.tin]: '12-9876543',
+        [BusinessDI.phoneNumber]: '6594539494',
+        [BusinessDI.website]: 'www.acme.com',
       });
     });
   });
@@ -104,9 +101,9 @@ describe('<BasicDataForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        name: 'Acme Inc.',
-        dba: 'Acme',
-        tin: '12-9876543',
+        [BusinessDI.name]: 'Acme Inc.',
+        [BusinessDI.doingBusinessAs]: 'Acme',
+        [BusinessDI.tin]: '12-9876543',
       });
     });
   });
@@ -136,8 +133,8 @@ describe('<BasicDataForm />', () => {
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        name: 'Acme Inc.',
-        tin: '98-7654321',
+        [BusinessDI.name]: 'Acme Inc.',
+        [BusinessDI.tin]: '98-7654321',
       });
     });
   });

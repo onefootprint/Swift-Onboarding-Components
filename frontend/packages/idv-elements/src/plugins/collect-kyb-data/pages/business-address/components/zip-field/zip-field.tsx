@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDataAttribute, CountryCode } from '@onefootprint/types';
+import { CountryCode } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -23,15 +23,15 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
     <TextInput
       data-private
       autoComplete="postal-code"
-      hasError={!!errors[BusinessDataAttribute.zip]}
-      hint={errors[BusinessDataAttribute.zip] && t('error')}
+      hasError={!!errors.zip}
+      hint={errors.zip && t('error')}
       label={t('label')}
       mask={zip.mask}
       maxLength={zip.maxLength}
       minLength={zip.minLength}
       placeholder={t('placeholder')}
-      value={getValues(BusinessDataAttribute.zip)}
-      {...register(BusinessDataAttribute.zip, {
+      value={getValues('zip')}
+      {...register('zip', {
         required: true,
         pattern: zip.pattern,
       })}

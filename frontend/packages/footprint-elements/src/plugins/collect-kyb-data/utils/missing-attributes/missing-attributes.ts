@@ -1,7 +1,7 @@
 import {
   BusinessData,
+  BusinessDataAttribute,
   CollectedKybDataOption,
-  CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
 
 /*
@@ -20,6 +20,32 @@ const BASIC_DATA_ATTRIBUTES = [
 const BUSINESS_ADDRESS_ATTRIBUTES = [CollectedKybDataOption.address];
 
 const BENEFICIAL_OWNER_ATTRIBUTES = [CollectedKybDataOption.beneficialOwners];
+
+export const CollectedKybDataOptionToRequiredAttributes: Record<
+  CollectedKybDataOption,
+  BusinessDataAttribute[]
+> = {
+  [CollectedKybDataOption.name]: [BusinessDataAttribute.name],
+  [CollectedKybDataOption.tin]: [BusinessDataAttribute.tin],
+  [CollectedKybDataOption.address]: [
+    BusinessDataAttribute.addressLine1,
+    BusinessDataAttribute.city,
+    BusinessDataAttribute.state,
+    BusinessDataAttribute.zip,
+    BusinessDataAttribute.country,
+  ],
+  [CollectedKybDataOption.phoneNumber]: [BusinessDataAttribute.phoneNumber],
+  [CollectedKybDataOption.website]: [BusinessDataAttribute.website],
+  [CollectedKybDataOption.corporationType]: [
+    BusinessDataAttribute.corporationType,
+  ],
+  [CollectedKybDataOption.beneficialOwners]: [
+    BusinessDataAttribute.beneficialOwners,
+  ],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [
+    BusinessDataAttribute.kycedBeneficialOwners,
+  ],
+};
 
 const isMissing = (
   attributes: CollectedKybDataOption[],
