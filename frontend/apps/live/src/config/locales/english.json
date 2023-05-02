@@ -1,9 +1,19 @@
 {
   "home": {
-    "html-title": "The last identity form you'll ever fill out",
-    "title": "The last identity form you'll ever fill out",
-    "subtitle": "Create a portable digital identity that can be reused at multiple companies when you need to verify your identity. All it takes is one click.",
-    "cta": "Create your account",
+    "kyc": {
+      "html-title": "The last identity form you'll ever fill out",
+      "title": "The last identity form you'll ever fill out",
+      "subtitle": "Create a portable digital identity that can be reused at multiple companies when you need to verify your identity. All it takes is one click.",
+      "cta": "Create your account",
+      "disclaimer": "Footprint will not be able to access (or decrypt) any sensitive data. We will only get access to your name, phone, and email address."
+    },
+    "kyb": {
+      "html-title": "Accurate, reliable and fast KYB verification for your business",
+      "title": "The simplest way to verify businesses.",
+      "subtitle": "Accurate, reliable and fast KYB verification for your business",
+      "cta": "Verify your business",
+      "disclaimer": "Footprint will not be able to access (or decrypt) any sensitive data. We will only get access to your business name, phone, and email address."
+    },
     "legal-documents": {
       "terms-of-service": {
         "title": "Terms of service"
@@ -11,8 +21,7 @@
       "privacy-policy": {
         "title": "Privacy Policy"
       }
-    },
-    "disclaimer": "Footprint will not be able to access (or decrypt) any sensitive data. We will only get access to your name, phone, and email address."
+    }
   },
   "ending": {
     "html-title": "Your identity is safe now.",

@@ -4,21 +4,23 @@ import { LogoFpDefault } from '@onefootprint/icons';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import Footer from './components/footer';
 
-const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY;
+const kycPublicKey = process.env.NEXT_PUBLIC_KYC_TENANT_KEY;
+const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY;
 
 const Live = () => {
   const { t } = useTranslation('home');
-
+  const router = useRouter();
+  const type = router.query.type === 'kyb' ? 'kyb' : 'kyc';
   return (
     <>
-      <SEO title={t('html-title')} />
+      <SEO title={t(`${type}.html-title`)} />
       <BlurredBackground>
         <Wrapper>
           <Nav>
@@ -33,21 +35,21 @@ const Live = () => {
           <HeroContainer>
             <TextContainer>
               <Typography as="h1" variant="display-2">
-                {t('title')}
+                {t(`${type}.title`)}
               </Typography>
               <Typography as="h1" variant="display-4">
-                {t('subtitle')}
+                {t(`${type}.subtitle`)}
               </Typography>
               <ActionsContainer>
                 <FootprintButton
-                  publicKey={publicKey}
-                  label={t('cta')}
+                  publicKey={type === 'kyb' ? kybPublicKey : kycPublicKey}
+                  label={t(`${type}.cta`)}
                   onCompleted={() => {
                     router.push('/ending');
                   }}
                 />
                 <Typography as="p" variant="body-2" color="secondary">
-                  {t('disclaimer')}
+                  {t(`${type}.disclaimer`)}
                 </Typography>
               </ActionsContainer>
             </TextContainer>
