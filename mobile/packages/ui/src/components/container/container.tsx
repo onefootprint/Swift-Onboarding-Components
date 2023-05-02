@@ -1,22 +1,70 @@
-/* eslint-disable react/jsx-props-no-spreading */
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { Box, BoxProps } from '../box';
+export type ContainerProps = {
+  center?: boolean;
+  children?: React.ReactNode;
+  keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
+  scroll?: boolean;
+};
 
-export type ContainerProps = BoxProps;
-
-const Container = ({ children, ...props }: ContainerProps) => {
+const Container = ({
+  center = false,
+  children,
+  keyboardShouldPersistTaps,
+  scroll,
+}: ContainerProps) => {
   return (
-    <Box
-      {...props}
-      backgroundColor="primary"
-      flex={1}
-      paddingHorizontal={5}
-      paddingTop={5}
-    >
-      {children}
-    </Box>
+    <Wrapper>
+      {scroll ? (
+        <InnerWithScrolling
+          center={center}
+          keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+        >
+          {children}
+        </InnerWithScrolling>
+      ) : (
+        <InnerWithoutScrolling center={center}>
+          {children}
+        </InnerWithoutScrolling>
+      )}
+    </Wrapper>
   );
 };
+
+const Wrapper = styled.SafeAreaView`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
+    flex: 1;
+  `}
+`;
+
+const InnerWithoutScrolling = styled.View<{ center: boolean }>`
+  ${({ theme }) => css`
+    flex: 1;
+    padding-horizontal: ${theme.spacing[5]};
+    padding-vertical: ${theme.spacing[7]};
+  `}
+  ${({ center }) =>
+    center &&
+    css`
+      align-items: center;
+      justify-content: center;
+    `}
+`;
+
+const InnerWithScrolling = styled.ScrollView<{ center: boolean }>`
+  ${({ theme }) => css`
+    flex: 1;
+    padding-horizontal: ${theme.spacing[5]};
+    padding-vertical: ${theme.spacing[7]};
+  `}
+  ${({ center }) =>
+    center &&
+    css`
+      align-items: center;
+      justify-content: center;
+    `}
+`;
 
 export default Container;

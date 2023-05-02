@@ -20,6 +20,7 @@ module.exports = function (api) {
           alias: {
             '@': './src',
             '@/app-clip': './src/domains/app-clip',
+            '@/wallet': './src/domains/wallet',
           },
         },
       ],

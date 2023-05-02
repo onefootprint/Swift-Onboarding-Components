@@ -49,6 +49,7 @@ export type Color = keyof Colors;
 export type Spacings = {
   0: string;
   1: string;
+  // 4px
   2: string;
   3: string;
   4: string;

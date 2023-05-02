@@ -1,1 +1,31 @@
-{}
+{
+  "di": {
+    "id.name": "Name",
+    "id.phone_number": "Phone number",
+    "id.email": "Email",
+    "id.first_name": "First name",
+    "id.last_name": "Last name",
+    "id.ssn9": "SSN (Full)",
+    "id.ssn4": "SSN (Last 4)",
+    "id.dob": "Date of birth",
+    "id.address_line1": "Address line 1",
+    "id.address_line2": "Address line 2",
+    "id.city": "City",
+    "id.state": "State",
+    "id.zip": "Zip code"
+  },
+  "cdo": {
+    "name": "Full name",
+    "dob": "Date of birth",
+    "ssn9": "SSN (Full)",
+    "ssn4": "SSN (Last 4)",
+    "full_address": "Address",
+    "partial_address": "Address (Country & Zip Code)",
+    "email": "Email",
+    "phone_number": "Phone number",
+    "selfie": "Selfie",
+    "document": "ID Document",
+    "document_and_selfie": "ID Document & Selfie",
+    "investor_profile": "Investor profile"
+  }
+}

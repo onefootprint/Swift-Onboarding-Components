@@ -6,6 +6,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/app-clip/*": ["./src/domains/app-clip/*"],
+      "@/wallet/*": ["./src/domains/wallet/*"],
     },
   }
 }

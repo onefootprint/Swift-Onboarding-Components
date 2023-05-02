@@ -78,7 +78,7 @@ const Box = ({ children, ...props }: BoxProps) => {
   return <Container {...props}>{children}</Container>;
 };
 
-const Container = styled.View<BoxProps>`
+const Container = styled.SafeAreaView<BoxProps>`
   ${({ theme, ...props }) =>
     css`
       ${props.center && 'justify-content: center; align-items: center;'}

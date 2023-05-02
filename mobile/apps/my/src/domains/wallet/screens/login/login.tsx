@@ -2,12 +2,22 @@ import { LogoFpDefault } from '@onefootprint/icons';
 import { Box, Button, Container } from '@onefootprint/ui';
 import React from 'react';
 
-const Login = () => {
+import type { ScreenProps } from '@/wallet/wallet.types';
+
+type LoginProps = ScreenProps<'Login'>;
+
+const Login = ({ navigation }: LoginProps) => {
+  const handlePress = () => {
+    navigation.replace('MainTabs');
+  };
+
   return (
     <Container center>
       <LogoFpDefault />
       <Box width="100%" marginTop={9}>
-        <Button>Continue with Footprint</Button>
+        <Button onPress={handlePress} variant="secondary">
+          Continue using Footprint
+        </Button>
       </Box>
     </Container>
   );

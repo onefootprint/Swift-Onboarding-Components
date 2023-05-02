@@ -1,0 +1,30 @@
+import { Icon } from '@onefootprint/icons';
+import { Box, Typography } from '@onefootprint/ui';
+import React from 'react';
+
+export type FieldsetProps = {
+  iconComponent: Icon;
+  title: string;
+  children: React.ReactNode;
+};
+
+const Fieldset = ({ title, iconComponent: Icon, children }: FieldsetProps) => {
+  return (
+    <Box
+      borderColor="tertiary"
+      borderRadius="default"
+      borderStyle="solid"
+      borderWidth={1}
+      paddingHorizontal={5}
+      paddingVertical={7}
+    >
+      <Box marginBottom={7} gap={3} flexDirection="row" alignItems="center">
+        <Icon />
+        <Typography variant="label-2">{title}</Typography>
+      </Box>
+      <Box gap={7}>{children}</Box>
+    </Box>
+  );
+};
+
+export default Fieldset;
