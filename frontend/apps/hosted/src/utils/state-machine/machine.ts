@@ -16,6 +16,9 @@ export const createHostedMachine = () =>
       initial: 'init',
       context: {},
       on: {
+        expired: {
+          target: 'expired',
+        },
         reset: {
           target: 'init',
           actions: ['resetContext'],
@@ -43,14 +46,15 @@ export const createHostedMachine = () =>
             },
           },
         },
-        idv: {
+        expired: {
           on: {
-            idvCompleted: {
-              target: 'complete',
+            reset: {
+              target: 'init',
+              actions: ['resetContext'],
             },
           },
         },
-        complete: {
+        idv: {
           type: 'final',
         },
       },

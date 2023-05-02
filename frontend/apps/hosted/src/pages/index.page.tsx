@@ -4,6 +4,7 @@ import { IdDI } from '@onefootprint/types';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
+import Expired from './expired';
 import Init from './init';
 import Intro from './intro';
 
@@ -22,15 +23,13 @@ const Root = () => {
     >
       {state.matches('init') && <Init />}
       {state.matches('intro') && <Intro />}
+      {state.matches('expired') && <Expired />}
       {state.matches('idv') && (
         <Idv
           tenantPk={key}
           data={{
             [IdDI.email]: email,
             [IdDI.phoneNumber]: phoneNumber,
-          }}
-          onComplete={() => {
-            send({ type: 'idvCompleted' });
           }}
         />
       )}

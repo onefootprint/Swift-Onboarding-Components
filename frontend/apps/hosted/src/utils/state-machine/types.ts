@@ -9,6 +9,7 @@ export type MachineContext = {
 
 export type MachineEvents =
   | { type: 'reset' }
+  | { type: 'expired' }
   | {
       type: 'initContextUpdated';
       payload: {
