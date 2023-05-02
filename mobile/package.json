@@ -2,6 +2,7 @@
   "name": "mobile",
   "private": true,
   "scripts": {
+    "install": "yarn install --frozen-lockfile",
     "build": "turbo run build",
     "clean": "turbo run clean && rm -rf node_modules",
     "dev": "turbo run dev --concurrency 30 --continue",
