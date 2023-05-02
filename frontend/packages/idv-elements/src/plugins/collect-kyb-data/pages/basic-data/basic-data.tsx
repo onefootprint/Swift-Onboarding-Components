@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDI } from '@onefootprint/types';
+import {
+  BusinessDI,
+  CollectedKybDataOption,
+  CollectedKybDataOptionToRequiredAttributes,
+} from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -18,7 +22,7 @@ type BasicDataProps = {
 
 const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data } = state.context;
+  const { authToken, data, missingKybAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { allT, t } = useTranslation('pages.basic-data');
@@ -61,6 +65,14 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
     phoneNumber: data?.[BusinessDI.phoneNumber],
     website: data?.[BusinessDI.website],
   };
+  const optionalFields = missingKybAttributes
+    .filter(
+      attr =>
+        attr === CollectedKybDataOption.phoneNumber ||
+        attr === CollectedKybDataOption.website,
+    )
+    .map(attr => CollectedKybDataOptionToRequiredAttributes[attr])
+    .flat() as (BusinessDI.phoneNumber | BusinessDI.website)[];
 
   return (
     <>
@@ -76,7 +88,7 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
       )}
       <BasicDataForm
         defaultValues={defaultValues}
-        optionalFields={[BusinessDI.website, BusinessDI.phoneNumber]}
+        optionalFields={optionalFields}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}

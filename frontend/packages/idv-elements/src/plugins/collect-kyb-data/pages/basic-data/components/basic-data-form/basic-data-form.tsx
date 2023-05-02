@@ -16,11 +16,9 @@ type FormData = {
   website?: string;
 };
 
-type OptionalFields = BusinessDI.phoneNumber | BusinessDI.website;
-
 export type BasicDataFormProps = {
   defaultValues?: Partial<FormData>;
-  optionalFields?: OptionalFields[];
+  optionalFields?: (BusinessDI.phoneNumber | BusinessDI.website)[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   ctaLabel?: string;
