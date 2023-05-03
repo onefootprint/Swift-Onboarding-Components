@@ -40,6 +40,16 @@ const getKybOnboardingConfigFromContext = (
   if (kybCollect?.[CollectedKybDataOption.phoneNumber]) {
     mustCollectKybData.push(CollectedKybDataOption.phoneNumber);
   }
+  if (kybCollect?.[CollectedKybDataOption.kycedBeneficialOwners]) {
+    // Remove the beneficialOwners entry, add the kycedBeneficialOwners one
+    const index = mustCollectKybData.indexOf(
+      CollectedKybDataOption.beneficialOwners,
+    );
+    if (index > -1) {
+      mustCollectKybData.splice(index, 1);
+    }
+    mustCollectKybData.push(CollectedKybDataOption.kycedBeneficialOwners);
+  }
 
   // Optional BO KYC attributes
   if (kycCollect?.ssnKind === CollectedKycDataOption.ssn4) {
