@@ -1,5 +1,3 @@
-export * from './accordion';
-export { default as Accordion } from './accordion';
 export * from './address-input';
 export { default as AddressInput } from './address-input';
 export * from './avatar';
