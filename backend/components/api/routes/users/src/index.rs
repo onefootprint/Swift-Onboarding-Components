@@ -29,8 +29,8 @@ use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
-    description = "Creates a new user vault + scoped user that is not portable.",
-    tags(Users, PublicApi)
+    description = "Creates a new user vault, optionally initializing with the provided data",
+    tags(Vault, Users, PublicApi)
 )]
 #[post("/users")]
 pub async fn post(

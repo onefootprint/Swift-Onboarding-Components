@@ -15,8 +15,8 @@ use newtypes::{AccessEventKind, FpId, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[api_v2_operation(
-    description = "Checks if provided data is valid before adding it to the vault",
-    tags(Vault, PublicApi, Entities)
+    description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
+    tags(Entities, Vault, PublicApi)
 )]
 #[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post_validate(
@@ -61,8 +61,8 @@ pub async fn post_validate_inner(
 }
 
 #[api_v2_operation(
-    description = "Updates data in a user vault",
-    tags(Vault, PublicApi, Entities)
+    description = "Works for either person or business entities. Updates data in a user vault.",
+    tags(Entities, Vault, PublicApi)
 )]
 #[actix::put("/entities/{fp_id}/vault")]
 pub async fn put(

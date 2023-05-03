@@ -14,7 +14,7 @@ use db::models::onboarding::{BasicOnboardingInfo, Onboarding, OnboardingIdentifi
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Validate a transient onboarding session token to exchange it for a long-lived Footprint user token",
+    description = "Validate a short-lived onboarding session token and exchange it for a long-lived fp_id",
     tags(Onboarding, PublicApi)
 )]
 #[post("/onboarding/session/validate")]
