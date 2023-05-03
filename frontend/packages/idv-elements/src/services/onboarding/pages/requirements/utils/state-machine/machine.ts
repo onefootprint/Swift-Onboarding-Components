@@ -11,6 +11,7 @@ export type OnboardingRequirementsMachineArgs = {
   config: OnboardingConfig;
   authToken: string;
   email?: string;
+  phoneNumber?: string;
   sandboxSuffix?: string; // only if in sandbox mode
   isTransfer?: boolean;
 };
@@ -29,6 +30,7 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   config,
   email,
+  phoneNumber,
   sandboxSuffix,
   isTransfer,
 }: OnboardingRequirementsMachineArgs) =>
@@ -49,6 +51,7 @@ const createOnboardingRequirementsMachine = ({
           authToken,
           config,
           email,
+          phoneNumber,
           sandboxSuffix,
           isTransfer,
         },

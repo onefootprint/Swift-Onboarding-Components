@@ -13,7 +13,10 @@ const BASIC_DATA_ATTRIBUTES = [
 
 const BUSINESS_ADDRESS_ATTRIBUTES = [CollectedKybDataOption.address];
 
-const BENEFICIAL_OWNER_ATTRIBUTES = [CollectedKybDataOption.beneficialOwners];
+const BENEFICIAL_OWNER_ATTRIBUTES = [
+  CollectedKybDataOption.beneficialOwners,
+  CollectedKybDataOption.kycedBeneficialOwners,
+];
 
 const isMissing = (
   attributes: CollectedKybDataOption[],

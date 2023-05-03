@@ -1,21 +1,23 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
+import {
+  BeneficialOwner,
+  BeneficialOwnerDataAttribute,
+} from '@onefootprint/types';
 import { Button, Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { BeneficialOwnersData } from '../../../../utils/state-machine/types';
 import AddButton from './components/add-button';
 import FormInvalidError from './components/error';
 import Fields from './components/fields';
 import { FormData } from './types';
 
 export type FormProps = {
-  defaultValues?: Partial<FormData>;
+  defaultValues?: BeneficialOwner[];
   isLoading: boolean;
-  onSubmit: (data: BeneficialOwnersData) => void;
+  onSubmit: (data: BeneficialOwner[]) => void;
   ctaLabel?: string;
   requireMultiKyc?: boolean;
 };
@@ -30,12 +32,12 @@ const Form = ({
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t, allT } = useTranslation('pages.beneficial-owners.form');
   const toast = useToast();
-  const defaultBeneficialOwnersData = defaultValues?.beneficialOwners ?? [
+  const defaultBeneficialOwnersData = defaultValues ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]: undefined,
-      [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
+      [BeneficialOwnerDataAttribute.email]: '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];
@@ -64,8 +66,8 @@ const Form = ({
     append({
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]: undefined,
-      [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
+      [BeneficialOwnerDataAttribute.email]: '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     });
   };
@@ -107,7 +109,8 @@ const Form = ({
           bo[BeneficialOwnerDataAttribute.ownershipStake],
         ),
       }));
-    onSubmit({ [BusinessDI.beneficialOwners]: beneficialOwners });
+
+    onSubmit(beneficialOwners);
   };
 
   return (

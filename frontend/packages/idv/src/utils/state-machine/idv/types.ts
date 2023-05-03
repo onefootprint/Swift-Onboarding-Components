@@ -34,6 +34,7 @@ export type MachineEvents =
         authToken: string;
         userFound: boolean;
         email?: string;
+        phoneNumber?: string;
         sandboxSuffix?: string;
       };
     }

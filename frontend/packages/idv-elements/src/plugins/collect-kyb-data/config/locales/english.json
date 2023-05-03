@@ -141,6 +141,14 @@
           "ownership-stake-total": {
             "title": "Ownership stake total exceeds 100%",
             "description": "Please verify each beneficial owner's ownership stake. The sum can't exceed 100%."
+          },
+          "duplicate-email": {
+            "title": "Duplicate email",
+            "description": "Please make sure that each beneficial owner has a unique email address."
+          },
+          "duplicate-phone-number": {
+            "title": "Duplicate phone number",
+            "description": "Please make sure that each beneficial owner has a unique phone number."
           }
         }
       }

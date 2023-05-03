@@ -15,6 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignAuthToken: 'identifyCompleted';
     assignEmail: 'identifyCompleted';
+    assignPhoneNumber: 'identifyCompleted';
     assignSandboxOutcome: 'identifyCompleted';
     assignUserFound: 'identifyCompleted';
     assignValidationToken: 'onboardingCompleted';

@@ -1,5 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDI, CollectedKybDataOption } from '@onefootprint/types';
+import {
+  BeneficialOwner,
+  BeneficialOwnerDataAttribute,
+  BusinessDI,
+  CollectedKybDataOption,
+} from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -7,8 +12,8 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { BeneficialOwnersData } from '../../utils/state-machine/types';
 import BeneficialOwnersForm from './components/form';
+import useCheckDuplicateContacts from './hooks/check-duplicate-contacts';
 
 type BeneficialOwnersProps = {
   hideHeader?: boolean;
@@ -22,19 +27,30 @@ const BeneficialOwners = ({
   onComplete,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data, missingKybAttributes } = state.context;
+  const { authToken, data, missingKybAttributes, email, phoneNumber } =
+    state.context;
   const { mutation, syncData } = useSyncData();
+  const checkDuplicateContacts = useCheckDuplicateContacts();
   const toast = useToast();
   const { t, allT } = useTranslation('pages.beneficial-owners');
   const requireMultiKyc = missingKybAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
 
-  const handleSubmit = (beneficialOwners: BeneficialOwnersData) => {
+  const handleSubmit = (beneficialOwners: BeneficialOwner[]) => {
+    // Check that no two beneficial owners have the same email or phone number
+    const hasDuplicateContacts = checkDuplicateContacts(beneficialOwners);
+    if (hasDuplicateContacts) {
+      return;
+    }
+    const submittedData = requireMultiKyc
+      ? { [BusinessDI.kycedBeneficialOwners]: beneficialOwners }
+      : { [BusinessDI.beneficialOwners]: beneficialOwners };
+
     const handleSuccess = () => {
       send({
         type: 'beneficialOwnersSubmitted',
-        payload: beneficialOwners,
+        payload: submittedData,
       });
       onComplete?.();
     };
@@ -52,16 +68,25 @@ const BeneficialOwners = ({
     }
     syncData({
       authToken,
-      data: beneficialOwners,
+      data: submittedData,
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
     });
   };
 
-  const defaultValues = {
-    beneficialOwners: data?.[BusinessDI.beneficialOwners],
-  };
+  const defaultData = requireMultiKyc
+    ? data?.[BusinessDI.kycedBeneficialOwners]
+    : data?.[BusinessDI.beneficialOwners];
+  const defaultValues = defaultData ?? [
+    {
+      [BeneficialOwnerDataAttribute.firstName]: '',
+      [BeneficialOwnerDataAttribute.lastName]: '',
+      [BeneficialOwnerDataAttribute.email]: email ?? '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: phoneNumber ?? '',
+      [BeneficialOwnerDataAttribute.ownershipStake]: 0,
+    },
+  ];
 
   return (
     <>

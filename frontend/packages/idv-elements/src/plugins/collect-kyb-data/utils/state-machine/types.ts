@@ -27,9 +27,9 @@ export type BusinessAddressData = Required<
   >
 >;
 
-export type BeneficialOwnersData = Required<
-  Pick<BusinessDIData, BusinessDI.beneficialOwners>
->;
+export type BeneficialOwnersData =
+  | Required<Pick<BusinessDIData, BusinessDI.beneficialOwners>>
+  | Required<Pick<BusinessDIData, BusinessDI.kycedBeneficialOwners>>;
 
 export type MachineContext = {
   // Plugin context
@@ -40,6 +40,7 @@ export type MachineContext = {
   config?: OnboardingConfig;
   userFound?: boolean;
   email?: string;
+  phoneNumber?: string;
   // Machine generated
   data: BusinessDIData;
 };
@@ -55,6 +56,7 @@ export type MachineEvents =
         config: OnboardingConfig;
         userFound: boolean;
         email?: string;
+        phoneNumber?: string;
       };
     }
   | {

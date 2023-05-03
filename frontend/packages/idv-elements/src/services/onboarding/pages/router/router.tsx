@@ -50,6 +50,7 @@ const Router = ({ onDone }: RouterProps) => {
           config={config}
           authToken={authToken}
           email={data[IdDI.email]}
+          phoneNumber={data[IdDI.phoneNumber]}
           sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
           onDone={() => {

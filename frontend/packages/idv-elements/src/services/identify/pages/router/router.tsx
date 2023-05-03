@@ -14,6 +14,7 @@ export type DonePayload = {
   authToken: string;
   userFound: boolean;
   email?: string;
+  phoneNumber?: string;
   sandboxSuffix?: string;
 };
 
@@ -26,7 +27,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('success');
   const {
     challenge: { authToken },
-    identify: { userFound, email, sandboxSuffix },
+    identify: { userFound, email, phoneNumber, sandboxSuffix },
   } = state.context;
   useLogStateMachine('identify', state);
 
@@ -36,7 +37,13 @@ const Router = ({ onDone }: RouterProps) => {
       return;
     }
     if (isDone) {
-      onDone({ authToken, userFound: !!userFound, email, sandboxSuffix });
+      onDone({
+        authToken,
+        userFound: !!userFound,
+        email,
+        phoneNumber,
+        sandboxSuffix,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);

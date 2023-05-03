@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
-import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
+import {
+  BeneficialOwnerDataAttribute,
+  BusinessDI,
+  CollectedKybDataOption,
+} from '@onefootprint/types';
 import React from 'react';
 
 import {
@@ -16,9 +20,15 @@ type BeneficialOwnersSectionProps = {
 const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm.beneficial-owners');
   const [state] = useCollectKybDataMachine();
-  const { data } = state.context;
+  const { data, missingKybAttributes } = state.context;
+  const isMultiKyc = missingKybAttributes.includes(
+    CollectedKybDataOption.kycedBeneficialOwners,
+  );
 
-  const beneficialOwners = data[BusinessDI.beneficialOwners] ?? [];
+  const beneficialOwners =
+    (isMultiKyc
+      ? data[BusinessDI.kycedBeneficialOwners]
+      : data[BusinessDI.beneficialOwners]) ?? [];
   if (!beneficialOwners.length) {
     return null;
   }

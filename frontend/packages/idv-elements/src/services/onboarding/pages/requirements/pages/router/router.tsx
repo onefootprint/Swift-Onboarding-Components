@@ -26,6 +26,7 @@ const Router = ({ onDone }: RouterProps) => {
       userFound,
       email,
       sandboxSuffix,
+      phoneNumber,
       config,
       device,
     },
@@ -72,6 +73,7 @@ const Router = ({ onDone }: RouterProps) => {
               config,
               userFound,
               email,
+              phoneNumber,
             },
           }}
           onDone={handleRequirementCompleted}

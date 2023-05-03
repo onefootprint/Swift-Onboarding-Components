@@ -11,7 +11,9 @@ export type CollectKybDataContext = {
   missingKybAttributes: CollectedKybDataOption[];
   missingKycAttributes: CollectedKycDataOption[];
   userFound: boolean;
+  // TODO: generalize this data by using DataIdentifiers
   email?: string;
+  phoneNumber?: string;
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

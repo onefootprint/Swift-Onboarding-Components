@@ -4,7 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
 import Form, { FormProps } from './form';
@@ -53,17 +53,15 @@ describe('<Form />', () => {
     expect(continueButton).toBeInTheDocument();
     await userEvent.click(continueButton);
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
-        [BusinessDI.beneficialOwners]: [
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'John',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-            [BeneficialOwnerDataAttribute.email]: undefined,
-            [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
-          },
-        ],
-      });
+      expect(onSubmit).toBeCalledWith([
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+          [BeneficialOwnerDataAttribute.email]: '',
+          [BeneficialOwnerDataAttribute.phoneNumber]: '',
+        },
+      ]);
     });
   });
 
@@ -111,22 +109,22 @@ describe('<Form />', () => {
     expect(continueButton).toBeInTheDocument();
     await userEvent.click(continueButton);
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
-        [BusinessDI.beneficialOwners]: [
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'John',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          },
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'Lily',
-            [BeneficialOwnerDataAttribute.lastName]: 'Smith',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-            [BeneficialOwnerDataAttribute.email]: 'Lily@smith.com',
-            [BeneficialOwnerDataAttribute.phoneNumber]: '9999999999',
-          },
-        ],
-      });
+      expect(onSubmit).toBeCalledWith([
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+          [BeneficialOwnerDataAttribute.email]: undefined,
+          [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
+        },
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'Lily',
+          [BeneficialOwnerDataAttribute.lastName]: 'Smith',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+          [BeneficialOwnerDataAttribute.email]: 'Lily@smith.com',
+          [BeneficialOwnerDataAttribute.phoneNumber]: '9999999999',
+        },
+      ]);
     });
 
     const removeButton = screen.getByRole('button', { name: 'Remove' });
@@ -147,15 +145,15 @@ describe('<Form />', () => {
 
     await userEvent.click(continueButton);
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
-        [BusinessDI.beneficialOwners]: [
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'John',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          },
-        ],
-      });
+      expect(onSubmit).toBeCalledWith([
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+          [BeneficialOwnerDataAttribute.email]: undefined,
+          [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
+        },
+      ]);
     });
   });
 
@@ -186,22 +184,22 @@ describe('<Form />', () => {
     const onSubmit = jest.fn();
     renderForm({
       onSubmit,
-      defaultValues: {
-        beneficialOwners: [
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'John',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          },
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'Lily',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 25,
-            [BeneficialOwnerDataAttribute.email]: 'Lily@doey.com',
-            [BeneficialOwnerDataAttribute.phoneNumber]: '9999999999',
-          },
-        ],
-      },
+      defaultValues: [
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+          [BeneficialOwnerDataAttribute.email]: '',
+          [BeneficialOwnerDataAttribute.phoneNumber]: '',
+        },
+        {
+          [BeneficialOwnerDataAttribute.firstName]: 'Lily',
+          [BeneficialOwnerDataAttribute.lastName]: 'Doey',
+          [BeneficialOwnerDataAttribute.ownershipStake]: 25,
+          [BeneficialOwnerDataAttribute.email]: 'Lily@doey.com',
+          [BeneficialOwnerDataAttribute.phoneNumber]: '9999999999',
+        },
+      ],
     });
 
     const firstNameFields = screen.getAllByLabelText('First name');

@@ -27,6 +27,7 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
       config,
       userFound,
       email,
+      phoneNumber,
       missingKybAttributes,
       missingKycAttributes,
     } = customData;
@@ -38,6 +39,7 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
         config,
         userFound,
         email,
+        phoneNumber,
         missingKybAttributes,
         missingKycAttributes,
       },

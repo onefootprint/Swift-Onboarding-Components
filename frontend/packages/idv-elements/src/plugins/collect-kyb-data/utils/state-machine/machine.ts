@@ -291,6 +291,7 @@ const createCollectKybDataMachine = () =>
             config,
             userFound,
             email,
+            phoneNumber,
             missingKybAttributes,
             missingKycAttributes,
           } = event.payload;
@@ -301,6 +302,7 @@ const createCollectKybDataMachine = () =>
           context.config = config;
           context.userFound = userFound;
           context.email = email;
+          context.phoneNumber = phoneNumber;
           return context;
         }),
         assignBasicData: assign((context, event) => {

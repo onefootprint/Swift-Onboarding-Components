@@ -58,6 +58,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
                   'assignAuthToken',
                   'assignUserFound',
                   'assignEmail',
+                  'assignPhoneNumber',
                   'assignSandboxOutcome',
                 ],
               },
@@ -99,6 +100,11 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         assignEmail: assign((context, event) => {
           context.data = context.data || {};
           context.data[IdDI.email] = event.payload.email;
+          return context;
+        }),
+        assignPhoneNumber: assign((context, event) => {
+          context.data = context.data || {};
+          context.data[IdDI.phoneNumber] = event.payload.phoneNumber;
           return context;
         }),
         assignAuthToken: assign((context, event) => {
