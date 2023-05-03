@@ -84,8 +84,6 @@ define_newtype_id!(
 );
 define_newtype_id!(AppearanceId, String, "Identifier for an appearance");
 
-define_newtype_id!(AliasId, String, "Represents the alias for a piece of named data");
-define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data");
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
 define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
 define_newtype_id!(RequirementId, String, "Identifier for a Requirement");

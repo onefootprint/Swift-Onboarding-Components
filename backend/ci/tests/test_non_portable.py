@@ -3,54 +3,71 @@ from tests.utils import post, get, put
 from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
-class TestNonPortableVaultApi:
-    @pytest.mark.parametrize(
-        "key, value, expected_error",
-        [
-            ("id.ssn9", "12345678", "Invalid length"),
-            ("id.ssn4", "123456789", "Invalid length"),
-            ("id.ssn4", "123", "Invalid length"),
-            ("id.ssn4", "123a", "Invalid character: can only provide ascii digits"),
-            ("id.first_name", "Hi", "Cannot vault without other Name data"),
-            ("id.last_name", "Bye", "Cannot vault without other Name data"),
-            (
-                "id.dob",
-                "2023-13-25",
-                "Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD",
-            ),
-            ("id.zip", "12345", "Cannot vault without other Address data"),
-            (
-                "id.address_line1",
-                "1 Footprint Way",
-                "Cannot vault without other Address data",
-            ),
-            (
-                "business.tin",
-                "12-1234567",
-                "Cannot add to this type of vault",
-            ),
-            (
-                "card.flerp.number",
-                "4026123412341233",
-                "InvalidLuhn",
-            ),
-        ],
-    )
-    def test_data_validation(self, tenant, key, value, expected_error):
-        # Can't create the user inline with invalid data
-        data = {key: value}
-        post("users/", data, tenant.sk.key, status_code=400)
+@pytest.mark.parametrize(
+    "key, value, expected_error",
+    [
+        ("id.ssn9", "12345678", "Invalid length"),
+        ("id.ssn4", "123456789", "Invalid length"),
+        ("id.ssn4", "123", "Invalid length"),
+        ("id.ssn4", "123a", "Invalid character: can only provide ascii digits"),
+        ("id.first_name", "Hi", "Cannot vault without other Name data"),
+        ("id.last_name", "Bye", "Cannot vault without other Name data"),
+        (
+            "id.dob",
+            "2023-13-25",
+            "Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD",
+        ),
+        ("id.zip", "12345", "Cannot vault without other Address data"),
+        (
+            "id.address_line1",
+            "1 Footprint Way",
+            "Cannot vault without other Address data",
+        ),
+        (
+            "business.tin",
+            "12-1234567",
+            "Cannot add to this type of vault",
+        ),
+        (
+            "card.flerp.number",
+            "4026123412341233",
+            "InvalidLuhn",
+        ),
+    ],
+)
+def test_data_validation(tenant, key, value, expected_error):
+    # Can't create the user inline with invalid data
+    data = {key: value}
+    # TODO fix this
+    post("users/", data, tenant.sk.key, status_code=400)
 
-        body = post("users/", None, tenant.sk.key)
-        user = body
-        fp_id = user["id"]
-        assert fp_id
+    body = post("users/", None, tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
 
-        body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
-        # Should have a JSON error message with the invalid field identifier as the key
-        assert body["error"]["message"][key] == expected_error
-        # Validate endpoint should also fail
-        post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+    body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    # Should have a JSON error message with the invalid field identifier as the key
+    assert body["error"]["message"][key] == expected_error
+    # Validate endpoint should also fail
+    post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+
+
+@pytest.mark.parametrize(
+    "key", ["custom.", "custom.flerp!", "card.hayes valley.cvc", "id.derp"]
+)
+def test_invalid_dis(key, tenant):
+    # Can't create the user inline with invalid data
+    data = {key: "123"}
+    # TODO fix this
+    # post("users/", data, tenant.sk.key, status_code=400)
+
+    body = post("users/", None, tenant.sk.key)
+    fp_id = body["id"]
+
+    body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    assert "Json deserialize error" in body["error"]["message"]
+    post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
 
 def test_vault_create_write_decrypt(tenant):

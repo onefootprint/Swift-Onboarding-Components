@@ -21,6 +21,8 @@ pub trait Validate {
 pub enum Error {
     #[error("Invalid length")]
     InvalidLength,
+    #[error("Invalid character")]
+    InvalidCharacter,
     #[error("Invalid character: can only provide ascii digits")]
     NonDigitCharacter,
     #[error("Invalid character: can only provide alphanumeric with `-` or ` `")]
@@ -57,4 +59,4 @@ pub enum Error {
     CannotParseInt(#[from] std::num::ParseIntError),
 }
 
-pub(super) type VResult<T> = Result<T, Error>;
+pub type VResult<T> = Result<T, Error>;

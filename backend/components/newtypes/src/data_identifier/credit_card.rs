@@ -33,9 +33,7 @@ impl TryFrom<DataIdentifier> for CardInfo {
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Card(info) => Ok(info),
-            _ => Err(crate::Error::Custom(
-                "Can't convert into CardInfo".to_owned(),
-            )),
+            _ => Err(crate::Error::Custom("Can't convert into CardInfo".to_owned())),
         }
     }
 }
@@ -63,7 +61,8 @@ impl FromStr for CardInfo {
             .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
-        let alias = AliasId::from(prefix.to_owned());
+        let alias = AliasId::from_str(prefix)
+            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
         let kind = CardDataKind::from_str(suffix)
             .map_err(|_| EnumDotNotationError::CannotParseSuffix(suffix.to_owned()))?;
         Ok(Self { alias, kind })

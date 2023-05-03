@@ -35,6 +35,7 @@ use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 #[post("/users")]
 pub async fn post(
     state: web::Data<State>,
+    // TODO this maps Err to None and will silently swallow errors deserializing the body :o
     request: Option<Json<RawDataRequest>>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,

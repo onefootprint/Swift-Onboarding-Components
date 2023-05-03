@@ -1,7 +1,8 @@
+mod alias;
 mod basic;
 mod data_lifetime;
 mod prefix;
-pub use self::{basic::*, data_lifetime::*};
+pub use self::{alias::*, basic::*, data_lifetime::*};
 
 /// This macro generates an Id type that wraps a string
 macro_rules! define_newtype_id {
