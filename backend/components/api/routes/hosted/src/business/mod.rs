@@ -8,5 +8,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(index::get)
         .service(vault::post_validate)
+        .service(vault::patch)
         .service(vault::put);
 }

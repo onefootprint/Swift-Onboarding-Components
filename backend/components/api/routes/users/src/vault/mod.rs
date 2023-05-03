@@ -9,7 +9,7 @@ use crate::State;
 use actix_web::web::Query;
 use api_route_entities::vault::decrypt::{post_inner, DecryptRequest, DecryptResponse};
 use api_route_entities::vault::get::{get_inner, FieldsParams, GetVaultResponse};
-use api_route_entities::vault::put::{post_validate_inner, put_inner};
+use api_route_entities::vault::patch::{patch_inner, post_validate_inner};
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::FpId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -63,7 +63,10 @@ pub async fn post_validate(
     Ok(result)
 }
 
-#[api_v2_operation(description = "Updates data in a user vault", tags(Vault, PublicApi, Users))]
+#[api_v2_operation(
+    description = "Updates data in a user vault. Same functionality as PATCH",
+    tags(Vault, PublicApi, Users, Deprecated)
+)]
 #[actix::put("/users/{footprint_user_id}/vault")]
 pub async fn put(
     state: web::Data<State>,
@@ -72,7 +75,20 @@ pub async fn put(
     tenant_auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let result = put_inner(state, path, request, tenant_auth, insight).await?;
+    let result = patch_inner(state, path, request, tenant_auth, insight).await?;
+    Ok(result)
+}
+
+#[api_v2_operation(description = "Updates data in a user vault", tags(Vault, PublicApi, Users))]
+#[actix::patch("/users/{footprint_user_id}/vault")]
+pub async fn patch(
+    state: web::Data<State>,
+    path: Path<FpId>,
+    request: Json<RawDataRequest>,
+    tenant_auth: SecretTenantAuthContext,
+    insight: InsightHeaders,
+) -> JsonApiResponse<EmptyResponse> {
+    let result = patch_inner(state, path, request, tenant_auth, insight).await?;
     Ok(result)
 }
 

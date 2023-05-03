@@ -71,6 +71,9 @@ class Endpoint:
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"
+        if "Deprecated" in self.path_info["tags"]:
+            # Add a disclaimer tag to all Deprecated APIs
+            description = f"THIS API IS DEPRECATED.\n\n{description}"
         return {**self.path_info, "description": description}
 
 
@@ -110,7 +113,7 @@ def get_apis(open_api_spec, tag):
 
 if __name__ == "__main__":
     # If running this script, actually output the new open api spec
-    open_api_spec = requests.get("https://api.onefootprint.com/docs-spec-v3").json()
+    open_api_spec = requests.get("http://localhost:8000/docs-spec-v3").json()
     os.makedirs("out", exist_ok=True)
     public_open_api_spec = get_apis(open_api_spec, "PublicApi")
     with open("out/API Docs.json", "w") as f:

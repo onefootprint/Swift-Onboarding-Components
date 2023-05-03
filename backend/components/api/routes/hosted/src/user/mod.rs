@@ -15,8 +15,9 @@ mod tests;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
-        .service(vault::put::put)
-        .service(vault::put::post_validate)
+        .service(vault::patch::put)
+        .service(vault::patch::patch)
+        .service(vault::patch::post_validate)
         .service(vault::decrypt::post)
         .service(access_events::get)
         .service(biometric::init_post)
