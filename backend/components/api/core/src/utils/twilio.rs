@@ -4,15 +4,59 @@ use crate::{
     errors::{challenge::ChallengeError, ApiError, ApiResult},
     State,
 };
+use actix_web::http::StatusCode;
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use newtypes::{PhoneNumber, PiiString};
+use thiserror::Error;
 
 use self::rate_limit::RateLimit;
 
 use super::session::{JsonSession, RateLimitRecord};
 
 pub type SecondsBeforeRetry = Duration;
+
+#[derive(Debug, Error)]
+/// Our own wrapper around twilio errors to better display them
+pub enum TwilioError {
+    #[error("{0}")]
+    Request(reqwest::Error),
+    #[error("Delivery failed")]
+    DeliveryFailed,
+    #[error("Not delivered")]
+    NotDelivered,
+    #[error("{0}")]
+    Api(twilio::error::ApiErrorResponse),
+    #[error("{0}")]
+    SerdeJson(serde_json::Error),
+}
+
+impl From<twilio::error::Error> for TwilioError {
+    fn from(value: twilio::error::Error) -> Self {
+        match value {
+            twilio::error::Error::Request(e) => Self::Request(e),
+            twilio::error::Error::DeliveryFailed => Self::DeliveryFailed,
+            twilio::error::Error::NotDelivered => Self::NotDelivered,
+            twilio::error::Error::Api(e) => Self::Api(e),
+            twilio::error::Error::SerdeJson(e) => Self::SerdeJson(e),
+        }
+    }
+}
+
+impl TwilioError {
+    pub fn status_code(&self) -> StatusCode {
+        match self {
+            Self::Request(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DeliveryFailed => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::NotDelivered => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Api(e) => match e.status {
+                400 => StatusCode::BAD_REQUEST,
+                _ => StatusCode::INTERNAL_SERVER_ERROR,
+            },
+            Self::SerdeJson(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct TwilioClient {
@@ -60,18 +104,10 @@ impl TwilioClient {
         }
         .enforce_and_update()
         .await?;
-        // spawn this async so we return immediately
-        let client = self.client.clone();
-        let destination_clone = destination.clone();
-
-        tokio::spawn(async move {
-            let _ = client
-                .send_message(destination_clone.e164().leak(), message_body)
-                .await
-                .map_err(|err| {
-                    tracing::error!(error=?err, "twilio error");
-                });
-        });
+        self.client
+            .send_message(destination.e164().leak(), message_body)
+            .await
+            .map_err(TwilioError::from)?;
         Ok(())
     }
 

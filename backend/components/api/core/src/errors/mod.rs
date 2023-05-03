@@ -23,6 +23,7 @@ pub mod workos;
 use crate::{
     decision::vendor::VendorAPIError,
     types::error::{ApiResponseError, FpResponseErrorInfo},
+    utils::twilio::TwilioError,
 };
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
@@ -87,7 +88,7 @@ pub enum ApiError {
     #[error("{0}")]
     SerdeCbor(#[from] serde_cbor::Error),
     #[error("{0}")]
-    Twilio(#[from] twilio::error::Error),
+    Twilio(#[from] TwilioError),
     #[error("Endpoint not found")]
     EndpointNotFound,
     #[error("Resource not found")]
@@ -187,7 +188,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Twilio(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Twilio(e) => e.status_code(),
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::BillingError(_) => StatusCode::INTERNAL_SERVER_ERROR,
