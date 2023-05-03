@@ -1,29 +1,69 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoPin24 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { IcoQuoteLeft16 } from '@onefootprint/icons';
+import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import TruncatedText from '@/entities/components/details/components/truncated-text';
+import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
 
 export type PinnedNoteProps = {
   note: string;
   author?: string;
+  timestamp: string;
+  noteId: string;
 };
 
-const PinnedNote = ({ note, author }: PinnedNoteProps) => {
+const DEFAULT_TEXT_VIEW_HEIGHT = 60;
+
+const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
   const { t } = useTranslation('pages.entity.pinned-notes');
+  const updateMutation = useCurrentEntityUpdateAnnotation();
+
+  const handleUnpinNote = (annotationId: string) => {
+    updateMutation.mutate({
+      isPinned: false,
+      annotationId,
+    });
+  };
 
   return note.length > 0 ? (
     <Container>
-      <TitleContainer>
-        <IcoPin24 />
-        <Typography variant="label-3" sx={{ marginLeft: 2 }}>
-          {t('title')}
-          {author && t('title-by-author', { author })}
+      <Header>
+        <TitleContainer>
+          <Typography variant="label-3">
+            {t('note')}
+            {author && t('title-by-author', { author })}
+          </Typography>
+          <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+            &middot;
+          </Typography>
+          <LinkButton
+            sx={{ marginLeft: 2 }}
+            onClick={() => handleUnpinNote(noteId)}
+            size="compact"
+          >
+            {t('unpin-button-text')}
+          </LinkButton>
+        </TitleContainer>
+        <Typography variant="body-3" color="secondary">
+          {timestamp}
         </Typography>
-      </TitleContainer>
-      <Typography variant="body-3" color="secondary">
-        {note}
-      </Typography>
+      </Header>
+      <Box sx={{ display: 'flex' }}>
+        <Box as="span" sx={{ width: 'fit-content' }}>
+          <IcoQuoteLeft16 />
+        </Box>
+        <TruncatedText
+          text={note}
+          maxTextViewHeight={DEFAULT_TEXT_VIEW_HEIGHT}
+          textFontVariant="body-3"
+          textSxStyle={{
+            marginLeft: 4,
+            color: 'secondary',
+          }}
+        />
+      </Box>
     </Container>
   ) : null;
 };
@@ -33,7 +73,6 @@ const Container = styled.div`
     background-color: rgba(74, 36, 219, 0.06);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     padding: ${theme.spacing[5]};
     gap: ${theme.spacing[4]};
     border-radius: ${theme.borderRadius.default};
@@ -42,6 +81,12 @@ const Container = styled.div`
 
 const TitleContainer = styled.div`
   display: flex;
+  align-items: center;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 `;
 

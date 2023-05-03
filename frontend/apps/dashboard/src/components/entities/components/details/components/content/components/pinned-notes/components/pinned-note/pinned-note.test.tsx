@@ -1,14 +1,45 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import PinnedNote, { PinnedNoteProps } from './pinned-note';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<PinnedNote />', () => {
-  const renderPinnedNote = ({ author, note }: PinnedNoteProps) =>
-    customRender(<PinnedNote author={author} note={note} />);
+  beforeEach(() => {
+    useRouterSpy({
+      pathname: `/entities/1`,
+      query: {
+        id: '1',
+      },
+    });
+  });
+
+  const renderPinnedNote = ({
+    author,
+    note,
+    timestamp,
+    noteId,
+  }: PinnedNoteProps) =>
+    customRender(
+      <PinnedNote
+        author={author}
+        note={note}
+        timestamp={timestamp}
+        noteId={noteId}
+      />,
+    );
 
   it('should render the note correctly', () => {
-    renderPinnedNote({ note: 'Lorem ipsum dolor simet at magna' });
+    renderPinnedNote({
+      note: 'Lorem ipsum dolor simet at magna',
+      timestamp: '4/27/23, 3:24 PM',
+      noteId: '1',
+    });
     const note = screen.getByText('Lorem ipsum dolor simet at magna');
     expect(note).toBeInTheDocument();
   });
@@ -17,8 +48,21 @@ describe('<PinnedNote />', () => {
     renderPinnedNote({
       note: 'Lorem ipsum dolor simet at magna',
       author: 'jane.doe@acme.com',
+      timestamp: '4/27/23, 3:24 PM',
+      noteId: '1',
     });
-    const author = screen.getByText('Pinned note from jane.doe@acme.com');
+    const author = screen.getByText('Note from jane.doe@acme.com');
     expect(author).toBeInTheDocument();
+  });
+
+  it('should render the timestamp correctly', () => {
+    renderPinnedNote({
+      note: 'Lorem ipsum dolor simet at magna',
+      author: 'jane.doe@acme.com',
+      timestamp: '4/27/23, 3:24 PM',
+      noteId: '1',
+    });
+    const timestamp = screen.getByText('4/27/23, 3:24 PM');
+    expect(timestamp).toBeInTheDocument();
   });
 });

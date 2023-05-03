@@ -12,6 +12,7 @@ import CdoTagList from 'src/components/cdo-tag-list';
 import createStringList from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';
 
+import AnnotationNote from '../annotation-note/annotation-note';
 import EventBodyEntry from '../event-body-entry';
 
 type OnboardingDecisionEventBodyProps = {
@@ -25,6 +26,7 @@ const OnboardingDecisionEventBody = ({
     'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
   const {
+    annotation,
     decision: {
       source,
       vendors,
@@ -34,8 +36,8 @@ const OnboardingDecisionEventBody = ({
   } = data;
   const statusStr = t(`decision-status.${status}`);
 
-  if (source.kind !== DecisionSourceKind.footprint) {
-    return null;
+  if (annotation && source.kind !== DecisionSourceKind.footprint) {
+    return <AnnotationNote annotation={annotation} />;
   }
 
   if (status === DecisionStatus.pass) {

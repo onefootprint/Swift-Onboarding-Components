@@ -416,8 +416,14 @@
         }
       },
       "pinned-notes": {
-        "title": "Pinned note",
-        "title-by-author": " from {{author}}"
+        "title": "Pinned notes",
+        "title-by-author": " from {{author}}",
+        "note": "Note",
+        "unpin-button-text": "Unpin note",
+        "carousel-buttons": {
+          "left-aria-label": "Previous note",
+          "right-aria-label": "Next note"
+        }
       },
       "breadcrumb": {
         "title": "{{kind}} details breadcrumb",
@@ -631,6 +637,10 @@
         "country": "Country",
         "verified": "Verified",
         "not_verified": "Not verified"
+      },
+      "truncated-text": {
+        "see-more": "See more",
+        "see-less": "See less"
       }
     },
     "businesses": {

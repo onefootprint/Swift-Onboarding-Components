@@ -96,7 +96,6 @@ const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     justify-content: flex-start;
     padding-bottom: ${theme.spacing[8]};
     gap: ${theme.spacing[2]};
