@@ -1,7 +1,7 @@
 use super::WriteableVw;
 use crate::errors::{ApiError, ApiResult};
 use crate::utils::file_upload::FileUpload;
-use crate::utils::vault_wrapper::{Business, Person};
+use crate::utils::vault_wrapper::Person;
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
@@ -12,6 +12,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
 use db::{DbError, PgConn, TxnPgConn};
 use itertools::Itertools;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
     DocumentKind, DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData,
@@ -19,54 +20,35 @@ use newtypes::{
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
+type SecondaryBos = Vec<BusinessOwner>;
 
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the VaultWrapper for a specific tenant.
 /// These are the publically accessible utils to update data on a VaultWrapper.
 /// They use the private, update_data_unsafe method, which cannot be exposed publically because they don't
 /// take ownership over the VaultWrapper that is potentially stale after an update
-impl WriteableVw<Person> {
-    /// Util function to make updates to multiple pieces of the Vault in one transaction
-    pub fn put_person_data(
+impl<Type> WriteableVw<Type> {
+    pub fn patch_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest<Fingerprints>,
-    ) -> ApiResult<Vec<NewContactInfo>> {
-        request.assert_no_business_data()?;
+    ) -> ApiResult<(Vec<NewContactInfo>, SecondaryBos)> {
+        request.assert_allowable_identifiers(self.vault.kind)?;
         let keys = request.keys().cloned().collect();
+        let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let new_contact_info = if !request.is_empty() {
-            let vds = self.update_data_unsafe(conn, request)?;
+            // Must do this validation here inside the locked, WriteableUvw
+            let request = self.validate_request(request)?;
+            let vds = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
             Self::create_contact_info_if_needed(conn, vds)?
         } else {
             vec![]
         };
+        let new_bos = self.create_bos_if_needed(conn, kyced_bos)?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
-        Ok(new_contact_info)
-    }
-}
-
-type SecondaryBos = Vec<BusinessOwner>;
-
-impl WriteableVw<Business> {
-    /// Util function to make updates to multiple pieces of the Vault in one transaction
-    pub fn put_business_data(
-        self, // consume self, since we don't want stale data getting used
-        conn: &mut TxnPgConn,
-        request: DataRequest<Fingerprints>,
-    ) -> ApiResult<SecondaryBos> {
-        // Error if trying to add person data to business vault
-        use newtypes::BusinessDataKind as BDK;
-        request.assert_no_id_data()?;
-        let keys = request.keys().cloned().collect();
-        let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
-        self.update_data_unsafe(conn, request)?;
-        let bos = self.create_bos_if_needed(conn, kyced_bos)?;
-        // Add timeline event for all the newly added data
-        self.add_timeline_event(conn, keys)?;
-
-        Ok(bos)
+        Ok((new_contact_info, new_bos))
     }
 
     /// We have book-keeping for business owners that are KYCed outside of the vault. When BOs are
@@ -87,19 +69,6 @@ impl WriteableVw<Business> {
         let secondary_bos = BusinessOwner::bulk_create_secondary(conn, bo_ids, self.vault().id.clone())?;
 
         Ok(secondary_bos)
-    }
-}
-
-impl<Type> WriteableVw<Type> {
-    fn update_data_unsafe(
-        &self, // NOTE: we should be consuming this but we are not, which makes it unsafe
-        conn: &mut TxnPgConn,
-        request: DataRequest<Fingerprints>,
-    ) -> ApiResult<Vec<VaultData>> {
-        // Must do this validation here inside the locked, WriteableUvw
-        let request = self.validate_request(request)?;
-        let vds = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
-        Ok(vds)
     }
 
     fn create_contact_info_if_needed(
@@ -148,10 +117,7 @@ impl<Type> WriteableVw<Type> {
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        errors::ApiResult,
-        utils::vault_wrapper::{Business, Person, WriteableVw},
-    };
+    use crate::{errors::ApiResult, utils::vault_wrapper::WriteableVw};
     use db::TxnPgConn;
     use newtypes::{
         DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, IdentityDataKind,
@@ -159,15 +125,16 @@ mod test {
     };
     use std::collections::HashMap;
 
-    impl WriteableVw<Person> {
-        /// Shorthand to add data to a user vault in tests
-        pub fn add_person_data_test(
+    impl<Type> WriteableVw<Type> {
+        /// Shorthand to add data to a vault in tests
+        pub fn patch_data_test(
             self,
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
         ) -> ApiResult<()> {
             let data = HashMap::from_iter(data.into_iter());
             let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
+            // Add fingerprints for ID data
             let fingerprints = request
                 .iter()
                 .filter_map(|(di, pii)| match di {
@@ -190,22 +157,7 @@ mod test {
                 })
                 .collect();
             let request = request.manual_fingerprints(fingerprints);
-            self.put_person_data(conn, request)?;
-            Ok(())
-        }
-    }
-
-    impl WriteableVw<Business> {
-        /// Shorthand to add data to a business vault in tests
-        pub fn add_business_data_test(
-            self,
-            conn: &mut TxnPgConn,
-            data: Vec<(DataIdentifier, PiiString)>,
-        ) -> ApiResult<()> {
-            let data = HashMap::from_iter(data.into_iter());
-            let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
-            let request = request.no_fingerprints();
-            self.put_business_data(conn, request)?;
+            self.patch_data(conn, request)?;
             Ok(())
         }
     }

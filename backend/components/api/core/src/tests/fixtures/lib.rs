@@ -1,4 +1,4 @@
-use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::{VaultWrapper, Any};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::scoped_vault::ScopedVault;
@@ -60,8 +60,8 @@ pub fn create_user_and_populate_vault(
     ];
     let update = update.into_iter().filter(|i| idks.contains(&i.0)).collect();
 
-    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_person_data_test(conn, update).unwrap();
+    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
+    uvw.patch_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)
 }

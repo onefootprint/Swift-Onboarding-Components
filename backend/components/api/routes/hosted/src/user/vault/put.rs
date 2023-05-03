@@ -7,7 +7,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
 use api_core::utils::vault_wrapper::checks::pre_add_data_checks;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::{Any, TenantUvw};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
@@ -32,13 +32,13 @@ pub async fn post_validate(
         allow_dangling_keys: *allow_extra_fields,
     };
     let request = request.into_inner().clean_and_validate(opts)?;
-    request.assert_no_business_data()?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
     let su_id = user_auth.data.scoped_user.id;
     let uvw: TenantUvw = state
         .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &su_id))
         .await??;
+    request.assert_allowable_identifiers(uvw.vault.kind)?;
     uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
@@ -65,10 +65,10 @@ pub async fn put(
 
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
-    let new_contact_info = state
+    let new_ci = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
             // Enforce that sandbox emails/phones are used for sandbox users
             if let Some(is_live) = email_is_live {
                 if is_live != uvw.vault().is_live {
@@ -78,14 +78,14 @@ pub async fn put(
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let new_contact_info = uvw.put_person_data(conn, request)?;
+            let (new_contact_info, _) = uvw.patch_data(conn, request)?;
             Ok(new_contact_info)
         })
         .await?;
 
     // If we just added a new email address to the vault, send a verification email
     if let Some(email) = email {
-        if let Some((_, ci)) = new_contact_info
+        if let Some((_, ci)) = new_ci
             .into_iter()
             .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
         {

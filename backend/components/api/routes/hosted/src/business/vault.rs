@@ -28,7 +28,6 @@ pub async fn post_validate(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_bifrost())?;
-    request.assert_no_id_data()?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
     let bvw = state
         .db_pool
@@ -40,6 +39,7 @@ pub async fn post_validate(
             Ok(bvw)
         })
         .await??;
+    request.assert_allowable_identifiers(bvw.vault.kind)?;
     bvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
@@ -70,7 +70,7 @@ pub async fn put(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            let secondary_bos = bvw.put_business_data(conn, request)?;
+            let (_, secondary_bos) = bvw.patch_data(conn, request)?;
             Ok((secondary_bos, sb_id))
         })
         .await?;

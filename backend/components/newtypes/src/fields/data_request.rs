@@ -1,7 +1,7 @@
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
     CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK,
-    PiiString, TenantId, Validate, VdKind,
+    PiiString, TenantId, Validate, VaultKind, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
@@ -125,27 +125,11 @@ impl DataRequest<()> {
 }
 
 impl<T> DataRequest<T> {
-    pub fn assert_no_id_data(&self) -> NtResult<()> {
-        let id_keys = self
-            .keys()
-            .filter(|di| matches!(di, DataIdentifier::Id(_) | DataIdentifier::InvestorProfile(_)))
-            .collect();
-        Self::assert_empty(id_keys)?;
-        Ok(())
-    }
-
-    /// Returns an Err if this request contains business data
-    pub fn assert_no_business_data(&self) -> NtResult<()> {
-        let business_keys = self
-            .keys()
-            .filter(|di| matches!(di, DataIdentifier::Business(_)))
-            .collect();
-        Self::assert_empty(business_keys)
-    }
-
-    fn assert_empty(values: Vec<&DataIdentifier>) -> NtResult<()> {
-        if !values.is_empty() {
-            let field_errors = values
+    /// Enforce that this update only has the allowable set of DIs based on the vault kind
+    pub fn assert_allowable_identifiers(&self, kind: VaultKind) -> NtResult<()> {
+        let disallowed_keys = self.keys().filter(|di| !di.is_allowed_for(kind)).collect_vec();
+        if !disallowed_keys.is_empty() {
+            let field_errors = disallowed_keys
                 .into_iter()
                 .map(|di| (di.clone(), Error::IncompatibleDataIdentifier))
                 .collect();

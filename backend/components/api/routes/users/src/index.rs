@@ -13,6 +13,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginationRequest;
+use api_core::utils::vault_wrapper::Any;
 use api_route_entities::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::models::access_event::NewAccessEvent;
@@ -78,8 +79,8 @@ pub async fn post(
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
-                let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-                uvw.put_person_data(conn, request)?;
+                let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
+                uvw.patch_data(conn, request)?;
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_vault_id: scoped_user.id.clone(),

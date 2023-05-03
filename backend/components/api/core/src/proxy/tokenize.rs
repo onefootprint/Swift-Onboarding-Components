@@ -3,7 +3,7 @@ use crate::auth::tenant::TenantAuth;
 use crate::errors::ApiResult;
 use crate::utils;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::Business;
+use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -100,17 +100,8 @@ pub async fn vault_pii(
 
                 // put our data
                 if !data.is_empty() {
-                    match vault.kind {
-                        newtypes::VaultKind::Person => {
-                            let uvw: utils::vault_wrapper::WriteableVw<Person> =
-                                VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                            uvw.put_person_data(conn, data)?;
-                        }
-                        newtypes::VaultKind::Business => {
-                            let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                            uvw.put_business_data(conn, data)?;
-                        }
-                    }
+                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
+                    uvw.patch_data(conn, data)?;
                 }
 
                 // put our documents

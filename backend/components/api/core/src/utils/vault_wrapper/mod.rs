@@ -38,7 +38,7 @@ pub struct Any;
 ///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
 ///         * it is the source of truth to know what we datums we have collected from a User
 #[derive(Debug, Clone)]
-pub struct VaultWrapper<Type> {
+pub struct VaultWrapper<Type = Any> {
     pub vault: Vault,
     speculative: VwData<Type>,
     portable: VwData<Type>,

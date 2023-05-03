@@ -5,7 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::{Any, TenantUvw};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -44,9 +44,6 @@ pub async fn post_validate_inner(
     let request = request
         .into_inner()
         .clean_and_validate(ParseOptions::for_non_portable())?;
-    request.assert_no_business_data()?;
-    let request = request.no_fingerprints(); // No fingerprints to check speculatively
-
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -55,6 +52,8 @@ pub async fn post_validate_inner(
             Ok(uvw)
         })
         .await??;
+    request.assert_allowable_identifiers(uvw.vault.kind)?;
+    let request = request.no_fingerprints(); // No fingerprints to check speculatively
     uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
@@ -105,8 +104,8 @@ pub async fn put_inner(
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
-            uvw.put_person_data(conn, request)?;
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
+            uvw.patch_data(conn, request)?;
 
             // Create an access event to show data was added
             NewAccessEvent {

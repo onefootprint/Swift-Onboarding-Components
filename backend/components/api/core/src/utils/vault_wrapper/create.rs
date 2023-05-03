@@ -1,4 +1,4 @@
-use super::{Person, VaultWrapper};
+use super::{Any, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
@@ -54,7 +54,7 @@ impl VaultWrapper<Person> {
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault
-        let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+        let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
@@ -77,7 +77,7 @@ impl VaultWrapper<Person> {
             .into_iter()
             .flatten(),
         ));
-        let new_ci = uvw.put_person_data(conn, request)?;
+        let (new_ci, _) = uvw.patch_data(conn, request)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault
         let (_, ci) = new_ci

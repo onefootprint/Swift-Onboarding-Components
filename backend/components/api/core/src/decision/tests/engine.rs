@@ -2,6 +2,7 @@ use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
+use crate::utils::vault_wrapper::Any;
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
     utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
@@ -63,8 +64,8 @@ fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfigurati
         ),
     ];
 
-    let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.add_person_data_test(conn, update).unwrap();
+    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
+    uvw.patch_data_test(conn, update).unwrap();
 
     (uv.into_inner(), su)
 }

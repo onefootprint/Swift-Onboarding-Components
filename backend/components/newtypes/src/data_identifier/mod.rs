@@ -40,7 +40,7 @@ pub use self::{
     identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
     vd_kind::*,
 };
-use crate::{util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString};
+use crate::{util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString, VaultKind};
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -305,6 +305,26 @@ impl DataIdentifier {
             .chain(BusinessDataKind::iter().map(DataIdentifier::from))
             .filter(Self::is_fingerprintable)
             .collect()
+    }
+
+    /// Returns true if the DI is allowed to be inserted into the specified vault kind
+    pub fn is_allowed_for(&self, vault_kind: VaultKind) -> bool {
+        // Keep full match statements here so we have to implement this any time there's a new
+        // VaultKind or DataIdentifierDiscriminant
+        match vault_kind {
+            VaultKind::Person => match self {
+                Self::Id(_)
+                | Self::Custom(_)
+                | Self::InvestorProfile(_)
+                | Self::Document(_)
+                | Self::Card(_) => true,
+                Self::Business(_) => false,
+            },
+            VaultKind::Business => match self {
+                Self::Business(_) | Self::Custom(_) => true,
+                Self::Id(_) | Self::InvestorProfile(_) | Self::Document(_) | Self::Card(_) => false,
+            },
+        }
     }
 }
 
