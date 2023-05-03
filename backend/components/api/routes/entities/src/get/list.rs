@@ -13,7 +13,7 @@ use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::ListEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
@@ -78,7 +78,7 @@ pub async fn get(
                 (page_size + 1) as i64,
             )?;
             let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
-            let vws: HashMap<ScopedVaultId, TenantUvw> =
+            let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id, None)?;
             let scoped_vault_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
             let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;

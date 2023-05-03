@@ -18,8 +18,7 @@ pub mod fingerprint;
 /// data on the user vault.
 /// This UVW variant contains all of the functionality to decrypt information on the vault
 #[derive(Deref)]
-// TODO Rename to TenantVw
-pub struct TenantUvw<Type = Any> {
+pub struct TenantVw<Type = Any> {
     #[deref]
     uvw: VaultWrapper<Type>,
     pub scoped_vault_id: ScopedVaultId,

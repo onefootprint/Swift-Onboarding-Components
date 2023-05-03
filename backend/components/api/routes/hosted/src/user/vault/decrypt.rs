@@ -3,7 +3,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::CanDecrypt;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::{flat_api_object_map_type, PiiString};
@@ -40,7 +40,7 @@ pub async fn post(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
+            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

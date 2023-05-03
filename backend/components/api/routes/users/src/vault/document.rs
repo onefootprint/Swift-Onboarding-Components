@@ -12,7 +12,7 @@ use crate::State;
 
 use actix_web::HttpResponse;
 use api_core::auth::CanDecrypt;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::DecryptDocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -42,7 +42,7 @@ pub async fn post_decrypt(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
+            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
             Ok(uvw)
         })

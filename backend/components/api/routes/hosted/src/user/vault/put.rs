@@ -7,7 +7,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
 use api_core::utils::vault_wrapper::checks::pre_add_data_checks;
-use api_core::utils::vault_wrapper::{Any, TenantUvw};
+use api_core::utils::vault_wrapper::{Any, TenantVw};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
@@ -34,7 +34,7 @@ pub async fn post_validate(
     let request = request.into_inner().clean_and_validate(opts)?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
     let su_id = user_auth.data.scoped_user.id;
-    let uvw: TenantUvw = state
+    let uvw: TenantVw = state
         .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &su_id))
         .await??;

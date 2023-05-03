@@ -1,9 +1,9 @@
-use super::TenantUvw;
+use super::TenantVw;
 use crate::auth::{tenant::TenantGuardDsl, CanDecrypt, IsGuardMet};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, TenantScope};
 
-impl<Type> TenantUvw<Type> {
+impl<Type> TenantVw<Type> {
     /// Returns the list of TenantScopes representing permissions to see data on this user vault.
     /// For portable vaults, the visible data is granted by approved onboarding configurations.
     /// For non-portable vaults, all data is visible

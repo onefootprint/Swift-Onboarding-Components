@@ -1,4 +1,4 @@
-use super::TenantUvw;
+use super::TenantVw;
 use super::VaultWrapper;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VwArgs;
@@ -14,10 +14,10 @@ use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
-    pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantUvw<Type>> {
+    pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
         let uvw = Self::build(conn, VwArgs::Tenant(sv_id))?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![sv_id])?.remove(sv_id);
-        Ok(TenantUvw {
+        Ok(TenantVw {
             uvw,
             scoped_vault_id: sv_id.clone(),
             onboarding,
@@ -33,7 +33,7 @@ impl<Type> VaultWrapper<Type> {
         users: Vec<(ScopedVault, Vault)>,
         tenant_id: &TenantId,
         seqno: Option<DataLifetimeSeqno>,
-    ) -> ApiResult<HashMap<ScopedVaultId, TenantUvw<Type>>> {
+    ) -> ApiResult<HashMap<ScopedVaultId, TenantVw<Type>>> {
         let uv_ids: Vec<_> = users.iter().map(|(_, uv)| &uv.id).collect();
         let uv_id_to_active_lifetimes =
             DataLifetime::get_bulk_active_for_tenant(conn, uv_ids.clone(), tenant_id, seqno)?;
@@ -67,7 +67,7 @@ impl<Type> VaultWrapper<Type> {
                     document_datas.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )?;
-                let uvw = TenantUvw {
+                let uvw = TenantVw {
                     uvw,
                     scoped_vault_id: sv.id.clone(),
                     onboarding: onboarding_map.get(&sv.id).cloned(),

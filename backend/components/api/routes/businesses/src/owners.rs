@@ -11,7 +11,7 @@ use api_core::serializers::BusinessOwnerInfo;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
@@ -40,7 +40,7 @@ pub async fn get(
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
-            let vw: TenantUvw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((vw, sv))
         })
         .await??;

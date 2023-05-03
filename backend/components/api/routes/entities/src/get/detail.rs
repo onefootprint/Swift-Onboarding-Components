@@ -10,7 +10,7 @@ use crate::types::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::FpId;
@@ -48,7 +48,7 @@ pub async fn get(
             let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
                 .ok_or(ApiError::ResourceNotFound)?;
-            let vw: TenantUvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?
                 .remove(&sv.id)
                 .ok_or(ApiError::ResourceNotFound)?;

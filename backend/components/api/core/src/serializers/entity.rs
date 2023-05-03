@@ -1,6 +1,6 @@
 use crate::utils::{
     db2api::DbToApi,
-    vault_wrapper::{Any, TenantUvw},
+    vault_wrapper::{Any, TenantVw},
 };
 use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
@@ -9,7 +9,7 @@ use db::models::{
 use newtypes::{BusinessDataKind as BDK, DataIdentifier};
 use std::collections::HashMap;
 
-pub type EntityDetail<'a> = (SerializableEntity, &'a TenantUvw<Any>);
+pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>);
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw): EntityDetail) -> Self {

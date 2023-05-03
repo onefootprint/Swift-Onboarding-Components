@@ -8,7 +8,7 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::errors::business::BusinessError;
 use api_core::types::ResponseData;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::ParseOptions;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -35,7 +35,7 @@ pub async fn post_validate(
             let sb_id = user_auth
                 .scoped_business_id()
                 .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
-            let bvw: TenantUvw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
+            let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             Ok(bvw)
         })
         .await??;

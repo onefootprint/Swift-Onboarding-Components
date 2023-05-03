@@ -6,7 +6,7 @@ use crate::State;
 use api_core::errors::business::BusinessError;
 use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::{Business, VaultWrapper};
-use api_core::{auth::ob_config::BoSessionAuth, utils::vault_wrapper::TenantUvw};
+use api_core::{auth::ob_config::BoSessionAuth, utils::vault_wrapper::TenantVw};
 use api_wire_types::hosted::business::{HostedBusiness, Invited, Inviter};
 use db::models::onboarding::Onboarding;
 use newtypes::{BoLinkId, BusinessDataKind as BDK, KycedBusinessOwnerData, PiiString};
@@ -64,7 +64,7 @@ pub struct BasicBusinessInfo {
 
 pub async fn decrypt_basic_business_info(
     state: &State,
-    bvw: &TenantUvw<Business>,
+    bvw: &TenantVw<Business>,
 ) -> ApiResult<BasicBusinessInfo> {
     let bos: Vec<KycedBusinessOwnerData> = bvw
         .decrypt_unchecked_single(&state.enclave_client, BDK::KycedBeneficialOwners.into())

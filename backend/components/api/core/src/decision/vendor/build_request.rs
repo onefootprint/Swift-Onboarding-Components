@@ -1,7 +1,7 @@
 use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
 use crate::errors::business::BusinessError;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business, TenantUvw, DecryptedBusinessOwners};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business, TenantVw, DecryptedBusinessOwners};
 use crate::{errors::ApiError, State};
 
 use db::DbPool;
@@ -88,7 +88,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
-                let uvw: TenantUvw<Person> = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
+                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
                 Ok((doc, ref_id.ref_id, uvw))
             },
         )
@@ -172,7 +172,7 @@ pub async fn build_business_data_from_verification_request(
             let secondary_bo_vaults = secondary_bos.into_iter().map(|b| b.2.ok_or(BusinessError::BoOnboardingNotComplete)).collect::<Result<Vec<_>,_>>()?;
             let vaults: Vec<_> = vec![primary_bo_vault].into_iter().chain(secondary_bo_vaults).map(|v| (v.0, v.1)).collect();
  
-             let vws: HashMap<ScopedVaultId, TenantUvw> = db_pool.db_query(move |conn| {
+             let vws: HashMap<ScopedVaultId, TenantVw> = db_pool.db_query(move |conn| {
                  VaultWrapper::multi_get_for_tenant(conn, vaults, &sv.tenant_id, Some(seqno))
              
              }).await??;

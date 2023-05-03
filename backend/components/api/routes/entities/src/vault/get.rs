@@ -4,7 +4,7 @@ use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
 use actix_web::web::Query;
-use api_core::utils::vault_wrapper::TenantUvw;
+use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::flat_api_object_map_type;
 use newtypes::input::Csv;
@@ -59,7 +59,7 @@ pub async fn get_inner(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw: TenantUvw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
+            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })
         .await??;

@@ -6,9 +6,9 @@ use paperclip::actix::web;
 
 use crate::{errors::ApiResult, State};
 
-use super::TenantUvw;
+use super::TenantVw;
 
-impl<Type> TenantUvw<Type> {
+impl<Type> TenantVw<Type> {
     /// This creates fingerprints scoped to the tenant for data
     /// that the tenant has access to
     pub async fn create_authorized_fingerprints(

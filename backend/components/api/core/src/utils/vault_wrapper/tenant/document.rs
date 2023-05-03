@@ -1,4 +1,4 @@
-use super::{DecryptRequest, TenantUvw};
+use super::{DecryptRequest, TenantVw};
 use crate::errors::ApiResult;
 use crate::State;
 use db::{
@@ -19,7 +19,7 @@ pub struct DecryptedIdentityDocuments {
     pub selfie: Option<PiiBytes>,
 }
 
-impl<Type> TenantUvw<Type> {
+impl<Type> TenantVw<Type> {
     pub async fn decrypt_document(
         &self,
         state: &State,
