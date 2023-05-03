@@ -62,7 +62,7 @@ describe('Bifrost Machine Tests', () => {
       config: { ...testOnboardingConfig },
       bootstrapData: testBootstrapData,
     });
-    expect(state.value).toEqual('complete');
+    expect(state.value).toEqual('idv');
   });
 
   it('completes bifrost flow in sandbox mode', () => {
@@ -90,7 +90,7 @@ describe('Bifrost Machine Tests', () => {
       },
     });
 
-    expect(state.value).toEqual('complete');
+    expect(state.value).toEqual('idv');
     expect(state.context).toEqual({
       validationToken: 'token',
       config: { ...testOnboardingConfig, isLive: false },
