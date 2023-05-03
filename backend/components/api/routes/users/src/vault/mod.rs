@@ -96,6 +96,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(post_validate)
         .service(put)
+        .service(patch)
         .service(get)
         .service(post)
         .service(document::post_decrypt);
