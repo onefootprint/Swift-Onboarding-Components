@@ -40,7 +40,6 @@ export const createBifrostMachine = () =>
           },
         },
         idv: {
-          type: 'final',
           on: {
             idvCompleted: {
               actions: ['assignValidationToken'],
