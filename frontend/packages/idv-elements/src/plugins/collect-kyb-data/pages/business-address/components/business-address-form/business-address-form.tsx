@@ -3,12 +3,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { BusinessDI, CountryCode } from '@onefootprint/types';
 import {
   AddressInput,
+  Button,
   CountrySelectOption,
   Grid,
   SelectOption,
   TextInput,
 } from '@onefootprint/ui';
-import Button from '@onefootprint/ui/src/components/button/button';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
