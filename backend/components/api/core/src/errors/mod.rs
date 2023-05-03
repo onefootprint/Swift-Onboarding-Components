@@ -21,7 +21,7 @@ pub mod user;
 pub mod workos;
 
 use crate::{
-    decision::vendor::VendorAPIError,
+    decision::vendor::{middesk, VendorAPIError},
     types::error::{ApiResponseError, FpResponseErrorInfo},
     utils::twilio::TwilioError,
 };
@@ -121,6 +121,8 @@ pub enum ApiError {
     FileUploadError(#[from] file_upload::FileUploadError),
     #[error("internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
+    #[error("MiddeskError: {0}")]
+    MiddeskError(#[from] middesk::MiddeskError),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -230,6 +232,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::FileUploadError(_) => StatusCode::BAD_REQUEST,
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

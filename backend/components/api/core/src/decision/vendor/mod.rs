@@ -12,6 +12,7 @@ use self::tenant_vendor_control::TenantVendorControl;
 
 pub mod build_request;
 pub mod make_request;
+pub mod middesk;
 pub mod tenant_vendor_control;
 pub mod vendor_result;
 pub mod vendor_trait;

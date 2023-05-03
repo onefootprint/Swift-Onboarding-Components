@@ -1,0 +1,1 @@
+DROP TABLE middesk_request;

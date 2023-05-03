@@ -195,9 +195,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use schema::{
         access_event, annotation, business_owner, contact_info, data_lifetime, document_data,
         document_request, fingerprint, fingerprint_visit_event, identity_document, liveness_event,
-        manual_review, onboarding, onboarding_decision, onboarding_decision_verification_result_junction,
-        risk_signal, scoped_vault, socure_device_session, user_timeline, vault, vault_data,
-        verification_request, verification_result, watchlist_check, webauthn_credential,
+        manual_review, middesk_request, onboarding, onboarding_decision,
+        onboarding_decision_verification_result_junction, risk_signal, scoped_vault, socure_device_session,
+        user_timeline, vault, vault_data, verification_request, verification_result, watchlist_check,
+        webauthn_credential,
     };
     let mut deleted_rows = 0;
 
@@ -330,6 +331,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
             deleted_rows += diesel::delete(socure_device_session::table)
                 .filter(socure_device_session::onboarding_id.eq_any(ob_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(middesk_request::table)
+                .filter(middesk_request::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
 
             // Onboarding decisions

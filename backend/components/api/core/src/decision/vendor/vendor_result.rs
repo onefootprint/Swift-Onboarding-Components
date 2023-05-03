@@ -87,7 +87,7 @@ fn deserialize_from_vendor_api(
         VendorAPI::MiddeskTinRetriedWebhook => {
             ParsedResponse::from_middesk_tin_retried_webhook(raw_response)?
         }
-        VendorAPI::MiddeskGetBusiness => todo!(),
+        VendorAPI::MiddeskGetBusiness => ParsedResponse::from_middesk_get_business(raw_response)?,
         VendorAPI::IncodeStartOnboarding => todo!(),
         VendorAPI::IncodeAddFront => todo!(),
         VendorAPI::IncodeAddBack => todo!(),

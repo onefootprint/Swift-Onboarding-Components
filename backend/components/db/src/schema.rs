@@ -309,6 +309,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    middesk_request (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        onboarding_id -> Text,
+        decision_intent_id -> Text,
+        business_id -> Nullable<Text>,
+        state -> Text,
+        completed_at -> Nullable<Timestamptz>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     ob_configuration (id) {
         id -> Text,
         key -> Text,
@@ -819,6 +836,8 @@ joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
+joinable!(middesk_request -> decision_intent (decision_intent_id));
+joinable!(middesk_request -> onboarding (onboarding_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
@@ -879,6 +898,7 @@ allow_tables_to_appear_in_same_query!(
     insight_event,
     liveness_event,
     manual_review,
+    middesk_request,
     ob_configuration,
     onboarding,
     onboarding_decision,

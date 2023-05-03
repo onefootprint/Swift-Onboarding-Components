@@ -13,6 +13,7 @@ pub mod identity_document;
 pub mod insight_event;
 pub mod liveness_event;
 pub mod manual_review;
+pub mod middesk_request;
 pub mod ob_configuration;
 pub mod onboarding;
 pub mod onboarding_decision;

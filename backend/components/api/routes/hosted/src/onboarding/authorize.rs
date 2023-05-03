@@ -21,12 +21,10 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
-use newtypes::VendorAPI;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
@@ -122,7 +120,14 @@ pub async fn post(
         let should_run_kyb = should_run_kyb(&state.db_pool, &state.enclave_client, &biz_ob).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
-            let kyb_res = run_kyb(&state, biz_ob).await;
+            let kyb_res = decision::vendor::middesk::run_kyb(
+                &state.db_pool,
+                &state.enclave_client,
+                &state.middesk_client,
+                &state.feature_flag_client,
+                biz_ob.id,
+            )
+            .await;
             if let Err(e) = kyb_res {
                 tracing::error!(error=%e, "Error kicking off KYB")
             }
@@ -273,48 +278,6 @@ async fn run_kyc(
         )
         .await?;
     }
-
-    Ok(())
-}
-
-async fn run_kyb(state: &State, biz_ob: Onboarding) -> Result<(), ApiError> {
-    let obid = biz_ob.id.clone();
-    let (vreq, ob_configuration_key) = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let ob = Onboarding::lock(conn, &biz_ob.id)?;
-
-            if biz_ob.idv_reqs_initiated_at.is_some() {
-                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-            }
-
-            let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &ob.id)?.key;
-
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyb(conn, &ob.scoped_vault_id)?;
-            let vreq = VerificationRequest::create(
-                conn,
-                &ob.scoped_vault_id,
-                &decision_intent.id,
-                VendorAPI::MiddeskCreateBusiness,
-            )?;
-
-            ob.into_inner()
-                .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
-
-            Ok((vreq, ob_configuration_key))
-        })
-        .await?;
-
-    decision::vendor::make_request::make_kyb_request(
-        &state.db_pool,
-        &state.enclave_client,
-        vreq,
-        &obid,
-        &state.middesk_client,
-        &state.feature_flag_client,
-        ob_configuration_key,
-    )
-    .await?;
 
     Ok(())
 }

@@ -5,7 +5,7 @@ use std::fmt::Debug;
 pub struct BusinessRequest {
     name: PiiString, // TODO: do we consider this PII?
     addresses: Vec<Address>,
-    tin: Option<PiiString>,
+    tin: Option<Tin>,
     people: Vec<Person>,
     website: Option<Website>,
     phone_numbers: Option<Vec<PhoneNumber>>,
@@ -20,6 +20,11 @@ pub struct Address {
     pub city: PiiString,
     pub state: PiiString,
     pub postal_code: PiiString,
+}
+
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
+pub struct Tin {
+    pub tin: PiiString,
 }
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
@@ -55,7 +60,7 @@ impl From<BusinessData> for BusinessRequest {
                 state: data.state.unwrap(),
                 postal_code: data.zip.unwrap(),
             }],
-            tin: data.tin,
+            tin: data.tin.map(|t| Tin { tin: t }),
             people: data
                 .business_owners
                 .into_iter()
@@ -119,7 +124,9 @@ mod tests {
                     state: PiiString::from("CA"),
                     postal_code: PiiString::from("94110")
                 }],
-                tin: Some(PiiString::from("23571113171923")),
+                tin: Some(Tin {
+                    tin: PiiString::from("23571113171923")
+                }),
                 people: vec![
                     Person {
                         name: PiiString::from("Marvin Gaye"),

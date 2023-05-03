@@ -126,6 +126,11 @@ impl ParsedResponse {
         let parsed: MiddeskTinRetriedWebhookResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::MiddeskTinRetriedWebhook(parsed))
     }
+
+    pub fn from_middesk_get_business(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: BusinessResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::MiddeskGetBusiness(parsed))
+    }
 }
 
 #[derive(Clone)]

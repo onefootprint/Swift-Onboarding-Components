@@ -3,6 +3,7 @@ use crate::middesk::Error;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum MiddeskWebhookResponse {
     BusinessUpdate(MiddeskBusinessUpdateWebhookResponse),
@@ -55,8 +56,10 @@ impl MiddeskBusinessUpdateWebhookResponse {
             .and_then(|r| r.tasks.as_ref())
             .and_then(|ts| {
                 ts.iter().find(|t| {
-                    if let (Some(key), Some(status)) = (&t.key, &t.status) {
-                        key == "tin" && status == "failure"
+                    if let (Some(key), Some(sub_label), Some(message)) = (&t.key, &t.sub_label, &t.message) {
+                        key.to_lowercase() == "tin"
+                            && sub_label.to_lowercase() == "error"
+                            && message.to_lowercase().contains("unavailable")
                     } else {
                         false
                     }
@@ -92,5 +95,54 @@ impl MiddeskTinRetriedWebhookResponse {
             .as_ref()
             .and_then(|d| d.object.as_ref())
             .and_then(|t| t.business_id.clone())
+    }
+}
+
+impl MiddeskWebhookResponse {
+    pub fn business_id(&self) -> Option<String> {
+        match self {
+            MiddeskWebhookResponse::BusinessUpdate(v) => v.business_id(),
+            MiddeskWebhookResponse::TinRetried(v) => v.business_id(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_deser() {
+        let res = serde_json::from_value::<MiddeskBusinessUpdateWebhookResponse>(
+            crate::test_fixtures::middesk_business_update_webhook_response(),
+        )
+        .unwrap();
+        assert_eq!(
+            "bankruptcies".to_owned(),
+            res.clone()
+                .data
+                .unwrap()
+                .object
+                .unwrap()
+                .review
+                .unwrap()
+                .tasks
+                .unwrap()
+                .pop()
+                .unwrap()
+                .key
+                .unwrap()
+        );
+        assert_eq!(
+            1,
+            res.data
+                .unwrap()
+                .object
+                .unwrap()
+                .watchlist
+                .unwrap()
+                .hit_count
+                .unwrap()
+        );
     }
 }

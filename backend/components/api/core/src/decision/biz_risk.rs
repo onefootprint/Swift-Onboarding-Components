@@ -4,7 +4,7 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::VerificationResultId;
+use newtypes::{OnboardingId, VerificationResultId};
 
 use crate::{
     enclave_client::EnclaveClient,
@@ -19,16 +19,19 @@ pub async fn make_kyb_decision(
     db_pool: &DbPool,
     ff_client: &impl FeatureFlagClient,
     enclave_client: &EnclaveClient,
-    ob: &Onboarding,
+    ob_id: OnboardingId,
     business_response: &BusinessResponse,
     vres_id: &VerificationResultId,
 ) -> Result<(), ApiError> {
-    let svid = ob.scoped_vault_id.clone();
-    let ob_conf_id = ob.ob_configuration_id.clone();
-
-    let bvw = db_pool
-        .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
+    let (ob, bvw) = db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let (ob, _, _, _) = Onboarding::get(conn, &ob_id)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &ob.scoped_vault_id)?;
+            Ok((ob, bvw))
+        })
         .await??;
+
+    let ob_conf_id = ob.ob_configuration_id.clone();
 
     let dbo = bvw
         .decrypt_business_owners(db_pool, enclave_client, Some(ob_conf_id))
@@ -84,5 +87,5 @@ pub async fn make_kyb_decision(
     }
 
     let fv = KybFeatureVector::new(business_response, vres_id, obds);
-    engine::make_onboarding_decision(ob, fv, ff_client, db_pool).await
+    engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
 }

@@ -200,10 +200,13 @@ impl VerificationRequest {
     ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)>> {
         let res: Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)> =
             verification_request::table
-                .left_join(verification_result::table)
+                .left_join(
+                    verification_result::table.on(verification_result::request_id
+                        .eq(verification_request::id)
+                        .and(verification_result::is_error.eq(false))),
+                )
                 .inner_join(decision_intent::table)
                 .filter(decision_intent::id.eq(decision_intent_id))
-                .filter(verification_result::is_error.eq(false))
                 .get_results(conn)?;
 
         Ok(res)

@@ -148,3 +148,4 @@ define_newtype_id!(
     String,
     "Identifier for a a tenant vendor control"
 );
+define_newtype_id!(MiddeskRequestId, String, "Identifier for a middesk_request");
