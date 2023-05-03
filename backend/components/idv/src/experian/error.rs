@@ -23,7 +23,7 @@ pub enum Error {
     #[error("Missing precise ID Response")]
     MissingPreciseIDResponse,
     #[error("invalid PreciseID score received")]
-    InvalidScore,
+    InvalidScore(String),
     #[error("Experian Validation error {0}")]
     ValidationError(#[from] ValidationError),
 }

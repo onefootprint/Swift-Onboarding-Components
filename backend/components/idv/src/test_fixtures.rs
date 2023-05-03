@@ -1142,6 +1142,823 @@ pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> se
     })
 }
 
+pub fn cross_core_response_with_fraud_shield_codes() -> serde_json::Value {
+    serde_json::json!({
+        "responseHeader": {
+            "requestType": "PreciseIdOnly",
+            "clientReferenceId": "ExpInternal-TEST",
+            "expRequestId": "RB000000013465",
+            "messageTime": "2023-04-16T02:35:07Z",
+            "overallResponse": {
+                "decision": "REFER",
+                "decisionText": "Continue & Investigate",
+                "decisionReasons": [
+                    "Continue & Investigate"
+                ],
+                "recommendedNextActions": [],
+                "spareObjects": []
+            },
+            "responseCode": "R0201",
+            "responseType": "INFO",
+            "responseMessage": "Workflow Complete.",
+            "tenantID": "105408b68cde455a92e95a3eaa989e"
+        },
+        "clientResponsePayload": {
+            "orchestrationDecisions": [
+                {
+                    "sequenceId": "1",
+                    "decisionSource": "PreciseId",
+                    "decision": "REFER",
+                    "decisionReasons": [
+                        "Continue & Investigate"
+                    ],
+                    "score": 269,
+                    "decisionText": "Continue & Investigate",
+                    "nextAction": "Continue",
+                    "appReference": "2250516834",
+                    "decisionTime": "2023-04-28T18:35:38Z"
+                }
+            ],
+            "decisionElements": [
+                {
+                    "serviceName": "PreciseId",
+                    "applicantId": "APPLICANT_CONTACT_ID_1",
+                    "decision": "R20",
+                    "normalizedScore": 27,
+                    "score": 269,
+                    "decisionText": "Refer",
+                    "appReference": "2250516834",
+                    "rules": [
+                        {
+                            "ruleId": "3403",
+                            "ruleName": "glbRule01"
+                        },
+                        {
+                            "ruleId": "1015",
+                            "ruleName": "glbRule02"
+                        },
+                        {
+                            "ruleId": "1009",
+                            "ruleName": "glbRule03"
+                        },
+                        {
+                            "ruleId": "1017",
+                            "ruleName": "glbRule04"
+                        },
+                        {
+                            "ruleId": "3201",
+                            "ruleName": "glbRule05"
+                        },
+                        {
+                            "ruleId": "3402",
+                            "ruleName": "glbRule06"
+                        }
+                    ],
+                    "otherData": {
+                        "json": {
+                            "fraudSolutions": {
+                                "response": {
+                                    "products": {
+                                        "preciseIDServer": {
+                                            "sessionID": "PB47EFFK8YETQSBAKLP7PGNX.pidd2v-23042813353781977586",
+                                            "header": {
+                                                "reportDate": "04282023",
+                                                "reportTime": "133538",
+                                                "productOption": "01",
+                                                "subcode": "2956241",
+                                                "referenceNumber": "ExpInternal-TEST"
+                                            },
+                                            "summary": {
+                                                "transactionID": "2250516834",
+                                                "finalDecision": "R20",
+                                                "scores": {
+                                                    "preciseIDScore": "269",
+                                                    "preciseIDScorecard": "IDS_V3.0",
+                                                    "validationScore": "000000",
+                                                    "verificationScore": "000000",
+                                                    "complianceDescription": "No Compliance Code",
+                                                    "fpdscore": "000000"
+                                                }
+                                            },
+                                            "preciseMatch": {
+                                                "version": "02.00",
+                                                "responseStatusCode": {
+                                                    "value": "",
+                                                    "code": "00"
+                                                },
+                                                "preciseMatchTransactionID": "123ab111-4d47-486d-a",
+                                                "preciseMatchScore": "000",
+                                                "preciseMatchDecision": {
+                                                    "value": "",
+                                                    "code": " "
+                                                },
+                                                "addresses": {
+                                                    "address": [
+                                                        {
+                                                            "summary": {
+                                                                "verificationResult": {
+                                                                    "value": "",
+                                                                    "code": "A1"
+                                                                },
+                                                                "type": {
+                                                                    "value": "",
+                                                                    "code": "N "
+                                                                },
+                                                                "unitMismatchResult": {
+                                                                    "value": "",
+                                                                    "code": "  "
+                                                                },
+                                                                "highRiskResult": {
+                                                                    "value": "",
+                                                                    "code": "N "
+                                                                },
+                                                                "counts": {
+                                                                    "standardizedAddressReturnCount": 1,
+                                                                    "residentialAddressMatchCount": 1,
+                                                                    "residentialAddressReturnCount": 1,
+                                                                    "highRiskAddressReturnCount": 0,
+                                                                    "businessAddressMatchCount": 0,
+                                                                    "businessAddressReturnCount": 0
+                                                                }
+                                                            },
+                                                            "detail": {
+                                                                "standardizedAddressRcd": {
+                                                                    "surname": "KURTH",
+                                                                    "firstName": "BRIAN",
+                                                                    "middle": "P",
+                                                                    "address": "2010 SAINT NAZAIRE BLVD",
+                                                                    "city": "HOMESTEAD",
+                                                                    "state": "FL",
+                                                                    "zipCode": "33039",
+                                                                    "zipPlus4": "0001"
+                                                                },
+                                                                "residentialAddressRcd": [
+                                                                    {
+                                                                        "surname": "KURTH",
+                                                                        "firstName": "BRIAN",
+                                                                        "aliasName": [],
+                                                                        "address": "2010 SAINT NAZAIRE BLVD",
+                                                                        "city": "HOMESTEAD",
+                                                                        "state": "FL",
+                                                                        "zipCode": "33039"
+                                                                    }
+                                                                ],
+                                                                "highRiskAddressRcd": [],
+                                                                "highRiskAddressDescription": [
+                                                                    {
+                                                                        "highRiskDescription": "No high risk business at address/phone"
+                                                                    }
+                                                                ],
+                                                                "businessAddressRcd": []
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "phones": {
+                                                    "phone": [
+                                                        {
+                                                            "summary": {
+                                                                "verificationResult": {
+                                                                    "value": "",
+                                                                    "code": "NX"
+                                                                },
+                                                                "classification": {
+                                                                    "value": "",
+                                                                    "code": "L"
+                                                                },
+                                                                "highRiskResult": {
+                                                                    "value": "",
+                                                                    "code": "N"
+                                                                },
+                                                                "counts": {
+                                                                    "residentialPhoneMatchCount": 0,
+                                                                    "residentialPhoneReturnCount": 0,
+                                                                    "highRiskPhoneReturnCount": 0,
+                                                                    "businessPhoneMatchCount": 0,
+                                                                    "businessPhoneReturnCount": 0
+                                                                }
+                                                            },
+                                                            "detail": {
+                                                                "residentialPhoneRcd": [],
+                                                                "phoneHighRiskRcd": [],
+                                                                "highRiskPhoneDescription": [
+                                                                    {
+                                                                        "highRiskDescription": "No high risk business at address/phone"
+                                                                    }
+                                                                ],
+                                                                "businessPhoneRcd": []
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "consumerID": {
+                                                    "summary": {
+                                                        "verificationResult": {
+                                                            "value": "",
+                                                            "code": "Y "
+                                                        },
+                                                        "deceasedResult": {
+                                                            "value": "",
+                                                            "code": "N"
+                                                        },
+                                                        "formatResult": {
+                                                            "value": "",
+                                                            "code": "V"
+                                                        },
+                                                        "issueResult": {
+                                                            "value": "",
+                                                            "code": "C"
+                                                        },
+                                                        "counts": {
+                                                            "consumerIDReturnCount": 1
+                                                        }
+                                                    },
+                                                    "detail": {
+                                                        "consumerIDRcd": [
+                                                            {
+                                                                "surname": "KURTH",
+                                                                "firstName": "BRIAN",
+                                                                "middle": "P",
+                                                                "aliasName": [],
+                                                                "address": "2010 SAINT NAZAIRE BLVD",
+                                                                "city": "HOMESTEAD",
+                                                                "state": "FL",
+                                                                "areaCode": "301",
+                                                                "phone": "3246413",
+                                                                "reportedDate": "20050418",
+                                                                "lastUpdatedDate": "20060620"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "dateOfBirth": {
+                                                    "summary": {
+                                                        "matchResult": {
+                                                            "value": "",
+                                                            "code": "8"
+                                                        },
+                                                        "yearOfBirth": "1963"
+                                                    }
+                                                },
+                                                "driverLicense": {
+                                                    "summary": {
+                                                        "verificationResult": {
+                                                            "value": "",
+                                                            "code": "M"
+                                                        },
+                                                        "formatValidation": {
+                                                            "value": "",
+                                                            "code": " "
+                                                        }
+                                                    }
+                                                },
+                                                "changeOfAddresses": {
+                                                    "changeOfAddress": [
+                                                        {
+                                                            "summary": {
+                                                                "verificationResult": {
+                                                                    "value": "",
+                                                                    "code": "N "
+                                                                },
+                                                                "counts": {
+                                                                    "changeOfAddressReturnCount": 0
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "ofac": {
+                                                    "summary": {
+                                                        "verificationResult": {
+                                                            "value": "",
+                                                            "code": "1 "
+                                                        },
+                                                        "counts": {
+                                                            "ofacReturnCount": 0
+                                                        }
+                                                    }
+                                                },
+                                                "previousAddresses": {
+                                                    "previousAddress": [
+                                                        {
+                                                            "summary": {
+                                                                "counts": {
+                                                                    "previousAddressReturnCount": 2
+                                                                }
+                                                            },
+                                                            "detail": {
+                                                                "previousAddressRcd": [
+                                                                    {
+                                                                        "address": "PO BOX 10244",
+                                                                        "city": "POMPANO BEACH",
+                                                                        "state": "FL",
+                                                                        "zipCode": "33061",
+                                                                        "zipPlus4": "6244",
+                                                                        "reportedDate": "20060321",
+                                                                        "lastUpdatedDate": "20060321"
+                                                                    },
+                                                                    {
+                                                                        "address": "135 FALLS RD",
+                                                                        "city": "BEAUFORT",
+                                                                        "state": "SC",
+                                                                        "zipCode": "29906",
+                                                                        "zipPlus4": "6221",
+                                                                        "reportedDate": "20040614",
+                                                                        "lastUpdatedDate": "20060227"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "ssnfinder": {
+                                                    "summary": {
+                                                        "counts": {
+                                                            "ssnfinderReturnCount": 0
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "pidxmlversion": "06.00",
+                                            "glbDetail": {
+                                                "fraudShield": {
+                                                    "indicator": [
+                                                        {
+                                                            "value": "N",
+                                                            "code": "01"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "02"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "03"
+                                                        },
+                                                        {
+                                                            "value": "Y",
+                                                            "code": "04"
+                                                        },
+                                                        {
+                                                            "value": "Y", // I manually changed this to generate FRCs
+                                                            "code": "05"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "06"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "10"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "11"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "13"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "14"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "15"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "16"
+                                                        },
+                                                        {
+                                                            "value": "Y",
+                                                            "code": "17"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "18"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "21"
+                                                        },
+                                                        {
+                                                            "value": "N",
+                                                            "code": "25"
+                                                        },
+                                                        {
+                                                            "value": "Y",
+                                                            "code": "26"
+                                                        }
+                                                    ]
+                                                },
+                                                "glbRules": {
+                                                    "glbRule": [
+                                                        {
+                                                            "value": "",
+                                                            "code": "3403"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "1015"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "1009"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "1017"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "3201"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "3402"
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        },
+                                                        {
+                                                            "value": "",
+                                                            "code": "    "
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "ipAddress": {
+                                                "ipAddressMatchCountry": {
+                                                    "value": "",
+                                                    "code": " "
+                                                },
+                                                "ipAddressMatchState": {
+                                                    "value": "",
+                                                    "code": " "
+                                                },
+                                                "ipAddressMatchCity": {
+                                                    "value": "",
+                                                    "code": " "
+                                                },
+                                                "ipAddressMatchZipCode": {
+                                                    "value": "",
+                                                    "code": " "
+                                                }
+                                            }
+                                        },
+                                        "customerManagement": {
+                                            "version": "1.00",
+                                            "reportDate": "04282023",
+                                            "reportTime": "133537",
+                                            "transactionID": "PIDCM0757440541671513783227151379716",
+                                            "clientTrackingID": "2250516834",
+                                            "primaryResponseCode": "0000",
+                                            "secondaryResponseCode": "1300",
+                                            "responseCodeDesc": "PID Cust Management v1 Scores/Attributes are calculated without SSN",
+                                            "referenceText": "ExpInternal-TEST",
+                                            "scoreResults": {
+                                                "score": "150",
+                                                "scoreFactors": {
+                                                    "scoreFactor1": {
+                                                        "value": "Number of records with same phone number and different last names",
+                                                        "code": "E007"
+                                                    },
+                                                    "scoreFactor2": {
+                                                        "value": "Number of SSNs, phone numbers, name/address matches",
+                                                        "code": "E014"
+                                                    },
+                                                    "scoreFactor3": {
+                                                        "value": "Number of records with same name and address, and different phone numbers",
+                                                        "code": "E010"
+                                                    },
+                                                    "scoreFactor4": {
+                                                        "value": "Number of records with current address not on file and same phone number",
+                                                        "code": "E008"
+                                                    }
+                                                }
+                                            },
+                                            "attributes": {
+                                                "attributes01Day": "0;0;0;0;0;0;0;0;0;0;0;0;",
+                                                "attributes03Day": "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;",
+                                                "attributes07Day": "0;0;0;0;0;0;0;5;5;5;0;0;1;1;4;0;4;0;0;1;1;1;0;0;0;0;0;0;0;5;5;5;0;0;1;1;4;0;4;0;0;1;1;1;0;0;0;0;0;0;0;5;5;5;0;0;1;1;4;0;4;0;0;1;1;1;",
+                                                "attributes21Day": "0;0;0;",
+                                                "attributes28Day": "0;0;0;0;0;0;0;8;8;8;2;2;2;2;4;0;4;0;0;1;1;1;0;0;0;0;0;0;0;8;8;8;2;2;2;2;4;0;4;0;0;1;1;1;0;0;0;0;0;0;0;8;8;8;2;2;2;2;4;0;4;0;0;1;1;1;",
+                                                "attributes90Day": "0;0;0;0;0;0;0;0;10;10;10;2;2;2;2;6;0;6;0;0;1;2;2;0;0;0;0;0;0;0;0;10;10;10;2;2;2;2;6;0;6;0;0;1;1;2;0;0;0;0;0;0;0;0;10;10;10;2;2;2;2;6;1;6;0;0;2;2;2;"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "decisions": [
+                        {
+                            "element": "finalDecision",
+                            "value": "R20",
+                            "reason": ""
+                        },
+                        {
+                            "element": "ienScoreFactor1",
+                            "value": "E007",
+                            "reason": "Number of records with same phone number and different last names"
+                        },
+                        {
+                            "element": "ienScoreFactor2",
+                            "value": "E014",
+                            "reason": "Number of SSNs, phone numbers, name/address matches"
+                        },
+                        {
+                            "element": "ienScoreFactor3",
+                            "value": "E010",
+                            "reason": "Number of records with same name and address, and different phone numbers"
+                        },
+                        {
+                            "element": "ienScoreFactor4",
+                            "value": "E008",
+                            "reason": "Number of records with current address not on file and same phone number"
+                        }
+                    ],
+                    "matches": [
+                        {
+                            "name": "pmAddressVerificationResult1",
+                            "value": "A1"
+                        },
+                        {
+                            "name": "pmPhoneVerificationResult1",
+                            "value": "NX"
+                        },
+                        {
+                            "name": "pmConsumerIDVerificationResult",
+                            "value": "Y"
+                        },
+                        {
+                            "name": "pmDateOfBirthMatchResult",
+                            "value": "8"
+                        },
+                        {
+                            "name": "pmDriverLicenseVerificationResult",
+                            "value": "M"
+                        },
+                        {
+                            "name": "pmChangeOfAddressVerificationResult1",
+                            "value": "N"
+                        },
+                        {
+                            "name": "pmOFACVerificationResult",
+                            "value": "1"
+                        },
+                        {
+                            "name": "glbFSIndicator01",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator02",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator03",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator04",
+                            "value": "Y"
+                        },
+                        {
+                            "name": "glbFSIndicator05",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator06",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator10",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator11",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator13",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator14",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator15",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator16",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator17",
+                            "value": "Y"
+                        },
+                        {
+                            "name": "glbFSIndicator18",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator21",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator25",
+                            "value": "N"
+                        },
+                        {
+                            "name": "glbFSIndicator26",
+                            "value": "Y"
+                        }
+                    ],
+                    "scores": [
+                        {
+                            "name": "preciseIDScore",
+                            "score": 269,
+                            "type": "score"
+                        },
+                        {
+                            "name": "validationScore",
+                            "score": 0,
+                            "type": "score"
+                        },
+                        {
+                            "name": "verificationScore",
+                            "score": 0,
+                            "type": "score"
+                        },
+                        {
+                            "name": "fpdScore",
+                            "score": 0,
+                            "type": "score"
+                        },
+                        {
+                            "name": "preciseMatchScore",
+                            "score": 0,
+                            "type": "score"
+                        },
+                        {
+                            "name": "ienScore",
+                            "score": 150,
+                            "type": "score"
+                        }
+                    ]
+                }
+            ]
+        },
+        "originalRequestData": {
+            "control": [
+                {
+                    "option": "PIDXML_VERSION",
+                    "value": "06.00"
+                },
+                {
+                    "option": "SUBSCRIBER_PREAMBLE",
+                    "value": "TBD3"
+                },
+                {
+                    "option": "SUBSCRIBER_OPERATOR_INITIAL",
+                    "value": "OF"
+                },
+                {
+                    "option": "SUBSCRIBER_SUB_CODE",
+                    "value": "2956241"
+                },
+                {
+                    "option": "PID_USERNAME",
+                    "value": "ofp_demo"
+                },
+                {
+                    "option": "PID_PASSWORD",
+                    "value": "Y3lkamVqLTBXdXNkZS12dXJ3ZWM="
+                },
+                {
+                    "option": "PRODUCT_OPTION",
+                    "value": "01"
+                },
+                {
+                    "option": "DETAIL_REQUEST",
+                    "value": "D"
+                }
+            ],
+            "contacts": [
+                {
+                    "id": "APPLICANT_CONTACT_ID_1",
+                    "person": {
+                        "typeOfPerson": "APPLICANT",
+                        "personIdentifier": "1234",
+                        "personDetails": {
+                            "dateOfBirth": "1963-01-01"
+                        },
+                        "names": [
+                            {
+                                "firstName": "BRIAN",
+                                "middleNames": "P",
+                                "surName": "KURTH"
+                            }
+                        ]
+                    },
+                    "addresses": [
+                        {
+                            "id": "Main_Contact_Address_0",
+                            "addressType": "CURRENT",
+                            "street": "2010 SAINT NAZAIRE BLVD",
+                            "postTown": "HOMESTEAD",
+                            "postal": "33039",
+                            "stateProvinceCode": "FL"
+                        }
+                    ],
+                    "telephones": [
+                        {
+                            "id": "Main_Phone_0",
+                            "number": "+1 7818945369"
+                        }
+                    ],
+                    "emails": [
+                        {
+                            "id": "MAIN_EMAIL_0",
+                            "email": "John.Smith@Experian.com"
+                        }
+                    ],
+                    "identityDocuments": [
+                        {
+                            "documentNumber": "666810987",
+                            "documentType": "SSN"
+                        }
+                    ]
+                }
+            ],
+            "application": {
+                "productDetails": {
+                    "productType": "WRITTEN_INSTRUCTIONS"
+                },
+                "applicants": [
+                    {
+                        "contactId": "APPLICANT_CONTACT_ID_1",
+                        "applicantType": "APPLICANT"
+                    }
+                ]
+            }
+        }
+    })
+}
+
 pub fn middesk_business_response() -> serde_json::Value {
     serde_json::json!({
         "object": "business",

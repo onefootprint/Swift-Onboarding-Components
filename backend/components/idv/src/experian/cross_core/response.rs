@@ -177,8 +177,13 @@ pub struct FraudSolutionResponseProducts {
 
 #[cfg(test)]
 mod tests {
+    use newtypes::ExperianFraudShieldCodes;
+
     use super::*;
-    use crate::test_fixtures::experian_cross_core_response;
+    use crate::{
+        test_fixtures::{cross_core_response_with_fraud_shield_codes, experian_cross_core_response},
+        tests::assert_have_same_elements,
+    };
 
     #[test]
     fn test_parses() {
@@ -194,5 +199,20 @@ mod tests {
             .unwrap()
             .precise_id_score
             .is_some());
+    }
+
+    #[test]
+    fn test_fraud_shield_codes() {
+        let r: CrossCoreAPIResponse = serde_json::from_value(cross_core_response_with_fraud_shield_codes())
+            .expect("could not parse experian cross core");
+        assert_have_same_elements(
+            r.precise_id_response().unwrap().fraud_shield_reason_codes(),
+            vec![
+                ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified,
+                ExperianFraudShieldCodes::LocatedAddressNonResidential,
+                ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified,
+                ExperianFraudShieldCodes::InputSSNDeceased,
+            ],
+        )
     }
 }

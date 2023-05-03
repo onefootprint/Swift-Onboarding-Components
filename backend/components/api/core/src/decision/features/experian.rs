@@ -12,19 +12,8 @@ pub struct ExperianFeatures {
 
 impl ExperianFeatures {
     pub fn from(resp: CrossCoreAPIResponse, verification_result_id: VerificationResultId) -> Self {
-        let score_reason_code = resp
-            .precise_id_response()
-            .ok()
-            .and_then(|p| p.score().ok().and_then(score_to_reason_code));
-
-        let reason_codes = if let Some(src) = score_reason_code {
-            vec![src]
-        } else {
-            vec![]
-        };
-
         Self {
-            footprint_reason_codes: reason_codes,
+            footprint_reason_codes: footprint_reason_codes(resp),
             verification_result_id,
         }
     }
@@ -42,8 +31,67 @@ fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCo
                 Some(FootprintReasonCode::IdNotLocated)
             }
         }
-        // TODO: probably should error upstream for this
-        PreciseIDParsedScore::InvalidScore => None,
-        PreciseIDParsedScore::MissingOrInvalidInputData => None,
+    }
+}
+
+fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode> {
+    // TODO: these aren't appearing in the response where the docs say they should be
+    let model_reason_codes: Vec<FootprintReasonCode> = vec![];
+
+    // TODO: matching
+
+    let fraud_shield_reason_codes: Vec<FootprintReasonCode> = resp
+        .precise_id_response()
+        .ok()
+        .map(|p| {
+            p.fraud_shield_reason_codes()
+                .into_iter()
+                .flat_map(|rs| std::convert::Into::<Option<FootprintReasonCode>>::into(&rs))
+                .collect()
+        })
+        .unwrap_or(vec![]);
+
+    let mut reason_codes: Vec<FootprintReasonCode> = model_reason_codes
+        .into_iter()
+        .chain(fraud_shield_reason_codes.into_iter())
+        .collect();
+
+    if let Some(s) = resp
+        .precise_id_response()
+        .ok()
+        .and_then(|p| p.score().ok().and_then(score_to_reason_code))
+    {
+        reason_codes.push(s)
+    };
+
+    reason_codes
+}
+
+#[cfg(test)]
+mod tests {
+    use idv::{
+        experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore},
+        tests::assert_have_same_elements,
+    };
+    use newtypes::FootprintReasonCode;
+
+    #[test]
+    fn test_reason_codes() {
+        let r: CrossCoreAPIResponse =
+            serde_json::from_value(idv::test_fixtures::cross_core_response_with_fraud_shield_codes())
+                .expect("could not parse");
+
+        assert_eq!(
+            r.precise_id_response().unwrap().score().unwrap(),
+            PreciseIDParsedScore::Score(269)
+        );
+
+        assert_have_same_elements(
+            super::footprint_reason_codes(r),
+            vec![
+                FootprintReasonCode::SubjectDeceased,
+                FootprintReasonCode::IdNotLocated,
+            ],
+        )
     }
 }
