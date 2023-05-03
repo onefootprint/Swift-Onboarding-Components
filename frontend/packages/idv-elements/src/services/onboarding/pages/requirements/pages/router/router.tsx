@@ -25,7 +25,7 @@ const Router = ({ onDone }: RouterProps) => {
       authToken,
       userFound,
       email,
-      sandboxSuffix: identifierSuffix,
+      sandboxSuffix,
       config,
       device,
     },
@@ -90,7 +90,7 @@ const Router = ({ onDone }: RouterProps) => {
               missingAttributes: kycData,
               userFound,
               email,
-              sandboxSuffix: identifierSuffix,
+              sandboxSuffix,
               config,
             },
           }}

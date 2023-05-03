@@ -26,7 +26,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('success');
   const {
     challenge: { authToken },
-    identify: { userFound, email },
+    identify: { userFound, email, sandboxSuffix },
   } = state.context;
   useLogStateMachine('identify', state);
 
@@ -36,7 +36,7 @@ const Router = ({ onDone }: RouterProps) => {
       return;
     }
     if (isDone) {
-      onDone({ authToken, userFound: !!userFound, email });
+      onDone({ authToken, userFound: !!userFound, email, sandboxSuffix });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
