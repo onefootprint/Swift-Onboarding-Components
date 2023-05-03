@@ -53,6 +53,7 @@ pub enum ParsedResponse {
     IncodeAddBack(AddSideResponse),
     IncodeFetchScores(FetchScoresResponse),
     IncodeProcessId(ProcessIdResponse),
+    IncodeRawResponse(serde_json::Value),
 }
 
 impl ParsedResponse {
@@ -130,6 +131,35 @@ impl ParsedResponse {
     pub fn from_middesk_get_business(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: BusinessResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::MiddeskGetBusiness(parsed))
+    }
+
+    pub fn from_incode_start_response(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: OnboardingStartResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeOnboardingStart(parsed))
+    }
+
+    // We should never need this
+    pub fn from_incode_add_front(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: AddSideResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeAddFront(parsed))
+    }
+
+    // We should never need this
+    pub fn from_incode_add_back(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: AddSideResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeAddBack(parsed))
+    }
+
+    // We should never need this
+    pub fn from_incode_process_id(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: ProcessIdResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeProcessId(parsed))
+    }
+
+    // We should never need this
+    pub fn from_incode_fetch_scores(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: FetchScoresResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeFetchScores(parsed))
     }
 }
 

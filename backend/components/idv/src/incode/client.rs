@@ -1,6 +1,7 @@
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
 use newtypes::{
-    vendor_credentials::IncodeCredentials, IdDocKind, IncodeConfigurationId, IncodeSessionId, PiiString,
+    vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
+    PiiString,
 };
 use reqwest::header;
 
@@ -24,6 +25,11 @@ impl IncodeClientAdapter {
         }
         Ok(format!("{}/{}", self.base_url, path))
     }
+
+    // change this to == once we get a prod clientID
+    fn is_production(client_id: &PiiString) -> bool {
+        client_id.leak() != "onefootprint887"
+    }
 }
 
 /// A struct that represents a client that has an Authorization token to be reused across API calls
@@ -45,8 +51,8 @@ impl AuthenticatedIncodeClientAdapter {
 }
 
 impl IncodeClientAdapter {
-    pub fn new(is_production: bool, credentials: IncodeCredentials) -> Result<Self, IncodeError> {
-        let base_url = if is_production {
+    pub fn new(credentials: IncodeCredentials) -> Result<Self, IncodeError> {
+        let base_url = if Self::is_production(&credentials.client_id) {
             Err(IncodeError::SendError("not enabled in production".into()))
         } else {
             Ok("https://demo-api.incodesmile.com".into())
@@ -119,13 +125,18 @@ impl AuthenticatedIncodeClientAdapter {
     pub async fn add_document(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-        config: AddDocumentRequest,
+        docv_data: DocVData,
+        document_side: DocumentSide,
     ) -> Result<serde_json::Value, IncodeError> {
+        let document_type = docv_data
+            .document_type
+            .ok_or(IncodeError::AssertionError("Missing document type".into()))?;
+
         let url = self
             .client_adapter
-            .api_url(url_path_for_document_side(&config).as_str())?;
+            .api_url(url_path_for_document_side(&document_type, &document_side).as_str())?;
         let request = AddDocumentSideRequest {
-            base_64_image: config.image.to_owned(),
+            base_64_image: image_from_side(docv_data, document_side)?,
         };
 
         let response = footprint_http_client
@@ -196,32 +207,41 @@ impl AuthenticatedIncodeClientAdapter {
     }
 }
 
-fn url_path_for_document_side(config: &AddDocumentRequest) -> String {
+fn url_path_for_document_side(document_type: &IdDocKind, document_side: &DocumentSide) -> String {
     // Not all documents have backs
-    let front_only = match config.document_type {
+    let front_only = match document_type {
         IdDocKind::IdCard => false,
         IdDocKind::DriverLicense => false,
         IdDocKind::Passport => true,
     };
 
-    match config.side {
+    match document_side {
         DocumentSide::Front => {
             format!("omni/add/front-id/v2?onlyFront={front_only}")
         }
-        DocumentSide::Back => format!("omni/add/back-id/v2?retry={}", config.back_is_retry),
+        // For now, we always will restart the session if we need to re-collect the document
+        DocumentSide::Back => "omni/add/back-id/v2?retry=false".to_string(),
     }
 }
 
-pub struct AddDocumentRequest {
-    pub side: DocumentSide,
-    pub image: PiiString,
-    pub back_is_retry: bool,
-    pub document_type: IdDocKind,
+fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString, IncodeError> {
+    let image = match side {
+        DocumentSide::Front => docv_data
+            .front_image
+            .ok_or(IncodeError::AssertionError("Missing front image".into()))?,
+        DocumentSide::Back => docv_data
+            .back_image
+            .ok_or(IncodeError::AssertionError("Missing back image".into()))?,
+    };
+
+    Ok(image)
 }
 
 #[cfg(test)]
 mod tests {
-    use newtypes::{vendor_credentials::IncodeCredentials, IdDocKind, IncodeConfigurationId, PiiString};
+    use newtypes::{
+        vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, PiiString,
+    };
 
     use crate::{
         footprint_http_client::FootprintVendorHttpClient,
@@ -233,7 +253,7 @@ mod tests {
         tests::fixtures::images::load_image_and_encode_as_b64,
     };
 
-    use super::{AddDocumentRequest, AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
+    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
 
     fn load_client() -> IncodeClientAdapter {
         let creds = IncodeCredentials {
@@ -241,7 +261,7 @@ mod tests {
             client_id: PiiString::from(dotenv::var("INCODE_CLIENT_ID").unwrap()),
         };
 
-        IncodeClientAdapter::new(false, creds).expect("couldn't load incode client")
+        IncodeClientAdapter::new(creds).expect("couldn't load incode client")
     }
     #[ignore]
     #[tokio::test]
@@ -261,24 +281,26 @@ mod tests {
 
         // Use token we got from omni/start to authenticate future requests
         let authenticated_client = AuthenticatedIncodeClientAdapter::new(client, parsed.token).unwrap();
-        let front = AddDocumentRequest {
-            side: DocumentSide::Front,
-            image: load_image_and_encode_as_b64("fake_incode_front.jpg").0.into(),
-            back_is_retry: false,
-            document_type: IdDocKind::DriverLicense,
+        let front_docv_data = DocVData {
+            front_image: Some(PiiString::from(
+                load_image_and_encode_as_b64("fake_incode_front.jpg").0,
+            )),
+            document_type: Some(IdDocKind::DriverLicense),
+            ..Default::default()
         };
-        let back = AddDocumentRequest {
-            side: DocumentSide::Back,
-            image: load_image_and_encode_as_b64("fake_incode_back.jpg").0.into(),
-            back_is_retry: false,
-            document_type: IdDocKind::DriverLicense,
+        let back_docv_data = DocVData {
+            back_image: Some(PiiString::from(
+                load_image_and_encode_as_b64("fake_incode_back.jpg").0,
+            )),
+            document_type: Some(IdDocKind::DriverLicense),
+            ..Default::default()
         };
 
         //
         // Add document sides
         //
         let raw_front_add_side_res = authenticated_client
-            .add_document(&fp_client, front)
+            .add_document(&fp_client, front_docv_data, DocumentSide::Front)
             .await
             .expect("add side failed");
         // check we can deser
@@ -288,7 +310,7 @@ mod tests {
             .unwrap();
 
         let raw_back_add_side_res = authenticated_client
-            .add_document(&fp_client, back)
+            .add_document(&fp_client, back_docv_data, DocumentSide::Back)
             .await
             .expect("add side failed");
         // check we can deser

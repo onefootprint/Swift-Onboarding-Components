@@ -1,9 +1,36 @@
+use newtypes::{
+    vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken},
+    DocVData, IncodeConfigurationId, IncodeSessionId,
+};
 use serde::de::DeserializeOwned;
 
 pub mod client;
 pub mod error;
 pub mod request;
 pub mod response;
+
+pub struct IncodeStartOnboardingRequest {
+    pub credentials: IncodeCredentials,
+    pub configuration_id: IncodeConfigurationId,
+    pub session_id: Option<IncodeSessionId>,
+}
+
+pub struct IncodeAddFrontRequest {
+    pub credentials: IncodeCredentialsWithToken,
+    pub docv_data: DocVData,
+}
+pub struct IncodeAddBackRequest {
+    pub credentials: IncodeCredentialsWithToken,
+    pub docv_data: DocVData,
+}
+
+pub struct IncodeProcessIdRequest {
+    pub credentials: IncodeCredentialsWithToken,
+}
+
+pub struct IncodeFetchScoresRequest {
+    pub credentials: IncodeCredentialsWithToken,
+}
 
 /// Trait that an API Response uses to convert to an API error
 /// response that is in the incode API response
@@ -12,6 +39,11 @@ pub trait APIResponseToIncodeError {
 }
 
 /// Struct representing a deserialized response that can include errors
+pub struct IncodeResponse<T: APIResponseToIncodeError> {
+    pub result: IncodeAPIResult<T>,
+    pub raw_response: serde_json::Value,
+}
+
 pub enum IncodeAPIResult<T: APIResponseToIncodeError> {
     Success(T),
     ResponseError(response::Error),

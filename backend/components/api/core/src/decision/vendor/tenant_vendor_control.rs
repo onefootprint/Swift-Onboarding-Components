@@ -85,9 +85,8 @@ impl TenantVendorControl {
     }
 
     // As of 2023-04-25, we re-use a single set of credentials for Incode
-    pub fn build_incode_client_adapter(&self, is_production: bool) -> ApiResult<IncodeClientAdapter> {
-        let res =
-            IncodeClientAdapter::new(is_production, self.incode_credentials()).map_err(idv::Error::from)?;
+    pub fn build_incode_client_adapter(&self) -> ApiResult<IncodeClientAdapter> {
+        let res = IncodeClientAdapter::new(self.incode_credentials()).map_err(idv::Error::from)?;
 
         Ok(res)
     }

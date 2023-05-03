@@ -1,5 +1,6 @@
 pub mod experian;
 pub mod idology;
+pub mod incode;
 pub mod middesk;
 pub mod socure;
 pub mod twilio;

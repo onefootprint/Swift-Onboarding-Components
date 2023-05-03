@@ -14,4 +14,6 @@ pub enum Error {
     Unauthorized,
     #[error("Incode API Error: {0}")]
     APIResponseError(super::response::Error),
+    #[error("Assertion Error: {0}")]
+    AssertionError(String),
 }

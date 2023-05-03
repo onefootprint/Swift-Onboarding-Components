@@ -23,6 +23,12 @@ pub struct IncodeCredentials {
     pub client_id: PiiString,
 }
 
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct IncodeCredentialsWithToken {
+    pub credentials: IncodeCredentials,
+    pub authentication_token: PiiString,
+}
+
 /// The bulk of experian credentials are shared across requests for different tenants
 /// All that is different is the subscriber code
 impl ExperianCredentialBuilder {

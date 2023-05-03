@@ -88,11 +88,11 @@ fn deserialize_from_vendor_api(
             ParsedResponse::from_middesk_tin_retried_webhook(raw_response)?
         }
         VendorAPI::MiddeskGetBusiness => ParsedResponse::from_middesk_get_business(raw_response)?,
-        VendorAPI::IncodeStartOnboarding => todo!(),
-        VendorAPI::IncodeAddFront => todo!(),
-        VendorAPI::IncodeAddBack => todo!(),
-        VendorAPI::IncodeProcessId => todo!(),
-        VendorAPI::IncodeFetchScores => todo!(),
+        VendorAPI::IncodeStartOnboarding => ParsedResponse::from_incode_start_response(raw_response)?,
+        VendorAPI::IncodeAddFront => ParsedResponse::from_incode_add_front(raw_response)?,
+        VendorAPI::IncodeAddBack => ParsedResponse::from_incode_add_back(raw_response)?,
+        VendorAPI::IncodeProcessId => ParsedResponse::from_incode_process_id(raw_response)?,
+        VendorAPI::IncodeFetchScores => ParsedResponse::from_incode_fetch_scores(raw_response)?,
     };
 
     Ok(res)
