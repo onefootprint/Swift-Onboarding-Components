@@ -4,13 +4,13 @@ import { Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { FormData } from '../../types';
+import { FormData } from '../../../../types';
 
-type BeneficialOwnerNameProps = {
+type NameProps = {
   index: number;
 };
 
-const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
+const Name = ({ index }: NameProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields');
   const {
     register,
@@ -57,4 +57,4 @@ const BeneficialOwnerName = ({ index }: BeneficialOwnerNameProps) => {
   );
 };
 
-export default BeneficialOwnerName;
+export default Name;

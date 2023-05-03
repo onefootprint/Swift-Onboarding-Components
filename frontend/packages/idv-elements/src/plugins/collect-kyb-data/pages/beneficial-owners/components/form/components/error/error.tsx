@@ -4,14 +4,14 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const FormInvalidError = () => {
-  const { t } = useTranslation('pages.beneficial-owners.form');
+const Error = () => {
+  const { t } = useTranslation('pages.beneficial-owners.form.errors');
 
   return (
     <Container>
       <IcoWarning16 color="error" />
       <Typography variant="body-3" color="error">
-        {t('errors.invalid')}
+        {t('invalid')}
       </Typography>
     </Container>
   );
@@ -25,4 +25,4 @@ const Container = styled.div`
   `}
 `;
 
-export default FormInvalidError;
+export default Error;

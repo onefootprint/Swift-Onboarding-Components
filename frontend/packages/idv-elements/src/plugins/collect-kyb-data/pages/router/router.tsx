@@ -19,7 +19,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useCollectKybDataMachine();
   const isDone = state.matches('completed');
-  useLogStateMachine('collect-kyc-data', state);
+  useLogStateMachine('collect-kyb-data', state);
 
   useEffect(() => {
     if (isDone) {

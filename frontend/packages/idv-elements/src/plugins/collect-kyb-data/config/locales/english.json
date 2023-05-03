@@ -116,6 +116,14 @@
               "pattern": "Add ”#string” (e.g., #test1) at the end of your email address."
             }
           },
+          "phone": {
+            "label": "Phone number",
+            "placeholder": "(123) 456-7890",
+            "errors": {
+              "required": "Phone number is required",
+              "pattern": "Phone number is invalid"
+            }
+          },
           "ownership-stake": {
             "label": "Ownership stake (%)",
             "placeholder": "25",
@@ -126,6 +134,7 @@
             }
           }
         },
+        "multi-kyc": "We need to verify all other beneficial owners’ identities. We'll email them a link after you finish filling out your business verification.",
         "add-more": "Add more",
         "errors": {
           "invalid": "Please complete the fields above.",

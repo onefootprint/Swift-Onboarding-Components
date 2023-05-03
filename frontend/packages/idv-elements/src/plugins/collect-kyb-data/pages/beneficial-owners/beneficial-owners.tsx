@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { BusinessDI } from '@onefootprint/types';
+import { BusinessDI, CollectedKybDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -8,7 +8,7 @@ import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-na
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BeneficialOwnersData } from '../../utils/state-machine/types';
-import BeneficialOwnersForm from './components/beneficial-owners-form';
+import BeneficialOwnersForm from './components/form';
 
 type BeneficialOwnersProps = {
   hideHeader?: boolean;
@@ -22,10 +22,13 @@ const BeneficialOwners = ({
   onComplete,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data } = state.context;
+  const { authToken, data, missingKybAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t, allT } = useTranslation('pages.beneficial-owners');
+  const requireMultiKyc = missingKybAttributes.includes(
+    CollectedKybDataOption.kycedBeneficialOwners,
+  );
 
   const handleSubmit = (beneficialOwners: BeneficialOwnersData) => {
     const handleSuccess = () => {
@@ -77,6 +80,7 @@ const BeneficialOwners = ({
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
+        requireMultiKyc={requireMultiKyc}
       />
     </>
   );

@@ -1,30 +1,32 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
-import { Button, Divider, useToast } from '@onefootprint/ui';
+import { Button, Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { BeneficialOwnersData } from '../../../../utils/state-machine/types';
 import AddButton from './components/add-button';
-import BeneficialOwnerFields from './components/beneficial-owner-fields';
-import FormInvalidError from './components/form-invalid-error';
+import FormInvalidError from './components/error';
+import Fields from './components/fields';
 import { FormData } from './types';
 
-export type BeneficialOwnersFormProps = {
+export type FormProps = {
   defaultValues?: Partial<FormData>;
   isLoading: boolean;
   onSubmit: (data: BeneficialOwnersData) => void;
   ctaLabel?: string;
+  requireMultiKyc?: boolean;
 };
 
-const BeneficialOwnersForm = ({
+const Form = ({
   defaultValues,
   isLoading,
   onSubmit,
   ctaLabel,
-}: BeneficialOwnersFormProps) => {
+  requireMultiKyc,
+}: FormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t, allT } = useTranslation('pages.beneficial-owners.form');
   const toast = useToast();
@@ -33,6 +35,7 @@ const BeneficialOwnersForm = ({
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]: undefined,
+      [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];
@@ -55,12 +58,14 @@ const BeneficialOwnersForm = ({
   });
   const shouldShowError =
     !!errors?.beneficialOwners && errors?.beneficialOwners?.[0];
+  const shouldShowMultiKyc = requireMultiKyc && fields.length > 1;
 
   const handleAddMore = () => {
     append({
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]: undefined,
+      [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     });
   };
@@ -90,8 +95,10 @@ const BeneficialOwnersForm = ({
           bo[BeneficialOwnerDataAttribute.firstName] &&
           bo[BeneficialOwnerDataAttribute.lastName] &&
           bo[BeneficialOwnerDataAttribute.ownershipStake] >= 25 &&
-          // Only require email for additional BOs
-          (index === 0 || !!bo[BeneficialOwnerDataAttribute.email]),
+          // Only require email/phone for additional BOs
+          (index === 0 ||
+            !!bo[BeneficialOwnerDataAttribute.email] ||
+            !!bo[BeneficialOwnerDataAttribute.phoneNumber]),
       )
       .map(bo => ({
         ...bo,
@@ -105,28 +112,34 @@ const BeneficialOwnersForm = ({
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmitFormData)} ref={animate}>
+      <StyledForm onSubmit={handleSubmit(onSubmitFormData)} ref={animate}>
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
-            <BeneficialOwnerFields index={index} onRemove={removeIndex} />
-            <Divider />
+            <Fields index={index} onRemove={removeIndex} />
+            {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>
         ))}
+        {shouldShowMultiKyc && (
+          <Typography variant="body-3" color="secondary">
+            {t('multi-kyc')}
+          </Typography>
+        )}
+        <Divider />
         <AddButton onClick={handleAddMore} />
         {shouldShowError && <FormInvalidError />}
         <Button type="submit" fullWidth loading={isLoading}>
           {ctaLabel ?? allT('pages.cta-continue')}
         </Button>
-      </Form>
+      </StyledForm>
     </FormProvider>
   );
 };
 
-const Form = styled.form`
+const StyledForm = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[6]};
   `}
 `;
 
-export default BeneficialOwnersForm;
+export default Form;

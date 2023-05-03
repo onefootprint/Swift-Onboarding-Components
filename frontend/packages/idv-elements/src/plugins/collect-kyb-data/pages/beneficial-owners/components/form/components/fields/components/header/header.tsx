@@ -3,12 +3,12 @@ import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-type FieldsHeaderProps = {
+type HeaderProps = {
   shouldShowRemove?: boolean;
   onRemove: () => void;
 };
 
-const FieldsHeader = ({ shouldShowRemove, onRemove }: FieldsHeaderProps) => {
+const Header = ({ shouldShowRemove, onRemove }: HeaderProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields-header');
 
   return shouldShowRemove ? (
@@ -30,4 +30,4 @@ const HeaderContainer = styled.div`
   align-items: center;
 `;
 
-export default FieldsHeader;
+export default Header;
