@@ -70,6 +70,35 @@ def test_invalid_dis(key, tenant):
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
 
+@pytest.mark.parametrize(
+    "entry,derived_entry",
+    [
+        (
+            {
+                "id.ssn9": "123-12-0987",
+                "id.ssn4": "something bogus that will be overwritten",
+            },
+            {"id.ssn4": "0987"},
+        ),
+        (
+            {
+                "card.hayes_valley.number": "4428680502681658",
+                "card.hayes_valley.last4": "something bogus that will be overwritten",
+            },
+            {"card.hayes_valley.last4": "1658"},
+        ),
+    ],
+)
+def test_derived_entries(tenant, entry, derived_entry):
+    body = post("users/", entry, tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(fields=list(derived_entry), reason="Hayes valley integration test")
+    body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
+    for k, v in derived_entry.items():
+        assert body[k] == v
+
+
 def test_vault_create_write_decrypt(tenant):
     # create the vault
     initial_data = {

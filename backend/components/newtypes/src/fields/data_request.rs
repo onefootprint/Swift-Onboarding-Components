@@ -1,7 +1,7 @@
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK,
-    PiiString, TenantId, Validate, VaultKind, VdKind,
+    CardDataKind as CDK, CardInfo, CollectedDataOption, DataIdentifier, Error, Fingerprint,
+    FingerprintScopeKind, IdentityDataKind as IDK, PiiString, TenantId, Validate, VaultKind, VdKind,
 };
 use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
@@ -68,19 +68,40 @@ impl ParseOptions {
     }
 }
 
+/// Given an entry in a DataIdentifierRequest, determines if we should add any other derived
+/// entries to the DataIdentifierRequest that are a function of other DIs
+fn derived_entry(di: &DataIdentifier, v: &PiiString) -> Option<(DataIdentifier, PiiString)> {
+    match di {
+        // Autopopulate Ssn4 if we have Ssn9
+        DataIdentifier::Id(IDK::Ssn9) => {
+            let ssn4 = PiiString::new(v.leak().chars().skip(v.leak().len() - 4).collect());
+            Some((IDK::Ssn4.into(), ssn4))
+        }
+        // Autopopulate CDK::Last4 if we have CDK::Number
+        DataIdentifier::Card(CardInfo {
+            alias,
+            kind: CDK::Number,
+        }) => {
+            let last4 = PiiString::new(v.leak().chars().skip(v.leak().len() - 4).collect());
+            let di = CardInfo {
+                alias: alias.clone(),
+                kind: CDK::Last4,
+            }
+            .into();
+            Some((di, last4))
+        }
+        _ => None,
+    }
+}
+
 impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
     pub fn clean_and_validate(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<Self> {
-        let mut map = map;
-        // Custom logic to always populate ssn4 if ssn9 is provided
-        if let Some(ssn9) = map.get(&IDK::Ssn9.into()) {
-            #[allow(clippy::map_entry)]
-            if !map.contains_key(&IDK::Ssn4.into()) {
-                let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
-                map.insert(IDK::Ssn4.into(), ssn4);
-            }
-        }
+        let derived_entries = map.iter().filter_map(|(di, v)| derived_entry(di, v));
+        // Purposefully overlay derived entries on top of existing entries in order to overwrite
+        // an ssn4 that's provided and might not match the given ssn9
+        let map: DataIdentifierRequest = map.clone().into_iter().chain(derived_entries).collect();
 
         // Only take the data that fits in the Vd table
         // TODO should we make the DataRequest a VdKind -> PiiString
