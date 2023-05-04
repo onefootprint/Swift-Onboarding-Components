@@ -60,22 +60,6 @@ pub async fn post_validate_inner(
 }
 
 #[api_v2_operation(
-    description = "Works for either person or business entities. Updates data in a user vault. Same as PATCH",
-    tags(Entities, Vault, PublicApi, Deprecated)
-)]
-#[actix::put("/entities/{fp_id}/vault")]
-pub async fn put(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Json<RawDataRequest>,
-    tenant_auth: SecretTenantAuthContext,
-    insight: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = patch_inner(state, path, request, tenant_auth, insight).await?;
-    Ok(result)
-}
-
-#[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a user vault.",
     tags(Entities, Vault, PublicApi)
 )]

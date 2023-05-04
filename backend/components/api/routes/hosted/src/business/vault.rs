@@ -46,34 +46,11 @@ pub async fn post_validate(
 }
 
 #[api_v2_operation(
-    description = "Updates data in a business vault. Can be used to update `business.` data. Same as PATCH",
-    tags(Hosted, Vault, Businesses, Deprecated)
-)]
-#[actix::put("/hosted/business/vault")]
-pub async fn put(
-    state: web::Data<State>,
-    request: Json<RawDataRequest>,
-    user_auth: UserObAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = patch_inner(state, request, user_auth).await?;
-    Ok(result)
-}
-
-#[api_v2_operation(
     description = "Updates data in a business vault. Can be used to update `business.` data",
     tags(Hosted, Vault, Businesses)
 )]
 #[actix::patch("/hosted/business/vault")]
 pub async fn patch(
-    state: web::Data<State>,
-    request: Json<RawDataRequest>,
-    user_auth: UserObAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = patch_inner(state, request, user_auth).await?;
-    Ok(result)
-}
-
-async fn patch_inner(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_auth: UserObAuthContext,

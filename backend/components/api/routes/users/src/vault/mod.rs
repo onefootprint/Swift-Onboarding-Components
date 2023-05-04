@@ -67,6 +67,7 @@ pub async fn post_validate(
     description = "Updates data in a user vault. Same functionality as PATCH",
     tags(Vault, PublicApi, Users, Deprecated)
 )]
+// TODO rm this once we confirm nobody is using it
 #[actix::put("/users/{footprint_user_id}/vault")]
 pub async fn put(
     state: web::Data<State>,
