@@ -39,7 +39,7 @@ config:
       crossCoreSubscriberCode:
         secure: v1:e1/a6J/MlJzhfBEg:kXiwWudlbD+jXVnfaoz89OZ49Eri9Sc=
       crossCoreUsername:
-        secure: v1:1VQb93G3yV3CAE4+:c9GLMxpylAjgRJg5h8GBoUvqmwq9myog[]
+        secure: v1:1VQb93G3yV3CAE4+:c9GLMxpylAjgRJg5h8GBoUvqmwq9myog
     fingerprint:
       fingerprintSdkKey:
         secure: v1:vM4Ei3NKCOggmINc:nCqVE0nBwd+A32iIVQterKi9D7qFbbgjAeDHaR9MuMB8+r68
