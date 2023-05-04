@@ -105,8 +105,9 @@ pub struct Config {
     #[envconfig(nested = true)]
     pub stripe: StripeConfig,
 
-    // #[envconfig(nested = true)]
-    // pub experian: ExperianConfig,
+    #[envconfig(nested = true)]
+    pub experian: ExperianConfig,
+
     #[envconfig(from = "FINGERPRINTJS_SDK_KEY")]
     pub fingerprintjs_sdk_key: String,
 
@@ -259,7 +260,6 @@ pub struct IncodeConfig {
 }
 
 #[derive(Envconfig, Debug, Clone)]
-#[allow(dead_code)]
 pub struct ExperianConfig {
     #[envconfig(from = "EXPERIAN_AUTH_USERNAME")]
     pub auth_username: PiiString,
@@ -273,6 +273,8 @@ pub struct ExperianConfig {
     pub cross_core_username: PiiString,
     #[envconfig(from = "EXPERIAN_CROSS_CORE_PASSWORD")]
     pub cross_core_password: PiiString,
+    #[envconfig(from = "EXPERIAN_PRECISEID_SUBSCRIBER_CODE")]
+    pub subscriber_code: PiiString,
 }
 
 #[derive(Envconfig, Debug, Clone)]

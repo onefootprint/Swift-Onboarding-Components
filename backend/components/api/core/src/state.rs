@@ -13,11 +13,10 @@ use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use idv::{
-    experian::cross_core::client::ExperianClientAdapter, fingerprintjs::client::FingerprintJSClient,
-    footprint_http_client::FootprintVendorHttpClient, idology::client::IdologyClient,
-    middesk::client::MiddeskClient, socure::client::SocureClient,
+    fingerprintjs::client::FingerprintJSClient, footprint_http_client::FootprintVendorHttpClient,
+    idology::client::IdologyClient, middesk::client::MiddeskClient, socure::client::SocureClient,
 };
-use newtypes::PiiString;
+
 use workos::{ApiKey, WorkOs};
 
 #[derive(Clone)]
@@ -41,7 +40,6 @@ pub struct State {
     pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
-    pub experian_client: ExperianClientAdapter,
     pub fingerprintjs_client: FingerprintJSClient,
     pub middesk_client: MiddeskClient,
     pub footprint_vendor_http_client: FootprintVendorHttpClient,
@@ -118,29 +116,19 @@ impl State {
 
         let billing_client = billing::BillingClient::new(config.stripe.api_key.clone());
 
-        let experian_client = ExperianClientAdapter::new(
-            PiiString::from("crosscore2.uat@onefootprint.com"),
-            PiiString::from(""),
-            PiiString::from(""),
-            PiiString::from(""),
-            PiiString::from(""),
-            PiiString::from(""),
-            PiiString::from(""),
-            // TODO: uncomment once we have production credentials, for now we'll just use fixtures
-            // config.experian.auth_username.clone(),
-            // config.experian.auth_password.clone(),
-            // config.experian.auth_client_id.clone(),
-            // config.experian.auth_client_secret.clone(),
-            // config.experian.cross_core_username.clone(),
-            // config.experian.cross_core_password.clone(),
-        )
-        .expect("failed to build experian client");
-
         let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
             .expect("failed to build fingerprint client");
 
         let middesk_client = MiddeskClient::new(config.middesk_config.middesk_sandbox_api_key.clone(), true)
             .expect("failed to build middesk client");
+
+        // Check experian in dev so we fail early if something is misconfigured
+        if !config.service_config.is_production()
+            && !config.service_config.is_local()
+            && config.experian.auth_client_secret.leak().len() > 1
+        {
+            panic!("should not have experian credentials in anything other than local or production!")
+        }
 
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
@@ -191,7 +179,6 @@ impl State {
             feature_flag_client,
             webhook_service_client,
             billing_client,
-            experian_client,
             fingerprintjs_client,
             middesk_client,
             footprint_vendor_http_client,

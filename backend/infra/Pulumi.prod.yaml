@@ -25,6 +25,21 @@ config:
       heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
       id: omacKoQBB6pi8-b5UVPY
     enclaveCertPCR8: e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96
+    experian:
+      authClientId:
+        secure: v1:nKH6gAZEyJmAV3v+:i53g5Yqq4/bwPZTY2l8bKnebzJjcK2P2reAbWD8ySBi2uqumN1+EksM7Ay9sCvqT
+      authClientSecret:
+        secure: v1:ZIckzBZbX6QsUjAd:Rqpr3hcBNPESndBB+0PE5uiEJbbg/QQ2AFDtFcMrviE=
+      authPassword:
+        secure: v1:ZY2jHzMlxncFgLJx:efvXEuxdidwQeMkg4fXXV8AJnlTWraC17cKtD0KEaIsHXmwu
+      authUsername:
+        secure: v1:gN3HRu4vD+cyCn7o:0Qd3VH5hZvazjgnMs0bCp4lFnvls3HU3szF2RYNUEY3tsqbFN5A2WnSuDu3aJbxw
+      crossCorePassword:
+        secure: v1:pP4cIHpZc1xX/NAM:GZ9FU6JsFQYb2Xthx9lpBO/OFaDrD3+6REX8EvdwS/WSvgoO
+      crossCoreSubscriberCode:
+        secure: v1:e1/a6J/MlJzhfBEg:kXiwWudlbD+jXVnfaoz89OZ49Eri9Sc=
+      crossCoreUsername:
+        secure: v1:1VQb93G3yV3CAE4+:c9GLMxpylAjgRJg5h8GBoUvqmwq9myog[]
     fingerprint:
       fingerprintSdkKey:
         secure: v1:vM4Ei3NKCOggmINc:nCqVE0nBwd+A32iIVQterKi9D7qFbbgjAeDHaR9MuMB8+r68

@@ -8,7 +8,6 @@ use db::{
 use idv::{
     experian::ExperianCrossCoreRequest,
     idology::{pa::IdologyPaRequest, IdologyExpectIDRequest},
-    incode::client::IncodeClientAdapter,
 };
 use newtypes::{
     vendor_credentials::{
@@ -83,13 +82,6 @@ impl TenantVendorControl {
             credentials: self.idology_credentials(),
         }
     }
-
-    // As of 2023-04-25, we re-use a single set of credentials for Incode
-    pub fn build_incode_client_adapter(&self) -> ApiResult<IncodeClientAdapter> {
-        let res = IncodeClientAdapter::new(self.incode_credentials()).map_err(idv::Error::from)?;
-
-        Ok(res)
-    }
 }
 
 impl TenantVendorControl {
@@ -128,8 +120,8 @@ impl TenantVendorControl {
             if let Some(sub_code) = Self::get_experian_subscriber_code(&vendor_control) {
                 sub_code
             } else {
-                // TODO: upstream this to config
-                "2956241".to_string().into()
+                // use default
+                config.experian.subscriber_code.clone()
             };
         let experian_credentials =
             experian_credential_builder.build_with_subscriber_code(experian_subscriber_code);
@@ -263,14 +255,26 @@ impl From<&Config> for IncodeCredentials {
 }
 
 impl From<&Config> for ExperianCredentialBuilder {
-    fn from(_config: &Config) -> Self {
-        ExperianCredentialBuilder {
-            auth_username: PiiString::from("crosscore2.uat@onefootprint.com"),
-            auth_password: PiiString::from(""),
-            auth_client_id: PiiString::from(""),
-            auth_client_secret: PiiString::from(""),
-            cross_core_username: PiiString::from(""),
-            cross_core_password: PiiString::from(""),
+    fn from(config: &Config) -> Self {
+        // only load real creds in prod
+        if config.service_config.is_production() {
+            ExperianCredentialBuilder {
+                auth_username: config.experian.auth_username.clone(),
+                auth_password: config.experian.auth_password.clone(),
+                auth_client_id: config.experian.auth_client_id.clone(),
+                auth_client_secret: config.experian.auth_client_secret.clone(),
+                cross_core_username: config.experian.cross_core_username.clone(),
+                cross_core_password: config.experian.cross_core_password.clone(),
+            }
+        } else {
+            ExperianCredentialBuilder {
+                auth_username: PiiString::from(""),
+                auth_password: PiiString::from(""),
+                auth_client_id: PiiString::from(""),
+                auth_client_secret: PiiString::from(""),
+                cross_core_username: PiiString::from(""),
+                cross_core_password: PiiString::from(""),
+            }
         }
     }
 }

@@ -146,6 +146,13 @@ export abstract class ServiceContainers {
         secretsStore.incodeClientId.arn,
         secretsStore.middeskSandboxApiKey.arn,
         secretsStore.middeskWebhookSecret.arn,
+        secretsStore.experianAuthUsername.arn,
+        secretsStore.experianAuthPassword.arn,
+        secretsStore.experianAuthClientId.arn,
+        secretsStore.experianAuthClientSecret.arn,
+        secretsStore.experianCrossCoreUsername.arn,
+        secretsStore.experianCrossCorePassword.arn,
+        secretsStore.experianCrossCoreSubscriberCode.arn,
       ])
       .apply(
         ([
@@ -177,6 +184,13 @@ export abstract class ServiceContainers {
           incodeClientId,
           middeskSandboxApiKey,
           middeskWebhookSecret,
+          experianAuthUsername,
+          experianAuthPassword,
+          experianAuthClientId,
+          experianAuthClientSecret,
+          experianCrossCoreUsername,
+          experianCrossCorePassword,
+          experianCrossCoreSubscriberCode,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -283,6 +297,36 @@ export abstract class ServiceContainers {
                 name: 'MIDDESK_WEBHOOK_SECRET',
                 valueFrom: middeskWebhookSecret,
               },
+
+              {
+                name: 'EXPERIAN_AUTH_USERNAME',
+                valueFrom: experianAuthUsername,
+              },
+              {
+                name: 'EXPERIAN_AUTH_PASSWORD',
+                valueFrom: experianAuthPassword,
+              },
+              {
+                name: 'EXPERIAN_AUTH_CLIENT_ID',
+                valueFrom: experianAuthClientId,
+              },
+              {
+                name: 'EXPERIAN_AUTH_CLIENT_SECRET',
+                valueFrom: experianAuthClientSecret,
+              },
+              {
+                name: 'EXPERIAN_CROSS_CORE_USERNAME',
+                valueFrom: experianCrossCoreUsername,
+              },
+              {
+                name: 'EXPERIAN_CROSS_CORE_PASSWORD',
+                valueFrom: experianCrossCorePassword,
+              },
+              {
+                name: 'EXPERIAN_PRECISEID_SUBSCRIBER_CODE',
+                valueFrom: experianCrossCoreSubscriberCode,
+              },
+
             ],
             environment: [
               {

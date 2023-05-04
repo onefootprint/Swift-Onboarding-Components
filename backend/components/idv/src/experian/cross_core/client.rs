@@ -1,5 +1,6 @@
 use chrono::Utc;
 use newtypes::experian::ProductOptions;
+use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::{IdvData, PiiString, Uuid};
 
 use crate::experian::auth::{self, response::JwtTokenResponse};
@@ -27,34 +28,30 @@ pub struct ExperianClientAdapter {
     cross_core_credentials: CrossCoreRequestCredentials,
     environment: ClientEnvironment,
     subscriber_code: PiiString,
+    cross_core_url: String,
 }
 
 impl ExperianClientAdapter {
-    #[allow(unused)]
-    pub fn new(
-        auth_username: PiiString,
-        auth_password: PiiString,
-        auth_client_id: PiiString,
-        auth_client_secret: PiiString,
-        cross_core_username: PiiString,
-        cross_core_password: PiiString,
-        subscriber_code: PiiString,
-    ) -> Result<Self, Error> {
-        let client_mode = Self::get_environment(&auth_username)?;
+    pub fn new(credentials: ExperianCredentials) -> Result<Self, Error> {
+        let client_mode = Self::get_environment(&credentials.auth_username)?;
+        let cross_core_url = Self::get_cross_core_url(&client_mode);
 
-        let cross_core_credentials =
-            CrossCoreRequestCredentials::new(cross_core_username, cross_core_password)?;
+        let cross_core_credentials = CrossCoreRequestCredentials::new(
+            credentials.cross_core_username,
+            credentials.cross_core_password,
+        )?;
         let jwt_token_auth_credentials = CrossCoreAuthTokenCredentials {
-            username: auth_username,
-            password: auth_password,
-            client_id: auth_client_id,
-            client_secret: auth_client_secret,
+            username: credentials.auth_username,
+            password: credentials.auth_password,
+            client_id: credentials.auth_client_id,
+            client_secret: credentials.auth_client_secret,
         };
         Ok(Self {
             jwt_token_auth_credentials,
             cross_core_credentials,
             environment: client_mode,
-            subscriber_code: "2956241".into(),
+            subscriber_code: credentials.subscriber_code,
+            cross_core_url,
         })
     }
 
@@ -76,11 +73,21 @@ impl ExperianClientAdapter {
         }
     }
 
-    fn is_production(_auth_username: &PiiString) -> bool {
-        false
+    fn is_production(auth_username: &PiiString) -> bool {
+        auth_username.leak() == "crosscore2.prod@onefootprint.com"
     }
     fn is_sandbox(auth_username: &PiiString) -> bool {
         auth_username.leak() == "crosscore2.uat@onefootprint.com"
+    }
+
+    fn get_cross_core_url(client_mode: &ClientEnvironment) -> String {
+        if client_mode == &ClientEnvironment::Sandbox {
+            "https://us-api.experian.com/decisionanalytics/crosscore/npfrawmfuwsu/services/v0/applications/3"
+                .into()
+        } else {
+            "https://us-api.experian.com/decisionanalytics/crosscore/npqa4sgh49xh/services/v0/applications/3"
+                .into()
+        }
     }
 }
 
@@ -129,9 +136,6 @@ impl ExperianClientAdapter {
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
     ) -> Result<serde_json::Value, Error> {
-        let url =
-            "https://us-api.experian.com/decisionanalytics/crosscore/npfrawmfuwsu/services/v0/applications/3";
-
         let req_struct = &CrossCoreAPIRequest::try_from(
             validated_idv_data.into_idv_data(),
             self.config(),
@@ -141,7 +145,7 @@ impl ExperianClientAdapter {
         let auth_token = self.send_token_request(client).await?.access_token;
 
         let response = client
-            .post(url)
+            .post(self.cross_core_url.as_str())
             .body(req)
             .bearer_auth(auth_token)
             .header("Content-Type", "application/json")
@@ -157,9 +161,7 @@ impl ExperianClientAdapter {
     fn config(&self) -> PreciseIDRequestConfig {
         PreciseIDRequestConfig {
             control_options: self.control_options(),
-            // TODO: prob should put this in credentials
             tenant_id: "105408b68cde455a92e95a3eaa989e".into(),
-            // TODO: prob should put this in credentials
             request_type: "PreciseIdOnly".into(),
             // TODO: verification request id?
             client_reference_id: Uuid::new_v4().to_string(),
@@ -295,7 +297,7 @@ mod tests {
         let auth_client_secret = PiiString::from(dotenv::var("EXPERIAN_AUTH_CLIENT_SECRET").unwrap());
         let cross_core_username = PiiString::from(dotenv::var("EXPERIAN_CROSS_CORE_USERNAME").unwrap());
         let cross_core_password = PiiString::from(dotenv::var("EXPERIAN_CROSS_CORE_PASSWORD").unwrap());
-        let subscriber_code = PiiString::from("2956241");
+        let subscriber_code = PiiString::from(dotenv::var("EXPERIAN_PRECISEID_SUBSCRIBER_CODE").unwrap());
 
         ExperianCredentials {
             auth_username,
@@ -308,25 +310,7 @@ mod tests {
         }
     }
     fn sandbox_client() -> Result<ExperianClientAdapter, Error> {
-        let ExperianCredentials {
-            auth_username,
-            auth_password,
-            auth_client_id,
-            auth_client_secret,
-            cross_core_username,
-            cross_core_password,
-            subscriber_code,
-        } = load_sandbox_credentials();
-
-        ExperianClientAdapter::new(
-            auth_username,
-            auth_password,
-            auth_client_id,
-            auth_client_secret,
-            cross_core_username,
-            cross_core_password,
-            subscriber_code,
-        )
+        ExperianClientAdapter::new(load_sandbox_credentials())
     }
 
     #[test]
@@ -346,15 +330,15 @@ mod tests {
         } = load_sandbox_credentials();
 
         // client with wrong auth username
-        let res = ExperianClientAdapter::new(
-            PiiString::from("production-scary-secret"),
+        let res = ExperianClientAdapter::new(ExperianCredentials {
+            auth_username: PiiString::from("production-scary-secret"),
             auth_password,
             auth_client_id,
             auth_client_secret,
             cross_core_username,
             cross_core_password,
             subscriber_code,
-        );
+        });
 
         let assertion = match res {
             Err(Error::ValidationError(e)) => e == ValidationError::CredentialsNotRegistered,

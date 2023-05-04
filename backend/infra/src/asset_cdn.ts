@@ -33,11 +33,23 @@ export async function CreateAssetCdn(
     domain = constants.domain.assets;
   }
 
-  const logsBucket = new aws.s3.Bucket('requestLogs', {
-    forceDestroy: !constants.deletionProtection,
-    bucket: `${domain}-logs`,
-    acl: 'private',
-  });
+  // const logsBucket = new aws.s3.Bucket('requestLogs', {
+  //   forceDestroy: !constants.deletionProtection,
+  //   bucket: `${domain}-logs`,
+  //   acl: 'public-read-write',
+  // });
+
+  // new aws.s3.BucketOwnershipControls('asset-requestLogs-ownc', {
+  //   bucket: logsBucket.id,
+  //   rule: {
+  //     objectOwnership: 'ObjectWriter',
+  //   },
+  // });
+
+  // new aws.s3.BucketAclV2('requestLogsAcl', {
+  //   bucket: logsBucket.id,
+  //   acl: 'log-delivery-write',
+  // });
 
   // create an access identity for CDN -> S3
   const originAccessIdentity = new aws.cloudfront.OriginAccessIdentity(
@@ -128,11 +140,11 @@ export async function CreateAssetCdn(
       sslSupportMethod: 'sni-only',
     },
 
-    loggingConfig: {
-      bucket: logsBucket.bucketDomainName,
-      includeCookies: false,
-      prefix: `${domain}/`,
-    },
+    // loggingConfig: {
+    //   bucket: logsBucket.bucketDomainName,
+    //   includeCookies: false,
+    //   prefix: `${domain}/`,
+    // },
   };
 
   const cdn = new aws.cloudfront.Distribution('asset_cdn', distributionArgs);

@@ -25,6 +25,21 @@ config:
       heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
       id: omacKoQBB6pi8-b5UVPY
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
+    experian:
+      authClientId:
+        secure: v1:unfbwS5zFVaOGfO9:/e9b9dCYCMsg5gZUMf41LP0=
+      authClientSecret:
+        secure: v1:ModTej1vm6xTBFMF:Aw9ylPiuaJku5hvLfL0xxcE=
+      authPassword:
+        secure: v1:+8Bjx1b4y1B7qSkl:/O/V1LBxcxC4jje7P+Pkgtg=
+      authUsername:
+        secure: v1:gwMHX176qoV6ots2:Om7CN9qC/Q2VCZWnPoeAu8o=
+      crossCorePassword:
+        secure: v1:P06WmGgWifwn8l3E:jJG+h7aHTsiJRjdjh2/TnFg=
+      crossCoreSubscriberCode:
+        secure: v1:Wki6tvPguF40QCSG:LmSJKHGtnYOVTaf4DA5DOBw=
+      crossCoreUsername:
+        secure: v1:zaOCGtKaEamTeTmm:xAwLlNGY0GVTYMELpjzxIiY=
     fingerprint:
       fingerprintSdkKey:
         secure: v1:ShqC3sYp5bwUGSIi:1Wcf0WjDOj6NSh2ZBOWffhqskNZVxExTOGkaDd/JDH5WdIvR
@@ -85,8 +100,8 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

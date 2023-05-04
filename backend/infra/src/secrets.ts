@@ -44,6 +44,13 @@ export interface StaticSecrets {
   incodeClientId: aws.ssm.Parameter;
   middeskSandboxApiKey: aws.ssm.Parameter;
   middeskWebhookSecret: aws.ssm.Parameter;
+  experianAuthUsername: aws.ssm.Parameter;
+  experianAuthPassword: aws.ssm.Parameter;
+  experianAuthClientId: aws.ssm.Parameter;
+  experianAuthClientSecret: aws.ssm.Parameter;
+  experianCrossCoreUsername: aws.ssm.Parameter;
+  experianCrossCorePassword: aws.ssm.Parameter;
+  experianCrossCoreSubscriberCode: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -61,6 +68,7 @@ interface SecretConstants {
   fingerprint: Fingerprint;
   incode: Incode;
   middesk: Middesk;
+  experian: Experian;
 }
 
 interface ElasticSecrets {
@@ -128,6 +136,16 @@ interface Fingerprint {
 
 interface Middesk {
   webhookSecret: string;
+}
+
+interface Experian {
+  authUsername: string;
+  authPassword: string;
+  authClientId: string;
+  authClientSecret: string;
+  crossCoreUsername: string;
+  crossCorePassword: string;
+  crossCoreSubscriberCode: string;
 }
 
 export async function LoadSecrets(
@@ -314,6 +332,34 @@ export async function LoadSecrets(
       `middeskWebhookSecret-${stack}`,
       secretConstants.middesk.webhookSecret,
     ),
+    experianAuthUsername: createSecretParameter(
+      `experianAuthUsername-${stack}`,
+      secretConstants.experian.authUsername,
+    ),
+    experianAuthPassword: createSecretParameter(
+      `experianAuthPassword-${stack}`,
+      secretConstants.experian.authPassword,
+    ),
+    experianAuthClientId: createSecretParameter(
+      `experianAuthClientId-${stack}`,
+      secretConstants.experian.authClientId,
+    ),
+    experianAuthClientSecret: createSecretParameter(
+      `experianAuthClientSecret-${stack}`,
+      secretConstants.experian.authClientSecret,
+    ),
+    experianCrossCoreUsername: createSecretParameter(
+      `experianCrossCoreUsername-${stack}`,
+      secretConstants.experian.crossCoreUsername,
+    ),
+    experianCrossCorePassword: createSecretParameter(
+      `experianCrossCorePassword-${stack}`,
+      secretConstants.experian.crossCorePassword,
+    ),
+    experianCrossCoreSubscriberCode: createSecretParameter(
+      `experianCrossCoreSubscriberCode-${stack}`,
+      secretConstants.experian.crossCoreSubscriberCode,
+    ),    
   };
 }
 /// create a secret param

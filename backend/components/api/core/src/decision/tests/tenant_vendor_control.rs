@@ -58,7 +58,8 @@ async fn get_tenant_vendor_control(
         .unwrap();
 
     let experian_builder = ExperianCredentialBuilder::from(config);
-    let experian_creds = experian_builder.build_with_subscriber_code("2956241".into());
+    let default_sub_code = config.experian.subscriber_code.clone();
+    let experian_creds = experian_builder.build_with_subscriber_code(default_sub_code);
 
     (
         DefaultCredentials {
