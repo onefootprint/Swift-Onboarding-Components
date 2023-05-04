@@ -1,6 +1,6 @@
 import pytest
 from tests.utils import (
-    put,
+    patch,
     post,
     get_requirement_from_requirements,
 )
@@ -109,7 +109,7 @@ def test_put_business_vault(incomplete_bifrost, business_data, expected_status_c
         incomplete_bifrost.auth_token,
         status_code=expected_status_code,
     )
-    put(
+    patch(
         "hosted/business/vault",
         business_data,
         incomplete_bifrost.auth_token,
@@ -120,8 +120,8 @@ def test_put_business_vault(incomplete_bifrost, business_data, expected_status_c
 def test_put_business_vault_not_authorized(sandbox_tenant, twilio):
     bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
     auth_token = bifrost.auth_token
-    # Can't hit PUT /hosted/business/vault without a business vault
-    put("hosted/business/vault", {}, auth_token, status_code=401)
+    # Can't hit PATCH /hosted/business/vault without a business vault
+    patch("hosted/business/vault", {}, auth_token, status_code=401)
 
 
 def test_one_click_kyb(kyb_sandbox_ob_config, twilio):

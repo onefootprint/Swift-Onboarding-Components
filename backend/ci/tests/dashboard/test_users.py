@@ -4,7 +4,7 @@ from tests.bifrost_client import BifrostClient
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
-    put,
+    patch,
     post,
     create_sandbox_user,
 )
@@ -230,7 +230,7 @@ def test_update_data_for_portable_user(sandbox_user):
     # Even though the vault is portable, we should be able to update the data
     for new_ssn in ["120981234", "098765432"]:
         new_data = {"id.ssn9": new_ssn}
-        put(f"entities/{fp_id}/vault", new_data, sandbox_user.tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", new_data, sandbox_user.tenant.sk.key)
 
         # Make sure we see the new ssn
         body = post(

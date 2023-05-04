@@ -62,7 +62,7 @@ def get(path, params=None, *auths, status_code=200):
     ).json()
 
 
-def put(path, data=None, *auths, status_code=200, files=None, addl_headers=None):
+def put(path, data=None, *auths, status_code=200, files=None):
     return _make_request(
         method=requests.put,
         path=path,
@@ -71,7 +71,6 @@ def put(path, data=None, *auths, status_code=200, files=None, addl_headers=None)
         status_code=status_code,
         auths=auths,
         files=files,
-        addl_headers=addl_headers,
     ).json()
 
 
@@ -100,7 +99,7 @@ def post(
         return res.json()
 
 
-def patch(path, data=None, *auths, status_code=200):
+def patch(path, data=None, *auths, status_code=200, addl_headers=None):
     return _make_request(
         method=requests.patch,
         path=path,
@@ -109,6 +108,7 @@ def patch(path, data=None, *auths, status_code=200):
         status_code=status_code,
         auths=auths,
         files=None,
+        addl_headers=addl_headers,
     ).json()
 
 

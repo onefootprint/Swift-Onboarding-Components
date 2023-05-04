@@ -5,7 +5,7 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import (
     get,
     post,
-    put,
+    patch,
     clean_up_user,
 )
 
@@ -64,7 +64,7 @@ def test_collect_data(bifrost):
         "id.first_name": "Flerp2",
         "id.last_name": "Derp2",
     }
-    put("hosted/user/vault", data, bifrost.auth_token)
+    patch("hosted/user/vault", data, bifrost.auth_token)
 
     for k, v in data.items():
         bifrost.data[k] = v

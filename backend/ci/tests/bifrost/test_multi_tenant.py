@@ -2,7 +2,7 @@ from typing import NamedTuple
 import pytest
 from tests.utils import (
     get,
-    put,
+    patch,
     post,
     create_tenant,
     inherit_user,
@@ -121,7 +121,7 @@ def test_cant_see_speculative_fingerprints(
         "id.first_name": "New",
         "id.last_name": "Name",
     }
-    put(f"/entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    patch(f"/entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
     for search_query in ["new", "name"]:
         data = dict(search=search_query)

@@ -11,7 +11,7 @@ from tests.utils import (
     get,
     create_user,
     post,
-    put,
+    patch,
     override_webauthn_challenge,
     override_webauthn_attestation,
 )
@@ -95,7 +95,7 @@ class BifrostClient:
         if not override_inherit_phone:
             email_data = {"id.email": self.data["id.email"]}
             post("/hosted/user/vault/validate", email_data, self.auth_token)
-            put("/hosted/user/vault", email_data, self.auth_token)
+            patch("/hosted/user/vault", email_data, self.auth_token)
 
         # Initialize the onboarding
         self.initialize_onboarding()
@@ -139,7 +139,7 @@ class BifrostClient:
 
     def handle_collect_user(self, requirement):
         """
-        PUT data in the vault to satisfy the provided requirement.
+        PATCH data in the vault to satisfy the provided requirement.
         Operates on collect_data or collect_investor_profile requirement
         """
         dis_to_provide = [
@@ -147,11 +147,11 @@ class BifrostClient:
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/user/vault/validate", data, self.auth_token)
-        put("/hosted/user/vault", data, self.auth_token)
+        patch("/hosted/user/vault", data, self.auth_token)
 
     def handle_collect_business(self, requirement):
         """
-        PUT data in the vault to satisfy the provided requirement.
+        PATCH data in the vault to satisfy the provided requirement.
         Operates on collect_business_data requirement
         """
         dis_to_provide = [
@@ -159,7 +159,7 @@ class BifrostClient:
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/business/vault/validate", data, self.auth_token)
-        put("/hosted/business/vault", data, self.auth_token)
+        patch("/hosted/business/vault", data, self.auth_token)
 
     def handle_ip_doc(self):
         """Some special logic to upload a document for certain investor profile options"""

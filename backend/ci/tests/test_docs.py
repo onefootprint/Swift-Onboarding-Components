@@ -4,7 +4,7 @@ tests breaks, you are probably making a breaking change to our public API and ne
 do it OR do it VERY carefully.
 """
 
-from tests.utils import get, post, put
+from tests.utils import get, post, patch
 
 
 def test_get_users(sandbox_user, sandbox_tenant):
@@ -31,7 +31,7 @@ def test_standalone_vaults(sandbox_tenant):
     fp_id = body["id"]
 
     data = {"id.email": "jane@acmebank.com", "custom.ach_account": "111122224444"}
-    put(f"/users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    patch(f"/users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
     body = get("/users", dict(search="Jane"), sandbox_tenant.sk.key)
     assert any(i["id"] == fp_id for i in body["data"])

@@ -1,7 +1,7 @@
 import json
 import pytest
 from tests.utils import (
-    put,
+    patch,
     post,
     get_requirement_from_requirements,
     file_contents,
@@ -60,7 +60,7 @@ def test_put_ip_info_invalid(incomplete_client, key, value, expected_error):
     body = post("hosted/user/vault/validate", data, auth_token, status_code=400)
     assert expected_error in body["error"]["message"][key]
 
-    body = put("hosted/user/vault", data, auth_token, status_code=400)
+    body = patch("hosted/user/vault", data, auth_token, status_code=400)
     assert expected_error in body["error"]["message"][key]
 
 
@@ -75,7 +75,7 @@ def test_put_ip_info_incomplete_data(incomplete_client):
     post("hosted/user/vault/validate", data, auth_token, addl_headers=addl_headers)
 
     # The non-speculative endpoint should never accept this header
-    put(
+    patch(
         "hosted/user/vault",
         data,
         auth_token,
@@ -93,7 +93,7 @@ def test_document_requirement(incomplete_client):
 
     # When we add a specific declaration, we should now have a missing requirement
     data = {**IP_DATA, "investor_profile.declarations": '["affiliated_with_us_broker"]'}
-    put("hosted/user/vault", data, auth_token)
+    patch("hosted/user/vault", data, auth_token)
     requirements = incomplete_client.get_status()["requirements"]
     req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
     assert req["missing_document"]

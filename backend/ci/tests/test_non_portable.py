@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import post, get, put
+from tests.utils import post, get, patch
 from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
@@ -46,7 +46,7 @@ def test_data_validation(tenant, key, value, expected_error):
     fp_id = user["id"]
     assert fp_id
 
-    body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
     # Should have a JSON error message with the invalid field identifier as the key
     assert body["error"]["message"][key] == expected_error
     # Validate endpoint should also fail
@@ -65,7 +65,7 @@ def test_invalid_dis(key, tenant):
     body = post("users/", None, tenant.sk.key)
     fp_id = body["id"]
 
-    body = put(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
     assert "Json deserialize error" in body["error"]["message"]
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
@@ -89,7 +89,7 @@ def test_vault_create_write_decrypt(tenant):
         "custom.ach_account_number": "123467890",
         "custom.cc4": "4242",
     }
-    put(f"entities/{fp_id}/vault", update_data, tenant.sk.key)
+    patch(f"entities/{fp_id}/vault", update_data, tenant.sk.key)
 
     # check that the data is there now
     all_data = {

@@ -1,7 +1,7 @@
 from tests.cert_fixtures import GOOGLE_CERT
-from tests.utils import _make_request, patch
+from tests.utils import _make_request
 from tests.auth import BaseAuth
-from tests.utils import post, get, put
+from tests.utils import post, get, patch
 from tests.constants import ID_DATA
 import requests
 import urllib.parse
@@ -109,7 +109,7 @@ class TestVaultProxy:
             "custom.cc4": "4242",
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
@@ -163,7 +163,7 @@ class TestVaultProxy:
             "custom.test_field": "hello world",
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev:8443"
@@ -227,7 +227,7 @@ class TestVaultProxy:
             "custom.test_field": "hello world",
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
@@ -279,7 +279,7 @@ class TestVaultProxy:
             "custom.message": "hello world",
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # fire the proxy request
         data = {
@@ -388,7 +388,7 @@ class TestVaultProxy:
             "custom.test_field": "hello world",
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
@@ -453,7 +453,7 @@ class TestVaultProxy:
         data = {
             **ID_DATA,
         }
-        put(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
         ditto_url = "https://ditto.footprint.dev"
