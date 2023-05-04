@@ -39,13 +39,14 @@ const DemoVideo = ({ open, title, link, onClose }: DemoVideoProps) => {
 };
 
 const ModalContainer = styled.div`
-  position: absolute;
-  transform: translateY(-50%);
-  z-index: 100;
-  top: 50%;
-  left: 5%;
-  width: 90%; /* Leave some space at the edges of the modal */
-  padding-top: 50.625%; /* Preserves 16:9 Aspect Ratio */
+  ${({ theme }) => css`
+    position: absolute;
+    z-index: 100;
+    top: ${theme.spacing[10]};
+    left: 5%;
+    width: 90%; /* Leave some space at the edges of the modal */
+    padding-top: 50.625%; /* Preserves 16:9 Aspect Ratio */
+  `}
 `;
 
 const CloseContainer = styled.div`

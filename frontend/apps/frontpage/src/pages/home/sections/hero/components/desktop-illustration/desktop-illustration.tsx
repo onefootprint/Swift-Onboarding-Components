@@ -61,7 +61,8 @@ const DesktopIllustration = () => {
         <MockupContainer as={motion.div} variants={mockup} key={2}>
           <Image
             src="/home/hero/dashboard.png"
-            fill
+            height={820}
+            width={1440}
             alt={t('desktop-img-alt')}
             priority
           />
@@ -155,7 +156,7 @@ const MockupContainer = styled.div`
     img {
       object-fit: cover;
       object-position: top left;
-      min-width: 100%;
+      width: 100%;
     }
   `}
 `;

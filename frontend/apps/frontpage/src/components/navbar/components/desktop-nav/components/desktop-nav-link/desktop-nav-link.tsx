@@ -1,4 +1,5 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -8,8 +9,10 @@ type DesktopNavLinkProps = {
   link: NavLink;
 };
 const DesktopNavLink = ({ link }: DesktopNavLinkProps) => (
-  <NavigationMenu.Item>
-    <StyledLink href={link.href}>{link.text}</StyledLink>
+  <NavigationMenu.Item asChild>
+    <StyledLink asChild>
+      <Link href={link.href}>{link.text}</Link>
+    </StyledLink>
   </NavigationMenu.Item>
 );
 
