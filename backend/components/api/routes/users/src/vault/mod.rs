@@ -63,23 +63,6 @@ pub async fn post_validate(
     Ok(result)
 }
 
-#[api_v2_operation(
-    description = "Updates data in a user vault. Same functionality as PATCH",
-    tags(Vault, PublicApi, Users, Deprecated)
-)]
-// TODO rm this once we confirm nobody is using it
-#[actix::put("/users/{footprint_user_id}/vault")]
-pub async fn put(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Json<RawDataRequest>,
-    tenant_auth: SecretTenantAuthContext,
-    insight: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = patch_inner(state, path, request, tenant_auth, insight).await?;
-    Ok(result)
-}
-
 #[api_v2_operation(description = "Updates data in a user vault", tags(Vault, PublicApi, Users))]
 #[actix::patch("/users/{footprint_user_id}/vault")]
 pub async fn patch(
@@ -96,7 +79,6 @@ pub async fn patch(
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(post_validate)
-        .service(put)
         .service(patch)
         .service(get)
         .service(post)
