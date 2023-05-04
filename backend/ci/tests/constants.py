@@ -87,8 +87,6 @@ BUSINESS_DATA = {
             {
                 "first_name": "Piip",
                 "last_name": "Penguin",
-                "email": "piip@onefootprint.com",
-                "phone_number": "+14255555555",
                 "ownership_stake": 50,
             },
             {

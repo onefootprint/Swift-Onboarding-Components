@@ -16,7 +16,7 @@ pub enum BusinessError {
     KycedAndNonKycedBos,
     #[error("BO not found with link_id")]
     BoNotFound,
-    #[error("Primary business_owner not found for Business vault")]
+    #[error("Primary business owner not found for Business vault")]
     PrimaryBoNotFound,
     #[error("Primary BO has no Vault")]
     PrimaryBoHasNoVault,
@@ -26,4 +26,6 @@ pub enum BusinessError {
     BoVaultMissingFirstName,
     #[error("BO vault does not have LastName")]
     BoVaultMissingLastName,
+    #[error("Primary BO has no email")]
+    PrimaryBoHasNoEmail,
 }

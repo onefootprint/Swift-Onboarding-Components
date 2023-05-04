@@ -70,20 +70,16 @@ fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> 
 // Or should we branch validation logic based on a ParseArg
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
-pub struct KycedBusinessOwnerData<IdT = BoLinkId>
+pub struct KycedBusinessOwnerData<IdT = BoLinkId, EmailT = Email, PhoneT = PhoneNumber>
 where
     IdT: Serialize,
 {
     /// We'll autogenerate a link_id that is used as the PK of the BO in the DB
     pub link_id: IdT,
-    #[allow(unused)]
     pub first_name: PiiString,
-    #[allow(unused)]
     pub last_name: PiiString,
-    #[allow(unused)]
-    pub email: Email,
-    #[allow(unused)]
-    pub phone_number: PhoneNumber,
+    pub email: EmailT,
+    pub phone_number: PhoneT,
     pub ownership_stake: u32,
 }
 

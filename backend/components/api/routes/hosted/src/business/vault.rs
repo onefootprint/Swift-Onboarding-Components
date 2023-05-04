@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::auth::user::UserAuthGuard;
 use crate::business::utils::send_secondary_bo_links;
 use crate::errors::ApiResult;
@@ -7,10 +9,15 @@ use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::errors::business::BusinessError;
+use api_core::errors::AssertionError;
 use api_core::types::ResponseData;
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::{Person, TenantVw};
+use api_core::ApiError;
+use db::models::business_owner::BusinessOwner;
+use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::ParseOptions;
+use newtypes::{BusinessDataKind as BDK, BusinessOwnerKind, PiiString, ScopedVaultId};
+use newtypes::{KycedBusinessOwnerData, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -25,10 +32,18 @@ pub async fn post_validate(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
     pre_add_data_checks(&user_auth)?;
-    let request = request
-        .into_inner()
-        .clean_and_validate(ParseOptions::for_bifrost())?;
+    let mut request = request.into_inner();
+    if let Some(kyced_bos) = request.remove(&BDK::KycedBeneficialOwners.into()) {
+        let sb_id = user_auth
+            .scoped_business_id()
+            .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+        let new_kyced_bos = augment_bos(&state, sb_id, kyced_bos).await?;
+        request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
+    }
+
+    let request = request.clean_and_validate(ParseOptions::for_bifrost())?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
+
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -57,13 +72,17 @@ pub async fn patch(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
     pre_add_data_checks(&user_auth)?;
-    let request = request
-        .into_inner()
-        .clean_and_validate(ParseOptions::for_bifrost())?;
     let sb_id = user_auth
         .scoped_business_id()
         .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
 
+    let mut request = request.into_inner();
+    if let Some(kyced_bos) = request.remove(&BDK::KycedBeneficialOwners.into()) {
+        let new_kyced_bos = augment_bos(&state, sb_id.clone(), kyced_bos).await?;
+        request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
+    }
+
+    let request = request.clean_and_validate(ParseOptions::for_bifrost())?;
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
     let (secondary_bos, sb_id) = state
@@ -79,4 +98,66 @@ pub async fn patch(
     send_secondary_bo_links(&state, tenant, sb_id, secondary_bos).await?;
 
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+/// Given a serialized list of KycedBos, replaces the primary BO's phone and email with the
+/// provided scoped business's primary BO's phone and email.
+/// This is some crazy logic needed to properly validate KYCed BOs since the client does not always
+/// know the primary BO's phone and email to send along
+async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) -> ApiResult<PiiString> {
+    use newtypes::{email::Email, IdentityDataKind as IDK, PhoneNumber};
+
+    // If we are about to vault KycedBos, we should also fetch the primary BO's contact info to
+    // make sure we don't make secondary BOs with the same phone number
+    let pbo_vw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let sb = ScopedVault::get(conn, &sb_id)?;
+            let ob_config_id = sb
+                .ob_configuration_id
+                .ok_or(AssertionError("Expected scoped user vault to have ob config id"))?;
+            // Find the primary BO - it is not necessarily the authed user
+            let primary_bo = BusinessOwner::list(conn, &sb.vault_id, &ob_config_id)?
+                .into_iter()
+                .find(|bo| bo.0.kind == BusinessOwnerKind::Primary)
+                .ok_or(AssertionError("Primary BO not found"))?;
+            let primary_bo_sv = primary_bo.1.ok_or(AssertionError("Primary BO has no SV"))?;
+            let vw = VaultWrapper::<Person>::build_for_tenant(conn, &primary_bo_sv.0.id)?;
+            Ok(vw)
+        })
+        .await??;
+
+    // Decrypt the phone and email from the primary BO's vault and strip their sandbox suffix
+    let dis = vec![IDK::PhoneNumber.into(), IDK::Email.into()];
+    let mut decrypted = pbo_vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
+    let phone_number = decrypted
+        .remove(&IDK::PhoneNumber.into())
+        .ok_or(ApiError::NoPhoneNumberForVault)?;
+    let mut phone_number = PhoneNumber::parse(phone_number)?;
+    phone_number.sandbox_suffix = "".to_owned();
+    let email = decrypted
+        .remove(&IDK::Email.into())
+        .ok_or(BusinessError::PrimaryBoHasNoEmail)?;
+    let mut email = Email::from_str(email.leak())?;
+    email.suffix = "".to_owned();
+
+    // Augment the request to include the primary BO's email and phone number
+    type Bo = KycedBusinessOwnerData<Option<()>, Option<Email>, Option<PhoneNumber>>;
+    let new_bos: Vec<Bo> = kyced_bos
+        .deserialize::<Vec<Bo>>()?
+        .into_iter()
+        .enumerate()
+        .map(|(i, mut bo)| {
+            // Replace the primary BO's phone number and email with the phone and email from the
+            // primary BO's vault
+            if i == 0 {
+                bo.phone_number = Some(phone_number.clone());
+                bo.email = Some(email.clone());
+            }
+            bo
+        })
+        .collect();
+
+    let new_kyced_bos = PiiString::new(serde_json::to_string(&new_bos)?);
+    Ok(new_kyced_bos)
 }

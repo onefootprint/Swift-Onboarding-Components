@@ -3,18 +3,12 @@ pub mod declare_map_container {
     macro_rules! flat_api_object_map_type {
         ($name: ident <$key: ty, $value: ty>, description = $desc: literal, example = $example: literal) => {
             #[doc = $desc]
-            #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+            #[derive(
+                Debug, Clone, serde::Serialize, serde::Deserialize, derive_more::Deref, derive_more::DerefMut,
+            )]
             pub struct $name {
                 #[serde(flatten)]
                 map: std::collections::HashMap<$key, $value>,
-            }
-
-            impl std::ops::Deref for $name {
-                type Target = std::collections::HashMap<$key, $value>;
-
-                fn deref(&self) -> &Self::Target {
-                    &self.map
-                }
             }
 
             impl IntoIterator for $name {
