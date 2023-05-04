@@ -57,10 +57,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
         <>
           <span>·</span>
           <Typography color="accent" variant="label-4">
-            <Link
-              target="_blank"
-              href={`/users/detail?footprint_user_id=${businessOwner.id}`}
-            >
+            <Link target="_blank" href={`/users/${businessOwner.id}`}>
               {t('link')}
             </Link>
           </Typography>

@@ -358,7 +358,7 @@ describe.skip('<Details />', () => {
               name: 'View profile',
             }) as HTMLAnchorElement;
             const url = link.href.endsWith(
-              '/users/detail?footprint_user_id=fp_id_XW3pNYPpV4Niup1PgFZBg6',
+              '/users/fp_id_XW3pNYPpV4Niup1PgFZBg6',
             );
             expect(url).toBeTruthy();
           });
