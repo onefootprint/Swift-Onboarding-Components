@@ -1,8 +1,10 @@
 import footprintClassNamesMap from './constants/footprint-class-names-map';
 import rulesWhitelist from './constants/rules-whitelist';
 
-const createAppearanceRules = (rules: Record<string, any>) => {
-  const filteredRules = filterNonWhitelistRules(rules);
+const createAppearanceRules = (rules: string) => {
+  const parsedRules = getParsedValue(rules);
+  if (!parsedRules) return null;
+  const filteredRules = filterNonWhitelistRules(parsedRules);
   const styles = createStylesFromRules(filteredRules);
   return styles;
 };
@@ -64,6 +66,18 @@ export const createStylesFromRules = (rules: Record<string, any>) => {
     styles = `${styles}${fpSelector}{${css}} `;
   });
   return styles.trim();
+};
+
+export const getParsedValue = (params: string) => {
+  try {
+    const parsedParams = JSON.parse(decodeURIComponent(params));
+    return parsedParams;
+  } catch (_) {
+    console.warn(
+      `Could not parse appearance appearance rules. They will be ignored`,
+    );
+    return null;
+  }
 };
 
 export default createAppearanceRules;
