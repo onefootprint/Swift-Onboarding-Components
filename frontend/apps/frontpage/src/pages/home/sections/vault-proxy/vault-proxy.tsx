@@ -32,7 +32,6 @@ const VaultProxy = () => {
           <Typography as="p" variant="body-1" color="quinary">
             {t('subtitle')}
           </Typography>
-          x
         </Header>
         <Features>
           <FeatureElement
@@ -76,13 +75,7 @@ const Background = styled.div`
     width: 100%;
     text-align: center;
     overflow: hidden;
-    background: linear-gradient(
-        360deg,
-        ${theme.backgroundColor.tertiary} 0%,
-        ${theme.backgroundColor.transparent} 100%
-      ),
-      url('/home/vault-proxy/background-transparency.png'),
-      ${theme.backgroundColor.tertiary};
+    background: linear-gradient(180deg, #242b58 0%, #070c26 100%);
   `}
   background-repeat: no-repeat;
   background-size: cover;
