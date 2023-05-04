@@ -128,6 +128,15 @@ impl SendgridClient {
                 Some(("business_name".to_string(), business_name.leak_to_string())),
                 Some(("flow_url".to_string(), url.leak_to_string())),
                 Some(("org_name".to_string(), org_name.to_string())),
+                Some((
+                    "org_name_first_char".to_string(),
+                    org_name
+                        .chars()
+                        .next()
+                        .unwrap_or_default()
+                        .to_uppercase()
+                        .to_string(),
+                )),
                 // TODO need to handle no logo
                 logo_url.map(|u| ("logo_url".to_string(), u)),
             ]
