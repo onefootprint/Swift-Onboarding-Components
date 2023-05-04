@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserDataAttribute } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Filters } from '@onefootprint/ui';
 import React from 'react';
 
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
+import getFilterValueForDI from '../../utils/get-filter-value-for-di';
 
 const UsersFilters = () => {
   const { t, allT } = useTranslation('pages.security-logs.filters');
@@ -21,20 +22,20 @@ const UsersFilters = () => {
               label: t('date-attributes.basic.title'),
               options: [
                 {
-                  label: allT(`di.${UserDataAttribute.firstName}`),
+                  label: allT(`di.${IdDI.firstName}`),
                   value: 'name',
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.lastName}`),
+                  label: allT(`di.${IdDI.lastName}`),
                   value: 'name',
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.email}`),
-                  value: UserDataAttribute.email,
+                  label: allT(`di.${IdDI.email}`),
+                  value: getFilterValueForDI(IdDI.email),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.phoneNumber}`),
-                  value: UserDataAttribute.phoneNumber,
+                  label: allT(`di.${IdDI.phoneNumber}`),
+                  value: getFilterValueForDI(IdDI.phoneNumber),
                 },
               ],
             },
@@ -42,16 +43,16 @@ const UsersFilters = () => {
               label: t('date-attributes.identity.title'),
               options: [
                 {
-                  label: allT(`di.${UserDataAttribute.ssn4}`),
-                  value: UserDataAttribute.ssn4,
+                  label: allT(`di.${IdDI.ssn4}`),
+                  value: getFilterValueForDI(IdDI.ssn4),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.ssn9}`),
-                  value: UserDataAttribute.ssn9,
+                  label: allT(`di.${IdDI.ssn9}`),
+                  value: getFilterValueForDI(IdDI.ssn9),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.dob}`),
-                  value: UserDataAttribute.dob,
+                  label: allT(`di.${IdDI.dob}`),
+                  value: getFilterValueForDI(IdDI.dob),
                 },
               ],
             },
@@ -59,28 +60,28 @@ const UsersFilters = () => {
               label: t('date-attributes.address.title'),
               options: [
                 {
-                  label: allT(`di.${UserDataAttribute.country}`),
-                  value: UserDataAttribute.country,
+                  label: allT(`di.${IdDI.country}`),
+                  value: getFilterValueForDI(IdDI.country),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.addressLine1}`),
-                  value: UserDataAttribute.addressLine1,
+                  label: allT(`di.${IdDI.addressLine1}`),
+                  value: getFilterValueForDI(IdDI.addressLine1),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.addressLine2}`),
-                  value: UserDataAttribute.addressLine2,
+                  label: allT(`di.${IdDI.addressLine2}`),
+                  value: getFilterValueForDI(IdDI.addressLine2),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.city}`),
-                  value: UserDataAttribute.city,
+                  label: allT(`di.${IdDI.city}`),
+                  value: getFilterValueForDI(IdDI.city),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.zip}`),
-                  value: UserDataAttribute.zip,
+                  label: allT(`di.${IdDI.zip}`),
+                  value: getFilterValueForDI(IdDI.zip),
                 },
                 {
-                  label: allT(`di.${UserDataAttribute.state}`),
-                  value: UserDataAttribute.state,
+                  label: allT(`di.${IdDI.state}`),
+                  value: getFilterValueForDI(IdDI.state),
                 },
               ],
             },
