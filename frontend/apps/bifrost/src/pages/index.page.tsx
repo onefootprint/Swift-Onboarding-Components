@@ -13,6 +13,8 @@ import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 
 import Init from './init';
 
+const CLOSE_DELAY = 6000;
+
 const Root = () => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
@@ -47,9 +49,15 @@ const Root = () => {
               [IdDI.email]: bootstrapData?.email,
               [IdDI.phoneNumber]: bootstrapData?.phoneNumber,
             }}
-            onComplete={validationToken =>
-              send({ type: 'idvCompleted', payload: { validationToken } })
-            }
+            onComplete={validationToken => {
+              send({ type: 'idvCompleted', payload: { validationToken } });
+              if (validationToken) {
+                footprint.complete({
+                  validationToken,
+                  closeDelay: CLOSE_DELAY,
+                });
+              }
+            }}
             onClose={footprint.close}
           />
         )}

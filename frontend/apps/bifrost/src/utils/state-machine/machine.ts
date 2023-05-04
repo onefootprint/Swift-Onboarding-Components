@@ -40,11 +40,7 @@ export const createBifrostMachine = () =>
           },
         },
         idv: {
-          on: {
-            idvCompleted: {
-              actions: ['assignValidationToken'],
-            },
-          },
+          type: 'final',
         },
       },
     },
@@ -55,11 +51,6 @@ export const createBifrostMachine = () =>
           context.config = config !== undefined ? config : context.config;
           context.bootstrapData =
             bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
-          return context;
-        }),
-        assignValidationToken: assign((context, event) => {
-          const { validationToken } = event.payload;
-          context.validationToken = validationToken;
           return context;
         }),
         resetContext: assign(() => ({})),

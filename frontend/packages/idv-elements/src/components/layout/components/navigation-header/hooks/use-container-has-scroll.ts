@@ -1,3 +1,4 @@
+import { noop } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
 const useContainerHasScroll = (containerId: string) => {
@@ -9,17 +10,19 @@ const useContainerHasScroll = (containerId: string) => {
       return;
     }
     setHasScroll(container.scrollTop > 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [containerId]);
 
   useEffect(() => {
     handleScroll();
     const container = document.getElementById(containerId);
     if (!container) {
-      return;
+      return noop;
     }
     container.addEventListener('scroll', handleScroll);
-  });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [containerId, handleScroll]);
 
   return hasScroll;
 };
