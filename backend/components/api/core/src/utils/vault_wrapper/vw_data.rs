@@ -1,5 +1,5 @@
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::vault_data::VaultData;
@@ -47,7 +47,7 @@ impl<Type> VwData<Type> {
         if portable_vd.iter().any(|vd| matches!(vd.kind, VdKind::Custom(_))) {
             // We don't commit custom data yet because we don't want it to be portable. Error if we
             // find any
-            return Err(ApiError::AssertionError("Found portable custom data".to_owned()));
+            return Err(AssertionError("Found portable custom data").into());
         }
 
         let portable = Self::build(portable_vd, portable_documents, &all_lifetimes);

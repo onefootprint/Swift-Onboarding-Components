@@ -20,7 +20,12 @@ use newtypes::{
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::{config::Config, errors::enclave::EnclaveError, s3::S3Client, ApiError};
+use crate::{
+    config::Config,
+    errors::{enclave::EnclaveError, AssertionError},
+    s3::S3Client,
+    ApiError,
+};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
@@ -340,13 +345,13 @@ impl EnclaveClient {
         e_private_key: &EncryptedVaultPrivateKey,
         document: &DocumentData,
     ) -> Result<PiiBytes, ApiError> {
-        self.batch_decrypt_documents(e_private_key, &[document])
+        let result = self
+            .batch_decrypt_documents(e_private_key, &[document])
             .await?
             .into_iter()
             .next()
-            .ok_or(ApiError::AssertionError(
-                "unexpected number of decrypted documents".into(),
-            ))
+            .ok_or(AssertionError("unexpected number of decrypted documents"))?;
+        Ok(result)
     }
 
     #[tracing::instrument(skip_all)]

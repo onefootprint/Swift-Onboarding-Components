@@ -12,6 +12,7 @@ use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::errors::AssertionError;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::ListEntitiesRequest;
@@ -97,12 +98,10 @@ pub async fn get(
         .take(page_size)
         .map(|(sv, _)| {
             // Zip with VW and OB
-            let vw = vws
-                .get(&sv.id)
-                .ok_or_else(|| ApiError::AssertionError("VW not found".to_owned()))?;
+            let vw = vws.get(&sv.id).ok_or(AssertionError("VW not found"))?;
             let entity = entities
                 .remove(&sv.id)
-                .ok_or_else(|| ApiError::AssertionError("Entity info not found".to_owned()))?;
+                .ok_or(AssertionError("Entity info not found"))?;
             Ok((vw, entity))
         })
         .collect::<ApiResult<Vec<_>>>()?

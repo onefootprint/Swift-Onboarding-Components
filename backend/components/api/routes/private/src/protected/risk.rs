@@ -7,6 +7,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::decision::onboarding::OnboardingRulesDecisionOutput;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::errors::AssertionError;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -184,15 +185,11 @@ async fn make_decision(
     .await?;
 
     if !vendor_requests.outstanding_requests.is_empty() {
-        return Err(ApiError::AssertionError(
-            "Outstanding vendor requests found".to_owned(),
-        ));
+        return Err(AssertionError("Outstanding vendor requests found").into());
     }
     if vendor_requests.completed_requests.is_empty() {
         // Don't think this should ever be possible, but worth asserting
-        return Err(ApiError::AssertionError(
-            "No completed vendor requests found".to_owned(),
-        ));
+        return Err(AssertionError("No completed vendor requests found").into());
     }
 
     let vendor_result_ids = vendor_requests

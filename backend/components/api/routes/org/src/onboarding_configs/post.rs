@@ -10,6 +10,7 @@ use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use itertools::Itertools;
 use newtypes::CollectedData as CD;
@@ -45,7 +46,7 @@ impl CreateOnboardingConfigurationRequest {
                 ))
                 .into())
             } else {
-                let cdo = cdos.into_iter().next().ok_or_else(|| ApiError::AssertionError("No CDO for CD".to_owned()))?;
+                let cdo = cdos.into_iter().next().ok_or(AssertionError("No CDO for CD"))?;
                  Ok((cd, cdo))
             }})
             // Find the CDO parents that have more than one option specified

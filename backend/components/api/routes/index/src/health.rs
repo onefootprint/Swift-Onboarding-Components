@@ -1,9 +1,9 @@
-use crate::errors::ApiError;
 use crate::types::{ResponseData, StringResponse};
 use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
 use crate::{metrics, State};
 
 use actix_web::cookie::time::Instant;
+use api_core::errors::AssertionError;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 
@@ -120,7 +120,7 @@ async fn enclave_decrypt(
 #[get("/fail")]
 async fn fail_handler() -> StringResponse {
     tracing::debug!("about to fail");
-    Err(ApiError::AssertionError("Hit /fail endpoint".to_owned()))
+    Err(AssertionError("Hit /fail endpoint").into())
 }
 
 #[api_v2_operation(tags(Private))]

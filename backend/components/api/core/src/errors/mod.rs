@@ -8,6 +8,7 @@ use newtypes::{ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
+mod assertion;
 pub mod business;
 pub mod challenge;
 pub mod enclave;
@@ -19,6 +20,7 @@ pub mod proxy;
 pub mod tenant;
 pub mod user;
 pub mod workos;
+pub use assertion::*;
 
 use crate::{
     decision::vendor::{middesk, VendorAPIError},

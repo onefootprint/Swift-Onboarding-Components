@@ -1,5 +1,5 @@
 use super::WriteableVw;
-use crate::errors::{ApiError, ApiResult};
+use crate::errors::{ApiResult, AssertionError};
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
 use crate::State;
@@ -94,7 +94,7 @@ impl<Type> WriteableVw<Type> {
                     .iter()
                     .find(|vd| vd.lifetime_id == ci.lifetime_id)
                     .map(|vd| DataIdentifier::from(vd.kind.clone()))
-                    .ok_or_else(|| ApiError::AssertionError("No lifetime ID".to_owned()))?;
+                    .ok_or(AssertionError("No lifetime ID"))?;
                 Ok((di, ci))
             })
             .collect::<ApiResult<Vec<_>>>()?;

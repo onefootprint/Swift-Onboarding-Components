@@ -2,6 +2,7 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_core::errors::AssertionError;
 use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -40,9 +41,7 @@ async fn post(
         .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
 
     if !(is_integration_test_phone_number || is_allowlisted_real_phone_number) {
-        return Err(ApiError::AssertionError(
-            "Cannot clean up provided number".to_owned(),
-        ));
+        return Err(AssertionError("Cannot clean up provided number").into());
     }
 
     // Use e164 with suffix to compute fingerprint

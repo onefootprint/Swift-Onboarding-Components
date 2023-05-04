@@ -1,5 +1,5 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
+use crate::errors::{ApiResult, AssertionError};
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business, TenantVw, DecryptedBusinessOwners};
 use crate::{errors::ApiError, State};
@@ -98,7 +98,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
 
     if decrypted_documents.front.is_none() {
-        return Err(ApiError::AssertionError("Missing at least front part of document".into()))
+        return Err(AssertionError("Missing at least front part of document").into())
     }
 
     // Get the reference id for idology
@@ -137,7 +137,7 @@ pub async fn build_docv_data_from_identity_doc(
     let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
 
     if decrypted_documents.front.is_none() {
-        return Err(ApiError::AssertionError("Missing at least front part of document".into()))
+        return Err(AssertionError("Missing at least front part of document").into())
     }
     
     Ok(DocVData {
@@ -177,7 +177,7 @@ async fn build_docv_for_scan_verify_results(state: &State, request: Verification
 }
 
 fn parse_reference_id_for_scan_verify(reference_id: Option<String>) -> Result<Option<u64>, ApiError> {
-    reference_id.map(|r| r.parse::<u64>()).transpose().map_err(|_| ApiError::AssertionError("could not parse ref_id for idology".into()))
+    reference_id.map(|r| r.parse::<u64>()).transpose().map_err(|_| AssertionError("could not parse ref_id for idology").into())
 }
 
 pub async fn build_business_data_from_verification_request(

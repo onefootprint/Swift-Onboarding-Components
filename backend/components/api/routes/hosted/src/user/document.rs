@@ -7,6 +7,7 @@ use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::auth::user::{UserAuth, UserObAuthContext};
+use api_core::errors::AssertionError;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
@@ -273,9 +274,7 @@ pub async fn post(
     // TODO: more vendors!
     let api = newtypes::VendorAPI::IdologyScanOnboarding;
     if db_document_request.ref_id.is_some() {
-        return Err(ApiError::AssertionError(
-            "ref_id found for document request".into(),
-        ));
+        return Err(AssertionError("ref_id found for document request").into());
     }
 
     // Save Verification Requests and run our vendor requests
@@ -292,9 +291,7 @@ pub async fn post(
                     let doc_request = DbDocumentRequest::lock(conn, &su_id, &db_document_request.id)?;
                     let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                     if doc_request.idv_reqs_initiated {
-                        return Err(ApiError::AssertionError(
-                            "Document request already initiated".into(),
-                        ));
+                        return Err(AssertionError("Document request already initiated").into());
                     }
 
                     let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
@@ -403,7 +400,7 @@ pub fn construct_get_response(
         if let Some(result) = previous_request_verification_result {
             // TODO: need to decrypt this
             let parsed = idv::idology::scan_onboarding::response::parse_response(result.response.0)
-                .map_err(|_| ApiError::AssertionError("Could not parse ScanOnboarding response".into()))?;
+                .map_err(|_| AssertionError("Could not parse ScanOnboarding response"))?;
             if let Some((None, image_errors)) = parsed.response.error() {
                 previous_request_errors = image_errors;
                 // If we actually have errors, we should tell the frontend that there's an error, even
@@ -474,9 +471,7 @@ async fn handle_scan_onboarding_request(
             // Handle request
             let response = match result.response.response {
                 ParsedResponse::IDologyScanOnboarding(response) => Ok(response),
-                _ => Err(ApiError::AssertionError(
-                    "wrong document vendor response received".into(),
-                )),
+                _ => Err(AssertionError("wrong document vendor response received")),
             }?;
 
             if response.response.needs_retry() {

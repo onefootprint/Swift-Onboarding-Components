@@ -11,6 +11,7 @@ use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::IsGuardMet;
+use api_core::errors::AssertionError;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -118,9 +119,9 @@ pub async fn post(
                     };
                     let business_vault = Vault::create(conn, args)?;
                     BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
-                    let ob_config_id = scoped_user.ob_configuration_id.ok_or_else(|| {
-                        ApiError::AssertionError("Expected scoped user vault to have ob config id".to_owned())
-                    })?;
+                    let ob_config_id = scoped_user
+                        .ob_configuration_id
+                        .ok_or(AssertionError("Expected scoped user vault to have ob config id"))?;
                     let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
                     let ob_create_args = OnboardingCreateArgs {
                         scoped_vault_id: sb.id.clone(),

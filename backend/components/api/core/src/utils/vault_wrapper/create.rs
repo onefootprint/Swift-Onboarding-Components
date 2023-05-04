@@ -1,7 +1,7 @@
 use super::{Any, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
-use crate::errors::{ApiError, ApiResult};
+use crate::errors::{ApiResult, AssertionError};
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
@@ -83,7 +83,7 @@ impl VaultWrapper<Person> {
         let (_, ci) = new_ci
             .into_iter()
             .find(|(di, _)| di == &DataIdentifier::from(IDK::PhoneNumber))
-            .ok_or_else(|| ApiError::AssertionError("No CI made with new vault".to_owned()))?;
+            .ok_or(AssertionError("No CI made with new vault"))?;
         ContactInfo::mark_verified(conn, &ci.id)?;
         // I don't love this trick, but it is tricky to propogate the created_seqno of the DL through
         let seqno = DataLifetime::get_current_seqno(conn)?;

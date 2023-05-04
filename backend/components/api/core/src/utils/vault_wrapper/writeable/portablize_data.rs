@@ -1,6 +1,6 @@
 use super::WriteableVw;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
@@ -113,9 +113,7 @@ impl WriteableVw<Person> {
                 .all(|l| l.portablized_seqno.is_some());
             if !is_all_data_portable {
                 // Everything we are deactivating should be portable already
-                return Err(ApiError::AssertionError(
-                    "Lifetime to deactivate is not portable".to_owned(),
-                ));
+                return Err(AssertionError("Lifetime to deactivate is not portable").into());
             }
             // And, grab the IDs of speculative data that we're deactivating.
             let speculative_lifetimes_to_deactivate =
@@ -152,10 +150,10 @@ impl WriteableVw<Person> {
             if !all_data_is_speculative_and_belongs_to_scoped_user {
                 // Just a sanity check filter that we don't portablize other data - all results should match
                 // this filter
-                return Err(ApiError::AssertionError(
-                    "About to portablize data that is not speculative or does not belong to tenant"
-                        .to_owned(),
-                ));
+                return Err(AssertionError(
+                    "About to portablize data that is not speculative or does not belong to tenant",
+                )
+                .into());
             }
             speculative_lifetimes_to_portablize
                 .into_iter()

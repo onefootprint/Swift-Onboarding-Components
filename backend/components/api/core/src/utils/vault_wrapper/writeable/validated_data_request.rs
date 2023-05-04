@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use crate::{
-    errors::{user::UserError, ApiError, ApiResult},
+    errors::{user::UserError, ApiResult, AssertionError},
     utils::{vault_wrapper::VaultWrapper},
 };
 use db::{
@@ -109,7 +109,7 @@ impl ValidatedDataRequest {
                 let vd = vds
                         .iter()
                         .find(|vd| DataIdentifier::from(vd.kind.clone()) == kind)
-                        .ok_or_else(|| ApiError::AssertionError("No lifetime id found".to_owned()))?;
+                        .ok_or(AssertionError("No lifetime id found"))?;
 
                 Ok(NewFingerprint {
                     kind: kind.clone(),
