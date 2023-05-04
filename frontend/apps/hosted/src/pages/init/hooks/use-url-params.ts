@@ -11,20 +11,14 @@ const useUrlParams = () => {
     return {};
   }
 
-  const { token } = router.query;
-  const publicKey = router.query.public_key;
-
-  let authToken = '';
-  let tenantPk = '';
-
-  if (token) {
-    if (typeof token === 'string') {
-      authToken = token;
-    } else {
-      [authToken] = token;
-    }
+  let authToken;
+  const parts = router.asPath.split('#');
+  if (parts.length === 2) {
+    authToken = decodeURI(parts[1]);
   }
 
+  const publicKey = router.query.public_key;
+  let tenantPk = '';
   if (publicKey) {
     if (typeof publicKey === 'string') {
       tenantPk = publicKey;
