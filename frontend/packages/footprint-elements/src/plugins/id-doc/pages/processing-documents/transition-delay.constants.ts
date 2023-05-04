@@ -1,3 +1,0 @@
-const TRANSITION_DELAY = 3000;
-
-export default TRANSITION_DELAY;
