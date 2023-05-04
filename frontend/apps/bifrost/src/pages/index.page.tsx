@@ -50,7 +50,6 @@ const Root = () => {
               [IdDI.phoneNumber]: bootstrapData?.phoneNumber,
             }}
             onComplete={validationToken => {
-              send({ type: 'idvCompleted', payload: { validationToken } });
               if (validationToken) {
                 footprint.complete({
                   validationToken,

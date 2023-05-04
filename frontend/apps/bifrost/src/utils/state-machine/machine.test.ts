@@ -50,19 +50,6 @@ describe('Bifrost Machine Tests', () => {
       bootstrapData: testBootstrapData,
     });
     expect(state.value).toEqual('idv');
-
-    state = machine.send({
-      type: 'idvCompleted',
-      payload: {
-        validationToken: 'token',
-      },
-    });
-    expect(state.context).toEqual({
-      validationToken: 'token',
-      config: { ...testOnboardingConfig },
-      bootstrapData: testBootstrapData,
-    });
-    expect(state.value).toEqual('idv');
   });
 
   it('completes bifrost flow in sandbox mode', () => {
@@ -82,20 +69,6 @@ describe('Bifrost Machine Tests', () => {
       bootstrapData: testBootstrapData,
     });
     expect(state.value).toEqual('idv');
-
-    state = machine.send({
-      type: 'idvCompleted',
-      payload: {
-        validationToken: 'token',
-      },
-    });
-
-    expect(state.value).toEqual('idv');
-    expect(state.context).toEqual({
-      validationToken: 'token',
-      config: { ...testOnboardingConfig, isLive: false },
-      bootstrapData: testBootstrapData,
-    });
   });
 
   it('moves onto idv if config request fails', () => {

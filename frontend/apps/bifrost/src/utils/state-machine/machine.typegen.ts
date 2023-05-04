@@ -14,7 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignInitContext: 'initContextUpdated';
-    assignValidationToken: 'idvCompleted';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};

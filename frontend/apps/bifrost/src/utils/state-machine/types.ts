@@ -19,11 +19,5 @@ export type MachineEvents =
       type: 'configRequestFailed';
     }
   | {
-      type: 'idvCompleted';
-      payload: {
-        validationToken?: string;
-      };
-    }
-  | {
       type: 'reset';
     };
