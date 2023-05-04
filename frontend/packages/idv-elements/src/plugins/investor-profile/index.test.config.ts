@@ -14,7 +14,7 @@ export const withUserVaultValidate = () => {
 
 export const withUserVault = () =>
   mockRequest({
-    method: 'put',
+    method: 'patch',
     path: '/hosted/user/vault',
     response: {
       data: {

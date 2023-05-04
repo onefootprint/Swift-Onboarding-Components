@@ -24,7 +24,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     method = 'POST';
     url = '/hosted/user/vault/validate';
   } else {
-    method = 'PUT';
+    method = 'PATCH';
     url = '/hosted/user/vault';
   }
   // Transform the data into the format expected by the API

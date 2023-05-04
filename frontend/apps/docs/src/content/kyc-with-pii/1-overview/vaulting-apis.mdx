@@ -25,7 +25,7 @@ Footprint also supports custom key-value attributes that are provided by you and
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
-	-X PUT \
+	-X PATCH \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
 			"custom.ach_account": "111122224444",
@@ -132,7 +132,7 @@ With the `id` given from creating a user, you may always update and add new data
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
-	-X PUT \
+	-X PATCH \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
 		    "id.email": "jane@acmebank.com",

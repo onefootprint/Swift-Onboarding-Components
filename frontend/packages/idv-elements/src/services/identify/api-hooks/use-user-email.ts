@@ -11,7 +11,7 @@ const userEmailRequest = async (payload: UserEmailRequest) => {
     method = 'POST';
     url = '/hosted/user/vault/validate';
   } else {
-    method = 'PUT';
+    method = 'PATCH';
     url = '/hosted/user/vault';
   }
   const response = await requestWithoutCaseConverter<UserEmailResponse>({

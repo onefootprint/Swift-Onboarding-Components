@@ -11,7 +11,7 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     method = 'POST';
     url = '/hosted/business/vault/validate';
   } else {
-    method = 'PUT';
+    method = 'PATCH';
     url = '/hosted/business/vault';
   }
   // Transform the data into the format expected by the API
