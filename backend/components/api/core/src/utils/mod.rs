@@ -11,6 +11,7 @@ pub mod session;
 pub mod twilio;
 pub mod vault_wrapper;
 pub mod webhook_app;
+pub mod actix;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]

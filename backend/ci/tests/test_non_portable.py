@@ -38,7 +38,6 @@ from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 def test_data_validation(tenant, key, value, expected_error):
     # Can't create the user inline with invalid data
     data = {key: value}
-    # TODO fix this
     post("users/", data, tenant.sk.key, status_code=400)
 
     body = post("users/", None, tenant.sk.key)
@@ -59,8 +58,8 @@ def test_data_validation(tenant, key, value, expected_error):
 def test_invalid_dis(key, tenant):
     # Can't create the user inline with invalid data
     data = {key: "123"}
-    # TODO fix this
-    # post("users/", data, tenant.sk.key, status_code=400)
+    body = post("users/", data, tenant.sk.key, status_code=400)
+    assert "Json deserialize error" in body["error"]["message"]
 
     body = post("users/", None, tenant.sk.key)
     fp_id = body["id"]

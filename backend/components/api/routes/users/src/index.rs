@@ -14,6 +14,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::vault_wrapper::Any;
+use api_core::utils::actix::OptionalJson;
 use api_route_entities::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::models::access_event::NewAccessEvent;
@@ -36,8 +37,7 @@ use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 #[post("/users")]
 pub async fn post(
     state: web::Data<State>,
-    // TODO this maps Err to None and will silently swallow errors deserializing the body :o
-    request: Option<Json<RawDataRequest>>,
+    request: OptionalJson<RawDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
@@ -55,8 +55,7 @@ pub async fn post(
     };
 
     // Parse optional request
-    let request_info = if let Some(request) = request {
-        let request = request.into_inner();
+    let request_info = if let Some(request) = request.into_inner() {
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
             let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
