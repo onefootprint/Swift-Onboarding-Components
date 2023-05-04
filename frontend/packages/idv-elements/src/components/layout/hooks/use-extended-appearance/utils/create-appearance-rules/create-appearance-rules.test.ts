@@ -9,14 +9,9 @@ describe('createAppearanceRules', () => {
   describe('createAppearanceRules', () => {
     it('should generate the right styles', () => {
       expect(
-        createAppearanceRules({
-          button: {
-            background: 'red',
-          },
-          'button:hover': {
-            background: 'green',
-          },
-        }),
+        createAppearanceRules(
+          '{"button":{"background":"red"},"button:hover":{"background":"green"}}',
+        ),
       ).toEqual(
         '.fp-button{background:red;} .fp-button:hover{background:green;}',
       );
