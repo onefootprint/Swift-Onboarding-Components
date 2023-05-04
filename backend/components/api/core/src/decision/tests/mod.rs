@@ -26,3 +26,7 @@ mod requirements;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tenant_vendor_control;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+pub mod test_helpers;

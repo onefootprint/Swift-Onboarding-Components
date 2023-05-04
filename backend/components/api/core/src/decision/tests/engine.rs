@@ -1,110 +1,23 @@
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::Any;
-use crate::{
-    decision::vendor::vendor_trait::MockVendorAPICall,
-    utils::{mock_enclave::StateWithMockEnclave, vault_wrapper::VaultWrapper},
-};
-use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::tenant::Tenant;
-use db::models::vault::Vault;
-use db::DbPool;
+use crate::{decision::vendor::vendor_trait::MockVendorAPICall, utils::mock_enclave::StateWithMockEnclave};
 use db::{
-    models::{
-        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-    },
+    models::{onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
     test_helpers::test_db_pool,
-    tests::fixtures,
-    DbError, TxnPgConn,
+    DbError,
 };
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
-use newtypes::{
-    DecisionStatus, FootprintReasonCode, IdentityDataKind, PiiString, VaultId, Vendor, VendorAPI,
-};
-use rand::Rng;
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor};
+
 #[cfg(test)]
 use test_case::test_case;
 
-fn random_phone_number() -> String {
-    let mut rng = rand::thread_rng();
-
-    format!(
-        "+1{}",
-        (0..10)
-            .map(|_| rng.gen_range(0..10).to_string())
-            .collect::<Vec<String>>()
-            .join("")
-    )
-}
-
-fn create_user_and_populate_vault(conn: &mut TxnPgConn, ob_config: ObConfiguration) -> (Vault, ScopedVault) {
-    let uv = fixtures::vault::create_person(conn, ob_config.is_live);
-    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
-
-    let update = vec![
-        (
-            IdentityDataKind::PhoneNumber.into(),
-            PiiString::new(random_phone_number()),
-        ),
-        (
-            IdentityDataKind::FirstName.into(),
-            PiiString::new("Bob".to_owned()),
-        ),
-        (
-            IdentityDataKind::LastName.into(),
-            PiiString::new("Boberto".to_owned()),
-        ),
-    ];
-
-    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.patch_data_test(conn, update).unwrap();
-
-    (uv.into_inner(), su)
-}
-
-async fn create_user_and_onboarding(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-) -> (Tenant, Onboarding, VaultId) {
-    let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
-    db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
-            let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
-            let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-            let ob_config_id = ob_config.id.clone();
-
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config);
-
-            let onboarding = fixtures::onboarding::create(conn, su.id, ob_config_id);
-
-            let decision_intent =
-                DecisionIntent::get_or_create_onboarding_kyc(conn, &onboarding.scoped_vault_id).unwrap();
-
-            fixtures::verification_request::bulk_create(
-                conn,
-                &onboarding.scoped_vault_id,
-                vec![
-                    VendorAPI::TwilioLookupV2,
-                    VendorAPI::IdologyExpectID,
-                    VendorAPI::SocureIDPlus,
-                    VendorAPI::ExperianPreciseID,
-                ],
-                &decision_intent.id,
-            );
-
-            Ok((tenant, onboarding, uv.id))
-        })
-        .await
-        .unwrap()
-}
+use super::test_helpers::create_user_and_onboarding;
 
 //
 // A smattering of e2e integration tests for Decision Engine :)
@@ -151,7 +64,7 @@ async fn test_run(
     let db_pool = test_db_pool();
     let state = &StateWithMockEnclave::init().await.state;
 
-    let (tenant, onboarding, uvid) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+    let (tenant, onboarding, uv, _, _) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
     let tenant_vendor_control =
         TenantVendorControl::new(tenant.id.clone(), &db_pool, &state.enclave_client, &state.config)
             .await
@@ -264,7 +177,7 @@ async fn test_run(
                 .all(|r| rs_reason_codes.contains(r)));
             assert_eq!(vec![Vendor::Idology], risk_signals[0].vendors);
 
-            db::private_cleanup_integration_tests(conn, uvid).unwrap();
+            db::private_cleanup_integration_tests(conn, uv.id).unwrap();
             Ok(())
         })
         .await

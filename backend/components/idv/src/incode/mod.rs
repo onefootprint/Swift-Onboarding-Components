@@ -1,6 +1,6 @@
 use newtypes::{
     vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken},
-    DocVData, IncodeConfigurationId, IncodeSessionId,
+    DocVData, IncodeConfigurationId, IncodeSessionId, ScrubbedJsonValue,
 };
 use serde::de::DeserializeOwned;
 
@@ -39,21 +39,39 @@ pub trait APIResponseToIncodeError {
 }
 
 /// Struct representing a deserialized response that can include errors
-pub struct IncodeResponse<T: APIResponseToIncodeError> {
+#[derive(Clone)]
+pub struct IncodeResponse<T: APIResponseToIncodeError + serde::Serialize> {
     pub result: IncodeAPIResult<T>,
     pub raw_response: serde_json::Value,
 }
 
+#[derive(Clone)]
 pub enum IncodeAPIResult<T: APIResponseToIncodeError> {
     Success(T),
     ResponseError(response::Error),
 }
 
-impl<T: APIResponseToIncodeError> IncodeAPIResult<T> {
+impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
     pub fn into_success(self) -> Result<T, error::Error> {
         match self {
             IncodeAPIResult::Success(s) => Ok(s),
             IncodeAPIResult::ResponseError(e) => Err(error::Error::APIResponseError(e)),
+        }
+    }
+
+    pub fn scrub(&self) -> Result<ScrubbedJsonValue, error::Error> {
+        let res = match self {
+            IncodeAPIResult::Success(s) => ScrubbedJsonValue::scrub(s),
+            IncodeAPIResult::ResponseError(e) => ScrubbedJsonValue::scrub(e),
+        }?;
+
+        Ok(res)
+    }
+
+    pub fn is_error(&self) -> bool {
+        match self {
+            IncodeAPIResult::Success(_) => false,
+            IncodeAPIResult::ResponseError(_) => true,
         }
     }
 }

@@ -5,7 +5,7 @@ use newtypes::{Base64Data, Base64EncodedString};
 
 /// All images are assumed to be in `./images/ and are jpgs`
 #[allow(unused)]
-pub(crate) fn load_image_and_encode_as_b64(path: &str) -> Base64EncodedString {
+pub fn load_image_and_encode_as_b64(path: &str) -> Base64EncodedString {
     let image_dir = std::fs::canonicalize("./src/tests/fixtures/images").unwrap();
     let path = image_dir.join(std::path::Path::new(path));
     let base_img = image::open(path).expect("could not open image");

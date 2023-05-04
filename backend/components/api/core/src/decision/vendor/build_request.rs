@@ -10,7 +10,7 @@ use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
-use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString};
+use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId};
 use std::collections::HashMap;
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
@@ -71,9 +71,10 @@ pub async fn bulk_build_data_from_requests(
 
 /// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors
 #[allow(dead_code)]
-#[tracing::instrument(skip(state))]
+#[tracing::instrument(skip_all)]
 pub async fn build_docv_data_for_submission_from_verification_request(
-    state: &State,
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
     request: VerificationRequest,
 ) -> Result<DocVData, ApiError> {
     let Some(identity_doc_id) = request.identity_document_id.clone() else { 
@@ -81,8 +82,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
             format!("{} is not a document verification vendor", request.vendor_api),
     ))};
 
-    let (doc, ref_id, uvw) = state
-        .db_pool
+    let (doc, ref_id, uvw) = db_pool
         .db_query(
             move |conn| -> Result<(IdentityDocument, Option<String>, _), ApiError> {
                 let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
@@ -95,7 +95,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         .await??;        
 
     // decrypt the images and make sure we have at least a front image
-    let decrypted_documents = uvw.decrypt_id_doc_documents(state, &doc).await?;
+    let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
 
     if decrypted_documents.front.is_none() {
         return Err(ApiError::AssertionError("Missing at least front part of document".into()))
@@ -114,6 +114,41 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     })
 }
 
+#[tracing::instrument(skip_all)]
+pub async fn build_docv_data_from_identity_doc(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    identity_document_id: IdentityDocumentId,
+    scoped_vault_id: ScopedVaultId
+) -> Result<DocVData, ApiError> {
+    let (doc, uvw) = db_pool
+        .db_query(
+            move |conn| -> Result<(IdentityDocument,  _), ApiError> {
+                let (doc, _) = IdentityDocument::get(conn, &identity_document_id)?;
+                // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
+                // This would allow us to re-use the uvw util to decrypt an image
+                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &scoped_vault_id)?;
+                Ok((doc, uvw))
+            },
+        )
+        .await??;        
+
+    // decrypt the images and make sure we have at least a front image
+    let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
+
+    if decrypted_documents.front.is_none() {
+        return Err(ApiError::AssertionError("Missing at least front part of document".into()))
+    }
+    
+    Ok(DocVData {
+        reference_id: None,
+        front_image: decrypted_documents.front.map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted_documents.back.map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
+        country_code: Some(doc.country_code.into()),
+        document_type: Some(doc.document_type),
+    })
+}
 
 /// 2023-01-05 
 /// We are deprioritizing scan verify step ups for now since it requires a bit more product thought, but leaving this around for the future 

@@ -1,6 +1,8 @@
 use super::{DecryptRequest, TenantVw};
+use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
 use crate::State;
+use db::DbPool;
 use db::{
     models::{document_data::DocumentData, identity_document::IdentityDocument},
     HasLifetime,
@@ -52,7 +54,8 @@ impl<Type> TenantVw<Type> {
     /// this is internally used for verification requests
     pub async fn decrypt_id_doc_documents(
         &self,
-        state: &State,
+        db_pool: &DbPool,
+        enclave_client: &EnclaveClient,
         id_document: &IdentityDocument,
     ) -> ApiResult<DecryptedIdentityDocuments> {
         let lifetimes = vec![
@@ -64,16 +67,14 @@ impl<Type> TenantVw<Type> {
         .flatten()
         .collect::<Vec<_>>();
 
-        let documents = state
-            .db_pool
+        let documents = db_pool
             .db_query(move |conn| DocumentData::get_for(conn, &lifetimes))
             .await??;
 
         let mut decrypted = DecryptedIdentityDocuments::default();
 
         for document in documents {
-            let plaintext = state
-                .enclave_client
+            let plaintext = enclave_client
                 .decrypt_document(&self.vault.e_private_key, &document)
                 .await?;
             if id_document.front_lifetime_id.as_ref() == Some(&document.lifetime_id) {

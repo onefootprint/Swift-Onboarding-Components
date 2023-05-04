@@ -32,6 +32,7 @@ impl IncodeClientAdapter {
     }
 }
 
+#[derive(Clone)]
 /// A struct that represents a client that has an Authorization token to be reused across API calls
 pub struct AuthenticatedIncodeClientAdapter {
     client_adapter: IncodeClientAdapter,
@@ -255,7 +256,7 @@ mod tests {
 
     use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
 
-    fn load_client() -> IncodeClientAdapter {
+    pub fn load_client() -> IncodeClientAdapter {
         let creds = IncodeCredentials {
             api_key: PiiString::from(dotenv::var("INCODE_API_KEY").unwrap()),
             client_id: PiiString::from(dotenv::var("INCODE_CLIENT_ID").unwrap()),

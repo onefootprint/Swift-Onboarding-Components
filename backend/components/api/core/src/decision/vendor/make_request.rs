@@ -428,9 +428,12 @@ pub async fn make_docv_request(
     let request_id = request.id.clone();
     let requestid = request.id.clone();
 
-    let data =
-        build_request::build_docv_data_for_submission_from_verification_request(state, request.clone())
-            .await?;
+    let data = build_request::build_docv_data_for_submission_from_verification_request(
+        &state.db_pool,
+        &state.enclave_client,
+        request.clone(),
+    )
+    .await?;
 
     let vendor_response = send_docv_request(state, request.clone(), onboarding_id, data).await?;
 
