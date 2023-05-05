@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDotSmall16 } from '@onefootprint/icons';
-import { Box, Typography } from '@onefootprint/ui';
+import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { SignalShortInfoType } from '../../hooks/use-entity-match-signals/utils/transform-response';
 
@@ -21,21 +21,41 @@ const ValidationTimelineItemBody = ({
       {signals.map(signal => {
         const { matchLevel, description } = signal;
         return (
-          <Box sx={{ display: 'flex' }}>
-            <Box sx={{ marginRight: 2 }}>
-              <IcoDotSmall16 />
-            </Box>
-            <Typography variant="body-3">
-              <Typography as="span" variant="label-3">
-                {`${t(`match-level.${matchLevel}`)}: `}
-              </Typography>
+          <Container>
+            <Typography as="span" variant="label-3">
+              •
+            </Typography>
+            <Typography variant="body-3" sx={{ width: '100%' }}>
+              <Title>{`${t(`match-level.${matchLevel}`)}:`}</Title>
               {description}
             </Typography>
-          </Box>
+          </Container>
         );
       })}
     </>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: flex-start;
+    gap: ${theme.spacing[4]};
+    margin-right: ${theme.spacing[4]};
+    margin-bottom: ${theme.spacing[2]};
+    max-width: 100%;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  `};
+`;
+
+const Title = styled.span`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')};
+    margin-right: ${theme.spacing[2]};
+  `}
+`;
 
 export default ValidationTimelineItemBody;
