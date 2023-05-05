@@ -25,14 +25,14 @@ const Knob = ({ className, width }: KnobProps) => (
         <circle
           cx={width / 2}
           cy={width / 2}
-          r={(width - 2) / 2}
+          r={width / 2}
           stroke="url(#circle)"
           strokeOpacity="0.2"
         />
         <circle
           cx={width / 2}
           cy={width / 2}
-          r={(width - 2) / 2}
+          r={width / 2}
           stroke="url(#gradient)"
         />
         <defs>
@@ -76,6 +76,17 @@ const Container = styled.div`
       ${theme.backgroundColor.tertiary} 100%
     );
     backdrop-filter: blur(1px);
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1px;
+      height: 6px;
+      top: -4px;
+      background-color: ${theme.backgroundColor.quinary};
+      opacity: 0.4;
+      left: 49%;
+    }
   `}
 `;
 const rotation = keyframes`

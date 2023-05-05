@@ -9,7 +9,7 @@ import VerticalBeam from '../components/vertical-beam';
 const values = {
   cc: {
     value: '1234-5678-9012-3456',
-    token: '{{ fp_id_Srd...SQq.ccn }}',
+    token: '{{ fp_id_Srd...SQq.card.number }}',
   },
   snn: {
     value: '123-45-6789',
