@@ -77,7 +77,7 @@ pub struct Registration {
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Officer {
     pub name: Option<PiiString>,
-    pub roles: Option<String>,
+    pub roles: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -236,7 +236,7 @@ pub struct Result {
     pub agency_list_url: Option<String>,
     pub agency_information_url: Option<String>,
     pub score: Option<String>,
-    pub addresses: Option<serde_json::Value>, // schema not specified in docs and wierdly its a vec of json objects 
+    pub addresses: Option<serde_json::Value>, // schema not specified in docs and wierdly its a vec of json objects
     pub url: Option<String>,
 }
 

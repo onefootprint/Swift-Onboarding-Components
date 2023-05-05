@@ -2638,7 +2638,20 @@ pub fn middesk_business_response() -> serde_json::Value {
                     "354 CIRCLE COURT,BRONX, NY 10468"
                 ],
                 "officers":
-                [],
+                [
+                    {
+                        "name": "BOB BOBERTO",
+                        "roles": [
+                          "CEO"
+                        ]
+                      },
+                      {
+                        "name": "BOB BOBERTO",
+                        "roles": [
+                          "PRESIDENT"
+                        ]
+                      },
+                ],
                 "registered_agent":
                 {},
                 "registration_date": "2020-02-24",
@@ -3449,7 +3462,8 @@ pub fn middesk_business_update_webhook_response() -> serde_json::Value {
             ],
             "officers": [
               {
-                "name": "JANE WATCHLIST HIT"
+                "name": "JANE WATCHLIST HIT",
+                "roles": [ "CEO"]
               }
             ],
             "registered_agent": {},
