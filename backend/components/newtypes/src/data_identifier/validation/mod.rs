@@ -39,9 +39,11 @@ pub enum Error {
     CannotParseEnum(#[from] strum::ParseError),
     #[error("Cannot parse: {0}")]
     CannotParseJson(#[from] serde_json::Error),
-    #[error("The business owners' ownership stakes must not sum to more than 100%")]
+    #[error("The beneficial owners' ownership stakes must not sum to more than 100%")]
     BusinessOwnersStakeAbove100,
-    #[error("Contact info for business owners must be unique")]
+    #[error("You only need to provide beneficial owners who own at least 25% of the business")]
+    BusinessOwnerStakeBelow25,
+    #[error("Contact info for beneficial owners must be unique")]
     NonUniqueBusinessOwners,
     #[error("Invalid phone or email")]
     SandboxNotAllowed,
