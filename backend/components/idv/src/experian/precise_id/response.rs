@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use newtypes::ExperianFraudShieldCodes;
+use newtypes::{scrub_value, ExperianFraudShieldCodes};
 
 use crate::experian::error::Error as ExperianError;
 
@@ -21,9 +21,11 @@ pub struct PreciseIDAPIResponse {
     //   - ssn finder
     //   - change of address record
     //   - other information about the located individual
+    #[serde(serialize_with = "scrub_value")]
     pub precise_match: Option<serde_json::Value>,
     // Unclear if we get this, but just in case
     #[serde(rename(deserialize = "onFileSSN"))]
+    #[serde(serialize_with = "scrub_value")]
     pub on_file_ssn: Option<serde_json::Value>,
     // in the docs this is included but isn't populated yet as it's
     // a future feature. Might as well start recording it

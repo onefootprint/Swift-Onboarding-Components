@@ -14,6 +14,8 @@ pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIRespons
 #[serde(rename_all = "camelCase")]
 pub struct CrossCoreAPIResponse {
     pub response_header: ResponseHeader,
+    // Experian sends us back all the data we sent to them
+    #[serde(skip_serializing)]
     pub original_request_data: super::request::BodyPayload,
     pub client_response_payload: ClientResponsePayload,
 }
@@ -214,5 +216,19 @@ mod tests {
                 ExperianFraudShieldCodes::InputSSNDeceased,
             ],
         )
+    }
+
+    #[test]
+    fn test_serializes() {
+        // test we scrub sensitive data in a hack way
+        let response = cross_core_response_with_fraud_shield_codes();
+        assert!(response.to_string().contains("BRIAN"));
+
+        let r: CrossCoreAPIResponse =
+            serde_json::from_value(response).expect("could not parse experian cross core");
+
+        let s = serde_json::to_value(&r).unwrap().to_string();
+        assert!(s.contains("<SCRUBBED>"));
+        assert!(!s.contains("BRIAN"))
     }
 }
