@@ -2,6 +2,7 @@ use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
+use super::tenant::Tenant;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
@@ -348,6 +349,24 @@ impl Onboarding {
         self.idv_reqs_initiated_at.is_some()
             && self.decision_made_at.is_some()
             && self.authorized_at.is_some()
+    }
+}
+
+pub type AuthorizedOnboarding = (Onboarding, ScopedVault, ObConfiguration, Tenant);
+
+impl Onboarding {
+    /// List all authorized onboardings for a given vault
+    pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedOnboarding>> {
+        use crate::schema::{ob_configuration, tenant};
+        let results = onboarding::table
+            .inner_join(scoped_vault::table)
+            .inner_join(ob_configuration::table)
+            .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
+            .filter(scoped_vault::vault_id.eq(v_id))
+            .filter(onboarding::status.eq(OnboardingStatus::Pass))
+            .order_by(onboarding::start_timestamp.desc())
+            .get_results(conn)?;
+        Ok(results)
     }
 }
 

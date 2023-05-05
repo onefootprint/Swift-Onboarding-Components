@@ -1,6 +1,7 @@
 mod access_event;
 mod actor;
 mod annotation;
+mod authorized_org;
 mod business_owner;
 mod document_uploaded_timeline_event;
 mod entity;

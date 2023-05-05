@@ -81,3 +81,6 @@ pub use self::business_owner::*;
 
 pub mod field_validations;
 pub use self::field_validations::*;
+
+mod authorized_org;
+pub use authorized_org::*;
