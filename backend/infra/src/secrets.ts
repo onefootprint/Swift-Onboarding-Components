@@ -42,8 +42,9 @@ export interface StaticSecrets {
   fingerprintSdkKey: aws.ssm.Parameter;
   incodeApiKey: aws.ssm.Parameter;
   incodeClientId: aws.ssm.Parameter;
-  middeskSandboxApiKey: aws.ssm.Parameter;
+  middeskApiKey: aws.ssm.Parameter;
   middeskWebhookSecret: aws.ssm.Parameter;
+  middeskBaseUrl: aws.ssm.Parameter;
   experianAuthUsername: aws.ssm.Parameter;
   experianAuthPassword: aws.ssm.Parameter;
   experianAuthClientId: aws.ssm.Parameter;
@@ -126,16 +127,14 @@ interface Incode {
   incodeClientId: string;
 }
 
-interface Middesk {
-  sandboxApiKey: string;
-}
-
 interface Fingerprint {
   fingerprintSdkKey: string;
 }
 
 interface Middesk {
+  apiKey: string;
   webhookSecret: string;
+  baseUrl: string;
 }
 
 interface Experian {
@@ -324,13 +323,17 @@ export async function LoadSecrets(
       `incodeClientId-${stack}`,
       secretConstants.incode.incodeClientId,
     ),
-    middeskSandboxApiKey: createSecretParameter(
-      `middeskSandboxApiKey-${stack}`,
-      secretConstants.middesk.sandboxApiKey,
+    middeskApiKey: createSecretParameter(
+      `middeskApiKey-${stack}`,
+      secretConstants.middesk.apiKey,
     ),
     middeskWebhookSecret: createSecretParameter(
       `middeskWebhookSecret-${stack}`,
       secretConstants.middesk.webhookSecret,
+    ),
+    middeskBaseUrl: createSecretParameter(
+      `middeskBaseUrl-${stack}`,
+      secretConstants.middesk.baseUrl,
     ),
     experianAuthUsername: createSecretParameter(
       `experianAuthUsername-${stack}`,
@@ -359,7 +362,7 @@ export async function LoadSecrets(
     experianCrossCoreSubscriberCode: createSecretParameter(
       `experianCrossCoreSubscriberCode-${stack}`,
       secretConstants.experian.crossCoreSubscriberCode,
-    ),    
+    ),
   };
 }
 /// create a secret param

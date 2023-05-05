@@ -144,8 +144,9 @@ export abstract class ServiceContainers {
         secretsStore.fingerprintSdkKey.arn,
         secretsStore.incodeApiKey.arn,
         secretsStore.incodeClientId.arn,
-        secretsStore.middeskSandboxApiKey.arn,
+        secretsStore.middeskApiKey.arn,
         secretsStore.middeskWebhookSecret.arn,
+        secretsStore.middeskBaseUrl.arn,
         secretsStore.experianAuthUsername.arn,
         secretsStore.experianAuthPassword.arn,
         secretsStore.experianAuthClientId.arn,
@@ -182,8 +183,9 @@ export abstract class ServiceContainers {
           fingerprintSdkKey,
           incodeApiKey,
           incodeClientId,
-          middeskSandboxApiKey,
+          middeskApiKey,
           middeskWebhookSecret,
+          middeskBaseUrl,
           experianAuthUsername,
           experianAuthPassword,
           experianAuthClientId,
@@ -290,14 +292,17 @@ export abstract class ServiceContainers {
                 valueFrom: incodeClientId,
               },
               {
-                name: 'MIDDESK_SANDBOX_API_KEY',
-                valueFrom: middeskSandboxApiKey,
+                name: 'MIDDESK_API_KEY',
+                valueFrom: middeskApiKey,
               },
               {
                 name: 'MIDDESK_WEBHOOK_SECRET',
                 valueFrom: middeskWebhookSecret,
               },
-
+              {
+                name: 'MIDDESK_BASE_RUL',
+                valueFrom: middeskBaseUrl,
+              },
               {
                 name: 'EXPERIAN_AUTH_USERNAME',
                 valueFrom: experianAuthUsername,
@@ -326,7 +331,6 @@ export abstract class ServiceContainers {
                 name: 'EXPERIAN_PRECISEID_SUBSCRIBER_CODE',
                 valueFrom: experianCrossCoreSubscriberCode,
               },
-
             ],
             environment: [
               {

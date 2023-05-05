@@ -64,10 +64,12 @@ config:
       launchDarklySdkKey:
         secure: v1:UDxCGOYtRW7Wj7hH:hf5y2xIB89mGz6PiW8tkKL5tDvTC1CmUAtwNTMURbfK0BvcOJymessVR0TbfptH4Bp/97+bU6hE=
     middesk:
-      sandboxApiKey:
-        secure: v1:c2celu24sm60D6fn:/CgswieCvCzZWgKZ2reiS2iTVvjSbswr1mjfx+PaUYH5qYyjPgUBY0ul6/Zhw2j6
+      apiKey:
+        secure: v1:xtdaUeliAIgFqHjM:SoQBIALTVJdwz/fpovGd1nvNQLpJoz4Q85B+AS2LvmdqgKhAiiLUrAemlAfK0X/X
+      baseUrl:
+        secure: v1:LvoJE/ffotY3W3cU:bLfjuC+8MJYTxNn8xJccLHasVIP5nYHjejbnkDZMOuFHbYYEGpAooPyvT7VgJNx/2Y4=
       webhookSecret:
-        secure: v1:eWuqyEw60oAdfrI7:T1uUmgxv9VBc/SOJl3C/soqGSVGOsbo0Yfj2kFYXnz9HSOvgZr1UVSVWZSrYTi17RKPZXB329zSCvg==
+        secure: v1:pEdCWHncA7z7jfpm:Y/925Y6RiRhHoHPHx+SQDmCmyCHR67OWPQQEn0qcAfS6LHxBUXisSvn7Wfmdl7wtcpOBcpV3I1Gkng==
     resources:
       cpuUnits: 256
       instances: 2

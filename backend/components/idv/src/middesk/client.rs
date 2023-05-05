@@ -14,12 +14,7 @@ pub struct MiddeskClient {
 }
 
 impl MiddeskClient {
-    pub fn new(api_key: String, sandbox: bool) -> Result<Self, Error> {
-        let base_url = if sandbox {
-            "https://api-sandbox.middesk.com/v1/"
-        } else {
-            "https://api.middesk.com/v1/"
-        };
+    pub fn new(api_key: String, base_url: String) -> Result<Self, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "Authorization",
@@ -35,10 +30,7 @@ impl MiddeskClient {
             .default_headers(headers)
             .build()
             .map_err(MiddeskReqwestError::from)?;
-        Ok(Self {
-            client,
-            base_url: base_url.to_owned(),
-        })
+        Ok(Self { client, base_url })
     }
 
     #[allow(unused)]
@@ -92,7 +84,9 @@ mod tests {
     #[tokio::test]
     async fn test_client() {
         let api_key = dotenv::var("MIDDESK_SANDBOX_API_KEY").unwrap();
-        let client = MiddeskClient::new(api_key, true).unwrap();
+        let base_url = dotenv::var("MIDDESK_BASE_URL").unwrap();
+
+        let client = MiddeskClient::new(api_key, base_url).unwrap();
 
         let business_data = BusinessData {
             name: Some(PiiString::from("Middesk".to_owned())),
