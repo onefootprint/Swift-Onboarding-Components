@@ -45,13 +45,37 @@ impl<T: DeserializeOwned + 'static> FromRequest for OptionalJson<T> {
     }
 }
 
-impl<T: paperclip::v2::schema::Apiv2Schema> paperclip::v2::schema::Apiv2Schema for OptionalJson<T> {
+impl<T> paperclip::v2::schema::Apiv2Schema for OptionalJson<T>
+where
+    T: paperclip::v2::schema::Apiv2Schema,
+{
     fn name() -> Option<String> {
         T::name()
     }
 
+    fn description() -> &'static str {
+        T::description()
+    }
+
+    fn required() -> bool {
+        false
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        T::raw_schema()
+    }
+
+    fn schema_with_ref() -> paperclip::v2::models::DefaultSchemaRaw {
+        T::schema_with_ref()
+    }
+
     fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
         T::security_scheme()
+    }
+
+    fn header_parameter_schema(
+    ) -> Vec<paperclip::v2::models::Parameter<paperclip::v2::models::DefaultSchemaRaw>> {
+        T::header_parameter_schema()
     }
 }
 

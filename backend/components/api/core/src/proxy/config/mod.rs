@@ -30,19 +30,25 @@ pub mod ingress_rule;
 
 api_headers_schema! {
     pub mod proxy_headers {
-        /// Target proxy destination URL (required if just in time)
+        /// Target proxy destination URL
+        /// Required if "just-in-time" OR ignored if using proxy configuration
+        #[required = true]
         EGRESS_URL_HEADER_NAME = "x-fp-proxy-target-url";
 
         /// HTTP Method VERB for the proxy destination request (defaults to POST)
+        #[required = false]
         EGRESS_METHOD_HEADER_NAME = "x-fp-proxy-method";
 
         /// Egress destination URL path and query string to append
+        #[required = false]
         EGRESS_PATH_AND_QUERY = "x-fp-path-and-query";
 
         /// Content-type for the proxy ingress
+        #[required = false]
         INGRESS_CONTENT_TYPE = "x-fp-proxy-ingress-content-type";
 
         /// Access reason for any egress decryption operations during the proxy request
+        #[required = false]
         ACCESS_REASON = "x-fp-proxy-access-reason";
 
         /// When proxy requests are on behalf of a single footprint vault, you can
@@ -53,6 +59,7 @@ api_headers_schema! {
         /// the corresponding token must be assigned just-in-time via a headers
         ///
         /// i.e: `x-fp-proxy-footprint-token: fp_id_abc`
+        #[required = false]
         USER_TOKEN_ASSIGNMENT_HEADER = "x-fp-proxy-footprint-token";
 
         /// Configure one more ingress rules
@@ -60,21 +67,25 @@ api_headers_schema! {
         /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
         /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
         /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
-        ///
+        #[required = false]
         INGRESS_RULE_HEADER = "x-fp-proxy-ingress-rule";
 
         /// Prefixes custom headers to forward along egress
         /// For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination
+        #[required = false]
         FORWARD_HEADER_PREFIX = "x-fp-proxy-fwd-";
 
         /// Base64 encoded PEM client certificate to use (required if using key)
+        #[required = false]
         PROXY_CLIENT_CERT_HEADER = "x-fp-proxy-client-cert";
 
         /// Base64 encoded PEM client key to use (required if using cert)
+        #[required = false]
         PROXY_CLIENT_KEY_HEADER = "x-fp-proxy-client-key";
 
         /// Configure one or more base64 encoded PEM server certificates to validate and pin
         /// proxy destination TLS connections.
+        #[required = false]
         PROXY_PIN_SERVER_CERT_HEADER = "x-fp-proxy-pin-cert";
     }
 }
@@ -151,6 +162,28 @@ impl FromRequest for JustInTimeProxyConfig {
                 config: proxy_config_from_headers?,
             })
         })
+    }
+}
+
+/// Workaround: An empty struct to pass into the route for
+/// defining that headers can be passed in optionally
+#[derive(Debug, Clone)]
+pub struct ProxyIdAdditonalHeaders;
+
+impl paperclip::v2::schema::Apiv2Schema for ProxyIdAdditonalHeaders {
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        proxy_headers::schema_opts(true)
+    }
+}
+
+impl paperclip::actix::OperationModifier for ProxyIdAdditonalHeaders {}
+/// Parse a proxy config from the request by it's id or just-in-time specified headers
+impl FromRequest for ProxyIdAdditonalHeaders {
+    type Error = crate::ApiError;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(_req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+        Box::pin(async move { Ok(ProxyIdAdditonalHeaders) })
     }
 }
 

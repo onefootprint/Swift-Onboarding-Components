@@ -3,6 +3,7 @@ macro_rules! api_headers_schema {
         pub mod $group:ident {
             $(
                 $(#[doc = $doc:expr])*
+                #[required = $required:literal]
                 $name:ident = $header:literal;
             )*
         }
@@ -16,9 +17,12 @@ macro_rules! api_headers_schema {
                 pub const $name: &'static str = $header;
             )*
 
+            pub fn schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+                schema_opts(false)
+            }
+
             paste::paste! {
-                pub fn schema() ->
-                Vec<Parameter<DefaultSchemaRaw>>{
+                pub fn schema_opts(mark_all_optional: bool) -> Vec<Parameter<DefaultSchemaRaw>> {
                     vec![
                         $(
                             Parameter {
@@ -37,7 +41,7 @@ macro_rules! api_headers_schema {
                                     use paperclip::v2::schema::TypedData;
                                     String::format()
                                 },
-                                required: false,
+                                required: $required && !mark_all_optional,
                                 ..Default::default()
                             },
                         )*
@@ -59,10 +63,12 @@ mod tests {
         api_headers_schema! {
             pub mod test_group {
                 /// test description
+                #[required = true]
                 TEST_HEADER = "x-fp-test";
 
                 /// test description 2
                 /// multline
+                #[required = true]
                 TEST_HEADER2 = "x-fp-test-2";
             }
         }

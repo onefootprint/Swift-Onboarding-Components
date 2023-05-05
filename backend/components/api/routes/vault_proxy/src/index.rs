@@ -16,13 +16,14 @@ use crate::utils::headers::InsightHeaders;
 use crate::State;
 
 use api_core::proxy::config::JustInTimeProxyConfig;
+use api_core::proxy::config::ProxyIdAdditonalHeaders;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 
 #[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
     description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
-    tags(Proxy, PublicApi)
+    tags(VaultProxy, PublicApi)
 )]
 #[post("/vault_proxy/jit")]
 pub async fn just_in_time(
@@ -47,7 +48,7 @@ pub async fn just_in_time(
 #[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
     description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
-    tags(Proxy, PublicApi)
+    tags(VaultProxy, PublicApi)
 )]
 #[post("/vault_proxy/{proxy_id}")]
 pub async fn id(
@@ -57,6 +58,7 @@ pub async fn id(
     body_bytes: web::Bytes,
     insight: InsightHeaders,
     request: HttpRequest,
+    _: ProxyIdAdditonalHeaders,
 ) -> ApiResult<HttpResponse> {
     let id = proxy_config_id.into_inner();
     invoke_vault_proxy(
