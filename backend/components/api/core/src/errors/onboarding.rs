@@ -38,4 +38,6 @@ pub enum OnboardingError {
     MissingBoOnboarding,
     #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
     MissingBoOnboardingDecision(Csv<OnboardingId>),
+    #[error("Need to provide onboarding public key auth in order to start a sign-up session")]
+    MissingObPkAuth,
 }

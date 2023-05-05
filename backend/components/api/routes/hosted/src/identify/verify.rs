@@ -12,6 +12,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
+use api_core::errors::onboarding::OnboardingError;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::business_owner::BusinessOwner;
@@ -20,6 +21,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
+use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
@@ -58,7 +60,7 @@ pub struct VerifyResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
-    ob_pk_auth: ObConfigAuth,
+    ob_pk_auth: Option<ObConfigAuth>,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -79,15 +81,24 @@ pub async fn post(
             let global_sh_phone_number = state
                 .compute_fingerprint(GlobalFingerprintKind::PhoneNumber, &phone_number)
                 .await?;
-            let tenant_sh_phone_number = state
-                .compute_fingerprint((&di, &ob_pk_auth.tenant().id), &phone_number)
-                .await?;
+            let ob_info = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
+                let tenant_sh_phone_number = state
+                    .compute_fingerprint((&di, &ob_pk_auth.tenant().id), &phone_number)
+                    .await?;
+                let obc = ob_pk_auth.ob_config().clone();
+                Some(OnboardingInfo {
+                    obc,
+                    tenant_sh_phone_number,
+                })
+            } else {
+                None
+            };
             let legacy_sh_phone_number = state.compute_legacy_fingerprint(di, &phone_number).await?;
             let context = SmsContext {
                 challenge_state,
                 global_sh_phone_number,
-                tenant_sh_phone_number,
                 legacy_sh_phone_number,
+                ob_info,
                 keypair,
             };
             ChallengeData::Sms(context)
@@ -100,58 +111,35 @@ pub async fn post(
     let (auth_token, user_kind) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let ob_config = ob_pk_auth.ob_config();
-            let (user_vault_id, user_kind) = match challenge_data {
-                ChallengeData::Sms(c_state) => {
-                    validate_sms_challenge(conn, c_state, &challenge_response, ob_config.clone())?
-                }
+            let (uv_id, user_kind) = match challenge_data {
+                ChallengeData::Sms(c_state) => validate_sms_challenge(conn, c_state, &challenge_response)?,
                 ChallengeData::Biometric(c_state) => {
                     validate_biometric_challenge(conn, &config, c_state, &challenge_response)?
                 }
             };
 
-            // Since only some codepaths above will create a SU, we need to always get_or_create
-            // a SU here
-            let uv = Vault::lock(conn, &user_vault_id)?;
-            let su = ScopedVault::get_or_create(conn, &uv, ob_config.id.clone())?;
+            // Determine scopes you get for authing
+            let basic_scopes = vec![
+                // Always get BasicProfile just for authing - go you!
+                Some(UserAuthScope::BasicProfile),
+                // If you authed with Biometric, you also get SensitiveProfile
+                matches!(challenge_kind, ChallengeDataKind::Biometric)
+                    .then_some(UserAuthScope::SensitiveProfile),
+            ];
 
-            // If we verified with a BoSessionAuth, update the corresponding BO
-            let bo_scope = if let Some(business_owner) = ob_pk_auth.business_owner() {
-                let bo = BusinessOwner::lock(conn, &business_owner.id)?.into_inner();
-                let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &ob_config.id))?;
-                if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
-                    // If uv on the BO, make sure it is the same UV that was located in identify flow
-                    if existing_uv_id != &uv.id {
-                        return Err(BusinessError::BoAlreadyHasVault.into());
-                    }
-                } else {
-                    // If no uv_id on the BO, add it
-                    bo.add_user_vault_id(conn, &uv.id)?;
-                }
-                // TODO this scope will give the secondary BO perms to update the business vault
-                Some(UserAuthScope::Business(scoped_business.id))
+            // And scopes you get for onboarding
+            let (ob_scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
+                let scopes = onboarding_scopes(conn, ob_pk_auth, &uv_id)?.into_iter();
+                let duration = Duration::minutes(30); // Onboarding is pretty short
+                (scopes, duration)
             } else {
-                None
+                let duration = Duration::hours(8); // Issue my1fp token for a long time
+                (vec![].into_iter(), duration)
             };
 
-            let elevated_scope = matches!(challenge_kind, ChallengeDataKind::Biometric)
-                .then_some(UserAuthScope::SensitiveProfile);
             // Create the auth token for this user
-            let token_scopes = [
-                Some(UserAuthScope::SignUp),
-                Some(UserAuthScope::OrgOnboarding { id: su.id }),
-                // Business owner scope, if any
-                bo_scope,
-                // Higher permissions to view sensitive datas if authed with biometric
-                elevated_scope,
-            ]
-            .into_iter()
-            .flatten()
-            .collect();
-            let duration = Duration::minutes(30);
-
-            // Create the auth session and save it in the database
-            let data = UserSession::make(uv.into_inner().id, token_scopes);
+            let scopes = basic_scopes.into_iter().chain(ob_scopes).flatten().collect();
+            let data = UserSession::make(uv_id, scopes);
             let auth_token = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, user_kind))
         })
@@ -163,6 +151,45 @@ pub async fn post(
             auth_token,
         },
     }))
+}
+
+/// Determines the auth scopes to issue to allow a user to complete onboarding
+fn onboarding_scopes(
+    conn: &mut TxnPgConn,
+    ob_pk_auth: ObConfigAuth,
+    uv_id: &VaultId,
+) -> ApiResult<Vec<Option<UserAuthScope>>> {
+    let obc = ob_pk_auth.ob_config();
+    // Since only some codepaths above will create a SU, we need to always get_or_create
+    // a SU here
+    let uv = Vault::lock(conn, uv_id)?;
+    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
+
+    // If we verified with a BoSessionAuth, update the corresponding BO
+    let bo_scope = if let Some(bo) = ob_pk_auth.business_owner() {
+        let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
+        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &obc.id))?;
+        if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
+            // If uv on the BO, make sure it is the same UV that was located in identify flow
+            if existing_uv_id != &uv.id {
+                return Err(BusinessError::BoAlreadyHasVault.into());
+            }
+        } else {
+            // If no uv_id on the BO, add it
+            bo.add_user_vault_id(conn, &uv.id)?;
+        }
+        // TODO this scope will give the secondary BO perms to update the business vault
+        Some(UserAuthScope::Business(scoped_business.id))
+    } else {
+        None
+    };
+
+    Ok(vec![
+        Some(UserAuthScope::SignUp),
+        Some(UserAuthScope::OrgOnboarding { id: su.id }),
+        // Business owner scope, if any
+        bo_scope,
+    ])
 }
 
 fn validate_biometric_challenge(
@@ -189,12 +216,19 @@ fn validate_biometric_challenge(
     Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))
 }
 
+/// Info extracted when an onboarding config auth is provided that allows creating a new vault
+struct OnboardingInfo {
+    obc: ObConfiguration,
+    tenant_sh_phone_number: Fingerprint,
+}
+
 struct SmsContext {
     challenge_state: PhoneChallengeState,
     global_sh_phone_number: Fingerprint,
-    tenant_sh_phone_number: Fingerprint,
     // TODO: remove this post fingerprint
     legacy_sh_phone_number: Fingerprint,
+    // Only non-null when an ObConfigAuth was provided
+    ob_info: Option<OnboardingInfo>,
     keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
 }
 
@@ -202,31 +236,35 @@ fn validate_sms_challenge(
     conn: &mut TxnPgConn,
     context: SmsContext,
     challenge_response: &str,
-    ob_config: ObConfiguration,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
     if context.challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     }
-    let existing_user = Vault::find_portable(
-        conn,
-        &[
-            context.global_sh_phone_number.clone(),
-            context.tenant_sh_phone_number.clone(),
-            context.legacy_sh_phone_number,
-        ],
-    )?;
+    let fps_to_search = vec![
+        Some(context.global_sh_phone_number.clone()),
+        Some(context.legacy_sh_phone_number),
+        context.ob_info.as_ref().map(|i| i.tenant_sh_phone_number.clone()),
+    ]
+    .into_iter()
+    .flatten()
+    .collect_vec();
+    let existing_user = Vault::find_portable(conn, &fps_to_search)?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
-            // The user does not exist. Create a new user vault
-            // TODO Don't make global fingerprints for fixture number
+            // The user does not exist. Create a new user vault.
+            // Must have ob_info to create a new user vault
+            let OnboardingInfo {
+                obc,
+                tenant_sh_phone_number,
+            } = context.ob_info.ok_or(OnboardingError::MissingObPkAuth)?;
             let (uv, _) = VaultWrapper::create_user_vault(
                 conn,
                 context.keypair,
-                ob_config,
+                obc,
                 context.challenge_state.phone_number_e164_with_suffix,
                 context.global_sh_phone_number,
-                context.tenant_sh_phone_number,
+                tenant_sh_phone_number,
             )?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }

@@ -125,7 +125,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def inherit_user(twilio, phone_number, ob_config_auth):
+def inherit_user(twilio, phone_number, ob_config_auth=None):
     challenge_data = challenge_user(phone_number, ob_config_auth, "sms")
 
     # Log in as the user
@@ -175,16 +175,17 @@ def inherit_user_biometric(user):
     return FpAuth(body["auth_token"])
 
 
-def challenge_user(phone_number, ob_config_auth, challenge_kind="sms"):
+def challenge_user(phone_number, ob_config_auth=None, challenge_kind="sms"):
     identifier = dict(phone_number=phone_number)
     # Support sandbox phone numbers being passed in
     real_phone_number = phone_number.split("#")[0]
+    auth_args = [ob_config_auth] if ob_config_auth else []
 
     def identify():
         data = dict(
             identifier=identifier,
         )
-        body = post("hosted/identify", data, ob_config_auth)
+        body = post("hosted/identify", data, *auth_args)
         assert body["user_found"]
         assert body["available_challenge_kinds"]
 
@@ -193,7 +194,7 @@ def challenge_user(phone_number, ob_config_auth, challenge_kind="sms"):
             identifier=identifier,
             preferred_challenge_kind=challenge_kind,
         )
-        body = post("hosted/identify/login_challenge", data, ob_config_auth)
+        body = post("hosted/identify/login_challenge", data, *auth_args)
         last_two = real_phone_number[-2:]
         assert (
             body["challenge_data"]["scrubbed_phone_number"]
