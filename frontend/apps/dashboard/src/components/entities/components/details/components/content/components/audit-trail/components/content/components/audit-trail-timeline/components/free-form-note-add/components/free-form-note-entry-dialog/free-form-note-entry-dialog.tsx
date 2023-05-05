@@ -1,5 +1,4 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
@@ -8,39 +7,34 @@ import ManualNoteEntryForm, {
 } from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useSubmitReview from './hooks/use-submit-review';
+import useSubmitFreeFormNote from '../hooks/use-submit-free-form-note';
 
-export type ManualReviewDialogProps = {
+export type FreeFormNoteEntryDialogProps = {
   open: boolean;
   onClose: () => void;
-  status: ReviewStatus;
 };
 
-const ManualReviewDialog = ({
+const FreeFormNoteEntryDialog = ({
   open,
   onClose,
-  status,
-}: ManualReviewDialogProps) => {
-  const { t } = useTranslation('pages.entity.manual-review');
+}: FreeFormNoteEntryDialogProps) => {
+  const { t } = useTranslation(
+    'pages.entity.audit-trail.timeline.free-form-note-event',
+  );
   const showRequestErrorToast = useRequestErrorToast();
-  const submitReviewMutation = useSubmitReview();
+  const submitFreeFormMutation = useSubmitFreeFormNote();
   const entityId = useEntityId();
 
   const handleSubmit = (data: ManualNoteFormData) => {
     const { isPinned, note } = data;
-    submitReviewMutation.mutate(
+    submitFreeFormMutation.mutate(
       {
         entityId,
-        status,
-        annotation: {
-          isPinned,
-          note,
-        },
+        isPinned,
+        note,
       },
       {
-        onSuccess: () => {
-          onClose();
-        },
+        onSuccess: onClose,
         onError: showRequestErrorToast,
       },
     );
@@ -51,22 +45,21 @@ const ManualReviewDialog = ({
       size="compact"
       title={t('dialog.title')}
       primaryButton={{
-        form: 'manual-review-form',
-        label: t('dialog.complete'),
-        loading: submitReviewMutation.isLoading,
+        form: 'free-form-note-form',
+        label: t('dialog.save'),
+        loading: submitFreeFormMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: t('dialog.cancel'),
         onClick: onClose,
-        disabled: submitReviewMutation.isLoading,
+        disabled: submitFreeFormMutation.isLoading,
       }}
       onClose={onClose}
       open={open}
     >
       <ManualNoteEntryForm
-        formId="manual-review-form"
-        prompt={t('dialog.form.prompt', { status: t(`status.${status}`) })}
+        formId="free-form-note-form"
         placeholder={t('dialog.form.placeholder')}
         onSubmit={handleSubmit}
       />
@@ -74,4 +67,4 @@ const ManualReviewDialog = ({
   );
 };
 
-export default ManualReviewDialog;
+export default FreeFormNoteEntryDialog;

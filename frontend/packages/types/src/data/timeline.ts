@@ -16,6 +16,7 @@ export enum TimelineEventKind {
   liveness = 'liveness',
   idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
+  freeFormNote = 'annotation',
 }
 
 export type CollectedDataEvent = {
@@ -29,6 +30,11 @@ export type CollectedDataEventData = {
     | CollectedKycDataOption
     | CollectedInvestorProfileDataOption
   )[];
+};
+
+export type FreeFormNoteEvent = {
+  kind: TimelineEventKind.freeFormNote;
+  data: Annotation;
 };
 
 export type LivenessEvent = {
@@ -94,7 +100,8 @@ export type TimelineEvent = {
     | LivenessEvent
     | IdDocUploadedEvent
     | OnboardingDecisionEvent
-    | WatchlistCheckEvent;
+    | WatchlistCheckEvent
+    | FreeFormNoteEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };

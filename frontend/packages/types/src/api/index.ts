@@ -50,6 +50,7 @@ export * from './session-validate';
 export * from './signup-challenge';
 export * from './skip-liveness';
 export * from './submit-doc';
+export * from './submit-free-form-note';
 export * from './submit-review';
 export * from './update-d2p-status';
 export * from './update-member';

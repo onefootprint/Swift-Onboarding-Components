@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoWarning16 } from '@onefootprint/icons';
+import { IcoFileText16, IcoWarning16 } from '@onefootprint/icons';
 import {
+  Annotation,
   CollectedDataEventData,
   Entity,
   EntityStatus,
@@ -20,10 +21,15 @@ import {
   AbandonedEventBody,
   AbandonedEventHeader,
 } from './components/abandoned-event';
+import AnnotationNote from './components/annotation-note';
 import {
   DataCollectedEventHeader,
   DataCollectedEventIcon,
 } from './components/data-collected-event';
+import {
+  FreeFormNoteAddHeader,
+  FreeFormNoteAddIcon,
+} from './components/free-form-note-add';
 import {
   IdDocUploadedEventHeader,
   IdDocUploadedEventIcon,
@@ -116,6 +122,18 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
           bodyComponent: <WatchlistCheckEventBody data={eventData} />,
         });
       }
+    } else if (kind === TimelineEventKind.freeFormNote) {
+      const eventData = data as Annotation;
+      items.push({
+        time,
+        iconComponent: <IcoFileText16 />,
+        headerComponent: (
+          <Typography variant="label-3">{`${t(
+            'timeline.free-form-note-event.note-added-by',
+          )} ${eventData.source.member}`}</Typography>
+        ),
+        bodyComponent: <AnnotationNote annotation={eventData} />,
+      });
     }
   });
   if (entity.status === EntityStatus.incomplete) {
@@ -127,6 +145,11 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       bodyComponent: <AbandonedEventBody />,
     });
   }
+
+  items.push({
+    iconComponent: <FreeFormNoteAddIcon />,
+    headerComponent: <FreeFormNoteAddHeader />,
+  });
 
   return items.length > 0 ? (
     <Timeline items={items} />
