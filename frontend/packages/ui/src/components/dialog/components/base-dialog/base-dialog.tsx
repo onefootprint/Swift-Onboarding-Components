@@ -175,7 +175,7 @@ const DialogContainer = styled(Fade)<{
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }>`
   ${({ theme, isResponsive, isConfirmation }) => css`
-    position: absolute;
+    position: fixed;
     display: flex;
     flex-direction: column;
     background-color: ${theme.backgroundColor.primary};
