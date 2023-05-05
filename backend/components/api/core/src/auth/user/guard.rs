@@ -13,27 +13,25 @@ impl IsGuardMet<UserAuthScope> for UserAuthGuard {
 
 impl IsGuardMet<UserAuthScope> for CanDecrypt {
     fn is_met(self, token_scopes: &[UserAuthScope]) -> bool {
-        let mut required_guards = self
-            .0
-            .iter()
-            .map(|di| match di {
-                DataIdentifier::Id(id) => match id {
-                    IDK::City | IDK::State | IDK::Country | IDK::Zip | IDK::FirstName | IDK::LastName => {
-                        UserAuthGuard::SignUp
-                    }
-                    IDK::AddressLine1
-                    | IDK::AddressLine2
-                    | IDK::Dob
-                    | IDK::PhoneNumber
-                    | IDK::Email
-                    | IDK::Ssn4
-                    | IDK::Ssn9 => UserAuthGuard::SensitiveProfile,
-                },
-                // We don't allow decrypting business data with a user auth token right now - we
-                // theoretically could, but we just don't support portable businesses yet
-                _ => UserAuthGuard::Never,
-            })
-            .unique();
-        required_guards.all(|s| s.is_met(token_scopes))
+        self.0.iter().all(|di| match di {
+            DataIdentifier::Id(id) => match id {
+                IDK::City | IDK::State | IDK::Country | IDK::Zip | IDK::FirstName | IDK::LastName => {
+                    // Either BasicProfile or SignUp give permissions to decrypt basic info
+                    UserAuthGuard::BasicProfile
+                        .or(UserAuthGuard::SignUp)
+                        .is_met(token_scopes)
+                }
+                IDK::AddressLine1
+                | IDK::AddressLine2
+                | IDK::Dob
+                | IDK::PhoneNumber
+                | IDK::Email
+                | IDK::Ssn4
+                | IDK::Ssn9 => UserAuthGuard::SensitiveProfile.is_met(token_scopes),
+            },
+            // We don't allow decrypting business data with a user auth token right now - we
+            // theoretically could, but we just don't support portable businesses yet
+            _ => false,
+        })
     }
 }

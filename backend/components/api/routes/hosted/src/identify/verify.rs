@@ -118,27 +118,23 @@ pub async fn post(
                 }
             };
 
-            // Determine scopes you get for authing
-            let basic_scopes = vec![
-                // Always get BasicProfile just for authing - go you!
-                Some(UserAuthScope::BasicProfile),
-                // If you authed with Biometric, you also get SensitiveProfile
-                matches!(challenge_kind, ChallengeDataKind::Biometric)
-                    .then_some(UserAuthScope::SensitiveProfile),
-            ];
-
-            // And scopes you get for onboarding
-            let (ob_scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
+            // And specific scopes for either bifrost or my1fp
+            let (scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
                 let scopes = onboarding_scopes(conn, ob_pk_auth, &uv_id)?.into_iter();
                 let duration = Duration::minutes(30); // Onboarding is pretty short
                 (scopes, duration)
             } else {
+                let scopes = vec![Some(UserAuthScope::BasicProfile)].into_iter();
                 let duration = Duration::hours(8); // Issue my1fp token for a long time
-                (vec![].into_iter(), duration)
+                (scopes, duration)
             };
 
+            // If you authed with Biometric, you also get SensitiveProfile
+            let sensitive_scope = matches!(challenge_kind, ChallengeDataKind::Biometric)
+                .then_some(UserAuthScope::SensitiveProfile);
+
             // Create the auth token for this user
-            let scopes = basic_scopes.into_iter().chain(ob_scopes).flatten().collect();
+            let scopes = scopes.chain([sensitive_scope]).flatten().collect();
             let data = UserSession::make(uv_id, scopes);
             let auth_token = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, user_kind))
