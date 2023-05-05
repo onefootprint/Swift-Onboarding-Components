@@ -30,6 +30,7 @@
     "i18next": "^22.0.4",
     "react-hook-form": "^7.43.9",
     "react-i18next": "^12.2.0",
+    "react-use-measure": "^2.1.1",
     "styled-media-query": "^2.1.2",
     "usehooks-ts": "2.7.2",
     "xstate": "^4.37.1"

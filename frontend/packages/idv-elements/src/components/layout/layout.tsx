@@ -44,7 +44,6 @@ const Layout = ({
   const configQuery = useGetOnboardingConfig({ tenantPk });
   const { data: onboardingConfig } = configQuery;
   const isSandbox = onboardingConfig && !onboardingConfig.isLive;
-
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 

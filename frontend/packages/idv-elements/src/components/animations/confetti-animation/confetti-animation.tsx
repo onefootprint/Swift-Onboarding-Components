@@ -1,63 +1,60 @@
-import { media } from '@onefootprint/ui';
-import Lottie from 'lottie-react';
 import React from 'react';
+import Confetti from 'react-confetti';
 import styled, { css } from 'styled-components';
 
-import LottieFile from './confetti-lottie.json';
-
 type ConfettiAnimationProps = {
-  onComplete?: () => void;
+  onComplete: () => void;
+  width: number;
+  height: number;
+  left: number;
+  top: number;
 };
 
-const ConfettiAnimation = ({ onComplete }: ConfettiAnimationProps) => (
-  <>
-    <Overlay />
-    <AnimationContainer
-      animationData={LottieFile}
-      loop={false}
-      onComplete={onComplete}
+const colors = ['#76FB8F', '#CBC1F6', '#4A24DB', '#F28900'];
+
+const ConfettiAnimation = ({
+  onComplete,
+  width,
+  height,
+  left,
+  top,
+}: ConfettiAnimationProps) => (
+  <Container left={left} top={top}>
+    <Confetti
+      width={width}
+      height={height}
+      numberOfPieces={150}
+      confettiSource={{ x: 0, y: height * 0.1, w: 0, h: height }}
+      onConfettiComplete={onComplete}
+      gravity={0.1}
+      initialVelocityX={6}
+      initialVelocityY={4}
+      colors={colors}
+      recycle={false}
     />
-  </>
+    <Confetti
+      width={width}
+      height={height}
+      numberOfPieces={150}
+      confettiSource={{ x: width, y: height * 0.1, w: 0, h: height }}
+      onConfettiComplete={onComplete}
+      gravity={0.1}
+      initialVelocityX={-6}
+      initialVelocityY={4}
+      colors={colors}
+      recycle={false}
+    />
+  </Container>
 );
 
-const AnimationContainer = styled(Lottie)`
-  position: absolute;
-  top: -30vh;
-  left: 0;
-  height: 100vh;
-  width: 92vw;
-  pointer-events: none;
-  isolation: isolate;
-  z-index: 1;
-
-  ${media.greaterThan('sm')`
-    height: 200%;
-    width: 200%;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-  `}
-`;
-
-const Overlay = styled.span`
-  ${({ theme }) => css`
-    display: block;
+const Container = styled.span<{ left: number; top: number }>`
+  ${({ theme, left, top }) => css`
+    pointer-events: none;
+    user-select: none;
+    z-index: ${theme.zIndex.toast};
     position: fixed;
-    bottom: 40px;
-    left: 0;
-    height: 50%;
-    width: 100%;
-    z-index: 2;
-    background: linear-gradient(
-      180deg,
-      ${theme.backgroundColor.transparent} 0%,
-      ${theme.backgroundColor.primary} 20%,
-      ${theme.backgroundColor.primary} 100%
-    );
-
-    ${media.greaterThan('sm')`
-      display: none;
-    `};
+    left: ${left}px;
+    top: ${top}px;
   `}
 `;
 
