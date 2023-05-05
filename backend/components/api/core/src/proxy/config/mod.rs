@@ -2,7 +2,7 @@ use actix_web::{http::header::HeaderMap, FromRequest};
 
 use futures::Future;
 use newtypes::{ApiKeyStatus, FpId, PiiString, ProxyConfigId, ProxyIngressContentType};
-use paperclip::actix::Apiv2Header;
+use paperclip::v2::models::{DefaultSchemaRaw, Parameter};
 use reqwest::Method;
 use std::{pin::Pin, str::FromStr};
 use strum::EnumString;
@@ -20,6 +20,7 @@ use self::{
     ingress_rule::IngressRule,
 };
 use self::{fwd_headers::ForwardProxyHeaders, ingress_rule::ParsedIngressRules};
+use crate::utils::paperclip::api_headers_schema;
 
 mod certificates;
 pub use self::certificates::ClientCertificateKey;
@@ -27,39 +28,62 @@ pub use self::certificates::ClientCertificateKey;
 mod fwd_headers;
 pub mod ingress_rule;
 
-pub mod proxy_headers {
-    use super::*;
+api_headers_schema! {
+    pub mod proxy_headers {
+        /// Target proxy destination URL (required if just in time)
+        EGRESS_URL_HEADER_NAME = "x-fp-proxy-target-url";
 
-    /// specify the proxy configuration via the id
-    pub const PROXY_CONFIG_BY_ID_HEADER: &str = "x-fp-proxy-id";
+        /// HTTP Method VERB for the proxy destination request (defaults to POST)
+        EGRESS_METHOD_HEADER_NAME = "x-fp-proxy-method";
 
-    // Egress
-    pub const EGRESS_URL_HEADER_NAME: &str = "x-fp-proxy-target-url";
-    pub const EGRESS_METHOD_HEADER_NAME: &str = "x-fp-proxy-method";
-    pub const EGRESS_PATH_AND_QUERY: &str = "x-fp-path-and-query";
+        /// Egress destination URL path and query string to append
+        EGRESS_PATH_AND_QUERY = "x-fp-path-and-query";
 
-    // Ingress
-    pub const INGRESS_CONTENT_TYPE: &str = "x-fp-proxy-ingress-content-type";
+        /// Content-type for the proxy ingress
+        INGRESS_CONTENT_TYPE = "x-fp-proxy-ingress-content-type";
 
-    // other
-    pub const ACCESS_REASON: &str = "x-fp-proxy-access-reason";
+        /// Access reason for any egress decryption operations during the proxy request
+        ACCESS_REASON = "x-fp-proxy-access-reason";
 
-    /// When proxy requests are on behalf of a single footprint user, users
-    /// can omit the fp_id_xxx. prefix on proxy tokens, and just use `id.x` or `custom.y`.
-    ///
-    /// This header denotes the token to se.
-    ///
-    /// Similarly, If specifying proxy configuration ingress rules from a stored configuration
-    /// the corresponding token must be assigned just-in-time via a headers
-    /// i.e: `x-fp-proxy-footprint-token: fp_id_abc`
-    pub const USER_TOKEN_ASSIGNMENT_HEADER: &str = "x-fp-proxy-footprint-token";
+        /// When proxy requests are on behalf of a single footprint vault, you can
+        /// can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead
+        /// of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.
+        ///
+        /// Similarly, if specifying proxy configuration ingress rules from a stored configuration
+        /// the corresponding token must be assigned just-in-time via a headers
+        ///
+        /// i.e: `x-fp-proxy-footprint-token: fp_id_abc`
+        USER_TOKEN_ASSIGNMENT_HEADER = "x-fp-proxy-footprint-token";
 
-    // helper function to get method
-    pub fn get_proxy_method_or_default(headers: &HeaderMap, default: Method) -> Method {
-        get_header(EGRESS_METHOD_HEADER_NAME, headers)
-            .and_then(|m| super::Method::from_str(&m).ok())
-            .unwrap_or(default)
+        /// Configure one more ingress rules
+        ///
+        /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
+        /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
+        /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
+        ///
+        INGRESS_RULE_HEADER = "x-fp-proxy-ingress-rule";
+
+        /// Prefixes custom headers to forward along egress
+        /// For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination
+        FORWARD_HEADER_PREFIX = "x-fp-proxy-fwd-";
+
+        /// Base64 encoded PEM client certificate to use (required if using key)
+        PROXY_CLIENT_CERT_HEADER = "x-fp-proxy-client-cert";
+
+        /// Base64 encoded PEM client key to use (required if using cert)
+        PROXY_CLIENT_KEY_HEADER = "x-fp-proxy-client-key";
+
+        /// Configure one or more base64 encoded PEM server certificates to validate and pin
+        /// proxy destination TLS connections.
+        PROXY_PIN_SERVER_CERT_HEADER = "x-fp-proxy-pin-cert";
     }
+}
+
+// helper function to get method
+pub fn get_proxy_method_or_default(headers: &HeaderMap, default: Method) -> Method {
+    get_header(proxy_headers::EGRESS_METHOD_HEADER_NAME, headers)
+        .and_then(|m| Method::from_str(&m).ok())
+        .unwrap_or(default)
 }
 
 #[derive(Debug, Clone)]
@@ -102,60 +126,29 @@ impl From<ProxyIngressContentType> for IngressContentType {
     }
 }
 
-/// Possible ways to declare how to source
-/// the proxy configuration
-#[derive(Clone, Apiv2Header)]
-pub struct ProxyConfigSourceHeader {
-    #[openapi(skip)]
-    pub source: ProxyConfigSource,
-
-    // WORKAROUND: annoying workaround to get
-    // openapi spec to render correctly for this FromRequest header
-    #[allow(unused)]
-    #[openapi(
-        name = "x-fp-proxy-id",
-        description = "the Proxy configuration id to use or all the parameters specified as headers"
-    )]
-    uses_config_id: String,
+#[derive(Debug, Clone)]
+pub struct JustInTimeProxyConfig {
+    pub config: ProxyConfig,
 }
 
-impl std::fmt::Debug for ProxyConfigSourceHeader {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.source {
-            ProxyConfigSource::Id(id) => format!("ProxySource = {}", &id).fmt(f),
-            ProxyConfigSource::JustInTime(_) => "ProxySource = JIT headers".fmt(f),
-        }
+impl paperclip::v2::schema::Apiv2Schema for JustInTimeProxyConfig {
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        proxy_headers::schema()
     }
 }
 
-#[derive(Debug, Clone)]
-#[allow(clippy::large_enum_variant)]
-pub enum ProxyConfigSource {
-    Id(ProxyConfigId),
-    JustInTime(ProxyConfig),
-}
-
+impl paperclip::actix::OperationModifier for JustInTimeProxyConfig {}
 /// Parse a proxy config from the request by it's id or just-in-time specified headers
-impl FromRequest for ProxyConfigSourceHeader {
+impl FromRequest for JustInTimeProxyConfig {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let proxy_config_id =
-            get_header(proxy_headers::PROXY_CONFIG_BY_ID_HEADER, req.headers()).map(ProxyConfigId::from);
         let proxy_config_from_headers = ProxyConfig::try_from(req.headers());
 
         Box::pin(async move {
-            let Some(proxy_config_id) = proxy_config_id else {
-                return Ok(ProxyConfigSourceHeader {
-                    source: ProxyConfigSource::JustInTime(proxy_config_from_headers?),
-                    uses_config_id: "".to_string(),
-                })
-            };
-
-            Ok(ProxyConfigSourceHeader {
-                uses_config_id: proxy_config_id.to_string(),
-                source: ProxyConfigSource::Id(proxy_config_id),
+            Ok(JustInTimeProxyConfig {
+                config: proxy_config_from_headers?,
             })
         })
     }
@@ -170,7 +163,7 @@ impl TryFrom<&HeaderMap> for ProxyConfig {
 
         let proxy_target = get_required_header(proxy_headers::EGRESS_URL_HEADER_NAME, headers)?;
         let url = url::Url::parse(&proxy_target).map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
-        let method = proxy_headers::get_proxy_method_or_default(headers, Method::POST);
+        let method = get_proxy_method_or_default(headers, Method::POST);
         let global_fp_id = get_header(proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FpId::from);
 
         let egress_headers = ForwardProxyHeaders::try_from(headers)?;
@@ -267,7 +260,7 @@ impl ProxyConfig {
             reqwest::Method::from_str(&method).map_err(|_| VaultProxyError::InvalidDestinationMethod)?;
 
         // support method JIT overwrite
-        let method = proxy_headers::get_proxy_method_or_default(header_map, method);
+        let method = get_proxy_method_or_default(header_map, method);
 
         // grab a global fp_id
         // note we dont throw the error here as it may or may not be required

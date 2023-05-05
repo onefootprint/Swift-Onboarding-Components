@@ -6,6 +6,8 @@ use actix_web::http::header::HeaderMap;
 
 use std::fmt::Debug;
 
+use super::proxy_headers::{PROXY_CLIENT_CERT_HEADER, PROXY_CLIENT_KEY_HEADER, PROXY_PIN_SERVER_CERT_HEADER};
+
 /// Client certificate authentication to use for the upstream proxy
 #[derive(Clone)]
 pub struct ClientCertificateKey {
@@ -41,19 +43,12 @@ pub struct ParsedClientCertificate {
     pub client_tls_credential: Option<ClientCertificateKey>,
 }
 
-impl ParsedClientCertificate {
-    /// base64 encoded PEM
-    pub const PROXY_CLIENT_CERT_HEADER: &str = "x-fp-proxy-client-cert";
-    /// base64 encoded
-    pub const PROXY_CLIENT_KEY_HEADER: &str = "x-fp-proxy-client-key";
-}
-
 impl TryFrom<&HeaderMap> for ParsedClientCertificate {
     type Error = ApiError;
 
     fn try_from(headers: &HeaderMap) -> ApiResult<Self> {
-        let cert = get_header(Self::PROXY_CLIENT_CERT_HEADER, headers);
-        let key = get_header(Self::PROXY_CLIENT_KEY_HEADER, headers);
+        let cert = get_header(PROXY_CLIENT_CERT_HEADER, headers);
+        let key = get_header(PROXY_CLIENT_KEY_HEADER, headers);
 
         match (cert, key) {
             (Some(cert), Some(key)) => {
@@ -81,29 +76,34 @@ pub struct PinnedServerCertificates {
     pub certs: Vec<reqwest::Certificate>,
 }
 
-impl PinnedServerCertificates {
-    /// PEM encoded certificate trust store
-    pub const PROXY_PIN_SERVER_CERT_HEADER: &str = "x-fp-proxy-pin-cert";
-}
-
 impl TryFrom<&HeaderMap> for PinnedServerCertificates {
     type Error = VaultProxyError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, VaultProxyError> {
         let certs = headers
-            .iter()
-            .filter(|(n, _v)| n.as_str() == Self::PROXY_PIN_SERVER_CERT_HEADER)
-            .map(|(_n, value)| -> Result<_, VaultProxyError> {
+            .get_all(PROXY_PIN_SERVER_CERT_HEADER)
+            .map(|value| -> Result<_, VaultProxyError> {
                 let value = value
                     .to_str()
                     .map_err(|_| VaultProxyError::InvalidPinCertHeader)?;
 
-                let value = urlencoding::decode(value).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
+                // support HTTP1.1 where multi-header values are CSV
+                let values: Vec<_> = value
+                    .split(',')
+                    .map(|value_split| {
+                        let value = urlencoding::decode(value_split)
+                            .map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
 
-                reqwest::Certificate::from_pem(value.as_bytes())
-                    .map_err(VaultProxyError::ServerPinCertificate)
+                        reqwest::Certificate::from_pem(value.as_bytes())
+                            .map_err(VaultProxyError::ServerPinCertificate)
+                    })
+                    .collect::<Result<Vec<_>, VaultProxyError>>()?;
+                Ok(values)
             })
-            .collect::<Result<Vec<_>, VaultProxyError>>()?;
+            .collect::<Result<Vec<_>, VaultProxyError>>()?
+            .into_iter()
+            .flatten()
+            .collect();
 
         Ok(Self { certs })
     }

@@ -8,6 +8,8 @@ use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::{DataIdentifier, FpId, ProxyToken, ProxyTokenError};
 
+use super::proxy_headers::INGRESS_RULE_HEADER;
+
 /// Ingress rules define how to vault data in the response
 /// from the proxy requests
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
@@ -19,16 +21,6 @@ pub struct IngressRule {
     /// for now this will be a JSONPath selector
     /// In the future we can support XPath, Regex, and more
     pub target: String,
-}
-
-impl IngressRule {
-    /// These can be configured fully as headers:
-    ///
-    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
-    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
-    /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
-    ///
-    pub const INGRESS_RULE_HEADER: &str = "x-fp-proxy-ingress-rule";
 }
 
 impl IngressRule {
@@ -94,7 +86,7 @@ impl TryFrom<&HeaderMap> for ParsedIngressRules {
             get_header(super::proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FpId::from);
 
         let result = headers
-            .get_all(IngressRule::INGRESS_RULE_HEADER)
+            .get_all(INGRESS_RULE_HEADER)
             .map(|value| {
                 let value = value
                     .to_str()

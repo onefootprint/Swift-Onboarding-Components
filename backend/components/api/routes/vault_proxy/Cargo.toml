@@ -1,5 +1,5 @@
 [package]
-name = "api_route_proxy"
+name = "api_route_vault_proxy"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }

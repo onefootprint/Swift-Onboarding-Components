@@ -12,6 +12,7 @@ pub mod twilio;
 pub mod vault_wrapper;
 pub mod webhook_app;
 pub mod actix;
+pub mod paperclip;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]

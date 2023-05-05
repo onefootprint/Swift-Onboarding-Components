@@ -43,10 +43,6 @@ class ProxyIngressContentType(BaseAuth):
     HEADER_NAME = "x-fp-proxy-ingress-content-type"
 
 
-class ProxyId(BaseAuth):
-    HEADER_NAME = "x-fp-proxy-id"
-
-
 class ProxyTokenAssignment(BaseAuth):
     HEADER_NAME = "x-fp-proxy-footprint-token"
 
@@ -124,7 +120,7 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path="vault_proxy/jit",
             data=data,
             params=None,
             status_code=200,
@@ -175,7 +171,7 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path="vault_proxy/jit",
             data=data,
             params=None,
             status_code=200,
@@ -239,7 +235,7 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path="vault_proxy/jit",
             data=data,
             params=None,
             status_code=200,
@@ -291,13 +287,12 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path=f"vault_proxy/{proxy_id}",
             data=data,
             params=None,
             status_code=200,
             auths=[
                 sandbox_tenant.sk.key,
-                ProxyId(proxy_id),
                 ProxyTokenAssignment(fp_id),
             ],
             files=None,
@@ -372,6 +367,18 @@ class TestVaultProxy:
             status_code=404,
         )
 
+        response = _make_request(
+            method=requests.post,
+            path=f"vault_proxy/{proxy_id}",
+            data={},
+            params=None,
+            status_code=404,
+            auths=[
+                sandbox_tenant.sk.key,
+            ],
+            files=None,
+        )
+
     def test_ingress_non_custom(self, sandbox_tenant):
         # create the vault
         body = post("users/", None, sandbox_tenant.sk.key)
@@ -405,7 +412,7 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path="vault_proxy/jit",
             data=data,
             params=None,
             status_code=200,
@@ -470,7 +477,7 @@ class TestVaultProxy:
 
         response = _make_request(
             method=requests.post,
-            path="proxy",
+            path="vault_proxy/jit",
             data=data,
             params=None,
             status_code=200,

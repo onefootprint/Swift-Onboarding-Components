@@ -8,8 +8,8 @@ use reqwest::header::HeaderValue;
 
 use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
 
-/// Prefixes custom headers to forward along egress
-pub const FORWARD_HEADER_PREFIX: &str = "x-fp-proxy-fwd-";
+use super::proxy_headers::FORWARD_HEADER_PREFIX;
+
 
 /// Parses out headers to forward along the egress
 #[derive(Debug, Clone, Default)]

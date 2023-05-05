@@ -45,14 +45,22 @@ The vault proxy supports the following main features:
 
 # Configuration
 
-The proxy can be configured in two main ways: define the configuration using the dashboard/admin API or dynamically specify all the configuration values via headers "just-in-time."
+The proxy can be configured in two main ways: define the configuration using the dashboard/admin API or dynamically specify all the configuration values via headers "just-in-time." Both methods support the same fundamental capabilities, but the two options offer flexibility in defining proxy configurations and simplifying the management of sensitive data and authentication credentials.
 
-Both methods support the same fundamental capabilities, but the two options offer flexibility in defining proxy configurations and simplifying the management of sensitive data and authentication credentials.
+## Just-in-time
 
-| Header                  | Usage                           | Description                                                                                          |
-| ----------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `x-fp-proxy-target-url` | Required if "just-in-time"      | The target destination HTTPS URL to which the request will be routed                                 |
-| `x-fp-proxy-id`         | Required if proxy configuration | The `id` of the Proxy Configuration declared in the developer dashboard or created via the admin API |
+In order to dynamically proxy data anywhere, without defining a configuration ahead of time, you must specify the following header:
+
+| Header                  | Usage                      | Description                                                          |
+| ----------------------- | -------------------------- | -------------------------------------------------------------------- |
+| `x-fp-proxy-target-url` | Required if "just-in-time" | The target destination HTTPS URL to which the request will be routed |
+
+Alternatively, if using a vault proxy configuration either via the API or the dashboard, you can invoke a specific configuration by grabbing it's `id` as follows:
+
+```bash
+curl  https://api.onefootprint.com/vault_proxy/proxy_id_AY5ec7I5QDUFWG8BAQG78k \
+  ...other parameters...
+```
 
 <img
   alt="Vault proxy configuration"
@@ -63,15 +71,15 @@ Both methods support the same fundamental capabilities, but the two options offe
 
 # Basic Proxying
 
-## Making the proxy request
+## Making a proxy request
 
-A vault proxy request consists of a typical authenticated HTTP `POST` request to the `/proxy` endpoint of the Footprint API.
+A vault proxy request consists of a typical authenticated HTTP `POST` request to either `/vault_proxy/jit` or `/vault_proxy/{proxy_config_id}` endpoint.
 
 For example:
 
 ```bash
 
-curl https://api.onefootprint.com/proxy \
+curl https://api.onefootprint.com/vault_proxy/jit \
     -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
     -X POST \
     -H 'x-fp-proxy-target-url: https://payments.acmebank.com' \
@@ -167,7 +175,7 @@ If multiple certificates are specified, all the supplied certificates will be us
 
 Ingress vaulting rules define how to tokenize and vault certain sensitive fields that appear in the response from the upstream proxy destination. This allows the vault proxy to not only de-tokenize outgoing data but to also tokenize incoming data to vault it just in time.
 
-For simplicity, you can also define all of your ingress vaulting rules via the developer dashboard or admin API and simply reference the proxy configuration via the `x-fp-proxy-id` header.
+For simplicity, you can also define all of your ingress vaulting rules via the developer dashboard or admin API and simply invoke the proxy configuration by it's `id` using the `api.onefootprint.com/vault_proxy/{proxy_id}` endpoint.
 
 However, when you declare ingress vaulting rules in the configuration, you still need to denote in the proxy request into which Footprint user vault to tokenize the data. Therefore, the following header value is required when using ingress rules for pre-configured proxy:
 
@@ -224,7 +232,6 @@ Note that some values can be defined in the proxy configuration settings and do 
 | Header                            | Usage                                            | Description                                                                                                                           |
 | --------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `x-fp-proxy-target-url`           | Required if "just-in-time"                       | The target destination HTTPS URL to which the request will be routed                                                                  |
-| `x-fp-proxy-id`                   | Required if proxy configuration                  | The `id` of the Proxy Configuration declared in the developer dashboard or created via the admin API                                  |
 | `x-fp-proxy-method`               | Optional.                                        | Selects the HTTP Method Verb to use (defaults to POST if unspecified). Overrides a configuration's value if present.                  |
 | `x-fp-proxy-fwd-<HEADER>`         | Optional. Multiple allowed.                      | Sends a header named `<HEADER>` with the corresponding value                                                                          |
 | `x-fp-path-and-query`             | Optional.                                        | Use this header to customize/add additional path and/or query parameters to your existing proxy target URL                            |
@@ -300,8 +307,8 @@ In this example we invoke the proxy to generate a credit card number for user by
 
 ```bash
 curl  -X POST -u <YOUR_API_KEY>: \
-      -H 'x-fp-proxy-id: proxy_id_AY5ec7I5QDUFWG8BAQG78k' \
       -H 'x-fp-proxy-footprint-token: fp_id_ABoOtcf9DbF6shyLNONT3n' \
+      https://api.onefootprint.com/vault_proxy/proxy_id_AY5ec7I5QDUFWG8BAQG78k
       --data '{
           "ssn_last_four": "{{ id.ssn4 }}",
           "date_of_birth": "{{ id.dob }}",

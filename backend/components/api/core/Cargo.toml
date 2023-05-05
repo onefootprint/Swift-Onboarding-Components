@@ -93,6 +93,8 @@ rand = { version = "0.8 " }
 sentry-tracing = { workspace = true }
 once_cell = { workspace = true }
 
+paste = "1.0"
+
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../enclave/enclave"}

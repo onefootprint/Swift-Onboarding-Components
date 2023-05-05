@@ -6,8 +6,6 @@ use crate::errors::ApiResult;
 
 use crate::proxy;
 use crate::proxy::config::ProxyConfig;
-use crate::proxy::config::ProxyConfigSource;
-use crate::proxy::config::ProxyConfigSourceHeader;
 use crate::proxy::net_client;
 use crate::proxy::pii_parser;
 use crate::proxy::pii_parser::TokenizedIngress;
@@ -17,18 +15,73 @@ use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 
+use api_core::proxy::config::JustInTimeProxyConfig;
+use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 
 #[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
-    description = "Proxy decrypt user vault data to a target HTTPS destination",
+    description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
     tags(Proxy, PublicApi)
 )]
-#[post("/proxy")]
-pub async fn post(
+#[post("/vault_proxy/jit")]
+pub async fn just_in_time(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-    proxy_config_source: ProxyConfigSourceHeader,
+    jit: JustInTimeProxyConfig,
+    body_bytes: web::Bytes,
+    insight: InsightHeaders,
+    request: HttpRequest,
+) -> ApiResult<HttpResponse> {
+    invoke_vault_proxy(
+        state,
+        auth,
+        ProxyConfigSource::JustInTime(jit.config),
+        body_bytes,
+        insight,
+        request,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(state, body_bytes, request))]
+#[api_v2_operation(
+    description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
+    tags(Proxy, PublicApi)
+)]
+#[post("/vault_proxy/{proxy_id}")]
+pub async fn id(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    proxy_config_id: web::Path<ProxyConfigId>,
+    body_bytes: web::Bytes,
+    insight: InsightHeaders,
+    request: HttpRequest,
+) -> ApiResult<HttpResponse> {
+    let id = proxy_config_id.into_inner();
+    invoke_vault_proxy(
+        state,
+        auth,
+        ProxyConfigSource::Id(id),
+        body_bytes,
+        insight,
+        request,
+    )
+    .await
+}
+
+#[derive(Debug)]
+#[allow(clippy::large_enum_variant)]
+enum ProxyConfigSource {
+    Id(ProxyConfigId),
+    JustInTime(ProxyConfig),
+}
+
+#[tracing::instrument(skip(state, body_bytes, request))]
+async fn invoke_vault_proxy(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    source: ProxyConfigSource,
     body_bytes: web::Bytes,
     insight: InsightHeaders,
     request: HttpRequest,
@@ -43,9 +96,9 @@ pub async fn post(
     };
 
     // parse the proxy configuration either by ID or just in time via headers
-    let config = match proxy_config_source.source {
-        ProxyConfigSource::Id(id) => {
-            ProxyConfig::load_from_db(&state, auth.as_ref(), id, request.headers()).await?
+    let config = match source {
+        ProxyConfigSource::Id(proxy_id) => {
+            ProxyConfig::load_from_db(&state, auth.as_ref(), proxy_id, request.headers()).await?
         }
         ProxyConfigSource::JustInTime(config) => config,
     };
