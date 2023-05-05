@@ -11,11 +11,11 @@ const isContextReady = (
   if (!device) {
     return false;
   }
-  const hasOnboarding = !!context.onboarding.tenantPk;
-  if (!hasOnboarding) {
+  const hasObConfigAuth = !!context.obConfigAuth;
+  if (!hasObConfigAuth) {
     return true;
   }
-  const config = context.onboarding.config || event.payload.config;
+  const config = context.config || event.payload.config;
   return !!config;
 };
 

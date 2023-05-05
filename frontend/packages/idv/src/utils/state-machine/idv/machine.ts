@@ -1,4 +1,4 @@
-import { IdDI } from '@onefootprint/types';
+import { IdDI, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { IdvData } from '../../../types';
@@ -6,10 +6,9 @@ import { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
   authToken?: string;
-  tenantPk?: string;
+  obConfigAuth: ObConfigAuth;
   data?: IdvData;
   isTransfer?: boolean;
-  customIdentifyAuthHeader?: Record<string, string>;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
 };
@@ -43,10 +42,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
             },
             {
               target: 'onboarding',
-              cond: context => !!context.tenantPk,
-            },
-            {
-              target: 'complete',
             },
           ],
         },
@@ -87,9 +82,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
     },
     {
       actions: {
-        resetContext: assign(context => ({
-          tenantPk: context.tenantPk,
-        })),
         assignSandboxOutcome: assign((context, event) => ({
           ...context,
           sandboxSuffix: event.payload.sandboxSuffix,

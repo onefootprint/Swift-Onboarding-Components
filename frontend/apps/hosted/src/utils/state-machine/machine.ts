@@ -63,10 +63,14 @@ export const createHostedMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context, event) => {
-          const { tenantPk, authToken, businessBoKycData, onboardingConfig } =
-            event.payload;
-          context.tenantPk =
-            tenantPk !== undefined ? tenantPk : context.tenantPk;
+          const {
+            obConfigAuth,
+            authToken,
+            businessBoKycData,
+            onboardingConfig,
+          } = event.payload;
+          context.obConfigAuth =
+            obConfigAuth !== undefined ? obConfigAuth : context.obConfigAuth;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
           context.businessBoKycData =

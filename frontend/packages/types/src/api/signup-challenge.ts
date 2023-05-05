@@ -1,9 +1,8 @@
-import { ChallengeData } from '../data';
+import { ChallengeData, ObConfigAuth } from '../data';
 
 export type SignupChallengeRequest = {
   phoneNumber: string;
-  tenantPk?: string;
-  customAuthHeader?: Record<string, string>;
+  obConfigAuth: ObConfigAuth;
 };
 
 export type SignupChallengeResponse = {

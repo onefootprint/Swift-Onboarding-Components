@@ -1,5 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
+  CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
   IdDI,
   OnboardingConfig,
@@ -31,17 +32,16 @@ describe('Onboarding Machine Tests', () => {
   const createMachine = ({
     userFound = true,
     authToken = 'token',
-    tenantPk = 'pk',
     data = { [IdDI.email]: 'belce@onefootprint.com' },
     sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
-        tenantPk,
         data,
         authToken,
         sandboxSuffix,
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       }),
     );
     machine.start();
@@ -62,13 +62,13 @@ describe('Onboarding Machine Tests', () => {
     });
     expect(state.value).toEqual('requirements');
     expect(state.context).toEqual({
-      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
       data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: undefined,
+      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
     });
 
     state = machine.send({
@@ -85,13 +85,13 @@ describe('Onboarding Machine Tests', () => {
     expect(state.value).toEqual('complete');
 
     expect(state.context).toEqual({
-      tenantPk: 'pk',
       userFound: true,
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
       data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: 'token',
+      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
     });
   });
 });

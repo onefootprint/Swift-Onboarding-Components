@@ -17,7 +17,7 @@ import useOnboarding from './hooks/use-onboarding';
 const Init = () => {
   const { t } = useTranslation('pages.init');
   const [state, send] = useOnboardingMachine();
-  const { authToken, tenantPk } = state.context;
+  const { authToken, obConfigAuth } = state.context;
   const onboardingMutation = useOnboarding();
   const observeCollector = useObserveCollector();
 
@@ -34,7 +34,7 @@ const Init = () => {
   });
 
   useGetOnboardingConfig(
-    { tenantPk },
+    { obConfigAuth },
     {
       onSuccess: (config: OnboardingConfig) => {
         observeCollector.setAppContext({

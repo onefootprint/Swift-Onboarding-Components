@@ -9,7 +9,8 @@ import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useIdentifyVerify, useLoginChallenge } from '../../../../api-hooks';
+import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
+import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
 import SmsChallengeVerification from '../../../sms-challenge-verification';
@@ -21,8 +22,7 @@ const Sms = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { phoneNumber, successfulIdentifier },
-    onboarding: { config },
-    customAuthHeader,
+    obConfigAuth,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();
@@ -90,8 +90,7 @@ const Sms = () => {
       {
         challengeResponse: pin,
         challengeToken,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -113,8 +112,7 @@ const Sms = () => {
       {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: payload => {
@@ -146,8 +144,7 @@ const Sms = () => {
       {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: handleRequestChallengeSuccess,

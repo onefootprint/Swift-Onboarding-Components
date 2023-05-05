@@ -2,7 +2,7 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
-import { useIdentify } from '../../api-hooks';
+import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import LegalFooter from '../../components/legal-footer';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
@@ -18,8 +18,7 @@ const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email, sandboxSuffix: identifierSuffix },
-    onboarding: { tenantPk },
-    customAuthHeader,
+    obConfigAuth,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -30,7 +29,10 @@ const EmailIdentification = () => {
     const emailFromForm = formData.email;
     const emailWithSuffix = idSuffix.append(emailFromForm);
     identifyMutation.mutate(
-      { identifier: { email: emailWithSuffix }, tenantPk, customAuthHeader },
+      {
+        identifier: { email: emailWithSuffix },
+        obConfigAuth,
+      },
       {
         onSuccess: ({
           userFound,

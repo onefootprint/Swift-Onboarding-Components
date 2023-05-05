@@ -5,7 +5,7 @@ import {
   Layout,
   useGetD2PStatus,
 } from '@onefootprint/idv-elements';
-import { GetD2PResponse } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, GetD2PResponse } from '@onefootprint/types';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
@@ -18,6 +18,10 @@ const Root = () => {
   const [state, send] = useHandoffMachine();
   const { authToken, onboardingConfig } = state.context;
   const tenantPk = onboardingConfig?.key;
+  const isSandbox = onboardingConfig?.isLive === false;
+  const obConfigAuth = tenantPk && {
+    [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
+  };
   useLogStateMachine('handoff', state);
 
   useGetD2PStatus({
@@ -49,12 +53,12 @@ const Root = () => {
         send({ type: 'reset' });
       }}
     >
-      <Layout tenantPk={tenantPk}>
+      <Layout tenantPk={tenantPk} isSandbox={isSandbox}>
         {state.matches('init') && <Init />}
-        {state.matches('idv') && (
+        {state.matches('idv') && obConfigAuth && (
           <Idv
-            tenantPk={tenantPk}
             authToken={authToken}
+            obConfigAuth={obConfigAuth}
             isTransfer
             onComplete={() => {
               send({ type: 'idvCompleted' });

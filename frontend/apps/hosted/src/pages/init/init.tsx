@@ -12,30 +12,32 @@ import useUrlParams from './hooks/use-url-params';
 const Init = () => {
   const [, send] = useHostedMachine();
   const showRequestError = useRequestErrorToast();
-  const { authToken = '', tenantPk = '' } = useUrlParams();
+  const obConfigAuth = useUrlParams();
 
-  useGetBusiness(authToken, {
-    onSuccess: (data: BusinessResponse) => {
-      send({
-        type: 'initContextUpdated',
-        payload: {
-          authToken,
-          businessBoKycData: { ...data },
-        },
-      });
+  useGetBusiness(
+    { obConfigAuth },
+    {
+      onSuccess: (data: BusinessResponse) => {
+        send({
+          type: 'initContextUpdated',
+          payload: {
+            obConfigAuth,
+            businessBoKycData: { ...data },
+          },
+        });
+      },
+      onError: showRequestError,
     },
-    onError: showRequestError,
-  });
+  );
 
   useGetOnboardingConfig(
-    { kybBoAuthToken: authToken, tenantPk },
+    { obConfigAuth },
     {
       onSuccess: onboardingConfig => {
         send({
           type: 'initContextUpdated',
           payload: {
-            authToken,
-            tenantPk: onboardingConfig.key,
+            obConfigAuth,
             onboardingConfig,
           },
         });

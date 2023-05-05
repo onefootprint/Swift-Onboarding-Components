@@ -4,11 +4,9 @@ import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import {
-  useIdentifyVerify,
-  useSignupChallenge,
-  useUserEmail,
-} from '../../../../api-hooks';
+import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
+import useSignupChallenge from '../../../../../../hooks/api/hosted/identify/use-signup-challenge';
+import useUserEmail from '../../../../../../hooks/api/hosted/user/use-user-email';
 import SmsChallengeVerification from '../../../../components/sms-challenge-verification';
 import useIdentifierSuffix from '../../../../hooks/use-identifier-suffix';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
@@ -21,8 +19,7 @@ const SignupChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, email, phoneNumber },
-    onboarding: { config },
-    customAuthHeader,
+    obConfigAuth,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();
@@ -85,8 +82,7 @@ const SignupChallenge = () => {
       {
         challengeResponse: pin,
         challengeToken,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -107,8 +103,7 @@ const SignupChallenge = () => {
     signupChallengeMutation.mutate(
       {
         phoneNumber: phoneNumberWithSuffix,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
@@ -134,8 +129,7 @@ const SignupChallenge = () => {
     signupChallengeMutation.mutate(
       {
         phoneNumber: phoneNumberWithSuffix,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {

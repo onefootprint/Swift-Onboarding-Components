@@ -2,7 +2,8 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
 import React, { useState } from 'react';
 
-import { useIdentifyVerify, useLoginChallenge } from '../../../../api-hooks';
+import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
+import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import { getBiometricChallengeResponse } from '../../../../utils/biometrics';
 import Verification from './components/verification';
@@ -13,8 +14,7 @@ const Biometric = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier },
-    onboarding: { config },
-    customAuthHeader,
+    obConfigAuth,
   } = state.context;
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();
@@ -39,7 +39,7 @@ const Biometric = () => {
         {
           identifier: successfulIdentifier,
           preferredChallengeKind: ChallengeKind.biometric,
-          customAuthHeader,
+          obConfigAuth,
         },
         {
           onSuccess: handleRequestChallengeSuccess,
@@ -86,8 +86,7 @@ const Biometric = () => {
       {
         challengeResponse,
         challengeToken,
-        tenantPk: config?.key,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: ({ authToken }) => {

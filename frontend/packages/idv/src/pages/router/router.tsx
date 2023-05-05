@@ -18,13 +18,12 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
   const {
     data,
-    tenantPk,
     sandboxSuffix,
     authToken,
     userFound,
     isTransfer,
     validationToken,
-    customIdentifyAuthHeader,
+    obConfigAuth,
     onClose,
     onComplete,
   } = state.context;
@@ -46,23 +45,22 @@ const Router = ({ onDone }: RouterProps) => {
     >
       {state.matches('identify') && (
         <Identify
+          obConfigAuth={obConfigAuth}
           // TODO: generalize this in the next iteratin
           bootstrapData={{
             email: data?.[IdDI.email],
             phoneNumber: data?.[IdDI.phoneNumber],
           }}
-          tenantPk={tenantPk}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
-          customAuthHeader={customIdentifyAuthHeader}
         />
       )}
       {state.matches('onboarding') && (
         <Onboarding
-          userFound={userFound}
-          tenantPk={tenantPk}
           authToken={authToken}
+          obConfigAuth={obConfigAuth}
+          userFound={userFound}
           // TODO: generalize this more in the next iteration
           data={data}
           sandboxSuffix={sandboxSuffix}

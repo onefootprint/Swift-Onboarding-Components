@@ -1,6 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
+  CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
   OnboardingConfig,
 } from '@onefootprint/types';
@@ -32,7 +33,7 @@ describe('Identify Machine Tests', () => {
   const createMachine = (bootstrapData?: BootstrapData) => {
     const machine = interpret(
       createIdentifyMachine({
-        tenantPk: 'pk',
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         bootstrapData,
       }),
     );

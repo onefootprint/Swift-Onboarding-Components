@@ -1,11 +1,11 @@
-import { IdDIData } from '@onefootprint/types';
+import { IdDIData, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
-  tenantPk: string;
+  obConfigAuth: ObConfigAuth;
   authToken: string;
   data?: IdDIData; // TODO: generalize this more in the next iteration
   sandboxSuffix?: string; // only if in sandbox mode
@@ -16,7 +16,7 @@ export type OnboardingMachineArgs = {
 };
 
 const createOnboardingMachine = ({
-  tenantPk,
+  obConfigAuth,
   authToken,
   data = {},
   sandboxSuffix,
@@ -36,7 +36,7 @@ const createOnboardingMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        tenantPk,
+        obConfigAuth,
         authToken,
         data,
         sandboxSuffix,

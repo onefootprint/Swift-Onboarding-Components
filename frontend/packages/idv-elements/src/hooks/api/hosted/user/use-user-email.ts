@@ -1,5 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
+import { IdDI, UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';
@@ -18,7 +18,7 @@ const userEmailRequest = async (payload: UserEmailRequest) => {
     method,
     url,
     data: {
-      'id.email': payload.data.email,
+      [IdDI.email]: payload.data.email,
     },
     headers: {
       [AUTH_HEADER]: payload.authToken,

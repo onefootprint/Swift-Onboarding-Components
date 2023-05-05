@@ -2,7 +2,7 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
-import { useIdentify } from '../../api-hooks';
+import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
@@ -18,8 +18,7 @@ const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { phoneNumber, email, sandboxSuffix: identifierSuffix },
-    onboarding: { tenantPk },
-    customAuthHeader,
+    obConfigAuth,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -33,8 +32,7 @@ const PhoneIdentification = () => {
     identifyMutation.mutate(
       {
         identifier: { phoneNumber: phoneNumberWithSuffix },
-        tenantPk,
-        customAuthHeader,
+        obConfigAuth,
       },
       {
         onSuccess: ({

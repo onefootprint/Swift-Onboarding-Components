@@ -1,7 +1,7 @@
-import { BusinessBoKycData } from '../data';
+import { BusinessBoKycData, ObConfigAuth } from '../data';
 
 export type BusinessRequest = {
-  authToken: string;
+  obConfigAuth?: ObConfigAuth;
 };
 
 export type BusinessResponse = BusinessBoKycData;

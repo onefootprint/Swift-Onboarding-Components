@@ -12,21 +12,19 @@ import { IdvProps } from './types';
 
 const App = ({
   authToken,
-  tenantPk,
   data,
   isTransfer,
-  customIdentifyAuthHeader,
+  obConfigAuth,
   onComplete,
   onClose,
 }: IdvProps) => (
   <>
     <I18nextProvider i18n={configureI18next()}>
       <MachineProvider
-        tenantPk={tenantPk}
         data={data}
         authToken={authToken}
         isTransfer={isTransfer}
-        customIdentifyAuthHeader={customIdentifyAuthHeader}
+        obConfigAuth={obConfigAuth}
         onComplete={onComplete}
         onClose={onClose}
       >

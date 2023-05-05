@@ -1,11 +1,7 @@
-import { OnboardingConfig } from '../data';
+import { ObConfigAuth, OnboardingConfig } from '../data';
 
-export type GetOnboardingConfigRequest =
-  | {
-      tenantPk: string;
-    }
-  | {
-      kybBoAuthToken: string;
-    };
+export type GetOnboardingConfigRequest = {
+  obConfigAuth?: ObConfigAuth;
+};
 
 export type GetOnboardingConfigResponse = OnboardingConfig;

@@ -4,6 +4,7 @@ import {
   useGetOnboardingConfig,
 } from '@onefootprint/idv-elements';
 import {
+  CLIENT_PUBLIC_KEY_HEADER,
   CollectedDataOptionLabels,
   OnboardingConfig,
 } from '@onefootprint/types';
@@ -19,7 +20,7 @@ const Init = () => {
   const observeCollector = useObserveCollector();
 
   useGetOnboardingConfig(
-    { tenantPk },
+    { obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk } },
     {
       onSuccess: (config: OnboardingConfig) => {
         observeCollector.setAppContext({

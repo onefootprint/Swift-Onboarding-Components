@@ -12,7 +12,8 @@ type Link = { label: string; href: string };
 const Footer = () => {
   const { t } = useTranslation('components.layout.footer');
   const [state] = useHostedMachine();
-  const { tenantPk } = state.context;
+  const { onboardingConfig } = state.context;
+  const tenantPk = onboardingConfig?.key;
 
   const links: Link[] = [
     {

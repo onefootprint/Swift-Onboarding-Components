@@ -12,9 +12,7 @@ import { useIdentifyMachine } from '../../components/identify-machine-provider';
 
 const Init = () => {
   const [state, send] = useIdentifyMachine();
-  const {
-    onboarding: { tenantPk = '' },
-  } = state.context;
+  const { obConfigAuth } = state.context;
   const observeCollector = useObserveCollector();
 
   useDeviceInfo((device: DeviceInfo) => {
@@ -30,7 +28,7 @@ const Init = () => {
   });
 
   useGetOnboardingConfig(
-    { tenantPk },
+    { obConfigAuth },
     {
       onSuccess: (config: OnboardingConfig) => {
         observeCollector.setAppContext({

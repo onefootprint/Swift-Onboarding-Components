@@ -4,7 +4,6 @@ import React, { useCallback, useState } from 'react';
 import useMeasure from 'react-use-measure';
 import styled, { css } from 'styled-components';
 
-import useGetOnboardingConfig from '../../hooks/api/org/get-onboarding-config';
 import FootprintFooter from './components/footprint-footer';
 import FullHeightContainer from './components/full-height-container';
 import LayoutOptionsProvider from './components/layout-options-provider';
@@ -24,13 +23,15 @@ type LayoutProps = {
   options?: LayoutOptions;
   appearance?: Record<string, any>;
   tenantPk?: string;
+  isSandbox?: boolean;
   onClose?: () => void;
 };
 
 const Layout = ({
   children,
   options = {},
-  tenantPk = '',
+  tenantPk,
+  isSandbox,
   appearance,
   onClose,
 }: LayoutProps) => {
@@ -41,9 +42,6 @@ const Layout = ({
   } = options;
 
   useExtendedAppearance(appearance);
-  const configQuery = useGetOnboardingConfig({ tenantPk });
-  const { data: onboardingConfig } = configQuery;
-  const isSandbox = onboardingConfig && !onboardingConfig.isLive;
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 

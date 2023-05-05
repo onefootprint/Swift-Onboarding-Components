@@ -1,15 +1,14 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import { ObConfigAuth, OnboardingConfig } from '@onefootprint/types';
 
 import { IdvData } from '../../../types';
 
 export type MachineContext = {
   // Inputs
-  tenantPk?: string;
   authToken?: string;
   data?: IdvData;
   isTransfer?: boolean;
-  customIdentifyAuthHeader?: Record<string, string>;
+  obConfigAuth: ObConfigAuth;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
   // Generated

@@ -1,2 +1,3 @@
-export const AUTH_HEADER = 'x-fp-authorization';
-export const CLIENT_PUBLIC_KEY_HEADER = 'X-Onboarding-Config-Key';
+const AUTH_HEADER = 'x-fp-authorization';
+
+export default AUTH_HEADER;

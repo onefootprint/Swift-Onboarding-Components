@@ -1,3 +1,4 @@
+import { ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { BootstrapData, MachineContext, MachineEvents } from './types';
@@ -7,14 +8,12 @@ import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
   bootstrapData?: BootstrapData;
-  tenantPk?: string;
-  customAuthHeader?: Record<string, string>;
+  obConfigAuth: ObConfigAuth;
 };
 
 const createIdentifyMachine = ({
   bootstrapData,
-  tenantPk,
-  customAuthHeader,
+  obConfigAuth,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -27,11 +26,8 @@ const createIdentifyMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        customAuthHeader,
+        obConfigAuth,
         bootstrapData: bootstrapData ?? {},
-        onboarding: {
-          tenantPk,
-        },
         identify: {},
         challenge: {},
       },
@@ -205,8 +201,7 @@ const createIdentifyMachine = ({
         assignInitContext: assign((context, event) => {
           const { device, config } = event.payload;
           context.device = device !== undefined ? device : context.device;
-          context.onboarding.config =
-            config !== undefined ? config : context.onboarding.config;
+          context.config = config !== undefined ? config : context.config;
 
           return context;
         }),

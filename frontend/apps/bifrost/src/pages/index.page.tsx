@@ -5,7 +5,7 @@ import {
   Layout,
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
-import { IdDI } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, IdDI } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -19,8 +19,10 @@ const Root = () => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
-  const { bootstrapData } = state.context;
+  const { bootstrapData, config } = state.context;
+  const isSandbox = config?.isLive === false;
   useLogStateMachine('bifrost', state);
+  const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
   const router = useRouter();
   const searchParams = new URLSearchParams(router.asPath);
@@ -37,6 +39,7 @@ const Root = () => {
     >
       <Layout
         options={{ hasDesktopBorderRadius: true }}
+        isSandbox={isSandbox}
         appearance={appearance}
         tenantPk={tenantPk}
         onClose={footprint.close}
@@ -44,7 +47,7 @@ const Root = () => {
         {state.matches('init') && <Init />}
         {state.matches('idv') && (
           <Idv
-            tenantPk={tenantPk}
+            obConfigAuth={obConfigAuth}
             data={{
               [IdDI.email]: bootstrapData?.email,
               [IdDI.phoneNumber]: bootstrapData?.phoneNumber,

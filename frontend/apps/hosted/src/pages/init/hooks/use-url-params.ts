@@ -1,20 +1,20 @@
+import {
+  CLIENT_PUBLIC_KEY_HEADER,
+  KYB_BO_SESSION_AUTHORIZATION_HEADER,
+  ObConfigAuth,
+} from '@onefootprint/types';
 import { useRouter } from 'next/router';
 
-export type HostedUrlParams = {
-  authToken?: string;
-  tenantPk?: string;
-};
-
-const useUrlParams = () => {
+const useUrlParams = (): ObConfigAuth | undefined => {
   const router = useRouter();
   if (!router.isReady) {
-    return {};
+    return undefined;
   }
 
-  let authToken;
   const parts = router.asPath.split('#');
   if (parts.length === 2) {
-    authToken = decodeURI(parts[1]);
+    const authToken = decodeURI(parts[1]);
+    return { [KYB_BO_SESSION_AUTHORIZATION_HEADER]: authToken };
   }
 
   const publicKey = router.query.public_key;
@@ -26,8 +26,11 @@ const useUrlParams = () => {
       [tenantPk] = publicKey;
     }
   }
+  if (tenantPk) {
+    return { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
+  }
 
-  return { authToken, tenantPk };
+  return undefined;
 };
 
 export default useUrlParams;

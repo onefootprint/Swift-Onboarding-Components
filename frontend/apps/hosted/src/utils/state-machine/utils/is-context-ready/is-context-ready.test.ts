@@ -1,6 +1,8 @@
 import {
   BusinessBoKycData,
+  CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
+  KYB_BO_SESSION_AUTHORIZATION_HEADER,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -37,8 +39,7 @@ describe('isContextReady', () => {
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
       const context: MachineContext = {
-        authToken: 'token',
-        tenantPk: 'pk',
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         businessBoKycData: testBusinessBoKycData,
         onboardingConfig: testOnboardingConfig,
       };
@@ -51,7 +52,7 @@ describe('isContextReady', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
-        tenantPk: 'pk',
+        obConfigAuth: { [KYB_BO_SESSION_AUTHORIZATION_HEADER]: 'pk' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -67,7 +68,7 @@ describe('isContextReady', () => {
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
-        authToken: 'token',
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',

@@ -1,8 +1,11 @@
-import { BusinessBoKycData, OnboardingConfig } from '@onefootprint/types';
+import {
+  BusinessBoKycData,
+  ObConfigAuth,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 export type MachineContext = {
-  authToken?: string;
-  tenantPk?: string;
+  obConfigAuth?: ObConfigAuth;
   businessBoKycData?: BusinessBoKycData;
   onboardingConfig?: OnboardingConfig;
 };
@@ -13,8 +16,7 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        tenantPk?: string;
-        authToken?: string;
+        obConfigAuth?: ObConfigAuth;
         businessBoKycData?: BusinessBoKycData;
         onboardingConfig?: OnboardingConfig;
       };

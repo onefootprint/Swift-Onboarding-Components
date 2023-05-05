@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import InitShimmer from '../../../../components/init-shimmer';
-import { useIdentify } from '../../api-hooks';
+import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import validateBootstrapData from './utils/validate-bootstrap-data';
@@ -11,8 +11,8 @@ const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,
-    onboarding: { tenantPk },
-    customAuthHeader,
+
+    obConfigAuth,
   } = state.context;
   const identifyMutation = useIdentify();
   const idSuffix = useIdentifierSuffix();
@@ -24,8 +24,7 @@ const InitBootstrap = () => {
         const identifier = { phoneNumber: idSuffix.append(phoneNumber) };
         const phoneIdentify = await identifyMutation.mutateAsync({
           identifier,
-          tenantPk,
-          customAuthHeader,
+          obConfigAuth,
         });
 
         if (phoneIdentify.userFound) {
@@ -46,8 +45,7 @@ const InitBootstrap = () => {
         const identifier = { email: idSuffix.append(email) };
         const emailIdentify = await identifyMutation.mutateAsync({
           identifier,
-          tenantPk,
-          customAuthHeader,
+          obConfigAuth,
         });
 
         if (emailIdentify.userFound) {

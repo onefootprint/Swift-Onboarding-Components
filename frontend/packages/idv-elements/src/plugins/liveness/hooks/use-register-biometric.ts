@@ -7,7 +7,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-import { AUTH_HEADER } from '../config/constants';
+import AUTH_HEADER from '../config/constants';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

@@ -1,9 +1,8 @@
-import { ChallengeKind, Identifier } from '../data';
+import { ChallengeKind, Identifier, ObConfigAuth } from '../data';
 
 export type IdentifyRequest = {
   identifier: Identifier;
-  tenantPk?: string;
-  customAuthHeader?: Record<string, string>;
+  obConfigAuth: ObConfigAuth;
 };
 
 export type IdentifyResponse = {

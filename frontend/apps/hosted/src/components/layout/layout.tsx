@@ -14,13 +14,16 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
+  const isSandbox = onboardingConfig?.isLive === false;
+  const tenantPk = onboardingConfig?.key;
 
   return (
     <Container>
       <SandboxBanner />
       <Content>
         <AppLayout
-          tenantPk={onboardingConfig?.key}
+          tenantPk={tenantPk}
+          isSandbox={isSandbox}
           options={{
             hideDesktopSandboxBanner: true,
             hideDesktopFooter: true,

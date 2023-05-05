@@ -1,36 +1,35 @@
 import request from '@onefootprint/request';
-import { BusinessRequest, BusinessResponse } from '@onefootprint/types';
+import {
+  BusinessRequest,
+  BusinessResponse,
+  KYB_BO_SESSION_AUTHORIZATION_HEADER,
+} from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { KYB_BO_SESSION_AUTHORIZATION_HEADER } from 'src/config/constants';
 
-const getBusinessRequest = async ({ authToken }: BusinessRequest) => {
+const getBusinessRequest = async ({ obConfigAuth }: BusinessRequest) => {
   const { data } = await request<BusinessResponse>({
     method: 'GET',
     url: '/hosted/business',
-    headers: {
-      [KYB_BO_SESSION_AUTHORIZATION_HEADER]: authToken,
-    },
+    headers: obConfigAuth,
   });
 
   return data;
 };
 
 const useGetBusiness = (
-  authToken: string,
+  payload: BusinessRequest,
   options: {
     onSuccess?: (data: BusinessResponse) => void;
     onError?: (error: unknown) => void;
   } = {},
 ) => {
-  useQuery(
-    ['get-business', authToken],
-    () => getBusinessRequest({ authToken }),
-    {
-      enabled: !!authToken,
-      onSuccess: options.onSuccess,
-      onError: options.onError,
-    },
-  );
+  useQuery(['get-business', payload], () => getBusinessRequest(payload), {
+    enabled:
+      !!payload?.obConfigAuth &&
+      KYB_BO_SESSION_AUTHORIZATION_HEADER in payload.obConfigAuth,
+    onSuccess: options.onSuccess,
+    onError: options.onError,
+  });
 };
 
 export default useGetBusiness;

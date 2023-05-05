@@ -8,22 +8,16 @@ import queryClient from './config/initializers/react-query';
 import Router, { DonePayload } from './pages/router';
 import { IdentifyMachineArgs } from './utils/state-machine';
 
-type IdentifyProps = Partial<IdentifyMachineArgs> & {
+type IdentifyProps = IdentifyMachineArgs & {
   onDone: (payload: DonePayload) => void;
 };
 
-const Identify = ({
-  bootstrapData,
-  tenantPk,
-  customAuthHeader,
-  onDone,
-}: IdentifyProps) => (
+const Identify = ({ bootstrapData, obConfigAuth, onDone }: IdentifyProps) => (
   <I18nextProvider i18n={configureI18next()}>
     <QueryClientProvider client={queryClient}>
       <IdentifyMachineProvider
         bootstrapData={bootstrapData}
-        tenantPk={tenantPk}
-        customAuthHeader={customAuthHeader}
+        obConfigAuth={obConfigAuth}
       >
         <Router onDone={onDone} />
       </IdentifyMachineProvider>

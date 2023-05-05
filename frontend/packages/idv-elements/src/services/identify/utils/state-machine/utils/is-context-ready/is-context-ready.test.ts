@@ -1,4 +1,8 @@
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CLIENT_PUBLIC_KEY_HEADER,
+  CollectedKycDataOption,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';
@@ -25,10 +29,8 @@ describe('isContextReady', () => {
           type: 'mobile',
           hasSupportForWebauthn: true,
         },
-        onboarding: {
-          tenantPk: 'pk',
-          config: { ...testOnboardingConfig },
-        },
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
+        config: { ...testOnboardingConfig },
         bootstrapData: {},
         identify: {},
         challenge: {},
@@ -42,13 +44,11 @@ describe('isContextReady', () => {
 
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
-        onboarding: {
-          tenantPk: 'pk',
-          config: { ...testOnboardingConfig },
-        },
+        config: { ...testOnboardingConfig },
         bootstrapData: {},
         identify: {},
         challenge: {},
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -66,12 +66,10 @@ describe('isContextReady', () => {
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
-        onboarding: {
-          tenantPk: 'pk',
-        },
         bootstrapData: {},
         identify: {},
         challenge: {},
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
