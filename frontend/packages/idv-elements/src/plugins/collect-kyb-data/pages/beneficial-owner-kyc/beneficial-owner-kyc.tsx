@@ -1,6 +1,7 @@
 import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
+  CollectedKybDataOption,
   IdDI,
 } from '@onefootprint/types';
 import React from 'react';
@@ -11,6 +12,7 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
   const {
+    missingKybAttributes,
     missingKycAttributes,
     data,
     authToken,
@@ -29,7 +31,12 @@ const BeneficialOwnerKyc = () => {
     });
   };
 
-  const primaryBeneficialOwner = data?.[BusinessDI.beneficialOwners]?.[0];
+  const requireMultiKyc = missingKybAttributes.includes(
+    CollectedKybDataOption.kycedBeneficialOwners,
+  );
+  const primaryBeneficialOwner = requireMultiKyc
+    ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
+    : data?.[BusinessDI.beneficialOwners]?.[0];
   const fixedData = primaryBeneficialOwner
     ? {
         [IdDI.firstName]:

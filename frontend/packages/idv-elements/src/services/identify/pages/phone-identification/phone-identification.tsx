@@ -19,6 +19,7 @@ const PhoneIdentification = () => {
   const {
     identify: { phoneNumber, email, sandboxSuffix: identifierSuffix },
     onboarding: { tenantPk },
+    customAuthHeader,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -33,6 +34,7 @@ const PhoneIdentification = () => {
       {
         identifier: { phoneNumber: phoneNumberWithSuffix },
         tenantPk,
+        customAuthHeader,
       },
       {
         onSuccess: ({

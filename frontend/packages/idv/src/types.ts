@@ -5,6 +5,7 @@ export type IdvProps = {
   authToken?: string; // If provided, will skip identify step
   tenantPk?: string; // If provided, will complete onboarding
   data?: IdvData; // If provided, will bootstrap identify and pre-fill fields on onboarding
+  customIdentifyAuthHeader?: Record<string, string>;
   isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;

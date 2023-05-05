@@ -12,6 +12,7 @@ const InitBootstrap = () => {
   const {
     bootstrapData,
     onboarding: { tenantPk },
+    customAuthHeader,
   } = state.context;
   const identifyMutation = useIdentify();
   const idSuffix = useIdentifierSuffix();
@@ -24,6 +25,7 @@ const InitBootstrap = () => {
         const phoneIdentify = await identifyMutation.mutateAsync({
           identifier,
           tenantPk,
+          customAuthHeader,
         });
 
         if (phoneIdentify.userFound) {
@@ -45,6 +47,7 @@ const InitBootstrap = () => {
         const emailIdentify = await identifyMutation.mutateAsync({
           identifier,
           tenantPk,
+          customAuthHeader,
         });
 
         if (emailIdentify.userFound) {

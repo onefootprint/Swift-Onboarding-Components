@@ -15,6 +15,7 @@ const App = ({
   tenantPk,
   data,
   isTransfer,
+  customIdentifyAuthHeader,
   onComplete,
   onClose,
 }: IdvProps) => (
@@ -25,6 +26,7 @@ const App = ({
         data={data}
         authToken={authToken}
         isTransfer={isTransfer}
+        customIdentifyAuthHeader={customIdentifyAuthHeader}
         onComplete={onComplete}
         onClose={onClose}
       >

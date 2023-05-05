@@ -22,6 +22,7 @@ const SignupChallenge = () => {
   const {
     identify: { successfulIdentifier, email, phoneNumber },
     onboarding: { config },
+    customAuthHeader,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();
@@ -85,6 +86,7 @@ const SignupChallenge = () => {
         challengeResponse: pin,
         challengeToken,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -106,6 +108,7 @@ const SignupChallenge = () => {
       {
         phoneNumber: phoneNumberWithSuffix,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
@@ -132,6 +135,7 @@ const SignupChallenge = () => {
       {
         phoneNumber: phoneNumberWithSuffix,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {

@@ -20,6 +20,7 @@ const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
         'kybBoAuthToken' in payload && payload.kybBoAuthToken,
     },
   });
+
   return response.data;
 };
 

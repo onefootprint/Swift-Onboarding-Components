@@ -9,6 +9,7 @@ export type MachineContext = {
   authToken?: string;
   data?: IdvData;
   isTransfer?: boolean;
+  customIdentifyAuthHeader?: Record<string, string>;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
   // Generated

@@ -14,6 +14,7 @@ const Biometric = () => {
   const {
     identify: { successfulIdentifier },
     onboarding: { config },
+    customAuthHeader,
   } = state.context;
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();
@@ -38,6 +39,7 @@ const Biometric = () => {
         {
           identifier: successfulIdentifier,
           preferredChallengeKind: ChallengeKind.biometric,
+          customAuthHeader,
         },
         {
           onSuccess: handleRequestChallengeSuccess,
@@ -81,7 +83,12 @@ const Biometric = () => {
     }
 
     identifyVerifyMutation.mutate(
-      { challengeResponse, challengeToken, tenantPk: config?.key },
+      {
+        challengeResponse,
+        challengeToken,
+        tenantPk: config?.key,
+        customAuthHeader,
+      },
       {
         onSuccess: ({ authToken }) => {
           setSuccess(true);

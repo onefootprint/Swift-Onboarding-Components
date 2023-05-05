@@ -19,6 +19,7 @@ const EmailIdentification = () => {
   const {
     identify: { email, sandboxSuffix: identifierSuffix },
     onboarding: { tenantPk },
+    customAuthHeader,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -29,7 +30,7 @@ const EmailIdentification = () => {
     const emailFromForm = formData.email;
     const emailWithSuffix = idSuffix.append(emailFromForm);
     identifyMutation.mutate(
-      { identifier: { email: emailWithSuffix }, tenantPk },
+      { identifier: { email: emailWithSuffix }, tenantPk, customAuthHeader },
       {
         onSuccess: ({
           userFound,

@@ -24,6 +24,7 @@ const Router = ({ onDone }: RouterProps) => {
     userFound,
     isTransfer,
     validationToken,
+    customIdentifyAuthHeader,
     onClose,
     onComplete,
   } = state.context;
@@ -54,6 +55,7 @@ const Router = ({ onDone }: RouterProps) => {
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
+          customAuthHeader={customIdentifyAuthHeader}
         />
       )}
       {state.matches('onboarding') && (

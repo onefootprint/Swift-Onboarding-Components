@@ -8,11 +8,13 @@ import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 export type IdentifyMachineArgs = {
   bootstrapData?: BootstrapData;
   tenantPk?: string;
+  customAuthHeader?: Record<string, string>;
 };
 
 const createIdentifyMachine = ({
   bootstrapData,
   tenantPk,
+  customAuthHeader,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -25,6 +27,7 @@ const createIdentifyMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
+        customAuthHeader,
         bootstrapData: bootstrapData ?? {},
         onboarding: {
           tenantPk,

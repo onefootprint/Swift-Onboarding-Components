@@ -22,6 +22,7 @@ const Sms = () => {
   const {
     identify: { phoneNumber, successfulIdentifier },
     onboarding: { config },
+    customAuthHeader,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();
@@ -90,6 +91,7 @@ const Sms = () => {
         challengeResponse: pin,
         challengeToken,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -112,6 +114,7 @@ const Sms = () => {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: payload => {
@@ -144,6 +147,7 @@ const Sms = () => {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
         tenantPk: config?.key,
+        customAuthHeader,
       },
       {
         onSuccess: handleRequestChallengeSuccess,

@@ -12,12 +12,18 @@ type IdentifyProps = Partial<IdentifyMachineArgs> & {
   onDone: (payload: DonePayload) => void;
 };
 
-const Identify = ({ bootstrapData, tenantPk, onDone }: IdentifyProps) => (
+const Identify = ({
+  bootstrapData,
+  tenantPk,
+  customAuthHeader,
+  onDone,
+}: IdentifyProps) => (
   <I18nextProvider i18n={configureI18next()}>
     <QueryClientProvider client={queryClient}>
       <IdentifyMachineProvider
         bootstrapData={bootstrapData}
         tenantPk={tenantPk}
+        customAuthHeader={customAuthHeader}
       >
         <Router onDone={onDone} />
       </IdentifyMachineProvider>

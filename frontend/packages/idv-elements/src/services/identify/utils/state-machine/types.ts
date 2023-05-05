@@ -17,6 +17,7 @@ export type OnboardingContext = {
 
 export type MachineContext = {
   bootstrapData: BootstrapData;
+  customAuthHeader?: Record<string, string>;
   device?: DeviceInfo;
   onboarding: OnboardingContext;
   identify: MachineIdentifyContext;
