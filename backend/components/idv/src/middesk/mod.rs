@@ -1,4 +1,5 @@
 use newtypes::{BusinessData, PiiJsonValue};
+use reqwest::StatusCode;
 use thiserror::Error;
 
 pub mod client;
@@ -33,8 +34,8 @@ pub enum Error {
     ReqwestError(#[from] MiddeskReqwestError),
     #[error("error response from middesk api: {0}")]
     MiddeskErrorResponse(#[from] MiddeskApiErrorResponse),
-    #[error("unexpected error from middesk api: {0}")]
-    MiddeskUnknownError(String),
+    #[error("unexpected error from middesk api: {0} {1}")]
+    MiddeskUnknownError(StatusCode, String),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
     #[error("url error: {0}")]

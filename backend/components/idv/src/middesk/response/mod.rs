@@ -9,13 +9,14 @@ use self::business::BusinessResponse;
 use super::{Error, MiddeskReqwestError};
 
 pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, Error> {
-    if response.status().is_success() {
+    let status = response.status();
+    if status.is_success() {
         Ok(response.json().await.map_err(MiddeskReqwestError::from)?)
     } else {
         let text = response.text().await.map_err(MiddeskReqwestError::from)?;
         let api_error_response =
             serde_json::from_str::<MiddeskApiErrorResponse>(&text).map(Error::MiddeskErrorResponse);
-        Err(api_error_response.unwrap_or(Error::MiddeskUnknownError(text)))
+        Err(api_error_response.unwrap_or(Error::MiddeskUnknownError(status, text)))
     }
 }
 

@@ -36,11 +36,12 @@ impl MiddeskClient {
     #[allow(unused)]
     pub async fn post_business(&self, business_data: BusinessData) -> Result<serde_json::Value, Error> {
         let req = BusinessRequest::from(business_data);
-
         let url = Url::parse(self.base_url.as_str())
             .map_err(Error::RequestUrlError)?
             .join("businesses")
             .map_err(Error::RequestUrlError)?;
+
+        tracing::info!(req=?req, url=?url, "MiddeskClient::post_business");
 
         let response = self
             .client
@@ -60,6 +61,8 @@ impl MiddeskClient {
             .map_err(Error::RequestUrlError)?
             .join(&format!("businesses/{}", business_id))
             .map_err(Error::RequestUrlError)?;
+
+        tracing::info!(url=?url, "MiddeskClient::get_business");
 
         let response = self
             .client
@@ -83,7 +86,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_client() {
-        let api_key = dotenv::var("MIDDESK_SANDBOX_API_KEY").unwrap();
+        let api_key = dotenv::var("MIDDESK_API_KEY").unwrap();
         let base_url = dotenv::var("MIDDESK_BASE_URL").unwrap();
 
         let client = MiddeskClient::new(api_key, base_url).unwrap();

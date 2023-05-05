@@ -67,7 +67,7 @@ config:
       apiKey:
         secure: v1:xtdaUeliAIgFqHjM:SoQBIALTVJdwz/fpovGd1nvNQLpJoz4Q85B+AS2LvmdqgKhAiiLUrAemlAfK0X/X
       baseUrl:
-        secure: v1:LvoJE/ffotY3W3cU:bLfjuC+8MJYTxNn8xJccLHasVIP5nYHjejbnkDZMOuFHbYYEGpAooPyvT7VgJNx/2Y4=
+        secure: v1:KOd46J2re36iezi8:4tlk/l6S81SZ7HSbCX718nccBoQ9fdrPKVRGfHBp1V1ozf3qWEQ74U6mwv8YYqtvOAOz
       webhookSecret:
         secure: v1:pEdCWHncA7z7jfpm:Y/925Y6RiRhHoHPHx+SQDmCmyCHR67OWPQQEn0qcAfS6LHxBUXisSvn7Wfmdl7wtcpOBcpV3I1Gkng==
     resources:
