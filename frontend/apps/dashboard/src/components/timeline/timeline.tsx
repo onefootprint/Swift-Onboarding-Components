@@ -89,7 +89,6 @@ const TimeContainer = styled.div`
   justify-content: flex-start;
   height: ${HEADER_HEIGHT};
   flex-shrink: 0;
-  min-width: 146px;
 `;
 
 const Content = styled.div`

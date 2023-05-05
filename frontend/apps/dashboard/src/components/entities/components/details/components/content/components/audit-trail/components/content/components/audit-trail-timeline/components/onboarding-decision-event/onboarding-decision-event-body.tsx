@@ -14,6 +14,7 @@ import styled, { css } from 'styled-components';
 
 import AnnotationNote from '../annotation-note/annotation-note';
 import EventBodyEntry from '../event-body-entry';
+import FieldValidationDetails from './components/field-validation-details';
 
 type OnboardingDecisionEventBodyProps = {
   data: OnboardingDecisionEventData;
@@ -80,6 +81,7 @@ const OnboardingDecisionEventBody = ({
                 <Typography variant="body-3" as="span">
                   {vendorsList}
                 </Typography>
+                <FieldValidationDetails />
               </>
             )}
           </Container>

@@ -16,6 +16,7 @@ export * from './get-d2p-status';
 export * from './get-doc-status';
 export * from './get-entities';
 export * from './get-entity';
+export * from './get-entity-match-signals';
 export * from './get-entity-risk-signals';
 export * from './get-liveness';
 export * from './get-members';

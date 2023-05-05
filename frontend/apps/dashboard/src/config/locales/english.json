@@ -576,6 +576,28 @@
                 "note": "Note",
                 "pin-note": "Pin note to the top of the page"
               }
+            },
+            "field-validation": {
+              "drawer": {
+                "title": "Field validations"
+              },
+              "view-details": "View details",
+              "attributes": {
+                "phone": "Phone number",
+                "name": "Name",
+                "address": "Address",
+                "dob": "Date of birth",
+                "email": "Email",
+                "ssn": "SSN"
+              },
+              "match-level": {
+                "exact": "Matched",
+                "no_match": "Did not match",
+                "could_not_match": "Could not match",
+                "partial": "Partial match",
+                "verified": "Verified",
+                "not_verified": "Not verified"
+              }
             }
           },
           "abandoned-event": {

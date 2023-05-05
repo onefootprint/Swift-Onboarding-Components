@@ -35,6 +35,7 @@ export * from './investor-data-attribute';
 export * from './investor-profile-data';
 export * from './liveness';
 export * from './liveness-check-info';
+export * from './match-signal';
 export * from './onboarding';
 export * from './onboarding-config';
 export * from './onboarding-decision';
