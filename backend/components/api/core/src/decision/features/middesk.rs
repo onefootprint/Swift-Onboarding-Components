@@ -206,7 +206,7 @@ task_enum! {
     #[derive(Display, Debug, EnumString, Eq, PartialEq)]
     pub enum TinTask {
         #[footprint_reason_code = Some(FootprintReasonCode::TinMatch)]
-        #[strum(serialize = "Verified")]
+        #[strum(serialize = "Found")]
         Found,
 
         #[footprint_reason_code = Some(FootprintReasonCode::TinNotFound)]
