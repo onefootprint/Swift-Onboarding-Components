@@ -22,7 +22,6 @@ const getVaultOrCreate = async (queryClient: QueryClient) => {
   };
 
   const possibleData = await getFromCache();
-  console.log(`possible ${possibleData}`);
   return possibleData || createInitialData();
 };
 

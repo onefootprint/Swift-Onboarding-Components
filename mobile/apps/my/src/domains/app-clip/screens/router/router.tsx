@@ -1,39 +1,60 @@
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
+import Liveness from '../../components/liveness';
 import Canceled from '../canceled';
+import Completed from '../completed';
+import Error from '../error';
 import Expired from '../expired';
 import Init from '../init';
-import Liveness from '../liveness';
-import Success from '../success';
+import useGetD2PStatus from './hooks/use-get-d2p-status';
+import useParseHandoffUrl from './hooks/use-parse-handoff-url';
 import machine from './utils/state-machine';
 
 const Router = () => {
   const [state, send] = useMachine(machine);
   const { authToken = '' } = state.context;
+  useParseHandoffUrl({
+    onSuccess: newAuthToken => {
+      send({ type: 'authTokenChanged', payload: { authToken: newAuthToken } });
+    },
+    onError: () => {
+      send({ type: 'authTokenFailed' });
+    },
+  });
+
+  useGetD2PStatus({
+    enabled: !state.done,
+    authToken,
+    options: {
+      onSuccess: ({ status }) => {
+        send({ type: 'statusReceived', payload: { status } });
+      },
+      onError: () => {
+        send({ type: 'statusReceived', payload: { isError: true } });
+      },
+    },
+  });
+
   return (
     <>
       {state.matches('init') && (
         <Init
-          onSuccess={authToken => {
-            send({ type: 'started', payload: { authToken } });
-          }}
-          onError={() => {
-            alert('error');
-          }}
+          authToken={authToken}
+          onSuccess={() => send({ type: 'initCompleted' })}
+          onError={() => send({ type: 'initFailed' })}
         />
       )}
+      {state.matches('error') && <Error />}
       {state.matches('canceled') && <Canceled />}
       {state.matches('expired') && <Expired />}
       {state.matches('liveness') && (
         <Liveness
-          authToken={authToken}
-          onSuccess={() => {
-            send({ type: 'requirementCompleted' });
-          }}
+          context={{ authToken }}
+          onDone={() => send({ type: 'requirementCompleted' })}
         />
       )}
-      {state.matches('completed') && <Success />}
+      {state.matches('completed') && <Completed authToken={authToken} />}
     </>
   );
 };

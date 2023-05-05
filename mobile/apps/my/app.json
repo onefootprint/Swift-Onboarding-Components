@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my",
+    "name": "Footprint",
     "slug": "my",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,6 @@
           "$(AppIdentifierPrefix)undefined.Clip"
         ]
       },
-      "bundleIdentifier": "com.onefootprint.my",
       "usesNonExemptEncryption": "false"
     },
     "android": {

@@ -16,23 +16,25 @@ export const createHandoffMachine = () =>
       initial: 'init',
       context: {},
       on: {
-        reset: {
+        authTokenChanged: {
           target: 'init',
-          actions: ['resetContext'],
+          actions: ['assignAuthToken'],
+        },
+        authTokenFailed: {
+          target: 'error',
         },
         statusReceived: [
           {
             target: 'expired',
-            cond: (context, event) => !!event.payload.isError,
+            cond: (_, event) => !!event.payload.isError,
           },
           {
             target: 'canceled',
-            cond: (context, event) =>
-              event.payload.status === D2PStatus.canceled,
+            cond: (_, event) => event.payload.status === D2PStatus.canceled,
           },
           {
             target: 'completed',
-            cond: (context, event) =>
+            cond: (_, event) =>
               event.payload.status === D2PStatus.completed ||
               event.payload.status === D2PStatus.failed,
           },
@@ -41,39 +43,14 @@ export const createHandoffMachine = () =>
       states: {
         init: {
           on: {
-            started: [
-              {
-                actions: ['assignAuthToken'],
-                target: 'liveness',
-              },
-            ],
-            completed: [
-              {
-                target: 'completed',
-              },
-            ],
+            initCompleted: {
+              target: 'liveness',
+            },
+            initFailed: {
+              target: 'error',
+            },
           },
         },
-        // checkRequirements: {
-        //   on: {
-        //     requirementsReceived: [
-        //       {
-        //         actions: ['assignRequirements'],
-        //       },
-        //       {
-        //         target: 'liveness',
-        //         cond: context => !!context.requirements?.missingLiveness,
-        //       },
-        //       {
-        //         target: 'idDoc',
-        //         cond: context => !!context.requirements?.missingIdDoc,
-        //       },
-        //       {
-        //         target: 'completed',
-        //       },
-        //     ],
-        //   },
-        // },
         liveness: {
           on: {
             requirementCompleted: {
@@ -81,13 +58,9 @@ export const createHandoffMachine = () =>
             },
           },
         },
-        // idDoc: {
-        //   on: {
-        //     requirementCompleted: {
-        //       target: 'checkRequirements',
-        //     },
-        //   },
-        // },
+        error: {
+          type: 'final',
+        },
         expired: {
           type: 'final',
         },
@@ -101,17 +74,11 @@ export const createHandoffMachine = () =>
     },
     {
       actions: {
-        assignAuthToken: assign((context, event) => {
-          context.authToken = event.payload.authToken;
-          return context;
+        assignAuthToken: assign((_, event) => {
+          return {
+            authToken: event.payload.authToken,
+          };
         }),
-        // assignRequirements: assign((context, event) => {
-        //   context.requirements = {
-        //     ...event.payload,
-        //   };
-        //   return context;
-        // }),
-        resetContext: assign(() => ({})),
       },
     },
   );

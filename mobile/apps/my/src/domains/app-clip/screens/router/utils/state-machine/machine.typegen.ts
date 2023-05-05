@@ -13,12 +13,17 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'started';
-    resetContext: 'reset';
+    assignAuthToken: 'authTokenChanged';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'canceled' | 'completed' | 'expired' | 'init' | 'liveness';
+  matchesStates:
+    | 'canceled'
+    | 'completed'
+    | 'error'
+    | 'expired'
+    | 'init'
+    | 'liveness';
   tags: never;
 }

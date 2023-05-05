@@ -1,14 +1,18 @@
 import { Container, Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import useTranslation from '@/hooks/use-translation';
+
 const Canceled = () => {
+  const { t } = useTranslation('screens.canceled');
+
   return (
     <Container center>
       <Typography variant="heading-3" marginBottom={3} marginTop={4}>
-        Session canceled
+        {t('title')}
       </Typography>
-      <Typography variant="body-3" marginBottom={9} center>
-        Please return to the previous page.
+      <Typography variant="body-3" center>
+        {t('subtitle')}
       </Typography>
     </Container>
   );

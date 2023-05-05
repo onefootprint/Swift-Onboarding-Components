@@ -27,5 +27,41 @@
     "document": "ID Document",
     "document_and_selfie": "ID Document & Selfie",
     "investor_profile": "Investor profile"
+  },
+  "screens": {
+    "canceled": {
+      "title": "Session canceled",
+      "subtitle": "Please return to the previous page"
+    },
+    "completed": {
+      "title": "Success!",
+      "subtitle": "You can now continue where you left on desktop"
+    },
+    "error": {
+      "title": "Session is not valid",
+      "subtitle": "Please go back to the previous page."
+    },
+    "expired": {
+      "title": "Session expired",
+      "subtitle": "For security reasons, this session has timed out. Please go back to the previous page."
+    }
+  },
+  "components": {
+    "liveness": {
+      "register": {
+        "title": "Liveness check",
+        "subtitle": "We need to verify that you're a real person.",
+        "cta": "Launch Verification"
+      },
+      "retry": {
+        "title": "Biometrics not recognized",
+        "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
+        "cta": "Try biometrics again",
+        "skip": "Do it later"
+      },
+      "success": {
+        "title": "Biometric authentication successful!"
+      }
+    }
   }
 }
