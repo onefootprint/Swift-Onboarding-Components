@@ -128,16 +128,20 @@ mod tests {
     use db::{
         models::{
             document_request::DocumentRequest, identity_document::IdentityDocument,
+            incode_verification_session::IncodeVerificationSession,
+            incode_verification_session_event::IncodeVerificationSessionEvent,
             verification_request::VerificationRequest,
         },
-        test_helpers::test_db_pool,
+        test_helpers::{assert_have_same_elements, test_db_pool},
         DbError,
     };
     use idv::{
         footprint_http_client::FootprintVendorHttpClient,
         incode::{response::FetchScoresResponse, IncodeAPIResult},
     };
-    use newtypes::{DocVData, IdDocKind, IncodeConfigurationId, PiiString, VendorAPI};
+    use newtypes::{
+        DocVData, IdDocKind, IncodeConfigurationId, IncodeVerificationSessionState, PiiString, VendorAPI,
+    };
 
     use crate::{
         decision::{
@@ -146,6 +150,7 @@ mod tests {
         },
         utils::mock_enclave::StateWithMockEnclave,
     };
+    use strum::IntoEnumIterator;
 
     #[ignore]
     #[tokio::test]
@@ -159,6 +164,7 @@ mod tests {
 
         let (tenant, _, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
         let suid = su.id.clone();
+        let suid2 = su.id.clone();
 
         //
         // Simulate doc v data
@@ -182,14 +188,6 @@ mod tests {
             })
             .await
             .unwrap();
-        // tenant_id: TenantId,
-        // db_pool: &DbPool,
-        // enclave_client: &EnclaveClient,
-        // config: &Config,
-        // decision_intent_id: DecisionIntentId,
-        // scoped_vault_id: ScopedVaultId,
-        // configuration_id: IncodeConfigurationId,
-        // identity_document_id: IdentityDocumentId,
 
         let machine = IncodeStateMachine::init(
             tenant.id,
@@ -209,26 +207,47 @@ mod tests {
             .await
             .unwrap();
 
-        let score_result = db_pool
+        db_pool
             .db_transaction(move |conn| -> Result<_, DbError> {
                 let (_, score_vres, _) =
                     VerificationRequest::list_successful_by_decision_intent_id(conn, &di.id)?
                         .into_iter()
                         .find(|(req, _, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
                         .unwrap();
+
+                let incode_verification_session = IncodeVerificationSession::get(conn, &suid2)?;
+                let incode_events = IncodeVerificationSessionEvent::get_for_session_id(
+                    conn,
+                    incode_verification_session.id.clone(),
+                )?;
+                assert_have_same_elements(
+                    incode_events
+                        .into_iter()
+                        .map(|i| i.incode_verification_session_state)
+                        .collect(),
+                    IncodeVerificationSessionState::iter().collect(),
+                );
+
                 let score_result =
                     IncodeAPIResult::<FetchScoresResponse>::try_from(score_vres.unwrap().response.0)
                         .unwrap()
                         .into_success()
                         .unwrap();
+                //
+                // Assertions
+                //
+                assert_eq!(
+                    incode_verification_session.state,
+                    IncodeVerificationSessionState::Complete
+                );
+                assert!(score_result.id_validation.is_some());
 
                 db::private_cleanup_integration_tests(conn, uv.id).unwrap();
-                Ok(score_result)
+
+                Ok(())
             })
             .await
             .unwrap();
-
-        assert!(score_result.id_validation.is_some())
     }
 
     fn small_image() -> String {

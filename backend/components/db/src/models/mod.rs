@@ -10,6 +10,8 @@ pub mod document_request;
 pub mod fingerprint;
 pub mod fingerprint_visit_event;
 pub mod identity_document;
+pub mod incode_verification_session;
+pub mod incode_verification_session_event;
 pub mod insight_event;
 pub mod liveness_event;
 pub mod manual_review;

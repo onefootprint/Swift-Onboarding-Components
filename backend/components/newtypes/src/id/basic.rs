@@ -47,6 +47,12 @@ define_newtype_id!(
     String,
     "Session id representing a verification session on incode"
 );
+define_newtype_id!(
+    IncodeAuthorizationToken,
+    String,
+    "Authorization token for an incode session"
+);
+
 impl_verified_prefix_for_nt_id!(FpId, "fp_id_");
 
 define_newtype_id!(
@@ -149,3 +155,13 @@ define_newtype_id!(
     "Identifier for a a tenant vendor control"
 );
 define_newtype_id!(MiddeskRequestId, String, "Identifier for a middesk_request");
+define_newtype_id!(
+    IncodeVerificationSessionId,
+    String,
+    "Identifier for a incode_verification_session"
+);
+define_newtype_id!(
+    IncodeVerificationSessionEventId,
+    String,
+    "Identifier for a incode_verification_session_event"
+);

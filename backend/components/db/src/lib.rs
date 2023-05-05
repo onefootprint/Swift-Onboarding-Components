@@ -23,7 +23,7 @@ mod instrumented_connection;
 use std::time::Duration;
 
 pub use crate::errors::DbError;
-use crate::schema::{decision_intent, user_consent};
+use crate::schema::{decision_intent, incode_verification_session_event, user_consent};
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::Runtime;
 use diesel::pg::PgConnection as DieselPgConnection;
@@ -194,11 +194,11 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
     use schema::{
         access_event, annotation, business_owner, contact_info, data_lifetime, document_data,
-        document_request, fingerprint, fingerprint_visit_event, identity_document, liveness_event,
-        manual_review, middesk_request, onboarding, onboarding_decision,
-        onboarding_decision_verification_result_junction, risk_signal, scoped_vault, socure_device_session,
-        user_timeline, vault, vault_data, verification_request, verification_result, watchlist_check,
-        webauthn_credential,
+        document_request, fingerprint, fingerprint_visit_event, identity_document,
+        incode_verification_session, liveness_event, manual_review, middesk_request, onboarding,
+        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_vault,
+        socure_device_session, user_timeline, vault, vault_data, verification_request, verification_result,
+        watchlist_check, webauthn_credential,
     };
     let mut deleted_rows = 0;
 
@@ -313,6 +313,16 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(decision_intent::table)
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
+
+        let incode_ids = incode_verification_session::table
+            .filter(incode_verification_session::scoped_vault_id.eq_any(su_ids.clone()))
+            .select(incode_verification_session::id);
+        deleted_rows += diesel::delete(incode_verification_session_event::table)
+            .filter(incode_verification_session_event::incode_verification_session_id.eq_any(incode_ids))
+            .execute(conn.conn())?;
+        deleted_rows += diesel::delete(incode_verification_session::table)
+            .filter(incode_verification_session::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         // Onboardings

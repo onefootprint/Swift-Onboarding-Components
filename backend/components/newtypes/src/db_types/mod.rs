@@ -13,6 +13,7 @@ mod document_request_status;
 mod fingerprint;
 mod fingerprint_meta;
 mod footprint_reason_code;
+mod incode_verification_session_state;
 mod liveness_source;
 mod middesk_request_state;
 mod ob_config_status;
@@ -35,9 +36,9 @@ pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, business_owner_kind::*, company_size::*,
     compliance_status::*, contact_info_priority::*, d2p_session_status::*, d2p_session_status::*,
     data_priority::*, decision_intent_kind::*, decision_status::*, document_request_status::*,
-    fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, liveness_source::*,
-    middesk_request_state::*, ob_config_status::*, onboarding_status::*, org_member_email::*,
-    proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*, task_status::*,
-    tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
+    fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, incode_verification_session_state::*,
+    liveness_source::*, middesk_request_state::*, ob_config_status::*, onboarding_status::*,
+    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*,
+    task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
     verification_status::*, watchlist_check::*,
 };

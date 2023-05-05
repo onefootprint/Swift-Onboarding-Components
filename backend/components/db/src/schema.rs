@@ -243,6 +243,41 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    incode_verification_session (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        incode_session_id -> Nullable<Text>,
+        incode_configuration_id -> Text,
+        incode_authentication_token -> Nullable<Text>,
+        incode_authentication_token_expires_at -> Nullable<Timestamptz>,
+        identity_document_id -> Text,
+        state -> Text,
+        completed_at -> Nullable<Timestamptz>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    incode_verification_session_event (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        incode_verification_session_id -> Text,
+        incode_verification_session_state -> Text,
+        identity_document_id -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     insight_event (id) {
         id -> Text,
         timestamp -> Timestamptz,
@@ -832,6 +867,8 @@ joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
 joinable!(identity_document -> document_request (request_id));
+joinable!(incode_verification_session -> scoped_vault (scoped_vault_id));
+joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> onboarding (onboarding_id));
@@ -895,6 +932,8 @@ allow_tables_to_appear_in_same_query!(
     fingerprint_visit_event,
     identity_document,
     identity_document_backup,
+    incode_verification_session,
+    incode_verification_session_event,
     insight_event,
     liveness_event,
     manual_review,

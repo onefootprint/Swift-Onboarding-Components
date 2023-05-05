@@ -1,7 +1,8 @@
 use async_trait::async_trait;
+use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::DbPool;
+use db::{DbPool, DbResult};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 
 use idv::incode::{
@@ -10,8 +11,9 @@ use idv::incode::{
 };
 use newtypes::vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken};
 use newtypes::{
-    DecisionIntentId, DocVData, IdentityDocumentId, IncodeConfigurationId, ScopedVaultId, ScrubbedJsonValue,
-    VaultPublicKey, VendorAPI, VerificationRequestId,
+    DecisionIntentId, DocVData, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId,
+    IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionState, ScopedVaultId,
+    ScrubbedJsonValue, VaultPublicKey, VendorAPI, VerificationRequestId,
 };
 
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
@@ -48,15 +50,24 @@ impl IncodeState for StartOnboarding {
         let di_id = self.decision_intent_id.clone();
         let di_id2 = self.decision_intent_id.clone();
         let incode_credentials = self.incode_credentials.clone();
+        let config_id = self.configuration_id.clone();
+        let id_doc_id2 = self.identity_document_id.clone();
 
         //
         // Save our initial VReq
         //
-        let start_onboarding_verification_request = db_pool
-            .db_query(move |conn| {
-                VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeStartOnboarding)
-            })
-            .await??;
+        let (start_onboarding_verification_request, verification_session) = db_pool
+            .db_transaction(
+                move |conn| -> DbResult<(VerificationRequest, IncodeVerificationSession)> {
+                    let vr =
+                        VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeStartOnboarding)?;
+                    // Initialize the incode state
+                    let is = IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id2)?;
+
+                    Ok((vr, is))
+                },
+            )
+            .await?;
 
         //
         // make the request to incode
@@ -80,6 +91,7 @@ impl IncodeState for StartOnboarding {
         save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
 
         // Now ensure we don't have an error
+        // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
         let successful_response = request_result
             .map_err(map_to_api_err)?
             .result
@@ -89,14 +101,18 @@ impl IncodeState for StartOnboarding {
         //
         // Set up the next state transition
         //
-        let credentials = IncodeCredentialsWithToken {
-            credentials: incode_credentials,
-            authentication_token: successful_response.token,
+        let session = VerificationSession {
+            id: verification_session.id.clone(),
+            credentials: IncodeCredentialsWithToken {
+                credentials: incode_credentials,
+                authentication_token: successful_response.token.clone(),
+            },
         };
         let id_doc_id = self.identity_document_id.clone();
+
         // Save the next stage's Vreq
         let add_front_vreq = db_pool
-            .db_query(move |conn| -> ApiResult<VerificationRequest> {
+            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                 let res = VerificationRequest::create_document_verification_request(
                     conn,
                     VendorAPI::IncodeAddFront,
@@ -105,12 +121,21 @@ impl IncodeState for StartOnboarding {
                     &di_id2,
                 )?;
 
+                // Update our state to the next stage
+                let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
+                    IncodeVerificationSessionState::AddFront,
+                    IncodeSessionId::from(successful_response.interview_id),
+                    IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
+                );
+
+                IncodeVerificationSession::update(conn, verification_session.id, update)?;
+
                 Ok(res)
             })
-            .await??;
+            .await?;
 
         Ok(Transition::Next(Box::new(AddFront {
-            credentials,
+            session,
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
             add_front_verification_request: add_front_vreq,
@@ -120,7 +145,7 @@ impl IncodeState for StartOnboarding {
 }
 
 pub struct AddFront {
-    pub credentials: IncodeCredentialsWithToken,
+    pub session: VerificationSession,
     pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: DecisionIntentId,
     pub add_front_verification_request: VerificationRequest,
@@ -153,7 +178,7 @@ impl IncodeState for AddFront {
             ..Default::default()
         };
         let request = IncodeAddFrontRequest {
-            credentials: self.credentials.clone(),
+            credentials: self.session.credentials.clone(),
             docv_data,
         };
         let request_result = footprint_http_client.make_request(request).await;
@@ -176,10 +201,11 @@ impl IncodeState for AddFront {
         //
         // Set up the next state transition
         //
+        let verification_session_id = self.session.id.clone();
         let id_doc_id = self.identity_document_id.clone();
         // Save the next stage's Vreq
         let add_back_vreq = db_pool
-            .db_query(move |conn| -> ApiResult<VerificationRequest> {
+            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                 let res = VerificationRequest::create_document_verification_request(
                     conn,
                     VendorAPI::IncodeAddBack,
@@ -188,12 +214,17 @@ impl IncodeState for AddFront {
                     &di_id,
                 )?;
 
+                let update =
+                    UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
+
+                IncodeVerificationSession::update(conn, verification_session_id, update)?;
+
                 Ok(res)
             })
-            .await??;
+            .await?;
 
         Ok(Transition::Next(Box::new(AddBack {
-            credentials: self.credentials.clone(),
+            session: self.session.clone(),
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
             add_back_verification_request: add_back_vreq,
@@ -202,7 +233,7 @@ impl IncodeState for AddFront {
 }
 
 pub struct AddBack {
-    pub credentials: IncodeCredentialsWithToken,
+    pub session: VerificationSession,
     pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: DecisionIntentId,
     pub add_back_verification_request: VerificationRequest,
@@ -235,7 +266,7 @@ impl IncodeState for AddBack {
             ..Default::default()
         };
         let request = IncodeAddBackRequest {
-            credentials: self.credentials.clone(),
+            credentials: self.session.credentials.clone(),
             docv_data,
         };
         let request_result = footprint_http_client.make_request(request).await;
@@ -259,16 +290,21 @@ impl IncodeState for AddBack {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
+        let verification_session_id = self.session.id.clone();
         let process_id_vreq = db_pool
-            .db_query(move |conn| -> ApiResult<VerificationRequest> {
+            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                 let res = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeProcessId)?;
+                let update =
+                    UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::ProcessId);
+
+                IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
                 Ok(res)
             })
-            .await??;
+            .await?;
 
         Ok(Transition::Next(Box::new(ProcessId {
-            credentials: self.credentials.clone(),
+            session: self.session.clone(),
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
             process_id_verification_request: process_id_vreq,
@@ -277,7 +313,7 @@ impl IncodeState for AddBack {
 }
 
 pub struct ProcessId {
-    pub credentials: IncodeCredentialsWithToken,
+    pub session: VerificationSession,
     pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: DecisionIntentId,
     pub process_id_verification_request: VerificationRequest,
@@ -305,7 +341,7 @@ impl IncodeState for ProcessId {
         let process_id_vreq_id = self.process_id_verification_request.id.clone();
 
         let request = IncodeProcessIdRequest {
-            credentials: self.credentials.clone(),
+            credentials: self.session.credentials.clone(),
         };
         let request_result = footprint_http_client.make_request(request).await;
 
@@ -328,23 +364,29 @@ impl IncodeState for ProcessId {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
+        let verification_session_id = self.session.id.clone();
         let process_id_vreq = db_pool
-            .db_query(move |conn| -> ApiResult<VerificationRequest> {
+            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                 let res = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeFetchScores)?;
+
+                let update =
+                    UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::FetchScores);
+
+                IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
                 Ok(res)
             })
-            .await??;
+            .await?;
 
         Ok(Transition::Next(Box::new(FetchScores {
-            credentials: self.credentials.clone(),
+            session: self.session.clone(),
             fetch_scores_verification_request: process_id_vreq,
         })))
     }
 }
 
 pub struct FetchScores {
-    pub credentials: IncodeCredentialsWithToken,
+    pub session: VerificationSession,
     pub fetch_scores_verification_request: VerificationRequest,
 }
 
@@ -367,7 +409,7 @@ impl IncodeState for FetchScores {
         let fetch_scores_vreq_id = self.fetch_scores_verification_request.id.clone();
 
         let request = IncodeFetchScoresRequest {
-            credentials: self.credentials.clone(),
+            credentials: self.session.credentials.clone(),
         };
 
         let request_result = footprint_http_client.make_request(request).await;
@@ -387,11 +429,29 @@ impl IncodeState for FetchScores {
             .into_success()
             .map_err(map_to_api_err)?;
 
+        let verification_session_id = self.session.id.clone();
+        db_pool
+            .db_transaction(move |conn| -> ApiResult<()> {
+                let update =
+                    UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::Complete);
+
+                IncodeVerificationSession::update(conn, verification_session_id, update)?;
+
+                Ok(())
+            })
+            .await?;
+
         // We're done!
         // TODO: Since this yields control back to /documents, I think we'll
         // want to actually return VRes or something
         Ok(Transition::Complete)
     }
+}
+
+#[derive(Clone)]
+pub struct VerificationSession {
+    pub id: IncodeVerificationSessionId,
+    pub credentials: IncodeCredentialsWithToken,
 }
 
 /// Struct to make sure we handle the different cases of Incode vendor call errors we may see

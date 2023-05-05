@@ -1,0 +1,2 @@
+DROP TABLE incode_verification_session_event;
+DROP TABLE incode_verification_session;
