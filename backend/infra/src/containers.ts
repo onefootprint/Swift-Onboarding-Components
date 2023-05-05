@@ -300,7 +300,7 @@ export abstract class ServiceContainers {
                 valueFrom: middeskWebhookSecret,
               },
               {
-                name: 'MIDDESK_BASE_RUL',
+                name: 'MIDDESK_BASE_URL',
                 valueFrom: middeskBaseUrl,
               },
               {
