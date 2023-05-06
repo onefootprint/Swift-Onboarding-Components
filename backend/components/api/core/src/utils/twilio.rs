@@ -164,10 +164,10 @@ impl TwilioClient {
     #[tracing::instrument(skip_all)]
     pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
         let message_body = format!(
-            "To sign up for {}, {} is verifying {}, and you were identified as a beneficial owner. For it to be successfully verified, you need to verify your identity. Continue here: {}\n\nSent via Footprint",
-            info.org_name,
+            "{} identified you as a beneficial owner of {}. To finish verifying your business for {}, we need to verify your identity as well. Continue here: {}\n\nSent via Footprint",
             info.inviter.leak(),
             info.business_name.leak(),
+            info.org_name,
             info.url.leak()
         );
 
