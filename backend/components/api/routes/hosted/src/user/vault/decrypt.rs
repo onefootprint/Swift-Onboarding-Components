@@ -1,9 +1,9 @@
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
-use api_core::auth::user::UserObAuthContext;
-use api_core::auth::CanDecrypt;
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::auth::user::{UserAuth, UserAuthContext};
+use api_core::auth::{Any, CanDecrypt};
+use api_core::utils::vault_wrapper::VwArgs;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::{flat_api_object_map_type, PiiString};
@@ -31,8 +31,7 @@ flat_api_object_map_type!(
 pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptRequest>,
-    // is it worth having an OnboardingAuth that only extracts if onboarding is present
-    user_auth: UserObAuthContext,
+    user_auth: UserAuthContext,
 ) -> JsonApiResponse<DecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
@@ -40,7 +39,17 @@ pub async fn post(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &user_auth.scoped_user.id)?;
+            let su_id = user_auth.scoped_user_id();
+            let args = if let Some(su_id) = su_id.as_ref() {
+                // If the auth token is during an onboarding session, create a UVW that sees all
+                // speculative data for the tenant in order to see a speculative phone number
+                // that was added by this tenant.
+                VwArgs::Tenant(su_id)
+            } else {
+                // Otherwise, create a UVW that only sees portable data
+                VwArgs::Vault(user_auth.user_vault_id())
+            };
+            let uvw = VaultWrapper::<Any>::build(conn, args)?;
             Ok(uvw)
         })
         .await??;
