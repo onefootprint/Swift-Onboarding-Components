@@ -182,7 +182,6 @@ const DialogContainer = styled(Fade)<{
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
-    overflow: hidden;
     justify-content: stretch;
     max-height: calc(100vh - ${theme.spacing[9]} * 2);
     isolation: isolate;
@@ -275,6 +274,8 @@ const Footer = styled.footer`
     z-index: 1;
     position: sticky;
     bottom: 0;
+    border-radius: 0 0 ${theme.borderRadius.default}
+      ${theme.borderRadius.default};
   `}
 `;
 
