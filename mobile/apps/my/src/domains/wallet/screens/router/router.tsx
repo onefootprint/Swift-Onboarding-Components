@@ -20,16 +20,10 @@ const Tab = createBottomTabNavigator<Navigation>();
 const Router = () => (
   <NavigationContainer>
     <Stack.Navigator>
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MainTabs"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
+      <Stack.Group screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+      </Stack.Group>
     </Stack.Navigator>
   </NavigationContainer>
 );

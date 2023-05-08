@@ -29,6 +29,7 @@ const button: Button = {
       loading: {
         bg: t.buttonsPrimaryLoadingBg,
         color: t.buttonsPrimaryLoadingIcon,
+        borderColor: t.buttonsPrimaryLoadingBorder,
       },
       disabled: {
         bg: t.buttonsPrimaryDisabledBg,
@@ -53,6 +54,7 @@ const button: Button = {
       loading: {
         bg: t.buttonsSecondaryLoadingBg,
         color: t.buttonsSecondaryLoadingIcon,
+        borderColor: t.buttonsSecondaryLoadingBorder,
       },
       disabled: {
         bg: t.buttonsSecondaryDisabledBg,

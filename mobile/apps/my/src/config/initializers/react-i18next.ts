@@ -7,17 +7,15 @@ const resources = {
   en: { translation: en },
 };
 
-const I18NOptions = {
-  compatibilityJSON: 'v3',
-  resources,
-  lng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
-};
-
 const configureReactI18next = () => {
-  i18next.use(initReactI18next).init(I18NOptions);
+  i18next.use(initReactI18next).init({
+    compatibilityJSON: 'v3',
+    resources,
+    lng: 'en',
+    interpolation: {
+      escapeValue: false,
+    },
+  });
   return i18next;
 };
 

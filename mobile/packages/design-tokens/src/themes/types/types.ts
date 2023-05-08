@@ -1,4 +1,10 @@
-import type { Button, LinkButton } from './components';
+import type {
+  Button,
+  Input,
+  InputHint,
+  InputLabel,
+  LinkButton,
+} from './components';
 
 export type UIStates = {
   accent: string;
@@ -129,6 +135,9 @@ export type Theme = {
   components: {
     button: Button;
     linkButton: LinkButton;
+    inputLabel: InputLabel;
+    inputHint: InputHint;
+    input: Input;
   };
 };
 

@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 
 export type PressableProps = {
+  activeOpacity?: number;
   children: React.ReactNode;
   disabled?: boolean;
   hitSlop?: number;
@@ -14,6 +15,7 @@ export type PressableProps = {
 };
 
 const Pressable = ({
+  activeOpacity = 0.75,
   children,
   disabled = false,
   hitSlop = 0,
@@ -28,7 +30,7 @@ const Pressable = ({
         left: hitSlop,
         right: hitSlop,
       }}
-      activeOpacity={0.75}
+      activeOpacity={activeOpacity}
       style={style}
       disabled={disabled}
       onPress={disabled ? undefined : onPress}

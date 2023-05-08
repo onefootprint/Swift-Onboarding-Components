@@ -29,6 +29,13 @@
     "investor_profile": "Investor profile"
   },
   "screens": {
+    "login": {
+      "title": "Hey there! 👋",
+      "subtitle": "Enter your email to get started.",
+      "form": {
+        "cta": "Continue"
+      }
+    },
     "canceled": {
       "title": "Session canceled",
       "subtitle": "Please return to the previous page"

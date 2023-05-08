@@ -495,9 +495,9 @@ export const baseInputsTypographyCompactInputContent =
 export const baseInputsTypographyCompactHint =
   '500 13px/16px "DMSans_500Medium"';
 export const baseInputsElevationFocus =
-  '0px 0px 0px 4px rgba(74, 36, 219, 0.12156862745098039)';
+  '0px 8px 8px rgba(74,36,219,0.12156862745098039)';
 export const baseInputsElevationFocusError =
-  '0px 0px 0px 4px rgba(191, 20, 10, 0.12156862745098039)';
+  '0px 0px 4px rgba(191,20,10,0.12156862745098039)';
 export const baseInputsBorderWidth = 1;
 export const baseDropdownBaseBgPrimary = '#FFFFFF';
 export const baseDropdownBaseBgPrimaryHover = '#f7f7f7';
@@ -508,7 +508,7 @@ export const baseDropdownBaseBorder = '#e2e2e2';
 export const baseDropdownBaseIconPrimary = '#000000';
 export const baseDropdownBaseIconSecondary = '#8d8d8d';
 export const baseDropdownElevation =
-  '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
+  '0px 1px 8px 0px rgba(0,0,0,0.1411764705882353)';
 export const baseDropdownSpacingItems2linesPaddingsHorizontal = 16;
 export const baseDropdownSpacingItems2linesPaddingsVertical = 4;
 export const baseDropdownSpacingItems2linesGap = 4;
