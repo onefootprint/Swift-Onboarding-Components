@@ -22,10 +22,10 @@ const MobileIllustration = () => (
     <Beams>
       <VerticalBeam
         width={120}
-        height={280}
+        height={340}
         speed={6}
         delay={0}
-        path="M34 -1.52588e-05V30.5C34 34.9183 30.4183 38.5 26 38.5H9C4.58172 38.5 1 42.0817 1 46.5V98C1 102.418 4.58173 106 9.00002 106L43 106C47.4183 106 51 109.582 51 114L51 185.5C51 189.918 54.5817 193.5 59 193.5H77.5C81.9183 193.5 85.5 197.082 85.5 201.5L85.5 238.5"
+        path="M34.1953 9.77516e-06V46.8847C34.1953 51.303 30.6135 54.8847 26.1953 54.8847H9C4.58172 54.8847 1 58.4664 1 62.8847L1 267.849C1 272.267 4.58172 275.849 8.99999 275.849H51.2959H78C82.4183 275.849 86 279.431 86 283.849L86 340"
         className="beam-1"
       />
       <VerticalBeam
@@ -96,17 +96,17 @@ const Label = styled.div`
     }
 
     &[data-id='credit-card'] {
-      top: 20px;
+      top: -55px;
       right: 10%;
     }
 
     &[data-id='token-cc'] {
-      top: 280px;
+      top: 310px;
       right: 10%;
     }
 
     &[data-id='snn'] {
-      top: -20px;
+      top: -10px;
       left: 0%;
     }
 
@@ -127,7 +127,7 @@ const Beams = styled.div`
   }
 
   .beam-1 {
-    top: 20%;
+    top: -10%;
     right: 10%;
   }
 

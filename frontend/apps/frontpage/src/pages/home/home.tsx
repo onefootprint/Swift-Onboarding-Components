@@ -28,8 +28,6 @@ const NewHome = () => {
       <OwnData />
       <SectionSpacer />
       <VaultProxy />
-      {/* <SectionSpacer /> */}
-      {/* <IdentityWallet /> */}
       <SectionSpacer />
       <Customizable />
       <SectionSpacer />

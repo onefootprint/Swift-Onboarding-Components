@@ -67,27 +67,34 @@ const VaultProxy = () => {
 const Background = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.tertiary};
-    padding: ${theme.spacing[13]} 0 ${theme.spacing[10]} 0;
+    padding: ${theme.spacing[12]} 0 ${theme.spacing[12]} 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: ${theme.spacing[6]};
     width: 100%;
     text-align: center;
     overflow: hidden;
     background: linear-gradient(180deg, #242b58 0%, #070c26 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: normal, luminosity, normal;
+    background-position: center;
+
+    ${media.greaterThan('md')`
+      padding: ${theme.spacing[12]} 0 ${theme.spacing[12]} 0;
+    `}
   `}
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-blend-mode: normal, luminosity, normal;
-  background-position: center;
 `;
 
 const StyledContainer = styled(Container)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[9]};
+    gap: ${theme.spacing[10]};
+
+    ${media.greaterThan('md')`
+      gap: ${theme.spacing[9]};
+    `}
   `}
 `;
 
