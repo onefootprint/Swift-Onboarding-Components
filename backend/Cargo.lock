@@ -604,6 +604,7 @@ dependencies = [
  "lazy_static",
  "levenshtein",
  "log",
+ "macros",
  "mime",
  "mockall 0.11.3",
  "newtypes",

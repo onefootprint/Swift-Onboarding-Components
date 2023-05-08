@@ -9,10 +9,11 @@ use api_core::utils::vault_wrapper::TenantVw;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
+use macros::route_alias;
 use newtypes::{flat_api_object_map_type, PiiString};
 use newtypes::{DataIdentifier, FpId};
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
@@ -30,23 +31,14 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
+#[tracing::instrument(skip(state, auth))]
+#[route_alias(post("/users/{footprint_user_id}/vault/decrypt"))]
 #[api_v2_operation(
     tags(Vault, Entities, Preview),
     description = "Works for either person or business entities. Decrypts the specified list of fields from the provided vault."
 )]
-#[actix::post("/entities/{fp_id}/vault/decrypt")]
+#[post("/entities/{fp_id}/vault/decrypt")]
 pub async fn post(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Json<DecryptRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-    insights: InsightHeaders,
-) -> JsonApiResponse<DecryptResponse> {
-    let result = post_inner(state, path, request, auth, insights).await?;
-    Ok(result)
-}
-
-pub async fn post_inner(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<DecryptRequest>,

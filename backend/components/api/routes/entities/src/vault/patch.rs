@@ -10,26 +10,18 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
+use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{AccessEventKind, FpId, ParseOptions};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
+#[route_alias(actix::post("/users/{footprint_user_id}/vault/validate"))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
     tags(Entities, Vault, PublicApi)
 )]
 #[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post_validate(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Json<RawDataRequest>,
-    tenant_auth: SecretTenantAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = post_validate_inner(state, path, request, tenant_auth).await?;
-    Ok(result)
-}
-
-pub async fn post_validate_inner(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<RawDataRequest>,
@@ -59,23 +51,13 @@ pub async fn post_validate_inner(
     EmptyResponse::ok().json()
 }
 
+#[route_alias(actix::patch("/users/{fp_id}/vault"))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a user vault.",
     tags(Entities, Vault, PublicApi)
 )]
 #[actix::patch("/entities/{fp_id}/vault")]
 pub async fn patch(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Json<RawDataRequest>,
-    tenant_auth: SecretTenantAuthContext,
-    insight: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
-    let result = patch_inner(state, path, request, tenant_auth, insight).await?;
-    Ok(result)
-}
-
-pub async fn patch_inner(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<RawDataRequest>,

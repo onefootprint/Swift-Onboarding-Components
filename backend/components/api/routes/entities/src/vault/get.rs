@@ -6,6 +6,7 @@ use crate::{errors::ApiError, State};
 use actix_web::web::Query;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
+use macros::route_alias;
 use newtypes::flat_api_object_map_type;
 use newtypes::input::Csv;
 use newtypes::{DataIdentifier, FpId};
@@ -27,22 +28,13 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
+#[route_alias(actix::get("/users/{footprint_user_id}/vault"))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",
     tags(Vault, Entities, Preview)
 )]
 #[actix::get("/entities/{fp_id}/vault")]
 pub async fn get(
-    state: web::Data<State>,
-    path: Path<FpId>,
-    request: Query<FieldsParams>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetVaultResponse> {
-    let result = get_inner(state, path, request, auth).await?;
-    Ok(result)
-}
-
-pub async fn get_inner(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Query<FieldsParams>,

@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, ItemFn, Meta};
 use syn::{parse_quote, AttributeArgs};
@@ -187,4 +187,122 @@ pub fn test_db_pool(
         }
     };
     out.into()
+}
+
+#[proc_macro_attribute]
+/// creates an alias of paperclip route with another path
+pub fn route_alias(
+    args: proc_macro::TokenStream,
+    stream: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    let item = parse_macro_input!(stream as ItemFn);
+
+    // original item
+    let ItemFn {
+        attrs,
+        vis,
+        sig,
+        block,
+    } = item.clone();
+
+    let alias_route_macros: Vec<proc_macro2::TokenStream> = {
+        let attr = parse_macro_input!(args as syn::AttributeArgs);
+
+        attr.iter()
+            .filter_map(|meta| match meta {
+                syn::NestedMeta::Meta(Meta::List(list)) => {
+                    let method = list.path.to_token_stream();
+                    let path = list.nested.to_token_stream();
+                    let block = quote! {
+                        #method(#path)
+                    };
+                    Some(block)
+                }
+                _ => None,
+            })
+            .collect()
+    };
+
+    let method_attr = |meta: &Meta| -> Option<proc_macro2::TokenStream> {
+        match meta {
+            Meta::Path(path) => {
+                let ident = path.get_ident()?;
+                let method_str = ident.to_string().to_lowercase();
+                if !matches!(method_str.as_str(), "get" | "post" | "put" | "patch" | "delete") {
+                    return None;
+                }
+                Some(ident.to_token_stream())
+            }
+            Meta::List(list) => {
+                let Some(last) = list.path.segments.last() else {
+                    return None
+                };
+                let method_str = last.ident.to_string().to_lowercase();
+                if !matches!(method_str.as_str(), "get" | "post" | "put" | "patch" | "delete") {
+                    return None;
+                }
+
+                let method = list.path.segments.to_token_stream();
+                Some(method)
+            }
+            Meta::NameValue(_) => None,
+        }
+    };
+
+    let other_attrs = item
+        .attrs
+        .into_iter()
+        .filter(|attr| {
+            let Some(meta) = attr.parse_meta().ok() else {
+                return true
+            };
+            method_attr(&meta).is_none()
+        })
+        .collect::<Vec<_>>();
+
+    let (alias_blocks, configures): (Vec<_>, Vec<_>) = alias_route_macros
+        .into_iter()
+        .enumerate()
+        .map(|(index, alias)| {
+            let mut sig2 = item.sig.clone();
+            let index: String = if index == 0 {
+                "alias".to_string()
+            } else {
+                format!("alias_{}", index)
+            };
+            let handler_name = format!("{}_{}", sig2.ident, index);
+            let handler_ident = proc_macro2::Ident::new(&handler_name, sig2.ident.span());
+            sig2.ident = handler_ident.clone();
+
+            let alias = quote! {
+                // render alias
+                #(#other_attrs)*
+                #[#alias]
+                #vis #sig2
+                #block
+            };
+            let configure = quote! {
+                config.service(#handler_ident);
+            };
+            (alias, configure)
+        })
+        .unzip();
+
+    let configure_ident = format_ident!("configure_{}_aliases", &sig.ident);
+
+    let output = quote! {
+        // render original
+        #(#attrs)*
+        #vis #sig
+        #block
+
+        // render aliases
+        #(#alias_blocks)*
+
+        #[allow(unused)]
+        #vis fn #configure_ident(config: &mut paperclip::actix::web::ServiceConfig) {
+            #(#configures)*
+        }
+    };
+    output.into()
 }

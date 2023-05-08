@@ -10,6 +10,7 @@ from tests.utils import (
 )
 from tests.constants import IP_DATA
 from tests.bifrost_client import BifrostClient
+import base64
 
 
 @pytest.fixture(scope="function")
@@ -113,17 +114,14 @@ def test_invalid_doc_upload(incomplete_client):
 def test_valid_doc_upload(incomplete_client, sandbox_tenant):
     user = incomplete_client.run()
 
-    res = post(
-        f"/users/{user.fp_id}/vault/document/decrypt",
-        {
-            "kind": "document.finra_compliance_letter",
-            "reason": "show me",
-        },
-        sandbox_tenant.sk.key,
-        raw_response=True,
+    data = dict(
+        reason="test decrypt finra",
+        fields=["document.finra_compliance_letter"],
     )
-    assert "application/pdf" == res.headers["content-type"]
-    assert file_contents("example_pdf.pdf") == res.content
+    response = post(f"/users/{user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+    assert file_contents("example_pdf.pdf") == base64.b64decode(
+        response["document.finra_compliance_letter"]
+    )
 
     timeline = get(f"/entities/{user.fp_id}/timeline", None, sandbox_tenant.sk.key)
     doc_upload_events = [
@@ -147,15 +145,12 @@ def test_doc_reupload(sandbox_tenant, investor_profile_ob_config, twilio):
     )
     user = bifrost.run()
 
-    res = post(
-        f"/users/{user.fp_id}/vault/document/decrypt",
-        {
-            "kind": "document.finra_compliance_letter",
-            "reason": "show me",
-        },
-        sandbox_tenant.sk.key,
-        raw_response=True,
+    data = dict(
+        reason="show me",
+        fields=["document.finra_compliance_letter"],
     )
+    response = post(f"/users/{user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+    res_content = base64.b64decode(response["document.finra_compliance_letter"])
 
-    assert file_contents("example_pdf2.pdf") == res.content
-    assert file_contents("example_pdf.pdf") != res.content
+    assert file_contents("example_pdf2.pdf") == res_content
+    assert file_contents("example_pdf.pdf") != res_content
