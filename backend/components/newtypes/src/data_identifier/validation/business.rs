@@ -1,7 +1,7 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::email::Email;
-use crate::{BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, PhoneNumber, PiiString};
+use crate::{BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, PhoneNumber, PiiString, ValidateArgs};
 use crate::{NtResult, Validate};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -10,7 +10,7 @@ use strum::EnumString;
 use url::{Host, Url};
 
 impl Validate for BDK {
-    fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
         let value = utils::validate_not_empty(value)?;
         let result = match self {
             BDK::Name => value,
@@ -181,6 +181,7 @@ mod test {
     use crate::BusinessDataKind as BDK;
     use crate::PiiString;
     use crate::Validate;
+    use crate::ValidateArgs;
     use serde_json::json;
     use test_case::test_case;
 
@@ -214,7 +215,7 @@ mod test {
     #[test_case(BeneficialOwners, "[{\"first_name\": \"Piip\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}, {\"first_name\": \"Marco\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}]" => None)]
     #[test_case(BeneficialOwners, "I am not json" => None)]
     fn test_clean_and_validate_field_not_bifrost(bdk: BDK, pii: &str) -> Option<String> {
-        bdk.validate(PiiString::new(pii.to_owned()), false)
+        bdk.validate(PiiString::new(pii.to_owned()), ValidateArgs::default())
             .ok()
             .map(|pii| pii.leak_to_string())
     }
@@ -231,7 +232,7 @@ mod test {
         }]);
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners
-            .validate(PiiString::new(input_str), false)
+            .validate(PiiString::new(input_str), ValidateArgs::default())
             .unwrap();
         let result: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(result.leak()).unwrap();
         let owner = result.into_iter().next().unwrap();
@@ -252,7 +253,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
         assert!(result.is_err());
 
         // Test bad phone
@@ -265,7 +266,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
         assert!(result.is_err());
 
         // Test duplicate phones
@@ -284,7 +285,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), false);
+        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
         assert!(result.is_err());
     }
 }

@@ -40,7 +40,10 @@ pub use self::{
     identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
     vd_kind::*,
 };
-use crate::{util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString, VaultKind};
+use crate::{
+    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiString, ValidateArgs,
+    VaultKind,
+};
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -138,14 +141,14 @@ impl DataIdentifier {
 }
 
 impl Validate for DataIdentifier {
-    fn validate(&self, value: crate::PiiString, for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
+    fn validate(&self, value: crate::PiiString, args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
         match self {
-            Self::Id(s) => s.validate(value, for_bifrost),
-            Self::Custom(s) => s.validate(value, for_bifrost),
-            Self::Business(s) => s.validate(value, for_bifrost),
-            Self::InvestorProfile(s) => s.validate(value, for_bifrost),
-            Self::Document(s) => s.validate(value, for_bifrost),
-            Self::Card(s) => s.validate(value, for_bifrost),
+            Self::Id(s) => s.validate(value, args),
+            Self::Custom(s) => s.validate(value, args),
+            Self::Business(s) => s.validate(value, args),
+            Self::InvestorProfile(s) => s.validate(value, args),
+            Self::Document(s) => s.validate(value, args),
+            Self::Card(s) => s.validate(value, args),
         }
     }
 }

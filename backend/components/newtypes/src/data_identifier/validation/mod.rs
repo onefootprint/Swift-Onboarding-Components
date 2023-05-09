@@ -1,4 +1,4 @@
-use crate::{NtResult, PiiString};
+use crate::{NtResult, PiiString, ValidateArgs};
 
 mod business;
 mod credit_card;
@@ -11,9 +11,7 @@ pub use investor_profile::Declaration;
 
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
-    /// When `for_bifrost` is true, performs more advanced validation that attempts to proactively
-    /// prevent sending invalid data for verification to vendors
-    fn validate(&self, value: PiiString, for_bifrost: bool) -> NtResult<PiiString>;
+    fn validate(&self, value: PiiString, args: ValidateArgs) -> NtResult<PiiString>;
 }
 
 #[derive(Debug, thiserror::Error)]

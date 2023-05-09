@@ -116,7 +116,7 @@ mod test {
     use db::TxnPgConn;
     use newtypes::{
         DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, IdentityDataKind,
-        ParseOptions, PiiString,
+        PiiString, ValidateArgs,
     };
     use std::collections::HashMap;
 
@@ -128,7 +128,7 @@ mod test {
             data: Vec<(DataIdentifier, PiiString)>,
         ) -> ApiResult<()> {
             let data = HashMap::from_iter(data.into_iter());
-            let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
+            let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost())?;
             // Add fingerprints for ID data
             let fingerprints = request
                 .iter()

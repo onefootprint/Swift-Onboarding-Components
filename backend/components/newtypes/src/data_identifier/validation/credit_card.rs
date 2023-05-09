@@ -1,10 +1,10 @@
 use super::{Error, VResult};
-use crate::{CardDataKind as CDK, CardInfo as CI, PiiString};
+use crate::{CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 
 impl Validate for CI {
-    fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
         let Self { alias: _, kind } = self;
         let result = match kind {
             CDK::Number => validate_cc_number(value)?,
@@ -61,8 +61,8 @@ fn validate_cc_last4(value: PiiString) -> VResult<PiiString> {
 mod test {
     use super::CDK::*;
     use super::{CDK, CI};
-    use crate::PiiString;
     use crate::{AliasId, Validate};
+    use crate::{PiiString, ValidateArgs};
     use test_case::test_case;
 
     // Invalid prefix
@@ -85,8 +85,12 @@ mod test {
     #[test_case(Last4, "12-" => None)]
     fn test_clean_and_validate_field_not_bifrost(kind: CDK, pii: &str) -> Option<String> {
         let alias = AliasId::from("flerp".to_owned());
+        let args = ValidateArgs {
+            for_bifrost: true,
+            ..ValidateArgs::default()
+        };
         CI { alias, kind }
-            .validate(PiiString::new(pii.to_owned()), false)
+            .validate(PiiString::new(pii.to_owned()), args)
             .ok()
             .map(|pii| pii.leak_to_string())
     }

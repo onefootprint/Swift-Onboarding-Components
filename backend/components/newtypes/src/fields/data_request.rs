@@ -42,8 +42,8 @@ impl<T> DataRequest<T> {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct ParseOptions {
+#[derive(Debug, Copy, Clone, Default)]
+pub struct ValidateArgs {
     /// When true, performs some front-loaded validation that vendors normally perform in order to
     /// try to prevent vendors rejecting our request with a 400.
     pub for_bifrost: bool,
@@ -52,17 +52,10 @@ pub struct ParseOptions {
     pub allow_dangling_keys: bool,
 }
 
-impl ParseOptions {
+impl ValidateArgs {
     pub fn for_bifrost() -> Self {
         Self {
             for_bifrost: true,
-            allow_dangling_keys: false,
-        }
-    }
-
-    pub fn for_non_portable() -> Self {
-        Self {
-            for_bifrost: false,
             allow_dangling_keys: false,
         }
     }
@@ -97,7 +90,7 @@ fn derived_entry(di: &DataIdentifier, v: &PiiString) -> Option<(DataIdentifier, 
 impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
-    pub fn clean_and_validate(map: DataIdentifierRequest, opts: ParseOptions) -> NtResult<Self> {
+    pub fn clean_and_validate(map: DataIdentifierRequest, args: ValidateArgs) -> NtResult<Self> {
         let derived_entries = map.iter().filter_map(|(di, v)| derived_entry(di, v));
         // Purposefully overlay derived entries on top of existing entries in order to overwrite
         // an ssn4 that's provided and might not match the given ssn9
@@ -119,7 +112,7 @@ impl DataRequest<()> {
         // For example, don't allow updating only AddressLine1 - need the whoel address
         let new_dis = data.keys().cloned().collect_vec();
         let dangling_keys = CollectedDataOption::dangling_identifiers(new_dis);
-        if !opts.allow_dangling_keys && !dangling_keys.is_empty() {
+        if !args.allow_dangling_keys && !dangling_keys.is_empty() {
             let err = Error::from(DataValidationError::ExtraFieldError(dangling_keys));
             return Err(err);
         }
@@ -127,7 +120,7 @@ impl DataRequest<()> {
         // Clean and validate each individual piece of data
         let (cleaned_data, errors): (HashMap<_, _>, HashMap<_, _>) =
             data.into_iter()
-                .partition_map(|(k, v)| match k.validate(v, opts.for_bifrost) {
+                .partition_map(|(k, v)| match k.validate(v, args) {
                     Ok(v) => Left((k, v)),
                     Err(v) => Right((k, v)),
                 });

@@ -1,7 +1,7 @@
-use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, Validate};
+use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, Validate, ValidateArgs};
 
 impl Validate for KvDataKey {
-    fn validate(&self, value: crate::PiiString, _for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
+    fn validate(&self, value: crate::PiiString, _args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
         Ok(value)
     }
 }

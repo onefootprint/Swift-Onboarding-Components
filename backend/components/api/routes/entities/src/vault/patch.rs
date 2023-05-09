@@ -12,7 +12,7 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{AccessEventKind, FpId, ParseOptions};
+use newtypes::{AccessEventKind, FpId, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[route_alias(actix::post("/users/{footprint_user_id}/vault/validate"))]
@@ -33,9 +33,7 @@ pub async fn post_validate(
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
 
-    let request = request
-        .into_inner()
-        .clean_and_validate(ParseOptions::for_non_portable())?;
+    let request = request.into_inner().clean_and_validate(ValidateArgs::default())?;
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -74,9 +72,7 @@ pub async fn patch(
     let principal = tenant_auth.actor().into();
 
     let targets = request.keys().cloned().collect_vec();
-    let request = request
-        .into_inner()
-        .clean_and_validate(ParseOptions::for_non_portable())?;
+    let request = request.into_inner().clean_and_validate(ValidateArgs::default())?;
     let request = request
         .build_tenant_fingerprints(state.as_ref(), &tenant_id)
         .await?;

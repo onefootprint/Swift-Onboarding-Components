@@ -2,12 +2,13 @@ use super::utils;
 use super::Error;
 use crate::NtResult;
 use crate::Validate;
+use crate::ValidateArgs;
 use crate::{InvestorProfileKind as IPK, PiiString};
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
 impl Validate for IPK {
-    fn validate(&self, value: PiiString, _for_bifrost: bool) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
         // Don't want anything to be empty
         let value = utils::validate_not_empty(value)?;
         let value = match self {

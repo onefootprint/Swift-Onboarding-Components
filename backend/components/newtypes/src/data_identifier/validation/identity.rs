@@ -1,21 +1,21 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
-use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString};
+use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs};
 use chrono::{Datelike, NaiveDate, Utc};
 use std::str::FromStr;
 
 impl Validate for IDK {
-    fn validate(&self, value: PiiString, for_bifrost: bool) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
         // Generally don't want anything to be empty
         let value = utils::validate_not_empty(value)?;
         let result = match self {
-            IDK::FirstName => validate_name(value, for_bifrost)?,
-            IDK::LastName => validate_name(value, for_bifrost)?,
-            IDK::Dob => clean_and_validate_dob(value, for_bifrost)?,
+            IDK::FirstName => validate_name(value, args.for_bifrost)?,
+            IDK::LastName => validate_name(value, args.for_bifrost)?,
+            IDK::Dob => clean_and_validate_dob(value, args.for_bifrost)?,
             IDK::Ssn4 => clean_and_validate_ssn4(value)?,
             IDK::Ssn9 => clean_and_validate_ssn9(value)?,
-            IDK::AddressLine1 => validate_address(value, for_bifrost)?,
+            IDK::AddressLine1 => validate_address(value, args.for_bifrost)?,
             IDK::AddressLine2 => value,
             IDK::City => value,
             IDK::State => value, // maybe we'll want to validate state based on country some day
@@ -94,6 +94,7 @@ mod test {
     use crate::IdentityDataKind as IDK;
     use crate::PiiString;
     use crate::Validate;
+    use crate::ValidateArgs;
     use test_case::test_case;
 
     #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
@@ -126,7 +127,7 @@ mod test {
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
     #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        idk.validate(PiiString::new(pii.to_owned()), false)
+        idk.validate(PiiString::new(pii.to_owned()), ValidateArgs::default())
             .ok()
             .map(|pii| pii.leak_to_string())
     }
@@ -143,7 +144,11 @@ mod test {
     #[test_case(LastName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     #[test_case(AddressLine1, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     fn test_clean_and_validate_field_for_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        idk.validate(PiiString::new(pii.to_owned()), true)
+        let args = ValidateArgs {
+            for_bifrost: true,
+            ..ValidateArgs::default()
+        };
+        idk.validate(PiiString::new(pii.to_owned()), args)
             .ok()
             .map(|pii| pii.leak_to_string())
     }

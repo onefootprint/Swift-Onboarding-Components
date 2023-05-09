@@ -13,8 +13,8 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginationRequest;
-use api_core::utils::vault_wrapper::Any;
 use api_core::utils::actix::OptionalJson;
+use api_core::utils::vault_wrapper::Any;
 use api_route_entities::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::models::access_event::NewAccessEvent;
@@ -26,7 +26,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
-use newtypes::ParseOptions;
+use newtypes::ValidateArgs;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
@@ -58,7 +58,7 @@ pub async fn post(
     let request_info = if let Some(request) = request.into_inner() {
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
-            let request = request.clean_and_validate(ParseOptions::for_non_portable())?;
+            let request = request.clean_and_validate(ValidateArgs::default())?;
             let request = request
                 .build_tenant_fingerprints(state.as_ref(), &tenant_id)
                 .await?;

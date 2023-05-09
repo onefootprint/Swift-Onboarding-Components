@@ -16,7 +16,7 @@ use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{BusinessDataKind as BDK, BusinessOwnerKind, PiiString, ScopedVaultId};
-use newtypes::{KycedBusinessOwnerData, ParseOptions};
+use newtypes::{KycedBusinessOwnerData, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -40,7 +40,7 @@ pub async fn post_validate(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ParseOptions::for_bifrost())?;
+    let request = request.clean_and_validate(ValidateArgs::for_bifrost())?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
 
     let bvw = state
@@ -81,7 +81,7 @@ pub async fn patch(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ParseOptions::for_bifrost())?;
+    let request = request.clean_and_validate(ValidateArgs::for_bifrost())?;
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
     state

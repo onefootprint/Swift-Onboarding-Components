@@ -14,7 +14,7 @@ use newtypes::{
     SealedVaultBytes,
 };
 use newtypes::{IdentityDataKind as IDK, PiiString, VaultKind};
-use newtypes::{Locked, ParseOptions};
+use newtypes::{Locked, ValidateArgs};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
@@ -58,7 +58,7 @@ impl VaultWrapper<Person> {
 
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
-        let request = DataRequest::clean_and_validate(data, ParseOptions::for_bifrost())?;
+        let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost())?;
         let request = request.manual_fingerprints(HashSet::from_iter(
             [
                 // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise

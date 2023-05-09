@@ -1,4 +1,4 @@
-use crate::{CollectedData, DataIdentifier, IdDocKind, IsDataIdentifierDiscriminant, Validate};
+use crate::{CollectedData, DataIdentifier, IdDocKind, IsDataIdentifierDiscriminant, Validate, ValidateArgs};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use mime::Mime;
 use paperclip::actix::Apiv2Schema;
@@ -64,7 +64,7 @@ impl TryFrom<DataIdentifier> for DocumentKind {
 impl Validate for DocumentKind {
     // TODO this isn't used for DocumentKind since the input isn't a PiiString, but we have to implement
     // it in order to implement IsDataIdentifierDiscriminant. Maybe in the future we can split this functionality out
-    fn validate(&self, value: crate::PiiString, _for_bifrost: bool) -> crate::NtResult<crate::PiiString> {
+    fn validate(&self, value: crate::PiiString, _args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
         Ok(value)
     }
 }

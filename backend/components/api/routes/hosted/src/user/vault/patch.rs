@@ -10,7 +10,7 @@ use api_core::utils::vault_wrapper::checks::pre_add_data_checks;
 use api_core::utils::vault_wrapper::{Any, TenantVw};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, ParseOptions};
+use newtypes::{DataIdentifier, IdentityDataKind as IDK, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
 
@@ -27,7 +27,7 @@ pub async fn post_validate(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     pre_add_data_checks(&user_auth)?;
-    let opts = ParseOptions {
+    let opts = ValidateArgs {
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
     };
@@ -79,7 +79,7 @@ async fn patch_inner(
     let su_id = user_auth.data.scoped_user.id;
     let request = request
         .into_inner()
-        .clean_and_validate(ParseOptions::for_bifrost())?;
+        .clean_and_validate(ValidateArgs::for_bifrost())?;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))

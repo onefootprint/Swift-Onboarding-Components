@@ -19,10 +19,10 @@ use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
 use newtypes::FpId;
-use newtypes::ParseOptions;
 use newtypes::PiiString;
 use newtypes::SealedVaultDataKey;
 use newtypes::TenantId;
+use newtypes::ValidateArgs;
 use std::collections::HashMap;
 
 /// Vaults PII values
@@ -69,7 +69,7 @@ pub async fn vault_pii(
         }
 
         // prepare the data
-        let data = DataRequest::clean_and_validate(data, ParseOptions::for_non_portable())?;
+        let data = DataRequest::clean_and_validate(data, ValidateArgs::default())?;
         let data = data.build_tenant_fingerprints(state, &tenant_id).await?;
 
         // prepare the documents

@@ -1,4 +1,4 @@
-use crate::{flat_api_object_map_type, DataIdentifier, DataRequest, NtResult, ParseOptions, PiiString};
+use crate::{flat_api_object_map_type, DataIdentifier, DataRequest, NtResult, PiiString, ValidateArgs};
 
 flat_api_object_map_type!(
     RawDataRequest<DataIdentifier, PiiString>,
@@ -8,7 +8,7 @@ flat_api_object_map_type!(
 
 impl RawDataRequest {
     /// Shorthand to parse into a DataRequest
-    pub fn clean_and_validate(self, opts: ParseOptions) -> NtResult<DataRequest<()>> {
+    pub fn clean_and_validate(self, opts: ValidateArgs) -> NtResult<DataRequest<()>> {
         let valid_request = DataRequest::<()>::clean_and_validate(self.into(), opts)?;
         Ok(valid_request)
     }
