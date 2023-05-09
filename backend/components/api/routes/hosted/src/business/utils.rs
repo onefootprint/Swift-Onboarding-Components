@@ -3,45 +3,41 @@ use std::pin::Pin;
 use crate::business::index::{decrypt_basic_business_info, BasicBusinessInfo};
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::business::BusinessError;
 use api_core::utils::email::BoInviteEmailInfo;
 use api_core::utils::session::AuthSession;
+use api_core::utils::vault_wrapper::{Business, TenantVw};
 use api_core::{auth::ob_config::BoSession, utils::twilio::BoSessionSmsInfo};
 use db::models::business_owner::BusinessOwner;
 use db::models::tenant::Tenant;
 use futures::FutureExt;
-use newtypes::{BusinessOwnerKind, PiiString, ScopedVaultId};
+use newtypes::{BusinessOwnerKind, PiiString};
 use rand::Rng;
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
-pub(super) async fn send_secondary_bo_links(
+pub async fn send_secondary_bo_links(
     state: &State,
+    bvw: &TenantVw<Business>,
     tenant: &Tenant,
-    sb_id: ScopedVaultId,
     secondary_bos: Vec<BusinessOwner>,
 ) -> ApiResult<()> {
     if secondary_bos.is_empty() {
         return Ok(());
     }
 
-    let bvw = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sb_id))
-        .await??;
-
     let BasicBusinessInfo {
         business_name,
         primary_bo,
         secondary_bos: secondary_bos_from_vault,
-    } = decrypt_basic_business_info(state, &bvw).await?;
+    } = decrypt_basic_business_info(state, bvw).await?;
 
     // If we created any BOs in the DB, create an auth session for each of the BOs - we will send
     // this token in a link to each BO
     use chrono::Duration;
     let ob_config_id = bvw
         .onboarding
+        .clone()
         .map(|ob| ob.1.id)
         .ok_or(UserError::NotAllowedWithoutTenant)?;
 

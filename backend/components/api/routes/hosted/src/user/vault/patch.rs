@@ -101,7 +101,7 @@ async fn patch_inner(
 
             // Even though this accepts id.phone_number, it will always error at runtime since we
             // only allow a vault to have one phone number
-            let (new_contact_info, _) = uvw.patch_data(conn, request)?;
+            let new_contact_info = uvw.patch_data(conn, request)?;
             Ok(new_contact_info)
         })
         .await?;

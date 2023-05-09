@@ -1,4 +1,5 @@
 use crate::auth::user::UserAuthGuard;
+use crate::business::utils::send_secondary_bo_links;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -11,7 +12,6 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use api_core::enclave_client::EnclaveClient;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use api_core::utils::vault_wrapper::Person;
@@ -21,7 +21,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
-use db::DbPool;
+use db::models::tenant::Tenant;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
@@ -116,8 +116,9 @@ pub async fn post(
     let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
 
     // Kickoff KYB
+    let tenant = user_auth.tenant()?;
     if let Some(biz_ob) = biz_ob {
-        let should_run_kyb = should_run_kyb(&state.db_pool, &state.enclave_client, &biz_ob).await?;
+        let should_run_kyb = should_run_kyb(&state, &biz_ob, tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
             let kyb_res = decision::vendor::middesk::run_kyb(
@@ -162,10 +163,7 @@ pub async fn post(
         // create the webhook event to fire
         let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
             fp_id: su.fp_id.clone(),
-            footprint_user_id: user_auth
-                .tenant()?
-                .uses_legacy_serialization()
-                .then(|| su.fp_id.clone()),
+            footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),
             timestamp: decision_timestamp,
             status,
             requires_manual_review: manual_review.is_some(),
@@ -282,21 +280,18 @@ async fn run_kyc(
     Ok(())
 }
 
-#[tracing::instrument(skip(db_pool, enclave_client))]
-async fn should_run_kyb(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    biz_ob: &Onboarding,
-) -> ApiResult<bool> {
+#[tracing::instrument(skip(state))]
+async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant) -> ApiResult<bool> {
     let svid = biz_ob.scoped_vault_id.clone();
     let ob_config_id = biz_ob.ob_configuration_id.clone();
 
-    let bvw = db_pool
+    let bvw = state
+        .db_pool
         .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
         .await??;
 
     let dbo = bvw
-        .decrypt_business_owners(db_pool, enclave_client, Some(ob_config_id))
+        .decrypt_business_owners(&state.db_pool, &state.enclave_client, Some(ob_config_id))
         .await?;
 
     let bo_kyc_is_complete = match dbo {
@@ -325,6 +320,13 @@ async fn should_run_kyb(
             secondary_bos,
         } => {
             tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, ?secondary_bos, "[should_run_kyb] MultiKYC");
+            let all_secondary_not_initiated = secondary_bos.iter().all(|bo| bo.2.is_none());
+            if all_secondary_not_initiated {
+                // If we are in authorize and all secondary BOs have no vault, we are in authorize
+                // for the primary BO. So, send the links out to all secondary BOs
+                let secondary_bos = secondary_bos.iter().map(|bo| bo.1.clone()).collect();
+                send_secondary_bo_links(state, &bvw, tenant, secondary_bos).await?;
+            }
             primary_bo_vault.2.status.has_decision()
                 && secondary_bos
                     .into_iter()

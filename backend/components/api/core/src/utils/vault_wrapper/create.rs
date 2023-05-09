@@ -77,7 +77,7 @@ impl VaultWrapper<Person> {
             .into_iter()
             .flatten(),
         ));
-        let (new_ci, _) = uvw.patch_data(conn, request)?;
+        let new_ci = uvw.patch_data(conn, request)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault
         let (_, ci) = new_ci

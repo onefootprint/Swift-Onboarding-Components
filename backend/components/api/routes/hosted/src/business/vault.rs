@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use crate::auth::user::UserAuthGuard;
-use crate::business::utils::send_secondary_bo_links;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::checks::pre_add_data_checks;
@@ -85,17 +84,14 @@ pub async fn patch(
     let request = request.clean_and_validate(ParseOptions::for_bifrost())?;
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
-    let (secondary_bos, sb_id) = state
+    state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            let (_, secondary_bos) = bvw.patch_data(conn, request)?;
-            Ok((secondary_bos, sb_id))
+            bvw.patch_data(conn, request)?;
+            Ok(())
         })
         .await?;
-
-    let tenant = user_auth.tenant()?;
-    send_secondary_bo_links(&state, tenant, sb_id, secondary_bos).await?;
 
     ResponseData::ok(EmptyResponse {}).json()
 }
