@@ -27,7 +27,7 @@ const BeneficialOwners = ({
   onComplete,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data, missingKybAttributes, email, phoneNumber } =
+  const { authToken, data, missingKybAttributes, email, phoneNumber, config } =
     state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
@@ -38,10 +38,12 @@ const BeneficialOwners = ({
   );
 
   const handleSubmit = (beneficialOwners: BeneficialOwner[]) => {
-    // Check that no two beneficial owners have the same email or phone number
-    const hasDuplicateContacts = checkDuplicateContacts(beneficialOwners);
-    if (hasDuplicateContacts) {
-      return;
+    if (config?.isLive) {
+      // Check that no two beneficial owners have the same email or phone number, when not sandbox
+      const hasDuplicateContacts = checkDuplicateContacts(beneficialOwners);
+      if (hasDuplicateContacts) {
+        return;
+      }
     }
     const submittedData = requireMultiKyc
       ? { [BusinessDI.kycedBeneficialOwners]: beneficialOwners }
