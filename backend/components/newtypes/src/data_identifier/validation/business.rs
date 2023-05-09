@@ -10,7 +10,7 @@ use strum::EnumString;
 use url::{Host, Url};
 
 impl Validate for BDK {
-    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
         let value = utils::validate_not_empty(value)?;
         let result = match self {
             BDK::Name => value,
@@ -25,7 +25,7 @@ impl Validate for BDK {
             BDK::Zip => utils::clean_and_validate_zip(value)?,
             BDK::Country => utils::clean_and_validate_country(value)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
-            BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value)?,
+            BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value, args)?,
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value)?,
         };
         Ok(result)
@@ -85,7 +85,7 @@ where
 
 type KycedBusinessOwnerDataDe = KycedBusinessOwnerData<Option<()>>;
 
-fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiString> {
+fn clean_and_validate_kyced_beneficial_owners(input: PiiString, args: ValidateArgs) -> VResult<PiiString> {
     utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
         if bos.is_empty() {
             return Err(Error::InvalidLength);
@@ -99,10 +99,11 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         {
             return Err(Error::SandboxNotAllowed);
         }
-        if bos.iter().map(|bo| &bo.phone_number).unique().count() != bos.len() {
+        // Allow non-unique emails and phones in sandbox for easier testing
+        if args.is_live && bos.iter().map(|bo| &bo.phone_number).unique().count() != bos.len() {
             return Err(Error::NonUniqueBusinessOwners);
         }
-        if bos.iter().map(|bo| &bo.email).unique().count() != bos.len() {
+        if args.is_live && bos.iter().map(|bo| &bo.email).unique().count() != bos.len() {
             return Err(Error::NonUniqueBusinessOwners);
         }
         // TODO make sure unique set of emails + phones
