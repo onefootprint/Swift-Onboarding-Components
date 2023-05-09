@@ -1,3 +1,4 @@
+
 use futures_util::Stream;
 use futures_util::StreamExt;
 use opentelemetry::global;
@@ -27,8 +28,8 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     // don't setup the exporter
     if config.disable_otel.is_some() {
         let sub = Registry::default()
-            .with(env_filter)
-            .with(tracing_subscriber::fmt::layer().pretty());
+            .with(env_filter)            
+            .with(tracing_subscriber::fmt::layer().with_ansi(true).pretty());
 
         tracing::subscriber::set_global_default(sub)?;
         return Ok(None);
@@ -58,7 +59,7 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     let sub = Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().with_ansi(false).pretty())
         .with(tracing_opentelemetry::layer().with_tracer(tracer))        
         .with(sentry_layer);
 

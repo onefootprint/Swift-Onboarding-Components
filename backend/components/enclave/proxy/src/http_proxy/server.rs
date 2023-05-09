@@ -46,7 +46,7 @@ pub async fn build_server(config: Config) -> std::io::Result<Server> {
     let server = HttpServer::new(move || {
         App::new()
             .app_data(state.clone())
-            .wrap(Logger::default())
+            .wrap(Logger::default().log_target("http_actix"))
             .service(health)
             .service(proxy)
     })
