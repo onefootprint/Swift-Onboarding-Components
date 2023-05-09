@@ -6,7 +6,7 @@
       "guidelines": {
         "beneficial-owner": {
           "title": "You need to be a beneficial owner to verify your business.",
-          "description": "A beneficial owner is anyone who owns at least 25% of the business."
+          "description": "A beneficial owner is anyone who has substantial control of or owns at least 25% of the business."
         },
         "bo-kyc": {
           "title": "We need to verify your identity, as a beneficial owner.",
@@ -89,7 +89,7 @@
     },
     "beneficial-owners": {
       "title": "Who are the beneficial owners?",
-      "subtitle": "List all individuals who own at least 25% of the business.",
+      "subtitle": "List all individuals who own at least 25% of the business or have substantial control over the business.",
       "form": {
         "fields-header": {
           "beneficial-owner-you": "Beneficial owner (You)",
@@ -125,11 +125,11 @@
             }
           },
           "ownership-stake": {
-            "label": "Ownership stake (%)",
+            "label": "Approximate ownership stake (%)",
             "placeholder": "25",
             "errors": {
-              "required": "Ownership stake cannot be empty or is invalid",
-              "min": "Only list individuals who own at least 25% of the business",
+              "required": "Ownership stake is empty or invalid",
+              "min": "Ownership stake cannot be smaller than 1%",
               "max": "Ownership stake cannot be larger than 100%"
             }
           }

@@ -42,7 +42,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
             message: t('errors.required'),
           },
           min: {
-            value: 25,
+            value: 1,
             message: t('errors.min'),
           },
           max: {

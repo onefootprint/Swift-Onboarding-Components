@@ -163,7 +163,9 @@ describe('<CollectKybData />', () => {
       expect(screen.getByPlaceholderText('Doe')).toBeInTheDocument();
       await userEvent.type(lastName, 'Doe');
 
-      let ownershipStake = screen.getByLabelText('Ownership stake (%)');
+      let ownershipStake = screen.getByLabelText(
+        'Approximate ownership stake (%)',
+      );
       expect(ownershipStake).toBeInTheDocument();
       expect(screen.getByPlaceholderText('25')).toBeInTheDocument();
       await userEvent.type(ownershipStake, '50');

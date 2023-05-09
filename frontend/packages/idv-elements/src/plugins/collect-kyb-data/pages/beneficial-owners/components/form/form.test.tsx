@@ -44,7 +44,9 @@ describe('<Form />', () => {
     expect(screen.getByPlaceholderText('Doe')).toBeInTheDocument();
     await userEvent.type(lastName, 'Doe');
 
-    const ownershipStake = screen.getByLabelText('Ownership stake (%)');
+    const ownershipStake = screen.getByLabelText(
+      'Approximate ownership stake (%)',
+    );
     expect(ownershipStake).toBeInTheDocument();
     expect(screen.getByPlaceholderText('25')).toBeInTheDocument();
     await userEvent.type(ownershipStake, '50');
@@ -99,7 +101,7 @@ describe('<Form />', () => {
     await userEvent.type(phoneFields[0], '9999999999');
 
     const ownershipStakeFields = screen.getAllByLabelText(
-      'Ownership stake (%)',
+      'Approximate ownership stake (%)',
     );
     expect(ownershipStakeFields).toHaveLength(2);
     await userEvent.type(ownershipStakeFields[0], '50');
@@ -139,7 +141,9 @@ describe('<Form />', () => {
     expect(lastNameField).toHaveLength(1);
     expect(lastNameField[0]).toHaveValue('Doe');
 
-    const ownershipStakeField = screen.getAllByLabelText('Ownership stake (%)');
+    const ownershipStakeField = screen.getAllByLabelText(
+      'Approximate ownership stake (%)',
+    );
     expect(ownershipStakeField).toHaveLength(1);
     expect(ownershipStakeField[0]).toHaveValue(50);
 
@@ -213,7 +217,7 @@ describe('<Form />', () => {
     expect(lastNameFields[1]).toHaveValue('Doey');
 
     const ownershipStakeFields = screen.getAllByLabelText(
-      'Ownership stake (%)',
+      'Approximate ownership stake (%)',
     );
     expect(ownershipStakeFields).toHaveLength(2);
     expect(ownershipStakeFields[0]).toHaveValue(50);
@@ -249,19 +253,19 @@ describe('<Form />', () => {
     });
 
     // Type value less than 25 into ownership stake
-    const ownershipStakeField = screen.getByLabelText('Ownership stake (%)');
-    await userEvent.type(ownershipStakeField, '20');
+    const ownershipStakeField = screen.getByLabelText(
+      'Approximate ownership stake (%)',
+    );
+    await userEvent.type(ownershipStakeField, '0');
     expect(
-      screen.getByText(
-        'Only list individuals who own at least 25% of the business',
-      ),
+      screen.getByText('Ownership stake cannot be smaller than 1%'),
     ).toBeInTheDocument();
 
     await userEvent.clear(ownershipStakeField);
     await userEvent.click(continueButton);
     await waitFor(() => {
       expect(
-        screen.getByText('Ownership stake cannot be empty or is invalid'),
+        screen.getByText('Ownership stake is empty or invalid'),
       ).toBeInTheDocument();
     });
 
@@ -319,7 +323,7 @@ describe('<Form />', () => {
     await userEvent.type(emailFields[0], 'Lily@smith.com');
 
     const ownershipStakeFields = screen.getAllByLabelText(
-      'Ownership stake (%)',
+      'Approximate ownership stake (%)',
     );
     expect(ownershipStakeFields).toHaveLength(2);
     await userEvent.type(ownershipStakeFields[0], '70');

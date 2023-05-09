@@ -96,7 +96,7 @@ const Form = ({
         (bo, index) =>
           bo[BeneficialOwnerDataAttribute.firstName] &&
           bo[BeneficialOwnerDataAttribute.lastName] &&
-          bo[BeneficialOwnerDataAttribute.ownershipStake] >= 25 &&
+          bo[BeneficialOwnerDataAttribute.ownershipStake] > 0 &&
           // Only require email/phone for additional BOs
           (index === 0 ||
             !!bo[BeneficialOwnerDataAttribute.email] ||

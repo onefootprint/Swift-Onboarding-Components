@@ -93,9 +93,6 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString) -> VResult<PiiSt
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }
-        if bos.iter().any(|bo| bo.ownership_stake < 25) {
-            return Err(Error::BusinessOwnerStakeBelow25);
-        }
         if bos
             .iter()
             .any(|bo| !bo.email.is_live() || !bo.phone_number.is_live())
