@@ -1,4 +1,10 @@
-use newtypes::PiiString;
+use std::collections::HashMap;
+
+use crate::incode::error::Error as IncodeError;
+use newtypes::{
+    incode::{IncodeStatus, IncodeTest},
+    PiiString,
+};
 
 use super::APIResponseToIncodeError;
 
@@ -107,13 +113,148 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
-    pub id_validation: Option<serde_json::Value>,
+    pub id_validation: Option<IdValidation>,
+    pub liveness: Option<serde_json::Value>,
+    pub face_recognition: Option<serde_json::Value>,
+    pub id_ocr_confidence: Option<IdOcrConfidence>,
+    pub overall: Option<IdTest>,
+
     #[serde(flatten)]
     pub error: Option<Error>,
+}
+
+impl FetchScoresResponse {
+    pub fn overall_score(&self) -> Result<IncodeStatus, IncodeError> {
+        self.overall
+            .as_ref()
+            .and_then(|o| o.status.as_ref())
+            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
+            .ok_or(IncodeError::AssertionError("missing score status".into()))
+    }
+
+    pub fn get_id_tests(&self) -> HashMap<IncodeTest, IncodeStatus> {
+        let photo_sec_tests = self
+            .id_validation
+            .as_ref()
+            .and_then(|i| i.photo_security_and_quality.as_ref())
+            .cloned()
+            .unwrap_or(vec![]);
+
+        let id_specific_tests = self
+            .id_validation
+            .as_ref()
+            .and_then(|i| i.id_specific.as_ref())
+            .cloned()
+            .unwrap_or(vec![]);
+
+        let custom_field_tests = self
+            .id_validation
+            .as_ref()
+            .and_then(|i: &IdValidation| i.custom_fields.as_ref())
+            .cloned()
+            .unwrap_or(vec![]);
+
+        photo_sec_tests
+            .into_iter()
+            .chain(id_specific_tests.into_iter())
+            .chain(custom_field_tests.into_iter())
+            .filter_map(|test| {
+                let (key, status) = match (test.key, test.status) {
+                    (Some(key), Some(status)) => (
+                        IncodeTest::try_from(key.as_str()).ok(),
+                        IncodeStatus::try_from(status.as_str()).ok(),
+                    ),
+                    _ => (None, None),
+                };
+
+                key.and_then(|k| status.map(|s| (k, s)))
+            })
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IdValidation {
+    pub photo_security_and_quality: Option<Vec<IdTest>>,
+    pub id_specific: Option<Vec<IdTest>>,
+    pub custom_fields: Option<Vec<IdTest>>,
+    pub applied_rule: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IdOcrConfidence {
+    pub overall_confidence: Option<IdTest>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IdTest {
+    pub value: Option<String>,
+    pub status: Option<String>,
+    pub key: Option<String>,
 }
 
 impl APIResponseToIncodeError for FetchScoresResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use newtypes::incode::{IncodeStatus, IncodeTest};
+
+    use super::FetchScoresResponse;
+
+    #[test]
+    pub fn test_parse_fetch_scores() {
+        let raw_response = serde_json::json!({"idValidation":{"photoSecurityAndQuality":[{"value":"PASSED","status":"OK","key":"tamperCheck"},{"value":"PASSED","status":"OK","key":"postitCheck"}, {"value":"PASSED","status":"OK","key":"alignment"},{"value":"OK","status":"OK","key":"screenIdLiveness"},{"value":"OK","status":"OK","key":"paperIdLiveness"},{"value":"PASSED","status":"OK","key":"idAlreadyUsedCheck"},{"value":"96","status":"OK","key":"balancedLightFront"},{"value":"99","status":"OK","key":"sharpnessFront"}],"idSpecific":[{"value":"100","status":"WARN","key":"documentClassification"},{"value":"100","status":"OK","key":"birthDateValidity"},{"value":"100","status":"OK","key":"visiblePhotoFeatures"},{"value":"100","status":"FAIL","key":"expirationDateValidity"},{"value":"100","status":"OK","key":"documentExpired"}],"customFields":[{"value":"firstNameMatch","status":"FAIL","key":"firstNameMatch"},{"value":"lastNameMatch","status":"FAIL","key":"lastNameMatch"}],"appliedRule":null},"liveness":null,"faceRecognition":null,"idOcrConfidence":{"overallConfidence":{"value":"99.0","status":"OK","key":null}},"overall":{"value":"100.0","status":"OK","key":null}});
+
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let parsed_tests = parsed.get_id_tests();
+
+        // Check a few tests
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::TamperCheck).unwrap(),
+            &IncodeStatus::Ok
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::ScreenIdLiveness).unwrap(),
+            &IncodeStatus::Ok
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::PaperIdLiveness).unwrap(),
+            &IncodeStatus::Ok
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::ExpirationDateValidity).unwrap(),
+            &IncodeStatus::Fail
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::PostitCheck).unwrap(),
+            &IncodeStatus::Ok
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::DocumentClassification).unwrap(),
+            &IncodeStatus::Warn
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::BirthDateValidity).unwrap(),
+            &IncodeStatus::Ok
+        );
+
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::FirstNameMatch).unwrap(),
+            &IncodeStatus::Fail
+        );
+        assert_eq!(
+            parsed_tests.get(&IncodeTest::LastNameMatch).unwrap(),
+            &IncodeStatus::Fail
+        );
+
+        // Overall score
+        assert_eq!(parsed.overall_score().unwrap(), IncodeStatus::Ok)
     }
 }

@@ -79,6 +79,8 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             selfie_image: _,
             country_code,
             document_type,
+            first_name: _,
+            last_name: _,
         } = d;
 
         let reference_id = reference_id.ok_or(IdologyError::ConversionError::MissingReferenceId)?;

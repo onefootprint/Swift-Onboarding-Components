@@ -6,7 +6,9 @@ use newtypes::{
 use reqwest::header;
 
 use super::{
-    request::{AddDocumentSideRequest, DocumentSide, OnboardingStartRequest},
+    request::{
+        AddDocumentSideRequest, DocumentSide, OnboardingStartCustomNameFields, OnboardingStartRequest,
+    },
     response::OnboardingStartResponse,
     IncodeAPIResult,
 };
@@ -96,6 +98,7 @@ impl IncodeClientAdapter {
         configuration_id: Option<IncodeConfigurationId>,
         // used to fetch a new token for requests
         incode_session_id: Option<IncodeSessionId>,
+        custom_name_fields: Option<OnboardingStartCustomNameFields>,
     ) -> Result<serde_json::Value, IncodeError> {
         let path = "omni/start";
         let request = OnboardingStartRequest {
@@ -105,6 +108,7 @@ impl IncodeClientAdapter {
             configuration_id,
             interview_id: incode_session_id,
             language: "en-US".into(),
+            custom_fields: custom_name_fields,
         };
 
         let response = footprint_http_client
@@ -200,7 +204,7 @@ impl AuthenticatedIncodeClientAdapter {
     ) -> Result<(), IncodeError> {
         let result = self
             .client_adapter
-            .onboarding_start(footprint_http_client, None, Some(incode_session_id))
+            .onboarding_start(footprint_http_client, None, Some(incode_session_id), None)
             .await?;
         let parsed = IncodeAPIResult::<OnboardingStartResponse>::try_from(result)?.into_success()?;
 
@@ -272,7 +276,7 @@ mod tests {
         // Start the session
         let config = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
         let res = client
-            .onboarding_start(&fp_client, Some(config), None)
+            .onboarding_start(&fp_client, Some(config), None, None)
             .await
             .unwrap();
         let parsed = IncodeAPIResult::<OnboardingStartResponse>::try_from(res)

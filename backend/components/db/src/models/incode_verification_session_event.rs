@@ -52,7 +52,10 @@ impl IncodeVerificationSessionEvent {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_for_session_id(conn: &mut TxnPgConn, session_id: IncodeVerificationSessionId) -> DbResult<Vec<Self>> {
+    pub fn get_for_session_id(
+        conn: &mut TxnPgConn,
+        session_id: IncodeVerificationSessionId,
+    ) -> DbResult<Vec<Self>> {
         let res = incode_verification_session_event::table
             .filter(incode_verification_session_event::incode_verification_session_id.eq(session_id))
             .get_results(conn.conn())?;

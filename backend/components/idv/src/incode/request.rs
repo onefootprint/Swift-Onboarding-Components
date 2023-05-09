@@ -19,10 +19,18 @@ pub struct OnboardingStartRequest {
     // interviewId: String, optional. InterviewId from a previous onboarding, including it helps get a new token for that id.
     pub interview_id: Option<IncodeSessionId>,
     pub language: String,
+    pub custom_fields: Option<OnboardingStartCustomNameFields>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AddDocumentSideRequest {
     pub base_64_image: PiiString,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OnboardingStartCustomNameFields {
+    pub first_name: Option<PiiString>,
+    pub last_name: Option<PiiString>,
 }

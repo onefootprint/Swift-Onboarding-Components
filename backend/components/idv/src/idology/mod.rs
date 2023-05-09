@@ -242,6 +242,7 @@ mod test {
             selfie_image: None, // TODO: add selfie to this test or add another
             country_code: map_pii("USA".to_string()),
             document_type: Some(IdDocKind::DriverLicense),
+            ..Default::default()
         };
 
         let scan_res = send_scan_verify_request(&legacy_idology_client, docv_data)
@@ -292,6 +293,7 @@ mod test {
             selfie_image: None,
             country_code: map_pii(test_data.country_code),
             document_type: Some(test_data.scan_document_type),
+            ..Default::default()
         };
 
         let client =
@@ -327,6 +329,7 @@ mod test {
             selfie_image: map_pii(fixtures::images::scan_onboarding_test_image_face_15_match_score()),
             country_code: map_pii(test_data.country_code),
             document_type: Some(test_data.scan_document_type),
+            ..Default::default()
         };
 
         let client =

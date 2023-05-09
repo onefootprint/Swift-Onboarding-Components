@@ -30,6 +30,8 @@ impl TryFrom<DocVData> for SubmissionRequestData {
             selfie_image,
             country_code,
             document_type,
+            first_name: _,
+            last_name: _,
         } = d;
 
         let front_image = front_image.ok_or(IdologyError::ConversionError::MissingFrontImage)?;

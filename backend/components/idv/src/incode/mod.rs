@@ -4,6 +4,8 @@ use newtypes::{
 };
 use serde::de::DeserializeOwned;
 
+use self::request::OnboardingStartCustomNameFields;
+
 pub mod client;
 pub mod error;
 pub mod request;
@@ -13,6 +15,7 @@ pub struct IncodeStartOnboardingRequest {
     pub credentials: IncodeCredentials,
     pub configuration_id: IncodeConfigurationId,
     pub session_id: Option<IncodeSessionId>,
+    pub custom_name_fields: Option<OnboardingStartCustomNameFields>,
 }
 
 pub struct IncodeAddFrontRequest {

@@ -156,6 +156,7 @@ mod tests {
         incode::{response::FetchScoresResponse, IncodeAPIResult},
     };
     use newtypes::{
+        incode::{IncodeStatus, IncodeTest},
         DocVData, IdDocKind, IncodeConfigurationId, IncodeVerificationSessionState, PiiString, VendorAPI,
     };
 
@@ -189,6 +190,8 @@ mod tests {
             front_image: Some(PiiString::from(small_image())),
             back_image: Some(PiiString::from(small_image())),
             document_type: Some(IdDocKind::Passport),
+            first_name: Some(PiiString::from("Robert")),
+            last_name: Some(PiiString::from("Roberto")),
             ..Default::default()
         };
 
@@ -256,7 +259,15 @@ mod tests {
                     incode_verification_session.state,
                     IncodeVerificationSessionState::Complete
                 );
-                assert!(score_result.id_validation.is_some());
+                let parsed_tests = score_result.get_id_tests();
+                assert_eq!(
+                    parsed_tests.get(&IncodeTest::FirstNameMatch).unwrap(),
+                    &IncodeStatus::Fail
+                );
+                assert_eq!(
+                    parsed_tests.get(&IncodeTest::LastNameMatch).unwrap(),
+                    &IncodeStatus::Fail
+                );
 
                 db::private_cleanup_integration_tests(conn, uv.id).unwrap();
 

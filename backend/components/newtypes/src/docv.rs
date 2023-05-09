@@ -12,4 +12,6 @@ pub struct DocVData {
     // ISO 3166 Alpha-3 country code.
     pub country_code: Option<PiiString>,
     pub document_type: Option<IdDocKind>,
+    pub first_name: Option<PiiString>,
+    pub last_name: Option<PiiString>,
 }

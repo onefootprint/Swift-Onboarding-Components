@@ -5,7 +5,7 @@ use db::models::verification_result::VerificationResult;
 use db::{DbPool, DbResult};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 
-use idv::incode::response::FetchScoresResponse;
+use idv::incode::{request::OnboardingStartCustomNameFields, response::FetchScoresResponse};
 use idv::incode::{
     APIResponseToIncodeError, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeFetchScoresRequest,
     IncodeProcessIdRequest, IncodeResponse, IncodeStartOnboardingRequest,
@@ -44,7 +44,7 @@ impl IncodeState for StartOnboarding {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
-        _docv_data: &DocVData,
+        docv_data: &DocVData,
     ) -> Result<StateHolder, ApiError> {
         let sv_id = self.scoped_vault_id.clone();
         let sv_id2 = self.scoped_vault_id.clone();
@@ -73,10 +73,16 @@ impl IncodeState for StartOnboarding {
         //
         // make the request to incode
         //
+        // TODO: we need to be able to error if the fn/ln is missing and we need it
+        let custom_name_fields = OnboardingStartCustomNameFields {
+            first_name: docv_data.first_name.clone(),
+            last_name: docv_data.last_name.clone(),
+        };
         let request = IncodeStartOnboardingRequest {
             credentials: incode_credentials.clone(),
             configuration_id: self.configuration_id.clone(),
             session_id: None,
+            custom_name_fields: Some(custom_name_fields),
         };
 
         let request_result = footprint_http_client.make_request(request).await;

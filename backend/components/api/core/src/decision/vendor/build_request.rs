@@ -97,6 +97,8 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     // decrypt the images and make sure we have at least a front image
     let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
 
+   
+
     if decrypted_documents.front.is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
     }
@@ -111,6 +113,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
+        ..Default::default()
     })
 }
 
@@ -133,6 +136,8 @@ pub async fn build_docv_data_from_identity_doc(
         )
         .await??;        
 
+    let name_idks = vec![DataIdentifier::from(IDK::FirstName), DataIdentifier::from(IDK::LastName)];
+    let mut decrypted_name_idks = uvw.decrypt_unchecked(enclave_client, &name_idks).await?;
     // decrypt the images and make sure we have at least a front image
     let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
 
@@ -147,6 +152,8 @@ pub async fn build_docv_data_from_identity_doc(
         selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
+        first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),
+        last_name: decrypted_name_idks.remove(&IDK::LastName.into()),
     })
 }
 

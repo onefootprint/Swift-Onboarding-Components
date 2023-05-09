@@ -29,7 +29,12 @@ impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartR
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials)?;
         let raw_response = client
-            .onboarding_start(self, Some(request.configuration_id), request.session_id)
+            .onboarding_start(
+                self,
+                Some(request.configuration_id),
+                request.session_id,
+                request.custom_name_fields,
+            )
             .await?;
         let result = IncodeResponse::<OnboardingStartResponse> {
             result: IncodeAPIResult::<OnboardingStartResponse>::try_from(raw_response.clone())?,
