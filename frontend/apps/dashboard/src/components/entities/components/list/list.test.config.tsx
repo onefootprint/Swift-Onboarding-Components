@@ -67,6 +67,7 @@ export const entitiesFixture: Entity[] = [
     decryptedAttributes: {
       [BusinessDI.name]: 'Acme Inc.',
     },
+    watchlistCheck: null,
   },
 ];
 

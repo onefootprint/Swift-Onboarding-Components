@@ -28,6 +28,7 @@ const Row = ({ entity }: RowProps) => {
         <StatusBadge
           status={entity.status}
           requiresManualReview={entity.requiresManualReview}
+          isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
         />
       </td>
       <td>

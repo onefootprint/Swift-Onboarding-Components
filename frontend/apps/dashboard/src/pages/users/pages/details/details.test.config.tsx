@@ -91,6 +91,7 @@ export const entityFixture: Entity = {
     ],
   },
   decryptedAttributes: {},
+  watchlistCheck: null,
 };
 
 export const livenessFixture: Liveness[] = [

@@ -443,6 +443,9 @@
         },
         "person": {
           "title": "User info"
+        },
+        "watchlist": {
+          "on-watchlist": "This user is on a watchlist"
         }
       },
       "fieldset": {

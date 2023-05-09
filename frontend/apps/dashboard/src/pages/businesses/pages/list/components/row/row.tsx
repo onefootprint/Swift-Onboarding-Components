@@ -1,11 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoWarning16 } from '@onefootprint/icons';
 import { BusinessDI, Entity } from '@onefootprint/types';
-import { Badge, Box, CodeInline, Typography } from '@onefootprint/ui';
+import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { FieldOrPlaceholder } from 'src/components';
+import { FieldOrPlaceholder, StatusBadge } from 'src/components';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
-import getBadgeVariantByStatus from 'src/components/entities/utils';
 
 type RowProps = {
   entity: Entity;
@@ -13,12 +10,7 @@ type RowProps = {
 
 // TODO: https://linear.app/footprint/issue/FP-3097/business-list-user-list-use-right-function-to-format-date
 const Row = ({ entity }: RowProps) => {
-  const { t } = useTranslation();
   const { data: vault } = useEntityVault(entity.id, entity);
-  const badgeVariant = getBadgeVariantByStatus(
-    entity.status,
-    entity.requiresManualReview,
-  );
 
   return (
     <>
@@ -33,14 +25,11 @@ const Row = ({ entity }: RowProps) => {
         </CodeInline>
       </td>
       <td>
-        <Badge variant={badgeVariant}>
-          {t(`entity-statuses.${entity.status}`)}
-          {entity.requiresManualReview && (
-            <Box sx={{ marginLeft: 2 }}>
-              <IcoWarning16 color={badgeVariant} />
-            </Box>
-          )}
-        </Badge>
+        <StatusBadge
+          status={entity.status}
+          requiresManualReview={entity.requiresManualReview}
+          isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+        />
       </td>
       <td>
         <FieldOrPlaceholder data={vault?.[BusinessDI.beneficialOwners]} />

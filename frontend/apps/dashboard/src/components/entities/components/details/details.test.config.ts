@@ -86,6 +86,7 @@ export const entityFixture: Entity = {
   decryptedAttributes: {
     [BusinessDI.name]: 'Acme Inc.',
   },
+  watchlistCheck: null,
 };
 
 export const timelineFixture: Timeline = [

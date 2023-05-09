@@ -83,7 +83,7 @@ export enum WatchlistCheckReasonCode {
 
 export enum WatchlistCheckStatus {
   error = 'error',
-  notNeeded = 'notNeeded',
+  notNeeded = 'not_needed',
   pass = 'pass',
   fail = 'fail',
 }

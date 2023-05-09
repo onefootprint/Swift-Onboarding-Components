@@ -24,6 +24,8 @@ const Header = ({ entity }: HeaderProps) => {
         <StatusBadge
           status={entity.status}
           requiresManualReview={entity.requiresManualReview}
+          isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+          watchlistLabel={t('watchlist.on-watchlist')}
         />
       </Row>
       <SubHeader>
