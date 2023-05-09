@@ -14,13 +14,14 @@ use crate::ApiError;
 
 use super::incode_states::StartOnboarding;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum IncodeStateName {
     StartOnboarding,
     AddFront,
     AddBack,
     ProcessId,
     FetchScores,
+    Complete,
 }
 
 /// This trait represents a state that a particular Incode Verification could be in
@@ -32,14 +33,18 @@ pub trait IncodeState {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         docv_data: &DocVData,
-    ) -> Result<Transition, ApiError>;
+    ) -> Result<StateHolder, ApiError>;
 
     fn name(&self) -> IncodeStateName;
 }
 
-pub enum Transition {
-    Next(Box<dyn IncodeState>),
-    Complete,
+pub struct StateHolder(pub Box<dyn IncodeState>);
+
+impl std::ops::Deref for StateHolder {
+    type Target = Box<dyn IncodeState>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 pub struct IncodeMachineError {
@@ -58,7 +63,7 @@ impl std::fmt::Debug for IncodeMachineError {
 }
 
 pub struct IncodeStateMachine {
-    state: Box<dyn IncodeState>,
+    state: StateHolder,
 }
 impl IncodeStateMachine {
     #[allow(clippy::too_many_arguments)]
@@ -85,7 +90,7 @@ impl IncodeStateMachine {
         };
 
         Ok(Self {
-            state: Box::new(initial_state),
+            state: StateHolder(Box::new(initial_state)),
         })
     }
 
@@ -96,30 +101,41 @@ impl IncodeStateMachine {
         uv_public_key: VaultPublicKey,
         docv_data: &DocVData,
     ) -> Result<Self, IncodeMachineError> {
-        let mut state = self.state;
+        let mut machine = self;
         loop {
-            let transition = {
-                state
-                    .run(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
-                    .await
-            };
+            machine = machine
+                .step(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
+                .await?;
 
-            // unless we are in a terminal state, continue
-            state = match transition {
-                Err(e) => {
-                    // We need to know where in the flow the machine failed in order to handle
-                    return Err(IncodeMachineError {
-                        state_name: state.name(),
-                        error: e,
-                    });
-                }
-                Ok(Transition::Next(s)) => s,
-                // TODO: since we need to run decisioning, I think we should encode `COMPLETE` as a state
-                Ok(Transition::Complete) => break,
-            };
+            if machine.state.name() == IncodeStateName::Complete {
+                break;
+            }
         }
 
-        Ok(IncodeStateMachine { state })
+        // return machine with state
+        Ok(machine)
+    }
+
+    // Allows us to materialize each step
+    pub async fn step(
+        self,
+        db_pool: &DbPool,
+        footprint_http_client: &FootprintVendorHttpClient,
+        uv_public_key: VaultPublicKey,
+        docv_data: &DocVData,
+    ) -> Result<Self, IncodeMachineError> {
+        let current_state = self.state.name().clone();
+
+        let result = {
+            self.state
+                .run(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
+                .await
+        };
+
+        result.map(|s| Self { state: s }).map_err(|e| IncodeMachineError {
+            state_name: current_state,
+            error: e,
+        })
     }
 }
 

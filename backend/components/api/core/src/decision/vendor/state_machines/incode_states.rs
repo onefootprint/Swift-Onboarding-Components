@@ -5,6 +5,7 @@ use db::models::verification_result::VerificationResult;
 use db::{DbPool, DbResult};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 
+use idv::incode::response::FetchScoresResponse;
 use idv::incode::{
     APIResponseToIncodeError, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeFetchScoresRequest,
     IncodeProcessIdRequest, IncodeResponse, IncodeStartOnboardingRequest,
@@ -21,7 +22,7 @@ use crate::decision::vendor::verification_result::encrypt_verification_result_re
 use crate::errors::ApiResult;
 use crate::ApiError;
 
-use super::incode_state_machine::{IncodeState, IncodeStateName, Transition};
+use super::incode_state_machine::{IncodeState, IncodeStateName, StateHolder};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 
 pub struct StartOnboarding {
@@ -44,7 +45,7 @@ impl IncodeState for StartOnboarding {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         _docv_data: &DocVData,
-    ) -> Result<Transition, ApiError> {
+    ) -> Result<StateHolder, ApiError> {
         let sv_id = self.scoped_vault_id.clone();
         let sv_id2 = self.scoped_vault_id.clone();
         let di_id = self.decision_intent_id.clone();
@@ -134,7 +135,7 @@ impl IncodeState for StartOnboarding {
             })
             .await?;
 
-        Ok(Transition::Next(Box::new(AddFront {
+        Ok(StateHolder(Box::new(AddFront {
             session,
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
@@ -163,7 +164,7 @@ impl IncodeState for AddFront {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         docv_data: &DocVData,
-    ) -> Result<Transition, ApiError> {
+    ) -> Result<StateHolder, ApiError> {
         let sv_id = self.scoped_vault_id.clone();
         let di_id = self.decision_intent_id.clone();
 
@@ -223,7 +224,7 @@ impl IncodeState for AddFront {
             })
             .await?;
 
-        Ok(Transition::Next(Box::new(AddBack {
+        Ok(StateHolder(Box::new(AddBack {
             session: self.session.clone(),
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
@@ -251,7 +252,7 @@ impl IncodeState for AddBack {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         docv_data: &DocVData,
-    ) -> Result<Transition, ApiError> {
+    ) -> Result<StateHolder, ApiError> {
         let sv_id = self.scoped_vault_id.clone();
         let di_id = self.decision_intent_id.clone();
 
@@ -303,7 +304,7 @@ impl IncodeState for AddBack {
             })
             .await?;
 
-        Ok(Transition::Next(Box::new(ProcessId {
+        Ok(StateHolder(Box::new(ProcessId {
             session: self.session.clone(),
             scoped_vault_id: self.scoped_vault_id.clone(),
             decision_intent_id: self.decision_intent_id.clone(),
@@ -331,7 +332,7 @@ impl IncodeState for ProcessId {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         _docv_data: &DocVData,
-    ) -> Result<Transition, ApiError> {
+    ) -> Result<StateHolder, ApiError> {
         let sv_id = self.scoped_vault_id.clone();
         let di_id = self.decision_intent_id.clone();
 
@@ -378,7 +379,7 @@ impl IncodeState for ProcessId {
             })
             .await?;
 
-        Ok(Transition::Next(Box::new(FetchScores {
+        Ok(StateHolder(Box::new(FetchScores {
             session: self.session.clone(),
             fetch_scores_verification_request: process_id_vreq,
         })))
@@ -402,7 +403,7 @@ impl IncodeState for FetchScores {
         footprint_http_client: &FootprintVendorHttpClient,
         uv_public_key: VaultPublicKey,
         _docv_data: &DocVData,
-    ) -> Result<Transition, ApiError> {
+    ) -> Result<StateHolder, ApiError> {
         //
         // make the request to incode
         //
@@ -423,7 +424,7 @@ impl IncodeState for FetchScores {
         save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
 
         // Now ensure we don't have an error
-        request_result
+        let fetch_scores_response = request_result
             .map_err(map_to_api_err)?
             .result
             .into_success()
@@ -442,9 +443,30 @@ impl IncodeState for FetchScores {
             .await?;
 
         // We're done!
-        // TODO: Since this yields control back to /documents, I think we'll
-        // want to actually return VRes or something
-        Ok(Transition::Complete)
+        Ok(StateHolder(Box::new(Complete {
+            fetch_scores_response,
+        })))
+    }
+}
+
+pub struct Complete {
+    pub fetch_scores_response: FetchScoresResponse,
+}
+
+#[async_trait]
+impl IncodeState for Complete {
+    fn name(&self) -> IncodeStateName {
+        IncodeStateName::Complete
+    }
+
+    async fn run(
+        &self,
+        _db_pool: &DbPool,
+        _footprint_http_client: &FootprintVendorHttpClient,
+        _uv_public_key: VaultPublicKey,
+        _docv_data: &DocVData,
+    ) -> Result<StateHolder, ApiError> {
+        Err(ApiError::AssertionError("incode already complete".into()))
     }
 }
 
