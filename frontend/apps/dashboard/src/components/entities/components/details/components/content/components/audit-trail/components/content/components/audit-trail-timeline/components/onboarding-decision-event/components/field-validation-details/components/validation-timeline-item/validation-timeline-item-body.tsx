@@ -18,10 +18,10 @@ const ValidationTimelineItemBody = ({
 
   return (
     <>
-      {signals.map(signal => {
-        const { matchLevel, description } = signal;
+      {signals.map(({ matchLevel, description, reasonCode }, i) => {
+        const key = `${reasonCode}-${i}`;
         return (
-          <Container>
+          <Container key={key}>
             <Typography as="span" variant="label-3">
               •
             </Typography>

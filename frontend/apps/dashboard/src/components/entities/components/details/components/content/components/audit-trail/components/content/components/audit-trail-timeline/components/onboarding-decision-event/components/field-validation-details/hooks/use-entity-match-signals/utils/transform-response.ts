@@ -3,6 +3,7 @@ import { GetEntityMatchSignalsResponse, MatchLevel } from '@onefootprint/types';
 export type SignalShortInfoType = {
   matchLevel: MatchLevel;
   description: string;
+  reasonCode: string;
 };
 
 export type TransformedMatchSignalDataType = {
@@ -21,8 +22,16 @@ const transformResponse = (data: GetEntityMatchSignalsResponse) => {
 
       const signalInfo: SignalShortInfoType[] = [];
       signals.forEach(signal => {
-        const { description, matchLevel: signalMatchLevel } = signal;
-        signalInfo.push({ matchLevel: signalMatchLevel, description });
+        const {
+          description,
+          matchLevel: signalMatchLevel,
+          reasonCode,
+        } = signal;
+        signalInfo.push({
+          matchLevel: signalMatchLevel,
+          description,
+          reasonCode,
+        });
       });
       transformedData.push({
         attribute,
