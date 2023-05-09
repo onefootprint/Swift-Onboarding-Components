@@ -40,7 +40,7 @@ pub async fn post_validate(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ValidateArgs::for_bifrost())?;
+    let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
 
     let bvw = state
@@ -81,7 +81,7 @@ pub async fn patch(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ValidateArgs::for_bifrost())?;
+    let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
     state

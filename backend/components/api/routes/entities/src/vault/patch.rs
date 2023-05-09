@@ -33,7 +33,9 @@ pub async fn post_validate(
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
 
-    let request = request.into_inner().clean_and_validate(ValidateArgs::default())?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -72,7 +74,9 @@ pub async fn patch(
     let principal = tenant_auth.actor().into();
 
     let targets = request.keys().cloned().collect_vec();
-    let request = request.into_inner().clean_and_validate(ValidateArgs::default())?;
+    let request = request
+        .into_inner()
+        .clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let request = request
         .build_tenant_fingerprints(state.as_ref(), &tenant_id)
         .await?;

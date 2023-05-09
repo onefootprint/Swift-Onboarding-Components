@@ -21,11 +21,27 @@ impl Validate for IDK {
             IDK::State => value, // maybe we'll want to validate state based on country some day
             IDK::Zip => utils::clean_and_validate_zip(value)?,
             IDK::Country => utils::clean_and_validate_country(value)?,
-            IDK::Email => Email::from_str(value.leak())?.to_piistring(),
-            IDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
+            IDK::Email => clean_and_validate_email(value, args)?,
+            IDK::PhoneNumber => clean_and_validate_phone(value, args)?,
         };
         Ok(result)
     }
+}
+
+fn clean_and_validate_email(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
+    let email = Email::from_str(value.leak())?;
+    if email.is_live() != args.is_live {
+        return Err(Error::InvalidSandboxState.into());
+    }
+    Ok(email.to_piistring())
+}
+
+fn clean_and_validate_phone(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
+    let phone = PhoneNumber::parse(value)?;
+    if phone.is_live() != args.is_live {
+        return Err(Error::InvalidSandboxState.into());
+    }
+    Ok(phone.e164_with_suffix())
 }
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
@@ -122,14 +138,30 @@ mod test {
     #[test_case(Country, "US" => Some("US".to_owned()))]
     #[test_case(Email, "flerp@derp@" => None)]
     #[test_case(Email, "flerp@derp.com" => Some("flerp@derp.com".to_owned()))]
-    #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
+    #[test_case(Email, "flerp@derp.com#sandbox" => None)] // Sandbox email
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
-    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
+    #[test_case(PhoneNumber, "+15555555555#sandbox" => None)] // Sandbox phone
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        idk.validate(PiiString::new(pii.to_owned()), ValidateArgs::default())
-            .ok()
-            .map(|pii| pii.leak_to_string())
+        idk.validate(
+            PiiString::new(pii.to_owned()),
+            ValidateArgs::for_non_portable(true),
+        )
+        .ok()
+        .map(|pii| pii.leak_to_string())
+    }
+
+    #[test_case(Email, "flerp@derp.com" => None)]
+    #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
+    #[test_case(PhoneNumber, "+1-555-555-5555" => None)]
+    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
+    fn test_clean_and_validate_sandbox(idk: IDK, pii: &str) -> Option<String> {
+        idk.validate(
+            PiiString::new(pii.to_owned()),
+            ValidateArgs::for_non_portable(false),
+        )
+        .ok()
+        .map(|pii| pii.leak_to_string())
     }
 
     #[test_case(Dob, "1876-12-25" => None)]
@@ -146,7 +178,7 @@ mod test {
     fn test_clean_and_validate_field_for_bifrost(idk: IDK, pii: &str) -> Option<String> {
         let args = ValidateArgs {
             for_bifrost: true,
-            ..ValidateArgs::default()
+            ..ValidateArgs::for_tests()
         };
         idk.validate(PiiString::new(pii.to_owned()), args)
             .ok()

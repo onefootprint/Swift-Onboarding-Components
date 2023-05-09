@@ -87,7 +87,7 @@ mod test {
         let alias = AliasId::from("flerp".to_owned());
         let args = ValidateArgs {
             for_bifrost: true,
-            ..ValidateArgs::default()
+            ..ValidateArgs::for_tests()
         };
         CI { alias, kind }
             .validate(PiiString::new(pii.to_owned()), args)

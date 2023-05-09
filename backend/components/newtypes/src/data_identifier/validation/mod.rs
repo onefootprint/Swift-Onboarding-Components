@@ -57,6 +57,8 @@ pub enum Error {
     InvalidYear,
     #[error("{0}")]
     CannotParseInt(#[from] std::num::ParseIntError),
+    #[error("Can only provide sandbox phones and emails in sandbox mode")]
+    InvalidSandboxState,
 }
 
 pub type VResult<T> = Result<T, Error>;

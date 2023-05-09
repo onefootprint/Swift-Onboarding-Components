@@ -42,7 +42,7 @@ impl<T> DataRequest<T> {
     }
 }
 
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone)]
 pub struct ValidateArgs {
     /// When true, performs some front-loaded validation that vendors normally perform in order to
     /// try to prevent vendors rejecting our request with a 400.
@@ -50,13 +50,35 @@ pub struct ValidateArgs {
     /// Don't raise errors for dangling keys.
     /// Useful to allow speculatively validating data for a partial CDO
     pub allow_dangling_keys: bool,
+    /// When true, validates as production data. When false, validates as sandbox data
+    pub is_live: bool,
 }
 
 impl ValidateArgs {
-    pub fn for_bifrost() -> Self {
+    pub fn for_bifrost(is_live: bool) -> Self {
         Self {
             for_bifrost: true,
             allow_dangling_keys: false,
+            is_live,
+        }
+    }
+
+    pub fn for_non_portable(is_live: bool) -> Self {
+        Self {
+            for_bifrost: false,
+            allow_dangling_keys: false,
+            is_live,
+        }
+    }
+}
+
+#[cfg(test)]
+impl ValidateArgs {
+    pub fn for_tests() -> Self {
+        Self {
+            for_bifrost: false,
+            allow_dangling_keys: false,
+            is_live: true,
         }
     }
 }

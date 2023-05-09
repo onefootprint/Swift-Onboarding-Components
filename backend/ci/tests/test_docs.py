@@ -16,8 +16,8 @@ def test_get_users(sandbox_user, sandbox_tenant):
     assert any(i["id"] == sandbox_user.fp_id for i in body["data"])
 
 
-def test_standalone_vaults(sandbox_tenant):
-    body = post("/users", None, sandbox_tenant.sk.key)
+def test_standalone_vaults(tenant):
+    body = post("/users", None, tenant.sk.key)
     assert body["id"]
 
     data = {
@@ -27,13 +27,13 @@ def test_standalone_vaults(sandbox_tenant):
         "id.ssn9": "12-121-1212",
         "custom.cc4": "4242",
     }
-    body = post("/users", data, sandbox_tenant.sk.key)
+    body = post("/users", data, tenant.sk.key)
     fp_id = body["id"]
 
     data = {"id.email": "jane@acmebank.com", "custom.ach_account": "111122224444"}
-    patch(f"/users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    patch(f"/users/{fp_id}/vault", data, tenant.sk.key)
 
-    body = get("/users", dict(search="Jane"), sandbox_tenant.sk.key)
+    body = get("/users", dict(search="Jane"), tenant.sk.key)
     assert any(i["id"] == fp_id for i in body["data"])
 
 

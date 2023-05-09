@@ -1,6 +1,5 @@
 use super::{Any, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
-use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -36,16 +35,12 @@ impl VaultWrapper<Person> {
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
         // Verify that the ob config is_live matches the user vault
         let phone_number_parsed = PhoneNumber::parse(phone_number.clone())?;
-        if ob_config.is_live != phone_number_parsed.is_live() {
-            return Err(UserError::SandboxMismatch.into());
-        }
-
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {
             e_private_key,
             public_key,
-            is_live: phone_number_parsed.is_live(),
+            is_live: ob_config.is_live, // Must derive is_live from the ob config used to create it
             is_portable: true,
             kind: VaultKind::Person,
         };
@@ -58,7 +53,7 @@ impl VaultWrapper<Person> {
 
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
-        let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost())?;
+        let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
         let request = request.manual_fingerprints(HashSet::from_iter(
             [
                 // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise

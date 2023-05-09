@@ -83,7 +83,7 @@
     "editor.formatOnPaste": false
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python",
+    "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.semanticHighlighting.enabled": true,
     "editor.formatOnSave": true
   },

@@ -1,4 +1,3 @@
-use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::email::send_email_challenge;
@@ -30,6 +29,7 @@ pub async fn post_validate(
     let opts = ValidateArgs {
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
+        is_live: user_auth.scoped_user.is_live,
     };
     let request = request.into_inner().clean_and_validate(opts)?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
@@ -76,15 +76,14 @@ async fn patch_inner(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     pre_add_data_checks(&user_auth)?;
-    let su_id = user_auth.data.scoped_user.id;
     let request = request
         .into_inner()
-        .clean_and_validate(ValidateArgs::for_bifrost())?;
+        .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let su_id = user_auth.data.scoped_user.id;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
-    let email_is_live = email.as_ref().map(|e| e.is_live());
 
     let request = request.build_global_fingerprints(state.as_ref()).await?;
 
@@ -92,15 +91,9 @@ async fn patch_inner(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
-            // Enforce that sandbox emails/phones are used for sandbox users
-            if let Some(is_live) = email_is_live {
-                if is_live != uvw.vault().is_live {
-                    return Err(UserError::SandboxMismatch.into());
-                }
-            }
 
-            // Even though this accepts id.phone_number, it will always error at runtime since we
-            // only allow a vault to have one phone number
+            // Even though this accepts id.phone_number, it will always error at runtime if we
+            // provide id.phone_number since we only allow a vault to have one phone number
             let new_contact_info = uvw.patch_data(conn, request)?;
             Ok(new_contact_info)
         })

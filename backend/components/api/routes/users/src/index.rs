@@ -46,10 +46,11 @@ pub async fn post(
     let insight = CreateInsightEvent::from(insight);
 
     let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
     let new_user = NewVaultArgs {
         public_key,
         e_private_key,
-        is_live: auth.is_live()?,
+        is_live,
         is_portable: false,
         kind: VaultKind::Person,
     };
@@ -58,7 +59,7 @@ pub async fn post(
     let request_info = if let Some(request) = request.into_inner() {
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
-            let request = request.clean_and_validate(ValidateArgs::default())?;
+            let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
             let request = request
                 .build_tenant_fingerprints(state.as_ref(), &tenant_id)
                 .await?;

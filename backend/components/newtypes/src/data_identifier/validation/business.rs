@@ -212,7 +212,7 @@ mod test {
     #[test_case(BeneficialOwners, "[{\"first_name\": \"Piip\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}, {\"first_name\": \"Marco\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}]" => None)]
     #[test_case(BeneficialOwners, "I am not json" => None)]
     fn test_clean_and_validate_field_not_bifrost(bdk: BDK, pii: &str) -> Option<String> {
-        bdk.validate(PiiString::new(pii.to_owned()), ValidateArgs::default())
+        bdk.validate(PiiString::new(pii.to_owned()), ValidateArgs::for_tests())
             .ok()
             .map(|pii| pii.leak_to_string())
     }
@@ -229,7 +229,7 @@ mod test {
         }]);
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners
-            .validate(PiiString::new(input_str), ValidateArgs::default())
+            .validate(PiiString::new(input_str), ValidateArgs::for_tests())
             .unwrap();
         let result: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(result.leak()).unwrap();
         let owner = result.into_iter().next().unwrap();
@@ -250,7 +250,8 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
+        let result =
+            BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::for_tests());
         assert!(result.is_err());
 
         // Test bad phone
@@ -263,7 +264,8 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
+        let result =
+            BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::for_tests());
         assert!(result.is_err());
 
         // Test duplicate phones
@@ -282,7 +284,8 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::default());
+        let result =
+            BDK::KycedBeneficialOwners.validate(PiiString::new(input_str), ValidateArgs::for_tests());
         assert!(result.is_err());
     }
 }
