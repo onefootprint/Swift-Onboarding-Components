@@ -17,7 +17,7 @@ const Login = ({ navigation }: LoginProps) => {
   const { t } = useTranslation('screens.login');
 
   const handlePress = () => {
-    navigation.replace('PhoneIdentification');
+    navigation.push('PhoneIdentification');
   };
 
   return (

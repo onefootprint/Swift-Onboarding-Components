@@ -23,11 +23,18 @@ const Router = () => (
     <Stack.Navigator>
       <Stack.Group screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+      </Stack.Group>
+      <Stack.Group
+        screenOptions={{
+          title: '',
+          headerShadowVisible: false,
+        }}
+      >
         <Stack.Screen
           name="PhoneIdentification"
           component={PhoneIdentification}
         />
-        <Stack.Screen name="MainTabs" component={MainTabs} />
       </Stack.Group>
     </Stack.Navigator>
   </NavigationContainer>

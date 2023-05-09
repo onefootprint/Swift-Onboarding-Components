@@ -9,6 +9,7 @@ export * from './link-button';
 export * from './loading-indicator';
 export * from './pin-input';
 export * from './pressable';
+export * from './segmented-control';
 export * from './tag';
 export * from './text-input';
 export * from './typography';

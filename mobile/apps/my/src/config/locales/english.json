@@ -40,8 +40,8 @@
       "title": "Welcome back! 🎉",
       "sms": {
         "title": "SMS",
-        "instructions": "Enter the 6-digit code sent to {{phoneNumber}}..",
-        "cta": "Resend",
+        "instructions": "Enter the 6-digit code sent to",
+        "cta": "Resend code",
         "notifications": {
           "success": {
             "title": "Success",
