@@ -36,6 +36,24 @@
         "cta": "Continue"
       }
     },
+    "phone-identification": {
+      "title": "Welcome back! 🎉",
+      "sms": {
+        "title": "SMS",
+        "instructions": "Enter the 6-digit code sent to {{phoneNumber}}..",
+        "cta": "Resend",
+        "notifications": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      },
+      "biometric": {
+        "title": "Biometric",
+        "cta": "Launch biometrics"
+      }
+    },
     "canceled": {
       "title": "Session canceled",
       "subtitle": "Please return to the previous page"

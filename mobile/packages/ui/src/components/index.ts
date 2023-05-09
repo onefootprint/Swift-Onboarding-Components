@@ -7,6 +7,7 @@ export * from './inline-alert';
 export * from './label';
 export * from './link-button';
 export * from './loading-indicator';
+export * from './pin-input';
 export * from './pressable';
 export * from './tag';
 export * from './text-input';

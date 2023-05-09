@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import styled, { css, useTheme } from '@onefootprint/styled';
 import React, { forwardRef, useRef, useState } from 'react';
-import { mergeRefs } from 'react-merge-refs';
+import mergeRefs from 'react-merge-refs';
 import {
   NativeSyntheticEvent,
   TextInput as RNTextInput,

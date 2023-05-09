@@ -9,6 +9,7 @@ import configureReactI18next from '@/config/initializers/react-i18next';
 
 import type { Navigation } from '../../wallet.types';
 import Login from '../login';
+import PhoneIdentification from '../phone-identification';
 import Sharing from '../sharing';
 import Vault from '../vault';
 
@@ -22,6 +23,10 @@ const Router = () => (
     <Stack.Navigator>
       <Stack.Group screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen
+          name="PhoneIdentification"
+          component={PhoneIdentification}
+        />
         <Stack.Screen name="MainTabs" component={MainTabs} />
       </Stack.Group>
     </Stack.Navigator>
