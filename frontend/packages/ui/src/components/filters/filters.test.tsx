@@ -78,6 +78,82 @@ describe('<Filters />', () => {
     });
   });
 
+  describe('single-select variant', () => {
+    const defaulOptions = [
+      { label: 'Yes', value: 'true' },
+      { label: 'No', value: 'false' },
+    ];
+
+    const renderMultiSelectFilters = ({ onChange }: Partial<FiltersProps>) =>
+      renderFilters({
+        controls: [
+          {
+            query: 'watchlist_hit',
+            label: 'On a watchlist',
+            kind: 'single-select',
+            options: defaulOptions,
+            selectedOptions: undefined,
+          },
+        ],
+        onChange,
+      });
+
+    describe('when clicking on the filter label', () => {
+      it('should open the popover and display the options', async () => {
+        renderMultiSelectFilters({});
+
+        const trigger = screen.getByRole('button', { name: 'On a watchlist' });
+        await userEvent.click(trigger);
+
+        const popover = screen.getByRole('dialog');
+        defaulOptions.forEach(option => {
+          const radio = within(popover).getByRole('radio', {
+            name: option.label,
+          });
+          expect(radio).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when selecting an option', () => {
+      it('should trigger onChange with the selected option and close the popover', async () => {
+        const onChange = jest.fn();
+        renderMultiSelectFilters({ onChange });
+
+        const trigger = screen.getByRole('button', { name: 'On a watchlist' });
+        await userEvent.click(trigger);
+
+        const firstRadioOption = screen.getByRole('radio', {
+          name: 'Yes',
+        });
+        await userEvent.click(firstRadioOption);
+
+        const submitButton = screen.getByRole('button', { name: 'Apply' });
+        await userEvent.click(submitButton);
+
+        expect(onChange).toHaveBeenCalledWith('watchlist_hit', 'true');
+
+        const popover = screen.queryByRole('dialog');
+        expect(popover).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when clicking on the cancel button', () => {
+      it('should close the popover', async () => {
+        renderMultiSelectFilters({});
+
+        const trigger = screen.getByRole('button', { name: 'On a watchlist' });
+        await userEvent.click(trigger);
+
+        const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+        await userEvent.click(cancelButton);
+
+        const popover = screen.queryByRole('dialog');
+        expect(popover).not.toBeInTheDocument();
+      });
+    });
+  });
+
   describe('multi-select variant', () => {
     const defaulOptions = [
       { label: 'Verified', value: 'verified' },

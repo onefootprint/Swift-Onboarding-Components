@@ -9,7 +9,10 @@ import type { FilterControl, FilterSelectedOption } from './filters.types';
 
 export type FiltersProps = {
   controls: FilterControl[];
-  onChange?: (query: string, options: FilterSelectedOption[]) => void;
+  onChange?: (
+    query: string,
+    options: FilterSelectedOption | FilterSelectedOption[],
+  ) => void;
   onClear?: () => void;
 };
 
@@ -19,7 +22,7 @@ const Filters = ({
   onClear = noop,
 }: FiltersProps) => {
   const hasSelectedOptions = controls.some(
-    control => control.selectedOptions.length > 0,
+    control => control.selectedOptions && control.selectedOptions.length > 0,
   );
 
   return (

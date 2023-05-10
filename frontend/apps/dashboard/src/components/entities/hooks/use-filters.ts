@@ -10,6 +10,7 @@ import getDateRange from 'src/utils/get-date-range';
 export type EntitiesQueryParams = {
   status?: string | string[];
   date_range?: string | string[];
+  watchlist_hit?: string;
   search?: string;
   cursor?: string;
   page_size?: string;
@@ -21,6 +22,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   search: undefined,
   cursor: undefined,
   page_size: undefined,
+  watchlist_hit: undefined,
 };
 
 const useFilters = () => {
@@ -31,6 +33,7 @@ const useFilters = () => {
     pageSize: filters.query.page_size || `${DEFAULT_PAGE_SIZE}`,
     search: filters.query.search,
     status: queryToArray(filters.query.status),
+    watchlist_hit: filters.query.watchlist_hit,
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
@@ -40,6 +43,7 @@ const useFilters = () => {
     statuses: queryToString(values.status),
     timestamp_gte: from,
     timestamp_lte: to,
+    watchlist_hit: values.watchlist_hit,
   };
   const searchParams = getSearchParams({
     cursor: filters.query.cursor,
@@ -47,6 +51,7 @@ const useFilters = () => {
     pageSize: filters.query.page_size,
     search: filters.query.search,
     status: filters.query.status,
+    watchlist_hit: filters.query.watchlist_hit,
   });
   return {
     ...filters,

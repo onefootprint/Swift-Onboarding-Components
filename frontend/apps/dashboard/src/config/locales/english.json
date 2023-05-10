@@ -401,6 +401,13 @@
         },
         "date-range": {
           "label": "Date range"
+        },
+        "on-watchlist": {
+          "label": "On a watchlist",
+          "options": {
+            "yes": "Yes",
+            "no": "No"
+          }
         }
       }
     },

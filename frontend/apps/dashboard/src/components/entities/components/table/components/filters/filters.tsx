@@ -5,6 +5,11 @@ import React from 'react';
 
 import useFilters from '../../../../hooks/use-filters';
 
+export enum EntityWatchlistHitStatus {
+  onWatchlist = 'true',
+  notOnWatchlist = 'false',
+}
+
 const Filters = () => {
   const { t } = useTranslation('pages.entities.filters');
   const filters = useFilters();
@@ -37,6 +42,22 @@ const Filters = () => {
           label: t('date-range.label'),
           kind: 'date',
           selectedOptions: filters.values.dateRange,
+        },
+        {
+          query: 'watchlist_hit',
+          label: t('on-watchlist.label'),
+          kind: 'single-select',
+          options: [
+            {
+              value: EntityWatchlistHitStatus.onWatchlist,
+              label: t('on-watchlist.options.yes'),
+            },
+            {
+              value: EntityWatchlistHitStatus.notOnWatchlist,
+              label: t('on-watchlist.options.no'),
+            },
+          ],
+          selectedOptions: filters.values.watchlist_hit,
         },
       ]}
       onChange={(queryKey, queryValue) => {

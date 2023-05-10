@@ -195,6 +195,31 @@ describe('<List />', () => {
         });
       });
     });
+
+    describe('when filtering by "On a watchlist"', () => {
+      it('should apply the "watchlist_hit" in the url', async () => {
+        const push = jest.fn();
+        useRouterSpy({
+          pathname: '/entities',
+          push,
+          query: {},
+        });
+        await renderEntitiesAndWaitData();
+
+        await filterEvents.apply({
+          trigger: 'On a watchlist',
+          option: 'Yes',
+        });
+
+        await waitFor(() => {
+          expect(push).toHaveBeenCalledWith(
+            { query: { watchlist_hit: 'true' } },
+            undefined,
+            expect.anything(),
+          );
+        });
+      });
+    });
   });
 
   describe('when the request to fetch the entities fails', () => {

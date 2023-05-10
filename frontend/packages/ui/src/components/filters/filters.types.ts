@@ -10,6 +10,12 @@ export type FilterGroupOption = {
   options: FilterOption[];
 };
 
+export type FilterSingleSelect = {
+  kind: 'single-select';
+  options: FilterOption[];
+  selectedOptions: FilterSelectedOption | undefined;
+};
+
 export type FilterMultiSelect = {
   kind: 'multi-select';
   options: FilterOption[];
@@ -32,7 +38,12 @@ export type FilterControl = {
   loading?: boolean;
   query: string;
   label: string;
-} & (FilterMultiSelect | FilterMultiSelectGrouped | FilterDate);
+} & (
+  | FilterSingleSelect
+  | FilterMultiSelect
+  | FilterMultiSelectGrouped
+  | FilterDate
+);
 
 export enum FilterDateRange {
   AllTime = 'all-time',

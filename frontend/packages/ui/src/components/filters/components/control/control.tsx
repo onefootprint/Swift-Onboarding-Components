@@ -9,19 +9,24 @@ import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
 import DateForm from './components/date-form';
-import MultiSelectForm from './components/multi-select-form';
 import MultiSelectGroupedForm from './components/multi-select-grouped-form';
 import Popover from './components/popover';
+import SelectForm from './components/select-form';
+import { SelectFormKind } from './components/select-form/select-form';
 import SelectedPill from './components/selected-pill';
 import useDateOptions from './hooks/use-date-options';
 import usePopper from './hooks/use-popper';
 import getDateLabel from './utils/get-date-label';
 import getMultiSelectGroupedLabel from './utils/get-multi-select-grouped-label';
 import getMultiSelectLabel from './utils/get-multi-select-label';
+import getSingleSelectLabel from './utils/get-single-select-label/get-single-select-label';
 
 export type ControlProps = {
   control: FilterControl;
-  onChange: (query: string, newSelectedOptions: FilterSelectedOption[]) => void;
+  onChange: (
+    query: string,
+    newSelectedOptions: FilterSelectedOption | FilterSelectedOption[],
+  ) => void;
 };
 
 const Control = ({ control, onChange }: ControlProps) => {
@@ -29,7 +34,7 @@ const Control = ({ control, onChange }: ControlProps) => {
   const popoverId = useId();
   const dateOptions = useDateOptions();
   const { query, kind, label, loading, options, selectedOptions } = control;
-  const hasSelectedOptions = selectedOptions.length > 0;
+  const hasSelectedOptions = selectedOptions && selectedOptions.length > 0;
   const { attributes, setReferenceElement, setPopperElement } = usePopper();
 
   const handleToggle = () => {
@@ -44,7 +49,9 @@ const Control = ({ control, onChange }: ControlProps) => {
     onChange(query, []);
   };
 
-  const handleSubmit = (newSelectedOptions: FilterSelectedOption[]) => {
+  const handleSubmit = (
+    newSelectedOptions: FilterSelectedOption | FilterSelectedOption[],
+  ) => {
     onChange(query, newSelectedOptions);
     setOpen(false);
   };
@@ -69,6 +76,8 @@ const Control = ({ control, onChange }: ControlProps) => {
               aria-haspopup="dialog"
               onClick={handleToggle}
             >
+              {kind === 'single-select' &&
+                getSingleSelectLabel(options, selectedOptions)}
               {kind === 'multi-select' &&
                 getMultiSelectLabel(options, selectedOptions)}
               {kind === 'multi-select-grouped' &&
@@ -105,8 +114,17 @@ const Control = ({ control, onChange }: ControlProps) => {
               />
             ) : (
               <>
+                {kind === 'single-select' && (
+                  <SelectForm
+                    kind={SelectFormKind.singleSelect}
+                    onSubmit={handleSubmit}
+                    options={options}
+                    selectedOptions={selectedOptions}
+                  />
+                )}
                 {kind === 'multi-select' && (
-                  <MultiSelectForm
+                  <SelectForm
+                    kind={SelectFormKind.multiSelect}
                     onSubmit={handleSubmit}
                     options={options}
                     selectedOptions={selectedOptions}

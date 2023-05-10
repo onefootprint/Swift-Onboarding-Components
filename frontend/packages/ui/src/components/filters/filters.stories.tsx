@@ -13,10 +13,12 @@ const defaultFilters: {
   statuses: [];
   attributes: [];
   dateRange: [];
+  watchlist_hit?: string;
 } = {
   statuses: [],
   attributes: [],
   dateRange: [],
+  watchlist_hit: undefined,
 };
 
 const Template: Story = ({ onClear, onChange }) => {
@@ -76,6 +78,16 @@ const Template: Story = ({ onClear, onChange }) => {
           label: 'Date',
           kind: 'date',
           selectedOptions: filters.dateRange,
+        },
+        {
+          query: 'watchlist_hit',
+          label: 'On a watchlist',
+          kind: 'single-select',
+          options: [
+            { label: 'Yes', value: 'true' },
+            { label: 'No', value: 'false' },
+          ],
+          selectedOptions: filters.watchlist_hit,
         },
       ]}
       onClear={() => {
