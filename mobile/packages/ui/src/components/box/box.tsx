@@ -3,6 +3,7 @@ import {
   BackgroundColor,
   BorderColor,
   BorderRadius,
+  Elevation,
   Spacing,
 } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
@@ -36,6 +37,9 @@ const Container = styled(({ isSafeArea, ...props }) =>
           } else if (prop === 'backgroundColor') {
             const value = props[prop] as BackgroundColor;
             return `background-color: ${theme.backgroundColor[value]};`;
+          } else if (prop === 'elevation') {
+            const value = props[prop] as Elevation;
+            return `box-shadow: ${theme.elevation[value]};`;
           } else if (prop === 'gap' || prop === 'rowGap') {
             const value = props[prop] as Spacing;
             return `${prop}: ${theme.spacing[value]};`;

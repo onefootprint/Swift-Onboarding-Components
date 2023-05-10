@@ -2,6 +2,7 @@ import {
   BackgroundColor,
   BorderColor,
   BorderRadius,
+  Elevation,
   Spacing,
 } from '@onefootprint/design-tokens';
 import type { TransformsStyle, ViewProps, ViewStyle } from 'react-native';
@@ -35,6 +36,7 @@ export type BoxProps = ViewProps &
     children?: React.ReactNode | React.ReactNode[];
   } & {
     gap?: Spacing;
+    elevation?: Elevation;
     rowGap?: Spacing;
     margin?: Spacing;
     marginBottom?: Spacing;

@@ -6,7 +6,9 @@ import {
   DismissKeyboard,
   TextInput,
   Typography,
+  useToast,
 } from '@onefootprint/ui';
+import * as Linking from 'expo-linking';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -23,6 +25,7 @@ type FormData = {
 
 const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
   const { t } = useTranslation('screens.email-identification');
+  const toast = useToast();
   const identifyMutation = useIdentify();
   const {
     control,
@@ -37,13 +40,23 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
       { identifier: { email } },
       {
         onSuccess: ({ userFound, availableChallengeKinds }) => {
-          if (userFound) {
-            navigation.push('Login', {
-              canUseBiometric: availableChallengeKinds.includes(
-                ChallengeKind.biometric,
-              ),
+          if (!userFound) {
+            return toast.show({
+              variant: 'error',
+              title: t('user-not-found.title'),
+              description: t('user-not-found.description'),
+              cta: {
+                label: t('user-not-found.cta'),
+                onPress: () =>
+                  Linking.openURL('https://live.onefootprint.com/'),
+              },
             });
           }
+          navigation.push('Login', {
+            canUseBiometric: availableChallengeKinds.includes(
+              ChallengeKind.biometric,
+            ),
+          });
         },
       },
     );
@@ -73,6 +86,7 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
                 label={t('form.email.label')}
                 onBlur={onBlur}
                 onChangeText={onChange}
+                onSubmitEditing={handleSubmit(onSubmit)}
                 placeholder={t('form.email.placeholder')}
                 returnKeyType="send"
                 spellCheck={false}

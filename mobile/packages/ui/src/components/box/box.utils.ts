@@ -46,6 +46,7 @@ const filterStyleProps = (props: BoxProps): Partial<BoxProps> => {
     'scaleY',
     'translateX',
     'translateY',
+    'elevation',
   ];
 
   const filteredProps: Partial<BoxProps> = {};
