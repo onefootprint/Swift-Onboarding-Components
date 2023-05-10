@@ -1,8 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type Navigation = {
-  Login: undefined;
-  PhoneIdentification: undefined;
+  EmailIdentification: undefined;
+  Login: {
+    canUseBiometric: boolean;
+  };
   MainTabs: undefined;
   Vault: undefined;
   VaultStack: undefined;

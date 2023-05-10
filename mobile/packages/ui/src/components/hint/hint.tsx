@@ -25,7 +25,7 @@ const Hint = ({
   </Box>
 );
 
-const HintContainer = styled.View<{ hasError: boolean; size: HintSize }>`
+const HintContainer = styled.Text<{ hasError: boolean; size: HintSize }>`
   ${({ theme, size, hasError }) => {
     const { inputHint } = theme.components;
 

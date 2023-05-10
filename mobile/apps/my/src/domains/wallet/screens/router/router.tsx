@@ -9,8 +9,8 @@ import { BackButton } from '@/components';
 import configureReactI18next from '@/config/initializers/react-i18next';
 
 import type { Navigation } from '../../wallet.types';
+import EmailIdentification from '../email-identification';
 import Login from '../login';
-import PhoneIdentification from '../phone-identification';
 import Sharing from '../sharing';
 import Vault from '../vault';
 
@@ -24,7 +24,10 @@ const Router = () => {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Group screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen
+            name="EmailIdentification"
+            component={EmailIdentification}
+          />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Group>
         <Stack.Group
@@ -36,10 +39,7 @@ const Router = () => {
             },
           }}
         >
-          <Stack.Screen
-            name="PhoneIdentification"
-            component={PhoneIdentification}
-          />
+          <Stack.Screen name="Login" component={Login} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

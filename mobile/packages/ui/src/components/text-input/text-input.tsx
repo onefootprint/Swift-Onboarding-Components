@@ -10,17 +10,19 @@ import {
 } from 'react-native';
 
 import { Box, BoxProps } from '../box';
+import { Hint } from '../hint';
 import { Label } from '../label';
 
 export type TextInputProps = {
-  hasError?: boolean;
-  label?: string;
   disabled?: boolean;
+  hasError?: boolean;
+  hint?: string;
+  label?: string;
 } & RNTextInputProps &
   BoxProps;
 
 const TextInput = forwardRef<RNTextInput, TextInputProps>(
-  ({ hasError = false, label, disabled = false, ...props }, ref) => {
+  ({ hasError = false, hint, label, disabled = false, ...props }, ref) => {
     const { onBlur, onFocus } = props;
     const [isFocused, setFocus] = useState(false);
     const localRef = useRef<RNTextInput>(null);
@@ -51,15 +53,20 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
         {label && <Label onPress={handleLabelPress}>{label}</Label>}
         <Input
           {...props}
-          underlineColorAndroid="transparent"
           disabled={disabled}
           hasError={hasError}
+          hasFocus={isFocused}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          hasFocus={isFocused}
           placeholderTextColor={input.global.placeholderColor}
           ref={mergeRefs([ref, localRef])}
+          underlineColorAndroid="transparent"
         />
+        {!!hint && (
+          <Hint marginTop={3} hasError={hasError}>
+            {hint}
+          </Hint>
+        )}
       </Box>
     );
   },

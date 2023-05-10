@@ -8,7 +8,11 @@ export type FieldsetProps = {
   children: React.ReactNode;
 };
 
-const Fieldset = ({ title, iconComponent: Icon, children }: FieldsetProps) => {
+const Fieldset = ({
+  title,
+  iconComponent: IconComponent,
+  children,
+}: FieldsetProps) => {
   return (
     <Box
       borderColor="tertiary"
@@ -19,7 +23,7 @@ const Fieldset = ({ title, iconComponent: Icon, children }: FieldsetProps) => {
       paddingVertical={7}
     >
       <Box marginBottom={7} gap={3} flexDirection="row" alignItems="center">
-        <Icon />
+        <IconComponent />
         <Typography variant="label-2">{title}</Typography>
       </Box>
       <Box gap={7}>{children}</Box>

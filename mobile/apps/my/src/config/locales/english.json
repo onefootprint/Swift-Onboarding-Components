@@ -29,14 +29,21 @@
     "investor_profile": "Investor profile"
   },
   "screens": {
-    "login": {
+    "email-identification": {
       "title": "Hey there! 👋",
       "subtitle": "Enter your email to get started.",
       "form": {
+        "email": {
+          "label": "Email",
+          "placeholder": "your.email@email.com",
+          "errors": {
+            "required": "Please enter an email"
+          }
+        },
         "cta": "Continue"
       }
     },
-    "phone-identification": {
+    "login": {
       "title": "Welcome back! 🎉",
       "sms": {
         "title": "SMS",
@@ -49,9 +56,9 @@
           }
         }
       },
-      "biometric": {
-        "title": "Biometric",
-        "cta": "Launch biometrics"
+      "passkey": {
+        "title": "Passkey",
+        "cta": "Launch passkey"
       }
     },
     "canceled": {
