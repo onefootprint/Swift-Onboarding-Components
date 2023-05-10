@@ -4,9 +4,11 @@ import {
   DecisionStatus,
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import FieldValidationDetails from './components/field-validation-details';
 
 type OnboardingDecisionEventHeaderProps = {
   data: OnboardingDecisionEventData;
@@ -26,15 +28,18 @@ const OnboardingDecisionEventHeader = ({
 
   if (source.kind === DecisionSourceKind.footprint) {
     return (
-      <Typography
-        variant="label-3"
-        color={color}
-        testID="onboarding-decision-event-header"
-      >
-        {isVerified
-          ? t('verified-by-footprint')
-          : t('not-verified-by-footprint')}
-      </Typography>
+      <Box sx={{ gap: 2 }}>
+        <Typography
+          variant="label-3"
+          color={color}
+          testID="onboarding-decision-event-header"
+        >
+          {isVerified
+            ? t('verified-by-footprint')
+            : t('not-verified-by-footprint')}
+        </Typography>
+        {!isVerified && <FieldValidationDetails />}
+      </Box>
     );
   }
 

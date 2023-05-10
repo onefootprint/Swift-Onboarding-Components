@@ -81,9 +81,9 @@ const OnboardingDecisionEventBody = ({
                 <Typography variant="body-3" as="span">
                   {vendorsList}
                 </Typography>
-                <FieldValidationDetails />
               </>
             )}
+            <FieldValidationDetails />
           </Container>
         }
         testID="onboarding-decision-event-body"
