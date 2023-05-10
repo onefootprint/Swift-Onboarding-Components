@@ -72,6 +72,9 @@
     }
   },
   "components": {
+    "back-button": {
+      "cta": "Go back"
+    },
     "liveness": {
       "register": {
         "title": "Liveness check",

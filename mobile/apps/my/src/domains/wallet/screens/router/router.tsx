@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
+import { BackButton } from '@/components';
 import configureReactI18next from '@/config/initializers/react-i18next';
 
 import type { Navigation } from '../../wallet.types';
@@ -18,27 +19,32 @@ configureReactI18next();
 const Stack = createNativeStackNavigator<Navigation>();
 const Tab = createBottomTabNavigator<Navigation>();
 
-const Router = () => (
-  <NavigationContainer>
-    <Stack.Navigator>
-      <Stack.Group screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-      </Stack.Group>
-      <Stack.Group
-        screenOptions={{
-          title: '',
-          headerShadowVisible: false,
-        }}
-      >
-        <Stack.Screen
-          name="PhoneIdentification"
-          component={PhoneIdentification}
-        />
-      </Stack.Group>
-    </Stack.Navigator>
-  </NavigationContainer>
-);
+const Router = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Group screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+        </Stack.Group>
+        <Stack.Group
+          screenOptions={{
+            title: '',
+            headerShadowVisible: false,
+            headerLeft: ({ canGoBack }) => {
+              return canGoBack ? <BackButton /> : null;
+            },
+          }}
+        >
+          <Stack.Screen
+            name="PhoneIdentification"
+            component={PhoneIdentification}
+          />
+        </Stack.Group>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 const VaultScreen = () => {
   return (

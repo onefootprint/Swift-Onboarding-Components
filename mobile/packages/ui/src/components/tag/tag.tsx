@@ -4,7 +4,7 @@ import { Box } from '../box';
 import { Typography } from '../typography';
 
 export type TagProps = {
-  children: React.ReactNode;
+  children: string;
 };
 
 const Tag = ({ children }: TagProps) => {

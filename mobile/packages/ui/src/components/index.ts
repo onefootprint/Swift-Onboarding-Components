@@ -3,6 +3,7 @@ export * from './button';
 export * from './container';
 export * from './design-system-provider';
 export * from './dismiss-keyboard';
+export * from './icon-button';
 export * from './inline-alert';
 export * from './label';
 export * from './link-button';
