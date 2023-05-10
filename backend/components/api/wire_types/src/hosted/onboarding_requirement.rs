@@ -29,11 +29,15 @@ pub enum OnboardingRequirement {
         should_collect_selfie: bool,
         should_collect_consent: bool,
     },
+    Authorize {
+        fields_to_authorize: AuthorizeFields,
+    },
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
+    // TODO do we need these?
     pub identity_document_types: Vec<IdDocKind>,
     pub selfie_collected: bool,
 }

@@ -16,6 +16,7 @@ use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::TenantVw;
+use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
@@ -49,9 +50,14 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
-    let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
-    if !requirements.is_empty() {
-        let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect_vec();
+    let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
+    let reqs = reqs
+        .into_iter()
+        // An Authorize requirement shouldn't block the authorize endpoint!
+        .filter(|r| !matches!(r, OnboardingRequirement::Authorize { .. }))
+        .collect_vec();
+    if !reqs.is_empty() {
+        let unmet_requirements = reqs.into_iter().map(|x| x.into()).collect_vec();
         return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
     }
 

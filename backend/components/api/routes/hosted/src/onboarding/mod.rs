@@ -17,15 +17,14 @@ use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
-        user_consent::UserConsent,
+        liveness_event::LivenessEvent, user_consent::UserConsent,
     },
     DbError, PgConn,
 };
 use itertools::Itertools;
 use newtypes::{
     DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, OnboardingId,
-    PiiString, ScopedVaultId, SessionAuthToken, VaultId,
+    PiiString, ScopedVaultId, SessionAuthToken,
 };
 use paperclip::actix::web;
 
@@ -103,13 +102,11 @@ fn get_requirements_inner(
     scoped_business_id: Option<ScopedVaultId>,
     declarations: Option<PiiString>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
-    let scoped_user_id = &ob_info.scoped_user.id;
-
-    let id_data_req = {
+    let id_req = {
         let missing_attributes = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
         (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes })
     };
-    let ip_data_req = {
+    let ip_req = {
         let missing_attributes =
             uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::InvestorProfile);
         let missing_document = if let Some(declarations) = declarations {
@@ -128,7 +125,7 @@ fn get_requirements_inner(
             },
         )
     };
-    let business_data_req = {
+    let biz_req = {
         // Fetch missing business fields
         let missing_attributes = if ob_info.ob_config()?.must_collect_business() {
             let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
@@ -154,20 +151,28 @@ fn get_requirements_inner(
         //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
         //      we will create a DocumentRequest row.
         let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding()?.id)?;
-        let doc_request = DocumentRequest::get_active(conn, scoped_user_id)?;
+        let doc_request = DocumentRequest::get_active(conn, &ob_info.scoped_user.id)?;
         doc_request.map(|dr| OnboardingRequirement::CollectDocument {
             document_request_id: dr.id,
             should_collect_selfie: dr.should_collect_selfie,
             should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
         })
     };
+    let authorize_req = {
+        if ob_info.onboarding()?.authorized_at.is_none() {
+            let fields_to_authorize = get_fields_to_authorize(conn, ob_info)?;
+            Some(OnboardingRequirement::Authorize { fields_to_authorize })
+        } else {
+            None
+        }
+    };
 
-    let requirements = vec![id_data_req, ip_data_req, business_data_req, liveness_req, doc_req]
+    let requirements = vec![id_req, ip_req, biz_req, liveness_req, doc_req, authorize_req]
         .into_iter()
         .flatten()
         .collect();
 
-    tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
+    tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%ob_info.scoped_user.id, "get_requirements result");
 
     Ok(requirements)
 }
@@ -175,32 +180,18 @@ fn get_requirements_inner(
 /// This function gets all the fields the User needs to authorize the Tenant having access to.
 /// Since we don't know the type of the document until the User selects it and we process it, we
 /// need to check the IdentityDocument table for documents gathered during the onboarding
-pub fn get_fields_to_authorize(
-    conn: &mut PgConn,
-    user_vault_id: &VaultId,
-    ob_config: &ObConfiguration,
-) -> ApiResult<AuthorizeFields> {
-    let (onboarding, _, _, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
-
-    let mut identity_document_types: Vec<_> = vec![];
-    let mut selfie_collected = false;
-    if ob_config.can_access_document() {
+pub fn get_fields_to_authorize(conn: &mut PgConn, ob_info: &UserObSession) -> ApiResult<AuthorizeFields> {
+    let ob_config = ob_info.ob_config()?;
+    let (identity_document_types, selfie_collected) = if ob_config.can_access_document() {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-        let identity_documents =
-            IdentityDocument::get_for_scoped_vault_id(conn, &onboarding.scoped_vault_id)?;
-
-        identity_document_types = identity_documents
-            .iter()
-            .map(|id| id.document_type)
-            .unique()
-            .collect();
-
-        if ob_config.can_access_selfie() {
-            selfie_collected = identity_documents
-                .iter()
-                .any(|doc| doc.selfie_lifetime_id.is_some());
-        }
-    }
+        let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
+        let identity_document_types = id_docs.iter().map(|id| id.document_type).unique().collect();
+        let selfie_collected =
+            ob_config.can_access_selfie() && id_docs.iter().any(|d| d.selfie_lifetime_id.is_some());
+        (identity_document_types, selfie_collected)
+    } else {
+        (vec![], false)
+    };
 
     let res = AuthorizeFields {
         collected_data: ob_config.can_access_data.clone(),
