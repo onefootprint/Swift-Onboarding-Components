@@ -26,7 +26,16 @@ export type ContentProps = {
 const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   const { t } = useTranslation('pages.business.vault.bos');
   const field = useField(entity);
-  const { label, value } = field(BusinessDI.beneficialOwners);
+  let di = BusinessDI.beneficialOwners;
+  if (entity.attributes.includes(BusinessDI.kycedBeneficialOwners)) {
+    // This is really unique - we render two different DIs in the same section since their contents
+    // are almost identical: kycedBOs and BOs.
+    // Here, we just check which type DI for BOs exists in the vault and use it
+    // TODO: this displays the BOs' name from the vault, but if the BO is kyced they may have a
+    // different name on their profile
+    di = BusinessDI.kycedBeneficialOwners;
+  }
+  const { label, value } = field(di);
 
   const renderValue = (index: number) => {
     if (
@@ -76,7 +85,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
           >
             <Field
               entity={entity}
-              di={BusinessDI.beneficialOwners}
+              di={di}
               hint={t(
                 businessOwner.kind === 'primary'
                   ? 'hint.primary'

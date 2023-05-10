@@ -76,6 +76,7 @@
     "business.phone_number": "Phone number",
     "business.tin": "Taxpayer Identification Number (TIN)",
     "business.beneficial_owners": "Beneficial owner",
+    "business.kyced_beneficial_owners": "Beneficial owner",
     "business.address_line1": "Address line 1",
     "business.address_line2": "Address line 2",
     "business.city": "City",
