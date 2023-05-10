@@ -37,7 +37,5 @@ pub enum OnboardingRequirement {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
-    // TODO do we need these?
     pub identity_document_types: Vec<IdDocKind>,
-    pub selfie_collected: bool,
 }

@@ -193,21 +193,17 @@ fn get_requirements_inner(
 /// need to check the IdentityDocument table for documents gathered during the onboarding
 pub fn get_fields_to_authorize(conn: &mut PgConn, ob_info: &UserObSession) -> ApiResult<AuthorizeFields> {
     let ob_config = ob_info.ob_config()?;
-    let (identity_document_types, selfie_collected) = if ob_config.can_access_document() {
+    let identity_document_types = if ob_config.can_access_document() {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
         let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
-        let identity_document_types = id_docs.iter().map(|id| id.document_type).unique().collect();
-        let selfie_collected =
-            ob_config.can_access_selfie() && id_docs.iter().any(|d| d.selfie_lifetime_id.is_some());
-        (identity_document_types, selfie_collected)
+        id_docs.iter().map(|id| id.document_type).unique().collect()
     } else {
-        (vec![], false)
+        vec![]
     };
 
     let res = AuthorizeFields {
         collected_data: ob_config.can_access_data.clone(),
         identity_document_types,
-        selfie_collected,
     };
 
     Ok(res)
