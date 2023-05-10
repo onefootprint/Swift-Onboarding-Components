@@ -1,10 +1,12 @@
 use async_trait::async_trait;
+use db::models::incode_verification_session::IncodeVerificationSession;
 use db::DbPool;
+use enum_dispatch::enum_dispatch;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 
 use newtypes::{
-    DecisionIntentId, DocVData, IdentityDocumentId, IncodeConfigurationId, ScopedVaultId, TenantId,
-    VaultPublicKey,
+    DecisionIntentId, DocVData, IdentityDocumentId, IncodeConfigurationId, IncodeVerificationSessionState,
+    ScopedVaultId, TenantId, VaultPublicKey,
 };
 
 use crate::config::Config;
@@ -12,10 +14,25 @@ use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
 use crate::ApiError;
 
-use super::incode_states::StartOnboarding;
+use super::incode_states::state_impl::*;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum IncodeStateName {
+/// This trait represents a running a state transition for an Incode Verification session
+#[async_trait]
+#[enum_dispatch]
+pub trait IncodeStateTransition {
+    async fn run(
+        &self,
+        db_pool: &DbPool,
+        footprint_http_client: &FootprintVendorHttpClient,
+        uv_public_key: VaultPublicKey,
+        docv_data: &DocVData,
+    ) -> Result<IncodeState, ApiError>;
+}
+
+// These are concrete structs that implement `IncodeStateTransition`. By using `enum_dispatch`,
+// we can recover the structs rather than working with trait objects (and we get some runtime perf increases)
+#[enum_dispatch(IncodeStateTransition)]
+pub enum IncodeState {
     StartOnboarding,
     AddFront,
     AddBack,
@@ -24,32 +41,22 @@ pub enum IncodeStateName {
     Complete,
 }
 
-/// This trait represents a state that a particular Incode Verification could be in
-#[async_trait]
-pub trait IncodeState {
-    async fn run(
-        &self,
-        db_pool: &DbPool,
-        footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
-    ) -> Result<StateHolder, ApiError>;
-
-    fn name(&self) -> IncodeStateName;
-}
-
-pub struct StateHolder(pub Box<dyn IncodeState>);
-
-impl std::ops::Deref for StateHolder {
-    type Target = Box<dyn IncodeState>;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl IncodeState {
+    fn name(&self) -> IncodeVerificationSessionState {
+        match self {
+            IncodeState::StartOnboarding(_) => IncodeVerificationSessionState::StartOnboarding,
+            IncodeState::AddFront(_) => IncodeVerificationSessionState::AddFront,
+            IncodeState::AddBack(_) => IncodeVerificationSessionState::AddBack,
+            IncodeState::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
+            IncodeState::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
+            IncodeState::Complete(_) => IncodeVerificationSessionState::Complete,
+        }
     }
 }
 
 pub struct IncodeMachineError {
     pub error: ApiError,
-    pub state_name: IncodeStateName,
+    pub state_name: IncodeVerificationSessionState,
 }
 
 impl std::fmt::Debug for IncodeMachineError {
@@ -62,8 +69,9 @@ impl std::fmt::Debug for IncodeMachineError {
     }
 }
 
+/// The machine that initializes and then runs a series of state transitions
 pub struct IncodeStateMachine {
-    state: StateHolder,
+    state: IncodeState,
 }
 impl IncodeStateMachine {
     #[allow(clippy::too_many_arguments)]
@@ -77,21 +85,31 @@ impl IncodeStateMachine {
         configuration_id: IncodeConfigurationId,
         identity_document_id: IdentityDocumentId,
     ) -> Result<Self, ApiError> {
+        let sv_id = scoped_vault_id.clone();
+
+        // get incode credentials from TVC
         let tenant_vendor_control =
             TenantVendorControl::new(tenant_id, db_pool, enclave_client, config).await?;
 
-        // TODO: retries by loading machine into the latest state
-        let initial_state = StartOnboarding {
-            incode_credentials: tenant_vendor_control.incode_credentials(),
-            configuration_id,
-            scoped_vault_id,
-            decision_intent_id,
-            identity_document_id,
+        // Load our existing state
+        let existing_verification_session = db_pool
+            .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
+            .await??;
+
+        let initial_state: IncodeState = if let Some(_existing) = existing_verification_session {
+            unimplemented!()
+        } else {
+            StartOnboarding {
+                incode_credentials: tenant_vendor_control.incode_credentials(),
+                configuration_id,
+                scoped_vault_id,
+                decision_intent_id,
+                identity_document_id,
+            }
+            .into()
         };
 
-        Ok(Self {
-            state: StateHolder(Box::new(initial_state)),
-        })
+        Ok(Self { state: initial_state })
     }
 
     pub async fn run(
@@ -107,7 +125,7 @@ impl IncodeStateMachine {
                 .step(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
                 .await?;
 
-            if machine.state.name() == IncodeStateName::Complete {
+            if machine.state.name() == IncodeVerificationSessionState::Complete {
                 break;
             }
         }
@@ -124,7 +142,7 @@ impl IncodeStateMachine {
         uv_public_key: VaultPublicKey,
         docv_data: &DocVData,
     ) -> Result<Self, IncodeMachineError> {
-        let current_state = self.state.name().clone();
+        let current_state = self.state.name();
 
         let result = {
             self.state
@@ -160,6 +178,7 @@ mod tests {
         DocVData, IdDocKind, IncodeConfigurationId, IncodeVerificationSessionState, PiiString, VendorAPI,
     };
 
+    use super::IncodeState;
     use crate::{
         decision::{
             tests::test_helpers::create_user_and_onboarding,
@@ -208,6 +227,9 @@ mod tests {
             .await
             .unwrap();
 
+        //
+        // Run the incode verification machine
+        //
         let machine = IncodeStateMachine::init(
             tenant.id,
             &db_pool,
@@ -221,10 +243,17 @@ mod tests {
         .await
         .unwrap();
 
-        machine
+        // Assert machine is in the correct final state
+        let final_state = machine
             .run(&db_pool, &vendor_client, uv.public_key.clone(), &docv_data)
             .await
-            .unwrap();
+            .unwrap()
+            .state;
+
+        match final_state {
+            IncodeState::Complete(c) => assert!(c.fetch_scores_response.id_validation.is_some()),
+            _ => panic!("state machine finished in wrong state!"),
+        }
 
         db_pool
             .db_transaction(move |conn| -> Result<_, DbError> {
@@ -234,7 +263,7 @@ mod tests {
                         .find(|(req, _, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
                         .unwrap();
 
-                let incode_verification_session = IncodeVerificationSession::get(conn, &suid2)?;
+                let incode_verification_session = IncodeVerificationSession::get(conn, &suid2)?.unwrap();
                 let incode_events = IncodeVerificationSessionEvent::get_for_session_id(
                     conn,
                     incode_verification_session.id.clone(),

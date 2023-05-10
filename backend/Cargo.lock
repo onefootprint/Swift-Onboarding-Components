@@ -505,6 +505,7 @@ dependencies = [
  "either",
  "enclave",
  "enclave_proxy",
+ "enum_dispatch",
  "env_logger 0.9.0",
  "envconfig",
  "feature_flag",
@@ -3070,6 +3071,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9852635589dc9f9ea1b6fe9f05b50ef208c85c834a562f0c6abb1c475736ec2b"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "enum_dispatch"
+version = "0.3.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "11f36e95862220b211a6e2aa5eca09b4fa391b13cd52ceb8035a24bf65a79de2"
+dependencies = [
+ "once_cell",
+ "proc-macro2 1.0.55",
+ "quote 1.0.26",
+ "syn 1.0.98",
 ]
 
 [[package]]

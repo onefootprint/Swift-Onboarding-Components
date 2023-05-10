@@ -121,6 +121,24 @@ impl IncodeVerificationSession {
         Ok(res)
     }
 
+    #[tracing::instrument(skip(conn))]
+    pub fn get_or_create(
+        conn: &mut TxnPgConn,
+        scoped_vault_id: ScopedVaultId,
+        configuration_id: IncodeConfigurationId,
+        identity_document_id: IdentityDocumentId,
+    ) -> DbResult<Self> {
+        let existing_session = Self::get(conn, &scoped_vault_id)?;
+
+        if let Some(existing) = existing_session {
+            Ok(existing)
+        } else {
+            let new = Self::create(conn, scoped_vault_id, configuration_id, identity_document_id)?;
+
+            Ok(new)
+        }
+    }
+
     #[tracing::instrument(skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
@@ -154,11 +172,12 @@ impl IncodeVerificationSession {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Option<Self>>
     where
         T: Into<IncodeSessionIdentifier<'a>>,
     {
-        let vs = Self::query(id.into()).first(conn)?;
+        // TODO: need to grab something like non-complete
+        let vs = Self::query(id.into()).first(conn).optional()?;
         Ok(vs)
     }
 }
