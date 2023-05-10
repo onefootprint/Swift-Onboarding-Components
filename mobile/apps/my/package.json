@@ -5,13 +5,15 @@
   "scripts": {
     "android": "expo run:android",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "expo start --dev-client",
+    "dev": "expo start --clear",
     "ios": "expo run:ios",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch",
     "test": "jest --ci --bail ",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "cd ../.. && yarn build:packages"
+    "postinstall": "cd ../.. && yarn build:packages",
+    "testflight": "npx eas build -p ios --auto-submit --profile testflight",
+    "appstore": "npx eas build -p ios --auto-submit"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.2.3",
@@ -30,6 +32,7 @@
     "buffer": "^6.0.3",
     "expo": "~48.0.11",
     "expo-camera": "~13.2.1",
+    "expo-dev-client": "~2.2.1",
     "expo-font": "~11.1.1",
     "expo-haptics": "~12.2.1",
     "expo-linking": "~4.0.1",
@@ -39,7 +42,7 @@
     "jest-expo": "^48.0.2",
     "react": "18.2.0",
     "react-i18next": "^12.2.0",
-    "react-native": "0.71.6",
+    "react-native": "0.71.7",
     "react-native-app-clip": "^0.1.2",
     "react-native-base64": "^0.2.1",
     "react-native-passkey": "^1.1.3",
@@ -55,6 +58,7 @@
     "babel-plugin-module-resolver": "^5.0.0",
     "eslint-config-footprint": "*",
     "module-resolver": "^1.0.0",
+    "react-native-dotenv": "^3.4.8",
     "reactotron-react-native": "^5.0.3"
   },
   "jest": {

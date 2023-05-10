@@ -8,7 +8,6 @@ import {
   TextInputFocusEventData,
   TextInputProps as RNTextInputProps,
 } from 'react-native';
-import { useTimeout } from 'usehooks-ts';
 
 import { Box, BoxProps } from '../box';
 import { Label } from '../label';
@@ -22,18 +21,12 @@ export type TextInputProps = {
 
 const TextInput = forwardRef<RNTextInput, TextInputProps>(
   ({ hasError = false, label, disabled = false, ...props }, ref) => {
-    const { autoFocus, onBlur, onFocus } = props;
+    const { onBlur, onFocus } = props;
     const [isFocused, setFocus] = useState(false);
     const localRef = useRef<RNTextInput>(null);
     const {
       components: { input },
     } = useTheme();
-
-    useTimeout(() => {
-      if (autoFocus) {
-        localRef.current?.focus();
-      }
-    }, 700);
 
     const handleLabelPress = () => {
       localRef.current?.focus();
@@ -97,14 +90,12 @@ const Input = styled.TextInput<{
       css`
         background: ${input.state.default.focus.bg};
         border: ${input.state.default.focus.border};
-        box-shadow: ${input.state.default.focus.elevation};
       `}
 
       ${hasError &&
       css`
         background: ${input.state.error.focus.bg};
         border: ${input.state.error.focus.border};
-        box-shadow: ${input.state.error.focus.elevation};
       `}
 
       ${disabled &&

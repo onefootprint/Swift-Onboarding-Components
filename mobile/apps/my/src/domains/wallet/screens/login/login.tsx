@@ -33,7 +33,6 @@ const Login = ({ navigation }: LoginProps) => {
           <TextInput
             autoCapitalize="none"
             autoComplete="email"
-            autoFocus
             blurOnSubmit
             inputMode="email"
             label="Email"

@@ -52,7 +52,7 @@ const PhoneIdentification = ({ navigation }: PhoneIdentificationProps) => {
           <Typography variant="label-2">(•••) ••• ••02</Typography>
         </Box>
         <Box gap={7}>
-          <PinInput onComplete={value => alert(value)} />
+          <PinInput onComplete={handlePress} />
           <LinkButton onPress={handlePress}>{t('sms.cta')}</LinkButton>
         </Box>
       </DismissKeyboard>

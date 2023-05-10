@@ -60,7 +60,7 @@ export const getErrorMessage = (error?: unknown | Error): string => {
 
 const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
   return {
-    baseURL: 'https://api.dev.onefootprint.com',
+    baseURL: process.env.API_BASE_URL,
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,
