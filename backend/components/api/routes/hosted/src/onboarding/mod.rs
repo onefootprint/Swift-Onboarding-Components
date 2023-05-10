@@ -105,77 +105,67 @@ fn get_requirements_inner(
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let scoped_user_id = &ob_info.scoped_user.id;
 
-    let missing_id_fields = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
-    let missing_ip_fields =
-        uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::InvestorProfile);
-    let missing_finra_compliance_doc = if let Some(declarations) = declarations {
-        let declarations: Vec<Declaration> = declarations.deserialize()?;
-        // The finra compliance doc is missing if any of the declarations require a doc and we don't
-        // yet have one on file
-        declarations.iter().any(|d| d.requires_finra_compliance_doc())
-            && !uvw.has_field(DocumentKind::FinraComplianceLetter)
-    } else {
-        false
+    let id_data_req = {
+        let missing_attributes = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
+        (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes })
     };
-
-    // Fetch missing business fields
-    let missing_business_fields = if ob_info.ob_config()?.must_collect_business() {
-        let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
-        let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-        bvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Business)
-    } else {
-        vec![]
-    };
-
-    // Document requirements are determined by the presence of DocumentRequest database objects.
-    // In various places in the codebase, we will determine if a DocumentRequest should be created
-    //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
-    //      we will create a DocumentRequest row.
-    let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding()?.id)?;
-
-    let doc_request_result = DocumentRequest::get_active(conn, scoped_user_id);
-    // Handle not finding an active request differently than other db errors
-    let document_request_requirements = match doc_request_result {
-        Err(e) => {
-            if e.is_not_found() {
-                Ok(vec![])
-            } else {
-                Err(e)
-            }
-        }
-        Ok(doc_request) => Ok(vec![OnboardingRequirement::CollectDocument {
-            document_request_id: doc_request.id,
-            should_collect_selfie: doc_request.should_collect_selfie,
-            should_collect_consent: doc_request.should_collect_selfie && user_consent.is_none(),
-        }]),
-    }?;
-
-    // TODO: force liveness checks to be re-done and not shared across tenants
-    // RELATED: FP-1802 and FP-1800
-    let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
-
-    let requirements = vec![
-        (!missing_id_fields.is_empty()).then_some(OnboardingRequirement::CollectData {
-            missing_attributes: missing_id_fields,
-        }),
-        (!missing_ip_fields.is_empty() || missing_finra_compliance_doc).then_some(
+    let ip_data_req = {
+        let missing_attributes =
+            uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::InvestorProfile);
+        let missing_document = if let Some(declarations) = declarations {
+            let declarations: Vec<Declaration> = declarations.deserialize()?;
+            // The finra compliance doc is missing if any of the declarations require a doc and we don't
+            // yet have one on file
+            declarations.iter().any(|d| d.requires_finra_compliance_doc())
+                && !uvw.has_field(DocumentKind::FinraComplianceLetter)
+        } else {
+            false
+        };
+        (!missing_attributes.is_empty() || missing_document).then_some(
             OnboardingRequirement::CollectInvestorProfile {
-                missing_attributes: missing_ip_fields,
-                missing_document: missing_finra_compliance_doc,
+                missing_attributes,
+                missing_document,
             },
-        ),
-        (!missing_business_fields.is_empty()).then_some(OnboardingRequirement::CollectBusinessData {
-            missing_attributes: missing_business_fields,
-        }),
-        // check if we have liveness events
+        )
+    };
+    let business_data_req = {
+        // Fetch missing business fields
+        let missing_attributes = if ob_info.ob_config()?.must_collect_business() {
+            let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+            let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
+            bvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Business)
+        } else {
+            vec![]
+        };
+        (!missing_attributes.is_empty())
+            .then_some(OnboardingRequirement::CollectBusinessData { missing_attributes })
+    };
+    let liveness_req = {
+        // TODO: force liveness checks to be re-done and not shared across tenants
+        // RELATED: FP-1802 and FP-1800
+        let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
         liveness_events
             .is_empty()
-            .then_some(OnboardingRequirement::Liveness),
-    ]
-    .into_iter()
-    .flatten()
-    .chain(document_request_requirements)
-    .collect();
+            .then_some(OnboardingRequirement::Liveness)
+    };
+    let doc_req = {
+        // Document requirements are determined by the presence of DocumentRequest database objects.
+        // In various places in the codebase, we will determine if a DocumentRequest should be created
+        //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
+        //      we will create a DocumentRequest row.
+        let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding()?.id)?;
+        let doc_request = DocumentRequest::get_active(conn, scoped_user_id)?;
+        doc_request.map(|dr| OnboardingRequirement::CollectDocument {
+            document_request_id: dr.id,
+            should_collect_selfie: dr.should_collect_selfie,
+            should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
+        })
+    };
+
+    let requirements = vec![id_data_req, ip_data_req, business_data_req, liveness_req, doc_req]
+        .into_iter()
+        .flatten()
+        .collect();
 
     tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%scoped_user_id, "get_requirements result");
 

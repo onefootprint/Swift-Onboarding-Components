@@ -87,11 +87,12 @@ impl DocumentRequest {
 
     /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
-            .first::<Self>(conn)?;
+            .first(conn)
+            .optional()?;
 
         Ok(result)
     }
