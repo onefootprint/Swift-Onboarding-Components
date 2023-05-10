@@ -12,6 +12,7 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use api_core::utils::vault_wrapper::Person;
@@ -26,7 +27,7 @@ use db::models::tenant::Tenant;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::SessionAuthToken;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
 use webhooks::WebhookClient;
@@ -42,10 +43,7 @@ pub struct CommitResponse {
     description = "Finish onboarding the user. Processes the collected data and returns the validation token that can be exchanged for a permanent Footprint user token."
 )]
 #[actix::post("/hosted/onboarding/authorize")]
-pub async fn post(
-    user_auth: UserObAuthContext,
-    state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
+pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<CommitResponse> {
     let session_key = state.session_sealing_key.clone();
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
@@ -208,9 +206,7 @@ pub async fn post(
         }
     }
 
-    Ok(Json(ResponseData {
-        data: CommitResponse { validation_token },
-    }))
+    ResponseData::ok(CommitResponse { validation_token }).json()
 }
 
 async fn run_kyc(

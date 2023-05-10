@@ -136,6 +136,11 @@ class BifrostClient:
             self.handle_collect_document(requirement)
         elif requirement["kind"] == "liveness":
             self.handle_liveness()
+        elif requirement["kind"] == "authorize":
+            self.handle_authorize()
+        else:
+            kind = requirement["kind"]
+            assert False, f"Unknown requirement {kind}"
 
     def handle_collect_user(self, requirement):
         """
@@ -208,10 +213,13 @@ class BifrostClient:
         )
         post("hosted/user/biometric", data, self.auth_token)
 
-    def authorize(self, **kwargs):
-        return post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
+    def handle_authorize(self, **kwargs):
+        post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
 
-    def validate(self, validation_token):
+    def validate(self, **kwargs):
+        return post("hosted/onboarding/validate", None, self.auth_token, **kwargs)
+
+    def validate_token(self, validation_token):
         # Use the SK of the tenant that owns the ob config
         tenant_sk = self.ob_config.tenant.sk
         data = dict(validation_token=validation_token)
@@ -225,8 +233,8 @@ class BifrostClient:
         Simulates all bifrost logic of satisfying requirements and authorizing.
         """
         self.handle_requirements()
-        validation_token = self.authorize()["validation_token"]
-        (fp_id, fp_bid) = self.validate(validation_token)
+        validation_token = self.validate()["validation_token"]
+        (fp_id, fp_bid) = self.validate_token(validation_token)
 
         return User(
             fp_id=fp_id,

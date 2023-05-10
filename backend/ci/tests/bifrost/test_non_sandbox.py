@@ -49,7 +49,7 @@ def test_onboarding_init(bifrost):
     assert req("liveness")
 
     # Shouldn't be able to complete the onboarding until user data is provided
-    bifrost.authorize(status_code=400)
+    bifrost.handle_authorize(status_code=400)
 
 
 def test_collect_data(bifrost):
@@ -76,7 +76,8 @@ def test_liveness(bifrost):
 
 def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     # Manually authorize
-    body = bifrost.authorize()
+    bifrost.handle_authorize()
+    body = bifrost.validate()
     data = dict(validation_token=body["validation_token"])
     # Shouldn't be able to validate with other tenant
     post("onboarding/session/validate", data, sandbox_tenant.sk.key, status_code=400)

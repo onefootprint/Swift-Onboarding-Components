@@ -29,14 +29,15 @@ use newtypes::{
 };
 use paperclip::actix::web;
 
-pub mod authorize;
-pub mod d2p;
-pub mod fingerprint_visit;
-pub mod index;
-pub mod pat;
-pub mod skip_liveness;
-pub mod socure_device;
-pub mod status;
+mod authorize;
+mod d2p;
+mod fingerprint_visit;
+mod index;
+mod pat;
+mod skip_liveness;
+mod socure_device;
+mod status;
+mod validate;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -46,7 +47,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(skip_liveness::post)
         .service(fingerprint_visit::post)
         .service(pat::get)
-        .service(socure_device::post);
+        .service(socure_device::post)
+        .service(validate::post);
 
     d2p::routes(config);
 }
