@@ -21,7 +21,6 @@ use db::{
     },
     DbError, PgConn,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
     DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, OnboardingId,
@@ -85,14 +84,12 @@ pub async fn get_requirements(
         .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
         .await?;
 
-    let tenant_id = &user_auth.tenant()?.id;
-    let is_demo_tenant = state.feature_flag_client.flag(BoolFlag::IsDemoTenant(tenant_id));
     let (requirements, user_auth) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let sb_id = user_auth.scoped_business_id();
+        .db_query(|conn| -> ApiResult<_> {
+            let scoped_business_id = user_auth.scoped_business_id();
             let requirements =
-                get_requirements_inner(conn, uvw, &user_auth, sb_id, declarations, is_demo_tenant)?;
+                get_requirements_inner(conn, uvw, &user_auth, scoped_business_id, declarations)?;
             Ok((requirements, user_auth))
         })
         .await??;
@@ -106,7 +103,6 @@ fn get_requirements_inner(
     ob_info: &UserObSession,
     scoped_business_id: Option<ScopedVaultId>,
     declarations: Option<PiiString>,
-    is_demo_tenant: bool,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let id_req = {
         let missing_attributes = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
@@ -165,12 +161,7 @@ fn get_requirements_inner(
         })
     };
     let authorize_req = {
-        if ob_info.onboarding()?.authorized_at.is_none() || is_demo_tenant {
-            // TODO we have some weird logic here to ALWAYS serialize an authorize requirement for
-            // the demo tenant.
-            // In our demos today, we show one-click by onboarding onto the exact same ob config,
-            // where the onboarding is already authorized. In the future, a longer-term solution
-            // is to just use two separate ob configs to demo
+        if ob_info.onboarding()?.authorized_at.is_none() {
             let fields_to_authorize = get_fields_to_authorize(conn, ob_info)?;
             Some(OnboardingRequirement::Authorize { fields_to_authorize })
         } else {
