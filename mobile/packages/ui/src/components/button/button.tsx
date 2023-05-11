@@ -28,12 +28,17 @@ const Button = ({
   onPress,
   ...props
 }: ButtonProps) => {
+  const handlePress = (event: GestureResponderEvent) => {
+    if (loading || disabled) return;
+    onPress?.(event);
+  };
+
   return (
     <Box {...props}>
       <ButtonContainer
         disabled={disabled}
         loading={loading}
-        onPress={onPress}
+        onPress={handlePress}
         size={size}
         variant={variant}
       >
@@ -44,12 +49,12 @@ const Button = ({
         ) : (
           <HiddenButtonText>{children}</HiddenButtonText>
         )}
-        <LoandingIndicatorContainer loading={loading}>
+        <LoadingContainer loading={loading}>
           <LoadingIndicator
             aria-label={loadingAriaLabel}
             color={variant === 'primary' ? 'quinary' : 'primary'}
           />
-        </LoandingIndicatorContainer>
+        </LoadingContainer>
       </ButtonContainer>
     </Box>
   );
@@ -108,7 +113,7 @@ const HiddenButtonText = styled(Text)`
   opacity: 0;
 `;
 
-const LoandingIndicatorContainer = styled.View<{
+const LoadingContainer = styled.View<{
   loading: boolean;
 }>`
   ${({ loading }) => {

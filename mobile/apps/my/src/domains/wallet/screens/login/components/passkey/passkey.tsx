@@ -1,21 +1,33 @@
 import { IcoFaceid24 } from '@onefootprint/icons';
-import { Box, Button, Typography } from '@onefootprint/ui';
-import React from 'react';
+import { Identifier } from '@onefootprint/types';
+import { Box, Button } from '@onefootprint/ui';
+import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
+import useAuthenticateWithPasskeys from './hooks/use-authenticate-with-passkeys';
+import hasUserCancelled from './utils/has-user-canceled-passkey';
+
 type PasskeyProps = {
-  onSuccess?: () => void;
+  identifier: Identifier;
+  onSuccess?: (authToken: string) => void;
 };
 
-const Passkey = ({ onSuccess }: PasskeyProps) => {
+const Passkey = ({ identifier, onSuccess }: PasskeyProps) => {
+  const mutation = useAuthenticateWithPasskeys();
+  const [isRetry, setRetry] = useState(false);
   const { t } = useTranslation('screens.login.passkey');
-  const isWaiting = false;
-  const hasCta = true;
-  const isRetry = false;
 
   const handlePress = () => {
-    onSuccess();
+    mutation.mutate(identifier, {
+      onSuccess: ({ authToken }) => {
+        onSuccess(authToken);
+      },
+      onError: (error: unknown) => {
+        if (hasUserCancelled(error)) return;
+        setRetry(true);
+      },
+    });
   };
 
   return (
@@ -32,21 +44,14 @@ const Passkey = ({ onSuccess }: PasskeyProps) => {
         backgroundColor="primary"
         borderRadius="default"
         center
-        width={40}
         height={40}
+        width={40}
       >
         <IcoFaceid24 />
       </Box>
-      {isWaiting && (
-        <Typography variant="label-3" color="secondary" marginBottom={6}>
-          {t('loading')}
-        </Typography>
-      )}
-      {hasCta && (
-        <Button onPress={handlePress} size="compact" loading={false}>
-          {isRetry ? t('cta-retry') : t('cta')}
-        </Button>
-      )}
+      <Button onPress={handlePress} size="compact" loading={mutation.isLoading}>
+        {isRetry ? t('cta-retry') : t('cta')}
+      </Button>
     </Box>
   );
 };

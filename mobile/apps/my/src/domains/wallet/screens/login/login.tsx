@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import useTranslation from '@/hooks/use-translation';
 import type { ScreenProps } from '@/wallet/wallet.types';
 
+import useSession from '../../hooks/use-session';
 import Passkey from './components/passkey';
 import Sms from './components/sms';
 
@@ -12,11 +13,13 @@ type LoginProps = ScreenProps<'Login'>;
 
 const Login = ({ route, navigation }: LoginProps) => {
   const { t } = useTranslation('screens.login');
-  const { canUseBiometric } = route.params;
+  const { canUseBiometric, identifier } = route.params;
   const shouldShowTabs = canUseBiometric;
   const [tab, setTab] = useState(canUseBiometric ? 'passkey' : 'sms');
+  const session = useSession();
 
-  const handleSuccess = () => {
+  const handleSuccess = (authToken: string) => {
+    session.logIn(authToken);
     navigation.navigate('MainTabs');
   };
 
@@ -50,7 +53,7 @@ const Login = ({ route, navigation }: LoginProps) => {
       {tab === 'sms' ? (
         <Sms onSuccess={handleSuccess} />
       ) : (
-        <Passkey onSuccess={handleSuccess} />
+        <Passkey identifier={identifier} onSuccess={handleSuccess} />
       )}
     </Container>
   );

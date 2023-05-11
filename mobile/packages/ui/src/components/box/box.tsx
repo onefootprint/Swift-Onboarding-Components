@@ -17,8 +17,12 @@ const Box = ({ children, ...props }: BoxProps) => {
   return <Container {...props}>{children}</Container>;
 };
 
-const Container = styled(({ isSafeArea, ...props }) =>
-  isSafeArea ? <SafeAreaView {...props} /> : <View {...props} />,
+const Container = styled(({ style, isSafeArea, ...props }) =>
+  isSafeArea ? (
+    <SafeAreaView {...props} style={style} />
+  ) : (
+    <View {...props} style={style} />
+  ),
 )<BoxProps>`
   ${({ theme, ...props }) =>
     css`

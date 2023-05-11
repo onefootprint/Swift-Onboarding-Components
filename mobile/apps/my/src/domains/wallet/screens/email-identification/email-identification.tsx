@@ -6,9 +6,7 @@ import {
   DismissKeyboard,
   TextInput,
   Typography,
-  useToast,
 } from '@onefootprint/ui';
-import * as Linking from 'expo-linking';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -25,7 +23,6 @@ type FormData = {
 
 const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
   const { t } = useTranslation('screens.email-identification');
-  const toast = useToast();
   const identifyMutation = useIdentify();
   const {
     control,
@@ -36,23 +33,14 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
   });
 
   const onSubmit = ({ email }) => {
+    const identifier = { email };
     identifyMutation.mutate(
-      { identifier: { email } },
+      { identifier },
       {
         onSuccess: ({ userFound, availableChallengeKinds }) => {
-          if (!userFound) {
-            return toast.show({
-              variant: 'error',
-              title: t('user-not-found.title'),
-              description: t('user-not-found.description'),
-              cta: {
-                label: t('user-not-found.cta'),
-                onPress: () =>
-                  Linking.openURL('https://live.onefootprint.com/'),
-              },
-            });
-          }
+          if (!userFound) return;
           navigation.push('Login', {
+            identifier,
             canUseBiometric: availableChallengeKinds.includes(
               ChallengeKind.biometric,
             ),

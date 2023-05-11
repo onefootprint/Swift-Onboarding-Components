@@ -11,6 +11,7 @@
     "id.address_line1": "Address line 1",
     "id.address_line2": "Address line 2",
     "id.city": "City",
+    "id.country": "Country",
     "id.state": "State",
     "id.zip": "Zip code"
   },
@@ -44,7 +45,7 @@
       },
       "user-not-found": {
         "title": "User not found",
-        "subtitle": "Sorry, we couldn't find an account associated to this email.",
+        "description": "Sorry, we couldn't find an account associated to this email.",
         "cta": "Create account"
       }
     },
@@ -63,44 +64,50 @@
       },
       "passkey": {
         "title": "Passkey",
-        "cta": "Launch passkey"
+        "cta": "Launch passkey",
+        "cta-retry": "Retry passkey",
+        "notifications": {
+          "error": {
+            "title": "We couldn't authenticate using passkey",
+          }
+        }
+      },
+      "canceled": {
+        "title": "Session canceled",
+        "subtitle": "Please return to the previous page"
+      },
+      "completed": {
+        "title": "Success!",
+        "subtitle": "You can now continue where you left on desktop"
+      },
+      "error": {
+        "title": "Session is not valid",
+        "subtitle": "Please go back to the previous page."
+      },
+      "expired": {
+        "title": "Session expired",
+        "subtitle": "For security reasons, this session has timed out. Please go back to the previous page."
       }
     },
-    "canceled": {
-      "title": "Session canceled",
-      "subtitle": "Please return to the previous page"
-    },
-    "completed": {
-      "title": "Success!",
-      "subtitle": "You can now continue where you left on desktop"
-    },
-    "error": {
-      "title": "Session is not valid",
-      "subtitle": "Please go back to the previous page."
-    },
-    "expired": {
-      "title": "Session expired",
-      "subtitle": "For security reasons, this session has timed out. Please go back to the previous page."
-    }
-  },
-  "components": {
-    "back-button": {
-      "cta": "Go back"
-    },
-    "liveness": {
-      "register": {
-        "title": "Liveness check",
-        "subtitle": "We need to verify that you're a real person.",
-        "cta": "Launch Verification"
+    "components": {
+      "back-button": {
+        "cta": "Go back"
       },
-      "retry": {
-        "title": "Biometrics not recognized",
-        "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
-        "cta": "Try biometrics again",
-        "skip": "Do it later"
-      },
-      "success": {
-        "title": "Biometric authentication successful!"
+      "liveness": {
+        "register": {
+          "title": "Liveness check",
+          "subtitle": "We need to verify that you're a real person.",
+          "cta": "Launch Verification"
+        },
+        "retry": {
+          "title": "Biometrics not recognized",
+          "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
+          "cta": "Try biometrics again",
+          "skip": "Do it later"
+        },
+        "success": {
+          "title": "Biometric authentication successful!"
+        }
       }
     }
   }

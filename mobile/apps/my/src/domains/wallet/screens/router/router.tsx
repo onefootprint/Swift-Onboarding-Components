@@ -11,6 +11,7 @@ import configureReactI18next from '@/config/initializers/react-i18next';
 import type { Navigation } from '../../wallet.types';
 import EmailIdentification from '../email-identification';
 import Login from '../login';
+import Settings from '../settings';
 import Sharing from '../sharing';
 import Vault from '../vault';
 
@@ -41,6 +42,7 @@ const Router = () => {
         >
           <Stack.Screen name="Login" component={Login} />
         </Stack.Group>
+        <Stack.Screen name="Settings" component={Settings} />
       </Stack.Navigator>
     </NavigationContainer>
   );

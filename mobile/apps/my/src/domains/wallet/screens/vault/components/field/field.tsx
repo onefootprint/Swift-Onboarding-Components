@@ -1,5 +1,6 @@
 import {
   DataIdentifier,
+  isVaultDataEmpty,
   isVaultDataEncrypted,
   isVaultDataText,
 } from '@onefootprint/types';
@@ -8,7 +9,7 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import useUserVault from '../../../../hooks/use-user-vault';
+import useUserVault from '../../hooks/use-user-vault';
 
 export type FieldProps = {
   di: DataIdentifier;
@@ -36,6 +37,7 @@ const Field = ({ di }: FieldProps) => {
         )}
       </Box>
       {isDataEncrypted && <Typography variant="body-3">•••••••••</Typography>}
+      {isVaultDataEmpty(value) && <Typography variant="body-3">-</Typography>}
       {isVaultDataText(value) ? (
         <Typography variant="body-3">{value}</Typography>
       ) : null}

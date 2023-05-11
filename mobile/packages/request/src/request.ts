@@ -1,4 +1,5 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { DataIdentifierKeys } from '@onefootprint/types';
+import axios, { AxiosError, AxiosRequestConfig as RequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 const LOGOUT_ERROR = 'Session expired or does not exist';
@@ -21,6 +22,7 @@ export type PaginatedRequestResponse<T> = {
     count: number;
   };
 };
+const preservedKeys = [...DataIdentifierKeys];
 
 export const isFootprintError = (error: unknown): error is RequestError =>
   (error as RequestError)?.response?.data !== undefined;
@@ -58,7 +60,7 @@ export const getErrorMessage = (error?: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
+const getRequestOptions = (requestConfig: RequestConfig) => {
   return {
     baseURL: process.env.API_BASE_URL,
     timeout: 60000,
@@ -70,8 +72,9 @@ const getRequestOptions = (requestConfig: AxiosRequestConfig) => {
   };
 };
 
-const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
-  const client = applyCaseMiddleware(axios.create());
+export const client = applyCaseMiddleware(axios.create(), { preservedKeys });
+
+const request = <Response = any>(requestConfig: RequestConfig = {}) => {
   const options = getRequestOptions(requestConfig);
   return client.request<Response>(options);
 };
