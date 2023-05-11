@@ -138,11 +138,6 @@ fn get_requirements_inner(
         })
     };
     let authorize_req = if ob_info.onboarding()?.authorized_at.is_none() {
-        // TODO we have some weird logic here to ALWAYS serialize an authorize requirement for
-        // the demo tenant.
-        // In our demos today, we show one-click by onboarding onto the exact same ob config,
-        // where the onboarding is already authorized. In the future, a longer-term solution
-        // is to just use two separate ob configs to demo
         let identity_document_types = if ob_config.can_access_document() {
             // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
             let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
