@@ -1,4 +1,3 @@
-use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{fingerprint::NewFingerprint, ob_configuration::ObConfiguration};
 use itertools::Itertools;
 use newtypes::{FingerprintScopeKind, FingerprintVersion};
@@ -29,11 +28,7 @@ impl<Type> TenantVw<Type> {
             .filter_map(|id| {
                 self.uvw
                     .get(id.clone())
-                    .and_then(|data| {
-                        EciesP256Sha256AesGcmSealed::from_bytes(data.e_data.as_ref())
-                            .map(|ed| (&data.lifetime_id, ed))
-                            .ok()
-                    })
+                    .map(|ed: &db::models::vault_data::VaultData| (&ed.lifetime_id, &ed.e_data))
                     .map(|(dl_id, e_data)| ((id, dl_id), ((id, tenant_id), e_data)))
             })
             .unzip();

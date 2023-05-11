@@ -91,6 +91,13 @@ impl VaultData {
             .get_results(conn.conn())?;
         Ok(results)
     }
+
+    #[tracing::instrument(skip_all)]
+    pub fn bulk_get_by_id(conn: &mut PgConn, ids: &[VdId]) -> DbResult<Vec<Self>> {
+        Ok(vault_data::table
+            .filter(vault_data::id.eq_any(ids))
+            .get_results(conn)?)
+    }
 }
 
 impl HasLifetime for VaultData {

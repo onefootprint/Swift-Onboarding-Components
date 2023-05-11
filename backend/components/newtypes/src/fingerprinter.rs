@@ -86,6 +86,18 @@ impl GlobalFingerprintKind {
     }
 }
 
+impl TryFrom<DataIdentifier> for GlobalFingerprintKind {
+    type Error = crate::Error;
+
+    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+        Self::iter()
+            .find(|g| g.data_identifier() == value)
+            .ok_or(crate::Error::Custom(
+                "Data is not globally fingerprintable".into(),
+            ))
+    }
+}
+
 /// Signed hasher interface
 #[async_trait]
 pub trait Fingerprinter: std::marker::Sync {

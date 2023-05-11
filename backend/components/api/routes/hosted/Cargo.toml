@@ -62,7 +62,7 @@ lazy_static = { workspace = true }
 strum = { workspace = true }
 
 workos = "0.2"
-byteorder = "1.4"
+byteorder = { workspace = true }
 bytes = "1.3"
 
 

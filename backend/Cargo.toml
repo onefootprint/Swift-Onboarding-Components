@@ -104,3 +104,4 @@ sentry-actix = "0.30.0"
 sentry-tracing = "0.30.0"
 
 log = "0.4.14"
+byteorder = "1.4"

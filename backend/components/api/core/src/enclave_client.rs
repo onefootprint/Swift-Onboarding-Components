@@ -301,15 +301,17 @@ impl EnclaveClient {
     pub async fn batch_fingerprint_sealed<S: FingerprintScopable + Send + Sync>(
         &self,
         sealed_key: &EncryptedVaultPrivateKey,
-        sealed_data: Vec<(S, EciesP256Sha256AesGcmSealed)>,
+        sealed_data: Vec<(S, &SealedVaultBytes)>,
     ) -> Result<Vec<Fingerprint>, EnclaveError> {
         let requests = sealed_data
             .into_iter()
-            .map(|(di, sealed_data)| DecryptThenSignRequest {
-                scope: di.scope().bytes(),
-                sealed_data,
+            .map(|(di, sealed_data)| {
+                Ok(DecryptThenSignRequest {
+                    scope: di.scope().bytes(),
+                    sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
+                })
             })
-            .collect_vec();
+            .collect::<Result<Vec<_>, EnclaveError>>()?;
 
         let num_requests = requests.len();
 

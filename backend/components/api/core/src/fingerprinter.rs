@@ -149,9 +149,15 @@ impl State {
         let existing_user = if existing_user.is_none() {
             let sh_data = self.compute_legacy_fingerprint(idk.into(), &data).await?;
 
-            self.db_pool
+            let result = self
+                .db_pool
                 .db_query(|conn| Vault::find_portable(conn, &[sh_data]))
-                .await??
+                .await??;
+            
+            if let Some(vault) = &result {
+                tracing::info!(vault_id=%vault.id, "found vault via legacy fingerprint");
+            }
+            result
         } else {
             existing_user
         };

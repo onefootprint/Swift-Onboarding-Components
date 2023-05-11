@@ -2,6 +2,7 @@
 #![warn(clippy::expect_used)]
 
 use api_core::*;
+mod custom_migrations;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -43,6 +44,11 @@ async fn run_server() -> std::io::Result<()> {
     std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = State::init_or_die(config.clone()).await;
+
+    // run custom migrations if needed
+    custom_migrations::run(&state)
+        .await
+        .expect("failed to run custom migrations");
 
     // only perform Socure Reason Code API check on prod startups
     if config.service_config.is_production() {

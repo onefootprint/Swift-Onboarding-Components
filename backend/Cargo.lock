@@ -1117,10 +1117,18 @@ dependencies = [
  "actix-web",
  "api_core",
  "api_routes_root",
+ "byteorder",
+ "crypto",
+ "db",
+ "diesel",
+ "futures",
+ "itertools 0.10.3",
  "log",
+ "newtypes",
  "sentry",
  "sentry-actix",
  "sentry-tracing",
+ "tokio",
  "tracing",
 ]
 

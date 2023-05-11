@@ -10,6 +10,6 @@ doctest = false
 
 [dependencies]
 thiserror = "1.0"
-byteorder = "1.4"
+byteorder = { workspace = true }
 blind-rsa-signatures = "0.13"
 crypto = { path = "../enclave/crypto"}

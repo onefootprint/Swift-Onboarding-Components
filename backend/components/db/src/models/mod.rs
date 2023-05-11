@@ -3,6 +3,7 @@ pub mod annotation;
 pub mod appearance;
 pub mod business_owner;
 pub mod contact_info;
+pub mod custom_migration;
 pub mod data_lifetime;
 pub mod decision_intent;
 pub mod document_data;

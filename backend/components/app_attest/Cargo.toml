@@ -14,5 +14,5 @@ serde_cbor = { workspace = true }
 thiserror = { workspace = true }
 serde_bytes = { workspace = true }
 openssl = { workspace = true }
-byteorder = "1.4"
+byteorder = { workspace = true }
 x509-parser = { workspace = true }

@@ -79,6 +79,16 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    custom_migration (version) {
+        version -> Text,
+        run_on -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     data_lifetime (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -923,6 +933,7 @@ allow_tables_to_appear_in_same_query!(
     appearance,
     business_owner,
     contact_info,
+    custom_migration,
     data_lifetime,
     data_lifetime_backup,
     decision_intent,

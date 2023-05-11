@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable, PartialEq)]
 #[diesel(table_name = vault)]
 pub struct Vault {
     pub id: VaultId,

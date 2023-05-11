@@ -24,7 +24,7 @@ envconfig = "0.10.0"
 log = "0.4"
 serde = { workspace = true }
 serde_cbor = { workspace = true }
-byteorder = "1.4"
+byteorder = { workspace = true }
 env_logger = "0.9"
 uuid = { workspace = true }
 thiserror = { workspace = true }

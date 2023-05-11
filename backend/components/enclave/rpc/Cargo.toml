@@ -11,7 +11,7 @@ doctest = false
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_cbor = { workspace = true }
-byteorder = "1.4"
+byteorder = { workspace = true }
 uuid = { workspace = true }
 thiserror = { workspace = true }
 crypto = { path = "../crypto" }

@@ -21,6 +21,7 @@ pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
 
+#[tracing::instrument(skip(state, _custodian))]
 #[api_v2_operation(
     description = "Private endpoint to clean up specific integration test user information.",
     tags(Private)
