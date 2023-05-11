@@ -1,8 +1,10 @@
+import { IdDocRequirement, LivenessRequirement } from '@onefootprint/types';
+
 import { BasePluginProps } from '../base-plugin';
 
 export type TransferRequirements = {
-  liveness?: boolean;
-  idDoc?: boolean;
+  liveness?: LivenessRequirement;
+  idDoc?: IdDocRequirement;
 };
 
 export type TransferCustomData = {

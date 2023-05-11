@@ -1,11 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import {
-  AuthorizeRequirement,
-  CollectedInvestorProfileDataOption,
-  CollectedKybDataOption,
-  CollectedKycDataOption,
-  OnboardingRequirement,
   OnboardingRequirementKind,
   OnboardingStatusResponse,
 } from '@onefootprint/types';
@@ -14,6 +9,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
+import { Requirements } from '../../utils/state-machine';
 import useGetOnboardingStatus from '../authorize/hooks/use-get-onboarding-status';
 
 const CheckRequirements = () => {
@@ -26,50 +22,27 @@ const CheckRequirements = () => {
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
     const { requirements } = response;
-    let liveness = false;
-    let idDoc = false;
-    let selfie = false;
-    let consent = false;
-    let kycData: CollectedKycDataOption[] = [];
-    let kybData: CollectedKybDataOption[] = [];
-    let investorProfile: CollectedInvestorProfileDataOption[] = [];
-    let authorize: AuthorizeRequirement | undefined;
+    const payload = {} as Requirements;
 
-    requirements.forEach((req: OnboardingRequirement) => {
+    requirements.forEach(req => {
       if (req.kind === OnboardingRequirementKind.collectKybData) {
-        kybData = req.missingAttributes;
-      }
-      if (req.kind === OnboardingRequirementKind.collectKycData) {
-        kycData = req.missingAttributes;
-      }
-      if (req.kind === OnboardingRequirementKind.liveness) {
-        liveness = true;
-      }
-      if (req.kind === OnboardingRequirementKind.idDoc) {
-        idDoc = true;
-        selfie = req.shouldCollectSelfie;
-        consent = req.shouldCollectConsent;
-      }
-      if (req.kind === OnboardingRequirementKind.investorProfile) {
-        investorProfile = req.missingAttributes;
-      }
-      if (req.kind === OnboardingRequirementKind.authorize) {
-        authorize = req;
+        payload.kyb = req;
+      } else if (req.kind === OnboardingRequirementKind.collectKycData) {
+        payload.kyc = req;
+      } else if (req.kind === OnboardingRequirementKind.liveness) {
+        payload.liveness = req;
+      } else if (req.kind === OnboardingRequirementKind.idDoc) {
+        payload.idDoc = req;
+      } else if (req.kind === OnboardingRequirementKind.investorProfile) {
+        payload.investorProfile = req;
+      } else if (req.kind === OnboardingRequirementKind.authorize) {
+        payload.authorize = req;
       }
     });
 
     send({
       type: 'onboardingRequirementsReceived',
-      payload: {
-        liveness,
-        idDoc,
-        selfie,
-        consent,
-        kybData,
-        kycData,
-        investorProfile,
-        authorize,
-      },
+      payload,
     });
   };
 

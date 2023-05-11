@@ -32,15 +32,7 @@ const Router = ({ onDone }: RouterProps) => {
       device,
     },
     collectedKycData,
-    requirements: {
-      liveness,
-      idDoc,
-      selfie,
-      consent,
-      kycData,
-      kybData,
-      authorize,
-    },
+    requirements: { kyb, kyc, liveness, idDoc },
   } = state.context;
   const isDone = state.matches('success');
 
@@ -68,7 +60,7 @@ const Router = ({ onDone }: RouterProps) => {
       </DeviceSignals>
     );
   }
-  if (state.matches('kybData')) {
+  if (state.matches('kybData') && kyb) {
     return (
       <DeviceSignals page="kyb-data" fpAuthToken={authToken}>
         <CollectKybData
@@ -76,8 +68,8 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
-              missingKybAttributes: kybData,
-              missingKycAttributes: kycData,
+              requirement: kyb,
+              kycRequirement: kyc,
               config,
               userFound,
               email,
@@ -89,7 +81,7 @@ const Router = ({ onDone }: RouterProps) => {
       </DeviceSignals>
     );
   }
-  if (state.matches('kycData')) {
+  if (state.matches('kycData') && kyc) {
     return (
       <DeviceSignals page="kyc-data" fpAuthToken={authToken}>
         <CollectKycData
@@ -97,7 +89,7 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
-              missingAttributes: kycData,
+              requirement: kyc,
               userFound,
               email,
               sandboxSuffix,
@@ -157,7 +149,7 @@ const Router = ({ onDone }: RouterProps) => {
       </DeviceSignals>
     );
   }
-  if (state.matches('idDoc')) {
+  if (state.matches('idDoc') && idDoc) {
     return (
       <DeviceSignals page="id-doc" fpAuthToken={authToken}>
         <IdDoc
@@ -165,9 +157,7 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
-              shouldCollectIdDoc: idDoc,
-              shouldCollectSelfie: selfie,
-              shouldCollectConsent: consent,
+              requirement: idDoc,
             },
           }}
           onDone={handleRequirementCompleted}
@@ -176,9 +166,6 @@ const Router = ({ onDone }: RouterProps) => {
     );
   }
   if (state.matches('authorize')) {
-    if (!authorize) {
-      return null;
-    }
     return (
       <DeviceSignals page="authorize" fpAuthToken={authToken}>
         <Authorize onDone={handleRequirementCompleted} />

@@ -16,16 +16,19 @@ import Router from './pages/router';
 const App = ({ context, onDone }: IdDocProps) => {
   const [, send] = useIdDocMachine();
   const { authToken, device, customData } = context;
-  const { shouldCollectIdDoc, shouldCollectSelfie, shouldCollectConsent } =
-    customData || {};
 
   useEffectOnce(() => {
+    if (!customData) {
+      return;
+    }
+    const { shouldCollectSelfie, shouldCollectConsent } =
+      customData.requirement;
     send({
       type: 'receivedContext',
       payload: {
         authToken,
         device,
-        idDocRequired: !!shouldCollectIdDoc,
+        idDocRequired: true,
         selfieRequired: !!shouldCollectSelfie,
         consentRequired: !!shouldCollectConsent,
       },

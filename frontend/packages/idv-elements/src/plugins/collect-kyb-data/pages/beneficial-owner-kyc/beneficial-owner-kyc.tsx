@@ -13,7 +13,7 @@ const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
   const {
     missingKybAttributes,
-    missingKycAttributes,
+    kycRequirement,
     data,
     authToken,
     device,
@@ -21,7 +21,7 @@ const BeneficialOwnerKyc = () => {
     userFound,
     email,
   } = state.context;
-  if (!authToken || !device || !config) {
+  if (!authToken || !device || !config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
   }
 
@@ -53,7 +53,7 @@ const BeneficialOwnerKyc = () => {
         device,
         customData: {
           fixedData,
-          missingAttributes: missingKycAttributes,
+          requirement: kycRequirement,
           userFound: !!userFound,
           email,
           config,

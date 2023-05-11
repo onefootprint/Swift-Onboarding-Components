@@ -41,32 +41,28 @@ export const RequirementTargets: MachineTarget[] = [
 export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound, isTransfer },
-    requirements: { kycData, idDoc, liveness },
+    requirements: { kyc, idDoc, liveness, investorProfile, kyb },
     startedDataCollection,
   } = context;
   return (
     !startedDataCollection &&
     userFound &&
     !isTransfer &&
-    (kycData.length > 0 || !!idDoc || !!liveness)
+    (!!kyc || !!idDoc || !!liveness || !!investorProfile || !!kyb)
   );
 };
 
 const shouldRunCollectKybData = (context: MachineContext) =>
-  context.requirements.kybData.length > 0;
+  !!context.requirements.kyb;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
-  context.requirements.kycData.length > 0;
+  !!context.requirements.kyc;
 
 const shouldRunCollectInvestorProfile = (context: MachineContext) =>
-  context.requirements.investorProfile.length > 0;
+  !!context.requirements.investorProfile;
 
-const shouldRunLiveness = (context: MachineContext) => {
-  const {
-    requirements: { liveness },
-  } = context;
-  return !!liveness;
-};
+const shouldRunLiveness = (context: MachineContext) =>
+  !!context.requirements.liveness;
 
 const shouldRunIdDoc = (context: MachineContext) => {
   const {

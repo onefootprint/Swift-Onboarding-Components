@@ -5,6 +5,7 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingConfig,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -43,7 +44,10 @@ describe('Collect KYB Data Machine Tests', () => {
         userFound: true,
         config: { ...TestOnboardingConfig },
         missingKybAttributes,
-        missingKycAttributes,
+        kycRequirement: {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: missingKycAttributes,
+        },
       },
     });
     return machine;

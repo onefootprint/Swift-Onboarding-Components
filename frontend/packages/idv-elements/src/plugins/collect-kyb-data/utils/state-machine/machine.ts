@@ -21,7 +21,6 @@ const createCollectKybDataMachine = () =>
       initial: 'init',
       context: {
         missingKybAttributes: [],
-        missingKycAttributes: [],
         data: {},
       },
       states: {
@@ -157,7 +156,8 @@ const createCollectKybDataMachine = () =>
           on: {
             confirmed: [
               {
-                cond: context => context.missingKycAttributes.length > 0,
+                cond: context =>
+                  (context.kycRequirement?.missingAttributes || []).length > 0,
                 target: 'beneficialOwnerKyc',
               },
               {
@@ -293,10 +293,10 @@ const createCollectKybDataMachine = () =>
             email,
             phoneNumber,
             missingKybAttributes,
-            missingKycAttributes,
+            kycRequirement,
           } = event.payload;
           context.missingKybAttributes = [...missingKybAttributes];
-          context.missingKycAttributes = [...missingKycAttributes];
+          context.kycRequirement = kycRequirement;
           context.device = device;
           context.authToken = authToken;
           context.config = config;

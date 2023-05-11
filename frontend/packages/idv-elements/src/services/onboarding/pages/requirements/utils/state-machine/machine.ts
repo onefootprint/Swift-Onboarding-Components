@@ -16,13 +16,7 @@ export type OnboardingRequirementsMachineArgs = {
   isTransfer?: boolean;
 };
 
-const defaultRequirements: Requirements = {
-  idDoc: false,
-  liveness: false,
-  kybData: [],
-  kycData: [],
-  investorProfile: [],
-};
+const defaultRequirements: Requirements = {};
 
 const createOnboardingRequirementsMachine = ({
   userFound,

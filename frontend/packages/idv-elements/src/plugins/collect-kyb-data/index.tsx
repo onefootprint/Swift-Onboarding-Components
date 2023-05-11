@@ -28,8 +28,8 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
       userFound,
       email,
       phoneNumber,
-      missingKybAttributes,
-      missingKycAttributes,
+      requirement,
+      kycRequirement,
     } = customData;
     send({
       type: 'receivedContext',
@@ -40,8 +40,8 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
         userFound,
         email,
         phoneNumber,
-        missingKybAttributes,
-        missingKycAttributes,
+        missingKybAttributes: requirement.missingAttributes,
+        kycRequirement,
       },
     });
   });

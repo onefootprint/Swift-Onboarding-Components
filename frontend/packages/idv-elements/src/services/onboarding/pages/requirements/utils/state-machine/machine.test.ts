@@ -1,14 +1,35 @@
 import {
+  AuthorizeRequirement,
   CollectedKycDataOption,
+  CollectKycDataRequirement,
+  IdDocRequirement,
+  IdDocType,
+  LivenessRequirement,
   OnboardingConfig,
-  OnboardingRequirementKind,
 } from '@onefootprint/types';
-import { AuthorizeRequirement } from '@onefootprint/types/src/api/onboarding-status';
 import { interpret } from 'xstate';
 
 import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
+
+const livenessRequirement = {} as LivenessRequirement;
+
+const idDocRequirement = {
+  shouldCollectSelfie: true,
+  shouldCollectConsent: true,
+} as IdDocRequirement;
+
+const kycRequirement = {
+  missingAttributes: [CollectedKycDataOption.name],
+} as CollectKycDataRequirement;
+
+const authorizeRequirement = {
+  fieldsToAuthorize: {
+    collectedData: [CollectedKycDataOption.name],
+    identityDocumentTypes: [] as IdDocType[],
+  },
+} as AuthorizeRequirement;
 
 describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
@@ -49,13 +70,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(state.value).toBe('checkRequirements');
       const { requirements, startedDataCollection, onboardingContext } =
         state.context;
-      expect(requirements).toEqual({
-        liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-        investorProfile: [],
-      });
+      expect(requirements).toEqual({});
       expect(startedDataCollection).toBe(false);
       expect(onboardingContext).toEqual({
         device: {
@@ -71,14 +86,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
-          authorize: undefined,
-        },
+        payload: {},
       });
       expect(state.value).toBe('success');
     });
@@ -100,31 +108,18 @@ describe('Onboarding Requirements Machine Tests', () => {
       let { state } = machine;
 
       expect(state.context.startedDataCollection).toBe(false);
-      const authorizeRequirement = {
-        kind: OnboardingRequirementKind.authorize,
-        fieldsToAuthorize: {
-          collectedData: [CollectedKycDataOption.name],
-          identityDocumentTypes: [],
-        },
-      } as AuthorizeRequirement;
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: true,
-          idDoc: false,
-          kycData: [CollectedKycDataOption.name],
-          kybData: [],
-          investorProfile: [],
+          liveness: livenessRequirement,
+          kyc: kycRequirement,
           authorize: authorizeRequirement,
         },
       });
 
       expect(state.context.requirements).toEqual({
-        liveness: true,
-        idDoc: false,
-        kycData: [CollectedKycDataOption.name],
-        kybData: [],
-        investorProfile: [],
+        liveness: livenessRequirement,
+        kyc: kycRequirement,
         authorize: authorizeRequirement,
       });
       expect(state.context.startedDataCollection).toBe(true);
@@ -144,20 +139,12 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: true,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
+          liveness: livenessRequirement,
           authorize: authorizeRequirement,
         },
       });
       expect(state.context.requirements).toEqual({
-        liveness: true,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-        investorProfile: [],
+        liveness: livenessRequirement,
         authorize: authorizeRequirement,
       });
 
@@ -171,22 +158,12 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
           authorize: authorizeRequirement,
         },
       });
 
       expect(state.value).toBe('authorize');
       expect(state.context.requirements).toEqual({
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-        investorProfile: [],
-        liveness: false,
         authorize: authorizeRequirement,
       });
 
@@ -197,14 +174,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
-          authorize: undefined,
-        },
+        payload: {},
       });
       expect(state.value).toBe('success');
     });
@@ -226,30 +196,17 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       machine.start();
       let { state } = machine;
-      const authorizeRequirement = {
-        kind: OnboardingRequirementKind.authorize,
-        fieldsToAuthorize: {
-          collectedData: [CollectedKycDataOption.name],
-          identityDocumentTypes: [],
-        },
-      } as AuthorizeRequirement;
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: true,
-          idDoc: false,
-          kycData: [CollectedKycDataOption.name],
-          kybData: [],
-          investorProfile: [],
+          liveness: livenessRequirement,
+          kyc: kycRequirement,
           authorize: authorizeRequirement,
         },
       });
       expect(state.context.requirements).toEqual({
-        liveness: true,
-        idDoc: false,
-        kycData: [CollectedKycDataOption.name],
-        kybData: [],
-        investorProfile: [],
+        liveness: livenessRequirement,
+        kyc: kycRequirement,
         authorize: authorizeRequirement,
       });
 
@@ -263,20 +220,14 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: true,
-          idDoc: true,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
+          liveness: livenessRequirement,
+          idDoc: idDocRequirement,
           authorize: authorizeRequirement,
         },
       });
       expect(state.context.requirements).toEqual({
-        liveness: true,
-        idDoc: true,
-        kycData: [],
-        kybData: [],
-        investorProfile: [],
+        liveness: livenessRequirement,
+        idDoc: idDocRequirement,
         authorize: authorizeRequirement,
       });
 
@@ -290,22 +241,12 @@ describe('Onboarding Requirements Machine Tests', () => {
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: {
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
           authorize: authorizeRequirement,
         },
       });
 
       expect(state.value).toBe('authorize');
       expect(state.context.requirements).toEqual({
-        liveness: false,
-        idDoc: false,
-        kycData: [],
-        kybData: [],
-        investorProfile: [],
         authorize: authorizeRequirement,
       });
 
@@ -316,14 +257,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: false,
-          idDoc: false,
-          kycData: [],
-          kybData: [],
-          investorProfile: [],
-          authorize: undefined,
-        },
+        payload: {},
       });
       expect(state.value).toBe('success');
     });

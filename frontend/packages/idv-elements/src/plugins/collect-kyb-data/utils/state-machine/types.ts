@@ -3,7 +3,7 @@ import {
   BusinessDI,
   BusinessDIData,
   CollectedKybDataOption,
-  CollectedKycDataOption,
+  CollectKycDataRequirement,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -34,7 +34,7 @@ export type BeneficialOwnersData =
 export type MachineContext = {
   // Plugin context
   missingKybAttributes: CollectedKybDataOption[];
-  missingKycAttributes: CollectedKycDataOption[];
+  kycRequirement?: CollectKycDataRequirement;
   device?: DeviceInfo;
   authToken?: string;
   config?: OnboardingConfig;
@@ -50,7 +50,7 @@ export type MachineEvents =
       type: 'receivedContext';
       payload: {
         missingKybAttributes: CollectedKybDataOption[];
-        missingKycAttributes: CollectedKycDataOption[];
+        kycRequirement?: CollectKycDataRequirement;
         authToken: string;
         device: DeviceInfo;
         config: OnboardingConfig;

@@ -12,6 +12,7 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
   OnboardingConfig,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -22,7 +23,11 @@ import {
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
-import { CollectKybDataProps } from './collect-kyb-data.types';
+import { PluginContext } from '../base-plugin';
+import {
+  CollectKybDataContext,
+  CollectKybDataProps,
+} from './collect-kyb-data.types';
 import CollectKybData from './index';
 import {
   withBusinessVault,
@@ -79,15 +84,21 @@ describe('<CollectKybData />', () => {
   const getContext = (
     kycAttributes: CollectedKycDataOption[],
     kybAttributes: CollectedKybDataOption[],
-  ) => {
+  ): PluginContext<CollectKybDataContext> => {
     const allAttributes = [...kycAttributes, ...kybAttributes];
 
     return {
       authToken: 'token',
       customData: {
         config: getOnboardingConfig(allAttributes, allAttributes),
-        missingKybAttributes: kybAttributes ?? [],
-        missingKycAttributes: kycAttributes ?? [],
+        requirement: {
+          kind: OnboardingRequirementKind.collectKybData,
+          missingAttributes: kybAttributes,
+        },
+        kycRequirement: {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: kycAttributes,
+        },
         userFound: true,
         email: 'piip@onefootprint.com',
       },

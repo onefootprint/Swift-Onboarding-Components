@@ -1,20 +1,20 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   AuthorizeRequirement,
-  CollectedInvestorProfileDataOption,
-  CollectedKybDataOption,
-  CollectedKycDataOption,
+  CollectInvestorProfileRequirement,
+  CollectKybDataRequirement,
+  CollectKycDataRequirement,
+  IdDocRequirement,
+  LivenessRequirement,
   OnboardingConfig,
 } from '@onefootprint/types';
 
 export type Requirements = {
-  liveness: boolean;
-  idDoc?: boolean;
-  selfie?: boolean;
-  consent?: boolean;
-  kycData: CollectedKycDataOption[];
-  kybData: CollectedKybDataOption[];
-  investorProfile: CollectedInvestorProfileDataOption[];
+  kyb?: CollectKybDataRequirement;
+  kyc?: CollectKycDataRequirement;
+  investorProfile?: CollectInvestorProfileRequirement;
+  liveness?: LivenessRequirement;
+  idDoc?: IdDocRequirement;
   authorize?: AuthorizeRequirement;
 };
 

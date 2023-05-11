@@ -23,7 +23,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
       return;
     }
     const {
-      missingAttributes,
+      requirement: { missingAttributes },
       userFound,
       email,
       sandboxSuffix,

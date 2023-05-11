@@ -11,6 +11,7 @@ import {
   CollectedKycDataOption,
   IdDIData,
   OnboardingConfig,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -100,7 +101,10 @@ describe('<CollectKycData />', () => {
   ): PluginContext<CollectKycDataContext> => ({
     authToken: 'token',
     customData: {
-      missingAttributes: attributes ?? [],
+      requirement: {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: attributes ?? [],
+      },
       fixedData: fixedData ?? {},
       userFound: true,
       email: 'piip@onefootprint.com',
