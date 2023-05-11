@@ -31,7 +31,6 @@ def test_onboarding_init(bifrost):
     # Already initialized in bifrost client, but try again to make sure this endpoint is
     # idempotent
     body = bifrost.initialize_onboarding()
-    assert not body["validation_token"]
 
     body = bifrost.get_status()
     assert body["ob_configuration"]["org_name"] == bifrost.ob_config.tenant.name
@@ -42,9 +41,8 @@ def test_onboarding_init(bifrost):
     expected_data = set(bifrost.ob_config.must_collect_data) - {"phone_number", "email"}
     assert set(collect_data_req["missing_attributes"]) == expected_data
 
-    # requirements are non-null, so we expect this to be None
-    authorize_fields = body["fields_to_authorize"]
-    assert not authorize_fields
+    authorize_fields = req("authorize")["fields_to_authorize"]["collected_data"]
+    assert set(authorize_fields) == set(bifrost.ob_config.can_access_data)
 
     assert req("liveness")
 

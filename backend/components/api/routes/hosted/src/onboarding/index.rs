@@ -1,4 +1,3 @@
-use super::create_onboarding_validation_token;
 use crate::auth::session::UpdateSession;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
@@ -12,6 +11,8 @@ use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::IsGuardMet;
 use api_core::errors::AssertionError;
+use api_core::types::EmptyResponse;
+use api_core::types::JsonApiResponse;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -21,15 +22,8 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
-use newtypes::SessionAuthToken;
 use newtypes::VaultKind;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct OnboardingResponse {
-    /// Populated if the user has already onboarded onto this tenant's ob_configuration
-    validation_token: Option<SessionAuthToken>,
-}
+use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     tags(Hosted, Bifrost),
@@ -40,7 +34,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
-) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
+) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let scoped_user_id = user_auth
@@ -74,7 +68,7 @@ pub async fn post(
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
-    let validation_token = state
+    state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
@@ -89,25 +83,20 @@ pub async fn post(
             if is_new_ob && ob_config.must_collect_document() {
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
-                DocumentRequest::create(
-                    conn,
-                    ob.scoped_vault_id.clone(),
-                    None,
-                    ob_config.must_collect_selfie(),
-                    None,
-                )?;
+                let must_collect_selfie = ob_config.must_collect_selfie();
+                DocumentRequest::create(conn, ob.scoped_vault_id, None, must_collect_selfie, None)?;
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            let is_business_authorized = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
+            if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
                 let existing_businesses =
                     BusinessOwner::list_businesses(conn, &user_vault.id, &ob_config.id)?;
-                let (sb, ob) = if let Some(existing) = existing_businesses.into_iter().next() {
+                let sb = if let Some(existing) = existing_businesses.into_iter().next() {
                     // If the user has already started onboarding their business onto this exact
                     // ob config, we should locate it.
                     // Note, this isn't quite portablizing the business since we only locate it
                     // when onboarding onto the exact same ob config
-                    existing.1
+                    existing.1 .0
                 } else {
                     let (public_key, e_private_key) = maybe_new_biz_keypair;
                     let args = NewVaultArgs {
@@ -128,27 +117,18 @@ pub async fn post(
                         ob_configuration_id: ob_config.id.clone(),
                         insight_event: insight_event.clone(),
                     };
-                    let (ob, _) = Onboarding::get_or_create(conn, ob_create_args)?;
-                    (sb, ob)
+                    Onboarding::get_or_create(conn, ob_create_args)?;
+                    sb
                 };
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
                 let new_scope = UserAuthScope::Business(sb.id);
                 let data = user_auth.data.clone().add_scopes(vec![new_scope]);
                 user_auth.update_session(conn, &session_key, data)?;
-                ob.authorized_at.is_some()
-            } else {
-                true
-            };
+            }
 
-            // If the user has already onboarded onto this same ob config, return a validation token
-            let is_user_authorized = ob.authorized_at.is_some();
-            let validation_token = (is_user_authorized && is_business_authorized)
-                .then(|| create_onboarding_validation_token(conn, &session_key, ob.id))
-                .transpose()?;
-
-            Ok(validation_token)
+            Ok(())
         })
         .await?;
 
-    ResponseData::ok(OnboardingResponse { validation_token }).json()
+    ResponseData::ok(EmptyResponse {}).json()
 }

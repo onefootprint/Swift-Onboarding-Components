@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
-use crate::onboarding::{get_fields_to_authorize, get_requirements};
+use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -19,21 +19,11 @@ pub async fn get(
     let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant()?.clone();
-    let fields_to_authorize = state
-        .db_pool
-        .db_query(move |conn| get_fields_to_authorize(conn, &user_auth))
-        .await??;
-
-    // If we still have requirements, we don't want to authorize any fields yet.
-    // This is kinda hacky, but belce and argoff discussed doing this for now
-    // TODO deprecate
-    let auth_fields = requirements.is_empty().then_some(fields_to_authorize);
-
     let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
 
     ResponseData::ok(OnboardingStatusResponse {
         requirements,
-        fields_to_authorize: auth_fields,
+        // This is only used by the handoff app - we might be able to rm and move elsewhere
         ob_configuration: ob_config,
     })
     .json()

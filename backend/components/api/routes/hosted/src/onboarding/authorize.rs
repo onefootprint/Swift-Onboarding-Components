@@ -12,6 +12,7 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
@@ -26,25 +27,17 @@ use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
-use newtypes::SessionAuthToken;
-use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
+use paperclip::actix::{self, api_v2_operation, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
 use webhooks::WebhookClient;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-pub struct CommitResponse {
-    /// Footprint validation token
-    validation_token: SessionAuthToken,
-}
-
 #[api_v2_operation(
     tags(Hosted, Bifrost),
-    description = "Finish onboarding the user. Processes the collected data and returns the validation token that can be exchanged for a permanent Footprint user token."
+    description = "Mark the onboarding as authorized and initiate IDV checks"
 )]
 #[actix::post("/hosted/onboarding/authorize")]
-pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<CommitResponse> {
-    let session_key = state.session_sealing_key.clone();
+pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
@@ -139,7 +132,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     }
 
-    let (validation_token, status, su, decision_timestamp, manual_review, ob_config) = state
+    let (status, su, decision_timestamp, manual_review, ob_config) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Return status as well
@@ -150,15 +143,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             // we shouldn't have many cases that need to fall back to Utc::now
             let timestamp = ob.authorized_at.unwrap_or_else(Utc::now);
 
-            let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
-            Ok((
-                validation_token,
-                status,
-                scoped_user,
-                timestamp,
-                manual_review,
-                ob_config,
-            ))
+            Ok((status, scoped_user, timestamp, manual_review, ob_config))
         })
         .await??;
 
@@ -206,7 +191,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     }
 
-    ResponseData::ok(CommitResponse { validation_token }).json()
+    ResponseData::ok(EmptyResponse {}).json()
 }
 
 async fn run_kyc(

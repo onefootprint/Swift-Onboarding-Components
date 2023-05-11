@@ -3,14 +3,23 @@ use crate::errors::onboarding::OnboardingError;
 use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::{auth::user::UserObAuthContext, types::JsonApiResponse};
+use api_core::{
+    auth::{
+        session::AuthSessionData,
+        user::{UserObAuthContext, ValidateUserToken},
+    },
+    errors::ApiResult,
+    types::JsonApiResponse,
+    utils::session::AuthSession,
+};
 use api_wire_types::hosted::validate::ValidateResponse;
+use chrono::Duration;
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     tags(Hosted, Bifrost),
-    description = "Finish onboarding the user. Processes the collected data and returns the validation token that can be exchanged for a permanent Footprint user token."
+    description = "Finish onboarding the user. Returns the validation token that can be exchanged for a permanent Footprint user token."
 )]
 #[actix::post("/hosted/onboarding/validate")]
 pub async fn post(
@@ -30,7 +39,11 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let validation_token = state
         .db_pool
-        .db_query(move |conn| super::create_onboarding_validation_token(conn, &session_key, ob_id))
+        .db_query(move |conn| -> ApiResult<_> {
+            let data = AuthSessionData::ValidateUserToken(ValidateUserToken { ob_id });
+            let validation_token = AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
+            Ok(validation_token)
+        })
         .await??;
 
     ResponseData::ok(ValidateResponse { validation_token }).json()

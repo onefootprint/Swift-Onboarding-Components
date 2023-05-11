@@ -1,30 +1,21 @@
-use crate::{
-    auth::session::AuthSessionData,
-    auth::user::ValidateUserToken,
-    utils::{
-        session::AuthSession,
-        vault_wrapper::{Business, Person, VaultWrapper, VwArgs},
-    },
-};
+use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
     auth::user::{CheckedUserObAuthContext, UserObSession},
     errors::{business::BusinessError, ApiResult},
     State,
 };
 use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
-use chrono::Duration;
-use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
         liveness_event::LivenessEvent, user_consent::UserConsent,
     },
-    DbError, PgConn,
+    PgConn,
 };
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, OnboardingId,
-    PiiString, ScopedVaultId, SessionAuthToken,
+    DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, PiiString,
+    ScopedVaultId,
 };
 use paperclip::actix::web;
 
@@ -50,20 +41,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(validate::post);
 
     d2p::routes(config);
-}
-
-fn create_onboarding_validation_token(
-    conn: &mut PgConn,
-    session_sealing_key: &ScopedSealingKey,
-    ob_id: OnboardingId,
-) -> Result<SessionAuthToken, DbError> {
-    let validation_token = AuthSession::create_sync(
-        conn,
-        session_sealing_key,
-        AuthSessionData::ValidateUserToken(ValidateUserToken { ob_id }),
-        Duration::minutes(15),
-    )?;
-    Ok(validation_token)
 }
 
 #[tracing::instrument(skip_all)]
@@ -104,13 +81,13 @@ fn get_requirements_inner(
     scoped_business_id: Option<ScopedVaultId>,
     declarations: Option<PiiString>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
+    let ob_config = ob_info.ob_config()?;
     let id_req = {
-        let missing_attributes = uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Id);
+        let missing_attributes = uvw.missing_fields(ob_config, DataIdentifierDiscriminant::Id);
         (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes })
     };
     let ip_req = {
-        let missing_attributes =
-            uvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::InvestorProfile);
+        let missing_attributes = uvw.missing_fields(ob_config, DataIdentifierDiscriminant::InvestorProfile);
         let missing_document = if let Some(declarations) = declarations {
             let declarations: Vec<Declaration> = declarations.deserialize()?;
             // The finra compliance doc is missing if any of the declarations require a doc and we don't
@@ -129,10 +106,10 @@ fn get_requirements_inner(
     };
     let biz_req = {
         // Fetch missing business fields
-        let missing_attributes = if ob_info.ob_config()?.must_collect_business() {
+        let missing_attributes = if ob_config.must_collect_business() {
             let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
             let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-            bvw.missing_fields(ob_info.ob_config()?, DataIdentifierDiscriminant::Business)
+            bvw.missing_fields(ob_config, DataIdentifierDiscriminant::Business)
         } else {
             vec![]
         };
@@ -160,13 +137,27 @@ fn get_requirements_inner(
             should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
         })
     };
-    let authorize_req = {
-        if ob_info.onboarding()?.authorized_at.is_none() {
-            let fields_to_authorize = get_fields_to_authorize(conn, ob_info)?;
-            Some(OnboardingRequirement::Authorize { fields_to_authorize })
+    let authorize_req = if ob_info.onboarding()?.authorized_at.is_none() {
+        // TODO we have some weird logic here to ALWAYS serialize an authorize requirement for
+        // the demo tenant.
+        // In our demos today, we show one-click by onboarding onto the exact same ob config,
+        // where the onboarding is already authorized. In the future, a longer-term solution
+        // is to just use two separate ob configs to demo
+        let identity_document_types = if ob_config.can_access_document() {
+            // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
+            let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
+            id_docs.iter().map(|id| id.document_type).unique().collect()
         } else {
-            None
-        }
+            vec![]
+        };
+
+        let fields_to_authorize = AuthorizeFields {
+            collected_data: ob_config.can_access_data.clone(),
+            identity_document_types,
+        };
+        Some(OnboardingRequirement::Authorize { fields_to_authorize })
+    } else {
+        None
     };
 
     let requirements = vec![id_req, ip_req, biz_req, liveness_req, doc_req, authorize_req]
@@ -177,25 +168,4 @@ fn get_requirements_inner(
     tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%ob_info.scoped_user.id, "get_requirements result");
 
     Ok(requirements)
-}
-
-/// This function gets all the fields the User needs to authorize the Tenant having access to.
-/// Since we don't know the type of the document until the User selects it and we process it, we
-/// need to check the IdentityDocument table for documents gathered during the onboarding
-pub fn get_fields_to_authorize(conn: &mut PgConn, ob_info: &UserObSession) -> ApiResult<AuthorizeFields> {
-    let ob_config = ob_info.ob_config()?;
-    let identity_document_types = if ob_config.can_access_document() {
-        // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-        let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
-        id_docs.iter().map(|id| id.document_type).unique().collect()
-    } else {
-        vec![]
-    };
-
-    let res = AuthorizeFields {
-        collected_data: ob_config.can_access_data.clone(),
-        identity_document_types,
-    };
-
-    Ok(res)
 }
