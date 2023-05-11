@@ -23,9 +23,13 @@ url = lambda path: "{}/{}".format(TEST_URL, path)
 TWILIO_API_KEY = get_secret("TWILIO_API_KEY")
 TWILIO_ACCOUNT_SID = get_secret("TWILIO_ACCOUNT_SID")
 TWILIO_API_KEY_SECRET = get_secret("TWILIO_API_KEY_SECRET")
+
+# This phone number can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send SMS messages to it.
+# However, users created with this phone number can never be identified at another tenant.
 FIXTURE_PHONE_NUMBER = "+15555550100"
-PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
-SCRUBBED_PHONE_NUMBER = f"+1 (***) ***-**{PHONE_NUMBER[-2:]}"
+# This is a real phone number - we send real SMSes to this phone number
+LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
+
 EMAIL = "footprint.user.dev@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 
@@ -69,7 +73,7 @@ BUSINESS_DATA = {
     "business.name": "Foobar Inc",  # We'll add a random suffix to this
     "business.dba": "Barfoo Inc",
     "business.website": "https://foobar.com",
-    "business.phone_number": PHONE_NUMBER,
+    "business.phone_number": FIXTURE_PHONE_NUMBER,
     "business.address_line1": "1 Hayes St",
     "business.city": "SF",
     "business.state": "CA",
@@ -93,7 +97,7 @@ BUSINESS_DATA = {
                 "first_name": "Franklin",
                 "last_name": "Frog",
                 "email": "franklin@onefootprint.com",
-                "phone_number": "+14254444444",
+                "phone_number": LIVE_PHONE_NUMBER,
                 "ownership_stake": 30,
             },
         ]

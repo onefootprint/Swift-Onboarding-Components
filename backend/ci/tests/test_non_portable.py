@@ -1,6 +1,6 @@
 import pytest
 from tests.utils import post, get, patch
-from tests.constants import EMAIL, PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
+from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
 @pytest.mark.parametrize(
@@ -101,7 +101,7 @@ def test_derived_entries(tenant, entry, derived_entry):
 def test_vault_create_write_decrypt(tenant):
     # create the vault
     initial_data = {
-        "id.phone_number": PHONE_NUMBER,
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
         "id.email": EMAIL,
         "custom.hi": "bye",
         **ID_DATA,

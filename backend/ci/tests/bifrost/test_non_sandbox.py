@@ -1,6 +1,6 @@
 import pytest
 
-from tests.constants import EMAIL, PHONE_NUMBER
+from tests.constants import EMAIL, LIVE_PHONE_NUMBER
 from tests.bifrost_client import BifrostClient
 from tests.utils import (
     get,
@@ -13,7 +13,7 @@ from tests.utils import (
 @pytest.fixture(scope="module", autouse="true")
 def cleanup():
     # Cleanup the non-sandbox user that is used across all integration test runs
-    clean_up_user(PHONE_NUMBER, EMAIL)
+    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
 
 
 @pytest.fixture(scope="module")
@@ -22,7 +22,7 @@ def bifrost(twilio, tenant):
     Bifrost client for a non-sandbox user
     """
     bifrost_client = BifrostClient(
-        tenant.default_ob_config, twilio, override_create_phone=PHONE_NUMBER
+        tenant.default_ob_config, twilio, override_create_phone=LIVE_PHONE_NUMBER
     )
     return bifrost_client
 

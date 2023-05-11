@@ -33,19 +33,17 @@ class DualOnboardedUser(NamedTuple):
     foo_fp_id: str
 
 
-@pytest.fixture(scope="session")
-def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
+@pytest.fixture(scope="module")
+def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     # Create a sandbox user, onboard them onto sandbox_tenant
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
-    user = bifrost.run()
-    fp_id = user.fp_id
+    fp_id = sandbox_user_real_phone.fp_id
 
     #
     # Then onboard them onto foo_sandbox_tenant
     #
     inherited_auth_token = inherit_user(
         twilio,
-        bifrost.data["id.phone_number"],
+        sandbox_user_real_phone.client.data["id.phone_number"],
         foo_sandbox_tenant.default_ob_config.key,
     )
     foo_bifrost = BifrostClient(foo_sandbox_tenant.default_ob_config, twilio)

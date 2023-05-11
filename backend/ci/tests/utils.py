@@ -9,7 +9,11 @@ import os
 
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from tests.auth import DashboardAuth, FpAuth
-from tests.constants import CUSTODIAN_AUTH, TEST_URL, PHONE_NUMBER, FIXTURE_PHONE_NUMBER
+from tests.constants import (
+    CUSTODIAN_AUTH,
+    TEST_URL,
+    FIXTURE_PHONE_NUMBER,
+)
 
 url = lambda path: "{}/{}".format(TEST_URL, path)
 
@@ -229,7 +233,13 @@ def identify_verify(
     real_phone_number = phone_number.split("#")[0]
     if real_phone_number == FIXTURE_PHONE_NUMBER:
         # The code for the fixture number in sandbox is fixed
-        return verify("000000")
+        try:
+            return verify("000000")
+        except HttpError as e:
+            if expected_error and expected_error in str(e):
+                # The specific error we expected to see was returned from verify - we can exit
+                return
+            raise e
 
     def inner():
         messages = twilio.messages.list(to=real_phone_number, limit=10)
@@ -348,9 +358,13 @@ def _gen_random_n_digit_number(n):
 
 
 def _random_sandbox_phone(suffix=None):
+    """
+    Generates a random sandbox phone number that uses our FIXTURE phone number.
+    No SMS messages will be sent to this number, and its PIN code in identify is always 000000
+    """
     suffix = suffix or "sandbox"
     seed = _gen_random_n_digit_number(10)
-    return f"{PHONE_NUMBER}#{suffix}{seed}"
+    return f"{FIXTURE_PHONE_NUMBER}#{suffix}{seed}"
 
 
 def _gen_random_ssn():

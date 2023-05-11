@@ -59,7 +59,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
     assert body["invited"]["email"] == bos[1]["email"]
-    assert body["invited"]["phone_number"] == bos[1]["phone_number"]
+    assert body["invited"]["phone_number"] == bos[1]["phone_number"].replace(" ", "")
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient(

@@ -5,7 +5,7 @@ from tests.utils import (
     get_requirement_from_requirements,
 )
 from tests.bifrost_client import BifrostClient
-from tests.constants import PHONE_NUMBER
+from tests.constants import FIXTURE_PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
@@ -28,7 +28,7 @@ def incomplete_bifrost(kyb_sandbox_ob_config, twilio, kyb_cdos):
             {
                 "business.name": "Flerp",
                 "business.website": "flerp.com",
-                "business.phone_number": PHONE_NUMBER,
+                "business.phone_number": FIXTURE_PHONE_NUMBER,
                 "business.tin": "123-45-1234",
                 "business.address_line1": "One Footprint Way",
                 "business.city": "Hayes Valley",
