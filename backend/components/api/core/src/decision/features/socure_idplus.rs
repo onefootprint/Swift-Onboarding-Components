@@ -315,7 +315,7 @@ mod tests {
                     scores: vec![Score {
                         name: "sigma".to_owned(),
                         version: "1.0".to_owned(),
-                        score: 0.81
+                        score: Some(0.81)
                     }]
                 }),
                 kyc: None,

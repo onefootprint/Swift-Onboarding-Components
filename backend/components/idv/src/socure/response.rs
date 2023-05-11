@@ -28,7 +28,7 @@ pub struct SocureIDPlusResponse {
 #[serde(rename_all = "camelCase")]
 pub struct Correlation {
     pub reason_codes: Vec<String>,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -50,7 +50,7 @@ pub struct Fraud {
 pub struct Score {
     pub name: String,
     pub version: String,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -78,7 +78,7 @@ pub struct FieldValidation {
 #[serde(rename_all = "camelCase")]
 pub struct AddressRisk {
     pub reason_codes: Vec<String>,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 // alternatively could combine AddressRisk, EmailRisk, PhoneRisk into one struct i guess
@@ -86,14 +86,14 @@ pub struct AddressRisk {
 #[serde(rename_all = "camelCase")]
 pub struct EmailRisk {
     pub reason_codes: Vec<String>,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PhoneRisk {
     pub reason_codes: Vec<String>,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -128,7 +128,7 @@ pub struct GlobalWatchlistMatch {
     pub match_fields: Option<Vec<String>>,
     pub source_urls: Option<Vec<String>>,
     pub comments: Option<GlobalWatchlistMatchComment>,
-    pub match_score: f32,
+    pub match_score: Option<f32>,
 }
 
 impl Eq for GlobalWatchlistMatch {}
@@ -139,7 +139,8 @@ impl PartialEq for GlobalWatchlistMatch {
             && self.match_fields == other.match_fields
             && self.source_urls == other.source_urls
             && self.comments == other.comments
-            && (self.match_score - other.match_score).abs() < f32::EPSILON
+            && (self.match_score.unwrap_or_default() - other.match_score.unwrap_or_default()).abs()
+                < f32::EPSILON
     }
 }
 
@@ -233,7 +234,7 @@ pub struct Counts {
 }
 
 fn get_score_by_name(scores: &[Score], name: String) -> Option<f32> {
-    scores.iter().find(|s| s.name == name).map(|s| s.score)
+    scores.iter().find(|s| s.name == name).and_then(|s| s.score)
 }
 
 impl SocureIDPlusResponse {
@@ -250,11 +251,11 @@ impl SocureIDPlusResponse {
     }
 
     pub fn email_risk_score(&self) -> Option<f32> {
-        self.email_risk.as_ref().map(|e| e.score)
+        self.email_risk.as_ref().and_then(|e| e.score)
     }
 
     pub fn phone_risk_score(&self) -> Option<f32> {
-        self.phone_risk.as_ref().map(|e| e.score)
+        self.phone_risk.as_ref().and_then(|e| e.score)
     }
 
     pub fn all_device_reason_codes(&self) -> Vec<String> {

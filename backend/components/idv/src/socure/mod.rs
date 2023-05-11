@@ -310,7 +310,7 @@ mod tests {
                                 political_position: Some(vec!["Child of Henry Doe (Politician)".to_owned()]),
                                 offense: Some(vec!["Pep,Pep Class 2,Pep Class 4".to_owned()])
                             }),
-                            match_score: 98.0
+                            match_score: Some(98.0)
                         },
                         GlobalWatchlistMatch {
                             entity_id: "ZaP+/U4QWUgjZmsjDltrtDGFl5D6Alw".to_owned(),
@@ -330,7 +330,7 @@ mod tests {
                                 political_position: None,
                                 offense: Some(vec!["Pep Class 2".to_owned()])
                             }),
-                            match_score: 97.0
+                            match_score: Some(97.0)
                         }
                     ]
                 )])
