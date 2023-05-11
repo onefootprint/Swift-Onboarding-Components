@@ -294,6 +294,7 @@ const createCollectKybDataMachine = () =>
             phoneNumber,
             missingKybAttributes,
             kycRequirement,
+            sandboxSuffix,
           } = event.payload;
           context.missingKybAttributes = [...missingKybAttributes];
           context.kycRequirement = kycRequirement;
@@ -303,6 +304,7 @@ const createCollectKybDataMachine = () =>
           context.userFound = userFound;
           context.email = email;
           context.phoneNumber = phoneNumber;
+          context.sandboxSuffix = sandboxSuffix;
           return context;
         }),
         assignBasicData: assign((context, event) => {

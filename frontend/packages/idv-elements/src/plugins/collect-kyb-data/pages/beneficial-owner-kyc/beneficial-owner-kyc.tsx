@@ -3,6 +3,7 @@ import {
   BusinessDI,
   CollectedKybDataOption,
   IdDI,
+  IdDIData,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -20,6 +21,7 @@ const BeneficialOwnerKyc = () => {
     config,
     userFound,
     email,
+    sandboxSuffix,
   } = state.context;
   if (!authToken || !device || !config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
@@ -37,14 +39,16 @@ const BeneficialOwnerKyc = () => {
   const primaryBeneficialOwner = requireMultiKyc
     ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
     : data?.[BusinessDI.beneficialOwners]?.[0];
-  const fixedData = primaryBeneficialOwner
-    ? {
-        [IdDI.firstName]:
-          primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName],
-        [IdDI.lastName]:
-          primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName],
-      }
-    : undefined;
+  const bootstrapData: IdDIData = {};
+  if (email) {
+    bootstrapData[IdDI.email] = email;
+  }
+  if (primaryBeneficialOwner) {
+    bootstrapData[IdDI.firstName] =
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName];
+    bootstrapData[IdDI.lastName] =
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName];
+  }
 
   return (
     <CollectKycData
@@ -52,11 +56,12 @@ const BeneficialOwnerKyc = () => {
         authToken,
         device,
         customData: {
-          fixedData,
+          fixedFields: [IdDI.firstName, IdDI.lastName],
+          bootstrapData,
           requirement: kycRequirement,
           userFound: !!userFound,
-          email,
           config,
+          sandboxSuffix,
         },
       }}
       onDone={handleDone}

@@ -14,6 +14,7 @@ export type CollectKybDataContext = {
   // TODO: generalize this data by using DataIdentifiers
   email?: string;
   phoneNumber?: string;
+  sandboxSuffix?: string;
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

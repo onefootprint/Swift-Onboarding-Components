@@ -1,5 +1,6 @@
 import {
   CollectKycDataRequirement,
+  IdDI,
   IdDIData,
   OnboardingConfig,
 } from '@onefootprint/types';
@@ -7,12 +8,12 @@ import {
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKycDataContext = {
-  requirement: CollectKycDataRequirement;
-  fixedData?: IdDIData;
-  email?: string; // TODO: remove
+  config: OnboardingConfig;
   userFound: boolean;
   sandboxSuffix?: string; // only if in sandbox mode
-  config: OnboardingConfig;
+  requirement: CollectKycDataRequirement;
+  bootstrapData?: IdDIData; // For tenant-provided initial data or email/phone from identify flows
+  fixedFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
 };
 
 export type CollectKycDataProps = BasePluginProps<CollectKycDataContext>;

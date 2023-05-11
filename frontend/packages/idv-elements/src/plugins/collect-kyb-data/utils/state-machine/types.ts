@@ -39,6 +39,7 @@ export type MachineContext = {
   authToken?: string;
   config?: OnboardingConfig;
   userFound?: boolean;
+  sandboxSuffix?: string;
   email?: string;
   phoneNumber?: string;
   // Machine generated
@@ -57,6 +58,7 @@ export type MachineEvents =
         userFound: boolean;
         email?: string;
         phoneNumber?: string;
+        sandboxSuffix?: string;
       };
     }
   | {

@@ -9,7 +9,7 @@ import {
 } from '@onefootprint/test-utils';
 import {
   CollectedKycDataOption,
-  IdDIData,
+  IdDI,
   OnboardingConfig,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
@@ -97,7 +97,6 @@ describe('<CollectKycData />', () => {
 
   const getContext = (
     attributes?: CollectedKycDataOption[],
-    fixedData?: IdDIData,
   ): PluginContext<CollectKycDataContext> => ({
     authToken: 'token',
     customData: {
@@ -105,9 +104,10 @@ describe('<CollectKycData />', () => {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: attributes ?? [],
       },
-      fixedData: fixedData ?? {},
+      bootstrapData: {
+        [IdDI.email]: 'piip@onefootprint.com',
+      },
       userFound: true,
-      email: 'piip@onefootprint.com',
       sandboxSuffix: 'sandbox',
       config: getOnboardingConfig(attributes, attributes),
     },

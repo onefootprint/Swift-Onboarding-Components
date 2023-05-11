@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import DeviceSignals from '../../../../../../components/device-signals';
@@ -74,6 +75,7 @@ const Router = ({ onDone }: RouterProps) => {
               userFound,
               email,
               phoneNumber,
+              sandboxSuffix,
             },
           }}
           onDone={handleRequirementCompleted}
@@ -90,8 +92,10 @@ const Router = ({ onDone }: RouterProps) => {
             device,
             customData: {
               requirement: kyc,
+              bootstrapData: {
+                [IdDI.email]: email,
+              },
               userFound,
-              email,
               sandboxSuffix,
               config,
             },
