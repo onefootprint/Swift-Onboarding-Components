@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  DecisionSourceKind,
+  ActorKind,
   DecisionStatus,
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
@@ -26,7 +26,7 @@ const OnboardingDecisionEventHeader = ({
   const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
 
-  if (source.kind === DecisionSourceKind.footprint) {
+  if (source.kind === ActorKind.footprint) {
     return (
       <Box sx={{ gap: 2 }}>
         <Typography
@@ -43,7 +43,7 @@ const OnboardingDecisionEventHeader = ({
     );
   }
 
-  if (source.kind === DecisionSourceKind.firmEmployee) {
+  if (source.kind === ActorKind.firmEmployee) {
     return (
       <OrgDecisionContainer>
         <Typography
@@ -59,7 +59,7 @@ const OnboardingDecisionEventHeader = ({
     );
   }
 
-  if (source.kind === DecisionSourceKind.organization) {
+  if (source.kind === ActorKind.organization) {
     const decision = t(`decision-status.${status}`);
 
     return (

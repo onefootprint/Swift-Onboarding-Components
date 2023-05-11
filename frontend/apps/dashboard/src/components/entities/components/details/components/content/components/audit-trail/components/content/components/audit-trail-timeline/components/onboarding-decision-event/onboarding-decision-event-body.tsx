@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  ActorKind,
   CollectedDataOption,
   CollectedDocumentDataOption,
-  DecisionSourceKind,
   DecisionStatus,
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
@@ -37,7 +37,7 @@ const OnboardingDecisionEventBody = ({
   } = data;
   const statusStr = t(`decision-status.${status}`);
 
-  if (annotation && source.kind !== DecisionSourceKind.footprint) {
+  if (annotation && source.kind !== ActorKind.footprint) {
     return <AnnotationNote annotation={annotation} />;
   }
 

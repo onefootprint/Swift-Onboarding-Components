@@ -7,9 +7,9 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
+  ActorKind,
   CollectedKycDataOption,
   DataIdentifier,
-  DecisionSourceKind,
   DecisionStatus,
   DocumentDI,
   Entity,
@@ -161,7 +161,7 @@ export const timelineFixture: Timeline = [
           status: DecisionStatus.pass,
           timestamp: new Date('2023-03-29T23:08:36.755235Z'),
           source: {
-            kind: DecisionSourceKind.footprint,
+            kind: ActorKind.footprint,
           },
           obConfiguration: {
             mustCollectData: [],

@@ -431,6 +431,11 @@
         "carousel-buttons": {
           "left-aria-label": "Previous note",
           "right-aria-label": "Next note"
+        },
+        "note-added-by-source": {
+          "firm_employee": "Footprint Risk Ops",
+          "footprint": "Footprint",
+          "api_key": "API key"
         }
       },
       "breadcrumb": {
@@ -641,7 +646,12 @@
                 "placeholder": "Type your note..."
               }
             },
-            "note-added-by": "Note added by"
+            "note-added-by": "Note added by",
+            "note-added-by-source": {
+              "firm_employee": "Footprint Risk Ops",
+              "footprint": "Footprint",
+              "api_key": "API key"
+            }
           }
         }
       },

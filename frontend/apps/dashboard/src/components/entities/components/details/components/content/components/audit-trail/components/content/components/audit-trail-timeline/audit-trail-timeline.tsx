@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16, IcoWarning16 } from '@onefootprint/icons';
 import {
+  ActorKind,
   Annotation,
   CollectedDataEventData,
   Entity,
@@ -130,7 +131,13 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: (
           <Typography variant="label-3">{`${t(
             'timeline.free-form-note-event.note-added-by',
-          )} ${eventData.source.member}`}</Typography>
+          )} ${
+            eventData.source.kind === ActorKind.organization
+              ? eventData.source.member
+              : t(
+                  `timeline.free-form-note-event.note-added-by-source.${eventData.source.kind}`,
+                )
+          }`}</Typography>
         ),
         bodyComponent: <AnnotationNote annotation={eventData} />,
       });

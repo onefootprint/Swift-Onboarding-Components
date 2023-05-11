@@ -4,7 +4,7 @@ import {
   IcoChevronRight24,
   IcoPin24,
 } from '@onefootprint/icons';
-import { DecisionSourceKind } from '@onefootprint/types';
+import { ActorKind } from '@onefootprint/types';
 import { IconButton, SXStyles, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -71,9 +71,9 @@ const PinnedNotes = () => {
       </PinHeader>
       <PinnedNote
         author={
-          source.kind === DecisionSourceKind.organization
+          source.kind === ActorKind.organization
             ? source.member
-            : undefined
+            : t(`note-added-by-source.${source.kind}`)
         }
         key={id}
         note={note}

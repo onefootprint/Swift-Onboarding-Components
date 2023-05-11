@@ -1,10 +1,9 @@
 import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
-  DecisionAnnotation,
+  Annotation,
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
-  PinnedAnnotation,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
@@ -29,13 +28,13 @@ const useEntityAnnotations = (id: string) => {
   const { authHeaders } = useSession();
   const { formatDateWithTime } = useIntl();
 
-  return useQuery<PinnedAnnotation[]>(
+  return useQuery<Annotation[]>(
     ['entity', id, 'annotations'],
     () => getPinnedAnnotations({ entityId: id }, authHeaders),
     {
       enabled: !!id,
       select: response =>
-        response.map((annotation: DecisionAnnotation) => ({
+        response.map((annotation: Annotation) => ({
           ...annotation,
           timestamp: formatDateWithTime(new Date(annotation.timestamp)),
         })),

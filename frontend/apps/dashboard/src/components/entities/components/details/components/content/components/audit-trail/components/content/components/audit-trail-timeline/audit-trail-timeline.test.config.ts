@@ -1,6 +1,6 @@
 import {
+  ActorKind,
   CollectedKycDataOption,
-  DecisionSourceKind,
   DecisionStatus,
   LivenessIssuer,
   LivenessSource,
@@ -64,7 +64,7 @@ const TimelineFixture: Timeline = [
           status: DecisionStatus.pass,
           timestamp: new Date('2022-11-08T20:21:53.750904Z'),
           source: {
-            kind: DecisionSourceKind.footprint,
+            kind: ActorKind.footprint,
           },
           obConfiguration: {
             mustCollectData: [
@@ -93,7 +93,7 @@ const TimelineFixture: Timeline = [
           status: DecisionStatus.stepUpRequired,
           timestamp: new Date('2022-11-08T20:21:53.769699Z'),
           source: {
-            kind: DecisionSourceKind.footprint,
+            kind: ActorKind.footprint,
           },
           obConfiguration: {
             mustCollectData: [

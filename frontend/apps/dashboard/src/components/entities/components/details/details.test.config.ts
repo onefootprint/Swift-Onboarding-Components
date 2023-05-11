@@ -7,12 +7,12 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
+  ActorKind,
   BusinessDI,
   BusinessOwner,
   CollectedKybDataOption,
   CollectedKycDataOption,
   DataIdentifier,
-  DecisionSourceKind,
   DecisionStatus,
   Entity,
   EntityKind,
@@ -116,7 +116,7 @@ export const timelineFixture: Timeline = [
           status: DecisionStatus.pass,
           timestamp: new Date('2023-04-05T11:17:06.773951Z'),
           source: {
-            kind: DecisionSourceKind.footprint,
+            kind: ActorKind.footprint,
           },
           obConfiguration: {
             mustCollectData: [
