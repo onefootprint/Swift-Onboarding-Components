@@ -88,8 +88,7 @@ impl TwilioClient {
     async fn send_message(
         &self,
         state: &State,
-        // TODO PiiString so we don't log this
-        message_body: String,
+        message_body: PiiString,
         destination: &PhoneNumber,
         rate_limit_scope: &str,
     ) -> ApiResult<()> {
@@ -105,9 +104,9 @@ impl TwilioClient {
         }
         .enforce_and_update()
         .await?;
-        let message_body = format!("{}\n\nSent via Footprint", message_body);
+        let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         self.client
-            .send_message(destination.e164().leak(), message_body)
+            .send_message(destination.e164(), message_body)
             .await
             .map_err(TwilioError::from)?;
         Ok(())
@@ -128,9 +127,9 @@ impl TwilioClient {
             crypto::random::gen_rand_n_digit_code(6)
         };
         let message_body = if let Some(tenant_name) = tenant_name {
-            format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code)
+            PiiString::from(format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code))
         } else {
-            format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code)
+            PiiString::from(format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
         self.send_message(state, message_body, destination, rate_limit::SMS_CHALLENGE)
@@ -152,7 +151,7 @@ impl TwilioClient {
         destination: &PhoneNumber,
         url: String,
     ) -> ApiResult<SecondsBeforeRetry> {
-        let message_body = format!("Continue account verification using this link: {}", url);
+        let message_body = PiiString::from(format!("Continue account verification using this link: {}", url));
 
         self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
             .await?;
@@ -162,13 +161,13 @@ impl TwilioClient {
 
     #[tracing::instrument(skip_all)]
     pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
-        let message_body = format!(
+        let message_body = PiiString::from(format!(
             "{} identified you as a beneficial owner of {}. To finish verifying your business for {}, we need to verify your identity as well. Continue here: {}",
             info.inviter.leak(),
             info.business_name.leak(),
             info.org_name,
             info.url.leak()
-        );
+        ));
 
         self.send_message(state, message_body, info.destination, rate_limit::BO_SESSION)
             .await?;

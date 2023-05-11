@@ -1,3 +1,4 @@
+use newtypes::PiiString;
 use workos::passwordless::{
     CreatePasswordlessSession, CreatePasswordlessSessionParams, CreatePasswordlessSessionType,
     PasswordlessSessionType,
@@ -14,7 +15,7 @@ pub async fn create_magic_link(
     email: &str,
     redirect_url: &str,
     is_invite: bool,
-) -> ApiResult<String> {
+) -> ApiResult<PiiString> {
     let session = state
         .workos_client
         .passwordless()
@@ -31,5 +32,5 @@ pub async fn create_magic_link(
         PasswordlessSessionType::MagicLink { email: _, link } => link.clone(),
     };
 
-    Ok(link)
+    Ok(PiiString::from(link))
 }

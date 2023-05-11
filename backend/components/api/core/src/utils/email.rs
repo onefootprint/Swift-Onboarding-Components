@@ -83,10 +83,14 @@ impl SendgridClient {
         Self { api_key, client }
     }
 
-    pub async fn send_magic_link_email(&self, to_email: String, curl_url: String) -> ApiResult<()> {
-        let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
-        self.send_template(to_email, Self::MAGIC_LINK_TEMPLATE_ID, template_data)
-            .await
+    pub async fn send_magic_link_email(&self, to_email: String, url: PiiString) -> ApiResult<()> {
+        let template_data = HashMap::from([("curl_request".to_string(), url)]);
+        self.send_template(
+            PiiString::from(to_email),
+            Self::MAGIC_LINK_TEMPLATE_ID,
+            template_data,
+        )
+        .await
     }
 
     pub async fn send_dashboard_invite_email(
@@ -94,19 +98,20 @@ impl SendgridClient {
         to_email: String,
         inviter: String,
         org_name: String,
-        accept_url: String,
+        accept_url: PiiString,
     ) -> Result<(), ApiError> {
+        let to_email = PiiString::from(to_email);
         let template_data = HashMap::from([
             ("recipient_email".to_string(), to_email.clone()),
-            ("inviter".to_string(), inviter),
-            ("org_name".to_string(), org_name),
+            ("inviter".to_string(), PiiString::from(inviter)),
+            ("org_name".to_string(), PiiString::from(org_name)),
             ("accept_url".to_string(), accept_url),
         ]);
         self.send_template(to_email, Self::DASHBOARD_INVITE_TEMPLATE_ID, template_data)
             .await
     }
 
-    pub async fn send_email_verify_email(&self, to_email: String, curl_url: String) -> ApiResult<()> {
+    pub async fn send_email_verify_email(&self, to_email: PiiString, curl_url: PiiString) -> ApiResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
         self.send_template(to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
             .await
@@ -123,41 +128,48 @@ impl SendgridClient {
         } = info;
         let d = HashMap::from_iter(
             vec![
-                Some(("recipient_email".to_string(), to_email.leak_to_string())),
-                Some(("inviter".to_string(), inviter.leak_to_string())),
-                Some(("business_name".to_string(), business_name.leak_to_string())),
-                Some(("flow_url".to_string(), url.leak_to_string())),
-                Some(("org_name".to_string(), org_name.to_string())),
+                Some(("recipient_email".to_string(), to_email.clone())),
+                Some(("inviter".to_string(), inviter.clone())),
+                Some(("business_name".to_string(), business_name.clone())),
+                Some(("flow_url".to_string(), url)),
+                Some(("org_name".to_string(), PiiString::from(org_name.to_string()))),
                 Some((
                     "org_name_first_char".to_string(),
-                    org_name
-                        .chars()
-                        .next()
-                        .unwrap_or_default()
-                        .to_uppercase()
-                        .to_string(),
+                    PiiString::from(
+                        org_name
+                            .chars()
+                            .next()
+                            .unwrap_or_default()
+                            .to_uppercase()
+                            .to_string(),
+                    ),
                 )),
                 // TODO need to handle no logo
-                logo_url.map(|u| ("logo_url".to_string(), u)),
+                logo_url.map(|u| ("logo_url".to_string(), PiiString::from(u))),
             ]
             .into_iter()
             .flatten(),
         );
-        self.send_template(to_email.leak_to_string(), Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
+        self.send_template(to_email, Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
             .await
     }
 
     #[tracing::instrument(skip_all)]
     async fn send_template(
         &self,
-        to_email: String,
+        to_email: PiiString,
         template_id: &str,
-        // TODO make this PiiString so we don't accidentally log
-        template_data: HashMap<String, String>,
+        template_data: HashMap<String, PiiString>,
     ) -> ApiResult<()> {
+        let template_data = template_data
+            .into_iter()
+            .map(|(k, v)| (k, v.leak_to_string()))
+            .collect();
         let req = SendgridTemplateRequest {
             personalizations: vec![SendgridPersonalization {
-                to: vec![SendgridEmail { email: to_email }],
+                to: vec![SendgridEmail {
+                    email: to_email.leak_to_string(),
+                }],
                 dynamic_template_data: template_data,
             }],
             from: SendgridEmail {
@@ -202,10 +214,10 @@ pub async fn send_email_challenge(
     } else {
         "https://confirm.preview.onefootprint.com"
     };
-    let confirm_link_str = format!("{}/?v={}#{}", base_url, unique_param, token);
+    let confirm_link_str = PiiString::from(format!("{}/?v={}#{}", base_url, unique_param, token));
     state
         .sendgrid_client
-        .send_email_verify_email(email_address.leak_to_string(), confirm_link_str)
+        .send_email_verify_email(email_address.clone(), confirm_link_str)
         .await?;
     Ok(())
 }

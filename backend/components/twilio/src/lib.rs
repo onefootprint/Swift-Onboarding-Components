@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use newtypes::PiiString;
 use request::send_message::SendMessage;
 use reqwest::{RequestBuilder, Method, IntoUrl};
 use response::{decode_response, lookup::{LookupResponse}, message::Message};
@@ -82,13 +83,13 @@ impl Client {
     }
 
     /// send an sms message
-    pub async fn send_message(&self, destination: &str, body: String) -> crate::response::Result<Message> {
+    pub async fn send_message(&self, destination: PiiString, body: PiiString) -> crate::response::Result<Message> {
         let retry_strategy = ExponentialBackoff::from_millis(10)        
         .map(jitter) // add jitter
         .take(3); // limit to 3 retries
 
         let result = Retry::spawn(retry_strategy, move || {
-            self.send_message_internal(destination, body.clone())
+            self.send_message_internal(destination.clone(), body.clone())
         })
         .await?;
 
@@ -97,8 +98,8 @@ impl Client {
 
     async fn send_message_internal(
         &self,
-        destination: &str,
-        body: String,
+        destination: PiiString,
+        body: PiiString,
     ) -> crate::response::Result<Message> {
         /// if a message wasnt delivered in 15s it should be useless to us
         /// so tell twilio to drop it
@@ -108,8 +109,8 @@ impl Client {
         let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
 
         let params = SendMessage {
-            body,
-            to: destination.to_owned(),
+            body: body.leak_to_string(),
+            to: destination.leak_to_string(),
             from: self.from_number.to_string(),
             validity_period: VALIDITY_PERIOD_SECS // dont send the message after TTL
         };
