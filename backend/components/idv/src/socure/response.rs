@@ -157,7 +157,7 @@ pub struct GlobalWatchlistMatchComment {
 #[serde(rename_all = "camelCase")]
 pub struct DeviceRisk {
     pub reason_codes: Vec<String>,
-    pub score: f32,
+    pub score: Option<f32>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

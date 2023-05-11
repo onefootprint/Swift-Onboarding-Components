@@ -327,7 +327,7 @@ mod tests {
                 global_watchlist: None,
                 device_risk: Some(DeviceRisk {
                     reason_codes: vec!["I412".to_owned()],
-                    score: 0.0
+                    score: Some(0.0)
                 }),
                 device_identity_correlation: None,
                 device_data: None,
