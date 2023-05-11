@@ -52,13 +52,10 @@ const createOnboardingMachine = ({
               target: 'configInvalid',
             },
             initContextUpdated: [
-              // TODO: For now, for the demo, we are unconditionally showing the authorize screen
-              // every time the user signs-in even if they previously onboarded.
+              // TODO can simplify this logic when validationToken is separate from authorize
               {
-                target: 'authorize',
-                cond: (context, event) =>
-                  isContextReady(context, event) &&
-                  !!event.payload.validationToken,
+                target: 'complete',
+                cond: (_, event) => !!event.payload.validationToken,
                 actions: ['assignInitContext', 'assignValidationToken'],
               },
               {
@@ -76,21 +73,10 @@ const createOnboardingMachine = ({
           on: {
             requirementsCompleted: [
               {
-                target: 'authorize',
-                cond: context => !context.isTransfer,
-              },
-              {
                 target: 'complete',
+                actions: ['assignValidationToken'],
               },
             ],
-          },
-        },
-        authorize: {
-          on: {
-            authorized: {
-              target: 'complete',
-              actions: ['assignValidationToken'],
-            },
           },
         },
         configInvalid: {

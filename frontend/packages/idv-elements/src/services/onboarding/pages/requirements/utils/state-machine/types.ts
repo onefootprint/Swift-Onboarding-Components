@@ -1,5 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
+  AuthorizeRequirement,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -14,6 +15,7 @@ export type Requirements = {
   kycData: CollectedKycDataOption[];
   kybData: CollectedKybDataOption[];
   investorProfile: CollectedInvestorProfileDataOption[];
+  authorize?: AuthorizeRequirement;
 };
 
 export type MachineContext = {

@@ -29,10 +29,7 @@ export type MachineEvents =
     }
   | {
       type: 'requirementsCompleted';
-    }
-  | {
-      type: 'authorized';
       payload: {
-        validationToken: string;
+        validationToken?: string;
       };
     };

@@ -133,6 +133,13 @@ const createOnboardingRequirementsMachine = ({
             },
           },
         },
+        authorize: {
+          on: {
+            requirementCompleted: {
+              target: 'checkRequirements',
+            },
+          },
+        },
         success: {
           type: 'final',
         },

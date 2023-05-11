@@ -5,7 +5,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
+import useOnboardingRequirementsMachine from '../../../../hooks/use-onboarding-requirements-machine';
 
 type ButtonProps = {
   isLoading?: boolean;
@@ -14,13 +14,12 @@ type ButtonProps = {
 
 const Button = ({ isLoading, onClick }: ButtonProps) => {
   const { t } = useTranslation('pages.authorize');
-  const [state] = useOnboardingMachine();
-  const { config } = state.context;
-
-  if (!config) {
-    return null;
-  }
-  const { orgName: tenantName, privacyPolicyUrl } = config;
+  const [state] = useOnboardingRequirementsMachine();
+  const {
+    onboardingContext: {
+      config: { orgName: tenantName, privacyPolicyUrl },
+    },
+  } = state.context;
 
   return (
     <ButtonContainer>

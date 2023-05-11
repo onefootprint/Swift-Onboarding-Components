@@ -2,9 +2,7 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
-import DeviceSignals from '../../../../components/device-signals';
 import { useOnboardingMachine } from '../../components/machine-provider';
-import Authorize from '../authorize/authorize';
 import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import Requirements from '../requirements';
@@ -53,17 +51,13 @@ const Router = ({ onDone }: RouterProps) => {
           phoneNumber={data[IdDI.phoneNumber]}
           sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
-          onDone={() => {
+          onDone={payload => {
             send({
               type: 'requirementsCompleted',
+              payload,
             });
           }}
         />
-      )}
-      {state.matches('authorize') && (
-        <DeviceSignals page="authorize" fpAuthToken={state.context.authToken}>
-          <Authorize />
-        </DeviceSignals>
       )}
     </>
   );

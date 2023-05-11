@@ -1,5 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import DeviceSignals from '../../../../../../components/device-signals';
 import {
@@ -12,14 +12,20 @@ import {
 } from '../../../../../../plugins';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from '../additional-info-required';
+import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 
+type DonePayload = {
+  validationToken?: string;
+};
+
 type RouterProps = {
-  onDone: () => void;
+  onDone: (payload: DonePayload) => void;
 };
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
+  const [validationToken, setValidationToken] = useState('');
   const {
     onboardingContext: {
       authToken,
@@ -31,7 +37,15 @@ const Router = ({ onDone }: RouterProps) => {
       device,
     },
     collectedKycData,
-    requirements: { liveness, idDoc, selfie, consent, kycData, kybData },
+    requirements: {
+      liveness,
+      idDoc,
+      selfie,
+      consent,
+      kycData,
+      kybData,
+      authorize,
+    },
   } = state.context;
   const isDone = state.matches('success');
 
@@ -39,10 +53,10 @@ const Router = ({ onDone }: RouterProps) => {
 
   useEffect(() => {
     if (isDone) {
-      onDone();
+      onDone({ validationToken });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDone, onDone]);
+  }, [isDone, onDone, validationToken]);
 
   const handleRequirementCompleted = () => {
     send({
@@ -162,6 +176,19 @@ const Router = ({ onDone }: RouterProps) => {
               shouldCollectConsent: consent,
             },
           }}
+          onDone={handleRequirementCompleted}
+        />
+      </DeviceSignals>
+    );
+  }
+  if (state.matches('authorize')) {
+    if (!authorize) {
+      return null;
+    }
+    return (
+      <DeviceSignals page="authorize" fpAuthToken={authToken}>
+        <Authorize
+          onReceivedValidationToken={setValidationToken}
           onDone={handleRequirementCompleted}
         />
       </DeviceSignals>

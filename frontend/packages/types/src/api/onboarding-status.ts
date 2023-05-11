@@ -12,6 +12,7 @@ export enum OnboardingRequirementKind {
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
   investorProfile = 'collect_investor_profile',
+  authorize = 'authorize',
 }
 
 export type CollectKybDataRequirement = {
@@ -39,12 +40,18 @@ export type LivenessRequirement = {
   kind: OnboardingRequirementKind.liveness;
 };
 
+export type AuthorizeRequirement = {
+  kind: OnboardingRequirementKind.authorize;
+  fieldsToAuthorize: AuthorizeFields;
+};
+
 export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
   | IdDocRequirement
-  | LivenessRequirement;
+  | LivenessRequirement
+  | AuthorizeRequirement;
 
 export type OnboardingStatusRequest = {
   authToken: string;
@@ -56,7 +63,7 @@ export type AuthorizeFields = {
 };
 
 export type OnboardingStatusResponse = {
-  obConfiguration: OnboardingConfig;
   requirements: OnboardingRequirement[];
-  fieldsToAuthorize?: AuthorizeFields;
+  // This is only used to initialize handoff, and the requirements are discarded.
+  obConfiguration: OnboardingConfig;
 };

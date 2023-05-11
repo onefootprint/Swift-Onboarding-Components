@@ -63,26 +63,9 @@ describe('Onboarding Machine Tests', () => {
         validationToken: 'token',
       },
     });
-    expect(state.value).toEqual('authorize');
-    expect(state.context).toEqual({
-      validationToken: 'token',
-      tenantPk: 'pk',
-      userFound: true,
-      device: testDevice,
-      config: testOnboardingConfig,
-      authToken: 'token',
-      data: { [IdDI.email]: 'belce@onefootprint.com' },
-      sandboxSuffix: 'sandboxTest',
-    });
-
-    state = machine.send({
-      type: 'authorized',
-      payload: {
-        validationToken: 'token',
-      },
-    });
     expect(state.value).toEqual('complete');
     expect(state.context).toEqual({
+      validationToken: 'token',
       tenantPk: 'pk',
       userFound: true,
       device: testDevice,
@@ -90,7 +73,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       data: { [IdDI.email]: 'belce@onefootprint.com' },
       sandboxSuffix: 'sandboxTest',
-      validationToken: 'token',
     });
   });
 
@@ -120,25 +102,12 @@ describe('Onboarding Machine Tests', () => {
 
     state = machine.send({
       type: 'requirementsCompleted',
-    });
-    expect(state.value).toEqual('authorize');
-    expect(state.context).toEqual({
-      tenantPk: 'pk',
-      userFound: true,
-      device: testDevice,
-      config: testOnboardingConfig,
-      authToken: 'token',
-      data: { [IdDI.email]: 'belce@onefootprint.com' },
-      validationToken: '',
-    });
-
-    state = machine.send({
-      type: 'authorized',
       payload: {
         validationToken: 'token',
       },
     });
     expect(state.value).toEqual('complete');
+
     expect(state.context).toEqual({
       tenantPk: 'pk',
       userFound: true,

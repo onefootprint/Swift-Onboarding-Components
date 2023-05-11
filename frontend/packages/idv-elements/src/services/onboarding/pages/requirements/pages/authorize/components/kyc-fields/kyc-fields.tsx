@@ -22,7 +22,7 @@ import {
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { isKycCdo } from '../../../../utils/cdo-utils';
+import { isKycCdo } from '../../../../../../utils/cdo-utils';
 import { FieldProps } from '../field';
 import FieldsList from '../fields-list';
 

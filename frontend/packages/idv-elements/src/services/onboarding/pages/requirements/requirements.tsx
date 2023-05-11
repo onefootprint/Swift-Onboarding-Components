@@ -4,8 +4,12 @@ import RequirementsMachineProvider from './components/machine-provider';
 import Router from './pages/router';
 import { OnboardingRequirementsMachineArgs } from './utils/state-machine';
 
+type DonePayload = {
+  validationToken?: string;
+};
+
 type RequirementsProps = Partial<OnboardingRequirementsMachineArgs> & {
-  onDone: () => void;
+  onDone: (payload: DonePayload) => void;
 };
 
 const Requirements = ({

@@ -24,6 +24,7 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'additionalInfoRequired'
+    | 'authorize'
     | 'checkRequirements'
     | 'idDoc'
     | 'investorProfile'

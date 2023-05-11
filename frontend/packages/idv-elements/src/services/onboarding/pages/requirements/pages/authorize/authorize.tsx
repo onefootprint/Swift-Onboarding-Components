@@ -4,47 +4,46 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  IdDocType,
 } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import { useOnboardingMachine } from '../../components/machine-provider';
+import HeaderTitle from '../../../../../../components/layout/components/header-title';
+import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import {
   isDocCdo,
   isInvestorProfileCdo,
   isKybCdo,
   isKycCdo,
-} from '../../utils/cdo-utils';
+} from '../../../../utils/cdo-utils';
+import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import Button from './components/button/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
-import Loading from './components/loading';
-import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
 import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 
-const Authorize = () => {
+export type AuthorizeProps = {
+  onReceivedValidationToken: (validationToken: string) => void;
+  onDone: () => void;
+};
+
+const Authorize = ({ onReceivedValidationToken, onDone }: AuthorizeProps) => {
   const { t } = useTranslation('pages.authorize');
-  const [state, send] = useOnboardingMachine();
-  const { authToken, config } = state.context;
+  const [state] = useOnboardingRequirementsMachine();
+  const {
+    onboardingContext: { authToken, config },
+    requirements: { authorize: requirement },
+  } = state.context;
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const toast = useToast();
-  const [collectedIdDocTypes, setCollectedIdDocTypes] = useState<IdDocType[]>(
-    [],
-  );
 
-  const statusQuery = useGetOnboardingStatus(authToken, {
-    onSuccess: ({ fieldsToAuthorize }) => {
-      setCollectedIdDocTypes(fieldsToAuthorize?.identityDocumentTypes ?? []);
-    },
-  });
-
-  if (!config) {
-    return null;
+  if (!requirement) {
+    return <div />;
   }
+
+  const collectedIdDocTypes =
+    requirement.fieldsToAuthorize.identityDocumentTypes;
 
   const { orgName: tenantName, canAccessData } = config;
   const kycData = canAccessData.filter(
@@ -59,21 +58,14 @@ const Authorize = () => {
   ) as CollectedKybDataOption[];
   const hasBothSections = kycData.length > 0 && kybData.length > 0;
 
-  if (statusQuery.isLoading) {
-    return <Loading />;
-  }
-
   const handleClick = () => {
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {
+        // TODO in the future, validationToken will be optional since this may lead to a step-up
         onSuccess: ({ validationToken }) => {
-          send({
-            type: 'authorized',
-            payload: {
-              validationToken,
-            },
-          });
+          onReceivedValidationToken(validationToken);
+          onDone();
         },
         onError() {
           toast.show({

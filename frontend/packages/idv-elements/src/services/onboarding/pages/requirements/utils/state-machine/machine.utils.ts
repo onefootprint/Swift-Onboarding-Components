@@ -5,6 +5,8 @@ type MachineTarget = {
   cond: (context: MachineContext) => boolean;
 };
 
+// NOTE: the ordering of these targets actually dictates the order in which requirements are
+// handled by the frontend
 export const RequirementTargets: MachineTarget[] = [
   {
     target: 'kybData',
@@ -29,6 +31,10 @@ export const RequirementTargets: MachineTarget[] = [
   {
     target: 'idDoc',
     cond: context => shouldRunIdDoc(context),
+  },
+  {
+    target: 'authorize',
+    cond: context => shouldShowAuthorize(context),
   },
 ];
 
@@ -70,6 +76,14 @@ const shouldRunIdDoc = (context: MachineContext) => {
     },
   } = context;
   return !!idDoc && type === 'mobile';
+};
+
+const shouldShowAuthorize = (context: MachineContext) => {
+  const {
+    requirements: { authorize },
+    onboardingContext: { isTransfer },
+  } = context;
+  return !isTransfer && !!authorize;
 };
 
 const shouldRunTransfer = (context: MachineContext) => {
