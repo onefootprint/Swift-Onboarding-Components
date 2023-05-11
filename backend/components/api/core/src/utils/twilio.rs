@@ -88,6 +88,7 @@ impl TwilioClient {
     async fn send_message(
         &self,
         state: &State,
+        // TODO PiiString so we don't log this
         message_body: String,
         destination: &PhoneNumber,
         rate_limit_scope: &str,
@@ -104,6 +105,7 @@ impl TwilioClient {
         }
         .enforce_and_update()
         .await?;
+        let message_body = format!("{}\n\nSent via Footprint", message_body);
         self.client
             .send_message(destination.e164().leak(), message_body)
             .await
@@ -126,9 +128,9 @@ impl TwilioClient {
             crypto::random::gen_rand_n_digit_code(6)
         };
         let message_body = if let Some(tenant_name) = tenant_name {
-            format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", tenant_name, &code)
+            format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code)
         } else {
-            format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code. Sent via Footprint.", &code)
+            format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code)
         };
 
         self.send_message(state, message_body, destination, rate_limit::SMS_CHALLENGE)
@@ -150,10 +152,7 @@ impl TwilioClient {
         destination: &PhoneNumber,
         url: String,
     ) -> ApiResult<SecondsBeforeRetry> {
-        let message_body = format!(
-            "Continue account verification using this link: {}. Sent via Footprint",
-            url
-        );
+        let message_body = format!("Continue account verification using this link: {}", url);
 
         self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
             .await?;
@@ -164,7 +163,7 @@ impl TwilioClient {
     #[tracing::instrument(skip_all)]
     pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
         let message_body = format!(
-            "{} identified you as a beneficial owner of {}. To finish verifying your business for {}, we need to verify your identity as well. Continue here: {}\n\nSent via Footprint",
+            "{} identified you as a beneficial owner of {}. To finish verifying your business for {}, we need to verify your identity as well. Continue here: {}",
             info.inviter.leak(),
             info.business_name.leak(),
             info.org_name,
