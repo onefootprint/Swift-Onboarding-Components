@@ -52,7 +52,6 @@ describe('isContextReady', () => {
             type: 'mobile',
             hasSupportForWebauthn: true,
           },
-          validationToken: 'token',
         },
       };
       expect(isContextReady(context, event)).toEqual(true);
@@ -73,7 +72,6 @@ describe('isContextReady', () => {
             type: 'mobile',
             hasSupportForWebauthn: true,
           },
-          validationToken: '',
         },
       };
       expect(isContextReady(context, event)).toEqual(false);

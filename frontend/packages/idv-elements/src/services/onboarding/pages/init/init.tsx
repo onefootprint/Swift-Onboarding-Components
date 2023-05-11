@@ -70,12 +70,10 @@ const Init = () => {
     onboardingMutation.mutate(
       { authToken },
       {
-        onSuccess: ({ validationToken }) => {
+        onSuccess: () => {
           send({
             type: 'initContextUpdated',
-            payload: {
-              validationToken: validationToken ?? '',
-            },
+            payload: {},
           });
         },
       },

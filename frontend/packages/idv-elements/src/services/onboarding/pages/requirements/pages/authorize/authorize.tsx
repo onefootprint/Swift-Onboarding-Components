@@ -24,11 +24,10 @@ import KycFields from './components/kyc-fields';
 import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 
 export type AuthorizeProps = {
-  onReceivedValidationToken: (validationToken: string) => void;
   onDone: () => void;
 };
 
-const Authorize = ({ onReceivedValidationToken, onDone }: AuthorizeProps) => {
+const Authorize = ({ onDone }: AuthorizeProps) => {
   const { t } = useTranslation('pages.authorize');
   const [state] = useOnboardingRequirementsMachine();
   const {
@@ -62,11 +61,7 @@ const Authorize = ({ onReceivedValidationToken, onDone }: AuthorizeProps) => {
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {
-        // TODO in the future, validationToken will be optional since this may lead to a step-up
-        onSuccess: ({ validationToken }) => {
-          onReceivedValidationToken(validationToken);
-          onDone();
-        },
+        onSuccess: onDone,
         onError() {
           toast.show({
             title: t('onboarding-complete-error.title'),

@@ -52,19 +52,13 @@ const createOnboardingMachine = ({
               target: 'configInvalid',
             },
             initContextUpdated: [
-              // TODO can simplify this logic when validationToken is separate from authorize
-              {
-                target: 'complete',
-                cond: (_, event) => !!event.payload.validationToken,
-                actions: ['assignInitContext', 'assignValidationToken'],
-              },
               {
                 target: 'requirements',
                 cond: (context, event) => isContextReady(context, event),
-                actions: ['assignInitContext', 'assignValidationToken'],
+                actions: ['assignInitContext'],
               },
               {
-                actions: ['assignInitContext', 'assignValidationToken'],
+                actions: ['assignInitContext'],
               },
             ],
           },
@@ -72,6 +66,20 @@ const createOnboardingMachine = ({
         requirements: {
           on: {
             requirementsCompleted: [
+              // Transfer app doesn't get validation token
+              {
+                target: 'complete',
+                cond: context => !!context.isTransfer,
+              },
+              {
+                target: 'validate',
+              },
+            ],
+          },
+        },
+        validate: {
+          on: {
+            validationComplete: [
               {
                 target: 'complete',
                 actions: ['assignValidationToken'],

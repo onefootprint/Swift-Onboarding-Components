@@ -1,10 +1,10 @@
 import request from '@onefootprint/request';
-import { OnboardingRequest, OnboardingResponse } from '@onefootprint/types';
+import { OnboardingRequest } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from 'src/config/constants';
 
 const onboardingRequest = async (payload: OnboardingRequest) => {
-  const response = await request<OnboardingResponse>({
+  const response = await request<{}>({
     method: 'POST',
     url: '/hosted/onboarding',
     headers: {

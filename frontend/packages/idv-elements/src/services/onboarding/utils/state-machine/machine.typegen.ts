@@ -14,11 +14,16 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignInitContext: 'initContextUpdated';
-    assignValidationToken: 'initContextUpdated' | 'requirementsCompleted';
+    assignValidationToken: 'validationComplete';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'complete' | 'configInvalid' | 'init' | 'requirements';
+  matchesStates:
+    | 'complete'
+    | 'configInvalid'
+    | 'init'
+    | 'requirements'
+    | 'validate';
   tags: never;
 }

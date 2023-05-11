@@ -6,6 +6,7 @@ import { useOnboardingMachine } from '../../components/machine-provider';
 import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import Requirements from '../requirements';
+import Validate from '../validate';
 
 export type DonePayload = {
   validationToken?: string;
@@ -17,9 +18,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
-  const isDone = state.matches('complete');
   const {
-    validationToken,
     userFound,
     device,
     config,
@@ -27,15 +26,18 @@ const Router = ({ onDone }: RouterProps) => {
     data,
     sandboxSuffix,
     isTransfer,
+    validationToken,
   } = state.context;
   useLogStateMachine('onboarding', state);
 
+  const isDone = state.matches('complete');
   useEffect(() => {
     if (isDone) {
+      // Will enter this with either a null validationToken (in the transfer app) or with a
+      // validationToken after validate
       onDone({ validationToken });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDone, onDone]);
+  }, [isDone, onDone, validationToken]);
 
   return (
     <>
@@ -51,14 +53,14 @@ const Router = ({ onDone }: RouterProps) => {
           phoneNumber={data[IdDI.phoneNumber]}
           sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
-          onDone={payload => {
+          onDone={() => {
             send({
               type: 'requirementsCompleted',
-              payload,
             });
           }}
         />
       )}
+      {state.matches('validate') && <Validate />}
     </>
   );
 };

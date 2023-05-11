@@ -1,5 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import DeviceSignals from '../../../../../../components/device-signals';
 import {
@@ -15,17 +15,12 @@ import AdditionalInfoRequired from '../additional-info-required';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 
-type DonePayload = {
-  validationToken?: string;
-};
-
 type RouterProps = {
-  onDone: (payload: DonePayload) => void;
+  onDone: () => void;
 };
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
-  const [validationToken, setValidationToken] = useState('');
   const {
     onboardingContext: {
       authToken,
@@ -53,10 +48,9 @@ const Router = ({ onDone }: RouterProps) => {
 
   useEffect(() => {
     if (isDone) {
-      onDone({ validationToken });
+      onDone();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDone, onDone, validationToken]);
+  }, [isDone, onDone]);
 
   const handleRequirementCompleted = () => {
     send({
@@ -187,10 +181,7 @@ const Router = ({ onDone }: RouterProps) => {
     }
     return (
       <DeviceSignals page="authorize" fpAuthToken={authToken}>
-        <Authorize
-          onReceivedValidationToken={setValidationToken}
-          onDone={handleRequirementCompleted}
-        />
+        <Authorize onDone={handleRequirementCompleted} />
       </DeviceSignals>
     );
   }

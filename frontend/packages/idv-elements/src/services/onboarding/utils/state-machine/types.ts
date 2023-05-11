@@ -19,7 +19,6 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        validationToken?: string;
         config?: OnboardingConfig;
         device?: DeviceInfo;
       };
@@ -29,7 +28,10 @@ export type MachineEvents =
     }
   | {
       type: 'requirementsCompleted';
+    }
+  | {
+      type: 'validationComplete';
       payload: {
-        validationToken?: string;
+        validationToken: string;
       };
     };

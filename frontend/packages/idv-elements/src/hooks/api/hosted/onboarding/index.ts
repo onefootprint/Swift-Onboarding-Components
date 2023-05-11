@@ -1,3 +1,4 @@
+export { default as useOnboardingValidate } from '../../../../services/onboarding/pages/validate/hooks/use-onboarding-validate';
 export * from './d2p';
 export { default as useGetOnboardingStatus } from './use-get-onboarding-status';
 export { default as useOnboarding } from './use-onboarding';
