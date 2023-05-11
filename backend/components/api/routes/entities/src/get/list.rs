@@ -163,6 +163,6 @@ async fn compute_fingerprint_for_search(
         .collect::<Vec<_>>();
 
     state
-        .compute_fingerprints_opts(searchable.as_slice(), tenant_id.clone(), true)
+        .compute_fingerprints_by_tenant(searchable.as_slice(), tenant_id.clone())
         .await
 }

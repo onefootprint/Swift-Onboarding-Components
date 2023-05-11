@@ -121,43 +121,51 @@ pub trait Fingerprinter: std::marker::Sync {
             .ok_or(crate::Error::Custom("missing fingerprints".into()))?)
     }
 
-    /// TODO: remove this once migration done
-    async fn legacy_compute_fingerprints(
-        &self,
-        data: &[(DataIdentifier, &PiiString)],
-    ) -> Result<Vec<Fingerprint>, Self::Error>;
-
-    /// For legacy clients we compute both kinds of fingerprints
-    /// TODO: remove once migration is done
-    async fn compute_fingerprints_opts(
+    /// Helper to compute fingperirnts tied to a tenant id
+    async fn compute_fingerprints_by_tenant(
         &self,
         data: &[(DataIdentifier, &PiiString)],
         tenant_id: TenantId,
-        legacy: bool,
     ) -> Result<Vec<Fingerprint>, Self::Error> {
-        let legacy_fp = if legacy {
-            self.legacy_compute_fingerprints(data).await?
-        } else {
-            vec![]
-        };
-
         let scopable: Vec<_> = data.iter().map(|(di, pii)| ((di, &tenant_id), *pii)).collect();
 
         let fp = self.compute_fingerprints(&scopable).await?;
 
-        Ok(fp.into_iter().chain(legacy_fp).collect())
+        Ok(fp)
     }
+}
 
-    async fn compute_legacy_fingerprint(
-        &self,
-        id: DataIdentifier,
-        data: &PiiString,
-    ) -> Result<Fingerprint, Self::Error> {
-        Ok(self
-            .legacy_compute_fingerprints(&[(id, data)])
-            .await?
-            .into_iter()
-            .next()
-            .ok_or(crate::Error::Custom("missing fingerprints".into()))?)
+#[cfg(test)]
+mod tests {
+    enum Scope {
+        Global,
+        Tenant,
+    }
+    use std::str::FromStr;
+
+    use super::{FingerprintScope, GlobalFingerprintKind};
+    use crate::{DataIdentifier, TenantId};
+    use test_case::test_case;
+    use Scope::*;
+
+    #[test_case("id.phone_number", Global => "d3d059cf8cb307035ab86a728dc4a1774a9dad641925d1b54bfd767c75352797".to_string())]
+    #[test_case("id.email", Global => "9f9b892d2e59405899706bbd46b7477a47684385efed538475e785108c298615".to_string())]
+    #[test_case("id.phone_number", Tenant => "6f930e083b99ac46ef5ce0acfe28ea15454fd8c0f035b41fe866ddc521ab3d0b".to_string())]
+    #[test_case("id.email", Tenant => "ff41f7640520c8fe77574f839706cdde2eafbd1d852c507cf76662ef3380cf52".to_string())]
+    #[test_case("id.first_name", Tenant => "618954b917c536cd90cdb556f0f8153a63d89048dba2894f00895169414a30db".to_string())]
+    #[test_case("id.ssn9", Global => "525339bc5289b4848ed65342337aef5f6ae8254967d13f368ab073bdcb1a2088".to_string())]
+    fn test_unchanged_fingerprint_salting(di: &str, scope: Scope) -> String {
+        let id = DataIdentifier::from_str(di).expect("invalid di");
+        let bytes = match scope {
+            Global => {
+                let global = GlobalFingerprintKind::try_from(id).expect("invalid global scope");
+                FingerprintScope::Global(global).bytes()
+            }
+            Tenant => {
+                let tenant_id = TenantId::test_data("org_hello_world".into());
+                FingerprintScope::Tenant(&id, &tenant_id).bytes()
+            }
+        };
+        crypto::hex::encode(bytes)
     }
 }

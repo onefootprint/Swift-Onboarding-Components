@@ -3,7 +3,6 @@ use async_trait::async_trait;
 use aws_sdk_kms::types::Blob;
 use crypto::sha256;
 use db::models::vault::Vault;
-use futures::future::try_join_all;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
@@ -60,19 +59,6 @@ impl AwsHmacClient {
     }
 }
 
-impl AwsHmacClient {
-    #[tracing::instrument(skip_all)]
-    pub async fn compute_fingerprint(
-        &self,
-        id: DataIdentifier,
-        data: &PiiString,
-    ) -> Result<Fingerprint, KmsSignError> {
-        let data = data.clean_for_fingerprint();
-        let data_to_sign = id.legacy_salt_pii_to_sign(&data);
-        Ok(Fingerprint(self.signed_hash(&data_to_sign).await?))
-    }
-}
-
 #[async_trait]
 impl ApiKeyFingerprinter for State {
     type Error = ApiError;
@@ -92,22 +78,10 @@ impl Fingerprinter for State {
     ) -> Result<Vec<Fingerprint>, Self::Error> {
         Ok(self.enclave_client.batch_fingerprint(data).await?)
     }
-
-    async fn legacy_compute_fingerprints(
-        &self,
-        data: &[(DataIdentifier, &PiiString)],
-    ) -> Result<Vec<Fingerprint>, Self::Error> {
-        Ok(try_join_all(
-            data.iter()
-                .map(|(id, pii)| self.aws_hmac_client.compute_fingerprint(id.to_owned(), pii)),
-        )
-        .await?)
-    }
 }
 
 impl State {
     /// This is a helper function for finding vaults by using fingerprinted data.
-    /// Currently it fallbacks to legacy fingerprints if lookup fails (we can simplify once we migrate)
     /// If t_id is provided, we will also look up users by tenant-scoped fingerprints.
     #[tracing::instrument(skip(self))]
     pub async fn find_vault(
@@ -115,7 +89,6 @@ impl State {
         identifier: &IdentifyId,
         t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
-        let idk = identifier.idk();
         let (scopes, data) = match identifier {
             IdentifyId::PhoneNumber(phone_number) => (
                 vec![
@@ -145,22 +118,6 @@ impl State {
             .db_query(move |conn| Vault::find_portable(conn, &sh_datas))
             .await??;
 
-        // Legacy fingerprint support (todo: remove once migration complete)
-        let existing_user = if existing_user.is_none() {
-            let sh_data = self.compute_legacy_fingerprint(idk.into(), &data).await?;
-
-            let result = self
-                .db_pool
-                .db_query(|conn| Vault::find_portable(conn, &[sh_data]))
-                .await??;
-            
-            if let Some(vault) = &result {
-                tracing::info!(vault_id=%vault.id, "found vault via legacy fingerprint");
-            }
-            result
-        } else {
-            existing_user
-        };
         Ok(existing_user)
     }
 }

@@ -93,11 +93,9 @@ pub async fn post(
             } else {
                 None
             };
-            let legacy_sh_phone_number = state.compute_legacy_fingerprint(di, &phone_number).await?;
             let context = SmsContext {
                 challenge_state,
                 global_sh_phone_number,
-                legacy_sh_phone_number,
                 ob_info,
                 keypair,
             };
@@ -221,8 +219,6 @@ struct OnboardingInfo {
 struct SmsContext {
     challenge_state: PhoneChallengeState,
     global_sh_phone_number: Fingerprint,
-    // TODO: remove this post fingerprint
-    legacy_sh_phone_number: Fingerprint,
     // Only non-null when an ObConfigAuth was provided
     ob_info: Option<OnboardingInfo>,
     keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
@@ -238,7 +234,6 @@ fn validate_sms_challenge(
     }
     let fps_to_search = vec![
         Some(context.global_sh_phone_number.clone()),
-        Some(context.legacy_sh_phone_number),
         context.ob_info.as_ref().map(|i| i.tenant_sh_phone_number.clone()),
     ]
     .into_iter()
