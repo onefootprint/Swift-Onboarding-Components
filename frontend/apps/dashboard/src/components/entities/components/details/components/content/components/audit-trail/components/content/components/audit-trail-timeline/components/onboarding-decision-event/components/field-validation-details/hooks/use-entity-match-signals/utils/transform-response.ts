@@ -12,6 +12,17 @@ export type TransformedMatchSignalDataType = {
   signals: SignalShortInfoType[];
 };
 
+const filterUniqueSignals = (signals: SignalShortInfoType[]) => {
+  const descriptions = new Set<string>();
+  return signals.filter(signal => {
+    if (descriptions.has(signal.description)) {
+      return false;
+    }
+    descriptions.add(signal.description);
+    return true;
+  });
+};
+
 const transformResponse = (data: GetEntityMatchSignalsResponse) => {
   const dataArray = Object.entries(data);
   const transformedData: TransformedMatchSignalDataType[] = [];
@@ -19,7 +30,6 @@ const transformResponse = (data: GetEntityMatchSignalsResponse) => {
   dataArray.forEach(([attribute, signalsAndLevel]) => {
     if (signalsAndLevel) {
       const { matchLevel, signals } = signalsAndLevel;
-
       const signalInfo: SignalShortInfoType[] = [];
       signals.forEach(signal => {
         const {
@@ -33,10 +43,11 @@ const transformResponse = (data: GetEntityMatchSignalsResponse) => {
           reasonCode,
         });
       });
+      const dedupedSignals = filterUniqueSignals(signalInfo);
       transformedData.push({
         attribute,
         matchLevel,
-        signals: signalInfo,
+        signals: dedupedSignals,
       });
     }
   });
