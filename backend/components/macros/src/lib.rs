@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, ItemFn, Meta};
+use syn::{parse_macro_input, ItemFn, Meta, NestedMeta};
 use syn::{parse_quote, AttributeArgs};
 use test_case_core::TestCase;
 
@@ -208,44 +208,94 @@ pub fn route_alias(
     let alias_route_macros: Vec<proc_macro2::TokenStream> = {
         let attr = parse_macro_input!(args as syn::AttributeArgs);
 
-        attr.iter()
-            .filter_map(|meta| match meta {
+        match attr
+            .iter()
+            .map(|meta| match meta {
                 syn::NestedMeta::Meta(Meta::List(list)) => {
                     let method = list.path.to_token_stream();
-                    let path = list.nested.to_token_stream();
-                    let block = quote! {
-                        #method(#path)
+                    let mut iter = list.nested.iter();
+                    let path = iter
+                        .next()
+                        .ok_or("first argument must be the path")?
+                        .to_token_stream();
+
+                    let mut description = Ok(None);
+                    let mut tags = Ok(None);
+
+                    let mut extract = |meta: &NestedMeta| -> Result<_, _> {
+                        match meta {
+                            syn::NestedMeta::Meta(Meta::NameValue(nv)) => {
+                                if nv.path.is_ident("description") {
+                                    description = Ok(Some(nv.lit.to_token_stream()));
+                                } else {
+                                    description = Err("must specify description = \"literal\"");
+                                }
+                            }
+                            syn::NestedMeta::Meta(Meta::List(list)) => {
+                                if list.path.is_ident("tags") {
+                                    tags = Ok(Some(list.to_token_stream()));
+                                } else {
+                                    tags = Err("must specify tags(Tag1, Tag2)");
+                                }
+                            }
+                            _ => return Err("must description key-value or tags list "),
+                        };
+                        Ok(())
                     };
-                    Some(block)
+                    iter.next().map(&mut extract).transpose()?;
+                    iter.next().map(&mut extract).transpose()?;
+
+                    let api_attrs: Vec<_> = vec![
+                        description?.map(|d| {
+                            quote! {
+                                description = #d
+                            }
+                        }),
+                        tags?,
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .collect();
+
+                    let block = quote! {
+                        #[api_v2_operation(
+                            #(#api_attrs),*
+                        )]
+                        #[#method(#path)]
+                    };
+
+                    Ok(block)
                 }
-                _ => None,
+                _ => Err("invalid properties in alias"),
             })
             .collect()
+        {
+            Ok(results) => results,
+            Err(err) => {
+                return syn::Error::new(attr.first().span(), err)
+                    .to_compile_error()
+                    .into()
+            }
+        }
     };
 
-    let method_attr = |meta: &Meta| -> Option<proc_macro2::TokenStream> {
+    let filter_attrs = |meta: &Meta, disallowed: &[&str]| -> bool {
         match meta {
             Meta::Path(path) => {
-                let ident = path.get_ident()?;
+                let Some(ident) = path.get_ident() else {
+                    return false
+                };
                 let method_str = ident.to_string().to_lowercase();
-                if !matches!(method_str.as_str(), "get" | "post" | "put" | "patch" | "delete") {
-                    return None;
-                }
-                Some(ident.to_token_stream())
+                disallowed.contains(&method_str.as_str())
             }
             Meta::List(list) => {
                 let Some(last) = list.path.segments.last() else {
-                    return None
+                    return false
                 };
                 let method_str = last.ident.to_string().to_lowercase();
-                if !matches!(method_str.as_str(), "get" | "post" | "put" | "patch" | "delete") {
-                    return None;
-                }
-
-                let method = list.path.segments.to_token_stream();
-                Some(method)
+                disallowed.contains(&method_str.as_str())
             }
-            Meta::NameValue(_) => None,
+            Meta::NameValue(_) => false,
         }
     };
 
@@ -256,7 +306,10 @@ pub fn route_alias(
             let Some(meta) = attr.parse_meta().ok() else {
                 return true
             };
-            method_attr(&meta).is_none()
+            !filter_attrs(
+                &meta,
+                &["get", "post", "put", "patch", "delete", "api_v2_operation"],
+            )
         })
         .collect::<Vec<_>>();
 
@@ -277,7 +330,7 @@ pub fn route_alias(
             let alias = quote! {
                 // render alias
                 #(#other_attrs)*
-                #[#alias]
+                #alias
                 #vis #sig2
                 #block
             };
@@ -304,5 +357,7 @@ pub fn route_alias(
             #(#configures)*
         }
     };
+    // keep for debugging:
+    // eprintln!("block: {}", &output.to_string());
     output.into()
 }

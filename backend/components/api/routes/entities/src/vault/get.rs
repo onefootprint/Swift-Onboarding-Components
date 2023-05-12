@@ -25,10 +25,14 @@ pub struct FieldsParams {
 flat_api_object_map_type!(
     GetVaultResponse<DataIdentifier, bool>,
     description="A key-value map of identifier to whether the identifier exists in the vault",
-    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+    example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
 );
 
-#[route_alias(actix::get("/users/{footprint_user_id}/vault"))]
+#[route_alias(actix::get(
+    "/users/{footprint_user_id}/vault",
+    description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
+    tags(Vault, Users, PublicApi)
+))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",
     tags(Vault, Entities, Preview)
