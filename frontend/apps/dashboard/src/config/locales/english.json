@@ -458,7 +458,8 @@
           "title": "User info"
         },
         "watchlist": {
-          "on-watchlist": "This user is on a watchlist"
+          "on-watchlist-person": "This user is on a watchlist",
+          "on-watchlist-business": "This business is on a watchlist"
         }
       },
       "fieldset": {
