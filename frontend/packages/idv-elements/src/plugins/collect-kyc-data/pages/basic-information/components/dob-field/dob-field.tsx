@@ -5,7 +5,11 @@ import { useFormContext } from 'react-hook-form';
 
 import validateDob from '../../utils/validate-dob';
 
-const DobField = () => {
+type DobFieldProps = {
+  disabled?: boolean;
+};
+
+const DobField = ({ disabled }: DobFieldProps) => {
   const { t } = useTranslation('pages.basic-information.form.dob');
   const {
     register,
@@ -17,6 +21,7 @@ const DobField = () => {
   return (
     <TextInput
       data-private
+      disabled={disabled}
       hasError={!!errors.dob}
       hint={errors.dob ? t('error') : undefined}
       label={t('label')}

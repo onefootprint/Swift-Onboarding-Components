@@ -1,26 +1,35 @@
-import { IdDI, IdDIData, UserDataResponse } from '@onefootprint/types';
+import { useTranslation } from '@onefootprint/hooks';
+import { IdDI, IdDIData } from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
 
 import useUserData from '../../../hooks/api/hosted/user/vault/use-user-data';
 import { KycData } from '../utils/data-types';
+import useCollectKycDataMachine from './use-collect-kyc-data-machine';
 
 type SyncDataArgs = {
-  authToken?: string;
   data: KycData;
   speculative?: boolean;
-  onSuccess?: (data: UserDataResponse) => void;
-  onError?: (error: unknown) => void;
+  onSuccess?: () => void;
 };
 
 const useSyncData = () => {
+  const [state] = useCollectKycDataMachine();
+  const { authToken } = state.context;
   const userDataMutation = useUserData();
 
-  const syncData = ({
-    authToken,
-    data,
-    speculative,
-    onSuccess,
-    onError,
-  }: SyncDataArgs) => {
+  const { t } = useTranslation('components.sync-data-error');
+  const toast = useToast();
+
+  const handleError = (error: unknown) => {
+    toast.show({
+      title: t('sync-data-error.title'),
+      description: t('sync-data-error.description'),
+      variant: 'error',
+    });
+    console.error(error);
+  };
+
+  const syncData = ({ data, speculative, onSuccess }: SyncDataArgs) => {
     if (!authToken) {
       console.error('Found empty auth token while syncing kyc data fields.');
       return;
@@ -45,12 +54,12 @@ const useSyncData = () => {
       },
       {
         onSuccess,
-        onError,
+        onError: handleError,
       },
     );
   };
 
-  return { mutation: userDataMutation, syncData };
+  return { syncData, mutation: userDataMutation };
 };
 
 export default useSyncData;

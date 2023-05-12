@@ -1,16 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedKycDataOption } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
+import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
+import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { KycData } from '../../utils/data-types';
-import DobForm from './components/dob-form';
-import NameAndDobForm from './components/name-and-dob-form';
-import NameForm from './components/name-form';
+import DobField from './components/dob-field';
+import NameFields from './components/name-fields';
+import useConvertFormData from './hooks/use-convert-form-data';
+import { FormData } from './types';
 
 type BasicInformationProps = {
   hideHeader?: boolean;
@@ -25,71 +27,39 @@ const BasicInformation = ({
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
   const {
-    authToken,
+    data,
     requirement: { missingAttributes },
   } = state.context;
   const { mutation, syncData } = useSyncData();
-  const toast = useToast();
   const { t } = useTranslation('pages.basic-information');
-
-  const onSubmit = (basicInformation: KycData) => {
-    const handleSuccess = () => {
-      send({
-        type: 'dataSubmitted',
-        payload: basicInformation,
-      });
-      onComplete?.();
-    };
-
-    const handleError = () => {
-      toast.show({
-        title: t('sync-data-error.title'),
-        description: t('sync-data-error.description'),
-        variant: 'error',
-      });
-    };
-
-    if (!authToken) {
-      return;
-    }
-    syncData({
-      authToken,
-      data: basicInformation,
-      speculative: true,
-      onSuccess: handleSuccess,
-      onError: handleError,
-    });
-  };
-
   const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
   const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
+  const convertFormData = useConvertFormData();
+  const hasFixedName =
+    data?.[IdDI.firstName]?.fixed && data?.[IdDI.lastName]?.fixed;
+  const hasFixedDob = data?.[IdDI.dob]?.fixed;
 
-  const renderForm = () => {
-    if (requiresName && requiresDob) {
-      return (
-        <NameAndDobForm
-          onSubmit={onSubmit}
-          isLoading={mutation.isLoading}
-          ctaLabel={ctaLabel}
-        />
-      );
-    }
-    if (requiresName) {
-      return (
-        <NameForm
-          onSubmit={onSubmit}
-          isLoading={mutation.isLoading}
-          ctaLabel={ctaLabel}
-        />
-      );
-    }
-    return (
-      <DobForm
-        onSubmit={onSubmit}
-        isLoading={mutation.isLoading}
-        ctaLabel={ctaLabel}
-      />
-    );
+  const methods = useForm<FormData>({
+    defaultValues: {
+      firstName: data[IdDI.firstName]?.value,
+      lastName: data[IdDI.lastName]?.value,
+      dob: data[IdDI.dob]?.value,
+    },
+  });
+
+  const onSubmitFormData = (formData: FormData) => {
+    const convertedData = convertFormData(formData);
+    syncData({
+      data: convertedData,
+      speculative: true,
+      onSuccess: () => {
+        send({
+          type: 'dataSubmitted',
+          payload: convertedData,
+        });
+        onComplete?.();
+      },
+    });
   };
 
   return (
@@ -104,9 +74,22 @@ const BasicInformation = ({
           />
         </>
       )}
-      {renderForm()}
+      <FormProvider {...methods}>
+        <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
+          {requiresName && <NameFields disabled={hasFixedName} />}
+          {requiresDob && <DobField disabled={hasFixedDob} />}
+          <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
+        </Form>
+      </FormProvider>
     </>
   );
 };
+
+const Form = styled.form`
+  ${({ theme }) => css`
+    display: grid;
+    row-gap: ${theme.spacing[7]};
+  `}
+`;
 
 export default BasicInformation;

@@ -1,6 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IdDI } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
@@ -31,30 +30,16 @@ const Confirm = () => {
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
-  const toast = useToast();
-
-  const handleError = (error: unknown) => {
-    toast.show({
-      title: t('error.title'),
-      description: t('error.description'),
-      variant: 'error',
-    });
-    console.error(error);
-  };
-
-  const handleSyncSuccess = () => {
-    send({
-      type: 'confirmed',
-    });
-  };
 
   const handleSyncData = () => {
     syncData({
-      authToken,
       data,
       speculative: false,
-      onSuccess: handleSyncSuccess,
-      onError: handleError,
+      onSuccess: () => {
+        send({
+          type: 'confirmed',
+        });
+      },
     });
   };
 
@@ -78,7 +63,6 @@ const Confirm = () => {
       sandboxSuffix,
       speculative: false,
       onSuccess: handleSyncData,
-      onError: handleError,
     });
   };
 

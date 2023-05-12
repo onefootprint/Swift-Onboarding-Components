@@ -1,4 +1,10 @@
 {
+  "components": {
+    "sync-data-error": {
+      "title": "An error occurred",
+      "description": "An error occurred while saving data. Please fix the inputs and try again."
+    }
+  },
   "pages": {
     "email": {
       "title": "Email address",
@@ -32,14 +38,29 @@
           "placeholder": "MM/DD/YYYY",
           "error": "Date of birth cannot be empty or is invalid"
         }
-      },
-      "sync-data-error": {
-        "title": "An error occurred",
-        "description": "An error occurred while saving data. Please fix the inputs and try again."
       }
     },
     "residential-address": {
       "form": {
+        "address-line-1": {
+          "label": "Address line 1",
+          "placeholder": "Street and house number",
+          "error": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
+        },
+        "address-line-2": {
+          "label": "Address line 2 (optional)",
+          "placeholder": "Apartment, suite, etc."
+        },
+        "city": {
+          "label": "City",
+          "placeholder": "Brooklyn",
+          "error": "City cannot be empty"
+        },
+        "state": {
+          "label": "State",
+          "placeholder": "Select",
+          "error": "State cannot be empty"
+        },
         "country": {
           "label": "Country",
           "placeholder": "Select",
@@ -53,36 +74,11 @@
       },
       "full": {
         "title": "What's your residential address?",
-        "subtitle": "We're legally required to collect this information.",
-        "form": {
-          "address-line-1": {
-            "label": "Address line 1",
-            "placeholder": "Street and house number",
-            "error": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
-          },
-          "address-line-2": {
-            "label": "Address line 2 (optional)",
-            "placeholder": "Apartment, suite, etc."
-          },
-          "city": {
-            "label": "City",
-            "placeholder": "Brooklyn",
-            "error": "City cannot be empty"
-          },
-          "state": {
-            "label": "State",
-            "placeholder": "Select",
-            "error": "State cannot be empty"
-          }
-        }
-      },
-      "zip-code-and-country": {
-        "title": "What's your country zip code?",
         "subtitle": "We're legally required to collect this information."
       },
-      "sync-data-error": {
-        "title": "An error occurred",
-        "description": "An error occurred while saving data. Please fix the inputs and try again."
+      "partial": {
+        "title": "What's your country zip code?",
+        "subtitle": "We're legally required to collect this information."
       }
     },
     "ssn": {
@@ -117,10 +113,6 @@
           "placeholder": "XXXX",
           "error": "SSN cannot be empty or is invalid"
         }
-      },
-      "sync-data-error": {
-        "title": "An error occurred",
-        "description": "An error occurred while saving data. Please fix the inputs and try again."
       }
     },
     "cta": {
@@ -160,10 +152,6 @@
           "address": "address",
           "identity": "identity"
         }
-      },
-      "error": {
-        "title": "Oops, something went wrong.",
-        "description": "Please try again."
       }
     }
   }
