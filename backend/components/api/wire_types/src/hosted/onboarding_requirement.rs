@@ -12,15 +12,18 @@ pub enum OnboardingRequirement {
     /// There is missing identity data that must be collected
     CollectData {
         missing_attributes: Vec<CollectedDataOption>,
+        populated_attributes: Vec<CollectedDataOption>,
     },
     /// There is missing investor profile data that must be collected
     CollectInvestorProfile {
         missing_attributes: Vec<CollectedDataOption>,
+        populated_attributes: Vec<CollectedDataOption>,
         missing_document: bool,
     },
     /// There is missing business data that must be collected
     CollectBusinessData {
         missing_attributes: Vec<CollectedDataOption>,
+        populated_attributes: Vec<CollectedDataOption>,
     },
     /// Perform liveness checks
     Liveness,

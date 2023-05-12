@@ -1,18 +1,14 @@
-use super::{VaultWrapper};
+use super::VaultWrapper;
 use db::models::document_data::DocumentData;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::models::vault_data::VaultedData;
 use itertools::Itertools;
-use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
-use newtypes::DataIdentifierDiscriminant;
 use newtypes::DocumentKind;
 use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::PiiString;
 use newtypes::SealedVaultBytes;
-
 
 impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a LockedVaultWrapper)
@@ -78,24 +74,6 @@ impl<Type> VaultWrapper<Type> {
         T: Into<DataIdentifier> + Clone,
     {
         self.get(id).and_then(|v| v.p_data.as_ref())
-    }
-
-    pub fn missing_fields(
-        &self,
-        ob_config: &ObConfiguration,
-        di_kind: DataIdentifierDiscriminant,
-    ) -> Vec<CollectedDataOption> {
-        ob_config
-            .must_collect_data
-            .iter()
-            .filter(|cdo| cdo.parent().data_identifier_kind() == di_kind)
-            .filter(|cdo| {
-                cdo.required_data_identifiers()
-                    .into_iter()
-                    .any(|d| !self.populated_dis().contains(&d))
-            })
-            .cloned()
-            .collect()
     }
 
     pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {

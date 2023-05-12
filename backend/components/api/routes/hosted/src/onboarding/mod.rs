@@ -8,14 +8,15 @@ use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, Onboarding
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, user_consent::UserConsent,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, user_consent::UserConsent,
     },
     PgConn,
 };
+use either::Either;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK, PiiString,
-    ScopedVaultId,
+    CollectedDataOption, DataIdentifierDiscriminant, Declaration, DocumentKind, InvestorProfileKind as IPK,
+    PiiString, ScopedVaultId,
 };
 use paperclip::actix::web;
 
@@ -73,6 +74,37 @@ pub async fn get_requirements(
     Ok((requirements, user_auth))
 }
 
+struct RequirementProgress {
+    populated_attributes: Vec<CollectedDataOption>,
+    missing_attributes: Vec<CollectedDataOption>,
+}
+
+fn get_progress<Type>(
+    vw: &VaultWrapper<Type>,
+    ob_config: &ObConfiguration,
+    di_kind: DataIdentifierDiscriminant,
+) -> RequirementProgress {
+    let (populated_attributes, missing_attributes) = ob_config
+        .must_collect_data
+        .iter()
+        .filter(|cdo| cdo.parent().data_identifier_kind() == di_kind)
+        .cloned()
+        .partition_map(|cdo| {
+            let has_all_dis = cdo
+                .required_data_identifiers()
+                .into_iter()
+                .all(|di| vw.has_field(di));
+            match has_all_dis {
+                true => Either::Left(cdo),
+                false => Either::Right(cdo),
+            }
+        });
+    RequirementProgress {
+        populated_attributes,
+        missing_attributes,
+    }
+}
+
 #[tracing::instrument(skip_all)]
 fn get_requirements_inner(
     conn: &mut PgConn,
@@ -83,11 +115,20 @@ fn get_requirements_inner(
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let ob_config = ob_info.ob_config()?;
     let id_req = {
-        let missing_attributes = uvw.missing_fields(ob_config, DataIdentifierDiscriminant::Id);
-        (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes })
+        let RequirementProgress {
+            populated_attributes,
+            missing_attributes,
+        } = get_progress(&uvw, ob_config, DataIdentifierDiscriminant::Id);
+        (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData {
+            missing_attributes,
+            populated_attributes,
+        })
     };
     let ip_req = {
-        let missing_attributes = uvw.missing_fields(ob_config, DataIdentifierDiscriminant::InvestorProfile);
+        let RequirementProgress {
+            populated_attributes,
+            missing_attributes,
+        } = get_progress(&uvw, ob_config, DataIdentifierDiscriminant::InvestorProfile);
         let missing_document = if let Some(declarations) = declarations {
             let declarations: Vec<Declaration> = declarations.deserialize()?;
             // The finra compliance doc is missing if any of the declarations require a doc and we don't
@@ -100,21 +141,26 @@ fn get_requirements_inner(
         (!missing_attributes.is_empty() || missing_document).then_some(
             OnboardingRequirement::CollectInvestorProfile {
                 missing_attributes,
+                populated_attributes,
                 missing_document,
             },
         )
     };
-    let biz_req = {
-        // Fetch missing business fields
-        let missing_attributes = if ob_config.must_collect_business() {
-            let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
-            let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-            bvw.missing_fields(ob_config, DataIdentifierDiscriminant::Business)
-        } else {
-            vec![]
-        };
-        (!missing_attributes.is_empty())
-            .then_some(OnboardingRequirement::CollectBusinessData { missing_attributes })
+    let biz_req = if ob_config.must_collect_business() {
+        // Use the bvw to determine which fields still need to be collected
+        let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+        let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
+        let RequirementProgress {
+            populated_attributes,
+            missing_attributes,
+        } = get_progress(&bvw, ob_config, DataIdentifierDiscriminant::Business);
+
+        (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectBusinessData {
+            missing_attributes,
+            populated_attributes,
+        })
+    } else {
+        None
     };
     let liveness_req = {
         // TODO: force liveness checks to be re-done and not shared across tenants
