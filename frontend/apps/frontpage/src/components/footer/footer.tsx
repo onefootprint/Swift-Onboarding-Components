@@ -120,6 +120,10 @@ const Footer = () => {
                 href={t('links.resources.privacy-policy.href')}
               />
               <FooterLink
+                text={t('links.resources.security-disclosure.text')}
+                href={t('links.resources.security-disclosure.href')}
+              />
+              <FooterLink
                 text={t('links.resources.faq.text')}
                 href={t('links.resources.faq.href')}
               />

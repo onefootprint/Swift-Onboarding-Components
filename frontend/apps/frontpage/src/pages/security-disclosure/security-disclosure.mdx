@@ -1,0 +1,27 @@
+import MarkdownLayout from 'src/components/markdown-layout';
+
+export const meta = {
+  slug: '/security-disclosure',
+  htmlTitleKey: 'pages.security-disclosure.html-title',
+  titleKey: 'pages.security-disclosure.title',
+  subtitleKey: 'pages.security-disclosure.subtitle',
+};
+
+Help make Footprint safer and more secure by disclosing security issues responsibly. We're committed to protecting our customers and users.
+
+If you're a security expert or researcher and you believe you've discovered a security-related issue with Footprint's systems we appreciate your help in disclosing the issue to us responsibly.
+
+We ask the security research community to give us an opportunity to correct a vulnerability before publicly disclosing it. Please submit a bug to us at [security@onefootprint.com](mailto:security@onefootprint.com) with a detailed description of the issue and the steps you believe may be required to reproduce what you have observed. Please make a good faith effort to protect our users' privacy and data. We are committed to addressing security issues responsibly and in a timely manner.
+
+If you're having issues related to your individual account, then please visit our support pages.
+
+### For all other questions, please contact us at:
+
+One Footprint Inc.
+201 Varick Street New York, NY 10014
+
+[support@onefootprint.com](mailto:support@onefootprint.com)
+
+export default ({ children }) => (
+  <MarkdownLayout meta={meta}>{children}</MarkdownLayout>
+);

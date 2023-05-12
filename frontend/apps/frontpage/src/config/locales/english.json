@@ -187,6 +187,10 @@
           "supported-id-documents": {
             "text": "Supported ID Documents",
             "href": "/supported-id-documents"
+          },
+          "security-disclosure": {
+            "href": "/security-disclosure",
+            "text": "Security Disclosure"
           }
         },
         "developers": {
@@ -790,6 +794,11 @@
       "html-title": "Footprint - Privacy Policy",
       "title": "Privacy Policy",
       "subtitle": "Last modified 04/14/2022"
+    },
+    "security-disclosure": {
+      "html-title": "Footprint - Responsible Security Disclosure",
+      "title": "Responsible Security Disclosure",
+      "subtitle": "Last modified 05/12/2023"
     },
     "terms-of-service": {
       "html-title": "Footprint - Terms of Service",
