@@ -5,7 +5,7 @@ import React from 'react';
 
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { SSNInformation } from '../../utils/data-types';
+import { KycData } from '../../utils/data-types';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 
@@ -31,7 +31,7 @@ const SSN = ({
   const toast = useToast();
   const { t } = useTranslation('pages.ssn');
 
-  const onSubmit = (ssnInfo: SSNInformation) => {
+  const onSubmit = (ssnInfo: KycData) => {
     const handleSuccess = () => {
       send({
         type: 'dataSubmitted',

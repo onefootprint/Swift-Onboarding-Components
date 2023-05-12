@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { ResidentialZipCodeAndCountry } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 import getInitialCountry from '../../utils/get-initial-country';
 import CountryField from '../country-field';
 import ZipField from '../zip-field';
@@ -20,7 +20,7 @@ type FormData = {
 
 export type AddressZipCodeAndCountryProps = {
   isMutationLoading: boolean;
-  onSubmit: (residentialAddress: ResidentialZipCodeAndCountry) => void;
+  onSubmit: (residentialAddress: KycData) => void;
   ctaLabel?: string;
   hideHeader?: boolean;
 };

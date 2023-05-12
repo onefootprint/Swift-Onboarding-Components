@@ -1,4 +1,3 @@
-import { IdDI, OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -9,7 +8,7 @@ import {
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
 
-const createCollectKycDataMachine = () =>
+const createCollectKycDataMachine = (initialContext: MachineContext) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -20,67 +19,47 @@ const createCollectKycDataMachine = () =>
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {
-        requirement: {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-        },
-        data: {},
-      },
+      context: initialContext,
       states: {
         init: {
-          on: {
-            receivedContext: [
-              {
-                target: 'email',
-                actions: 'assignInitialContext',
-                cond: (context, event) =>
-                  // If email was passed into initial context, no need to collect again
-                  isMissingEmailAttribute(
-                    event.payload.requirement.missingAttributes,
-                    // TODO: fix this ugliness in the next PR
-                    {
-                      ...context.data,
-                      [IdDI.email]: event.payload.bootstrapData?.[IdDI.email]
-                        ? {
-                            value: event.payload.bootstrapData?.[IdDI.email],
-                          }
-                        : undefined,
-                    },
-                  ),
-              },
-              {
-                target: 'basicInformation',
-                actions: 'assignInitialContext',
-                cond: (context, event) =>
-                  isMissingBasicAttribute(
-                    event.payload.requirement.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: 'residentialAddress',
-                actions: 'assignInitialContext',
-                cond: (context, event) =>
-                  isMissingResidentialAttribute(
-                    event.payload.requirement.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: 'ssn',
-                actions: 'assignInitialContext',
-                cond: (context, event) =>
-                  isMissingSsnAttribute(
-                    event.payload.requirement.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: 'completed',
-              },
-            ],
-          },
+          always: [
+            {
+              target: 'email',
+              cond: context =>
+                // If email was passed into initial context, no need to collect again
+                isMissingEmailAttribute(
+                  context.requirement.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: 'basicInformation',
+              cond: context =>
+                isMissingBasicAttribute(
+                  context.requirement.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: 'residentialAddress',
+              cond: context =>
+                isMissingResidentialAttribute(
+                  context.requirement.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: 'ssn',
+              cond: context =>
+                isMissingSsnAttribute(
+                  context.requirement.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: 'completed',
+            },
+          ],
         },
         email: {
           on: {
@@ -256,24 +235,24 @@ const createCollectKycDataMachine = () =>
             // Below are DESKTOP transitions
             editEmail: {
               target: 'emailEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
             editBasicInfo: {
               target: 'basicInfoEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
             editAddress: {
               target: 'addressEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
             editIdentity: {
               target: 'identityEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
             // Below are MOBILE transitions
             dataSubmitted: {
               actions: ['assignData'],
-              cond: context => context.device?.type === 'mobile',
+              cond: context => context.device.type === 'mobile',
             },
           },
         },
@@ -282,7 +261,7 @@ const createCollectKycDataMachine = () =>
             dataSubmitted: [
               {
                 target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
+                cond: context => context.device.type !== 'mobile',
                 actions: ['assignData'],
               },
               {
@@ -291,7 +270,7 @@ const createCollectKycDataMachine = () =>
             ],
             returnToSummary: {
               target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
           },
         },
@@ -300,7 +279,7 @@ const createCollectKycDataMachine = () =>
             dataSubmitted: [
               {
                 target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
+                cond: context => context.device.type !== 'mobile',
                 actions: ['assignData'],
               },
               {
@@ -309,7 +288,7 @@ const createCollectKycDataMachine = () =>
             ],
             returnToSummary: {
               target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
           },
         },
@@ -318,7 +297,7 @@ const createCollectKycDataMachine = () =>
             dataSubmitted: [
               {
                 target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
+                cond: context => context.device.type !== 'mobile',
                 actions: ['assignData'],
               },
               {
@@ -327,7 +306,7 @@ const createCollectKycDataMachine = () =>
             ],
             returnToSummary: {
               target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
           },
         },
@@ -336,7 +315,7 @@ const createCollectKycDataMachine = () =>
             dataSubmitted: [
               {
                 target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
+                cond: context => context.device.type !== 'mobile',
                 actions: ['assignData'],
               },
               {
@@ -345,7 +324,7 @@ const createCollectKycDataMachine = () =>
             ],
             returnToSummary: {
               target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
+              cond: context => context.device.type !== 'mobile',
             },
           },
         },
@@ -356,43 +335,6 @@ const createCollectKycDataMachine = () =>
     },
     {
       actions: {
-        assignInitialContext: assign((context, event) => {
-          const {
-            authToken,
-            device,
-            userFound,
-            requirement,
-            sandboxSuffix,
-            config,
-            bootstrapData,
-            fixedFields,
-          } = event.payload;
-          context.device = device;
-          context.authToken = authToken;
-          context.userFound = userFound;
-          context.sandboxSuffix = sandboxSuffix;
-          context.config = config;
-          context.requirement = requirement;
-
-          if (bootstrapData) {
-            Object.entries(bootstrapData).forEach(([key, value]) => {
-              context.data[key as IdDI] = {
-                value,
-                bootstrap: true,
-              };
-            });
-          }
-          if (fixedFields) {
-            fixedFields.forEach(field => {
-              const entry = context.data[field];
-              if (entry) {
-                entry.fixed = true;
-              }
-            });
-          }
-
-          return context;
-        }),
         assignData: assign((context, event) => {
           context.data = {
             ...context.data,

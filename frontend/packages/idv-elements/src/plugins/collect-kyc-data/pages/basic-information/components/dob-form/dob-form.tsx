@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { DobInformation } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import DobField from '../dob-field';
 
@@ -14,7 +14,7 @@ type FormData = {
 
 type DobFormProps = {
   isLoading: boolean;
-  onSubmit: (data: DobInformation) => void;
+  onSubmit: (data: KycData) => void;
   ctaLabel?: string;
 };
 

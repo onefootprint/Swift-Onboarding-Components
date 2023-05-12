@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { NameInformation } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import NameFields from '../name-fields';
 
@@ -15,7 +15,7 @@ type FormData = {
 
 type NameFormProps = {
   isLoading: boolean;
-  onSubmit: (data: NameInformation) => void;
+  onSubmit: (data: KycData) => void;
   ctaLabel?: string;
 };
 

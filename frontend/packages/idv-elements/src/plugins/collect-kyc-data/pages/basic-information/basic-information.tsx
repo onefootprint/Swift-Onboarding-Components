@@ -7,7 +7,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { BasicInformation as BasicInformationData } from '../../utils/data-types';
+import { KycData } from '../../utils/data-types';
 import DobForm from './components/dob-form';
 import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
@@ -32,7 +32,7 @@ const BasicInformation = ({
   const toast = useToast();
   const { t } = useTranslation('pages.basic-information');
 
-  const onSubmit = (basicInformation: BasicInformationData) => {
+  const onSubmit = (basicInformation: KycData) => {
     const handleSuccess = () => {
       send({
         type: 'dataSubmitted',

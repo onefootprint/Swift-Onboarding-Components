@@ -8,6 +8,7 @@ import {
 import { interpret } from 'xstate';
 
 import createCollectKycDataMachine from './machine';
+import { MachineContext } from './types';
 
 describe('Collect KYC Data Machine Tests', () => {
   const TestOnboardingConfig: OnboardingConfig = {
@@ -34,23 +35,23 @@ describe('Collect KYC Data Machine Tests', () => {
     email?: string,
     sandboxSuffix?: string,
   ) => {
-    const machine = interpret(createCollectKycDataMachine());
-    machine.start();
-    machine.send({
-      type: 'receivedContext',
-      payload: {
-        userFound,
-        authToken: 'authToken',
-        requirement: {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes,
-        },
-        device,
-        config: { ...TestOnboardingConfig },
-        bootstrapData: email ? { [IdDI.email]: email } : undefined,
-        sandboxSuffix,
+    const data = email
+      ? { [IdDI.email]: { value: email, bootstrap: true } }
+      : {};
+    const initialContext: MachineContext = {
+      userFound,
+      authToken: 'authToken',
+      requirement: {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes,
       },
-    });
+      device,
+      config: { ...TestOnboardingConfig },
+      data,
+      sandboxSuffix,
+    };
+    const machine = interpret(createCollectKycDataMachine(initialContext));
+    machine.start();
     return machine;
   };
 

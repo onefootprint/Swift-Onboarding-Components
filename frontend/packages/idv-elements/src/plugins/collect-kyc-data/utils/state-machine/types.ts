@@ -8,13 +8,12 @@ import {
 
 import { KycData } from '../data-types';
 
-// TODO: make some of these non-optional by passing the context in directly as opposed to using an event to send it
 export type MachineContext = {
   // Plugin context
-  authToken?: string;
-  device?: DeviceInfo;
-  config?: OnboardingConfig;
-  userFound?: boolean;
+  authToken: string;
+  device: DeviceInfo;
+  config: OnboardingConfig;
+  userFound: boolean;
   sandboxSuffix?: string; // only if in sandbox mode
   requirement: CollectKycDataRequirement;
   // Machine generated

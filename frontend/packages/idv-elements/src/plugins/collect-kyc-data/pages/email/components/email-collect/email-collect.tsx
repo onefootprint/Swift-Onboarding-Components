@@ -32,7 +32,7 @@ const EmailCollect = ({
   const { t, allT } = useTranslation('pages.email');
   const showRequestErrorToast = useRequestErrorToast();
   const { mutation, syncEmail } = useSyncEmail();
-  const isSandbox = !config?.isLive;
+  const isSandbox = !config.isLive;
   const {
     register,
     handleSubmit,

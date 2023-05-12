@@ -10,7 +10,7 @@ import InfoBox from '../../../../../../components/info-box';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { SSN9Information } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 
 type FormData = {
   ssn9: string;
@@ -18,7 +18,7 @@ type FormData = {
 
 type SSN9Props = {
   isMutationLoading: boolean;
-  onSubmit: (formData: SSN9Information) => void;
+  onSubmit: (formData: KycData) => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
   hideHeader?: boolean;

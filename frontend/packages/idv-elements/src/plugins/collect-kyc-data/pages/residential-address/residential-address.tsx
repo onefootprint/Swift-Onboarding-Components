@@ -5,7 +5,7 @@ import React from 'react';
 
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { ResidentialAddress as ResidentialAddressData } from '../../utils/data-types';
+import { KycData } from '../../utils/data-types';
 import AddressFull from './components/address-full';
 import AddressZipCodeAndCountry from './components/address-zip-code-and-country';
 
@@ -29,7 +29,7 @@ const ResidentialAddress = ({
   const toast = useToast();
   const { mutation, syncData } = useSyncData();
 
-  const handleSubmit = (residentialAddress: ResidentialAddressData) => {
+  const handleSubmit = (residentialAddress: KycData) => {
     const handleSuccess = () => {
       send({
         type: 'dataSubmitted',

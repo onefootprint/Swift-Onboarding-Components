@@ -17,7 +17,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { ResidentialAddressFull } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 import getAddressComponent from '../../utils/get-address-components/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country/get-initial-country';
 import getInitialState from '../../utils/get-initial-state/get-initial-state';
@@ -35,7 +35,7 @@ type FormData = {
 
 export type AddressFullProps = {
   isMutationLoading: boolean;
-  onSubmit: (residentialAddress: ResidentialAddressFull) => void;
+  onSubmit: (residentialAddress: KycData) => void;
   ctaLabel?: string;
   hideHeader?: boolean;
 };

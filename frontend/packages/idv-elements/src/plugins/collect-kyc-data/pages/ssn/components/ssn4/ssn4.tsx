@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { SSN4Information } from '../../../../utils/data-types';
+import { KycData } from '../../../../utils/data-types';
 
 type FormData = {
   ssn4: string;
@@ -16,7 +16,7 @@ type FormData = {
 
 type SSN4Props = {
   isMutationLoading: boolean;
-  onSubmit: (formData: SSN4Information) => void;
+  onSubmit: (formData: KycData) => void;
   ctaLabel?: string;
   hideHeader?: boolean;
 };

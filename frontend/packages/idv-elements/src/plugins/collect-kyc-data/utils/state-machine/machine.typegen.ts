@@ -14,7 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignData: 'dataSubmitted';
-    assignInitialContext: 'receivedContext';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

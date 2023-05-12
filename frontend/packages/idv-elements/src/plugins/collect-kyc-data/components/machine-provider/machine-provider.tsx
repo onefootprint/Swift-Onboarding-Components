@@ -1,9 +1,17 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import collectKycDataMachine from '../../utils/state-machine/machine';
+import {
+  createCollectKycDataMachine,
+  MachineContext,
+} from '../../utils/state-machine';
 
-const useLocalCollectKycDataMachine = () => useMachine(collectKycDataMachine);
+type CollectKycDataMachineArgs = {
+  args: MachineContext;
+};
+
+const useLocalCollectKycDataMachine = ({ args }: CollectKycDataMachineArgs) =>
+  useMachine(() => createCollectKycDataMachine(args));
 
 export const [MachineProvider, useCollectKycDataMachine] = constate(
   useLocalCollectKycDataMachine,

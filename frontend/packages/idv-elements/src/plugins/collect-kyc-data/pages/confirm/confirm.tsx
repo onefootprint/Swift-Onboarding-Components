@@ -25,8 +25,8 @@ const Confirm = () => {
     device,
     requirement: { missingAttributes },
   } = state.context;
-  const isMobile = device?.type === 'mobile';
-  const isSandbox = !config?.isLive;
+  const isMobile = device.type === 'mobile';
+  const isSandbox = !config.isLive;
   const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
