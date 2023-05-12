@@ -9,6 +9,9 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::Any;
+use api_core::fingerprinter::VaultIdentifier;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
@@ -18,8 +21,8 @@ use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, 
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct LoginChallengeRequest {
-    identifier: IdentifyId,
+pub struct AuthChallengeRequest {
+    identifier: Option<IdentifyId>,
     preferred_challenge_kind: ChallengeKind,
 }
 
@@ -36,17 +39,30 @@ pub struct LoginChallengeResponse {
 )]
 #[actix::post("/hosted/identify/login_challenge")]
 pub async fn post(
-    request: Json<LoginChallengeRequest>,
+    request: Json<AuthChallengeRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
+    // When provided, is used to identify the currently authed user. Will generate a challenge
+    // for the authed user
+    user_auth: Option<UserAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     let tenant = ob_context.as_ref().map(|obc| obc.tenant());
 
     // clean phone number
-    let LoginChallengeRequest {
+    let AuthChallengeRequest {
         identifier,
         preferred_challenge_kind,
     } = request.into_inner();
+
+    // Require one of user_auth or identifier
+    let identifier = match (user_auth, identifier) {
+        (Some(user_auth), None) => {
+            let user_auth = user_auth.check_guard(Any)?;
+            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id.clone())
+        }
+        (None, Some(id)) => id.into(),
+        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
+    };
 
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
     let twilio_client = &state.twilio_client;
@@ -54,7 +70,7 @@ pub async fn post(
     // Look up existing user vault by identifier
     let t_id = tenant.map(|t| &t.id);
     let (uvw, creds, _) =
-        if let Some(user_challenge_context) = get_user_challenge_context(&state, &identifier, t_id).await? {
+        if let Some(user_challenge_context) = get_user_challenge_context(&state, identifier, t_id).await? {
             user_challenge_context
         } else {
             // The user vault doesn't exist. Just return that the user wasn't found

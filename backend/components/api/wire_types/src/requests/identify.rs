@@ -15,12 +15,3 @@ pub enum IdentifyId {
 pub struct IdentifyRequest {
     pub identifier: IdentifyId,
 }
-
-impl IdentifyId {
-    pub fn idk(&self) -> IdentityDataKind {
-        match self {
-            Self::Email(_) => IdentityDataKind::Email,
-            Self::PhoneNumber(_) => IdentityDataKind::PhoneNumber,
-        }
-    }
-}

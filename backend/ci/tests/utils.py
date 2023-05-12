@@ -130,6 +130,8 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 
 def inherit_user(twilio, phone_number, ob_config_auth=None):
+    body = identify_user(phone_number, ob_config_auth)
+    assert "sms" in body["available_challenge_kinds"]
     challenge_data = challenge_user(phone_number, ob_config_auth, "sms")
 
     # Log in as the user
@@ -144,10 +146,26 @@ def inherit_user(twilio, phone_number, ob_config_auth=None):
 
 def inherit_user_biometric(user):
     phone_number = user.client.data["id.phone_number"]
+    body = identify_user(phone_number, user.client.ob_config.key)
+    assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
         phone_number, user.client.ob_config.key, "biometric"
     )
+    body = biometric_challenge_response(challenge_data, user, user.client.ob_config.key)
+    assert body["kind"] == "user_inherited"
+    return FpAuth(body["auth_token"])
 
+
+def step_up_user_biometric(auth_token, user):
+    # Don't technically need to pass in the phone number to step up, but the util takes it in
+    phone_number = user.client.data["id.phone_number"]
+    challenge_data = challenge_user(phone_number, auth_token, "biometric")
+    body = biometric_challenge_response(challenge_data, user, auth_token)
+    assert body["kind"] == "user_inherited"
+    assert body["auth_token"] == auth_token.value
+
+
+def biometric_challenge_response(challenge_data, user, *auths):
     # do webauthn
     chal = json.loads(challenge_data["biometric_challenge_json"])
     chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
@@ -174,16 +192,13 @@ def inherit_user_biometric(user):
         "challenge_kind": "biometric",
         "challenge_token": challenge_data["challenge_token"],
     }
-    body = post("hosted/identify/verify", data, user.client.ob_config.key)
-    assert body["kind"] == "user_inherited"
-    return FpAuth(body["auth_token"])
+    body = post("hosted/identify/verify", data, *auths)
+    return body
 
 
-def challenge_user(phone_number, ob_config_auth=None, challenge_kind="sms"):
+def identify_user(phone_number, auth=None):
     identifier = dict(phone_number=phone_number)
-    # Support sandbox phone numbers being passed in
-    real_phone_number = phone_number.split("#")[0]
-    auth_args = [ob_config_auth] if ob_config_auth else []
+    auth_args = [auth] if auth else []
 
     def identify():
         data = dict(
@@ -192,12 +207,27 @@ def challenge_user(phone_number, ob_config_auth=None, challenge_kind="sms"):
         body = post("hosted/identify", data, *auth_args)
         assert body["user_found"]
         assert body["available_challenge_kinds"]
+        return body
+
+    return try_until_success(identify, 5)
+
+
+def challenge_user(phone_number, auth=None, challenge_kind="sms"):
+    identifier = dict(phone_number=phone_number)
+    # Support sandbox phone numbers being passed in
+    real_phone_number = phone_number.split("#")[0]
+    auth_args = [auth] if auth else []
 
     def challenge():
         data = dict(
             identifier=identifier,
             preferred_challenge_kind=challenge_kind,
         )
+
+        if isinstance(auth, FpAuth):
+            # Hacky - if we are challenging for step up, don't provide an identifier
+            data.pop("identifier")
+
         body = post("hosted/identify/login_challenge", data, *auth_args)
         last_two = real_phone_number[-2:]
         assert (
@@ -207,7 +237,6 @@ def challenge_user(phone_number, ob_config_auth=None, challenge_kind="sms"):
         assert body["challenge_data"]["challenge_kind"] == challenge_kind
         return body["challenge_data"]
 
-    try_until_success(identify, 5)
     return try_until_success(challenge, 20)
 
 

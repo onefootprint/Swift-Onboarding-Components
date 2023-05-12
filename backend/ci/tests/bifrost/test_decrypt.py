@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import post, inherit_user_biometric
+from tests.utils import post, step_up_user_biometric
 
 
 @pytest.fixture(scope="module")
@@ -7,8 +7,8 @@ def biometric_sandbox_user_auth(sandbox_user):
     """
     auth token for sandbox_user from logging in via biometric credential
     """
-    auth_token = inherit_user_biometric(sandbox_user)
-    return auth_token
+    step_up_user_biometric(sandbox_user.client.auth_token, sandbox_user)
+    return sandbox_user.client.auth_token
 
 
 @pytest.mark.parametrize(

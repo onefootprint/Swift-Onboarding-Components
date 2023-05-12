@@ -8,6 +8,7 @@ from tests.utils import (
     challenge_user,
     identify_verify,
     try_until_success,
+    identify_user,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -96,6 +97,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
+    identify_user(phone_number, kyb_sandbox_ob_config.key)
     challenge_data = challenge_user(phone_number, kyb_sandbox_ob_config.key, "sms")
     identify_verify(
         twilio,

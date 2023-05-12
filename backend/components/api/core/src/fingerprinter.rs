@@ -6,7 +6,7 @@ use db::models::vault::Vault;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
+    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId, VaultId,
 };
 
 use crate::{errors::kms::KmsSignError, ApiError, State};
@@ -80,43 +80,63 @@ impl Fingerprinter for State {
     }
 }
 
+#[derive(Debug)]
+pub enum VaultIdentifier {
+    IdentifyId(IdentifyId),
+    AuthenticatedId(VaultId),
+}
+
+impl From<IdentifyId> for VaultIdentifier {
+    fn from(value: IdentifyId) -> Self {
+        Self::IdentifyId(value)
+    }
+}
+
 impl State {
     /// This is a helper function for finding vaults by using fingerprinted data.
     /// If t_id is provided, we will also look up users by tenant-scoped fingerprints.
     #[tracing::instrument(skip(self))]
     pub async fn find_vault(
         &self,
-        identifier: &IdentifyId,
+        identifier: VaultIdentifier,
         t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
-        let (scopes, data) = match identifier {
-            IdentifyId::PhoneNumber(phone_number) => (
-                vec![
-                    Some(GlobalFingerprintKind::PhoneNumber.scope()),
-                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)),
-                ],
-                phone_number.e164_with_suffix(),
-            ),
-            IdentifyId::Email(email) => (
-                vec![
-                    Some(GlobalFingerprintKind::Email.scope()),
-                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
-                ],
-                PiiString::from(email.clone()),
-            ),
+        let existing_user = match identifier {
+            VaultIdentifier::IdentifyId(id) => {
+                // Search via fingerprint
+                let (scopes, data) = match id {
+                    IdentifyId::PhoneNumber(phone_number) => (
+                        vec![
+                            Some(GlobalFingerprintKind::PhoneNumber.scope()),
+                            t_id.map(|id| {
+                                FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)
+                            }),
+                        ],
+                        phone_number.e164_with_suffix(),
+                    ),
+                    IdentifyId::Email(email) => (
+                        vec![
+                            Some(GlobalFingerprintKind::Email.scope()),
+                            t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
+                        ],
+                        PiiString::from(email),
+                    ),
+                };
+                let fps: Vec<_> = scopes
+                    .into_iter()
+                    .flatten()
+                    .zip(std::iter::repeat(&data))
+                    .collect();
+                let sh_datas = self.compute_fingerprints(&fps).await?;
+                self.db_pool
+                    .db_query(move |conn| Vault::find_portable(conn, &sh_datas))
+                    .await??
+            }
+            VaultIdentifier::AuthenticatedId(id) => {
+                // Look up by id
+                Some(self.db_pool.db_query(move |conn| Vault::get(conn, &id)).await??)
+            }
         };
-
-        let fps: Vec<_> = scopes
-            .into_iter()
-            .flatten()
-            .zip(std::iter::repeat(&data))
-            .collect();
-        let sh_datas = self.compute_fingerprints(&fps).await?;
-
-        let existing_user = self
-            .db_pool
-            .db_query(move |conn| Vault::find_portable(conn, &sh_datas))
-            .await??;
 
         Ok(existing_user)
     }

@@ -16,4 +16,6 @@ pub enum ChallengeError {
     BiometricCredentialAlreadyExists,
     #[error("Login challenge initiated for non-existent user vault")]
     LoginChallengeUserNotFound,
+    #[error("Provide one user identifier to initiate a challenge")]
+    OnlyOneIdentifier,
 }

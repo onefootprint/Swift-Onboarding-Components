@@ -2,8 +2,8 @@
 pub mod identify;
 pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::twilio::PhoneChallengeState;
-use api_wire_types::IdentifyId;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::TenantId;
 use strum::EnumDiscriminants;
@@ -85,7 +85,7 @@ impl ChallengeState {
 #[tracing::instrument(skip(state))]
 async fn get_user_challenge_context(
     state: &web::Data<State>,
-    identifier: &IdentifyId,
+    identifier: VaultIdentifier,
     t_id: Option<&TenantId>,
 ) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
     // Look up existing user vault by identifier

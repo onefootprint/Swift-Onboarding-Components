@@ -33,19 +33,20 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let t_id = ob_context.as_ref().map(|obc| &obc.tenant().id);
-    let (_, webauthn_creds, kinds) =
-        if let Some(user_challenge_context) = get_user_challenge_context(&state, &identifier, t_id).await? {
-            user_challenge_context
-        } else {
-            // The user vault doesn't exist. Just return that the user wasn't found
-            return Ok(Json(ResponseData {
-                data: IdentifyResponse {
-                    user_found: false,
-                    available_challenge_kinds: None,
-                    has_syncable_pass_key: false,
-                },
-            }));
-        };
+    let (_, webauthn_creds, kinds) = if let Some(user_challenge_context) =
+        get_user_challenge_context(&state, identifier.into(), t_id).await?
+    {
+        user_challenge_context
+    } else {
+        // The user vault doesn't exist. Just return that the user wasn't found
+        return Ok(Json(ResponseData {
+            data: IdentifyResponse {
+                user_found: false,
+                available_challenge_kinds: None,
+                has_syncable_pass_key: false,
+            },
+        }));
+    };
 
     let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
 

@@ -10,6 +10,9 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::session::UpdateSession;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
@@ -61,6 +64,8 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
     ob_pk_auth: Option<ObConfigAuth>,
+    // When provided, augments the existing user_auth token with the scopes gained from the challenge
+    user_auth: Option<UserAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -116,25 +121,37 @@ pub async fn post(
                 }
             };
 
-            // And specific scopes for either bifrost or my1fp
-            let (scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
-                let scopes = onboarding_scopes(conn, ob_pk_auth, &uv_id)?.into_iter();
-                let duration = Duration::minutes(30); // Onboarding is pretty short
-                (scopes, duration)
-            } else {
-                let scopes = vec![Some(UserAuthScope::BasicProfile)].into_iter();
-                let duration = Duration::hours(8); // Issue my1fp token for a long time
-                (scopes, duration)
-            };
-
             // If you authed with Biometric, you also get SensitiveProfile
             let sensitive_scope = matches!(challenge_kind, ChallengeDataKind::Biometric)
                 .then_some(UserAuthScope::SensitiveProfile);
 
-            // Create the auth token for this user
-            let scopes = scopes.chain([sensitive_scope]).flatten().collect();
-            let data = UserSession::make(uv_id, scopes);
-            let auth_token = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            let auth_token = if let Some(user_auth) = user_auth {
+                // If you provided an existing auth token, add the warranted scopes
+                let user_auth = user_auth.check_guard(Any)?;
+                let token = user_auth.auth_token.clone();
+                let data = user_auth
+                    .data
+                    .clone()
+                    .add_scopes(sensitive_scope.into_iter().collect());
+                user_auth.update_session(conn, &session_key, data)?;
+                token
+            } else {
+                // Otherwise, create a new token with the scopes for bifrost or my1fp
+                let (new_token_scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
+                    let scopes = onboarding_scopes(conn, ob_pk_auth, &uv_id)?.into_iter();
+                    let duration = Duration::minutes(30); // Onboarding is pretty short
+                    (scopes, duration)
+                } else {
+                    let scopes = vec![Some(UserAuthScope::BasicProfile)].into_iter();
+                    let duration = Duration::hours(8); // Issue my1fp token for a long time
+                    (scopes, duration)
+                };
+
+                // Create the auth token for this user
+                let scopes = new_token_scopes.chain([sensitive_scope]).flatten().collect();
+                let data = UserSession::make(uv_id, scopes);
+                AuthSession::create_sync(conn, &session_key, data, duration)?
+            };
             Ok((auth_token, user_kind))
         })
         .await?;

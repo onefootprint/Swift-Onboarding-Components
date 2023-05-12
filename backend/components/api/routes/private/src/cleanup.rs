@@ -47,7 +47,7 @@ async fn post(
 
     // Use e164 with suffix to compute fingerprint
     let id = IdentifyId::PhoneNumber(phone_number);
-    let uv = state.find_vault(&id, None).await?;
+    let uv = state.find_vault(id.into(), None).await?;
 
     let user_vault_id = if let Some(uv) = uv {
         uv.id

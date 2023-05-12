@@ -3,9 +3,8 @@ from tests.utils import (
     inherit_user,
     get,
     post,
-    inherit_user_biometric,
+    step_up_user_biometric,
 )
-from tests.bifrost_client import BifrostClient
 
 
 @pytest.fixture(scope="module")
@@ -18,15 +17,6 @@ def auth_token(sandbox_user_real_phone, twilio):
     auth_token = inherit_user(twilio, phone_number)
     body = get("/hosted/user/token", None, auth_token)
     assert body["scopes"] == ["BasicProfile"]
-    return auth_token
-
-
-@pytest.fixture(scope="module")
-def biometric_auth_token(sandbox_user_real_phone, twilio):
-    """
-    Auth token with an elevated scope from authing with biometric rather than sms
-    """
-    auth_token = inherit_user_biometric(sandbox_user_real_phone)
     return auth_token
 
 
@@ -70,10 +60,14 @@ def test_decrypt_basic(sandbox_user_real_phone, auth_token):
         post("/hosted/user/vault/decrypt", data, auth_token, status_code=401)
 
 
-def test_decrypt_sensitive(sandbox_user_real_phone, biometric_auth_token):
+def test_decrypt_sensitive(sandbox_user_real_phone, auth_token):
+    # First, step up with the existing auth token
+    step_up_user_biometric(auth_token, sandbox_user_real_phone)
+
+    # Now, we should be able to decrypt sensitive data
     fields = BASIC_FIELDS + SENSITIVE_FIELDS
     data = dict(fields=fields)
-    body = post("/hosted/user/vault/decrypt", data, biometric_auth_token)
+    body = post("/hosted/user/vault/decrypt", data, auth_token)
     verified_data = {
         **sandbox_user_real_phone.client.data,
         # Grrr, phone number spaces strike again
