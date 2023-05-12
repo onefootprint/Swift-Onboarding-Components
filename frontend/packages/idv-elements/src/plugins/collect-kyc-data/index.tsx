@@ -1,4 +1,3 @@
-import { IdDI } from '@onefootprint/types';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -27,28 +26,21 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
       config,
       userFound,
       sandboxSuffix,
-      requirement: { missingAttributes },
+      requirement,
       bootstrapData,
       fixedFields,
     } = customData;
-    const email = bootstrapData?.[IdDI.email];
     send({
       type: 'receivedContext',
       payload: {
         device,
         authToken,
-        missingAttributes,
+        requirement,
         userFound,
-        email,
         sandboxSuffix,
         config,
-        fixedData:
-          fixedFields && bootstrapData
-            ? {
-                [IdDI.firstName]: bootstrapData[IdDI.firstName],
-                [IdDI.lastName]: bootstrapData[IdDI.lastName],
-              }
-            : undefined,
+        fixedFields,
+        bootstrapData,
       },
     });
   });

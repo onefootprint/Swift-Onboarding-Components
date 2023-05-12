@@ -13,8 +13,13 @@ type EmailSectionProps = {
 const EmailSection = ({ onEdit }: EmailSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
-  const { data, missingAttributes, receivedEmail } = state.context;
-  const email = data[IdDI.email];
+  const {
+    data,
+    requirement: { missingAttributes },
+  } = state.context;
+  const emailEntry = data[IdDI.email];
+  const email = emailEntry?.value;
+  const receivedEmail = emailEntry?.bootstrap;
   if (
     !missingAttributes.includes(CollectedKycDataOption.email) ||
     receivedEmail

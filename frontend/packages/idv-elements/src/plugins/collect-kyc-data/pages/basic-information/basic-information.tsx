@@ -24,7 +24,10 @@ const BasicInformation = ({
   onComplete,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, missingAttributes } = state.context;
+  const {
+    authToken,
+    requirement: { missingAttributes },
+  } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.basic-information');
@@ -32,10 +35,8 @@ const BasicInformation = ({
   const onSubmit = (basicInformation: BasicInformationData) => {
     const handleSuccess = () => {
       send({
-        type: 'basicInformationSubmitted',
-        payload: {
-          basicInformation,
-        },
+        type: 'dataSubmitted',
+        payload: basicInformation,
       });
       onComplete?.();
     };

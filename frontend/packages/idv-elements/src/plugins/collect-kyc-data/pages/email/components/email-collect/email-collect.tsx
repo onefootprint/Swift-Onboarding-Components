@@ -40,7 +40,7 @@ const EmailCollect = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      email: data[IdDI.email],
+      email: data[IdDI.email]?.value,
     },
   });
 

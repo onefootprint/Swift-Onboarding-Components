@@ -48,8 +48,8 @@ const Router = ({ onDone }: RouterProps) => {
         <Identify
           // TODO: generalize this in the next iteratin
           bootstrapData={{
-            email: data?.[IdDI.email] as string,
-            phoneNumber: data?.[IdDI.phoneNumber] as string,
+            email: data?.[IdDI.email],
+            phoneNumber: data?.[IdDI.phoneNumber],
           }}
           tenantPk={tenantPk}
           onDone={payload => {

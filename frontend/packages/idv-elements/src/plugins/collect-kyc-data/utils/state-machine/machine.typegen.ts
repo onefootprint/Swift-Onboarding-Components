@@ -13,11 +13,8 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignBasicInformation: 'basicInformationSubmitted';
-    assignEmail: 'emailSubmitted';
+    assignData: 'dataSubmitted';
     assignInitialContext: 'receivedContext';
-    assignResidentialAddress: 'residentialAddressSubmitted';
-    assignSsn: 'ssnSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

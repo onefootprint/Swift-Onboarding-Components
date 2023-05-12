@@ -1,10 +1,11 @@
 import { IdDI, IdDIData, UserDataResponse } from '@onefootprint/types';
 
 import useUserData from '../../../hooks/api/hosted/user/vault/use-user-data';
+import { KycData } from '../utils/data-types';
 
 type SyncDataArgs = {
   authToken?: string;
-  data: IdDIData;
+  data: KycData;
   speculative?: boolean;
   onSuccess?: (data: UserDataResponse) => void;
   onError?: (error: unknown) => void;
@@ -25,9 +26,12 @@ const useSyncData = () => {
       return;
     }
 
-    const requestData = { ...data };
+    const keyValuePairs: [IdDI, string][] = Object.entries(data).map(
+      ([key, value]) => [key as IdDI, value.value],
+    );
+    const requestData: IdDIData = Object.fromEntries(keyValuePairs);
     // DOB is accepted by the backend in a different format
-    const dobData = data[IdDI.dob];
+    const dobData = requestData[IdDI.dob];
     if (dobData) {
       const [month, day, year] = dobData.split('/');
       requestData[IdDI.dob] = `${year}-${month}-${day}`;

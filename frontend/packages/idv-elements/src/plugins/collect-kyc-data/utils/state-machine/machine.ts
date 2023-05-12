@@ -1,4 +1,4 @@
-import { IdDI } from '@onefootprint/types';
+import { IdDI, OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -21,7 +21,10 @@ const createCollectKycDataMachine = () =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        missingAttributes: [],
+        requirement: {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+        },
         data: {},
       },
       states: {
@@ -33,17 +36,25 @@ const createCollectKycDataMachine = () =>
                 actions: 'assignInitialContext',
                 cond: (context, event) =>
                   // If email was passed into initial context, no need to collect again
-                  isMissingEmailAttribute(event.payload.missingAttributes, {
-                    ...context.data,
-                    [IdDI.email]: event.payload.email,
-                  }),
+                  isMissingEmailAttribute(
+                    event.payload.requirement.missingAttributes,
+                    // TODO: fix this ugliness in the next PR
+                    {
+                      ...context.data,
+                      [IdDI.email]: event.payload.bootstrapData?.[IdDI.email]
+                        ? {
+                            value: event.payload.bootstrapData?.[IdDI.email],
+                          }
+                        : undefined,
+                    },
+                  ),
               },
               {
                 target: 'basicInformation',
                 actions: 'assignInitialContext',
                 cond: (context, event) =>
                   isMissingBasicAttribute(
-                    event.payload.missingAttributes,
+                    event.payload.requirement.missingAttributes,
                     context.data,
                   ),
               },
@@ -52,7 +63,7 @@ const createCollectKycDataMachine = () =>
                 actions: 'assignInitialContext',
                 cond: (context, event) =>
                   isMissingResidentialAttribute(
-                    event.payload.missingAttributes,
+                    event.payload.requirement.missingAttributes,
                     context.data,
                   ),
               },
@@ -61,7 +72,7 @@ const createCollectKycDataMachine = () =>
                 actions: 'assignInitialContext',
                 cond: (context, event) =>
                   isMissingSsnAttribute(
-                    event.payload.missingAttributes,
+                    event.payload.requirement.missingAttributes,
                     context.data,
                   ),
               },
@@ -73,126 +84,136 @@ const createCollectKycDataMachine = () =>
         },
         email: {
           on: {
-            emailSubmitted: [
+            dataSubmitted: [
               {
                 target: 'basicInformation',
-                actions: 'assignEmail',
+                actions: 'assignData',
                 cond: context =>
                   isMissingBasicAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'residentialAddress',
-                actions: ['assignEmail'],
+                actions: ['assignData'],
                 cond: context =>
                   isMissingResidentialAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'ssn',
-                actions: ['assignEmail'],
+                actions: ['assignData'],
                 cond: context =>
                   isMissingSsnAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'confirm',
-                actions: ['assignEmail'],
+                actions: ['assignData'],
               },
             ],
           },
         },
         basicInformation: {
           on: {
-            basicInformationSubmitted: [
+            dataSubmitted: [
               {
                 target: 'residentialAddress',
-                actions: ['assignBasicInformation'],
+                actions: ['assignData'],
                 cond: context =>
                   isMissingResidentialAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'ssn',
-                actions: ['assignBasicInformation'],
+                actions: ['assignData'],
                 cond: context =>
                   isMissingSsnAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'confirm',
-                actions: ['assignBasicInformation'],
+                actions: ['assignData'],
               },
             ],
             navigatedToPrevPage: {
               target: 'email',
               cond: context =>
-                isMissingEmailAttribute(context.missingAttributes),
+                isMissingEmailAttribute(context.requirement.missingAttributes),
             },
           },
         },
         residentialAddress: {
           on: {
-            residentialAddressSubmitted: [
+            dataSubmitted: [
               {
                 target: 'ssn',
-                actions: ['assignResidentialAddress'],
+                actions: ['assignData'],
                 cond: context =>
                   isMissingSsnAttribute(
-                    context.missingAttributes,
+                    context.requirement.missingAttributes,
                     context.data,
                   ),
               },
               {
                 target: 'confirm',
-                actions: ['assignResidentialAddress'],
+                actions: ['assignData'],
               },
             ],
             navigatedToPrevPage: [
               {
                 target: 'basicInformation',
                 cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
+                  isMissingBasicAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
               {
                 target: 'email',
                 cond: context =>
-                  isMissingEmailAttribute(context.missingAttributes),
+                  isMissingEmailAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
             ],
           },
         },
         ssn: {
           on: {
-            ssnSubmitted: {
+            dataSubmitted: {
               target: 'confirm',
-              actions: ['assignSsn'],
+              actions: ['assignData'],
             },
             navigatedToPrevPage: [
               {
                 target: 'residentialAddress',
                 cond: context =>
-                  isMissingResidentialAttribute(context.missingAttributes),
+                  isMissingResidentialAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
               {
                 target: 'basicInformation',
                 cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
+                  isMissingBasicAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
               {
                 target: 'email',
                 cond: context =>
-                  isMissingEmailAttribute(context.missingAttributes),
+                  isMissingEmailAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
             ],
           },
@@ -208,22 +229,28 @@ const createCollectKycDataMachine = () =>
               {
                 target: 'ssn',
                 cond: context =>
-                  isMissingSsnAttribute(context.missingAttributes),
+                  isMissingSsnAttribute(context.requirement.missingAttributes),
               },
               {
                 target: 'residentialAddress',
                 cond: context =>
-                  isMissingResidentialAttribute(context.missingAttributes),
+                  isMissingResidentialAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
               {
                 target: 'basicInformation',
                 cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
+                  isMissingBasicAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
               {
                 target: 'email',
                 cond: context =>
-                  isMissingEmailAttribute(context.missingAttributes),
+                  isMissingEmailAttribute(
+                    context.requirement.missingAttributes,
+                  ),
               },
             ],
             // Below are DESKTOP transitions
@@ -244,34 +271,22 @@ const createCollectKycDataMachine = () =>
               cond: context => context.device?.type !== 'mobile',
             },
             // Below are MOBILE transitions
-            emailSubmitted: {
-              actions: ['assignEmail'],
-              cond: context => context.device?.type === 'mobile',
-            },
-            basicInformationSubmitted: {
-              actions: ['assignBasicInformation'],
-              cond: context => context.device?.type === 'mobile',
-            },
-            residentialAddressSubmitted: {
-              actions: ['assignResidentialAddress'],
-              cond: context => context.device?.type === 'mobile',
-            },
-            ssnSubmitted: {
-              actions: ['assignSsn'],
+            dataSubmitted: {
+              actions: ['assignData'],
               cond: context => context.device?.type === 'mobile',
             },
           },
         },
         emailEditDesktop: {
           on: {
-            emailSubmitted: [
+            dataSubmitted: [
               {
                 target: 'confirm',
                 cond: context => context.device?.type !== 'mobile',
-                actions: ['assignEmail'],
+                actions: ['assignData'],
               },
               {
-                actions: ['assignEmail'],
+                actions: ['assignData'],
               },
             ],
             returnToSummary: {
@@ -282,14 +297,14 @@ const createCollectKycDataMachine = () =>
         },
         basicInfoEditDesktop: {
           on: {
-            basicInformationSubmitted: [
+            dataSubmitted: [
               {
                 target: 'confirm',
                 cond: context => context.device?.type !== 'mobile',
-                actions: ['assignBasicInformation'],
+                actions: ['assignData'],
               },
               {
-                actions: ['assignBasicInformation'],
+                actions: ['assignData'],
               },
             ],
             returnToSummary: {
@@ -300,14 +315,14 @@ const createCollectKycDataMachine = () =>
         },
         addressEditDesktop: {
           on: {
-            residentialAddressSubmitted: [
+            dataSubmitted: [
               {
                 target: 'confirm',
                 cond: context => context.device?.type !== 'mobile',
-                actions: ['assignResidentialAddress'],
+                actions: ['assignData'],
               },
               {
-                actions: ['assignResidentialAddress'],
+                actions: ['assignData'],
               },
             ],
             returnToSummary: {
@@ -318,14 +333,14 @@ const createCollectKycDataMachine = () =>
         },
         identityEditDesktop: {
           on: {
-            ssnSubmitted: [
+            dataSubmitted: [
               {
                 target: 'confirm',
                 cond: context => context.device?.type !== 'mobile',
-                actions: ['assignSsn'],
+                actions: ['assignData'],
               },
               {
-                actions: ['assignSsn'],
+                actions: ['assignData'],
               },
             ],
             returnToSummary: {
@@ -346,43 +361,39 @@ const createCollectKycDataMachine = () =>
             authToken,
             device,
             userFound,
-            missingAttributes,
-            email,
+            requirement,
             sandboxSuffix,
             config,
-            fixedData,
+            bootstrapData,
+            fixedFields,
           } = event.payload;
           context.device = device;
           context.authToken = authToken;
           context.userFound = userFound;
-          context.missingAttributes = [...missingAttributes];
-          context.data[IdDI.email] = email;
-          context.receivedEmail = !!email;
           context.sandboxSuffix = sandboxSuffix;
           context.config = config;
-          context.fixedData = fixedData;
+          context.requirement = requirement;
+
+          if (bootstrapData) {
+            Object.entries(bootstrapData).forEach(([key, value]) => {
+              context.data[key as IdDI] = {
+                value,
+                bootstrap: true,
+              };
+            });
+          }
+          if (fixedFields) {
+            fixedFields.forEach(field => {
+              const entry = context.data[field];
+              if (entry) {
+                entry.fixed = true;
+              }
+            });
+          }
+
           return context;
         }),
-        assignEmail: assign((context, event) => {
-          context.data = context.data || {};
-          context.data[IdDI.email] = event.payload.email;
-          return context;
-        }),
-        assignBasicInformation: assign((context, event) => {
-          context.data = {
-            ...context.data,
-            ...event.payload.basicInformation,
-          };
-          return context;
-        }),
-        assignResidentialAddress: assign((context, event) => {
-          context.data = {
-            ...context.data,
-            ...event.payload.residentialAddress,
-          };
-          return context;
-        }),
-        assignSsn: assign((context, event) => {
+        assignData: assign((context, event) => {
           context.data = {
             ...context.data,
             ...event.payload,

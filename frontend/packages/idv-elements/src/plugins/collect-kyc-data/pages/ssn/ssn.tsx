@@ -23,7 +23,10 @@ const SSN = ({
   onComplete,
 }: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, missingAttributes } = state.context;
+  const {
+    authToken,
+    requirement: { missingAttributes },
+  } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.ssn');
@@ -31,7 +34,7 @@ const SSN = ({
   const onSubmit = (ssnInfo: SSNInformation) => {
     const handleSuccess = () => {
       send({
-        type: 'ssnSubmitted',
+        type: 'dataSubmitted',
         payload: ssnInfo,
       });
       onComplete?.();

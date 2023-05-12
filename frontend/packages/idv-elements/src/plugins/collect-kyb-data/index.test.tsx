@@ -140,7 +140,11 @@ describe('<CollectKybData />', () => {
 
       renderPlugin({
         context: getContext(
-          [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
+          [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.ssn4,
+          ],
           [CollectedKybDataOption.beneficialOwners],
         ),
         onDone,
@@ -217,6 +221,11 @@ describe('<CollectKybData />', () => {
       expect(lastName).toBeInTheDocument();
       expect(lastName).toHaveValue('Doe');
       expect(lastName).toBeDisabled();
+
+      const dob = screen.getByLabelText('Date of Birth');
+      expect(dob).toBeInTheDocument();
+      await userEvent.type(dob, '01/01/1990');
+      expect(dob).toHaveValue('01/01/1990');
 
       submitButton = screen.getByRole('button', { name: 'Continue' });
       expect(submitButton).toBeInTheDocument();

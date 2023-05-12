@@ -27,26 +27,23 @@ const NameAndDobForm = ({
   ctaLabel,
 }: NameAndDobFormProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data, fixedData } = state.context;
+  const { data } = state.context;
   const hasFixedName =
-    fixedData?.[IdDI.firstName] !== undefined &&
-    fixedData?.[IdDI.lastName] !== undefined;
+    data?.[IdDI.firstName]?.fixed && data?.[IdDI.lastName]?.fixed;
 
   const methods = useForm<FormData>({
     defaultValues: {
-      firstName: hasFixedName
-        ? fixedData?.[IdDI.firstName]
-        : data[IdDI.firstName],
-      lastName: hasFixedName ? fixedData?.[IdDI.lastName] : data[IdDI.lastName],
-      dob: data[IdDI.dob],
+      firstName: data[IdDI.firstName]?.value,
+      lastName: data[IdDI.lastName]?.value,
+      dob: data[IdDI.dob]?.value,
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [IdDI.firstName]: formData.firstName,
-      [IdDI.lastName]: formData.lastName,
-      [IdDI.dob]: formData.dob,
+      [IdDI.firstName]: { value: formData.firstName, fixed: hasFixedName },
+      [IdDI.lastName]: { value: formData.lastName, fixed: hasFixedName },
+      [IdDI.dob]: { value: formData.dob },
     };
     onSubmit(basicInformation);
   };

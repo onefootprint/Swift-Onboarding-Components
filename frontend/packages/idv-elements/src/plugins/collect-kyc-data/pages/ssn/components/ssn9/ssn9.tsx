@@ -43,13 +43,13 @@ const SSN9 = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      ssn9: data[IdDI.ssn9],
+      ssn9: data[IdDI.ssn9]?.value,
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      [IdDI.ssn9]: formData.ssn9,
+      [IdDI.ssn9]: { value: formData.ssn9 },
     });
   };
 

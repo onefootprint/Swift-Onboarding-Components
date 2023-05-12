@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CountryCode, IdDI } from '@onefootprint/types';
+import { IdDI, isCountryCode } from '@onefootprint/types';
 import { Button, CountrySelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -37,19 +37,24 @@ const AddressZipCodeAndCountry = ({
     'pages.residential-address.zip-code-and-country',
   );
   const { t: cta } = useTranslation('pages.cta');
+  const countryVal = data[IdDI.country]?.value;
+  const defaultCountry =
+    countryVal && isCountryCode(countryVal) ? countryVal : undefined;
+  const defaultValues = {
+    country: getInitialCountry(defaultCountry),
+    zip: data[IdDI.zip]?.value,
+  };
+
   const methods = useForm<FormData>({
-    defaultValues: {
-      country: getInitialCountry(data[IdDI.country] as CountryCode),
-      zip: data[IdDI.zip],
-    },
+    defaultValues,
   });
   const { watch, handleSubmit, setFocus, setValue } = methods;
   const country = watch('country');
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      [IdDI.zip]: formData.zip,
-      [IdDI.country]: formData.country.value,
+      [IdDI.zip]: { value: formData.zip },
+      [IdDI.country]: { value: formData.country.value },
     });
   };
 

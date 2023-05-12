@@ -6,7 +6,9 @@ import getCurrentStepFromMissingAttributes from './utils/current-step-from-missi
 
 const NavigationHeader = () => {
   const [state, send] = useCollectKycDataMachine();
-  const { missingAttributes } = state.context;
+  const {
+    requirement: { missingAttributes },
+  } = state.context;
   const value = getCurrentStepFromMissingAttributes(
     missingAttributes,
     state.value,

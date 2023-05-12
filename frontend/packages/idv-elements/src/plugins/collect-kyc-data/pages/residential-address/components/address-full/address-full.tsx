@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { CountryCode, IdDI } from '@onefootprint/types';
+import { IdDI, isCountryCode } from '@onefootprint/types';
 import {
   AddressInput,
   Button,
@@ -50,15 +50,21 @@ const AddressFull = ({
   const { data } = state.context;
   const { t } = useTranslation('pages.residential-address.full');
   const { t: cta } = useTranslation('pages.cta');
+
+  const countryVal = data[IdDI.country]?.value;
+  const defaultCountry =
+    countryVal && isCountryCode(countryVal) ? countryVal : undefined;
+  const defaultValues = {
+    country: getInitialCountry(defaultCountry),
+    state: getInitialState(data[IdDI.state]?.value),
+    city: data[IdDI.city]?.value,
+    zip: data[IdDI.zip]?.value,
+    addressLine1: data[IdDI.addressLine1]?.value,
+    addressLine2: data[IdDI.addressLine2]?.value,
+  };
+
   const methods = useForm<FormData>({
-    defaultValues: {
-      country: getInitialCountry(data[IdDI.country] as CountryCode),
-      state: getInitialState(data[IdDI.state]),
-      city: data[IdDI.city],
-      zip: data[IdDI.zip],
-      addressLine1: data[IdDI.addressLine1],
-      addressLine2: data[IdDI.addressLine2],
-    },
+    defaultValues,
   });
   const {
     watch,
@@ -73,15 +79,15 @@ const AddressFull = ({
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      [IdDI.addressLine1]: formData.addressLine1,
-      [IdDI.addressLine2]: formData.addressLine2,
-      [IdDI.city]: formData.city,
-      [IdDI.zip]: formData.zip,
-      [IdDI.country]: formData.country.value,
+      [IdDI.addressLine1]: { value: formData.addressLine1 },
+      [IdDI.addressLine2]: { value: formData.addressLine2 },
+      [IdDI.city]: { value: formData.city },
+      [IdDI.zip]: { value: formData.zip },
+      [IdDI.country]: { value: formData.country.value },
       [IdDI.state]:
         typeof formData.state === 'object'
-          ? formData.state.value
-          : formData.state,
+          ? { value: formData.state.value }
+          : { value: formData.state },
     });
   };
 

@@ -17,8 +17,14 @@ import IdentitySection from './components/identity-section';
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, config, sandboxSuffix, device, missingAttributes } =
-    state.context;
+  const {
+    authToken,
+    data,
+    config,
+    sandboxSuffix,
+    device,
+    requirement: { missingAttributes },
+  } = state.context;
   const isMobile = device?.type === 'mobile';
   const isSandbox = !config?.isLive;
   const [editContent, setEditContent] = useState<EditSection | undefined>();
@@ -68,7 +74,7 @@ const Confirm = () => {
 
     syncEmail({
       authToken,
-      email: data[IdDI.email],
+      email: data[IdDI.email]?.value,
       sandboxSuffix,
       speculative: false,
       onSuccess: handleSyncData,

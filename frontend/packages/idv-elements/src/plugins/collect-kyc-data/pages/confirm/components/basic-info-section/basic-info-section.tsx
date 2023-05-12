@@ -17,7 +17,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
 
   const basicInfo = [];
 
-  const firstName = data[IdDI.firstName];
+  const firstName = data[IdDI.firstName]?.value;
   if (firstName) {
     basicInfo.push({
       text: t('basic-info.first-name'),
@@ -25,7 +25,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const lastName = data[IdDI.lastName];
+  const lastName = data[IdDI.lastName]?.value;
   if (lastName) {
     basicInfo.push({
       text: t('basic-info.last-name'),
@@ -33,7 +33,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const dob = data[IdDI.dob];
+  const dob = data[IdDI.dob]?.value;
   if (dob) {
     basicInfo.push({
       text: t('basic-info.dob'),

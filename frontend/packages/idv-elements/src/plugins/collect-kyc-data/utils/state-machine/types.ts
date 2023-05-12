@@ -1,34 +1,24 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CollectedKycDataOption,
+  CollectKycDataRequirement,
+  IdDI,
   IdDIData,
   OnboardingConfig,
 } from '@onefootprint/types';
 
-import {
-  BasicInformation,
-  ResidentialAddress,
-  SSNInformation,
-} from '../data-types';
+import { KycData } from '../data-types';
 
-export type OnboardingData = {
-  missingAttributes: CollectedKycDataOption[];
-  data: IdDIData;
-  validationToken?: string;
-};
-
+// TODO: make some of these non-optional by passing the context in directly as opposed to using an event to send it
 export type MachineContext = {
   // Plugin context
-  device?: DeviceInfo;
   authToken?: string;
-  userFound?: boolean;
+  device?: DeviceInfo;
   config?: OnboardingConfig;
-  receivedEmail?: boolean; // Whether received non-empty email from initial context
+  userFound?: boolean;
   sandboxSuffix?: string; // only if in sandbox mode
-  fixedData?: IdDIData;
+  requirement: CollectKycDataRequirement;
   // Machine generated
-  missingAttributes: CollectedKycDataOption[];
-  data: IdDIData;
+  data: KycData; // combines bootstrapData, fixedFields and fieldsToDecrypt after decrypting the values
 };
 
 export type MachineEvents =
@@ -36,36 +26,18 @@ export type MachineEvents =
       type: 'receivedContext';
       payload: {
         authToken: string;
-        missingAttributes: CollectedKycDataOption[];
+        requirement: CollectKycDataRequirement;
         userFound: boolean;
         device: DeviceInfo;
-        email?: string;
         sandboxSuffix?: string;
         config: OnboardingConfig;
-        fixedData?: IdDIData;
+        bootstrapData?: IdDIData;
+        fixedFields?: IdDI[];
       };
     }
   | {
-      type: 'emailSubmitted';
-      payload: {
-        email?: string;
-      };
-    }
-  | {
-      type: 'basicInformationSubmitted';
-      payload: {
-        basicInformation: BasicInformation;
-      };
-    }
-  | {
-      type: 'residentialAddressSubmitted';
-      payload: {
-        residentialAddress: ResidentialAddress;
-      };
-    }
-  | {
-      type: 'ssnSubmitted';
-      payload: SSNInformation;
+      type: 'dataSubmitted';
+      payload: KycData;
     }
   | { type: 'navigatedToPrevPage' }
   | { type: 'confirmed' }

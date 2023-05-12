@@ -22,17 +22,18 @@ const ResidentialAddress = ({
 }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
-  const { missingAttributes, authToken } = state.context;
+  const {
+    requirement: { missingAttributes },
+    authToken,
+  } = state.context;
   const toast = useToast();
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (residentialAddress: ResidentialAddressData) => {
     const handleSuccess = () => {
       send({
-        type: 'residentialAddressSubmitted',
-        payload: {
-          residentialAddress,
-        },
+        type: 'dataSubmitted',
+        payload: residentialAddress,
       });
       onComplete?.();
     };

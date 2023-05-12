@@ -24,13 +24,13 @@ const DobForm = ({ isLoading, onSubmit, ctaLabel }: DobFormProps) => {
 
   const methods = useForm<FormData>({
     defaultValues: {
-      dob: data[IdDI.dob],
+      dob: data[IdDI.dob]?.value,
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [IdDI.dob]: formData.dob,
+      [IdDI.dob]: { value: formData.dob },
     };
     onSubmit(basicInformation);
   };

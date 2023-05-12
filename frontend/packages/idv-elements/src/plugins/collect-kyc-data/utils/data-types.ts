@@ -1,4 +1,29 @@
-import { IdDI, IdDIData } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
+
+export type KycData = Partial<{
+  [IdDI.firstName]: DataValue;
+  [IdDI.lastName]: DataValue;
+  [IdDI.dob]: DataValue;
+  [IdDI.email]: DataValue;
+  [IdDI.ssn9]: DataValue;
+  [IdDI.ssn4]: DataValue;
+  [IdDI.addressLine1]: DataValue;
+  [IdDI.addressLine2]: DataValue;
+  [IdDI.city]: DataValue;
+  [IdDI.state]: DataValue;
+  [IdDI.country]: DataValue;
+  [IdDI.zip]: DataValue;
+  [IdDI.phoneNumber]: DataValue;
+}>;
+
+export type DataValue = {
+  value: string;
+  bootstrap?: boolean;
+  decrypted?: boolean;
+  fixed?: boolean;
+};
+
+export type EmailInformation = Pick<KycData, IdDI.email>;
 
 export type BasicInformation =
   | NameInformation
@@ -6,13 +31,13 @@ export type BasicInformation =
   | DobInformation;
 
 export type NameInformation = Required<
-  Pick<IdDIData, IdDI.firstName | IdDI.lastName>
+  Pick<KycData, IdDI.firstName | IdDI.lastName>
 >;
 
-export type DobInformation = Required<Pick<IdDIData, IdDI.dob>>;
+export type DobInformation = Required<Pick<KycData, IdDI.dob>>;
 
 export type NameAndDobInformation = Required<
-  Pick<IdDIData, IdDI.firstName | IdDI.lastName | IdDI.dob>
+  Pick<KycData, IdDI.firstName | IdDI.lastName | IdDI.dob>
 >;
 
 export type ResidentialAddress =
@@ -20,12 +45,12 @@ export type ResidentialAddress =
   | ResidentialAddressFull;
 
 export type ResidentialZipCodeAndCountry = Required<
-  Pick<IdDIData, IdDI.country | IdDI.zip>
+  Pick<KycData, IdDI.country | IdDI.zip>
 >;
 
 export type ResidentialAddressFull = Required<
   Pick<
-    IdDIData,
+    KycData,
     | IdDI.country
     | IdDI.addressLine1
     | IdDI.addressLine2
@@ -35,6 +60,6 @@ export type ResidentialAddressFull = Required<
   >
 >;
 
-export type SSN4Information = Pick<IdDIData, IdDI.ssn4>;
-export type SSN9Information = Pick<IdDIData, IdDI.ssn9>;
+export type SSN4Information = Pick<KycData, IdDI.ssn4>;
+export type SSN9Information = Pick<KycData, IdDI.ssn9>;
 export type SSNInformation = SSN4Information | SSN9Information;

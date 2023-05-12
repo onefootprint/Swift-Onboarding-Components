@@ -1,3 +1,4 @@
+import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
@@ -13,11 +14,11 @@ const Email = ({ onComplete, ctaLabel, hideHeader }: EmailProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, config } = state.context;
 
-  const handleSubmit = (submittedEmail?: string) => {
+  const handleSubmit = (submittedEmail: string) => {
     send({
-      type: 'emailSubmitted',
+      type: 'dataSubmitted',
       payload: {
-        email: submittedEmail,
+        [IdDI.email]: { value: submittedEmail },
       },
     });
     onComplete?.();

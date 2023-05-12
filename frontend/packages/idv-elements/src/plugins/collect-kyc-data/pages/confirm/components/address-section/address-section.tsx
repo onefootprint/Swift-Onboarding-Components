@@ -18,12 +18,12 @@ const AddressSection = ({ onEdit }: AddressSectionProps) => {
   const { data } = state.context;
 
   const address = [];
-  const addressLine1 = data[IdDI.addressLine1];
-  const addressLine2 = data[IdDI.addressLine2];
-  const city = data[IdDI.city];
-  const stateName = data[IdDI.state];
-  const country = data[IdDI.country];
-  const zip = data[IdDI.zip];
+  const addressLine1 = data[IdDI.addressLine1]?.value;
+  const addressLine2 = data[IdDI.addressLine2]?.value;
+  const city = data[IdDI.city]?.value;
+  const stateName = data[IdDI.state]?.value;
+  const country = data[IdDI.country]?.value;
+  const zip = data[IdDI.zip]?.value;
   const hasFullAddress = addressLine1 && city && stateName && country && zip;
   const hasCountryAndZip = country && zip;
   if (hasFullAddress) {

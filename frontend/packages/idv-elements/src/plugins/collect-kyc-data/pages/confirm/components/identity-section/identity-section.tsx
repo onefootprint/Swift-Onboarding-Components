@@ -16,8 +16,8 @@ const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
   const { data } = state.context;
 
   const identity = [];
-  const ssn9 = data[IdDI.ssn9];
-  const ssn4 = data[IdDI.ssn4];
+  const ssn9 = data[IdDI.ssn9]?.value;
+  const ssn4 = data[IdDI.ssn4]?.value;
   if (ssn9) {
     identity.push({
       text: t('identity.ssn9'),
