@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedKycDataOption,
   IdDI,
@@ -7,6 +6,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
+import { KycData } from '../data-types';
 import createCollectKycDataMachine from './machine';
 import { MachineContext } from './types';
 
@@ -26,26 +26,22 @@ describe('Collect KYC Data Machine Tests', () => {
   };
 
   const createMachine = (
-    userFound: boolean,
     missingAttributes: CollectedKycDataOption[],
-    device: DeviceInfo = {
-      type: 'mobile',
-      hasSupportForWebauthn: false,
-    },
-    email?: string,
+    data: KycData = {},
     sandboxSuffix?: string,
+    deviceType?: string,
   ) => {
-    const data = email
-      ? { [IdDI.email]: { value: email, bootstrap: true } }
-      : {};
     const initialContext: MachineContext = {
-      userFound,
+      userFound: true,
       authToken: 'authToken',
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes,
       },
-      device,
+      device: {
+        type: deviceType ?? 'mobile',
+        hasSupportForWebauthn: false,
+      },
       config: { ...TestOnboardingConfig },
       data,
       sandboxSuffix,
@@ -58,17 +54,12 @@ describe('Collect KYC Data Machine Tests', () => {
   describe('When user has missing fields', () => {
     it('If missing at least one attribute from each page, takes user to all pages in order', () => {
       const machine = createMachine(
-        true,
         [
           CollectedKycDataOption.name,
           CollectedKycDataOption.fullAddress,
           CollectedKycDataOption.ssn9,
         ],
-        {
-          type: 'mobile',
-          hasSupportForWebauthn: false,
-        },
-        'piip@onefootprint.com',
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
       let { state } = machine;
@@ -159,7 +150,7 @@ describe('Collect KYC Data Machine Tests', () => {
     });
 
     it('Skips states without missing attributes', () => {
-      const machine = createMachine(true, [
+      const machine = createMachine([
         CollectedKycDataOption.name,
         CollectedKycDataOption.ssn9,
       ]);
@@ -220,7 +211,7 @@ describe('Collect KYC Data Machine Tests', () => {
 
   describe('When user has onboarded to tenant with current configuration', () => {
     it('Onboarding ends', () => {
-      const machine = createMachine(true, []);
+      const machine = createMachine([]);
       const { state } = machine;
       expect(state.value).toEqual('completed');
     });
@@ -228,7 +219,7 @@ describe('Collect KYC Data Machine Tests', () => {
 
   describe('When user is missing an email', () => {
     it('If missing at least one attribute from each page, takes user to all pages in order', () => {
-      const machine = createMachine(true, [
+      const machine = createMachine([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
@@ -348,7 +339,7 @@ describe('Collect KYC Data Machine Tests', () => {
     });
 
     it('Skips states without missing attributes', () => {
-      const machine = createMachine(true, [
+      const machine = createMachine([
         CollectedKycDataOption.email,
         CollectedKycDataOption.ssn9,
       ]);
@@ -425,13 +416,8 @@ describe('Collect KYC Data Machine Tests', () => {
 
     it('when email is received in the initial context', () => {
       const machine = createMachine(
-        true,
         [CollectedKycDataOption.email, CollectedKycDataOption.ssn9],
-        {
-          type: 'mobile',
-          hasSupportForWebauthn: false,
-        },
-        'piip@onefootprint.com',
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
       let { state } = machine;
@@ -465,21 +451,94 @@ describe('Collect KYC Data Machine Tests', () => {
     });
   });
 
-  describe('Confirm flow', () => {
-    it('when on mobile', () => {
+  describe('When user has bootstrapped/decrypted/fixed data', () => {
+    it('if no attributes are missing at the start', () => {
       const machine = createMachine(
-        true,
         [
-          CollectedKycDataOption.email,
           CollectedKycDataOption.name,
           CollectedKycDataOption.fullAddress,
           CollectedKycDataOption.ssn9,
         ],
         {
-          type: 'mobile',
-          hasSupportForWebauthn: false,
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
+          [IdDI.firstName]: { value: 'John', bootstrap: true },
+          [IdDI.lastName]: { value: 'Doe', bootstrap: true },
+          [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
+          [IdDI.city]: { value: 'San Francisco', decrypted: true },
+          [IdDI.state]: { value: 'CA', fixed: true },
+          [IdDI.zip]: { value: '94105', fixed: true },
+          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.ssn9]: { value: '101010101', decrypted: true },
         },
       );
+      let { state } = machine;
+      const { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.ssn9,
+      ]);
+
+      expect(state.value).toEqual('confirm');
+      // Navigate to prev should be a no-op
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('confirm');
+    });
+
+    it('if some attributes are missing at the start', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.ssn9,
+        ],
+        {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
+          [IdDI.firstName]: { value: 'John', bootstrap: true },
+          [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
+          [IdDI.city]: { value: 'San Francisco', decrypted: true },
+          [IdDI.state]: { value: 'CA', fixed: true },
+          [IdDI.zip]: { value: '94105', fixed: true },
+          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.ssn9]: { value: '101010101', decrypted: true },
+        },
+      );
+      let { state } = machine;
+      const { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.ssn9,
+      ]);
+
+      expect(state.value).toEqual('basicInformation');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'Diffie' },
+          [IdDI.lastName]: { value: 'Footprint' },
+        },
+      });
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('basicInformation');
+    });
+  });
+
+  describe('Confirm flow', () => {
+    it('when on mobile', () => {
+      const machine = createMachine([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.ssn9,
+      ]);
       let { state } = machine;
       const { context } = state;
       expect(context.requirement.missingAttributes).toEqual([
@@ -585,17 +644,15 @@ describe('Collect KYC Data Machine Tests', () => {
 
     it('when on desktop', () => {
       const machine = createMachine(
-        true,
         [
           CollectedKycDataOption.email,
           CollectedKycDataOption.name,
           CollectedKycDataOption.fullAddress,
           CollectedKycDataOption.ssn9,
         ],
-        {
-          type: 'unknown',
-          hasSupportForWebauthn: false,
-        },
+        undefined,
+        undefined,
+        'unknown',
       );
       let { state } = machine;
       const { context } = state;

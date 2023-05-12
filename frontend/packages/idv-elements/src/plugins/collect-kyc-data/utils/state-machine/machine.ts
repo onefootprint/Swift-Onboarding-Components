@@ -5,6 +5,7 @@ import {
   isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
+  shouldConfirm,
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
 
@@ -19,7 +20,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: initialContext,
+      context: { ...initialContext },
       states: {
         init: {
           always: [
@@ -55,6 +56,10 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                   context.requirement.missingAttributes,
                   context.data,
                 ),
+            },
+            {
+              target: 'confirm',
+              cond: context => shouldConfirm(context.data),
             },
             {
               target: 'completed',
@@ -127,7 +132,10 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: {
               target: 'email',
               cond: context =>
-                isMissingEmailAttribute(context.requirement.missingAttributes),
+                isMissingEmailAttribute(
+                  context.requirement.missingAttributes,
+                  initialContext.data,
+                ),
             },
           },
         },
@@ -154,6 +162,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingBasicAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
               {
@@ -161,6 +170,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingEmailAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
             ],
@@ -178,6 +188,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingResidentialAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
               {
@@ -185,6 +196,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingBasicAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
               {
@@ -192,6 +204,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingEmailAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
             ],
@@ -208,13 +221,17 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
               {
                 target: 'ssn',
                 cond: context =>
-                  isMissingSsnAttribute(context.requirement.missingAttributes),
+                  isMissingSsnAttribute(
+                    context.requirement.missingAttributes,
+                    initialContext.data,
+                  ),
               },
               {
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
               {
@@ -222,6 +239,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingBasicAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
               {
@@ -229,6 +247,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
                 cond: context =>
                   isMissingEmailAttribute(
                     context.requirement.missingAttributes,
+                    initialContext.data,
                   ),
               },
             ],

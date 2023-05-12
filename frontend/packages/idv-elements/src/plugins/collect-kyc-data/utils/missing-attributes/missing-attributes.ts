@@ -25,17 +25,39 @@ const SSN_ATTRIBUTES = [
 ];
 
 // An attribute is missing if
-// (1) it must be collected for this onboarding session AND
+// (1) it wasn't a fixed/bootstrapped/decrypted value
 // (2) it hasn't yet been collected
 export const isMissing = (
-  attributes: CollectedKycDataOption[],
+  options: CollectedKycDataOption[],
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) =>
-  attributes
+) => {
+  const attributes = options
     .filter(option => mustCollect.includes(option))
-    .flatMap(option => CollectedKycDataOptionToRequiredAttributes[option])
-    .some(attr => !collectedData || !collectedData[attr]?.value);
+    .flatMap(option => CollectedKycDataOptionToRequiredAttributes[option]);
+
+  // No attributes to collect
+  if (!attributes.length) {
+    return false;
+  }
+  // No data collected so far
+  if (!collectedData || Object.keys(collectedData).length === 0) {
+    return true;
+  }
+
+  // Filter out entries with fixed/bootstrapped/decrypted values
+  const filteredAttributes = attributes.filter(attr => {
+    const entry = collectedData[attr];
+    return !entry?.bootstrap && !entry?.fixed && !entry?.decrypted;
+  });
+
+  // Completely missing entries
+  const isMissingEntries = filteredAttributes.some(
+    attr => !collectedData[attr] || !collectedData[attr]?.value,
+  );
+
+  return isMissingEntries;
+};
 
 export const isMissingEmailAttribute = (
   mustCollect: CollectedKycDataOption[],
@@ -68,3 +90,12 @@ export const hasMissingAttributes = (
       attr => !collectedData || !collectedData[attr],
     ),
   );
+
+export const shouldConfirm = (collectedData?: KycData) => {
+  // Show confirm if any data is collected at all
+  if (!collectedData || Object.keys(collectedData).length === 0) {
+    return false;
+  }
+  const hasData = Object.values(collectedData).some(data => data.value);
+  return hasData;
+};

@@ -12,7 +12,7 @@ const CityField = ({ disabled }: CityFieldProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('pages.residential-address.form.state');
+  const { t } = useTranslation('pages.residential-address.form.city');
 
   return (
     <TextInput
@@ -20,9 +20,9 @@ const CityField = ({ disabled }: CityFieldProps) => {
       autoComplete="address-level2"
       disabled={disabled}
       hasError={!!errors.city}
-      hint={errors.city && t('form.city.error')}
-      label={t('form.city.label')}
-      placeholder={t('form.city.placeholder')}
+      hint={errors.city && t('error')}
+      label={t('label')}
+      placeholder={t('placeholder')}
       {...register('city', { required: true })}
     />
   );
