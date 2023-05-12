@@ -17,12 +17,15 @@ pub async fn get(
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
+    let (met_requirements, requirements) = requirements.into_iter().partition(|r| r.is_met());
+
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant()?.clone();
     let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
 
     ResponseData::ok(OnboardingStatusResponse {
         requirements,
+        met_requirements,
         // This is only used by the handoff app - we might be able to rm and move elsewhere
         ob_configuration: ob_config,
     })

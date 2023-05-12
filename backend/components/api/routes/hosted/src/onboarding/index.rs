@@ -22,6 +22,7 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
+use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -57,8 +58,8 @@ pub async fn post(
 
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
-    let should_create_new_business_vault =
-        ob_config.must_collect_business() && !UserAuthGuard::Business.is_met(&user_auth.scopes);
+    let should_create_new_business_vault = ob_config.must_collect(DataIdentifierDiscriminant::Business)
+        && !UserAuthGuard::Business.is_met(&user_auth.scopes);
     let maybe_new_biz_keypair = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         Some(state.enclave_client.generate_sealed_keypair().await?)
@@ -80,7 +81,7 @@ pub async fn post(
                 insight_event: insight_event.clone(),
             };
             let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args)?;
-            if is_new_ob && ob_config.must_collect_document() {
+            if is_new_ob && ob_config.must_collect(DataIdentifierDiscriminant::Document) {
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
                 let must_collect_selfie = ob_config.must_collect_selfie();

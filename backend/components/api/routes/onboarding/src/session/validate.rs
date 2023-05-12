@@ -11,6 +11,7 @@ use api_core::utils::db2api::DbToApi;
 use api_wire_types::{EntityValidateResponse, LegacyValidateResponse, ValidateRequest};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{BasicOnboardingInfo, Onboarding, OnboardingIdentifier};
+use newtypes::DataIdentifierDiscriminant;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -37,7 +38,7 @@ pub async fn post(
         .db_query(move |conn| -> ApiResult<_> {
             let user_ob = Onboarding::get(conn, &ob_id)?;
             let (ob_config, _) = ObConfiguration::get(conn, &user_ob.0.ob_configuration_id)?;
-            let business_ob = if ob_config.must_collect_business() {
+            let business_ob = if ob_config.must_collect(DataIdentifierDiscriminant::Business) {
                 let id = OnboardingIdentifier::BusinessOwner {
                     owner_vault_id: &user_ob.1.vault_id,
                     ob_config_id: &ob_config.id,

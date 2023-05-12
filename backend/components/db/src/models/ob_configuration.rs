@@ -224,11 +224,6 @@ impl ObConfiguration {
 }
 
 impl ObConfiguration {
-    pub fn must_collect_document(&self) -> bool {
-        self.must_collect_data.contains(&CDO::Document)
-            || self.must_collect_data.contains(&CDO::DocumentAndSelfie)
-    }
-
     pub fn must_collect_selfie(&self) -> bool {
         self.must_collect_data.contains(&CDO::DocumentAndSelfie)
     }
@@ -242,9 +237,10 @@ impl ObConfiguration {
         self.can_access_data.contains(&CDO::DocumentAndSelfie)
     }
 
-    pub fn must_collect_business(&self) -> bool {
+    /// Returns true if this ob config requires collecting any CDO with the provided DataIdentifier kind
+    pub fn must_collect(&self, di_kind: DataIdentifierDiscriminant) -> bool {
         self.must_collect_data
             .iter()
-            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business)
+            .any(|cdo| cdo.parent().data_identifier_kind() == di_kind)
     }
 }

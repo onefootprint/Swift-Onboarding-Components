@@ -111,12 +111,14 @@ class BifrostClient:
         Handle all onboarding requirements.
         If `kind` is provided, will only handle the requested requirement
         """
-        requirements = self.get_status()["requirements"]
+        body = self.get_status()
+        requirements = body["requirements"]
         requirements_to_handle = (
             requirements if not kind else [i for i in requirements if i["kind"] == kind]
         )
 
         self.handled_requirements = requirements_to_handle
+        self.already_met_requirements = body["met_requirements"]
         for req in requirements_to_handle:
             self.handle_requirement(req)
 

@@ -1,9 +1,20 @@
-from tests.utils import _gen_random_n_digit_number, post
+import pytest
+from tests.utils import _gen_random_n_digit_number, post, create_ob_config
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER
 
 
-def test_one_click(sandbox_tenant, tenant, twilio):
+@pytest.fixture(scope="session")
+def ob_config2(sandbox_tenant, must_collect_data, can_access_data):
+    ob_conf_data = {
+        "name": "Acme Bank Card 2",
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
+    }
+    return create_ob_config(sandbox_tenant, **ob_conf_data)
+
+
+def test_one_click(sandbox_tenant, ob_config2, tenant, twilio):
     seed = _gen_random_n_digit_number(10)
     phone_number = f"{FIXTURE_PHONE_NUMBER}#sandbox{seed}"
     ob_config = sandbox_tenant.default_ob_config
@@ -24,9 +35,10 @@ def test_one_click(sandbox_tenant, tenant, twilio):
     body = post("hosted/identify", identify_data, ob_config.key)
     assert body["user_found"]
 
-    bifrost2 = BifrostClient(ob_config, twilio, override_inherit_phone=phone_number)
+    bifrost2 = BifrostClient(ob_config2, twilio, override_inherit_phone=phone_number)
     bifrost2.run()
-    assert not bifrost2.handled_requirements
+    assert set(i["kind"] for i in bifrost2.handled_requirements) == {"authorize"}
+    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {"collect_data"}
 
 
 def test_identify_fixture_phone_number_non_sandbox(sandbox_tenant):

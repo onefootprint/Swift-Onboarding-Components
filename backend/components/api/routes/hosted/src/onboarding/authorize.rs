@@ -42,14 +42,15 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
 
     // Verify there are no unmet requirements
     let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
-    let reqs = reqs
+    let unmet_reqs = reqs
         .into_iter()
+        .filter(|r| !r.is_met())
         // An Authorize requirement shouldn't block the authorize endpoint!
         .filter(|r| !matches!(r, OnboardingRequirement::Authorize { .. }))
         .collect_vec();
-    if !reqs.is_empty() {
-        let unmet_requirements = reqs.into_iter().map(|x| x.into()).collect_vec();
-        return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
+    if !unmet_reqs.is_empty() {
+        let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
+        return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
     // Mark the obs for the person and business as authorized

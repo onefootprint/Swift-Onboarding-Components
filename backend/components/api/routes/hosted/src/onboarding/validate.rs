@@ -30,7 +30,7 @@ pub async fn post(
 
     // Verify there are no unmet requirements
     let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
-    if !reqs.is_empty() {
+    if reqs.iter().any(|r| !r.is_met()) {
         let unmet_requirements = reqs.into_iter().map(|x| x.into()).collect_vec();
         return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
     }

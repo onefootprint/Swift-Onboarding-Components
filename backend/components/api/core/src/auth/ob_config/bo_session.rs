@@ -10,7 +10,7 @@ use db::{
     PgConn,
 };
 use feature_flag::LaunchDarklyFeatureFlagClient;
-use newtypes::{BoId, ObConfigurationId};
+use newtypes::{BoId, DataIdentifierDiscriminant, ObConfigurationId};
 use paperclip::actix::Apiv2Security;
 
 /// A business-owner specific session. This is issued when sending out links to each owner of a
@@ -54,7 +54,7 @@ impl ExtractableAuthSession for ParsedBoSession {
             }
         };
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
-        if !ob_config.must_collect_business() {
+        if !ob_config.must_collect(DataIdentifierDiscriminant::Business) {
             return Err(AuthError::BusinessNotRequired.into());
         }
         let bo = BusinessOwner::get(conn, &data.bo_id)?;
