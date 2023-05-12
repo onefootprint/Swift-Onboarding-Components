@@ -2,11 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import {
-  addAuthTokenToRequest,
-  removeAuthTokenToRequest,
-} from '../utils/assing-default-headers';
-
 export type SessionData = { authToken: string };
 
 export type Session = {
@@ -15,19 +10,21 @@ export type Session = {
   reset: () => void;
 };
 
-const initialState: SessionData = undefined;
+const initialData: SessionData = undefined;
 
 export const useStore = create<Session>()(
   persist(
     set => ({
-      data: initialState,
+      data: initialData,
       reset: () => {
-        set({ data: initialState });
+        set(() => ({ data: initialData }));
       },
-      update: (data: Partial<Session>) => {
-        set(currentSession => ({
-          ...currentSession,
-          ...data,
+      update: (newData: Partial<SessionData>) => {
+        set(session => ({
+          data: {
+            ...session.data,
+            ...newData,
+          },
         }));
       },
     }),
@@ -40,16 +37,14 @@ export const useStore = create<Session>()(
 );
 
 const useSession = () => {
-  const { reset, update, ...data } = useStore(state => state);
+  const { reset, update, data } = useStore(state => state);
   const isLoggedIn = !!data;
 
   const logIn = async (authToken: string) => {
-    addAuthTokenToRequest(authToken);
     update({ authToken });
   };
 
   const logOut = () => {
-    removeAuthTokenToRequest();
     reset();
   };
 

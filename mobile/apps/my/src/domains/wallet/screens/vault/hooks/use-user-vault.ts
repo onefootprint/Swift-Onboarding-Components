@@ -2,7 +2,10 @@ import request from '@onefootprint/request';
 import { DecryptResponse, IdDI } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-const getVaultData = async () => {
+import AUTH_HEADER from '@/config/constants';
+import useSession from '@/domains/wallet/hooks/use-session';
+
+const getVaultData = async (authToken: string) => {
   const response = await request<DecryptResponse>({
     method: 'POST',
     url: '/hosted/user/vault/decrypt',
@@ -23,12 +26,16 @@ const getVaultData = async () => {
         IdDI.zip,
       ],
     },
+    headers: {
+      [AUTH_HEADER]: authToken,
+    },
   });
   return response.data;
 };
 
 const useUserVault = () => {
-  return useQuery(['user', 'vault'], () => getVaultData());
+  const { data } = useSession();
+  return useQuery(['user', 'vault'], () => getVaultData(data.authToken));
 };
 
 export default useUserVault;

@@ -25,6 +25,7 @@ export * from './get-pinned-annotations';
 export * from './get-proxy-config';
 export * from './get-proxy-configs';
 export * from './get-risk-signal-details';
+export * from './get-sharing';
 export * from './get-timeline';
 export * from './identify';
 export * from './identify-verify';

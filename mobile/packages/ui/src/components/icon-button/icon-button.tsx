@@ -18,6 +18,7 @@ const IconButton = ({
   <Pressable onPress={onPress}>
     <Box
       aria-label={ariaLabel}
+      backgroundColor="secondary"
       borderRadius="full"
       center
       height={32}
