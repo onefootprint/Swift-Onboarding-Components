@@ -1,26 +1,29 @@
+import { Color } from '@onefootprint/design-tokens';
 import { IcoCheck16, Icon } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const LINE_HEIGHT = '26px';
-
 type EventBodyEntryProps = {
   content: string | JSX.Element;
   testID?: string;
   iconComponent?: Icon;
+  iconColor?: Color;
+  lineHeight?: 'default' | 'large';
 };
 
 const EventBodyEntry = ({
   content,
   testID,
   iconComponent: IconComponent = IcoCheck16,
+  iconColor = 'neutral',
+  lineHeight = 'large',
 }: EventBodyEntryProps) => (
   <Container data-testid={testID}>
     <IconBounds>
-      <IconComponent />
+      <IconComponent color={iconColor} />
     </IconBounds>
-    <Content>{content}</Content>
+    <Content data-height={lineHeight}>{content}</Content>
   </Container>
 );
 
@@ -29,22 +32,20 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
 `;
 
 const IconBounds = styled.div`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[2]};
+    margin-right: ${theme.spacing[3]};
+    margin-left: ${theme.spacing[3]};
     display: flex;
     justify-content: center;
     align-items: center;
-    height: ${LINE_HEIGHT};
-    width: ${LINE_HEIGHT};
   `}
 `;
 
 const Content = styled.div`
-  min-height: ${LINE_HEIGHT};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -56,6 +57,14 @@ const Content = styled.div`
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
+  }
+
+  &[data-height='large'] {
+    min-height: 26px;
+  }
+
+  &[data-height='default'] {
+    min-height: 20px;
   }
 `;
 

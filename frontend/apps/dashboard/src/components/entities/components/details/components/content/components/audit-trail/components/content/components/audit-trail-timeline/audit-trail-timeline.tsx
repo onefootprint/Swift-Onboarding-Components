@@ -4,15 +4,16 @@ import {
   ActorKind,
   Annotation,
   CollectedDataEventData,
+  CombinedWatchlistChecksEvent,
   Entity,
   EntityStatus,
   IdDocUploadedEventData,
   LivenessEventData,
   OnboardingDecisionEventData,
+  PreviousWatchlistChecksEventData,
   Timeline as EntityTimeline,
   TimelineEventKind,
   WatchlistCheckEventData,
-  WatchlistCheckStatus,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -108,21 +109,20 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: <OnboardingDecisionEventBody data={eventData} />,
       });
-    } else if (kind === TimelineEventKind.watchlistCheck) {
-      const eventData = data as WatchlistCheckEventData;
-      if (
-        eventData.status === WatchlistCheckStatus.pass ||
-        eventData.status === WatchlistCheckStatus.fail
-      ) {
-        // TODO hack to only show pass/fail events for now
-        // Very basic timeline event - will add more details in the future
-        items.push({
-          time,
-          iconComponent: <WatchlistCheckEventIcon />,
-          headerComponent: <WatchlistCheckEventHeader />,
-          bodyComponent: <WatchlistCheckEventBody data={eventData} />,
-        });
-      }
+    } else if (kind === TimelineEventKind.combinedWatchlistChecks) {
+      const eventData = data as PreviousWatchlistChecksEventData;
+      const combinedWatchlistEvent =
+        event.event as CombinedWatchlistChecksEvent;
+      const latestWatchlistEventData = combinedWatchlistEvent
+        .latestWatchlistEvent?.data as WatchlistCheckEventData;
+      items.push({
+        time,
+        iconComponent: <WatchlistCheckEventIcon />,
+        headerComponent: <WatchlistCheckEventHeader data={eventData} />,
+        bodyComponent: (
+          <WatchlistCheckEventBody data={latestWatchlistEventData} />
+        ),
+      });
     } else if (kind === TimelineEventKind.freeFormNote) {
       const eventData = data as Annotation;
       items.push({

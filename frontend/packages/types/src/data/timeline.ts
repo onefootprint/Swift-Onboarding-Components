@@ -17,6 +17,7 @@ export enum TimelineEventKind {
   idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
+  combinedWatchlistChecks = 'combined_watchlist_checks',
 }
 
 export type CollectedDataEvent = {
@@ -94,6 +95,17 @@ export type WatchlistCheckEventData = {
   status: WatchlistCheckStatus;
 };
 
+export type CombinedWatchlistChecksEvent = {
+  kind: TimelineEventKind.combinedWatchlistChecks;
+  data: PreviousWatchlistChecksEventData;
+  latestWatchlistEvent: WatchlistCheckEvent | null;
+};
+
+export type PreviousWatchlistChecksEventData = {
+  watchlistEvent: WatchlistCheckEvent;
+  timestamp: string;
+}[];
+
 export type TimelineEvent = {
   event:
     | CollectedDataEvent
@@ -101,7 +113,8 @@ export type TimelineEvent = {
     | IdDocUploadedEvent
     | OnboardingDecisionEvent
     | WatchlistCheckEvent
-    | FreeFormNoteEvent;
+    | FreeFormNoteEvent
+    | CombinedWatchlistChecksEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };

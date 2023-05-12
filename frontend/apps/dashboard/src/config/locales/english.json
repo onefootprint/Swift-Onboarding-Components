@@ -626,11 +626,19 @@
             "title": "Watchlist check performed",
             "status": {
               "pass": "User was not found on a watchlist",
-              "fail": "User was found on a watchlist"
+              "fail": "User was found on a watchlist",
+              "not_needed": "Watchlist check was not required for the user",
+              "error": "There was error running this watchlist check"
             },
             "reason-codes": {
               "watchlist_hit_ofac": "User was found on OFAC watchlist",
               "watchlist_hit_pep": "User was found on PEP watchlist"
+            },
+            "previous-checks-button": {
+              "label": "See previous checks"
+            },
+            "previous-checks-drawer": {
+              "title": "Watchlist checks"
             }
           },
           "free-form-note-event": {
