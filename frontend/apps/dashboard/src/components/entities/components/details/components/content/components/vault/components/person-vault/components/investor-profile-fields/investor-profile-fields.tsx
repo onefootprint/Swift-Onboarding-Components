@@ -1,7 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
+import {
+  DocumentDI,
+  InvestorProfileDI,
+  isVaultDataEmpty,
+} from '@onefootprint/types';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
+import useEntityVault from 'src/components/entities/hooks/use-entity-vault/use-entity-vault';
 import createStringList from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';
 
@@ -14,6 +19,7 @@ type InvestorProfileFieldsProps = WithEntityProps;
 
 const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
   const { t } = useTranslation('pages.user.vault.investor-profile');
+  const { data } = useEntityVault(entity.id, entity);
 
   return (
     <Grid>
@@ -110,7 +116,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               return <FieldOrPlaceholder data={value} />;
             }}
           />
-          <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
+          {isVaultDataEmpty(data?.[DocumentDI.finraComplianceLetter]) ? null : (
+            <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
+          )}
         </FieldSection>
       </Column>
     </Grid>

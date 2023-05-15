@@ -845,6 +845,9 @@
               "senior_political_figure": "I'm a senior political figure",
               "family_of_political_figure": "I'm a family member or relative of a senior political figure"
             }
+          },
+          "compliance_letter": {
+            "title": "Finra compliance letter"
           }
         },
         "id-documents-and-selfie": {
