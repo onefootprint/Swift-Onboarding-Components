@@ -96,3 +96,22 @@ pub enum IncodeTest {
     #[strum(serialize = "lastNameMatch")]
     LastNameMatch,
 }
+
+#[derive(Display, Debug, EnumString, Eq, PartialEq)]
+pub enum IncodeAddSideFailureReason {
+    #[strum(serialize = "UNKNOWN_DOCUMENT_TYPE")]
+    UnknownDocumentType,
+    #[strum(serialize = "WRONG_DOCUMENT_SIDE")]
+    WrongDocumentSide,
+    #[strum(serialize = "WRONG_ONE_SIDED_DOCUMENT")]
+    WrongOneSidedDocument,
+    #[strum(serialize = "DOCUMENT_NOT_READABLE")]
+    DocumentNotReadable,
+    #[strum(serialize = "UNABLE_TO_ALIGN_DOCUMENT")]
+    UnableToAlignDocument,
+    #[strum(serialize = "ID_TYPE_UNACCEPTABLE")]
+    IdTypeNotAcceptable,
+    #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
+    UnexpectedErrorOccurred,
+    Other(String),
+}

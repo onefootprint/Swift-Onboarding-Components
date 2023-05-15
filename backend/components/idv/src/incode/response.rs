@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::incode::error::Error as IncodeError;
 use newtypes::{
-    incode::{IncodeStatus, IncodeTest},
+    incode::{IncodeAddSideFailureReason, IncodeStatus, IncodeTest},
     PiiString,
 };
 
@@ -83,8 +83,19 @@ pub struct AddSideResponse {
     pub session_status: Option<String>,
     pub sharpness: Option<i32>,
     pub type_of_id: Option<String>,
+    pub fail_reason: Option<String>,
     #[serde(flatten)]
     pub error: Option<Error>,
+}
+
+impl AddSideResponse {
+    // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
+    pub fn add_side_failure_reason(&self) -> Option<IncodeAddSideFailureReason> {
+        self.fail_reason.as_ref().map(|e| {
+            IncodeAddSideFailureReason::try_from(e.as_str())
+                .unwrap_or(IncodeAddSideFailureReason::Other(e.clone()))
+        })
+    }
 }
 
 impl APIResponseToIncodeError for AddSideResponse {
@@ -204,9 +215,9 @@ impl APIResponseToIncodeError for FetchScoresResponse {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::incode::{IncodeStatus, IncodeTest};
+    use newtypes::incode::{IncodeAddSideFailureReason, IncodeStatus, IncodeTest};
 
-    use super::FetchScoresResponse;
+    use super::{AddSideResponse, FetchScoresResponse};
 
     #[test]
     pub fn test_parse_fetch_scores() {
@@ -256,5 +267,41 @@ mod tests {
 
         // Overall score
         assert_eq!(parsed.overall_score().unwrap(), IncodeStatus::Ok)
+    }
+
+    #[test]
+    fn test_parse_add_side_failure() {
+        // With a failure
+        let raw_response_with_failure = serde_json::json!({
+            "sharpness": 100,
+            "glare": 100,
+            "horizontalResolution": 0,
+            "classification": false,
+            "typeOfId": "DriversLicense",
+            "issueYear": 2016,
+            "issueName": "USA DriversLicense DRIVERS_LICENSE",
+            "sessionStatus": "Alive",
+            "failReason": "WRONG_DOCUMENT_SIDE"
+        });
+
+        let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
+        let failure = parsed.add_side_failure_reason().unwrap();
+        assert_eq!(failure, IncodeAddSideFailureReason::WrongDocumentSide);
+
+        // No failure
+        let raw_response = serde_json::json!({
+            "sharpness": 100,
+            "glare": 100,
+            "horizontalResolution": 0,
+            "classification": false,
+            "typeOfId": "DriversLicense",
+            "issueYear": 2016,
+            "issueName": "USA DriversLicense DRIVERS_LICENSE",
+            "sessionStatus": "Alive",
+        });
+
+        let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
+        let failure = parsed.add_side_failure_reason();
+        assert!(failure.is_none())
     }
 }

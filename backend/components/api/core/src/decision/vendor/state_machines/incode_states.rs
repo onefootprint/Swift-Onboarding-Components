@@ -26,6 +26,8 @@ use super::incode_state_machine::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 
 pub mod state_impl {
+    use newtypes::incode::IncodeAddSideFailureReason;
+
     use super::*;
 
     pub struct StartOnboarding {
@@ -200,11 +202,14 @@ pub mod state_impl {
             save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
 
             // Now ensure we don't have an error
-            request_result
+            let response = request_result
                 .map_err(map_to_api_err)?
                 .result
                 .into_success()
                 .map_err(map_to_api_err)?;
+
+            // Incode returns 200 for upload failures, so catch these here
+            let failure_reason = response.add_side_failure_reason();
 
             //
             // Set up the next state transition
@@ -213,31 +218,57 @@ pub mod state_impl {
             let id_doc_id = self.identity_document_id.clone();
             // Save the next stage's Vreq
             let add_back_vreq = db_pool
-                .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
-                    let res = VerificationRequest::create_document_verification_request(
-                        conn,
-                        VendorAPI::IncodeAddBack,
-                        sv_id,
-                        id_doc_id,
-                        &di_id,
-                    )?;
+                .db_transaction(move |conn| -> ApiResult<Option<VerificationRequest>> {
+                    // If there's failure, we move to retry upload
+                    // TODO: notate reason on incode session
+                    let vreq = if let Some(_reason) = failure_reason {
+                        let update = UpdateIncodeVerificationSession::set_state(
+                            IncodeVerificationSessionState::RetryUpload,
+                        );
 
-                    let update =
-                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
+                        IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
-                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                        None
+                    } else {
+                        let res = VerificationRequest::create_document_verification_request(
+                            conn,
+                            VendorAPI::IncodeAddBack,
+                            sv_id,
+                            id_doc_id,
+                            &di_id,
+                        )?;
 
-                    Ok(res)
+                        let update = UpdateIncodeVerificationSession::set_state(
+                            IncodeVerificationSessionState::AddBack,
+                        );
+
+                        IncodeVerificationSession::update(conn, verification_session_id, update)?;
+
+                        Some(res)
+                    };
+
+                    Ok(vreq)
                 })
                 .await?;
 
-            Ok(AddBack {
-                session: self.session.clone(),
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
-                add_back_verification_request: add_back_vreq,
+            if let Some(vreq) = add_back_vreq {
+                Ok(AddBack {
+                    session: self.session.clone(),
+                    scoped_vault_id: self.scoped_vault_id.clone(),
+                    decision_intent_id: self.decision_intent_id.clone(),
+                    identity_document_id: self.identity_document_id.clone(),
+                    add_back_verification_request: vreq,
+                }
+                .into())
+            } else {
+                Ok(RetryUpload {
+                    session: self.session.clone(),
+                    scoped_vault_id: self.scoped_vault_id.clone(),
+                    decision_intent_id: self.decision_intent_id.clone(),
+                    identity_document_id: self.identity_document_id.clone(),
+                }
+                .into())
             }
-            .into())
         }
     }
 
@@ -245,6 +276,7 @@ pub mod state_impl {
         pub session: VerificationSession,
         pub scoped_vault_id: ScopedVaultId,
         pub decision_intent_id: DecisionIntentId,
+        pub identity_document_id: IdentityDocumentId,
         pub add_back_verification_request: VerificationRequest,
     }
 
@@ -285,11 +317,19 @@ pub mod state_impl {
             save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
 
             // Now ensure we don't have an error
-            request_result
+            let response = request_result
                 .map_err(map_to_api_err)?
                 .result
                 .into_success()
                 .map_err(map_to_api_err)?;
+
+            // Incode returns 200 for upload failures, so catch these here
+            let failure_reason = response.add_side_failure_reason();
+            let is_failure = if let Some(reason) = failure_reason {
+                reason != IncodeAddSideFailureReason::WrongOneSidedDocument
+            } else {
+                false
+            };
 
             //
             // Set up the next state transition
@@ -297,24 +337,50 @@ pub mod state_impl {
             // Save the next stage's Vreq
             let verification_session_id = self.session.id.clone();
             let process_id_vreq = db_pool
-                .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
-                    let res = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeProcessId)?;
-                    let update =
-                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::ProcessId);
+                .db_transaction(move |conn| -> ApiResult<Option<VerificationRequest>> {
+                    // If there's failure, we move to retry upload
+                    // TODO: notate reason on incode session
+                    let vreq = if is_failure {
+                        let update = UpdateIncodeVerificationSession::set_state(
+                            IncodeVerificationSessionState::RetryUpload,
+                        );
 
-                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                        IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
-                    Ok(res)
+                        None
+                    } else {
+                        let res =
+                            VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeProcessId)?;
+                        let update = UpdateIncodeVerificationSession::set_state(
+                            IncodeVerificationSessionState::ProcessId,
+                        );
+
+                        IncodeVerificationSession::update(conn, verification_session_id, update)?;
+
+                        Some(res)
+                    };
+
+                    Ok(vreq)
                 })
                 .await?;
 
-            Ok(ProcessId {
-                session: self.session.clone(),
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
-                process_id_verification_request: process_id_vreq,
+            if let Some(vreq) = process_id_vreq {
+                Ok(ProcessId {
+                    session: self.session.clone(),
+                    scoped_vault_id: self.scoped_vault_id.clone(),
+                    decision_intent_id: self.decision_intent_id.clone(),
+                    process_id_verification_request: vreq,
+                }
+                .into())
+            } else {
+                Ok(RetryUpload {
+                    session: self.session.clone(),
+                    scoped_vault_id: self.scoped_vault_id.clone(),
+                    decision_intent_id: self.decision_intent_id.clone(),
+                    identity_document_id: self.identity_document_id.clone(),
+                }
+                .into())
             }
-            .into())
         }
     }
 
@@ -464,6 +530,62 @@ pub mod state_impl {
             _docv_data: &DocVData,
         ) -> Result<IncodeState, ApiError> {
             Err(ApiError::AssertionError("incode already complete".into()))
+        }
+    }
+
+    /// Document upload has failed and user needs to retry
+    pub struct RetryUpload {
+        pub session: VerificationSession,
+        pub identity_document_id: IdentityDocumentId,
+        pub scoped_vault_id: ScopedVaultId,
+        pub decision_intent_id: DecisionIntentId,
+    }
+
+    #[async_trait]
+    impl IncodeStateTransition for RetryUpload {
+        async fn run(
+            &self,
+            db_pool: &DbPool,
+            _footprint_http_client: &FootprintVendorHttpClient,
+            _uv_public_key: VaultPublicKey,
+            _docv_data: &DocVData,
+        ) -> Result<IncodeState, ApiError> {
+            let sv_id = self.scoped_vault_id.clone();
+            let di_id = self.decision_intent_id.clone();
+            let session_id = self.session.id.clone();
+            let id_doc_id = self.identity_document_id.clone();
+            //
+            // Set up the next state transition
+            //
+            // Save the next stage's Vreq
+            let add_front_vreq = db_pool
+                .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
+                    let res = VerificationRequest::create_document_verification_request(
+                        conn,
+                        VendorAPI::IncodeAddFront,
+                        sv_id,
+                        id_doc_id,
+                        &di_id,
+                    )?;
+
+                    // Update our state to the next stage
+                    let update =
+                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddFront);
+
+                    IncodeVerificationSession::update(conn, session_id, update)?;
+
+                    Ok(res)
+                })
+                .await?;
+
+            Ok(AddFront {
+                session: self.session.to_owned(),
+                scoped_vault_id: self.scoped_vault_id.clone(),
+                decision_intent_id: self.decision_intent_id.clone(),
+                add_front_verification_request: add_front_vreq,
+                identity_document_id: self.identity_document_id.clone(),
+            }
+            .into())
         }
     }
 }
