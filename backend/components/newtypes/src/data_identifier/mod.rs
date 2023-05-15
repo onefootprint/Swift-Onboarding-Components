@@ -25,8 +25,8 @@
 //!   `IDK::LastName`.
 
 mod business_data_kind;
+mod card_data_kind;
 mod collected_data;
-mod credit_card;
 mod document_kind;
 mod id_doc_kind;
 mod identity_data_kind;
@@ -36,7 +36,7 @@ mod validation;
 mod vd_kind;
 
 pub use self::{
-    business_data_kind::*, collected_data::*, credit_card::*, document_kind::*, id_doc_kind::*,
+    business_data_kind::*, card_data_kind::*, collected_data::*, document_kind::*, id_doc_kind::*,
     identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
     vd_kind::*,
 };
@@ -344,7 +344,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
-    #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.exp_month")]
+    #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration.month")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -356,7 +356,7 @@ mod tests {
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
-    #[test_case("card.hayesvalley.exp_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
+    #[test_case("card.hayesvalley.expiration.month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

@@ -31,7 +31,7 @@ flat_api_object_map_type!(
 #[route_alias(actix::get(
     "/users/{footprint_user_id}/vault",
     description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
-    tags(Vault, Users, PublicApi)
+    tags(Users, Vault, PublicApi)
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",

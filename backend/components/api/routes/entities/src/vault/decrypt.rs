@@ -34,7 +34,7 @@ flat_api_object_map_type!(
 #[tracing::instrument(skip(state, auth))]
 #[route_alias(post(
     "/users/{footprint_user_id}/vault/decrypt",
-    tags(Vault, Users, PublicApi),
+    tags(Users, Vault, PublicApi),
     description = "Decrypts the specified list of fields from the provided vault."
 ))]
 #[api_v2_operation(

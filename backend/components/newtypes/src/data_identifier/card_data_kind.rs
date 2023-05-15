@@ -10,9 +10,17 @@ use strum_macros::{Display, EnumString};
 #[strum(serialize_all = "snake_case")]
 pub enum CardDataKind {
     Number,
-    ExpMonth,
-    ExpYear,
+    Expiration,
     Cvc,
+
+    // TODO: remove serialize after migrate DB
+    #[strum(to_string = "expiration.month", serialize = "exp_month")]
+    ExpMonth,
+    // TODO: remove serialize after migrate DB
+    #[strum(to_string = "expiration.year", serialize = "exp_year")]
+    ExpYear,
+    // TODO: remove serialize after migrate DB
+    #[strum(to_string = "number.last4", serialize = "last4")]
     Last4,
 }
 

@@ -1,12 +1,13 @@
 use crate::{NtResult, PiiString, ValidateArgs};
 
 mod business;
-mod credit_card;
+mod card;
 mod identity;
 mod investor_profile;
 mod utils;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
+pub use card::Expiration as CardExpiration;
 pub use investor_profile::Declaration;
 
 pub trait Validate {
@@ -55,10 +56,14 @@ pub enum Error {
     InvalidMonth,
     #[error("Invalid year")]
     InvalidYear,
+    #[error("Invalid expiration")]
+    InvalidExpiration,
     #[error("{0}")]
     CannotParseInt(#[from] std::num::ParseIntError),
     #[error("Can only provide sandbox phones and emails in sandbox mode")]
     InvalidSandboxState,
+    #[error("Cannot set card last4, expiration month/year (must be derived from number or expiration)")]
+    CardEntriesMustBeDerivedOnly,
 }
 
 pub type VResult<T> = Result<T, Error>;

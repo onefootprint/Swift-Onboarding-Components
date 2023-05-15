@@ -17,7 +17,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[route_alias(actix::post(
     "/users/{footprint_user_id}/vault/validate",
-    tags(Vault, Users, PublicApi),
+    tags(Users, Vault, PublicApi),
     description = "Checks if provided data is valid before adding it to the vault."
 ))]
 #[api_v2_operation(
