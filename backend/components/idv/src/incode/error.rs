@@ -16,4 +16,8 @@ pub enum Error {
     APIResponseError(super::response::Error),
     #[error("Assertion Error: {0}")]
     AssertionError(String),
+    #[error("OCR Error: {0}")]
+    OcrError(String),
+    #[error("{0}")]
+    StringParseError(#[from] std::num::ParseIntError),
 }

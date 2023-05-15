@@ -27,7 +27,10 @@ use crate::decision::vendor::vendor_trait::VendorAPICall;
 
 pub mod state_impl {
     use db::models::user_consent::UserConsent;
-    use idv::incode::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
+    use idv::incode::{
+        response::FetchOCRResponse, IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest,
+        IncodeFetchOCRRequest,
+    };
     use newtypes::IncodeVerificationFailureReason;
 
     use super::*;
@@ -561,6 +564,8 @@ pub mod state_impl {
 
             Ok(FetchScores {
                 session: self.session.clone(),
+                scoped_vault_id: self.scoped_vault_id.clone(),
+                decision_intent_id: self.decision_intent_id.clone(),
                 fetch_scores_verification_request: process_id_vreq,
             }
             .into())
@@ -569,6 +574,8 @@ pub mod state_impl {
 
     pub struct FetchScores {
         pub session: VerificationSession,
+        pub scoped_vault_id: ScopedVaultId,
+        pub decision_intent_id: DecisionIntentId,
         pub fetch_scores_verification_request: VerificationRequest,
     }
 
@@ -581,6 +588,8 @@ pub mod state_impl {
             uv_public_key: VaultPublicKey,
             _docv_data: &DocVData,
         ) -> Result<IncodeState, ApiError> {
+            let sv_id = self.scoped_vault_id.clone();
+            let di_id = self.decision_intent_id.clone();
             //
             // make the request to incode
             //
@@ -608,6 +617,70 @@ pub mod state_impl {
                 .map_err(map_to_api_err)?;
 
             let verification_session_id = self.session.id.clone();
+            let fetch_ocr_verification_request = db_pool
+                .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
+                    let req = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeFetchOCR)?;
+
+                    let update =
+                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::FetchOCR);
+
+                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+
+                    Ok(req)
+                })
+                .await?;
+
+            Ok(FetchOCR {
+                session: self.session.clone(),
+                fetch_scores_response,
+                fetch_ocr_verification_request,
+            }
+            .into())
+        }
+    }
+
+    pub struct FetchOCR {
+        pub session: VerificationSession,
+        pub fetch_ocr_verification_request: VerificationRequest,
+        pub fetch_scores_response: FetchScoresResponse,
+    }
+
+    #[async_trait]
+    impl IncodeStateTransition for FetchOCR {
+        async fn run(
+            &self,
+            db_pool: &DbPool,
+            footprint_http_client: &FootprintVendorHttpClient,
+            uv_public_key: VaultPublicKey,
+            _docv_data: &DocVData,
+        ) -> Result<IncodeState, ApiError> {
+            //
+            // make the request to incode
+            //
+            let fetch_ocr_vreq_id = self.fetch_ocr_verification_request.id.clone();
+
+            let request = IncodeFetchOCRRequest {
+                credentials: self.session.credentials.clone(),
+            };
+
+            let request_result = footprint_http_client.make_request(request).await;
+
+            //
+            // Save our result
+            //
+            let save_verification_result_args =
+                SaveVerificationResultArgs::from((&request_result, fetch_ocr_vreq_id));
+
+            save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
+
+            // Now ensure we don't have an error
+            let fetch_ocr_response = request_result
+                .map_err(map_to_api_err)?
+                .result
+                .into_success()
+                .map_err(map_to_api_err)?;
+
+            let verification_session_id = self.session.id.clone();
             db_pool
                 .db_transaction(move |conn| -> ApiResult<()> {
                     let update =
@@ -621,7 +694,8 @@ pub mod state_impl {
 
             // We're done!
             Ok(Complete {
-                fetch_scores_response,
+                fetch_scores_response: self.fetch_scores_response.clone(),
+                fetch_ocr_response,
             }
             .into())
         }
@@ -629,6 +703,7 @@ pub mod state_impl {
 
     pub struct Complete {
         pub fetch_scores_response: FetchScoresResponse,
+        pub fetch_ocr_response: FetchOCRResponse,
     }
 
     #[async_trait]

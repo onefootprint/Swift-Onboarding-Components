@@ -42,6 +42,7 @@ pub enum IncodeState {
     RetryUpload,
     ProcessId,
     FetchScores,
+    FetchOCR,
     Complete,
 }
 
@@ -55,6 +56,7 @@ impl IncodeState {
             IncodeState::RetryUpload(_) => IncodeVerificationSessionState::RetryUpload,
             IncodeState::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
             IncodeState::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
+            IncodeState::FetchOCR(_) => IncodeVerificationSessionState::FetchOCR,
             IncodeState::Complete(_) => IncodeVerificationSessionState::Complete,
         }
     }
@@ -546,6 +548,7 @@ mod tests {
                         IncodeVerificationSessionState::AddBack,
                         IncodeVerificationSessionState::ProcessId,
                         IncodeVerificationSessionState::FetchScores,
+                        IncodeVerificationSessionState::FetchOCR,
                         IncodeVerificationSessionState::Complete,
                     ],
                 );

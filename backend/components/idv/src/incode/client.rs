@@ -242,6 +242,25 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn fetch_ocr(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/get/ocr-data")?;
+
+        let response = footprint_http_client
+            .client
+            .get(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
     /// Update authentication token by requesting a new one w/ the verification session id
     pub async fn update_authentication_token(
         &mut self,
@@ -290,6 +309,7 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 
 #[cfg(test)]
 mod tests {
+    use chrono::NaiveDate;
     use newtypes::{
         vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, PiiString,
     };
@@ -298,7 +318,10 @@ mod tests {
         footprint_http_client::FootprintVendorHttpClient,
         incode::{
             request::DocumentSide,
-            response::{AddSideResponse, FetchScoresResponse, OnboardingStartResponse, ProcessIdResponse},
+            response::{
+                AddSideResponse, FetchOCRResponse, FetchScoresResponse, OnboardingStartResponse,
+                ProcessIdResponse,
+            },
             IncodeAPIResult,
         },
         tests::fixtures::images::load_image_and_encode_as_b64,
@@ -395,6 +418,29 @@ mod tests {
             .unwrap()
             .into_success()
             .unwrap();
-        assert!(scores.id_validation.is_some())
+        assert!(scores.id_validation.is_some());
+
+        //
+        // Get OCR
+        //
+        let raw_get_ocr = authenticated_client
+            .fetch_ocr(&fp_client)
+            .await
+            .expect("fetch ocr failed");
+
+        let ocr = IncodeAPIResult::<FetchOCRResponse>::try_from(raw_get_ocr)
+            .unwrap()
+            .into_success()
+            .unwrap();
+        assert!(ocr.name.clone().unwrap().full_name.is_some());
+        assert_eq!(
+            ocr.address_fields.clone().unwrap().state.unwrap(),
+            "MA".to_string()
+        );
+
+        let expected_expiration = NaiveDate::parse_from_str("2024-10-15", "%Y-%m-%d").unwrap();
+        let expected_dob = NaiveDate::parse_from_str("1986-10-16", "%Y-%m-%d").unwrap();
+        assert_eq!(ocr.expiration_date().unwrap(), expected_expiration);
+        assert_eq!(ocr.dob().unwrap(), expected_dob);
     }
 }

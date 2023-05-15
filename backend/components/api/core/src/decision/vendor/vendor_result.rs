@@ -95,6 +95,7 @@ fn deserialize_from_vendor_api(
         VendorAPI::IncodeFetchScores => ParsedResponse::from_incode_fetch_scores(raw_response)?,
         VendorAPI::IncodeAddPrivacyConsent => ParsedResponse::from_incode_add_privacy_consent(raw_response)?,
         VendorAPI::IncodeAddMLConsent => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
+        VendorAPI::IncodeFetchOCR => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
     };
 
     Ok(res)

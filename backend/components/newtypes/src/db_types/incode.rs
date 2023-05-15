@@ -33,6 +33,7 @@ pub enum IncodeVerificationSessionState {
     RetryUpload,
     ProcessId,
     FetchScores,
+    FetchOCR,
     Complete,
 }
 

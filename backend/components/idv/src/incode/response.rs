@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::incode::error::Error as IncodeError;
+use chrono::{NaiveDate, NaiveDateTime};
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     IncodeVerificationFailureReason, PiiString,
@@ -227,14 +228,121 @@ impl APIResponseToIncodeError for AddConsentResponse {
     }
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchOCRResponse {
+    pub name: Option<OCRName>,
+    // Address as read from id. Address can have two or three lines. Lines are separated by \n.
+    pub address: Option<String>,
+    pub checked_address: Option<String>,
+    pub checked_address_bean: Option<serde_json::Value>,
+    pub address_fields: Option<OCRAddress>,
+    // Image was classified as one of the following:
+    // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
+    // Other, WeaponLicense, TribalIdentification, VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
+    pub type_of_id: Option<String>,
+    pub document_front_subtype: Option<String>,
+    pub document_back_subtype: Option<String>,
+    // Long, UTC millis
+    pub birth_date: Option<i64>,
+    pub gender: Option<String>,
+    pub document_number: Option<String>,
+    pub personal_number: Option<String>,
+    // Document Reference Number.
+    pub ref_number: Option<String>,
+    // Optional. Personal tax identification number.
+    pub tax_id_number: Option<String>,
+    // UTC timestamp, in ms
+    pub expire_at: Option<String>,
+    // year of expiration
+    pub expiration_date: Option<i32>,
+    pub additional_timestamps: Option<serde_json::Value>,
+    // year of issue
+    pub issue_date: Option<i32>,
+    pub issuing_country: Option<String>,
+    pub issuing_state: Option<String>,
+    pub issuing_authority: Option<String>,
+    pub nationality: Option<String>,
+    // String. Person's nationality as it appears in MRZ (if present).
+    pub nationality_mrz: Option<String>,
+    // Array. Optional. List of driver's license details elements:
+    pub dl_class_details: Option<serde_json::Value>,
+    pub ocr_data_confidence: Option<serde_json::Value>,
+    pub restrictions: Option<String>,
+
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl FetchOCRResponse {
+    pub fn expiration_date(&self) -> Result<NaiveDate, IncodeError> {
+        let expiration_timestamp = self
+            .expire_at
+            .clone()
+            .ok_or(IncodeError::OcrError("missing field expire_at".into()))?
+            .parse::<i64>()?;
+
+        let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0).ok_or(
+            IncodeError::OcrError("could not parse expiration timestamp".into()),
+        )?;
+
+        Ok(naive.date())
+    }
+
+    pub fn dob(&self) -> Result<NaiveDate, IncodeError> {
+        let expiration_timestamp = self
+            .birth_date
+            .ok_or(IncodeError::OcrError("missing field birth_date".into()))?;
+
+        // in ms, so divide by 1000
+        let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0).ok_or(
+            IncodeError::OcrError("could not parse birth_date timestamp".into()),
+        )?;
+
+        Ok(naive.date())
+    }
+}
+
+impl APIResponseToIncodeError for FetchOCRResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OCRName {
+    pub full_name: Option<String>,
+    pub first_name: Option<String>,
+    pub paternal_last_name: Option<String>,
+    pub maternal_last_name: Option<String>,
+    pub given_name: Option<String>,
+    pub middle_name: Option<String>,
+    pub name_suffix: Option<String>,
+    pub machine_readable_full_name: Option<String>,
+    pub given_name_mrz: Option<String>,
+    pub last_name_mrz: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OCRAddress {
+    pub street: Option<String>,
+    pub colony: Option<String>,
+    pub postal_code: Option<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+}
+
 #[cfg(test)]
 mod tests {
+    use chrono::NaiveDate;
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
         IncodeVerificationFailureReason,
     };
 
-    use super::{AddSideResponse, FetchScoresResponse};
+    use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse};
 
     #[test]
     pub fn test_parse_fetch_scores() {
@@ -320,5 +428,72 @@ mod tests {
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
         let failure = parsed.add_side_failure_reason();
         assert!(failure.is_none())
+    }
+
+    #[test]
+    fn test_parse_ocr() {
+        let raw_response = serde_json::json!({
+          "name": {
+            "fullName": "ALEX GINMAN",
+            "firstName": "ALEX",
+            "givenName": "ALEX",
+            "paternalLastName": "GINMAN"
+          },
+          "address": "76 PARKER HILL AVE 1\nBOSTON, MA 02120",
+          "addressFields": {
+            "state": "MA"
+          },
+          "checkedAddress": "76 Parker Hill Ave, Boston, MA 02120, United States",
+          "checkedAddressBean": {
+            "street": "76 Parker Hill Ave",
+            "postalCode": "02120",
+            "city": "Boston",
+            "state": "MA",
+            "label": "76 Parker Hill Ave, Boston, MA 02120, United States",
+            "zipColonyOptions": []
+          },
+          "typeOfId": "DriversLicense",
+          "documentFrontSubtype": "DRIVERS_LICENSE",
+          "documentBackSubtype": "DRIVERS_LICENSE",
+          "birthDate": 5298048, // serde_json overflows, so this is artificially truncated
+          "gender": "M",
+          "documentNumber": "S3441243",
+          "refNumber": "06/13/2015 Rev 02/22/2016",
+          "issuedAt": "1560384000000",
+          "expireAt": "1728950400000",
+          "expirationDate": 2024,
+          "issueDate": 2019,
+          "additionalTimestamps": [],
+          "issuingCountry": "USA",
+          "issuingState": "MASSACHUSETTS",
+          "height": "5 '  11",
+          "restrictions": "NONE",
+          "ocrDataConfidence": {
+            "birthDateConfidence": 0.9975609,
+            "nameConfidence": 0.98470485,
+            "givenNameConfidence": 0.98787415,
+            "firstNameConfidence": 0.98787415,
+            "fathersSurnameConfidence": 0.98153555,
+            "addressConfidence": 0.91200954,
+            "genderConfidence": 0.9834226,
+            "issueDateConfidence": 0.99,
+            "expirationDateConfidence": 0.99,
+            "issuedAtConfidence": 0.99948984,
+            "expireAtConfidence": 0.9990068,
+            "documentNumberConfidence": 0.9766761,
+            "heightConfidence": 0.9645301,
+            "refNumberConfidence": 0.9727157,
+            "restrictionsConfidence": 0.92769164
+          }
+        });
+
+        let mut parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
+        // serde_json doens't like i32, so add in the bday
+        parsed.birth_date = Some(529873860000);
+
+        let expected_expiration = NaiveDate::parse_from_str("2024-10-15", "%Y-%m-%d").unwrap();
+        let expected_dob = NaiveDate::parse_from_str("1986-10-16", "%Y-%m-%d").unwrap();
+        assert_eq!(parsed.expiration_date().unwrap(), expected_expiration);
+        assert_eq!(parsed.dob().unwrap(), expected_dob);
     }
 }

@@ -46,6 +46,10 @@ pub struct IncodeAddMLConsentRequest {
     pub status: bool,
 }
 
+pub struct IncodeFetchOCRRequest {
+    pub credentials: IncodeCredentialsWithToken,
+}
+
 /// Trait that an API Response uses to convert to an API error
 /// response that is in the incode API response
 pub trait APIResponseToIncodeError {

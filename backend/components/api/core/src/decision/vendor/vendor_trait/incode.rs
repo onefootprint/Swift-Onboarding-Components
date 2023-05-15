@@ -6,12 +6,12 @@ use idv::{
         error::Error as IncodeError,
         request::DocumentSide,
         response::{
-            AddConsentResponse, AddSideResponse, FetchScoresResponse, OnboardingStartResponse,
-            ProcessIdResponse,
+            AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+            OnboardingStartResponse, ProcessIdResponse,
         },
         IncodeAPIResult, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-        IncodeAddPrivacyConsentRequest, IncodeFetchScoresRequest, IncodeProcessIdRequest, IncodeResponse,
-        IncodeStartOnboardingRequest,
+        IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
+        IncodeProcessIdRequest, IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse,
 };
@@ -264,6 +264,44 @@ impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
     fn vendor_api(self) -> newtypes::VendorAPI {
         // this isn't correct
         VendorAPI::IncodeAddPrivacyConsent
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response.into()
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeFetchOCRRequest,
+    ) -> Result<IncodeResponse<FetchOCRResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client.fetch_ocr(self).await?;
+        let result = IncodeResponse::<FetchOCRResponse> {
+            result: IncodeAPIResult::<FetchOCRResponse>::try_from(raw_response.clone())?,
+            raw_response,
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeFetchOCR
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
