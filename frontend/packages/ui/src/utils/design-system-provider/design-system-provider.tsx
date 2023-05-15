@@ -67,10 +67,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   html {
-    font-size: 16px;
+    font-size: clamp(16px, 4.35vw, 18px);
 
-    ${media.between('xs', 'sm')`
-      font-size: 12px;
+    ${media.greaterThan('md')`
+      font-size: clamp(14px, 2vw, 16px);
     `}
   }
 `;
