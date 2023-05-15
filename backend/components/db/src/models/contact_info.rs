@@ -43,4 +43,12 @@ impl ContactInfo {
             .execute(conn)?;
         Ok(())
     }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get(conn: &mut PgConn, lifetime_id: &DataLifetimeId) -> DbResult<Self> {
+        let result = contact_info::table
+            .filter(contact_info::lifetime_id.eq(lifetime_id))
+            .get_result(conn)?;
+        Ok(result)
+    }
 }

@@ -1,5 +1,6 @@
 use envconfig::Envconfig;
-use newtypes::{PhoneNumber, PiiString};
+use newtypes::{PhoneNumber, PiiString, SessionAuthToken};
+use rand::Rng;
 
 #[derive(Envconfig, Clone)]
 
@@ -211,6 +212,26 @@ impl ServiceEnvironmentConfig {
 
     pub fn is_local(&self) -> bool {
         self.environment.as_str() == "local"
+    }
+
+    /// Generate a link to hosted bifrost based on the environment in which we are running
+    pub fn generate_verify_link(&self, token: SessionAuthToken) -> PiiString {
+        // TODO right now, for simplicity, we determine the verify link from the environment running
+        // in the backend. Ideally, if you are testing a local frontend, we should send you a link
+        // to your local frontend. In the future, migrate to have the client provide info on the
+        // environment
+        let base_url = if self.is_production() {
+            "https://verify.onefootprint.com"
+        } else if self.is_local() {
+            "http://localhost:3004"
+        } else {
+            "https://verify.preview.onefootprint.com"
+        };
+        // Generate a random querystring so different links open in different tabs
+        let r = rand::thread_rng().gen_range(0..1000);
+        // Send the auth token in the url fragment #, which isn't logged by default.
+        // The auth token is a secret
+        PiiString::new(format!("{}?r={}#{}", base_url, r, token))
     }
 }
 

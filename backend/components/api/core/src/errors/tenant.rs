@@ -12,4 +12,9 @@ pub enum TenantError {
     NotIntegrationTestTenant,
     #[error("Cannot manually review a user with an incomplete onboarding")]
     CannotMakeDecision,
+
+    #[error("Incorrect entity kind for redoing KYC")]
+    IncorrectVaultKindForRedoKyc,
+    #[error("Cannot trigger KYC for non-portable vault")]
+    CannotTriggerKycForNonPortable,
 }

@@ -33,3 +33,6 @@ pub use list_timeline_request::*;
 
 mod identify;
 pub use identify::*;
+
+mod trigger_request;
+pub use trigger_request::*;

@@ -13,7 +13,6 @@ use db::models::business_owner::BusinessOwner;
 use db::models::tenant::Tenant;
 use futures::FutureExt;
 use newtypes::{BusinessOwnerKind, PiiString};
-use rand::Rng;
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 pub async fn send_secondary_bo_links(
@@ -64,23 +63,13 @@ pub async fn send_secondary_bo_links(
         primary_bo.first_name.leak(),
         primary_bo.last_name.leak()
     ));
-    // TODO we do this in a few places - we might want to support a more general header that the
-    // client sends to the backend specifying the environment of the frontend app
-    let base_url = if state.config.service_config.is_production() {
-        "https://verify.onefootprint.com"
-    } else if state.config.service_config.is_local() {
-        "http://localhost:3004"
-    } else {
-        "https://verify.preview.onefootprint.com"
-    };
-    let r = rand::thread_rng().gen_range(0..1000);
     let bo_sms_info = tokens
         .into_iter()
         .map(|(l_id, token)| -> ApiResult<_> {
             let bo_data = secondary_bos_from_vault
                 .get(&l_id)
                 .ok_or(BusinessError::BoNotFound)?;
-            let url = PiiString::new(format!("{}?r={}#{}", base_url, r, token));
+            let url = state.config.service_config.generate_verify_link(token);
             let sms = BoSessionSmsInfo {
                 destination: &bo_data.phone_number,
                 inviter: &inviter,

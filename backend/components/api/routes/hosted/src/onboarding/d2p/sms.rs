@@ -4,6 +4,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
 use api_core::auth::user::UserAuthGuard;
+use api_core::utils::vault_wrapper::Person;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -42,7 +43,7 @@ pub async fn handler(
                 // Otherwise, create a UVW that only sees portable data
                 VwArgs::Vault(user_auth.user_vault_id())
             };
-            let uvw = VaultWrapper::build(conn, args)?;
+            let uvw = VaultWrapper::<Person>::build(conn, args)?;
             Ok(uvw)
         })
         .await??;

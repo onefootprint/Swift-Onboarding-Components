@@ -1,10 +1,12 @@
-use super::{Business, Person, VaultWrapper};
+use super::{Business, VaultWrapper};
 use crate::enclave_client::EnclaveClient;
 use crate::errors::business::BusinessError;
+use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use crypto::aead::SealingKey;
 use db::models::business_owner::{BusinessOwner, UserData};
+use db::models::contact_info::ContactInfo;
 use db::models::document_data::DocumentData;
 use db::models::vault_data::VaultedData;
 use db::DbPool;
@@ -111,7 +113,7 @@ impl<Type> VaultWrapper<Type> {
 }
 
 // TODO should we gate these permissions somehow? Make access events in these?
-impl VaultWrapper<Person> {
+impl<Type> VaultWrapper<Type> {
     pub async fn decrypt_data_keys(
         &self,
         state: &State,
@@ -126,6 +128,23 @@ impl VaultWrapper<Person> {
     }
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
+        let phone_lifetime_id = self
+            .get(IDK::PhoneNumber)
+            .ok_or(ApiError::NoPhoneNumberForVault)?
+            .lifetime_id
+            .clone();
+        let ci = state
+            .db_pool
+            .db_query(move |conn| ContactInfo::get(conn, &phone_lifetime_id))
+            .await??;
+        if !ci.is_verified {
+            // Many of the communications we send out give either OTPs or links that allow authing
+            // as the user. So, we want to make sure a tenant can't update the user's phonen number
+            // and then send themselves OTPs. First, check that the phone number is verified to
+            // be owned by the user
+            return Err(UserError::PhoneNumberNotVerified.into());
+        }
+
         let e164 = self
             .decrypt_unchecked_single(&state.enclave_client, IDK::PhoneNumber.into())
             .await?

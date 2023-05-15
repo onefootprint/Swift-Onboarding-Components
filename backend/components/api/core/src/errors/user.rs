@@ -13,4 +13,6 @@ pub enum UserError {
     InvalidDataKind(IdentityDataKind),
     #[error("Cannot decrypt {0}")]
     CannotDecrypt(DataIdentifier),
+    #[error("Cannot send SMS communications to a phone number that isn't verified")]
+    PhoneNumberNotVerified,
 }

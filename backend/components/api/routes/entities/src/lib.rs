@@ -8,7 +8,8 @@ mod get;
 mod liveness;
 mod risk_signals;
 mod timeline;
-pub mod vault;
+mod trigger;
+mod vault;
 
 pub use get::list::parse_search;
 
@@ -25,5 +26,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(timeline::get)
         .service(risk_signals::get)
         .service(field_validations::get)
+        .service(trigger::post)
         .service(risk_signals::get_detail);
 }

@@ -5,6 +5,7 @@ use crate::{
     State,
 };
 use actix_web::http::StatusCode;
+use api_wire_types::TriggerKind;
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use newtypes::{PhoneNumber, PiiString};
@@ -174,6 +175,30 @@ impl TwilioClient {
 
         Ok(())
     }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn send_trigger<'a>(
+        &self,
+        state: &State,
+        destination: &PhoneNumber,
+        org_name: String,
+        kind: TriggerKind,
+        link: PiiString,
+    ) -> ApiResult<()> {
+        // TODO copy
+        let message_body = match kind {
+            TriggerKind::RedoKyc => PiiString::from(format!(
+                "Re-verify your identity for {} here: {}",
+                org_name,
+                link.leak()
+            )),
+        };
+
+        self.send_message(state, message_body, destination, rate_limit::DASHBOARD_TRIGGER)
+            .await?;
+
+        Ok(())
+    }
 }
 
 pub struct BoSessionSmsInfo<'a> {
@@ -198,6 +223,7 @@ mod rate_limit {
     use super::*;
 
     pub const BO_SESSION: &str = "bo_session";
+    pub const DASHBOARD_TRIGGER: &str = "dashboard_trigger";
     pub const D2P_LINK: &str = "d2p_session";
     pub const SMS_CHALLENGE: &str = "sms_challenge";
 

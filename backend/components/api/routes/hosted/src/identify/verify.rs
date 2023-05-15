@@ -171,8 +171,8 @@ fn onboarding_scopes(
     uv_id: &VaultId,
 ) -> ApiResult<Vec<Option<UserAuthScope>>> {
     let obc = ob_pk_auth.ob_config();
-    // Since only some codepaths above will create a SU, we need to always get_or_create
-    // a SU here
+    // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
+    // created with an ob config
     let uv = Vault::lock(conn, uv_id)?;
     let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
 
@@ -195,6 +195,7 @@ fn onboarding_scopes(
         None
     };
 
+    // todo share logic
     Ok(vec![
         Some(UserAuthScope::SignUp),
         Some(UserAuthScope::OrgOnboarding { id: su.id }),
