@@ -34,6 +34,9 @@ const TableFilter = ({
         onChangeText={handleChangeText}
         placeholder={placeholder}
         sx={{ width: '232px' }}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
         value={search}
       />
       {children}
