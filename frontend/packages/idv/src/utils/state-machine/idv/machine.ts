@@ -82,6 +82,12 @@ const createIdvMachine = (args: IdvMachineArgs) =>
     },
     {
       actions: {
+        resetContext: assign(context => ({
+          isTransfer: context.isTransfer,
+          obConfigAuth: context.obConfigAuth,
+          onClose: context.onClose,
+          onComplete: context.onComplete,
+        })),
         assignSandboxOutcome: assign((context, event) => ({
           ...context,
           sandboxSuffix: event.payload.sandboxSuffix,

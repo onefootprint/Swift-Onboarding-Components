@@ -7,7 +7,7 @@ export interface Typegen0 {
   };
   invokeSrcNameMap: {};
   missingImplementations: {
-    actions: 'resetContext';
+    actions: never;
     delays: never;
     guards: never;
     services: never;
