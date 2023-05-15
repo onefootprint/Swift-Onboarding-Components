@@ -1,6 +1,6 @@
-use db::PgConn;
+use db::{models::vault::Vault, PgConn};
 use itertools::Itertools;
-use newtypes::{ScopedVaultId, VaultId};
+use newtypes::{ScopedVaultId, VaultId, VaultKind};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthGuard, UserAuthScope};
@@ -22,10 +22,8 @@ use feature_flag::LaunchDarklyFeatureFlagClient;
 pub struct UserSession {
     pub user_vault_id: VaultId,
     pub scopes: Vec<UserAuthScope>,
+    // TODO Eventually might want to store auth methods to know if a token is generated from SMS, biometric, or via tenant trigger
 }
-
-// Allow calling SessionContext<T>::update for T=UserSession
-impl AllowSessionUpdate for UserSession {}
 
 impl UserSession {
     pub fn make(user_vault_id: VaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
@@ -34,8 +32,25 @@ impl UserSession {
             scopes,
         })
     }
+}
 
-    pub fn add_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
+#[derive(Debug, Clone)]
+pub struct UserSessionContext {
+    pub user: Vault,
+    pub scopes: Vec<UserAuthScope>,
+}
+
+impl UserAuth for UserSessionContext {
+    fn user_vault_id(&self) -> &VaultId {
+        &self.user.id
+    }
+}
+
+// Allow calling SessionContext<T>::update for T=UserSessionContext
+impl AllowSessionUpdate for UserSessionContext {}
+
+impl UserSessionContext {
+    pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
         let new_scope_kinds = new_scopes.iter().map(UserAuthGuard::from).collect_vec();
         let new_scopes = self.scopes
             .into_iter()
@@ -44,7 +59,7 @@ impl UserSession {
             // And replace it with the new scope
             .chain(new_scopes.into_iter())
             .collect();
-        Self::make(self.user_vault_id, new_scopes)
+        UserSession::make(self.user.id, new_scopes)
     }
 
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboarding` scope on this
@@ -60,12 +75,6 @@ impl UserSession {
     }
 }
 
-impl UserAuth for UserSession {
-    fn user_vault_id(&self) -> &VaultId {
-        &self.user_vault_id
-    }
-}
-
 /// Nests a private UserSession and implements traits required to extract this session from an
 /// actix request.
 /// Notably, this struct isn't very useful since the entire nested UserSession is hidden. If you
@@ -78,33 +87,44 @@ impl UserAuth for UserSession {
     name = "X-Fp-Authorization",
     description = "Auth token for user"
 )]
-pub struct ParsedUserSession(pub(super) UserSession);
+pub struct ParsedUserSessionContext(pub(super) UserSessionContext);
 
-impl ExtractableAuthSession for ParsedUserSession {
+impl ExtractableAuthSession for ParsedUserSessionContext {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Authorization"]
     }
 
     fn try_load_session(
         value: AuthSessionData,
-        _: &mut PgConn,
+        conn: &mut PgConn,
         _: LaunchDarklyFeatureFlagClient,
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
+                let vault = Vault::get(conn, &data.user_vault_id)?;
+                if !vault.is_portable {
+                    return Err(AuthError::NonPortableVault.into());
+                }
+                if vault.kind != VaultKind::Person {
+                    return Err(AuthError::NonPersonVault.into());
+                }
                 tracing::info!(user_vault_id=%data.user_vault_id, "user session authenticated");
-                Ok(ParsedUserSession(data))
+                let data = UserSessionContext {
+                    user: vault,
+                    scopes: data.scopes,
+                };
+                Ok(ParsedUserSessionContext(data))
             }
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }
 }
 
-/// A shorthand for the commonly used ParsedUserSession context
-pub type UserAuthContext = SessionContext<ParsedUserSession>;
+/// A shorthand for the commonly used ParsedUserSessionContext context
+pub type UserAuthContext = SessionContext<ParsedUserSessionContext>;
 
 /// A shorthand for the commonly used UserSession context
-pub type CheckedUserAuthContext = SessionContext<UserSession>;
+pub type CheckedUserAuthContext = SessionContext<UserSessionContext>;
 
 impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth

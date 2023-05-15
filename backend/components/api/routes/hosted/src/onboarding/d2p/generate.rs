@@ -27,7 +27,7 @@ pub async fn handler(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    if UserAuthGuard::Handoff.is_met(&user_auth.scopes) {
+    if UserAuthGuard::Handoff.is_met(&user_auth.data.scopes) {
         // Don't allow making a handoff token with an existing handoff token. This allows subverting
         // token expiry by constantly just making a new one
         return Err(AuthError::CannotCreateMultipleHandoffTokens.into());
@@ -37,7 +37,9 @@ pub async fn handler(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let expires_in = Duration::minutes(10);
-            let data = user_auth.data.add_scopes(vec![UserAuthScope::Handoff]);
+            let data = user_auth
+                .data
+                .session_with_added_scopes(vec![UserAuthScope::Handoff]);
             let auth_token = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status

@@ -9,6 +9,7 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
@@ -58,7 +59,7 @@ pub async fn post(
     let identifier = match (user_auth, identifier) {
         (Some(user_auth), None) => {
             let user_auth = user_auth.check_guard(Any)?;
-            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id.clone())
+            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
         }
         (None, Some(id)) => id.into(),
         (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),

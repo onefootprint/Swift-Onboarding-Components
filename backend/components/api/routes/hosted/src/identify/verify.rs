@@ -132,7 +132,7 @@ pub async fn post(
                 let data = user_auth
                     .data
                     .clone()
-                    .add_scopes(sensitive_scope.into_iter().collect());
+                    .session_with_added_scopes(sensitive_scope.into_iter().collect());
                 user_auth.update_session(conn, &session_key, data)?;
                 token
             } else {

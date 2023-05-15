@@ -49,4 +49,8 @@ pub enum AuthError {
     NotFirmEmployee,
     #[error("Not allowed: ob config doesn't require collecting business")]
     BusinessNotRequired,
+    #[error("Cannot log in as a non-portable vault")]
+    NonPortableVault,
+    #[error("Cannot log in as a non-person vault")]
+    NonPersonVault,
 }

@@ -6,8 +6,7 @@ use crate::utils::{self, file_upload};
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
-use api_core::auth::user::{UserAuth, UserObAuthContext};
-use db::models::vault::Vault;
+use api_core::auth::user::UserObAuthContext;
 use newtypes::{DataIdentifier, DocumentKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -26,12 +25,6 @@ pub async fn post(
 
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     utils::vault_wrapper::checks::pre_add_data_checks(&user_auth)?;
-    let uv_id = user_auth.user_vault_id().clone();
-    let uv = state
-        .db_pool
-        .db_query(move |conn| Vault::get(conn, &uv_id))
-        .await??;
-
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,
@@ -44,8 +37,8 @@ pub async fn post(
         &state,
         &file,
         kind,
-        &uv.public_key,
-        &uv.id,
+        &user_auth.user().public_key,
+        &user_auth.user().id,
         &user_auth.scoped_user.id,
     )
     .await?;

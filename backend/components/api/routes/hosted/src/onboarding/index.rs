@@ -123,7 +123,7 @@ pub async fn post(
                 };
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
                 let new_scope = UserAuthScope::Business(sb.id);
-                let data = user_auth.data.clone().add_scopes(vec![new_scope]);
+                let data = user_auth.data.clone().session_with_added_scopes(vec![new_scope]);
                 user_auth.update_session(conn, &session_key, data)?;
             }
 

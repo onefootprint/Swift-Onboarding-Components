@@ -5,6 +5,7 @@ use db::{
         onboarding::{Onboarding, OnboardingIdentifier},
         scoped_vault::ScopedVault,
         tenant::Tenant,
+        vault::Vault,
     },
     PgConn,
 };
@@ -21,14 +22,14 @@ use crate::{
     ApiError,
 };
 
-use super::{ParsedUserSession, UserAuthScope, UserSession};
+use super::{ParsedUserSessionContext, UserAuthScope, UserSessionContext};
 
 /// A wrapper around UserSession that can only be extracted when the auth token is for an active
 /// onboarding session linked to a scoped user.
 /// We preload information for the scoped vault and onboarding that is commonly used by HTTP handlers
 #[derive(Debug, Clone)]
 pub struct UserObSession {
-    user_session: UserSession,
+    user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
     onboarding: Option<Onboarding>,
     ob_config: Option<ObConfiguration>,
@@ -56,16 +57,16 @@ impl ExtractableAuthSession for ParsedUserObSession {
     ) -> Result<Self, ApiError> {
         // Since this is derived from a user session, we just grab all the user info
         let user_session =
-            <ParsedUserSession as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
+            <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
         let Some(scoped_user_id) = user_session.scoped_user_id() else {
             return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
         };
 
         // Confirm that the onboarding in the auth token belongs to the user
-        let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user_vault_id))?;
+        let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
-        let ob = Onboarding::get(conn, (&scoped_user_id, &user_session.user_vault_id));
+        let ob = Onboarding::get(conn, (&scoped_user_id, &user_session.user.id));
         let onboarding = match ob {
             Ok((onboarding, _, _, _)) => Ok(Some(onboarding)),
             Err(e) => {
@@ -169,10 +170,14 @@ impl UserObSession {
         let tenant = self.tenant.as_ref().ok_or(OnboardingError::NoOnboarding)?;
         Ok(tenant)
     }
+
+    pub fn user(&self) -> &Vault {
+        &self.user_session.user
+    }
 }
 
 impl UserAuth for UserObSession {
     fn user_vault_id(&self) -> &VaultId {
-        &self.user_session.user_vault_id
+        self.user_session.user_vault_id()
     }
 }

@@ -62,6 +62,8 @@ pub async fn post(
                     let scopes = vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboarding { id: sv.id }];
                     let duration = Duration::days(1);
                     (scopes, duration)
+
+                    // TODO make a timeline event?
                 }
             };
             let data = UserSession::make(sv.vault_id, scopes);

@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::auth::user::UserAuthGuard;
+use api_core::auth::user::{UserAuth, UserAuthGuard};
 use db::access_event::AccessEventListItemForUser;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -23,7 +23,7 @@ pub async fn get(
     let user_auth = user_auth.check_guard(UserAuthGuard::BasicProfile)?;
 
     // TODO paginate the response when there are too many results
-    let results = AccessEventListItemForUser::get(&state.db_pool, user_auth.data.user_vault_id)
+    let results = AccessEventListItemForUser::get(&state.db_pool, user_auth.user_vault_id().clone())
         .await?
         .into_iter()
         .map(api_wire_types::AccessEvent::from_db)
