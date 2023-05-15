@@ -77,7 +77,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/kyc-with-pii/getting-started',
+        destination: '/kyc/getting-started',
         permanent: true,
       },
     ];

@@ -15,11 +15,18 @@ use newtypes::put_data_request::RawDataRequest;
 use newtypes::{AccessEventKind, FpId, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
-#[route_alias(actix::post(
-    "/users/{footprint_user_id}/vault/validate",
-    tags(Users, Vault, PublicApi),
-    description = "Checks if provided data is valid before adding it to the vault."
-))]
+#[route_alias(
+    actix::post(
+        "/users/{footprint_user_id}/vault/validate",
+        tags(Users, Vault, PublicApi),
+        description = "Checks if provided data is valid before adding it to the vault."
+    ),
+    actix::post(
+        "/businesses/{footprint_biz_id}/vault/validate",
+        tags(Businesses, Vault, PublicApi),
+        description = "Checks if provided data is valid before adding it to the vault."
+    )
+)]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
     tags(Vault, Entities, Preview)
@@ -55,11 +62,18 @@ pub async fn post_validate(
     EmptyResponse::ok().json()
 }
 
-#[route_alias(actix::patch(
-    "/users/{fp_id}/vault",
-    description = "Updates data in a user vault.",
-    tags(Users, Vault, PublicApi)
-))]
+#[route_alias(
+    actix::patch(
+        "/users/{fp_id}/vault",
+        description = "Updates data in a user vault.",
+        tags(Users, Vault, PublicApi)
+    ),
+    actix::patch(
+        "/businesses/{fp_id}/vault",
+        description = "Updates data in a business vault.",
+        tags(Businesses, Vault, PublicApi)
+    )
+)]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault.",
     tags(Entities, Vault, Preview)

@@ -8,7 +8,7 @@ use crate::State;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
-use api_wire_types::{EntityValidateResponse, LegacyValidateResponse, ValidateRequest};
+use api_wire_types::{EntityValidateResponse, ValidateRequest, ValidateResponse};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{BasicOnboardingInfo, Onboarding, OnboardingIdentifier};
 use newtypes::DataIdentifierDiscriminant;
@@ -23,7 +23,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<LegacyValidateResponse> {
+) -> JsonApiResponse<ValidateResponse> {
     let session = AuthSession::get(&state, &request.validation_token)
         .await?
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
@@ -85,7 +85,7 @@ pub async fn post(
     let user = validate_and_serialize(user_ob)?;
     let business = business_ob.map(validate_and_serialize).transpose()?;
 
-    let response = LegacyValidateResponse {
+    let response = ValidateResponse {
         user,
         business,
         footprint_user_id,

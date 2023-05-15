@@ -1,25 +1,31 @@
 ---
-page: KYC + PII Vault
-category: KYC + PII Vault
-title: Use the PII Vault
-slug: /kyc-with-pii/vaulting-apis
-position: 4
-meta:
-  {
-    title: KYC + PII Vault - Standalone Vaulting APIs,
-    description: Footprint's PII vaulting APIs work seamlessly with and without our KYC APIs,
-  }
+page: default
+category: Guides
+title: Vault PII, PCI, and more
+slug: /vault/apis
+position: 3
+meta: { title: 'Vault identity,
+      payment cards,
+      and anything sensitive', description: Footprint's vaulting APIs work seamlessly with and without our onboarding components }
 ---
 
-## Setup and authentication
+Footprint vaults store three types of data: identity data, payment card data, and custom key-value data.
+
+### Identity
+
+Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable. Identity vaults can also be standalone and provisioned via API or vault-proxy, which can be useful when migrating sensitive user data. Regardless of origination, the APIs are identical to provide unified secure PII vaulting. PII reserves the namespace of vault data identifiers prefixed with `id.`
+
+### Payment Cards
+
+In many financial applications, it's required to collect or store payment card data associated with users that your onboard (KYC or not). Footprint provides a PCI-compliant vaulting solution for payment card holder data like: card number, expiration authorization/security code (CVV), and more. The payment card vaulting APIs are consistent with all Footprint vaulting APIs and reserve a specific namespace of vault data identifiers: `card.`. Unlike identity data, users may have multiple cards, so you can give each card type an alias namespace such as `card.primary.`. Like identity data, card data is validated prior to vaulting.
+
+### Custom Key-Value
+
+Footprint also supports custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests. You can use custom data to **securely vault** any associated sensitive user or businesses in the vault using a unified vaulting API.
+
+### Setup and authentication
 
 Please ensure you are familiar with our [server-side API authentication guide](/kyc-with-pii/api-auth) to securely connect to the Footprint API from your backend.
-
-## Vault custom data
-
-Footprint user vaults store two types of data: identity data and custom key-values. Identity data comes from user onboardings is verified with our verification and decisioning platform. Identity data is comprised of first-class attributes that are validated, vaulted, tokenized, and in some cases fingerprinted to make searchable.
-
-Footprint also supports custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests. You can use custom data to **securely vault** any associated PII information on your users using our simple APIs.
 
 ### Update a user vault
 
@@ -29,7 +35,8 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
 			"custom.ach_account": "111122224444",
-			"custom.cc4": "4242"
+			"card.primary.expiration": "10/2025",
+			"card.primary.cvc": "424"
 		}'
 ```
 
@@ -38,14 +45,15 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 Check what fields exist on a user's vault.
 
 ```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=id.ssn9,custom.ach_account \
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=id.ssn9,custom.ach_account,card.primary.number \
   	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
 
 ```json
 {
   "id.ssn9": true,
-  "custom.ach_account": true
+  "custom.ach_account": true,
+  "card.primary.number": true
 }
 ```
 
@@ -111,7 +119,7 @@ curl https://api.onefootprint.com/users \
 		    "id.last_name": "Joe",
 		    "id.dob": "1988-12-30",
 			"id.ssn9": "12-121-1212",
-			"custom.cc4": "4242"
+			"custom.ach_account": "111122224444"
 		}' \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```

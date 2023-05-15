@@ -28,11 +28,18 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
 );
 
-#[route_alias(actix::get(
-    "/users/{footprint_user_id}/vault",
-    description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
-    tags(Users, Vault, PublicApi)
-))]
+#[route_alias(
+    actix::get(
+        "/users/{footprint_user_id}/vault",
+        description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
+        tags(Users, Vault, PublicApi)
+    ),
+    actix::get(
+        "/businesses/{footprint_biz_id}/vault",
+        description = "Given a list of fields, checks for their existence in the business vault without decrypting them.",
+        tags(Businesses, Vault, PublicApi)
+    )
+)]
 #[api_v2_operation(
     description = "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",
     tags(Vault, Entities, Preview)

@@ -1,22 +1,22 @@
 ---
-page: KYC + PII Vault
-slug: /kyc-with-pii/getting-started
-category: KYC + PII Vault
-title: Getting started
+page: default
+slug: /kyc/getting-started
+category: Guides
+title: Know Your Customer (KYC)
 position: 1
 meta:
   {
-    title: KYC + PII Vault - Getting started,
+    title: Footprint KYC - Getting started,
     description: Getting started with KYC and PII Vault,
   }
 ---
 
 ## Add Footprint.js to your app
 
-1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and create a new `Onboarding configuration`
+1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and create a new `Onboarding configuration` of type "KYC".
 
-   - Select the “standard” list of IDV fields to collect or customize the fields.
-   - Select the “standard” list of IDV fields you require access to decrypt.
+   - Select the Identity fields to collect or customize the fields.
+   - Select the Identity fields you require access to decrypt.
 
 2. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
@@ -51,7 +51,7 @@ yarn add @onefootprint/footprint-js
 4. Embed the Footprint button.
 
 ```html
-<div id="footprint-button" data-public-key="pk_test_yflLnFW219f9bC0pdyGd"></div>
+<div id="footprint-button" data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"></div>
 ```
 
 5. Add your Footprint completion handler
