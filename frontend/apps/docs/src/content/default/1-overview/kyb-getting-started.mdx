@@ -51,7 +51,10 @@ yarn add @onefootprint/footprint-js
 4. Embed the Footprint button.
 
 ```html
-<div id="footprint-button" data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"></div>
+<div
+  id="footprint-button"
+  data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"
+></div>
 ```
 
 5. Add your Footprint completion handler
@@ -119,8 +122,9 @@ for both the primary beneficial owner of the business (the user who submitted th
 ```
 
 <inline-alert variant="info">
-  Save both `fp_id`s in your database tied to the user and business. These are the
-  identifiers you will send to request any user- or business-specific information.
+  Save both `fp_id`s in your database tied to the user and business. These are
+  the identifiers you will send to request any user- or business-specific
+  information.
 </inline-alert>
 
 ### Check the onboarding decision status
