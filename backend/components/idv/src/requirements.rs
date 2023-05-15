@@ -85,6 +85,8 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IncodeAddBack => false,
         VendorAPI::IncodeProcessId => false,
         VendorAPI::IncodeFetchScores => false,
+        VendorAPI::IncodeAddPrivacyConsent => false,
+        VendorAPI::IncodeAddMLConsent => false,
     }
 }
 
@@ -116,6 +118,8 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::IncodeAddBack => false,
         VendorAPI::IncodeProcessId => false,
         VendorAPI::IncodeFetchScores => false,
+        VendorAPI::IncodeAddPrivacyConsent => false,
+        VendorAPI::IncodeAddMLConsent => false,
     }
 }
 

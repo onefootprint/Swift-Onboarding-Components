@@ -1,0 +1,2 @@
+ALTER TABLE incode_verification_session DROP COLUMN latest_failure_reason;
+ALTER TABLE incode_verification_session_event DROP COLUMN latest_failure_reason;

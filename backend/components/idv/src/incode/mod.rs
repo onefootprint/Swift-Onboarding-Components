@@ -35,6 +35,17 @@ pub struct IncodeFetchScoresRequest {
     pub credentials: IncodeCredentialsWithToken,
 }
 
+pub struct IncodeAddPrivacyConsentRequest {
+    pub credentials: IncodeCredentialsWithToken,
+    pub title: String,
+    pub content: String,
+}
+
+pub struct IncodeAddMLConsentRequest {
+    pub credentials: IncodeCredentialsWithToken,
+    pub status: bool,
+}
+
 /// Trait that an API Response uses to convert to an API error
 /// response that is in the incode API response
 pub trait APIResponseToIncodeError {

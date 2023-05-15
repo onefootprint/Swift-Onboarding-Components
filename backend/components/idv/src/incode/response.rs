@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::incode::error::Error as IncodeError;
 use newtypes::{
-    incode::{IncodeAddSideFailureReason, IncodeStatus, IncodeTest},
-    PiiString,
+    incode::{IncodeStatus, IncodeTest},
+    IncodeVerificationFailureReason, PiiString,
 };
 
 use super::APIResponseToIncodeError;
@@ -90,10 +90,10 @@ pub struct AddSideResponse {
 
 impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
-    pub fn add_side_failure_reason(&self) -> Option<IncodeAddSideFailureReason> {
+    pub fn add_side_failure_reason(&self) -> Option<IncodeVerificationFailureReason> {
         self.fail_reason.as_ref().map(|e| {
-            IncodeAddSideFailureReason::try_from(e.as_str())
-                .unwrap_or(IncodeAddSideFailureReason::Other(e.clone()))
+            IncodeVerificationFailureReason::try_from(e.as_str())
+                .unwrap_or(IncodeVerificationFailureReason::Other(e.clone()))
         })
     }
 }
@@ -213,9 +213,26 @@ impl APIResponseToIncodeError for FetchScoresResponse {
     }
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddConsentResponse {
+    pub success: bool,
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl APIResponseToIncodeError for AddConsentResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use newtypes::incode::{IncodeAddSideFailureReason, IncodeStatus, IncodeTest};
+    use newtypes::{
+        incode::{IncodeStatus, IncodeTest},
+        IncodeVerificationFailureReason,
+    };
 
     use super::{AddSideResponse, FetchScoresResponse};
 
@@ -286,7 +303,7 @@ mod tests {
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
         let failure = parsed.add_side_failure_reason().unwrap();
-        assert_eq!(failure, IncodeAddSideFailureReason::WrongDocumentSide);
+        assert_eq!(failure, IncodeVerificationFailureReason::WrongDocumentSide);
 
         // No failure
         let raw_response = serde_json::json!({

@@ -226,6 +226,20 @@ impl Onboarding {
         Ok(result)
     }
 
+    // Generally we need to query by scoped vault AND user vault in authed endpoints,
+    // to prove ownership, so this is broken out
+    #[tracing::instrument(skip_all)]
+    pub fn get_by_scoped_vault_internal_lookup_only(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Self> {
+        let res = onboarding::table
+            .filter(onboarding::scoped_vault_id.eq(scoped_vault_id))
+            .get_result(conn)?;
+
+        Ok(res)
+    }
+
     #[tracing::instrument(skip_all)]
     pub fn lock_for_tenant(
         conn: &mut TxnPgConn,

@@ -2,7 +2,8 @@ use chrono::{DateTime, Duration, Utc};
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId,
-    IncodeVerificationSessionId, IncodeVerificationSessionState, ScopedVaultId,
+    IncodeVerificationFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionState,
+    ScopedVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -30,6 +31,7 @@ pub struct IncodeVerificationSession {
     pub identity_document_id: IdentityDocumentId,
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
+    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -51,6 +53,7 @@ pub struct UpdateIncodeVerificationSession {
     pub identity_document_id: Option<IdentityDocumentId>,
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
+    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
 }
 
 impl UpdateIncodeVerificationSession {
@@ -58,6 +61,14 @@ impl UpdateIncodeVerificationSession {
         Self {
             state: Some(state),
             completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
+            latest_failure_reason: None,
+            ..Self::default()
+        }
+    }
+    pub fn set_state_to_retry_with_failure_reason(failure_reason: IncodeVerificationFailureReason) -> Self {
+        Self {
+            latest_failure_reason: Some(failure_reason),
+            state: Some(IncodeVerificationSessionState::RetryUpload),
             ..Self::default()
         }
     }
@@ -70,6 +81,7 @@ impl UpdateIncodeVerificationSession {
             state: Some(state),
             completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
             identity_document_id: Some(identity_document_id),
+            latest_failure_reason: None,
             ..Self::default()
         }
     }
@@ -116,6 +128,7 @@ impl IncodeVerificationSession {
             res.id.clone(),
             res.state,
             res.identity_document_id.clone(),
+            None,
         )?;
 
         Ok(res)
@@ -155,6 +168,7 @@ impl IncodeVerificationSession {
             res.id.clone(),
             res.state,
             res.identity_document_id.clone(),
+            res.latest_failure_reason.clone(),
         )?;
 
         Ok(res)

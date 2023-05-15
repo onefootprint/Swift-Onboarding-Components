@@ -87,6 +87,8 @@ impl KycFeatureVector {
             VendorAPI::IncodeAddBack => None,
             VendorAPI::IncodeProcessId => None,
             VendorAPI::IncodeFetchScores => None,
+            VendorAPI::IncodeAddPrivacyConsent => None,
+            VendorAPI::IncodeAddMLConsent => None,
         }
     }
 

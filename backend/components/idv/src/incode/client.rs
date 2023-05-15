@@ -7,7 +7,8 @@ use reqwest::header;
 
 use super::{
     request::{
-        AddDocumentSideRequest, DocumentSide, OnboardingStartCustomNameFields, OnboardingStartRequest,
+        AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, DocumentSide,
+        OnboardingStartCustomNameFields, OnboardingStartRequest,
     },
     response::OnboardingStartResponse,
     IncodeAPIResult,
@@ -168,6 +169,51 @@ impl AuthenticatedIncodeClientAdapter {
             .client
             .post(url)
             .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn add_privacy_consent(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        title: String,
+        content: String,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/add/user-consent")?;
+        let request = AddPrivacyConsent::new(title, content);
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
+    pub async fn add_ml_consent(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        status: bool,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/add/ml-consent")?;
+        let request: AddMLConsent = AddMLConsent { status };
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .json(&request)
             .send()
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?

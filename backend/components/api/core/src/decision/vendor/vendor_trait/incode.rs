@@ -5,9 +5,13 @@ use idv::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
         error::Error as IncodeError,
         request::DocumentSide,
-        response::{AddSideResponse, FetchScoresResponse, OnboardingStartResponse, ProcessIdResponse},
-        IncodeAPIResult, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeFetchScoresRequest,
-        IncodeProcessIdRequest, IncodeResponse, IncodeStartOnboardingRequest,
+        response::{
+            AddConsentResponse, AddSideResponse, FetchScoresResponse, OnboardingStartResponse,
+            ProcessIdResponse,
+        },
+        IncodeAPIResult, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
+        IncodeAddPrivacyConsentRequest, IncodeFetchScoresRequest, IncodeProcessIdRequest, IncodeResponse,
+        IncodeStartOnboardingRequest,
     },
     ParsedResponse,
 };
@@ -193,6 +197,73 @@ impl VendorAPIResponse for IncodeResponse<FetchScoresResponse> {
     fn vendor_api(self) -> newtypes::VendorAPI {
         // this isn't correct
         VendorAPI::IncodeFetchScores
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response.into()
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+//
+// Consent
+//
+#[async_trait]
+impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeAddPrivacyConsentRequest,
+    ) -> Result<IncodeResponse<AddConsentResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client
+            .add_privacy_consent(self, request.title, request.content)
+            .await?;
+        let result = IncodeResponse::<AddConsentResponse> {
+            result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
+            raw_response,
+        };
+
+        Ok(result)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeAddMLConsentRequest,
+    ) -> Result<IncodeResponse<AddConsentResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client.add_ml_consent(self, request.status).await?;
+        let result = IncodeResponse::<AddConsentResponse> {
+            result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
+            raw_response,
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        // this isn't correct
+        VendorAPI::IncodeAddPrivacyConsent
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {

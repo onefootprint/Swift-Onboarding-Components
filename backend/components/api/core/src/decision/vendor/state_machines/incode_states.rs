@@ -26,7 +26,9 @@ use super::incode_state_machine::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 
 pub mod state_impl {
-    use newtypes::incode::IncodeAddSideFailureReason;
+    use db::models::user_consent::UserConsent;
+    use idv::incode::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
+    use newtypes::IncodeVerificationFailureReason;
 
     use super::*;
 
@@ -120,34 +122,147 @@ pub mod state_impl {
                     authentication_token: successful_response.token.clone(),
                 },
             };
-            let id_doc_id = self.identity_document_id.clone();
 
             // Save the next stage's Vreq
+            let (consent, privacy_vreq, ml_vreq) = db_pool
+                .db_transaction(
+                    move |conn| -> ApiResult<(UserConsent, VerificationRequest, VerificationRequest)> {
+                        // Update our state to the next stage
+                        let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
+                            IncodeVerificationSessionState::AddConsent,
+                            IncodeSessionId::from(successful_response.interview_id),
+                            IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
+                        );
+
+                        IncodeVerificationSession::update(conn, verification_session.id, update)?;
+
+                        // we need consent in order to proceed, so we error
+                        let consent = UserConsent::latest_for_scoped_vault(conn, &sv_id2)?
+                            .ok_or(ApiError::AssertionError("User consent not found".into()))?;
+
+                        let privacy_vreq = VerificationRequest::create(
+                            conn,
+                            &sv_id2,
+                            &di_id2,
+                            VendorAPI::IncodeAddPrivacyConsent,
+                        )?;
+
+                        let ml_vreq = VerificationRequest::create(
+                            conn,
+                            &sv_id2,
+                            &di_id2,
+                            VendorAPI::IncodeAddMLConsent,
+                        )?;
+
+                        Ok((consent, privacy_vreq, ml_vreq))
+                    },
+                )
+                .await?;
+            // If we don't have consent, we can't proceed
+
+            Ok(AddConsent {
+                session,
+                user_consent_text: consent.consent_language_text,
+                scoped_vault_id: self.scoped_vault_id.clone(),
+                decision_intent_id: self.decision_intent_id.clone(),
+                identity_document_id: self.identity_document_id.clone(),
+                privacy_vreq,
+                ml_vreq,
+            }
+            .into())
+        }
+    }
+
+    /// Add Consent
+    pub struct AddConsent {
+        pub session: VerificationSession,
+        pub user_consent_text: String,
+        pub privacy_vreq: VerificationRequest,
+        pub ml_vreq: VerificationRequest,
+        pub scoped_vault_id: ScopedVaultId,
+        pub decision_intent_id: DecisionIntentId,
+        pub identity_document_id: IdentityDocumentId,
+    }
+
+    #[async_trait]
+    impl IncodeStateTransition for AddConsent {
+        async fn run(
+            &self,
+            db_pool: &DbPool,
+            footprint_http_client: &FootprintVendorHttpClient,
+            uv_public_key: VaultPublicKey,
+            _docv_data: &DocVData,
+        ) -> Result<IncodeState, ApiError> {
+            let sv_id = self.scoped_vault_id.clone();
+            let di_id = self.decision_intent_id.clone();
+            let id_doc_id = self.identity_document_id.clone();
+
+            let privacy_request = IncodeAddPrivacyConsentRequest {
+                credentials: self.session.credentials.clone(),
+                title: "Service Consent".into(),
+                content: self.user_consent_text.to_owned(),
+            };
+            // TODO this should be separated out from privacy in bifrost
+            let ml_request = IncodeAddMLConsentRequest {
+                credentials: self.session.credentials.clone(),
+                status: true,
+            };
+
+            let privacy_request_result = footprint_http_client.make_request(privacy_request).await;
+            let ml_request_result = footprint_http_client.make_request(ml_request).await;
+
+            //
+            // Save our result
+            //
+            let save_privacy_verification_result_args =
+                SaveVerificationResultArgs::from((&privacy_request_result, self.privacy_vreq.id.clone()));
+            let save_ml_verification_result_args =
+                SaveVerificationResultArgs::from((&ml_request_result, self.ml_vreq.id.clone()));
+
+            save_incode_verification_result(db_pool, save_privacy_verification_result_args, &uv_public_key)
+                .await?;
+            save_incode_verification_result(db_pool, save_ml_verification_result_args, &uv_public_key)
+                .await?;
+
+            // Now ensure we don't have an error
+            privacy_request_result
+                .map_err(map_to_api_err)?
+                .result
+                .into_success()
+                .map_err(map_to_api_err)?;
+
+            ml_request_result
+                .map_err(map_to_api_err)?
+                .result
+                .into_success()
+                .map_err(map_to_api_err)?;
+
+            //
+            // Set up the next state transition
+            //
+            // Save the next stage's Vreq
+            let verification_session_id = self.session.id.clone();
             let add_front_vreq = db_pool
                 .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                     let res = VerificationRequest::create_document_verification_request(
                         conn,
                         VendorAPI::IncodeAddFront,
-                        sv_id2,
+                        sv_id,
                         id_doc_id,
-                        &di_id2,
+                        &di_id,
                     )?;
 
-                    // Update our state to the next stage
-                    let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
-                        IncodeVerificationSessionState::AddFront,
-                        IncodeSessionId::from(successful_response.interview_id),
-                        IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
-                    );
+                    let update =
+                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddFront);
 
-                    IncodeVerificationSession::update(conn, verification_session.id, update)?;
+                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
                     Ok(res)
                 })
                 .await?;
 
             Ok(AddFront {
-                session,
+                session: self.session.to_owned(),
                 scoped_vault_id: self.scoped_vault_id.clone(),
                 decision_intent_id: self.decision_intent_id.clone(),
                 add_front_verification_request: add_front_vreq,
@@ -220,11 +335,9 @@ pub mod state_impl {
             let add_back_vreq = db_pool
                 .db_transaction(move |conn| -> ApiResult<Option<VerificationRequest>> {
                     // If there's failure, we move to retry upload
-                    // TODO: notate reason on incode session
-                    let vreq = if let Some(_reason) = failure_reason {
-                        let update = UpdateIncodeVerificationSession::set_state(
-                            IncodeVerificationSessionState::RetryUpload,
-                        );
+                    let vreq = if let Some(reason) = failure_reason {
+                        let update =
+                            UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
 
                         IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
@@ -324,12 +437,13 @@ pub mod state_impl {
                 .map_err(map_to_api_err)?;
 
             // Incode returns 200 for upload failures, so catch these here
-            let failure_reason = response.add_side_failure_reason();
-            let is_failure = if let Some(reason) = failure_reason {
-                reason != IncodeAddSideFailureReason::WrongOneSidedDocument
-            } else {
-                false
-            };
+            let failure_reason = response.add_side_failure_reason().and_then(|r| {
+                if r != IncodeVerificationFailureReason::WrongOneSidedDocument {
+                    Some(r)
+                } else {
+                    None
+                }
+            });
 
             //
             // Set up the next state transition
@@ -339,12 +453,9 @@ pub mod state_impl {
             let process_id_vreq = db_pool
                 .db_transaction(move |conn| -> ApiResult<Option<VerificationRequest>> {
                     // If there's failure, we move to retry upload
-                    // TODO: notate reason on incode session
-                    let vreq = if is_failure {
-                        let update = UpdateIncodeVerificationSession::set_state(
-                            IncodeVerificationSessionState::RetryUpload,
-                        );
-
+                    let vreq = if let Some(reason) = failure_reason {
+                        let update =
+                            UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
                         IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
                         None

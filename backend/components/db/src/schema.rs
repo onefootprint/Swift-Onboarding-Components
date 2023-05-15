@@ -266,6 +266,7 @@ table! {
         identity_document_id -> Text,
         state -> Text,
         completed_at -> Nullable<Timestamptz>,
+        latest_failure_reason -> Nullable<Text>,
     }
 }
 
@@ -281,6 +282,7 @@ table! {
         incode_verification_session_id -> Text,
         incode_verification_session_state -> Text,
         identity_document_id -> Text,
+        latest_failure_reason -> Nullable<Text>,
     }
 }
 

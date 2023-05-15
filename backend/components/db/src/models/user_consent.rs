@@ -1,9 +1,12 @@
+use crate::schema::onboarding;
+use crate::schema::scoped_vault;
 use crate::schema::user_consent;
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::ScopedVaultId;
 use newtypes::{InsightEventId, OnboardingId, UserConsentId};
 use serde::{Deserialize, Serialize};
 
@@ -59,6 +62,22 @@ impl UserConsent {
         let res = user_consent::table
             .filter(user_consent::onboarding_id.eq(onboarding_id))
             .order_by(user_consent::timestamp.desc())
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn latest_for_scoped_vault(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Option<UserConsent>> {
+        let res = scoped_vault::table
+            .filter(scoped_vault::id.eq(scoped_vault_id))
+            .inner_join(onboarding::table.inner_join(user_consent::table))
+            .order_by(user_consent::timestamp.desc())
+            .select(user_consent::all_columns)
             .first(conn)
             .optional()?;
 

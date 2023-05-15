@@ -36,6 +36,7 @@ pub trait IncodeStateTransition {
 #[enum_dispatch(IncodeStateTransition)]
 pub enum IncodeState {
     StartOnboarding,
+    AddConsent,
     AddFront,
     AddBack,
     RetryUpload,
@@ -49,6 +50,7 @@ impl IncodeState {
         match self {
             IncodeState::StartOnboarding(_) => IncodeVerificationSessionState::StartOnboarding,
             IncodeState::AddFront(_) => IncodeVerificationSessionState::AddFront,
+            IncodeState::AddConsent(_) => IncodeVerificationSessionState::AddConsent,
             IncodeState::AddBack(_) => IncodeVerificationSessionState::AddBack,
             IncodeState::RetryUpload(_) => IncodeVerificationSessionState::RetryUpload,
             IncodeState::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
@@ -194,12 +196,14 @@ impl IncodeStateMachine {
 
 #[cfg(test)]
 mod tests {
+    use chrono::Utc;
     use db::{
         models::{
             document_request::{DocumentRequest, DocumentRequestUpdate},
             identity_document::IdentityDocument,
             incode_verification_session::IncodeVerificationSession,
             incode_verification_session_event::IncodeVerificationSessionEvent,
+            user_consent::UserConsent,
             verification_request::VerificationRequest,
         },
         test_helpers::{assert_have_same_elements, test_db_pool},
@@ -211,8 +215,8 @@ mod tests {
     };
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
-        DocVData, DocumentRequestStatus, IdDocKind, IncodeConfigurationId, IncodeVerificationSessionState,
-        PiiString, VendorAPI,
+        vendor_apis_from_vendor, DocVData, DocumentRequestStatus, IdDocKind, IncodeConfigurationId,
+        IncodeVerificationSessionState, PiiString, Vendor, VendorAPI,
     };
 
     use super::IncodeState;
@@ -235,7 +239,7 @@ mod tests {
         let state = &StateWithMockEnclave::init().await.state;
         let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
-        let (tenant, _, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+        let (tenant, ob, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
         let suid = su.id.clone();
         let suid2 = su.id.clone();
 
@@ -255,7 +259,13 @@ mod tests {
         let id_doc = db_pool
             .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
                 let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
-
+                UserConsent::create(
+                    conn,
+                    Utc::now(),
+                    ob.id,
+                    ob.insight_event_id,
+                    "I, Bob Boberto, consent to NOTHING".into(),
+                )?;
                 Ok(db::tests::fixtures::identity_document::create(
                     conn,
                     Some(doc_request.id),
@@ -294,11 +304,22 @@ mod tests {
 
         db_pool
             .db_transaction(move |conn| -> Result<_, DbError> {
-                let (_, score_vres, _) =
-                    VerificationRequest::list_successful_by_decision_intent_id(conn, &di.id)?
-                        .into_iter()
-                        .find(|(req, _, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
-                        .unwrap();
+                let db_verifications =
+                    VerificationRequest::list_successful_by_decision_intent_id(conn, &di.id)?;
+
+                // Assert we've made all the requests we expect
+                assert_have_same_elements(
+                    db_verifications
+                        .iter()
+                        .filter_map(|(req, res, _)| res.as_ref().map(|_| req.vendor_api))
+                        .collect(),
+                    vendor_apis_from_vendor(Vendor::Incode),
+                );
+
+                let (_, score_vres, _) = db_verifications
+                    .into_iter()
+                    .find(|(req, _, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
+                    .unwrap();
 
                 let incode_verification_session = IncodeVerificationSession::get(conn, &suid2)?.unwrap();
                 let incode_events = IncodeVerificationSessionEvent::get_for_session_id(
@@ -310,7 +331,9 @@ mod tests {
                         .into_iter()
                         .map(|i| i.incode_verification_session_state)
                         .collect(),
-                    IncodeVerificationSessionState::iter().collect(),
+                    IncodeVerificationSessionState::iter()
+                        .filter(|s| s != &IncodeVerificationSessionState::RetryUpload)
+                        .collect(),
                 );
 
                 let score_result =
@@ -353,7 +376,7 @@ mod tests {
         let state = &StateWithMockEnclave::init().await.state;
         let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
-        let (tenant, _, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+        let (tenant, ob, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
         let suid = su.id.clone();
         let suid2 = su.id.clone();
         let suid3 = su.id.clone();
@@ -375,6 +398,13 @@ mod tests {
             .db_transaction(
                 move |conn| -> Result<(IdentityDocument, DocumentRequest), DbError> {
                     let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
+                    UserConsent::create(
+                        conn,
+                        Utc::now(),
+                        ob.id,
+                        ob.insight_event_id,
+                        "I, Bob Boberto, consent to NOTHING".into(),
+                    )?;
 
                     Ok((
                         db::tests::fixtures::identity_document::create(conn, Some(doc_request.id.clone())),
@@ -413,10 +443,22 @@ mod tests {
             .unwrap()
             .state;
 
-        match after_running_with_blurry_state {
-            IncodeState::RetryUpload(_) => (),
+        let session_id = match after_running_with_blurry_state {
+            IncodeState::RetryUpload(r) => r.session.id,
             _ => panic!("state machine finished in wrong state!"),
-        }
+        };
+
+        // Check we have the right things in the state db
+        db_pool
+            .db_query(move |conn| {
+                let session = IncodeVerificationSession::get(conn, &session_id)
+                    .unwrap()
+                    .unwrap();
+
+                assert!(session.latest_failure_reason.is_some())
+            })
+            .await
+            .unwrap();
 
         //
         // Now, simulate retrying with non-blurry
@@ -497,6 +539,7 @@ mod tests {
                         .collect(),
                     vec![
                         IncodeVerificationSessionState::StartOnboarding,
+                        IncodeVerificationSessionState::AddConsent,
                         IncodeVerificationSessionState::AddFront,
                         IncodeVerificationSessionState::RetryUpload,
                         IncodeVerificationSessionState::AddFront,

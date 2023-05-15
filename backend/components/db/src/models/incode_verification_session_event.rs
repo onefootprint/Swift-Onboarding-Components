@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{
-    IdentityDocumentId, IncodeVerificationSessionEventId, IncodeVerificationSessionId,
-    IncodeVerificationSessionState,
+    IdentityDocumentId, IncodeVerificationFailureReason, IncodeVerificationSessionEventId,
+    IncodeVerificationSessionId, IncodeVerificationSessionState,
 };
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +18,7 @@ pub struct IncodeVerificationSessionEvent {
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
     pub identity_document_id: IdentityDocumentId,
+    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -27,6 +28,7 @@ pub struct NewIncodeVerificationSessionEvent {
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
     pub identity_document_id: IdentityDocumentId,
+    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
 }
 
 impl IncodeVerificationSessionEvent {
@@ -36,12 +38,14 @@ impl IncodeVerificationSessionEvent {
         incode_verification_session_id: IncodeVerificationSessionId,
         incode_verification_session_state: IncodeVerificationSessionState,
         identity_document_id: IdentityDocumentId,
+        latest_failure_reason: Option<IncodeVerificationFailureReason>,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSessionEvent {
             created_at: Utc::now(),
             incode_verification_session_id,
             incode_verification_session_state,
             identity_document_id,
+            latest_failure_reason,
         };
 
         let res = diesel::insert_into(incode_verification_session_event::table)

@@ -1,0 +1,2 @@
+ALTER TABLE incode_verification_session ADD COLUMN latest_failure_reason TEXT;
+ALTER TABLE incode_verification_session_event ADD COLUMN latest_failure_reason TEXT;
