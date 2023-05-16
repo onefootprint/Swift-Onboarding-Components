@@ -43,3 +43,4 @@ pub mod verification_result;
 pub mod watchlist_check;
 pub mod webauthn_credential;
 pub mod workflow;
+pub mod workflow_event;

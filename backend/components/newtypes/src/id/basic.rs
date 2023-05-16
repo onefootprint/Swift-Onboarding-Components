@@ -166,3 +166,4 @@ define_newtype_id!(
     "Identifier for a incode_verification_session_event"
 );
 define_newtype_id!(WorkflowId, String, "Identifier for a workflow");
+define_newtype_id!(WorkflowEventId, String, "Identifier for a workflow_event");
