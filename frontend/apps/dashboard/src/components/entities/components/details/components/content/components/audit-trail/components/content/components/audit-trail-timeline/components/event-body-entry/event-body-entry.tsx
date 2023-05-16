@@ -20,7 +20,7 @@ const EventBodyEntry = ({
   lineHeight = 'large',
 }: EventBodyEntryProps) => (
   <Container data-testid={testID}>
-    <IconBounds>
+    <IconBounds data-height={lineHeight}>
       <IconComponent color={iconColor} />
     </IconBounds>
     <Content data-height={lineHeight}>{content}</Content>
@@ -32,7 +32,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const IconBounds = styled.div`
@@ -42,6 +42,14 @@ const IconBounds = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    &[data-height='large'] {
+      min-height: 26px;
+    }
+
+    &[data-height='default'] {
+      min-height: 20px;
+    }
   `}
 `;
 
