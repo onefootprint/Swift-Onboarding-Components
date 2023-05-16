@@ -13,6 +13,7 @@ type ConfirmCollectedDataProps = {
   onClickConfirm: () => void;
   isLoading?: boolean;
   children: React.ReactNode;
+  headerVariant?: 'back' | 'close';
 };
 
 const ConfirmCollectedData = ({
@@ -23,9 +24,12 @@ const ConfirmCollectedData = ({
   onClickConfirm,
   isLoading,
   children,
+  headerVariant = 'back',
 }: ConfirmCollectedDataProps) => (
   <>
-    <NavigationHeader button={{ variant: 'back', onBack: onClickPrev }} />
+    <NavigationHeader
+      button={{ variant: headerVariant, onBack: onClickPrev }}
+    />
     <Container>
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>

@@ -1,19 +1,89 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 
 import getCurrentStepFromMissingAttributes from './current-step-from-missing-attributes';
 
 describe('getCurrentStepFromMissingAttributes', () => {
   it('returns 0 when there are no missing attributes', () => {
-    expect(getCurrentStepFromMissingAttributes([], 'basicInformation')).toEqual(
-      0,
-    );
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+        },
+        {},
+        'basicInformation',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+        },
+        {},
+        'residentialAddress',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+        },
+        {},
+        'confirm',
+      ),
+    ).toEqual(0);
   });
 
   it('returns 1 if showing the page with only missing attribute', () => {
     expect(
       getCurrentStepFromMissingAttributes(
-        [CollectedKycDataOption.partialAddress],
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.partialAddress],
+        },
+        {},
         'residentialAddress',
+      ),
+    ).toEqual(1);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.partialAddress],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(1);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.partialAddress],
+        },
+        {},
+        'confirm',
       ),
     ).toEqual(1);
   });
@@ -21,16 +91,143 @@ describe('getCurrentStepFromMissingAttributes', () => {
   it('calculates correctly with multiple missing attributes and pages', () => {
     expect(
       getCurrentStepFromMissingAttributes(
-        [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {},
         'basicInformation',
       ),
     ).toEqual(1);
 
     expect(
       getCurrentStepFromMissingAttributes(
-        [CollectedKycDataOption.dob, CollectedKycDataOption.fullAddress],
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(2);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {},
         'residentialAddress',
       ),
     ).toEqual(2);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(2);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {},
+        'confirm',
+      ),
+    ).toEqual(2);
+  });
+
+  it('calculates correctly when initData is populated', () => {
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'John' },
+          [IdDI.dob]: { value: '1990-01-01' },
+          [IdDI.addressLine1]: { value: '123 Main St' },
+          [IdDI.city]: { value: 'New York' },
+          [IdDI.state]: { value: 'NY' },
+          [IdDI.zip]: { value: '10001' },
+          [IdDI.country]: { value: 'US' },
+        },
+        'basicInformation',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'John' },
+          [IdDI.dob]: { value: '1990-01-01' },
+          [IdDI.addressLine1]: { value: '123 Main St' },
+          [IdDI.city]: { value: 'New York' },
+          [IdDI.state]: { value: 'NY' },
+          [IdDI.zip]: { value: '10001' },
+          [IdDI.country]: { value: 'US' },
+        },
+        'residentialAddress',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+        },
+        {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'John' },
+          [IdDI.dob]: { value: '1990-01-01' },
+          [IdDI.addressLine1]: { value: '123 Main St' },
+          [IdDI.city]: { value: 'New York' },
+          [IdDI.state]: { value: 'NY' },
+          [IdDI.zip]: { value: '10001' },
+          [IdDI.country]: { value: 'US' },
+        },
+        'confirm',
+      ),
+    ).toEqual(0);
   });
 });

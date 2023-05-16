@@ -10,12 +10,12 @@ const useConvertFormData = () => {
     data,
     requirement: { missingAttributes },
   } = machineState.context;
-  const hasFixedAddressLine1 = data?.[IdDI.addressLine1]?.fixed;
-  const hasFixedAddressLine2 = data?.[IdDI.addressLine2]?.fixed;
-  const hasFixedCity = data?.[IdDI.city]?.fixed;
-  const hasFixedState = data?.[IdDI.state]?.fixed;
-  const hasFixedZip = data?.[IdDI.zip]?.fixed;
-  const hasFixedCountry = data?.[IdDI.country]?.fixed;
+  const isAddressLine1Disabled = data?.[IdDI.addressLine1]?.disabled;
+  const isAddressLine2Disabled = data?.[IdDI.addressLine2]?.disabled;
+  const isCityDisabled = data?.[IdDI.city]?.disabled;
+  const isStateDisabled = data?.[IdDI.state]?.disabled;
+  const isZipDisabled = data?.[IdDI.zip]?.disabled;
+  const isCountryDisabled = data?.[IdDI.country]?.disabled;
   const requiresFullAddress = missingAttributes.includes(
     CollectedKycDataOption.fullAddress,
   );
@@ -24,38 +24,38 @@ const useConvertFormData = () => {
     const convertedData: KycData = {};
     const { addressLine1, addressLine2, city, state, zip, country } = formData;
 
-    if (zip && !hasFixedZip) {
+    if (zip && !isZipDisabled) {
       convertedData[IdDI.zip] = {
         value: zip,
       };
     }
 
-    if (country && !hasFixedCountry) {
+    if (country && !isCountryDisabled) {
       convertedData[IdDI.country] = {
         value: country.value,
       };
     }
 
     if (requiresFullAddress) {
-      if (addressLine1 && !hasFixedAddressLine1) {
+      if (addressLine1 && !isAddressLine1Disabled) {
         convertedData[IdDI.addressLine1] = {
           value: addressLine1,
         };
       }
 
-      if (addressLine2 && !hasFixedAddressLine2) {
+      if (addressLine2 && !isAddressLine2Disabled) {
         convertedData[IdDI.addressLine2] = {
           value: addressLine2,
         };
       }
 
-      if (city && !hasFixedCity) {
+      if (city && !isCityDisabled) {
         convertedData[IdDI.city] = {
           value: city,
         };
       }
 
-      if (state && !hasFixedState) {
+      if (state && !isStateDisabled) {
         convertedData[IdDI.state] = {
           value: typeof state === 'object' ? state.value : state,
         };

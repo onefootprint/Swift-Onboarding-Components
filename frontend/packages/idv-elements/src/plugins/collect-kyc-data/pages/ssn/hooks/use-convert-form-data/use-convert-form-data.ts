@@ -10,8 +10,8 @@ const useConvertFormData = () => {
     data,
     requirement: { missingAttributes },
   } = state.context;
-  const hasFixedSsn4 = data?.[IdDI.ssn4]?.fixed;
-  const hasFixedSsn9 = data?.[IdDI.ssn9]?.fixed;
+  const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
+  const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
   const requiresSsn9 = missingAttributes.includes(CollectedKycDataOption.ssn9);
 
   return (formData: FormData) => {
@@ -20,12 +20,12 @@ const useConvertFormData = () => {
 
     // Only one of ssn4 vs ssn9 will be present
     if (requiresSsn9) {
-      if (ssn9 && !hasFixedSsn9) {
+      if (ssn9 && !isSsn9Disabled) {
         convertedData[IdDI.ssn9] = {
           value: ssn9,
         };
       }
-    } else if (ssn4 && !hasFixedSsn4) {
+    } else if (ssn4 && !isSsn4Disabled) {
       convertedData[IdDI.ssn4] = {
         value: ssn4,
       };

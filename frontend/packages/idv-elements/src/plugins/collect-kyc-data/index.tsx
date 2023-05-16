@@ -1,4 +1,3 @@
-import { IdDI } from '@onefootprint/types';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -8,7 +7,7 @@ import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import { CollectKycDataProps } from './types';
-import { KycData } from './utils/data-types';
+import getInitData from './utils/get-init-data';
 import { MachineContext } from './utils/state-machine';
 
 const i18n = configureI18next();
@@ -25,39 +24,22 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     sandboxSuffix,
     requirement,
     bootstrapData,
-    fixedFields,
+    disabledFields,
   } = customData;
-
-  const data: KycData = {};
-  if (bootstrapData) {
-    Object.entries(bootstrapData).forEach(([key, value]) => {
-      data[key as IdDI] = {
-        value,
-        bootstrap: true,
-      };
-    });
-  }
-  if (fixedFields) {
-    fixedFields.forEach(field => {
-      const entry = data[field];
-      if (entry) {
-        entry.fixed = true;
-      }
-    });
-  }
-
-  const initialContext: MachineContext = {
+  const initData = getInitData(bootstrapData, disabledFields);
+  const initContext: MachineContext = {
     authToken,
     device,
     config,
     userFound,
     sandboxSuffix,
     requirement,
-    data,
+    initData,
+    data: initData,
   };
 
   return (
-    <MachineProvider args={initialContext}>
+    <MachineProvider args={initContext}>
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <Router onDone={onDone} />

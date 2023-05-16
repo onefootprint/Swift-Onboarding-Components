@@ -35,9 +35,9 @@ const BasicInformation = ({
   const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
   const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
   const convertFormData = useConvertFormData();
-  const hasFixedName =
-    data?.[IdDI.firstName]?.fixed && data?.[IdDI.lastName]?.fixed;
-  const hasFixedDob = data?.[IdDI.dob]?.fixed;
+  const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
+  const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
+  const isDobDisabled = data?.[IdDI.dob]?.disabled;
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -76,8 +76,13 @@ const BasicInformation = ({
       )}
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-          {requiresName && <NameFields disabled={hasFixedName} />}
-          {requiresDob && <DobField disabled={hasFixedDob} />}
+          {requiresName && (
+            <NameFields
+              isFirstNameDisabled={isFirstNameDisabled}
+              isLastNameDisabled={isLastNameDisabled}
+            />
+          )}
+          {requiresDob && <DobField disabled={isDobDisabled} />}
           <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
         </Form>
       </FormProvider>

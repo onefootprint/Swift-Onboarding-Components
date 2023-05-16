@@ -4,10 +4,14 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 type NameFieldsProps = {
-  disabled?: boolean;
+  isFirstNameDisabled?: boolean;
+  isLastNameDisabled?: boolean;
 };
 
-const NameFields = ({ disabled }: NameFieldsProps) => {
+const NameFields = ({
+  isFirstNameDisabled,
+  isLastNameDisabled,
+}: NameFieldsProps) => {
   const {
     register,
     formState: { errors },
@@ -19,7 +23,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
       <Grid.Column col={6}>
         <TextInput
           data-private
-          disabled={disabled}
+          disabled={isFirstNameDisabled}
           hasError={!!errors.firstName}
           hint={errors.firstName ? t('first-name.error') : undefined}
           label={t('first-name.label')}
@@ -30,7 +34,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
       <Grid.Column col={6}>
         <TextInput
           data-private
-          disabled={disabled}
+          disabled={isLastNameDisabled}
           hasError={!!errors.lastName}
           hint={errors.firstName ? t('last-name.error') : undefined}
           label={t('last-name.label')}

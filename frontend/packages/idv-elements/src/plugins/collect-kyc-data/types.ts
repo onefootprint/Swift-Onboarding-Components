@@ -13,7 +13,7 @@ export type CollectKycDataContext = {
   sandboxSuffix?: string; // only if in sandbox mode
   requirement: CollectKycDataRequirement;
   bootstrapData?: IdDIData; // For tenant-provided initial data or email/phone from identify flows
-  fixedFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
+  disabledFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
 };
 
 export type CollectKycDataProps = BasePluginProps<CollectKycDataContext>;

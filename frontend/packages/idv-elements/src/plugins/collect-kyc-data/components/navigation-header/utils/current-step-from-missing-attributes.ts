@@ -1,40 +1,45 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
+import { CollectKycDataRequirement } from '@onefootprint/types';
 import { StateValue } from 'xstate';
 
+import { KycData } from '../../../utils/data-types';
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,
+  isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../../../utils/missing-attributes';
 
 const getCurrentStepFromMissingAttributes = (
-  mustCollect: CollectedKycDataOption[],
+  requirement: CollectKycDataRequirement,
+  initData: KycData,
   state: StateValue,
 ) => {
-  if (!hasMissingAttributes(mustCollect)) {
+  const { missingAttributes } = requirement;
+  // Use init data below to figure out which pages we visited previously
+  if (!hasMissingAttributes(missingAttributes, initData)) {
     return 0;
   }
   let currentStep = 0;
-  if (mustCollect.includes(CollectedKycDataOption.email)) {
+  if (isMissingEmailAttribute(missingAttributes, initData)) {
     currentStep += 1;
     if (state === 'email') {
       return currentStep;
     }
   }
-  if (isMissingBasicAttribute(mustCollect)) {
+  if (isMissingBasicAttribute(missingAttributes, initData)) {
     currentStep += 1;
     if (state === 'basicInformation') {
       return currentStep;
     }
   }
-  if (isMissingResidentialAttribute(mustCollect)) {
+  if (isMissingResidentialAttribute(missingAttributes, initData)) {
     currentStep += 1;
     if (state === 'residentialAddress') {
       return currentStep;
     }
   }
-  if (isMissingSsnAttribute(mustCollect)) {
+  if (isMissingSsnAttribute(missingAttributes, initData)) {
     currentStep += 1;
     if (state === 'ssn') {
       return currentStep;

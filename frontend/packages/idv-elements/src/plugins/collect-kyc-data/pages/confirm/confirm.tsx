@@ -3,6 +3,7 @@ import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
+import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncEmail from '../../hooks/use-sync-email';
@@ -22,14 +23,23 @@ const Confirm = () => {
     config,
     sandboxSuffix,
     device,
-    requirement: { missingAttributes },
+    requirement,
+    initData,
   } = state.context;
+  const { missingAttributes } = requirement;
   const isMobile = device.type === 'mobile';
   const isSandbox = !config.isLive;
   const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
+  const value = getCurrentStepFromMissingAttributes(
+    requirement,
+    initData,
+    state.value,
+  );
+  const shouldShowBackButton = value > 0;
+  const headerVariant = shouldShowBackButton ? 'back' : 'close';
 
   const handleSyncData = () => {
     syncData({
@@ -115,6 +125,7 @@ const Confirm = () => {
         onClickPrev={handlePrev}
         onClickConfirm={handleConfirm}
         isLoading={isLoading}
+        headerVariant={headerVariant}
       >
         <EmailSection onEdit={handleEmailEdit} />
         <BasicInfoSection onEdit={handleBasicInfoEdit} />

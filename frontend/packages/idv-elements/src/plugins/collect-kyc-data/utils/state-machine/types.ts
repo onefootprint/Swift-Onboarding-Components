@@ -1,8 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectKycDataRequirement,
-  IdDI,
-  IdDIData,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -16,24 +14,12 @@ export type MachineContext = {
   userFound: boolean;
   sandboxSuffix?: string; // only if in sandbox mode
   requirement: CollectKycDataRequirement;
+  initData: KycData;
   // Machine generated
-  data: KycData; // combines bootstrapData, fixedFields and fieldsToDecrypt after decrypting the values
+  data: KycData; // combines bootstrapData, disabledFields and fieldsToDecrypt after decrypting the values
 };
 
 export type MachineEvents =
-  | {
-      type: 'receivedContext';
-      payload: {
-        authToken: string;
-        requirement: CollectKycDataRequirement;
-        userFound: boolean;
-        device: DeviceInfo;
-        sandboxSuffix?: string;
-        config: OnboardingConfig;
-        bootstrapData?: IdDIData;
-        fixedFields?: IdDI[];
-      };
-    }
   | {
       type: 'dataSubmitted';
       payload: KycData;

@@ -56,7 +56,7 @@ const BeneficialOwnerKyc = () => {
         authToken,
         device,
         customData: {
-          fixedFields: [IdDI.firstName, IdDI.lastName],
+          disabledFields: [IdDI.firstName, IdDI.lastName],
           bootstrapData,
           requirement: kycRequirement,
           userFound: !!userFound,

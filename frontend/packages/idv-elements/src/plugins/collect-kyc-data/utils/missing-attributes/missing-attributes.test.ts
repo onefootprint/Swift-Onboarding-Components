@@ -13,33 +13,33 @@ describe('MissingAttributesUtils', () => {
       expect(isMissingBasicAttribute([], {})).toEqual(false);
     });
 
-    it('should return false if the user has all the basic attributes but they are fixed', () => {
+    it('should return false if the user has all the basic attributes but they are disabled', () => {
       expect(
         isMissingBasicAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [IdDI.firstName]: { value: 'Belce', fixed: true },
-            [IdDI.lastName]: { value: 'Dogru', fixed: true },
-            [IdDI.city]: { value: 'Enclave', fixed: true },
+            [IdDI.firstName]: { value: 'Belce', disabled: true },
+            [IdDI.lastName]: { value: 'Dogru', disabled: true },
+            [IdDI.city]: { value: 'Enclave', disabled: true },
           },
         ),
       ).toEqual(false);
 
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.name], {
-          [IdDI.firstName]: { value: 'Belce', fixed: true },
-          [IdDI.lastName]: { value: 'Dogru', fixed: true },
+          [IdDI.firstName]: { value: 'Belce', disabled: true },
+          [IdDI.lastName]: { value: 'Dogru', disabled: true },
         }),
       ).toEqual(false);
     });
 
-    it('should return true if only some of the data values are fixed', () => {
+    it('should return true if only some of the data values are disabled', () => {
       expect(
         isMissingBasicAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [IdDI.firstName]: { value: 'Belce', fixed: true },
-            [IdDI.city]: { value: 'Enclave', fixed: true },
+            [IdDI.firstName]: { value: 'Belce', disabled: true },
+            [IdDI.city]: { value: 'Enclave', disabled: true },
           },
         ),
       ).toEqual(true);
@@ -48,23 +48,23 @@ describe('MissingAttributesUtils', () => {
         isMissingBasicAttribute(
           [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
-            [IdDI.firstName]: { value: 'Belce', fixed: true },
+            [IdDI.firstName]: { value: 'Belce', disabled: true },
             [IdDI.lastName]: { value: 'Dogru' },
-            [IdDI.city]: { value: 'Enclave', fixed: true },
+            [IdDI.city]: { value: 'Enclave', disabled: true },
           },
         ),
       ).toEqual(false);
 
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.name], {
-          [IdDI.lastName]: { value: 'Dogru', fixed: true },
+          [IdDI.lastName]: { value: 'Dogru', disabled: true },
         }),
       ).toEqual(true);
 
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.name], {
           [IdDI.firstName]: { value: 'Belce' },
-          [IdDI.lastName]: { value: 'Dogru', fixed: true },
+          [IdDI.lastName]: { value: 'Dogru', disabled: true },
         }),
       ).toEqual(false);
     });
@@ -190,64 +190,64 @@ describe('MissingAttributesUtils', () => {
       expect(isMissingResidentialAttribute([], {})).toEqual(false);
     });
 
-    it('should return false if the user has all the residential attributes but they are fixed', () => {
+    it('should return false if the user has all the residential attributes but they are disabled', () => {
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [IdDI.addressLine1]: { value: '123 Main St', fixed: true },
-          [IdDI.city]: { value: 'Enclave', fixed: true },
-          [IdDI.state]: { value: 'NY', fixed: true },
-          [IdDI.zip]: { value: '94117', fixed: true },
-          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
+          [IdDI.city]: { value: 'Enclave', disabled: true },
+          [IdDI.state]: { value: 'NY', disabled: true },
+          [IdDI.zip]: { value: '94117', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
         }),
       ).toEqual(false);
 
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
-          [IdDI.zip]: { value: 'Enclave', fixed: true },
-          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.zip]: { value: 'Enclave', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
         }),
       ).toEqual(false);
     });
 
-    it('should return true if only some of the data values are fixed', () => {
+    it('should return true if only some of the data values are disabled', () => {
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [IdDI.addressLine1]: { value: '123 Main St', fixed: true },
-          [IdDI.city]: { value: 'Enclave', fixed: true },
+          [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
+          [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.country]: { value: 'US' },
         }),
       ).toEqual(true);
 
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [IdDI.addressLine1]: { value: '123 Main St', fixed: true },
-          [IdDI.city]: { value: 'Enclave', fixed: true },
-          [IdDI.state]: { value: 'NY', fixed: true },
-          [IdDI.zip]: { value: '94117', fixed: true },
+          [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
+          [IdDI.city]: { value: 'Enclave', disabled: true },
+          [IdDI.state]: { value: 'NY', disabled: true },
+          [IdDI.zip]: { value: '94117', disabled: true },
           [IdDI.country]: { value: 'US' },
         }),
       ).toEqual(false);
 
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
-          [IdDI.addressLine1]: { value: '123 Main St', fixed: true },
-          [IdDI.city]: { value: 'Enclave', fixed: true },
+          [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
+          [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.state]: { value: 'NY' },
-          [IdDI.zip]: { value: '94117', fixed: true },
-          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.zip]: { value: '94117', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
         }),
       ).toEqual(false);
 
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
-          [IdDI.zip]: { value: 'Enclave', fixed: true },
+          [IdDI.zip]: { value: 'Enclave', disabled: true },
           [IdDI.country]: { value: 'US' },
         }),
       ).toEqual(false);
 
       expect(
         isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
-          [IdDI.zip]: { value: 'Enclave', fixed: true },
+          [IdDI.zip]: { value: 'Enclave', disabled: true },
         }),
       ).toEqual(true);
     });
@@ -412,7 +412,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
-          [IdDI.ssn9]: { value: '000000', fixed: true },
+          [IdDI.ssn9]: { value: '000000', disabled: true },
         }),
       ).toEqual(false);
 
@@ -438,7 +438,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
-          [IdDI.ssn4]: { value: '000000', fixed: true },
+          [IdDI.ssn4]: { value: '000000', disabled: true },
         }),
       ).toEqual(false);
 
@@ -469,7 +469,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
-          [IdDI.ssn9]: { value: '0000000', fixed: true },
+          [IdDI.ssn9]: { value: '0000000', disabled: true },
         }),
       ).toEqual(true);
       expect(
@@ -489,7 +489,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
-          [IdDI.ssn4]: { value: '0000', fixed: true },
+          [IdDI.ssn4]: { value: '0000', disabled: true },
         }),
       ).toEqual(true);
     });
@@ -516,9 +516,9 @@ describe('MissingAttributesUtils', () => {
         hasMissingAttributes(
           [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
           {
-            [IdDI.firstName]: { value: 'Belce', fixed: true },
+            [IdDI.firstName]: { value: 'Belce', disabled: true },
             [IdDI.lastName]: { value: 'Dogru' },
-            [IdDI.ssn4]: { value: '0000', fixed: true },
+            [IdDI.ssn4]: { value: '0000', disabled: true },
           },
         ),
       ).toEqual(false);
@@ -533,21 +533,21 @@ describe('MissingAttributesUtils', () => {
             CollectedKycDataOption.fullAddress,
           ],
           {
-            [IdDI.firstName]: { value: 'Belce', fixed: true },
-            [IdDI.lastName]: { value: 'Dogru', fixed: true },
+            [IdDI.firstName]: { value: 'Belce', disabled: true },
+            [IdDI.lastName]: { value: 'Dogru', disabled: true },
             [IdDI.ssn4]: { value: '0000' },
           },
         ),
       ).toEqual(true);
     });
 
-    it('should skip attribute groups with all fixed/decrypted/bootstrapped data', () => {
+    it('should skip attribute groups with all disabled/decrypted/bootstrapped data', () => {
       expect(
         hasMissingAttributes(
           [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
           {
             [IdDI.firstName]: { value: 'Belce', bootstrap: true },
-            [IdDI.lastName]: { value: 'Dogru', fixed: true },
+            [IdDI.lastName]: { value: 'Dogru', disabled: true },
             [IdDI.ssn4]: { value: '0000', decrypted: true },
           },
         ),

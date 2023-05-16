@@ -44,6 +44,7 @@ describe('Collect KYC Data Machine Tests', () => {
       },
       config: { ...TestOnboardingConfig },
       data,
+      initData: data,
       sandboxSuffix,
     };
     const machine = interpret(createCollectKycDataMachine(initialContext));
@@ -451,7 +452,7 @@ describe('Collect KYC Data Machine Tests', () => {
     });
   });
 
-  describe('When user has bootstrapped/decrypted/fixed data', () => {
+  describe('When user has bootstrapped/decrypted/disabled data', () => {
     it('if no attributes are missing at the start', () => {
       const machine = createMachine(
         [
@@ -465,9 +466,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.lastName]: { value: 'Doe', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
           [IdDI.city]: { value: 'San Francisco', decrypted: true },
-          [IdDI.state]: { value: 'CA', fixed: true },
-          [IdDI.zip]: { value: '94105', fixed: true },
-          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.state]: { value: 'CA', disabled: true },
+          [IdDI.zip]: { value: '94105', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
           [IdDI.ssn9]: { value: '101010101', decrypted: true },
         },
       );
@@ -499,9 +500,9 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.firstName]: { value: 'John', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
           [IdDI.city]: { value: 'San Francisco', decrypted: true },
-          [IdDI.state]: { value: 'CA', fixed: true },
-          [IdDI.zip]: { value: '94105', fixed: true },
-          [IdDI.country]: { value: 'US', fixed: true },
+          [IdDI.state]: { value: 'CA', disabled: true },
+          [IdDI.zip]: { value: '94105', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
           [IdDI.ssn9]: { value: '101010101', decrypted: true },
         },
       );

@@ -52,19 +52,12 @@ const ResidentialAddress = ({
     ? t('full.subtitle')
     : t('partial.subtitle');
 
-  const isAddressLine1Fixed = data[IdDI.addressLine1]?.fixed;
-  const isAddressLine2Fixed = data[IdDI.addressLine2]?.fixed;
-  const isCityFixed = data[IdDI.city]?.fixed;
-  const isStateFixed = data[IdDI.state]?.fixed;
-  const isZipFixed = data[IdDI.zip]?.fixed;
-  const isCountryFixed = data[IdDI.country]?.fixed;
-  const isFullAddressFixed =
-    isAddressLine1Fixed ||
-    isAddressLine2Fixed ||
-    isCityFixed ||
-    isStateFixed ||
-    isZipFixed ||
-    isCountryFixed;
+  const isAddressLine1Disabled = data[IdDI.addressLine1]?.disabled;
+  const isAddressLine2Disabled = data[IdDI.addressLine2]?.disabled;
+  const isCityDisabled = data[IdDI.city]?.disabled;
+  const isStateDisabled = data[IdDI.state]?.disabled;
+  const isZipDisabled = data[IdDI.zip]?.disabled;
+  const isCountryDisabled = data[IdDI.country]?.disabled;
 
   const countryVal = data[IdDI.country]?.value;
   const defaultCountry =
@@ -117,35 +110,35 @@ const ResidentialAddress = ({
             <>
               <CountryField
                 onChange={handleCountryChange}
-                disabled={isFullAddressFixed}
+                disabled={isCountryDisabled}
               />
               <AddressLines
                 countryCode={country.value}
-                disabled={isFullAddressFixed}
+                disabled={isAddressLine1Disabled || isAddressLine2Disabled}
               />
               <Grid.Row>
                 <Grid.Column col={6}>
-                  <CityField disabled={isFullAddressFixed} />
+                  <CityField disabled={isCityDisabled} />
                 </Grid.Column>
                 <Grid.Column col={6}>
                   <ZipField
                     countryCode={country.value}
-                    disabled={isFullAddressFixed}
+                    disabled={isZipDisabled}
                   />
                 </Grid.Column>
               </Grid.Row>
               <StateField
                 inputKind={country.value === 'US' ? 'dropdown' : 'text'}
-                disabled={isFullAddressFixed}
+                disabled={isStateDisabled}
               />
             </>
           ) : (
             <>
               <CountryField
                 onChange={handleCountryChange}
-                disabled={isCountryFixed}
+                disabled={isCountryDisabled}
               />
-              <ZipField countryCode={country.value} disabled={isZipFixed} />
+              <ZipField countryCode={country.value} disabled={isZipDisabled} />
             </>
           )}
           <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />

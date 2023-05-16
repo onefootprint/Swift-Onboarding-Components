@@ -20,5 +20,5 @@ export type DataValue = {
   value: string;
   bootstrap?: boolean;
   decrypted?: boolean;
-  fixed?: boolean;
+  disabled?: boolean;
 };

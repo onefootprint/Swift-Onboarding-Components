@@ -25,7 +25,7 @@ const SSN_ATTRIBUTES = [
 ];
 
 // An attribute is missing if
-// (1) it wasn't a fixed/bootstrapped/decrypted value
+// (1) it wasn't a disabled/bootstrapped/decrypted value
 // (2) it hasn't yet been collected
 export const isMissing = (
   options: CollectedKycDataOption[],
@@ -45,10 +45,10 @@ export const isMissing = (
     return true;
   }
 
-  // Filter out entries with fixed/bootstrapped/decrypted values
+  // Filter out entries with disabled/bootstrapped/decrypted values
   const filteredAttributes = attributes.filter(attr => {
     const entry = collectedData[attr];
-    return !entry?.bootstrap && !entry?.fixed && !entry?.decrypted;
+    return !entry?.bootstrap && !entry?.disabled && !entry?.decrypted;
   });
 
   // Completely missing entries

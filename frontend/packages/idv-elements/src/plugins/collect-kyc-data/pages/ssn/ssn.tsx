@@ -46,8 +46,8 @@ const SSN = ({
       ssn4: data[IdDI.ssn4]?.value,
     },
   });
-  const isSsn4Fixed = data?.[IdDI.ssn9]?.fixed;
-  const isSsn9Fixed = data?.[IdDI.ssn4]?.fixed;
+  const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
+  const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
 
   const onSubmitFormData = (formData: FormData) => {
     const convertedData = convertFormData(formData);
@@ -71,9 +71,9 @@ const SSN = ({
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
           {requiresSsn9 ? (
-            <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Fixed} />
+            <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
           ) : (
-            <SSN4 disabled={isSsn4Fixed} />
+            <SSN4 disabled={isSsn4Disabled} />
           )}
           <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
         </Form>

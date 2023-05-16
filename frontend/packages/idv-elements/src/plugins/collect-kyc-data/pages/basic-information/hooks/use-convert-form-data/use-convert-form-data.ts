@@ -10,9 +10,9 @@ const useConvertFormData = () => {
     data,
     requirement: { missingAttributes },
   } = state.context;
-  const hasFixedName =
-    data?.[IdDI.firstName]?.fixed && data?.[IdDI.lastName]?.fixed;
-  const hasFixedDob = data?.[IdDI.dob]?.fixed;
+  const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
+  const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
+  const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
   const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
 
@@ -20,19 +20,19 @@ const useConvertFormData = () => {
     const convertedData: KycData = {};
     const { firstName, lastName, dob } = formData;
 
-    if (requiresName && firstName && !hasFixedName) {
+    if (requiresName && firstName && !isFirstNameDisabled) {
       convertedData[IdDI.firstName] = {
         value: firstName,
       };
     }
 
-    if (requiresName && lastName && !hasFixedName) {
+    if (requiresName && lastName && !isLastNameDisabled) {
       convertedData[IdDI.lastName] = {
         value: lastName,
       };
     }
 
-    if (requiresDob && dob && !hasFixedDob) {
+    if (requiresDob && dob && !isDobDisabled) {
       convertedData[IdDI.dob] = {
         value: dob,
       };
