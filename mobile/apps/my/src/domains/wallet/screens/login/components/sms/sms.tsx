@@ -1,36 +1,34 @@
-import {
-  Box,
-  DismissKeyboard,
-  LinkButton,
-  PinInput,
-  Typography,
-} from '@onefootprint/ui';
-import React from 'react';
+import { Identifier } from '@onefootprint/types';
+import React, { useEffect } from 'react';
 
-import useTranslation from '@/hooks/use-translation';
+import Content from './components/content';
+import Loading from './components/loading';
+import useLoginChallenge from './hooks/use-login-challenge';
 
 type SmsProps = {
-  onSuccess?: () => void;
+  identifier: Identifier;
+  onSuccess: (authToken) => void;
 };
 
-const Sms = ({ onSuccess }: SmsProps) => {
-  const { t } = useTranslation('screens.login.sms');
+const Sms = ({ identifier, onSuccess }: SmsProps) => {
+  const { isLoading, data, mutate } = useLoginChallenge();
 
-  const handlePress = () => {
-    onSuccess();
+  const createChallenge = () => {
+    mutate(identifier);
   };
+  useEffect(createChallenge, []);
 
   return (
-    <DismissKeyboard>
-      <Box center marginBottom={7}>
-        <Typography variant="body-2">{t('instructions')}</Typography>
-        <Typography variant="label-2">(•••) ••• ••02</Typography>
-      </Box>
-      <Box gap={7}>
-        <PinInput onComplete={handlePress} />
-        <LinkButton onPress={handlePress}>{t('cta')}</LinkButton>
-      </Box>
-    </DismissKeyboard>
+    <>
+      {isLoading && <Loading />}
+      {data && (
+        <Content
+          challengeToken={data.challengeData.challengeToken}
+          onSuccess={onSuccess}
+          phoneNumber={data.challengeData.scrubbedPhoneNumber}
+        />
+      )}
+    </>
   );
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
 import {
@@ -8,18 +9,24 @@ import {
 
 import { Box } from '../box';
 import { Hint } from '../hint';
-import { TextInput } from '../text-input';
+import { TextInput, TextInputProps } from '../text-input';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import { getNextValue, isNumber } from './pin-input.utils';
 
-export type PinInputProps = {
+export type PinInputProps = TextInputProps & {
   hasError?: boolean;
   hint?: string;
   onComplete?: (value: string) => void;
 };
 
-const PinInput = ({ hasError = false, hint, onComplete }: PinInputProps) => {
+const PinInput = ({
+  hasError = false,
+  hint,
+  onComplete,
+  ...props
+}: PinInputProps) => {
+  const { autoFocus, ...inputProps } = props;
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
 
@@ -34,6 +41,7 @@ const PinInput = ({ hasError = false, hint, onComplete }: PinInputProps) => {
     const isLastIndex = index === INPUT_FIELDS_COUNT - 1;
     const areAllTheFieldsFilled =
       pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
+
     if (isLastIndex && areAllTheFieldsFilled) {
       onComplete?.(pin);
     } else {
@@ -88,7 +96,10 @@ const PinInput = ({ hasError = false, hint, onComplete }: PinInputProps) => {
           const isDisabled = pinIndex > enteredPin.length;
           return (
             <TextInput
+              {...inputProps}
               autoComplete="sms-otp"
+              autoFocus={autoFocus && pinIndex === 0}
+              blurOnSubmit
               disabled={isDisabled}
               hasError={hasError}
               height={44}
@@ -97,6 +108,7 @@ const PinInput = ({ hasError = false, hint, onComplete }: PinInputProps) => {
               onChange={handleChange(pinIndex)}
               onKeyPress={handleKeyPress(pinIndex)}
               padding={0}
+              paddingHorizontal={undefined}
               placeholder=""
               ref={pinInputs.refs[pinIndex]}
               textAlign="center"

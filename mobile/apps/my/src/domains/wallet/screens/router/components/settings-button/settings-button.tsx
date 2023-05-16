@@ -5,13 +5,12 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-export type SettingsButtonProps = {};
-
 const SettingsButton = () => {
   const { t } = useTranslation('components.settings-button');
   const navigation = useNavigation();
 
   const handlePress = () => {
+    // @ts-ignore
     navigation.navigate('Settings');
   };
 

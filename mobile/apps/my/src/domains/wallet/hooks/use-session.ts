@@ -1,8 +1,15 @@
+import { ChallengeKind } from '@onefootprint/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type SessionData = { authToken: string };
+import AUTH_HEADER from '@/config/constants';
+
+export type AuthHeaders = {
+  'x-fp-authorization': string;
+};
+
+export type SessionData = { authToken: string; challengeKind: ChallengeKind };
 
 export type Session = {
   data?: SessionData;
@@ -30,7 +37,7 @@ export const useStore = create<Session>()(
     }),
     {
       name: 'my',
-      version: 0,
+      version: 1,
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),
@@ -39,16 +46,17 @@ export const useStore = create<Session>()(
 const useSession = () => {
   const { reset, update, data } = useStore(state => state);
   const isLoggedIn = !!data;
+  const authHeaders = { [AUTH_HEADER]: data?.authToken };
 
-  const logIn = async (authToken: string) => {
-    update({ authToken });
+  const logIn = async (challengeKind: ChallengeKind, authToken: string) => {
+    update({ challengeKind, authToken });
   };
 
   const logOut = () => {
     reset();
   };
 
-  return { data, isLoggedIn, logIn, logOut };
+  return { authHeaders, data, isLoggedIn, logIn, logOut };
 };
 
 export default useSession;

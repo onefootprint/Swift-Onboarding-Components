@@ -5,21 +5,21 @@ import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import useAuthenticateWithPasskeys from './hooks/use-authenticate-with-passkeys';
+import useLoginWithPasskey from './hooks/use-login-with-passkey';
 import hasUserCancelled from './utils/has-user-canceled-passkey';
 
 type PasskeyProps = {
   identifier: Identifier;
-  onSuccess?: (authToken: string) => void;
+  onSuccess: (authToken: string) => void;
 };
 
 const Passkey = ({ identifier, onSuccess }: PasskeyProps) => {
-  const mutation = useAuthenticateWithPasskeys();
+  const { isLoading, mutate } = useLoginWithPasskey();
   const [isRetry, setRetry] = useState(false);
   const { t } = useTranslation('screens.login.passkey');
 
   const handlePress = () => {
-    mutation.mutate(identifier, {
+    mutate(identifier, {
       onSuccess: ({ authToken }) => {
         onSuccess(authToken);
       },
@@ -49,7 +49,7 @@ const Passkey = ({ identifier, onSuccess }: PasskeyProps) => {
       >
         <IcoFaceid24 />
       </Box>
-      <Button onPress={handlePress} size="compact" loading={mutation.isLoading}>
+      <Button onPress={handlePress} size="compact" loading={isLoading}>
         {isRetry ? t('cta-retry') : t('cta')}
       </Button>
     </Box>

@@ -13,7 +13,7 @@ const DismissKeyboard = ({
   children,
 }: DismissKeyboardProps) => (
   <TouchableWithoutFeedback accessible={accessible} onPress={Keyboard.dismiss}>
-    <Box flex={1}>{children}</Box>
+    <Box>{children}</Box>
   </TouchableWithoutFeedback>
 );
 

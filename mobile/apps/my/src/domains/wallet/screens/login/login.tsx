@@ -1,4 +1,5 @@
 import { IcoFaceid24, IcoPhone24 } from '@onefootprint/icons';
+import { ChallengeKind } from '@onefootprint/types';
 import { Box, Container, SegmentedControl, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -18,10 +19,11 @@ const Login = ({ route, navigation }: LoginProps) => {
   const [tab, setTab] = useState(canUseBiometric ? 'passkey' : 'sms');
   const session = useSession();
 
-  const handleSuccess = (authToken: string) => {
-    session.logIn(authToken);
-    navigation.navigate('MainTabs');
-  };
+  const handleSuccess =
+    (challengeKind: ChallengeKind) => (authToken: string) => {
+      session.logIn(challengeKind, authToken);
+      navigation.navigate('MainTabs');
+    };
 
   return (
     <Container>
@@ -31,29 +33,35 @@ const Login = ({ route, navigation }: LoginProps) => {
         </Typography>
         {shouldShowTabs ? (
           <SegmentedControl
-            aria-label="Identification method"
-            value={tab}
+            aria-label={t('aria-label')}
+            marginBottom={7}
             onChange={setTab}
             options={[
               {
+                IconComponent: IcoFaceid24,
                 label: t('passkey.title'),
                 value: 'passkey',
-                IconComponent: IcoFaceid24,
               },
               {
+                IconComponent: IcoPhone24,
                 label: t('sms.title'),
                 value: 'sms',
-                IconComponent: IcoPhone24,
               },
             ]}
-            marginBottom={7}
+            value={tab}
           />
         ) : null}
       </Box>
       {tab === 'sms' ? (
-        <Sms onSuccess={handleSuccess} />
+        <Sms
+          identifier={identifier}
+          onSuccess={handleSuccess(ChallengeKind.sms)}
+        />
       ) : (
-        <Passkey identifier={identifier} onSuccess={handleSuccess} />
+        <Passkey
+          identifier={identifier}
+          onSuccess={handleSuccess(ChallengeKind.biometric)}
+        />
       )}
     </Container>
   );

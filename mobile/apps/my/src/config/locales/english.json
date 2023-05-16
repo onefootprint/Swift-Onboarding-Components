@@ -72,15 +72,21 @@
     },
     "login": {
       "title": "Welcome back! 🎉",
+      "tab": {
+        "aria-label": "Identification method"
+      },
       "sms": {
         "title": "SMS",
         "instructions": "Enter the 6-digit code sent to",
         "cta": "Resend code",
-        "notifications": {
-          "success": {
-            "title": "Success",
-            "description": "We sent you a new code."
-          }
+        "verifying": "Verifying...",
+        "success": "Success!",
+        "resend-button": {
+          "cta": "Resend code",
+          "disabled": "Please wait {{seconds}} seconds to resend it..."
+        },
+        "error": {
+          "title": "We couldn't authenticate using sms"
         }
       },
       "passkey": {
@@ -89,7 +95,7 @@
         "cta-retry": "Retry passkey",
         "notifications": {
           "error": {
-            "title": "We couldn't authenticate using passkey",
+            "title": "We couldn't authenticate using passkey"
           }
         }
       }

@@ -2,23 +2,20 @@ import request from '@onefootprint/request';
 import { GetSharingResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import AUTH_HEADER from '@/config/constants';
-import useSession from '@/domains/wallet/hooks/use-session';
+import useSession, { AuthHeaders } from '@/domains/wallet/hooks/use-session';
 
-const getSharing = async (authToken: string) => {
+const getSharing = async (authHeaders: AuthHeaders) => {
   const response = await request<GetSharingResponse>({
     method: 'GET',
     url: '/hosted/user/authorized_orgs',
-    headers: {
-      [AUTH_HEADER]: authToken,
-    },
+    headers: authHeaders,
   });
   return response.data;
 };
 
 const useSharing = () => {
-  const { data } = useSession();
-  return useQuery(['user', 'sharing'], () => getSharing(data.authToken));
+  const { authHeaders } = useSession();
+  return useQuery(['user', 'sharing'], () => getSharing(authHeaders));
 };
 
 export default useSharing;

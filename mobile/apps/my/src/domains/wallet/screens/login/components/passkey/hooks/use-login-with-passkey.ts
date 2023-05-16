@@ -58,7 +58,7 @@ const identifyVerify = async (payload: IdentifyVerifyRequest) => {
   return response.data;
 };
 
-const authenticateWithPasskey = async (identifier: Identifier) => {
+const loginWithPasskey = async (identifier: Identifier) => {
   const {
     challengeData: { biometricChallengeJson, challengeToken },
   } = await loginChallenge(identifier);
@@ -69,12 +69,12 @@ const authenticateWithPasskey = async (identifier: Identifier) => {
   return response;
 };
 
-const useAuthenticateWithPasskey = () => {
+const useLoginWithPasskey = () => {
   const { t } = useTranslation('screens.login.passkey.notifications');
   const toast = useToast();
 
   return useMutation({
-    mutationFn: authenticateWithPasskey,
+    mutationFn: loginWithPasskey,
     onError: (error: unknown) => {
       if (hasUserCancelledPasskey(error)) return;
       toast.show({
@@ -86,4 +86,4 @@ const useAuthenticateWithPasskey = () => {
   });
 };
 
-export default useAuthenticateWithPasskey;
+export default useLoginWithPasskey;
