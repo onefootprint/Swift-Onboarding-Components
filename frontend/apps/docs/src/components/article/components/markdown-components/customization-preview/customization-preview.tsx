@@ -54,11 +54,7 @@ const IframeContainer = styled.div`
     background: rgba(14, 20, 56, 0.2);
     overflow: auto;
     max-width: 100%;
-
-    iframe {
-      width: 500px;
-      min-height: 420px;
-    }
+    position: relative;
   `}
 `;
 

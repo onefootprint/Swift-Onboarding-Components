@@ -20,9 +20,12 @@ const Iframe = ({ name, src, selected }: IframeProps) => (
 const IframeContainer = styled.div<{ show: boolean }>`
   align-items: center;
   display: flex;
-  height: 100%;
   justify-content: center;
   width: 100%;
+  height: 100%;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
 
   ${({ show }) =>
     !show &&
@@ -33,6 +36,9 @@ const IframeContainer = styled.div<{ show: boolean }>`
 
 const StyledIframe = styled.iframe`
   max-width: 90%;
+  width: 500px;
+  min-height: 480px;
+  height: fit-content;
 `;
 
 export default Iframe;
