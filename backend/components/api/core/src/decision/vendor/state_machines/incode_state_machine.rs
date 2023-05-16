@@ -47,7 +47,7 @@ pub enum IncodeState {
 }
 
 impl IncodeState {
-    fn name(&self) -> IncodeVerificationSessionState {
+    pub fn name(&self) -> IncodeVerificationSessionState {
         match self {
             IncodeState::StartOnboarding(_) => IncodeVerificationSessionState::StartOnboarding,
             IncodeState::AddFront(_) => IncodeVerificationSessionState::AddFront,
@@ -217,8 +217,8 @@ mod tests {
     };
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
-        vendor_apis_from_vendor, DocVData, DocumentRequestStatus, IdDocKind, IncodeConfigurationId,
-        IncodeVerificationSessionState, PiiString, Vendor, VendorAPI,
+        vendor_apis_from_vendor, CollectedDataOption, DocVData, DocumentRequestStatus, IdDocKind,
+        IncodeConfigurationId, IncodeVerificationSessionState, PiiString, Vendor, VendorAPI,
     };
 
     use super::IncodeState;
@@ -230,10 +230,46 @@ mod tests {
         utils::mock_enclave::StateWithMockEnclave,
     };
     use strum::IntoEnumIterator;
+    use test_case::test_case;
+
+    fn expected_vendor_apis(is_selfie: bool) -> Vec<VendorAPI> {
+        let consent_apis = vec![VendorAPI::IncodeAddMLConsent, VendorAPI::IncodeAddPrivacyConsent];
+        vendor_apis_from_vendor(Vendor::Incode)
+            .into_iter()
+            .filter(|v| {
+                if !is_selfie && consent_apis.contains(v) {
+                    return false;
+                }
+
+                true
+            })
+            .collect()
+    }
+
+    fn expected_incode_verification_session_states(
+        is_selfie: bool,
+        is_retry: bool,
+    ) -> Vec<IncodeVerificationSessionState> {
+        IncodeVerificationSessionState::iter()
+            .filter(|s| {
+                if !is_selfie && s == &IncodeVerificationSessionState::AddConsent {
+                    return false;
+                }
+
+                if !is_retry && s == &IncodeVerificationSessionState::RetryUpload {
+                    return false;
+                }
+
+                true
+            })
+            .collect()
+    }
 
     #[ignore]
+    #[test_case(true)]
+    #[test_case(false)]
     #[tokio::test]
-    async fn test_run_machine() {
+    async fn test_run_machine(is_selfie: bool) {
         //
         // Set up
         //
@@ -241,7 +277,13 @@ mod tests {
         let state = &StateWithMockEnclave::init().await.state;
         let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
-        let (tenant, ob, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+        let must_collect_data = if is_selfie {
+            Some(vec![CollectedDataOption::DocumentAndSelfie])
+        } else {
+            None
+        };
+        let (tenant, ob, uv, su, di) =
+            create_user_and_onboarding(&db_pool, &state.enclave_client, must_collect_data).await;
         let suid = su.id.clone();
         let suid2 = su.id.clone();
 
@@ -261,13 +303,16 @@ mod tests {
         let id_doc = db_pool
             .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
                 let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
-                UserConsent::create(
-                    conn,
-                    Utc::now(),
-                    ob.id,
-                    ob.insight_event_id,
-                    "I, Bob Boberto, consent to NOTHING".into(),
-                )?;
+                if is_selfie {
+                    UserConsent::create(
+                        conn,
+                        Utc::now(),
+                        ob.id,
+                        ob.insight_event_id,
+                        "I, Bob Boberto, consent to NOTHING".into(),
+                    )?;
+                }
+
                 Ok(db::tests::fixtures::identity_document::create(
                     conn,
                     Some(doc_request.id),
@@ -315,7 +360,7 @@ mod tests {
                         .iter()
                         .filter_map(|(req, res, _)| res.as_ref().map(|_| req.vendor_api))
                         .collect(),
-                    vendor_apis_from_vendor(Vendor::Incode),
+                    expected_vendor_apis(is_selfie),
                 );
 
                 let (_, score_vres, _) = db_verifications
@@ -333,9 +378,7 @@ mod tests {
                         .into_iter()
                         .map(|i| i.incode_verification_session_state)
                         .collect(),
-                    IncodeVerificationSessionState::iter()
-                        .filter(|s| s != &IncodeVerificationSessionState::RetryUpload)
-                        .collect(),
+                    expected_incode_verification_session_states(is_selfie, false),
                 );
 
                 let score_result =
@@ -369,8 +412,10 @@ mod tests {
     }
 
     #[ignore]
+    #[test_case(true)]
+    #[test_case(false)]
     #[tokio::test]
-    async fn test_e2e_with_retries() {
+    async fn test_e2e_with_retries(is_selfie: bool) {
         //
         // Set up
         //
@@ -378,7 +423,13 @@ mod tests {
         let state = &StateWithMockEnclave::init().await.state;
         let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
-        let (tenant, ob, uv, su, di) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+        let must_collect_data = if is_selfie {
+            Some(vec![CollectedDataOption::DocumentAndSelfie])
+        } else {
+            None
+        };
+        let (tenant, ob, uv, su, di) =
+            create_user_and_onboarding(&db_pool, &state.enclave_client, must_collect_data).await;
         let suid = su.id.clone();
         let suid2 = su.id.clone();
         let suid3 = su.id.clone();
@@ -400,13 +451,15 @@ mod tests {
             .db_transaction(
                 move |conn| -> Result<(IdentityDocument, DocumentRequest), DbError> {
                     let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
-                    UserConsent::create(
-                        conn,
-                        Utc::now(),
-                        ob.id,
-                        ob.insight_event_id,
-                        "I, Bob Boberto, consent to NOTHING".into(),
-                    )?;
+                    if is_selfie {
+                        UserConsent::create(
+                            conn,
+                            Utc::now(),
+                            ob.id,
+                            ob.insight_event_id,
+                            "I, Bob Boberto, consent to NOTHING".into(),
+                        )?;
+                    }
 
                     Ok((
                         db::tests::fixtures::identity_document::create(conn, Some(doc_request.id.clone())),
@@ -550,7 +603,10 @@ mod tests {
                         IncodeVerificationSessionState::FetchScores,
                         IncodeVerificationSessionState::FetchOCR,
                         IncodeVerificationSessionState::Complete,
-                    ],
+                    ]
+                    .into_iter()
+                    .filter(|s| is_selfie || !(s == &IncodeVerificationSessionState::AddConsent))
+                    .collect(),
                 );
 
                 let score_result =

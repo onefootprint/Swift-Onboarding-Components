@@ -54,6 +54,7 @@ pub enum IncodeVerificationSessionState {
     JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 
 pub enum IncodeVerificationFailureReason {
@@ -74,5 +75,40 @@ pub enum IncodeVerificationFailureReason {
     Other(String),
 }
 
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Eq,
+    PartialEq,
+    Deserialize,
+    Serialize,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    Apiv2Schema,
+    JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+
+pub enum IncodeVerificationSessionKind {
+    IdDocument,
+    Selfie,
+}
+
+impl IncodeVerificationSessionKind {
+    pub fn requires_consent(&self) -> bool {
+        match self {
+            IncodeVerificationSessionKind::IdDocument => false,
+            IncodeVerificationSessionKind::Selfie => true,
+        }
+    }
+}
+
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionState);
 crate::util::impl_enum_str_diesel!(IncodeVerificationFailureReason);
+crate::util::impl_enum_str_diesel!(IncodeVerificationSessionKind);

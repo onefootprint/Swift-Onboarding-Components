@@ -26,12 +26,15 @@ use super::incode_state_machine::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 
 pub mod state_impl {
-    use db::models::user_consent::UserConsent;
+    use db::{
+        models::{ob_configuration::ObConfiguration, user_consent::UserConsent},
+        TxnPgConn,
+    };
     use idv::incode::{
         response::FetchOCRResponse, IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest,
         IncodeFetchOCRRequest,
     };
-    use newtypes::IncodeVerificationFailureReason;
+    use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionKind};
 
     use super::*;
 
@@ -72,8 +75,22 @@ pub mod state_impl {
                             &di_id,
                             VendorAPI::IncodeStartOnboarding,
                         )?;
+
+                        let obc = ObConfiguration::get_by_scoped_vault_id(conn, &sv_id)?;
+                        let session_kind = if obc.must_collect_selfie() {
+                            IncodeVerificationSessionKind::Selfie
+                        } else {
+                            IncodeVerificationSessionKind::IdDocument
+                        };
+
                         // Initialize the incode state
-                        let is = IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id2)?;
+                        let is = IncodeVerificationSession::create(
+                            conn,
+                            sv_id,
+                            config_id,
+                            id_doc_id2,
+                            session_kind,
+                        )?;
 
                         Ok((vr, is))
                     },
@@ -126,53 +143,31 @@ pub mod state_impl {
                 },
             };
 
+            let id_doc = self.identity_document_id.clone();
             // Save the next stage's Vreq
-            let (consent, privacy_vreq, ml_vreq) = db_pool
-                .db_transaction(
-                    move |conn| -> ApiResult<(UserConsent, VerificationRequest, VerificationRequest)> {
-                        // Update our state to the next stage
-                        let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
-                            IncodeVerificationSessionState::AddConsent,
-                            IncodeSessionId::from(successful_response.interview_id),
-                            IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
-                        );
+            let next_state = db_pool
+                .db_transaction(move |conn| -> ApiResult<IncodeState> {
+                    // We only need to add consent if the session is of kind=Selfie
+                    let next_state: IncodeState = if verification_session.kind.requires_consent() {
+                        AddConsent::enter(conn, sv_id2, di_id2, id_doc, session)?.into()
+                    } else {
+                        AddFront::enter(conn, sv_id2, di_id2, id_doc, session)?.into()
+                    };
 
-                        IncodeVerificationSession::update(conn, verification_session.id, update)?;
+                    // Update our state to the next stage
+                    let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
+                        next_state.name(),
+                        IncodeSessionId::from(successful_response.interview_id),
+                        IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
+                    );
 
-                        // we need consent in order to proceed, so we error
-                        let consent = UserConsent::latest_for_scoped_vault(conn, &sv_id2)?
-                            .ok_or(ApiError::AssertionError("User consent not found".into()))?;
+                    IncodeVerificationSession::update(conn, verification_session.id, update)?;
 
-                        let privacy_vreq = VerificationRequest::create(
-                            conn,
-                            &sv_id2,
-                            &di_id2,
-                            VendorAPI::IncodeAddPrivacyConsent,
-                        )?;
-
-                        let ml_vreq = VerificationRequest::create(
-                            conn,
-                            &sv_id2,
-                            &di_id2,
-                            VendorAPI::IncodeAddMLConsent,
-                        )?;
-
-                        Ok((consent, privacy_vreq, ml_vreq))
-                    },
-                )
+                    Ok(next_state)
+                })
                 .await?;
-            // If we don't have consent, we can't proceed
 
-            Ok(AddConsent {
-                session,
-                user_consent_text: consent.consent_language_text,
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
-                identity_document_id: self.identity_document_id.clone(),
-                privacy_vreq,
-                ml_vreq,
-            }
-            .into())
+            Ok(next_state)
         }
     }
 
@@ -185,6 +180,44 @@ pub mod state_impl {
         pub scoped_vault_id: ScopedVaultId,
         pub decision_intent_id: DecisionIntentId,
         pub identity_document_id: IdentityDocumentId,
+    }
+
+    impl AddConsent {
+        pub fn enter(
+            conn: &mut TxnPgConn,
+            scoped_vault_id: ScopedVaultId,
+            decision_intent_id: DecisionIntentId,
+            identity_document_id: IdentityDocumentId,
+            session: VerificationSession,
+        ) -> ApiResult<Self> {
+            // we need consent in order to proceed, so we error
+            let consent = UserConsent::latest_for_scoped_vault(conn, &scoped_vault_id)?
+                .ok_or(ApiError::AssertionError("User consent not found".into()))?;
+
+            let privacy_vreq = VerificationRequest::create(
+                conn,
+                &scoped_vault_id,
+                &decision_intent_id,
+                VendorAPI::IncodeAddPrivacyConsent,
+            )?;
+
+            let ml_vreq = VerificationRequest::create(
+                conn,
+                &scoped_vault_id,
+                &decision_intent_id,
+                VendorAPI::IncodeAddMLConsent,
+            )?;
+
+            Ok(Self {
+                session,
+                user_consent_text: consent.consent_language_text,
+                scoped_vault_id,
+                decision_intent_id,
+                identity_document_id,
+                privacy_vreq,
+                ml_vreq,
+            })
+        }
     }
 
     #[async_trait]
@@ -244,34 +277,20 @@ pub mod state_impl {
             // Set up the next state transition
             //
             // Save the next stage's Vreq
-            let verification_session_id = self.session.id.clone();
-            let add_front_vreq = db_pool
-                .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
-                    let res = VerificationRequest::create_document_verification_request(
-                        conn,
-                        VendorAPI::IncodeAddFront,
-                        sv_id,
-                        id_doc_id,
-                        &di_id,
-                    )?;
-
+            let session1 = self.session.clone();
+            let next_state = db_pool
+                .db_transaction(move |conn| -> ApiResult<IncodeState> {
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddFront);
 
-                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                    IncodeVerificationSession::update(conn, session1.id.clone(), update)?;
 
-                    Ok(res)
+                    let next = AddFront::enter(conn, sv_id, di_id, id_doc_id, session1)?.into();
+
+                    Ok(next)
                 })
                 .await?;
-
-            Ok(AddFront {
-                session: self.session.to_owned(),
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
-                add_front_verification_request: add_front_vreq,
-                identity_document_id: self.identity_document_id.clone(),
-            }
-            .into())
+            Ok(next_state)
         }
     }
 
@@ -281,6 +300,32 @@ pub mod state_impl {
         pub decision_intent_id: DecisionIntentId,
         pub add_front_verification_request: VerificationRequest,
         pub identity_document_id: IdentityDocumentId,
+    }
+
+    impl AddFront {
+        pub fn enter(
+            conn: &mut TxnPgConn,
+            scoped_vault_id: ScopedVaultId,
+            decision_intent_id: DecisionIntentId,
+            identity_document_id: IdentityDocumentId,
+            session: VerificationSession,
+        ) -> ApiResult<Self> {
+            let res = VerificationRequest::create_document_verification_request(
+                conn,
+                VendorAPI::IncodeAddFront,
+                scoped_vault_id.clone(),
+                identity_document_id.clone(),
+                &decision_intent_id,
+            )?;
+
+            Ok(AddFront {
+                session,
+                scoped_vault_id,
+                decision_intent_id,
+                add_front_verification_request: res,
+                identity_document_id,
+            })
+        }
     }
 
     #[async_trait]

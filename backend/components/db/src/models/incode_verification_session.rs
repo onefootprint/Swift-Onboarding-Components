@@ -2,8 +2,8 @@ use chrono::{DateTime, Duration, Utc};
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId,
-    IncodeVerificationFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionState,
-    ScopedVaultId,
+    IncodeVerificationFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    IncodeVerificationSessionState, ScopedVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -32,6 +32,7 @@ pub struct IncodeVerificationSession {
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
     pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
+    pub kind: IncodeVerificationSessionKind,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -42,6 +43,7 @@ pub struct NewIncodeVerificationSession {
     pub state: IncodeVerificationSessionState,
     pub incode_configuration_id: IncodeConfigurationId,
     pub identity_document_id: IdentityDocumentId,
+    pub kind: IncodeVerificationSessionKind,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -110,6 +112,7 @@ impl IncodeVerificationSession {
         scoped_vault_id: ScopedVaultId,
         configuration_id: IncodeConfigurationId,
         identity_document_id: IdentityDocumentId,
+        kind: IncodeVerificationSessionKind,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSession {
             created_at: Utc::now(),
@@ -117,6 +120,7 @@ impl IncodeVerificationSession {
             state: IncodeVerificationSessionState::StartOnboarding,
             incode_configuration_id: configuration_id,
             identity_document_id,
+            kind: kind.clone(),
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)
@@ -129,6 +133,7 @@ impl IncodeVerificationSession {
             res.state,
             res.identity_document_id.clone(),
             None,
+            kind,
         )?;
 
         Ok(res)
@@ -140,13 +145,29 @@ impl IncodeVerificationSession {
         scoped_vault_id: ScopedVaultId,
         configuration_id: IncodeConfigurationId,
         identity_document_id: IdentityDocumentId,
+        kind: IncodeVerificationSessionKind,
     ) -> DbResult<Self> {
         let existing_session = Self::get(conn, &scoped_vault_id)?;
 
         if let Some(existing) = existing_session {
             Ok(existing)
         } else {
-            let new = Self::create(conn, scoped_vault_id, configuration_id, identity_document_id)?;
+            let new = Self::create(
+                conn,
+                scoped_vault_id,
+                configuration_id,
+                identity_document_id,
+                kind.clone(),
+            )?;
+
+            IncodeVerificationSessionEvent::create(
+                conn,
+                new.id.clone(),
+                new.state,
+                new.identity_document_id.clone(),
+                None,
+                kind,
+            )?;
 
             Ok(new)
         }
@@ -169,6 +190,7 @@ impl IncodeVerificationSession {
             res.state,
             res.identity_document_id.clone(),
             res.latest_failure_reason.clone(),
+            res.kind.clone(),
         )?;
 
         Ok(res)

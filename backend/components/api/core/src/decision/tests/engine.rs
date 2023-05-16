@@ -64,7 +64,8 @@ async fn test_run(
     let db_pool = test_db_pool();
     let state = &StateWithMockEnclave::init().await.state;
 
-    let (tenant, onboarding, uv, _, _) = create_user_and_onboarding(&db_pool, &state.enclave_client).await;
+    let (tenant, onboarding, uv, _, _) =
+        create_user_and_onboarding(&db_pool, &state.enclave_client, None).await;
     let tenant_vendor_control =
         TenantVendorControl::new(tenant.id.clone(), &db_pool, &state.enclave_client, &state.config)
             .await

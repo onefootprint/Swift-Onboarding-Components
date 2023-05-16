@@ -1,6 +1,6 @@
 use super::tenant::Tenant;
 use crate::schema::ob_configuration::BoxedQuery;
-use crate::schema::{ob_configuration, onboarding, tenant};
+use crate::schema::{ob_configuration, onboarding, scoped_vault, tenant};
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{DbError, DbResult};
@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, DataIdentifierDiscriminant};
+use newtypes::{ApiKeyStatus, DataIdentifierDiscriminant, ScopedVaultId};
 use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
@@ -216,6 +216,17 @@ impl ObConfiguration {
         let ob_config: ObConfiguration = onboarding::table
             .inner_join(ob_configuration::table)
             .filter(onboarding::id.eq(onboarding_id))
+            .select(ob_configuration::all_columns)
+            .get_result(conn)?;
+
+        Ok(ob_config)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_by_scoped_vault_id(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+        let ob_config: ObConfiguration = scoped_vault::table
+            .filter(scoped_vault::id.eq(scoped_vault_id))
+            .inner_join(ob_configuration::table)
             .select(ob_configuration::all_columns)
             .get_result(conn)?;
 

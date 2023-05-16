@@ -6,7 +6,7 @@ use db::{
     tests::fixtures,
     DbError, DbPool, TxnPgConn,
 };
-use newtypes::{IdentityDataKind, PiiString, VendorAPI};
+use newtypes::{CollectedDataOption, IdentityDataKind, PiiString, VendorAPI};
 
 use crate::{
     enclave_client::EnclaveClient,
@@ -17,12 +17,14 @@ use crate::{
 pub async fn create_user_and_onboarding(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
+    must_collect_data: Option<Vec<CollectedDataOption>>,
 ) -> (Tenant, Onboarding, Vault, ScopedVault, DecisionIntent) {
     let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
-            let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+            let ob_config =
+                fixtures::ob_configuration::create_with_opts(conn, &tenant.id, true, must_collect_data);
             let ob_config_id = ob_config.id.clone();
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config);
