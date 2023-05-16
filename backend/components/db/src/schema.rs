@@ -867,6 +867,21 @@ table! {
     }
 }
 
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    workflow (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        kind -> Text,
+        state -> Text,
+    }
+}
+
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_vault (scoped_vault_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
@@ -930,6 +945,7 @@ joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
 joinable!(watchlist_check -> task (task_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> vault (vault_id));
+joinable!(workflow -> scoped_vault (scoped_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_event,
@@ -983,4 +999,5 @@ allow_tables_to_appear_in_same_query!(
     verification_result,
     watchlist_check,
     webauthn_credential,
+    workflow,
 );

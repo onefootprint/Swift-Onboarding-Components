@@ -31,6 +31,7 @@ mod vault_kind;
 mod vendor;
 mod verification_status;
 mod watchlist_check;
+mod workflow;
 
 pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, business_owner_kind::*, company_size::*,
@@ -40,5 +41,5 @@ pub use self::{
     middesk_request_state::*, ob_config_status::*, onboarding_status::*, org_member_email::*,
     proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*, task_status::*,
     tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
-    verification_status::*, watchlist_check::*,
+    verification_status::*, watchlist_check::*, workflow::*,
 };
