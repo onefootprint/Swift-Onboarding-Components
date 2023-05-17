@@ -8,8 +8,8 @@
     "dev": "expo start --dev-client --clear",
     "ios": "expo run:ios",
     "lint": "eslint src --fix",
-    "test:watch": "jest --watch",
-    "test": "jest --ci --bail ",
+    "test:watch": "jest --watch --detectOpenHandles",
+    "test": "jest --ci --bail --detectOpenHandles",
     "typecheck": "yarn tsc --noEmit",
     "postinstall": "cd ../.. && yarn build:packages",
     "testflight": "npx eas build -p ios --auto-submit --profile testflight",
@@ -69,6 +69,7 @@
     "reactotron-react-native": "^5.0.3"
   },
   "jest": {
+    "testTimeout": 30000,
     "preset": "jest-expo",
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"

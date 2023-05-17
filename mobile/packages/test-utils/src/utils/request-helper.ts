@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.API_BASE_URL;
 
 const combineURL = (baseURL: string, relativeURL: string) =>
   relativeURL
@@ -34,9 +34,9 @@ const requestHelper = ({
 }: RequestParams) => {
   const caller = rest[method];
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
-  return caller(URL, (_req, res, ctx) =>
-    res(ctx.status(statusCode), ctx.delay(delay), ctx.json(response)),
-  );
+  return caller(URL, (_req, res, ctx) => {
+    return res(ctx.status(statusCode), ctx.delay(delay), ctx.json(response));
+  });
 };
 
 export default requestHelper;

@@ -1,4 +1,5 @@
 import themes, { Theme } from '@onefootprint/design-tokens';
+import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
 import { FootprintAppearance } from '../../theme.types';
@@ -55,7 +56,7 @@ const iterateOverVariables = (options: {
   return theme;
 };
 
-export const generateTokens = (
+export const createTokens = (
   appearance: FootprintAppearance,
   baseTheme: Theme,
 ): Theme => {
@@ -69,7 +70,7 @@ export const generateTokens = (
 const createTheme = (appearanceAsString: string): Theme => {
   const appearance = parseAppearance(appearanceAsString);
   if (!appearance) return themes.light;
-  return generateTokens(appearance, themes.light);
+  return createTokens(appearance, cloneDeep(themes.light));
 };
 
 export default createTheme;
