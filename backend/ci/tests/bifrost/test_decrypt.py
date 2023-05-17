@@ -15,7 +15,7 @@ def biometric_sandbox_user_auth(sandbox_user):
     "fields_to_decrypt,expected_success",
     [
         (["id.first_name", "id.last_name"], True),
-        (["id.dob"], False),
+        (["id.dob"], True),
         (["id.phone_number"], False),
         (["id.ssn9"], False),
         (["business.address_line1"], False),

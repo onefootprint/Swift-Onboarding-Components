@@ -31,17 +31,17 @@ def test_authorized_orgs(sandbox_user_real_phone, auth_token):
 
 
 BASIC_FIELDS = [
+    "id.address_line1",
+    "id.address_line2",
     "id.city",
     "id.state",
     "id.country",
     "id.zip",
     "id.first_name",
     "id.last_name",
+    "id.dob",
 ]
 SENSITIVE_FIELDS = [
-    "id.address_line1",
-    "id.address_line2",
-    "id.dob",
     "id.phone_number",
     "id.email",
     "id.ssn4",
