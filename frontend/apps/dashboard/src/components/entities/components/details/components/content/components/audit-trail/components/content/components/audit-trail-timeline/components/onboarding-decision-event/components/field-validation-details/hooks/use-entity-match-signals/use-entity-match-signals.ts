@@ -8,6 +8,10 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import transformResponse from './utils/transform-response';
 
+type UseEntityMatchSignalsProps = {
+  id: string;
+};
+
 const getMatchSignals = async (
   payload: GetEntityMatchSignalsRequest,
   authHeaders: AuthHeaders,
@@ -21,13 +25,15 @@ const getMatchSignals = async (
   return response;
 };
 
-const useEntityMatchSignals = (id: string) => {
+const useEntityMatchSignals = ({ id }: UseEntityMatchSignalsProps) => {
   const { authHeaders } = useSession();
 
   return useQuery(
     ['entity', id, 'match_signals'],
     () => getMatchSignals({ id }, authHeaders),
-    { select: transformResponse },
+    {
+      select: transformResponse,
+    },
   );
 };
 

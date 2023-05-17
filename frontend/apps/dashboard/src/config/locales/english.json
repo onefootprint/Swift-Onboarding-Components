@@ -599,7 +599,9 @@
             },
             "field-validation": {
               "drawer": {
-                "title": "Field validations"
+                "title": "Field validations",
+                "no-data": "Match data not available",
+                "error": "There was an error loading the data. Try again later."
               },
               "view-details": "View details",
               "attributes": {
