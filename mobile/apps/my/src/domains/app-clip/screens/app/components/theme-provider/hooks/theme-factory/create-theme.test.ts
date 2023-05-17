@@ -37,7 +37,7 @@ describe('create theme', () => {
     });
 
     describe('button', () => {
-      it('should return the theme extended', () => {
+      it('should extend the theme correctly', () => {
         const appearance: FootprintAppearance = {
           variables: {
             borderRadius: '10px',
@@ -55,7 +55,7 @@ describe('create theme', () => {
     });
 
     describe('link button', () => {
-      it('should return the theme extended', () => {
+      it('should extend the theme correctly', () => {
         const appearance: FootprintAppearance = {
           variables: {
             borderRadius: '10px',
@@ -72,7 +72,7 @@ describe('create theme', () => {
     });
 
     describe('label', () => {
-      it('should return the theme extended', () => {
+      it('should extend the theme correctly', () => {
         const appearance: FootprintAppearance = {
           variables: {
             labelColor: 'purple',
@@ -81,6 +81,20 @@ describe('create theme', () => {
         const expectedTheme = structuredClone(defaultTheme);
         const { inputLabel } = expectedTheme.components;
         inputLabel.states.default.color = 'purple';
+        expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
+      });
+    });
+
+    describe('hint', () => {
+      it('should extend the theme correctly', () => {
+        const appearance: FootprintAppearance = {
+          variables: {
+            hintColor: 'blue',
+          },
+        };
+        const expectedTheme = structuredClone(defaultTheme);
+        const { inputHint } = expectedTheme.components;
+        inputHint.states.default.color = 'blue';
         expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
       });
     });
