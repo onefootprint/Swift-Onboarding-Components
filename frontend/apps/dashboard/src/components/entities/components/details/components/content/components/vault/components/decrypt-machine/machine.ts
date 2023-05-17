@@ -9,7 +9,7 @@ import {
   MachineStates,
   State,
 } from './types';
-import getDiFields from './utils/get-di-fields';
+import getDiFields from './utils/get-di-fields/get-di-fields';
 
 export const createDecryptStateMachine = () =>
   createMachine<Context, MachineEvents, MachineStates>(
@@ -76,12 +76,7 @@ export const createDecryptStateMachine = () =>
       actions: {
         [Action.assignFields]: (context, event) => {
           if (event.type === Event.submittedFields) {
-            context.fields = event.payload.fields;
-          }
-        },
-        [Action.assignDI]: (context, event) => {
-          if (event.type === Event.submittedFields) {
-            context.diFields = getDiFields(event.payload.fields);
+            context.dis = getDiFields(event.payload.fields);
           }
         },
         [Action.assignReason]: (context, event) => {

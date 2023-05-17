@@ -19,7 +19,9 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
   const entityVault = useEntityVault(entity.id, entity);
 
   const handleSubmit = () => {
-    controls.decrypt(entity.id, { onSuccess: entityVault.update });
+    controls.decrypt(entity.id, entityVault.data, {
+      onSuccess: entityVault.update,
+    });
   };
 
   return (

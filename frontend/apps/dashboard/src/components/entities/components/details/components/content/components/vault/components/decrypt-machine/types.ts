@@ -29,12 +29,10 @@ export enum Action {
   assignReason = 'assignReason',
 }
 
-export type DiField = DataIdentifier;
-
 export type Context = {
   reason?: string;
   fields?: FormData;
-  diFields?: DiField[];
+  dis?: DataIdentifier[];
 };
 
 export type MachineEvents =

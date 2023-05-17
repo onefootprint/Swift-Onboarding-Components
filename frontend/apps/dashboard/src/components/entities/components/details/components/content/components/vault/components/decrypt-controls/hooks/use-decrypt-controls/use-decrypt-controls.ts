@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { EntityVault } from '@onefootprint/types';
+import { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 
 import type { FormData } from '../../../../vault.types';
 import { Event, State, useDecryptMachine } from '../../../decrypt-machine';
@@ -36,15 +36,16 @@ const useDecryptControls = () => {
   };
 
   const decrypt = (
-    userId: string,
+    entityId: string,
+    vaultData?: Partial<Record<DataIdentifier, VaultValue>>,
     callbacks?: {
       onSuccess?: (response: EntityVault) => void;
       onError?: (error: unknown) => void;
     },
   ) => {
-    const { reason, diFields } = context;
+    const { reason, dis } = context;
     decryptFields(
-      { reason, diFields, userId },
+      { reason, dis, entityId, vaultData },
       {
         onSuccess: results => {
           send(Event.decryptSucceeded);

@@ -1,7 +1,7 @@
 import { DataIdentifier } from '../data';
 
 export type DecryptRequest = {
-  userId: string;
+  entityId: string;
   fields: DataIdentifier[];
   reason: string;
 };

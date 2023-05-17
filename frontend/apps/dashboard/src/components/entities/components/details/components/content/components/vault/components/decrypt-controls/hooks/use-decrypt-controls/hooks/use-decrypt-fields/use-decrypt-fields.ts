@@ -1,13 +1,14 @@
-import { EntityVault } from '@onefootprint/types';
+import { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 
-import type { DiField } from '../../../../../decrypt-machine';
 import useDecryptText from './hooks/use-decrypt';
+import getDiFields from './utils/get-doc-dis';
 import transformResponseToVaultFormat from './utils/transform-response-to-vault-format';
 
 type DecryptPayload = {
-  userId: string;
+  entityId: string;
   reason?: string;
-  diFields?: DiField[];
+  dis?: DataIdentifier[];
+  vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
 };
 
 type DecryptCallbacks = {
@@ -19,14 +20,14 @@ const useDecryptFields = () => {
   const decryptText = useDecryptText();
 
   const decryptFields = (
-    { userId, reason = '', diFields }: DecryptPayload,
+    { entityId, reason = '', dis, vaultData }: DecryptPayload,
     { onSuccess, onError }: DecryptCallbacks,
   ) => {
-    if (diFields && diFields.length) {
+    if (dis && dis.length) {
       decryptText
         .mutateAsync({
-          userId,
-          fields: diFields,
+          entityId,
+          fields: getDiFields(dis, vaultData),
           reason,
         })
         .then(transformResponseToVaultFormat)
