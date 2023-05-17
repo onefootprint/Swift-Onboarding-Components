@@ -11,8 +11,8 @@ use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::IsGuardMet;
 use api_core::errors::AssertionError;
-use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
+use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -35,7 +35,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let scoped_user_id = user_auth
@@ -69,7 +69,7 @@ pub async fn post(
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
-    state
+    let ob = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
@@ -85,7 +85,7 @@ pub async fn post(
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
                 let must_collect_selfie = ob_config.must_collect_selfie();
-                DocumentRequest::create(conn, ob.scoped_vault_id, None, must_collect_selfie, None)?;
+                DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie, None)?;
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
@@ -127,9 +127,10 @@ pub async fn post(
                 user_auth.update_session(conn, &session_key, data)?;
             }
 
-            Ok(())
+            Ok(ob)
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    let already_authorized = ob.authorized_at.is_some();
+    ResponseData::ok(OnboardingResponse { already_authorized }).json()
 }
