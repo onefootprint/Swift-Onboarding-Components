@@ -36,20 +36,33 @@ describe('create theme', () => {
       expect(generateTokens(appearance, defaultTheme)).toEqual(defaultTheme);
     });
 
-    describe('button', () => {
+    describe('globals', () => {
       it('should extend the theme correctly', () => {
         const appearance: FootprintAppearance = {
           variables: {
             borderRadius: '10px',
+          },
+        };
+        const expectedTheme = structuredClone(defaultTheme);
+        const { button, input } = expectedTheme.components;
+        expectedTheme.borderRadius.default = '10px';
+        button.global.borderRadius = '10px';
+        input.global.borderRadius = '10px';
+        expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
+      });
+    });
+
+    describe('button', () => {
+      it('should extend the theme correctly', () => {
+        const appearance: FootprintAppearance = {
+          variables: {
             buttonPrimaryBg: 'red',
           },
         };
         const expectedTheme = structuredClone(defaultTheme);
         const { button } = expectedTheme.components;
-        expectedTheme.borderRadius.default = '10px';
         button.variant.primary.bg = 'red';
         button.variant.primary.hover.bg = 'red';
-        button.global.borderRadius = '10px';
         expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
       });
     });
@@ -95,6 +108,22 @@ describe('create theme', () => {
         const expectedTheme = structuredClone(defaultTheme);
         const { inputHint } = expectedTheme.components;
         inputHint.states.default.color = 'blue';
+        expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
+      });
+    });
+
+    describe('input', () => {
+      it('should extend the theme correctly', () => {
+        const appearance: FootprintAppearance = {
+          variables: {
+            inputBg: 'black',
+          },
+        };
+        const expectedTheme = structuredClone(defaultTheme);
+        const { input } = expectedTheme.components;
+        input.state.default.initial.bg = 'black';
+        input.state.default.hover.bg = 'black';
+        input.state.default.focus.bg = 'black';
         expect(generateTokens(appearance, defaultTheme)).toEqual(expectedTheme);
       });
     });

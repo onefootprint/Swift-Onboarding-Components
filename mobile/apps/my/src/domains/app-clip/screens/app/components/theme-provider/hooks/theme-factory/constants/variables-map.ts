@@ -1,5 +1,6 @@
 import buttonVariables from './button-variables';
 import hintVariables from './hint-variables';
+import inputVariables from './input-variables';
 import labelVariables from './label-variables';
 import linkButtonVariables from './link-button-variables';
 
@@ -65,6 +66,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
     ...linkButtonVariables,
     ...labelVariables,
     ...hintVariables,
+    ...inputVariables,
   ],
 );
 
