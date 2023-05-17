@@ -1,11 +1,5 @@
 use std::collections::HashMap;
 
-use crate::{
-    enclave_client::EnclaveClient,
-    errors::{ApiError, ApiResult},
-    metrics,
-};
-
 use super::{
     features::kyc_features::KycFeatureVector,
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
@@ -18,26 +12,35 @@ use super::{
     },
     *,
 };
+use crate::{
+    enclave_client::EnclaveClient,
+    errors::{ApiError, ApiResult},
+    metrics,
+};
 use db::{
     models::{
         onboarding::Onboarding,
+        scoped_vault::ScopedVault,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
     },
-    DbError, DbPool,
+    DbError, DbPool, TxnPgConn,
 };
 use either::Either;
-use feature_flag::FeatureFlagClient;
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
     socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
+use strum::IntoEnumIterator;
 
 use itertools::Itertools;
-use newtypes::{OnboardingId, ScopedVaultId, VerificationRequestId};
+use newtypes::{
+    FootprintReasonCode, OnboardingId, ScopedVaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+};
 use prometheus::labels;
 ///
 /// Run loads saved VerificationRequests and (potentially) VerificationResults and produces a Decision
@@ -115,26 +118,55 @@ pub async fn make_onboarding_decision<T>(
     db_pool: &DbPool,
 ) -> ApiResult<()>
 where
-    T: FeatureVector,
+    T: FeatureVector + Send + Sync,
 {
     // Calculate output from rules + features
     let rules_output = fv.evaluate(&ff_client)?;
 
-    // Log decision output
-    tracing::info!(
-       rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
-       rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
-       create_manual_review=%rules_output.create_manual_review,
-       decision=%rules_output.decision_status,
-       onboarding_id=%ob.id,
-       scoped_user_id=%ob.scoped_vault_id,
-       ob_configuration_id=%ob.ob_configuration_id,
-       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
-       // TODO: differentiate KYB vs KYC here
-    );
+    let obid = ob.id.clone();
+    let reason_codes = reason_codes_for_tenant(db_pool, ff_client, obid, &fv).await?;
+    let verification_result_ids = fv.verification_results();
 
-    // Save/action/emit risk signals for the decision
-    save_onboarding_decision(db_pool, ff_client, &ob.id, rules_output, fv, true).await
+    let ob = ob.clone();
+    db_pool
+        .db_transaction(move |conn| {
+            // Save/action/emit risk signals for the decision
+            save_onboarding_decision(
+                conn,
+                &ob,
+                rules_output,
+                reason_codes,
+                verification_result_ids,
+                true,
+            )
+        })
+        .await
+}
+
+// TODO: probably make this a direct output of rules eval or something
+pub async fn reason_codes_for_tenant<T>(
+    db_pool: &DbPool,
+    ff_client: impl FeatureFlagClient,
+    obid: OnboardingId,
+    fv: &T,
+) -> ApiResult<Vec<(FootprintReasonCode, Vec<Vendor>)>>
+where
+    T: FeatureVector,
+{
+    let tenant_id = db_pool
+        .db_query(move |conn| ScopedVault::get(conn, &obid))
+        .await??
+        .tenant_id;
+    let tenant_can_view_socure_risk_signal = ff_client.flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
+
+    let mut visible_vendor_apis: Vec<VendorAPI> = VendorAPI::iter()
+        .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
+        .collect();
+
+    if tenant_can_view_socure_risk_signal {
+        visible_vendor_apis.push(VendorAPI::SocureIDPlus)
+    }
+    Ok(fv.reason_codes(visible_vendor_apis))
 }
 
 pub async fn save_vendor_responses(
@@ -359,27 +391,23 @@ pub fn calculate_decision(
 }
 
 /// Create and save an onboarding decision
-pub async fn save_onboarding_decision<T>(
-    db_pool: &DbPool,
-    ff_client: impl FeatureFlagClient,
-    onboarding_id: &OnboardingId,
+pub fn save_onboarding_decision(
+    conn: &mut TxnPgConn,
+    ob: &Onboarding,
     rules_output: OnboardingRulesDecisionOutput,
-    fv: T,
+    reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+    verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
-) -> ApiResult<()>
-where
-    T: FeatureVector,
-{
+) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
-        onboarding_id.clone(),
-        fv,
-        db_pool,
-        ff_client,
-        rules_output,
+        conn,
+        ob.id.clone(),
+        reason_codes,
+        verification_result_ids,
+        &rules_output,
         assert_is_first_decision_for_onboarding,
-    )
-    .await?;
+    )?;
 
     let status = onboarding_decision.status.to_string();
     if let Ok(metric) =
@@ -387,6 +415,18 @@ where
     {
         metric.inc();
     }
+
+    tracing::info!(
+       rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
+       rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
+       create_manual_review=%rules_output.create_manual_review,
+       decision=%rules_output.decision_status,
+       onboarding_id=%ob.id,
+       scoped_user_id=%ob.scoped_vault_id,
+       ob_configuration_id=%ob.ob_configuration_id,
+       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
+       // TODO: differentiate KYB vs KYC here
+    );
 
     Ok(())
 }

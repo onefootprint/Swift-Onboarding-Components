@@ -5,6 +5,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
+use api_core::decision::features;
 use api_core::decision::onboarding::OnboardingRulesDecisionOutput;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
@@ -154,6 +155,7 @@ pub struct MakeDecisionResponse {
     // TODO: add OnboardingRulesDecisionOutput here
 }
 
+// TODO: rework these to use Workflows
 #[api_v2_operation(
     description = "Runs decisioning logic on latest completed vendor requests and writes a new onboarding decision",
     tags(Private)
@@ -199,18 +201,9 @@ async fn make_decision(
         .map(|vr| vr.verification_result_id.clone())
         .collect();
 
-    let (rules_output, features) =
-        decision::engine::calculate_decision(vendor_requests.completed_requests, &state.feature_flag_client)?;
-
-    decision::engine::save_onboarding_decision(
-        &state.db_pool,
-        state.feature_flag_client.clone(),
-        &ob.id,
-        rules_output,
-        features,
-        false,
-    )
-    .await?;
+    let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
+    decision::engine::make_onboarding_decision(&ob, fv, state.feature_flag_client.clone(), &state.db_pool)
+        .await?;
 
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }

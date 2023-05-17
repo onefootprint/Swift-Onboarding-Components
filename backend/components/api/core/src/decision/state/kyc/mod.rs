@@ -3,17 +3,32 @@ pub mod states;
 #[cfg(test)]
 mod tests;
 
-use super::{HasStateName, StateError, WorkflowActions, WorkflowStates};
-use crate::{errors::ApiResult, State};
+use super::{HasStateName, OnAction, StateError, WorkflowActions, WorkflowStates};
+use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use db::models::workflow::Workflow;
+use newtypes::{OnboardingId, ScopedVaultId, TenantId};
 
 ///
 /// States
 ///
 
-pub struct DataCollection;
-pub struct VendorCalls;
-pub struct Decisioning;
+pub struct DataCollection {
+    sv_id: ScopedVaultId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
+}
+
+pub struct VendorCalls {
+    sv_id: ScopedVaultId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
+}
+
+pub struct Decisioning {
+    ob_id: OnboardingId,
+    vendor_results: Vec<VendorResult>,
+}
+
 pub struct Complete;
 
 pub enum States {

@@ -37,6 +37,8 @@ pub enum StateError {
     UnexpectedStateForWorkflow(newtypes::WorkflowState, WorkflowId),
     #[error("Attempted to transition state, but state has been modified. Expected: {0}, found state: {1}")]
     ConcurrentStateChange(newtypes::WorkflowState, newtypes::WorkflowState),
+    #[error("Error initializing state {0}: {1}")]
+    StateInitError(String, String),
 }
 
 pub enum WorkflowStates {

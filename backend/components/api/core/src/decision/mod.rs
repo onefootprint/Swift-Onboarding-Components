@@ -4,7 +4,7 @@ use self::rule::RuleSetName;
 
 pub mod biz_risk;
 pub mod engine;
-pub(self) mod features;
+pub mod features;
 pub mod field_validations;
 pub mod onboarding;
 pub mod risk;
