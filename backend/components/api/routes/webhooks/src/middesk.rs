@@ -16,7 +16,7 @@ async fn handle_webhook(
 ) -> JsonApiResponse<EmptyResponse> {
     decision::vendor::middesk::handle_middesk_webhook(
         &state.db_pool,
-        &state.feature_flag_client,
+        state.feature_flag_client.clone(),
         &state.middesk_client,
         &state.enclave_client,
         webhook_signature.request,

@@ -192,7 +192,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         self,
         db_pool: &DbPool,
         enclave_client: &EnclaveClient,
-        ff_client: &impl FeatureFlagClient,
+        ff_client: impl FeatureFlagClient,
         middesk_client: &impl VendorAPICall<
             MiddeskCreateBusinessRequest,
             MiddeskCreateBusinessResponse,
@@ -455,7 +455,7 @@ impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(
         self,
         db_pool: &DbPool,
-        ff_client: &impl FeatureFlagClient,
+        ff_client: impl FeatureFlagClient,
         enclave_client: &EnclaveClient,
     ) -> ApiResult<()> {
         let obid = self.middesk_request.onboarding_id.clone();
@@ -507,7 +507,7 @@ pub async fn run_kyb(
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,
     >,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     ob_id: OnboardingId,
 ) -> Result<(), ApiError> {
     let state = init_middesk_request(db_pool, ob_id).await?;
@@ -562,7 +562,7 @@ pub async fn init_middesk_request(
 // Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from Middesk
 pub async fn handle_middesk_webhook(
     db_pool: &DbPool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     middesk_client: &impl VendorAPICall<
         MiddeskGetBusinessRequest,
         MiddeskGetBusinessResponse,
@@ -611,7 +611,7 @@ async fn send_middesk_call(
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,
     >,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     ob_configuration_key: ObConfigurationKey,
 ) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
     if ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key)) {

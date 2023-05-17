@@ -47,7 +47,7 @@ pub async fn run(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -72,7 +72,7 @@ pub async fn run(
         enclave_client,
         is_production,
         vendor_requests.outstanding_requests,
-        ff_client,
+        &ff_client,
         idology_client,
         socure_client,
         twilio_client,
@@ -111,14 +111,14 @@ pub async fn run(
 pub async fn make_onboarding_decision<T>(
     ob: &Onboarding,
     fv: T,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     db_pool: &DbPool,
 ) -> ApiResult<()>
 where
     T: FeatureVector,
 {
     // Calculate output from rules + features
-    let rules_output = fv.evaluate(ff_client)?;
+    let rules_output = fv.evaluate(&ff_client)?;
 
     // Log decision output
     tracing::info!(
@@ -361,7 +361,7 @@ pub fn calculate_decision(
 /// Create and save an onboarding decision
 pub async fn save_onboarding_decision<T>(
     db_pool: &DbPool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     onboarding_id: &OnboardingId,
     rules_output: OnboardingRulesDecisionOutput,
     fv: T,

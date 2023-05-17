@@ -146,7 +146,7 @@ async fn test_run(
         &db_pool,
         &state.enclave_client,
         is_production,
-        &mock_ff_client,
+        mock_ff_client,
         &mock_idology_api_call,
         &mock_socure_api_call,
         &mock_twilio_api_call,

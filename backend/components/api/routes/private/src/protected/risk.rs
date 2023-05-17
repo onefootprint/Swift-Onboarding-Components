@@ -204,7 +204,7 @@ async fn make_decision(
 
     decision::engine::save_onboarding_decision(
         &state.db_pool,
-        &state.feature_flag_client,
+        state.feature_flag_client.clone(),
         &ob.id,
         rules_output,
         features,

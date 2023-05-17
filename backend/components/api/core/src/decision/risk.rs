@@ -28,7 +28,7 @@ pub async fn save_final_decision<T>(
     ob_id: OnboardingId,
     fv: T,
     db_pool: &DbPool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: impl FeatureFlagClient,
     decision: OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,
 ) -> ApiResult<OnboardingDecision>

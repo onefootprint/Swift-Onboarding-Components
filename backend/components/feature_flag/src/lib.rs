@@ -81,7 +81,7 @@ impl LaunchDarklyFeatureFlagClient {
 }
 
 #[automock]
-pub trait FeatureFlagClient: Sync + Send {
+pub trait FeatureFlagClient: Sync + Send + 'static {
     #[allow(clippy::needless_lifetimes)]
     fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool;
 }

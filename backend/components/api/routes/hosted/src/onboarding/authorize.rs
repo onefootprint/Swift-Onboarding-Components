@@ -123,7 +123,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                 &state.db_pool,
                 &state.enclave_client,
                 &state.middesk_client,
-                &state.feature_flag_client,
+                state.feature_flag_client.clone(),
                 biz_ob.id,
             )
             .await;
@@ -255,7 +255,7 @@ async fn run_kyc(
             &state.db_pool,
             &state.enclave_client,
             state.config.service_config.is_production(),
-            &state.feature_flag_client,
+            state.feature_flag_client.clone(),
             &state.footprint_vendor_http_client,
             &state.socure_production_client,
             &state.twilio_client.client,
