@@ -13,18 +13,21 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId};
 ///
 
 pub struct DataCollection {
+    is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
 
 pub struct VendorCalls {
+    is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
 
 pub struct Decisioning {
+    is_redo: bool,
     ob_id: OnboardingId,
     vendor_results: Vec<VendorResult>,
 }
@@ -70,13 +73,16 @@ impl States {
         let newtypes::WorkflowState::Kyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
         };
+        let newtypes::WorkflowConfig::Kyc(c) = workflow.config.clone() else {
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+        };
         match s {
             newtypes::KycState::DataCollection => {
-                DataCollection::init(state, workflow).await.map(States::from)
+                DataCollection::init(state, workflow, c).await.map(States::from)
             }
-            newtypes::KycState::VendorCalls => VendorCalls::init(state, workflow).await.map(States::from),
-            newtypes::KycState::Decisioning => Decisioning::init(state, workflow).await.map(States::from),
-            newtypes::KycState::Complete => Complete::init(state, workflow).await.map(States::from),
+            newtypes::KycState::VendorCalls => VendorCalls::init(state, workflow, c).await.map(States::from),
+            newtypes::KycState::Decisioning => Decisioning::init(state, workflow, c).await.map(States::from),
+            newtypes::KycState::Complete => Complete::init(state, workflow, c).await.map(States::from),
         }
     }
 

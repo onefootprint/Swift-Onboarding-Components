@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::State;
 use db::models::workflow::Workflow;
 use db::DbError;
-use newtypes::{ScopedVaultId, WorkflowId, WorkflowKind, WorkflowState};
+use newtypes::{ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -13,6 +13,7 @@ pub struct CreateWorkflowRequest {
     pub sv_id: ScopedVaultId,
     pub wf_kind: WorkflowKind,
     pub wf_state: WorkflowState,
+    pub wf_config: WorkflowConfig,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -31,12 +32,13 @@ async fn create_workflow(
         sv_id,
         wf_kind,
         wf_state,
+        wf_config,
     } = request.into_inner();
 
     let wf = state
         .db_pool
         .db_query(move |conn| -> Result<Workflow, DbError> {
-            Workflow::create(conn, sv_id, wf_kind, wf_state)
+            Workflow::create(conn, sv_id, wf_kind, wf_state, wf_config)
         })
         .await??;
 

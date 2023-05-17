@@ -35,6 +35,8 @@ pub enum StateError {
     UnexpectedActionForState, // TODO: paramaterize
     #[error("Unexpected state: {0} for workflow: {1}")]
     UnexpectedStateForWorkflow(newtypes::WorkflowState, WorkflowId),
+    #[error("Unexpected config: {0:?} for workflow: {1}")]
+    UnexpectedConfigForWorkflow(newtypes::WorkflowConfig, WorkflowId),
     #[error("Attempted to transition state, but state has been modified. Expected: {0}, found state: {1}")]
     ConcurrentStateChange(newtypes::WorkflowState, newtypes::WorkflowState),
     #[error("Error initializing state {0}: {1}")]

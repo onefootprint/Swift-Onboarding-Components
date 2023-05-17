@@ -12,6 +12,8 @@ use db::models::workflow_event::WorkflowEvent;
 use db::tests::test_db_pool::TestDbPool;
 use itertools::Itertools;
 use macros::test_db_pool;
+use newtypes::KycConfig;
+use newtypes::WorkflowConfig;
 use newtypes::{KycState, WorkflowId, WorkflowState};
 
 async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
@@ -20,7 +22,16 @@ async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
 
     state
         .db_pool
-        .db_query(|conn| Workflow::create(conn, sv.id, (&s).into(), s).unwrap())
+        .db_query(|conn| {
+            Workflow::create(
+                conn,
+                sv.id,
+                (&s).into(),
+                s,
+                WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+            )
+            .unwrap()
+        })
         .await
         .unwrap()
 }

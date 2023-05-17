@@ -879,6 +879,7 @@ table! {
         scoped_vault_id -> Text,
         kind -> Text,
         state -> Text,
+        config -> Jsonb,
     }
 }
 

@@ -5,7 +5,7 @@ use db::models::{
     scoped_vault::ScopedVault,
     workflow::Workflow,
 };
-use newtypes::{FootprintReasonCode, Vendor, VerificationResultId};
+use newtypes::{FootprintReasonCode, KycConfig, Vendor, VerificationResultId};
 
 use super::{
     Authorize, Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls,
@@ -32,7 +32,7 @@ use crate::{
 /// DataCollection
 /// ////////////////
 impl DataCollection {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
@@ -42,6 +42,7 @@ impl DataCollection {
             })
             .await??;
         Ok(DataCollection {
+            is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -68,9 +69,14 @@ impl OnAction<Authorize> for DataCollection {
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         let ob = Onboarding::lock(conn, &self.ob_id)?;
         // redundant with new workflow state updates, will eventually remove when Onboarding is removed
-        if ob.idv_reqs_initiated_at.is_some() {
-            return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+        if !self.is_redo {
+            if ob.idv_reqs_initiated_at.is_some() {
+                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
+            }
+            ob.into_inner()
+                .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
         }
+        // TODO: create new DI if is_redo
         let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &self.sv_id)?;
 
         let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&self.sv_id))?;
@@ -82,10 +88,9 @@ impl OnAction<Authorize> for DataCollection {
             &decision_intent.id,
             &tvc,
         )?;
-        ob.into_inner()
-            .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
 
         Ok(States::from(VendorCalls {
+            is_redo: self.is_redo,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
@@ -98,7 +103,7 @@ impl OnAction<Authorize> for DataCollection {
 /// VendorCalls
 /// ////////////////
 impl VendorCalls {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
         // TODO: consolidate with other init
         let (ob, sv) = state
             .db_pool
@@ -109,6 +114,7 @@ impl VendorCalls {
             })
             .await??;
         Ok(VendorCalls {
+            is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -191,6 +197,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         _conn: &mut db::TxnPgConn,
     ) -> ApiResult<WorkflowStates> {
         Ok(States::from(Decisioning {
+            is_redo: self.is_redo,
             ob_id: self.ob_id,
             vendor_results,
         })
@@ -202,7 +209,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
 /// Decisioning
 /// ////////////////
 impl Decisioning {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
@@ -229,6 +236,7 @@ impl Decisioning {
         let vendor_results = vendor_requests.completed_requests;
 
         Ok(Decisioning {
+            is_redo: config.is_redo,
             ob_id: ob.id,
             vendor_results,
         })
@@ -270,7 +278,7 @@ impl OnAction<MakeDecision> for Decisioning {
             rules_output,
             reason_codes,
             verification_result_ids,
-            true,
+            !self.is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         )?;
         Ok(States::from(Complete).into())
     }
@@ -280,7 +288,7 @@ impl OnAction<MakeDecision> for Decisioning {
 /// Complete
 /// ////////////////
 impl Complete {
-    pub async fn init(_state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(_state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
         Ok(Complete)
     }
 }

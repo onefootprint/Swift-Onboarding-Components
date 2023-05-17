@@ -1,6 +1,7 @@
 use crate::util::impl_enum_string_diesel;
 use crate::EnumDotNotationError;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -160,6 +161,25 @@ impl From<AlpacaKycState> for WorkflowState {
         Self::AlpacaKyc(value)
     }
 }
+
+// TODO: probs consolidate this into WorkflowState somehow
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind", content = "data")]
+pub enum WorkflowConfig {
+    Kyc(KycConfig),
+    AlpacaKyc(AlpacaKycConfig),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+
+pub struct KycConfig {
+    pub is_redo: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+
+pub struct AlpacaKycConfig;
 
 #[cfg(test)]
 mod tests {

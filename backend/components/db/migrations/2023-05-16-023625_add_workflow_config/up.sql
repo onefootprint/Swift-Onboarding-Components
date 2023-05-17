@@ -1,0 +1,1 @@
+ALTER TABLE workflow ADD COLUMN config jsonb NOT NULL;

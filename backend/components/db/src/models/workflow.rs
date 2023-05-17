@@ -1,11 +1,10 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{Locked, ScopedVaultId, WorkflowId, WorkflowKind, WorkflowState};
+use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use serde::{Deserialize, Serialize};
 
-use crate::{schema::workflow, DbResult, PgConn, TxnPgConn};
-
 use super::workflow_event::WorkflowEvent;
+use crate::{schema::workflow, DbResult, PgConn, TxnPgConn};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow)]
@@ -17,6 +16,7 @@ pub struct Workflow {
     pub scoped_vault_id: ScopedVaultId,
     pub kind: WorkflowKind,
     pub state: WorkflowState,
+    pub config: WorkflowConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -26,6 +26,7 @@ pub struct NewWorkflow {
     pub scoped_vault_id: ScopedVaultId,
     pub kind: WorkflowKind,
     pub state: WorkflowState,
+    pub config: WorkflowConfig,
 }
 
 impl Workflow {
@@ -35,12 +36,14 @@ impl Workflow {
         scoped_vault_id: ScopedVaultId,
         kind: WorkflowKind,
         state: WorkflowState,
+        config: WorkflowConfig,
     ) -> DbResult<Self> {
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),
             scoped_vault_id,
             kind,
             state,
+            config,
         };
 
         let res = diesel::insert_into(workflow::table)
@@ -108,6 +111,7 @@ mod tests {
     use super::*;
     use crate::{models::workflow_event::WorkflowEvent, tests::prelude::*};
     use macros::db_test;
+    use newtypes::KycConfig;
     use newtypes::KycState;
     use std::str::FromStr;
 
@@ -115,21 +119,32 @@ mod tests {
     fn test(conn: &mut TestPgConn) {
         let state = KycState::VendorCalls;
         let wf_state: WorkflowState = state.into();
+        let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
         let wf = Workflow::create(
             conn,
             ScopedVaultId::from_str("sv_123").unwrap(),
             (&wf_state).into(),
             wf_state,
+            config,
         )
         .unwrap();
         assert!(wf.kind == WorkflowKind::Kyc);
         assert!(wf.state == WorkflowState::Kyc(KycState::VendorCalls));
+        assert!(wf.config == WorkflowConfig::Kyc(KycConfig { is_redo: false }));
     }
 
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
         let s: WorkflowState = KycState::VendorCalls.into();
-        let wf = Workflow::create(conn, ScopedVaultId::from_str("sv_123").unwrap(), (&s).into(), s).unwrap();
+        let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
+        let wf = Workflow::create(
+            conn,
+            ScopedVaultId::from_str("sv_123").unwrap(),
+            (&s).into(),
+            s,
+            config,
+        )
+        .unwrap();
 
         let wf = Workflow::lock(conn, &wf.id).unwrap();
         let wfid = wf.id.clone();
