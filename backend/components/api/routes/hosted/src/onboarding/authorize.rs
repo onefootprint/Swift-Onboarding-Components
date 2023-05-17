@@ -11,6 +11,9 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
+use api_core::decision::state::kyc;
+use api_core::decision::state::WorkflowActions;
+use api_core::decision::state::WorkflowWrapper;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
@@ -25,8 +28,10 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
+use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
+use newtypes::WorkflowKind;
 use paperclip::actix::{self, api_v2_operation, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
@@ -39,6 +44,16 @@ use webhooks::WebhookClient;
 #[actix::post("/hosted/onboarding/authorize")]
 pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+
+    let span = tracing::Span::current();
+    span.record("tenant_id", &format!("{:?}", user_auth.tenant()?.id.as_str()));
+    span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
+    span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
+    span.record("scoped_use_id", &format!("{}", user_auth.scoped_user.id));
+    span.record(
+        "ob_configuration_id",
+        &format!("{}", user_auth.onboarding()?.ob_configuration_id),
+    );
 
     // Verify there are no unmet requirements
     let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
@@ -53,8 +68,26 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    // Mark the obs for the person and business as authorized
     let ob_id = user_auth.onboarding()?.id.clone();
+
+    // For now, for testing purposes we will check if a Workflow exists and if so short circuit to use the workflow state machine.
+    // a Workflow would only exist if manually created (ie in PG to test this out).
+    let svid = user_auth.onboarding()?.scoped_vault_id.clone();
+    let wf = state
+        .db_pool
+        .db_query(move |conn| Workflow::latest_by_kind(conn, &svid, WorkflowKind::Kyc))
+        .await;
+    if let Ok(Ok(Some(wf))) = wf {
+        let ww = WorkflowWrapper::init(&state, wf).await?;
+        let ww = ww
+            .run(&state, WorkflowActions::from(kyc::Actions::from(kyc::Authorize)))
+            .await?;
+
+        tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran state machine");
+        return ResponseData::ok(EmptyResponse {}).json();
+    }
+
+    // Mark the obs for the person and business as authorized
     let (biz_ob, user_auth) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
@@ -77,15 +110,6 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         })
         .await?;
 
-    let span = tracing::Span::current();
-    span.record("tenant_id", &format!("{:?}", user_auth.tenant()?.id.as_str()));
-    span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
-    span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
-    span.record("scoped_use_id", &format!("{}", user_auth.scoped_user.id));
-    span.record(
-        "ob_configuration_id",
-        &format!("{}", user_auth.onboarding()?.ob_configuration_id),
-    );
     let tenant_vendor_control = TenantVendorControl::new(
         user_auth.tenant()?.id.clone(),
         &state.db_pool,
@@ -151,6 +175,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     // Don't send a webhook if we already sent an onboarding.completed webhook
     if should_run_kyc_checks {
         // create the webhook event to fire
+        // TODO: move webhook into Workflow
         let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
             fp_id: su.fp_id.clone(),
             footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),

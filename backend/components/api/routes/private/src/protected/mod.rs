@@ -1,6 +1,7 @@
 mod risk;
 mod task;
 mod token_reveal;
+mod workflow;
 
 use paperclip::actix::{
     api_v2_operation, get,
@@ -18,7 +19,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(task::execute_tasks)
         .service(task::create_task)
         .service(token_reveal::post)
-        .service(task::create_overdue_watchlist_check_tasks);
+        .service(task::create_overdue_watchlist_check_tasks)
+        .service(workflow::create_workflow);
 }
 
 #[api_v2_operation(tags(Private, Protected))]

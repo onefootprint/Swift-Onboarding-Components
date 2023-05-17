@@ -26,6 +26,7 @@ use strum_macros::EnumString;
     EnumDiscriminants,
     SerializeDisplay,
     DeserializeFromStr,
+    Apiv2Schema,
 )]
 #[strum_discriminants(
     name(WorkflowKind),
@@ -38,6 +39,7 @@ use strum_macros::EnumString;
         FromSqlRow,
         DeserializeFromStr,
         SerializeDisplay,
+        Apiv2Schema
     ),
     strum(serialize_all = "snake_case")
 )]

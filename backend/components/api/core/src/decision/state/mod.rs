@@ -72,7 +72,7 @@ impl From<&WorkflowStates> for newtypes::WorkflowState {
     }
 }
 
-struct WorkflowWrapper {
+pub struct WorkflowWrapper {
     pub state: WorkflowStates,
     pub workflow_id: WorkflowId,
 }
