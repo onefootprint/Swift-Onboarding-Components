@@ -6,7 +6,7 @@ import Error from './components/error';
 
 type AppErrorBoundaryProps = {
   children: React.ReactNode;
-  onReset: () => void;
+  onReset?: () => void;
 };
 
 const AppErrorBoundary = ({ children, onReset }: AppErrorBoundaryProps) => {
