@@ -58,6 +58,7 @@ describe('Onboarding Machine Tests', () => {
       payload: {
         device: testDevice,
         config: testOnboardingConfig,
+        alreadyAuthorized: false,
       },
     });
     expect(state.value).toEqual('requirements');
@@ -69,6 +70,7 @@ describe('Onboarding Machine Tests', () => {
       data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: undefined,
       obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
+      alreadyAuthorized: false,
     });
 
     state = machine.send({
@@ -91,6 +93,42 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       data: { [IdDI.email]: 'belce@onefootprint.com' },
       validationToken: 'token',
+      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
+      alreadyAuthorized: false,
+    });
+  });
+
+  it('skips requirements when already authorized', () => {
+    const machine = createMachine({});
+    let { state } = machine;
+    expect(state.value).toBe('init');
+
+    state = machine.send({
+      type: 'initContextUpdated',
+      payload: {
+        device: testDevice,
+        config: testOnboardingConfig,
+        alreadyAuthorized: true,
+      },
+    });
+    expect(state.value).toEqual('validate');
+
+    state = machine.send({
+      type: 'validationComplete',
+      payload: {
+        validationToken: 'token',
+      },
+    });
+    expect(state.value).toEqual('complete');
+
+    expect(state.context).toEqual({
+      userFound: true,
+      device: testDevice,
+      config: testOnboardingConfig,
+      authToken: 'token',
+      data: { [IdDI.email]: 'belce@onefootprint.com' },
+      validationToken: 'token',
+      alreadyAuthorized: true,
       obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
     });
   });

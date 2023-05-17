@@ -34,6 +34,7 @@ describe('isContextReady', () => {
         data: {},
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         validationToken: '',
+        alreadyAuthorized: false,
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -56,6 +57,7 @@ describe('isContextReady', () => {
             type: 'mobile',
             hasSupportForWebauthn: true,
           },
+          alreadyAuthorized: false,
         },
       };
       expect(isContextReady(context, event)).toEqual(true);

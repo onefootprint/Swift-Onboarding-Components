@@ -11,6 +11,7 @@ export type MachineContext = {
   userFound?: boolean;
   isTransfer?: boolean;
   validationToken?: string;
+  alreadyAuthorized?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
 };
@@ -21,6 +22,7 @@ export type MachineEvents =
       payload: {
         config?: OnboardingConfig;
         device?: DeviceInfo;
+        alreadyAuthorized?: boolean;
       };
     }
   | {
