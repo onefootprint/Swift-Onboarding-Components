@@ -1,3 +1,5 @@
+use crate::ExperianFraudShieldCodes;
+
 /// The experian enum lists are numerous and large.
 ///
 /// As of 2023-03-08:
@@ -143,4 +145,103 @@ pub enum ResponseCode {
     //  Indicates that following a pause, the workflow cannot be completed because the resume point (i.e., sequenceId) cannot be found. Check your CrossCore configuration file to make sure that the target sequenceId ex- ists, and that the sequenceId returned by the pauseScript matches the target sequenceId .
     #[serde(rename = "R0208")]
     WorflowCannotBecompletedAfterPause,
+}
+
+#[derive(strum::Display, Debug, strum::EnumString, Eq, PartialEq)]
+pub enum CrossCoreMatchNames {
+    #[strum(serialize = "pmAddressVerificationResult1")]
+    AddressVerificationMatchResult,
+    #[strum(serialize = "pmPhoneVerificationResult1")]
+    PhoneVerificationMatchResult,
+    #[strum(serialize = "pmConsumerIDVerificationResult")]
+    ConsumerIdMatchResult,
+    #[strum(serialize = "pmDateOfBirthMatchResult")]
+    DobMatchResult,
+    #[strum(serialize = "pmDriverLicenseVerificationResult")]
+    DriverLicenseVerificationResult,
+    #[strum(serialize = "pmChangeOfAddressVerificationResult1")]
+    ChangeOfAddressVerificationResult,
+    #[strum(serialize = "pmOFACVerificationResult")]
+    WatchlistVerificationResult,
+    #[strum(serialize = "glbFSIndicator01")]
+    FSIndicator01,
+    #[strum(serialize = "glbFSIndicator02")]
+    FSIndicator02,
+    #[strum(serialize = "glbFSIndicator03")]
+    FSIndicator03,
+    #[strum(serialize = "glbFSIndicator04")]
+    FSIndicator04,
+    #[strum(serialize = "glbFSIndicator05")]
+    FSIndicator05,
+    #[strum(serialize = "glbFSIndicator06")]
+    FSIndicator06,
+    #[strum(serialize = "glbFSIndicator10")]
+    FSIndicator10,
+    #[strum(serialize = "glbFSIndicator11")]
+    FSIndicator11,
+    #[strum(serialize = "glbFSIndicator13")]
+    FSIndicator13,
+    #[strum(serialize = "glbFSIndicator14")]
+    FSIndicator14,
+    #[strum(serialize = "glbFSIndicator15")]
+    FSIndicator15,
+    #[strum(serialize = "glbFSIndicator16")]
+    FSIndicator16,
+    #[strum(serialize = "glbFSIndicator17")]
+    FSIndicator17,
+    #[strum(serialize = "glbFSIndicator18")]
+    FSIndicator18,
+    #[strum(serialize = "glbFSIndicator21")]
+    FSIndicator21,
+    #[strum(serialize = "glbFSIndicator25")]
+    FSIndicator25,
+    #[strum(serialize = "glbFSIndicator26")]
+    FSIndicator26,
+    Unknown(String),
+}
+
+impl From<CrossCoreMatchNames> for Option<ExperianFraudShieldCodes> {
+    fn from(value: CrossCoreMatchNames) -> Self {
+        // Note: there are some addition FS indicators that don't get returned in precise ID requests, and this is because
+        // precise ID is GLB (e.g. non-credit) and those indicators are related to credit
+        match value {
+            CrossCoreMatchNames::AddressVerificationMatchResult => None,
+            CrossCoreMatchNames::PhoneVerificationMatchResult => None,
+            CrossCoreMatchNames::ConsumerIdMatchResult => None,
+            CrossCoreMatchNames::DobMatchResult => None,
+            CrossCoreMatchNames::DriverLicenseVerificationResult => None,
+            CrossCoreMatchNames::ChangeOfAddressVerificationResult => None,
+            CrossCoreMatchNames::WatchlistVerificationResult => None,
+            CrossCoreMatchNames::FSIndicator01 => Some(ExperianFraudShieldCodes::InputAddressConflict),
+            CrossCoreMatchNames::FSIndicator02 => {
+                Some(ExperianFraudShieldCodes::InputAddressFirstResponseRecently)
+            }
+            CrossCoreMatchNames::FSIndicator03 => Some(ExperianFraudShieldCodes::InputAddressNotOnFile),
+            CrossCoreMatchNames::FSIndicator04 => {
+                Some(ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified)
+            }
+            CrossCoreMatchNames::FSIndicator05 => Some(ExperianFraudShieldCodes::InputSSNDeceased),
+            CrossCoreMatchNames::FSIndicator06 => Some(ExperianFraudShieldCodes::InputAgeYoungerThanSSN),
+            CrossCoreMatchNames::FSIndicator10 => Some(ExperianFraudShieldCodes::InputAddressAlert),
+            CrossCoreMatchNames::FSIndicator11 => Some(ExperianFraudShieldCodes::InputAddressNonResidential),
+            CrossCoreMatchNames::FSIndicator13 => {
+                Some(ExperianFraudShieldCodes::InputAddressProbablyBelongsToAnother)
+            }
+            CrossCoreMatchNames::FSIndicator14 => Some(ExperianFraudShieldCodes::InputSSNFormatInvalid),
+            CrossCoreMatchNames::FSIndicator15 => Some(ExperianFraudShieldCodes::InputAddressCautious),
+            CrossCoreMatchNames::FSIndicator16 => Some(ExperianFraudShieldCodes::LocatedAddressAlert),
+            CrossCoreMatchNames::FSIndicator17 => {
+                Some(ExperianFraudShieldCodes::LocatedAddressNonResidential)
+            }
+            CrossCoreMatchNames::FSIndicator18 => Some(ExperianFraudShieldCodes::LocatedAddressCautious),
+            // As of April 15, 2022, Fraud Shield 21 (Telephone Number Inconsistent w/ Address) will be deprecated and no longer be active
+            // but is still returned
+            CrossCoreMatchNames::FSIndicator21 => None,
+            CrossCoreMatchNames::FSIndicator25 => Some(ExperianFraudShieldCodes::BestLocatedSSNDeceased),
+            CrossCoreMatchNames::FSIndicator26 => {
+                Some(ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified)
+            }
+            CrossCoreMatchNames::Unknown(_) => None,
+        }
+    }
 }

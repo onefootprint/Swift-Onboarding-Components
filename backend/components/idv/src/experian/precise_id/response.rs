@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use newtypes::{scrub_value, ExperianFraudShieldCodes};
+use newtypes::scrub_value;
 
 use crate::experian::error::Error as ExperianError;
 
@@ -94,38 +92,6 @@ impl PreciseIDAPIResponse {
             }?;
 
             Ok(res)
-        }
-    }
-
-    pub fn fraud_shield_reason_codes(&self) -> Vec<ExperianFraudShieldCodes> {
-        let fs_indicator = self
-            .glb_detail
-            .as_ref()
-            .and_then(|glb| glb.fraud_shield.as_ref())
-            .and_then(|fs| fs.indicator.as_ref());
-        if let Some(indicators) = fs_indicator {
-            indicators.iter().filter_map(|i| {
-                i.value.as_ref().and_then(|v| {
-                    i.code.as_ref().and_then(|c| {
-                        // Experian returns all indicators in the response, so we need to choose which ones are present
-                        if v == "Y" {
-                            let res = ExperianFraudShieldCodes::from_str(c.as_str());
-
-                            match res {
-                                c @ Ok(_) => c.ok(),
-                                Err(e) => {
-                                    tracing::error!(code=%c, err=%e, "could not parse response code for experian");
-                                    None
-                                }
-                            }
-                        } else {
-                            None
-                        }
-                    })
-                })
-            }).collect()
-        } else {
-            vec![]
         }
     }
 }

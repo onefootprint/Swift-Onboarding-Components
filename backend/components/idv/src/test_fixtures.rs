@@ -1776,7 +1776,7 @@ pub fn cross_core_response_with_fraud_shield_codes() -> serde_json::Value {
                         },
                         {
                             "name": "glbFSIndicator05",
-                            "value": "N"
+                            "value": "Y" // I manually changed this to generate FRCs
                         },
                         {
                             "name": "glbFSIndicator06",

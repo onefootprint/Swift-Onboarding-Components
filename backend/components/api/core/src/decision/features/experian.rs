@@ -41,10 +41,10 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     // TODO: matching
 
     let fraud_shield_reason_codes: Vec<FootprintReasonCode> = resp
-        .precise_id_response()
+        .fraud_shield_reason_codes()
         .ok()
-        .map(|p| {
-            p.fraud_shield_reason_codes()
+        .map(|codes| {
+            codes
                 .into_iter()
                 .flat_map(|rs| std::convert::Into::<Option<FootprintReasonCode>>::into(&rs))
                 .collect()

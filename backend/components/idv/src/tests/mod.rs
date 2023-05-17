@@ -1,5 +1,6 @@
 pub mod fixtures;
 
+#[track_caller]
 pub fn assert_have_same_elements<T>(l: Vec<T>, r: Vec<T>)
 where
     T: Eq + std::fmt::Debug + Clone,

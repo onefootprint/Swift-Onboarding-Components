@@ -1,3 +1,5 @@
+use newtypes::{experian::CrossCoreMatchNames, ExperianFraudShieldCodes};
+
 use crate::experian::{
     error::{CrossCoreResponseError, Error},
     precise_id::response::PreciseIDAPIResponse,
@@ -21,10 +23,8 @@ pub struct CrossCoreAPIResponse {
 }
 
 impl CrossCoreAPIResponse {
-    // Helper to dig down to the precise id response from cross core wrapper
-    #[allow(dead_code)]
-    pub fn precise_id_response(&self) -> Result<PreciseIDAPIResponse, Error> {
-        let response = self
+    fn get_precise_id_decision_element(&self) -> Result<&DecisionElement, Error> {
+        let de = self
             .client_response_payload
             .decision_elements
             .iter()
@@ -34,7 +34,14 @@ impl CrossCoreAPIResponse {
                     .map(|n| n == "PreciseId")
                     .unwrap_or(false)
             })
-            .ok_or(CrossCoreResponseError::PreciseIDResponseNotFound)?
+            .ok_or(CrossCoreResponseError::PreciseIDResponseNotFound)?;
+
+        Ok(de)
+    }
+    // Helper to dig down to the precise id response from cross core wrapper
+    pub fn precise_id_response(&self) -> Result<PreciseIDAPIResponse, Error> {
+        let response = self
+            .get_precise_id_decision_element()?
             .clone()
             .other_data
             .and_then(|o| o.json)
@@ -48,6 +55,21 @@ impl CrossCoreAPIResponse {
         } else {
             Err(Error::MissingPreciseIDResponse)
         }
+    }
+
+    pub fn fraud_shield_reason_codes(&self) -> Result<Vec<ExperianFraudShieldCodes>, Error> {
+        let matches = self
+            .get_precise_id_decision_element()?
+            .clone()
+            .matches
+            .ok_or(Error::MissingMatchesInDecisionElement)?;
+
+        let codes = matches
+            .iter()
+            .filter_map(|mv| mv.into_fraud_shield_reason_code())
+            .collect::<Vec<ExperianFraudShieldCodes>>();
+
+        Ok(codes)
     }
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -118,7 +140,7 @@ pub struct DecisionElement {
     pub normalized_score: Option<i32>,
     pub warnings_errors: Option<Vec<WarningError>>,
     pub other_data: Option<OtherData>,
-    pub matches: Option<serde_json::Value>,
+    pub matches: Option<Vec<MatchValue>>,
     pub decisions: Option<Vec<DecisionElementDecision>>,
 }
 
@@ -139,6 +161,25 @@ pub struct WarningError {
     pub response_type: Option<String>,
     pub response_code: Option<String>,
     pub response_message: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MatchValue {
+    pub name: Option<String>,
+    pub value: Option<String>,
+}
+
+impl MatchValue {
+    // None if the name is not related to fraud shield, otherwise Some
+    pub fn into_fraud_shield_reason_code(&self) -> Option<ExperianFraudShieldCodes> {
+        self.name.as_ref().and_then(|n| {
+            let match_name =
+                CrossCoreMatchNames::try_from(n.as_str()).unwrap_or(CrossCoreMatchNames::Unknown(n.clone()));
+            std::convert::Into::<Option<ExperianFraudShieldCodes>>::into(match_name)
+                .filter(|_| self.value == Some("Y".into()))
+        })
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -204,21 +245,6 @@ mod tests {
     }
 
     #[test]
-    fn test_fraud_shield_codes() {
-        let r: CrossCoreAPIResponse = serde_json::from_value(cross_core_response_with_fraud_shield_codes())
-            .expect("could not parse experian cross core");
-        assert_have_same_elements(
-            r.precise_id_response().unwrap().fraud_shield_reason_codes(),
-            vec![
-                ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified,
-                ExperianFraudShieldCodes::LocatedAddressNonResidential,
-                ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified,
-                ExperianFraudShieldCodes::InputSSNDeceased,
-            ],
-        )
-    }
-
-    #[test]
     fn test_serializes() {
         // test we scrub sensitive data in a hack way
         let response = cross_core_response_with_fraud_shield_codes();
@@ -230,5 +256,23 @@ mod tests {
         let s = serde_json::to_value(&r).unwrap().to_string();
         assert!(s.contains("<SCRUBBED>"));
         assert!(!s.contains("BRIAN"))
+    }
+    #[test]
+    fn test_parse_fs_from_match() {
+        let response = cross_core_response_with_fraud_shield_codes();
+
+        let r: CrossCoreAPIResponse =
+            serde_json::from_value(response).expect("could not parse experian cross core");
+
+        let matches = r.fraud_shield_reason_codes().unwrap();
+        assert_have_same_elements(
+            matches,
+            vec![
+                ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified,
+                ExperianFraudShieldCodes::InputSSNDeceased,
+                ExperianFraudShieldCodes::LocatedAddressNonResidential,
+                ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified,
+            ],
+        )
     }
 }
