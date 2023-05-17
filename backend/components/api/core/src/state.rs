@@ -187,4 +187,10 @@ impl State {
             footprint_vendor_http_client,
         }
     }
+
+    #[cfg(test)]
+    // temporar hack until we make a proper TestState
+    pub fn set_db_pool(&mut self, db_pool: DbPool) {
+        self.db_pool = db_pool;
+    }
 }

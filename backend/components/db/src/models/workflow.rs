@@ -51,11 +51,10 @@ impl Workflow {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Option<Self>> {
-        let res: Option<_> = workflow::table
+    pub fn get(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Self> {
+        let res = workflow::table
             .filter(workflow::id.eq(workflow_id))
-            .get_result(conn)
-            .optional()?;
+            .get_result(conn)?;
 
         Ok(res)
     }
@@ -119,14 +118,13 @@ mod tests {
 
         let wf = Workflow::lock(conn, &wf.id).unwrap();
         let wfid = wf.id.clone();
-        let updated_wf =
-            Workflow::update_state(conn, wf, WorkflowState::Kyc(KycState::MakeDecision)).unwrap();
-        assert!(updated_wf.state == WorkflowState::Kyc(KycState::MakeDecision));
+        let updated_wf = Workflow::update_state(conn, wf, WorkflowState::Kyc(KycState::Decisioning)).unwrap();
+        assert!(updated_wf.state == WorkflowState::Kyc(KycState::Decisioning));
 
         let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
         assert_eq!(1, wfe.len());
         let wfe = wfe.first().unwrap();
         assert!(wfe.from_state == WorkflowState::Kyc(KycState::VendorCalls));
-        assert!(wfe.to_state == WorkflowState::Kyc(KycState::MakeDecision));
+        assert!(wfe.to_state == WorkflowState::Kyc(KycState::Decisioning));
     }
 }

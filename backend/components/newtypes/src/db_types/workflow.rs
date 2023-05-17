@@ -46,6 +46,7 @@ use strum_macros::EnumString;
 #[diesel(sql_type = Text)]
 pub enum WorkflowState {
     Kyc(KycState),
+    AlpacaKyc(AlpacaKycState),
 }
 
 impl_enum_string_diesel!(WorkflowKind);
@@ -56,6 +57,7 @@ impl std::fmt::Display for WorkflowState {
         let prefix = self.as_ref();
         let suffix = match self {
             WorkflowState::Kyc(s) => s.to_string(),
+            WorkflowState::AlpacaKyc(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -76,6 +78,9 @@ impl FromStr for WorkflowState {
         let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
             WorkflowKind::Kyc => Self::Kyc(KycState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?),
+            WorkflowKind::AlpacaKyc => {
+                Self::AlpacaKyc(AlpacaKycState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
         };
         Ok(result)
     }
@@ -106,7 +111,7 @@ impl FromStr for WorkflowState {
 pub enum KycState {
     DataCollection,
     VendorCalls,
-    MakeDecision,
+    Decisioning,
     Complete,
 }
 
@@ -115,6 +120,42 @@ crate::util::impl_enum_str_diesel!(KycState);
 impl From<KycState> for WorkflowState {
     fn from(value: KycState) -> Self {
         Self::Kyc(value)
+    }
+}
+
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Deserialize,
+    Serialize,
+    Apiv2Schema,
+    PartialEq,
+    Eq,
+    Ord,
+    PartialOrd,
+    Hash,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    JsonSchema,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum AlpacaKycState {
+    KycDecisioning,
+    AdverseMediaCall,
+    AlpacaCall,
+}
+
+crate::util::impl_enum_str_diesel!(AlpacaKycState);
+
+impl From<AlpacaKycState> for WorkflowState {
+    fn from(value: AlpacaKycState) -> Self {
+        Self::AlpacaKyc(value)
     }
 }
 
@@ -128,7 +169,7 @@ mod tests {
         s.to_string()
     }
 
-    #[test_case("kyc.make_decision" => WorkflowState::Kyc(KycState::MakeDecision))]
+    #[test_case("kyc.decisioning" => WorkflowState::Kyc(KycState::Decisioning))]
     fn test_from_str(input: &str) -> WorkflowState {
         WorkflowState::from_str(input).unwrap()
     }

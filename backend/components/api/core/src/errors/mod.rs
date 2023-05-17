@@ -125,6 +125,8 @@ pub enum ApiError {
     WebhooksError(#[from] webhooks::Error),
     #[error("MiddeskError: {0}")]
     MiddeskError(#[from] middesk::MiddeskError),
+    #[error("StateError: {0}")]
+    StateError(#[from] crate::decision::state::StateError),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -235,6 +237,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

@@ -72,10 +72,10 @@ mod tests {
             conn,
             WorkflowId::from_str("wf_123").unwrap(),
             KycState::VendorCalls.into(),
-            KycState::MakeDecision.into(),
+            KycState::Decisioning.into(),
         )
         .unwrap();
         assert!(wfe.from_state == WorkflowState::Kyc(KycState::VendorCalls));
-        assert!(wfe.to_state == WorkflowState::Kyc(KycState::MakeDecision));
+        assert!(wfe.to_state == WorkflowState::Kyc(KycState::Decisioning));
     }
 }
