@@ -85,6 +85,8 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         kybData: {
+          // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
+          exit: ['markCollectedKycData'],
           on: {
             requirementCompleted: {
               target: 'checkRequirements',

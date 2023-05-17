@@ -1,45 +1,29 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
-import {
-  OnboardingRequirementKind,
-  OnboardingStatusResponse,
-} from '@onefootprint/types';
+import { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import { Requirements } from '../../utils/state-machine';
 import useGetOnboardingStatus from '../authorize/hooks/use-get-onboarding-status';
+import computeRequirementsToShow from './utils/compute-requirements-to-show/compute-requirements-to-show';
 
 const CheckRequirements = () => {
   const { t } = useTranslation('pages.check-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken },
+    onboardingContext: { authToken, isTransfer },
+    collectedKycData,
   } = state.context;
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
-    const { requirements } = response;
-    const payload = {} as Requirements;
-
-    requirements.forEach(req => {
-      if (req.kind === OnboardingRequirementKind.collectKybData) {
-        payload.kyb = req;
-      } else if (req.kind === OnboardingRequirementKind.collectKycData) {
-        payload.kyc = req;
-      } else if (req.kind === OnboardingRequirementKind.liveness) {
-        payload.liveness = req;
-      } else if (req.kind === OnboardingRequirementKind.idDoc) {
-        payload.idDoc = req;
-      } else if (req.kind === OnboardingRequirementKind.investorProfile) {
-        payload.investorProfile = req;
-      } else if (req.kind === OnboardingRequirementKind.authorize) {
-        payload.authorize = req;
-      }
-    });
-
+    const payload = computeRequirementsToShow(
+      !!isTransfer,
+      { collectedKycData: !!collectedKycData },
+      response,
+    );
     send({
       type: 'onboardingRequirementsReceived',
       payload,

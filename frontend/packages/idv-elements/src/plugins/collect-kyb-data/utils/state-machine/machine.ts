@@ -156,8 +156,7 @@ const createCollectKybDataMachine = () =>
           on: {
             confirmed: [
               {
-                cond: context =>
-                  (context.kycRequirement?.missingAttributes || []).length > 0,
+                cond: context => !!context.kycRequirement,
                 target: 'beneficialOwnerKyc',
               },
               {

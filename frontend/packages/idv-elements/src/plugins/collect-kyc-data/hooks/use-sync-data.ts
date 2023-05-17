@@ -22,8 +22,8 @@ const useSyncData = () => {
 
   const handleError = (error: unknown) => {
     toast.show({
-      title: t('sync-data-error.title'),
-      description: t('sync-data-error.description'),
+      title: t('title'),
+      description: t('description'),
       variant: 'error',
     });
     console.error(error);
@@ -35,9 +35,10 @@ const useSyncData = () => {
       return;
     }
 
-    const keyValuePairs: [IdDI, string][] = Object.entries(data).map(
-      ([key, value]) => [key as IdDI, value.value],
-    );
+    const keyValuePairs: [IdDI, string][] = Object.entries(data)
+      // Don't sync data that's already set in the vault
+      .filter(([, v]) => !v.scrubbed && !v.decrypted)
+      .map(([key, value]) => [key as IdDI, value.value]);
     const requestData: IdDIData = Object.fromEntries(keyValuePairs);
     // DOB is accepted by the backend in a different format
     const dobData = requestData[IdDI.dob];

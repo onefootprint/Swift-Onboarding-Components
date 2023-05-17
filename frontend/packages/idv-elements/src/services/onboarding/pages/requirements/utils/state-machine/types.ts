@@ -12,6 +12,7 @@ import {
 export type Requirements = {
   kyb?: CollectKybDataRequirement;
   kyc?: CollectKycDataRequirement;
+  isKycMet?: boolean;
   investorProfile?: CollectInvestorProfileRequirement;
   liveness?: LivenessRequirement;
   idDoc?: IdDocRequirement;
@@ -31,7 +32,10 @@ export type MachineContext = {
     phoneNumber?: string;
   };
   startedDataCollection: boolean;
-  collectedKycData?: boolean; // Used to determine if we should show a transition animation between kyc data and investor profile plugins
+  // TODO we might want a more generic list of requirements that have already been handled.
+  // One day, when more plugins have confirm screens, we'll need this information to determine
+  // whether to render the plugin for a requirement that's already been met
+  collectedKycData?: boolean;
   requirements: Requirements;
 };
 

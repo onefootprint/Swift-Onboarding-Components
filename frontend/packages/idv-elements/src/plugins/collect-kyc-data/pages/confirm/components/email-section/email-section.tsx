@@ -5,6 +5,7 @@ import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import { getDisplayValue } from '../../../../utils/data-types';
 
 type EmailSectionProps = {
   onEdit: () => void;
@@ -18,8 +19,10 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
     requirement: { missingAttributes },
   } = state.context;
   const emailEntry = data[IdDI.email];
-  const email = emailEntry?.value;
+  const email = getDisplayValue(emailEntry);
   const receivedEmail = emailEntry?.bootstrap;
+  // We allow editing most pieces of information, but we don't yet support updating a piece of
+  // contact info. So, if it's not missing, don't show the ability to edit
   if (
     !missingAttributes.includes(CollectedKycDataOption.email) ||
     receivedEmail

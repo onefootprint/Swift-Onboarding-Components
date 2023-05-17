@@ -6,10 +6,10 @@ import getCurrentStepFromMissingAttributes from './utils/current-step-from-missi
 
 const NavigationHeader = () => {
   const [state, send] = useCollectKycDataMachine();
-  const { requirement, initData } = state.context;
+  const { requirement, initialData } = state.context;
   const value = getCurrentStepFromMissingAttributes(
     requirement,
-    initData,
+    initialData,
     state.value,
   );
   const shouldShowCloseButton = value === 1;

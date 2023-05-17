@@ -48,7 +48,12 @@ export const isMissing = (
   // Filter out entries with disabled/bootstrapped/decrypted values
   const filteredAttributes = attributes.filter(attr => {
     const entry = collectedData[attr];
-    return !entry?.bootstrap && !entry?.disabled && !entry?.decrypted;
+    return (
+      !entry?.bootstrap &&
+      !entry?.disabled &&
+      !entry?.decrypted &&
+      !entry?.scrubbed
+    );
   });
 
   // Completely missing entries

@@ -14,6 +14,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignData: 'dataSubmitted';
+    assignInitialData: 'initialized';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -29,6 +30,7 @@ export interface Typegen0 {
     | 'identityEditDesktop'
     | 'init'
     | 'residentialAddress'
+    | 'router'
     | 'ssn';
   tags: never;
 }

@@ -19,6 +19,14 @@ export type KycData = Partial<{
 export type DataValue = {
   value: string;
   bootstrap?: boolean;
-  decrypted?: boolean;
+  decrypted?: boolean; // True when populated from decrypted value in vault
+  scrubbed?: boolean; // True when it exists in vault but we haven't yet decrypted it
   disabled?: boolean;
+};
+
+export const getDisplayValue = (v?: DataValue) => {
+  if (v?.scrubbed) {
+    return '•••••••••';
+  }
+  return v?.value;
 };

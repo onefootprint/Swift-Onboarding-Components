@@ -5,6 +5,7 @@ import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import { getDisplayValue } from '../../../../utils/data-types';
 
 type IdentitySectionProps = {
   onEdit: () => void;
@@ -16,8 +17,8 @@ const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
   const { data } = state.context;
 
   const identity = [];
-  const ssn9 = data[IdDI.ssn9]?.value;
-  const ssn4 = data[IdDI.ssn4]?.value;
+  const ssn9 = getDisplayValue(data[IdDI.ssn9]);
+  const ssn4 = getDisplayValue(data[IdDI.ssn4]);
   if (ssn9) {
     identity.push({
       text: t('identity.ssn9'),

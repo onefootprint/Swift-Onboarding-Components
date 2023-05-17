@@ -103,6 +103,7 @@ describe('<CollectKycData />', () => {
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: attributes ?? [],
+        populatedAttributes: [],
       },
       bootstrapData: {
         [IdDI.email]: 'piip@onefootprint.com',

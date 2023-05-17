@@ -37,15 +37,15 @@ const ResidentialAddress = ({
 }: ResidentialAddressProps) => {
   const [state, send] = useCollectKycDataMachine();
   const {
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
     data,
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
-  const requiresFullAddress = missingAttributes.includes(
-    CollectedKycDataOption.fullAddress,
-  );
+  const requiresFullAddress = missingAttributes
+    .concat(populatedAttributes)
+    .includes(CollectedKycDataOption.fullAddress);
   const { t } = useTranslation('pages.residential-address');
   const title = requiresFullAddress ? t('full.title') : t('partial.title');
   const subtitle = requiresFullAddress

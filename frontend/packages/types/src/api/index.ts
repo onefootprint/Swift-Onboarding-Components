@@ -8,6 +8,7 @@ export * from './create-proxy-config';
 export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt';
+export * from './decrypt-user';
 export * from './ger-roles';
 export * from './get-access-events';
 export * from './get-auth-roles';

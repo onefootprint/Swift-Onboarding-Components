@@ -23,6 +23,7 @@ export type CollectKybDataRequirement = {
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
   missingAttributes: CollectedKycDataOption[];
+  populatedAttributes: CollectedKycDataOption[];
 };
 
 export type CollectInvestorProfileRequirement = {
@@ -64,6 +65,7 @@ export type AuthorizeFields = {
 
 export type OnboardingStatusResponse = {
   requirements: OnboardingRequirement[];
+  metRequirements: OnboardingRequirement[];
   // This is only used to initialize handoff, and the requirements are discarded.
   obConfiguration: OnboardingConfig;
 };

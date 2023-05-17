@@ -98,6 +98,7 @@ describe('<CollectKybData />', () => {
         kycRequirement: {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: kycAttributes,
+          populatedAttributes: [],
         },
         userFound: true,
         email: 'piip@onefootprint.com',

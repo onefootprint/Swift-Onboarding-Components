@@ -8,11 +8,13 @@ const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const {
     data,
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
   } = state.context;
   const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
   const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
-  const requiresSsn9 = missingAttributes.includes(CollectedKycDataOption.ssn9);
+  const requiresSsn9 = missingAttributes
+    .concat(populatedAttributes)
+    .includes(CollectedKycDataOption.ssn9);
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

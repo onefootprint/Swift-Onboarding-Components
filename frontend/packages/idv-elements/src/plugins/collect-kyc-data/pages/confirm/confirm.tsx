@@ -24,7 +24,7 @@ const Confirm = () => {
     sandboxSuffix,
     device,
     requirement,
-    initData,
+    initialData,
   } = state.context;
   const { missingAttributes } = requirement;
   const isMobile = device.type === 'mobile';
@@ -35,7 +35,7 @@ const Confirm = () => {
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
   const value = getCurrentStepFromMissingAttributes(
     requirement,
-    initData,
+    initialData,
     state.value,
   );
   const shouldShowBackButton = value > 0;

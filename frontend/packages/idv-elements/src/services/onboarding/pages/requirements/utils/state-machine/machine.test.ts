@@ -20,6 +20,7 @@ const idDocRequirement = {
   shouldCollectConsent: true,
 } as IdDocRequirement;
 
+// TODO test showing this requirement when met
 const kycRequirement = {
   missingAttributes: [CollectedKycDataOption.name],
 } as CollectKycDataRequirement;

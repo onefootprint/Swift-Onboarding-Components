@@ -41,14 +41,18 @@ export const RequirementTargets: MachineTarget[] = [
 export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound, isTransfer },
-    requirements: { kyc, idDoc, liveness, investorProfile, kyb },
+    requirements: { kyc, isKycMet, idDoc, liveness, investorProfile, kyb },
     startedDataCollection,
   } = context;
   return (
     !startedDataCollection &&
     userFound &&
     !isTransfer &&
-    (!!kyc || !!idDoc || !!liveness || !!investorProfile || !!kyb)
+    ((!!kyc && !isKycMet) ||
+      !!idDoc ||
+      !!liveness ||
+      !!investorProfile ||
+      !!kyb)
   );
 };
 

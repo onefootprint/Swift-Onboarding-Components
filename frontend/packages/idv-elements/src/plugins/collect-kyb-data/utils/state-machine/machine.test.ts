@@ -47,6 +47,7 @@ describe('Collect KYB Data Machine Tests', () => {
         kycRequirement: {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: missingKycAttributes,
+          populatedAttributes: [],
         },
       },
     });
@@ -255,6 +256,10 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });
+
+    expect(state.value).toEqual('beneficialOwnerKyc');
+    state = machine.send({ type: 'beneficialOwnerKycSubmitted' });
+
     expect(state.value).toEqual('completed');
   });
 

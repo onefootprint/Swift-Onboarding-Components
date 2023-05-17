@@ -34,8 +34,8 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     userFound,
     sandboxSuffix,
     requirement,
-    initData,
     data: initData,
+    initialData: {},
   };
 
   return (

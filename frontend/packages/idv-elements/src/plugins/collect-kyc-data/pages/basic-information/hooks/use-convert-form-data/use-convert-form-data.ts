@@ -8,13 +8,14 @@ const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const {
     data,
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
   } = state.context;
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
-  const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
-  const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
+  const allAttributes = missingAttributes.concat(populatedAttributes);
+  const requiresName = allAttributes.includes(CollectedKycDataOption.name);
+  const requiresDob = allAttributes.includes(CollectedKycDataOption.dob);
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

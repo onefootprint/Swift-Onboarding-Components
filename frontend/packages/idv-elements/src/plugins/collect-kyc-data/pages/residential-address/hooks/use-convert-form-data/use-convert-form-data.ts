@@ -8,7 +8,7 @@ const useConvertFormData = () => {
   const [machineState] = useCollectKycDataMachine();
   const {
     data,
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
   } = machineState.context;
   const isAddressLine1Disabled = data?.[IdDI.addressLine1]?.disabled;
   const isAddressLine2Disabled = data?.[IdDI.addressLine2]?.disabled;
@@ -16,9 +16,9 @@ const useConvertFormData = () => {
   const isStateDisabled = data?.[IdDI.state]?.disabled;
   const isZipDisabled = data?.[IdDI.zip]?.disabled;
   const isCountryDisabled = data?.[IdDI.country]?.disabled;
-  const requiresFullAddress = missingAttributes.includes(
-    CollectedKycDataOption.fullAddress,
-  );
+  const requiresFullAddress = missingAttributes
+    .concat(populatedAttributes)
+    .includes(CollectedKycDataOption.fullAddress);
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

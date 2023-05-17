@@ -13,6 +13,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [],
+          populatedAttributes: [],
         },
         {},
         'basicInformation',
@@ -24,6 +25,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [],
+          populatedAttributes: [],
         },
         {},
         'residentialAddress',
@@ -35,6 +37,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [],
+          populatedAttributes: [],
         },
         {},
         'ssn',
@@ -46,6 +49,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [],
+          populatedAttributes: [],
         },
         {},
         'confirm',
@@ -59,6 +63,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [CollectedKycDataOption.partialAddress],
+          populatedAttributes: [],
         },
         {},
         'residentialAddress',
@@ -70,6 +75,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [CollectedKycDataOption.partialAddress],
+          populatedAttributes: [],
         },
         {},
         'ssn',
@@ -81,6 +87,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: [CollectedKycDataOption.partialAddress],
+          populatedAttributes: [],
         },
         {},
         'confirm',
@@ -97,6 +104,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {},
         'basicInformation',
@@ -111,6 +119,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {},
         'ssn',
@@ -125,6 +134,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {},
         'residentialAddress',
@@ -139,6 +149,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {},
         'ssn',
@@ -153,6 +164,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {},
         'confirm',
@@ -169,6 +181,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {
           [IdDI.firstName]: { value: 'John' },
@@ -192,6 +205,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {
           [IdDI.firstName]: { value: 'John' },
@@ -215,6 +229,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
           ],
+          populatedAttributes: [],
         },
         {
           [IdDI.firstName]: { value: 'John' },

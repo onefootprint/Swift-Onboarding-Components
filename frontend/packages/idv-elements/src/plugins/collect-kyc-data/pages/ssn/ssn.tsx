@@ -30,13 +30,15 @@ const SSN = ({
   const [state, send] = useCollectKycDataMachine();
   const {
     data,
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
   const { t } = useTranslation('pages.ssn');
-  const requiresSsn9 = missingAttributes.includes(CollectedKycDataOption.ssn9);
+  const requiresSsn9 = missingAttributes
+    .concat(populatedAttributes)
+    .includes(CollectedKycDataOption.ssn9);
   const title = requiresSsn9 ? t('full.title') : t('last-four.title');
   const subtitle = requiresSsn9 ? t('full.subtitle') : t('last-four.subtitle');
 

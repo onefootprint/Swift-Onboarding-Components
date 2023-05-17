@@ -5,6 +5,7 @@ import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import { getDisplayValue } from '../../../../utils/data-types';
 
 type BasicInfoSectionProps = {
   onEdit: () => void;
@@ -17,7 +18,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
 
   const basicInfo = [];
 
-  const firstName = data[IdDI.firstName]?.value;
+  const firstName = getDisplayValue(data[IdDI.firstName]);
   if (firstName) {
     basicInfo.push({
       text: t('basic-info.first-name'),
@@ -25,7 +26,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const lastName = data[IdDI.lastName]?.value;
+  const lastName = getDisplayValue(data[IdDI.lastName]);
   if (lastName) {
     basicInfo.push({
       text: t('basic-info.last-name'),
@@ -33,7 +34,7 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     });
   }
 
-  const dob = data[IdDI.dob]?.value;
+  const dob = getDisplayValue(data[IdDI.dob]);
   if (dob) {
     basicInfo.push({
       text: t('basic-info.dob'),

@@ -9,6 +9,7 @@ import EditBasicInfoDesktop from '../edit-basic-info-desktop';
 import EditEmailDesktop from '../edit-email-desktop';
 import EditIdentityDesktop from '../edit-identity-desktop';
 import Email from '../email';
+import Init from '../init';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -27,6 +28,9 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
+  if (state.matches('init')) {
+    return <Init />;
+  }
   if (state.matches('email')) {
     return <Email />;
   }

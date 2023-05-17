@@ -28,12 +28,13 @@ const BasicInformation = ({
   const [state, send] = useCollectKycDataMachine();
   const {
     data,
-    requirement: { missingAttributes },
+    requirement: { missingAttributes, populatedAttributes },
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('pages.basic-information');
-  const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
-  const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
+  const allAttributes = missingAttributes.concat(populatedAttributes);
+  const requiresName = allAttributes.includes(CollectedKycDataOption.name);
+  const requiresDob = allAttributes.includes(CollectedKycDataOption.dob);
   const convertFormData = useConvertFormData();
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
