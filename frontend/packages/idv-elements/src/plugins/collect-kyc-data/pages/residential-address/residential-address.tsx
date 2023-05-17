@@ -14,6 +14,7 @@ import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import allAttributes from '../../utils/all-attributes/all-attributes';
 import AddressLines from './components/address-lines';
 import CityField from './components/city-field';
 import CountryField from './components/country-field';
@@ -36,16 +37,13 @@ const ResidentialAddress = ({
   hideHeader,
 }: ResidentialAddressProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const {
-    requirement: { missingAttributes, populatedAttributes },
-    data,
-  } = state.context;
+  const { requirement, data } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
-  const requiresFullAddress = missingAttributes
-    .concat(populatedAttributes)
-    .includes(CollectedKycDataOption.fullAddress);
+  const requiresFullAddress = allAttributes(requirement).includes(
+    CollectedKycDataOption.fullAddress,
+  );
   const { t } = useTranslation('pages.residential-address');
   const title = requiresFullAddress ? t('full.title') : t('partial.title');
   const subtitle = requiresFullAddress

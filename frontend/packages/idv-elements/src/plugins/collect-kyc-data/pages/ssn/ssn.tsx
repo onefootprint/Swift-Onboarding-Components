@@ -9,6 +9,7 @@ import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import allAttributes from '../../utils/all-attributes/all-attributes';
 import SSN4 from './components/ssn4/ssn4';
 import SSN9 from './components/ssn9/ssn9';
 import useConvertFormData from './hooks/use-convert-form-data/use-convert-form-data';
@@ -28,17 +29,14 @@ const SSN = ({
   onComplete,
 }: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const {
-    data,
-    requirement: { missingAttributes, populatedAttributes },
-  } = state.context;
+  const { data, requirement } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
   const { t } = useTranslation('pages.ssn');
-  const requiresSsn9 = missingAttributes
-    .concat(populatedAttributes)
-    .includes(CollectedKycDataOption.ssn9);
+  const requiresSsn9 = allAttributes(requirement).includes(
+    CollectedKycDataOption.ssn9,
+  );
   const title = requiresSsn9 ? t('full.title') : t('last-four.title');
   const subtitle = requiresSsn9 ? t('full.subtitle') : t('last-four.subtitle');
 

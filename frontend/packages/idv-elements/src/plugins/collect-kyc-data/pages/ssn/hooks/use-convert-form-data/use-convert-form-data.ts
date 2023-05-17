@@ -1,20 +1,18 @@
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import allAttributes from '../../../../utils/all-attributes/all-attributes';
 import { KycData } from '../../../../utils/data-types';
 import { FormData } from '../../types';
 
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
-  const {
-    data,
-    requirement: { missingAttributes, populatedAttributes },
-  } = state.context;
+  const { data, requirement } = state.context;
   const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
   const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
-  const requiresSsn9 = missingAttributes
-    .concat(populatedAttributes)
-    .includes(CollectedKycDataOption.ssn9);
+  const requiresSsn9 = allAttributes(requirement).includes(
+    CollectedKycDataOption.ssn9,
+  );
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

@@ -9,6 +9,7 @@ import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import allAttributes from '../../utils/all-attributes/all-attributes';
 import DobField from './components/dob-field';
 import NameFields from './components/name-fields';
 import useConvertFormData from './hooks/use-convert-form-data';
@@ -26,15 +27,12 @@ const BasicInformation = ({
   onComplete,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const {
-    data,
-    requirement: { missingAttributes, populatedAttributes },
-  } = state.context;
+  const { data, requirement } = state.context;
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('pages.basic-information');
-  const allAttributes = missingAttributes.concat(populatedAttributes);
-  const requiresName = allAttributes.includes(CollectedKycDataOption.name);
-  const requiresDob = allAttributes.includes(CollectedKycDataOption.dob);
+  const attributes = allAttributes(requirement);
+  const requiresName = attributes.includes(CollectedKycDataOption.name);
+  const requiresDob = attributes.includes(CollectedKycDataOption.dob);
   const convertFormData = useConvertFormData();
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;

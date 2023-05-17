@@ -6,12 +6,6 @@
     }
   },
   "pages": {
-    "init": {
-      "error": {
-        "title": "An error occurred",
-        "description": "An error occurred while getting ready. Please try again"
-      }
-    },
     "email": {
       "title": "Email address",
       "subtitle": "We are required to collect your email address.",

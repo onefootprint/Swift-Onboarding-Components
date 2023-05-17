@@ -1,21 +1,19 @@
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import allAttributes from '../../../../utils/all-attributes/all-attributes';
 import { KycData } from '../../../../utils/data-types';
 import { FormData } from '../../types';
 
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
-  const {
-    data,
-    requirement: { missingAttributes, populatedAttributes },
-  } = state.context;
+  const { data, requirement } = state.context;
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
-  const allAttributes = missingAttributes.concat(populatedAttributes);
-  const requiresName = allAttributes.includes(CollectedKycDataOption.name);
-  const requiresDob = allAttributes.includes(CollectedKycDataOption.dob);
+  const attributes = allAttributes(requirement);
+  const requiresName = attributes.includes(CollectedKycDataOption.name);
+  const requiresDob = attributes.includes(CollectedKycDataOption.dob);
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

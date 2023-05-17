@@ -21,8 +21,9 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
   const emailEntry = data[IdDI.email];
   const email = getDisplayValue(emailEntry);
   const receivedEmail = emailEntry?.bootstrap;
+  // We don't use allAttributes here -
   // We allow editing most pieces of information, but we don't yet support updating a piece of
-  // contact info. So, if it's not missing, don't show the ability to edit
+  // contact info. So, if it's not missing, don't show the ability to edit.
   if (
     !missingAttributes.includes(CollectedKycDataOption.email) ||
     receivedEmail

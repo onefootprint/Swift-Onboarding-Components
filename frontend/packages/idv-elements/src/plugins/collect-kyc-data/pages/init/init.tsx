@@ -1,14 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoForbid40 } from '@onefootprint/icons';
 import {
   CdoToDiMap,
   DataIdentifier,
   DecryptUserResponse,
   IdDI,
 } from '@onefootprint/types';
-import { LoadingIndicator, Typography } from '@onefootprint/ui';
-import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
+import { LoadingIndicator } from '@onefootprint/ui';
+import React from 'react';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
@@ -16,6 +14,7 @@ import useDecryptUser from './hooks/use-decrypt-user';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
+// TODO add others
 const BASIC_PROFILE_DIS: DataIdentifier[] = [
   IdDI.firstName,
   IdDI.lastName,
@@ -26,10 +25,8 @@ const BASIC_PROFILE_DIS: DataIdentifier[] = [
 ];
 
 const Init = () => {
-  const { t } = useTranslation('pages.init');
   const [state, send] = useCollectKycDataMachine();
   const { authToken, requirement } = state.context;
-  const [error, setError] = useState(false);
   const decryptUserMutation = useDecryptUser();
   const populatedDis = requirement.populatedAttributes.flatMap(
     cdo => CdoToDiMap[cdo],
@@ -48,7 +45,6 @@ const Init = () => {
       ]);
     // Create a scrubbed entry for populated attributes that weren't decrypted - this allows us
     // to skip collection of them and display a scrubbed value showing that they already exist
-    // TODO handle case where value is empty from the backend
     const scrubbedEntries = populatedDis
       .filter(di => !BASIC_PROFILE_DIS.includes(di))
       .map(di => [
@@ -68,8 +64,15 @@ const Init = () => {
     });
   };
 
-  const handleError = () => {
-    setError(true);
+  const handleError = (err: any) => {
+    // If we fail to decrypt the existing information on the vault, it's no big deal - we can move
+    // forward and just have the user re-enter their info instead of taking the already portable info
+    // But log anyways because this shouldn't happen :)
+    console.log(err);
+    send({
+      type: 'initialized',
+      payload: {},
+    });
   };
 
   useEffectOnce(() => {
@@ -92,37 +95,12 @@ const Init = () => {
     );
   });
 
-  // TODO could we just move on if this fails without displaying an error message?
-  // We would presumably have a `reveal` button for all data that exists in the vault that isn't
-  // yet decrypted
-  if (error) {
-    return (
-      <Container>
-        <TitleContainer>
-          <IcoForbid40 color="error" />
-          <Typography variant="heading-3">{t('error.title')}</Typography>
-        </TitleContainer>
-        <Typography variant="body-2">{t('error.description')}</Typography>
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <LoadingIndicator />
     </Container>
   );
 };
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[2]};
-    justify-content: center;
-  `}
-`;
 
 const Container = styled.div`
   align-items: center;
