@@ -1,19 +1,19 @@
 import * as CSS from 'csstype';
 
-type VariantStyles = {
+export type ButtonVariantStyles = {
   bg: CSS.Property.Background;
   color: CSS.Property.Color;
   borderColor: CSS.Property.BorderColor;
 };
 
-type Variant = VariantStyles & {
-  hover: VariantStyles;
-  active: VariantStyles;
-  loading: VariantStyles;
-  disabled: VariantStyles;
+export type ButtonVariant = ButtonVariantStyles & {
+  hover: ButtonVariantStyles;
+  active: ButtonVariantStyles;
+  loading: ButtonVariantStyles;
+  disabled: ButtonVariantStyles;
 };
 
-type Size = {
+export type ButtonSize = {
   height: CSS.Property.Height;
   paddingHorizontal: CSS.Property.PaddingLeft | CSS.Property.PaddingRight;
   typography: string;
@@ -30,13 +30,13 @@ export type Button = {
     };
   };
   variant: {
-    primary: Variant;
-    secondary: Variant;
+    primary: ButtonVariant;
+    secondary: ButtonVariant;
   };
   size: {
-    large: Size;
-    compact: Size;
-    small: Size;
-    default: Size;
+    large: ButtonSize;
+    compact: ButtonSize;
+    small: ButtonSize;
+    default: ButtonSize;
   };
 };

@@ -29,7 +29,7 @@
     "@svgr/plugin-prettier": "^6.1.2",
     "@svgr/plugin-svgo": "^6.2.0",
     "@types/glob": "^7.2.0",
-    "csstype": "^3.1.0",
+    "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "glob": "^8.0.3",
     "jest-expo": "^48.0.2",

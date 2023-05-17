@@ -34,7 +34,7 @@ const useGetD2PStatus = ({
   refetchInterval = D2P_STATUS_FETCH_INTERVAL,
   options = {},
 }: GetD2PStatusPollArgs) =>
-  useQuery(['get-d2p-status', authToken], () => getD2PStatus(authToken), {
+  useQuery(['d2p-status', authToken], () => getD2PStatus(authToken), {
     enabled: !!enabled && !!authToken,
     refetchInterval,
     onSuccess: options.onSuccess,

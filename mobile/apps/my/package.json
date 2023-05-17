@@ -41,6 +41,7 @@
     "expo-status-bar": "~1.4.4",
     "i18next": "^22.0.4",
     "jest-expo": "^48.0.2",
+    "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-hook-form": "^7.43.9",
     "react-i18next": "^12.2.0",
@@ -58,8 +59,10 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@onefootprint/test-utils": "*",
+    "@types/lodash": "^4.14.194",
     "@types/react": "^18.0.37",
     "babel-plugin-module-resolver": "^5.0.0",
+    "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "module-resolver": "^1.0.0",
     "react-native-dotenv": "^3.4.8",

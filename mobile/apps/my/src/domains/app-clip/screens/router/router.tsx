@@ -8,21 +8,14 @@ import Error from '../error';
 import Expired from '../expired';
 import Init from '../init';
 import useGetD2PStatus from './hooks/use-get-d2p-status';
-import useParseHandoffUrl from './hooks/use-parse-handoff-url';
-import machine from './utils/state-machine';
+import createMachine from './utils/state-machine';
 
-const Router = () => {
-  const [state, send] = useMachine(machine);
-  const { authToken = '' } = state.context;
-  useParseHandoffUrl({
-    onSuccess: newAuthToken => {
-      send({ type: 'authTokenChanged', payload: { authToken: newAuthToken } });
-    },
-    onError: () => {
-      send({ type: 'authTokenFailed' });
-    },
-  });
+type RouterProps = {
+  authToken: string;
+};
 
+const Router = ({ authToken }: RouterProps) => {
+  const [state, send] = useMachine(createMachine(authToken));
   useGetD2PStatus({
     enabled: !state.done,
     authToken,

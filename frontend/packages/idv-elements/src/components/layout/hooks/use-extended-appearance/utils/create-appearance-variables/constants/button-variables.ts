@@ -101,6 +101,12 @@ const buttonVariables = new Map<
     },
   ],
   [
+    'buttonsPrimaryLoadingBorderColor',
+    {
+      var: 'fp-buttons-primary-loading-border',
+    },
+  ],
+  [
     'buttonSecondaryBg',
     {
       var: '--fp-buttons-secondary-initial-bg',

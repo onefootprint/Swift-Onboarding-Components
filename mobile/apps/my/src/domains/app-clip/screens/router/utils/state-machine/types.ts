@@ -6,15 +6,6 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
-      type: 'authTokenChanged';
-      payload: {
-        authToken: string;
-      };
-    }
-  | {
-      type: 'authTokenFailed';
-    }
-  | {
       type: 'initCompleted';
     }
   | {
