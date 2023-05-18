@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddConsent, AddFront, IncodeState,
     IncodeStateTransition, SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use crate::ApiError;
@@ -15,17 +16,11 @@ use idv::incode::request::OnboardingStartCustomNameFields;
 use idv::incode::IncodeStartOnboardingRequest;
 use newtypes::vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken};
 use newtypes::IncodeVerificationSessionKind;
-use newtypes::{
-    DecisionIntentId, DocVData, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId,
-    IncodeSessionId, ScopedVaultId, VaultPublicKey, VendorAPI,
-};
+use newtypes::{IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId, VendorAPI};
 
 pub struct StartOnboarding {
     pub incode_credentials: IncodeCredentials,
     pub configuration_id: IncodeConfigurationId,
-    pub scoped_vault_id: ScopedVaultId,
-    pub decision_intent_id: DecisionIntentId,
-    pub identity_document_id: IdentityDocumentId,
 }
 
 #[async_trait]
@@ -34,20 +29,18 @@ impl IncodeStateTransition for StartOnboarding {
         &self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
+        ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = self.scoped_vault_id.clone();
-        let sv_id2 = self.scoped_vault_id.clone();
-        let di_id = self.decision_intent_id.clone();
-        let di_id2 = self.decision_intent_id.clone();
+        let sv_id = ctx.scoped_vault_id.clone();
+        let di_id = ctx.decision_intent_id.clone();
+        let id_doc_id = ctx.identity_document_id.clone();
         let incode_credentials = self.incode_credentials.clone();
         let config_id = self.configuration_id.clone();
-        let id_doc_id2 = self.identity_document_id.clone();
 
         //
         // Save our initial VReq
         //
+        // TODO not idempotent
         let (start_onboarding_verification_request, verification_session) = db_pool
             .db_transaction(
                 move |conn| -> DbResult<(VerificationRequest, IncodeVerificationSession)> {
@@ -63,7 +56,7 @@ impl IncodeStateTransition for StartOnboarding {
 
                     // Initialize the incode state
                     let is =
-                        IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id2, session_kind)?;
+                        IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id, session_kind)?;
 
                     Ok((vr, is))
                 },
@@ -75,8 +68,8 @@ impl IncodeStateTransition for StartOnboarding {
         //
         // TODO: we need to be able to error if the fn/ln is missing and we need it
         let custom_name_fields = OnboardingStartCustomNameFields {
-            first_name: docv_data.first_name.clone(),
-            last_name: docv_data.last_name.clone(),
+            first_name: ctx.docv_data.first_name.clone(),
+            last_name: ctx.docv_data.last_name.clone(),
         };
         let request = IncodeStartOnboardingRequest {
             credentials: incode_credentials.clone(),
@@ -90,12 +83,12 @@ impl IncodeStateTransition for StartOnboarding {
         //
         // Save our result
         //
-        let save_verification_result_args = SaveVerificationResultArgs::from((
+        let vres = SaveVerificationResultArgs::from((
             &request_result,
             start_onboarding_verification_request.id.clone(),
         ));
 
-        save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
+        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
 
         // Now ensure we don't have an error
         // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
@@ -116,15 +109,15 @@ impl IncodeStateTransition for StartOnboarding {
             },
         };
 
-        let id_doc = self.identity_document_id.clone();
         // Save the next stage's Vreq
+        let ctx = ctx.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 // We only need to add consent if the session is of kind=Selfie
                 let next_state: IncodeState = if verification_session.kind.requires_consent() {
-                    AddConsent::enter(conn, sv_id2, di_id2, id_doc, session)?.into()
+                    AddConsent::enter(conn, &ctx, session)?.into()
                 } else {
-                    AddFront::enter(conn, sv_id2, di_id2, id_doc, session)?.into()
+                    AddFront::enter(conn, &ctx, session)?.into()
                 };
 
                 // Update our state to the next stage

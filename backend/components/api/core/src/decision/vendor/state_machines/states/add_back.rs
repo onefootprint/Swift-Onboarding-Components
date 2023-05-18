@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition, ProcessId,
     RetryUpload, SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use crate::ApiError;
@@ -12,16 +13,10 @@ use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::IncodeAddBackRequest;
 use newtypes::IncodeVerificationFailureReason;
-use newtypes::{
-    DecisionIntentId, DocVData, IdentityDocumentId, IncodeVerificationSessionState, ScopedVaultId,
-    VaultPublicKey, VendorAPI,
-};
+use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 
 pub struct AddBack {
     pub session: VerificationSession,
-    pub scoped_vault_id: ScopedVaultId,
-    pub decision_intent_id: DecisionIntentId,
-    pub identity_document_id: IdentityDocumentId,
     pub add_back_verification_request: VerificationRequest,
 }
 
@@ -31,20 +26,19 @@ impl IncodeStateTransition for AddBack {
         &self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
+        ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = self.scoped_vault_id.clone();
-        let di_id = self.decision_intent_id.clone();
+        let sv_id = ctx.scoped_vault_id.clone();
+        let di_id = ctx.decision_intent_id.clone();
 
         //
         // make the request to incode
         //
         let add_back_vreq_id = self.add_back_verification_request.id.clone();
         let docv_data = DocVData {
-            back_image: docv_data.back_image.clone(),
-            country_code: docv_data.country_code.clone(),
-            document_type: docv_data.document_type,
+            back_image: ctx.docv_data.back_image.clone(),
+            country_code: ctx.docv_data.country_code.clone(),
+            document_type: ctx.docv_data.document_type,
             ..Default::default()
         };
         let request = IncodeAddBackRequest {
@@ -59,7 +53,8 @@ impl IncodeStateTransition for AddBack {
         let save_verification_result_args =
             SaveVerificationResultArgs::from((&request_result, add_back_vreq_id));
 
-        save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
+        save_incode_verification_result(db_pool, save_verification_result_args, &ctx.vault.public_key)
+            .await?;
 
         // Now ensure we don't have an error
         let response = request_result
@@ -108,17 +103,12 @@ impl IncodeStateTransition for AddBack {
         if let Some(vreq) = process_id_vreq {
             Ok(ProcessId {
                 session: self.session.clone(),
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
                 process_id_verification_request: vreq,
             }
             .into())
         } else {
             Ok(RetryUpload {
                 session: self.session.clone(),
-                scoped_vault_id: self.scoped_vault_id.clone(),
-                decision_intent_id: self.decision_intent_id.clone(),
-                identity_document_id: self.identity_document_id.clone(),
             }
             .into())
         }

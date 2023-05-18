@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, FetchScores, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use crate::ApiError;
@@ -11,14 +12,10 @@ use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::IncodeProcessIdRequest;
-use newtypes::{
-    DecisionIntentId, DocVData, IncodeVerificationSessionState, ScopedVaultId, VaultPublicKey, VendorAPI,
-};
+use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 pub struct ProcessId {
     pub session: VerificationSession,
-    pub scoped_vault_id: ScopedVaultId,
-    pub decision_intent_id: DecisionIntentId,
     pub process_id_verification_request: VerificationRequest,
 }
 
@@ -28,11 +25,10 @@ impl IncodeStateTransition for ProcessId {
         &self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        _docv_data: &DocVData,
+        ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = self.scoped_vault_id.clone();
-        let di_id = self.decision_intent_id.clone();
+        let sv_id = ctx.scoped_vault_id.clone();
+        let di_id = ctx.decision_intent_id.clone();
 
         //
         // make the request to incode
@@ -47,10 +43,8 @@ impl IncodeStateTransition for ProcessId {
         //
         // Save our result
         //
-        let save_verification_result_args =
-            SaveVerificationResultArgs::from((&request_result, process_id_vreq_id));
-
-        save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
+        let vres = SaveVerificationResultArgs::from((&request_result, process_id_vreq_id));
+        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
 
         // Now ensure we don't have an error
         request_result
@@ -79,8 +73,6 @@ impl IncodeStateTransition for ProcessId {
 
         Ok(FetchScores {
             session: self.session.clone(),
-            scoped_vault_id: self.scoped_vault_id.clone(),
-            decision_intent_id: self.decision_intent_id.clone(),
             fetch_scores_verification_request: process_id_vreq,
         }
         .into())

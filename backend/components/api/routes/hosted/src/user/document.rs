@@ -11,7 +11,9 @@ use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::config::Config;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeState, IncodeStateMachine};
+use api_core::decision::vendor::state_machines::incode_state_machine::{
+    IncodeContext, IncodeState, IncodeStateMachine,
+};
 use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
 use api_wire_types::document_request::DocumentRequest;
@@ -211,7 +213,6 @@ pub async fn post(
             &state.config,
             &state.footprint_vendor_http_client,
             id_doc_id,
-            user_auth.scoped_user.id.clone(),
             user_auth.scoped_user.tenant_id.clone(),
             decision_intent.id,
             uvw.vault,
@@ -326,36 +327,35 @@ async fn handle_incode_request(
     config: &Config,
     footprint_http_client: &FootprintVendorHttpClient,
     identity_document_id: IdentityDocumentId,
-    scoped_vault_id: ScopedVaultId,
     tenant_id: TenantId,
     decision_intent_id: DecisionIntentId,
-    user_vault: Vault,
+    vault: Vault,
     document_request: DbDocumentRequest,
 ) -> Result<(), ApiError> {
     let docv_data =
         build_docv_data_from_identity_doc(db_pool, enclave_client, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
     // Initialize our state machine
+    let ctx = IncodeContext {
+        decision_intent_id,
+        scoped_vault_id: document_request.scoped_vault_id.clone(),
+        identity_document_id,
+        vault,
+        docv_data,
+    };
     let machine = IncodeStateMachine::init(
         tenant_id,
         db_pool,
         enclave_client,
         config,
-        decision_intent_id.clone(),
-        scoped_vault_id.clone(),
         // TODO: upstream this somewhere based on OBC
         IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
-        identity_document_id.clone(),
+        ctx,
     )
     .await?; // TODO: handle this with better requirement checking
 
     let result = machine
-        .run(
-            db_pool,
-            footprint_http_client,
-            user_vault.public_key.clone(),
-            &docv_data,
-        )
+        .run(db_pool, footprint_http_client)
         .await
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 
@@ -365,21 +365,9 @@ async fn handle_incode_request(
     db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
             if needs_retry {
-                handle_incode_error(
-                    conn,
-                    document_request,
-                    user_vault.id,
-                    scoped_vault_id,
-                    identity_document_id,
-                )?
+                handle_incode_error(conn, result.ctx, document_request)?
             } else {
-                handle_incode_success(
-                    conn,
-                    document_request,
-                    user_vault.id,
-                    scoped_vault_id,
-                    identity_document_id,
-                )?
+                handle_incode_success(conn, result.ctx, document_request)?
             }
 
             Ok(())
@@ -391,10 +379,8 @@ async fn handle_incode_request(
 
 fn handle_incode_error(
     conn: &mut TxnPgConn,
-    document_request: DbDocumentRequest,
-    user_vault_id: VaultId,
-    scoped_vault_id: ScopedVaultId,
-    identity_document_id: IdentityDocumentId,
+    ctx: IncodeContext,
+    doc_request: DbDocumentRequest,
 ) -> DbResult<()> {
     // Move our status to failed since we need a new doc verification request
     let failed_update = DocumentRequestUpdate {
@@ -403,11 +389,11 @@ fn handle_incode_error(
     };
     // Create a timeline event
     let info = newtypes::IdentityDocumentUploadedInfo {
-        id: identity_document_id,
+        id: ctx.identity_document_id,
     };
-    UserTimeline::create(conn, info, user_vault_id, scoped_vault_id.clone())?;
+    UserTimeline::create(conn, info, ctx.vault.id, ctx.scoped_vault_id.clone())?;
 
-    let current_doc_request = document_request.update(conn.conn(), failed_update)?;
+    let current_doc_request = doc_request.update(conn.conn(), failed_update)?;
     let current_doc_request_id = current_doc_request.id.clone();
     let should_collect_selfie = current_doc_request.should_collect_selfie;
     // If we have exceeded our retry limit, we no longer want to create new document requests and
@@ -422,7 +408,7 @@ fn handle_incode_error(
         // ref_id is None here since we are retrying scan onboarding!
         DbDocumentRequest::create(
             conn,
-            scoped_vault_id,
+            ctx.scoped_vault_id,
             None,
             should_collect_selfie,
             Some(current_doc_request_id),
@@ -434,10 +420,8 @@ fn handle_incode_error(
 
 fn handle_incode_success(
     conn: &mut TxnPgConn,
+    ctx: IncodeContext,
     document_request: DbDocumentRequest,
-    user_vault_id: VaultId,
-    scoped_vault_id: ScopedVaultId,
-    identity_document_id: IdentityDocumentId,
 ) -> DbResult<()> {
     let completed_update = DocumentRequestUpdate {
         status: Some(DocumentRequestStatus::Complete),
@@ -448,9 +432,9 @@ fn handle_incode_success(
 
     // Create a timeline event
     let info = newtypes::IdentityDocumentUploadedInfo {
-        id: identity_document_id,
+        id: ctx.identity_document_id,
     };
-    UserTimeline::create(conn, info, user_vault_id, scoped_vault_id)?;
+    UserTimeline::create(conn, info, ctx.vault.id, ctx.scoped_vault_id)?;
 
     Ok(())
 }

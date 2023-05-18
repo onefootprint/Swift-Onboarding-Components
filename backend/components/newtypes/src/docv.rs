@@ -1,6 +1,6 @@
 use crate::{IdDocKind, PiiString};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DocVData {
     /// This is the reference id number we send to the vendor
     pub reference_id: Option<u64>,

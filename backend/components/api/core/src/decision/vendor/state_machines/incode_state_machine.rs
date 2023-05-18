@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::vault::Vault;
 use db::DbPool;
 use enum_dispatch::enum_dispatch;
 use idv::footprint_http_client::FootprintVendorHttpClient;
@@ -7,7 +8,7 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, IdentityDocumentId, IncodeConfigurationId, IncodeVerificationSessionState,
-    ScopedVaultId, TenantId, VaultPublicKey,
+    ScopedVaultId, TenantId,
 };
 
 use crate::config::Config;
@@ -18,6 +19,16 @@ use crate::ApiError;
 
 use super::states::*;
 
+/// Various context fields needed by ever stage of the state machine
+#[derive(Clone)]
+pub struct IncodeContext {
+    pub decision_intent_id: DecisionIntentId,
+    pub scoped_vault_id: ScopedVaultId,
+    pub identity_document_id: IdentityDocumentId,
+    pub vault: Vault,
+    pub docv_data: DocVData,
+}
+
 /// This trait represents a running a state transition for an Incode Verification session
 #[async_trait]
 #[enum_dispatch]
@@ -26,8 +37,7 @@ pub trait IncodeStateTransition {
         &self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
+        ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError>;
 }
 
@@ -87,6 +97,7 @@ impl std::fmt::Debug for IncodeMachineError {
 /// The machine that initializes and then runs a series of state transitions
 pub struct IncodeStateMachine {
     pub state: IncodeState,
+    pub ctx: IncodeContext,
 }
 
 impl IncodeStateMachine {
@@ -96,18 +107,15 @@ impl IncodeStateMachine {
         db_pool: &DbPool,
         enclave_client: &EnclaveClient,
         config: &Config,
-        decision_intent_id: DecisionIntentId,
-        scoped_vault_id: ScopedVaultId,
         configuration_id: IncodeConfigurationId,
-        identity_document_id: IdentityDocumentId,
+        ctx: IncodeContext,
     ) -> Result<Self, ApiError> {
-        let sv_id = scoped_vault_id.clone();
-
         // get incode credentials from TVC
         let tenant_vendor_control =
             TenantVendorControl::new(tenant_id, db_pool, enclave_client, config).await?;
 
         // Load our existing state
+        let sv_id = ctx.scoped_vault_id.clone();
         let existing_verification_session = db_pool
             .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
             .await??;
@@ -127,13 +135,7 @@ impl IncodeStateMachine {
                             authentication_token: token,
                         },
                     };
-                    RetryUpload {
-                        session,
-                        identity_document_id,
-                        scoped_vault_id,
-                        decision_intent_id,
-                    }
-                    .into()
+                    RetryUpload { session }.into()
                 }
                 _ => return Err(ApiError::AssertionError("wrong state".into())),
             }
@@ -141,28 +143,24 @@ impl IncodeStateMachine {
             StartOnboarding {
                 incode_credentials: tenant_vendor_control.incode_credentials(),
                 configuration_id,
-                scoped_vault_id,
-                decision_intent_id,
-                identity_document_id,
             }
             .into()
         };
 
-        Ok(Self { state: initial_state })
+        Ok(Self {
+            state: initial_state,
+            ctx,
+        })
     }
 
     pub async fn run(
         self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
     ) -> Result<Self, IncodeMachineError> {
         let mut machine = self;
         loop {
-            machine = machine
-                .step(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
-                .await?;
+            machine = machine.step(db_pool, footprint_http_client).await?;
 
             // Break if in `Complete` or `RetryUpload`
             if machine.state.is_terminal_state() {
@@ -178,21 +176,18 @@ impl IncodeStateMachine {
         self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        docv_data: &DocVData,
     ) -> Result<Self, IncodeMachineError> {
-        let current_state = self.state.name();
+        let Self { state, ctx } = self;
+        let current_state = state.name();
 
-        let result = {
-            self.state
-                .run(db_pool, footprint_http_client, uv_public_key.clone(), docv_data)
-                .await
-        };
+        let result = { state.run(db_pool, footprint_http_client, &ctx).await };
 
-        result.map(|s| Self { state: s }).map_err(|e| IncodeMachineError {
-            state_name: current_state,
-            error: e,
-        })
+        result
+            .map(|s| Self { state: s, ctx })
+            .map_err(|e| IncodeMachineError {
+                state_name: current_state,
+                error: e,
+            })
     }
 }
 
@@ -221,7 +216,7 @@ mod tests {
         IncodeConfigurationId, IncodeVerificationSessionState, PiiString, Vendor, VendorAPI,
     };
 
-    use super::IncodeState;
+    use super::{IncodeContext, IncodeState};
     use crate::{
         decision::{
             tests::test_helpers::create_user_and_onboarding,
@@ -324,25 +319,26 @@ mod tests {
         //
         // Run the incode verification machine
         //
+        let ctx = IncodeContext {
+            decision_intent_id: di.id.clone(),
+            scoped_vault_id: su.id,
+            identity_document_id: id_doc.id,
+            vault: uv.clone(),
+            docv_data,
+        };
         let machine = IncodeStateMachine::init(
             tenant.id,
             &db_pool,
             &state.enclave_client,
             &state.config,
-            di.id.clone(),
-            su.id,
             IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
-            id_doc.id,
+            ctx,
         )
         .await
         .unwrap();
 
         // Assert machine is in the correct final state
-        let final_state = machine
-            .run(&db_pool, &vendor_client, uv.public_key.clone(), &docv_data)
-            .await
-            .unwrap()
-            .state;
+        let final_state = machine.run(&db_pool, &vendor_client).await.unwrap().state;
 
         match final_state {
             IncodeState::Complete(c) => assert!(c.fetch_scores_response.id_validation.is_some()),
@@ -473,15 +469,20 @@ mod tests {
         //
         // Run the incode verification machine, first with a blurry image
         //
+        let ctx = IncodeContext {
+            decision_intent_id: di.id.clone(),
+            scoped_vault_id: su.id.clone(),
+            identity_document_id: id_doc.id,
+            vault: uv.clone(),
+            docv_data,
+        };
         let machine = IncodeStateMachine::init(
             tenant.id.clone(),
             &db_pool,
             &state.enclave_client,
             &state.config,
-            di.id.clone(),
-            su.id.clone(),
             IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
-            id_doc.id,
+            ctx,
         )
         .await
         .unwrap();
@@ -492,11 +493,7 @@ mod tests {
         );
 
         // Assert machine is in the correct state
-        let after_running_with_blurry_state = machine
-            .run(&db_pool, &vendor_client, uv.public_key.clone(), &docv_data)
-            .await
-            .unwrap()
-            .state;
+        let after_running_with_blurry_state = machine.run(&db_pool, &vendor_client).await.unwrap().state;
 
         let session_id = match after_running_with_blurry_state {
             IncodeState::RetryUpload(r) => r.session.id,
@@ -548,26 +545,27 @@ mod tests {
         //
         // Run the incode verification machine
         //
+        let ctx = IncodeContext {
+            decision_intent_id: di.id.clone(),
+            scoped_vault_id: su.id,
+            identity_document_id: id_doc.id,
+            vault: uv.clone(),
+            docv_data,
+        };
         let machine = IncodeStateMachine::init(
             tenant.id,
             &db_pool,
             &state.enclave_client,
             &state.config,
-            di.id.clone(),
-            su.id,
             IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
-            id_doc.id,
+            ctx,
         )
         .await
         .unwrap();
 
         assert_eq!(machine.state.name(), IncodeVerificationSessionState::RetryUpload);
 
-        let final_state = machine
-            .run(&db_pool, &vendor_client, uv.public_key.clone(), &docv_data)
-            .await
-            .unwrap()
-            .state;
+        let final_state = machine.run(&db_pool, &vendor_client).await.unwrap().state;
 
         match final_state {
             IncodeState::Complete(c) => assert!(c.fetch_scores_response.id_validation.is_some()),

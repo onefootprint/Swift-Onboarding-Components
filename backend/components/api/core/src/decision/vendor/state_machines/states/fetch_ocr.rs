@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, Complete, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use crate::ApiError;
@@ -12,7 +13,7 @@ use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::response::FetchScoresResponse;
 use idv::incode::IncodeFetchOCRRequest;
-use newtypes::{DocVData, IncodeVerificationSessionState, VaultPublicKey};
+use newtypes::IncodeVerificationSessionState;
 
 pub struct FetchOCR {
     pub session: VerificationSession,
@@ -26,8 +27,7 @@ impl IncodeStateTransition for FetchOCR {
         &self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-        uv_public_key: VaultPublicKey,
-        _docv_data: &DocVData,
+        ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
@@ -43,10 +43,8 @@ impl IncodeStateTransition for FetchOCR {
         //
         // Save our result
         //
-        let save_verification_result_args =
-            SaveVerificationResultArgs::from((&request_result, fetch_ocr_vreq_id));
-
-        save_incode_verification_result(db_pool, save_verification_result_args, &uv_public_key).await?;
+        let vres = SaveVerificationResultArgs::from((&request_result, fetch_ocr_vreq_id));
+        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
 
         // Now ensure we don't have an error
         let fetch_ocr_response = request_result
