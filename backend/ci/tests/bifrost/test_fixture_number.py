@@ -38,7 +38,8 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio):
     bifrost2 = BifrostClient(ob_config2, twilio, override_inherit_phone=phone_number)
     bifrost2.run()
     assert set(i["kind"] for i in bifrost2.handled_requirements) == {"authorize"}
-    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {"collect_data"}
+    # TODO reinstate after we start serializing met requirements
+    # assert set(i["kind"] for i in bifrost2.already_met_requirements) == {"collect_data"}
 
 
 def test_identify_fixture_phone_number_non_sandbox(sandbox_tenant):
