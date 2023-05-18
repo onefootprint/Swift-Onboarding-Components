@@ -12,7 +12,6 @@ import SandboxBanner, {
   SandboxBannerHandler,
 } from './components/sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
-import useExtendedAppearance from './hooks/use-extended-appearance';
 import { LayoutOptions } from './types';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
@@ -41,7 +40,6 @@ const Layout = ({
     hasDesktopBorderRadius,
   } = options;
 
-  useExtendedAppearance(appearance);
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
   const [refBody, { height: bodyHeight }] = useMeasure();
 
@@ -56,7 +54,11 @@ const Layout = ({
   }, []);
 
   return (
-    <LayoutOptionsProvider options={options} onClose={onClose}>
+    <LayoutOptionsProvider
+      options={options}
+      onClose={onClose}
+      appearance={appearance}
+    >
       <FullHeightContainer
         id={LAYOUT_CONTAINER_ID}
         hasBorderRadius={!!hasDesktopBorderRadius}

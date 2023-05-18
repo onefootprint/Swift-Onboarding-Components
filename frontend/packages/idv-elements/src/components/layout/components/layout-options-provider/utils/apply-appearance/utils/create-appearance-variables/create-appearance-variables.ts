@@ -15,14 +15,14 @@ const addStyleRow = (options: {
   return `${styles} ${cssVariable}: ${cssValue};`;
 };
 
-const iterateOverTokens = (options: {
+const iterateOverVariables = (options: {
   styles: string;
-  tokens: Record<string, any>;
+  variables: Record<string, any>;
   tokenName: string;
   tokenValue: string;
 }) => {
   let { styles } = options;
-  const { tokens, tokenName, tokenValue } = options;
+  const { variables, tokenName, tokenValue } = options;
   const definitions = variablesMap.get(tokenName);
   if (definitions) {
     const cssVariable = definitions.var;
@@ -33,11 +33,11 @@ const iterateOverTokens = (options: {
     });
     if (definitions.assignDefault) {
       definitions.assignDefault.forEach(innerTokenName => {
-        const shouldOverwrite = !tokens.innerTokenName;
+        const shouldOverwrite = !variables.innerTokenName;
         if (shouldOverwrite) {
-          styles = iterateOverTokens({
+          styles = iterateOverVariables({
             styles,
-            tokens,
+            variables,
             tokenName: innerTokenName,
             tokenValue,
           });
@@ -49,11 +49,11 @@ const iterateOverTokens = (options: {
   return styles;
 };
 
-const generateStyles = (tokens: Record<string, any>) => {
+const generateStyles = (variables: Record<string, any>) => {
   const initialValue = '';
-  return Object.entries(tokens).reduce(
+  return Object.entries(variables).reduce(
     (styles, [tokenName, tokenValue]) =>
-      iterateOverTokens({ styles, tokens, tokenName, tokenValue }),
+      iterateOverVariables({ styles, variables, tokenName, tokenValue }),
     initialValue,
   );
 };

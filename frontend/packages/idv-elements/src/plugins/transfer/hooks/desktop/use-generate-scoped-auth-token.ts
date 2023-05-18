@@ -1,12 +1,14 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { useEffect } from 'react';
 
+import { useLayoutOptions } from '../../../../components/layout';
 import { useD2PGenerate } from '../../../../hooks';
 import useDesktopMachine from './use-desktop-machine';
 
 const useGenerateScopedAuthToken = () => {
   const d2pGenerateMutation = useD2PGenerate();
   const [state, send] = useDesktopMachine();
+  const { appearance } = useLayoutOptions();
   const { authToken, device } = state.context;
   const opener = device?.type ?? 'unknown';
   const sessionId = getSessionId();
@@ -25,6 +27,7 @@ const useGenerateScopedAuthToken = () => {
         meta: {
           opener,
           sessionId,
+          styleParams: appearance ? JSON.stringify(appearance) : undefined,
         },
       },
       {
