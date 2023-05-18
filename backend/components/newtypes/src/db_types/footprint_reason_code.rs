@@ -132,31 +132,31 @@ footprint_reason_code_enum! {
  #[note = "Address does not match", severity = SignalSeverity::High,  description = "Address located does not match address input."]
  AddressDoesNotMatch,
 
- #[scope = SignalScope::Zip, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::Zip], match_level = Some(MatchLevel::NoMatch)]
  #[note = "ZIP code does not match", severity = SignalSeverity::Medium,  description = "ZIP code located does not match the ZIP code input."]
  AddressZipCodeDoesNotMatch,
 
- #[scope = SignalScope::City, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::City], match_level = Some(MatchLevel::NoMatch)]
  #[note = "City does not match", severity = SignalSeverity::Medium,  description = "City located does not match the city input."]
  AddressCityDoesNotMatch,
 
- #[scope = SignalScope::City, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::City], match_level = Some(MatchLevel::Exact)]
  #[note = "City matches", severity = SignalSeverity::Info,  description = "City located matches the city input."]
  AddressCityMatches,
 
- #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Street name does not match", severity = SignalSeverity::Medium,  description = "Street name located does not match input street name."]
  AddressStreetNameDoesNotMatch,
 
- #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::Partial)]
  #[note = "Street name partially matches", severity = SignalSeverity::Low,  description = "Street name located partially matches input street name."]
  AddressStreetNamePartiallyMatches,
 
- #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Street number does not match", severity = SignalSeverity::Medium,  description = "Street number located does not match input street number."]
  AddressStreetNumberDoesNotMatch,
 
- #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::State], match_level = Some(MatchLevel::NoMatch)]
  #[note = "State does not match", severity = SignalSeverity::Low,  description = "State located does not match state input."]
  AddressStateDoesNotMatch,
 
@@ -580,11 +580,11 @@ footprint_reason_code_enum! {
  #[note = "ZIP code matches", severity = SignalSeverity::Info,  description = "ZIP code located matches the ZIP code input."]
  AddressZipCodeMatches,
 
- #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
  #[note = "Street name matches", severity = SignalSeverity::Info,  description = "Street name located matches input street name."]
  AddressStreetNameMatches,
 
- #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
  #[note = "Street number matches", severity = SignalSeverity::Info,  description = "Street number located matches input street number."]
  AddressStreetNumberMatches,
 

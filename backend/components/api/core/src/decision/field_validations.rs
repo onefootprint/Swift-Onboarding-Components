@@ -53,10 +53,13 @@ pub fn create_field_validation_results(
 
 #[cfg(test)]
 mod tests {
-    use db::test_helpers::have_same_elements;
-    use newtypes::{FootprintReasonCode, MatchLevel, SignalScope};
-
     use crate::decision::field_validations::create_field_validation_results;
+    use db::test_helpers::have_same_elements;
+    use newtypes::{
+        ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, FootprintReasonCode, MatchLevel,
+        SignalScope,
+    };
+    use test_case::test_case;
 
     #[test]
     fn test_field_validation() {
@@ -94,5 +97,36 @@ mod tests {
             result.get(&SignalScope::Name).unwrap().match_level,
             MatchLevel::Exact
         );
+    }
+
+    fn create_reason_codes_for_experian(
+        name_and_address: ExperianAddressAndNameMatchReasonCodes,
+        dob: ExperianDobMatchReasonCodes,
+    ) -> Vec<FootprintReasonCode> {
+        let mut n: Vec<FootprintReasonCode> = (&name_and_address).into();
+        let dob: Option<FootprintReasonCode> = (&dob).into();
+
+        n.push(dob.unwrap());
+
+        n
+    }
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::A1, ExperianDobMatchReasonCodes::Match => (MatchLevel::Exact, MatchLevel::Exact, MatchLevel::Exact))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::H1, ExperianDobMatchReasonCodes::Match => (MatchLevel::Exact, MatchLevel::Exact, MatchLevel::Exact))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::Q1, ExperianDobMatchReasonCodes::Match => (MatchLevel::Exact, MatchLevel::Exact, MatchLevel::Exact))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::A1, ExperianDobMatchReasonCodes::PartialMatch => (MatchLevel::Exact, MatchLevel::Exact, MatchLevel::Partial))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::A1, ExperianDobMatchReasonCodes::NoMatch => (MatchLevel::Exact, MatchLevel::Exact, MatchLevel::NoMatch))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::C8, ExperianDobMatchReasonCodes::Match => (MatchLevel::Partial, MatchLevel::NoMatch, MatchLevel::Exact))]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::D1, ExperianDobMatchReasonCodes::PartialMatch => (MatchLevel::Partial, MatchLevel::Exact, MatchLevel::Partial))]
+    fn test_experian_field_validations(
+        name_and_address: ExperianAddressAndNameMatchReasonCodes,
+        dob: ExperianDobMatchReasonCodes,
+    ) -> (MatchLevel, MatchLevel, MatchLevel) {
+        let res = create_field_validation_results(create_reason_codes_for_experian(name_and_address, dob));
+
+        (
+            res.get(&SignalScope::Name).unwrap().match_level,
+            res.get(&SignalScope::Address).unwrap().match_level,
+            res.get(&SignalScope::Dob).unwrap().match_level,
+        )
     }
 }
