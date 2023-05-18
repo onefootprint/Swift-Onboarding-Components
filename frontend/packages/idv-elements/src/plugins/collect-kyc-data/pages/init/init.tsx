@@ -14,10 +14,12 @@ import useDecryptUser from './hooks/use-decrypt-user';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
-// TODO add others
 const BASIC_PROFILE_DIS: DataIdentifier[] = [
   IdDI.firstName,
   IdDI.lastName,
+  IdDI.dob,
+  IdDI.addressLine1,
+  IdDI.addressLine2,
   IdDI.city,
   IdDI.state,
   IdDI.country,
