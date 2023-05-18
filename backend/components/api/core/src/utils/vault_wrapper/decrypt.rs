@@ -4,10 +4,8 @@ use crate::errors::business::BusinessError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
 use crate::State;
-use crypto::aead::SealingKey;
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
-use db::models::document_data::DocumentData;
 use db::models::vault_data::VaultedData;
 use db::DbPool;
 use derive_more::{Deref, DerefMut};
@@ -16,7 +14,7 @@ use enclave_proxy::DataTransform;
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString, SealedVaultDataKey,
+    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
 };
 use std::collections::HashMap;
 
@@ -52,21 +50,22 @@ impl<Type> VaultWrapper<Type> {
 
         // special case decrypt documents
         let documents: HashMap<DataIdentifier, PiiString> = {
-            let document_datas: Vec<&DocumentData> = documents_kinds
+            let (document_kinds, document_datas): (Vec<_>, _) = documents_kinds
                 .into_iter()
                 .filter_map(|kind| self.get_document(kind))
-                .collect();
+                .map(|doc| (doc.kind, (&doc.e_data_key, &doc.s3_url)))
+                .unzip();
 
             let decrypted_documents: Vec<PiiString> = enclave_client
-                .batch_decrypt_documents(&self.vault.e_private_key, &document_datas)
+                .batch_decrypt_documents(&self.vault.e_private_key, document_datas)
                 .await?
                 .into_iter()
                 .map(PiiBytes::into_leak_base64_pii)
                 .collect();
 
-            document_datas
+            document_kinds
                 .into_iter()
-                .map(|doc| DataIdentifier::Document(doc.kind))
+                .map(DataIdentifier::Document)
                 .zip(decrypted_documents)
                 .collect()
         };
@@ -114,19 +113,6 @@ impl<Type> VaultWrapper<Type> {
 
 // TODO should we gate these permissions somehow? Make access events in these?
 impl<Type> VaultWrapper<Type> {
-    pub async fn decrypt_data_keys(
-        &self,
-        state: &State,
-        keys: Vec<SealedVaultDataKey>,
-    ) -> ApiResult<Vec<SealingKey>> {
-        let decrypted_results = state
-            .enclave_client
-            .decrypt_sealed_vault_data_key(&keys, &self.vault.e_private_key)
-            .await?;
-
-        Ok(decrypted_results)
-    }
-
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
         let phone_lifetime_id = self
             .get(IDK::PhoneNumber)

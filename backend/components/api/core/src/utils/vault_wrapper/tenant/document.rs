@@ -1,13 +1,12 @@
-use super::{DecryptRequest, TenantVw};
+use super::TenantVw;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
-use crate::State;
 use db::DbPool;
 use db::{
     models::{document_data::DocumentData, identity_document::IdentityDocument},
     HasLifetime,
 };
-use newtypes::{DataIdentifier, DocumentKind, PiiBytes};
+use newtypes::PiiBytes;
 
 pub struct DecryptedDocument {
     pub document: DocumentData,
@@ -22,34 +21,6 @@ pub struct DecryptedIdentityDocuments {
 }
 
 impl<Type> TenantVw<Type> {
-    pub async fn decrypt_document(
-        &self,
-        state: &State,
-        kind: DocumentKind,
-        req: DecryptRequest,
-    ) -> ApiResult<Option<DecryptedDocument>> {
-        let di = vec![DataIdentifier::from(kind)];
-        self.check_ob_config_access(&di)?;
-
-        let doc = self.get_document(kind);
-        if let Some(doc) = doc {
-            let plaintext = state
-                .enclave_client
-                .decrypt_document(&self.vault.e_private_key, doc)
-                .await?;
-
-            req.create_access_event(state, self.scoped_vault_id.clone(), di)
-                .await?;
-
-            Ok(Some(DecryptedDocument {
-                document: doc.clone(),
-                plaintext,
-            }))
-        } else {
-            Ok(None)
-        }
-    }
-
     /// decrypts identity document images
     /// this is internally used for verification requests
     pub async fn decrypt_id_doc_documents(

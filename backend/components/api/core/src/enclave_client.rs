@@ -40,6 +40,8 @@ pub struct EnclaveClient {
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
 
+pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String);
+
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
     /// initialize a new enclave client with a pool of connections
@@ -144,7 +146,7 @@ impl EnclaveClient {
     #[tracing::instrument(skip_all)]
     pub async fn decrypt_sealed_vault_data_key(
         &self,
-        sealed_data_keys: &[SealedVaultDataKey],
+        sealed_data_keys: Vec<&SealedVaultDataKey>,
         sealed_key: &EncryptedVaultPrivateKey,
     ) -> Result<Vec<SealingKey>, EnclaveError> {
         let sealed_data = sealed_data_keys
@@ -345,10 +347,10 @@ impl EnclaveClient {
     pub async fn decrypt_document(
         &self,
         e_private_key: &EncryptedVaultPrivateKey,
-        document: &DocumentData,
+        doc: &DocumentData,
     ) -> Result<PiiBytes, ApiError> {
         let result = self
-            .batch_decrypt_documents(e_private_key, &[document])
+            .batch_decrypt_documents(e_private_key, vec![(&doc.e_data_key, &doc.s3_url)])
             .await?
             .into_iter()
             .next()
@@ -357,24 +359,21 @@ impl EnclaveClient {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn batch_decrypt_documents(
+    pub async fn batch_decrypt_documents<'a>(
         &self,
         e_private_key: &EncryptedVaultPrivateKey,
-        documents: &[&DocumentData],
+        documents: Vec<EncryptedDocumentData<'a>>,
     ) -> Result<Vec<PiiBytes>, ApiError> {
-        let get_futures = documents.iter().map(|doc| {
+        let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
+        let get_futures = s3_urls.into_iter().map(|s3_url| {
             self.s3_client
-                .get_object_from_s3_url(&doc.s3_url)
+                .get_object_from_s3_url(s3_url)
                 .map_err(ApiError::from)
         });
 
         let document_bytes = futures::future::try_join_all(get_futures).await?;
-        let sealed_keys = documents
-            .iter()
-            .map(|doc| doc.e_data_key.to_owned())
-            .collect::<Vec<_>>();
         let sealing_keys = self
-            .decrypt_sealed_vault_data_key(sealed_keys.as_slice(), e_private_key)
+            .decrypt_sealed_vault_data_key(sealed_keys, e_private_key)
             .await?;
         let decrypted_document_bytes = document_bytes
             .into_iter()
