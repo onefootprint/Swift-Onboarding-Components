@@ -11,12 +11,12 @@ use newtypes::{
 };
 
 use crate::config::Config;
-use crate::decision::vendor::state_machines::incode_states::VerificationSession;
+use crate::decision::vendor::state_machines::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
 use crate::ApiError;
 
-use super::incode_states::state_impl::*;
+use super::states::*;
 
 /// This trait represents a running a state transition for an Incode Verification session
 #[async_trait]
