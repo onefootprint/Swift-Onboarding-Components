@@ -1,7 +1,7 @@
 import * as t from '../../../output/light';
-import type { InputLabel } from '../../types/components';
+import type { Label } from '../../types/components';
 
-const inputLabel: InputLabel = {
+const label: Label = {
   states: {
     default: {
       color: t.baseInputsInitialLabel,
@@ -20,4 +20,4 @@ const inputLabel: InputLabel = {
   },
 };
 
-export default inputLabel;
+export default label;

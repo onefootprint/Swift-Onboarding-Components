@@ -27,16 +27,14 @@ const Hint = ({
 
 const HintContainer = styled.Text<{ hasError: boolean; size: HintSize }>`
   ${({ theme, size, hasError }) => {
-    const { inputHint } = theme.components;
+    const { hint } = theme.components;
 
     return css`
       text-align: left;
       font: ${size === 'compact'
-        ? inputHint.size.compact.typography
-        : inputHint.size.default.typography};
-      color: ${hasError
-        ? inputHint.states.error.color
-        : inputHint.states.error.color};
+        ? hint.size.compact.typography
+        : hint.size.default.typography};
+      color: ${hasError ? hint.states.error.color : hint.states.error.color};
     `;
   }}
 `;

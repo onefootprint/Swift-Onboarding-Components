@@ -15,14 +15,14 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonPrimaryBg',
     {
       var: 'components.button.variant.primary.bg',
-      assignDefault: ['buttonPrimaryHoverBg'],
+      assignDefault: ['buttonPrimaryActiveBg'],
     },
   ],
   [
     'buttonPrimaryColor',
     {
       var: 'components.button.variant.primary.color',
-      assignDefault: ['buttonPrimaryHoverColor'],
+      assignDefault: ['buttonPrimaryActiveColor'],
     },
   ],
   [
@@ -32,21 +32,21 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     },
   ],
   [
-    'buttonPrimaryHoverBg',
+    'buttonPrimaryActiveBg',
     {
-      var: 'components.button.variant.primary.hover.bg',
+      var: 'components.button.variant.primary.active.bg',
     },
   ],
   [
-    'buttonPrimaryHoverColor',
+    'buttonPrimaryActiveColor',
     {
-      var: 'components.button.variant.primary.hover.color',
+      var: 'components.button.variant.primary.active.color',
     },
   ],
   [
-    'buttonPrimaryHoverBorderColor',
+    'buttonPrimaryActiveBorderColor',
     {
-      var: 'components.button.variant.primary.hover.borderColor',
+      var: 'components.button.variant.primary.active.borderColor',
     },
   ],
   [
@@ -89,14 +89,14 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonSecondaryBg',
     {
       var: 'components.button.variant.secondary.bg',
-      assignDefault: ['buttonSecondaryHoverBg'],
+      assignDefault: ['buttonSecondaryActiveBg'],
     },
   ],
   [
     'buttonSecondaryColor',
     {
       var: 'components.button.variant.secondary.color',
-      assignDefault: ['buttonSecondaryHoverColor'],
+      assignDefault: ['buttonSecondaryActiveColor'],
     },
   ],
   [
@@ -106,21 +106,21 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     },
   ],
   [
-    'buttonSecondaryHoverBg',
+    'buttonSecondaryActiveBg',
     {
-      var: 'components.button.variant.secondary.hover.bg',
+      var: 'components.button.variant.secondary.active.bg',
     },
   ],
   [
-    'buttonSecondaryHoverColor',
+    'buttonSecondaryActiveColor',
     {
-      var: 'components.button.variant.secondary.hover.color',
+      var: 'components.button.variant.secondary.active.color',
     },
   ],
   [
-    'buttonSecondaryHoverBorderColor',
+    'buttonSecondaryActiveBorderColor',
     {
-      var: 'components.button.variant.secondary.hover.borderColor',
+      var: 'components.button.variant.secondary.active.borderColor',
     },
   ],
   [

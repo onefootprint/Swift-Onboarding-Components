@@ -2,13 +2,13 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
   [
     'labelColor',
     {
-      var: 'components.inputLabel.states.default.color',
+      var: 'components.label.states.default.color',
     },
   ],
   [
     'labelFont',
     {
-      var: 'components.inputLabel.size.default.typography',
+      var: 'components.label.size.default.typography',
     },
   ],
 ]);

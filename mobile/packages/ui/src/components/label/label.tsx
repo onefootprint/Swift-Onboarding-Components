@@ -13,7 +13,7 @@ export type LabelProps = {
 const Label = ({ children, onPress, hasError = false }: LabelProps) => {
   return (
     <Box marginBottom={3}>
-      <Pressable onPress={onPress} activeOpacity={1}>
+      <Pressable onPress={onPress}>
         <Text hasError={hasError}>{children}</Text>
       </Pressable>
     </Box>
@@ -21,16 +21,18 @@ const Label = ({ children, onPress, hasError = false }: LabelProps) => {
 };
 
 const Text = styled.Text<{ hasError: boolean }>`
-  ${({ theme, hasError }) => {
-    const { inputLabel } = theme.components;
-    const color = hasError
-      ? inputLabel.states.error.color
-      : inputLabel.states.default.color;
-    const { typography } = inputLabel.size.default;
-
+  ${({ theme }) => {
+    const { label } = theme.components;
     return css`
-      color: ${color};
-      font: ${typography};
+      color: ${label.states.default.color};
+      font: ${label.size.default.typography};
+    `;
+  }}
+  ${({ theme, hasError }) => {
+    if (!hasError) return;
+    const { label } = theme.components;
+    return css`
+      color: ${label.states.error.color};
     `;
   }}
 `;

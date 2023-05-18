@@ -1,6 +1,6 @@
 import type { Typography } from './typography';
 
-export type InputHint = {
+export type Hint = {
   states: {
     default: {
       color: string;

@@ -35,7 +35,6 @@ describe.skip('useExtendedAppearance', () => {
       button.global.borderRadius = '12px';
       input.global.borderRadius = '12px';
       button.variant.primary.bg = 'orange';
-      button.variant.primary.hover.bg = 'orange';
 
       await waitFor(() => {
         expect(result.current.data).toEqual(expectedTheme);

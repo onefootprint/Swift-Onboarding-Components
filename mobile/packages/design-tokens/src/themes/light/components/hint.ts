@@ -1,7 +1,7 @@
 import * as t from '../../../output/light';
-import type { InputHint } from '../../types/components';
+import type { Hint } from '../../types/components';
 
-const inputHint: InputHint = {
+const hint: Hint = {
   states: {
     default: {
       color: t.baseInputsBaseHint,
@@ -20,4 +20,4 @@ const inputHint: InputHint = {
   },
 };
 
-export default inputHint;
+export default hint;

@@ -2,38 +2,41 @@ import React from 'react';
 import {
   GestureResponderEvent,
   Platform,
-  TouchableOpacity,
+  Pressable as RNPressable,
   ViewStyle,
 } from 'react-native';
 
 export type PressableProps = {
-  activeOpacity?: number;
   children: React.ReactNode;
   disabled?: boolean;
   onPress?: (event: GestureResponderEvent) => void;
+  onPressIn?: (event: GestureResponderEvent) => void;
+  onPressOut?: (event: GestureResponderEvent) => void;
   style?: ViewStyle;
 };
 
 const Pressable = ({
-  activeOpacity = 0.75,
   children,
   disabled = false,
   onPress,
+  onPressIn,
+  onPressOut,
   style = {},
 }: PressableProps) => {
   return (
-    <TouchableOpacity
+    <RNPressable
+      disabled={disabled}
       hitSlop={Platform.select({
         ios: undefined,
         default: { top: 16, right: 16, bottom: 16, left: 16 },
       })}
-      activeOpacity={activeOpacity}
-      style={style}
-      disabled={disabled}
       onPress={disabled ? undefined : onPress}
+      onPressIn={disabled ? undefined : onPressIn}
+      onPressOut={disabled ? undefined : onPressOut}
+      style={style}
     >
       {children}
-    </TouchableOpacity>
+    </RNPressable>
   );
 };
 

@@ -8,13 +8,11 @@ const linkButton: LinkButton = {
         text: {
           initial: t.linkButtonDefaultInitialText,
           active: t.linkButtonDefaultActiveText,
-          hover: t.linkButtonDefaultHoverText,
           disabled: t.linkButtonDefaultDisabledText,
         },
         icon: {
           initial: t.linkButtonDefaultInitialIcon,
           active: t.linkButtonDefaultActiveIcon,
-          hover: t.linkButtonDefaultHoverIcon,
           disabled: t.linkButtonDefaultDisabledIcon,
         },
       },
@@ -24,13 +22,11 @@ const linkButton: LinkButton = {
         text: {
           initial: t.linkButtonDestructiveInitialText,
           active: t.linkButtonDestructiveActiveText,
-          hover: t.linkButtonDestructiveHoverText,
           disabled: t.linkButtonDestructiveDisabledText,
         },
         icon: {
           active: t.linkButtonDestructiveActiveIcon,
           initial: t.linkButtonDestructiveInitialIcon,
-          hover: t.linkButtonDestructiveHoverIcon,
           disabled: t.linkButtonDestructiveDisabledIcon,
         },
       },

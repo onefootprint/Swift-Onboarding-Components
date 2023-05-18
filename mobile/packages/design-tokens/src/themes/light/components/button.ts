@@ -7,7 +7,6 @@ const button: Button = {
     borderWidth: t.buttonBorderWidth,
     elevation: {
       initial: t.buttonElevationInitial,
-      hover: t.buttonElevationHover,
       active: t.buttonElevationActive,
     },
   },
@@ -16,11 +15,6 @@ const button: Button = {
       bg: t.buttonsPrimaryInitialBg,
       color: t.buttonsPrimaryInitialText,
       borderColor: t.buttonsPrimaryInitialBorder,
-      hover: {
-        bg: t.buttonsPrimaryHoverBg,
-        color: t.buttonsPrimaryHoverText,
-        borderColor: t.buttonsPrimaryHoverBorder,
-      },
       active: {
         bg: t.buttonsPrimaryActiveBg,
         color: t.buttonsPrimaryActiveText,
@@ -41,11 +35,6 @@ const button: Button = {
       bg: t.buttonsSecondaryInitialBg,
       color: t.buttonsSecondaryInitialText,
       borderColor: t.buttonsSecondaryInitialBorder,
-      hover: {
-        bg: t.buttonsSecondaryHoverBg,
-        color: t.buttonsSecondaryHoverText,
-        borderColor: t.buttonsSecondaryHoverBorder,
-      },
       active: {
         bg: t.buttonsSecondaryActiveBg,
         color: t.buttonsSecondaryActiveText,

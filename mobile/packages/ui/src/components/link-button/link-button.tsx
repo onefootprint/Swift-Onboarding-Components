@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import React from 'react';
+import React, { useState } from 'react';
 import { GestureResponderEvent, Text } from 'react-native';
 
 import { Pressable } from '../pressable';
@@ -29,27 +29,35 @@ const LinkButton = ({
   size = 'default',
   variant = 'default',
 }: LinkButtonProps) => {
+  const [active, setActive] = useState(false);
   const renderedIcon = Icon && (
     <Icon color={variant === 'default' ? 'accent' : 'error'} />
   );
 
   return (
-    <LinkButtonContainer
+    <StyledPressable
       aria-label={ariaLabel || children}
       disabled={disabled}
       onPress={onPress}
+      onPressIn={() => setActive(true)}
+      onPressOut={() => setActive(false)}
       size={size}
     >
       {iconPosition === 'left' && renderedIcon}
-      <ButtonText variant={variant} size={size}>
+      <LinkButtonText
+        variant={variant}
+        size={size}
+        active={active}
+        disabled={disabled}
+      >
         {children}
-      </ButtonText>
+      </LinkButtonText>
       {iconPosition === 'right' && renderedIcon}
-    </LinkButtonContainer>
+    </StyledPressable>
   );
 };
 
-const LinkButtonContainer = styled(Pressable)<{ size: LinkButtonSize }>`
+const StyledPressable = styled(Pressable)<{ size: LinkButtonSize }>`
   ${({ theme, size }) => {
     const { linkButton } = theme.components;
 
@@ -65,18 +73,25 @@ const LinkButtonContainer = styled(Pressable)<{ size: LinkButtonSize }>`
   }}
 `;
 
-const ButtonText = styled(Text)<{
-  variant: LinkButtonVariant;
+const LinkButtonText = styled(Text)<{
+  active: boolean;
+  disabled: boolean;
   size: LinkButtonSize;
+  variant: LinkButtonVariant;
 }>`
-  ${({ theme, size, disabled, variant }) => {
+  ${({ theme, variant, size, active, disabled }) => {
     const { linkButton } = theme.components;
+    let color = linkButton.variant[variant].color.text.initial;
+
+    if (disabled) {
+      color = linkButton.variant[variant].color.text.disabled;
+    } else if (active) {
+      color = linkButton.variant[variant].color.text.active;
+    }
 
     return css`
       font: ${linkButton.size[size].typography};
-      color: ${disabled
-        ? linkButton.variant[variant].color.text.disabled
-        : linkButton.variant[variant].color.text.initial};
+      color: ${color};
     `;
   }}
 `;

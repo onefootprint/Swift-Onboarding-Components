@@ -1,6 +1,6 @@
 import type { Typography } from './typography';
 
-export type InputLabel = {
+export type Label = {
   states: {
     default: {
       color: string;

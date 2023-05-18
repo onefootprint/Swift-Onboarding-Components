@@ -7,13 +7,11 @@ export type LinkButton = {
         text: {
           initial: string;
           active: string;
-          hover: string;
           disabled: string;
         };
         icon: {
           initial: string;
           active: string;
-          hover: string;
           disabled: string;
         };
       };
@@ -23,13 +21,11 @@ export type LinkButton = {
         text: {
           initial: string;
           active: string;
-          hover: string;
           disabled: string;
         };
         icon: {
           initial: string;
           active: string;
-          hover: string;
           disabled: string;
         };
       };

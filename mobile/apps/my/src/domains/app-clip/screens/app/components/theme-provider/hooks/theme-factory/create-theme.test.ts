@@ -29,12 +29,12 @@ describe('create theme', () => {
     describe('<Button />', () => {
       it('should extend the theme correctly', () => {
         const variables: FootprintAppearanceVariables = {
-          buttonPrimaryBg: 'red',
+          buttonPrimaryBg: 'green',
         };
         const expectedTheme = structuredClone(defaultTheme);
         const { button } = expectedTheme.components;
-        button.variant.primary.bg = 'red';
-        button.variant.primary.hover.bg = 'red';
+        button.variant.primary.bg = 'green';
+        button.variant.primary.active.bg = 'green';
         expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
       });
     });
@@ -42,14 +42,12 @@ describe('create theme', () => {
     describe('<LinkButton />', () => {
       it('should extend the theme correctly', () => {
         const variables: FootprintAppearanceVariables = {
-          borderRadius: '10px',
           linkButtonColor: 'red',
         };
         const expectedTheme = structuredClone(defaultTheme);
         const { linkButton } = expectedTheme.components;
-        expectedTheme.borderRadius.default = '10px';
         linkButton.variant.default.color.text.initial = 'red';
-        linkButton.variant.default.color.text.hover = 'red';
+        linkButton.variant.default.color.text.active = 'red';
         expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
       });
     });
@@ -60,8 +58,8 @@ describe('create theme', () => {
           labelColor: 'purple',
         };
         const expectedTheme = structuredClone(defaultTheme);
-        const { inputLabel } = expectedTheme.components;
-        inputLabel.states.default.color = 'purple';
+        const { label } = expectedTheme.components;
+        label.states.default.color = 'purple';
         expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
       });
     });
@@ -72,8 +70,8 @@ describe('create theme', () => {
           hintColor: 'blue',
         };
         const expectedTheme = structuredClone(defaultTheme);
-        const { inputHint } = expectedTheme.components;
-        inputHint.states.default.color = 'blue';
+        const { hint } = expectedTheme.components;
+        hint.states.default.color = 'blue';
         expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
       });
     });
@@ -104,7 +102,7 @@ describe('create theme', () => {
       button.global.borderRadius = '0px';
       input.global.borderRadius = '0px';
       button.variant.primary.bg = 'purple';
-      button.variant.primary.hover.bg = 'purple';
+      button.variant.primary.active.bg = 'purple';
       expect(createTheme(styleParams)).toEqual(expectedTheme);
     });
   });

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import styled, { css } from '@onefootprint/styled';
-import * as React from 'react';
+import React, { useState } from 'react';
 import { GestureResponderEvent, Text } from 'react-native';
 
 import { Box, BoxProps } from '../box';
@@ -28,6 +28,7 @@ const Button = ({
   onPress,
   ...props
 }: ButtonProps) => {
+  const [active, setActive] = useState(false);
   const handlePress = (event: GestureResponderEvent) => {
     if (loading || disabled) return;
     onPress?.(event);
@@ -35,10 +36,13 @@ const Button = ({
 
   return (
     <Box {...props}>
-      <ButtonContainer
+      <StyledPressable
         disabled={disabled}
         loading={loading}
         onPress={handlePress}
+        onPressIn={() => setActive(true)}
+        onPressOut={() => setActive(false)}
+        active={active}
         size={size}
         variant={variant}
       >
@@ -55,23 +59,34 @@ const Button = ({
             color={variant === 'primary' ? 'quinary' : 'primary'}
           />
         </LoadingContainer>
-      </ButtonContainer>
+      </StyledPressable>
     </Box>
   );
 };
 
-const ButtonContainer = styled(Pressable)<{
+const StyledPressable = styled(Pressable)<{
+  active?: boolean;
   loading: boolean;
   size: ButtonSize;
   variant: ButtonVariant;
 }>`
-  ${({ theme, size, variant }) => {
+  ${({ theme, size, variant, active, disabled }) => {
     const { button } = theme.components;
+    let backgroundColor = button.variant[variant].bg;
+    let { borderColor } = button.variant[variant];
+
+    if (disabled) {
+      backgroundColor = button.variant[variant].disabled.bg;
+      borderColor = button.variant[variant].disabled.borderColor;
+    } else if (active) {
+      backgroundColor = button.variant[variant].active.bg;
+      borderColor = button.variant[variant].active.borderColor;
+    }
 
     return css`
       align-items: center;
-      background-color: ${button.variant[variant].bg};
-      border-color: ${button.variant[variant].borderColor};
+      background-color: ${backgroundColor};
+      border-color: ${borderColor};
       border-radius: ${button.global.borderRadius};
       border-style: solid;
       border-width: ${button.global.borderWidth};
@@ -82,29 +97,27 @@ const ButtonContainer = styled(Pressable)<{
       position: relative;
     `;
   }}
-
-  ${({ theme, variant, disabled }) => {
-    if (!disabled) return;
-    const { button } = theme.components;
-    return css`
-      background-color: ${button.variant[variant].disabled.bg};
-      border-color: ${button.variant[variant].disabled.borderColor};
-    `;
-  }}
 `;
 
 const ButtonText = styled(Text)<{
-  variant: ButtonVariant;
-  size: ButtonSize;
+  active?: boolean;
   disabled: boolean;
+  size: ButtonSize;
+  variant: ButtonVariant;
 }>`
-  ${({ theme, size, disabled, variant }) => {
+  ${({ theme, size, variant, active, disabled }) => {
     const { button } = theme.components;
+    let { color } = button.variant[variant];
+
+    if (disabled) {
+      color = button.variant[variant].disabled.color;
+    } else if (active) {
+      color = button.variant[variant].active.color;
+    }
+
     return css`
       font: ${button.size[size].typography};
-      color: ${disabled
-        ? button.variant[variant].disabled.color
-        : button.variant[variant].color};
+      color: ${color};
     `;
   }}
 `;

@@ -7,7 +7,6 @@ export type ButtonVariantStyles = {
 };
 
 export type ButtonVariant = ButtonVariantStyles & {
-  hover: ButtonVariantStyles;
   active: ButtonVariantStyles;
   loading: ButtonVariantStyles;
   disabled: ButtonVariantStyles;
@@ -25,7 +24,6 @@ export type Button = {
     borderRadius: CSS.Property.BorderRadius;
     elevation: {
       initial: CSS.Property.BoxShadow;
-      hover: CSS.Property.BoxShadow;
       active: CSS.Property.BoxShadow;
     };
   };

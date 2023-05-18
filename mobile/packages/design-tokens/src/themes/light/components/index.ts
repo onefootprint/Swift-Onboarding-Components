@@ -1,13 +1,13 @@
 import button from './button';
+import hint from './hint';
 import input from './input';
-import inputHint from './input-hint';
-import inputLabel from './input-label';
+import label from './label';
 import linkButton from './link-button';
 
 export default {
   button,
-  linkButton,
+  hint,
   input,
-  inputHint,
-  inputLabel,
+  label,
+  linkButton,
 };
