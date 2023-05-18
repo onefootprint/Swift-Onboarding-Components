@@ -17,7 +17,7 @@ use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatu
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
-use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
@@ -199,7 +199,7 @@ pub async fn post(
             // Create a document record on the VW for each image type
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
 
-            let front = if let Some(front_path) = s3_path_front_image {
+            let front = if let Some(front_path) = s3_path_front_image.clone() {
                 Some(
                     uvw.put_document(
                         conn,
@@ -215,7 +215,7 @@ pub async fn post(
                 None
             };
 
-            let back = if let Some(back_path) = s3_path_back_image {
+            let back = if let Some(back_path) = s3_path_back_image.clone() {
                 Some(
                     uvw.put_document(
                         conn,
@@ -231,7 +231,7 @@ pub async fn post(
                 None
             };
 
-            let selfie = if let Some(selfie) = s3_path_selfie_image {
+            let selfie = if let Some(selfie) = s3_path_selfie_image.clone() {
                 Some(
                     uvw.put_document(
                         conn,
@@ -247,18 +247,20 @@ pub async fn post(
                 None
             };
 
-            let id_doc = IdentityDocument::create(
-                conn,
-                doc_request_id,
+            let args = NewIdentityDocumentArgs {
+                request_id: doc_request_id,
                 // TODO: should be from vendor response
-                request.document_type,
-                request.country_code.clone(),
-                e_data_key.clone(),
-                front,
-                back,
-                selfie,
-            )
-            .map_err(ApiError::from)?;
+                document_type: request.document_type,
+                country_code: request.country_code.clone(),
+                e_data_key: e_data_key.clone(),
+                front_lifetime_id: front,
+                back_lifetime_id: back,
+                selfie_lifetime_id: selfie,
+                front_image_s3_url: s3_path_front_image,
+                back_image_s3_url: s3_path_back_image,
+                selfie_image_s3_url: s3_path_selfie_image,
+            };
+            let id_doc = IdentityDocument::create(conn, args)?;
 
             Ok(id_doc)
         })

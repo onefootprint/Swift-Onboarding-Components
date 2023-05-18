@@ -30,35 +30,59 @@ pub struct IdentityDocument {
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
+    pub front_image_s3_url: Option<String>,
+    pub back_image_s3_url: Option<String>,
+    pub selfie_image_s3_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = identity_document)]
-pub struct NewIdentityDocument {
+pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
     pub country_code: String,
-    pub created_at: DateTime<Utc>,
     pub e_data_key: SealedVaultDataKey,
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
+    pub front_image_s3_url: Option<String>,
+    pub back_image_s3_url: Option<String>,
+    pub selfie_image_s3_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[diesel(table_name = identity_document)]
+struct NewIdentityDocumentRow {
+    request_id: DocumentRequestId,
+    document_type: IdDocKind,
+    country_code: String,
+    created_at: DateTime<Utc>,
+    e_data_key: SealedVaultDataKey,
+    front_lifetime_id: Option<DataLifetimeId>,
+    back_lifetime_id: Option<DataLifetimeId>,
+    selfie_lifetime_id: Option<DataLifetimeId>,
+    front_image_s3_url: Option<String>,
+    back_image_s3_url: Option<String>,
+    selfie_image_s3_url: Option<String>,
 }
 
 impl IdentityDocument {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument(skip_all)]
-    pub fn create(
-        conn: &mut TxnPgConn,
-        request_id: DocumentRequestId,
-        document_type: IdDocKind,
-        country_code: String,
-        e_data_key: SealedVaultDataKey,
-        front_lifetime_id: Option<DataLifetimeId>,
-        back_lifetime_id: Option<DataLifetimeId>,
-        selfie_lifetime_id: Option<DataLifetimeId>,
-    ) -> DbResult<Self> {
-        let new = NewIdentityDocument {
+    pub fn create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
+        let NewIdentityDocumentArgs {
+            request_id,
+            document_type,
+            country_code,
+            e_data_key,
+            front_lifetime_id,
+            back_lifetime_id,
+            selfie_lifetime_id,
+            front_image_s3_url,
+            back_image_s3_url,
+            selfie_image_s3_url,
+        } = args;
+        let new = NewIdentityDocumentRow {
             request_id,
             document_type,
             country_code,
@@ -67,6 +91,9 @@ impl IdentityDocument {
             front_lifetime_id,
             back_lifetime_id,
             selfie_lifetime_id,
+            front_image_s3_url,
+            back_image_s3_url,
+            selfie_image_s3_url,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)

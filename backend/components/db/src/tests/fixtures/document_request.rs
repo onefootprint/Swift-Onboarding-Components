@@ -1,7 +1,7 @@
 use crate::{
     models::{
         document_request::{DocumentRequest, DocumentRequestUpdate},
-        identity_document::IdentityDocument,
+        identity_document::{IdentityDocument, NewIdentityDocumentArgs},
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
@@ -75,17 +75,19 @@ pub fn create(
 
     // If we want to simulate having collected an id document
     if opts.collected_doc_opts.id_doc_collected {
-        let id1 = IdentityDocument::create(
-            conn,
-            doc_request.id.clone(),
-            newtypes::IdDocKind::DriverLicense,
-            "USA".into(),
-            SealedVaultDataKey(vec![]),
-            None,
-            None,
-            None,
-        )
-        .unwrap();
+        let args = NewIdentityDocumentArgs {
+            request_id: doc_request.id.clone(),
+            document_type: newtypes::IdDocKind::DriverLicense,
+            country_code: "USA".to_owned(),
+            e_data_key: SealedVaultDataKey(vec![]),
+            front_lifetime_id: None,
+            back_lifetime_id: None,
+            selfie_lifetime_id: None,
+            front_image_s3_url: None,
+            back_image_s3_url: None,
+            selfie_image_s3_url: None,
+        };
+        let id1 = IdentityDocument::create(conn, args).unwrap();
 
         // If we want to simulate having sent id document to vendor
         if opts.collected_doc_opts.has_verification_result {

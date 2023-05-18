@@ -226,6 +226,9 @@ table! {
         front_lifetime_id -> Nullable<Text>,
         back_lifetime_id -> Nullable<Text>,
         selfie_lifetime_id -> Nullable<Text>,
+        front_image_s3_url -> Nullable<Text>,
+        back_image_s3_url -> Nullable<Text>,
+        selfie_image_s3_url -> Nullable<Text>,
     }
 }
 
