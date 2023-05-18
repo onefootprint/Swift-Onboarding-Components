@@ -15,7 +15,7 @@ type RouterProps = {
 };
 
 const Router = ({ authToken }: RouterProps) => {
-  const [state, send] = useMachine(createMachine(authToken));
+  const [state, send] = useMachine(() => createMachine(authToken));
   useGetD2PStatus({
     enabled: !state.done,
     authToken,

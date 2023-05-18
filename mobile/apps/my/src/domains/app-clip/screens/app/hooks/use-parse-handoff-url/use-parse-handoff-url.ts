@@ -19,7 +19,7 @@ const useParseHandoffUrl = () => {
   const linkingUrl = Linking.useURL();
   const debugUrl = DEBUG_HANDOFF_URL;
   const url = debugUrl || linkingUrl;
-  return useQuery(['token'], () => getToken(url));
+  return useQuery(['token', url], () => getToken(url));
 };
 
 export default useParseHandoffUrl;
