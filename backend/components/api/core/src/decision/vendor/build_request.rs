@@ -11,7 +11,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
-use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId, DocumentFace, EncryptedVaultPrivateKey};
+use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId, DocumentSide, EncryptedVaultPrivateKey};
 use std::collections::HashMap;
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
@@ -74,16 +74,16 @@ async fn decrypt_id_doc_documents(
     e_private_key: &EncryptedVaultPrivateKey,
     enclave_client: &EnclaveClient,
     id_document: &IdentityDocument,
-) -> ApiResult<HashMap<DocumentFace, PiiBytes>> {
+) -> ApiResult<HashMap<DocumentSide, PiiBytes>> {
     let e_data_key = id_document.e_data_key.clone();
-    let (faces, s3_urls): (Vec<_>, Vec<_>) = id_document.clone().images().into_iter().unzip();
+    let (sides, s3_urls): (Vec<_>, Vec<_>) = id_document.clone().images().into_iter().unzip();
     let document_datas = s3_urls.iter().map(|url| (&e_data_key, url)).collect();
 
     let decrypted_documents = enclave_client
         .batch_decrypt_documents(e_private_key, document_datas)
         .await?;
 
-    let results = faces.into_iter().zip(decrypted_documents).collect();
+    let results = sides.into_iter().zip(decrypted_documents).collect();
     Ok(results)
 }
 
@@ -113,7 +113,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     // decrypt the images and make sure we have at least a front image
     let mut decrypted = decrypt_id_doc_documents(&vault.e_private_key, enclave_client, &doc).await?;
 
-    if decrypted.get(&DocumentFace::Front).is_none() {
+    if decrypted.get(&DocumentSide::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
     }
 
@@ -122,9 +122,9 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     
     Ok(DocVData {
         reference_id: parsed_reference_id,
-        front_image: decrypted.remove(&DocumentFace::Front).map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted.remove(&DocumentFace::Back).map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted.remove(&DocumentFace::Selfie).map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
         // TODO not populating name here
@@ -155,15 +155,15 @@ pub async fn build_docv_data_from_identity_doc(
     // decrypt the images and make sure we have at least a front image
     let mut decrypted = decrypt_id_doc_documents(&uvw.vault.e_private_key, enclave_client, &doc).await?;
 
-    if decrypted.get(&DocumentFace::Front).is_none() {
+    if decrypted.get(&DocumentSide::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
     }
     
     Ok(DocVData {
         reference_id: None,
-        front_image: decrypted.remove(&DocumentFace::Front).map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted.remove(&DocumentFace::Back).map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted.remove(&DocumentFace::Selfie).map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
         first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),

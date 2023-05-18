@@ -32,7 +32,7 @@ use db::{DbError, DbPool, DbResult, PgConn, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentFace, DocumentKind, DocumentRequestId, DocumentRequestStatus,
+    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, DocumentSide,
     IdentityDocumentId, IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId,
     SealedVaultDataKey, TenantId, VaultId,
 };
@@ -109,15 +109,15 @@ pub async fn post(
     // Encrypt all images
     //
     let e_imgs = vec![
-        Some((DocumentFace::Front, request.front_image)),
-        request.back_image.map(|img| (DocumentFace::Back, img)),
-        request.selfie_image.map(|img| (DocumentFace::Selfie, img)),
+        Some((DocumentSide::Front, request.front_image)),
+        request.back_image.map(|img| (DocumentSide::Back, img)),
+        request.selfie_image.map(|img| (DocumentSide::Selfie, img)),
     ]
     .into_iter()
     .flatten()
-    .map(|(face, img)| -> ApiResult<_> {
+    .map(|(side, img)| -> ApiResult<_> {
         let e_data = IdentityDocument::seal_with_data_key(img.leak(), &data_key)?;
-        Ok((face, e_data))
+        Ok((side, e_data))
     })
     .collect::<ApiResult<Vec<_>>>()?;
 
@@ -126,7 +126,7 @@ pub async fn post(
     //
     let s3_upload_futs = e_imgs
         .into_iter()
-        .map(|(face, e_data)| upload_image(&state, face, e_data, &doc_request.id, &uvw.vault.id, bucket))
+        .map(|(side, e_data)| upload_image(&state, side, e_data, &doc_request.id, &uvw.vault.id, bucket))
         .collect_vec();
 
     let su_id = user_auth.scoped_user.id.clone();
@@ -167,12 +167,12 @@ pub async fn post(
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
                 e_data_key: e_data_key.clone(),
-                front_lifetime_id: lifetime_ids.remove(&DocumentFace::Front),
-                back_lifetime_id: lifetime_ids.remove(&DocumentFace::Back),
-                selfie_lifetime_id: lifetime_ids.remove(&DocumentFace::Selfie),
-                front_image_s3_url: s3_urls.remove(&DocumentFace::Front),
-                back_image_s3_url: s3_urls.remove(&DocumentFace::Back),
-                selfie_image_s3_url: s3_urls.remove(&DocumentFace::Selfie),
+                front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
+                back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
+                selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
+                front_image_s3_url: s3_urls.remove(&DocumentSide::Front),
+                back_image_s3_url: s3_urls.remove(&DocumentSide::Back),
+                selfie_image_s3_url: s3_urls.remove(&DocumentSide::Selfie),
             };
             let id_doc = IdentityDocument::create(conn, args)?;
 
@@ -228,15 +228,15 @@ pub async fn post(
 /// Only needed because rust doesn't yet support async closures
 async fn upload_image(
     state: &State,
-    face: DocumentFace,
+    side: DocumentSide,
     e_data: AeadSealedBytes,
     req_id: &DocumentRequestId,
     uv_id: &VaultId,
     bucket: &str,
-) -> ApiResult<(DocumentFace, String)> {
-    let path = IdentityDocument::s3_path_for_document_image(face, req_id, uv_id);
+) -> ApiResult<(DocumentSide, String)> {
+    let path = IdentityDocument::s3_path_for_document_image(side, req_id, uv_id);
     let s3_url = state.s3_client.put_object(bucket, path, e_data.0, None).await?;
-    Ok((face, s3_url))
+    Ok((side, s3_url))
 }
 
 // This just can pull the latest for the scoped_user_id and lock

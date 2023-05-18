@@ -1,5 +1,5 @@
 use db::models::{document_request::DocumentRequest, identity_document::IdentityDocument};
-use newtypes::{DataIdentifier, DocumentFace, DocumentKind};
+use newtypes::{DataIdentifier, DocumentKind, DocumentSide};
 
 use crate::utils::db2api::DbToApi;
 
@@ -19,7 +19,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
         } = document_request;
 
         let document_identifier =
-            DataIdentifier::Document(DocumentKind::from_id_doc_kind(document_type, DocumentFace::Front));
+            DataIdentifier::Document(DocumentKind::from_id_doc_kind(document_type, DocumentSide::Front));
         Self {
             id,
             timestamp: created_at,

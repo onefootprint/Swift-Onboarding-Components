@@ -9,7 +9,7 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DocumentFace, DocumentRequestId, IdDocKind, IdentityDocumentId,
+    Base64Data, DataLifetimeId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId,
     ScopedVaultId, SealedVaultDataKey, VaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -165,22 +165,22 @@ impl IdentityDocument {
     }
 
     pub fn s3_path_for_document_image(
-        face: DocumentFace,
+        side: DocumentSide,
         document_request_id: &DocumentRequestId,
         user_vault_id: &VaultId,
     ) -> String {
         // Store documents in a path like "documents/encrypted/uv_1234/front/dr_1234"
         format!(
             "documents/encrypted/{}/{}/{}",
-            user_vault_id, face, document_request_id
+            user_vault_id, side, document_request_id
         )
     }
 
-    pub fn images(self) -> Vec<(DocumentFace, S3Url)> {
+    pub fn images(self) -> Vec<(DocumentSide, S3Url)> {
         vec![
-            self.front_image_s3_url.map(|url| (DocumentFace::Front, url)),
-            self.back_image_s3_url.map(|url| (DocumentFace::Back, url)),
-            self.selfie_image_s3_url.map(|url| (DocumentFace::Selfie, url)),
+            self.front_image_s3_url.map(|url| (DocumentSide::Front, url)),
+            self.back_image_s3_url.map(|url| (DocumentSide::Back, url)),
+            self.selfie_image_s3_url.map(|url| (DocumentSide::Selfie, url)),
         ]
         .into_iter()
         .flatten()

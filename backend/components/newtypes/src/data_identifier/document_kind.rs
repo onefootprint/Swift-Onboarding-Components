@@ -1,5 +1,5 @@
 use crate::{
-    CollectedData, DataIdentifier, DocumentFace, IdDocKind, IsDataIdentifierDiscriminant, Validate,
+    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, Validate,
     ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -119,17 +119,17 @@ impl DocumentKind {
         }
     }
 
-    pub fn from_id_doc_kind(kind: IdDocKind, face: DocumentFace) -> Self {
-        match (kind, face) {
-            (IdDocKind::IdCard, DocumentFace::Front) => Self::IdCardFront,
-            (IdDocKind::IdCard, DocumentFace::Back) => Self::IdCardBack,
-            (IdDocKind::IdCard, DocumentFace::Selfie) => Self::IdCardSelfie,
-            (IdDocKind::DriverLicense, DocumentFace::Front) => Self::DriversLicenseFront,
-            (IdDocKind::DriverLicense, DocumentFace::Back) => Self::DriversLicenseBack,
-            (IdDocKind::DriverLicense, DocumentFace::Selfie) => Self::DriversLicenseSelfie,
-            (IdDocKind::Passport, DocumentFace::Front) => Self::Passport,
-            (IdDocKind::Passport, DocumentFace::Back) => Self::Passport,
-            (IdDocKind::Passport, DocumentFace::Selfie) => Self::PassportSelfie,
+    pub fn from_id_doc_kind(kind: IdDocKind, side: DocumentSide) -> Self {
+        match (kind, side) {
+            (IdDocKind::IdCard, DocumentSide::Front) => Self::IdCardFront,
+            (IdDocKind::IdCard, DocumentSide::Back) => Self::IdCardBack,
+            (IdDocKind::IdCard, DocumentSide::Selfie) => Self::IdCardSelfie,
+            (IdDocKind::DriverLicense, DocumentSide::Front) => Self::DriversLicenseFront,
+            (IdDocKind::DriverLicense, DocumentSide::Back) => Self::DriversLicenseBack,
+            (IdDocKind::DriverLicense, DocumentSide::Selfie) => Self::DriversLicenseSelfie,
+            (IdDocKind::Passport, DocumentSide::Front) => Self::Passport,
+            (IdDocKind::Passport, DocumentSide::Back) => Self::Passport,
+            (IdDocKind::Passport, DocumentSide::Selfie) => Self::PassportSelfie,
         }
     }
 }
