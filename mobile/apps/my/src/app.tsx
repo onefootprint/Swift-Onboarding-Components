@@ -6,12 +6,12 @@ import React, { useCallback } from 'react';
 import { isClip } from 'react-native-app-clip';
 
 import queryClient from './config/initializers/react-query';
-import configureLogger from './config/logger';
+// import configureLogger from './config/logger';
 import AppClip from './domains/app-clip';
 import Wallet from './domains/wallet';
 
 SplashScreen.preventAutoHideAsync();
-configureLogger();
+// configureLogger();
 
 const App = () => {
   const [fontsLoaded] = useFonts({
