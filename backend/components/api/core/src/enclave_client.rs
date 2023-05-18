@@ -3,7 +3,6 @@ use crypto::{
     hex,
     seal::EciesP256Sha256AesGcmSealed,
 };
-use db::models::document_data::DocumentData;
 use enclave_proxy::{
     http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest,
     EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
@@ -20,12 +19,7 @@ use newtypes::{
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::{
-    config::Config,
-    errors::{enclave::EnclaveError, AssertionError},
-    s3::S3Client,
-    ApiError,
-};
+use crate::{config::Config, errors::enclave::EnclaveError, s3::S3Client, ApiError};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
@@ -341,21 +335,6 @@ impl EnclaveClient {
             .collect();
 
         Ok(results)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn decrypt_document(
-        &self,
-        e_private_key: &EncryptedVaultPrivateKey,
-        doc: &DocumentData,
-    ) -> Result<PiiBytes, ApiError> {
-        let result = self
-            .batch_decrypt_documents(e_private_key, vec![(&doc.e_data_key, &doc.s3_url)])
-            .await?
-            .into_iter()
-            .next()
-            .ok_or(AssertionError("unexpected number of decrypted documents"))?;
-        Ok(result)
     }
 
     #[tracing::instrument(skip_all)]

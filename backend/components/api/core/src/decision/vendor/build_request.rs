@@ -8,9 +8,10 @@ use db::DbPool;
 use db::models::document_request::DocRefId;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
-use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId};
+use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId, DocumentFace, EncryptedVaultPrivateKey};
 use std::collections::HashMap;
 use std::{str::FromStr};
 use strum::IntoEnumIterator;
@@ -69,6 +70,23 @@ pub async fn bulk_build_data_from_requests(
 
 }
 
+async fn decrypt_id_doc_documents(
+    e_private_key: &EncryptedVaultPrivateKey,
+    enclave_client: &EnclaveClient,
+    id_document: &IdentityDocument,
+) -> ApiResult<HashMap<DocumentFace, PiiBytes>> {
+    let e_data_key = id_document.e_data_key.clone();
+    let (faces, s3_urls): (Vec<_>, Vec<_>) = id_document.clone().images().into_iter().unzip();
+    let document_datas = s3_urls.iter().map(|url| (&e_data_key, url)).collect();
+
+    let decrypted_documents = enclave_client
+        .batch_decrypt_documents(e_private_key, document_datas)
+        .await?;
+
+    let results = faces.into_iter().zip(decrypted_documents).collect();
+    Ok(results)
+}
+
 /// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors
 #[allow(dead_code)]
 #[tracing::instrument(skip_all)]
@@ -82,24 +100,20 @@ pub async fn build_docv_data_for_submission_from_verification_request(
             format!("{} is not a document verification vendor", request.vendor_api),
     ))};
 
-    let (doc, ref_id, uvw) = db_pool
+    let (doc, ref_id, vault) = db_pool
         .db_query(
             move |conn| -> Result<(IdentityDocument, Option<String>, _), ApiError> {
-                let (doc, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
-                // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
-                // This would allow us to re-use the uvw util to decrypt an image
-                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &request.scoped_vault_id)?;
-                Ok((doc, ref_id.ref_id, uvw))
+                let (doc, dr) = IdentityDocument::get(conn, &identity_doc_id)?;
+                let vault = Vault::get(conn, &dr.scoped_vault_id)?;
+                Ok((doc, dr.ref_id, vault))
             },
         )
         .await??;        
 
     // decrypt the images and make sure we have at least a front image
-    let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
+    let mut decrypted = decrypt_id_doc_documents(&vault.e_private_key, enclave_client, &doc).await?;
 
-   
-
-    if decrypted_documents.front.is_none() {
+    if decrypted.get(&DocumentFace::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
     }
 
@@ -108,11 +122,12 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     
     Ok(DocVData {
         reference_id: parsed_reference_id,
-        front_image: decrypted_documents.front.map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted_documents.back.map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentFace::Front).map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted.remove(&DocumentFace::Back).map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted.remove(&DocumentFace::Selfie).map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
+        // TODO not populating name here
         ..Default::default()
     })
 }
@@ -122,15 +137,14 @@ pub async fn build_docv_data_from_identity_doc(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     identity_document_id: IdentityDocumentId,
-    scoped_vault_id: ScopedVaultId
 ) -> Result<DocVData, ApiError> {
     let (doc, uvw) = db_pool
         .db_query(
             move |conn| -> Result<(IdentityDocument,  _), ApiError> {
-                let (doc, _) = IdentityDocument::get(conn, &identity_document_id)?;
+                let (doc, dr) = IdentityDocument::get(conn, &identity_document_id)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
-                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &scoped_vault_id)?;
+                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &dr.scoped_vault_id)?;
                 Ok((doc, uvw))
             },
         )
@@ -139,17 +153,17 @@ pub async fn build_docv_data_from_identity_doc(
     let name_idks = vec![DataIdentifier::from(IDK::FirstName), DataIdentifier::from(IDK::LastName)];
     let mut decrypted_name_idks = uvw.decrypt_unchecked(enclave_client, &name_idks).await?;
     // decrypt the images and make sure we have at least a front image
-    let decrypted_documents = uvw.decrypt_id_doc_documents(db_pool, enclave_client, &doc).await?;
+    let mut decrypted = decrypt_id_doc_documents(&uvw.vault.e_private_key, enclave_client, &doc).await?;
 
-    if decrypted_documents.front.is_none() {
+    if decrypted.get(&DocumentFace::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
     }
     
     Ok(DocVData {
         reference_id: None,
-        front_image: decrypted_documents.front.map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted_documents.back.map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted_documents.selfie.map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentFace::Front).map(PiiBytes::into_leak_base64_pii),
+        back_image: decrypted.remove(&DocumentFace::Back).map(PiiBytes::into_leak_base64_pii),
+        selfie_image: decrypted.remove(&DocumentFace::Selfie).map(PiiBytes::into_leak_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
         first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),

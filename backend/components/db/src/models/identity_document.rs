@@ -14,6 +14,8 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
+pub type S3Url = String;
+
 use super::document_request::DocumentRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -30,9 +32,9 @@ pub struct IdentityDocument {
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
-    pub front_image_s3_url: Option<String>,
-    pub back_image_s3_url: Option<String>,
-    pub selfie_image_s3_url: Option<String>,
+    pub front_image_s3_url: Option<S3Url>,
+    pub back_image_s3_url: Option<S3Url>,
+    pub selfie_image_s3_url: Option<S3Url>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -45,9 +47,9 @@ pub struct NewIdentityDocumentArgs {
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
-    pub front_image_s3_url: Option<String>,
-    pub back_image_s3_url: Option<String>,
-    pub selfie_image_s3_url: Option<String>,
+    pub front_image_s3_url: Option<S3Url>,
+    pub back_image_s3_url: Option<S3Url>,
+    pub selfie_image_s3_url: Option<S3Url>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -61,9 +63,9 @@ struct NewIdentityDocumentRow {
     front_lifetime_id: Option<DataLifetimeId>,
     back_lifetime_id: Option<DataLifetimeId>,
     selfie_lifetime_id: Option<DataLifetimeId>,
-    front_image_s3_url: Option<String>,
-    back_image_s3_url: Option<String>,
-    selfie_image_s3_url: Option<String>,
+    front_image_s3_url: Option<S3Url>,
+    back_image_s3_url: Option<S3Url>,
+    selfie_image_s3_url: Option<S3Url>,
 }
 
 impl IdentityDocument {
@@ -172,5 +174,16 @@ impl IdentityDocument {
             "documents/encrypted/{}/{}/{}",
             user_vault_id, face, document_request_id
         )
+    }
+
+    pub fn images(self) -> Vec<(DocumentFace, S3Url)> {
+        vec![
+            self.front_image_s3_url.map(|url| (DocumentFace::Front, url)),
+            self.back_image_s3_url.map(|url| (DocumentFace::Back, url)),
+            self.selfie_image_s3_url.map(|url| (DocumentFace::Selfie, url)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
     }
 }

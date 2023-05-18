@@ -332,13 +332,8 @@ async fn handle_incode_request(
     user_vault: Vault,
     document_request: DbDocumentRequest,
 ) -> Result<(), ApiError> {
-    let docv_data = build_docv_data_from_identity_doc(
-        db_pool,
-        enclave_client,
-        identity_document_id.clone(),
-        scoped_vault_id.clone(),
-    )
-    .await?; // TODO: handle this with better requirement checking
+    let docv_data =
+        build_docv_data_from_identity_doc(db_pool, enclave_client, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
     // Initialize our state machine
     let machine = IncodeStateMachine::init(
