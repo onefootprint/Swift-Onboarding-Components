@@ -1,4 +1,5 @@
 use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
+use itertools::Itertools;
 use newtypes::{FootprintReasonCode, VerificationResultId};
 
 const SCORE_THRESHOLD: i32 = 580;
@@ -51,9 +52,28 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         })
         .unwrap_or(vec![]);
 
+    // TODO: should error here
+    let dob_reason_codes = if let Ok(code) = resp.dob_match_reason_codes() {
+        let dob_frc = std::convert::Into::<Option<FootprintReasonCode>>::into(&code);
+        vec![dob_frc]
+    } else {
+        vec![]
+    }
+    .into_iter()
+    .flatten();
+
+    let name_and_address_reason_codes = if let Ok(code) = resp.name_and_address_match_reason_codes() {
+        std::convert::Into::<Vec<FootprintReasonCode>>::into(&code)
+    } else {
+        vec![]
+    };
+
     let mut reason_codes: Vec<FootprintReasonCode> = model_reason_codes
         .into_iter()
         .chain(fraud_shield_reason_codes.into_iter())
+        .chain(dob_reason_codes)
+        .chain(name_and_address_reason_codes.into_iter())
+        .unique()
         .collect();
 
     if let Some(s) = resp
@@ -77,9 +97,10 @@ mod tests {
 
     #[test]
     fn test_reason_codes() {
-        let r: CrossCoreAPIResponse =
-            serde_json::from_value(idv::test_fixtures::cross_core_response_with_fraud_shield_codes())
-                .expect("could not parse");
+        let r: CrossCoreAPIResponse = serde_json::from_value(
+            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(true),
+        )
+        .expect("could not parse");
 
         assert_eq!(
             r.precise_id_response().unwrap().score().unwrap(),
@@ -89,7 +110,53 @@ mod tests {
         assert_have_same_elements(
             super::footprint_reason_codes(r),
             vec![
+                // from fraud shield
                 FootprintReasonCode::SubjectDeceased,
+                // dob match
+                FootprintReasonCode::DobMobDoesNotMatch,
+                // from address + name
+                FootprintReasonCode::NameFirstMatches,
+                FootprintReasonCode::NameLastMatches,
+                FootprintReasonCode::AddressStreetNameMatches,
+                FootprintReasonCode::AddressStreetNumberMatches,
+                FootprintReasonCode::AddressCityMatches,
+                FootprintReasonCode::AddressStateMatches,
+                FootprintReasonCode::AddressZipCodeMatches,
+                // from score
+                FootprintReasonCode::IdNotLocated,
+            ],
+        );
+    }
+
+    #[test]
+    fn test_reason_codes_with_not_parsable_address() {
+        // can't parse address codes
+        let r: CrossCoreAPIResponse = serde_json::from_value(
+            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(false),
+        )
+        .expect("could not parse");
+
+        assert_eq!(
+            r.precise_id_response().unwrap().score().unwrap(),
+            PreciseIDParsedScore::Score(269)
+        );
+
+        assert_have_same_elements(
+            super::footprint_reason_codes(r),
+            vec![
+                // from fraud shield
+                FootprintReasonCode::SubjectDeceased,
+                // dob match
+                FootprintReasonCode::DobMobDoesNotMatch,
+                // from address + name
+                FootprintReasonCode::NameFirstDoesNotMatch,
+                FootprintReasonCode::NameLastDoesNotMatch,
+                FootprintReasonCode::AddressStreetNameDoesNotMatch,
+                FootprintReasonCode::AddressStreetNumberDoesNotMatch,
+                FootprintReasonCode::AddressCityDoesNotMatch,
+                FootprintReasonCode::AddressStateDoesNotMatch,
+                FootprintReasonCode::AddressZipCodeDoesNotMatch,
+                // from score
                 FootprintReasonCode::IdNotLocated,
             ],
         )

@@ -136,9 +136,21 @@ footprint_reason_code_enum! {
  #[note = "ZIP code does not match", severity = SignalSeverity::Medium,  description = "ZIP code located does not match the ZIP code input."]
  AddressZipCodeDoesNotMatch,
 
+ #[scope = SignalScope::City, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[note = "City does not match", severity = SignalSeverity::Medium,  description = "City located does not match the city input."]
+ AddressCityDoesNotMatch,
+
+ #[scope = SignalScope::City, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[note = "City matches", severity = SignalSeverity::Info,  description = "City located matches the city input."]
+ AddressCityMatches,
+
  #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Street name does not match", severity = SignalSeverity::Medium,  description = "Street name located does not match input street name."]
  AddressStreetNameDoesNotMatch,
+
+ #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "Street name partially matches", severity = SignalSeverity::Low,  description = "Street name located partially matches input street name."]
+ AddressStreetNamePartiallyMatches,
 
  #[scope = SignalScope::StreetAddress, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Street number does not match", severity = SignalSeverity::Medium,  description = "Street number located does not match input street number."]
@@ -262,7 +274,7 @@ footprint_reason_code_enum! {
 
  // ~~~~~~~~~ DOB ~~~~~~~~~~~~~~~
 
- #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
  #[note = "DOB year mismatch", severity = SignalSeverity::High,  description = "The year of birth located does not match the input."]
  DobYobDoesNotMatch,
 
@@ -270,7 +282,7 @@ footprint_reason_code_enum! {
  #[note = "DOB year mismatch by 1", severity = SignalSeverity::Medium,  description = "A one year difference between the YOB input and the YOB located."]
  DobYobDoesNotMatchWithin1Year,
 
- #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
  #[note = "DOB month mismatch", severity = SignalSeverity::Medium,  description = "Month of birth input does not match the month of birth located."]
  DobMobDoesNotMatch,
 
@@ -293,6 +305,19 @@ footprint_reason_code_enum! {
  #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = None]
  #[note = "Age COPPA alert", severity = SignalSeverity::High,  description = "Customer is 13 or under. COPPA laws forbid conducting e-commerce with people under 14 years of age."]
  DobLocatedCoppaAlert,
+
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[note = "Dob does not match", severity = SignalSeverity::High,  description = "DOB located does not match input"]
+ DobDoesNotMatch,
+
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "Dob partial match", severity = SignalSeverity::Medium,  description = "DOB located partially matches input"]
+ DobPartialMatch,
+
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+ #[note = "Dob was not found on file", severity = SignalSeverity::Medium,  description = "No DOB was located for the individual"]
+ DobNotOnFile,
+
 
  // ~~~~~~~~~~~~ SSN ~~~~~~~~~~~~
 
@@ -333,6 +358,9 @@ footprint_reason_code_enum! {
  #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Last name does not match", severity = SignalSeverity::Medium,  description = "The located last name does not match the input last name."]
  NameLastDoesNotMatch,
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "Last name partially matches", severity = SignalSeverity::Low,  description = "The located last name partially matches the input last name."]
+ NameLastPartiallyMatches,
 
  // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
 
@@ -565,6 +593,10 @@ footprint_reason_code_enum! {
  AddressStateMatches,
 
  #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[note = "DOB match", severity = SignalSeverity::Info,  description = "The DOB located matches the input."]
+ DobMatches,
+
+ #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
  #[note = "DOB year match", severity = SignalSeverity::Info,  description = "The year of birth located matches the input."]
  DobYobMatches,
 
@@ -579,6 +611,18 @@ footprint_reason_code_enum! {
  #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
  #[note = "Last name matches", severity = SignalSeverity::Info,  description = "The located last name matches the input last name."]
  NameLastMatches,
+
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[note = "First name matches", severity = SignalSeverity::Info,  description = "The located first name matches the input first name."]
+ NameFirstMatches,
+
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[note = "First name does not match", severity = SignalSeverity::Low,  description = "The located first name does not match the input first name."]
+ NameFirstDoesNotMatch,
+
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "First name partially matches", severity = SignalSeverity::Low,  description = "The located first name partially matches the input first name."]
+ NameFirstPartiallyMatches,
 
  #[scope = SignalScope::IpAddress, additional_scopes = vec![SignalScope::State], match_level = Some(MatchLevel::Exact)]
  #[note = "IP state matches", severity = SignalSeverity::Info,  description = "The located IP State matches the input IP State."]

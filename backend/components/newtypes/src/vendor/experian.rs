@@ -148,7 +148,7 @@ pub enum ResponseCode {
 }
 
 #[derive(strum::Display, Debug, strum::EnumString, Eq, PartialEq)]
-pub enum CrossCoreMatchNames {
+pub enum CrossCoreMatchName {
     #[strum(serialize = "pmAddressVerificationResult1")]
     AddressVerificationMatchResult,
     #[strum(serialize = "pmPhoneVerificationResult1")]
@@ -200,48 +200,46 @@ pub enum CrossCoreMatchNames {
     Unknown(String),
 }
 
-impl From<CrossCoreMatchNames> for Option<ExperianFraudShieldCodes> {
-    fn from(value: CrossCoreMatchNames) -> Self {
+impl From<CrossCoreMatchName> for Option<ExperianFraudShieldCodes> {
+    fn from(value: CrossCoreMatchName) -> Self {
         // Note: there are some addition FS indicators that don't get returned in precise ID requests, and this is because
         // precise ID is GLB (e.g. non-credit) and those indicators are related to credit
         match value {
-            CrossCoreMatchNames::AddressVerificationMatchResult => None,
-            CrossCoreMatchNames::PhoneVerificationMatchResult => None,
-            CrossCoreMatchNames::ConsumerIdMatchResult => None,
-            CrossCoreMatchNames::DobMatchResult => None,
-            CrossCoreMatchNames::DriverLicenseVerificationResult => None,
-            CrossCoreMatchNames::ChangeOfAddressVerificationResult => None,
-            CrossCoreMatchNames::WatchlistVerificationResult => None,
-            CrossCoreMatchNames::FSIndicator01 => Some(ExperianFraudShieldCodes::InputAddressConflict),
-            CrossCoreMatchNames::FSIndicator02 => {
+            CrossCoreMatchName::AddressVerificationMatchResult => None,
+            CrossCoreMatchName::PhoneVerificationMatchResult => None,
+            CrossCoreMatchName::ConsumerIdMatchResult => None,
+            CrossCoreMatchName::DobMatchResult => None,
+            CrossCoreMatchName::DriverLicenseVerificationResult => None,
+            CrossCoreMatchName::ChangeOfAddressVerificationResult => None,
+            CrossCoreMatchName::WatchlistVerificationResult => None,
+            CrossCoreMatchName::FSIndicator01 => Some(ExperianFraudShieldCodes::InputAddressConflict),
+            CrossCoreMatchName::FSIndicator02 => {
                 Some(ExperianFraudShieldCodes::InputAddressFirstResponseRecently)
             }
-            CrossCoreMatchNames::FSIndicator03 => Some(ExperianFraudShieldCodes::InputAddressNotOnFile),
-            CrossCoreMatchNames::FSIndicator04 => {
+            CrossCoreMatchName::FSIndicator03 => Some(ExperianFraudShieldCodes::InputAddressNotOnFile),
+            CrossCoreMatchName::FSIndicator04 => {
                 Some(ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified)
             }
-            CrossCoreMatchNames::FSIndicator05 => Some(ExperianFraudShieldCodes::InputSSNDeceased),
-            CrossCoreMatchNames::FSIndicator06 => Some(ExperianFraudShieldCodes::InputAgeYoungerThanSSN),
-            CrossCoreMatchNames::FSIndicator10 => Some(ExperianFraudShieldCodes::InputAddressAlert),
-            CrossCoreMatchNames::FSIndicator11 => Some(ExperianFraudShieldCodes::InputAddressNonResidential),
-            CrossCoreMatchNames::FSIndicator13 => {
+            CrossCoreMatchName::FSIndicator05 => Some(ExperianFraudShieldCodes::InputSSNDeceased),
+            CrossCoreMatchName::FSIndicator06 => Some(ExperianFraudShieldCodes::InputAgeYoungerThanSSN),
+            CrossCoreMatchName::FSIndicator10 => Some(ExperianFraudShieldCodes::InputAddressAlert),
+            CrossCoreMatchName::FSIndicator11 => Some(ExperianFraudShieldCodes::InputAddressNonResidential),
+            CrossCoreMatchName::FSIndicator13 => {
                 Some(ExperianFraudShieldCodes::InputAddressProbablyBelongsToAnother)
             }
-            CrossCoreMatchNames::FSIndicator14 => Some(ExperianFraudShieldCodes::InputSSNFormatInvalid),
-            CrossCoreMatchNames::FSIndicator15 => Some(ExperianFraudShieldCodes::InputAddressCautious),
-            CrossCoreMatchNames::FSIndicator16 => Some(ExperianFraudShieldCodes::LocatedAddressAlert),
-            CrossCoreMatchNames::FSIndicator17 => {
-                Some(ExperianFraudShieldCodes::LocatedAddressNonResidential)
-            }
-            CrossCoreMatchNames::FSIndicator18 => Some(ExperianFraudShieldCodes::LocatedAddressCautious),
+            CrossCoreMatchName::FSIndicator14 => Some(ExperianFraudShieldCodes::InputSSNFormatInvalid),
+            CrossCoreMatchName::FSIndicator15 => Some(ExperianFraudShieldCodes::InputAddressCautious),
+            CrossCoreMatchName::FSIndicator16 => Some(ExperianFraudShieldCodes::LocatedAddressAlert),
+            CrossCoreMatchName::FSIndicator17 => Some(ExperianFraudShieldCodes::LocatedAddressNonResidential),
+            CrossCoreMatchName::FSIndicator18 => Some(ExperianFraudShieldCodes::LocatedAddressCautious),
             // As of April 15, 2022, Fraud Shield 21 (Telephone Number Inconsistent w/ Address) will be deprecated and no longer be active
             // but is still returned
-            CrossCoreMatchNames::FSIndicator21 => None,
-            CrossCoreMatchNames::FSIndicator25 => Some(ExperianFraudShieldCodes::BestLocatedSSNDeceased),
-            CrossCoreMatchNames::FSIndicator26 => {
+            CrossCoreMatchName::FSIndicator21 => None,
+            CrossCoreMatchName::FSIndicator25 => Some(ExperianFraudShieldCodes::BestLocatedSSNDeceased),
+            CrossCoreMatchName::FSIndicator26 => {
                 Some(ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified)
             }
-            CrossCoreMatchNames::Unknown(_) => None,
+            CrossCoreMatchName::Unknown(_) => None,
         }
     }
 }

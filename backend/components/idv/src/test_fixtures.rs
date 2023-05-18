@@ -1142,7 +1142,12 @@ pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> se
     })
 }
 
-pub fn cross_core_response_with_fraud_shield_codes() -> serde_json::Value {
+pub fn cross_core_response_with_fraud_shield_codes(address_code_is_parseable: bool) -> serde_json::Value {
+    let address_code = if address_code_is_parseable {
+        "A1"
+    } else {
+        "Bob Boberto"
+    };
     serde_json::json!({
         "responseHeader": {
             "requestType": "PreciseIdOnly",
@@ -1732,7 +1737,7 @@ pub fn cross_core_response_with_fraud_shield_codes() -> serde_json::Value {
                     "matches": [
                         {
                             "name": "pmAddressVerificationResult1",
-                            "value": "A1"
+                            "value": address_code
                         },
                         {
                             "name": "pmPhoneVerificationResult1",

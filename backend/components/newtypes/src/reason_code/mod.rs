@@ -1,4 +1,5 @@
 mod experian;
+mod experian_reason_code_helpers;
 mod idology;
 mod signal;
 mod signal_attribute;
@@ -43,6 +44,31 @@ macro_rules! vendor_reason_code_enum {
     }
 }
 pub(crate) use vendor_reason_code_enum;
+
+macro_rules! experian_address_reason_code_enum {
+    (
+        $(#[$macros:meta])*
+        pub enum $name:ident {
+            $(#[ser = $ser:literal] #[footprint_reason_codes = $footprint_reason_codes:expr] $item:ident),*
+        }
+    ) => {
+        $(#[$macros])*
+        pub enum $name {
+            $(#[strum(to_string = $ser)] $item,)*
+        }
+
+
+        impl From<&$name> for Vec<FootprintReasonCode> {
+            fn from(vendor_reason_code: &$name) -> Self {
+                match vendor_reason_code {
+                    $($name::$item => $footprint_reason_codes),*
+                }
+            }
+        }
+
+    }
+}
+pub(crate) use experian_address_reason_code_enum;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]

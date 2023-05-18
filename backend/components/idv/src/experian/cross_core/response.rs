@@ -1,4 +1,7 @@
-use newtypes::{experian::CrossCoreMatchNames, ExperianFraudShieldCodes};
+use newtypes::{
+    experian::CrossCoreMatchName, ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes,
+    ExperianFraudShieldCodes,
+};
 
 use crate::experian::{
     error::{CrossCoreResponseError, Error},
@@ -38,6 +41,17 @@ impl CrossCoreAPIResponse {
 
         Ok(de)
     }
+
+    fn get_matches(&self) -> Result<Vec<MatchValue>, Error> {
+        let matches = self
+            .get_precise_id_decision_element()?
+            .clone()
+            .matches
+            .ok_or(Error::MissingMatchesInDecisionElement("match object".into()))?;
+
+        Ok(matches)
+    }
+
     // Helper to dig down to the precise id response from cross core wrapper
     pub fn precise_id_response(&self) -> Result<PreciseIDAPIResponse, Error> {
         let response = self
@@ -58,11 +72,7 @@ impl CrossCoreAPIResponse {
     }
 
     pub fn fraud_shield_reason_codes(&self) -> Result<Vec<ExperianFraudShieldCodes>, Error> {
-        let matches = self
-            .get_precise_id_decision_element()?
-            .clone()
-            .matches
-            .ok_or(Error::MissingMatchesInDecisionElement)?;
+        let matches = self.get_matches()?;
 
         let codes = matches
             .iter()
@@ -70,6 +80,30 @@ impl CrossCoreAPIResponse {
             .collect::<Vec<ExperianFraudShieldCodes>>();
 
         Ok(codes)
+    }
+
+    pub fn dob_match_reason_codes(&self) -> Result<ExperianDobMatchReasonCodes, Error> {
+        let matches = self.get_precise_id_decision_element()?;
+
+        let code = matches
+            .into_reason_code::<ExperianDobMatchReasonCodes>(CrossCoreMatchName::DobMatchResult)
+            .ok_or(Error::MissingMatchesInDecisionElement("dob".into()))?;
+
+        Ok(code)
+    }
+
+    pub fn name_and_address_match_reason_codes(
+        &self,
+    ) -> Result<ExperianAddressAndNameMatchReasonCodes, Error> {
+        let matches = self.get_precise_id_decision_element()?;
+
+        let code = matches
+            .into_reason_code::<ExperianAddressAndNameMatchReasonCodes>(
+                CrossCoreMatchName::AddressVerificationMatchResult,
+            )
+            .unwrap_or(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch);
+
+        Ok(code)
     }
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -144,6 +178,30 @@ pub struct DecisionElement {
     pub decisions: Option<Vec<DecisionElementDecision>>,
 }
 
+impl DecisionElement {
+    pub fn into_reason_code<T>(&self, match_name: CrossCoreMatchName) -> Option<T>
+    where
+        for<'a> T: TryFrom<&'a str>,
+    {
+        let match_value = self.matches.clone().and_then(|match_values| {
+            match_values.into_iter().find(|mv| {
+                mv.name
+                    .as_ref()
+                    .map(|n| {
+                        CrossCoreMatchName::try_from(n.as_str())
+                            .unwrap_or(CrossCoreMatchName::Unknown(n.clone()))
+                            == match_name
+                    })
+                    .unwrap_or(false)
+            })
+        });
+
+        match_value
+            .and_then(|mv| mv.value)
+            .and_then(|val| T::try_from(val.as_str()).ok())
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DecisionElementDecision {
@@ -175,7 +233,7 @@ impl MatchValue {
     pub fn into_fraud_shield_reason_code(&self) -> Option<ExperianFraudShieldCodes> {
         self.name.as_ref().and_then(|n| {
             let match_name =
-                CrossCoreMatchNames::try_from(n.as_str()).unwrap_or(CrossCoreMatchNames::Unknown(n.clone()));
+                CrossCoreMatchName::try_from(n.as_str()).unwrap_or(CrossCoreMatchName::Unknown(n.clone()));
             std::convert::Into::<Option<ExperianFraudShieldCodes>>::into(match_name)
                 .filter(|_| self.value == Some("Y".into()))
         })
@@ -247,7 +305,7 @@ mod tests {
     #[test]
     fn test_serializes() {
         // test we scrub sensitive data in a hack way
-        let response = cross_core_response_with_fraud_shield_codes();
+        let response = cross_core_response_with_fraud_shield_codes(true);
         assert!(response.to_string().contains("BRIAN"));
 
         let r: CrossCoreAPIResponse =
@@ -258,21 +316,37 @@ mod tests {
         assert!(!s.contains("BRIAN"))
     }
     #[test]
-    fn test_parse_fs_from_match() {
-        let response = cross_core_response_with_fraud_shield_codes();
-
+    fn test_parse_reason_codes_from_cc() {
+        let response = cross_core_response_with_fraud_shield_codes(true);
         let r: CrossCoreAPIResponse =
             serde_json::from_value(response).expect("could not parse experian cross core");
 
-        let matches = r.fraud_shield_reason_codes().unwrap();
+        let fs_matches = r.fraud_shield_reason_codes().unwrap();
+        let dob_match = r.dob_match_reason_codes().unwrap();
+        let address_and_name_match = r.name_and_address_match_reason_codes().unwrap();
+
         assert_have_same_elements(
-            matches,
+            fs_matches,
             vec![
                 ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified,
                 ExperianFraudShieldCodes::InputSSNDeceased,
                 ExperianFraudShieldCodes::LocatedAddressNonResidential,
                 ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified,
             ],
-        )
+        );
+
+        assert_eq!(dob_match, ExperianDobMatchReasonCodes::YobOnlyExactMatch);
+        assert_eq!(address_and_name_match, ExperianAddressAndNameMatchReasonCodes::A1);
+
+        let response_with_not_parsable_address = cross_core_response_with_fraud_shield_codes(false);
+        let r2_not_parsable: CrossCoreAPIResponse =
+            serde_json::from_value(response_with_not_parsable_address)
+                .expect("could not parse experian cross core");
+        let address_and_name_match_not_parsable =
+            r2_not_parsable.name_and_address_match_reason_codes().unwrap();
+        assert_eq!(
+            address_and_name_match_not_parsable,
+            ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch
+        );
     }
 }
