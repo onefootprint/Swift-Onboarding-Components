@@ -56,7 +56,6 @@ pub enum IncodeVerificationSessionState {
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-
 pub enum IncodeVerificationFailureReason {
     #[strum(serialize = "UNKNOWN_DOCUMENT_TYPE")]
     UnknownDocumentType,
@@ -94,7 +93,6 @@ pub enum IncodeVerificationFailureReason {
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-
 pub enum IncodeVerificationSessionKind {
     IdDocument,
     Selfie,

@@ -1,5 +1,8 @@
 use crate::export_schema;
-use newtypes::{idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, PiiString};
+use newtypes::{
+    idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, IncodeVerificationFailureReason,
+    PiiString,
+};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 
@@ -94,5 +97,22 @@ impl From<IdologyImageCaptureErrors> for DocumentImageError {
             IdologyImageCaptureErrors::InvalidJpeg => Self::InvalidJpeg,
             IdologyImageCaptureErrors::DocumentIsSkewed => Self::DocumentIsSkewed,
         }
+    }
+}
+
+impl From<IncodeVerificationFailureReason> for DocumentImageError {
+    // TODO: fix enum on frontend
+    fn from(_err: IncodeVerificationFailureReason) -> Self {
+        Self::ImageError
+        // match err {
+        //     IncodeVerificationFailureReason::UnknownDocumentType => Self::ImageError,
+        //     IncodeVerificationFailureReason::WrongDocumentSide => Self::ImageError,
+        //     IncodeVerificationFailureReason::WrongOneSidedDocument => Self::ImageError,
+        //     IncodeVerificationFailureReason::DocumentNotReadable => Self::ImageError,
+        //     IncodeVerificationFailureReason::UnableToAlignDocument => todo!(),
+        //     IncodeVerificationFailureReason::IdTypeNotAcceptable => todo!(),
+        //     IncodeVerificationFailureReason::UnexpectedErrorOccurred => Self::ImageError,
+        //     IncodeVerificationFailureReason::Other(_) => todo!(),
+        // }
     }
 }

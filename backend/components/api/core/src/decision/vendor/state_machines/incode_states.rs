@@ -795,13 +795,15 @@ pub mod state_impl {
                         conn,
                         VendorAPI::IncodeAddFront,
                         sv_id,
-                        id_doc_id,
+                        id_doc_id.clone(),
                         &di_id,
                     )?;
 
-                    // Update our state to the next stage
-                    let update =
-                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddFront);
+                    // Update our state to the next stage and add in the new identity document
+                    let update = UpdateIncodeVerificationSession::set_state_and_identity_document(
+                        IncodeVerificationSessionState::AddFront,
+                        id_doc_id,
+                    );
 
                     IncodeVerificationSession::update(conn, session_id, update)?;
 

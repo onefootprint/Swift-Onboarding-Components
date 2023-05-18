@@ -7,6 +7,10 @@ use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::auth::user::{UserAuth, UserObAuthContext};
+use api_core::config::Config;
+use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
+use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeState, IncodeStateMachine};
+use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
@@ -14,18 +18,18 @@ use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
 use db::models::identity_document::IdentityDocument;
+use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
-use db::models::verification_request::VerificationRequest;
-use db::{DbError, DbResult, PgConn};
+use db::{DbError, DbPool, DbResult, PgConn, TxnPgConn};
 use futures::TryFutureExt;
-use idv::ParsedResponse;
-use newtypes::idology::IdologyImageCaptureErrors;
+use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{
-    DocumentKind, DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, OnboardingId, ScopedVaultId,
-    SealedVaultDataKey, VaultId,
+    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, IdentityDocumentId,
+    IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId, SealedVaultDataKey, TenantId,
+    VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -161,8 +165,8 @@ pub async fn post(
     let results: Vec<String> = match futures::future::try_join_all(futures).await {
         Ok(s) => Ok(s),
         Err(e) => {
-            handle_s3_upload_error(
-                &state,
+            handle_upload_error(
+                &state.db_pool,
                 db_document_request.id.clone(),
                 user_auth.scoped_user.id.clone(),
             )
@@ -271,22 +275,16 @@ pub async fn post(
         decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &user_auth.scoped_user.tenant_id)
             .await?
             .is_none();
-    // TODO: more vendors!
-    let api = newtypes::VendorAPI::IdologyScanOnboarding;
-    if db_document_request.ref_id.is_some() {
-        return Err(AssertionError("ref_id found for document request").into());
-    }
 
-    // Save Verification Requests and run our vendor requests
+    // Run vendor requests
     if should_initiate_reqs {
-        // Save our verification request
         let su_id = user_auth.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
         let ob_id = user_auth.onboarding()?.id.clone();
-        let (document_verification_request, doc_request) = state
+        let (decision_intent, doc_request) = state
             .db_pool
             .db_transaction(
-                move |conn| -> Result<(VerificationRequest, DbDocumentRequest), ApiError> {
+                move |conn| -> Result<(DecisionIntent, DbDocumentRequest), ApiError> {
                     // Protect against race conditions
                     let doc_request = DbDocumentRequest::lock(conn, &su_id, &db_document_request.id)?;
                     let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
@@ -296,32 +294,27 @@ pub async fn post(
 
                     let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
 
-                    let res = decision::utils::create_document_verification_request(
-                        conn.conn(),
-                        api,
-                        su_id,
-                        id_doc_id,
-                        &decision_intent.id,
-                    )?;
-
                     // Move our status to uploaded since we have generated a doc verification request
                     let update = DocumentRequestUpdate::idv_reqs_initiated();
                     let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
 
-                    Ok((res, doc_request))
+                    Ok((decision_intent, doc_request))
                 },
             )
             .await?;
 
         // Make our request!
-        handle_scan_onboarding_request(
-            &state,
-            &user_auth.onboarding()?.id,
-            doc_request,
-            document_verification_request,
+        handle_incode_request(
+            &state.db_pool,
+            &state.enclave_client,
+            &state.config,
+            &state.footprint_vendor_http_client,
+            id_doc_id,
             user_auth.scoped_user.id.clone(),
-            user_auth.scoped_user.vault_id.clone(),
-            identity_document.id.clone(),
+            user_auth.scoped_user.tenant_id.clone(),
+            decision_intent.id,
+            uvw.vault,
+            doc_request,
         )
         .await?;
     } else {
@@ -376,7 +369,6 @@ pub async fn get(
     ResponseData::ok(response).json()
 }
 
-/// Based on the current and previous requests, map to our API response
 pub fn construct_get_response(
     conn: &mut PgConn,
     scoped_user_id: &ScopedVaultId,
@@ -384,35 +376,25 @@ pub fn construct_get_response(
     // Get the latest document request for the scoped user, and the previous result (for errors).
     // We don't just stash the errors on the document request because with multiple vendors, we'll need
     // to handle each set of errors appropriately
-    let (current_request, previous_request, previous_request_verification_result) =
+    let (current_request, previous_request, _) =
         DbDocumentRequest::get_latest_with_previous_request_and_result(conn, scoped_user_id)?;
+
     let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
 
     let should_return_errors = matches!(
         current_request.status,
         DocumentRequestStatus::Pending | DocumentRequestStatus::UploadFailed
     );
-    let mut previous_request_errors: Vec<IdologyImageCaptureErrors> = vec![];
+    let mut previous_request_errors: Vec<IncodeVerificationFailureReason> = vec![];
     let mut current_request_internal_errors_needing_retry: Vec<DocumentImageError> = vec![];
     let mut status = current_request.status.into();
 
     if should_return_errors {
-        if let Some(result) = previous_request_verification_result {
-            // TODO: need to decrypt this
-            let parsed = idv::idology::scan_onboarding::response::parse_response(result.response.0)
-                .map_err(|_| AssertionError("Could not parse ScanOnboarding response"))?;
-            if let Some((None, image_errors)) = parsed.response.error() {
-                previous_request_errors = image_errors;
-                // If we actually have errors, we should tell the frontend that there's an error, even
-                // though we have a pending doc request
-                status = DocumentResponseStatus::Error;
-            }
+        let incode_verification_session =
+            IncodeVerificationSession::get(conn, scoped_user_id)?.ok_or(DbError::ObjectNotFound)?;
 
-            // we don't get image errors for idology internal errors, but still want to return an error.
-            if parsed.response.capture_result_is_internal_error() {
-                status = DocumentResponseStatus::Error;
-                previous_request_errors = vec![IdologyImageCaptureErrors::ImageError]
-            }
+        if let Some(error) = incode_verification_session.latest_failure_reason {
+            previous_request_errors.push(error)
         }
 
         // If s3 or postgres errors when writing an identity document, we should ask client to retry (we handle retry limit exceeded below)
@@ -428,110 +410,85 @@ pub fn construct_get_response(
         status = DocumentResponseStatus::RetryLimitExceeded
     }
 
-    let errors = previous_request_errors
+    let errors: Vec<DocumentImageError> = previous_request_errors
         .into_iter()
         .map(DocumentImageError::from)
         .chain(current_request_internal_errors_needing_retry.into_iter())
         .collect();
 
+    if !errors.is_empty() {
+        status = DocumentResponseStatus::Error;
+    }
+
     Ok((status, errors))
 }
 
-#[tracing::instrument(skip(state, document_request, document_verification_request))]
-async fn handle_scan_onboarding_request(
-    state: &State,
-    onboarding_id: &OnboardingId,
-    document_request: DbDocumentRequest,
-    document_verification_request: VerificationRequest,
-    scoped_user_id: ScopedVaultId,
-    user_vault_id: VaultId,
+#[allow(clippy::too_many_arguments)]
+async fn handle_incode_request(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    config: &Config,
+    footprint_http_client: &FootprintVendorHttpClient,
     identity_document_id: IdentityDocumentId,
+    scoped_vault_id: ScopedVaultId,
+    tenant_id: TenantId,
+    decision_intent_id: DecisionIntentId,
+    user_vault: Vault,
+    document_request: DbDocumentRequest,
 ) -> Result<(), ApiError> {
-    // Make document verification request
-    // TODO: spawn a thread to make this request, but scan onboarding returns immediately (allegedly) so it's fine for now
-    let verification_request_id = document_verification_request.id.clone();
-    let vendor_result = decision::vendor::make_request::make_docv_request(
-        state,
-        document_verification_request,
-        onboarding_id,
+    let docv_data = build_docv_data_from_identity_doc(
+        db_pool,
+        enclave_client,
+        identity_document_id.clone(),
+        scoped_vault_id.clone(),
     )
-    .await;
+    .await?; // TODO: handle this with better requirement checking
 
-    // Our vendor request could fail for some reason. We handle most errors in the vendor request code, but if
-    // some anticipated error arises, if we don't catch the error here, we introduce a potential loophole for someone to get through
-    // doc verification by somehow inducing a failure on the vendor side
-    let mut status = DocumentRequestStatus::Complete;
-    let needs_retry = match vendor_result {
-        Err(e) => {
-            tracing::warn!(verification_request=%verification_request_id, err=%e, "Document vendor request failed for unknown reason");
-            status = DocumentRequestStatus::UploadFailed;
-            true
-        }
-        Ok(result) => {
-            // Handle request
-            let response = match result.response.response {
-                ParsedResponse::IDologyScanOnboarding(response) => Ok(response),
-                _ => Err(AssertionError("wrong document vendor response received")),
-            }?;
+    // Initialize our state machine
+    let machine = IncodeStateMachine::init(
+        tenant_id,
+        db_pool,
+        enclave_client,
+        config,
+        decision_intent_id.clone(),
+        scoped_vault_id.clone(),
+        // TODO: upstream this somewhere based on OBC
+        IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
+        identity_document_id.clone(),
+    )
+    .await?; // TODO: handle this with better requirement checking
 
-            if response.response.needs_retry() {
-                status = DocumentRequestStatus::Failed;
-                true
-            } else {
-                false
-            }
-        }
-    };
+    let result = machine
+        .run(
+            db_pool,
+            footprint_http_client,
+            user_vault.public_key.clone(),
+            &docv_data,
+        )
+        .await
+        .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 
-    state
-        .db_pool
+    // Incode has told us we need have a recoverable error, the error has been stashed on IncodeVerificationSession table
+    let needs_retry = matches!(result.state, IncodeState::RetryUpload(_));
+
+    db_pool
         .db_transaction(move |conn| -> Result<(), ApiError> {
             if needs_retry {
-                // Move our status to failed since we need a new doc verification request
-                let failed_update = DocumentRequestUpdate {
-                    status: Some(status),
-                    ..Default::default()
-                };
-                // Create a timeline event
-                let info = newtypes::IdentityDocumentUploadedInfo {
-                    id: identity_document_id.clone(),
-                };
-                UserTimeline::create(conn, info, user_vault_id, scoped_user_id.clone())?;
-
-                let current_doc_request = document_request.update(conn.conn(), failed_update)?;
-                let current_doc_request_id = current_doc_request.id.clone();
-                let should_collect_selfie = current_doc_request.should_collect_selfie;
-                // If we have exceeded our retry limit, we no longer want to create new document requests and
-                // we're done. GETting the status at this point will return `RetryLimitExceed` to the frontend
-                //
-                // Note (2023-01-19):
-                //   There's a the question of how to represent this in the document request status, if at all.
-                //   Since "failing due to retries" is a part of the overall bifrost "Doc collection" step, and not an individual doc request itself.
-                //   I think in order to maintain a serialized log of why an entire set of document requests failed, we'd need a new data model and this just seemed simpler for now to encode in runtime logic
-                if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_vault_id)? {
-                    // Create a new document request.
-                    // ref_id is None here since we are retrying scan onboarding!
-                    DbDocumentRequest::create(
-                        conn,
-                        scoped_user_id,
-                        None,
-                        should_collect_selfie,
-                        Some(current_doc_request_id),
-                    )?;
-                }
+                handle_incode_error(
+                    conn,
+                    document_request,
+                    user_vault.id,
+                    scoped_vault_id,
+                    identity_document_id,
+                )?
             } else {
-                let completed_update = DocumentRequestUpdate {
-                    status: Some(DocumentRequestStatus::Complete),
-                    ..Default::default()
-                };
-
-                document_request.update(conn.conn(), completed_update)?;
-
-                // Create a timeline event
-                let info = newtypes::IdentityDocumentUploadedInfo {
-                    id: identity_document_id,
-                };
-                UserTimeline::create(conn, info, user_vault_id, scoped_user_id)?;
+                handle_incode_success(
+                    conn,
+                    document_request,
+                    user_vault.id,
+                    scoped_vault_id,
+                    identity_document_id,
+                )?
             }
 
             Ok(())
@@ -541,14 +498,79 @@ async fn handle_scan_onboarding_request(
     Ok(())
 }
 
-async fn handle_s3_upload_error(
-    state: &State,
+fn handle_incode_error(
+    conn: &mut TxnPgConn,
+    document_request: DbDocumentRequest,
+    user_vault_id: VaultId,
+    scoped_vault_id: ScopedVaultId,
+    identity_document_id: IdentityDocumentId,
+) -> DbResult<()> {
+    // Move our status to failed since we need a new doc verification request
+    let failed_update = DocumentRequestUpdate {
+        status: Some(DocumentRequestStatus::Failed),
+        ..Default::default()
+    };
+    // Create a timeline event
+    let info = newtypes::IdentityDocumentUploadedInfo {
+        id: identity_document_id,
+    };
+    UserTimeline::create(conn, info, user_vault_id, scoped_vault_id.clone())?;
+
+    let current_doc_request = document_request.update(conn.conn(), failed_update)?;
+    let current_doc_request_id = current_doc_request.id.clone();
+    let should_collect_selfie = current_doc_request.should_collect_selfie;
+    // If we have exceeded our retry limit, we no longer want to create new document requests and
+    // we're done. GETting the status at this point will return `RetryLimitExceed` to the frontend
+    //
+    // Note (2023-01-19):
+    //   There's a the question of how to represent this in the document request status, if at all.
+    //   Since "failing due to retries" is a part of the overall bifrost "Doc collection" step, and not an individual doc request itself.
+    //   I think in order to maintain a serialized log of why an entire set of document requests failed, we'd need a new data model and this just seemed simpler for now to encode in runtime logic
+    if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_vault_id)? {
+        // Create a new document request.
+        // ref_id is None here since we are retrying scan onboarding!
+        DbDocumentRequest::create(
+            conn,
+            scoped_vault_id,
+            None,
+            should_collect_selfie,
+            Some(current_doc_request_id),
+        )?;
+    }
+
+    Ok(())
+}
+
+fn handle_incode_success(
+    conn: &mut TxnPgConn,
+    document_request: DbDocumentRequest,
+    user_vault_id: VaultId,
+    scoped_vault_id: ScopedVaultId,
+    identity_document_id: IdentityDocumentId,
+) -> DbResult<()> {
+    let completed_update = DocumentRequestUpdate {
+        status: Some(DocumentRequestStatus::Complete),
+        ..Default::default()
+    };
+
+    document_request.update(conn.conn(), completed_update)?;
+
+    // Create a timeline event
+    let info = newtypes::IdentityDocumentUploadedInfo {
+        id: identity_document_id,
+    };
+    UserTimeline::create(conn, info, user_vault_id, scoped_vault_id)?;
+
+    Ok(())
+}
+
+async fn handle_upload_error(
+    db_pool: &DbPool,
     document_request_id: DocumentRequestId,
     scoped_user_id: ScopedVaultId,
 ) -> DbResult<()> {
-    // In the case of an s3 error, we move our status to UploadFailed
-    state
-        .db_pool
+    // In the case of an s3 or other error, we move our status to UploadFailed
+    db_pool
         .db_transaction(move |conn| -> Result<(), DbError> {
             let doc = DbDocumentRequest::lock(conn, &scoped_user_id, &document_request_id)?;
 

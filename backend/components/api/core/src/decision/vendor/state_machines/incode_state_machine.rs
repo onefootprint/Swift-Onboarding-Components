@@ -86,8 +86,9 @@ impl std::fmt::Debug for IncodeMachineError {
 
 /// The machine that initializes and then runs a series of state transitions
 pub struct IncodeStateMachine {
-    state: IncodeState,
+    pub state: IncodeState,
 }
+
 impl IncodeStateMachine {
     #[allow(clippy::too_many_arguments)]
     pub async fn init(
@@ -169,7 +170,6 @@ impl IncodeStateMachine {
             }
         }
 
-        // return machine with state
         Ok(machine)
     }
 
