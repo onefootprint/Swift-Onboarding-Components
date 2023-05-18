@@ -8,7 +8,7 @@ use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{decision, State};
-use api_core::auth::user::{UserAuth, UserObAuthContext};
+use api_core::auth::user::UserObAuthContext;
 use api_core::config::Config;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeState, IncodeStateMachine};
@@ -49,8 +49,9 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let request = request.0;
+    let su_id = user_auth.scoped_user.id.clone();
 
-    let (uv, doc_request, user_auth, user_consent) = state
+    let (uvw, doc_request, user_auth, user_consent) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
@@ -65,11 +66,11 @@ pub async fn post(
             // Move our request to Uploaded so any subsequent POSTs will fail
             let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
             let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
-            let uv = Vault::get(conn, user_auth.user_vault_id())?;
+            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
 
             let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding()?.id)?;
 
-            Ok((uv, doc_request, user_auth, user_consent))
+            Ok((uvw, doc_request, user_auth, user_consent))
         })
         .await?;
 
@@ -89,13 +90,18 @@ pub async fn post(
     // generate a sealed data key (with its plaintext)
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
-            uv.public_key.as_ref(),
+            uvw.vault.public_key.as_ref(),
         )?;
-
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
-
     let bucket = &state.config.document_s3_bucket.clone();
-    let su_id = user_auth.scoped_user.id.clone();
+
+    // Check if we should be initiating requests (e.g. check if we are testing)
+    // TODO: generate fixture data for identity documents
+    let ff_client = &state.feature_flag_client;
+    let should_initiate_reqs =
+        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &user_auth.scoped_user.tenant_id)
+            .await?
+            .is_none();
 
     //
     // Encrypt all images
@@ -118,9 +124,10 @@ pub async fn post(
     //
     let s3_upload_futs = e_imgs
         .into_iter()
-        .map(|(face, e_data)| upload_image(&state, face, e_data, &doc_request.id, &uv.id, bucket))
+        .map(|(face, e_data)| upload_image(&state, face, e_data, &doc_request.id, &uvw.vault.id, bucket))
         .collect_vec();
 
+    let su_id = user_auth.scoped_user.id.clone();
     let mut s3_urls: HashMap<_, _> = match futures::future::try_join_all(s3_upload_futs).await {
         Ok(s) => Ok(s.into_iter().collect()),
         Err(e) => {
@@ -131,10 +138,11 @@ pub async fn post(
 
     // write a identity_document
     let doc_request_id = doc_request.id.clone();
+    let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let identity_document = state
+    let created_reqs = state
         .db_pool
-        .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             // temporary: for compatibility with the new document kinds
             // Create a document record on the VW for each image type
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
@@ -146,9 +154,8 @@ pub async fn post(
                     let kind = DocumentKind::from_id_doc_kind(request.document_type, *face);
                     let name = format!("{}.png", kind);
                     let mime_type = "image/png".to_string();
-                    let result =
-                        uvw.put_document(conn, kind, mime_type, name, e_data_key.clone(), url.clone())?;
-                    Ok((face, result.lifetime_id))
+                    let r = uvw.put_document(conn, kind, mime_type, name, e_data_key.clone(), url.clone())?;
+                    Ok((face, r.lifetime_id))
                 })
                 .collect::<ApiResult<_>>()?;
 
@@ -167,51 +174,36 @@ pub async fn post(
             };
             let id_doc = IdentityDocument::create(conn, args)?;
 
-            Ok(id_doc)
+            //
+            // Now that the document is created, either initiate IDV reqs or create fixture data
+            //
+            let result = if should_initiate_reqs {
+                // Initiate IDV reqs once and only once for this id_doc
+                let doc_request = DbDocumentRequest::lock(conn, &su_id, &doc_request.id)?;
+                let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
+                if doc_request.idv_reqs_initiated {
+                    return Err(AssertionError("Document request already initiated").into());
+                }
+                let update = DocumentRequestUpdate::idv_reqs_initiated();
+                let doc_request = doc_request.into_inner().update(conn, update)?;
+
+                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+                Some((decision_intent, doc_request, id_doc.id))
+            } else {
+                // Create fixture data
+                let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
+                doc_request.update(conn, update)?;
+
+                let info = newtypes::IdentityDocumentUploadedInfo { id: id_doc.id };
+                UserTimeline::create(conn, info, uvw.vault.id.clone(), su_id)?;
+                None
+            };
+
+            Ok(result)
         })
         .await?;
 
-    // Check if we should be initiating requests (e.g. check if we are testing)
-    let su_id = user_auth.scoped_user.id.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&su_id)))
-        .await??;
-    // TODO: generate fixture data for identity documents
-    let ff_client = &state.feature_flag_client;
-    let should_initiate_reqs =
-        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &user_auth.scoped_user.tenant_id)
-            .await?
-            .is_none();
-
-    // Run vendor requests
-    // TODO make this atomic with creating the ID
-    if should_initiate_reqs {
-        let su_id = user_auth.scoped_user.id.clone();
-        let id_doc_id = identity_document.id.clone();
-        let ob_id = user_auth.onboarding()?.id.clone();
-        let (decision_intent, doc_request) = state
-            .db_pool
-            .db_transaction(
-                move |conn| -> Result<(DecisionIntent, DbDocumentRequest), ApiError> {
-                    // Protect against race conditions
-                    let doc_request = DbDocumentRequest::lock(conn, &su_id, &doc_request.id)?;
-                    let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                    if doc_request.idv_reqs_initiated {
-                        return Err(AssertionError("Document request already initiated").into());
-                    }
-
-                    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
-
-                    // Move our status to uploaded since we have generated a doc verification request
-                    let update = DocumentRequestUpdate::idv_reqs_initiated();
-                    let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
-
-                    Ok((decision_intent, doc_request))
-                },
-            )
-            .await?;
-
+    if let Some((decision_intent, doc_request, id_doc_id)) = created_reqs {
         // Make our request!
         handle_incode_request(
             &state.db_pool,
@@ -226,26 +218,6 @@ pub async fn post(
             doc_request,
         )
         .await?;
-    } else {
-        // mark as complete if we are testing
-        let su_id = user_auth.scoped_user.id.clone();
-        state
-            .db_pool
-            .db_query(move |conn| -> Result<(), ApiError> {
-                let update = DocumentRequestUpdate {
-                    status: Some(DocumentRequestStatus::Complete),
-                    ..Default::default()
-                };
-                doc_request.update(conn, update)?;
-
-                let info = newtypes::IdentityDocumentUploadedInfo {
-                    id: identity_document.id.clone(),
-                };
-                UserTimeline::create(conn, info, uvw.vault.id, su_id)?;
-
-                Ok(())
-            })
-            .await??;
     }
 
     EmptyResponse::ok().json()
