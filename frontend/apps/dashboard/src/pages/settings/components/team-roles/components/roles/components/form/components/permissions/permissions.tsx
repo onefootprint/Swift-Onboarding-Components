@@ -17,7 +17,9 @@ import useDecryptOptions from './hooks/use-decrypt-options';
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
   const { t } = useTranslation('pages.settings.roles');
-  const { register, watch, control, setValue, getValues } = useFormContext();
+  const { register, watch, control, setValue, getValues, formState } =
+    useFormContext();
+  const { errors } = formState;
   const decryptOptions = useDecryptOptions();
   const showDecryptSelect = watch('showDecrypt');
 
@@ -74,7 +76,12 @@ const Permissions = () => {
               <Controller
                 control={control}
                 name="decryptFields"
-                rules={{ required: true }}
+                rules={{
+                  required: {
+                    value: true,
+                    message: t('form.decrypt.errors.required'),
+                  },
+                }}
                 render={({ field }) => (
                   <MultiSelect
                     label={t('form.decrypt-attributes.label')}
@@ -83,6 +90,8 @@ const Permissions = () => {
                     onBlur={field.onBlur}
                     onChange={field.onChange}
                     value={field.value}
+                    hasError={!!errors.decryptFields}
+                    hint={errors.decryptFields?.message as string}
                   />
                 )}
               />

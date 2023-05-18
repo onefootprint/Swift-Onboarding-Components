@@ -93,8 +93,17 @@ export default {
       control: 'boolean',
       description: 'Mark the multi-select as required',
     },
+    hasError: {
+      control: 'boolean',
+      description: 'Gives an error state to the input and hint',
+    },
+    hint: {
+      control: 'text',
+      description: 'Display an informative text below',
+      required: false,
+    },
     value: {
-      control: 'optio',
+      control: 'option',
       description: 'Value of the multi-select',
     },
     size: {
@@ -130,6 +139,8 @@ const Template: Story<MultiSelectProps<Option, Group>> = ({
   options,
   placeholder,
   required,
+  hasError,
+  hint,
   size,
   value,
 }: MultiSelectProps<Option, Group>) => (
@@ -148,6 +159,8 @@ const Template: Story<MultiSelectProps<Option, Group>> = ({
     options={options}
     placeholder={placeholder}
     required={required}
+    hasError={hasError}
+    hint={hint}
     size={size}
     value={value}
   />
@@ -169,6 +182,8 @@ Base.args = {
   options: defaultOptions,
   placeholder: 'Select...',
   required: false,
+  hasError: false,
+  hint: '',
   size: 'default',
   value: undefined,
 };

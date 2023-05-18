@@ -10,6 +10,7 @@ import { useTheme } from 'styled-components';
 
 import Box from '../box';
 import Label from '../form-label';
+import Hint from '../internal/hint/hint';
 import {
   ClearIndicator,
   DropdownIndicator,
@@ -35,6 +36,8 @@ export type MultiSelectProps<Option, Group extends GroupBase<Option>> = {
   options: OptionsOrGroups<Option, Group> | undefined;
   placeholder?: string;
   required?: boolean;
+  hasError?: boolean;
+  hint?: string;
   size?: 'default' | 'compact';
   value?: PropsValue<Option>;
 };
@@ -57,6 +60,8 @@ const MultiSelect = <
   options,
   placeholder = 'Search...',
   required,
+  hasError = false,
+  hint,
   size,
   value,
 }: MultiSelectProps<Option, Group>) => {
@@ -118,7 +123,9 @@ const MultiSelect = <
           }),
           control: (base, { isFocused }) => ({
             background: input.state.default.initial.bg,
-            borderColor: input.state.default.initial.border,
+            borderColor: hasError
+              ? `${input.state.error.initial.border}`
+              : input.state.default.initial.border,
             borderRadius: input.global.borderRadius,
             borderStyle: 'solid',
             borderWidth: input.global.borderWidth,
@@ -126,12 +133,16 @@ const MultiSelect = <
             ':hover': {
               ...(!isFocused && {
                 background: input.state.default.hover.bg,
-                borderColor: input.state.default.hover.border,
+                borderColor: hasError
+                  ? `${input.state.error.initial.border}`
+                  : input.state.default.hover.border,
               }),
             },
             ...(isFocused && {
               background: input.state.default.focus.bg,
-              borderColor: input.state.default.focus.border,
+              borderColor: hasError
+                ? `${input.state.error.initial.border}`
+                : input.state.default.focus.border,
               boxShadow: input.state.default.focus.elevation,
             }),
           }),
@@ -238,6 +249,7 @@ const MultiSelect = <
           }),
         }}
       />
+      {hint && <Hint hasError={hasError}>{hint}</Hint>}
     </Box>
   );
 };

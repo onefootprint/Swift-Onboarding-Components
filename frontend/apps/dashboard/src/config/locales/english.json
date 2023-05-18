@@ -1361,7 +1361,10 @@
             "title": "Permissions"
           },
           "decrypt": {
-            "label": "Decrypt data"
+            "label": "Decrypt data",
+            "errors": {
+              "required": "Must select at least one permissible attribute"
+            }
           },
           "decrypt-attributes": {
             "label": "Permissible attributes"
