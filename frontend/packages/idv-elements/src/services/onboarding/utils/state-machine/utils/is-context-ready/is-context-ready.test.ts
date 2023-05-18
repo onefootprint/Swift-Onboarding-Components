@@ -31,7 +31,7 @@ describe('isContextReady', () => {
           hasSupportForWebauthn: true,
         },
         config: { ...testOnboardingConfig },
-        data: {},
+        bootstrapData: {},
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         validationToken: '',
         alreadyAuthorized: false,
@@ -47,7 +47,7 @@ describe('isContextReady', () => {
       const context: MachineContext = {
         authToken: 'token',
         config: { ...testOnboardingConfig },
-        data: {},
+        bootstrapData: {},
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
@@ -68,7 +68,7 @@ describe('isContextReady', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
         authToken: 'token',
-        data: {},
+        bootstrapData: {},
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {

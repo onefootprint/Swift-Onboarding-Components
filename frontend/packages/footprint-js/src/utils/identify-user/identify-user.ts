@@ -16,7 +16,8 @@ const identifyUser = async (userData?: UserData) => {
   if (!userData) {
     throw new Error('User data must be passed in order to identify an user');
   }
-  const { email, phoneNumber } = userData;
+  const email = userData['id.email'];
+  const phoneNumber = userData['id.phone_number'];
   if (email) {
     const result = await identifyUserRequest({ identifier: { email } });
     if (result) return true;

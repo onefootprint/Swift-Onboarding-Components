@@ -7,7 +7,7 @@ import isContextReady from './utils/is-context-ready';
 export type OnboardingMachineArgs = {
   obConfigAuth: ObConfigAuth;
   authToken: string;
-  data?: IdDIData; // TODO: generalize this more in the next iteration
+  bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
   sandboxSuffix?: string; // only if in sandbox mode
   userFound?: boolean;
   isTransfer?: boolean;
@@ -18,7 +18,7 @@ export type OnboardingMachineArgs = {
 const createOnboardingMachine = ({
   obConfigAuth,
   authToken,
-  data = {},
+  bootstrapData = {},
   sandboxSuffix,
   userFound,
   isTransfer,
@@ -38,7 +38,7 @@ const createOnboardingMachine = ({
       context: {
         obConfigAuth,
         authToken,
-        data,
+        bootstrapData,
         sandboxSuffix,
         userFound,
         isTransfer,

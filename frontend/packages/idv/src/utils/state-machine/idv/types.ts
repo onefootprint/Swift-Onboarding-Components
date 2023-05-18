@@ -1,12 +1,14 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { ObConfigAuth, OnboardingConfig } from '@onefootprint/types';
-
-import { IdvData } from '../../../types';
+import {
+  IdvBootstrapData,
+  ObConfigAuth,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 export type MachineContext = {
   // Inputs
   authToken?: string;
-  data?: IdvData;
+  bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
   obConfigAuth: ObConfigAuth;
   onClose?: () => void;

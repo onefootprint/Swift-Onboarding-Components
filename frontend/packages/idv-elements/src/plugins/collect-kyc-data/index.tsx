@@ -26,7 +26,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     bootstrapData,
     disabledFields,
   } = customData;
-  const initData = getInitData(bootstrapData, disabledFields);
+  const initData = getInitData(config, bootstrapData, disabledFields);
   const initContext: MachineContext = {
     authToken,
     device,

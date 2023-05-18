@@ -20,8 +20,11 @@ type BeneficialOwnersSectionProps = {
 const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm.beneficial-owners');
   const [state] = useCollectKybDataMachine();
-  const { data, missingKybAttributes } = state.context;
-  const isMultiKyc = missingKybAttributes.includes(
+  const {
+    data,
+    kybRequirement: { missingAttributes },
+  } = state.context;
+  const isMultiKyc = missingAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
 

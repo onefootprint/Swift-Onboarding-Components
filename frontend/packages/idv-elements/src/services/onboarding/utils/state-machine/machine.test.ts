@@ -24,6 +24,10 @@ describe('Onboarding Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
   };
 
+  const defaultBootstrapData = {
+    [IdDI.email]: 'belce@onefootprint.com',
+  };
+
   const testDevice: DeviceInfo = {
     type: 'mobile',
     hasSupportForWebauthn: true,
@@ -32,13 +36,13 @@ describe('Onboarding Machine Tests', () => {
   const createMachine = ({
     userFound = true,
     authToken = 'token',
-    data = { [IdDI.email]: 'belce@onefootprint.com' },
+    bootstrapData = defaultBootstrapData,
     sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
-        data,
+        bootstrapData,
         authToken,
         sandboxSuffix,
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
@@ -67,7 +71,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      data: { [IdDI.email]: 'belce@onefootprint.com' },
+      bootstrapData: defaultBootstrapData,
       validationToken: undefined,
       obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       alreadyAuthorized: false,
@@ -91,7 +95,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      data: { [IdDI.email]: 'belce@onefootprint.com' },
+      bootstrapData: defaultBootstrapData,
       validationToken: 'token',
       obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       alreadyAuthorized: false,
@@ -126,7 +130,7 @@ describe('Onboarding Machine Tests', () => {
       device: testDevice,
       config: testOnboardingConfig,
       authToken: 'token',
-      data: { [IdDI.email]: 'belce@onefootprint.com' },
+      bootstrapData: defaultBootstrapData,
       validationToken: 'token',
       alreadyAuthorized: true,
       obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
