@@ -2,27 +2,33 @@ import {
   FootprintInternalEvent,
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
-import { IdvBootstrapData } from '@onefootprint/types';
+import { BootstrapData } from '@onefootprint/types';
 import { useEffectOnce } from 'usehooks-ts';
 
 const WAITING_USER_DATA_TIME = 500;
 
 const useBootstrapData = (
-  onSuccess: (bootstrapData?: IdvBootstrapData) => void,
+  onSuccess: (bootstrapData?: BootstrapData) => void,
 ) => {
   const footprintProvider = useFootprintProvider();
 
   const waitBootstrapDataOrStart = () => {
     const expirationTimeout = setTimeout(() => {
       unsubscribe();
-      onSuccess();
+      onSuccess({
+        email: undefined,
+        phoneNumber: undefined,
+      });
     }, WAITING_USER_DATA_TIME);
 
     const unsubscribe = footprintProvider.on(
       FootprintInternalEvent.bootstrapDataReceived,
-      (data: IdvBootstrapData) => {
+      data => {
         clearTimeout(expirationTimeout);
-        onSuccess(data);
+        onSuccess({
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+        });
       },
     );
   };

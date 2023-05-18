@@ -11,7 +11,6 @@ import {
   CollectedDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  IdDI,
   OnboardingConfig,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
@@ -92,7 +91,7 @@ describe('<CollectKybData />', () => {
       authToken: 'token',
       customData: {
         config: getOnboardingConfig(allAttributes, allAttributes),
-        kybRequirement: {
+        requirement: {
           kind: OnboardingRequirementKind.collectKybData,
           missingAttributes: kybAttributes,
         },
@@ -101,10 +100,8 @@ describe('<CollectKybData />', () => {
           missingAttributes: kycAttributes,
           populatedAttributes: [],
         },
-        kycBootstrapData: {
-          [IdDI.email]: 'piip@onefootprint.com',
-        },
         userFound: true,
+        email: 'piip@onefootprint.com',
       },
       device: {
         type: 'mobile',

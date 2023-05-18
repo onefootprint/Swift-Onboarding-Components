@@ -5,7 +5,6 @@ import {
   CollectKybDataRequirement,
   CollectKycDataRequirement,
   IdDocRequirement,
-  IdvBootstrapData,
   LivenessRequirement,
   OnboardingConfig,
 } from '@onefootprint/types';
@@ -28,7 +27,9 @@ export type MachineContext = {
     authToken: string;
     sandboxSuffix?: string; // only if in sandbox mode
     isTransfer?: boolean;
-    bootstrapData?: IdvBootstrapData;
+    // TODO: generalize this data using DataIdentifiers
+    email?: string;
+    phoneNumber?: string;
   };
   startedDataCollection: boolean;
   // TODO we might want a more generic list of requirements that have already been handled.

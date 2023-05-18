@@ -5,7 +5,7 @@ export type MachineContext = {
   obConfigAuth: ObConfigAuth;
   sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
-  bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
+  data: IdDIData; // TODO: generalize this more in the next iteration
   config?: OnboardingConfig;
   device?: DeviceInfo;
   userFound?: boolean;

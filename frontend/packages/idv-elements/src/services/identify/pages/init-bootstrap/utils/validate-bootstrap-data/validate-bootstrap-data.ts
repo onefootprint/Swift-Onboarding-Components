@@ -1,8 +1,9 @@
-import { IdentifyBootstrapData } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import IsEmail from 'isemail';
 
-const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
+import { BootstrapData } from '../../../../utils/state-machine/types';
+
+const validateBootstrapData = (bootstrapData?: BootstrapData) => {
   if (!bootstrapData) {
     return { email: undefined, phoneNumber: undefined };
   }

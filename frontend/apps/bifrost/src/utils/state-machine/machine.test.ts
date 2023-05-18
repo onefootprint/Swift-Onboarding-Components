@@ -1,7 +1,6 @@
 import {
+  BootstrapData,
   CollectedKycDataOption,
-  IdDI,
-  IdvBootstrapData,
   OnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
@@ -23,9 +22,9 @@ describe('Bifrost Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
   };
 
-  const testBootstrapData: IdvBootstrapData = {
-    [IdDI.email]: 'belce@onefootprint.com',
-    [IdDI.phoneNumber]: '+103433423423',
+  const testBootstrapData: BootstrapData = {
+    email: 'belce@onefootprint.com',
+    phoneNumber: '+103433423423',
   };
 
   const createMachine = () => {

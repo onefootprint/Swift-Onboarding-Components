@@ -25,7 +25,7 @@ const Root = () => {
       {state.matches('expired') && <Expired />}
       {state.matches('idv') && obConfigAuth && (
         <Idv
-          bootstrapData={{
+          data={{
             [IdDI.email]: email,
             [IdDI.phoneNumber]: phoneNumber,
           }}

@@ -22,8 +22,7 @@ type BasicDataProps = {
 
 const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data, kybRequirement } = state.context;
-  const { missingAttributes } = kybRequirement || {};
+  const { authToken, data, missingKybAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { allT, t } = useTranslation('pages.basic-data');
@@ -66,7 +65,7 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
     phoneNumber: data?.[BusinessDI.phoneNumber],
     website: data?.[BusinessDI.website],
   };
-  const optionalFields = missingAttributes
+  const optionalFields = missingKybAttributes
     .filter(
       attr =>
         attr === CollectedKybDataOption.phoneNumber ||

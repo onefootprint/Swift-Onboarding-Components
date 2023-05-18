@@ -4,11 +4,11 @@ import {
   Identify,
   Onboarding,
 } from '@onefootprint/idv-elements';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
 import Complete from '../complete';
-import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
 type RouterProps = {
   onDone?: (validationToken?: string) => void;
@@ -17,7 +17,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
   const {
-    bootstrapData,
+    data,
     sandboxSuffix,
     authToken,
     userFound,
@@ -29,7 +29,6 @@ const Router = ({ onDone }: RouterProps) => {
   } = state.context;
   useLogStateMachine('idv', state);
   const isDone = state.matches('complete');
-  const identifyBootstrapData = getIdentifyBootstrapData(bootstrapData);
 
   useEffect(() => {
     if (isDone) {
@@ -47,7 +46,11 @@ const Router = ({ onDone }: RouterProps) => {
       {state.matches('identify') && (
         <Identify
           obConfigAuth={obConfigAuth}
-          bootstrapData={identifyBootstrapData}
+          // TODO: generalize this in the next iteratin
+          bootstrapData={{
+            email: data?.[IdDI.email],
+            phoneNumber: data?.[IdDI.phoneNumber],
+          }}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
@@ -58,7 +61,8 @@ const Router = ({ onDone }: RouterProps) => {
           authToken={authToken}
           obConfigAuth={obConfigAuth}
           userFound={userFound}
-          bootstrapData={bootstrapData}
+          // TODO: generalize this more in the next iteration
+          data={data}
           sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
           onClose={onClose}

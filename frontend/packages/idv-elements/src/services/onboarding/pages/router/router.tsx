@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import { useOnboardingMachine } from '../../components/machine-provider';
@@ -22,7 +23,7 @@ const Router = ({ onDone }: RouterProps) => {
     device,
     config,
     authToken,
-    bootstrapData,
+    data,
     sandboxSuffix,
     isTransfer,
     validationToken,
@@ -48,7 +49,8 @@ const Router = ({ onDone }: RouterProps) => {
           device={device}
           config={config}
           authToken={authToken}
-          bootstrapData={bootstrapData}
+          email={data[IdDI.email]}
+          phoneNumber={data[IdDI.phoneNumber]}
           sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
           onDone={() => {

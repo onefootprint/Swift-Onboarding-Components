@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { IdvBootstrapData, OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
@@ -10,7 +10,8 @@ export type OnboardingRequirementsMachineArgs = {
   device: DeviceInfo;
   config: OnboardingConfig;
   authToken: string;
-  bootstrapData?: IdvBootstrapData;
+  email?: string;
+  phoneNumber?: string;
   sandboxSuffix?: string; // only if in sandbox mode
   isTransfer?: boolean;
 };
@@ -22,7 +23,8 @@ const createOnboardingRequirementsMachine = ({
   device,
   authToken,
   config,
-  bootstrapData,
+  email,
+  phoneNumber,
   sandboxSuffix,
   isTransfer,
 }: OnboardingRequirementsMachineArgs) =>
@@ -42,7 +44,8 @@ const createOnboardingRequirementsMachine = ({
           device,
           authToken,
           config,
-          bootstrapData,
+          email,
+          phoneNumber,
           sandboxSuffix,
           isTransfer,
         },

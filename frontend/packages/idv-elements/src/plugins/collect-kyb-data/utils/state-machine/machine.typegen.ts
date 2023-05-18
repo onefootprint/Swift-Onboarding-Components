@@ -16,6 +16,7 @@ export interface Typegen0 {
     assignBasicData: 'basicDataSubmitted';
     assignBeneficialOwners: 'beneficialOwnersSubmitted';
     assignBusinessAddress: 'businessAddressSubmitted';
+    assignInitialContext: 'receivedContext';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

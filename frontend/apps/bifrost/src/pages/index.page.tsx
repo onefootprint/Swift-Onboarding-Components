@@ -5,7 +5,7 @@ import {
   Layout,
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
-import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, IdDI } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -48,7 +48,10 @@ const Root = () => {
         {state.matches('idv') && (
           <Idv
             obConfigAuth={obConfigAuth}
-            bootstrapData={bootstrapData}
+            data={{
+              [IdDI.email]: bootstrapData?.email,
+              [IdDI.phoneNumber]: bootstrapData?.phoneNumber,
+            }}
             onComplete={validationToken => {
               if (validationToken) {
                 footprint.complete({

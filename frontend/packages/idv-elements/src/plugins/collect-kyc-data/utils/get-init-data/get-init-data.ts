@@ -1,16 +1,8 @@
-import {
-  CollectedKycDataOption,
-  CollectedKycDataOptionToRequiredAttributes,
-  IdDI,
-  IdDIData,
-  OnboardingConfig,
-} from '@onefootprint/types';
-import { pickBy } from 'lodash';
+import { IdDI, IdDIData } from '@onefootprint/types';
 
 import { KycData } from '../data-types';
 
 const getInitData = (
-  config: OnboardingConfig,
   bootstrapData?: IdDIData,
   disabledFields?: IdDI[],
 ): KycData => {
@@ -33,20 +25,7 @@ const getInitData = (
     });
   }
 
-  // Filter out fields that are not in the ob config
-  // For now we only support bootstrapping KYC fields
-  const allKycCdos = new Set(Object.values(CollectedKycDataOption));
-  const configKycCdos = config.mustCollectData.filter(cdo =>
-    allKycCdos.has(cdo as CollectedKycDataOption),
-  ) as CollectedKycDataOption[];
-  const configKycAttributes = configKycCdos.flatMap(
-    cdo => CollectedKycDataOptionToRequiredAttributes[cdo],
-  ) as IdDI[];
-  const filteredData = pickBy(data, (_, key) =>
-    configKycAttributes.includes(key as IdDI),
-  );
-
-  return filteredData;
+  return data;
 };
 
 export default getInitData;

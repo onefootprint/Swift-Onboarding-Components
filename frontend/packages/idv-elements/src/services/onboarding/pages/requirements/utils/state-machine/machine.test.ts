@@ -2,7 +2,6 @@ import {
   AuthorizeRequirement,
   CollectedKycDataOption,
   CollectKycDataRequirement,
-  IdDI,
   IdDocRequirement,
   IdDocType,
   LivenessRequirement,
@@ -62,9 +61,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           userFound: true,
           authToken: 'token',
           config: { ...TestOnboardingConfig },
-          bootstrapData: {
-            [IdDI.email]: 'piip@onefootprint.com',
-          },
+          email: 'piip@onefootprint.com',
           sandboxSuffix: 'sandboxTest',
         }),
       );
@@ -84,9 +81,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         userFound: true,
         authToken: 'token',
         config: { ...TestOnboardingConfig },
-        bootstrapData: {
-          [IdDI.email]: 'piip@onefootprint.com',
-        },
+        email: 'piip@onefootprint.com',
         sandboxSuffix: 'sandboxTest',
       });
 

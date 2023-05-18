@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import DeviceSignals from '../../../../../../components/device-signals';
@@ -14,7 +15,6 @@ import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-require
 import AdditionalInfoRequired from '../additional-info-required';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
-import getKycBootstrapData from './utils/get-kyc-bootstrap-data';
 
 type RouterProps = {
   onDone: () => void;
@@ -26,8 +26,9 @@ const Router = ({ onDone }: RouterProps) => {
     onboardingContext: {
       authToken,
       userFound,
+      email,
       sandboxSuffix,
-      bootstrapData,
+      phoneNumber,
       config,
       device,
     },
@@ -35,8 +36,8 @@ const Router = ({ onDone }: RouterProps) => {
     requirements: { kyb, kyc, liveness, idDoc },
   } = state.context;
   const isDone = state.matches('success');
+
   useLogStateMachine('onboarding-requirements', state);
-  const kycBootstrapData = getKycBootstrapData(bootstrapData);
 
   useEffect(() => {
     if (isDone) {
@@ -68,12 +69,13 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
-              kybRequirement: kyb,
+              requirement: kyb,
               kycRequirement: kyc,
-              kycBootstrapData,
-              userFound,
-              sandboxSuffix,
               config,
+              userFound,
+              email,
+              phoneNumber,
+              sandboxSuffix,
             },
           }}
           onDone={handleRequirementCompleted}
@@ -90,7 +92,9 @@ const Router = ({ onDone }: RouterProps) => {
             device,
             customData: {
               requirement: kyc,
-              bootstrapData: kycBootstrapData,
+              bootstrapData: {
+                [IdDI.email]: email,
+              },
               userFound,
               sandboxSuffix,
               config,

@@ -4,7 +4,6 @@ import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
   CollectedKybDataOption,
-  IdDI,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -28,18 +27,13 @@ const BeneficialOwners = ({
   onComplete,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const {
-    authToken,
-    data,
-    kybRequirement: { missingAttributes },
-    kycBootstrapData,
-    config,
-  } = state.context;
+  const { authToken, data, missingKybAttributes, email, phoneNumber, config } =
+    state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
   const toast = useToast();
   const { t, allT } = useTranslation('pages.beneficial-owners');
-  const requireMultiKyc = missingAttributes.includes(
+  const requireMultiKyc = missingKybAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
 
@@ -90,10 +84,8 @@ const BeneficialOwners = ({
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]:
-        kycBootstrapData?.[IdDI.email] ?? '',
-      [BeneficialOwnerDataAttribute.phoneNumber]:
-        kycBootstrapData?.[IdDI.phoneNumber] ?? '',
+      [BeneficialOwnerDataAttribute.email]: email ?? '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: phoneNumber ?? '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];

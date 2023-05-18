@@ -1,12 +1,13 @@
-import { IdDI, IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import { IdDI, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import { IdvData } from '../../../types';
 import { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
   authToken?: string;
   obConfigAuth: ObConfigAuth;
-  bootstrapData?: IdvBootstrapData;
+  data?: IdvData;
   isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
@@ -96,13 +97,13 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           userFound: event.payload.userFound,
         })),
         assignEmail: assign((context, event) => {
-          context.bootstrapData = context.bootstrapData || {};
-          context.bootstrapData[IdDI.email] = event.payload.email;
+          context.data = context.data || {};
+          context.data[IdDI.email] = event.payload.email;
           return context;
         }),
         assignPhoneNumber: assign((context, event) => {
-          context.bootstrapData = context.bootstrapData || {};
-          context.bootstrapData[IdDI.phoneNumber] = event.payload.phoneNumber;
+          context.data = context.data || {};
+          context.data[IdDI.phoneNumber] = event.payload.phoneNumber;
           return context;
         }),
         assignAuthToken: assign((context, event) => {

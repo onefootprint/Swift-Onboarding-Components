@@ -1,4 +1,4 @@
-import footprint, { identifyUser, UserData } from '@onefootprint/footprint-js';
+import footprint, { identifyUser } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/footprint-react';
 import {
   Button,
@@ -19,7 +19,6 @@ import validateUserData from './utils/validate-user-data';
 type FormData = {
   email?: string;
   phoneNumber?: string;
-  name?: string;
 };
 
 export const PHONE_REGEX = /^(\+)?([ 0-9]){10,16}$/;
@@ -43,50 +42,37 @@ const Form = ({ html, onSuccess }: FormProps) => {
     console.log('user canceled!');
   };
 
-  const getUserData = (): UserData => {
-    const userData: UserData = {
-      'id.email': getValues('email'),
-      'id.phone_number': getValues('phoneNumber'),
-    };
-
-    const names = getValues('name')?.split(' ') || [];
-    if (names.length >= 2) {
-      const lastName = names.pop();
-      const firstName = names.join(' ');
-      userData['id.first_name'] = firstName;
-      userData['id.last_name'] = lastName;
-    }
-
-    return userData;
-  };
-
   const showFootprint = () => {
     footprint.open({
-      userData: getUserData(),
+      userData: {
+        email: getValues('email'),
+        phoneNumber: getValues('phoneNumber'),
+      },
       publicKey,
       onCanceled: handleFootprintCanceled,
       onCompleted: handleFootprintCompleted,
     });
   };
 
-  const handleChange = async () => {
-    const userData = getUserData();
-    const email = userData['id.email'];
-    const phoneNumber = userData['id.phone_number'];
-    const isValidUserData = validateUserData(email, phoneNumber);
-    if (!isValidUserData) {
-      return;
-    }
+  const bootstrap = async (email?: string, phoneNumber?: string) => {
     try {
-      const foundUser = await identifyUser({
-        'id.email': email,
-        'id.phone_number': phoneNumber,
-      });
+      const foundUser = await identifyUser({ email, phoneNumber });
       if (foundUser) {
         showFootprint();
       }
     } catch (_) {
       // do nothing
+    }
+  };
+
+  const handleChange = () => {
+    const userData = {
+      email: getValues('email'),
+      phoneNumber: getValues('phoneNumber'),
+    };
+    const isValidUserData = validateUserData(userData);
+    if (isValidUserData) {
+      bootstrap(userData.email, userData.phoneNumber);
     }
   };
 
@@ -97,12 +83,6 @@ const Form = ({ html, onSuccess }: FormProps) => {
       <Content dangerouslySetInnerHTML={{ __html: html }} />
       <FormContainer>
         <InputsContainer>
-          <TextInput
-            label="Full Name"
-            placeholder="Jane Foe"
-            type="text"
-            {...register('name')}
-          />
           <TextInput
             label="Email address"
             placeholder="jane.doe@email.com"

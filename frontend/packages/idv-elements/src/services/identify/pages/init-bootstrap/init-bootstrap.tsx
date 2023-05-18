@@ -9,7 +9,11 @@ import validateBootstrapData from './utils/validate-bootstrap-data';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
-  const { bootstrapData, obConfigAuth } = state.context;
+  const {
+    bootstrapData,
+
+    obConfigAuth,
+  } = state.context;
   const identifyMutation = useIdentify();
   const idSuffix = useIdentifierSuffix();
 

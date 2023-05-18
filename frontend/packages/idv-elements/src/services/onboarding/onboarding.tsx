@@ -15,7 +15,7 @@ type OnboardingProps = Partial<OnboardingMachineArgs> & {
 const Onboarding = ({
   authToken,
   obConfigAuth,
-  bootstrapData,
+  data,
   sandboxSuffix,
   userFound,
   isTransfer,
@@ -32,7 +32,7 @@ const Onboarding = ({
           userFound={userFound}
           obConfigAuth={obConfigAuth}
           authToken={authToken}
-          bootstrapData={bootstrapData}
+          data={data}
           isTransfer={isTransfer}
           sandboxSuffix={sandboxSuffix}
         >

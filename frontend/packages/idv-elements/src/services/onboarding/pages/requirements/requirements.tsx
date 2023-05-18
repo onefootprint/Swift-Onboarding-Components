@@ -13,7 +13,8 @@ const Requirements = ({
   device,
   authToken,
   config,
-  bootstrapData,
+  email,
+  phoneNumber,
   sandboxSuffix,
   isTransfer,
   onDone,
@@ -28,7 +29,8 @@ const Requirements = ({
       device={device}
       authToken={authToken}
       config={config}
-      bootstrapData={bootstrapData}
+      email={email}
+      phoneNumber={phoneNumber}
       sandboxSuffix={sandboxSuffix}
       isTransfer={isTransfer}
     >

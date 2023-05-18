@@ -13,14 +13,14 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
   const {
-    kybRequirement: { missingAttributes },
+    missingKybAttributes,
     kycRequirement,
-    kycBootstrapData,
     data,
     authToken,
     device,
     config,
     userFound,
+    email,
     sandboxSuffix,
   } = state.context;
   if (!authToken || !device || !config || !kycRequirement) {
@@ -33,15 +33,16 @@ const BeneficialOwnerKyc = () => {
     });
   };
 
-  const requireMultiKyc = missingAttributes.includes(
+  const requireMultiKyc = missingKybAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
   const primaryBeneficialOwner = requireMultiKyc
     ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
     : data?.[BusinessDI.beneficialOwners]?.[0];
-  const bootstrapData: IdDIData = kycBootstrapData
-    ? { ...kycBootstrapData }
-    : {};
+  const bootstrapData: IdDIData = {};
+  if (email) {
+    bootstrapData[IdDI.email] = email;
+  }
   if (primaryBeneficialOwner) {
     bootstrapData[IdDI.firstName] =
       primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName];
