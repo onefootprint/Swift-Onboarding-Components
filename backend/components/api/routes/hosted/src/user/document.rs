@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
@@ -14,6 +16,7 @@ use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
+use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
@@ -24,18 +27,15 @@ use db::models::user_consent::UserConsent;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::{DbError, DbPool, DbResult, PgConn, TxnPgConn};
-use futures::TryFutureExt;
 use idv::footprint_http_client::FootprintVendorHttpClient;
+use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, IdentityDocumentId,
-    IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId, SealedVaultDataKey, TenantId,
-    VaultId,
+    DecisionIntentId, DocumentFace, DocumentKind, DocumentRequestId, DocumentRequestStatus,
+    IdentityDocumentId, IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId,
+    SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-const FRONT: &str = "front";
-const BACK: &str = "back";
-const SELFIE: &str = "selfie";
 const NUM_RETRIES: i64 = 3;
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -48,13 +48,14 @@ pub async fn post(
     request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let request = request.0;
 
-    let (uv, db_document_request, user_auth, user_consent) = state
+    let (uv, doc_request, user_auth, user_consent) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
-            let db_document_request = DbDocumentRequest::lock_active(conn, &user_auth.scoped_user.id)
-                .map_err(|e| {
+            let doc_request =
+                DbDocumentRequest::lock_active(conn, &user_auth.scoped_user.id).map_err(|e| {
                     if e.is_not_found() {
                         ApiError::from(OnboardingError::NoPendingDocumentRequestFound)
                     } else {
@@ -63,17 +64,17 @@ pub async fn post(
                 })?;
             // Move our request to Uploaded so any subsequent POSTs will fail
             let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
-            let db_document_request = db_document_request.into_inner().update(conn.conn(), update)?;
+            let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
             let uv = Vault::get(conn, user_auth.user_vault_id())?;
 
             let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding()?.id)?;
 
-            Ok((uv, db_document_request, user_auth, user_consent))
+            Ok((uv, doc_request, user_auth, user_consent))
         })
         .await?;
 
     if request.selfie_image.is_some() {
-        if !db_document_request.should_collect_selfie {
+        if !doc_request.should_collect_selfie {
             return Err(TenantError::ValidationError(
                 "Document request is not expecting selfie_image".to_owned(),
             )
@@ -93,105 +94,44 @@ pub async fn post(
 
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
 
-    // Encrypt the image using the UserVault
-    let sealed_front = IdentityDocument::seal_with_data_key(request.front_image.leak(), &data_key)?;
-
-    // ////////////////////
-    // Save to s3
-    // TODO: normalize this with the other DocumentData types so we have a single "upload mechanism" for all bifrost file uploads
-    // //////////////////
     let bucket = &state.config.document_s3_bucket.clone();
-    let mut s3_upload_futures = vec![];
-    // Front
-    let s3_path_front_result = state
-        .s3_client
-        .put_object(
-            bucket,
-            IdentityDocument::s3_path_for_document_image(
-                FRONT,
-                db_document_request.id.clone(),
-                uv.id.clone(),
-            ),
-            sealed_front.0,
-            None,
-        )
-        .into_future();
+    let su_id = user_auth.scoped_user.id.clone();
 
-    s3_upload_futures.push((FRONT, s3_path_front_result));
+    //
+    // Encrypt all images
+    //
+    let e_imgs = vec![
+        Some((DocumentFace::Front, request.front_image)),
+        request.back_image.map(|img| (DocumentFace::Back, img)),
+        request.selfie_image.map(|img| (DocumentFace::Selfie, img)),
+    ]
+    .into_iter()
+    .flatten()
+    .map(|(face, img)| -> ApiResult<_> {
+        let e_data = IdentityDocument::seal_with_data_key(img.leak(), &data_key)?;
+        Ok((face, e_data))
+    })
+    .collect::<ApiResult<Vec<_>>>()?;
 
-    if let Some(back_image) = &request.back_image {
-        let sealed_back = IdentityDocument::seal_with_data_key(back_image.leak(), &data_key)?;
+    //
+    // Upload all images to s3
+    //
+    let s3_upload_futs = e_imgs
+        .into_iter()
+        .map(|(face, e_data)| upload_image(&state, face, e_data, &doc_request.id, &uv.id, bucket))
+        .collect_vec();
 
-        let s3_path_back_result = state
-            .s3_client
-            .put_object(
-                bucket,
-                IdentityDocument::s3_path_for_document_image(
-                    BACK,
-                    db_document_request.id.clone(),
-                    uv.id.clone(),
-                ),
-                sealed_back.0,
-                None,
-            )
-            .into_future();
-
-        s3_upload_futures.push((BACK, s3_path_back_result));
-    }
-
-    if let Some(selfie_image) = &request.selfie_image {
-        let encrypted_selfie_image = IdentityDocument::seal_with_data_key(selfie_image.leak(), &data_key)?;
-
-        let s3_path_selfie_result = state
-            .s3_client
-            .put_object(
-                bucket,
-                IdentityDocument::s3_path_for_document_image(
-                    SELFIE,
-                    db_document_request.id.clone(),
-                    uv.id.clone(),
-                ),
-                encrypted_selfie_image.0,
-                None,
-            )
-            .into_future();
-
-        s3_upload_futures.push((SELFIE, s3_path_selfie_result));
-    }
-
-    let (doc_types, futures): (Vec<_>, Vec<_>) = s3_upload_futures.into_iter().unzip();
-    // This returned future will 1) return an error if any underlying futures error and 2)
-    // will preserve ordering of the original vec of futures
-    let results: Vec<String> = match futures::future::try_join_all(futures).await {
-        Ok(s) => Ok(s),
+    let mut s3_urls: HashMap<_, _> = match futures::future::try_join_all(s3_upload_futs).await {
+        Ok(s) => Ok(s.into_iter().collect()),
         Err(e) => {
-            handle_upload_error(
-                &state.db_pool,
-                db_document_request.id.clone(),
-                user_auth.scoped_user.id.clone(),
-            )
-            .await?;
-
+            handle_upload_error(&state.db_pool, doc_request.id.clone(), su_id).await?;
             Err(e)
         }
     }?;
 
-    let mut s3_path_front_image = None;
-    let mut s3_path_back_image = None;
-    let mut s3_path_selfie_image = None;
-    for (idx, dt) in doc_types.into_iter().enumerate() {
-        match dt {
-            FRONT => s3_path_front_image = Some(results[idx].to_owned()),
-            BACK => s3_path_back_image = Some(results[idx].to_owned()),
-            SELFIE => s3_path_selfie_image = Some(results[idx].to_owned()),
-            _ => {}
-        }
-    }
-
     // write a identity_document
-    let doc_request_id = db_document_request.id.clone();
+    let doc_request_id = doc_request.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let suid = user_auth.scoped_user.id.clone();
     let identity_document = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, ApiError> {
@@ -199,53 +139,18 @@ pub async fn post(
             // Create a document record on the VW for each image type
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
 
-            let front = if let Some(front_path) = s3_path_front_image.clone() {
-                Some(
-                    uvw.put_document(
-                        conn,
-                        DocumentKind::from_id_doc_kind(request.document_type),
-                        "image/png".to_string(),
-                        format!("{}_front.png", request.document_type),
-                        e_data_key.clone(),
-                        front_path,
-                    )?
-                    .lifetime_id,
-                )
-            } else {
-                None
-            };
-
-            let back = if let Some(back_path) = s3_path_back_image.clone() {
-                Some(
-                    uvw.put_document(
-                        conn,
-                        DocumentKind::from_id_doc_kind_back(request.document_type),
-                        "image/png".to_string(),
-                        format!("{}_back.png", request.document_type),
-                        e_data_key.clone(),
-                        back_path,
-                    )?
-                    .lifetime_id,
-                )
-            } else {
-                None
-            };
-
-            let selfie = if let Some(selfie) = s3_path_selfie_image.clone() {
-                Some(
-                    uvw.put_document(
-                        conn,
-                        DocumentKind::from_id_doc_kind_selfie(request.document_type),
-                        "image/png".to_string(),
-                        format!("{}.png", request.document_type),
-                        e_data_key.clone(),
-                        selfie,
-                    )?
-                    .lifetime_id,
-                )
-            } else {
-                None
-            };
+            // Add all Documents to the vault
+            let mut lifetime_ids: HashMap<_, _> = s3_urls
+                .iter()
+                .map(|(face, url)| -> ApiResult<_> {
+                    let kind = DocumentKind::from_id_doc_kind(request.document_type, *face);
+                    let name = format!("{}.png", kind);
+                    let mime_type = "image/png".to_string();
+                    let result =
+                        uvw.put_document(conn, kind, mime_type, name, e_data_key.clone(), url.clone())?;
+                    Ok((face, result.lifetime_id))
+                })
+                .collect::<ApiResult<_>>()?;
 
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request_id,
@@ -253,12 +158,12 @@ pub async fn post(
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
                 e_data_key: e_data_key.clone(),
-                front_lifetime_id: front,
-                back_lifetime_id: back,
-                selfie_lifetime_id: selfie,
-                front_image_s3_url: s3_path_front_image,
-                back_image_s3_url: s3_path_back_image,
-                selfie_image_s3_url: s3_path_selfie_image,
+                front_lifetime_id: lifetime_ids.remove(&DocumentFace::Front),
+                back_lifetime_id: lifetime_ids.remove(&DocumentFace::Back),
+                selfie_lifetime_id: lifetime_ids.remove(&DocumentFace::Selfie),
+                front_image_s3_url: s3_urls.remove(&DocumentFace::Front),
+                back_image_s3_url: s3_urls.remove(&DocumentFace::Back),
+                selfie_image_s3_url: s3_urls.remove(&DocumentFace::Selfie),
             };
             let id_doc = IdentityDocument::create(conn, args)?;
 
@@ -267,9 +172,10 @@ pub async fn post(
         .await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
+    let su_id = user_auth.scoped_user.id.clone();
     let uvw = state
         .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&suid)))
+        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&su_id)))
         .await??;
     // TODO: generate fixture data for identity documents
     let ff_client = &state.feature_flag_client;
@@ -279,6 +185,7 @@ pub async fn post(
             .is_none();
 
     // Run vendor requests
+    // TODO make this atomic with creating the ID
     if should_initiate_reqs {
         let su_id = user_auth.scoped_user.id.clone();
         let id_doc_id = identity_document.id.clone();
@@ -288,7 +195,7 @@ pub async fn post(
             .db_transaction(
                 move |conn| -> Result<(DecisionIntent, DbDocumentRequest), ApiError> {
                     // Protect against race conditions
-                    let doc_request = DbDocumentRequest::lock(conn, &su_id, &db_document_request.id)?;
+                    let doc_request = DbDocumentRequest::lock(conn, &su_id, &doc_request.id)?;
                     let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                     if doc_request.idv_reqs_initiated {
                         return Err(AssertionError("Document request already initiated").into());
@@ -329,7 +236,7 @@ pub async fn post(
                     status: Some(DocumentRequestStatus::Complete),
                     ..Default::default()
                 };
-                db_document_request.update(conn, update)?;
+                doc_request.update(conn, update)?;
 
                 let info = newtypes::IdentityDocumentUploadedInfo {
                     id: identity_document.id.clone(),
@@ -342,6 +249,21 @@ pub async fn post(
     }
 
     EmptyResponse::ok().json()
+}
+
+/// Uploads the provided image to s3.
+/// Only needed because rust doesn't yet support async closures
+async fn upload_image(
+    state: &State,
+    face: DocumentFace,
+    e_data: AeadSealedBytes,
+    req_id: &DocumentRequestId,
+    uv_id: &VaultId,
+    bucket: &str,
+) -> ApiResult<(DocumentFace, String)> {
+    let path = IdentityDocument::s3_path_for_document_image(face, req_id, uv_id);
+    let s3_url = state.s3_client.put_object(bucket, path, e_data.0, None).await?;
+    Ok((face, s3_url))
 }
 
 // This just can pull the latest for the scoped_user_id and lock

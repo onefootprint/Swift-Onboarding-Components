@@ -1,4 +1,7 @@
-use crate::{CollectedData, DataIdentifier, IdDocKind, IsDataIdentifierDiscriminant, Validate, ValidateArgs};
+use crate::{
+    CollectedData, DataIdentifier, DocumentFace, IdDocKind, IsDataIdentifierDiscriminant, Validate,
+    ValidateArgs,
+};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use mime::Mime;
 use paperclip::actix::Apiv2Schema;
@@ -116,26 +119,17 @@ impl DocumentKind {
         }
     }
 
-    pub fn from_id_doc_kind(kind: IdDocKind) -> Self {
-        match kind {
-            IdDocKind::IdCard => Self::IdCardFront,
-            IdDocKind::DriverLicense => Self::DriversLicenseFront,
-            IdDocKind::Passport => Self::Passport,
-        }
-    }
-
-    pub fn from_id_doc_kind_back(kind: IdDocKind) -> Self {
-        match kind {
-            IdDocKind::IdCard => Self::IdCardBack,
-            IdDocKind::DriverLicense => Self::DriversLicenseBack,
-            IdDocKind::Passport => Self::Passport,
-        }
-    }
-    pub fn from_id_doc_kind_selfie(kind: IdDocKind) -> Self {
-        match kind {
-            IdDocKind::IdCard => Self::IdCardSelfie,
-            IdDocKind::DriverLicense => Self::DriversLicenseSelfie,
-            IdDocKind::Passport => Self::PassportSelfie,
+    pub fn from_id_doc_kind(kind: IdDocKind, face: DocumentFace) -> Self {
+        match (kind, face) {
+            (IdDocKind::IdCard, DocumentFace::Front) => Self::IdCardFront,
+            (IdDocKind::IdCard, DocumentFace::Back) => Self::IdCardBack,
+            (IdDocKind::IdCard, DocumentFace::Selfie) => Self::IdCardSelfie,
+            (IdDocKind::DriverLicense, DocumentFace::Front) => Self::DriversLicenseFront,
+            (IdDocKind::DriverLicense, DocumentFace::Back) => Self::DriversLicenseBack,
+            (IdDocKind::DriverLicense, DocumentFace::Selfie) => Self::DriversLicenseSelfie,
+            (IdDocKind::Passport, DocumentFace::Front) => Self::Passport,
+            (IdDocKind::Passport, DocumentFace::Back) => Self::Passport,
+            (IdDocKind::Passport, DocumentFace::Selfie) => Self::PassportSelfie,
         }
     }
 }
