@@ -26,15 +26,14 @@ pub struct StartOnboarding {
 #[async_trait]
 impl IncodeStateTransition for StartOnboarding {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.scoped_vault_id.clone();
-        let di_id = ctx.decision_intent_id.clone();
-        let id_doc_id = ctx.identity_document_id.clone();
-        let incode_credentials = self.incode_credentials.clone();
+        let sv_id = ctx.sv_id.clone();
+        let di_id = ctx.di_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
         let config_id = self.configuration_id.clone();
 
         //
@@ -72,7 +71,7 @@ impl IncodeStateTransition for StartOnboarding {
             last_name: ctx.docv_data.last_name.clone(),
         };
         let request = IncodeStartOnboardingRequest {
-            credentials: incode_credentials.clone(),
+            credentials: self.incode_credentials.clone(),
             configuration_id: self.configuration_id.clone(),
             session_id: None,
             custom_name_fields: Some(custom_name_fields),
@@ -104,7 +103,7 @@ impl IncodeStateTransition for StartOnboarding {
         let session = VerificationSession {
             id: verification_session.id.clone(),
             credentials: IncodeCredentialsWithToken {
-                credentials: incode_credentials,
+                credentials: self.incode_credentials,
                 authentication_token: successful_response.token.clone(),
             },
         };
@@ -127,7 +126,7 @@ impl IncodeStateTransition for StartOnboarding {
                     IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
                 );
 
-                IncodeVerificationSession::update(conn, verification_session.id, update)?;
+                IncodeVerificationSession::update(conn, &verification_session.id, update)?;
 
                 Ok(next_state)
             })

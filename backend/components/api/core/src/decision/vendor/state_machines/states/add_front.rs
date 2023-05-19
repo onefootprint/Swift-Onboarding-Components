@@ -25,9 +25,9 @@ impl AddFront {
         let res = VerificationRequest::create_document_verification_request(
             conn,
             VendorAPI::IncodeAddFront,
-            ctx.scoped_vault_id.clone(),
-            ctx.identity_document_id.clone(),
-            &ctx.decision_intent_id,
+            ctx.sv_id.clone(),
+            ctx.id_doc_id.clone(),
+            &ctx.di_id,
         )?;
 
         Ok(AddFront {
@@ -40,18 +40,18 @@ impl AddFront {
 #[async_trait]
 impl IncodeStateTransition for AddFront {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.scoped_vault_id.clone();
-        let di_id = ctx.decision_intent_id.clone();
+        let sv_id = ctx.sv_id.clone();
+        let di_id = ctx.di_id.clone();
 
         //
         // make the request to incode
         //
-        let add_front_vreq_id = self.add_front_verification_request.id.clone();
+        let add_front_vreq_id = self.add_front_verification_request.id;
         let docv_data = DocVData {
             front_image: ctx.docv_data.front_image.clone(),
             country_code: ctx.docv_data.country_code.clone(),
@@ -83,20 +83,18 @@ impl IncodeStateTransition for AddFront {
         //
         // Set up the next state transition
         //
-        let verification_session_id = self.session.id.clone();
-        let id_doc_id = ctx.identity_document_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
         // Save the next stage's Vreq
         let ctx = ctx.clone();
-        let session = self.session.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 // If there's failure, we move to retry upload
                 let next_state = if let Some(reason) = failure_reason {
                     let update =
                         UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
-                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
-                    RetryUpload::enter(conn, &ctx, session)?.into()
+                    RetryUpload::enter(conn, &ctx, self.session)?.into()
                 } else {
                     let res = VerificationRequest::create_document_verification_request(
                         conn,
@@ -108,10 +106,10 @@ impl IncodeStateTransition for AddFront {
 
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
-                    IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
                     AddBack {
-                        session,
+                        session: self.session,
                         add_back_verification_request: res,
                     }
                     .into()

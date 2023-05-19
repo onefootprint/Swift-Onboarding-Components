@@ -24,7 +24,7 @@ pub struct FetchOCR {
 #[async_trait]
 impl IncodeStateTransition for FetchOCR {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
@@ -32,7 +32,7 @@ impl IncodeStateTransition for FetchOCR {
         //
         // make the request to incode
         //
-        let fetch_ocr_vreq_id = self.fetch_ocr_verification_request.id.clone();
+        let fetch_ocr_vreq_id = self.fetch_ocr_verification_request.id;
 
         let request = IncodeFetchOCRRequest {
             credentials: self.session.credentials.clone(),
@@ -55,8 +55,6 @@ impl IncodeStateTransition for FetchOCR {
             .map_err(map_to_api_err)?;
 
         let ctx = ctx.clone();
-        let session = self.session.clone();
-        let fetch_scores_response = self.fetch_scores_response.clone();
         let next_step = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let next_step = match fetch_ocr_response.document_kind() {
@@ -64,15 +62,15 @@ impl IncodeStateTransition for FetchOCR {
                         let update = UpdateIncodeVerificationSession::set_state(
                             IncodeVerificationSessionState::Complete,
                         );
-                        IncodeVerificationSession::update(conn, session.id, update)?;
+                        IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
                         Complete::enter(
                             conn,
                             &ctx.vault.id,
-                            &ctx.scoped_vault_id,
-                            &ctx.identity_document_id,
+                            &ctx.sv_id,
+                            &ctx.id_doc_id,
                             dk,
-                            fetch_scores_response,
+                            self.fetch_scores_response,
                             fetch_ocr_response,
                         )?
                         .into()
@@ -81,11 +79,11 @@ impl IncodeStateTransition for FetchOCR {
                         let update = UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(
                             IncodeVerificationFailureReason::UnknownDocumentType,
                         );
-                        IncodeVerificationSession::update(conn, session.id.clone(), update)?;
+                        IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
                         // TODO If the document uploaded isn't supported, retry.
                         // Should we include some context on the error here?
-                        RetryUpload::enter(conn, &ctx, session)?.into()
+                        RetryUpload::enter(conn, &ctx, self.session)?.into()
                     }
                 };
 

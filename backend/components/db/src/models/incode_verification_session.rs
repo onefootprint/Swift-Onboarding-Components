@@ -176,11 +176,11 @@ impl IncodeVerificationSession {
     #[tracing::instrument(skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
-        id: IncodeVerificationSessionId,
+        id: &IncodeVerificationSessionId,
         update: UpdateIncodeVerificationSession,
     ) -> DbResult<Self> {
         let res: IncodeVerificationSession = diesel::update(incode_verification_session::table)
-            .filter(incode_verification_session::id.eq(&id))
+            .filter(incode_verification_session::id.eq(id))
             .set(update)
             .get_result(conn.conn())?;
 

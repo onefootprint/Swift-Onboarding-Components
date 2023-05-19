@@ -319,9 +319,9 @@ async fn handle_incode_request(
 
     // Initialize our state machine
     let ctx = IncodeContext {
-        decision_intent_id,
-        scoped_vault_id: doc_request.scoped_vault_id.clone(),
-        identity_document_id,
+        di_id: decision_intent_id,
+        sv_id: doc_request.scoped_vault_id.clone(),
+        id_doc_id: identity_document_id,
         vault,
         docv_data,
         doc_request_id: doc_request.id,

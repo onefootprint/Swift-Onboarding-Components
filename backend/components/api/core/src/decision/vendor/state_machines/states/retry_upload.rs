@@ -38,9 +38,9 @@ impl RetryUpload {
     pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext, session: VerificationSession) -> ApiResult<Self> {
         // Create a timeline event
         let info = IdentityDocumentUploadedInfo {
-            id: ctx.identity_document_id.clone(),
+            id: ctx.id_doc_id.clone(),
         };
-        UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.scoped_vault_id.clone())?;
+        UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.sv_id.clone())?;
 
         // Move our status to failed since we need a new doc verification request
         let update = DocumentRequestUpdate::status(DocumentRequestStatus::Failed);
@@ -55,7 +55,7 @@ impl RetryUpload {
         if !document_retry_limit_exceeded(conn, &doc_request.scoped_vault_id)? {
             // Create a new document request.
             // ref_id is None here since we are retrying scan onboarding!
-            let sv_id = ctx.scoped_vault_id.clone();
+            let sv_id = ctx.sv_id.clone();
             let collect_selfie = doc_request.should_collect_selfie;
             DocumentRequest::create(conn, sv_id, None, collect_selfie, Some(doc_request.id))?;
         }
@@ -70,15 +70,15 @@ impl RetryUpload {
 #[async_trait]
 impl IncodeStateTransition for RetryUpload {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         _footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.scoped_vault_id.clone();
-        let di_id = ctx.decision_intent_id.clone();
+        let sv_id = ctx.sv_id.clone();
+        let di_id = ctx.di_id.clone();
         let session_id = self.session.id.clone();
-        let id_doc_id = ctx.identity_document_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
         //
         // Set up the next state transition
         //
@@ -99,14 +99,14 @@ impl IncodeStateTransition for RetryUpload {
                     id_doc_id,
                 );
 
-                IncodeVerificationSession::update(conn, session_id, update)?;
+                IncodeVerificationSession::update(conn, &session_id, update)?;
 
                 Ok(res)
             })
             .await?;
 
         Ok(AddFront {
-            session: self.session.to_owned(),
+            session: self.session,
             add_front_verification_request: add_front_vreq,
         }
         .into())

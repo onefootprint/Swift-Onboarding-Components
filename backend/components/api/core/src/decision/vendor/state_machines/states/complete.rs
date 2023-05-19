@@ -86,7 +86,7 @@ impl Complete {
 #[async_trait]
 impl IncodeStateTransition for Complete {
     async fn run(
-        &self,
+        self,
         _db_pool: &DbPool,
         _footprint_http_client: &FootprintVendorHttpClient,
         _ctx: &IncodeContext,

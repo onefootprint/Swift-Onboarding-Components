@@ -22,9 +22,9 @@ use super::states::*;
 /// Various context fields needed by ever stage of the state machine
 #[derive(Clone)]
 pub struct IncodeContext {
-    pub decision_intent_id: DecisionIntentId,
-    pub scoped_vault_id: ScopedVaultId,
-    pub identity_document_id: IdentityDocumentId,
+    pub di_id: DecisionIntentId,
+    pub sv_id: ScopedVaultId,
+    pub id_doc_id: IdentityDocumentId,
     pub vault: Vault,
     pub docv_data: DocVData,
     pub doc_request_id: DocumentRequestId,
@@ -35,7 +35,7 @@ pub struct IncodeContext {
 #[enum_dispatch]
 pub trait IncodeStateTransition {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
@@ -116,7 +116,7 @@ impl IncodeStateMachine {
             TenantVendorControl::new(tenant_id, db_pool, enclave_client, config).await?;
 
         // Load our existing state
-        let sv_id = ctx.scoped_vault_id.clone();
+        let sv_id = ctx.sv_id.clone();
         let existing_verification_session = db_pool
             .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
             .await??;
@@ -321,9 +321,9 @@ mod tests {
         // Run the incode verification machine
         //
         let ctx = IncodeContext {
-            decision_intent_id: di.id.clone(),
-            scoped_vault_id: su.id,
-            identity_document_id: id_doc.id,
+            di_id: di.id.clone(),
+            sv_id: su.id,
+            id_doc_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
             doc_request_id: id_doc.request_id,
@@ -472,9 +472,9 @@ mod tests {
         // Run the incode verification machine, first with a blurry image
         //
         let ctx = IncodeContext {
-            decision_intent_id: di.id.clone(),
-            scoped_vault_id: su.id.clone(),
-            identity_document_id: id_doc.id,
+            di_id: di.id.clone(),
+            sv_id: su.id.clone(),
+            id_doc_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
             doc_request_id: id_doc.request_id,
@@ -549,9 +549,9 @@ mod tests {
         // Run the incode verification machine
         //
         let ctx = IncodeContext {
-            decision_intent_id: di.id.clone(),
-            scoped_vault_id: su.id,
-            identity_document_id: id_doc.id,
+            di_id: di.id.clone(),
+            sv_id: su.id,
+            id_doc_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
             doc_request_id: id_doc.request_id,

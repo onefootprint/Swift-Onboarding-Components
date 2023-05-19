@@ -22,18 +22,18 @@ pub struct ProcessId {
 #[async_trait]
 impl IncodeStateTransition for ProcessId {
     async fn run(
-        &self,
+        self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.scoped_vault_id.clone();
-        let di_id = ctx.decision_intent_id.clone();
+        let sv_id = ctx.sv_id.clone();
+        let di_id = ctx.di_id.clone();
 
         //
         // make the request to incode
         //
-        let process_id_vreq_id = self.process_id_verification_request.id.clone();
+        let process_id_vreq_id = self.process_id_verification_request.id;
 
         let request = IncodeProcessIdRequest {
             credentials: self.session.credentials.clone(),
@@ -57,7 +57,7 @@ impl IncodeStateTransition for ProcessId {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
-        let verification_session_id = self.session.id.clone();
+        let session_id = self.session.id.clone();
         let process_id_vreq = db_pool
             .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
                 let res = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeFetchScores)?;
@@ -65,14 +65,14 @@ impl IncodeStateTransition for ProcessId {
                 let update =
                     UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::FetchScores);
 
-                IncodeVerificationSession::update(conn, verification_session_id, update)?;
+                IncodeVerificationSession::update(conn, &session_id, update)?;
 
                 Ok(res)
             })
             .await?;
 
         Ok(FetchScores {
-            session: self.session.clone(),
+            session: self.session,
             fetch_scores_verification_request: process_id_vreq,
         }
         .into())
