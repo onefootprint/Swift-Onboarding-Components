@@ -1,6 +1,23 @@
 /**
  * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
  */
+export { default as CcAlipay24 } from './cc-alipay-colored-24';
+export { default as CcAmex24 } from './cc-amex-colored-24';
+export { default as CcCode24 } from './cc-code-colored-24';
+export { default as CcCodeFront24 } from './cc-code-front-colored-24';
+export { default as CcDiners24 } from './cc-diners-colored-24';
+export { default as CcDiscover24 } from './cc-discover-colored-24';
+export { default as CcElo24 } from './cc-elo-colored-24';
+export { default as CcGeneric24 } from './cc-generic-colored-24';
+export { default as CcHiper24 } from './cc-hiper-colored-24';
+export { default as CcHipercard24 } from './cc-hipercard-colored-24';
+export { default as CcJcb24 } from './cc-jcb-colored-24';
+export { default as CcMaestro24 } from './cc-maestro-colored-24';
+export { default as CcMastercard24 } from './cc-mastercard-colored-24';
+export { default as CcMir24 } from './cc-mir-colored-24';
+export { default as CcPaypal24 } from './cc-paypal-colored-24';
+export { default as CcUnionpay24 } from './cc-unionpay-colored-24';
+export { default as CcVisa24 } from './cc-visa-colored-24';
 export { default as IcoActivity16 } from './ico-activity-16';
 export { default as IcoActivity24 } from './ico-activity-24';
 export { default as IcoAndroid16 } from './ico-android-colored-16';

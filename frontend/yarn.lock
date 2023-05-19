@@ -4990,6 +4990,11 @@
   resolved "https://registry.npmjs.org/@types/cookie/-/cookie-0.4.1.tgz"
   integrity sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==
 
+"@types/creditcardutils@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/creditcardutils/-/creditcardutils-1.0.0.tgz#e1544d8c336fab1405fec487283060e7efaa2860"
+  integrity sha512-UdXzeNWx4NDcKDlqi3TpbNKug87MPa0a/KcR3F32S4e0XWl/KRSroRnVwhKWPDTf6Sro4GoWP5NpYtNpNEY5xg==
+
 "@types/debug@^4.0.0", "@types/debug@^4.1.7":
   version "4.1.7"
   resolved "https://registry.npmjs.org/@types/debug/-/debug-4.1.7.tgz"
@@ -7957,6 +7962,11 @@ create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@^1.1.7:
     ripemd160 "^2.0.0"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+creditcardutils@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/creditcardutils/-/creditcardutils-1.0.0.tgz#c94ad8e6f5ef249b0463e0e5ea8d7a7c4e9ce425"
+  integrity sha512-5p2ldq1YH7loTXwuV6ZGiDejnSQfqOxGVGAffqrFoQcc+FP46eLeG8nEzQkgew18hxcW60ju2SrGmSPRiiCNdw==
 
 cross-fetch@^3.0.4:
   version "3.1.5"
