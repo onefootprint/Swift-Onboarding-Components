@@ -23,6 +23,7 @@ use super::document_request::DocumentRequest;
 pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
+    /// This is the stated document type, selected by the user, not necessarily the true document type
     pub document_type: IdDocKind,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
@@ -44,9 +45,6 @@ pub struct NewIdentityDocumentArgs {
     pub document_type: IdDocKind,
     pub country_code: String,
     pub e_data_key: SealedVaultDataKey,
-    pub front_lifetime_id: Option<DataLifetimeId>,
-    pub back_lifetime_id: Option<DataLifetimeId>,
-    pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub front_image_s3_url: Option<S3Url>,
     pub back_image_s3_url: Option<S3Url>,
     pub selfie_image_s3_url: Option<S3Url>,
@@ -60,12 +58,17 @@ struct NewIdentityDocumentRow {
     country_code: String,
     created_at: DateTime<Utc>,
     e_data_key: SealedVaultDataKey,
-    front_lifetime_id: Option<DataLifetimeId>,
-    back_lifetime_id: Option<DataLifetimeId>,
-    selfie_lifetime_id: Option<DataLifetimeId>,
     front_image_s3_url: Option<S3Url>,
     back_image_s3_url: Option<S3Url>,
     selfie_image_s3_url: Option<S3Url>,
+}
+
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = identity_document)]
+pub struct IdentityDocumentUpdate {
+    pub front_lifetime_id: Option<DataLifetimeId>,
+    pub back_lifetime_id: Option<DataLifetimeId>,
+    pub selfie_lifetime_id: Option<DataLifetimeId>,
 }
 
 impl IdentityDocument {
@@ -77,9 +80,6 @@ impl IdentityDocument {
             document_type,
             country_code,
             e_data_key,
-            front_lifetime_id,
-            back_lifetime_id,
-            selfie_lifetime_id,
             front_image_s3_url,
             back_image_s3_url,
             selfie_image_s3_url,
@@ -90,9 +90,6 @@ impl IdentityDocument {
             country_code,
             created_at: Utc::now(),
             e_data_key,
-            front_lifetime_id,
-            back_lifetime_id,
-            selfie_lifetime_id,
             front_image_s3_url,
             back_image_s3_url,
             selfie_image_s3_url,
@@ -101,6 +98,17 @@ impl IdentityDocument {
             .values(new)
             .get_result::<IdentityDocument>(conn.conn())?;
         Ok(result)
+    }
+
+    /// Get the identity document, and the associated document request
+    #[tracing::instrument(skip_all)]
+    pub fn update(conn: &mut PgConn, id: &IdentityDocumentId, update: IdentityDocumentUpdate) -> DbResult<Self> {
+        let res = diesel::update(identity_document::table)
+            .filter(identity_document::id.eq(id))
+            .set(update)
+            .get_result(conn)?;
+
+        Ok(res)
     }
 
     /// Get the identity document, and the associated document request

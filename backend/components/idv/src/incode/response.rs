@@ -4,7 +4,7 @@ use crate::incode::error::Error as IncodeError;
 use chrono::{NaiveDate, NaiveDateTime};
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    IncodeVerificationFailureReason, PiiString,
+    IdDocKind, IncodeVerificationFailureReason, PiiString,
 };
 
 use super::APIResponseToIncodeError;
@@ -122,7 +122,7 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 
 /// Response from fetch scores
 // TODO!
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
     pub id_validation: Option<IdValidation>,
@@ -183,6 +183,11 @@ impl FetchScoresResponse {
             })
             .collect()
     }
+
+    #[allow(non_snake_case)]
+    pub fn TEST_ONLY_FIXTURE() -> Self {
+        Self { ..Default::default() }
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -228,7 +233,7 @@ impl APIResponseToIncodeError for AddConsentResponse {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchOCRResponse {
     pub name: Option<OCRName>,
@@ -300,6 +305,24 @@ impl FetchOCRResponse {
         )?;
 
         Ok(naive.date())
+    }
+
+    pub fn document_kind(&self) -> Result<IdDocKind, IncodeError> {
+        let Some(type_of_id) = self.type_of_id.as_ref() else {
+            return Err(IncodeError::OcrError("Missing type_of_id".into()));
+        };
+        let result = match type_of_id.as_str() {
+            "Passport" => IdDocKind::Passport,
+            "DriversLicense" => IdDocKind::DriverLicense,
+            "IdentificationCard" => IdDocKind::IdCard,
+            t => return Err(IncodeError::OcrError(format!("Unsupported document type: {}", t))),
+        };
+        Ok(result)
+    }
+
+    #[allow(non_snake_case)]
+    pub fn TEST_ONLY_FIXTURE() -> Self {
+        Self { ..Default::default() }
     }
 }
 

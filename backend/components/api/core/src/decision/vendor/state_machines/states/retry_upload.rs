@@ -12,6 +12,7 @@ use newtypes::{IncodeVerificationSessionState, VendorAPI};
 /// Document upload has failed and user needs to retry
 pub struct RetryUpload {
     pub session: VerificationSession,
+    // TODO include information on why the upload failed
 }
 
 #[async_trait]

@@ -14,6 +14,7 @@ use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc
 use api_core::decision::vendor::state_machines::incode_state_machine::{
     IncodeContext, IncodeState, IncodeStateMachine,
 };
+use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
 use api_wire_types::document_request::DocumentRequest;
@@ -32,9 +33,9 @@ use db::{DbError, DbPool, DbResult, PgConn, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, DocumentSide,
-    IdentityDocumentId, IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId,
-    SealedVaultDataKey, TenantId, VaultId,
+    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, DocumentSide, IdentityDocumentId,
+    IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId, SealedVaultDataKey, TenantId,
+    VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -142,34 +143,18 @@ pub async fn post(
     let doc_request_id = doc_request.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
+    let vault_id = uvw.vault.id.clone();
     let created_reqs = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // temporary: for compatibility with the new document kinds
             // Create a document record on the VW for each image type
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
-
-            // Add all Documents to the vault
-            let mut lifetime_ids: HashMap<_, _> = s3_urls
-                .iter()
-                .map(|(face, url)| -> ApiResult<_> {
-                    let kind = DocumentKind::from_id_doc_kind(request.document_type, *face);
-                    let name = format!("{}.png", kind);
-                    let mime_type = "image/png".to_string();
-                    let r = uvw.put_document(conn, kind, mime_type, name, e_data_key.clone(), url.clone())?;
-                    Ok((face, r.lifetime_id))
-                })
-                .collect::<ApiResult<_>>()?;
 
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request_id,
-                // TODO: should be from vendor response
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
                 e_data_key: e_data_key.clone(),
-                front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
-                back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
-                selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
                 front_image_s3_url: s3_urls.remove(&DocumentSide::Front),
                 back_image_s3_url: s3_urls.remove(&DocumentSide::Back),
                 selfie_image_s3_url: s3_urls.remove(&DocumentSide::Selfie),
@@ -193,11 +178,16 @@ pub async fn post(
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 // Create fixture data
+                let scores = idv::incode::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
+                let ocr = idv::incode::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
+                let doc_type = request.document_type;
+                Complete::enter(conn, &su_id, &id_doc.id, doc_type, scores, ocr)?;
+
                 let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
                 doc_request.update(conn, update)?;
 
                 let info = newtypes::IdentityDocumentUploadedInfo { id: id_doc.id };
-                UserTimeline::create(conn, info, uvw.vault.id.clone(), su_id)?;
+                UserTimeline::create(conn, info, vault_id, su_id)?;
                 None
             };
 
@@ -360,6 +350,8 @@ async fn handle_incode_request(
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 
     // Incode has told us we need have a recoverable error, the error has been stashed on IncodeVerificationSession table
+    // TODO this needs to be atomic with the state machine transition otherwise we could forget
+    // to actually handle the result
     let needs_retry = matches!(result.state, IncodeState::RetryUpload(_));
 
     db_pool
@@ -423,12 +415,8 @@ fn handle_incode_success(
     ctx: IncodeContext,
     document_request: DbDocumentRequest,
 ) -> DbResult<()> {
-    let completed_update = DocumentRequestUpdate {
-        status: Some(DocumentRequestStatus::Complete),
-        ..Default::default()
-    };
-
-    document_request.update(conn.conn(), completed_update)?;
+    let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
+    document_request.update(conn, update)?;
 
     // Create a timeline event
     let info = newtypes::IdentityDocumentUploadedInfo {

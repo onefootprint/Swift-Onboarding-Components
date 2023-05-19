@@ -25,30 +25,15 @@ pub use complete::*;
 mod retry_upload;
 pub use retry_upload::*;
 
-
-
-
-use db::models::verification_result::VerificationResult;
-use db::{DbPool};
-
-
-
-use idv::incode::{
-    APIResponseToIncodeError, IncodeResponse,
-};
-use newtypes::vendor_credentials::{IncodeCredentialsWithToken};
-use newtypes::{
-    IncodeVerificationSessionId,
-    ScrubbedJsonValue, VaultPublicKey, VerificationRequestId,
-};
-
+use super::incode_state_machine::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-
 use crate::errors::ApiResult;
 use crate::ApiError;
-
-use super::incode_state_machine::{IncodeState, IncodeStateTransition};
-
+use db::models::verification_result::VerificationResult;
+use db::DbPool;
+use idv::incode::{APIResponseToIncodeError, IncodeResponse};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use newtypes::{IncodeVerificationSessionId, ScrubbedJsonValue, VaultPublicKey, VerificationRequestId};
 
 #[derive(Clone)]
 pub struct VerificationSession {
