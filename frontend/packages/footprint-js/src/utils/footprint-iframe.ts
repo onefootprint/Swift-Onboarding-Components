@@ -3,7 +3,7 @@ import Postmate from 'postmate';
 import {
   FootprintInternalEvent,
   FootprintPublicEvent,
-  UserData,
+  FootprintUserData,
 } from '../footprint-js.types';
 import {
   createContainer,
@@ -16,7 +16,7 @@ import {
 class FootprintIframe {
   private child: Postmate.ParentAPI | null = null;
 
-  private bootstrap(userData?: UserData) {
+  private bootstrap(userData?: FootprintUserData) {
     if (userData) {
       this.child?.call(FootprintInternalEvent.bootstrapDataReceived, userData);
     }
@@ -28,7 +28,7 @@ class FootprintIframe {
     this.child?.frame.classList.add('footprint-modal-loaded');
   };
 
-  async open(url: string, userData?: UserData) {
+  async open(url: string, userData?: FootprintUserData) {
     const container = createContainer();
     showOverlay(container);
     this.child = await new Postmate({

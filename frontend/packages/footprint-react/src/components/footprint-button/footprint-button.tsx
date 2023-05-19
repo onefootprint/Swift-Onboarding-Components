@@ -1,6 +1,6 @@
 import footprint, {
   FootprintAppearance,
-  UserData,
+  FootprintUserData,
 } from '@onefootprint/footprint-js';
 import React from 'react';
 
@@ -12,7 +12,7 @@ export type FootprintButtonProps = {
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
   testID?: string;
-  userData?: UserData;
+  userData?: FootprintUserData;
 };
 
 const FootprintButton = ({

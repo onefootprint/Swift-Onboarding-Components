@@ -1,4 +1,7 @@
-import type { IdentifyRequest, UserData } from '../../footprint-js.types';
+import type {
+  FootprintUserData,
+  IdentifyRequest,
+} from '../../footprint-js.types';
 
 const identifyUserRequest = async (payload: IdentifyRequest) => {
   const response = await fetch(`${process.env.API_BASE_URL}/hosted/identify`, {
@@ -12,7 +15,7 @@ const identifyUserRequest = async (payload: IdentifyRequest) => {
   return data.user_found;
 };
 
-const identifyUser = async (userData?: UserData) => {
+const identifyUser = async (userData?: FootprintUserData) => {
   if (!userData) {
     throw new Error('User data must be passed in order to identify an user');
   }

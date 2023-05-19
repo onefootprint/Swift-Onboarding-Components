@@ -149,7 +149,7 @@ export type OpenFootprint = {
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
-  userData?: UserData;
+  userData?: FootprintUserData;
 };
 
 export type Footprint = {
@@ -168,7 +168,7 @@ export enum FootprintInternalEvent {
   started = 'started',
 }
 
-export const USER_DATA_KEYS = [
+export const FOOTPRINT_USER_DATA_KEYS = [
   'id.email',
   'id.phone_number',
   'id.first_name',
@@ -184,7 +184,7 @@ export const USER_DATA_KEYS = [
   'id.ssn4',
 ];
 
-export type UserData = Partial<{
+export type FootprintUserData = Partial<{
   'id.email': string;
   'id.phone_number': string;
   'id.first_name': string;

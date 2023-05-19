@@ -1,4 +1,7 @@
-import footprint, { identifyUser, UserData } from '@onefootprint/footprint-js';
+import footprint, {
+  FootprintUserData,
+  identifyUser,
+} from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/footprint-react';
 import {
   Button,
@@ -43,8 +46,8 @@ const Form = ({ html, onSuccess }: FormProps) => {
     console.log('user canceled!');
   };
 
-  const getUserData = (): UserData => {
-    const userData: UserData = {
+  const getUserData = (): FootprintUserData => {
+    const userData: FootprintUserData = {
       'id.email': getValues('email'),
       'id.phone_number': getValues('phoneNumber'),
     };

@@ -11,8 +11,8 @@ export type {
   FootprintAppearanceTheme,
   FootprintAppearanceVariables,
   FootprintShowParams,
+  FootprintUserData,
   OpenFootprint,
-  UserData,
 } from './footprint-js.types';
 export {
   FootprintInternalEvent,
