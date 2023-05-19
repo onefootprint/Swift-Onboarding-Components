@@ -46,9 +46,9 @@ const StateField = ({ countryCode }: StateFieldProps) => {
       data-private
       autoComplete="address-level1"
       hasError={!!errors.state}
-      hint={errors.state && t('form.state.error')}
-      label={t('form.state.label')}
-      placeholder={t('form.state.placeholder')}
+      hint={errors.state && t('error')}
+      label={t('label')}
+      placeholder={t('placeholder')}
       {...register('state')}
     />
   );
