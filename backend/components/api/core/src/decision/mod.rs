@@ -1,4 +1,4 @@
-use newtypes::Vendor;
+use newtypes::{Vendor, VendorAPI};
 
 use self::rule::RuleSetName;
 
@@ -9,6 +9,7 @@ pub mod field_validations;
 pub mod onboarding;
 pub mod risk;
 pub mod rule;
+pub mod sandbox;
 #[allow(unused)]
 pub mod state;
 #[cfg(test)]
@@ -22,6 +23,8 @@ pub enum Error {
     MissingDataForRuleSet(RuleSetName),
     #[error("TenantVendorControl error {0}")]
     TenantVendorControlError(#[from] TenantVendorControlError),
+    #[error("Fixture data not found for: {0}")]
+    FixtureDataNotFound(VendorAPI),
 }
 
 #[derive(thiserror::Error, Debug)]

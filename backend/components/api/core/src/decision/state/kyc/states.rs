@@ -131,6 +131,14 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        let fixture_decision = decision::utils::get_fixture_data_decision(
+            state,
+            &state.feature_flag_client,
+            &self.sv_id,
+            &self.t_id,
+        )
+        .await?;
+
         let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
             &self.ob_id,
             &self.sv_id,
@@ -139,27 +147,33 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         )
         .await?;
 
-        let tvc = TenantVendorControl::new(
-            self.t_id.clone(),
-            &state.db_pool,
-            &state.enclave_client,
-            &state.config,
-        )
-        .await?;
-        let vendor_results = decision::engine::make_vendor_requests(
-            &state.db_pool,
-            &self.ob_id,
-            &state.enclave_client,
-            state.config.service_config.is_production(),
-            vendor_requests.outstanding_requests,
-            &state.feature_flag_client,
-            &state.footprint_vendor_http_client,
-            &state.socure_production_client,
-            &state.twilio_client.client,
-            &state.footprint_vendor_http_client,
-            tvc,
-        )
-        .await?;
+        // If we are Sandbox/Demo, we do not make real vendor calls and instead just artificially produce some canned vendor responses
+        let vendor_results = if let (Some(fixture_decision)) = fixture_decision {
+            decision::sandbox::get_fixture_vendor_results(vendor_requests.outstanding_requests)?
+        } else {
+            let tvc = TenantVendorControl::new(
+                self.t_id.clone(),
+                &state.db_pool,
+                &state.enclave_client,
+                &state.config,
+            )
+            .await?;
+            // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
+            decision::engine::make_vendor_requests(
+                &state.db_pool,
+                &self.ob_id,
+                &state.enclave_client,
+                state.config.service_config.is_production(),
+                vendor_requests.outstanding_requests,
+                &state.feature_flag_client,
+                &state.footprint_vendor_http_client,
+                &state.socure_production_client,
+                &state.twilio_client.client,
+                &state.footprint_vendor_http_client,
+                tvc,
+            )
+            .await?
+        };
 
         let has_critical_error = !vendor_results.critical_errors.is_empty();
         let error_message = format!("{:?}", vendor_results.all_errors());
