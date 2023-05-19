@@ -13,21 +13,37 @@ meta:
 
 ## Introduction
 
-Depending on your onboarding configuration, Footprint might request customer's phone number and email. In some circustances,
-you might have this data already available, so Footprint doesn't need to request this data once more. To pass user data to Footprint's flow,
-use the `userData` option:
+If you already have certain data about your user, you can share it with Footprint to expedite the onboarding process for your users. 
+We will pre-fill already available data and skip completed pages for your users. The users can always edit and correct this data 
+while onboarding through Footprint. To pass user data to Footprint's flow, use the `userData` option:
 
 ```typescript
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
-const userData = { email: 'jane.doe@acme.com', phoneNumber: '+12025550179' };
+const userData = { 
+  'id.email': 'jane.doe@acme.com', 
+  'id.phone_number': '+12025550179', 
+  'id.first_name': 'Jane', 
+  'id.last_name': 'Doe' 
+};
 footprint.open({ publicKey, userData });
 ```
 
 ### Available user data
 
-| Variable      | Description                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `email`       | Optional. User email (e.g `jane.doe@acme.com`)                                                                           |
-| `phoneNumber` | Optional. User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`) |
+| Variable           | Description                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `id.email`         | Optional. User email (e.g `jane.doe@acme.com`)                                                                                |
+| `id.phone_number`  | Optional. User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`)      |
+| `id.first_name`    | Optional. User's first name.                                                                                                  |
+| `id.last_name`     | Optional. User's last name.                                                                                                   |
+| `id.dob`           | Optional. User's date of birth. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                               |
+| `id.ssn9`          | Optional. User's 9-digit SSN number. (e.g. 123456789)                                                                         |
+| `id.ssn4`          | Optional. The last 4 digits of user's SSN. (e.g. 1234)                                                                        |
+| `id.address_line1` | Optional. The first line of user's residential address.                                                                       |
+| `id.address_line2` | Optional. The first line of user's residential address.                                                                       |
+| `id.city`          | Optional. User's residential city.                                                                                            |
+| `id.state`         | Optional. User's residential state. Must be in 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format. (e.g. CA) |
+| `id.country`       | Optional. User's residential country. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)         |
+| `id.zip`           | Optional. User's residential zip.                                                                                             |
