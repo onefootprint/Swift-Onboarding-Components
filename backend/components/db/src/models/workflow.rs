@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 
 use super::workflow_event::WorkflowEvent;
 use crate::{schema::workflow, DbResult, PgConn, TxnPgConn};
+use newtypes::KycConfig;
+use newtypes::KycState;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow)]
@@ -31,26 +33,25 @@ pub struct NewWorkflow {
 
 impl Workflow {
     #[tracing::instrument(skip_all)]
-    pub fn create(
-        conn: &mut PgConn,
-        scoped_vault_id: ScopedVaultId,
-        kind: WorkflowKind,
-        state: WorkflowState,
-        config: WorkflowConfig,
-    ) -> DbResult<Self> {
-        let new_workflow = NewWorkflow {
-            created_at: Utc::now(),
-            scoped_vault_id,
-            kind,
-            state,
-            config,
-        };
-
+    pub fn create(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
         let res = diesel::insert_into(workflow::table)
             .values(new_workflow)
             .get_result(conn)?;
 
         Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn create_redo_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+        let new_workflow = NewWorkflow {
+            created_at: Utc::now(),
+            scoped_vault_id: scoped_vault_id.clone(),
+            kind: WorkflowKind::Kyc,
+            state: WorkflowState::Kyc(KycState::DataCollection),
+            config: WorkflowConfig::Kyc(KycConfig { is_redo: true }),
+        };
+
+        Self::create(conn, new_workflow)
     }
 
     #[tracing::instrument(skip_all)]
@@ -122,10 +123,13 @@ mod tests {
         let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
         let wf = Workflow::create(
             conn,
-            ScopedVaultId::from_str("sv_123").unwrap(),
-            (&wf_state).into(),
-            wf_state,
-            config,
+            NewWorkflow {
+                created_at: Utc::now(),
+                scoped_vault_id: ScopedVaultId::from_str("sv_123").unwrap(),
+                kind: (&wf_state).into(),
+                state: wf_state,
+                config,
+            },
         )
         .unwrap();
         assert!(wf.kind == WorkflowKind::Kyc);
@@ -139,10 +143,13 @@ mod tests {
         let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
         let wf = Workflow::create(
             conn,
-            ScopedVaultId::from_str("sv_123").unwrap(),
-            (&s).into(),
-            s,
-            config,
+            NewWorkflow {
+                created_at: Utc::now(),
+                scoped_vault_id: ScopedVaultId::from_str("sv_123").unwrap(),
+                kind: (&s).into(),
+                state: s,
+                config,
+            },
         )
         .unwrap();
 

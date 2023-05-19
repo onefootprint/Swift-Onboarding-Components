@@ -1,4 +1,4 @@
-use newtypes::{ScopedVaultId, VaultId};
+use newtypes::{ScopedVaultId, VaultId, WorkflowId};
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -34,6 +34,9 @@ pub enum UserAuthScope {
     /// This scope should never be issued to a token - it is used to gate certain actions that
     /// should never be done by a user
     Never,
+    Workflow {
+        wf_id: WorkflowId,
+    },
 }
 
 /// A helper trait to extract a user vault id on combined types

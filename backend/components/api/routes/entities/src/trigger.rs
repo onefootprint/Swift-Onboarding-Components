@@ -19,6 +19,7 @@ use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
+use db::models::workflow::Workflow;
 use newtypes::FpId;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -58,8 +59,12 @@ pub async fn post(
                     if !vault.is_portable {
                         return Err(TenantError::CannotTriggerKycForNonPortable.into());
                     }
-                    // TODO create a new workflow here and attach it to the auth token
-                    let scopes = vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboarding { id: sv.id }];
+                    let wf = Workflow::create_redo_kyc(conn, &sv.id)?;
+                    let scopes = vec![
+                        UserAuthScope::SignUp,
+                        UserAuthScope::OrgOnboarding { id: sv.id },
+                        UserAuthScope::Workflow { wf_id: wf.id },
+                    ];
                     let duration = Duration::days(1);
                     (scopes, duration)
 

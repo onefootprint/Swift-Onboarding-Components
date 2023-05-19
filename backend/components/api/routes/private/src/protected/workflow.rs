@@ -2,7 +2,8 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use db::models::workflow::Workflow;
+use chrono::Utc;
+use db::models::workflow::{NewWorkflow, Workflow};
 use db::DbError;
 use newtypes::{ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use paperclip::actix::Apiv2Schema;
@@ -38,7 +39,16 @@ async fn create_workflow(
     let wf = state
         .db_pool
         .db_query(move |conn| -> Result<Workflow, DbError> {
-            Workflow::create(conn, sv_id, wf_kind, wf_state, wf_config)
+            Workflow::create(
+                conn,
+                NewWorkflow {
+                    created_at: Utc::now(),
+                    scoped_vault_id: sv_id,
+                    kind: wf_kind,
+                    state: wf_state,
+                    config: wf_config,
+                },
+            )
         })
         .await??;
 

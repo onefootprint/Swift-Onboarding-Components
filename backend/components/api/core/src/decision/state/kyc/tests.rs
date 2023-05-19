@@ -4,9 +4,11 @@ use crate::decision::state::WorkflowWrapper;
 use crate::decision::tests::test_helpers;
 use crate::utils::mock_enclave::StateWithMockEnclave;
 use crate::{decision::state::kyc, State};
+use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
+use db::models::workflow::NewWorkflow;
 use db::models::workflow::Workflow;
 use db::models::workflow_event::WorkflowEvent;
 use db::tests::test_db_pool::TestDbPool;
@@ -25,10 +27,13 @@ async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
         .db_query(|conn| {
             Workflow::create(
                 conn,
-                sv.id,
-                (&s).into(),
-                s,
-                WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+                NewWorkflow {
+                    created_at: Utc::now(),
+                    scoped_vault_id: sv.id,
+                    kind: (&s).into(),
+                    state: s,
+                    config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+                },
             )
             .unwrap()
         })

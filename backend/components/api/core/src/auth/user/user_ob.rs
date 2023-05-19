@@ -6,6 +6,7 @@ use db::{
         scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
+        workflow::Workflow,
     },
     PgConn,
 };
@@ -34,6 +35,7 @@ pub struct UserObSession {
     onboarding: Option<Onboarding>,
     ob_config: Option<ObConfiguration>,
     tenant: Option<Tenant>,
+    workflow: Option<Workflow>,
 }
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -91,12 +93,19 @@ impl ExtractableAuthSession for ParsedUserObSession {
             (None, None)
         };
 
+        let workflow = if let Some(wf_id) = user_session.workflow_id() {
+            Some(Workflow::get(conn, &wf_id)?)
+        } else {
+            None
+        };
+
         let onboarding_session = UserObSession {
             user_session,
             scoped_user,
             onboarding,
             ob_config,
             tenant,
+            workflow,
         };
         Ok(ParsedUserObSession(onboarding_session))
     }
@@ -169,6 +178,11 @@ impl UserObSession {
     pub fn tenant(&self) -> ApiResult<&Tenant> {
         let tenant = self.tenant.as_ref().ok_or(OnboardingError::NoOnboarding)?;
         Ok(tenant)
+    }
+
+    pub fn workflow(&self) -> ApiResult<&Workflow> {
+        let wf = self.workflow.as_ref().ok_or(OnboardingError::NoWorkflow)?;
+        Ok(wf)
     }
 
     pub fn user(&self) -> &Vault {

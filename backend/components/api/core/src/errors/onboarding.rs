@@ -12,6 +12,8 @@ pub enum OnboardingError {
     InvalidSandboxState,
     #[error("Onboarding does not exist")]
     NoOnboarding,
+    #[error("Workflow does not exist")]
+    NoWorkflow,
     #[error("IDV reqs have already been initiated")]
     IdvReqsAlreadyInitiated,
     #[error("Onboarding does not need a decision")]

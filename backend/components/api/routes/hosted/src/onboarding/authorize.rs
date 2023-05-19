@@ -28,10 +28,8 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
-use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
-use newtypes::WorkflowKind;
 use paperclip::actix::{self, api_v2_operation, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
@@ -49,10 +47,17 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     span.record("tenant_id", &format!("{:?}", user_auth.tenant()?.id.as_str()));
     span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
     span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
-    span.record("scoped_use_id", &format!("{}", user_auth.scoped_user.id));
+    span.record("scoped_user_id", &format!("{}", user_auth.scoped_user.id));
     span.record(
         "ob_configuration_id",
         &format!("{}", user_auth.onboarding()?.ob_configuration_id),
+    );
+    span.record(
+        "workflow_id",
+        &format!(
+            "{}",
+            user_auth.workflow().map(|wf| wf.id.clone()).unwrap_or_default()
+        ),
     );
 
     // Verify there are no unmet requirements
@@ -70,15 +75,8 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
 
     let ob_id = user_auth.onboarding()?.id.clone();
 
-    // For now, for testing purposes we will check if a Workflow exists and if so short circuit to use the workflow state machine.
-    // a Workflow would only exist if manually created (ie in PG to test this out).
-    let svid = user_auth.onboarding()?.scoped_vault_id.clone();
-    let wf = state
-        .db_pool
-        .db_query(move |conn| Workflow::latest_by_kind(conn, &svid, WorkflowKind::Kyc))
-        .await;
-    if let Ok(Ok(Some(wf))) = wf {
-        let ww = WorkflowWrapper::init(&state, wf).await?;
+    if let Ok(wf) = user_auth.workflow() {
+        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
         let ww = ww
             .run(&state, WorkflowActions::from(kyc::Actions::from(kyc::Authorize)))
             .await?;

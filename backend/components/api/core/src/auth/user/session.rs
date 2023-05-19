@@ -1,6 +1,6 @@
 use db::{models::vault::Vault, PgConn};
 use itertools::Itertools;
-use newtypes::{ScopedVaultId, VaultId, VaultKind};
+use newtypes::{ScopedVaultId, VaultId, VaultKind, WorkflowId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthGuard, UserAuthScope};
@@ -69,6 +69,16 @@ impl UserSessionContext {
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::OrgOnboarding { id } => Some(id.clone()),
+                _ => None,
+            })
+            .next()
+    }
+
+    pub fn workflow_id(&self) -> Option<WorkflowId> {
+        self.scopes
+            .iter()
+            .filter_map(|x| match x {
+                UserAuthScope::Workflow { wf_id } => Some(wf_id.clone()),
                 _ => None,
             })
             .next()
