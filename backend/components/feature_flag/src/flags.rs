@@ -34,6 +34,8 @@ pub enum BoolFlag<'a> {
     CanCleanUpTenant(&'a TenantId),
     #[strum(to_string = "CreateOnboardingWorkflows")]
     CreateOnboardingWorkflows(&'a ObConfigurationKey),
+    #[strum(to_string = "IsAlpacaTenant")]
+    IsAlpacaTenant(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -58,6 +60,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanCleanUpPhoneNumber(k) => Some(k.leak_to_string()),
             Self::CanCleanUpTenant(k) => Some(k.to_string()),
             Self::CreateOnboardingWorkflows(k) => Some(k.to_string()),
+            Self::IsAlpacaTenant(k) => Some(k.to_string()),
         }
     }
 
@@ -78,6 +81,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanCleanUpPhoneNumber(_) => false,
             Self::CanCleanUpTenant(_) => false,
             Self::CreateOnboardingWorkflows(_) => false,
+            Self::IsAlpacaTenant(_) => false,
         }
     }
 }

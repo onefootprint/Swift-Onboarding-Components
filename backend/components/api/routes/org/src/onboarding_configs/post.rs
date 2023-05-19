@@ -12,7 +12,10 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
+use newtypes::CipKind;
 use newtypes::CollectedData as CD;
 use newtypes::CollectedDataOption as CDO;
 use paperclip::actix::Apiv2Schema;
@@ -124,6 +127,9 @@ pub async fn post(
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
+    let is_alpaca_tenant = state
+        .feature_flag_client
+        .flag(BoolFlag::IsAlpacaTenant(&tenant_id));
     let obc = state
         .db_pool
         .db_query(move |conn| {
@@ -134,7 +140,7 @@ pub async fn post(
                 must_collect_data,
                 can_access_data,
                 is_live,
-                None,
+                is_alpaca_tenant.then_some(CipKind::Alpaca),
             )
         })
         .await??;
