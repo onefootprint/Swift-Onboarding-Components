@@ -54,8 +54,7 @@ impl IncodeStateTransition for FetchOCR {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        let sv_id = ctx.scoped_vault_id.clone();
-        let id_doc_id = ctx.identity_document_id.clone();
+        let ctx = ctx.clone();
         let session = self.session.clone();
         let fetch_scores_response = self.fetch_scores_response.clone();
         let next_step = db_pool
@@ -69,8 +68,9 @@ impl IncodeStateTransition for FetchOCR {
 
                         Complete::enter(
                             conn,
-                            &sv_id,
-                            &id_doc_id,
+                            &ctx.vault.id,
+                            &ctx.scoped_vault_id,
+                            &ctx.identity_document_id,
                             dk,
                             fetch_scores_response,
                             fetch_ocr_response,
@@ -85,7 +85,7 @@ impl IncodeStateTransition for FetchOCR {
 
                         // TODO If the document uploaded isn't supported, retry.
                         // Should we include some context on the error here?
-                        RetryUpload { session }.into()
+                        RetryUpload::enter(conn, &ctx, session)?.into()
                     }
                 };
 

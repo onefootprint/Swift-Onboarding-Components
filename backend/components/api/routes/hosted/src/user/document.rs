@@ -11,9 +11,8 @@ use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::config::Config;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use api_core::decision::vendor::state_machines::incode_state_machine::{
-    IncodeContext, IncodeState, IncodeStateMachine,
-};
+use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IncodeStateMachine};
+use api_core::decision::vendor::state_machines::states::document_retry_limit_exceeded;
 use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
@@ -27,9 +26,8 @@ use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
-use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
-use db::{DbError, DbPool, DbResult, PgConn, TxnPgConn};
+use db::{DbError, DbPool, DbResult, PgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use itertools::Itertools;
 use newtypes::{
@@ -39,7 +37,6 @@ use newtypes::{
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-const NUM_RETRIES: i64 = 3;
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 /// TODO: rename to /hosted/user/identity_document or find a way to merge in with new generic doc upload endpoint
@@ -181,13 +178,7 @@ pub async fn post(
                 let scores = idv::incode::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
                 let ocr = idv::incode::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
                 let doc_type = request.document_type;
-                Complete::enter(conn, &su_id, &id_doc.id, doc_type, scores, ocr)?;
-
-                let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
-                doc_request.update(conn, update)?;
-
-                let info = newtypes::IdentityDocumentUploadedInfo { id: id_doc.id };
-                UserTimeline::create(conn, info, vault_id, su_id)?;
+                Complete::enter(conn, &vault_id, &su_id, &id_doc.id, doc_type, scores, ocr)?;
                 None
             };
 
@@ -266,7 +257,8 @@ pub fn construct_get_response(
     let (current_request, previous_request, _) =
         DbDocumentRequest::get_latest_with_previous_request_and_result(conn, scoped_user_id)?;
 
-    let retry_limit_exceeded = retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
+    let retry_limit_exceeded =
+        document_retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
 
     let should_return_errors = matches!(
         current_request.status,
@@ -320,7 +312,7 @@ async fn handle_incode_request(
     tenant_id: TenantId,
     decision_intent_id: DecisionIntentId,
     vault: Vault,
-    document_request: DbDocumentRequest,
+    doc_request: DbDocumentRequest,
 ) -> Result<(), ApiError> {
     let docv_data =
         build_docv_data_from_identity_doc(db_pool, enclave_client, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
@@ -328,10 +320,11 @@ async fn handle_incode_request(
     // Initialize our state machine
     let ctx = IncodeContext {
         decision_intent_id,
-        scoped_vault_id: document_request.scoped_vault_id.clone(),
+        scoped_vault_id: doc_request.scoped_vault_id.clone(),
         identity_document_id,
         vault,
         docv_data,
+        doc_request_id: doc_request.id,
     };
     let machine = IncodeStateMachine::init(
         tenant_id,
@@ -344,85 +337,10 @@ async fn handle_incode_request(
     )
     .await?; // TODO: handle this with better requirement checking
 
-    let result = machine
+    machine
         .run(db_pool, footprint_http_client)
         .await
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
-
-    // Incode has told us we need have a recoverable error, the error has been stashed on IncodeVerificationSession table
-    // TODO this needs to be atomic with the state machine transition otherwise we could forget
-    // to actually handle the result
-    let needs_retry = matches!(result.state, IncodeState::RetryUpload(_));
-
-    db_pool
-        .db_transaction(move |conn| -> Result<(), ApiError> {
-            if needs_retry {
-                handle_incode_error(conn, result.ctx, document_request)?
-            } else {
-                handle_incode_success(conn, result.ctx, document_request)?
-            }
-
-            Ok(())
-        })
-        .await?;
-
-    Ok(())
-}
-
-fn handle_incode_error(
-    conn: &mut TxnPgConn,
-    ctx: IncodeContext,
-    doc_request: DbDocumentRequest,
-) -> DbResult<()> {
-    // Move our status to failed since we need a new doc verification request
-    let failed_update = DocumentRequestUpdate {
-        status: Some(DocumentRequestStatus::Failed),
-        ..Default::default()
-    };
-    // Create a timeline event
-    let info = newtypes::IdentityDocumentUploadedInfo {
-        id: ctx.identity_document_id,
-    };
-    UserTimeline::create(conn, info, ctx.vault.id, ctx.scoped_vault_id.clone())?;
-
-    let current_doc_request = doc_request.update(conn.conn(), failed_update)?;
-    let current_doc_request_id = current_doc_request.id.clone();
-    let should_collect_selfie = current_doc_request.should_collect_selfie;
-    // If we have exceeded our retry limit, we no longer want to create new document requests and
-    // we're done. GETting the status at this point will return `RetryLimitExceed` to the frontend
-    //
-    // Note (2023-01-19):
-    //   There's a the question of how to represent this in the document request status, if at all.
-    //   Since "failing due to retries" is a part of the overall bifrost "Doc collection" step, and not an individual doc request itself.
-    //   I think in order to maintain a serialized log of why an entire set of document requests failed, we'd need a new data model and this just seemed simpler for now to encode in runtime logic
-    if !retry_limit_exceeded(conn.conn(), &current_doc_request.scoped_vault_id)? {
-        // Create a new document request.
-        // ref_id is None here since we are retrying scan onboarding!
-        DbDocumentRequest::create(
-            conn,
-            ctx.scoped_vault_id,
-            None,
-            should_collect_selfie,
-            Some(current_doc_request_id),
-        )?;
-    }
-
-    Ok(())
-}
-
-fn handle_incode_success(
-    conn: &mut TxnPgConn,
-    ctx: IncodeContext,
-    document_request: DbDocumentRequest,
-) -> DbResult<()> {
-    let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
-    document_request.update(conn, update)?;
-
-    // Create a timeline event
-    let info = newtypes::IdentityDocumentUploadedInfo {
-        id: ctx.identity_document_id,
-    };
-    UserTimeline::create(conn, info, ctx.vault.id, ctx.scoped_vault_id)?;
 
     Ok(())
 }
@@ -453,15 +371,4 @@ async fn handle_upload_error(
             Ok(())
         })
         .await
-}
-
-// We only allow users to have NUM_RETRIES tries. We'll handle Failed vs. UpploadFailed differently when creating a decision
-fn retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedVaultId) -> Result<bool, DbError> {
-    let num_failed = DbDocumentRequest::count_statuses(
-        conn,
-        scoped_user_id,
-        vec![DocumentRequestStatus::Failed, DocumentRequestStatus::UploadFailed],
-    )?;
-
-    Ok(num_failed >= NUM_RETRIES)
 }

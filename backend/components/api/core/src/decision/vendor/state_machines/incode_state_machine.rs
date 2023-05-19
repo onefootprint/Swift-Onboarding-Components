@@ -7,8 +7,8 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DecisionIntentId, DocVData, IdentityDocumentId, IncodeConfigurationId, IncodeVerificationSessionState,
-    ScopedVaultId, TenantId,
+    DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
+    IncodeVerificationSessionState, ScopedVaultId, TenantId,
 };
 
 use crate::config::Config;
@@ -27,6 +27,7 @@ pub struct IncodeContext {
     pub identity_document_id: IdentityDocumentId,
     pub vault: Vault,
     pub docv_data: DocVData,
+    pub doc_request_id: DocumentRequestId,
 }
 
 /// This trait represents a running a state transition for an Incode Verification session
@@ -135,7 +136,7 @@ impl IncodeStateMachine {
                             authentication_token: token,
                         },
                     };
-                    RetryUpload { session }.into()
+                    RetryUpload::init(session).into()
                 }
                 _ => return Err(ApiError::AssertionError("wrong state".into())),
             }
@@ -325,6 +326,7 @@ mod tests {
             identity_document_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
+            doc_request_id: id_doc.request_id,
         };
         let machine = IncodeStateMachine::init(
             tenant.id,
@@ -475,6 +477,7 @@ mod tests {
             identity_document_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
+            doc_request_id: id_doc.request_id,
         };
         let machine = IncodeStateMachine::init(
             tenant.id.clone(),
@@ -496,7 +499,7 @@ mod tests {
         let after_running_with_blurry_state = machine.run(&db_pool, &vendor_client).await.unwrap().state;
 
         let session_id = match after_running_with_blurry_state {
-            IncodeState::RetryUpload(r) => r.session.id,
+            IncodeState::RetryUpload(r) => r.session().id.clone(),
             _ => panic!("state machine finished in wrong state!"),
         };
 
@@ -551,6 +554,7 @@ mod tests {
             identity_document_id: id_doc.id,
             vault: uv.clone(),
             docv_data,
+            doc_request_id: id_doc.request_id,
         };
         let machine = IncodeStateMachine::init(
             tenant.id,

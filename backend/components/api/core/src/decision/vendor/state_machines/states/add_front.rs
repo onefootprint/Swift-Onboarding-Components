@@ -86,16 +86,17 @@ impl IncodeStateTransition for AddFront {
         let verification_session_id = self.session.id.clone();
         let id_doc_id = ctx.identity_document_id.clone();
         // Save the next stage's Vreq
-        let add_back_vreq = db_pool
-            .db_transaction(move |conn| -> ApiResult<Option<VerificationRequest>> {
+        let ctx = ctx.clone();
+        let session = self.session.clone();
+        let next_state = db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
                 // If there's failure, we move to retry upload
-                let vreq = if let Some(reason) = failure_reason {
+                let next_state = if let Some(reason) = failure_reason {
                     let update =
                         UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
-
                     IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
-                    None
+                    RetryUpload::enter(conn, &ctx, session)?.into()
                 } else {
                     let res = VerificationRequest::create_document_verification_request(
                         conn,
@@ -107,27 +108,19 @@ impl IncodeStateTransition for AddFront {
 
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
-
                     IncodeVerificationSession::update(conn, verification_session_id, update)?;
 
-                    Some(res)
+                    AddBack {
+                        session,
+                        add_back_verification_request: res,
+                    }
+                    .into()
                 };
 
-                Ok(vreq)
+                Ok(next_state)
             })
             .await?;
 
-        if let Some(vreq) = add_back_vreq {
-            Ok(AddBack {
-                session: self.session.clone(),
-                add_back_verification_request: vreq,
-            }
-            .into())
-        } else {
-            Ok(RetryUpload {
-                session: self.session.clone(),
-            }
-            .into())
-        }
+        Ok(next_state)
     }
 }

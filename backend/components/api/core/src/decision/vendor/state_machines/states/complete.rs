@@ -6,18 +6,22 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
 use async_trait::async_trait;
+use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
+use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::response::FetchOCRResponse;
 use idv::incode::response::FetchScoresResponse;
 use newtypes::DocumentKind;
+use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
 use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 
 pub struct Complete {
     pub fetch_scores_response: FetchScoresResponse,
@@ -28,16 +32,28 @@ impl Complete {
     /// Must call this before instantiating Complete
     pub fn enter(
         conn: &mut TxnPgConn,
+        vault_id: &VaultId,
         sv_id: &ScopedVaultId,
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
         fetch_scores_response: FetchScoresResponse,
         fetch_ocr_response: FetchOCRResponse,
     ) -> ApiResult<Self> {
+        let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
+        let (id_doc, doc_req) = IdentityDocument::get(conn, id_doc_id)?;
+
+        // Mark the document request as complete
+        let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
+        doc_req.update(conn, update)?;
+
+        // Create a timeline event
+        let info = newtypes::IdentityDocumentUploadedInfo {
+            id: id_doc_id.clone(),
+        };
+        UserTimeline::create(conn, info, vault_id.clone(), sv_id.clone())?;
+
         // Now that we have the correct type of the document, add the images to the vault
         // under the correct type
-        let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-        let id_doc = IdentityDocument::get(conn, id_doc_id)?.0;
         let e_data_key = id_doc.e_data_key.clone();
         let mut lifetime_ids: HashMap<_, _> = id_doc
             .images()
