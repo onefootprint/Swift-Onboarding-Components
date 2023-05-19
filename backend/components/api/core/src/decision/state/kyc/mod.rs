@@ -29,6 +29,8 @@ pub struct VendorCalls {
 pub struct Decisioning {
     is_redo: bool,
     ob_id: OnboardingId,
+    sv_id: ScopedVaultId,
+    t_id: TenantId,
     vendor_results: Vec<VendorResult>,
 }
 

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use db::{
     models::{
         decision_intent::DecisionIntent,
@@ -13,13 +11,11 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionIntentId, DecisionStatus, FootprintReasonCode, IdentityDocumentId, OnboardingId,
-    PhoneNumber, ScopedVaultId, SignalSeverity, TenantId, Vendor, VendorAPI,
+    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, PhoneNumber, ScopedVaultId,
+    TenantId, VendorAPI,
 };
-use rand::seq::SliceRandom;
-use strum::IntoEnumIterator;
 
-use super::vendor;
+use super::{sandbox, vendor};
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
@@ -27,8 +23,8 @@ use crate::{
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
-type CreateManualReview = bool;
-type FixtureDecision = (DecisionStatus, CreateManualReview);
+pub type CreateManualReview = bool;
+pub type FixtureDecision = (DecisionStatus, CreateManualReview);
 
 #[tracing::instrument(skip_all)]
 /// Determines whether production IDV requests should be made.
@@ -200,80 +196,12 @@ pub async fn setup_test_fixtures(
                     OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
                 )?;
             }
-            let reason_code_map = build_reason_code_map();
-            // Create some mock risk signals that are somewhat consistent with the mock decision
-            let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
-                // Straight out rejection
-                (DecisionStatus::Fail, false) => {
-                    choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3)
-                }
-                // Manual review
-                (DecisionStatus::Fail, true) => {
-                    choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
-                }
-                // Approved
-                (DecisionStatus::Pass, _) => {
-                    choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4)
-                }
-            };
-            let signals = reason_codes
-                .into_iter()
-                .map(|r| (r, vec![Vendor::Idology]))
-                .collect();
+
+            let signals = sandbox::get_fixture_reason_codes(fixture_decision);
             RiskSignal::bulk_create(conn, decision.id, signals)?;
             Ok(())
         })
         .await?;
 
     Ok(())
-}
-
-fn choose_random_reason_codes(
-    reason_code_map: HashMap<SignalSeverity, Vec<FootprintReasonCode>>,
-    severity: SignalSeverity,
-    n: usize,
-) -> Vec<FootprintReasonCode> {
-    reason_code_map
-        .get(&severity)
-        .map(|frcs| {
-            frcs.choose_multiple(&mut rand::thread_rng(), n)
-                .cloned()
-                .collect()
-        })
-        .unwrap_or(vec![])
-}
-
-fn build_reason_code_map() -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
-    FootprintReasonCode::iter()
-        .filter_map(|rs| {
-            if rs.scopes().iter().all(|s| s.is_for_person()) {
-                Some((rs.severity(), rs))
-            } else {
-                None
-            }
-        })
-        .fold(HashMap::new(), |mut acc, (severity, frc)| {
-            acc.entry(severity).or_insert(Vec::new()).push(frc);
-            acc
-        })
-}
-
-#[cfg(test)]
-mod tests {
-    use newtypes::SignalSeverity;
-    use test_case::test_case;
-
-    use super::{build_reason_code_map, choose_random_reason_codes};
-
-    #[test_case(1, SignalSeverity::High => 1)]
-    #[test_case(3, SignalSeverity::Info => 3)]
-    #[test_case(2, SignalSeverity::Medium => 2)]
-    fn test_choose_random_reason_codes(n: usize, severity: SignalSeverity) -> usize {
-        let rc = build_reason_code_map();
-        let result = choose_random_reason_codes(rc, severity.clone(), n);
-
-        assert!(result.iter().all(|r| r.severity() == severity));
-
-        result.len()
-    }
 }

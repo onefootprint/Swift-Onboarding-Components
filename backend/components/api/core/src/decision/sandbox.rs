@@ -1,10 +1,15 @@
-use db::models::verification_request::VerificationRequest;
-use idv::{ParsedResponse, VendorResponse};
-use newtypes::VendorAPI;
+use std::collections::HashMap;
 
 use crate::errors::ApiResult;
+use db::models::verification_request::VerificationRequest;
+use idv::{ParsedResponse, VendorResponse};
+use newtypes::{DecisionStatus, FootprintReasonCode, SignalSeverity, Vendor, VendorAPI};
+use rand::seq::SliceRandom;
+use strum::IntoEnumIterator;
 
-use super::{engine::VendorResults, Error};
+use super::{
+    engine::VendorResults, onboarding::OnboardingRulesDecisionOutput, utils::FixtureDecision, Error,
+};
 
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
 // But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function of rules not just the individual vendor responses
@@ -56,4 +61,89 @@ pub fn get_fixture_vendor_results(vreqs: Vec<VerificationRequest>) -> ApiResult<
         non_critical_errors: vec![],
         critical_errors: vec![],
     })
+}
+
+pub fn get_fixture_reason_codes(
+    fixture_decision: FixtureDecision,
+) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+    let reason_code_map = build_reason_code_map();
+    let (decision_status, create_manual_review) = fixture_decision;
+    // Create some mock risk signals that are somewhat consistent with the mock decision
+    let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
+        // Straight out rejection
+        (DecisionStatus::Fail, false) => choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3),
+        // Manual review
+        (DecisionStatus::Fail, true) => {
+            choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
+        }
+        // Approved
+        (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
+    };
+    reason_codes
+        .into_iter()
+        .map(|r| (r, vec![Vendor::Idology]))
+        .collect()
+}
+
+fn choose_random_reason_codes(
+    reason_code_map: HashMap<SignalSeverity, Vec<FootprintReasonCode>>,
+    severity: SignalSeverity,
+    n: usize,
+) -> Vec<FootprintReasonCode> {
+    reason_code_map
+        .get(&severity)
+        .map(|frcs| {
+            frcs.choose_multiple(&mut rand::thread_rng(), n)
+                .cloned()
+                .collect()
+        })
+        .unwrap_or(vec![])
+}
+
+fn build_reason_code_map() -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
+    FootprintReasonCode::iter()
+        .filter_map(|rs| {
+            if rs.scopes().iter().all(|s| s.is_for_person()) {
+                Some((rs.severity(), rs))
+            } else {
+                None
+            }
+        })
+        .fold(HashMap::new(), |mut acc, (severity, frc)| {
+            acc.entry(severity).or_insert(Vec::new()).push(frc);
+            acc
+        })
+}
+
+impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
+    fn from(value: FixtureDecision) -> Self {
+        let (decision_status, create_manual_review) = value;
+        OnboardingRulesDecisionOutput {
+            decision_status,
+            should_commit: decision_status == DecisionStatus::Pass,
+            create_manual_review,
+            rules_triggered: vec![],
+            rules_not_triggered: vec![],
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use newtypes::SignalSeverity;
+    use test_case::test_case;
+
+    use super::{build_reason_code_map, choose_random_reason_codes};
+
+    #[test_case(1, SignalSeverity::High => 1)]
+    #[test_case(3, SignalSeverity::Info => 3)]
+    #[test_case(2, SignalSeverity::Medium => 2)]
+    fn test_choose_random_reason_codes(n: usize, severity: SignalSeverity) -> usize {
+        let rc = build_reason_code_map();
+        let result = choose_random_reason_codes(rc, severity.clone(), n);
+
+        assert!(result.iter().all(|r| r.severity() == severity));
+
+        result.len()
+    }
 }

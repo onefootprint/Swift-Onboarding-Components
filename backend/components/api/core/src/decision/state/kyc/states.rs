@@ -213,6 +213,8 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         Ok(States::from(Decisioning {
             is_redo: self.is_redo,
             ob_id: self.ob_id,
+            sv_id: self.sv_id,
+            t_id: self.t_id,
             vendor_results,
         })
         .into())
@@ -252,17 +254,21 @@ impl Decisioning {
         Ok(Decisioning {
             is_redo: config.is_redo,
             ob_id: ob.id,
+            sv_id: sv.id,
+            t_id: sv.tenant_id,
             vendor_results,
         })
     }
 }
 
+type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision> for Decisioning {
     type AsyncRes = (
         OnboardingRulesDecisionOutput,
         Vec<(FootprintReasonCode, Vec<Vendor>)>,
         Vec<VerificationResultId>,
+        IsSandbox,
     );
 
     async fn execute_async_idempotent_actions(
@@ -270,21 +276,44 @@ impl OnAction<MakeDecision> for Decisioning {
         action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let (decision, fv) =
-            decision::engine::calculate_decision(self.vendor_results.clone(), &state.feature_flag_client)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(
+            state,
+            &state.feature_flag_client,
+            &self.sv_id,
+            &self.t_id,
+        )
+        .await?;
 
-        let obid = self.ob_id.clone();
-        // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
-        let reason_codes =
-            engine::reason_codes_for_tenant(&state.db_pool, state.feature_flag_client.clone(), obid, &fv)
-                .await?;
-        let verification_result_ids = fv.verification_results();
+        let verification_result_ids = self
+            .vendor_results
+            .iter()
+            .map(|vr| vr.verification_result_id.clone())
+            .collect();
 
-        Ok((decision, reason_codes, verification_result_ids))
+        // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
+        let (rules_output, reason_codes, is_sandbox) = if let Some(fixture_decision) = fixture_decision {
+            let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+            let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision);
+            (rules_output, reason_codes, true)
+        } else {
+            let (rules_output, fv) = decision::engine::calculate_decision(
+                self.vendor_results.clone(),
+                &state.feature_flag_client,
+            )?;
+
+            let obid = self.ob_id.clone();
+            // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
+            let reason_codes =
+                engine::reason_codes_for_tenant(&state.db_pool, state.feature_flag_client.clone(), obid, &fv)
+                    .await?;
+            (rules_output, reason_codes, false)
+        };
+
+        Ok((rules_output, reason_codes, verification_result_ids, is_sandbox))
     }
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        let (rules_output, reason_codes, verification_result_ids) = async_res;
+        let (rules_output, reason_codes, verification_result_ids, is_sandbox) = async_res;
         let (ob, _, _, _) = Onboarding::get(conn, &self.ob_id)?;
         engine::save_onboarding_decision(
             conn,
@@ -293,6 +322,7 @@ impl OnAction<MakeDecision> for Decisioning {
             reason_codes,
             verification_result_ids,
             !self.is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
+            is_sandbox,
         )?;
         Ok(States::from(Complete).into())
     }

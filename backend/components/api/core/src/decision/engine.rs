@@ -138,6 +138,7 @@ where
                 reason_codes,
                 verification_result_ids,
                 true,
+                false,
             )
         })
         .await
@@ -398,6 +399,7 @@ pub fn save_onboarding_decision(
     reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
+    is_sandbox: bool,
 ) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
@@ -416,17 +418,19 @@ pub fn save_onboarding_decision(
         metric.inc();
     }
 
-    tracing::info!(
-       rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
-       rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
-       create_manual_review=%rules_output.create_manual_review,
-       decision=%rules_output.decision_status,
-       onboarding_id=%ob.id,
-       scoped_user_id=%ob.scoped_vault_id,
-       ob_configuration_id=%ob.ob_configuration_id,
-       "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
-       // TODO: differentiate KYB vs KYC here
-    );
+    if !is_sandbox {
+        tracing::info!(
+           rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
+           rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
+           create_manual_review=%rules_output.create_manual_review,
+           decision=%rules_output.decision_status,
+           onboarding_id=%ob.id,
+           scoped_user_id=%ob.scoped_vault_id,
+           ob_configuration_id=%ob.ob_configuration_id,
+           "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
+           // TODO: differentiate KYB vs KYC here
+        );
+    }
 
     Ok(())
 }
