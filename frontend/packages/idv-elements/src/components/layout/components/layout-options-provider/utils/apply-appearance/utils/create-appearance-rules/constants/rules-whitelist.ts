@@ -4,7 +4,12 @@ const input = ['input', 'input:hover', 'input:focus', 'input:active'];
 const label = ['label'];
 const hint = ['hint'];
 const link = ['link', 'link:hover', 'link:focus'];
-const linkButton = ['linkButton', 'linkButton:hover', 'linkButton:active'];
+const linkButton = [
+  'linkButton',
+  'linkButton:hover',
+  'linkButton:focus',
+  'linkButton:active',
+];
 
 const whitelist = [
   ...container,

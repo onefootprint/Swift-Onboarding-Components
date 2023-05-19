@@ -131,6 +131,10 @@ export type FootprintAppearanceRules = Partial<{
   link: CSS.Properties;
   'link:hover': CSS.Properties;
   'link:active': CSS.Properties;
+  linkButton: CSS.Properties;
+  'linkButton:hover': CSS.Properties;
+  'linkButton:focus': CSS.Properties;
+  'linkButton:active': CSS.Properties;
 }>;
 
 export type FootprintAppearance = {

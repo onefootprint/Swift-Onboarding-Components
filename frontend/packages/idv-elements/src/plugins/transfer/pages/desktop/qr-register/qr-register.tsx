@@ -77,7 +77,6 @@ const QRRegister = () => {
         </Typography>
         <Button
           fullWidth
-          disabled={isLoading}
           loading={d2pSmsMutation.isLoading}
           onClick={handleSendLinkToPhone}
         >
