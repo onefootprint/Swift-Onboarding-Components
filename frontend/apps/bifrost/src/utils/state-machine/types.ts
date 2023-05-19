@@ -1,10 +1,10 @@
-import { BootstrapData, OnboardingConfig } from '@onefootprint/types';
+import { IdvBootstrapData, OnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;
   config?: OnboardingConfig;
   validationToken?: string;
-  bootstrapData?: BootstrapData;
+  bootstrapData?: IdvBootstrapData;
 };
 
 export type MachineEvents =
@@ -12,7 +12,7 @@ export type MachineEvents =
       type: 'initContextUpdated';
       payload: {
         config?: OnboardingConfig;
-        bootstrapData?: BootstrapData;
+        bootstrapData?: IdvBootstrapData;
       };
     }
   | {

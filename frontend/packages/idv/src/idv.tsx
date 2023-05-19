@@ -12,7 +12,7 @@ import { IdvProps } from './types';
 
 const App = ({
   authToken,
-  data,
+  bootstrapData,
   isTransfer,
   obConfigAuth,
   onComplete,
@@ -21,7 +21,7 @@ const App = ({
   <>
     <I18nextProvider i18n={configureI18next()}>
       <MachineProvider
-        data={data}
+        bootstrapData={bootstrapData}
         authToken={authToken}
         isTransfer={isTransfer}
         obConfigAuth={obConfigAuth}

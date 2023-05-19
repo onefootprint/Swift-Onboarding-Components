@@ -1,13 +1,13 @@
-import { ObConfigAuth } from '@onefootprint/types';
+import { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { BootstrapData, MachineContext, MachineEvents } from './types';
+import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
 import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
-  bootstrapData?: BootstrapData;
+  bootstrapData?: IdentifyBootstrapData;
   obConfigAuth: ObConfigAuth;
 };
 

@@ -1,34 +1,10 @@
-import { IdDI, InvestorProfileDI, ObConfigAuth } from '@onefootprint/types';
-import { CountryCode } from '@onefootprint/types/src/data/countries';
+import { IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
 
 export type IdvProps = {
   obConfigAuth: ObConfigAuth;
   authToken?: string; // If provided, will skip identify step
-  data?: IdvData; // If provided, will bootstrap identify and pre-fill fields on onboarding
+  bootstrapData?: IdvBootstrapData; // If provided, will bootstrap identify and pre-fill fields on onboarding
   isTransfer?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
 };
-
-export type IdvData = Partial<{
-  [InvestorProfileDI.occupation]: string;
-  [InvestorProfileDI.employedByBrokerageFirm]: string;
-  [InvestorProfileDI.annualIncome]: string;
-  [InvestorProfileDI.netWorth]: string;
-  [InvestorProfileDI.investmentGoals]: string;
-  [InvestorProfileDI.riskTolerance]: string;
-  [InvestorProfileDI.declarations]: string;
-  [IdDI.firstName]: string;
-  [IdDI.lastName]: string;
-  [IdDI.email]: string;
-  [IdDI.phoneNumber]: string;
-  [IdDI.dob]: string;
-  [IdDI.ssn9]: string;
-  [IdDI.ssn4]: string;
-  [IdDI.addressLine1]: string;
-  [IdDI.addressLine2]: string;
-  [IdDI.city]: string;
-  [IdDI.state]: string;
-  [IdDI.country]: CountryCode;
-  [IdDI.zip]: string;
-}>;

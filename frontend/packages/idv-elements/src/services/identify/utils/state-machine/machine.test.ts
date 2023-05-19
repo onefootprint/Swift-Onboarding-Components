@@ -3,12 +3,12 @@ import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
+  IdentifyBootstrapData,
   OnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
-import { BootstrapData } from './types';
 
 describe('Identify Machine Tests', () => {
   const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
@@ -30,7 +30,7 @@ describe('Identify Machine Tests', () => {
     hasSupportForWebauthn: true,
   });
 
-  const createMachine = (bootstrapData?: BootstrapData) => {
+  const createMachine = (bootstrapData?: IdentifyBootstrapData) => {
     const machine = interpret(
       createIdentifyMachine({
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },

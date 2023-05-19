@@ -2,17 +2,13 @@ import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
   Identifier,
+  IdentifyBootstrapData,
   ObConfigAuth,
   OnboardingConfig,
 } from '@onefootprint/types';
 
-export type BootstrapData = {
-  email?: string;
-  phoneNumber?: string;
-};
-
 export type MachineContext = {
-  bootstrapData: BootstrapData;
+  bootstrapData: IdentifyBootstrapData;
   obConfigAuth: ObConfigAuth;
   config?: OnboardingConfig;
   device?: DeviceInfo;

@@ -10,6 +10,7 @@ import {
 import { interpret } from 'xstate';
 
 import createCollectKybDataMachine from './machine';
+import { MachineContext } from './types';
 
 describe('Collect KYB Data Machine Tests', () => {
   const TestOnboardingConfig: OnboardingConfig = {
@@ -34,23 +35,25 @@ describe('Collect KYB Data Machine Tests', () => {
       hasSupportForWebauthn: false,
     },
   ) => {
-    const machine = interpret(createCollectKybDataMachine());
-    machine.start();
-    machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'authToken',
-        device,
-        userFound: true,
-        config: { ...TestOnboardingConfig },
-        missingKybAttributes,
-        kycRequirement: {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: missingKycAttributes,
-          populatedAttributes: [],
-        },
+    const initialContext: MachineContext = {
+      authToken: 'authToken',
+      device,
+      userFound: true,
+      config: { ...TestOnboardingConfig },
+      kybRequirement: {
+        kind: OnboardingRequirementKind.collectKybData,
+        missingAttributes: missingKybAttributes,
       },
-    });
+      kycRequirement: {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: missingKycAttributes,
+        populatedAttributes: [],
+      },
+      data: {},
+    };
+
+    const machine = interpret(createCollectKybDataMachine(initialContext));
+    machine.start();
     return machine;
   };
 

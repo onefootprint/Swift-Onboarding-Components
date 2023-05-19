@@ -2,8 +2,9 @@ import { DeviceInfo } from '@onefootprint/hooks';
 import {
   BusinessDI,
   BusinessDIData,
-  CollectedKybDataOption,
+  CollectKybDataRequirement,
   CollectKycDataRequirement,
+  KycBootstrapData,
   OnboardingConfig,
 } from '@onefootprint/types';
 
@@ -33,34 +34,19 @@ export type BeneficialOwnersData =
 
 export type MachineContext = {
   // Plugin context
-  missingKybAttributes: CollectedKybDataOption[];
+  kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
+  kycBootstrapData?: KycBootstrapData;
   device?: DeviceInfo;
   authToken?: string;
   config?: OnboardingConfig;
   userFound?: boolean;
   sandboxSuffix?: string;
-  email?: string;
-  phoneNumber?: string;
   // Machine generated
   data: BusinessDIData;
 };
 
 export type MachineEvents =
-  | {
-      type: 'receivedContext';
-      payload: {
-        missingKybAttributes: CollectedKybDataOption[];
-        kycRequirement?: CollectKycDataRequirement;
-        authToken: string;
-        device: DeviceInfo;
-        config: OnboardingConfig;
-        userFound: boolean;
-        email?: string;
-        phoneNumber?: string;
-        sandboxSuffix?: string;
-      };
-    }
   | {
       type: 'introductionCompleted';
     }

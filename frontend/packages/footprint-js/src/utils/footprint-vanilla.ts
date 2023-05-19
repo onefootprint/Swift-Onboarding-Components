@@ -1,4 +1,5 @@
 import type { Footprint } from '../footprint-js.types';
+import { USER_DATA_KEYS, UserData } from '../footprint-js.types';
 import { createButton } from './footprint-ui';
 
 const defer = (callback: () => void) => {
@@ -26,8 +27,13 @@ const startVanillaIntegration = (footprint: Footprint) => {
   };
 
   const handleButtonClicked = (publicKey: string, container: HTMLElement) => {
-    const email = container.getAttribute('data-user-email');
-    const phoneNumber = container.getAttribute('data-user-phone-number');
+    const userData: UserData = {};
+    USER_DATA_KEYS.forEach(key => {
+      const val = container.getAttribute(`data-user-${key}`);
+      if (val) {
+        userData[key as keyof UserData] = val;
+      }
+    });
 
     footprint.open({
       publicKey,
@@ -42,10 +48,7 @@ const startVanillaIntegration = (footprint: Footprint) => {
           window.onFootprintCompleted?.(validationToken);
         }
       },
-      userData: {
-        email,
-        phoneNumber,
-      },
+      userData,
     });
   };
 
