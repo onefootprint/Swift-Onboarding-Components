@@ -32,6 +32,8 @@ pub enum BoolFlag<'a> {
     CanCleanUpPhoneNumber(&'a PiiString),
     #[strum(to_string = "CanCleanUpTenant")]
     CanCleanUpTenant(&'a TenantId),
+    #[strum(to_string = "CreateOnboardingWorkflows")]
+    CreateOnboardingWorkflows(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -55,6 +57,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableAllSocure => None,
             Self::CanCleanUpPhoneNumber(k) => Some(k.leak_to_string()),
             Self::CanCleanUpTenant(k) => Some(k.to_string()),
+            Self::CreateOnboardingWorkflows(k) => Some(k.to_string()),
         }
     }
 
@@ -74,6 +77,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableAllSocure => false,
             Self::CanCleanUpPhoneNumber(_) => false,
             Self::CanCleanUpTenant(_) => false,
+            Self::CreateOnboardingWorkflows(_) => false,
         }
     }
 }

@@ -17,11 +17,14 @@ use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding::IsNew;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -66,6 +69,9 @@ pub async fn post(
     } else {
         None
     };
+    let should_create_workflow = state
+        .feature_flag_client
+        .flag(BoolFlag::CreateOnboardingWorkflows(&ob_config.key));
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
@@ -80,12 +86,22 @@ pub async fn post(
                 ob_configuration_id: ob_config.id.clone(),
                 insight_event: insight_event.clone(),
             };
-            let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args)?;
-            if is_new_ob && ob_config.must_collect(DataIdentifierDiscriminant::Document) {
+
+            let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, should_create_workflow)?;
+
+            if matches!(is_new_ob, IsNew::Yes(_))
+                && ob_config.must_collect(DataIdentifierDiscriminant::Document)
+            {
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
                 let must_collect_selfie = ob_config.must_collect_selfie();
                 DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie, None)?;
+            }
+
+            let mut new_scopes = vec![];
+
+            if let IsNew::Yes(Some(wf)) = is_new_ob {
+                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id });
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
@@ -118,14 +134,15 @@ pub async fn post(
                         ob_configuration_id: ob_config.id.clone(),
                         insight_event: insight_event.clone(),
                     };
-                    Onboarding::get_or_create(conn, ob_create_args)?;
+                    Onboarding::get_or_create(conn, ob_create_args, false)?;
                     sb
                 };
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                let new_scope = UserAuthScope::Business(sb.id);
-                let data = user_auth.data.clone().session_with_added_scopes(vec![new_scope]);
-                user_auth.update_session(conn, &session_key, data)?;
+                new_scopes.push(UserAuthScope::Business(sb.id));
             }
+
+            let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
+            user_auth.update_session(conn, &session_key, data)?;
 
             Ok(ob)
         })

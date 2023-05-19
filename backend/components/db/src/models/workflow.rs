@@ -55,6 +55,19 @@ impl Workflow {
     }
 
     #[tracing::instrument(skip_all)]
+    pub fn create_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+        let new_workflow = NewWorkflow {
+            created_at: Utc::now(),
+            scoped_vault_id: scoped_vault_id.clone(),
+            kind: WorkflowKind::Kyc,
+            state: WorkflowState::Kyc(KycState::DataCollection),
+            config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+        };
+
+        Self::create(conn, new_workflow)
+    }
+
+    #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Self> {
         let res = workflow::table
             .filter(workflow::id.eq(workflow_id))

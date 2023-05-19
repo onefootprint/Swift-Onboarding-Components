@@ -3,6 +3,8 @@ use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::tenant::Tenant;
+use super::vault::Vault;
+use super::workflow::Workflow;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_vault};
 use crate::PgConn;
@@ -19,7 +21,10 @@ use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-type IsNew = bool;
+pub enum IsNew {
+    Yes(Option<Workflow>),
+    No,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding)]
@@ -291,19 +296,23 @@ impl Onboarding {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, args: OnboardingCreateArgs) -> DbResult<(Onboarding, IsNew)> {
+    pub fn get_or_create(
+        conn: &mut TxnPgConn,
+        args: OnboardingCreateArgs,
+        should_create_workflow: bool,
+    ) -> DbResult<(Onboarding, IsNew)> {
         let ob = onboarding::table
             .filter(onboarding::scoped_vault_id.eq(&args.scoped_vault_id))
             .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
             .first(conn.conn())
             .optional()?;
         if let Some(ob) = ob {
-            return Ok((ob, false));
+            return Ok((ob, IsNew::No));
         }
         // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
         let insight_event = args.insight_event.insert_with_conn(conn)?;
         let new_ob = NewOnboarding {
-            scoped_vault_id: args.scoped_vault_id,
+            scoped_vault_id: args.scoped_vault_id.clone(),
             ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
@@ -313,7 +322,16 @@ impl Onboarding {
             .values(new_ob)
             .get_result::<Onboarding>(conn.conn())?;
 
-        Ok((ob, true))
+        let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
+
+        // TODO: later have a KYB workflow and create that here as well
+        let wf = if matches!(v.kind, VaultKind::Person) && should_create_workflow {
+            Some(Workflow::create_kyc(conn, &args.scoped_vault_id)?)
+        } else {
+            None
+        };
+
+        Ok((ob, IsNew::Yes(wf)))
     }
 
     #[tracing::instrument(skip_all)]
