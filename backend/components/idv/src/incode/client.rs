@@ -438,9 +438,7 @@ mod tests {
             "MA".to_string()
         );
 
-        let expected_expiration = NaiveDate::parse_from_str("2024-10-15", "%Y-%m-%d").unwrap();
-        let expected_dob = NaiveDate::parse_from_str("1986-10-16", "%Y-%m-%d").unwrap();
-        assert_eq!(ocr.expiration_date().unwrap(), expected_expiration);
-        assert_eq!(ocr.dob().unwrap(), expected_dob);
+        assert_eq!(ocr.expiration_date().unwrap().leak(), "2024-10-15");
+        assert_eq!(ocr.dob().unwrap().leak(), "1986-10-16");
     }
 }

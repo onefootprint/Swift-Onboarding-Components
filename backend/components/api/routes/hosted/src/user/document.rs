@@ -140,7 +140,7 @@ pub async fn post(
     let doc_request_id = doc_request.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let vault_id = uvw.vault.id.clone();
+    let vault = uvw.vault.clone();
     let created_reqs = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -178,7 +178,7 @@ pub async fn post(
                 let scores = idv::incode::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
                 let ocr = idv::incode::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
                 let doc_type = request.document_type;
-                Complete::enter(conn, &vault_id, &su_id, &id_doc.id, doc_type, scores, ocr)?;
+                Complete::enter(conn, &vault, &su_id, &id_doc.id, doc_type, scores, ocr)?;
                 None
             };
 

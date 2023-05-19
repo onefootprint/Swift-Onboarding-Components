@@ -159,10 +159,11 @@ mod test {
 }
 
 impl WriteableVw<Person> {
-    // TODO: could later figure out how to merge this into VaultDataBuilder or make a complimentary struct for docs
-    // Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
-    //  so the logic around deactivating/portabalizing DL's is a little divergent here
-    pub fn put_document(
+    /// TODO: could later figure out how to merge this into VaultDataBuilder or make a complimentary struct for docs
+    /// Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
+    ///  so the logic around deactivating/portabalizing DL's is a little divergent here
+    /// NOTE: do not read from `self` after using this util as `self` will be stale
+    pub fn put_document_unsafe(
         &self,
         conn: &mut TxnPgConn,
         kind: DocumentKind,

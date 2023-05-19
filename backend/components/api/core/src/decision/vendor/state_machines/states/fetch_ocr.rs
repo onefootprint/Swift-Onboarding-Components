@@ -66,7 +66,7 @@ impl IncodeStateTransition for FetchOCR {
 
                         Complete::enter(
                             conn,
-                            &ctx.vault.id,
+                            &ctx.vault,
                             &ctx.sv_id,
                             &ctx.id_doc_id,
                             dk,

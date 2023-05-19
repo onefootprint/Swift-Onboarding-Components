@@ -778,7 +778,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
 
     // add an identity document
     let _ = uvw
-        .put_document(
+        .put_document_unsafe(
             conn,
             DocumentKind::DriversLicenseFront,
             "image/png".into(),

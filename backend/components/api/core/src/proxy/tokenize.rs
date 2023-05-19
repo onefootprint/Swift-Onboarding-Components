@@ -120,7 +120,9 @@ pub async fn vault_pii(
                                          filename,
                                          mime_type,
                                      }| {
-                                        uvw.put_document(conn, kind, mime_type, filename, e_data_key, s3_url)
+                                        uvw.put_document_unsafe(
+                                            conn, kind, mime_type, filename, e_data_key, s3_url,
+                                        )
                                     },
                                 )
                                 .collect::<Result<Vec<_>, _>>()?;

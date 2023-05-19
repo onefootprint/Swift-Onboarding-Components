@@ -106,6 +106,10 @@ def test_tenant_document_get_decrypt(user_with_documents):
     )
     assert resp["document.drivers_license_front"]
     assert resp["document.drivers_license_selfie"]
+    assert resp["custom.driver_license.document_number"]
+    assert resp["custom.driver_license.issuing_state"]
+    assert resp["custom.driver_license.expiration_date"]
+    assert resp["custom.driver_license.dob"]
 
 
 # Test decryption of vaulted documents
@@ -113,8 +117,15 @@ def test_tenant_document_decrypt(user_with_documents):
     from tests.image_fixtures import test_image
 
     tenant = user_with_documents.tenant
+    fields = [
+        "document.drivers_license_front",
+        "custom.driver_license.document_number",
+        "custom.driver_license.issuing_state",
+        "custom.driver_license.expiration_date",
+        "custom.driver_license.dob",
+    ]
     data = {
-        "fields": ["document.drivers_license_front"],
+        "fields": fields,
         "reason": "Responding to a customer request",
     }
 
@@ -126,9 +137,14 @@ def test_tenant_document_decrypt(user_with_documents):
     )
 
     assert resp["document.drivers_license_front"] == test_image
+    # These OCR values come from TEST_ONLY_FIXTURE
+    assert resp["custom.driver_license.document_number"] == "Y12341234"
+    assert resp["custom.driver_license.issuing_state"] == "MA"
+    assert resp["custom.driver_license.expiration_date"] == "2024-10-15"
+    assert resp["custom.driver_license.dob"] == "1986-10-16"
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
-    assert set(access_event["targets"]) == {"document.drivers_license_front"}
+    assert set(access_event["targets"]) == set(fields)
 
 
 def test_tenant_selfie_decrypt(

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::incode::error::Error as IncodeError;
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::NaiveDateTime;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     IdDocKind, IncodeVerificationFailureReason, PiiString,
@@ -235,28 +235,29 @@ impl APIResponseToIncodeError for AddConsentResponse {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
+// TODO need to PiiStringify eeeeeverything
 pub struct FetchOCRResponse {
     pub name: Option<OCRName>,
     // Address as read from id. Address can have two or three lines. Lines are separated by \n.
-    pub address: Option<String>,
-    pub checked_address: Option<String>,
+    pub address: Option<PiiString>,
+    pub checked_address: Option<PiiString>,
     pub checked_address_bean: Option<serde_json::Value>,
     pub address_fields: Option<OCRAddress>,
     // Image was classified as one of the following:
     // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
     // Other, WeaponLicense, TribalIdentification, VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
-    pub type_of_id: Option<String>,
-    pub document_front_subtype: Option<String>,
-    pub document_back_subtype: Option<String>,
+    pub type_of_id: Option<PiiString>,
+    pub document_front_subtype: Option<PiiString>,
+    pub document_back_subtype: Option<PiiString>,
     // Long, UTC millis
     pub birth_date: Option<i64>,
-    pub gender: Option<String>,
-    pub document_number: Option<String>,
-    pub personal_number: Option<String>,
+    pub gender: Option<PiiString>,
+    pub document_number: Option<PiiString>,
+    pub personal_number: Option<PiiString>,
     // Document Reference Number.
-    pub ref_number: Option<String>,
+    pub ref_number: Option<PiiString>,
     // Optional. Personal tax identification number.
-    pub tax_id_number: Option<String>,
+    pub tax_id_number: Option<PiiString>,
     // UTC timestamp, in ms
     pub expire_at: Option<String>,
     // year of expiration
@@ -264,23 +265,23 @@ pub struct FetchOCRResponse {
     pub additional_timestamps: Option<serde_json::Value>,
     // year of issue
     pub issue_date: Option<i32>,
-    pub issuing_country: Option<String>,
-    pub issuing_state: Option<String>,
-    pub issuing_authority: Option<String>,
-    pub nationality: Option<String>,
-    // String. Person's nationality as it appears in MRZ (if present).
-    pub nationality_mrz: Option<String>,
+    pub issuing_country: Option<PiiString>,
+    pub issuing_state: Option<PiiString>,
+    pub issuing_authority: Option<PiiString>,
+    pub nationality: Option<PiiString>,
+    // PiiString. Person's nationality as it appears in MRZ (if present).
+    pub nationality_mrz: Option<PiiString>,
     // Array. Optional. List of driver's license details elements:
     pub dl_class_details: Option<serde_json::Value>,
     pub ocr_data_confidence: Option<serde_json::Value>,
-    pub restrictions: Option<String>,
+    pub restrictions: Option<PiiString>,
 
     #[serde(flatten)]
     pub error: Option<Error>,
 }
 
 impl FetchOCRResponse {
-    pub fn expiration_date(&self) -> Result<NaiveDate, IncodeError> {
+    pub fn expiration_date(&self) -> Result<PiiString, IncodeError> {
         let expiration_timestamp = self
             .expire_at
             .clone()
@@ -291,27 +292,27 @@ impl FetchOCRResponse {
             IncodeError::OcrError("could not parse expiration timestamp".into()),
         )?;
 
-        Ok(naive.date())
+        Ok(PiiString::from(naive.format("%Y-%m-%d")))
     }
 
-    pub fn dob(&self) -> Result<NaiveDate, IncodeError> {
-        let expiration_timestamp = self
+    pub fn dob(&self) -> Result<PiiString, IncodeError> {
+        let date = self
             .birth_date
             .ok_or(IncodeError::OcrError("missing field birth_date".into()))?;
 
         // in ms, so divide by 1000
-        let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0).ok_or(
-            IncodeError::OcrError("could not parse birth_date timestamp".into()),
-        )?;
+        let naive = NaiveDateTime::from_timestamp_opt(date / 1000, 0).ok_or(IncodeError::OcrError(
+            "could not parse birth_date timestamp".into(),
+        ))?;
 
-        Ok(naive.date())
+        Ok(PiiString::from(naive.format("%Y-%m-%d")))
     }
 
     pub fn document_kind(&self) -> Result<IdDocKind, IncodeError> {
         let Some(type_of_id) = self.type_of_id.as_ref() else {
             return Err(IncodeError::OcrError("Missing type_of_id".into()));
         };
-        let result = match type_of_id.as_str() {
+        let result = match type_of_id.leak() {
             "Passport" => IdDocKind::Passport,
             "DriversLicense" => IdDocKind::DriverLicense,
             "IdentificationCard" => IdDocKind::IdCard,
@@ -322,7 +323,13 @@ impl FetchOCRResponse {
 
     #[allow(non_snake_case)]
     pub fn TEST_ONLY_FIXTURE() -> Self {
-        Self { ..Default::default() }
+        Self {
+            document_number: Some(PiiString::from("Y12341234")),
+            issuing_state: Some(PiiString::from("MA")),
+            expire_at: Some("1728950400000".to_owned()),
+            birth_date: Some(529873860000),
+            ..Default::default()
+        }
     }
 }
 
@@ -359,7 +366,6 @@ pub struct OCRAddress {
 
 #[cfg(test)]
 mod tests {
-    use chrono::NaiveDate;
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
         IncodeVerificationFailureReason,
@@ -514,9 +520,7 @@ mod tests {
         // serde_json doens't like i32, so add in the bday
         parsed.birth_date = Some(529873860000);
 
-        let expected_expiration = NaiveDate::parse_from_str("2024-10-15", "%Y-%m-%d").unwrap();
-        let expected_dob = NaiveDate::parse_from_str("1986-10-16", "%Y-%m-%d").unwrap();
-        assert_eq!(parsed.expiration_date().unwrap(), expected_expiration);
-        assert_eq!(parsed.dob().unwrap(), expected_dob);
+        assert_eq!(parsed.expiration_date().unwrap().leak(), "2024-10-15");
+        assert_eq!(parsed.dob().unwrap().leak(), "1986-10-16");
     }
 }

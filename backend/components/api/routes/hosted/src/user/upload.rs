@@ -47,7 +47,8 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
-            let doc = uvw.put_document(conn, kind, file.mime_type, file.filename, e_data_key, s3_url)?;
+            let doc =
+                uvw.put_document_unsafe(conn, kind, file.mime_type, file.filename, e_data_key, s3_url)?;
             Ok(doc)
         })
         .await?;
