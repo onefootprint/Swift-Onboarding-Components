@@ -14,6 +14,7 @@ use db::{
 
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 
+#[allow(unused)]
 pub type VwSetup = (
     ScopedVault,
     ObConfiguration,
@@ -22,6 +23,7 @@ pub type VwSetup = (
     Locked<Vault>,
 );
 
+#[allow(unused)]
 pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     let uv = db::tests::fixtures::vault::create_person(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);

@@ -224,15 +224,13 @@ async fn run_kyc(
     biz_ob: Option<Onboarding>, // TODO: remove from run_kyc and setup fixtures in run_kyb instead
     tenant_vendor_control: TenantVendorControl,
 ) -> Result<(), ApiError> {
-    let scoped_user_id = ob_info.scoped_user.id.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user_id)))
-        .await??;
-    let ff_client = &state.feature_flag_client;
-    let fixture_decision =
-        decision::utils::get_fixture_data_decision(state, ff_client, &uvw, &ob_info.scoped_user.tenant_id)
-            .await?;
+    let fixture_decision = decision::utils::get_fixture_data_decision(
+        state,
+        &state.feature_flag_client,
+        &ob_info.scoped_user.id,
+        &ob_info.scoped_user.tenant_id,
+    )
+    .await?;
 
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod IDV requests and instead just create fixture data for this user
@@ -256,6 +254,8 @@ async fn run_kyc(
                 if ob.idv_reqs_initiated_at.is_some() {
                     return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
                 }
+
+                let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user_id))?;
 
                 let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &scoped_user_id)?;
                 decision::vendor::build_verification_requests_and_checkpoint(

@@ -6,7 +6,7 @@ use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::large_json::LargeJson;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::config::Config;
@@ -16,6 +16,7 @@ use api_core::decision::vendor::state_machines::states::document_retry_limit_exc
 use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::enclave_client::EnclaveClient;
 use api_core::errors::AssertionError;
+use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::aead::AeadSealedBytes;
@@ -66,7 +67,7 @@ pub async fn post(
             // Move our request to Uploaded so any subsequent POSTs will fail
             let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
             let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
-            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
+            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
 
             let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding()?.id)?;
 
@@ -98,10 +99,14 @@ pub async fn post(
     // Check if we should be initiating requests (e.g. check if we are testing)
     // TODO: generate fixture data for identity documents
     let ff_client = &state.feature_flag_client;
-    let should_initiate_reqs =
-        decision::utils::get_fixture_data_decision(&state, ff_client, &uvw, &user_auth.scoped_user.tenant_id)
-            .await?
-            .is_none();
+    let should_initiate_reqs = decision::utils::get_fixture_data_decision(
+        &state,
+        ff_client,
+        &user_auth.scoped_user.id,
+        &user_auth.scoped_user.tenant_id,
+    )
+    .await?
+    .is_none();
 
     //
     // Encrypt all images

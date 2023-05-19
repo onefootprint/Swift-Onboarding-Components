@@ -1,22 +1,32 @@
 use crate::decision::utils;
 use crate::tests::fixtures;
-use db::tests::prelude::*;
+use crate::utils::mock_enclave::StateWithMockEnclave;
+use db::tests::test_db_pool::TestDbPool;
+use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
-use macros::db_test;
-use newtypes::{DecisionStatus, PhoneNumber};
+use macros::test_db_pool;
+use newtypes::{DecisionStatus, OnboardingStatus, PhoneNumber};
 use test_case::test_case;
 
-#[db_test]
-fn test_handle_setup(conn: &mut TestPgConn) {
-    let state =
-        &tokio_test::block_on(async { crate::utils::mock_enclave::StateWithMockEnclave::init().await }).state;
+#[test_db_pool]
+async fn test_handle_setup(db_pool: TestDbPool) {
+    let state = &mut StateWithMockEnclave::init().await.state;
+    state.set_db_pool((*db_pool).clone());
+
     //
     // PROD
     //
-
     // create a live UV and ob_config
-    let (_, _, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
-    assert!(uvw.vault.is_live);
+    let (tenant, vault, sv) = state
+        .db_pool
+        .db_transaction(move |conn| -> DbResult<_> {
+            let (tenant, _, vault, sv) =
+                fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
+            Ok((tenant, vault, sv))
+        })
+        .await
+        .unwrap();
+    assert!(vault.is_live);
 
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
@@ -27,10 +37,9 @@ fn test_handle_setup(conn: &mut TestPgConn) {
         .times(1)
         .return_once(|_| false);
 
-    let res = tokio_test::block_on(async {
-        utils::get_fixture_data_decision(state, &mock_ff_client, &uvw, &tenant.id).await
-    })
-    .unwrap();
+    let res = utils::get_fixture_data_decision(state, &mock_ff_client, &sv.id, &tenant.id)
+        .await
+        .unwrap();
     assert!(res.is_none()); // No fixture decision
 
     //
@@ -38,8 +47,17 @@ fn test_handle_setup(conn: &mut TestPgConn) {
     //
 
     // create a live UV and ob_config
-    let (_, _, uvw, tenant, _) = fixtures::vault_wrapper::create(conn, true);
-    assert!(uvw.vault.is_live);
+    // TODO: do we even need to make a new user here?
+    let (tenant, vault, sv) = state
+        .db_pool
+        .db_transaction(move |conn| -> db::DbResult<_> {
+            let (tenant, _, vault, sv) =
+                fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
+            Ok((tenant, vault, sv))
+        })
+        .await
+        .unwrap();
+    assert!(vault.is_live);
     // set up ff
     let mut mock_ff_client = MockFeatureFlagClient::new();
     let tenant_id = tenant.id.clone();
@@ -49,10 +67,9 @@ fn test_handle_setup(conn: &mut TestPgConn) {
         .times(1)
         .return_once(|_| true);
 
-    let res = tokio_test::block_on(async {
-        utils::get_fixture_data_decision(state, &mock_ff_client, &uvw, &tenant.id).await
-    })
-    .unwrap();
+    let res = utils::get_fixture_data_decision(state, &mock_ff_client, &sv.id, &tenant.id)
+        .await
+        .unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
 }
 

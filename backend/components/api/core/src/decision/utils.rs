@@ -22,7 +22,7 @@ use strum::IntoEnumIterator;
 use super::vendor;
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper},
+    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -37,9 +37,15 @@ type FixtureDecision = (DecisionStatus, CreateManualReview);
 pub async fn get_fixture_data_decision(
     state: &State,
     ff_client: &impl FeatureFlagClient, // Pass in ff_client directly to make it easier to test
-    uvw: &VaultWrapper<Person>,
+    scoped_vault_id: &ScopedVaultId,
     tenant_id: &TenantId,
 ) -> ApiResult<Option<FixtureDecision>> {
+    let svid = scoped_vault_id.clone();
+    let uvw: VaultWrapper<Person> = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&svid)))
+        .await??;
+
     let is_sandbox = !uvw.vault.is_live;
     if is_sandbox {
         // Sandbox users have the final KYC state encoded in their phone number's sandbox suffix
