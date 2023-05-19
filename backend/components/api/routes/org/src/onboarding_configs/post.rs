@@ -127,7 +127,15 @@ pub async fn post(
     let obc = state
         .db_pool
         .db_query(move |conn| {
-            ObConfiguration::create(conn, name, tenant_id, must_collect_data, can_access_data, is_live)
+            ObConfiguration::create(
+                conn,
+                name,
+                tenant_id,
+                must_collect_data,
+                can_access_data,
+                is_live,
+                None,
+            )
         })
         .await??;
 

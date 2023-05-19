@@ -19,7 +19,7 @@ use strum_macros::{AsRefStr, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema
+    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
@@ -31,6 +31,28 @@ pub enum ApiKeyStatus {
     Enabled,
 }
 
-
-
 impl_enum_str_diesel!(ApiKeyStatus);
+
+#[derive(
+    Eq,
+    PartialEq,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Apiv2Schema,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum CipKind {
+    Alpaca,
+    Apex,
+}
+
+impl_enum_str_diesel!(CipKind);

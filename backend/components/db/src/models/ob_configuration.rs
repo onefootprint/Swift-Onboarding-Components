@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, DataIdentifierDiscriminant, ScopedVaultId};
+use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, ScopedVaultId};
 use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
@@ -30,6 +30,7 @@ pub struct ObConfiguration {
     pub must_collect_data: Vec<CDO>,
     pub can_access_data: Vec<CDO>,
     pub appearance_id: Option<AppearanceId>,
+    pub cip_kind: Option<CipKind>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -43,6 +44,7 @@ struct NewObConfiguration {
 
     must_collect_data: Vec<CDO>,
     can_access_data: Vec<CDO>,
+    cip_kind: Option<CipKind>,
 }
 
 #[derive(Debug)]
@@ -170,6 +172,7 @@ impl ObConfiguration {
         must_collect_data: Vec<CDO>,
         can_access_data: Vec<CDO>,
         is_live: bool,
+        cip_kind: Option<CipKind>,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -180,6 +183,7 @@ impl ObConfiguration {
             is_live,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
+            cip_kind,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

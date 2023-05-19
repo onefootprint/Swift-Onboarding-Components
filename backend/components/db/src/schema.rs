@@ -391,6 +391,7 @@ table! {
         must_collect_data -> Array<Text>,
         can_access_data -> Array<Text>,
         appearance_id -> Nullable<Text>,
+        cip_kind -> Nullable<Text>,
     }
 }
 

@@ -11,6 +11,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         vec![CollectedDataOption::PhoneNumber],
         vec![CollectedDataOption::PhoneNumber],
         is_live,
+        None,
     )
     .expect("Could not create ob config")
 }
@@ -34,6 +35,7 @@ pub fn create_with_opts(
         must_collect,
         vec![CollectedDataOption::PhoneNumber],
         is_live,
+        None,
     )
     .expect("Could not create ob config")
 }
