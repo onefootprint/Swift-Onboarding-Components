@@ -1,3 +1,4 @@
+// TODO: delete when retiring idology
 enum IdDocBadImageError {
   // The submitted image does not meet the minimum required
   // resolution needed for processing.
