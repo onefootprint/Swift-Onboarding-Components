@@ -50,7 +50,7 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
                 .flat_map(|rs| std::convert::Into::<Option<FootprintReasonCode>>::into(&rs))
                 .collect()
         })
-        .unwrap_or(vec![]);
+        .unwrap_or_default();
 
     // TODO: should error here
     let dob_reason_codes = if let Ok(code) = resp.dob_match_reason_codes() {

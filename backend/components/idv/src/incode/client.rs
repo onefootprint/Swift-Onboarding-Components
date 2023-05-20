@@ -309,7 +309,7 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 
 #[cfg(test)]
 mod tests {
-    use chrono::NaiveDate;
+    
     use newtypes::{
         vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, PiiString,
     };

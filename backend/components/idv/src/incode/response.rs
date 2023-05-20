@@ -150,21 +150,21 @@ impl FetchScoresResponse {
             .as_ref()
             .and_then(|i| i.photo_security_and_quality.as_ref())
             .cloned()
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
 
         let id_specific_tests = self
             .id_validation
             .as_ref()
             .and_then(|i| i.id_specific.as_ref())
             .cloned()
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
 
         let custom_field_tests = self
             .id_validation
             .as_ref()
             .and_then(|i: &IdValidation| i.custom_fields.as_ref())
             .cloned()
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
 
         photo_sec_tests
             .into_iter()

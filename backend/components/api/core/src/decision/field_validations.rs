@@ -25,7 +25,7 @@ pub fn create_field_validation_results(
             })
         })
         .fold(HashMap::new(), |mut acc, (scope, fvd)| {
-            acc.entry(scope).or_insert(Vec::new()).push(fvd);
+            acc.entry(scope).or_default().push(fvd);
             acc
         });
 

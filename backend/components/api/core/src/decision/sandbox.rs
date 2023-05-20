@@ -97,7 +97,7 @@ fn choose_random_reason_codes(
                 .cloned()
                 .collect()
         })
-        .unwrap_or(vec![])
+        .unwrap_or_default()
 }
 
 fn build_reason_code_map() -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
@@ -110,7 +110,7 @@ fn build_reason_code_map() -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> 
             }
         })
         .fold(HashMap::new(), |mut acc, (severity, frc)| {
-            acc.entry(severity).or_insert(Vec::new()).push(frc);
+            acc.entry(severity).or_default().push(frc);
             acc
         })
 }
