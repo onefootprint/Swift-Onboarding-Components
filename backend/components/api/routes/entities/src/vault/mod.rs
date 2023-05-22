@@ -11,7 +11,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(decrypt::post)
         .service(decrypt::post_client)
         .service(validate::post)
-        .service(patch::patch);
+        .service(validate::post_client)
+        .service(patch::patch)
+        .service(patch::patch_client);
 
     get::configure_get_aliases(config);
     decrypt::configure_post_aliases(config);

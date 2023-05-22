@@ -4,6 +4,8 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
+use api_core::auth::CanDecrypt;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -32,17 +34,45 @@ pub async fn post(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<RawDataRequest>,
-    tenant_auth: SecretTenantAuthContext,
+    auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let fp_id = path.into_inner();
+    let auth = auth.check_guard(TenantGuard::Admin)?;
 
-    let tenant_auth = tenant_auth.check_guard(TenantGuard::Admin)?;
-    let tenant_id = tenant_auth.tenant().id.clone();
-    let is_live = tenant_auth.is_live()?;
+    let result = post_inner(&state, path.into_inner(), request.into_inner(), auth).await?;
+    Ok(result)
+}
 
-    let request = request
-        .into_inner()
-        .clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
+#[tracing::instrument(skip(state, auth))]
+#[api_v2_operation(
+    description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault given a short-lived, entity-scoped client token.",
+    tags(Entities, Vault, Preview)
+)]
+#[actix::post("/entities/vault/validate")]
+pub async fn post_client(
+    state: web::Data<State>,
+    request: Json<RawDataRequest>,
+    auth: ClientTenantAuthContext,
+) -> JsonApiResponse<EmptyResponse> {
+    // This is a little different - we actually require a permission to update the data in the
+    // vault since the ClientTenantAuth tokens are scoped to specific fields
+    let request = request.into_inner();
+    let auth = auth.check_guard(CanDecrypt::new(request.keys().cloned().collect()))?;
+    let fp_id = auth.fp_id.clone();
+
+    let result = post_inner(&state, fp_id, request, Box::new(auth)).await?;
+    Ok(result)
+}
+
+async fn post_inner(
+    state: &State,
+    fp_id: FpId,
+    request: RawDataRequest,
+    auth: Box<dyn TenantAuth>,
+) -> JsonApiResponse<EmptyResponse> {
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+
+    let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
