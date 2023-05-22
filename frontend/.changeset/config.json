@@ -12,10 +12,12 @@
     "handoff",
     "confirm",
     "dashboard",
-    "my1fp",
     "frontpage",
+    "components",
+    "hosted",
     "bifrost",
     "demos",
+    "emails",
     "docs",
     "@onefootprint/global-constants",
     "@onefootprint/ui",
@@ -24,6 +26,9 @@
     "@onefootprint/request",
     "@onefootprint/test-utils",
     "@onefootprint/design-tokens",
-    "@onefootprint/dev-tools"
+    "@onefootprint/dev-tools",
+    "@onefootprint/idv",
+    "@onefootprint/types",
+    "@onefootprint/idv-elements"
   ]
 }
