@@ -6,12 +6,15 @@ use db::models::tenant::Tenant;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
+
 mod secret_key;
 pub use secret_key::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
 mod firm_employee;
 pub use self::firm_employee::*;
+mod client;
+pub use client::*;
 
 use super::session::tenant::WorkOsSession;
 use super::Any;
