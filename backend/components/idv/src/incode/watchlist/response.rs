@@ -1,26 +1,31 @@
 use chrono::{DateTime, Utc};
 use newtypes::{PiiJsonValue, PiiString};
 
-// impl APIResponseToIncodeError for WatchlistResultResponse {
-//     fn to_error(&self) -> Option<Error> {
-//         self.error.clone()
-//     }
-// }
+use crate::incode::{response::Error, APIResponseToIncodeError};
 
-#[derive(Debug, Clone, serde::Deserialize)]
+impl APIResponseToIncodeError for WatchlistResultResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WatchlistResultResponse {
     pub status: Option<String>,
     pub content: Option<Content>,
+    // havent been able to trigger one but lets assume its the same as for the doc endpoints
+    #[serde(flatten)]
+    pub error: Option<Error>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Content {
     pub data: Option<Data>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Data {
     pub id: Option<i32>,
@@ -43,7 +48,7 @@ pub struct Data {
     pub share_url: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Filters {
     pub country_codes: Option<Vec<String>>,
@@ -53,7 +58,7 @@ pub struct Filters {
     pub types: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Hit {
     pub score: Option<f32>,
@@ -63,7 +68,7 @@ pub struct Hit {
     pub doc: Option<Doc>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
@@ -73,14 +78,14 @@ pub struct MatchTypeDetail {
     pub sources: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NameMatch {
     pub match_types: Option<Vec<String>>,
     pub query_term: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Doc {
     pub aka: Option<Vec<Aka>>,
@@ -93,13 +98,13 @@ pub struct Doc {
     pub types: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Aka {
     pub name: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: Option<String>,
@@ -108,7 +113,7 @@ pub struct Field {
     pub value: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
     pub date: Option<DateTime<Utc>>,

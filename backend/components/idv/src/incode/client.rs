@@ -1,4 +1,5 @@
 use super::doc::request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, DocumentSide};
+use super::watchlist::request::WatchlistResultRequest;
 use super::{
     request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
     response::OnboardingStartResponse,
@@ -258,6 +259,35 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn watchlist_result(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        first_name: Option<PiiString>,
+        last_name: Option<PiiString>,
+        dob_year: Option<PiiString>,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/watchlist-result")?;
+        let request = WatchlistResultRequest {
+            first_name,
+            sur_name: last_name,
+            birth_year: dob_year.map(|s| s.leak().parse::<f32>()).transpose()?,
+            fuzziness: None, //TODO: figure out how we want to set this
+        };
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
     /// Update authentication token by requesting a new one w/ the verification session id
     pub async fn update_authentication_token(
         &mut self,
@@ -316,6 +346,7 @@ mod tests {
             doc::request::DocumentSide,
             doc::response::{AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse},
             response::OnboardingStartResponse,
+            watchlist::response::WatchlistResultResponse,
             IncodeAPIResult,
         },
         tests::fixtures::images::load_image_and_encode_as_b64,
@@ -331,9 +362,8 @@ mod tests {
 
         IncodeClientAdapter::new(creds).expect("couldn't load incode client")
     }
-    #[ignore]
-    #[tokio::test]
-    async fn test_document_upload_e2e() {
+
+    async fn get_authed_client() -> (FootprintVendorHttpClient, AuthenticatedIncodeClientAdapter) {
         let client = load_client();
         let fp_client = FootprintVendorHttpClient::new().unwrap();
         // Start the session
@@ -346,9 +376,18 @@ mod tests {
             .unwrap()
             .into_success()
             .unwrap();
-
         // Use token we got from omni/start to authenticate future requests
-        let authenticated_client = AuthenticatedIncodeClientAdapter::new(client, parsed.token).unwrap();
+        (
+            fp_client,
+            AuthenticatedIncodeClientAdapter::new(client, parsed.token).unwrap(),
+        )
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_document_upload_e2e() {
+        let (fp_client, authenticated_client) = get_authed_client().await;
+
         let front_docv_data = DocVData {
             front_image: Some(PiiString::from(
                 load_image_and_encode_as_b64("fake_incode_front.jpg").0,
@@ -434,5 +473,28 @@ mod tests {
 
         assert_eq!(ocr.expiration_date().unwrap().leak(), "2024-10-15");
         assert_eq!(ocr.dob().unwrap().leak(), "1986-10-16");
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_watchlist_result() {
+        let (fp_client, authenticated_client) = get_authed_client().await;
+
+        let raw_res = authenticated_client
+            .watchlist_result(
+                &fp_client,
+                Some(PiiString::from("Bob")),
+                Some(PiiString::from("Boberto")),
+                None,
+            )
+            .await
+            .unwrap();
+
+        let parsed = IncodeAPIResult::<WatchlistResultResponse>::try_from(raw_res)
+            .unwrap()
+            .into_success()
+            .unwrap();
+
+        assert_eq!("success", parsed.status.unwrap());
     }
 }

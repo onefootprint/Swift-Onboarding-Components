@@ -20,4 +20,6 @@ pub enum Error {
     OcrError(String),
     #[error("{0}")]
     StringParseError(#[from] std::num::ParseIntError),
+    #[error("{0}")]
+    StringParseFloatError(#[from] std::num::ParseFloatError),
 }
