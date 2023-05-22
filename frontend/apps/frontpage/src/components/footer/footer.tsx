@@ -34,9 +34,9 @@ const Footer = () => {
                 {t('phone-number')}
               </Typography>
               <Image
-                src="/footer/soc-2-badge.png"
-                height={32}
-                width={32}
+                src="/footer/soc-2-badge-vanta.svg"
+                height={40}
+                width={40}
                 alt="Soc2 badge"
               />
             </TopLeftLinks>
