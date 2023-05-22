@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePopper } from 'react-popper';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useOnClickOutside } from 'usehooks-ts';
 
 import {
@@ -43,6 +43,7 @@ const ButtonPicker = forwardRef(
       placement: 'bottom-end',
       modifiers: [{ name: 'offset', options: { offset: [0, 8] } }],
     });
+    const theme = useTheme();
 
     const openPopper = () => {
       setIsPopperOpen(true);
@@ -92,7 +93,10 @@ const ButtonPicker = forwardRef(
           >
             <div
               tabIndex={-1}
-              style={popper.styles.popper}
+              style={{
+                ...popper.styles.popper,
+                zIndex: theme.zIndex.popover,
+              }}
               className="dialog-sheet"
               // eslint-disable-next-line
               {...popper.attributes.popper}
