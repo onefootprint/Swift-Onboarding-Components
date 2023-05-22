@@ -1,26 +1,24 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import InputDateRangePicker, {
-  InputDateRangePickerProps,
-} from './input-date-range-picker';
+import DateRangeInput, { DateRangeInputProps } from './date-range-input';
 
 export default {
-  component: InputDateRangePicker,
-  title: 'Components/InputDateRangePicker',
+  component: DateRangeInput,
+  title: 'Components/DateRangeInput',
   argTypes: {},
 } as Meta;
 
-const Template: Story<InputDateRangePickerProps> = ({
+const Template: Story<DateRangeInputProps> = ({
   onChange,
   endDate: initialEndDate,
   startDate: initialStartDate,
-}: InputDateRangePickerProps) => {
+}: DateRangeInputProps) => {
   const [startDate, setStartDate] = useState<Date>(initialStartDate);
   const [endDate, setEndDate] = useState<Date>(initialEndDate);
 
   return (
-    <InputDateRangePicker
+    <DateRangeInput
       onChange={(nextStartDate: Date, nextEndDate: Date) => {
         setStartDate(nextStartDate);
         setEndDate(nextEndDate);

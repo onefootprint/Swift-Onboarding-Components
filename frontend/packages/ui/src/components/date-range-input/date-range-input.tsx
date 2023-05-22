@@ -5,17 +5,17 @@ import styled, { css } from 'styled-components';
 import Box from '../box';
 import ButtonPicker, { ButtonPickerRef } from './components/button-picker';
 
-export type InputDateRangePickerProps = {
+export type DateRangeInputProps = {
   onChange?: (start: Date, end: Date) => void;
   startDate: Date;
   endDate: Date;
 };
 
-const InputDateRangePicker = ({
+const DateRangeInput = ({
   startDate,
   endDate,
   onChange,
-}: InputDateRangePickerProps) => {
+}: DateRangeInputProps) => {
   const endButtonPickerRef = useRef<ButtonPickerRef>(null);
 
   const opeEndDatePicker = () => {
@@ -61,4 +61,4 @@ const InputContainer = styled.div`
   `};
 `;
 
-export default InputDateRangePicker;
+export default DateRangeInput;

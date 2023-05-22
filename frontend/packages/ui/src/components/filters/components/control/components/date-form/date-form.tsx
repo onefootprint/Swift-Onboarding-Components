@@ -3,7 +3,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import InputDateRangePicker from '../../../../../input-date-range-picker';
+import DateRangeInput from '../../../../../date-range-input';
 import Radio from '../../../../../radio';
 import { FilterDate, FilterDateRange } from '../../../../filters.types';
 import useDateOptions from '../../hooks/use-date-options';
@@ -53,7 +53,7 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
             control={control}
             name="customDate"
             render={({ field }) => (
-              <InputDateRangePicker
+              <DateRangeInput
                 startDate={field.value.from}
                 endDate={field.value.to}
                 onChange={(nextStartDate: Date, nextEndDate: Date) => {
