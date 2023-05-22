@@ -10,23 +10,23 @@ export type ContentProps = {
   hasBiometrics: boolean;
 };
 
-const Content = ({ insightEvent, hasBiometrics }: ContentProps) =>
-  insightEvent ? (
-    <MapContainer>
-      <Map
-        latitude={insightEvent.latitude}
-        longitude={insightEvent.longitude}
-      />
-      <FloatingBox
-        city={insightEvent.city}
-        country={insightEvent.country}
-        hasBiometrics={hasBiometrics}
-        ipAddress={insightEvent.ipAddress}
-        region={insightEvent.region}
-        userAgent={insightEvent.userAgent}
-      />
-    </MapContainer>
-  ) : null;
+const Content = ({ insightEvent, hasBiometrics }: ContentProps) => (
+  <MapContainer>
+    <Map
+      latitude={insightEvent ? insightEvent.latitude : null}
+      longitude={insightEvent ? insightEvent.longitude : null}
+    />
+    <FloatingBox
+      hasInsights={!!insightEvent}
+      city={insightEvent?.city || null}
+      country={insightEvent?.country || null}
+      hasBiometrics={hasBiometrics}
+      ipAddress={insightEvent?.ipAddress || null}
+      region={insightEvent?.region || null}
+      userAgent={insightEvent?.userAgent || null}
+    />
+  </MapContainer>
+);
 
 const MapContainer = styled.div`
   ${({ theme }) => css`

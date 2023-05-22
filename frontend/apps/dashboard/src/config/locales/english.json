@@ -708,7 +708,11 @@
         "region": "Region",
         "country": "Country",
         "verified": "Verified",
-        "not_verified": "Not verified"
+        "not_verified": "Not verified",
+        "vault-only": {
+          "title": "No device insights available",
+          "message": "This is a \"Vault only\" user, so we don't have any device insights available."
+        }
       },
       "truncated-text": {
         "see-more": "See more",
