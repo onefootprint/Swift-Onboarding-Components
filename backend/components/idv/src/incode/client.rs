@@ -1,18 +1,15 @@
+use super::doc::request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, DocumentSide};
+use super::{
+    request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
+    response::OnboardingStartResponse,
+    IncodeAPIResult,
+};
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
     PiiString,
 };
 use reqwest::header;
-
-use super::{
-    request::{
-        AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, DocumentSide,
-        OnboardingStartCustomNameFields, OnboardingStartRequest,
-    },
-    response::OnboardingStartResponse,
-    IncodeAPIResult,
-};
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
     base_url: String,
@@ -309,7 +306,6 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 
 #[cfg(test)]
 mod tests {
-    
     use newtypes::{
         vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, PiiString,
     };
@@ -317,11 +313,9 @@ mod tests {
     use crate::{
         footprint_http_client::FootprintVendorHttpClient,
         incode::{
-            request::DocumentSide,
-            response::{
-                AddSideResponse, FetchOCRResponse, FetchScoresResponse, OnboardingStartResponse,
-                ProcessIdResponse,
-            },
+            doc::request::DocumentSide,
+            doc::response::{AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse},
+            response::OnboardingStartResponse,
             IncodeAPIResult,
         },
         tests::fixtures::images::load_image_and_encode_as_b64,

@@ -6,10 +6,10 @@ use std::fmt::Debug;
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
-use incode::response::{
-    AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, OnboardingStartResponse,
-    ProcessIdResponse,
+use incode::doc::response::{
+    AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
 };
+use incode::response::OnboardingStartResponse;
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 

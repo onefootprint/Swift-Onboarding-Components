@@ -11,7 +11,7 @@ use db::models::incode_verification_session::{IncodeVerificationSession, UpdateI
 use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::IncodeProcessIdRequest;
+use idv::incode::doc::IncodeProcessIdRequest;
 use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 pub struct ProcessId {

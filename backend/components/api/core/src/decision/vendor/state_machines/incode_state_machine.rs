@@ -209,7 +209,7 @@ mod tests {
     };
     use idv::{
         footprint_http_client::FootprintVendorHttpClient,
-        incode::{response::FetchScoresResponse, IncodeAPIResult},
+        incode::{doc::response::FetchScoresResponse, IncodeAPIResult},
     };
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},

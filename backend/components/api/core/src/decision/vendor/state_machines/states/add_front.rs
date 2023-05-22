@@ -12,7 +12,7 @@ use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use db::TxnPgConn;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::IncodeAddFrontRequest;
+use idv::incode::doc::IncodeAddFrontRequest;
 use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 
 pub struct AddFront {

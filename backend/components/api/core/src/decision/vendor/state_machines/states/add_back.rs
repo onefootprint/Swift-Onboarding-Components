@@ -11,7 +11,7 @@ use db::models::incode_verification_session::{IncodeVerificationSession, UpdateI
 use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::IncodeAddBackRequest;
+use idv::incode::doc::IncodeAddBackRequest;
 use newtypes::IncodeVerificationFailureReason;
 use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 

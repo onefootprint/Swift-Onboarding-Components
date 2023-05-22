@@ -180,8 +180,8 @@ pub async fn post(
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 // Create fixture data
-                let scores = idv::incode::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
-                let ocr = idv::incode::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
+                let scores = idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
+                let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
                 let doc_type = request.document_type;
                 Complete::enter(conn, &vault, &su_id, &id_doc.id, doc_type, scores, ocr)?;
                 None

@@ -3,15 +3,18 @@ use idv::{
     footprint_http_client::FootprintVendorHttpClient,
     incode::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        error::Error as IncodeError,
-        request::DocumentSide,
-        response::{
-            AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-            OnboardingStartResponse, ProcessIdResponse,
+        doc::request::DocumentSide,
+        doc::response::{
+            AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
         },
-        IncodeAPIResult, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-        IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
-        IncodeProcessIdRequest, IncodeResponse, IncodeStartOnboardingRequest,
+        doc::{
+            IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
+            IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
+            IncodeProcessIdRequest,
+        },
+        error::Error as IncodeError,
+        response::OnboardingStartResponse,
+        IncodeAPIResult, IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse,
 };

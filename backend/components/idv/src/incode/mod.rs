@@ -1,12 +1,12 @@
 use newtypes::{
-    vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken},
-    DocVData, IncodeConfigurationId, IncodeSessionId, ScrubbedJsonValue,
+    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeSessionId, ScrubbedJsonValue,
 };
 use serde::de::DeserializeOwned;
 
 use self::request::OnboardingStartCustomNameFields;
 
 pub mod client;
+pub mod doc;
 pub mod error;
 pub mod request;
 pub mod response;
@@ -16,38 +16,6 @@ pub struct IncodeStartOnboardingRequest {
     pub configuration_id: IncodeConfigurationId,
     pub session_id: Option<IncodeSessionId>,
     pub custom_name_fields: Option<OnboardingStartCustomNameFields>,
-}
-
-pub struct IncodeAddFrontRequest {
-    pub credentials: IncodeCredentialsWithToken,
-    pub docv_data: DocVData,
-}
-pub struct IncodeAddBackRequest {
-    pub credentials: IncodeCredentialsWithToken,
-    pub docv_data: DocVData,
-}
-
-pub struct IncodeProcessIdRequest {
-    pub credentials: IncodeCredentialsWithToken,
-}
-
-pub struct IncodeFetchScoresRequest {
-    pub credentials: IncodeCredentialsWithToken,
-}
-
-pub struct IncodeAddPrivacyConsentRequest {
-    pub credentials: IncodeCredentialsWithToken,
-    pub title: String,
-    pub content: String,
-}
-
-pub struct IncodeAddMLConsentRequest {
-    pub credentials: IncodeCredentialsWithToken,
-    pub status: bool,
-}
-
-pub struct IncodeFetchOCRRequest {
-    pub credentials: IncodeCredentialsWithToken,
 }
 
 /// Trait that an API Response uses to convert to an API error

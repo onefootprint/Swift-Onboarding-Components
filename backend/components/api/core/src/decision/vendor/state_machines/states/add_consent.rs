@@ -12,7 +12,7 @@ use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use db::{models::user_consent::UserConsent, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
+use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
 use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 /// Add Consent

@@ -11,8 +11,8 @@ use db::models::incode_verification_session::{IncodeVerificationSession, UpdateI
 use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::response::FetchScoresResponse;
-use idv::incode::IncodeFetchOCRRequest;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::IncodeFetchOCRRequest;
 use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState};
 
 pub struct FetchOCR {
