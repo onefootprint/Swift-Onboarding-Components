@@ -175,7 +175,7 @@ impl From<PiiString> for reqwest::Body {
 string_api_data_type_alias!(PiiString);
 
 /// Represents a struct that hides PII contained in JsonValues (usually from vendor responses)
-#[derive(Clone, Default, PartialEq, Eq)]
+#[derive(Clone, Default, PartialEq, Eq, Deserialize)]
 pub struct PiiJsonValue(serde_json::Value);
 impl PiiJsonValue {
     pub fn new(value: serde_json::Value) -> Self {

@@ -10,6 +10,7 @@ pub mod doc;
 pub mod error;
 pub mod request;
 pub mod response;
+pub mod watchlist;
 
 pub struct IncodeStartOnboardingRequest {
     pub credentials: IncodeCredentials,
