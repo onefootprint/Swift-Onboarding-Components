@@ -2,6 +2,7 @@ use api_core::*;
 use paperclip::actix::web;
 
 mod annotations;
+mod client_token;
 mod decisions;
 mod field_validations;
 mod get;
@@ -27,5 +28,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::get)
         .service(field_validations::get)
         .service(trigger::post)
+        .service(client_token::post)
         .service(risk_signals::get_detail);
 }

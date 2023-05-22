@@ -30,6 +30,9 @@ pub enum AuthSessionData {
     /// Authed as a firm employee impersonating a tenant with read-only permissions
     FirmEmployee(tenant::FirmEmployeeSession),
 
+    /// Proxy permissions of a tenant into a short-lived token
+    ClientTenant(tenant::ClientTenantAuth),
+
     /// user-specific sessions
     User(user::UserSession),
 
@@ -52,12 +55,14 @@ impl From<ob_config::BoSession> for AuthSessionData {
     }
 }
 
+// Used to store the kind of the token on the session table
 impl HasSessionKind for AuthSessionData {
     fn session_kind(&self) -> SessionKind {
         match self {
             Self::WorkOs(_) => SessionKind::WorkOs,
             Self::TenantRb(_) => SessionKind::TenantRb,
             Self::FirmEmployee(_) => SessionKind::FirmEmployee,
+            Self::ClientTenant(_) => SessionKind::ClientTenant,
             Self::User(_) => SessionKind::User,
             Self::EmailVerify(_) => SessionKind::EmailVerify,
             Self::ValidateUserToken(_) => SessionKind::ValidateUserToken,

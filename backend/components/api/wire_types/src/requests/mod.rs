@@ -36,3 +36,6 @@ pub use identify::*;
 
 mod trigger_request;
 pub use trigger_request::*;
+
+mod client_token;
+pub use client_token::*;

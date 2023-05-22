@@ -1,4 +1,4 @@
-use newtypes::{TenantId, TenantRolebindingId, TenantUserId};
+use newtypes::{DataIdentifier, FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -24,4 +24,29 @@ pub struct FirmEmployeeSession {
 pub struct WorkOsSession {
     /// The TenantUserId that is proven to be owned via a workos auth
     pub tenant_user_id: TenantUserId,
+}
+
+/// Short-lived token that temporarily gives a tenant's access to perform operations on a single user.
+/// For now, they are only allowed to be generated with a tenant API key that has admin permissions.
+/// Otherwise, we have to deal with the complexity of permissions
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ClientTenantAuth {
+    /// The scoped_vault_id belonging to this tenant
+    pub fp_id: FpId,
+    pub is_live: bool,
+    pub tenant_id: TenantId,
+    pub fields: Vec<DataIdentifier>,
+    /// The tenant API key whose permissions are proxied into this token.
+    /// In the future, maybe we'll want to support generating this token through other auth methods,
+    /// but for now it only makes sense to create a short-lived token through tenant API key
+    pub tenant_api_key_id: TenantApiKeyId,
+    // TODO should we bind to the actual actor? if we bind to the actor we can dynamically check permissions.
+    // but we should probably also check at the time the token is issued
+    // TODO do we want to scope to read/write?
+}
+
+impl From<ClientTenantAuth> for super::AuthSessionData {
+    fn from(value: ClientTenantAuth) -> Self {
+        Self::ClientTenant(value)
+    }
 }
