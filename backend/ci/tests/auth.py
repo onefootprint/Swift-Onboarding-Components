@@ -34,6 +34,10 @@ class DashboardAuth(BaseAuth):
     HEADER_NAME = "x-fp-dashboard-authorization"
 
 
+class ClientTokenAuth(BaseAuth):
+    HEADER_NAME = "x-fp-authorization"
+
+
 class DashboardAuthIsLive(BaseAuth):
     """
     Allows specifying whether a request made with the DashboardAuth should be for live or sandbox data
