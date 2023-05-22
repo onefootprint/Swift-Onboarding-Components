@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::errors::ApiResult;
 use db::models::verification_request::VerificationRequest;
 use idv::{ParsedResponse, VendorResponse};
-use newtypes::{DecisionStatus, FootprintReasonCode, SignalSeverity, Vendor, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, SignalSeverity, VaultKind, Vendor, VendorAPI};
 use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
 
@@ -65,8 +65,9 @@ pub fn get_fixture_vendor_results(vreqs: Vec<VerificationRequest>) -> ApiResult<
 
 pub fn get_fixture_reason_codes(
     fixture_decision: FixtureDecision,
+    vault_kind: VaultKind,
 ) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
-    let reason_code_map = build_reason_code_map();
+    let reason_code_map = build_reason_code_map(vault_kind);
     let (decision_status, create_manual_review) = fixture_decision;
     // Create some mock risk signals that are somewhat consistent with the mock decision
     let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
@@ -100,10 +101,13 @@ fn choose_random_reason_codes(
         .unwrap_or_default()
 }
 
-fn build_reason_code_map() -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
+fn build_reason_code_map(vault_kind: VaultKind) -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
     FootprintReasonCode::iter()
         .filter_map(|rs| {
-            if rs.scopes().iter().all(|s| s.is_for_person()) {
+            if rs.scopes().iter().all(|s| match vault_kind {
+                VaultKind::Person => s.is_for_person(),
+                VaultKind::Business => !s.is_for_person(),
+            }) {
                 Some((rs.severity(), rs))
             } else {
                 None
@@ -130,7 +134,7 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::SignalSeverity;
+    use newtypes::{SignalSeverity, VaultKind};
     use test_case::test_case;
 
     use super::{build_reason_code_map, choose_random_reason_codes};
@@ -139,7 +143,7 @@ mod tests {
     #[test_case(3, SignalSeverity::Info => 3)]
     #[test_case(2, SignalSeverity::Medium => 2)]
     fn test_choose_random_reason_codes(n: usize, severity: SignalSeverity) -> usize {
-        let rc = build_reason_code_map();
+        let rc = build_reason_code_map(VaultKind::Person);
         let result = choose_random_reason_codes(rc, severity.clone(), n);
 
         assert!(result.iter().all(|r| r.severity() == severity));

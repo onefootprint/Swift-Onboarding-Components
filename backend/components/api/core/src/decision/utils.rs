@@ -12,7 +12,7 @@ use db::{
 };
 use newtypes::{
     DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, PhoneNumber, ScopedVaultId,
-    TenantId, VendorAPI,
+    TenantId, VaultKind, VendorAPI,
 };
 
 use super::{sandbox, vendor};
@@ -189,15 +189,19 @@ pub async fn setup_test_fixtures(
                     actor: DbActor::Footprint,
                     seqno,
                 };
-                OnboardingDecision::create(conn, new_decision)?;
+                let biz_obd = OnboardingDecision::create(conn, new_decision)?;
 
                 biz_ob.into_inner().update(
                     conn,
                     OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
                 )?;
+
+                let biz_risk_signals =
+                    sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+                RiskSignal::bulk_create(conn, biz_obd.id, biz_risk_signals)?;
             }
 
-            let signals = sandbox::get_fixture_reason_codes(fixture_decision);
+            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
             RiskSignal::bulk_create(conn, decision.id, signals)?;
             Ok(())
         })

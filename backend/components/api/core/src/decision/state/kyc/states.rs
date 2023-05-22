@@ -5,7 +5,7 @@ use db::models::{
     scoped_vault::ScopedVault,
     workflow::Workflow,
 };
-use newtypes::{FootprintReasonCode, KycConfig, Vendor, VerificationResultId};
+use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
 
 use super::{
     Authorize, Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls,
@@ -293,7 +293,8 @@ impl OnAction<MakeDecision> for Decisioning {
         // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
         let (rules_output, reason_codes, is_sandbox) = if let Some(fixture_decision) = fixture_decision {
             let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-            let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision);
+            let reason_codes =
+                decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
             (rules_output, reason_codes, true)
         } else {
             let (rules_output, fv) = decision::engine::calculate_decision(
