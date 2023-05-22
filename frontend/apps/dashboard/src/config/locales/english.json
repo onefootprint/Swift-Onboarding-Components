@@ -733,6 +733,11 @@
           "status": "Status",
           "submitted-by": "Submitted by (beneficial owner)",
           "start": "Date"
+        },
+        "row": {
+          "status": {
+            "on-watchlist": "This business is on a watchlist"
+          }
         }
       }
     },
@@ -774,6 +779,11 @@
           "ssn": "SSN",
           "phone-number": "Phone number",
           "start": "Date"
+        },
+        "row": {
+          "status": {
+            "on-watchlist": "This user is on a watchlist"
+          }
         }
       }
     },

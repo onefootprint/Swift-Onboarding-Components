@@ -25,6 +25,7 @@ const Header = ({ entity }: HeaderProps) => {
           status={entity.status}
           requiresManualReview={entity.requiresManualReview}
           isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+          shouldShowWatchlistLabel
           watchlistLabel={t(`watchlist.on-watchlist-${kind}`)}
         />
       </Row>

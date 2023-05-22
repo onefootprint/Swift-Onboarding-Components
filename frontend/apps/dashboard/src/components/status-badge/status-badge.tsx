@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoEye16, IcoWarning16 } from '@onefootprint/icons';
 import { EntityStatus } from '@onefootprint/types';
-import { Badge, Box, Typography } from '@onefootprint/ui';
+import { Badge, Box, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -11,12 +11,14 @@ export type StatusBadgeProps = {
   status: EntityStatus;
   requiresManualReview?: boolean;
   isOnWatchlist?: boolean;
+  shouldShowWatchlistLabel?: boolean;
   watchlistLabel?: string;
 };
 
 const StatusBadge = ({
   status,
   requiresManualReview = false,
+  shouldShowWatchlistLabel,
   isOnWatchlist,
   watchlistLabel,
 }: StatusBadgeProps) => {
@@ -29,24 +31,26 @@ const StatusBadge = ({
         {t(status)}
         {requiresManualReview && (
           <IconContainer>
-            <IcoWarning16 color={badgeVariant} />
+            <IcoWarning16 color={badgeVariant} testID="manualReviewIcon" />
           </IconContainer>
         )}
       </Badge>
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
         {isOnWatchlist && (
           <>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                marginLeft: watchlistLabel ? 5 : 2,
-              }}
-              testID="watchlistFailIcon"
-            >
-              <IcoEye16 color="error" />
-            </Box>
-            {watchlistLabel && (
+            <Tooltip text={watchlistLabel} disabled={shouldShowWatchlistLabel}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginLeft: watchlistLabel ? 5 : 2,
+                }}
+                testID="watchlistFailIcon"
+              >
+                <IcoEye16 color="error" />
+              </Box>
+            </Tooltip>
+            {shouldShowWatchlistLabel && (
               <Typography variant="caption-2" color="error">
                 {watchlistLabel}
               </Typography>

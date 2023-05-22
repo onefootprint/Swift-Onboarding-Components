@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { Entity, IdDI } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -9,6 +10,7 @@ type RowProps = {
 };
 
 const Row = ({ entity }: RowProps) => {
+  const { t } = useTranslation('pages.users.table.row');
   const { data: vault } = useEntityVault(entity.id, entity);
   const fullName = vault?.[IdDI.firstName]
     ? `${vault?.[IdDI.firstName]} ${vault?.[IdDI.lastName]}`
@@ -29,6 +31,8 @@ const Row = ({ entity }: RowProps) => {
           status={entity.status}
           requiresManualReview={entity.requiresManualReview}
           isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+          shouldShowWatchlistLabel={false}
+          watchlistLabel={t('status.on-watchlist')}
         />
       </td>
       <td>
