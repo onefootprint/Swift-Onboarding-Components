@@ -10,16 +10,8 @@ use db::{
     PgConn,
 };
 use feature_flag::LaunchDarklyFeatureFlagClient;
-use newtypes::{BoId, DataIdentifierDiscriminant, ObConfigurationId};
+use newtypes::DataIdentifierDiscriminant;
 use paperclip::actix::Apiv2Security;
-
-/// A business-owner specific session. This is issued when sending out links to each owner of a
-/// business in order to allow each BO to fill out the
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub struct BoSession {
-    pub bo_id: BoId,
-    pub ob_config_id: ObConfigurationId,
-}
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(

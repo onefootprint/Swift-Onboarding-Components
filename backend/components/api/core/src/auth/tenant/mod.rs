@@ -13,6 +13,7 @@ pub use self::tenant_rb::*;
 mod firm_employee;
 pub use self::firm_employee::*;
 
+use super::session::tenant::WorkOsSession;
 use super::Any;
 use super::AuthError;
 use super::Either;

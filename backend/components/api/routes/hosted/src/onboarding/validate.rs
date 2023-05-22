@@ -5,8 +5,8 @@ use crate::types::response::ResponseData;
 use crate::State;
 use api_core::{
     auth::{
-        session::AuthSessionData,
-        user::{UserObAuthContext, ValidateUserToken},
+        session::{user::ValidateUserToken, AuthSessionData},
+        user::UserObAuthContext,
     },
     errors::ApiResult,
     types::JsonApiResponse,

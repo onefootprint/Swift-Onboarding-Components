@@ -1,6 +1,6 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
 use crate::auth::ob_config::ObConfigAuth;
-use crate::auth::user::{UserAuthScope, UserSession};
+use crate::auth::user::UserAuthScope;
 use crate::errors::challenge::ChallengeError;
 use crate::errors::{ApiError, ApiResult};
 use crate::identify::{ChallengeData, ChallengeDataKind, ChallengeState};
@@ -10,6 +10,7 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::session::user::UserSession;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;

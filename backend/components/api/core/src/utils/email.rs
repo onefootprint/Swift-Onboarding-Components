@@ -1,4 +1,4 @@
-use crate::auth::user::EmailVerifySession;
+use crate::auth::session::user::EmailVerifySession;
 use crate::errors::ApiError;
 use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};

@@ -1,4 +1,3 @@
-use crate::auth::ob_config::OnboardingSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
@@ -11,6 +10,7 @@ use crate::types::JsonApiResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
 
+use api_core::auth::session::ob_config::OnboardingSession;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 use newtypes::SessionAuthToken;

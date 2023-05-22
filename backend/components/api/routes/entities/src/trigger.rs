@@ -6,8 +6,8 @@ use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthScope;
-use api_core::auth::user::UserSession;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
@@ -25,8 +25,8 @@ use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Gets the timeline for a user verification trail.",
-    tags(Entities, Preview)
+    description = "Trigger a workflow for the provided user.",
+    tags(Entities, Private)
 )]
 #[post("/entities/{fp_id}/trigger")]
 pub async fn post(

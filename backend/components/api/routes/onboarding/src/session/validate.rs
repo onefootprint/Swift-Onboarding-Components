@@ -1,10 +1,10 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::{SecretTenantAuthContext, TenantAuth};
-use crate::auth::user::ValidateUserToken;
 use crate::errors::onboarding::OnboardingError;
 use crate::types::response::ResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
+use api_core::auth::session::user::ValidateUserToken;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;

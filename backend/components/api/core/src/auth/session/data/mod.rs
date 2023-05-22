@@ -1,3 +1,7 @@
+pub mod ob_config;
+pub mod tenant;
+pub mod user;
+
 use crypto::aead::ScopedSealingKey;
 use newtypes::{HasSessionKind, SealedSessionBytes, SessionKind};
 use serde::{Deserialize, Serialize};
@@ -18,32 +22,32 @@ impl AuthSessionData {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AuthSessionData {
     /// proven to own an email address via workos auth
-    WorkOs(crate::auth::tenant::WorkOsSession),
+    WorkOs(tenant::WorkOsSession),
 
     /// authed as a user at a tenant for admin dashboard
-    TenantRb(crate::auth::tenant::TenantRbSession),
+    TenantRb(tenant::TenantRbSession),
 
     /// Authed as a firm employee impersonating a tenant with read-only permissions
-    FirmEmployee(crate::auth::tenant::FirmEmployeeSession),
+    FirmEmployee(tenant::FirmEmployeeSession),
 
     /// user-specific sessions
-    User(crate::auth::user::UserSession),
+    User(user::UserSession),
 
     /// Used for validating email challenges
-    EmailVerify(crate::auth::user::EmailVerifySession),
+    EmailVerify(user::EmailVerifySession),
 
     /// Used to prove to a tenant that a user is authed with footprint
-    ValidateUserToken(crate::auth::user::ValidateUserToken),
+    ValidateUserToken(user::ValidateUserToken),
 
     /// Used to provide a single use onboarding session token for bifrost initialization
-    OnboardingSession(crate::auth::ob_config::OnboardingSession),
+    OnboardingSession(ob_config::OnboardingSession),
 
     /// Used to initialize an onboarding session to KYC an owner of a business
-    BusinessOwner(crate::auth::ob_config::BoSession),
+    BusinessOwner(ob_config::BoSession),
 }
 
-impl From<crate::auth::ob_config::BoSession> for AuthSessionData {
-    fn from(value: crate::auth::ob_config::BoSession) -> Self {
+impl From<ob_config::BoSession> for AuthSessionData {
+    fn from(value: ob_config::BoSession) -> Self {
         Self::BusinessOwner(value)
     }
 }

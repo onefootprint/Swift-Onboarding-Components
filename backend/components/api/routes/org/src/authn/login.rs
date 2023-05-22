@@ -2,7 +2,6 @@ use std::collections::HashSet;
 use std::str::FromStr;
 
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::WorkOsSession;
 use crate::errors::tenant::TenantError;
 use crate::errors::workos::WorkOsError;
 use crate::errors::ApiResult;
@@ -11,6 +10,7 @@ use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{errors::ApiError, types::response::ResponseData};
+use api_core::auth::session::tenant::WorkOsSession;
 use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
 use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;

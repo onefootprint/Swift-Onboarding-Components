@@ -1,12 +1,13 @@
 use std::str::FromStr;
 
 use crate::auth::session::{AuthSessionData, UpdateSession};
-use crate::auth::tenant::{FirmEmployeeSession, GetFirmEmployee, TenantSessionAuth};
+use crate::auth::tenant::{GetFirmEmployee, TenantSessionAuth};
 use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::session::tenant::FirmEmployeeSession;
 use db::models::tenant::Tenant;
 use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
 use paperclip::actix::Apiv2Schema;

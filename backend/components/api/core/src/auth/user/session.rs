@@ -6,33 +6,13 @@ use paperclip::actix::Apiv2Security;
 use super::{UserAuthGuard, UserAuthScope};
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{user::UserSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
     errors::ApiError,
 };
 use feature_flag::LaunchDarklyFeatureFlagClient;
-
-/// A user-specific session. Permissions for the session are defined by the set of scopes.
-/// IMPORTANT: Purposefully doesn't implement TryFrom<AuthSessionData> or HeaderName to prevent
-/// users from using this in an actix extractor. UserAuthContext below should be used as the
-/// extractor
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub struct UserSession {
-    pub user_vault_id: VaultId,
-    pub scopes: Vec<UserAuthScope>,
-    // TODO Eventually might want to store auth methods to know if a token is generated from SMS, biometric, or via tenant trigger
-}
-
-impl UserSession {
-    pub fn make(user_vault_id: VaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
-        AuthSessionData::User(Self {
-            user_vault_id,
-            scopes,
-        })
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct UserSessionContext {

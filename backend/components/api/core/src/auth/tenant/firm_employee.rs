@@ -16,8 +16,8 @@ use db::{
     PgConn,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{CollectedDataOption, TenantId, TenantScope, TenantUserId};
-use paperclip::actix::{Apiv2Schema, Apiv2Security};
+use newtypes::{CollectedDataOption, TenantScope};
+use paperclip::actix::Apiv2Security;
 use strum::IntoEnumIterator;
 
 /// Risk ops users can perform manual review and decrypt info
@@ -26,19 +26,6 @@ fn risk_ops_permissions() -> Vec<TenantScope> {
         .map(TenantScope::Decrypt)
         .chain([TenantScope::ManualReview, TenantScope::DecryptCustom])
         .collect()
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-/// The struct that is serialized and saved into the session table in the DB for a firm employee
-/// session token.
-/// The session token is used to look up this session info, and this session info is used to fetch
-/// the related user and tenant information from the DB
-pub struct FirmEmployeeSession {
-    /// The TenantUserId that is proven to be owned via a workos auth.
-    /// Must be a TenantUser with is_firm_employee=true
-    pub tenant_user_id: TenantUserId,
-    /// The TenantId whose role is being assumed by this firm employee
-    pub tenant_id: TenantId,
 }
 
 #[derive(Debug, Clone)]
@@ -183,7 +170,8 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
 #[cfg(test)]
 mod test {
     use super::super::CanCheckTenantGuard;
-    use super::{FirmEmployeeAuth, FirmEmployeeSession, ParsedFirmEmployeeAuth};
+    use super::{FirmEmployeeAuth, ParsedFirmEmployeeAuth};
+    use crate::auth::session::tenant::FirmEmployeeSession;
     use crate::auth::{session::AuthSessionData, SessionContext};
     use db::tests::prelude::*;
     use macros::db_test_case;

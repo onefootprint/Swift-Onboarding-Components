@@ -3,11 +3,7 @@ use paperclip::actix::Apiv2Schema;
 
 mod session;
 pub use session::*;
-mod email_verify;
-pub use email_verify::*;
-mod validate_user;
 use strum::EnumDiscriminants;
-pub use validate_user::*;
 mod guard;
 mod user_ob;
 pub use user_ob::*;

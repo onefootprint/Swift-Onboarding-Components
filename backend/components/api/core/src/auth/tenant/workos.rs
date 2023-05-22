@@ -1,22 +1,15 @@
-use db::PgConn;
-use newtypes::TenantUserId;
-use paperclip::actix::Apiv2Schema;
-
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{tenant::WorkOsSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         AuthError,
     },
     errors::ApiResult,
 };
+use db::PgConn;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-pub struct WorkOsSession {
-    /// The TenantUserId that is proven to be owned via a workos auth
-    pub tenant_user_id: TenantUserId,
-}
-
+// This is the only weird session where the extractor actually uses the same struct that is serialized
+// in the DB
 impl ExtractableAuthSession for WorkOsSession {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]

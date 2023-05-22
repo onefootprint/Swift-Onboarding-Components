@@ -1,7 +1,7 @@
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{tenant::TenantRbSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -14,7 +14,7 @@ use db::{
     PgConn,
 };
 use feature_flag::LaunchDarklyFeatureFlagClient;
-use newtypes::{TenantRolebindingId, TenantScope};
+use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -26,8 +26,6 @@ pub struct TenantRbAuth {
     tenant_user: TenantUser,
     #[allow(unused)]
     tenant_rolebinding: TenantRolebinding,
-    #[allow(unused)]
-    data: TenantRbSession,
 }
 
 /// Nests a private TenantRbAuth and implements traits required to extract this session from an
@@ -43,14 +41,6 @@ pub struct TenantRbAuth {
     description = "Auth token for a dashboard user"
 )]
 pub struct ParsedTenantRbAuth(TenantRbAuth);
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-/// The struct that is serialized and saved into the session table in the DB.
-/// The session token is used to look up this session info, and this session info is used to fetch
-/// the related user, rolebinding, role, and tenant information from the DB
-pub struct TenantRbSession {
-    pub tenant_rolebinding_id: TenantRolebindingId,
-}
 
 impl From<TenantRolebinding> for TenantRbSession {
     fn from(rb: TenantRolebinding) -> Self {
@@ -81,7 +71,6 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");
 
         Ok(Self(TenantRbAuth {
-            data,
             tenant,
             tenant_rolebinding: rb,
             tenant_role: tr,

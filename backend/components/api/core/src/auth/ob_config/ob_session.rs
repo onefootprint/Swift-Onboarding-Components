@@ -2,7 +2,6 @@ use db::{
     models::{ob_configuration::ObConfiguration, tenant::Tenant},
     PgConn,
 };
-use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
 
 use crate::auth::{
@@ -11,13 +10,6 @@ use crate::auth::{
 };
 use crate::{auth::AuthError, errors::ApiError};
 use feature_flag::LaunchDarklyFeatureFlagClient;
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub struct OnboardingSession {
-    pub tenant_id: TenantId,
-    pub ob_config_id: ObConfigurationId,
-    pub is_live: bool,
-}
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
