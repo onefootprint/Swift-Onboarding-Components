@@ -2713,6 +2713,11 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
+"@onefootprint/postmate@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@onefootprint/postmate/-/postmate-2.1.0.tgz#af6a7980a26b5a55a0e2d1f2a0b2400a25040adf"
+  integrity sha512-XMofyVGx424NaAWbW5Np/yjQZo2eX4/r4Y2F4ON/Y5O7nt69g3WaO95SBBjrWNLNNZgLeUb/DjKg00DUV72NSw==
+
 "@open-draft/until@^1.0.3":
   version "1.0.3"
   resolved "https://registry.npmjs.org/@open-draft/until/-/until-1.0.3.tgz"
@@ -5282,11 +5287,6 @@
   version "5.0.3"
   resolved "https://registry.npmjs.org/@types/parse5/-/parse5-5.0.3.tgz"
   integrity sha512-kUNnecmtkunAoQ3CnjmMkzNU/gtxG8guhi+Fk2U/kOpIKjIMKnXGp4IJCgQJrXSgMsWYimYG4TGjz/UzbGEBTw==
-
-"@types/postmate@^1.5.2":
-  version "1.5.2"
-  resolved "https://registry.npmjs.org/@types/postmate/-/postmate-1.5.2.tgz"
-  integrity sha512-BpNgyT6GBX1o6MES5SDEnfFhaeLyHWb8JDxF2ph3kZPqaGDPGZ3fZ8DDXV47Dpq9Sx7D9fC8EheqPuUqRWTI/A==
 
 "@types/prettier@^2.1.5":
   version "2.7.2"
@@ -14962,11 +14962,6 @@ postcss@^8.0.9, postcss@^8.2.15:
     nanoid "^3.3.6"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
-
-postmate@^1.5.2:
-  version "1.5.2"
-  resolved "https://registry.npmjs.org/postmate/-/postmate-1.5.2.tgz"
-  integrity sha512-EHLlEmrUA/hALls49oBrtE7BzDXXjB9EiO4MZpsoO3R/jRuBmD+2WKQuYAbeuVEpTzrPpUTT79z2cz4qaFgPRg==
 
 preferred-pm@^3.0.0:
   version "3.0.3"
