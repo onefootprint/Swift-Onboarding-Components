@@ -40,7 +40,7 @@ pub async fn handler(
             let data = user_auth
                 .data
                 .session_with_added_scopes(vec![UserAuthScope::Handoff]);
-            let auth_token = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
+            let (auth_token, _) = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status
             let handoff_record = HandoffRecord {

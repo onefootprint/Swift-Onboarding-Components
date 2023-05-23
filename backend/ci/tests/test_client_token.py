@@ -12,9 +12,10 @@ def client_token_with_scopes(user, scopes):
 
 
 def test_generate(sandbox_user):
-    data = dict(fields=["id.ssn9"])
+    data = dict(fields=["id.ssn9"], expires_in_m=60)
     tenant = sandbox_user.tenant
-    post(f"entities/{sandbox_user.fp_id}/client_token", data, tenant.sk.key)
+    body = post(f"entities/{sandbox_user.fp_id}/client_token", data, tenant.sk.key)
+    assert body["expires_at"]
 
     # Can't generate with dashboard auth
     post(

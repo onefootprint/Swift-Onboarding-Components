@@ -72,7 +72,7 @@ pub async fn post(
                 }
             };
             let data = UserSession::make(sv.vault_id, scopes);
-            let auth_token = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))
         })
         .await??;

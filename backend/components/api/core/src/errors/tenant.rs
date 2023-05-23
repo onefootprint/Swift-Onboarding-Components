@@ -17,4 +17,7 @@ pub enum TenantError {
     IncorrectVaultKindForRedoKyc,
     #[error("Cannot trigger KYC for non-portable vault")]
     CannotTriggerKycForNonPortable,
+
+    #[error("Token must be active for at least one minute and at most one day")]
+    InvalidExpiry,
 }

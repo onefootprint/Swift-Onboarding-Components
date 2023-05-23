@@ -1,10 +1,11 @@
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::ScopedSealingKey;
-use db::{models::session::Session, PgConn};
+use db::{models::session::Session, DbResult, PgConn};
 use newtypes::{AuthTokenHash, HasSessionKind, SealedSessionBytes, SessionAuthToken};
 
 use crate::{
     auth::{session::AuthSessionData, AuthError},
+    errors::ApiResult,
     State,
 };
 
@@ -16,7 +17,7 @@ pub struct AuthSession {
 }
 
 impl AuthSession {
-    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> Result<Option<Self>, crate::ApiError> {
+    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Option<Self>> {
         let key = auth_token.id();
         let session: Option<Session> = state
             .db_pool
@@ -44,9 +45,9 @@ impl AuthSession {
         state: &State,
         data: AuthSessionData,
         expires_in: Duration,
-    ) -> Result<SessionAuthToken, db::DbError> {
+    ) -> DbResult<SessionAuthToken> {
         let key = state.session_sealing_key.clone();
-        let auth_token = state
+        let (auth_token, _) = state
             .db_pool
             .db_query(move |conn| Self::create_sync(conn, &key, data, expires_in))
             .await??;
@@ -59,13 +60,13 @@ impl AuthSession {
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
         expires_in: Duration,
-    ) -> Result<SessionAuthToken, db::DbError> {
+    ) -> DbResult<(SessionAuthToken, Session)> {
         let token = SessionAuthToken::generate();
         let expires_at = Utc::now() + expires_in;
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
-        Session::update_or_create(conn, token.id(), sealed_data.0, kind, expires_at)?;
-        Ok(token)
+        let session = Session::update_or_create(conn, token.id(), sealed_data.0, kind, expires_at)?;
+        Ok((token, session))
     }
 
     pub fn update(
@@ -73,7 +74,7 @@ impl AuthSession {
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
-    ) -> Result<(), db::DbError> {
+    ) -> DbResult<()> {
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
         // Keep the same expiration date and primary key in the DB - just update the data

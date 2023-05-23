@@ -151,7 +151,8 @@ pub async fn post(
                 // Create the auth token for this user
                 let scopes = new_token_scopes.chain([sensitive_scope]).flatten().collect();
                 let data = UserSession::make(uv_id, scopes);
-                AuthSession::create_sync(conn, &session_key, data, duration)?
+                let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+                token
             };
             Ok((auth_token, user_kind))
         })

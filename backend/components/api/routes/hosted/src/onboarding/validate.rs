@@ -41,8 +41,8 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken { ob_id });
-            let validation_token = AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
-            Ok(validation_token)
+            let (token, _) = AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
+            Ok(token)
         })
         .await??;
 

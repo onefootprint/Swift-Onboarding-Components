@@ -5,6 +5,7 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
+use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::utils::session::AuthSession;
 use api_wire_types::ClientTokenRequest;
@@ -38,10 +39,16 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let ClientTokenRequest { fields } = request.into_inner();
+    let ClientTokenRequest { fields, ttl } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
 
-    let token = state
+    let ttl = ttl.unwrap_or(30 * 60);
+    #[allow(clippy::manual_range_contains)]
+    if ttl < 60 || ttl > (24 * 60 * 60) {
+        return Err(TenantError::InvalidExpiry.into());
+    }
+
+    let (token, session) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // We'll check this later too, but worth at least doing a sanity check that the user
@@ -54,11 +61,12 @@ pub async fn post(
                 fields: fields.into_iter().collect(),
                 tenant_api_key_id,
             };
-            let duration = Duration::minutes(30);
-            let auth_token = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
-            Ok(auth_token)
+            let duration = Duration::seconds(ttl.into());
+            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
+            Ok((auth_token, session))
         })
         .await??;
 
-    ResponseData::ok(ClientTokenResponse { token }).json()
+    let expires_at = session.expires_at;
+    ResponseData::ok(ClientTokenResponse { token, expires_at }).json()
 }
