@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoEye16, IcoWarning16 } from '@onefootprint/icons';
+import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
 import { EntityStatus } from '@onefootprint/types';
 import { Badge, Box, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -31,7 +31,7 @@ const StatusBadge = ({
         {t(status)}
         {requiresManualReview && (
           <IconContainer>
-            <IcoWarning16 color={badgeVariant} testID="manualReviewIcon" />
+            <IcoWarningSmall16 color={badgeVariant} testID="manualReviewIcon" />
           </IconContainer>
         )}
       </Badge>
@@ -64,6 +64,7 @@ const StatusBadge = ({
 
 const IconContainer = styled.div`
   ${({ theme }) => css`
+    display: flex;
     margin-left: ${theme.spacing[2]};
   `};
 `;
