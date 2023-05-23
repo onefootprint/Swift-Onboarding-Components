@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 2.0.1
+
+### Minor Changes
+
+- fa27c0bd7: Fix a bug where users using Chrome browser couldn't log in using passkeys
+
 ## 2.0.0
 
 ### Major Changes
