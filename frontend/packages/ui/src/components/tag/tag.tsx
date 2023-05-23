@@ -9,7 +9,7 @@ export type TagProps = {
 
 const Tag = styled.span<TagProps>`
   ${({ theme }) => css`
-    ${createFontStyles('caption-2')};
+    ${createFontStyles('body-4')};
     color: ${theme.color.neutral};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     background-color: ${theme.backgroundColor.primary};
