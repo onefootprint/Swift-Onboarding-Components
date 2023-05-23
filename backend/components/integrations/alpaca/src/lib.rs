@@ -1,0 +1,98 @@
+use std::fmt::Display;
+use std::time::Duration;
+
+use async_trait::async_trait;
+use macros::HiddenDebug;
+use newtypes::PiiString;
+use reqwest::Method;
+use serde::Serialize;
+use tokio_retry::strategy::{jitter, ExponentialBackoff};
+use tokio_retry::Retry;
+mod error;
+mod types;
+
+pub use self::error::Error;
+pub use self::types::*;
+
+pub type AlpacaResult<T> = Result<T, error::Error>;
+
+#[derive(HiddenDebug, Clone)]
+pub struct AlpacaCipClient {
+    api_key: PiiString,
+    api_secret: PiiString,
+    host: String,
+    client: reqwest::Client,
+}
+
+impl AlpacaCipClient {
+    pub fn new(api_key: PiiString, api_secret: PiiString, host: &str) -> AlpacaResult<Self> {
+        let client = reqwest::Client::builder().build()?;
+
+        Ok(Self {
+            api_key,
+            api_secret,
+            host: host.into(),
+            client,
+        })
+    }
+
+    fn url<P: Display>(&self, path: P) -> String {
+        format!("https://{}{}", &self.host, path)
+    }
+
+    async fn make_request_with_retry<S: Serialize + Clone, P: Display + Clone>(
+        &self,
+        method: Method,
+        path: P,
+        json_body: &S,
+    ) -> AlpacaResult<reqwest::Response> {
+        let retry_strategy = ExponentialBackoff::from_millis(10)
+        .map(jitter) // add jitter
+        .take(3); // limit to 3 retries
+
+        let result = Retry::spawn(retry_strategy, move || {
+            self.make_request(method.clone(), path.clone(), json_body)
+        })
+        .await?;
+
+        Ok(result)
+    }
+
+    async fn make_request<S: Serialize + Clone, P: Display>(
+        &self,
+        method: Method,
+        path: P,
+        json_body: &S,
+    ) -> AlpacaResult<reqwest::Response> {
+        let url = self.url(path);
+
+        let request: reqwest::Request = self
+            .client
+            .request(method, url)
+            .timeout(Duration::from_secs(4))
+            .basic_auth(
+                self.api_key.leak_to_string(),
+                Some(self.api_secret.leak_to_string()),
+            )
+            .json(json_body)
+            .build()?;
+
+        Ok(self.client.execute(request).await?)
+    }
+}
+
+#[async_trait]
+pub trait AlpacaCip {
+    /// POST /v1/accounts/{account_id}/cip
+    /// Returns the direct response from alpaca
+    async fn send_cip(&self, account_id: String, request: CipRequest) -> AlpacaResult<reqwest::Response>;
+}
+
+#[async_trait]
+impl AlpacaCip for AlpacaCipClient {
+    async fn send_cip(&self, account_id: String, request: CipRequest) -> AlpacaResult<reqwest::Response> {
+        let path = format!("/v1/accounts/{account_id}/cip");
+        let response = self.make_request_with_retry(Method::POST, path, &request).await?;
+        Ok(response)
+    }
+}

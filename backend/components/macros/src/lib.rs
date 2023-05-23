@@ -361,3 +361,19 @@ pub fn route_alias(
     // eprintln!("block: {}", &output.to_string());
     output.into()
 }
+
+#[proc_macro_derive(HiddenDebug)]
+pub fn hidden_debug(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    let name = &ast.ident;
+    let name_string = format!("{} {{ hidden }}", &name);
+
+    quote! {
+        impl std::fmt::Debug for #name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_struct(#name_string).finish()
+            }
+        }
+    }
+    .into()
+}

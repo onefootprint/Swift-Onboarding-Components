@@ -418,6 +418,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "alpaca"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "base64 0.13.0",
+ "chrono",
+ "derive_more",
+ "itertools 0.10.3",
+ "macros",
+ "newtypes",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+ "thiserror",
+ "tokio",
+ "tokio-retry",
+ "tracing",
+ "url",
+ "uuid 1.2.2",
+]
+
+[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
