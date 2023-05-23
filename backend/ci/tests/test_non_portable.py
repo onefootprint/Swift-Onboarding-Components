@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import post, get, patch
+from tests.utils import post, get, patch, delete
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
@@ -153,7 +153,7 @@ def test_vault_create_write_decrypt(tenant):
         **all_data,
         "card.hayes.expiration.month": all_data["card.hayes.expiration"].split("/")[0],
         "card.hayes.expiration.year": all_data["card.hayes.expiration"].split("/")[1],
-        "card.hayes.number.last4": all_data["card.hayes.number"][-4:]
+        "card.hayes.number.last4": all_data["card.hayes.number"][-4:],
     }
     for f in fields_to_check:
         assert data[f] == all_data[f]
@@ -169,3 +169,28 @@ def test_vault_create_write_decrypt(tenant):
 
     events = set(access_events[0]["targets"])
     assert events == set(fields_to_check)
+
+    # delete some data
+    params = dict(fields="card.valley.cvc")
+    body = delete(f"entities/{fp_id}/vault", params, tenant.sk.key)
+    assert body["card.valley.cvc"] == True
+
+    # check data no longer exists
+    body = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
+    assert not body["card.valley.cvc"]
+
+    data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
+    body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
+    assert "card.valley.cvc" not in data
+
+    # check the access events and check it's correct
+    body = get(
+        "org/access_events",
+        dict(footprint_user_id=fp_id),
+        tenant.sk.key,
+    )
+    access_events = body["data"]
+    events = access_events[1]["targets"]
+    assert events == ["card.valley.cvc"]
+
+    assert access_events[1]["kind"] == "delete"

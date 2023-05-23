@@ -31,5 +31,6 @@ use strum_macros::{AsRefStr, EnumString};
 pub enum AccessEventKind {
     Decrypt,
     Update,
+    Delete,
 }
 crate::util::impl_enum_str_diesel!(AccessEventKind);

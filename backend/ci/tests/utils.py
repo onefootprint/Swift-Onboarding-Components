@@ -116,6 +116,19 @@ def patch(path, data=None, *auths, status_code=200, addl_headers=None):
     ).json()
 
 
+def delete(path, data=None, *auths, status_code=200, addl_headers=None):
+    return _make_request(
+        method=requests.delete,
+        path=path,
+        data=data,
+        params=None,
+        status_code=status_code,
+        auths=auths,
+        files=None,
+        addl_headers=addl_headers,
+    ).json()
+
+
 def try_until_success(fn, timeout_s=5, retry_interval_s=1):
     start_time = arrow.now()
     last_exception = None

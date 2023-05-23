@@ -3,6 +3,7 @@ mod build;
 pub mod checks;
 mod decrypt;
 mod decrypt_request;
+mod delete;
 
 use db::models::onboarding::OnboardingAndConfig;
 pub use decrypt_request::DecryptRequest;

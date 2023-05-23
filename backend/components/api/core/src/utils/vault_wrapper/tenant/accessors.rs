@@ -7,7 +7,7 @@ impl<Type> TenantVw<Type> {
     /// Returns the list of TenantScopes representing permissions to see data on this user vault.
     /// For portable vaults, the visible data is granted by approved onboarding configurations.
     /// For non-portable vaults, all data is visible
-    fn can_see_scopes(&self) -> Vec<TenantScope> {
+    pub(super) fn can_see_scopes(&self) -> Vec<TenantScope> {
         if !self.vault.is_portable {
             // All fields are visible in non-portable vaults
             return vec![TenantScope::Admin];
