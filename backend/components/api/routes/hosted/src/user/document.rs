@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::tenant::TenantError;
@@ -23,6 +21,7 @@ use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
+use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
@@ -133,8 +132,8 @@ pub async fn post(
         .collect_vec();
 
     let su_id = user_auth.scoped_user.id.clone();
-    let mut s3_urls: HashMap<_, _> = match futures::future::try_join_all(s3_upload_futs).await {
-        Ok(s) => Ok(s.into_iter().collect()),
+    let s3_urls = match futures::future::try_join_all(s3_upload_futs).await {
+        Ok(s) => Ok(s),
         Err(e) => {
             handle_upload_error(&state.db_pool, doc_request.id.clone(), su_id).await?;
             Err(e)
@@ -156,12 +155,15 @@ pub async fn post(
                 request_id: doc_request_id,
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
-                e_data_key: e_data_key.clone(),
-                front_image_s3_url: s3_urls.remove(&DocumentSide::Front),
-                back_image_s3_url: s3_urls.remove(&DocumentSide::Back),
-                selfie_image_s3_url: s3_urls.remove(&DocumentSide::Selfie),
             };
             let id_doc = IdentityDocument::create(conn, args)?;
+            // Create each of the uploads
+            s3_urls
+                .into_iter()
+                .map(|(side, s3_url)| {
+                    DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone())
+                })
+                .collect::<db::DbResult<Vec<_>>>()?;
 
             //
             // Now that the document is created, either initiate IDV reqs or create fixture data

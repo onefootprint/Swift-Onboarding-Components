@@ -178,6 +178,23 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    document_upload (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        document_id -> Text,
+        side -> Text,
+        s3_url -> Text,
+        e_data_key -> Bytea,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     fingerprint (id) {
         id -> Text,
         sh_data -> Bytea,
@@ -222,13 +239,9 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        e_data_key -> Bytea,
         front_lifetime_id -> Nullable<Text>,
         back_lifetime_id -> Nullable<Text>,
         selfie_lifetime_id -> Nullable<Text>,
-        front_image_s3_url -> Nullable<Text>,
-        back_image_s3_url -> Nullable<Text>,
-        selfie_image_s3_url -> Nullable<Text>,
     }
 }
 
@@ -912,6 +925,7 @@ joinable!(data_lifetime -> vault (vault_id));
 joinable!(decision_intent -> scoped_vault (scoped_vault_id));
 joinable!(document_data -> data_lifetime (lifetime_id));
 joinable!(document_request -> scoped_vault (scoped_vault_id));
+joinable!(document_upload -> identity_document (document_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
@@ -980,6 +994,7 @@ allow_tables_to_appear_in_same_query!(
     decision_intent,
     document_data,
     document_request,
+    document_upload,
     fingerprint,
     fingerprint_visit_event,
     identity_document,

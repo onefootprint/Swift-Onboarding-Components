@@ -9,7 +9,7 @@ use crate::{
 };
 use newtypes::{
     DecisionIntentId, DocumentRequestId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedVaultId,
-    SealedVaultDataKey, VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+    VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
 };
 use std::str::FromStr;
 
@@ -79,10 +79,6 @@ pub fn create(
             request_id: doc_request.id.clone(),
             document_type: newtypes::IdDocKind::DriverLicense,
             country_code: "USA".to_owned(),
-            e_data_key: SealedVaultDataKey(vec![]),
-            front_image_s3_url: None,
-            back_image_s3_url: None,
-            selfie_image_s3_url: None,
         };
         let id1 = IdentityDocument::create(conn, args).unwrap();
 

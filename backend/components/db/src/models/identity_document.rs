@@ -1,4 +1,4 @@
-use crate::schema::{document_request, identity_document};
+use crate::schema::{document_request, document_upload, identity_document};
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -10,15 +10,15 @@ use std::collections::HashMap;
 
 use newtypes::{
     Base64Data, DataLifetimeId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId,
-    ScopedVaultId, SealedVaultDataKey, VaultId,
+    ScopedVaultId, VaultId,
 };
-use serde::{Deserialize, Serialize};
 
 pub type S3Url = String;
 
 use super::document_request::DocumentRequest;
+use super::document_upload::DocumentUpload;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document)]
 pub struct IdentityDocument {
     pub id: IdentityDocumentId,
@@ -29,38 +29,26 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub e_data_key: SealedVaultDataKey,
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
-    pub front_image_s3_url: Option<S3Url>,
-    pub back_image_s3_url: Option<S3Url>,
-    pub selfie_image_s3_url: Option<S3Url>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = identity_document)]
 pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
     pub country_code: String,
-    pub e_data_key: SealedVaultDataKey,
-    pub front_image_s3_url: Option<S3Url>,
-    pub back_image_s3_url: Option<S3Url>,
-    pub selfie_image_s3_url: Option<S3Url>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = identity_document)]
 struct NewIdentityDocumentRow {
     request_id: DocumentRequestId,
     document_type: IdDocKind,
     country_code: String,
     created_at: DateTime<Utc>,
-    e_data_key: SealedVaultDataKey,
-    front_image_s3_url: Option<S3Url>,
-    back_image_s3_url: Option<S3Url>,
-    selfie_image_s3_url: Option<S3Url>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -72,27 +60,18 @@ pub struct IdentityDocumentUpdate {
 }
 
 impl IdentityDocument {
-    #[allow(clippy::too_many_arguments)]
     #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
         let NewIdentityDocumentArgs {
             request_id,
             document_type,
             country_code,
-            e_data_key,
-            front_image_s3_url,
-            back_image_s3_url,
-            selfie_image_s3_url,
         } = args;
         let new = NewIdentityDocumentRow {
             request_id,
             document_type,
             country_code,
             created_at: Utc::now(),
-            e_data_key,
-            front_image_s3_url,
-            back_image_s3_url,
-            selfie_image_s3_url,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
@@ -102,7 +81,11 @@ impl IdentityDocument {
 
     /// Get the identity document, and the associated document request
     #[tracing::instrument(skip_all)]
-    pub fn update(conn: &mut PgConn, id: &IdentityDocumentId, update: IdentityDocumentUpdate) -> DbResult<Self> {
+    pub fn update(
+        conn: &mut PgConn,
+        id: &IdentityDocumentId,
+        update: IdentityDocumentUpdate,
+    ) -> DbResult<Self> {
         let res = diesel::update(identity_document::table)
             .filter(identity_document::id.eq(id))
             .set(update)
@@ -153,6 +136,14 @@ impl IdentityDocument {
 
         Ok(results)
     }
+
+    pub fn images(&self, conn: &mut PgConn) -> DbResult<Vec<DocumentUpload>> {
+        let results = document_upload::table
+            .filter(document_upload::document_id.eq(&self.id))
+            .filter(document_upload::deactivated_at.is_null())
+            .get_results(conn)?;
+        Ok(results)
+    }
 }
 
 impl IdentityDocument {
@@ -182,16 +173,5 @@ impl IdentityDocument {
             "documents/encrypted/{}/{}/{}",
             user_vault_id, side, document_request_id
         )
-    }
-
-    pub fn images(self) -> Vec<(DocumentSide, S3Url)> {
-        vec![
-            self.front_image_s3_url.map(|url| (DocumentSide::Front, url)),
-            self.back_image_s3_url.map(|url| (DocumentSide::Back, url)),
-            self.selfie_image_s3_url.map(|url| (DocumentSide::Selfie, url)),
-        ]
-        .into_iter()
-        .flatten()
-        .collect()
     }
 }

@@ -6,6 +6,7 @@ use crate::{errors::ApiError, State};
 
 use db::DbPool;
 use db::models::document_request::DocRefId;
+use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -70,17 +71,15 @@ pub async fn bulk_build_data_from_requests(
 
 }
 
-async fn decrypt_id_doc_documents(
+async fn decrypt_documents(
     e_private_key: &EncryptedVaultPrivateKey,
     enclave_client: &EnclaveClient,
-    id_document: &IdentityDocument,
+    images: Vec<DocumentUpload>,
 ) -> ApiResult<HashMap<DocumentSide, PiiBytes>> {
-    let e_data_key = id_document.e_data_key.clone();
-    let (sides, s3_urls): (Vec<_>, Vec<_>) = id_document.clone().images().into_iter().unzip();
-    let document_datas = s3_urls.iter().map(|url| (&e_data_key, url)).collect();
+    let (sides, docs): (Vec<_>, _) = images.iter().map(|u| (u.side, (&u.e_data_key, &u.s3_url))).unzip();
 
     let decrypted_documents = enclave_client
-        .batch_decrypt_documents(e_private_key, document_datas)
+        .batch_decrypt_documents(e_private_key, docs)
         .await?;
 
     let results = sides.into_iter().zip(decrypted_documents).collect();
@@ -100,18 +99,19 @@ pub async fn build_docv_data_for_submission_from_verification_request(
             format!("{} is not a document verification vendor", request.vendor_api),
     ))};
 
-    let (doc, ref_id, vault) = db_pool
+    let (doc, ref_id, images, vault) = db_pool
         .db_query(
-            move |conn| -> Result<(IdentityDocument, Option<String>, _), ApiError> {
+            move |conn| -> ApiResult<_> {
                 let (doc, dr) = IdentityDocument::get(conn, &identity_doc_id)?;
+                let images = doc.images(conn)?;
                 let vault = Vault::get(conn, &dr.scoped_vault_id)?;
-                Ok((doc, dr.ref_id, vault))
+                Ok((doc, dr.ref_id, images, vault))
             },
         )
         .await??;        
 
     // decrypt the images and make sure we have at least a front image
-    let mut decrypted = decrypt_id_doc_documents(&vault.e_private_key, enclave_client, &doc).await?;
+    let mut decrypted = decrypt_documents(&vault.e_private_key, enclave_client, images).await?;
 
     if decrypted.get(&DocumentSide::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())
@@ -137,15 +137,16 @@ pub async fn build_docv_data_from_identity_doc(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     identity_document_id: IdentityDocumentId,
-) -> Result<DocVData, ApiError> {
-    let (doc, uvw) = db_pool
+) -> ApiResult<DocVData> {
+    let (doc, images, uvw) = db_pool
         .db_query(
-            move |conn| -> Result<(IdentityDocument,  _), ApiError> {
+            move |conn| -> ApiResult<_> {
                 let (doc, dr) = IdentityDocument::get(conn, &identity_document_id)?;
+                let images = doc.images(conn)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
                 let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &dr.scoped_vault_id)?;
-                Ok((doc, uvw))
+                Ok((doc, images, uvw))
             },
         )
         .await??;        
@@ -153,7 +154,7 @@ pub async fn build_docv_data_from_identity_doc(
     let name_idks = vec![DataIdentifier::from(IDK::FirstName), DataIdentifier::from(IDK::LastName)];
     let mut decrypted_name_idks = uvw.decrypt_unchecked(enclave_client, &name_idks).await?;
     // decrypt the images and make sure we have at least a front image
-    let mut decrypted = decrypt_id_doc_documents(&uvw.vault.e_private_key, enclave_client, &doc).await?;
+    let mut decrypted = decrypt_documents(&uvw.vault.e_private_key, enclave_client, images).await?;
 
     if decrypted.get(&DocumentSide::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())

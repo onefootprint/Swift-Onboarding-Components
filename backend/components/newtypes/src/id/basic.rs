@@ -92,6 +92,7 @@ define_newtype_id!(AppearanceId, String, "Identifier for an appearance");
 
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
 define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
+define_newtype_id!(DocumentUploadId, String, "Identifier for a DocumentUpload");
 define_newtype_id!(RequirementId, String, "Identifier for a Requirement");
 define_newtype_id!(OnboardingDecisionId, String, "Identifier for a decision");
 define_newtype_id!(RiskSignalId, String, "Identifier for a risk signal");

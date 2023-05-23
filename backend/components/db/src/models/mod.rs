@@ -8,6 +8,7 @@ pub mod data_lifetime;
 pub mod decision_intent;
 pub mod document_data;
 pub mod document_request;
+pub mod document_upload;
 pub mod fingerprint;
 pub mod fingerprint_visit_event;
 pub mod identity_document;

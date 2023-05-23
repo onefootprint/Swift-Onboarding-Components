@@ -58,16 +58,15 @@ impl Complete {
 
         // Now that we have the correct type of the document, add the images to the vault
         // under the correct type
-        let e_data_key = id_doc.e_data_key.clone();
         let mut lifetime_ids: HashMap<_, _> = id_doc
-            .images()
+            .images(conn)?
             .into_iter()
-            .map(|(side, url)| -> ApiResult<_> {
-                let kind = DocumentKind::from_id_doc_kind(dk, side);
+            .map(|u| -> ApiResult<_> {
+                let kind = DocumentKind::from_id_doc_kind(dk, u.side);
                 let name = format!("{}.png", kind);
                 let mime_type = "image/png".to_string();
-                let r = uvw.put_document_unsafe(conn, kind, mime_type, name, e_data_key.clone(), url)?;
-                Ok((side, r.lifetime_id))
+                let r = uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url)?;
+                Ok((u.side, r.lifetime_id))
             })
             .collect::<ApiResult<_>>()?;
 
