@@ -8,7 +8,6 @@ use crate::errors::ApiResult;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchScoresRequest;
@@ -16,7 +15,6 @@ use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 pub struct FetchScores {
     pub session: VerificationSession,
-    pub fetch_scores_verification_request: VerificationRequest,
 }
 
 #[async_trait]
@@ -27,49 +25,41 @@ impl IncodeStateTransition for FetchScores {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.sv_id.clone();
-        let di_id = ctx.di_id.clone();
         //
         // make the request to incode
         //
-        let fetch_scores_vreq_id = self.fetch_scores_verification_request.id;
-
         let request = IncodeFetchScoresRequest {
             credentials: self.session.credentials.clone(),
         };
-
-        let request_result = footprint_http_client.make_request(request).await;
+        let res = footprint_http_client.make_request(request).await;
 
         //
         // Save our result
         //
-        let vres = SaveVerificationResultArgs::from((&request_result, fetch_scores_vreq_id));
-        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
+        let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeFetchScores, ctx);
+        save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        let fetch_scores_response = request_result
+        let fetch_scores_response = res
             .map_err(map_to_api_err)?
             .result
             .into_success()
             .map_err(map_to_api_err)?;
 
         let session_id = self.session.id.clone();
-        let fetch_ocr_verification_request = db_pool
-            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
-                let req = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeFetchOCR)?;
-
+        db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
                 let update =
                     UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::FetchOCR);
                 IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                Ok(req)
+                Ok(())
             })
             .await?;
 
         Ok(FetchOCR {
             session: self.session,
             fetch_scores_response,
-            fetch_ocr_verification_request,
         }
         .into())
     }

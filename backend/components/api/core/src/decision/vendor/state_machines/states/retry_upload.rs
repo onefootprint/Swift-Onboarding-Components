@@ -6,12 +6,10 @@ use async_trait::async_trait;
 use db::models::document_request::{DocumentRequest, DocumentRequestUpdate};
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::models::user_timeline::UserTimeline;
-use db::models::verification_request::VerificationRequest;
 use db::{DbPool, PgConn, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{
     DocumentRequestStatus, IdentityDocumentUploadedInfo, IncodeVerificationSessionState, ScopedVaultId,
-    VendorAPI,
 };
 
 /// Document upload has failed and user needs to retry
@@ -75,39 +73,27 @@ impl IncodeStateTransition for RetryUpload {
         _footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.sv_id.clone();
-        let di_id = ctx.di_id.clone();
         let session_id = self.session.id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         //
         // Set up the next state transition
         //
         // Save the next stage's Vreq
-        let add_front_vreq = db_pool
-            .db_transaction(move |conn| -> ApiResult<VerificationRequest> {
-                let res = VerificationRequest::create_document_verification_request(
-                    conn,
-                    VendorAPI::IncodeAddFront,
-                    sv_id,
-                    id_doc_id.clone(),
-                    &di_id,
-                )?;
-
+        db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
                 // Update our state to the next stage and add in the new identity document
                 let update = UpdateIncodeVerificationSession::set_state_and_identity_document(
                     IncodeVerificationSessionState::AddFront,
                     id_doc_id,
                 );
-
                 IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                Ok(res)
+                Ok(())
             })
             .await?;
 
         Ok(AddFront {
             session: self.session,
-            add_front_verification_request: add_front_vreq,
         }
         .into())
     }

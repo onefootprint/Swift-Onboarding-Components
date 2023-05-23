@@ -8,16 +8,14 @@ use crate::errors::ApiResult;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::doc::IncodeFetchOCRRequest;
-use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState};
+use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState, VendorAPI};
 
 pub struct FetchOCR {
     pub session: VerificationSession,
-    pub fetch_ocr_verification_request: VerificationRequest,
     pub fetch_scores_response: FetchScoresResponse,
 }
 
@@ -32,23 +30,19 @@ impl IncodeStateTransition for FetchOCR {
         //
         // make the request to incode
         //
-        let fetch_ocr_vreq_id = self.fetch_ocr_verification_request.id;
-
         let request = IncodeFetchOCRRequest {
             credentials: self.session.credentials.clone(),
         };
-
-        let request_result = footprint_http_client.make_request(request).await;
+        let res = footprint_http_client.make_request(request).await;
 
         //
         // Save our result
         //
-        // TODO this isn't atomic with the rest of the operations so could happen twice
-        let vres = SaveVerificationResultArgs::from((&request_result, fetch_ocr_vreq_id));
-        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
+        let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeFetchOCR, ctx);
+        save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        let fetch_ocr_response = request_result
+        let fetch_ocr_response = res
             .map_err(map_to_api_err)?
             .result
             .into_success()

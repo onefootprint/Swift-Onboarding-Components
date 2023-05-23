@@ -9,7 +9,6 @@ use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::models::ob_configuration::ObConfiguration;
-use db::models::verification_request::VerificationRequest;
 use db::{DbPool, DbResult};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::request::OnboardingStartCustomNameFields;
@@ -32,34 +31,28 @@ impl IncodeStateTransition for StartOnboarding {
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
         let sv_id = ctx.sv_id.clone();
-        let di_id = ctx.di_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         let config_id = self.configuration_id.clone();
 
         //
         // Save our initial VReq
         //
-        // TODO not idempotent
-        let (start_onboarding_verification_request, verification_session) = db_pool
-            .db_transaction(
-                move |conn| -> DbResult<(VerificationRequest, IncodeVerificationSession)> {
-                    let vr =
-                        VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeStartOnboarding)?;
+        // TODO should we do this inside the machine init where we look to see if there's an existing session?
+        let incode_session = db_pool
+            .db_transaction(move |conn| -> DbResult<_> {
+                let obc = ObConfiguration::get_by_scoped_vault_id(conn, &sv_id)?;
+                let session_kind = if obc.must_collect_selfie() {
+                    IncodeVerificationSessionKind::Selfie
+                } else {
+                    IncodeVerificationSessionKind::IdDocument
+                };
 
-                    let obc = ObConfiguration::get_by_scoped_vault_id(conn, &sv_id)?;
-                    let session_kind = if obc.must_collect_selfie() {
-                        IncodeVerificationSessionKind::Selfie
-                    } else {
-                        IncodeVerificationSessionKind::IdDocument
-                    };
+                // Initialize the incode state
+                let incode_session =
+                    IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id, session_kind)?;
 
-                    // Initialize the incode state
-                    let is =
-                        IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id, session_kind)?;
-
-                    Ok((vr, is))
-                },
-            )
+                Ok(incode_session)
+            })
             .await?;
 
         //
@@ -76,22 +69,17 @@ impl IncodeStateTransition for StartOnboarding {
             session_id: None,
             custom_name_fields: Some(custom_name_fields),
         };
-
-        let request_result = footprint_http_client.make_request(request).await;
+        let res = footprint_http_client.make_request(request).await;
 
         //
         // Save our result
         //
-        let vres = SaveVerificationResultArgs::from((
-            &request_result,
-            start_onboarding_verification_request.id.clone(),
-        ));
-
-        save_incode_verification_result(db_pool, vres, &ctx.vault.public_key).await?;
+        let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeStartOnboarding, ctx);
+        save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
         // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
-        let successful_response = request_result
+        let successful_response = res
             .map_err(map_to_api_err)?
             .result
             .into_success()
@@ -101,22 +89,21 @@ impl IncodeStateTransition for StartOnboarding {
         // Set up the next state transition
         //
         let session = VerificationSession {
-            id: verification_session.id.clone(),
+            id: incode_session.id.clone(),
             credentials: IncodeCredentialsWithToken {
                 credentials: self.incode_credentials,
                 authentication_token: successful_response.token.clone(),
             },
         };
 
-        // Save the next stage's Vreq
         let ctx = ctx.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 // We only need to add consent if the session is of kind=Selfie
-                let next_state: IncodeState = if verification_session.kind.requires_consent() {
+                let next_state: IncodeState = if incode_session.kind.requires_consent() {
                     AddConsent::enter(conn, &ctx, session)?.into()
                 } else {
-                    AddFront::enter(conn, &ctx, session)?.into()
+                    AddFront { session }.into()
                 };
 
                 // Update our state to the next stage
@@ -125,8 +112,7 @@ impl IncodeStateTransition for StartOnboarding {
                     IncodeSessionId::from(successful_response.interview_id),
                     IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
                 );
-
-                IncodeVerificationSession::update(conn, &verification_session.id, update)?;
+                IncodeVerificationSession::update(conn, &incode_session.id, update)?;
 
                 Ok(next_state)
             })

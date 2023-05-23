@@ -8,7 +8,6 @@ use crate::errors::ApiResult;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use db::{models::user_consent::UserConsent, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
@@ -19,8 +18,6 @@ use newtypes::{IncodeVerificationSessionState, VendorAPI};
 pub struct AddConsent {
     pub session: VerificationSession,
     pub user_consent_text: String,
-    pub privacy_vreq: VerificationRequest,
-    pub ml_vreq: VerificationRequest,
 }
 
 impl AddConsent {
@@ -29,17 +26,9 @@ impl AddConsent {
         let consent = UserConsent::latest_for_scoped_vault(conn, &ctx.sv_id)?
             .ok_or(ApiError::AssertionError("User consent not found".into()))?;
 
-        let privacy_vreq =
-            VerificationRequest::create(conn, &ctx.sv_id, &ctx.di_id, VendorAPI::IncodeAddPrivacyConsent)?;
-
-        let ml_vreq =
-            VerificationRequest::create(conn, &ctx.sv_id, &ctx.di_id, VendorAPI::IncodeAddMLConsent)?;
-
         Ok(Self {
             session,
             user_consent_text: consent.consent_language_text,
-            privacy_vreq,
-            ml_vreq,
         })
     }
 }
@@ -63,26 +52,27 @@ impl IncodeStateTransition for AddConsent {
             status: true,
         };
 
-        let privacy_request_result = footprint_http_client.make_request(privacy_request).await;
-        let ml_request_result = footprint_http_client.make_request(ml_request).await;
+        let privacy_res = footprint_http_client.make_request(privacy_request).await;
+        let ml_res = footprint_http_client.make_request(ml_request).await;
 
         //
         // Save our result
         //
-        let privacy_vres = SaveVerificationResultArgs::from((&privacy_request_result, self.privacy_vreq.id));
-        let ml_vres = SaveVerificationResultArgs::from((&ml_request_result, self.ml_vreq.id));
+        let privacy_args =
+            SaveVerificationResultArgs::from(&privacy_res, VendorAPI::IncodeAddPrivacyConsent, ctx);
+        let ml_args = SaveVerificationResultArgs::from(&ml_res, VendorAPI::IncodeAddMLConsent, ctx);
 
-        save_incode_verification_result(db_pool, privacy_vres, &ctx.vault.public_key).await?;
-        save_incode_verification_result(db_pool, ml_vres, &ctx.vault.public_key).await?;
+        save_incode_verification_result(db_pool, privacy_args).await?;
+        save_incode_verification_result(db_pool, ml_args).await?;
 
         // Now ensure we don't have an error
-        privacy_request_result
+        privacy_res
             .map_err(map_to_api_err)?
             .result
             .into_success()
             .map_err(map_to_api_err)?;
 
-        ml_request_result
+        ml_res
             .map_err(map_to_api_err)?
             .result
             .into_success()
@@ -92,7 +82,6 @@ impl IncodeStateTransition for AddConsent {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
-        let ctx = ctx.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 let update =
@@ -100,7 +89,10 @@ impl IncodeStateTransition for AddConsent {
 
                 IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
-                let next = AddFront::enter(conn, &ctx, self.session)?.into();
+                let next = AddFront {
+                    session: self.session,
+                }
+                .into();
 
                 Ok(next)
             })

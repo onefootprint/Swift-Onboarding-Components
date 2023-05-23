@@ -8,7 +8,6 @@ use crate::errors::ApiResult;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddBackRequest;
@@ -17,7 +16,6 @@ use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 
 pub struct AddBack {
     pub session: VerificationSession,
-    pub add_back_verification_request: VerificationRequest,
 }
 
 #[async_trait]
@@ -28,13 +26,9 @@ impl IncodeStateTransition for AddBack {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
     ) -> Result<IncodeState, ApiError> {
-        let sv_id = ctx.sv_id.clone();
-        let di_id = ctx.di_id.clone();
-
         //
         // make the request to incode
         //
-        let add_back_vreq_id = self.add_back_verification_request.id;
         let docv_data = DocVData {
             back_image: ctx.docv_data.back_image.clone(),
             country_code: ctx.docv_data.country_code.clone(),
@@ -50,11 +44,8 @@ impl IncodeStateTransition for AddBack {
         //
         // Save our result
         //
-        let save_verification_result_args =
-            SaveVerificationResultArgs::from((&request_result, add_back_vreq_id));
-
-        save_incode_verification_result(db_pool, save_verification_result_args, &ctx.vault.public_key)
-            .await?;
+        let args = SaveVerificationResultArgs::from(&request_result, VendorAPI::IncodeAddBack, ctx);
+        save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
         let response = request_result
@@ -87,14 +78,12 @@ impl IncodeStateTransition for AddBack {
 
                     RetryUpload::enter(conn, &ctx, self.session)?.into()
                 } else {
-                    let res = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeProcessId)?;
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::ProcessId);
                     IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
                     ProcessId {
                         session: self.session,
-                        process_id_verification_request: res,
                     }
                     .into()
                 };
