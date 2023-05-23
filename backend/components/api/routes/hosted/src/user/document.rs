@@ -7,12 +7,10 @@ use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
-use api_core::config::Config;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IncodeStateMachine};
 use api_core::decision::vendor::state_machines::states::document_retry_limit_exceeded;
 use api_core::decision::vendor::state_machines::states::Complete;
-use api_core::enclave_client::EnclaveClient;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
@@ -27,7 +25,6 @@ use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::{DbError, DbPool, DbResult, PgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DocumentRequestId, DocumentRequestStatus, DocumentSide, IdDocKind, IdentityDocumentId,
@@ -190,20 +187,10 @@ pub async fn post(
         })
         .await?;
 
-    if let Some((decision_intent, doc_request, id_doc_id)) = created_reqs {
+    if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Make our request!
-        handle_incode_request(
-            &state.db_pool,
-            &state.enclave_client,
-            &state.config,
-            &state.footprint_vendor_http_client,
-            id_doc_id,
-            user_auth.scoped_user.tenant_id.clone(),
-            decision_intent.id,
-            uvw.vault,
-            doc_request,
-        )
-        .await?;
+        let t_id = user_auth.scoped_user.tenant_id.clone();
+        handle_incode_request(&state, id_doc_id, t_id, di.id, uvw.vault, doc_request).await?;
     }
 
     EmptyResponse::ok().json()
@@ -308,18 +295,14 @@ pub fn construct_get_response(
 
 #[allow(clippy::too_many_arguments)]
 async fn handle_incode_request(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    config: &Config,
-    footprint_http_client: &FootprintVendorHttpClient,
+    state: &State,
     identity_document_id: IdentityDocumentId,
     tenant_id: TenantId,
     decision_intent_id: DecisionIntentId,
     vault: Vault,
     doc_request: DbDocumentRequest,
 ) -> Result<(), ApiError> {
-    let docv_data =
-        build_docv_data_from_identity_doc(db_pool, enclave_client, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
+    let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
     // Initialize our state machine
     let ctx = IncodeContext {
@@ -331,10 +314,8 @@ async fn handle_incode_request(
         doc_request_id: doc_request.id,
     };
     let machine = IncodeStateMachine::init(
+        state,
         tenant_id,
-        db_pool,
-        enclave_client,
-        config,
         // TODO: upstream this somewhere based on OBC
         IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
         ctx,
@@ -342,7 +323,7 @@ async fn handle_incode_request(
     .await?; // TODO: handle this with better requirement checking
 
     machine
-        .run(db_pool, footprint_http_client)
+        .run(&state.db_pool, &state.footprint_vendor_http_client)
         .await
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 

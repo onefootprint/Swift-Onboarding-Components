@@ -1,23 +1,20 @@
+use super::states::*;
+use crate::decision::vendor::state_machines::states::VerificationSession;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::errors::{ApiResult, AssertionError};
+use crate::{ApiError, State};
 use async_trait::async_trait;
 use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::DbPool;
 use enum_dispatch::enum_dispatch;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
-    IncodeVerificationSessionState, ScopedVaultId, TenantId,
+    IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId, TenantId,
 };
-
-use crate::config::Config;
-use crate::decision::vendor::state_machines::states::VerificationSession;
-use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::enclave_client::EnclaveClient;
-use crate::ApiError;
-
-use super::states::*;
 
 /// Various context fields needed by ever stage of the state machine
 #[derive(Clone)]
@@ -102,50 +99,79 @@ pub struct IncodeStateMachine {
 }
 
 impl IncodeStateMachine {
-    #[allow(clippy::too_many_arguments)]
     pub async fn init(
+        state: &State,
         tenant_id: TenantId,
-        db_pool: &DbPool,
-        enclave_client: &EnclaveClient,
-        config: &Config,
         configuration_id: IncodeConfigurationId,
         ctx: IncodeContext,
     ) -> Result<Self, ApiError> {
         // get incode credentials from TVC
         let tenant_vendor_control =
-            TenantVendorControl::new(tenant_id, db_pool, enclave_client, config).await?;
+            TenantVendorControl::new(tenant_id, &state.db_pool, &state.enclave_client, &state.config).await?;
 
         // Load our existing state
         let sv_id = ctx.sv_id.clone();
-        let existing_verification_session = db_pool
-            .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
-            .await??;
-
-        let initial_state: IncodeState = if let Some(existing) = existing_verification_session {
-            match existing.state {
-                IncodeVerificationSessionState::RetryUpload => {
-                    let token = existing
-                        .incode_authentication_token
-                        .ok_or(ApiError::AssertionError("missing token".into()))?
-                        .to_string()
-                        .into();
-                    let session = VerificationSession {
-                        id: existing.id,
-                        credentials: IncodeCredentialsWithToken {
-                            credentials: tenant_vendor_control.incode_credentials(),
-                            authentication_token: token,
-                        },
+        let id_doc_id = ctx.id_doc_id.clone();
+        let config_id = configuration_id.clone();
+        let session = state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let session = IncodeVerificationSession::get(conn, &sv_id)?;
+                let session = if let Some(existing) = session {
+                    existing
+                } else {
+                    // Create a brand new session
+                    let obc = ObConfiguration::get_by_scoped_vault_id(conn, &sv_id)?;
+                    let session_kind = if obc.must_collect_selfie() {
+                        IncodeVerificationSessionKind::Selfie
+                    } else {
+                        IncodeVerificationSessionKind::IdDocument
                     };
-                    RetryUpload::init(session).into()
-                }
-                _ => return Err(ApiError::AssertionError("wrong state".into())),
-            }
-        } else {
-            StartOnboarding {
+
+                    // Initialize the incode state
+                    IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id, session_kind)?
+                };
+                Ok(session)
+            })
+            .await?;
+
+        // Run StartOnboarding immediately - it sets up some data that all other states need
+        // TODO this doesn't really have to be a state
+        if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
+            let start = StartOnboarding {
+                incode_session: session,
                 incode_credentials: tenant_vendor_control.incode_credentials(),
                 configuration_id,
+            };
+            start
+                .run(&state.db_pool, &state.footprint_vendor_http_client, &ctx)
+                .await?;
+        }
+
+        // Refetch the session since it may have changed if we ran the start
+        let sv_id = ctx.sv_id.clone();
+        let session = state
+            .db_pool
+            .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
+            .await??
+            .ok_or(AssertionError("missing session"))?;
+        let v_session = {
+            let token = session
+                .incode_authentication_token
+                .ok_or(AssertionError("missing token"))?;
+            VerificationSession {
+                id: session.id,
+                credentials: IncodeCredentialsWithToken {
+                    credentials: tenant_vendor_control.incode_credentials(),
+                    authentication_token: token.into(),
+                },
             }
-            .into()
+        };
+
+        // Recover the session session and pick up where we left off
+        let initial_state = match session.state {
+            IncodeVerificationSessionState::RetryUpload => RetryUpload { session: v_session }.into(),
+            _ => return Err(AssertionError("wrong state").into()),
         };
 
         Ok(Self {

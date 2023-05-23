@@ -134,11 +134,10 @@ pub async fn build_docv_data_for_submission_from_verification_request(
 
 #[tracing::instrument(skip_all)]
 pub async fn build_docv_data_from_identity_doc(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    state: &State,
     identity_document_id: IdentityDocumentId,
 ) -> ApiResult<DocVData> {
-    let (doc, images, uvw) = db_pool
+    let (doc, images, uvw) = state.db_pool
         .db_query(
             move |conn| -> ApiResult<_> {
                 let (doc, dr) = IdentityDocument::get(conn, &identity_document_id)?;
@@ -152,9 +151,9 @@ pub async fn build_docv_data_from_identity_doc(
         .await??;        
 
     let name_idks = vec![DataIdentifier::from(IDK::FirstName), DataIdentifier::from(IDK::LastName)];
-    let mut decrypted_name_idks = uvw.decrypt_unchecked(enclave_client, &name_idks).await?;
+    let mut decrypted_name_idks = uvw.decrypt_unchecked(&state.enclave_client, &name_idks).await?;
     // decrypt the images and make sure we have at least a front image
-    let mut decrypted = decrypt_documents(&uvw.vault.e_private_key, enclave_client, images).await?;
+    let mut decrypted = decrypt_documents(&uvw.vault.e_private_key, &state.enclave_client, images).await?;
 
     if decrypted.get(&DocumentSide::Front).is_none() {
         return Err(AssertionError("Missing at least front part of document").into())

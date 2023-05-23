@@ -14,7 +14,7 @@ use newtypes::{
 
 /// Document upload has failed and user needs to retry
 pub struct RetryUpload {
-    session: VerificationSession,
+    pub session: VerificationSession,
 }
 
 const NUM_RETRIES: i64 = 3;
@@ -27,11 +27,6 @@ pub fn document_retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedV
 }
 
 impl RetryUpload {
-    /// Only to be used when the machine is initialized in the RetryUpload state
-    pub fn init(session: VerificationSession) -> Self {
-        Self { session }
-    }
-
     /// Create an instance of RetryUpload from any other state
     pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext, session: VerificationSession) -> ApiResult<Self> {
         // Create a timeline event
