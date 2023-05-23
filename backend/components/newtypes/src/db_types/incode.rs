@@ -26,6 +26,7 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum IncodeVerificationSessionState {
+    /// This state is orchestrated manually
     StartOnboarding,
     AddConsent,
     AddFront,

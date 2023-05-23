@@ -1,34 +1,29 @@
 use super::{
     map_to_api_err, save_incode_verification_result, AddConsent, AddFront, IncodeState,
-    IncodeStateTransition, SaveVerificationResultArgs, VerificationSession,
+    SaveVerificationResultArgs,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
-use crate::ApiError;
-use async_trait::async_trait;
+use crate::State;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::DbPool;
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::request::OnboardingStartCustomNameFields;
 use idv::incode::IncodeStartOnboardingRequest;
-use newtypes::vendor_credentials::{IncodeCredentials, IncodeCredentialsWithToken};
+use newtypes::vendor_credentials::IncodeCredentials;
 use newtypes::{IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId, VendorAPI};
 
-pub struct StartOnboarding {
-    pub incode_session: IncodeVerificationSession,
-    pub incode_credentials: IncodeCredentials,
-    pub configuration_id: IncodeConfigurationId,
-}
+/// This is weird - it's not a real state like all of the others. Just groups together some logic
+/// to initialize the state machine
+pub struct StartOnboarding {}
 
-#[async_trait]
-impl IncodeStateTransition for StartOnboarding {
-    async fn run(
-        self,
-        db_pool: &DbPool,
-        footprint_http_client: &FootprintVendorHttpClient,
+impl StartOnboarding {
+    pub async fn run(
+        state: &State,
         ctx: &IncodeContext,
-    ) -> Result<IncodeState, ApiError> {
+        incode_session: IncodeVerificationSession,
+        incode_credentials: IncodeCredentials,
+        configuration_id: IncodeConfigurationId,
+    ) -> ApiResult<IncodeState> {
         //
         // make the request to incode
         //
@@ -38,18 +33,18 @@ impl IncodeStateTransition for StartOnboarding {
             last_name: ctx.docv_data.last_name.clone(),
         };
         let request = IncodeStartOnboardingRequest {
-            credentials: self.incode_credentials.clone(),
-            configuration_id: self.configuration_id.clone(),
+            credentials: incode_credentials.clone(),
+            configuration_id: configuration_id.clone(),
             session_id: None,
             custom_name_fields: Some(custom_name_fields),
         };
-        let res = footprint_http_client.make_request(request).await;
+        let res = state.footprint_vendor_http_client.make_request(request).await;
 
         //
         // Save our result
         //
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeStartOnboarding, ctx);
-        save_incode_verification_result(db_pool, args).await?;
+        save_incode_verification_result(&state.db_pool, args).await?;
 
         // Now ensure we don't have an error
         // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
@@ -59,34 +54,25 @@ impl IncodeStateTransition for StartOnboarding {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        //
-        // Set up the next state transition
-        //
-        let session = VerificationSession {
-            id: self.incode_session.id.clone(),
-            credentials: IncodeCredentialsWithToken {
-                credentials: self.incode_credentials,
-                authentication_token: successful_response.token.clone(),
-            },
-        };
-
         let ctx = ctx.clone();
-        let next_state = db_pool
+        let next_state = state
+            .db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 // We only need to add consent if the session is of kind=Selfie
-                let next_state: IncodeState = if self.incode_session.kind.requires_consent() {
-                    AddConsent::enter(conn, &ctx, session)?.into()
+                let next_state: IncodeState = if incode_session.kind.requires_consent() {
+                    AddConsent::enter(conn, &ctx)?.into()
                 } else {
-                    AddFront { session }.into()
+                    AddFront {}.into()
                 };
 
-                // Update our state to the next stage
+                // Update our state to the next stage, saving the auth token needed for all other
+                // states
                 let update = UpdateIncodeVerificationSession::set_state_and_incode_session_and_token(
                     next_state.name(),
                     IncodeSessionId::from(successful_response.interview_id),
                     IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
                 );
-                IncodeVerificationSession::update(conn, &self.incode_session.id, update)?;
+                IncodeVerificationSession::update(conn, &incode_session.id, update)?;
 
                 Ok(next_state)
             })

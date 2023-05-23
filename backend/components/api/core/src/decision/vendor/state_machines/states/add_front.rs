@@ -13,9 +13,7 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddFrontRequest;
 use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 
-pub struct AddFront {
-    pub session: VerificationSession,
-}
+pub struct AddFront {}
 
 #[async_trait]
 impl IncodeStateTransition for AddFront {
@@ -24,6 +22,7 @@ impl IncodeStateTransition for AddFront {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
@@ -35,7 +34,7 @@ impl IncodeStateTransition for AddFront {
             ..Default::default()
         };
         let request = IncodeAddFrontRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
             docv_data,
         };
         let res = footprint_http_client.make_request(request).await;
@@ -58,26 +57,24 @@ impl IncodeStateTransition for AddFront {
         let failure_reason = response.add_side_failure_reason();
 
         let ctx = ctx.clone();
+        let session_id = session.id.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 // If there's failure, we move to retry upload
                 let next_state = if let Some(reason) = failure_reason {
                     let update =
                         UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
-                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                    IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    RetryUpload::enter(conn, &ctx, self.session)?.into()
+                    RetryUpload::enter(conn, &ctx)?.into()
                 } else {
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
-                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                    IncodeVerificationSession::update(conn, &session_id, update)?;
 
                     // TODO skip AddBack depending on what is required for the doc type
                     // Add an ::enter that will decide given the context if we need to do add back
-                    AddBack {
-                        session: self.session,
-                    }
-                    .into()
+                    AddBack {}.into()
                 };
 
                 Ok(next_state)

@@ -13,9 +13,7 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeProcessIdRequest;
 use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
-pub struct ProcessId {
-    pub session: VerificationSession,
-}
+pub struct ProcessId {}
 
 #[async_trait]
 impl IncodeStateTransition for ProcessId {
@@ -24,12 +22,13 @@ impl IncodeStateTransition for ProcessId {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
         //
         let request = IncodeProcessIdRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
         };
         let res = footprint_http_client.make_request(request).await;
 
@@ -49,7 +48,7 @@ impl IncodeStateTransition for ProcessId {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
-        let session_id = self.session.id.clone();
+        let session_id = session.id.clone();
         db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let update =
@@ -59,9 +58,6 @@ impl IncodeStateTransition for ProcessId {
             })
             .await?;
 
-        Ok(FetchScores {
-            session: self.session,
-        }
-        .into())
+        Ok(FetchScores {}.into())
     }
 }

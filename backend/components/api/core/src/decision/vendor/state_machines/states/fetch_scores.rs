@@ -13,9 +13,7 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchScoresRequest;
 use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
-pub struct FetchScores {
-    pub session: VerificationSession,
-}
+pub struct FetchScores {}
 
 #[async_trait]
 impl IncodeStateTransition for FetchScores {
@@ -24,12 +22,13 @@ impl IncodeStateTransition for FetchScores {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
         //
         let request = IncodeFetchScoresRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
         };
         let res = footprint_http_client.make_request(request).await;
 
@@ -46,7 +45,7 @@ impl IncodeStateTransition for FetchScores {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        let session_id = self.session.id.clone();
+        let session_id = session.id.clone();
         db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let update =
@@ -58,7 +57,6 @@ impl IncodeStateTransition for FetchScores {
             .await?;
 
         Ok(FetchOCR {
-            session: self.session,
             fetch_scores_response,
         }
         .into())

@@ -13,9 +13,7 @@ use newtypes::{
 };
 
 /// Document upload has failed and user needs to retry
-pub struct RetryUpload {
-    pub session: VerificationSession,
-}
+pub struct RetryUpload {}
 
 const NUM_RETRIES: i64 = 3;
 
@@ -28,7 +26,7 @@ pub fn document_retry_limit_exceeded(conn: &mut PgConn, scoped_user_id: &ScopedV
 
 impl RetryUpload {
     /// Create an instance of RetryUpload from any other state
-    pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext, session: VerificationSession) -> ApiResult<Self> {
+    pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext) -> ApiResult<Self> {
         // Create a timeline event
         let info = IdentityDocumentUploadedInfo {
             id: ctx.id_doc_id.clone(),
@@ -52,11 +50,7 @@ impl RetryUpload {
             let collect_selfie = doc_request.should_collect_selfie;
             DocumentRequest::create(conn, sv_id, None, collect_selfie, Some(doc_request.id))?;
         }
-        Ok(Self { session })
-    }
-
-    pub fn session(&self) -> &VerificationSession {
-        &self.session
+        Ok(Self {})
     }
 }
 
@@ -67,8 +61,9 @@ impl IncodeStateTransition for RetryUpload {
         db_pool: &DbPool,
         _footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
-        let session_id = self.session.id.clone();
+        let session_id = session.id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         //
         // Set up the next state transition
@@ -87,9 +82,6 @@ impl IncodeStateTransition for RetryUpload {
             })
             .await?;
 
-        Ok(AddFront {
-            session: self.session,
-        }
-        .into())
+        Ok(AddFront {}.into())
     }
 }

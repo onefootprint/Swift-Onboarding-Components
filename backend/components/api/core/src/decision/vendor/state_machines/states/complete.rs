@@ -1,3 +1,4 @@
+use super::VerificationSession;
 use super::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::errors::ApiResult;
@@ -117,6 +118,7 @@ impl IncodeStateTransition for Complete {
         _db_pool: &DbPool,
         _footprint_http_client: &FootprintVendorHttpClient,
         _ctx: &IncodeContext,
+        _: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         Err(ApiError::AssertionError("incode already complete".into()))
     }

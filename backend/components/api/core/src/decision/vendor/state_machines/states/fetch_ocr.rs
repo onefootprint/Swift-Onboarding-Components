@@ -15,7 +15,6 @@ use idv::incode::doc::IncodeFetchOCRRequest;
 use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState, VendorAPI};
 
 pub struct FetchOCR {
-    pub session: VerificationSession,
     pub fetch_scores_response: FetchScoresResponse,
 }
 
@@ -26,12 +25,13 @@ impl IncodeStateTransition for FetchOCR {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
         //
         let request = IncodeFetchOCRRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
         };
         let res = footprint_http_client.make_request(request).await;
 
@@ -49,6 +49,7 @@ impl IncodeStateTransition for FetchOCR {
             .map_err(map_to_api_err)?;
 
         let ctx = ctx.clone();
+        let session_id = session.id.clone();
         let next_step = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let next_step = match fetch_ocr_response.document_kind() {
@@ -56,7 +57,7 @@ impl IncodeStateTransition for FetchOCR {
                         let update = UpdateIncodeVerificationSession::set_state(
                             IncodeVerificationSessionState::Complete,
                         );
-                        IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                        IncodeVerificationSession::update(conn, &session_id, update)?;
 
                         Complete::enter(
                             conn,
@@ -73,11 +74,11 @@ impl IncodeStateTransition for FetchOCR {
                         let update = UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(
                             IncodeVerificationFailureReason::UnknownDocumentType,
                         );
-                        IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                        IncodeVerificationSession::update(conn, &session_id, update)?;
 
                         // TODO If the document uploaded isn't supported, retry.
                         // Should we include some context on the error here?
-                        RetryUpload::enter(conn, &ctx, self.session)?.into()
+                        RetryUpload::enter(conn, &ctx)?.into()
                     }
                 };
 

@@ -14,9 +14,7 @@ use idv::incode::doc::IncodeAddBackRequest;
 use newtypes::IncodeVerificationFailureReason;
 use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
 
-pub struct AddBack {
-    pub session: VerificationSession,
-}
+pub struct AddBack {}
 
 #[async_trait]
 impl IncodeStateTransition for AddBack {
@@ -25,6 +23,7 @@ impl IncodeStateTransition for AddBack {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         //
         // make the request to incode
@@ -36,7 +35,7 @@ impl IncodeStateTransition for AddBack {
             ..Default::default()
         };
         let request = IncodeAddBackRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
             docv_data,
         };
         let request_result = footprint_http_client.make_request(request).await;
@@ -68,24 +67,22 @@ impl IncodeStateTransition for AddBack {
         //
         // Save the next stage's Vreq
         let ctx = ctx.clone();
+        let session_id = session.id.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 // If there's failure, we move to retry upload
                 let next_state = if let Some(reason) = failure_reason {
                     let update =
                         UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
-                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                    IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    RetryUpload::enter(conn, &ctx, self.session)?.into()
+                    RetryUpload::enter(conn, &ctx)?.into()
                 } else {
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::ProcessId);
-                    IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                    IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    ProcessId {
-                        session: self.session,
-                    }
-                    .into()
+                    ProcessId {}.into()
                 };
 
                 Ok(next_state)

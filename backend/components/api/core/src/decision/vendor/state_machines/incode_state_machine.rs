@@ -36,6 +36,7 @@ pub trait IncodeStateTransition {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError>;
 }
 
@@ -43,7 +44,6 @@ pub trait IncodeStateTransition {
 // we can recover the structs rather than working with trait objects (and we get some runtime perf increases)
 #[enum_dispatch(IncodeStateTransition)]
 pub enum IncodeState {
-    StartOnboarding,
     AddConsent,
     AddFront,
     AddBack,
@@ -57,7 +57,6 @@ pub enum IncodeState {
 impl IncodeState {
     pub fn name(&self) -> IncodeVerificationSessionState {
         match self {
-            IncodeState::StartOnboarding(_) => IncodeVerificationSessionState::StartOnboarding,
             IncodeState::AddFront(_) => IncodeVerificationSessionState::AddFront,
             IncodeState::AddConsent(_) => IncodeVerificationSessionState::AddConsent,
             IncodeState::AddBack(_) => IncodeVerificationSessionState::AddBack,
@@ -96,6 +95,7 @@ impl std::fmt::Debug for IncodeMachineError {
 pub struct IncodeStateMachine {
     pub state: IncodeState,
     pub ctx: IncodeContext,
+    pub session: VerificationSession,
 }
 
 impl IncodeStateMachine {
@@ -136,16 +136,9 @@ impl IncodeStateMachine {
             .await?;
 
         // Run StartOnboarding immediately - it sets up some data that all other states need
-        // TODO this doesn't really have to be a state
         if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
-            let start = StartOnboarding {
-                incode_session: session,
-                incode_credentials: tenant_vendor_control.incode_credentials(),
-                configuration_id,
-            };
-            start
-                .run(&state.db_pool, &state.footprint_vendor_http_client, &ctx)
-                .await?;
+            let credentials = tenant_vendor_control.incode_credentials();
+            StartOnboarding::run(state, &ctx, session, credentials, configuration_id).await?;
         }
 
         // Refetch the session since it may have changed if we ran the start
@@ -170,13 +163,14 @@ impl IncodeStateMachine {
 
         // Recover the session session and pick up where we left off
         let initial_state = match session.state {
-            IncodeVerificationSessionState::RetryUpload => RetryUpload { session: v_session }.into(),
+            IncodeVerificationSessionState::RetryUpload => RetryUpload {}.into(),
             _ => return Err(AssertionError("wrong state").into()),
         };
 
         Ok(Self {
             state: initial_state,
             ctx,
+            session: v_session,
         })
     }
 
@@ -204,13 +198,17 @@ impl IncodeStateMachine {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
     ) -> Result<Self, IncodeMachineError> {
-        let Self { state, ctx } = self;
+        let Self { state, ctx, session } = self;
         let current_state = state.name();
 
-        let result = { state.run(db_pool, footprint_http_client, &ctx).await };
+        let result = { state.run(db_pool, footprint_http_client, &ctx, &session).await };
 
         result
-            .map(|s| Self { state: s, ctx })
+            .map(|s| Self {
+                state: s,
+                ctx,
+                session,
+            })
             .map_err(|e| IncodeMachineError {
                 state_name: current_state,
                 error: e,

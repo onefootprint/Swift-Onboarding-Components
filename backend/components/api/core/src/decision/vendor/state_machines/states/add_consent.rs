@@ -16,18 +16,16 @@ use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 /// Add Consent
 pub struct AddConsent {
-    pub session: VerificationSession,
     pub user_consent_text: String,
 }
 
 impl AddConsent {
-    pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext, session: VerificationSession) -> ApiResult<Self> {
+    pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext) -> ApiResult<Self> {
         // we need consent in order to proceed, so we error
         let consent = UserConsent::latest_for_scoped_vault(conn, &ctx.sv_id)?
             .ok_or(ApiError::AssertionError("User consent not found".into()))?;
 
         Ok(Self {
-            session,
             user_consent_text: consent.consent_language_text,
         })
     }
@@ -40,15 +38,16 @@ impl IncodeStateTransition for AddConsent {
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
         let privacy_request = IncodeAddPrivacyConsentRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
             title: "Service Consent".into(),
             content: self.user_consent_text,
         };
         // TODO this should be separated out from privacy in bifrost
         let ml_request = IncodeAddMLConsentRequest {
-            credentials: self.session.credentials.clone(),
+            credentials: session.credentials.clone(),
             status: true,
         };
 
@@ -82,17 +81,15 @@ impl IncodeStateTransition for AddConsent {
         // Set up the next state transition
         //
         // Save the next stage's Vreq
+        let session_id = session.id.clone();
         let next_state = db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 let update =
                     UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddFront);
 
-                IncodeVerificationSession::update(conn, &self.session.id, update)?;
+                IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                let next = AddFront {
-                    session: self.session,
-                }
-                .into();
+                let next = AddFront {}.into();
 
                 Ok(next)
             })
