@@ -22,6 +22,8 @@ pub enum CardDataKind {
     // TODO: remove serialize after migrate DB
     #[strum(to_string = "number.last4", serialize = "last4")]
     Last4,
+
+    Name,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Ord, PartialOrd, Hash)]

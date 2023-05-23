@@ -39,6 +39,14 @@ impl PiiString {
     pub fn try_decode_base64(&self) -> Result<PiiBytes, base64::DecodeError> {
         Ok(PiiBytes(Base64Data::from_str_standard(self.leak())?.0))
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }
 
 /// Represents a Vec<u8> that hides PII

@@ -14,6 +14,7 @@ impl Validate for CI {
             CDK::ExpMonth => Expiration::validate_month(value.leak())?,
             CDK::ExpYear => Expiration::validate_year(value.leak())?,
             CDK::Last4 => validate_card_number_last4(value)?,
+            CDK::Name => validate_card_name(value)?,
         };
         Ok(result)
     }
@@ -28,6 +29,17 @@ fn validate_card_number_last4(value: PiiString) -> VResult<PiiString> {
     if !(value.leak().len() == 4 && value.leak().chars().all(|c| c.is_ascii_digit())) {
         return Err(Error::CardError("card last 4 are invalid".into()));
     }
+    Ok(value)
+}
+
+/// TODO: there are probably more rules but couldn't find a definitive source here
+fn validate_card_name(value: PiiString) -> VResult<PiiString> {
+    if value.len() >= 200 || value.leak().chars().any(|c| !c.is_ascii()) {
+        return Err(Error::CardError(
+            "card name too long or contains invalid non-ascii characters".into(),
+        ));
+    }
+
     Ok(value)
 }
 
@@ -161,5 +173,12 @@ mod test {
             .ok()
             .map(PiiString::from)
             .map(|p| p.leak().to_string())
+    }
+
+    #[test_case("Alex Grinman" => true)]
+    #[test_case("Alissa P Hacker" => true)]
+    #[test_case("Ben 😃 Bitdiddle" => false)]
+    fn test_card_name(name: &str) -> bool {
+        super::validate_card_name(PiiString::try_from(name).unwrap()).is_ok()
     }
 }
