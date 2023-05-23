@@ -189,6 +189,7 @@ impl OnboardingDecision {
     pub fn list_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
         let result = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))
+            .order_by(onboarding_decision::created_at.desc())
             .get_results(conn)?;
         Ok(result)
     }
@@ -200,7 +201,7 @@ impl OnboardingDecision {
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<Option<Self>> {
-        let res = onboarding_decision::table
+        let res: Option<OnboardingDecision> = onboarding_decision::table
             .filter(onboarding_decision::actor.eq(DbActor::Footprint))
             .inner_join(onboarding::table.inner_join(scoped_vault::table))
             .filter(scoped_vault::fp_id.eq(fp_id))

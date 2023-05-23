@@ -1,11 +1,15 @@
+use crate::schema::onboarding_decision;
 use crate::{schema::manual_review, DbResult};
 use crate::{DbError, TxnPgConn};
 
 use crate::PgConn;
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId};
 use serde::{Deserialize, Serialize};
+
+use super::onboarding_decision::OnboardingDecision;
 
 #[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]
 #[diesel(table_name = manual_review)]
@@ -15,12 +19,12 @@ pub struct ManualReview {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub onboarding_id: OnboardingId,
-    // When populated, means the ManualReview is no longer active
+    /// When populated, means the ManualReview is no longer active
     pub completed_at: Option<DateTime<Utc>>,
-    // If the ManualReview was completed by making a new OnboardingDecision, is referenced here.
-    // Otherwise, means the ManualReview was simply cleared without making an updated decision.
+    /// If the ManualReview was completed by making a new OnboardingDecision, is referenced here.
+    /// Otherwise, means the ManualReview was simply cleared without making an updated decision.
     pub completed_by_decision_id: Option<OnboardingDecisionId>,
-    // If the ManualReview was completed by a tenant dashboard user, linked here
+    /// If the ManualReview was completed by a tenant dashboard user, linked here
     pub completed_by_actor: Option<DbActor>,
 }
 
@@ -79,5 +83,21 @@ impl ManualReview {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
         Ok(())
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn find_completed(
+        conn: &mut PgConn,
+        onboarding_id: &OnboardingId,
+    ) -> DbResult<Option<(ManualReview, OnboardingDecision)>> {
+        let res: Option<(ManualReview, OnboardingDecision)> = manual_review::table
+            .filter(manual_review::onboarding_id.eq(onboarding_id))
+            .filter(not(manual_review::completed_at.is_null()))
+            .inner_join(onboarding_decision::table)
+            .order_by(manual_review::completed_at.desc())
+            .select((manual_review::all_columns, onboarding_decision::all_columns))
+            .first(conn)
+            .optional()?;
+        Ok(res)
     }
 }

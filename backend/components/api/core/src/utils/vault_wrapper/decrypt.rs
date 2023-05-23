@@ -26,6 +26,15 @@ pub struct DecryptUncheckedResult {
     pub decrypted_dis: Vec<DataIdentifier>,
 }
 
+impl DecryptUncheckedResult {
+    pub fn rm<D: Into<DataIdentifier>>(&mut self, di: D) -> ApiResult<PiiString> {
+        let di = di.into();
+        self.results
+            .remove(&di)
+            .ok_or(ApiError::MissingRequiredEntityData(di))
+    }
+}
+
 impl<Type> VaultWrapper<Type> {
     /// Util to decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
     /// event.

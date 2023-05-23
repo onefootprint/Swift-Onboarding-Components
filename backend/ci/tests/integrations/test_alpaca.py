@@ -97,4 +97,14 @@ def test_alpaca_cip(sandbox_tenant, twilio):
     broker_client.get_cip_data_for_account_by_id(account_id=account.id)
 
     assert body["alpaca_response"]["id"]
-    assert body["alpaca_response"]["kyc"]["applicant_name"] == "Carl Cassanova"
+    assert (
+        body["alpaca_response"]["kyc"]["applicant_name"]
+        == f"{d['id.first_name']} {d['id.last_name']}"
+    )
+
+
+# TODO: Test scenarios to add
+# - FP failure, no manual review
+# - FP failure, then manual review pass
+# - FP failure, manual review fail.
+# - FP failure, manual review pass -> then manual review fail

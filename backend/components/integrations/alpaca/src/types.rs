@@ -49,12 +49,12 @@ pub struct Kyc {
     pub country_of_residency: PiiString,
 
     /// This would be the final time that your team finished the KYC check. If this user was subject to EDD, then this timestamp would likely be hours or days after the check_completed_at field
-    pub kyc_completed_at: chrono::DateTime<Utc>,
+    pub kyc_completed_at: Option<chrono::DateTime<Utc>>,
     pub ip_address: PiiString,
-    pub check_initiated_at: chrono::DateTime<Utc>,
-    pub check_completed_at: chrono::DateTime<Utc>,
+    pub check_initiated_at: Option<chrono::DateTime<Utc>>,
+    pub check_completed_at: Option<chrono::DateTime<Utc>>,
 
-    pub approved_reason: String,
+    pub approved_reason: Option<String>,
     pub approval_status: ApprovalStatus,
     pub approved_by: PiiString,
 
@@ -83,6 +83,16 @@ pub enum CipResult {
     #[default]
     Clear,
     Consider,
+}
+
+impl CipResult {
+    pub fn clear(is_clear: bool) -> Self {
+        if is_clear {
+            Self::Clear
+        } else {
+            Self::Consider
+        }
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
@@ -294,14 +304,14 @@ pub mod fixtures {
                     address: pii!("1 Penguin Place, Philadelphia PA"),
                     postal_code: pii!("10012"),
                     country_of_residency: pii!("USA"),
-                    kyc_completed_at: Utc::now(),
+                    kyc_completed_at: Some(Utc::now()),
                     ip_address: pii!("127.0.0.1"),
-                    check_initiated_at: Utc::now() - Duration::seconds(10),
-                    check_completed_at: Utc::now() - Duration::seconds(7),
+                    check_initiated_at: Some(Utc::now() - Duration::seconds(10)),
+                    check_completed_at: Some(Utc::now() - Duration::seconds(7)),
                     approval_status: ApprovalStatus::Approved,
                     approved_by: pii!("alex@onefootprint.com"),
                     approved_at: Utc::now(),
-                    approved_reason: "We carefully review the document and matched all the fields to the submitted information.".into()
+                    approved_reason: Some("We carefully review the document and matched all the fields to the submitted information.".into())
                 },
                 document: Some(DocumentPhotoId {
                     id: fp_id_test(),
