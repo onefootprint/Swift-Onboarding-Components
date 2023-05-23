@@ -49,9 +49,14 @@ pub async fn patch(
 }
 
 #[tracing::instrument(skip(state, auth))]
+#[route_alias(actix::patch(
+    "/users/vault",
+    tags(Vault, Users, Preview),
+    description = "Updates data in a vault given a short-lived, entity-scoped client token."
+))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault given a short-lived, entity-scoped client token.",
-    tags(Entities, Vault, Preview)
+    tags(Vault, Entities, Private)
 )]
 #[actix::patch("/entities/vault")]
 pub async fn patch_client(

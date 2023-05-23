@@ -65,8 +65,13 @@ pub async fn post(
 }
 
 #[tracing::instrument(skip(state, auth))]
+#[route_alias(post(
+    "/users/vault/decrypt",
+    tags(Vault, Users, Preview),
+    description = "Decrypts the specified list of fields given a short-lived, entity-scoped client token"
+))]
 #[api_v2_operation(
-    tags(Vault, Entities, Preview),
+    tags(Vault, Entities, Private),
     description = "Works for either person or business entities. Decrypts the specified list of fields given a short-lived, entity-scoped client token"
 )]
 #[post("/entities/vault/decrypt")]

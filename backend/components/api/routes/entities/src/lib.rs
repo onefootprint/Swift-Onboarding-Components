@@ -16,6 +16,7 @@ pub use get::list::parse_search;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
+    client_token::configure_post_aliases(config);
     config
         .service(get::detail::get)
         .service(get::list::get)

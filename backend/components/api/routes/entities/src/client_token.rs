@@ -11,11 +11,17 @@ use api_wire_types::ClientTokenRequest;
 use api_wire_types::ClientTokenResponse;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
+use macros::route_alias;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 
+#[route_alias(post(
+    "/users/{fp_id}/client_token",
+    tags(Users, Preview),
+    description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
+))]
 #[api_v2_operation(
-    description = "Create a short-lived token safe to pass to your client for operations affecting this user.",
+    description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
     tags(Entities, Preview)
 )]
 #[post("/entities/{fp_id}/client_token")]
