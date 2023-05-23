@@ -5,7 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
-use api_core::auth::CanDecrypt;
+use api_core::auth::CanVault;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -61,7 +61,7 @@ pub async fn post_client(
     // This is a little different - we actually require a permission to update the data in the
     // vault since the ClientTenantAuth tokens are scoped to specific fields
     let request = request.into_inner();
-    let auth = auth.check_guard(CanDecrypt::new(request.keys().cloned().collect()))?;
+    let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
 
     let result = post_inner(&state, fp_id, request, Box::new(auth)).await?;

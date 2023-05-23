@@ -20,4 +20,6 @@ pub enum TenantError {
 
     #[error("Token must be active for at least one minute and at most one day")]
     InvalidExpiry,
+    #[error("Must provide at least one scope")]
+    MustProvideScope,
 }

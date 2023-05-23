@@ -1,12 +1,13 @@
 use crate::{
     auth::{
         session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession},
-        AuthError, CanDecrypt, SessionContext,
+        AuthError, CanDecrypt, CanVault, IsGuardMet, SessionContext,
     },
     errors::ApiResult,
 };
 use db::{models::tenant::Tenant, PgConn};
 use feature_flag::LaunchDarklyFeatureFlagClient;
+use itertools::Itertools;
 use newtypes::{DataIdentifier, FpId, TenantApiKeyId};
 use paperclip::actix::Apiv2Security;
 
@@ -17,7 +18,7 @@ pub struct ClientTenantData {
     pub fp_id: FpId,
     pub is_live: bool,
     pub tenant: Tenant,
-    pub fields: Vec<DataIdentifier>,
+    pub scopes: Vec<ClientTenantScope>,
     pub tenant_api_key_id: TenantApiKeyId,
 }
 
@@ -49,7 +50,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
                     fp_id,
                     is_live,
                     tenant_id,
-                    fields,
+                    scopes,
                     tenant_api_key_id,
                 } = data;
                 let tenant = Tenant::get(conn, &tenant_id)?;
@@ -57,7 +58,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
                     fp_id,
                     is_live,
                     tenant,
-                    fields,
+                    scopes,
                     tenant_api_key_id,
                 }
             }
@@ -66,19 +67,6 @@ impl ExtractableAuthSession for ParsedClientTenantData {
             }
         };
         Ok(Self(data))
-    }
-}
-
-// Doesn't actually implement CanCheckTenantGuard or CheckTenantGuard - just uses ergonomics very
-// similar to it
-impl ClientTenantAuthContext {
-    pub fn check_guard(self, guard: CanDecrypt) -> Result<SessionContext<ClientTenantData>, AuthError> {
-        let requested_permission_str = format!("{}", guard);
-        if guard.0.into_iter().all(|di| self.data.0.fields.contains(&di)) {
-            Ok(self.map(|d| d.0))
-        } else {
-            Err(AuthError::MissingTenantPermission(requested_permission_str))
-        }
     }
 }
 
@@ -98,5 +86,58 @@ impl TenantAuth for SessionContext<ClientTenantData> {
 
     fn rolebinding(&self) -> Option<&db::models::tenant_rolebinding::TenantRolebinding> {
         None
+    }
+}
+
+// Some custom permissions only used by ClientTenant auth
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+/// The scopes of a client tenant token are significantly different from normal tenant auth, so
+/// we specify them with a new enum
+pub enum ClientTenantScope {
+    Vault(Vec<DataIdentifier>),
+    Decrypt(Vec<DataIdentifier>),
+}
+
+impl IsGuardMet<ClientTenantScope> for CanDecrypt {
+    fn is_met(self, token_scopes: &[ClientTenantScope]) -> bool {
+        let decryptable_dis = token_scopes
+            .iter()
+            .flat_map(|s| match s {
+                ClientTenantScope::Decrypt(dis) => dis.clone(),
+                _ => vec![],
+            })
+            .collect_vec();
+        self.0.into_iter().all(|di| decryptable_dis.contains(&di))
+    }
+}
+
+impl IsGuardMet<ClientTenantScope> for CanVault {
+    fn is_met(self, token_scopes: &[ClientTenantScope]) -> bool {
+        let encryptable_dis = token_scopes
+            .iter()
+            .flat_map(|s| match s {
+                ClientTenantScope::Vault(dis) => dis.clone(),
+                _ => vec![],
+            })
+            .collect_vec();
+        self.0.into_iter().all(|di| encryptable_dis.contains(&di))
+    }
+}
+
+// Doesn't actually implement CanCheckTenantGuard or CheckTenantGuard - just uses ergonomics very
+// similar to it
+impl ClientTenantAuthContext {
+    pub fn check_guard<T: IsGuardMet<ClientTenantScope>>(
+        self,
+        guard: T,
+    ) -> Result<SessionContext<ClientTenantData>, AuthError> {
+        let requested_permission_str = format!("{}", guard);
+        if guard.is_met(&self.0.scopes) {
+            Ok(self.map(|d| d.0))
+        } else {
+            Err(AuthError::MissingTenantPermission(requested_permission_str))
+        }
     }
 }

@@ -1,5 +1,7 @@
-use newtypes::{DataIdentifier, FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId};
+use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId};
 use paperclip::actix::Apiv2Schema;
+
+use crate::auth::tenant::ClientTenantScope;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Basic auth used for dashboard sessions - this represents an authenticated TenantUser at a
@@ -35,14 +37,11 @@ pub struct ClientTenantAuth {
     pub fp_id: FpId,
     pub is_live: bool,
     pub tenant_id: TenantId,
-    pub fields: Vec<DataIdentifier>,
+    pub scopes: Vec<ClientTenantScope>,
     /// The tenant API key whose permissions are proxied into this token.
     /// In the future, maybe we'll want to support generating this token through other auth methods,
     /// but for now it only makes sense to create a short-lived token through tenant API key
     pub tenant_api_key_id: TenantApiKeyId,
-    // TODO should we bind to the actual actor? if we bind to the actor we can dynamically check permissions.
-    // but we should probably also check at the time the token is issued
-    // TODO do we want to scope to read/write?
 }
 
 impl From<ClientTenantAuth> for super::AuthSessionData {

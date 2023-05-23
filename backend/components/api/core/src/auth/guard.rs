@@ -66,7 +66,6 @@ impl CanDecrypt {
         Self(l.into_iter().map(DataIdentifier::from).collect())
     }
 
-    #[allow(unused)]
     pub fn single<T: Into<DataIdentifier>>(k: T) -> Self {
         Self(vec![k.into()])
     }
@@ -75,5 +74,24 @@ impl CanDecrypt {
 impl Display for CanDecrypt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "CanDecrypt<{:?}>", self.0)
+    }
+}
+
+/// Represents a permission that is only met when the auth token contains a scope that allows
+/// encrypting the provided attributes.
+/// Only used by client tenant auth
+pub struct CanVault(pub(super) Vec<DataIdentifier>);
+impl CanVault {
+    pub fn new<T>(l: Vec<T>) -> Self
+    where
+        DataIdentifier: From<T>,
+    {
+        Self(l.into_iter().map(DataIdentifier::from).collect())
+    }
+}
+
+impl Display for CanVault {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "CanEncrypt<{:?}>", self.0)
     }
 }

@@ -5,13 +5,16 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
+use api_core::auth::tenant::ClientTenantScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::utils::session::AuthSession;
 use api_wire_types::ClientTokenRequest;
 use api_wire_types::ClientTokenResponse;
+use api_wire_types::ClientTokenScopeKind;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
+use itertools::Itertools;
 use macros::route_alias;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -39,8 +42,20 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let ClientTokenRequest { fields, ttl } = request.into_inner();
+    let ClientTokenRequest { fields, ttl, scopes } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
+
+    if scopes.is_empty() {
+        return Err(TenantError::MustProvideScope.into());
+    }
+    let fields = fields.into_iter().collect_vec();
+    let scopes = scopes
+        .into_iter()
+        .map(|s| match s {
+            ClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
+            ClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
+        })
+        .collect();
 
     let ttl = ttl.unwrap_or(30 * 60);
     #[allow(clippy::manual_range_contains)]
@@ -58,7 +73,7 @@ pub async fn post(
                 fp_id,
                 is_live,
                 tenant_id,
-                fields: fields.into_iter().collect(),
+                scopes,
                 tenant_api_key_id,
             };
             let duration = Duration::seconds(ttl.into());
