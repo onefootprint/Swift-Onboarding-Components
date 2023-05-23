@@ -74,7 +74,7 @@ def test_tenant_decrypt_no_permissions(sandbox_user):
 def test_tenant_document_decrypt_no_permissions(sandbox_user):
     tenant = sandbox_user.tenant
     data = {
-        "fields": ["document.drivers_license_front"],
+        "fields": ["document.drivers_license.front"],
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
@@ -104,8 +104,8 @@ def test_tenant_document_get_decrypt(user_with_documents):
         tenant.sk.key,
         status_code=200,
     )
-    assert resp["document.drivers_license_front"]
-    assert resp["document.drivers_license_selfie"]
+    assert resp["document.drivers_license.front"]
+    assert resp["document.drivers_license.selfie"]
     assert resp["document.drivers_license.number"]
     assert resp["document.drivers_license.issuing_state"]
     assert resp["document.drivers_license.expiration"]
@@ -118,7 +118,7 @@ def test_tenant_document_decrypt(user_with_documents):
 
     tenant = user_with_documents.tenant
     fields = [
-        "document.drivers_license_front",
+        "document.drivers_license.front",
         "document.drivers_license.number",
         "document.drivers_license.issuing_state",
         "document.drivers_license.expiration",
@@ -136,7 +136,7 @@ def test_tenant_document_decrypt(user_with_documents):
         status_code=200,
     )
 
-    assert resp["document.drivers_license_front"] == test_image
+    assert resp["document.drivers_license.front"] == test_image
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "MA"
@@ -159,9 +159,9 @@ def test_tenant_selfie_decrypt(
 
     data = {
         "fields": [
-            "document.drivers_license_front",
-            "document.drivers_license_back",
-            "document.drivers_license_selfie",
+            "document.drivers_license.front",
+            "document.drivers_license.back",
+            "document.drivers_license.selfie",
         ],
         "reason": "Responding to a customer request",
     }
@@ -172,13 +172,13 @@ def test_tenant_selfie_decrypt(
         sandbox_tenant.sk.key,
     )
 
-    assert resp["document.drivers_license_front"] == test_image
-    assert resp["document.drivers_license_back"] == test_image
-    assert resp["document.drivers_license_selfie"] == test_image
+    assert resp["document.drivers_license.front"] == test_image
+    assert resp["document.drivers_license.back"] == test_image
+    assert resp["document.drivers_license.selfie"] == test_image
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {
-        "document.drivers_license_front",
-        "document.drivers_license_back",
-        "document.drivers_license_selfie",
+        "document.drivers_license.front",
+        "document.drivers_license.back",
+        "document.drivers_license.selfie",
     }

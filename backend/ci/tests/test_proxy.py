@@ -486,23 +486,23 @@ class TestVaultProxy:
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
                 ProxyTokenAssignment(fp_id),
-                ProxyIngressRule("document.drivers_license_front=$.data.id_card"),
+                ProxyIngressRule("document.drivers_license.front=$.data.id_card"),
                 ProxyIngressContentType("json"),
             ],
             files=None,
         )
 
         result = response.json()
-        assert result["data"]["id_card"] == f"{fp_id}.document.drivers_license_front"
+        assert result["data"]["id_card"] == f"{fp_id}.document.drivers_license.front"
 
         data = dict(
             reason="test",
             fields=[
-                "document.drivers_license_front",
+                "document.drivers_license.front",
             ],
         )
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
-        assert response["document.drivers_license_front"] == test_image
+        assert response["document.drivers_license.front"] == test_image
 
 
 ### Tests to do ###

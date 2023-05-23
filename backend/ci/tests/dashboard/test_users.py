@@ -135,9 +135,9 @@ def test_get_users_detail_doc(
     user = bifrost.run()
 
     res = get(f"entities/{user.fp_id}", None, tenant.sk.key)
-    assert "document.drivers_license_front" in res["attributes"]
-    assert "document.drivers_license_back" in res["attributes"]
-    assert "document.drivers_license_selfie" in res["attributes"]
+    assert "document.drivers_license.front" in res["attributes"]
+    assert "document.drivers_license.back" in res["attributes"]
+    assert "document.drivers_license.selfie" in res["attributes"]
 
 
 def test_liveness_list(sandbox_user):

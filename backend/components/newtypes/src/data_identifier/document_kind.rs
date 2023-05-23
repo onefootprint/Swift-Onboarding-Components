@@ -34,12 +34,19 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 #[diesel(sql_type = Text)]
 pub enum DocumentKind {
     Passport,
+    #[strum(to_string = "passport.selfie", serialize = "passport_selfie")]
     PassportSelfie,
+    #[strum(to_string = "drivers_license.front", serialize = "drivers_license_front")]
     DriversLicenseFront,
+    #[strum(to_string = "drivers_license.back", serialize = "drivers_license_back")]
     DriversLicenseBack,
+    #[strum(to_string = "drivers_license.selfie", serialize = "drivers_license_selfie")]
     DriversLicenseSelfie,
+    #[strum(to_string = "id_card.front", serialize = "id_card_front")]
     IdCardFront,
+    #[strum(to_string = "id_card.back", serialize = "id_card_back")]
     IdCardBack,
+    #[strum(to_string = "id_card.selfie", serialize = "id_card_selfie")]
     IdCardSelfie,
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     FinraComplianceLetter,
