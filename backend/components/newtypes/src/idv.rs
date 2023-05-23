@@ -1,4 +1,5 @@
 use crate::{BusinessOwnerData, IdentityDataKind, PiiString};
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
@@ -53,6 +54,13 @@ impl IdvData {
             IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
             IdentityDataKind::Nationality => None,
         }
+    }
+
+    pub fn dob(&self) -> Result<Option<NaiveDate>, chrono::ParseError> {
+        self.dob
+            .as_ref()
+            .map(|d| NaiveDate::parse_from_str(d.leak(), "%Y-%m-%d"))
+            .transpose()
     }
 
     /// helper to normalize an idv data struct

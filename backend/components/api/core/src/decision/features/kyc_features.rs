@@ -90,6 +90,9 @@ impl KycFeatureVector {
             VendorAPI::IncodeAddPrivacyConsent => None,
             VendorAPI::IncodeAddMLConsent => None,
             VendorAPI::IncodeFetchOCR => None,
+            VendorAPI::IncodeAddSelfie => None,
+            // TODO!
+            VendorAPI::IncodeWatchlistCheck => None,
         }
     }
 

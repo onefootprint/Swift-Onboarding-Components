@@ -96,6 +96,8 @@ fn deserialize_from_vendor_api(
         VendorAPI::IncodeAddPrivacyConsent => ParsedResponse::from_incode_add_privacy_consent(raw_response)?,
         VendorAPI::IncodeAddMLConsent => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
         VendorAPI::IncodeFetchOCR => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
+        VendorAPI::IncodeAddSelfie => ParsedResponse::from_incode_add_selfie(raw_response)?,
+        VendorAPI::IncodeWatchlistCheck => ParsedResponse::from_incode_watchlist_check(raw_response)?,
     };
 
     Ok(res)

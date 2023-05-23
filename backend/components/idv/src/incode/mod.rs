@@ -1,5 +1,6 @@
 use newtypes::{
-    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeSessionId, ScrubbedJsonValue,
+    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeSessionId, PiiJsonValue,
+    ScrubbedJsonValue,
 };
 use serde::de::DeserializeOwned;
 
@@ -29,7 +30,7 @@ pub trait APIResponseToIncodeError {
 #[derive(Clone)]
 pub struct IncodeResponse<T: APIResponseToIncodeError + serde::Serialize> {
     pub result: IncodeAPIResult<T>,
-    pub raw_response: serde_json::Value,
+    pub raw_response: PiiJsonValue,
 }
 
 #[derive(Clone)]

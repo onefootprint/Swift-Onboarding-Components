@@ -7,9 +7,11 @@ use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
 use incode::doc::response::{
-    AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
+    AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+    ProcessIdResponse,
 };
 use incode::response::OnboardingStartResponse;
+use incode::watchlist::response::WatchlistResultResponse;
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 
@@ -59,7 +61,9 @@ pub enum ParsedResponse {
     IncodeAddPrivacyConsent(AddConsentResponse),
     IncodeAddMLConsent(AddConsentResponse),
     IncodeFetchOCR(FetchOCRResponse),
-    IncodeRawResponse(serde_json::Value),
+    IncodeAddSelfie(AddSelfieResponse),
+    IncodeWatchlistCheck(WatchlistResultResponse),
+    IncodeRawResponse(PiiJsonValue),
 }
 
 impl ParsedResponse {
@@ -184,6 +188,17 @@ impl ParsedResponse {
     pub fn from_incode_parse_ocr(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: FetchOCRResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeFetchOCR(parsed))
+    }
+
+    // We should never need this
+    pub fn from_incode_add_selfie(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: AddSelfieResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeAddSelfie(parsed))
+    }
+
+    pub fn from_incode_watchlist_check(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: WatchlistResultResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeWatchlistCheck(parsed))
     }
 }
 

@@ -34,7 +34,7 @@ use db::models::verification_result::VerificationResult;
 use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{IncodeVerificationSessionId, ScrubbedJsonValue, VendorAPI};
+use newtypes::{IncodeVerificationSessionId, PiiJsonValue, ScrubbedJsonValue, VendorAPI};
 
 #[derive(Clone)]
 pub struct VerificationSession {
@@ -45,7 +45,7 @@ pub struct VerificationSession {
 /// Struct to make sure we handle the different cases of Incode vendor call errors we may see
 struct SaveVerificationResultArgs<'a> {
     is_error: bool,
-    raw_response: serde_json::Value,
+    raw_response: PiiJsonValue,
     scrubbed_response: ScrubbedJsonValue,
     vendor_api: VendorAPI,
     ctx: &'a IncodeContext,
@@ -80,7 +80,7 @@ impl<'a> SaveVerificationResultArgs<'a> {
             }
             Err(_) => Self {
                 is_error: true,
-                raw_response: serde_json::json!(""),
+                raw_response: serde_json::json!("").into(),
                 scrubbed_response: serde_json::json!("").into(),
                 vendor_api,
                 ctx,
@@ -100,7 +100,7 @@ async fn save_incode_verification_result<'a>(
         vendor_api,
         ctx,
     } = args;
-    let e_response = encrypt_verification_result_response(&raw_response.into(), &ctx.vault.public_key)?;
+    let e_response = encrypt_verification_result_response(&raw_response, &ctx.vault.public_key)?;
     let sv_id = ctx.sv_id.clone();
     let id_doc_id = ctx.id_doc_id.clone();
     let di_id = ctx.di_id.clone();

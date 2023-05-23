@@ -12,6 +12,11 @@ pub struct IncodeAddBackRequest {
     pub docv_data: DocVData,
 }
 
+pub struct IncodeAddSelfieRequest {
+    pub credentials: IncodeCredentialsWithToken,
+    pub docv_data: DocVData,
+}
+
 pub struct IncodeProcessIdRequest {
     pub credentials: IncodeCredentialsWithToken,
 }

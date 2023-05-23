@@ -1,12 +1,13 @@
 use async_trait::async_trait;
+use chrono::Datelike;
 use idv::{
     footprint_http_client::FootprintVendorHttpClient,
     incode::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        doc::request::DocumentSide,
         doc::response::{
             AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
         },
+        doc::{request::DocumentSide, response::AddSelfieResponse, IncodeAddSelfieRequest},
         doc::{
             IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
             IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
@@ -14,11 +15,12 @@ use idv::{
         },
         error::Error as IncodeError,
         response::OnboardingStartResponse,
+        watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
         IncodeAPIResult, IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse,
 };
-use newtypes::VendorAPI;
+use newtypes::{PiiString, VendorAPI};
 
 use super::{VendorAPICall, VendorAPIResponse};
 
@@ -45,7 +47,7 @@ impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartR
             .await?;
         let result = IncodeResponse::<OnboardingStartResponse> {
             result: IncodeAPIResult::<OnboardingStartResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -58,7 +60,7 @@ impl VendorAPIResponse for IncodeResponse<OnboardingStartResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
     }
 
     // we don't use incode in this way
@@ -85,7 +87,7 @@ impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, Incod
             .await?;
         let result = IncodeResponse::<AddSideResponse> {
             result: IncodeAPIResult::<AddSideResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -100,7 +102,7 @@ impl VendorAPIResponse for IncodeResponse<AddSideResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
     }
 
     // we don't use incode in this way
@@ -127,7 +129,7 @@ impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, Incode
             .await?;
         let result = IncodeResponse::<AddSideResponse> {
             result: IncodeAPIResult::<AddSideResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -150,7 +152,7 @@ impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, In
         let raw_response = authenticated_client.process_id(self).await?;
         let result = IncodeResponse::<ProcessIdResponse> {
             result: IncodeAPIResult::<ProcessIdResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -164,7 +166,7 @@ impl VendorAPIResponse for IncodeResponse<ProcessIdResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
     }
 
     // we don't use incode in this way
@@ -189,7 +191,7 @@ impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>
         let raw_response = authenticated_client.fetch_scores(self).await?;
         let result = IncodeResponse::<FetchScoresResponse> {
             result: IncodeAPIResult::<FetchScoresResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -203,7 +205,7 @@ impl VendorAPIResponse for IncodeResponse<FetchScoresResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
     }
 
     // we don't use incode in this way
@@ -233,7 +235,7 @@ impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResp
             .await?;
         let result = IncodeResponse::<AddConsentResponse> {
             result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -256,7 +258,7 @@ impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>
         let raw_response = authenticated_client.add_ml_consent(self, request.status).await?;
         let result = IncodeResponse::<AddConsentResponse> {
             result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -270,7 +272,7 @@ impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
     }
 
     // we don't use incode in this way
@@ -295,7 +297,7 @@ impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, Inco
         let raw_response = authenticated_client.fetch_ocr(self).await?;
         let result = IncodeResponse::<FetchOCRResponse> {
             result: IncodeAPIResult::<FetchOCRResponse>::try_from(raw_response.clone())?,
-            raw_response,
+            raw_response: raw_response.into(),
         };
 
         Ok(result)
@@ -308,7 +310,96 @@ impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response.into()
+        self.raw_response
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeAddSelfieRequest,
+    ) -> Result<IncodeResponse<AddSelfieResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client.add_selfie(self, request.docv_data).await?;
+        let result = IncodeResponse::<AddSelfieResponse> {
+            result: IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<AddSelfieResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeAddSelfie
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeWatchlistCheckRequest,
+    ) -> Result<IncodeResponse<WatchlistResultResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let dob_year = request
+            .idv_data
+            .dob()?
+            .map(|d| PiiString::new(d.year().to_string()));
+
+        let raw_response = authenticated_client
+            .watchlist_result(
+                self,
+                request.idv_data.first_name,
+                request.idv_data.last_name,
+                dob_year,
+            )
+            .await?;
+
+        let result = IncodeResponse::<WatchlistResultResponse> {
+            result: IncodeAPIResult::<WatchlistResultResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeWatchlistCheck
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
     }
 
     // we don't use incode in this way

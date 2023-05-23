@@ -22,4 +22,6 @@ pub enum Error {
     StringParseError(#[from] std::num::ParseIntError),
     #[error("{0}")]
     StringParseFloatError(#[from] std::num::ParseFloatError),
+    #[error("{0}")]
+    ChronoParseError(#[from] chrono::ParseError),
 }

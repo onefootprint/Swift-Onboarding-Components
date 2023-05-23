@@ -86,6 +86,8 @@ pub enum VendorAPI {
     IncodeAddPrivacyConsent,
     IncodeAddMLConsent,
     IncodeFetchOCR,
+    IncodeAddSelfie,
+    IncodeWatchlistCheck,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -112,6 +114,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeAddPrivacyConsent => Self::Incode,
             VendorAPI::IncodeAddMLConsent => Self::Incode,
             VendorAPI::IncodeFetchOCR => Self::Incode,
+            VendorAPI::IncodeAddSelfie => Self::Incode,
+            VendorAPI::IncodeWatchlistCheck => Self::Incode,
         }
     }
 }
@@ -146,6 +150,8 @@ impl VendorAPI {
             VendorAPI::IncodeAddPrivacyConsent => false,
             VendorAPI::IncodeAddMLConsent => false,
             VendorAPI::IncodeFetchOCR => false,
+            VendorAPI::IncodeAddSelfie => false,
+            VendorAPI::IncodeWatchlistCheck => false,
         }
     }
 }

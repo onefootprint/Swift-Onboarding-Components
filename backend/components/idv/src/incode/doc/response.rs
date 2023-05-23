@@ -172,6 +172,31 @@ impl APIResponseToIncodeError for AddConsentResponse {
     }
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddSelfieResponse {
+    // Value can be 0 or 1. Value 0 means that person on photo is alive. We recommend capturing another photo if value is 1.
+    pub confidence: Option<f32>,
+    // We recommend capturing another photo if value is false.
+    pub is_bright: Option<bool>,
+    // We recommend capturing another photo if value is true.
+    pub has_lenses: Option<bool>,
+    // Checked only if configured in the session flow. We recommend capturing another photo if value is true.
+    pub has_face_mask: Option<bool>,
+    // Age of th person in the photo.
+    pub age: Option<i32>,
+    pub session_status: Option<serde_json::Value>,
+
+    #[serde(flatten)]
+    pub error: Option<Error>,
+}
+
+impl APIResponseToIncodeError for AddSelfieResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.error.clone()
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 // TODO need to PiiStringify eeeeeverything

@@ -1,4 +1,6 @@
-use super::doc::request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, DocumentSide};
+use super::doc::request::{
+    AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide,
+};
 use super::watchlist::request::WatchlistResultRequest;
 use super::{
     request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
@@ -11,6 +13,10 @@ use newtypes::{
     PiiString,
 };
 use reqwest::header;
+
+#[allow(unused)]
+const INCODE_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
+
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
     base_url: String,
@@ -221,6 +227,34 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn add_selfie(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        docv_data: DocVData,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self
+            .client_adapter
+            .api_url("omni/add/face/third-party?imageType=selfie")?;
+        let request: AddSelfieRequest = AddSelfieRequest {
+            base_64_image: docv_data
+                .selfie_image
+                .ok_or(IncodeError::AssertionError("missing selfie image".into()))?,
+        };
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
     pub async fn fetch_scores(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -352,7 +386,7 @@ mod tests {
         tests::fixtures::images::load_image_and_encode_as_b64,
     };
 
-    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
+    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter, INCODE_SELFIE_FLOW_ID};
 
     pub fn load_client() -> IncodeClientAdapter {
         let creds = IncodeCredentials {
@@ -367,7 +401,7 @@ mod tests {
         let client = load_client();
         let fp_client = FootprintVendorHttpClient::new().unwrap();
         // Start the session
-        let config = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
+        let config = IncodeConfigurationId::from(INCODE_SELFIE_FLOW_ID.to_string());
         let res = client
             .onboarding_start(&fp_client, Some(config), None, None)
             .await
@@ -402,6 +436,11 @@ mod tests {
             document_type: Some(IdDocKind::DriverLicense),
             ..Default::default()
         };
+        let selfie_docv_data = DocVData {
+            selfie_image: Some(PiiString::from(load_image_and_encode_as_b64("fake_selfie.jpg").0)),
+            document_type: Some(IdDocKind::DriverLicense),
+            ..Default::default()
+        };
 
         //
         // Add document sides
@@ -422,6 +461,19 @@ mod tests {
             .expect("add side failed");
         // check we can deser
         IncodeAPIResult::<AddSideResponse>::try_from(raw_back_add_side_res)
+            .unwrap()
+            .into_success()
+            .unwrap();
+
+        //
+        // Add selfie
+        //
+        let selfie_res = authenticated_client
+            .add_selfie(&fp_client, selfie_docv_data)
+            .await
+            .expect("add selfie failed");
+        // check we can deser
+        IncodeAPIResult::<AddSideResponse>::try_from(selfie_res)
             .unwrap()
             .into_success()
             .unwrap();
