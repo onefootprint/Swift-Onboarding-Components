@@ -12,9 +12,9 @@ pub use telemetry::TelemetrySpanBuilder;
 pub use tracing_actix_web::TracingLogger;
 
 pub mod config;
+pub mod fingerprinter;
 pub mod metrics;
 pub mod prometheus;
-pub mod fingerprinter;
 pub mod telemetry;
 
 pub mod auth;

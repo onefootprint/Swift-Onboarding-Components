@@ -127,6 +127,8 @@ pub enum ApiError {
     MiddeskError(#[from] middesk::MiddeskError),
     #[error("StateError: {0}")]
     StateError(#[from] crate::decision::state::StateError),
+    #[error("Alpaca error: {0}")]
+    AlpacaError(#[from] alpaca::Error),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -238,6 +240,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::AlpacaError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

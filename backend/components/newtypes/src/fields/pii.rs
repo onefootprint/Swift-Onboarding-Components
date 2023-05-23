@@ -198,6 +198,8 @@ impl PiiJsonValue {
     }
 }
 
+impl paperclip::v2::schema::TypedData for PiiJsonValue {}
+
 impl From<serde_json::Value> for PiiJsonValue {
     fn from(value: serde_json::Value) -> Self {
         Self(value)

@@ -1,0 +1,25 @@
+[package]
+name = "api_route_integrations"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+doctest = false
+
+[dependencies]
+api_core = { path = "../../core" }
+newtypes = { path = "../../../newtypes" }
+db = { path = "../../../db" }
+idv = { path = "../../../idv" }
+api_wire_types = { path = "../../wire_types" }
+alpaca = { path = "../../../integrations/alpaca" }
+
+actix-web = { workspace = true }
+paperclip = { workspace = true }
+tracing = { workspace = true }
+either = { workspace = true }
+tokio = { workspace = true }
+futures-util = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true }

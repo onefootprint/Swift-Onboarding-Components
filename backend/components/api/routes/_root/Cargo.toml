@@ -18,4 +18,5 @@ api_route_entities = { path = "../entities" }
 api_route_hosted = { path = "../hosted" }
 api_route_businesses = { path = "../businesses" }
 api_route_webhooks = { path = "../webhooks" }
+api_route_integrations = { path = "../integrations"}
 paperclip = { workspace = true }

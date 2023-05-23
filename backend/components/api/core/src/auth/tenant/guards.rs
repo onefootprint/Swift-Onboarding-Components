@@ -19,6 +19,7 @@ pub enum TenantGuard {
     OrgSettings,
     ManualReview,
     VaultProxy,
+    CipIntegration,
 }
 
 impl TenantGuard {
@@ -32,6 +33,7 @@ impl TenantGuard {
             Self::OrgSettings => TenantScope::OrgSettings,
             Self::ManualReview => TenantScope::ManualReview,
             Self::VaultProxy => TenantScope::VaultProxy,
+            Self::CipIntegration => TenantScope::CipIntegration,
         }
     }
 }
