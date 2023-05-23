@@ -19,8 +19,8 @@ use db::{
     },
 };
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, FootprintReasonCode, FpId, IdentityDataKind, MatchLevel,
-    PiiJsonValue, PiiString, SignalScope, TenantId, Vendor,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId,
+    IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, SignalScope, TenantId, Vendor,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -168,6 +168,7 @@ async fn kyc(
     annotations: Vec<Annotation>,
 ) -> ApiResult<alpaca::Kyc> {
     use DataIdentifier::*;
+    use DocumentKind::*;
     use IdentityDataKind::*;
 
     let mut vd = uvw
@@ -183,6 +184,9 @@ async fn kyc(
                 Id(AddressLine2),
                 Id(Zip),
                 Id(Country),
+                Document(PassportNumber),
+                Document(IdCardNumber),
+                Document(DriversLicenseNumber),
             ],
         )
         .await?;
@@ -203,6 +207,12 @@ async fn kyc(
         .iter()
         .max_by(|a, b| a.timestamp.cmp(&b.timestamp))
         .map(|annotation| format!("{} ({})", annotation.note, annotation.timestamp));
+
+    // find a gov't id number if we have one
+    let id_number = vec![PassportNumber, IdCardNumber, DriversLicenseDob]
+        .into_iter()
+        .flat_map(|id| vd.rm(id).ok())
+        .next();
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
@@ -227,8 +237,7 @@ async fn kyc(
 
         approved_reason,
 
-        // TODO: extract this from OCRd data if available
-        id_number: None,
+        id_number,
     };
     Ok(kyc)
 }

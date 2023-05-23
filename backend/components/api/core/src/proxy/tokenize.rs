@@ -21,6 +21,7 @@ use newtypes::DocumentKind;
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::SealedVaultDataKey;
+use newtypes::StorageType;
 use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use std::collections::HashMap;
@@ -52,7 +53,10 @@ pub async fn vault_pii(
 
         // build the update request
         let (data, documents): (Vec<_>, Vec<_>) = values.into_iter().partition_map(|(di, value)| match di {
-            DataIdentifier::Document(doc_kind) => Either::Right((doc_kind, value)),
+            DataIdentifier::Document(doc_kind) => match doc_kind.storage_type() {
+                StorageType::VaultData => Either::Left((di, value)),
+                StorageType::S3 => Either::Right((doc_kind, value)),
+            },
             DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Business(_)
             | DataIdentifier::Id(_)

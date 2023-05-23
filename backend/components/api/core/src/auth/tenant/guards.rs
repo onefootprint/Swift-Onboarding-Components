@@ -3,7 +3,7 @@ use crate::auth::{CanDecrypt, Either};
 use db::models::tenant_role::TenantRole;
 use either::Either::{Left, Right};
 use itertools::Itertools;
-use newtypes::{CollectedDataOption as CDO, DataIdentifier, TenantScope};
+use newtypes::{CollectedDataOption as CDO, DataIdentifier, DocumentKind, TenantScope};
 use std::collections::HashSet;
 use strum::Display;
 
@@ -53,11 +53,20 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             }
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
-            DataIdentifier::Document(newtypes::DocumentKind::Passport)
-            | DataIdentifier::Document(newtypes::DocumentKind::DriversLicenseFront)
-            | DataIdentifier::Document(newtypes::DocumentKind::DriversLicenseBack)
-            | DataIdentifier::Document(newtypes::DocumentKind::IdCardFront)
-            | DataIdentifier::Document(newtypes::DocumentKind::IdCardBack) => {
+            DataIdentifier::Document(DocumentKind::Passport)
+            | DataIdentifier::Document(DocumentKind::PassportNumber)
+            | DataIdentifier::Document(DocumentKind::PassportExpiration)
+            | DataIdentifier::Document(DocumentKind::PassportDob)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseFront)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseBack)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseNumber)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseExpiration)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseDob)
+            | DataIdentifier::Document(DocumentKind::DriversLicenseIssuingState)
+            | DataIdentifier::Document(DocumentKind::IdCardFront)
+            | DataIdentifier::Document(DocumentKind::IdCardBack)
+            | DataIdentifier::Document(DocumentKind::IdCardNumber)
+            | DataIdentifier::Document(DocumentKind::IdCardExpiration) => {
                 let can_decrypt = token_scopes.contains(&TenantScope::Decrypt(CDO::Document))
                     || token_scopes.contains(&TenantScope::Decrypt(CDO::DocumentAndSelfie));
                 Right(can_decrypt)

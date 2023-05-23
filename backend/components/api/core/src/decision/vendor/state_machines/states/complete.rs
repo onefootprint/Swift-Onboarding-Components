@@ -15,6 +15,7 @@ use db::TxnPgConn;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
+use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
@@ -22,11 +23,10 @@ use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
-use newtypes::KvDataKey;
+use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
 use std::collections::HashMap;
-use std::str::FromStr;
 
 pub struct Complete {
     pub fetch_scores_response: FetchScoresResponse,
@@ -79,30 +79,41 @@ impl Complete {
         IdentityDocument::update(conn, id_doc_id, update)?;
 
         // Add some extracted OCR data to the vault.
-        // For now, it will take the format of `custom.{document_type}.{attribute}`, like
-        // custom.id_card.document_number.
-        // In the future, we might want to make a formal DI for these
-        let di = |key: &str| -> Result<DataIdentifier, newtypes::Error> {
-            Ok(KvDataKey::from_str(&format!("{}.{}", dk, key))?.into())
-        };
         let r = fetch_ocr_response.clone();
-        let data = [
-            // TODO Do we want to error when these don't exist?
-            r.expiration_date().map(|x| (di("expiration_date"), x)).ok(),
-            r.dob().map(|x| (di("dob"), x)).ok(),
-            r.document_number.map(|x| (di("document_number"), x)),
-            r.issuing_state.map(|x| (di("issuing_state"), x)),
-            // TODO add more OCR data
-        ]
+
+        fn di<I: Into<DataIdentifier>>(i: I, pii: Option<PiiString>) -> Option<(DataIdentifier, PiiString)> {
+            pii.map(|x| (i.into(), x))
+        }
+
+        use DocumentKind::*;
+
+        let data = match dk {
+            IdDocKind::IdCard => vec![
+                di(IdCardExpiration, r.expiration_date().ok()),
+                di(IdCardNumber, r.document_number),
+            ],
+            IdDocKind::DriverLicense => vec![
+                di(DriversLicenseExpiration, r.expiration_date().ok()),
+                di(DriversLicenseDob, r.dob().ok()),
+                di(DriversLicenseNumber, r.document_number),
+                di(DriversLicenseIssuingState, r.issuing_state),
+            ],
+            IdDocKind::Passport => vec![
+                di(PassportExpiration, r.expiration_date().ok()),
+                di(PassportDob, r.dob().ok()),
+                di(PassportNumber, r.document_number),
+            ],
+        }
         .into_iter()
         .flatten()
-        .map(|(di, pii)| Ok((di?, pii)))
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect_vec();
 
         let data = HashMap::from_iter(data);
         let data = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(vault.is_live))?;
         let data = data.no_fingerprints();
         uvw.patch_data(conn, data)?;
+
+        // TODO: still need to fingerprint data afterwards!
 
         Ok(Self {
             fetch_scores_response,

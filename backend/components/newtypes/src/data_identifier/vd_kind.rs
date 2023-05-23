@@ -5,8 +5,8 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
 use crate::{
-    BusinessDataKind as BDK, CardInfo as CCI, DataIdentifier, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, KvDataKey,
+    BusinessDataKind as BDK, CardInfo as CCI, DataIdentifier, DocumentKind, IdentityDataKind as IDK,
+    InvestorProfileKind as IPK, KvDataKey, StorageType,
 };
 
 #[derive(
@@ -38,6 +38,7 @@ pub enum VdKind {
     Custom(KvDataKey),
     InvestorProfile(IPK),
     Card(CCI),
+    Document(DocumentKind), // TODO: should we create separate DocumentVaultDataKind?
 }
 
 crate::util::impl_enum_string_diesel!(VdKind);
@@ -51,6 +52,7 @@ impl From<VdKind> for DataIdentifier {
             VdKind::Custom(k) => Self::Custom(k),
             VdKind::InvestorProfile(k) => Self::InvestorProfile(k),
             VdKind::Card(k) => Self::Card(k),
+            VdKind::Document(d) => Self::Document(d),
         }
     }
 }
@@ -65,7 +67,10 @@ impl TryFrom<DataIdentifier> for VdKind {
             DataIdentifier::Custom(k) => Ok(Self::Custom(k)),
             DataIdentifier::InvestorProfile(k) => Ok(Self::InvestorProfile(k)),
             DataIdentifier::Card(k) => Ok(Self::Card(k)),
-            DataIdentifier::Document(_) => Err(ConversionError::Error(value)),
+            DataIdentifier::Document(doc) => match doc.storage_type() {
+                StorageType::VaultData => Ok(Self::Document(doc)),
+                StorageType::S3 => Err(ConversionError::Error(value)),
+            },
         }
     }
 }

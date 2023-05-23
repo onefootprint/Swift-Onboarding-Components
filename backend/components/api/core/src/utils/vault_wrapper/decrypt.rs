@@ -14,7 +14,7 @@ use enclave_proxy::DataTransform;
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
+    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString, StorageType,
 };
 use std::collections::HashMap;
 
@@ -49,7 +49,9 @@ impl<Type> VaultWrapper<Type> {
     ) -> ApiResult<DecryptUncheckedResult> {
         // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
         let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| match di {
-            DataIdentifier::Document(kind) => either::Either::Left(kind),
+            DataIdentifier::Document(kind) if matches!(kind.storage_type(), StorageType::S3) => {
+                either::Either::Left(kind)
+            }
             _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
                 VaultedData::Sealed(e_data) => Either::Left((di.clone(), e_data)),
                 VaultedData::NonPrivate(p_data) => Either::Right((di.clone(), p_data.clone())),

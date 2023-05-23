@@ -292,10 +292,8 @@ impl DataIdentifier {
         match self {
             DataIdentifier::Id(idk) => idk.is_searchable(),
             DataIdentifier::Business(bdk) => bdk.is_searchable(),
-            DataIdentifier::Custom(_)
-            | DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Document(_)
-            | DataIdentifier::Card(_) => false,
+            DataIdentifier::Document(dk) => dk.is_searchable(),
+            DataIdentifier::Custom(_) | DataIdentifier::InvestorProfile(_) | DataIdentifier::Card(_) => false,
         }
     }
 
@@ -304,6 +302,7 @@ impl DataIdentifier {
         IdentityDataKind::iter()
             .map(DataIdentifier::from)
             .chain(BusinessDataKind::iter().map(DataIdentifier::from))
+            .chain(DocumentKind::iter().map(DataIdentifier::from))
             .filter(Self::is_fingerprintable)
             .collect()
     }
@@ -329,6 +328,29 @@ impl DataIdentifier {
     }
 }
 
+/// Defines variants for how encrypted bytes are actually stored
+#[derive(Clone, Copy, Debug)]
+pub enum StorageType {
+    /// in the database as 'vault_data'
+    VaultData,
+    /// as an s3 object (larger data)
+    S3,
+}
+
+impl DataIdentifier {
+    /// defines how the encrypted bytes of the data identifier is stored
+    pub fn storage_type(&self) -> StorageType {
+        match self {
+            DataIdentifier::Document(doc_kind) => doc_kind.storage_type(),
+            DataIdentifier::InvestorProfile(_)
+            | DataIdentifier::Business(_)
+            | DataIdentifier::Id(_)
+            | DataIdentifier::Custom(_)
+            | DataIdentifier::Card(_) => StorageType::VaultData,
+        }
+    }
+}
+
 impl_enum_string_diesel!(DataIdentifier);
 
 #[cfg(test)]
@@ -345,6 +367,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration.month")]
+    #[test_case(DataIdentifier::Document(DocumentKind::DriversLicenseNumber) => "document.drivers_license.number")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -357,6 +380,7 @@ mod tests {
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration.month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
+    #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

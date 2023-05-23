@@ -1,6 +1,6 @@
 use crate::{
-    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, Validate,
-    ValidateArgs,
+    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, StorageType,
+    Validate, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use mime::Mime;
@@ -43,6 +43,25 @@ pub enum DocumentKind {
     IdCardSelfie,
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     FinraComplianceLetter,
+
+    #[strum(to_string = "passport.number")]
+    PassportNumber,
+    #[strum(to_string = "passport.expiration")]
+    PassportExpiration,
+    #[strum(to_string = "passport.dob")]
+    PassportDob,
+    #[strum(to_string = "drivers_license.number")]
+    DriversLicenseNumber,
+    #[strum(to_string = "drivers_license.expiration")]
+    DriversLicenseExpiration,
+    #[strum(to_string = "drivers_license.dob")]
+    DriversLicenseDob,
+    #[strum(to_string = "drivers_license.issuing_state")]
+    DriversLicenseIssuingState,
+    #[strum(to_string = "id_card.number")]
+    IdCardNumber,
+    #[strum(to_string = "id_card.expiration")]
+    IdCardExpiration,
 }
 // TODO: one day merge IdDocKind into here
 
@@ -84,6 +103,15 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             DocumentKind::DriversLicenseFront => true,
             DocumentKind::DriversLicenseBack => true,
             DocumentKind::DriversLicenseSelfie => true,
+            DocumentKind::PassportNumber
+            | DocumentKind::PassportExpiration
+            | DocumentKind::PassportDob
+            | DocumentKind::DriversLicenseNumber
+            | DocumentKind::DriversLicenseExpiration
+            | DocumentKind::DriversLicenseDob
+            | DocumentKind::DriversLicenseIssuingState
+            | DocumentKind::IdCardNumber
+            | DocumentKind::IdCardExpiration => true,
         }
     }
 
@@ -97,6 +125,16 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             | DocumentKind::DriversLicenseSelfie
             | DocumentKind::IdCardSelfie
             | DocumentKind::PassportSelfie => Some(CollectedData::Document),
+            // allow storing this data independently
+            DocumentKind::PassportNumber
+            | DocumentKind::PassportExpiration
+            | DocumentKind::PassportDob
+            | DocumentKind::DriversLicenseNumber
+            | DocumentKind::DriversLicenseExpiration
+            | DocumentKind::DriversLicenseDob
+            | DocumentKind::DriversLicenseIssuingState
+            | DocumentKind::IdCardNumber
+            | DocumentKind::IdCardExpiration => None,
             DocumentKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
     }
@@ -116,6 +154,15 @@ impl DocumentKind {
             | DocumentKind::IdCardSelfie
             | DocumentKind::PassportSelfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
             DocumentKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
+            DocumentKind::PassportNumber
+            | DocumentKind::PassportExpiration
+            | DocumentKind::PassportDob
+            | DocumentKind::DriversLicenseNumber
+            | DocumentKind::DriversLicenseExpiration
+            | DocumentKind::DriversLicenseDob
+            | DocumentKind::DriversLicenseIssuingState
+            | DocumentKind::IdCardNumber
+            | DocumentKind::IdCardExpiration => vec![],
         }
     }
 
@@ -131,5 +178,45 @@ impl DocumentKind {
             (IdDocKind::Passport, DocumentSide::Back) => Self::Passport,
             (IdDocKind::Passport, DocumentSide::Selfie) => Self::PassportSelfie,
         }
+    }
+}
+
+impl DocumentKind {
+    /// defines how the encrypted bytes of the data identifier is stored
+    pub fn storage_type(&self) -> StorageType {
+        match self {
+            DocumentKind::Passport
+            | DocumentKind::PassportSelfie
+            | DocumentKind::DriversLicenseFront
+            | DocumentKind::DriversLicenseBack
+            | DocumentKind::DriversLicenseSelfie
+            | DocumentKind::IdCardFront
+            | DocumentKind::IdCardBack
+            | DocumentKind::IdCardSelfie
+            | DocumentKind::FinraComplianceLetter => StorageType::S3,
+            DocumentKind::PassportNumber
+            | DocumentKind::PassportExpiration
+            | DocumentKind::PassportDob
+            | DocumentKind::DriversLicenseNumber
+            | DocumentKind::DriversLicenseExpiration
+            | DocumentKind::DriversLicenseDob
+            | DocumentKind::DriversLicenseIssuingState
+            | DocumentKind::IdCardNumber
+            | DocumentKind::IdCardExpiration => StorageType::VaultData,
+        }
+    }
+}
+
+impl DocumentKind {
+    pub fn searchable() -> Vec<Self> {
+        vec![
+            Self::PassportNumber,
+            Self::DriversLicenseNumber,
+            Self::IdCardNumber,
+        ]
+    }
+
+    pub fn is_searchable(&self) -> bool {
+        Self::searchable().contains(self)
     }
 }
