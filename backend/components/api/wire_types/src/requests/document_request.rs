@@ -11,7 +11,7 @@ use schemars::JsonSchema;
 pub struct DocumentRequest {
     //TODO: rename to IdentityDocumentRequest
     /// base64 standard encoded image bytes
-    pub front_image: PiiString,
+    pub front_image: Option<PiiString>,
     /// base64 standard encoded image bytes!)
     pub back_image: Option<PiiString>,
     pub selfie_image: Option<PiiString>,

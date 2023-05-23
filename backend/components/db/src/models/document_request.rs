@@ -22,7 +22,6 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
-    pub idv_reqs_initiated: bool,
     // We keep track of the previous document request in the case we want to not recollect selfie, we can copy over the s3 path
     pub previous_document_request_id: Option<DocumentRequestId>,
 }
@@ -30,22 +29,11 @@ pub struct DocumentRequest {
 #[diesel(table_name = document_request)]
 pub struct DocumentRequestUpdate {
     pub status: Option<DocumentRequestStatus>,
-    pub idv_reqs_initiated: Option<bool>,
 }
 
 impl DocumentRequestUpdate {
     pub fn status(status: DocumentRequestStatus) -> Self {
-        Self {
-            status: Some(status),
-            ..Default::default()
-        }
-    }
-
-    pub fn idv_reqs_initiated() -> Self {
-        Self {
-            idv_reqs_initiated: Some(true),
-            ..Default::default()
-        }
+        Self { status: Some(status) }
     }
 }
 
@@ -63,7 +51,6 @@ impl DocumentRequest {
             ref_id,
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
-            idv_reqs_initiated: false,
             should_collect_selfie,
             previous_document_request_id,
         };
@@ -207,6 +194,7 @@ impl DocumentRequest {
         self.status == DocumentRequestStatus::Pending
     }
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct NewDocumentRequest {
@@ -215,6 +203,5 @@ pub struct NewDocumentRequest {
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
-    pub idv_reqs_initiated: bool,
     pub previous_document_request_id: Option<DocumentRequestId>,
 }

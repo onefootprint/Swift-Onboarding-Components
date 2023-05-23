@@ -108,6 +108,8 @@ impl IncodeStateTransition for AddFront {
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
                     IncodeVerificationSession::update(conn, &self.session.id, update)?;
 
+                    // TODO skip AddBack depending on what is required for the doc type
+                    // Add an ::enter that will decide given the context if we need to do add back
                     AddBack {
                         session: self.session,
                         add_back_verification_request: res,

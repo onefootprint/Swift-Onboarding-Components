@@ -13,7 +13,6 @@ use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeCon
 use api_core::decision::vendor::state_machines::states::document_retry_limit_exceeded;
 use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::enclave_client::EnclaveClient;
-use api_core::errors::AssertionError;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
@@ -31,7 +30,7 @@ use db::{DbError, DbPool, DbResult, PgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, DocumentSide, IdentityDocumentId,
+    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, DocumentSide, IdDocKind, IdentityDocumentId,
     IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId, SealedVaultDataKey, TenantId,
     VaultId,
 };
@@ -49,39 +48,25 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let request = request.0;
+
     let su_id = user_auth.scoped_user.id.clone();
-
-    let (uvw, doc_request, user_auth, user_consent) = state
+    let ob_id = user_auth.onboarding()?.id.clone();
+    let (uvw, doc_request, user_consent) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
-            let doc_request =
-                DbDocumentRequest::lock_active(conn, &user_auth.scoped_user.id).map_err(|e| {
-                    if e.is_not_found() {
-                        ApiError::from(OnboardingError::NoPendingDocumentRequestFound)
-                    } else {
-                        ApiError::from(e)
-                    }
-                })?;
-            // Move our request to Uploaded so any subsequent POSTs will fail
-            let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
-            let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
+            let doc_request = DbDocumentRequest::get_active(conn, &su_id)?
+                .ok_or(OnboardingError::NoPendingDocumentRequestFound)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-
-            let user_consent = UserConsent::latest_for_onboarding(conn, &user_auth.onboarding()?.id)?;
-
-            Ok((uvw, doc_request, user_auth, user_consent))
+            let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
+            Ok((uvw, doc_request, user_consent))
         })
-        .await?;
+        .await??;
 
     if request.selfie_image.is_some() {
         if !doc_request.should_collect_selfie {
-            return Err(TenantError::ValidationError(
-                "Document request is not expecting selfie_image".to_owned(),
-            )
-            .into());
+            return Err(TenantError::NotExpectingSelfie.into());
         }
-
         if user_consent.is_none() {
             return Err(ApiError::from(OnboardingError::UserConsentNotFound));
         }
@@ -96,11 +81,9 @@ pub async fn post(
     let bucket = &state.config.document_s3_bucket.clone();
 
     // Check if we should be initiating requests (e.g. check if we are testing)
-    // TODO: generate fixture data for identity documents
-    let ff_client = &state.feature_flag_client;
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
         &state,
-        ff_client,
+        &state.feature_flag_client,
         &user_auth.scoped_user.id,
         &user_auth.scoped_user.tenant_id,
     )
@@ -111,7 +94,7 @@ pub async fn post(
     // Encrypt all images
     //
     let e_imgs = vec![
-        Some((DocumentSide::Front, request.front_image)),
+        request.front_image.map(|img| (DocumentSide::Front, img)),
         request.back_image.map(|img| (DocumentSide::Back, img)),
         request.selfie_image.map(|img| (DocumentSide::Selfie, img)),
     ]
@@ -148,15 +131,14 @@ pub async fn post(
     let created_reqs = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // temporary: for compatibility with the new document kinds
-            // Create a document record on the VW for each image type
-
+            let doc_request = DbDocumentRequest::lock_active(conn, &su_id)?;
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request_id,
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
             };
-            let id_doc = IdentityDocument::create(conn, args)?;
+            // TODO: get or create
+            let id_doc = IdentityDocument::get_or_create(conn, args)?;
             // Create each of the uploads
             s3_urls
                 .into_iter()
@@ -165,27 +147,42 @@ pub async fn post(
                 })
                 .collect::<db::DbResult<Vec<_>>>()?;
 
-            //
-            // Now that the document is created, either initiate IDV reqs or create fixture data
-            //
-            let result = if should_initiate_reqs {
-                // Initiate IDV reqs once and only once for this id_doc
-                let doc_request = DbDocumentRequest::lock(conn, &su_id, &doc_request.id)?;
-                let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                if doc_request.idv_reqs_initiated {
-                    return Err(AssertionError("Document request already initiated").into());
+            // Check if all documents are uploaded before proceeding
+            // In the future, we'll proceed until the state machine reaches the end
+            let existing_sides = id_doc.images(conn)?.into_iter().map(|u| u.side).collect_vec();
+            let required_sides = match id_doc.document_type {
+                IdDocKind::DriverLicense => vec![DocumentSide::Front, DocumentSide::Back],
+                IdDocKind::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
+                IdDocKind::Passport => vec![DocumentSide::Front],
+            }
+            .into_iter()
+            .chain(doc_request.should_collect_selfie.then_some(DocumentSide::Selfie))
+            .collect_vec();
+            let has_all_required_images = required_sides.into_iter().all(|s| existing_sides.contains(&s));
+            let result = if has_all_required_images {
+                // Mark the document request as Uploaded
+                // TODO we won't want to necessarily do this... this stops us from rendering
+                // the onboarding requirement
+                let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
+                let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
+                //
+                // Now that the document is created, either initiate IDV reqs or create fixture data
+                //
+                if should_initiate_reqs {
+                    // Initiate IDV reqs once and only once for this id_doc
+                    let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
+                                                               // TODO i think we rm this
+                    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+                    Some((decision_intent, doc_request, id_doc.id))
+                } else {
+                    // Create fixture data
+                    let scores = idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
+                    let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
+                    let doc_type = request.document_type;
+                    Complete::enter(conn, &vault, &su_id, &id_doc.id, doc_type, scores, ocr)?;
+                    None
                 }
-                let update = DocumentRequestUpdate::idv_reqs_initiated();
-                let doc_request = doc_request.into_inner().update(conn, update)?;
-
-                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
-                Some((decision_intent, doc_request, id_doc.id))
             } else {
-                // Create fixture data
-                let scores = idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE();
-                let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
-                let doc_type = request.document_type;
-                Complete::enter(conn, &vault, &su_id, &id_doc.id, doc_type, scores, ocr)?;
                 None
             };
 

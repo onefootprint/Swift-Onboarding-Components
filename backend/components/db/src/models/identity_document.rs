@@ -61,21 +61,30 @@ pub struct IdentityDocumentUpdate {
 
 impl IdentityDocument {
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
-        let NewIdentityDocumentArgs {
-            request_id,
-            document_type,
-            country_code,
-        } = args;
-        let new = NewIdentityDocumentRow {
-            request_id,
-            document_type,
-            country_code,
-            created_at: Utc::now(),
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
+        let existing_doc = identity_document::table
+            .filter(identity_document::request_id.eq(&args.request_id))
+            .get_result(conn.conn())
+            .optional()?;
+        let result = if let Some(existing_doc) = existing_doc {
+            existing_doc
+        } else {
+            // Create a new doc
+            let NewIdentityDocumentArgs {
+                request_id,
+                document_type,
+                country_code,
+            } = args;
+            let new = NewIdentityDocumentRow {
+                request_id,
+                document_type,
+                country_code,
+                created_at: Utc::now(),
+            };
+            diesel::insert_into(identity_document::table)
+                .values(new)
+                .get_result(conn.conn())?
         };
-        let result = diesel::insert_into(identity_document::table)
-            .values(new)
-            .get_result::<IdentityDocument>(conn.conn())?;
         Ok(result)
     }
 
@@ -97,7 +106,7 @@ impl IdentityDocument {
     /// Get the identity document, and the associated document request
     #[tracing::instrument(skip_all)]
     pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
-        let res: (Self, DocumentRequest) = identity_document::table
+        let res = identity_document::table
             .filter(identity_document::id.eq(id))
             .inner_join(document_request::table)
             .select((identity_document::all_columns, document_request::all_columns))

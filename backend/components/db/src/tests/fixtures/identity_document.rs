@@ -12,5 +12,5 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
         document_type: IdDocKind::DriverLicense,
         country_code: "Flerp country code".to_owned(),
     };
-    IdentityDocument::create(conn, args).unwrap()
+    IdentityDocument::get_or_create(conn, args).unwrap()
 }

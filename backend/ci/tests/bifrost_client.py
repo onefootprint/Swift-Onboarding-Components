@@ -181,20 +181,25 @@ class BifrostClient:
         """Add identity documents to vault"""
         from .image_fixtures import test_image
 
-        selfie_image = test_image if requirement["should_collect_selfie"] else None
-        data = {
-            "front_image": test_image,
-            "back_image": test_image,
-            "selfie_image": selfie_image,
-            "document_type": "driver_license",
-            "country_code": "USA",
-        }
-
         if requirement["should_collect_consent"]:
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)
 
-        post("hosted/user/document", data, self.auth_token)
+        common_data = {
+            "document_type": "driver_license",
+            "country_code": "USA",
+        }
+        images = [
+            dict(front_image=test_image),
+            dict(back_image=test_image),
+        ]
+        if requirement["should_collect_selfie"]:
+            images.append(dict(selfie_image=test_image))
+
+        # Upload the documents consecutively in separate requests
+        for image in images:
+            data = {**common_data, **image}
+            post("hosted/user/document", data, self.auth_token)
 
         # Check the status of uploading the doc
         body = get(f"hosted/user/document/status", None, self.auth_token)

@@ -76,11 +76,11 @@ pub fn create(
     // If we want to simulate having collected an id document
     if opts.collected_doc_opts.id_doc_collected {
         let args = NewIdentityDocumentArgs {
-            request_id: doc_request.id.clone(),
+            request_id: doc_request.id,
             document_type: newtypes::IdDocKind::DriverLicense,
             country_code: "USA".to_owned(),
         };
-        let id1 = IdentityDocument::create(conn, args).unwrap();
+        let id1 = IdentityDocument::get_or_create(conn, args).unwrap();
 
         // If we want to simulate having sent id document to vendor
         if opts.collected_doc_opts.has_verification_result {
@@ -108,8 +108,6 @@ pub fn create(
                 false,
             )
             .expect("VerificationResult failed to create");
-            let update = DocumentRequestUpdate::idv_reqs_initiated();
-            doc_request.update(conn.conn(), update).unwrap();
 
             verification_info = Some((vreq.id, vres.id));
         }
