@@ -51,6 +51,7 @@ impl IdvData {
             IdentityDataKind::Country => self.country.as_ref(),
             IdentityDataKind::Email => self.email.as_ref(),
             IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
+            IdentityDataKind::Nationality => None,
         }
     }
 

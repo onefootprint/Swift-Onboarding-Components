@@ -188,6 +188,7 @@ mod test {
         TenantScope::Decrypt(CollectedDataOption::PartialAddress),
         TenantScope::Decrypt(CollectedDataOption::Email),
         TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
+        TenantScope::Decrypt(CollectedDataOption::Nationality),
         TenantScope::Decrypt(CollectedDataOption::Document),
         TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie),
         TenantScope::Decrypt(CollectedDataOption::BusinessName),

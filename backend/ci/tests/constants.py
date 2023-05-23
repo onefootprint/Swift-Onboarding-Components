@@ -67,6 +67,7 @@ ID_DATA = {
     "id.state": "NY",
     "id.zip": "10009",
     "id.country": "US",
+    "id.nationality": "US",
 }
 
 BUSINESS_DATA = {
@@ -138,6 +139,7 @@ CDO_TO_DIS = {
     "partial_address": ["id.zip", "id.country"],
     "email": ["id.email"],
     "phone_number": ["id.phone_number"],
+    "nationality": ["id.nationality"],
     "business_name": ["business.name", "business.dba"],
     "business_tin": ["business.tin"],
     "business_address": [

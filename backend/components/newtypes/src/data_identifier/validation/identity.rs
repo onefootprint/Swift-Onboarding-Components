@@ -23,6 +23,7 @@ impl Validate for IDK {
             IDK::Country => utils::clean_and_validate_country(value)?,
             IDK::Email => clean_and_validate_email(value, args)?,
             IDK::PhoneNumber => clean_and_validate_phone(value, args)?,
+            IDK::Nationality => utils::clean_and_validate_country(value)?,
         };
         Ok(result)
     }
@@ -142,6 +143,8 @@ mod test {
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
     #[test_case(PhoneNumber, "+15555555555#sandbox" => None)] // Sandbox phone
+    #[test_case(Nationality, "US" => Some("US".to_owned()))] // Sandbox phone
+    #[test_case(Nationality, "Flerp" => None)] // Sandbox phone
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
         idk.validate(
             PiiString::new(pii.to_owned()),

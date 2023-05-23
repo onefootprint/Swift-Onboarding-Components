@@ -23,7 +23,8 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                 | IDK::Country
                 | IDK::Zip
                 | IDK::FirstName
-                | IDK::LastName => {
+                | IDK::LastName
+                | IDK::Nationality => {
                     // Either BasicProfile or SignUp give permissions to decrypt basic info
                     UserAuthGuard::BasicProfile
                         .or(UserAuthGuard::SignUp)

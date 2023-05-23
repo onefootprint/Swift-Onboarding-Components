@@ -23,7 +23,8 @@ pub enum CollectedData {
     Address,
     Email,
     PhoneNumber,
-    Document, // Represents IdDocKind's
+    Nationality,
+    Document,
 
     // TODO: maybe nest these
     BusinessName,
@@ -51,6 +52,7 @@ impl CollectedData {
             // contain fewer fields are first
             Self::Ssn => vec![Ssn4, Ssn9],
             Self::Address => vec![PartialAddress, FullAddress],
+            Self::Nationality => vec![Nationality],
             Self::Document => vec![Document, DocumentAndSelfie],
             Self::BusinessName => vec![BusinessName],
             Self::BusinessTin => vec![BusinessTin],
@@ -72,9 +74,13 @@ impl CollectedData {
             | Self::BusinessWebsite
             | Self::BusinessBeneficialOwners
             | Self::BusinessCorporationType => DataIdentifierDiscriminant::Business,
-            Self::Name | Self::Dob | Self::Ssn | Self::Address | Self::Email | Self::PhoneNumber => {
-                DataIdentifierDiscriminant::Id
-            }
+            Self::Name
+            | Self::Dob
+            | Self::Ssn
+            | Self::Address
+            | Self::Email
+            | Self::PhoneNumber
+            | Self::Nationality => DataIdentifierDiscriminant::Id,
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
         }
@@ -117,6 +123,7 @@ pub enum CollectedDataOption {
     PartialAddress,
     Email,
     PhoneNumber,
+    Nationality,
 
     // these correspond to Identity documents + selfie
     Document,
@@ -146,6 +153,7 @@ impl CollectedDataOption {
             Self::FullAddress | Self::PartialAddress => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
+            Self::Nationality => CollectedData::Nationality,
             Self::Document => CollectedData::Document,
             Self::DocumentAndSelfie => CollectedData::Document,
             Self::BusinessName => CollectedData::BusinessName,
@@ -178,6 +186,7 @@ impl CollectedDataOption {
             Self::PartialAddress => Some(vec![IDK::Zip.into(), IDK::Country.into()]),
             Self::Email => Some(vec![IDK::Email.into()]),
             Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
+            Self::Nationality => Some(vec![IDK::Nationality.into()]),
             Self::BusinessName => Some(vec![BDK::Name.into(), BDK::Dba.into()]),
             Self::BusinessTin => Some(vec![BDK::Tin.into()]),
             Self::BusinessAddress => Some(vec![

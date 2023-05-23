@@ -71,13 +71,7 @@ def wait_for_deploy():
 @pytest.fixture(scope="session")
 def can_access_data():
     # Everything but dob
-    return [
-        "name",
-        "ssn9",
-        "full_address",
-        "email",
-        "phone_number",
-    ]
+    return ["name", "ssn9", "full_address", "email", "phone_number", "nationality"]
 
 
 @pytest.fixture(scope="session")

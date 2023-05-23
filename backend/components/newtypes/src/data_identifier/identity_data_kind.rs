@@ -45,6 +45,7 @@ pub enum IdentityDataKind {
     Country,
     Email,
     PhoneNumber,
+    Nationality,
 }
 
 crate::util::impl_enum_str_diesel!(IdentityDataKind);
@@ -81,6 +82,7 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
             Self::Country => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
+            Self::Nationality => CollectedData::Nationality,
         };
         Some(result)
     }
