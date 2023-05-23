@@ -62,7 +62,7 @@ export const getErrorMessage = (error?: unknown | Error): string => {
 
 const getRequestOptions = (
   requestConfig: AxiosRequestConfig,
-  omitSessionId?: boolean,
+  extraOptions: { omitSessionId?: boolean } = {},
 ) => {
   const sessionId = getSessionId();
   return {
@@ -74,7 +74,7 @@ const getRequestOptions = (
     withCredentials: true,
     ...requestConfig,
     headers: {
-      'x-fp-session-id': omitSessionId ? undefined : sessionId,
+      'x-fp-session-id': extraOptions.omitSessionId ? undefined : sessionId,
       ...requestConfig.headers,
     },
   };
@@ -86,10 +86,10 @@ const preservedKeys = [...DataIdentifierKeys];
 
 const request = <Response = any>(
   requestConfig: AxiosRequestConfig = {},
-  omitSessionId?: boolean,
+  extraOptions: { omitSessionId?: boolean } = {},
 ) => {
   const client = applyCaseMiddleware(axios.create(), { preservedKeys });
-  const options = getRequestOptions(requestConfig, omitSessionId);
+  const options = getRequestOptions(requestConfig, extraOptions);
   return client.request<Response>(options);
 };
 

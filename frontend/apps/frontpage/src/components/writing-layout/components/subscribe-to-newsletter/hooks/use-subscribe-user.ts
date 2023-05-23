@@ -16,7 +16,7 @@ const subscribeUser = async (payload: SubscribeUserRequest) => {
       baseURL: undefined,
       withCredentials: false,
     },
-    true,
+    { omitSessionId: true },
   );
   return response.data;
 };

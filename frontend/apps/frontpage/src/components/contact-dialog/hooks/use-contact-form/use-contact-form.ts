@@ -16,7 +16,7 @@ const contactFormRequest = async ({ url, data }: ContactFormRequest) => {
       data,
       withCredentials: false,
     },
-    true,
+    { omitSessionId: true },
   );
   return response.data;
 };

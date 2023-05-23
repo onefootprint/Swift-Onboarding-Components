@@ -9,12 +9,15 @@ export type SupportFormRequest = {
 };
 
 const supportFormRequest = async ({ url, data }: SupportFormRequest) => {
-  const response = await request<{}>({
-    method: 'POST',
-    url,
-    data,
-    withCredentials: false,
-  });
+  const response = await request(
+    {
+      method: 'POST',
+      url,
+      data,
+      withCredentials: false,
+    },
+    { omitSessionId: true },
+  );
   return response.data;
 };
 
