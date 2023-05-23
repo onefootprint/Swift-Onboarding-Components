@@ -255,3 +255,26 @@ impl From<ScrubbedJsonValue> for PiiJsonValue {
         Self(s.0)
     }
 }
+
+#[macro_use]
+pub mod macros {
+    #[macro_export]
+    /// quickly define pii
+    macro_rules! pii {
+        ($lit:literal) => {
+            PiiString::from($lit)
+        };
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::super::PiiString;
+
+        #[test]
+        fn test_pii_macro() {
+            assert_eq!(pii!("hi").leak(), "hi");
+        }
+    }
+
+    pub use pii;
+}

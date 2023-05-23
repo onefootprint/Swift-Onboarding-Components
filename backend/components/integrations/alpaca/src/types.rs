@@ -1,11 +1,11 @@
 use chrono::Utc;
+use newtypes::macros::pii;
 use newtypes::{FpId, PiiJsonValue, PiiString, Vendor};
-
 /// Represents a request to upload CIP information for an alpaca Account
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CipRequest {
     /// The name of your identity verification and watchlist screening provider
-    pub provider_name: Provider,
+    pub provider_name: Vec<Provider>,
 
     /// kyc section
     pub kyc: Kyc,
@@ -54,6 +54,7 @@ pub struct Kyc {
     pub check_initiated_at: chrono::DateTime<Utc>,
     pub check_completed_at: chrono::DateTime<Utc>,
 
+    pub approved_reason: String,
     pub approval_status: ApprovalStatus,
     pub approved_by: PiiString,
 
@@ -62,30 +63,43 @@ pub struct Kyc {
     pub approved_at: chrono::DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum Nationality {
+    #[default]
     American,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum ApprovalStatus {
+    #[default]
     Approved,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum CipResult {
+    #[default]
     Clear,
     Consider,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum CipStatus {
+    #[default]
     Complete,
     Withdrawn,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DocumentType {
+    DriversLicense,
+    NationalId,
+    Passport,
+    Visa,
 }
 
 /// Document (photo ID)
@@ -106,10 +120,10 @@ pub struct DocumentPhotoId {
     pub last_name: PiiString,
     pub gender: PiiString,
     pub date_of_birth: PiiString,
-    pub date_of_expiry: chrono::DateTime<Utc>,
-    pub issuing_country: String,
+    pub date_of_expiry: PiiString,
+    pub issuing_country: PiiString,
     pub document_numbers: Vec<PiiString>,
-    pub document_type: String,
+    pub document_type: DocumentType,
 
     /// Checks whether the age calculated from the document’s date of birth data point is greater than or equal to the minimum accepted age. Unless otherwise discussed with Alpaca, users must be 18 years old to open an account.
     pub age_validation: CipResult,
@@ -123,7 +137,7 @@ pub struct DocumentPhotoId {
     pub visual_authenticity: VisualAuthenticity,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct DataComparsionBreakDown {
     pub first_name: CipResult,
     pub last_name: CipResult,
@@ -133,7 +147,7 @@ pub struct DataComparsionBreakDown {
     pub address: Option<CipResult>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct ImageIntegrityBreakdown {
     /// Checks whether the quality of the image was sufficient for processing.    
     pub image_quality: CipResult,
@@ -146,7 +160,7 @@ pub struct ImageIntegrityBreakdown {
     pub conclusive_document_quality: Option<CipResult>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct VisualAuthenticity {
     /// If there is an indication of digital tampering, this would result in a “consider”
     pub digital_tampering: CipResult,
@@ -252,4 +266,96 @@ pub struct Watchlist {
     /// If any of those fields are “consider” this is a space to provide the breakdown of those Matches or Hits that your KYC provider finds. It should include as much detail as possible broken down for each match or hit such as: name, aliases, addresses, DOB, type of hit (PEP, adverse media, etc.), and any accompanying details depending on the type of hit such as positions held, lists found on, a summary of and URL to adverse media article, explanation of the monitored list, etc. See below for an example.
     /// Free-form json here.
     pub records: Vec<PiiJsonValue>,
+}
+
+/// Fixtures for testing alpaca CIP types
+pub mod fixtures {
+    use chrono::Duration;
+    use serde_json::json;
+
+    use super::*;
+
+    fn fp_id_test() -> FpId {
+        FpId::from("fp_id_alpaca_test_1".to_string())
+    }
+
+    impl CipRequest {
+        /// generate a fixture CIP request
+        pub fn test_fixture() -> Self {
+            CipRequest {
+                provider_name: vec![Provider::Footprint],
+                kyc: Kyc {
+                    id: fp_id_test(),
+                    applicant_name: pii!("Carl Cassanova"),
+                    email_address: pii!("carl.casanova@gmail.com"),
+                    nationality: Nationality::American,
+                    id_number: None,
+                    date_of_birth: pii!("1992-02-02"),
+                    address: pii!("1 Penguin Place, Philadelphia PA"),
+                    postal_code: pii!("10012"),
+                    country_of_residency: pii!("USA"),
+                    kyc_completed_at: Utc::now(),
+                    ip_address: pii!("127.0.0.1"),
+                    check_initiated_at: Utc::now() - Duration::seconds(10),
+                    check_completed_at: Utc::now() - Duration::seconds(7),
+                    approval_status: ApprovalStatus::Approved,
+                    approved_by: pii!("alex@onefootprint.com"),
+                    approved_at: Utc::now(),
+                    approved_reason: "We carefully review the document and matched all the fields to the submitted information.".into()
+                },
+                document: Some(DocumentPhotoId {
+                    id: fp_id_test(),
+                    status: CipStatus::Complete,
+                    result: CipResult::Clear,
+                    created_at: Utc::now(),
+                    first_name: pii!("Carl"),
+                    last_name: pii!("Casanova"),
+                    gender: pii!("Male"),
+                    date_of_birth: pii!("1992-02-02"),
+                    date_of_expiry: pii!("2025-02-02"),
+                    issuing_country: pii!("USA"),
+                    document_numbers: vec![pii!("12121212")],
+                    document_type: DocumentType::DriversLicense,
+                    age_validation: CipResult::Clear,
+                    data_comparison: CipResult::Clear,
+                    data_comparison_breakdown: Default::default(),
+                    image_integrity: CipResult::Clear,
+                    image_integrity_breakdown: Default::default(),
+                    visual_authenticity: Default::default(),
+                }),
+                photo: Some(PhotoSelfie {
+                    id: fp_id_test(),
+                    status: CipStatus::Complete,
+                    result: CipResult::Clear,
+                    created_at: Utc::now(),
+                    face_comparison: CipResult::Clear,
+                    image_integrity: CipResult::Clear,
+                    visual_authenticity: CipResult::Clear,
+                }),
+                identity: Identity {
+                    id: fp_id_test(),
+                    status: CipStatus::Complete,
+                    result: CipResult::Clear,
+                    created_at: Utc::now(),
+                    matched_address: CipResult::Clear,
+                    matched_addresses: vec![Vendor::Idology, Vendor::Experian],
+                    date_of_birth: CipResult::Clear,
+                    date_of_birth_breakdown: vec![Vendor::Idology, Vendor::Experian],
+                    tax_id: CipResult::Clear,
+                    tax_id_breakdown: vec![Vendor::Idology, Vendor::Experian],
+                },
+                watchlist: Watchlist {
+                    id: fp_id_test(),
+                    status: CipStatus::Complete,
+                    result: CipResult::Clear,
+                    created_at: Utc::now(),
+                    politically_exposed_person: CipResult::Clear,
+                    sanction: CipResult::Clear,
+                    adverse_media: CipResult::Clear,
+                    monitored_lists: CipResult::Clear,
+                    records: vec![PiiJsonValue::from(json!({"test_result": "all_clear"}))],
+                },
+            }
+        }
+    }
 }

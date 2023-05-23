@@ -19,3 +19,4 @@ twilio==7.9.2
 aiohttp==3.8.3
 asyncio==3.4.3
 svix==0.78.0
+alpaca-py==0.8.2

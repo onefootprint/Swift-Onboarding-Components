@@ -74,6 +74,7 @@ impl AlpacaCipClient {
                 self.api_key.leak_to_string(),
                 Some(self.api_secret.leak_to_string()),
             )
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
             .json(json_body)
             .build()?;
 

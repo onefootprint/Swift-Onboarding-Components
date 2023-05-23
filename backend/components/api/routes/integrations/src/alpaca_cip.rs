@@ -11,7 +11,7 @@ use api_core::{
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse};
 use db::models::scoped_vault::ScopedVault;
-use newtypes::PiiJsonValue;
+use newtypes::{PiiJsonValue, PiiString};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -45,7 +45,7 @@ pub async fn post(
         .await??;
 
     // build the cip request
-    let cip_request = make_cip_request(&state, uvw).await?;
+    let cip_request = create_cip_request(&state, uvw, request.default_approver).await?;
 
     // fire off the cip request to alpaca
     let response = alpaca_client.send_cip(request.account_id, cip_request).await?;
@@ -61,6 +61,11 @@ pub async fn post(
     .json()
 }
 
-async fn make_cip_request(_state: &State, _uvw: TenantVw) -> ApiResult<CipRequest> {
-    todo!()
+async fn create_cip_request(
+    _state: &State,
+    _uvw: TenantVw,
+    _default_approver: PiiString,
+) -> ApiResult<CipRequest> {
+    //TODO: replace me
+    Ok(CipRequest::test_fixture())
 }

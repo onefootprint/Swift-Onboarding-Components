@@ -9,6 +9,7 @@
         "esbenp.prettier-vscode",
         "wayou.vscode-todo-highlight",
         "edonet.vscode-command-runner",
-        "styled-components.vscode-styled-components"
+        "styled-components.vscode-styled-components",
+        "ms-python.black-formatter"
     ]
 }
