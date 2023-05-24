@@ -158,7 +158,7 @@ describe('<List />', () => {
 
         await filterEvents.apply({
           trigger: 'Status',
-          option: 'Failed',
+          options: ['Failed'],
         });
 
         await waitFor(() => {
@@ -183,7 +183,7 @@ describe('<List />', () => {
 
         await filterEvents.apply({
           trigger: 'Date range',
-          option: 'Last 7 days',
+          options: ['Last 7 days'],
         });
 
         await waitFor(() => {
@@ -208,7 +208,7 @@ describe('<List />', () => {
 
         await filterEvents.apply({
           trigger: 'On a watchlist',
-          option: 'Yes',
+          options: ['Yes'],
         });
 
         await waitFor(() => {

@@ -8,11 +8,11 @@ import {
 import userEvent from '@testing-library/user-event';
 
 const apply = async ({
-  option,
+  options,
   trigger,
 }: {
   trigger: string;
-  option: string;
+  options: string[];
 }) => {
   const triggerButton = screen.getByRole('button', { name: trigger });
   await userEvent.click(triggerButton);
@@ -23,13 +23,20 @@ const apply = async ({
   });
 
   const popover = screen.getByRole('dialog', { name: trigger });
-  const inputField = within(popover).getByLabelText(option);
-  await userEvent.click(inputField);
 
-  const applyButton = within(popover).getByRole('button', { name: 'Apply' });
-  await userEvent.click(applyButton);
+  const clickChoice = async (choice: string) => {
+    const inputField = within(popover).getByLabelText(choice);
+    await userEvent.click(inputField);
+  };
+
+  for (const choice of options) {
+    await clickChoice(choice);
+  }
+
+  const apply = screen.getByRole('button', { name: 'Apply' });
+  expect(apply).toBeInTheDocument();
+  await userEvent.click(apply);
 };
-
 const filterEvents = {
   apply,
 };
