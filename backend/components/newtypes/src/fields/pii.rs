@@ -101,6 +101,13 @@ where
     s.serialize_str("<SCRUBBED>")
 }
 
+pub fn scrub_pii_value<S>(_v: &Option<PiiJsonValue>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    s.serialize_str("<SCRUBBED>")
+}
+
 impl<T> From<T> for PiiString
 where
     T: Display,

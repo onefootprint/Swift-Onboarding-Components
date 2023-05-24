@@ -39,8 +39,6 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     // TODO: these aren't appearing in the response where the docs say they should be
     let model_reason_codes: Vec<FootprintReasonCode> = vec![];
 
-    // TODO: matching
-
     let fraud_shield_reason_codes: Vec<FootprintReasonCode> = resp
         .fraud_shield_reason_codes()
         .ok()
@@ -52,7 +50,15 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         })
         .unwrap_or_default();
 
-    // TODO: should error here
+    // As of 2023-05-23, our rough understanding of how experian matches information we provided to them is as follows:
+    //
+    // experian_consumer_id = blackbox_experian_search(Name,DOB,Address,SSN,Phone);
+    //
+    // ssn_result_codes = SsnSearch(experian_consumer_id)
+    // address_result_codes = AddressSearch(experian_consumer_id)
+    // dob_result_codes = DOBSearch(experian_consumer_id)
+    //
+    // So they first locate a consumer_id row, then pull information from various databases that correspond to the matching codes below
     let dob_reason_codes = if let Ok(code) = resp.dob_match_reason_codes() {
         let dob_frc = std::convert::Into::<Option<FootprintReasonCode>>::into(&code);
         vec![dob_frc]
@@ -62,17 +68,34 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     .into_iter()
     .flatten();
 
-    let name_and_address_reason_codes = if let Ok(code) = resp.name_and_address_match_reason_codes() {
-        std::convert::Into::<Vec<FootprintReasonCode>>::into(&code)
+    let (input_missing_ssn, ssn_reason_codes) = if let Ok(code) = resp.ssn_match_reason_codes() {
+        // if we don't send SSN, we don't return any codes here
+        if code.input_missing_ssn() {
+            (true, vec![])
+        } else {
+            (false, std::convert::Into::<Vec<FootprintReasonCode>>::into(&code))
+        }
     } else {
-        vec![]
+        (true, vec![])
     };
+
+    // Since ssn codes include address and name information, and it's still unclear if they agree with one another, we only show the address codes
+    // if ssn wasn't provided (and as of 2023-05, we always get ssn)
+    let mut name_and_address_reason_codes = vec![];
+    if input_missing_ssn {
+        name_and_address_reason_codes = if let Ok(code) = resp.name_and_address_match_reason_codes() {
+            std::convert::Into::<Vec<FootprintReasonCode>>::into(&code)
+        } else {
+            vec![]
+        };
+    }
 
     let mut reason_codes: Vec<FootprintReasonCode> = model_reason_codes
         .into_iter()
         .chain(fraud_shield_reason_codes.into_iter())
         .chain(dob_reason_codes)
         .chain(name_and_address_reason_codes.into_iter())
+        .chain(ssn_reason_codes.into_iter())
         .unique()
         .collect();
 
@@ -89,16 +112,51 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
 
 #[cfg(test)]
 mod tests {
-    use idv::{
-        experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore},
-        tests::assert_have_same_elements,
+    use idv::experian::{
+        cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore,
     };
-    use newtypes::FootprintReasonCode;
+    use newtypes::{ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, FootprintReasonCode};
+    use test_case::test_case;
 
-    #[test]
-    fn test_reason_codes() {
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA => vec![
+        // from fraud shield
+        FootprintReasonCode::SubjectDeceased,
+        // dob match
+        FootprintReasonCode::DobMobDoesNotMatch,
+        // from SSN
+        FootprintReasonCode::NameFirstMatches,
+        FootprintReasonCode::NameLastMatches,
+        FootprintReasonCode::AddressStreetNameMatches,
+        FootprintReasonCode::AddressStreetNumberMatches,
+        FootprintReasonCode::AddressCityMatches,
+        FootprintReasonCode::AddressStateMatches,
+        FootprintReasonCode::AddressZipCodeMatches,
+        FootprintReasonCode::SsnMatches,
+        // from score
+        FootprintReasonCode::IdNotLocated,
+    ]; "address code says no match, but we opt for ssn codes since it's present")]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::MX =>             vec![
+        // from fraud shield
+        FootprintReasonCode::SubjectDeceased,
+        // dob match
+        FootprintReasonCode::DobMobDoesNotMatch,
+        // from address + name
+        FootprintReasonCode::NameFirstDoesNotMatch,
+        FootprintReasonCode::NameLastDoesNotMatch,
+        FootprintReasonCode::AddressStreetNameDoesNotMatch,
+        FootprintReasonCode::AddressStreetNumberDoesNotMatch,
+        FootprintReasonCode::AddressCityDoesNotMatch,
+        FootprintReasonCode::AddressStateDoesNotMatch,
+        FootprintReasonCode::AddressZipCodeDoesNotMatch,
+        // from score
+        FootprintReasonCode::IdNotLocated,
+    ]; "no ssn is provided, so we take address codes")]
+    fn test_reason_codes(
+        address_code: ExperianAddressAndNameMatchReasonCodes,
+        ssn_code: ExperianSSNReasonCodes,
+    ) -> Vec<FootprintReasonCode> {
         let r: CrossCoreAPIResponse = serde_json::from_value(
-            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(true),
+            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(address_code, ssn_code),
         )
         .expect("could not parse");
 
@@ -107,58 +165,6 @@ mod tests {
             PreciseIDParsedScore::Score(269)
         );
 
-        assert_have_same_elements(
-            super::footprint_reason_codes(r),
-            vec![
-                // from fraud shield
-                FootprintReasonCode::SubjectDeceased,
-                // dob match
-                FootprintReasonCode::DobMobDoesNotMatch,
-                // from address + name
-                FootprintReasonCode::NameFirstMatches,
-                FootprintReasonCode::NameLastMatches,
-                FootprintReasonCode::AddressStreetNameMatches,
-                FootprintReasonCode::AddressStreetNumberMatches,
-                FootprintReasonCode::AddressCityMatches,
-                FootprintReasonCode::AddressStateMatches,
-                FootprintReasonCode::AddressZipCodeMatches,
-                // from score
-                FootprintReasonCode::IdNotLocated,
-            ],
-        );
-    }
-
-    #[test]
-    fn test_reason_codes_with_not_parsable_address() {
-        // can't parse address codes
-        let r: CrossCoreAPIResponse = serde_json::from_value(
-            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(false),
-        )
-        .expect("could not parse");
-
-        assert_eq!(
-            r.precise_id_response().unwrap().score().unwrap(),
-            PreciseIDParsedScore::Score(269)
-        );
-
-        assert_have_same_elements(
-            super::footprint_reason_codes(r),
-            vec![
-                // from fraud shield
-                FootprintReasonCode::SubjectDeceased,
-                // dob match
-                FootprintReasonCode::DobMobDoesNotMatch,
-                // from address + name
-                FootprintReasonCode::NameFirstDoesNotMatch,
-                FootprintReasonCode::NameLastDoesNotMatch,
-                FootprintReasonCode::AddressStreetNameDoesNotMatch,
-                FootprintReasonCode::AddressStreetNumberDoesNotMatch,
-                FootprintReasonCode::AddressCityDoesNotMatch,
-                FootprintReasonCode::AddressStateDoesNotMatch,
-                FootprintReasonCode::AddressZipCodeDoesNotMatch,
-                // from score
-                FootprintReasonCode::IdNotLocated,
-            ],
-        )
+        super::footprint_reason_codes(r)
     }
 }

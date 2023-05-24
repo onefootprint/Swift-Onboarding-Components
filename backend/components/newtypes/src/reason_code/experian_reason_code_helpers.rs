@@ -146,25 +146,76 @@ impl AddressGrouping {
     }
 }
 
+// pub(crate)
+// SSN reported as deceased
+// last 4
+pub enum SsnTypes {
+    // there are no partial cases for this
+    Ssn4ExactMatch,
+    Ssn9(MatchLevel),
+    SsnIsItin,
+    SsnInvalid,
+}
+impl SsnTypes {
+    fn codes(self) -> Vec<FootprintReasonCode> {
+        match self {
+            SsnTypes::Ssn4ExactMatch => vec![FootprintReasonCode::SsnMatches],
+            SsnTypes::Ssn9(ml) => match ml {
+                MatchLevel::NoMatch => vec![FootprintReasonCode::SsnDoesNotMatch],
+                MatchLevel::Partial => vec![FootprintReasonCode::SsnPartiallyMatches],
+                MatchLevel::Exact => vec![FootprintReasonCode::SsnMatches],
+                _ => vec![],
+            },
+            SsnTypes::SsnIsItin => vec![FootprintReasonCode::SsnInputIsItin],
+            SsnTypes::SsnInvalid => vec![FootprintReasonCode::SsnInputIsInvalid],
+        }
+    }
+}
+
 /// Helper for constructing Address and Name reason codes for internal use only!
 ///
 /// Note: name is shortened to make constructing take up less line space
-pub(crate) struct ExpRCH {
+pub(crate) struct ExpAddressRCH {
     name: NameGrouping,
     address: AddressGrouping,
 }
-impl ExpRCH {
+impl ExpAddressRCH {
     pub fn new(name: NameGrouping, address: AddressGrouping) -> Self {
         Self { name, address }
     }
 }
 
-impl From<ExpRCH> for Vec<FootprintReasonCode> {
-    fn from(erch: ExpRCH) -> Self {
+impl From<ExpAddressRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: ExpAddressRCH) -> Self {
         let name_codes = erch.name.codes().into_iter();
         let address_codes = erch.address.codes().into_iter();
 
         name_codes.chain(address_codes).unique().collect()
+    }
+}
+
+pub(crate) struct ExpSsnRCH {
+    ssn: SsnTypes,
+    name: NameGrouping,
+    address: AddressGrouping,
+}
+impl ExpSsnRCH {
+    pub fn new(ssn: SsnTypes, name: NameGrouping, address: AddressGrouping) -> Self {
+        Self { ssn, name, address }
+    }
+}
+
+impl From<ExpSsnRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: ExpSsnRCH) -> Self {
+        let ssn_codes = erch.ssn.codes().into_iter();
+        let name_codes = erch.name.codes().into_iter();
+        let address_codes = erch.address.codes().into_iter();
+
+        name_codes
+            .chain(address_codes)
+            .chain(ssn_codes)
+            .unique()
+            .collect()
     }
 }
 
@@ -217,6 +268,15 @@ mod tests {
     fn test_address(address_grouping: AddressGrouping) -> Vec<FootprintReasonCode> {
         address_grouping.codes()
     }
+    #[test_case(SsnTypes::SsnIsItin => vec![SsnInputIsItin])]
+    #[test_case(SsnTypes::SsnInvalid => vec![SsnInputIsInvalid])]
+    #[test_case(SsnTypes::Ssn4ExactMatch => vec![SsnMatches])]
+    #[test_case(SsnTypes::Ssn9(MatchLevel::Exact) => vec![SsnMatches])]
+    #[test_case(SsnTypes::Ssn9(MatchLevel::Partial) => vec![SsnPartiallyMatches])]
+    #[test_case(SsnTypes::Ssn9(MatchLevel::NoMatch) => vec![SsnDoesNotMatch])]
+    fn test_ssn(ssn_type: SsnTypes) -> Vec<FootprintReasonCode> {
+        ssn_type.codes()
+    }
 
     #[test_case(NameGrouping::FullName(MatchLevel::Exact), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstMatches, NameLastMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
     #[test_case(NameGrouping::FullName(MatchLevel::Exact), AddressGrouping::FullAddress(MatchLevel::NoMatch) => vec![NameFirstMatches, NameLastMatches, AddressStreetNameDoesNotMatch, AddressStreetNumberDoesNotMatch, AddressCityDoesNotMatch, AddressStateDoesNotMatch, AddressZipCodeDoesNotMatch])]
@@ -227,10 +287,10 @@ mod tests {
     #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::NoMatch)), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstMatches, NameLastDoesNotMatch, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
     #[test_case(NameGrouping::FirstAndLast((MatchLevel::NoMatch, MatchLevel::Exact)), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstDoesNotMatch, NameLastMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
 
-    fn test_experian_reason_code_helper(
+    fn test_experian_address_reason_code_helper(
         name: NameGrouping,
         address: AddressGrouping,
     ) -> Vec<FootprintReasonCode> {
-        ExpRCH::new(name, address).into()
+        ExpAddressRCH::new(name, address).into()
     }
 }

@@ -22,8 +22,6 @@ pub enum Error {
     ScoreNotFound,
     #[error("Missing precise ID Response")]
     MissingPreciseIDResponse,
-    #[error("Missing matches in cross core response decision element {0}")]
-    MissingMatchesInDecisionElement(String),
     #[error("invalid PreciseID score received")]
     InvalidScore(String),
     #[error("Experian Validation error {0}")]

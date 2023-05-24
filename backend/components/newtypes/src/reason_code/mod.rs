@@ -1,5 +1,7 @@
 mod experian;
+mod experian_address_codes;
 mod experian_reason_code_helpers;
+mod experian_ssn_codes;
 mod idology;
 mod signal;
 mod signal_attribute;
@@ -8,6 +10,8 @@ mod socure;
 use std::str::FromStr;
 
 pub use experian::*;
+pub use experian_address_codes::*;
+pub use experian_ssn_codes::*;
 pub use idology::*;
 pub use signal::*;
 pub use signal_attribute::*;
@@ -45,7 +49,7 @@ macro_rules! vendor_reason_code_enum {
 }
 pub(crate) use vendor_reason_code_enum;
 
-macro_rules! experian_address_reason_code_enum {
+macro_rules! experian_reason_code_enum {
     (
         $(#[$macros:meta])*
         pub enum $name:ident {
@@ -68,7 +72,7 @@ macro_rules! experian_address_reason_code_enum {
 
     }
 }
-pub(crate) use experian_address_reason_code_enum;
+pub(crate) use experian_reason_code_enum;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]

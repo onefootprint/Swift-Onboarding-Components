@@ -1,6 +1,10 @@
-use newtypes::scrub_value;
+use newtypes::{
+    scrub_pii_value, scrub_value, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
+    ExperianSSNReasonCodes, PiiJsonValue, ScrubbedPiiString,
+};
 
 use crate::experian::error::Error as ExperianError;
+use std::str::FromStr;
 
 /// This is the top level response from PreciseID (which we receive embedded in the CrossCore API response)
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -8,7 +12,7 @@ use crate::experian::error::Error as ExperianError;
 pub struct PreciseIDAPIResponse {
     #[serde(rename(deserialize = "sessionID"))]
     pub session_id: Option<String>,
-    pub header: Option<serde_json::Value>,
+    pub header: Option<PiiJsonValue>,
     pub summary: Option<Summary>,
     // Gives per-data attribute matching details and summaries
     //
@@ -19,15 +23,14 @@ pub struct PreciseIDAPIResponse {
     //   - ssn finder
     //   - change of address record
     //   - other information about the located individual
-    #[serde(serialize_with = "scrub_value")]
-    pub precise_match: Option<serde_json::Value>,
+    pub precise_match: Option<PreciseMatch>,
     // Unclear if we get this, but just in case
     #[serde(rename(deserialize = "onFileSSN"))]
-    #[serde(serialize_with = "scrub_value")]
-    pub on_file_ssn: Option<serde_json::Value>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub on_file_ssn: Option<PiiJsonValue>,
     // in the docs this is included but isn't populated yet as it's
     // a future feature. Might as well start recording it
-    pub ip_address: Option<serde_json::Value>,
+    pub ip_address: Option<PiiJsonValue>,
     // GLB refers to the Gramm-Leach-Bliley Act. Experian uses this terminology
     // to refer to their data around consumers (as opposed to Credit-related-FCRA-regulated data. or something.)
     pub glb_detail: Option<GLBDetail>,
@@ -93,6 +96,80 @@ impl PreciseIDAPIResponse {
 
             Ok(res)
         }
+    }
+
+    pub fn fraud_shield_reason_codes(&self) -> Vec<ExperianFraudShieldCodes> {
+        let fs_indicator = self
+            .glb_detail
+            .as_ref()
+            .and_then(|glb| glb.fraud_shield.as_ref())
+            .and_then(|fs| fs.indicator.as_ref());
+        if let Some(indicators) = fs_indicator {
+            indicators.iter().filter_map(|i| {
+                i.value.as_ref().and_then(|v| {
+                    i.code.as_ref().and_then(|c| {
+                        // Experian returns all indicators in the response, so we need to choose which ones are present
+                        if v == "Y" {
+                            let res = ExperianFraudShieldCodes::from_str(c.as_str().trim());
+
+                            match res {
+                                c @ Ok(_) => c.ok(),
+                                Err(e) => {
+                                    tracing::error!(code=%c, err=%e, "could not parse response code for experian");
+                                    None
+                                }
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                })
+            }).collect()
+        } else {
+            vec![]
+        }
+    }
+
+    pub fn dob_match_reason_code(&self) -> ExperianDobMatchReasonCodes {
+        self.precise_match
+            .as_ref()
+            .and_then(|pm| pm.date_of_birth.as_ref())
+            .and_then(|dob| dob.summary.as_ref())
+            .and_then(|summary| summary.match_result.as_ref())
+            .and_then(|mr| mr.code.as_ref())
+            .and_then(|dob_code| {
+                let deser = ExperianDobMatchReasonCodes::try_from(dob_code.as_str().trim());
+                match deser {
+                    Ok(code) => Some(code),
+                    Err(_) => {
+                        // not erroring because we expect them
+                        log_unknown_match_code(dob_code, "dob");
+                        None
+                    }
+                }
+            })
+            .unwrap_or(ExperianDobMatchReasonCodes::NoMatch)
+    }
+
+    pub fn ssn_match_reason_code(&self) -> ExperianSSNReasonCodes {
+        self.precise_match
+            .as_ref()
+            .and_then(|pm| pm.consumer_id.as_ref())
+            .and_then(|ci: &ConsumerIdMatch| ci.summary.as_ref())
+            .and_then(|summary| summary.verification_result.as_ref())
+            .and_then(|mr| mr.code.as_ref())
+            .and_then(|ssn_code| {
+                let deser = ExperianSSNReasonCodes::try_from(ssn_code.as_str().trim());
+                match deser {
+                    Ok(code) => Some(code),
+                    Err(_) => {
+                        // not erroring because we expect them
+                        log_unknown_match_code(ssn_code, "ssn");
+                        None
+                    }
+                }
+            })
+            .unwrap_or(ExperianSSNReasonCodes::NX)
     }
 }
 
@@ -177,6 +254,72 @@ impl GLBDetail {
     }
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreciseMatch {
+    pub version: Option<String>,
+    pub response_status_code: Option<serde_json::Value>,
+    #[serde(rename(deserialize = "preciseMatchTransactionID"))]
+    pub precise_match_transaction_id: Option<String>,
+    pub precise_match_score: Option<serde_json::Value>,
+    #[serde(serialize_with = "scrub_value")]
+    pub precise_match_decision: Option<serde_json::Value>,
+    // get this from cross core
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub addresses: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub phones: Option<PiiJsonValue>,
+    #[serde(rename(deserialize = "consumerID"))]
+    pub consumer_id: Option<ConsumerIdMatch>,
+    // get this from cross core
+    pub date_of_birth: Option<DateOfBirthMatch>,
+    pub driver_license: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub change_of_addresses: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub ofac: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub previous_addresses: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub ssn_finder: Option<PiiJsonValue>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConsumerIdMatch {
+    pub summary: Option<ConsumerIdMatchSummary>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub detail: Option<PiiJsonValue>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConsumerIdMatchSummary {
+    pub verification_result: Option<ValueCodeDatum>,
+    pub deceased_result: Option<ValueCodeDatum>,
+    pub format_result: Option<ValueCodeDatum>,
+    pub issue_result: Option<ValueCodeDatum>,
+    pub counts: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DateOfBirthMatch {
+    pub summary: Option<DateOfBirthMatchSummary>,
+}
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DateOfBirthMatchSummary {
+    pub match_result: Option<ValueCodeDatum>,
+    pub month_of_birth: Option<ScrubbedPiiString>,
+    pub day_of_birth: Option<ScrubbedPiiString>,
+    pub year_of_birth: Option<ScrubbedPiiString>,
+}
+
+pub(crate) fn log_unknown_match_code(code: &str, attribute: &str) {
+    tracing::warn!(attribute=%attribute, code=%code, "Unknown match code received")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -216,6 +359,6 @@ mod tests {
         let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(false, "656"))
             .expect("could not parse experian precise id");
 
-        assert!(r.precise_match.is_some());
+        assert!(r.precise_match.unwrap().consumer_id.unwrap().summary.is_some());
     }
 }

@@ -325,6 +325,11 @@ footprint_reason_code_enum! {
  #[note = "SSN not available", severity = SignalSeverity::Low,  description = "No SSN information located. "]
  SsnNotAvailable,
 
+
+ #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "SSN9 partial match", severity = SignalSeverity::Low,  description = "SSN 9 partially located matches SSN 9 input."]
+ SsnPartiallyMatches,
+
  #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "SSN does not match", severity = SignalSeverity::High,  description = "SSN located does not match SSN input."]
  SsnDoesNotMatch,
@@ -333,11 +338,11 @@ footprint_reason_code_enum! {
  #[note = "SSN off by one digit", severity = SignalSeverity::Low,  description = "Difference of one digit between the SSN input and the SSN located. "]
  SsnDoesNotMatchWithin1Digit,
 
- #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
+ #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Input SSN is ITIN", severity = SignalSeverity::Low,  description = "The input SSN is an ITIN (Individual Taxpayer Identification Number)."]
  SsnInputIsItin,
 
- #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
+ #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
  #[note = "Located SSN is ITIN", severity = SignalSeverity::Low,  description = "The located SSN is an ITIN (Individual Taxpayer Identification Number)."]
  SsnLocatedIsItin,
 
