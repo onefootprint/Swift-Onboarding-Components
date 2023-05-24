@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::{decision::vendor::vendor_trait::MockVendorAPICall, utils::mock_enclave::StateWithMockEnclave};
+use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+use crate::State;
 use db::{
     models::{onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
     test_helpers::test_db_pool,
@@ -62,7 +65,7 @@ async fn test_run(
     // Setup
     //
     let db_pool = test_db_pool();
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = State::test_state().await;
 
     let (tenant, onboarding, uv, _, _) =
         create_user_and_onboarding(&db_pool, &state.enclave_client, None).await;
@@ -141,12 +144,13 @@ async fn test_run(
     //
     // Function Under Test
     //
+
     engine::run(
         onboarding,
         &db_pool,
         &state.enclave_client,
         is_production,
-        mock_ff_client,
+        Arc::new(mock_ff_client),
         &mock_idology_api_call,
         &mock_socure_api_call,
         &mock_twilio_api_call,

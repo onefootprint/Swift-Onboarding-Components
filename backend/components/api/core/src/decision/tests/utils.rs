@@ -1,16 +1,17 @@
 use crate::decision::utils;
 use crate::tests::fixtures;
-use crate::utils::mock_enclave::StateWithMockEnclave;
+use crate::State;
 use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_db_pool;
 use newtypes::{DecisionStatus, OnboardingStatus, PhoneNumber};
+use std::sync::Arc;
 use test_case::test_case;
 
 #[test_db_pool]
 async fn test_handle_setup(db_pool: TestDbPool) {
-    let state = &mut StateWithMockEnclave::init().await.state;
+    let state = &mut State::test_state().await;
     state.set_db_pool((*db_pool).clone());
 
     //
@@ -37,7 +38,7 @@ async fn test_handle_setup(db_pool: TestDbPool) {
         .times(1)
         .return_once(|_| false);
 
-    let res = utils::get_fixture_data_decision(state, &mock_ff_client, &sv.id, &tenant.id)
+    let res = utils::get_fixture_data_decision(state, Arc::new(mock_ff_client), &sv.id, &tenant.id)
         .await
         .unwrap();
     assert!(res.is_none()); // No fixture decision
@@ -67,7 +68,7 @@ async fn test_handle_setup(db_pool: TestDbPool) {
         .times(1)
         .return_once(|_| true);
 
-    let res = utils::get_fixture_data_decision(state, &mock_ff_client, &sv.id, &tenant.id)
+    let res = utils::get_fixture_data_decision(state, Arc::new(mock_ff_client), &sv.id, &tenant.id)
         .await
         .unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant

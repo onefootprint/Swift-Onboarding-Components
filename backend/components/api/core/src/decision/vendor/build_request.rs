@@ -275,7 +275,7 @@ mod tests {
     use db::{test_helpers::test_db_pool, models::verification_request::VerificationRequest};
     use newtypes::VerificationRequestId;
 
-    use crate::utils::mock_enclave::StateWithMockEnclave;
+    use crate::State;
     use super::build_idv_data_from_verification_request;
 
     /// Helper to debug IdvData being built from verification request while testing bifrost flows
@@ -285,7 +285,7 @@ mod tests {
     #[tokio::test]
     async fn debug_build_idv_data_from_verification_request() {
         let db_pool = test_db_pool();
-        let state = &StateWithMockEnclave::init().await.state;
+        let state = &State::test_state().await;
         
         let vr = db_pool.db_query(move |conn| {
             VerificationRequest::get(conn, VerificationRequestId::from("your vreq here".to_string())).unwrap()

@@ -6,7 +6,7 @@ use api_core::errors::AssertionError;
 use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::BoolFlag;
 use newtypes::PhoneNumber;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};

@@ -11,7 +11,7 @@ use crate::{
 };
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::{
     fingerprintjs::client::FingerprintJSClient, footprint_http_client::FootprintVendorHttpClient,
     idology::client::IdologyClient, middesk::client::MiddeskClient, socure::client::SocureClient,
@@ -36,7 +36,8 @@ pub struct State {
     pub socure_sandbox_client: SocureClient,
     #[allow(unused)]
     pub socure_production_client: SocureClient,
-    pub feature_flag_client: LaunchDarklyFeatureFlagClient,
+    pub feature_flag_client: Arc<dyn FeatureFlagClient>,
+    pub feature_flag_client_raw: LaunchDarklyFeatureFlagClient, // hack for now cause JsonFlag isn't working on the trait
     pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
@@ -48,10 +49,22 @@ impl State {
     /// initialize global state in test context
     #[cfg(test)]
     #[allow(clippy::expect_used)]
-    pub async fn test_state(enclave_proxy_port: u16) -> Self {
+    pub async fn test_state() -> Self {
+        use feature_flag::MockFeatureFlagClient;
+
+        use crate::utils::mock_enclave::MockEnclave;
         let mut config = Config::load_from_env().expect("failed to load config");
-        config.enclave_config.enclave_proxy_endpoint = format!("http://localhost:{}", enclave_proxy_port);
-        Self::init_or_die(config).await
+
+        let mock_enclave = MockEnclave::init().await;
+        config.enclave_config.enclave_proxy_endpoint = format!("http://localhost:{}", mock_enclave.port);
+        let enclave_client = EnclaveClient::new(config.clone()).await;
+        let _ = enclave_client.pong().await.expect("failed to ping");
+
+        let mock_ff_client = MockFeatureFlagClient::new();
+
+        let mut s = Self::init_or_die(config).await;
+        s.set_ff_client(Arc::new(mock_ff_client));
+        s
     }
 
     #[allow(clippy::expect_used)]
@@ -179,7 +192,8 @@ impl State {
             s3_client,
             socure_sandbox_client,
             socure_production_client,
-            feature_flag_client,
+            feature_flag_client: Arc::new(feature_flag_client.clone()),
+            feature_flag_client_raw: feature_flag_client,
             webhook_service_client,
             billing_client,
             fingerprintjs_client,
@@ -192,5 +206,10 @@ impl State {
     // temporar hack until we make a proper TestState
     pub fn set_db_pool(&mut self, db_pool: DbPool) {
         self.db_pool = db_pool;
+    }
+
+    #[cfg(test)]
+    pub fn set_ff_client(&mut self, ff_client: Arc<dyn FeatureFlagClient>) {
+        self.feature_flag_client = ff_client;
     }
 }

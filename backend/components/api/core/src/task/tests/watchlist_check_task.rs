@@ -1,11 +1,10 @@
 use crate::config::Config;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::enclave_client::EnclaveClient;
+use crate::task::tasks::watchlist_check_task::WatchlistCheckTask;
 use crate::task::ExecuteTask;
 use crate::task::TaskError;
-use crate::{
-    task::tasks::watchlist_check_task::WatchlistCheckTask, utils::mock_enclave::StateWithMockEnclave,
-};
+use crate::State;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
@@ -286,7 +285,7 @@ async fn non_portable_vault(db_pool: TestDbPool) {
         .unwrap();
 
     let mut mock_pa_client = MockPaClient::new();
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &State::test_state().await;
     let enclave_client = state.enclave_client.clone();
     let mut mock_webhook_client = MockWebhookClient::new();
 
@@ -351,7 +350,7 @@ async fn setup(
         .unwrap();
 
     let mock_idology_api_call = MockPaClient::new();
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &State::test_state().await;
     let enclave_client = state.enclave_client.clone();
     let mock_webhook_client = MockWebhookClient::new();
 

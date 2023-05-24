@@ -1,4 +1,6 @@
 mod context;
+use std::sync::Arc;
+
 pub use context::*;
 mod data;
 pub use data::*;
@@ -8,7 +10,7 @@ pub use update::*;
 use db::PgConn;
 
 use crate::errors::ApiError;
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::FeatureFlagClient;
 
 /// Allows an auth session to be extracted from an actix request using the extractor SessionContext utility
 pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
@@ -17,6 +19,6 @@ pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: LaunchDarklyFeatureFlagClient,
+        ff_client: Arc<dyn FeatureFlagClient>,
     ) -> Result<Self, ApiError>;
 }

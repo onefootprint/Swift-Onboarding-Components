@@ -8,7 +8,6 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use api_wire_types::ListTimelineRequest;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 
 use crate::utils::db2api::DbToApi;
 use crate::State;

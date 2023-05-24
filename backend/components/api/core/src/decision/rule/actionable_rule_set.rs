@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use super::{
@@ -44,7 +46,7 @@ impl<T: Clone> ActionableRuleSetBuilder<T> {
         Self { ruleset }
     }
 
-    pub fn build(self, feature_flag_client: &impl FeatureFlagClient) -> ActionableRuleSet<T> {
+    pub fn build(self, feature_flag_client: Arc<dyn FeatureFlagClient>) -> ActionableRuleSet<T> {
         let can_action = feature_flag_client.flag(BoolFlag::EnableRuleSetForDecision(&self.ruleset.name));
 
         ActionableRuleSet {

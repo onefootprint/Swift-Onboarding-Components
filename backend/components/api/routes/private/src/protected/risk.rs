@@ -106,7 +106,7 @@ async fn make_vendor_calls(
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,
-        &state.feature_flag_client,
+        state.feature_flag_client.clone(),
         &state.footprint_vendor_http_client,
         &state.socure_production_client,
         &state.twilio_client.client,
@@ -127,8 +127,10 @@ async fn make_vendor_calls(
     )
     .await?;
 
-    let (rules_output, _) =
-        crate::decision::engine::calculate_decision(vendor_results.clone(), &state.feature_flag_client)?;
+    let (rules_output, _) = crate::decision::engine::calculate_decision(
+        vendor_results.clone(),
+        state.feature_flag_client.clone(),
+    )?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()
@@ -276,7 +278,7 @@ async fn shadow_run(
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,
-        &state.feature_flag_client,
+        state.feature_flag_client.clone(),
         &state.footprint_vendor_http_client,
         &state.socure_production_client,
         &state.twilio_client.client,
@@ -307,7 +309,8 @@ async fn shadow_run(
         })
         .collect();
 
-    let (rules_output, _) = decision::engine::calculate_decision(vendor_results, &state.feature_flag_client)?;
+    let (rules_output, _) =
+        decision::engine::calculate_decision(vendor_results, state.feature_flag_client.clone())?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision_status,

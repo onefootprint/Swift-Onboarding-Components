@@ -226,7 +226,7 @@ async fn run_kyc(
 ) -> Result<(), ApiError> {
     let fixture_decision = decision::utils::get_fixture_data_decision(
         state,
-        &state.feature_flag_client,
+        state.feature_flag_client.clone(),
         &ob_info.scoped_user.id,
         &ob_info.scoped_user.tenant_id,
     )

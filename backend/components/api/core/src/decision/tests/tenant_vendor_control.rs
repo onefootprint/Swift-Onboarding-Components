@@ -9,7 +9,7 @@ use newtypes::{
 
 use crate::{
     config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
-    enclave_client::EnclaveClient, utils::mock_enclave::StateWithMockEnclave,
+    enclave_client::EnclaveClient,
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -72,7 +72,7 @@ async fn get_tenant_vendor_control(
 
 #[test_db_pool]
 async fn test_update_credentials(db_pool: TestDbPool) {
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &crate::State::test_state().await;
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let pk2 = pk.clone();
     let tenant_e_key2 = tenant_e_key.clone();

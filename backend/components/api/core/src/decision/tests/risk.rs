@@ -6,6 +6,7 @@ use crate::decision::{
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 use std::str::FromStr;
+use std::sync::Arc;
 use test_case::test_case;
 
 fn create_onboarding_rules_decision_output(
@@ -90,5 +91,5 @@ fn test_evaluate_onboarding_rules(
         .return_once(move |_| should_use_conservative_rules);
 
     // function under test
-    feature_vector.evaluate(&mock_ff_client).unwrap()
+    feature_vector.evaluate(Arc::new(mock_ff_client)).unwrap()
 }

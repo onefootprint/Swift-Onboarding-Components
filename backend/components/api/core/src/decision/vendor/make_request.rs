@@ -1,4 +1,6 @@
 #![allow(clippy::too_many_arguments)]
+use std::sync::Arc;
+
 use super::tenant_vendor_control::TenantVendorControl;
 
 use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
@@ -41,7 +43,7 @@ pub async fn send_idv_request(
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -174,7 +176,7 @@ pub async fn send_idology_idv_request(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
         let res = idology_api_call.make_request(request).await;
@@ -246,7 +248,7 @@ pub async fn send_socure_idv_request(
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
     socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if ff_client.flag(BoolFlag::DisableAllSocure) {
         Err(idv::Error::VendorCallsDisabledError)
@@ -297,7 +299,7 @@ pub async fn send_experian_idv_request(
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
     >,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if is_production || ff_client.flag(BoolFlag::EnableExperianInNonProd(&ob_configuration_key)) {
         let res = experian_api_call.make_request(request).await;
@@ -330,7 +332,7 @@ pub async fn send_scan_onboarding_docv_request(
     onboarding_id: &OnboardingId,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
-    let ff_client = &state.feature_flag_client;
+    let ff_client = state.feature_flag_client.clone();
 
     let obid = onboarding_id.clone();
     let ob_configuration_key = state
@@ -372,7 +374,7 @@ pub async fn make_idv_request(
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -465,7 +467,7 @@ pub async fn make_vendor_requests(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -516,7 +518,7 @@ pub async fn make_vendor_requests(
                 socure_data.clone(),
                 ob_configuration_key.clone(),
                 is_production,
-                ff_client,
+                ff_client.clone(),
                 idology_client,
                 socure_client,
                 twilio_client,
@@ -617,7 +619,7 @@ mod tests {
             is_production,
             ob_configuration_key,
             &mock_api,
-            &mock_ff_client,
+            Arc::new(mock_ff_client),
         )
         .await
         .expect("shouldn't error");

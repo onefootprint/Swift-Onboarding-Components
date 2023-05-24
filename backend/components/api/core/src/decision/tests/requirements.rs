@@ -8,7 +8,6 @@ use test_case::test_case;
 
 use crate::decision::vendor::get_vendor_apis_for_verification_requests;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::utils::mock_enclave::StateWithMockEnclave;
 use crate::State;
 
 async fn create_tvc_for_requirements(
@@ -117,7 +116,8 @@ async fn test_get_vendor_apis_for_verification_requests(
     data_lifetime_kinds: Vec<IdentityDataKind>,
     tenant_vendor_control_exists_and_has_vendors_enabled: Option<Vec<Vendor>>,
 ) -> Vec<VendorAPI> {
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &State::test_state().await;
+
     let (pub_key, e_priv_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let tenant = db::tests::fixtures::tenant::create_in_memory(pub_key, e_priv_key);
     let tenant_vendor_control = create_tvc_for_requirements(

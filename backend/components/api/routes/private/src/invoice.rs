@@ -10,7 +10,7 @@ use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::BoolFlag;
 use newtypes::{StripeCustomerId, TenantId, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
@@ -147,7 +147,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     };
     state
         .billing_client
-        .generate_draft_invoice(&state.feature_flag_client, info)
+        .generate_draft_invoice(state.feature_flag_client_raw.clone(), info)
         .await
         .map_err(|e| {
             // Log error since the request only fails with a single tenant's error message

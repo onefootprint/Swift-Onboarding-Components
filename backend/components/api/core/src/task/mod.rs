@@ -137,7 +137,6 @@ trait ExecuteTask<T> {
 
 #[cfg(test)]
 mod task_tests {
-    use crate::utils::mock_enclave::StateWithMockEnclave;
 
     use super::*;
     use chrono::Utc;
@@ -154,7 +153,7 @@ mod task_tests {
     #[tokio::test]
     async fn basic_end_to_end() {
         let db_pool = test_db_pool();
-        let state = &StateWithMockEnclave::init().await.state;
+        let state = &State::test_state().await;
         // TODO: need to create a test State so can pass to poll_and_execute_tasks
 
         // Setup

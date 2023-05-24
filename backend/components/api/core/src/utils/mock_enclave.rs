@@ -6,14 +6,14 @@ use std::{collections::HashMap, sync::Mutex, time::Duration};
 use tokio::task::JoinHandle;
 
 #[allow(unused)]
-pub struct StateWithMockEnclave {
+pub struct MockEnclave {
     h1: JoinHandle<()>,
     h2: JoinHandle<()>,
     server: ServerHandle,
-    pub state: State,
+    pub port: u16,
 }
 
-impl Drop for StateWithMockEnclave {
+impl Drop for MockEnclave {
     fn drop(&mut self) {
         #[allow(clippy::let_underscore_future)]
         let _ = self.server.stop(false);
@@ -24,7 +24,7 @@ impl Drop for StateWithMockEnclave {
 
 static PP_LOCK: Lazy<Mutex<()>> = Lazy::new(Mutex::default);
 
-impl StateWithMockEnclave {
+impl MockEnclave {
     fn unused_ports() -> (u16, u16) {
         let _g = PP_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         (
@@ -34,7 +34,7 @@ impl StateWithMockEnclave {
     }
 
     /// initializes a new enclave proxy on random port
-    pub async fn init() -> StateWithMockEnclave {
+    pub async fn init() -> MockEnclave {
         let (enclave_port, port) = Self::unused_ports();
         let h1 = tokio::spawn(async move {
             let enclave_config = enclave::Config {
@@ -59,12 +59,8 @@ impl StateWithMockEnclave {
 
         tokio::time::sleep(Duration::from_secs(2)).await;
 
-        let state = State::test_state(port).await;
-        let _ = state.enclave_client.pong().await.expect("failed to ping");
-        log::info!("setup state");
-
-        StateWithMockEnclave {
-            state,
+        MockEnclave {
+            port,
             h1,
             h2,
             server: handle,
@@ -80,9 +76,9 @@ mod tests {
     use super::*;
 
     async fn run_test() {
-        let s = StateWithMockEnclave::init().await;
+        let state = &State::test_state().await;
         log::info!("got state");
-        let resp = s.state.enclave_client.pong().await.expect("failed to ping");
+        let resp = state.enclave_client.pong().await.expect("failed to ping");
         assert_eq!(resp, "test".to_string());
     }
 

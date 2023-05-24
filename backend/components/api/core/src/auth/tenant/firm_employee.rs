@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
@@ -15,7 +17,7 @@ use db::{
     },
     PgConn,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{CollectedDataOption, TenantScope};
 use paperclip::actix::Apiv2Security;
 use strum::IntoEnumIterator;
@@ -63,7 +65,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: LaunchDarklyFeatureFlagClient,
+        ff_client: Arc<dyn FeatureFlagClient>,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,

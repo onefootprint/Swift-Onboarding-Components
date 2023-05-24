@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use super::{
     features::kyc_features::KycFeatureVector,
@@ -50,7 +50,7 @@ pub async fn run(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
-    ff_client: impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -75,7 +75,7 @@ pub async fn run(
         enclave_client,
         is_production,
         vendor_requests.outstanding_requests,
-        &ff_client,
+        ff_client.clone(),
         idology_client,
         socure_client,
         twilio_client,
@@ -114,14 +114,14 @@ pub async fn run(
 pub async fn make_onboarding_decision<T>(
     ob: &Onboarding,
     fv: T,
-    ff_client: impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     db_pool: &DbPool,
 ) -> ApiResult<()>
 where
     T: FeatureVector + Send + Sync,
 {
     // Calculate output from rules + features
-    let rules_output = fv.evaluate(&ff_client)?;
+    let rules_output = fv.evaluate(ff_client.clone())?;
 
     let obid = ob.id.clone();
     let reason_codes = reason_codes_for_tenant(db_pool, ff_client, obid, &fv).await?;
@@ -147,7 +147,7 @@ where
 // TODO: probably make this a direct output of rules eval or something
 pub async fn reason_codes_for_tenant<T>(
     db_pool: &DbPool,
-    ff_client: impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     obid: OnboardingId,
     fv: &T,
 ) -> ApiResult<Vec<(FootprintReasonCode, Vec<Vendor>)>>
@@ -345,7 +345,7 @@ pub async fn make_vendor_requests(
     enclave_client: &EnclaveClient,
     is_production: bool,
     requests: Vec<VerificationRequest>,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     idology_client: &impl VendorAPICall<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -382,7 +382,7 @@ pub async fn make_vendor_requests(
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
-    ff_client: &impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<(OnboardingRulesDecisionOutput, KycFeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
     let fv = features::kyc_features::create_features(vendor_results);

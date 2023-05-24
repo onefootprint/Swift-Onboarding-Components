@@ -1,5 +1,5 @@
 use db::models::tenant::Tenant;
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::{LaunchDarklyFeatureFlagClient};
 use interval::BillingInterval;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
@@ -127,7 +127,7 @@ impl BillingClient {
     #[tracing::instrument(skip(self, ff_client))]
     pub async fn generate_draft_invoice(
         &self,
-        ff_client: &LaunchDarklyFeatureFlagClient,
+        ff_client: LaunchDarklyFeatureFlagClient,
         info: BillingInfo,
     ) -> BResult<()> {
         if info.counts.is_zero() {

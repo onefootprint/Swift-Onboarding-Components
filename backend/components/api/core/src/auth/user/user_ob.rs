@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{UserAuth, UserAuthGuard};
 use db::{
     models::{
@@ -10,7 +12,7 @@ use db::{
     },
     PgConn,
 };
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::{FeatureFlagClient};
 use newtypes::{ScopedVaultId, VaultId};
 use paperclip::actix::Apiv2Security;
 
@@ -55,7 +57,7 @@ impl ExtractableAuthSession for ParsedUserObSession {
     fn try_load_session(
         value: AuthSessionData,
         conn: &mut PgConn,
-        ff_client: LaunchDarklyFeatureFlagClient,
+        ff_client: Arc<dyn FeatureFlagClient>,
     ) -> Result<Self, ApiError> {
         // Since this is derived from a user session, we just grab all the user info
         let user_session =

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{models::vault::Vault, PgConn};
 use itertools::Itertools;
 use newtypes::{ScopedVaultId, VaultId, VaultKind, WorkflowId};
@@ -12,7 +14,7 @@ use crate::{
     },
     errors::ApiError,
 };
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::{FeatureFlagClient};
 
 #[derive(Debug, Clone)]
 pub struct UserSessionContext {
@@ -87,7 +89,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
     fn try_load_session(
         value: AuthSessionData,
         conn: &mut PgConn,
-        _: LaunchDarklyFeatureFlagClient,
+        _: Arc<dyn FeatureFlagClient>,
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {

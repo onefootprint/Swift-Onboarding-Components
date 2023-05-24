@@ -1,3 +1,5 @@
+
+
 use feature_flag::{JsonFlag, LaunchDarklyFeatureFlagClient};
 use newtypes::TenantId;
 
@@ -13,7 +15,7 @@ pub(crate) struct BillingProfile {
 }
 
 impl BillingProfile {
-    pub(crate) fn get_for(ff_client: &LaunchDarklyFeatureFlagClient, tenant_id: &TenantId) -> BResult<Self> {
+    pub(crate) fn get_for(ff_client: LaunchDarklyFeatureFlagClient, tenant_id: &TenantId) -> BResult<Self> {
         let result = ff_client.json_flag(JsonFlag::BillingProfile(tenant_id))?;
         Ok(result)
     }

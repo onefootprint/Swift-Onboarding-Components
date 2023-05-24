@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
@@ -13,7 +15,7 @@ use db::{
     },
     PgConn,
 };
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::FeatureFlagClient;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 
@@ -58,7 +60,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: LaunchDarklyFeatureFlagClient,
+        _: Arc<dyn FeatureFlagClient>,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,

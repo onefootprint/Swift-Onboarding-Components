@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{
         decision_intent::DecisionIntent,
@@ -32,7 +34,7 @@ pub type FixtureDecision = (DecisionStatus, CreateManualReview);
 /// fixture status
 pub async fn get_fixture_data_decision(
     state: &State,
-    ff_client: &impl FeatureFlagClient, // Pass in ff_client directly to make it easier to test
+    ff_client: Arc<dyn FeatureFlagClient>, // Pass in ff_client directly to make it easier to test
     scoped_vault_id: &ScopedVaultId,
     tenant_id: &TenantId,
 ) -> ApiResult<Option<FixtureDecision>> {

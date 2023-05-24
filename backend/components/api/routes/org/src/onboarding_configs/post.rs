@@ -13,7 +13,6 @@ use crate::State;
 use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::CipKind;
 use newtypes::CollectedData as CD;

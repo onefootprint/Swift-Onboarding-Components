@@ -6,7 +6,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::BoolFlag;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(tags(Hosted, Bifrost), description = "Returns the status of the onboarding.")]

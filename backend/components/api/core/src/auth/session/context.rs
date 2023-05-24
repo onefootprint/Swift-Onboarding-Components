@@ -80,6 +80,7 @@ where
             // we fail
             let raw_session_data = session.data.clone();
             let ff_client = state.feature_flag_client.clone();
+
             let parsed_session_data = state
                 .db_pool
                 .db_query(move |conn| {

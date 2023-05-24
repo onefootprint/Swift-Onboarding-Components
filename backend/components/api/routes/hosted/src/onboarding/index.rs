@@ -24,7 +24,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};

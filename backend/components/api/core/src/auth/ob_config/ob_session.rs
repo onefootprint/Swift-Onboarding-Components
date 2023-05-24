@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{ob_configuration::ObConfiguration, tenant::Tenant},
     PgConn,
@@ -9,7 +11,7 @@ use crate::auth::{
     SessionContext,
 };
 use crate::{auth::AuthError, errors::ApiError};
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::{FeatureFlagClient};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -34,7 +36,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: LaunchDarklyFeatureFlagClient,
+        _: Arc<dyn FeatureFlagClient>,
     ) -> Result<Self, ApiError> {
         let data = match auth_session {
             AuthSessionData::OnboardingSession(data) => data,

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession},
@@ -9,7 +11,7 @@ use db::{
     models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant},
     PgConn,
 };
-use feature_flag::LaunchDarklyFeatureFlagClient;
+use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant;
 use paperclip::actix::Apiv2Security;
 
@@ -37,7 +39,7 @@ impl ExtractableAuthSession for ParsedBoSession {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: LaunchDarklyFeatureFlagClient,
+        _: Arc<dyn FeatureFlagClient>,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::BusinessOwner(data) => data,

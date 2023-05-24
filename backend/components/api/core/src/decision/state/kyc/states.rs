@@ -133,7 +133,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
     ) -> ApiResult<Self::AsyncRes> {
         let fixture_decision = decision::utils::get_fixture_data_decision(
             state,
-            &state.feature_flag_client,
+            state.feature_flag_client.clone(),
             &self.sv_id,
             &self.t_id,
         )
@@ -165,7 +165,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
                 &state.enclave_client,
                 state.config.service_config.is_production(),
                 vendor_requests.outstanding_requests,
-                &state.feature_flag_client,
+                state.feature_flag_client.clone(),
                 &state.footprint_vendor_http_client,
                 &state.socure_production_client,
                 &state.twilio_client.client,
@@ -278,7 +278,7 @@ impl OnAction<MakeDecision> for Decisioning {
     ) -> ApiResult<Self::AsyncRes> {
         let fixture_decision = decision::utils::get_fixture_data_decision(
             state,
-            &state.feature_flag_client,
+            state.feature_flag_client.clone(),
             &self.sv_id,
             &self.t_id,
         )
@@ -299,7 +299,7 @@ impl OnAction<MakeDecision> for Decisioning {
         } else {
             let (rules_output, fv) = decision::engine::calculate_decision(
                 self.vendor_results.clone(),
-                &state.feature_flag_client,
+                state.feature_flag_client.clone(),
             )?;
 
             let obid = self.ob_id.clone();

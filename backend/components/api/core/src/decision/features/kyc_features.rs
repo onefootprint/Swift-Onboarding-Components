@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use feature_flag::FeatureFlagClient;
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
@@ -218,7 +220,7 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 }
 
 impl FeatureVector for KycFeatureVector {
-    fn evaluate(&self, ff_client: &impl FeatureFlagClient) -> ApiResult<OnboardingRulesDecisionOutput> {
+    fn evaluate(&self, ff_client: Arc<dyn FeatureFlagClient>) -> ApiResult<OnboardingRulesDecisionOutput> {
         // Run our rules and log
         let idology_features = self
             .idology_features

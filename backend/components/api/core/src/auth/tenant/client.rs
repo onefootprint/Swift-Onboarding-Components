@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     auth::{
         session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession},
@@ -6,7 +8,6 @@ use crate::{
     errors::ApiResult,
 };
 use db::{models::tenant::Tenant, PgConn};
-use feature_flag::LaunchDarklyFeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{DataIdentifier, FpId, TenantApiKeyId};
 use paperclip::actix::Apiv2Security;
@@ -42,7 +43,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
     fn try_load_session(
         auth_session: AuthSessionData,
         conn: &mut PgConn,
-        _: LaunchDarklyFeatureFlagClient,
+        _: Arc<dyn feature_flag::FeatureFlagClient>,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::ClientTenant(data) => {

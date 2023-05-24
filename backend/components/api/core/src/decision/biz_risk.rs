@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{onboarding::Onboarding, onboarding_decision::OnboardingDecision},
     DbPool,
@@ -17,7 +19,7 @@ use super::{engine, features::kyb_features::KybFeatureVector};
 
 pub async fn make_kyb_decision(
     db_pool: &DbPool,
-    ff_client: impl FeatureFlagClient,
+    ff_client: Arc<dyn FeatureFlagClient>,
     enclave_client: &EnclaveClient,
     ob_id: OnboardingId,
     business_response: &BusinessResponse,

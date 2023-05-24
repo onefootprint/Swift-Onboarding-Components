@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 use db::models::onboarding_decision::OnboardingDecision;
+use feature_flag::FeatureFlagClient;
 use idv::middesk::response::business::BusinessResponse;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
@@ -49,10 +52,7 @@ impl KybFeatureVector {
 }
 
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(
-        &self,
-        _ff_client: &impl feature_flag::FeatureFlagClient,
-    ) -> ApiResult<OnboardingRulesDecisionOutput> {
+    fn evaluate(&self, _ff_client: Arc<dyn FeatureFlagClient>) -> ApiResult<OnboardingRulesDecisionOutput> {
         let middesk_rules: Vec<Box<dyn EvaluateRuleSet<KybFeatureVector>>> = vec![
             Box::new(kyb_rules::middesk_base_rule_set()),
             Box::new(kyb_rules::bos_pass_kyc_rule_set()),
