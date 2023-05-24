@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
 import { BusinessResponse } from '@onefootprint/types';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { LoadingIndicator, media } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled from 'styled-components';
@@ -59,6 +59,10 @@ const Container = styled.div`
   height: 100%;
   justify-content: center;
   min-height: var(--loading-container-min-height);
+
+  ${media.greaterThan('md')`
+    min-width: var(--loading-container-min-width);
+  `}
 `;
 
 export default Init;

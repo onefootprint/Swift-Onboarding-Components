@@ -36,6 +36,7 @@ const GlobalStyle = createGlobalStyle`
     
     ${media.greaterThan('md')`
        --navigation-header-height: 57px;
+       --loading-container-min-width: 432px;
     `}
   }
 

@@ -35,6 +35,8 @@ const FullHeightContainer = forwardRef<
 
 const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
   ${({ theme, height }) => css`
+    border: 1px solid ${theme.borderColor.tertiary};
+    box-shadow: ${theme.elevation[1]};
     background: ${theme.components.bifrost.dialog.bg};
     display: flex;
     flex-direction: column;
