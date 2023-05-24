@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import BootstrapChallenge from '../bootstrap-challenge';
 import Challenge from '../challenge';
+import ConfigInvalid from '../config-invalid';
 import EmailIdentification from '../email-identification';
 import Init from '../init';
 import InitBootstrap from '../init-bootstrap';
@@ -48,28 +49,18 @@ const Router = ({ onDone }: RouterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone, onDone]);
 
-  if (state.matches('init')) {
-    return <Init />;
-  }
-  if (state.matches('sandboxOutcome')) {
-    return <SandboxOutcome />;
-  }
-  if (state.matches('initBootstrap')) {
-    return <InitBootstrap />;
-  }
-  if (state.matches('bootstrapChallenge')) {
-    return <BootstrapChallenge />;
-  }
-  if (state.matches('emailIdentification')) {
-    return <EmailIdentification />;
-  }
-  if (state.matches('phoneIdentification')) {
-    return <PhoneIdentification />;
-  }
-  if (state.matches('challenge')) {
-    return <Challenge />;
-  }
-  return null;
+  return (
+    <>
+      {state.matches('init') && <Init />}
+      {state.matches('configInvalid') && <ConfigInvalid />}
+      {state.matches('sandboxOutcome') && <SandboxOutcome />}
+      {state.matches('initBootstrap') && <InitBootstrap />}
+      {state.matches('bootstrapChallenge') && <BootstrapChallenge />}
+      {state.matches('emailIdentification') && <EmailIdentification />}
+      {state.matches('phoneIdentification') && <PhoneIdentification />}
+      {state.matches('challenge') && <Challenge />}
+    </>
+  );
 };
 
 export default Router;
