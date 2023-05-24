@@ -2,6 +2,7 @@ import Idv from '@onefootprint/idv';
 import { AppErrorBoundary } from '@onefootprint/idv-elements';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
+import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 import Expired from './expired';
@@ -20,18 +21,20 @@ const Root = () => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('init') && <Init />}
-      {state.matches('intro') && <Intro />}
-      {state.matches('expired') && <Expired />}
-      {state.matches('idv') && obConfigAuth && (
-        <Idv
-          bootstrapData={{
-            [IdDI.email]: email,
-            [IdDI.phoneNumber]: phoneNumber,
-          }}
-          obConfigAuth={obConfigAuth}
-        />
-      )}
+      <Layout>
+        {state.matches('init') && <Init />}
+        {state.matches('intro') && <Intro />}
+        {state.matches('expired') && <Expired />}
+        {state.matches('idv') && obConfigAuth && (
+          <Idv
+            bootstrapData={{
+              [IdDI.email]: email,
+              [IdDI.phoneNumber]: phoneNumber,
+            }}
+            obConfigAuth={obConfigAuth}
+          />
+        )}
+      </Layout>
     </AppErrorBoundary>
   );
 };

@@ -94,7 +94,7 @@ const Container = styled.form`
   `}
 `;
 
-const ButtonsContainer = styled.form`
+const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[4]};
