@@ -5,7 +5,7 @@ import { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
   authToken?: string;
-  obConfigAuth: ObConfigAuth;
+  obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
   onClose?: () => void;

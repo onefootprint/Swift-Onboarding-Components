@@ -6,12 +6,13 @@ import React, { useState } from 'react';
 import {
   type SectionItemProps,
   Section,
+  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
 import getInitialCountry from '../../../../utils/get-initial-country';
-import BasicInformation from '../../../basic-information/basic-information';
+import BasicInformation from '../../../basic-information';
 
 const BasicInfoSection = () => {
   const { t, allT } = useTranslation('pages.confirm');
@@ -61,10 +62,6 @@ const BasicInfoSection = () => {
     return null;
   }
 
-  const startEditing = () => {
-    setEditing(true);
-  };
-
   const stopEditing = () => {
     setEditing(false);
   };
@@ -93,11 +90,18 @@ const BasicInfoSection = () => {
     );
   };
 
+  const actions: SectionAction[] = [];
+  if (!editing) {
+    actions.push({
+      label: allT('pages.confirm.summary.edit'),
+      onClick: () => setEditing(true),
+    });
+  }
+
   return (
     <Section
       title={t('basic-info.title')}
-      editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={editing ? undefined : startEditing}
+      actions={actions}
       IconComponent={IcoFileText24}
       content={getSectionContent()}
       testID="basic-info-section"

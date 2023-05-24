@@ -129,6 +129,7 @@
         "title": "Confirm your personal data",
         "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
         "edit": "Edit",
+        "reveal": "Reveal",
         "cta": "Confirm & Continue"
       },
       "email": {

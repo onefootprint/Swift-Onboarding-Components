@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import {
   type SectionItemProps,
   Section,
+  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
@@ -51,10 +52,6 @@ const EmailSection = () => {
     ),
   );
 
-  const startEditing = () => {
-    setEditing(true);
-  };
-
   const stopEditing = () => {
     setEditing(false);
   };
@@ -73,12 +70,19 @@ const EmailSection = () => {
     );
   };
 
+  const actions: SectionAction[] = [];
+  if (!editing) {
+    actions.push({
+      label: allT('pages.confirm.summary.edit'),
+      onClick: () => setEditing(true),
+    });
+  }
+
   return (
     <Section
-      title={t('email.title')}
       testID="email-section"
-      editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={editing ? undefined : startEditing}
+      title={t('email.title')}
+      actions={actions}
       IconComponent={IcoEmail24}
       content={getSectionContent()}
     />

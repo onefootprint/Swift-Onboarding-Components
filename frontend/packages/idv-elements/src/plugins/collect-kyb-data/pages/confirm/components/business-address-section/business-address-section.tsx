@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import {
   type SectionItemProps,
   Section,
+  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
@@ -62,10 +63,6 @@ const BusinessAddressSection = () => {
     ),
   );
 
-  const startEditing = () => {
-    setEditing(true);
-  };
-
   const stopEditing = () => {
     setEditing(false);
   };
@@ -85,11 +82,18 @@ const BusinessAddressSection = () => {
     );
   };
 
+  const actions: SectionAction[] = [];
+  if (!editing) {
+    actions.push({
+      label: allT('pages.confirm.summary.edit'),
+      onClick: () => setEditing(true),
+    });
+  }
+
   return (
     <Section
       title={t('title')}
-      editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={editing ? undefined : startEditing}
+      actions={actions}
       IconComponent={IcoBuilding24}
       content={getSectionContent()}
       testID="business-address"

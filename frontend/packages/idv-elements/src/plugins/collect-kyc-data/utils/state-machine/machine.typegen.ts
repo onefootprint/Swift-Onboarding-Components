@@ -13,7 +13,8 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignData: 'dataSubmitted';
+    assignAuthToken: 'stepUpCompleted';
+    assignData: 'dataSubmitted' | 'decrpytedData';
     assignInitialData: 'initialized';
   };
   eventsCausingDelays: {};

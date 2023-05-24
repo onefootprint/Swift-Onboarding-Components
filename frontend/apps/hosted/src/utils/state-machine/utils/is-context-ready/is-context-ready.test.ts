@@ -38,7 +38,7 @@ describe('isContextReady', () => {
 
   describe('when init context info is complete', () => {
     it('when all data is in the machine context', () => {
-      const context: MachineContext = {
+      let context: MachineContext = {
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         businessBoKycData: testBusinessBoKycData,
         onboardingConfig: testOnboardingConfig,
@@ -48,10 +48,17 @@ describe('isContextReady', () => {
         payload: {},
       };
       expect(isContextReady(context, event)).toEqual(true);
+
+      context = {
+        authToken: 'token',
+        businessBoKycData: testBusinessBoKycData,
+        onboardingConfig: testOnboardingConfig,
+      };
+      expect(isContextReady(context, event)).toEqual(true);
     });
 
     it('when some data is in the machine context and some in the event payload', () => {
-      const context: MachineContext = {
+      let context: MachineContext = {
         obConfigAuth: { [KYB_BO_SESSION_AUTHORIZATION_HEADER]: 'pk' },
       };
       const event: MachineEvents = {
@@ -60,6 +67,11 @@ describe('isContextReady', () => {
           onboardingConfig: testOnboardingConfig,
           businessBoKycData: testBusinessBoKycData,
         },
+      };
+      expect(isContextReady(context, event)).toEqual(true);
+
+      context = {
+        authToken: 'token',
       };
       expect(isContextReady(context, event)).toEqual(true);
     });

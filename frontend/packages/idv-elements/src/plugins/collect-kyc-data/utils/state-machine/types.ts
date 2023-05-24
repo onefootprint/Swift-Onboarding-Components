@@ -22,6 +22,16 @@ export type MachineContext = {
 export type MachineEvents =
   | { type: 'initialized'; payload: KycData }
   | {
+      type: 'stepUpCompleted';
+      payload: {
+        authToken: string;
+      };
+    }
+  | {
+      type: 'decrpytedData';
+      payload: KycData;
+    }
+  | {
       type: 'dataSubmitted';
       payload: KycData;
     }

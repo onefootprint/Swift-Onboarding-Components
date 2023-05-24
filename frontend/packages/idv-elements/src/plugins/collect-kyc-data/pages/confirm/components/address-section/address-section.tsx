@@ -7,11 +7,12 @@ import React, { useState } from 'react';
 import {
   type SectionItemProps,
   Section,
+  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
-import Address from '../../../residential-address/residential-address';
+import Address from '../../../residential-address';
 import createAddressLine from './utils/create-address-line';
 
 const AddressSection = () => {
@@ -56,10 +57,6 @@ const AddressSection = () => {
     ),
   );
 
-  const startEditing = () => {
-    setEditing(true);
-  };
-
   const stopEditing = () => {
     setEditing(false);
   };
@@ -73,11 +70,18 @@ const AddressSection = () => {
     );
   };
 
+  const actions: SectionAction[] = [];
+  if (!editing) {
+    actions.push({
+      label: allT('pages.confirm.summary.edit'),
+      onClick: () => setEditing(true),
+    });
+  }
+
   return (
     <Section
       title={t('address.title')}
-      editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={editing ? undefined : startEditing}
+      actions={actions}
       IconComponent={IcoBuilding24}
       content={getSectionContent()}
       testID="address-section"

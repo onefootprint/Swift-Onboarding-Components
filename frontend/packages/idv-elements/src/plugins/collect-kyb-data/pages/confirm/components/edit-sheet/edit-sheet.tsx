@@ -12,6 +12,7 @@ export enum EditSection {
   beneficialOwners = 'beneficial-owners',
 }
 
+// TODO: delete
 type EditSheetProps = {
   open: boolean;
   section?: EditSection;

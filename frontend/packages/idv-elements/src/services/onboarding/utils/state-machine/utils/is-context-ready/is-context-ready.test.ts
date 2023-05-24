@@ -1,8 +1,4 @@
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  CollectedKycDataOption,
-  OnboardingConfig,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';
@@ -32,7 +28,6 @@ describe('isContextReady', () => {
         },
         config: { ...testOnboardingConfig },
         bootstrapData: {},
-        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         validationToken: '',
         alreadyAuthorized: false,
       };
@@ -48,7 +43,6 @@ describe('isContextReady', () => {
         authToken: 'token',
         config: { ...testOnboardingConfig },
         bootstrapData: {},
-        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -69,7 +63,6 @@ describe('isContextReady', () => {
       const context: MachineContext = {
         authToken: 'token',
         bootstrapData: {},
-        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',

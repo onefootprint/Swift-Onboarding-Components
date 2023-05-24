@@ -10,7 +10,7 @@ export type MachineContext = {
   authToken?: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  obConfigAuth: ObConfigAuth;
+  obConfigAuth?: ObConfigAuth;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
   // Generated

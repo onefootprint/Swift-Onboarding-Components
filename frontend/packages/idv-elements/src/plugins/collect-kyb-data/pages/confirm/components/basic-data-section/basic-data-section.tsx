@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 
 import {
   Section,
+  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import { type SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
@@ -63,10 +64,6 @@ const BasicDataSection = () => {
     return null;
   }
 
-  const startEditing = () => {
-    setEditing(true);
-  };
-
   const stopEditing = () => {
     setEditing(false);
   };
@@ -96,12 +93,19 @@ const BasicDataSection = () => {
     );
   };
 
+  const actions: SectionAction[] = [];
+  if (!editing) {
+    actions.push({
+      label: allT('pages.confirm.summary.edit'),
+      onClick: () => setEditing(true),
+    });
+  }
+
   return (
     <Section
       testID="basic-data"
       title={t('title')}
-      editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={editing ? undefined : startEditing}
+      actions={actions}
       IconComponent={IcoFileText24}
       content={getSectionContent()}
     />

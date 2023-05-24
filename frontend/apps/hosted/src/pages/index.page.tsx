@@ -8,10 +8,11 @@ import useHostedMachine from 'src/hooks/use-hosted-machine';
 import Expired from './expired';
 import Init from './init';
 import Intro from './intro';
+import InvalidUrl from './invalid-url';
 
 const Root = () => {
   const [state, send] = useHostedMachine();
-  const { businessBoKycData, obConfigAuth } = state.context;
+  const { businessBoKycData, obConfigAuth, authToken } = state.context;
   const { invited } = businessBoKycData || {};
   const { email, phoneNumber } = invited || {};
 
@@ -25,12 +26,14 @@ const Root = () => {
         {state.matches('init') && <Init />}
         {state.matches('intro') && <Intro />}
         {state.matches('expired') && <Expired />}
-        {state.matches('idv') && obConfigAuth && (
+        {state.matches('invalidUrl') && <InvalidUrl />}
+        {state.matches('idv') && (
           <Idv
             bootstrapData={{
               [IdDI.email]: email,
               [IdDI.phoneNumber]: phoneNumber,
             }}
+            authToken={authToken}
             obConfigAuth={obConfigAuth}
           />
         )}

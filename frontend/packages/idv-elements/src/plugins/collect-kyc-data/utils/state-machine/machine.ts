@@ -226,6 +226,12 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
         },
         confirm: {
           on: {
+            stepUpCompleted: {
+              actions: ['assignAuthToken'],
+            },
+            decrpytedData: {
+              actions: ['assignData'],
+            },
             confirmed: [
               {
                 target: 'completed',
@@ -281,6 +287,10 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
           context.data = mergeData(context.data, event.payload);
           return context;
         }),
+        assignAuthToken: assign((context, event) => ({
+          ...context,
+          authToken: event.payload.authToken,
+        })),
         assignInitialData: assign((context, event) => {
           context.data = mergeInitialData(context.data, event.payload);
           // Snapshot the set of data we have before starting to collect from users. This helps

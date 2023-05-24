@@ -15,6 +15,7 @@ import IdentitySection from './components/identity-section';
 
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
+
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, config, sandboxSuffix, requirement, initialData } =
     state.context;
@@ -23,6 +24,7 @@ const Confirm = () => {
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
+
   const value = getCurrentStepFromMissingAttributes(
     requirement,
     initialData,

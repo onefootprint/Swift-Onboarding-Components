@@ -14,6 +14,8 @@ export enum EditSection {
   identity = 'identity',
 }
 
+// TODO: delete
+
 type EditSheetProps = {
   open: boolean;
   section?: EditSection;

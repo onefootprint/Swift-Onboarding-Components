@@ -1,8 +1,7 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { IdDIData, ObConfigAuth, OnboardingConfig } from '@onefootprint/types';
+import { IdDIData, OnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
-  obConfigAuth: ObConfigAuth;
   sandboxSuffix?: string; // only if in sandbox mode
   authToken: string;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration

@@ -44,7 +44,7 @@ const Router = ({ onDone }: RouterProps) => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('identify') && (
+      {state.matches('identify') && obConfigAuth && (
         <Identify
           obConfigAuth={obConfigAuth}
           bootstrapData={identifyBootstrapData}
@@ -53,10 +53,9 @@ const Router = ({ onDone }: RouterProps) => {
           }}
         />
       )}
-      {state.matches('onboarding') && (
+      {state.matches('onboarding') && authToken && (
         <Onboarding
           authToken={authToken}
-          obConfigAuth={obConfigAuth}
           userFound={userFound}
           bootstrapData={bootstrapData}
           sandboxSuffix={sandboxSuffix}

@@ -1,6 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
   IdDI,
   OnboardingConfig,
@@ -45,7 +44,6 @@ describe('Onboarding Machine Tests', () => {
         bootstrapData,
         authToken,
         sandboxSuffix,
-        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       }),
     );
     machine.start();
@@ -73,7 +71,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: undefined,
-      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       alreadyAuthorized: false,
     });
 
@@ -97,7 +94,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: 'token',
-      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
       alreadyAuthorized: false,
     });
   });
@@ -133,7 +129,6 @@ describe('Onboarding Machine Tests', () => {
       bootstrapData: defaultBootstrapData,
       validationToken: 'token',
       alreadyAuthorized: true,
-      obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
     });
   });
 });

@@ -14,14 +14,13 @@ type OnboardingProps = Partial<OnboardingMachineArgs> & {
 
 const Onboarding = ({
   authToken,
-  obConfigAuth,
   bootstrapData,
   sandboxSuffix,
   userFound,
   isTransfer,
   onDone,
 }: OnboardingProps) => {
-  if (!obConfigAuth || !authToken) {
+  if (!authToken) {
     throw new Error('Missing onboarding props');
   }
 
@@ -30,7 +29,6 @@ const Onboarding = ({
       <QueryClientProvider client={queryClient}>
         <OnboardingMachineProvider
           userFound={userFound}
-          obConfigAuth={obConfigAuth}
           authToken={authToken}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}

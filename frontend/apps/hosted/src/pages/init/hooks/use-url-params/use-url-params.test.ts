@@ -1,0 +1,118 @@
+import {
+  createUseRouterSpy,
+  customRenderHook,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
+  CLIENT_PUBLIC_KEY_HEADER,
+  KYB_BO_SESSION_AUTHORIZATION_HEADER,
+} from '@onefootprint/types';
+
+import useParseUrl, {
+  TokenKind,
+  UseParseUrlParamOptions,
+} from './use-url-params';
+
+describe('useUrlParams', () => {
+  const useRouterSpy = createUseRouterSpy();
+  const token = 'tok_123456';
+
+  const renderUseParseUrl = (options: UseParseUrlParamOptions) =>
+    customRenderHook(() => useParseUrl(options));
+
+  it('parses ob pk token correctly', async () => {
+    useRouterSpy({
+      query: { kind: TokenKind.onboardingConfigPublicKey },
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onError).not.toBeCalled();
+    });
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith({
+        [CLIENT_PUBLIC_KEY_HEADER]: token,
+      });
+    });
+  });
+
+  it('parses user token correctly', async () => {
+    useRouterSpy({
+      query: { kind: TokenKind.user },
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith(undefined, token);
+    });
+  });
+
+  it('parses beneficial owner token correctly', async () => {
+    useRouterSpy({
+      query: { kind: TokenKind.beneficialOwner },
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith({
+        [KYB_BO_SESSION_AUTHORIZATION_HEADER]: token,
+      });
+    });
+  });
+
+  it('handles misformatted kinds correctly', async () => {
+    useRouterSpy({
+      query: { kind: [TokenKind.beneficialOwner, TokenKind.user] },
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalled();
+    });
+  });
+
+  it('handles invalid kinds correctly', async () => {
+    useRouterSpy({
+      query: { kind: 'hello' },
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalled();
+    });
+  });
+
+  it('handles missing kinds correctly', async () => {
+    useRouterSpy({
+      asPath: `#${token}`,
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalled();
+    });
+  });
+
+  it('handles missing token correctly', async () => {
+    useRouterSpy({
+      asPath: '',
+    });
+    const onSuccess = jest.fn();
+    const onError = jest.fn();
+    renderUseParseUrl({ onSuccess, onError });
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalled();
+    });
+  });
+});

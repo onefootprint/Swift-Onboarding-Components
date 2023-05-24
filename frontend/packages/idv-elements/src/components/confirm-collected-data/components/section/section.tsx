@@ -1,12 +1,17 @@
 import { Icon } from '@onefootprint/icons';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+export type SectionAction = {
+  label: string;
+  onClick: () => void;
+  isLoading?: boolean;
+};
+
 export type SectionProps = {
   title: string;
-  editLabel?: string;
-  onEdit?: () => void;
+  actions: SectionAction[];
   IconComponent?: Icon;
   content: React.ReactNode;
   testID?: string;
@@ -14,9 +19,8 @@ export type SectionProps = {
 
 const Section = ({
   title,
-  editLabel,
   IconComponent,
-  onEdit,
+  actions,
   content,
   testID,
 }: SectionProps) => (
@@ -28,9 +32,17 @@ const Section = ({
           {title}
         </Typography>
       </TitleContainer>
-      {onEdit && editLabel && (
-        <LinkButton onClick={onEdit}>{editLabel}</LinkButton>
-      )}
+      <ActionsContainer>
+        {actions.map(({ label, onClick, isLoading }) =>
+          isLoading ? (
+            <LoadingIndicator key={label} />
+          ) : (
+            <LinkButton key={label} onClick={onClick} disabled={isLoading}>
+              {label}
+            </LinkButton>
+          ),
+        )}
+      </ActionsContainer>
     </Header>
     <Content>{content}</Content>
   </Container>
@@ -44,6 +56,13 @@ const Content = styled.div`
     align-items: flex-start;
     width: 100%;
     row-gap: ${theme.spacing[7]};
+  `}
+`;
+
+const ActionsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[4]};
   `}
 `;
 

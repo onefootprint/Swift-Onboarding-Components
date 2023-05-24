@@ -27,6 +27,9 @@ export const createHostedMachine = () =>
       states: {
         init: {
           on: {
+            invalidUrlReceived: {
+              target: 'invalidUrl',
+            },
             initContextUpdated: [
               {
                 target: 'intro',
@@ -57,16 +60,25 @@ export const createHostedMachine = () =>
         idv: {
           type: 'final',
         },
+        invalidUrl: {
+          type: 'final',
+        },
       },
     },
     {
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context, event) => {
-          const { obConfigAuth, businessBoKycData, onboardingConfig } =
-            event.payload;
+          const {
+            obConfigAuth,
+            businessBoKycData,
+            onboardingConfig,
+            authToken,
+          } = event.payload;
           context.obConfigAuth =
             obConfigAuth !== undefined ? obConfigAuth : context.obConfigAuth;
+          context.authToken =
+            authToken !== undefined ? authToken : context.authToken;
           context.businessBoKycData =
             businessBoKycData !== undefined
               ? businessBoKycData

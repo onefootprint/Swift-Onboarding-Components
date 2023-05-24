@@ -1,23 +1,19 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import { DeviceInfo, useDeviceInfo, useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
-import {
-  CollectedDataOptionLabels,
-  OnboardingConfig,
-} from '@onefootprint/types';
+import { CollectedDataOptionLabels } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useGetOnboardingConfig from '../../../../hooks/api/org/get-onboarding-config';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';
 
 const Init = () => {
   const { t } = useTranslation('pages.init');
   const [state, send] = useOnboardingMachine();
-  const { authToken, obConfigAuth } = state.context;
+  const { authToken } = state.context;
   const onboardingMutation = useOnboarding();
   const observeCollector = useObserveCollector();
 
@@ -33,36 +29,6 @@ const Init = () => {
     });
   });
 
-  useGetOnboardingConfig(
-    { obConfigAuth },
-    {
-      onSuccess: (config: OnboardingConfig) => {
-        observeCollector.setAppContext({
-          config,
-        });
-        send({
-          type: 'initContextUpdated',
-          payload: {
-            config: {
-              ...config,
-              mustCollectData: config.mustCollectData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
-              canAccessData: config.canAccessData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
-            },
-          },
-        });
-      },
-      onError: () => {
-        send({
-          type: 'configRequestFailed',
-        });
-      },
-    },
-  );
-
   useEffectOnce(() => {
     if (!authToken || onboardingMutation.isLoading) {
       return;
@@ -71,9 +37,26 @@ const Init = () => {
       { authToken },
       {
         onSuccess: payload => {
+          const { onboardingConfig } = payload;
           send({
             type: 'initContextUpdated',
-            payload,
+            payload: {
+              ...payload,
+              config: {
+                ...onboardingConfig,
+                mustCollectData: onboardingConfig.mustCollectData.map(
+                  (attr: string) => CollectedDataOptionLabels[attr],
+                ),
+                canAccessData: onboardingConfig.canAccessData.map(
+                  (attr: string) => CollectedDataOptionLabels[attr],
+                ),
+              },
+            },
+          });
+        },
+        onError: () => {
+          send({
+            type: 'configRequestFailed',
           });
         },
       },
