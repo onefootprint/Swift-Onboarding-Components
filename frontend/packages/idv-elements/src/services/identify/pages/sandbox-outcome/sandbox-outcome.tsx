@@ -48,6 +48,16 @@ const SandboxOutcome = () => {
     });
   };
 
+  const getHint = () => {
+    if (errors?.testID?.type === 'required') {
+      return t('test-id.errors.required');
+    }
+    if (errors?.testID) {
+      return t('test-id.errors.invalid');
+    }
+    return t('test-id.hint');
+  };
+
   return (
     <Box>
       <NavigationHeader button={{ variant: 'close' }} />
@@ -87,11 +97,16 @@ const SandboxOutcome = () => {
           hasError={!!errors.testID}
           label={t('test-id.label')}
           placeholder={t('test-id.placeholder')}
-          hint={t('test-id.hint')}
+          hint={getHint()}
           {...register('testID', {
             required: {
               value: true,
               message: t('test-id.errors.required'),
+            },
+            // Must not contain special characters
+            pattern: {
+              value: /^[A-z0-9]+$/,
+              message: t('test-id.errors.invalid'),
             },
           })}
         />

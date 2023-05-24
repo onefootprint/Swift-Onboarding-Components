@@ -24,7 +24,7 @@ describe('<Form />', () => {
     expect(
       screen.getByPlaceholderText('your.email@email.com'),
     ).toBeInTheDocument();
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: 'Continue' });
     expect(button).toBeInTheDocument();
   });
 
@@ -44,8 +44,10 @@ describe('<Form />', () => {
     });
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(screen.queryByLabelText('piip@onefootprint.com')).toBeNull();
-    const button = screen.getByRole('button');
-    expect(within(button).getByRole('progressbar')).toBeInTheDocument();
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBe(2);
+    const continueButton = buttons[0];
+    expect(within(continueButton).getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('should call onsubmit with valid data', async () => {
@@ -60,7 +62,7 @@ describe('<Form />', () => {
     ).toBeInTheDocument();
 
     await userEvent.type(input, 'footprint@onefootprint.com');
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith(
       {
@@ -74,7 +76,7 @@ describe('<Form />', () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
 
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(screen.getByText('Email is required')).toBeInTheDocument();
   });

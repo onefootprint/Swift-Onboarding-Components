@@ -67,7 +67,8 @@
         "placeholder": "Enter test ID",
         "hint": "Test ID helps you create different user onboardings with your email and phone number. Do not use spaces or #.",
         "errors": {
-          "required": "Test ID is required"
+          "required": "Test ID is required",
+          "invalid": "Test ID is invalid. Please remove spaces and special characters."
         }
       },
       "cta": "Continue"

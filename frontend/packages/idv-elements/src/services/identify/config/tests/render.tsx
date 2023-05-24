@@ -2,6 +2,7 @@ import { customRender } from '@onefootprint/test-utils';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import { Layout } from '../../../../components/layout';
 import configureI18next from '../initializers/react-i18next';
 
 type WrapperProps = {
@@ -15,6 +16,10 @@ export const CustomWrapper = ({ children }: WrapperProps) => (
 );
 
 export const renderIdentify = (Component?: React.ReactNode) =>
-  customRender(<CustomWrapper>{Component}</CustomWrapper>);
+  customRender(
+    <CustomWrapper>
+      <Layout>{Component}</Layout>
+    </CustomWrapper>,
+  );
 
 export * from '@onefootprint/test-utils';
