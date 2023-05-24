@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PGenerateResponse } from '@onefootprint/types';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
@@ -9,17 +10,30 @@ import NavigationHeader from '../../../../../components/layout/components/naviga
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
 import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
-import useGenerateScopedAuthToken from '../../../hooks/desktop/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
+import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { scopedAuthToken } = state.context;
+  const { authToken, device, config, scopedAuthToken } = state.context;
   const url = useCreateHandoffUrl(scopedAuthToken);
-  const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken();
+
+  const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
+    authToken,
+    device,
+    config,
+    onSuccess: (data: D2PGenerateResponse) => {
+      send({
+        type: 'scopedAuthTokenGenerated',
+        payload: {
+          scopedAuthToken: data.authToken,
+        },
+      });
+    },
+  });
   const isLoading = mutation.isLoading || !scopedAuthToken || !url;
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();

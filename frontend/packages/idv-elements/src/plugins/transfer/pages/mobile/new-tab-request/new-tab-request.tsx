@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PGenerateResponse } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -6,15 +7,28 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { useCreateHandoffUrl } from '../../../../../hooks/ui';
-import useGenerateScopedAuthToken from '../../../hooks/mobile/use-generate-scoped-auth-token';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
+import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
-  const { scopedAuthToken } = state.context;
-  const mutation = useGenerateScopedAuthToken();
+  const { authToken, device, config, scopedAuthToken } = state.context;
   const url = useCreateHandoffUrl(scopedAuthToken);
+
+  const { mutation } = useGenerateScopedAuthToken({
+    authToken,
+    device,
+    config,
+    onSuccess: (data: D2PGenerateResponse) => {
+      send({
+        type: 'scopedAuthTokenGenerated',
+        payload: {
+          scopedAuthToken: data.authToken,
+        },
+      });
+    },
+  });
 
   const handleClick = () => {
     if (!url) {

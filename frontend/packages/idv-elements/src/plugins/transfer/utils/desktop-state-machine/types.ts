@@ -1,4 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
+import { OnboardingConfig } from '@onefootprint/types';
 
 import { TransferRequirements } from '../../types';
 
@@ -8,6 +9,7 @@ export type MachineContext = {
   scopedAuthToken?: string;
   device?: DeviceInfo;
   missingRequirements: TransferRequirements;
+  config?: OnboardingConfig;
 };
 
 export type MachineEvents =
