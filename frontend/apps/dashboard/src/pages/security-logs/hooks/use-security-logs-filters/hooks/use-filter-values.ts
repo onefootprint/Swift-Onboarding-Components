@@ -2,7 +2,6 @@ import { IdDI } from '@onefootprint/types';
 import { useMemo } from 'react';
 import { queryToArray } from 'src/hooks/use-filters';
 
-import getFilterValueForDI from '../../../utils/get-filter-value-for-di';
 import {
   SecurityLogsFilterValues,
   SecurityLogsQueryString,
@@ -16,19 +15,9 @@ const useFilterValues = (
     const dateRange = queryToArray(query.date_range);
     let dataAttributes = queryToArray(query.data_attributes);
 
-    if (dataAttributes.includes('name')) {
-      dataAttributes = [
-        ...dataAttributes,
-        getFilterValueForDI(IdDI.firstName),
-        getFilterValueForDI(IdDI.lastName),
-      ];
-    }
-
-    if (dataAttributes.includes(getFilterValueForDI(IdDI.ssn9))) {
+    if (dataAttributes.includes(IdDI.ssn9)) {
       dataAttributes = [...dataAttributes, IdDI.ssn4];
     }
-
-    dataAttributes = dataAttributes.map(attr => attr.replace('id.', ''));
 
     return {
       dataAttributes,

@@ -877,16 +877,26 @@
         "title": "Security logs"
       },
       "filters": {
-        "date-attributes": {
+        "attributes": {
           "label": "Data attributes",
-          "basic": {
-            "title": "Basic data"
+          "id": {
+            "basic": {
+              "title": "Personal basic data"
+            },
+            "identity": {
+              "title": "Personal identity data"
+            },
+            "address": {
+              "title": "Personal address data"
+            }
           },
-          "identity": {
-            "title": "Identity data"
-          },
-          "address": {
-            "title": "Address data"
+          "business": {
+            "basic": {
+              "title": "Business basic data"
+            },
+            "address": {
+              "title": "Business address data"
+            }
           }
         },
         "date-range": {
