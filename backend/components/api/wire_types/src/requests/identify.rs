@@ -13,5 +13,5 @@ pub enum IdentifyId {
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
-    pub identifier: IdentifyId,
+    pub identifier: Option<IdentifyId>,
 }

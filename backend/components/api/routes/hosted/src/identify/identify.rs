@@ -4,7 +4,15 @@ use crate::identify::get_user_challenge_context;
 use crate::types::response::ResponseData;
 use crate::State;
 
-use api_core::auth::ob_config::ObConfigAuth;
+use api_core::{
+    auth::{
+        ob_config::ObConfigAuth,
+        user::{UserAuth, UserAuthContext},
+        Any,
+    },
+    errors::challenge::ChallengeError,
+    fingerprinter::VaultIdentifier,
+};
 use api_wire_types::IdentifyRequest;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -28,15 +36,26 @@ pub async fn post(
     request: Json<IdentifyRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
+    // When provided, is used to identify the currently authed user. Will generate a challenge
+    // for the authed user
+    user_auth: Option<UserAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<IdentifyResponse>>, ApiError> {
     let IdentifyRequest { identifier } = request.into_inner();
 
+    // Require one of user_auth or identifier
+    let identifier = match (user_auth, identifier) {
+        (Some(user_auth), None) => {
+            let user_auth = user_auth.check_guard(Any)?;
+            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
+        }
+        (None, Some(id)) => id.into(),
+        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
+    };
+
     // Look up existing user vault by identifier
     let t_id = ob_context.as_ref().map(|obc| &obc.tenant().id);
-    let (_, webauthn_creds, kinds) = if let Some(user_challenge_context) =
-        get_user_challenge_context(&state, identifier.into(), t_id).await?
-    {
-        user_challenge_context
+    let (_, creds, kinds) = if let Some(ctx) = get_user_challenge_context(&state, identifier, t_id).await? {
+        ctx
     } else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Ok(Json(ResponseData {
@@ -50,7 +69,7 @@ pub async fn post(
 
     let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
 
-    let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
+    let has_syncable_pass_key = creds.iter().any(|cred| cred.backup_state);
 
     Ok(Json(ResponseData {
         data: IdentifyResponse {
