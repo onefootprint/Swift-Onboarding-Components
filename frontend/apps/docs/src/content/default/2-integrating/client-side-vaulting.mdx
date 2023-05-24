@@ -53,18 +53,18 @@ Footprint's vault supports several types of structured data like identity data, 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_token \
 	-X POST \
-    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
     -d '{
           "fields": [
             "card.primary.number",
             "card.primary.cvc",
             "card.primary.expiration",
-            "card.name"
+            "card.primary.name"
           ],
           "scopes": [
             "vault"
           ],
-          "ttl": 180,
+          "ttl": 180
       }'
 ```
 
@@ -88,9 +88,9 @@ From your client-side app, vault the data directly to footprint:
 ```bash
 curl https://api.onefootprint.com/users/vault \
 	-X PATCH \
-    -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0'
+    -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
     -d '{
-            "card.primary.number": "42424242424242424242424",
+            "card.primary.number": "4242424242424242",
             "card.primary.cvc": "424",
             "card.primary.expiration": "10/25",
             "card.primary.name": "Whitfield Diffie"
