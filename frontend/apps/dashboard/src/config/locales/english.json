@@ -93,6 +93,7 @@
     "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
     "phone_number": "Phone number",
+    "nationality": "Nationality",
     "selfie": "Selfie",
     "document": "ID Document",
     "document_and_selfie": "ID Document & Selfie",
@@ -1085,6 +1086,7 @@
             "description": "You can customize the verification flow by choosing optional fields to collect.",
             "collected-data": "Collected data",
             "ssn": "SSN",
+            "nationality": "Nationality",
             "add-ons": {
               "title": "Add-ons",
               "document-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>",

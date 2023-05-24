@@ -10,6 +10,7 @@ export type MachineContext = {
   name?: string;
   kycCollect?: {
     ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+    [CollectedKycDataOption.nationality]: boolean;
     [CollectedDocumentDataOption.document]: boolean;
     [CollectedDocumentDataOption.documentAndSelfie]: boolean;
     [CollectedInvestorProfileDataOption.investorProfile]: boolean;
@@ -50,6 +51,7 @@ export type MachineEvents =
       type: 'kycCollectSubmitted';
       payload: {
         ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+        [CollectedKycDataOption.nationality]: boolean;
         [CollectedDocumentDataOption.document]: boolean;
         [CollectedDocumentDataOption.documentAndSelfie]: boolean;
         [CollectedInvestorProfileDataOption.investorProfile]: boolean;

@@ -19,6 +19,7 @@ import InvestorProfileQuestions from './components/investor-profile-questions';
 
 type FormData = {
   ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+  [CollectedKycDataOption.nationality]: boolean;
   [CollectedDocumentDataOption.document]: boolean;
   [CollectedDocumentDataOption.documentAndSelfie]: boolean;
   [CollectedInvestorProfileDataOption.investorProfile]: boolean;
@@ -37,18 +38,19 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
       ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn9,
-      [CollectedDocumentDataOption.document]: kycCollect
-        ? kycCollect[CollectedDocumentDataOption.document]
-        : false,
-      [CollectedDocumentDataOption.documentAndSelfie]: kycCollect
-        ? kycCollect[CollectedDocumentDataOption.documentAndSelfie]
-        : false,
+      [CollectedKycDataOption.nationality]:
+        kycCollect?.[CollectedKycDataOption.nationality],
+      [CollectedDocumentDataOption.document]:
+        kycCollect?.[CollectedDocumentDataOption.document],
+      [CollectedDocumentDataOption.documentAndSelfie]:
+        kycCollect?.[CollectedDocumentDataOption.documentAndSelfie],
     },
   });
 
   const ssnKind = watch('ssnKind');
   const idDoc = watch(CollectedDocumentDataOption.document);
   const selfie = watch(CollectedDocumentDataOption.documentAndSelfie);
+  const nationality = watch(CollectedKycDataOption.nationality);
   const investorProfile = watch(
     CollectedInvestorProfileDataOption.investorProfile,
   );
@@ -64,6 +66,9 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
       ? CollectedKycDataOption.ssn4
       : CollectedKycDataOption.ssn9,
   );
+  if (nationality) {
+    collectedData.push(CollectedKycDataOption.nationality);
+  }
   if (idDoc && selfie) {
     collectedData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (idDoc) {
@@ -78,6 +83,8 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
       type: 'kycCollectSubmitted',
       payload: {
         ssnKind: formData.ssnKind,
+        [CollectedKycDataOption.nationality]:
+          formData[CollectedKycDataOption.nationality],
         [CollectedDocumentDataOption.document]:
           formData[CollectedDocumentDataOption.document],
         [CollectedDocumentDataOption.documentAndSelfie]:
@@ -118,6 +125,14 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
             {...register('ssnKind')}
           />
         </OptionsContainer>
+      </Section>
+      <Section>
+        <Typography variant="label-3">{t('nationality')}</Typography>
+        <Checkbox
+          value={CollectedKycDataOption.nationality}
+          label={allT('cdo.nationality')}
+          {...register(CollectedKycDataOption.nationality)}
+        />
       </Section>
       <Divider />
       <Section>

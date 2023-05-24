@@ -24,6 +24,7 @@
     "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
     "phone_number": "Phone number",
+    "nationality": "Nationality",
     "selfie": "Selfie",
     "document": "ID Document",
     "document_and_selfie": "ID Document & Selfie",

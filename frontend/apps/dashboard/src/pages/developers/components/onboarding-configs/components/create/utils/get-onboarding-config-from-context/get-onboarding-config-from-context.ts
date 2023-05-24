@@ -57,6 +57,9 @@ const getKybOnboardingConfigFromContext = (
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
     mustCollectKycData.push(CollectedKycDataOption.ssn9);
   }
+  if (kycCollect?.[CollectedKycDataOption.nationality]) {
+    mustCollectKycData.push(CollectedKycDataOption.nationality);
+  }
   if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
     mustCollectKycData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
@@ -88,6 +91,9 @@ const getKybOnboardingConfigFromContext = (
     canAccessData.push(CollectedKycDataOption.ssn4);
   } else if (kycAccess?.[CollectedKycDataOption.ssn9]) {
     canAccessData.push(CollectedKycDataOption.ssn9);
+  }
+  if (kycAccess?.[CollectedKycDataOption.nationality]) {
+    canAccessData.push(CollectedKycDataOption.nationality);
   }
   if (kycAccess?.[CollectedDocumentDataOption.documentAndSelfie]) {
     canAccessData.push(CollectedDocumentDataOption.documentAndSelfie);
@@ -123,6 +129,9 @@ const getKycOnboardingConfigFromContext = (
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
     mustCollectData.push(CollectedKycDataOption.ssn9);
   }
+  if (kycCollect?.[CollectedKycDataOption.nationality]) {
+    mustCollectData.push(CollectedKycDataOption.nationality);
+  }
   if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
     mustCollectData.push(CollectedDocumentDataOption.documentAndSelfie);
   } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
@@ -153,6 +162,9 @@ const getKycOnboardingConfigFromContext = (
     canAccessData.push(CollectedKycDataOption.ssn4);
   } else if (kycAccess?.[CollectedKycDataOption.ssn9]) {
     canAccessData.push(CollectedKycDataOption.ssn9);
+  }
+  if (kycAccess?.[CollectedKycDataOption.nationality]) {
+    canAccessData.push(CollectedKycDataOption.nationality);
   }
   if (kycAccess?.[CollectedDocumentDataOption.documentAndSelfie]) {
     canAccessData.push(CollectedDocumentDataOption.documentAndSelfie);

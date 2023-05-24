@@ -25,6 +25,7 @@ const order: CollectedDataOption[] = [
   CollectedKycDataOption.phoneNumber,
   CollectedKycDataOption.ssn4,
   CollectedKycDataOption.ssn9,
+  CollectedKycDataOption.nationality,
   CollectedKybDataOption.name,
   CollectedKybDataOption.tin,
   CollectedKybDataOption.address,

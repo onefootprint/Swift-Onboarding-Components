@@ -27,6 +27,7 @@ const getDefaultKycAccess = (
       kycCollect?.ssnKind === CollectedKycDataOption.ssn4,
     [CollectedKycDataOption.ssn9]:
       kycCollect?.ssnKind === CollectedKycDataOption.ssn9,
+    [CollectedKycDataOption.nationality]: true,
     [CollectedDocumentDataOption.document]:
       !!kycCollect?.[CollectedDocumentDataOption.document],
     [CollectedDocumentDataOption.documentAndSelfie]:

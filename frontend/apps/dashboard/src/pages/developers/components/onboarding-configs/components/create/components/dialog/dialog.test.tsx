@@ -205,6 +205,21 @@ describe('<CreateConfig />', () => {
       await userEvent.click(ssnFullOption);
       expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
 
+      // Select nationality option
+      const nationalityOption = screen.getByLabelText('Nationality');
+      await userEvent.click(nationalityOption);
+      expect(
+        within(collectedData).getByText('Nationality'),
+      ).toBeInTheDocument();
+
+      // Unselect nationality option
+      await userEvent.click(nationalityOption);
+      expect(
+        within(collectedData).queryByText('Nationality'),
+      ).not.toBeInTheDocument();
+      // Re-select so we can test in access form
+      await userEvent.click(nationalityOption);
+
       // Select ID Document
       const idDocumentOption = screen.getByLabelText('ID Document');
       await userEvent.click(idDocumentOption);
@@ -297,6 +312,11 @@ describe('<CreateConfig />', () => {
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
+
+      // Select nationality option - unchecked by default
+      const nationalityOption = screen.getByLabelText('Nationality');
+      await userEvent.click(nationalityOption);
+
       await userEvent.click(nextButton);
 
       expect(
@@ -334,6 +354,14 @@ describe('<CreateConfig />', () => {
       expect(ssnFull.checked).toBeTruthy();
       await userEvent.click(ssnFull);
       expect(ssnFull.checked).toBeFalsy();
+
+      const nationality = screen.getByLabelText(
+        'Nationality',
+      ) as HTMLInputElement;
+      expect(nationality).toBeInTheDocument();
+      expect(nationality.checked).toBeTruthy();
+      await userEvent.click(nationality);
+      expect(nationality.checked).toBeFalsy();
     });
 
     it('should show document if only document was collected', async () => {

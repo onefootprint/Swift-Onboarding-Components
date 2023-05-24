@@ -90,6 +90,12 @@ const KycAccess = () => {
               {...register(CollectedKycDataOption.ssn9)}
             />
           )}
+          {kycCollect?.[CollectedKycDataOption.nationality] && (
+            <Checkbox
+              label={allT('cdo.nationality')}
+              {...register(CollectedKycDataOption.nationality)}
+            />
+          )}
           {kycCollect?.[CollectedDocumentDataOption.document] && (
             <Box>
               <Checkbox
