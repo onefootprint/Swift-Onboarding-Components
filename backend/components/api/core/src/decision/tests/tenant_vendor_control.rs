@@ -1,20 +1,18 @@
-use db::{
-    models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, tests::test_db_pool::TestDbPool,
+use crate::{
+    config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
+    enclave_client::EnclaveClient, State,
 };
-use macros::test_db_pool;
+use db::tests::test_db_pool::TestDbPool;
+use db::{models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, DbPool};
+use macros::test_state;
 use newtypes::{
     vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
     EncryptedVaultPrivateKey, SealedVaultBytes, TenantId, VaultPublicKey,
 };
 
-use crate::{
-    config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
-    enclave_client::EnclaveClient,
-};
-
 #[allow(clippy::too_many_arguments)]
 async fn create_db_vendor_control(
-    db_pool: &TestDbPool,
+    db_pool: &DbPool,
     public_key: VaultPublicKey,
     e_private_key: EncryptedVaultPrivateKey,
     idology_enabled: bool,
@@ -49,7 +47,7 @@ struct DefaultCredentials {
 }
 async fn get_tenant_vendor_control(
     tenant_id: TenantId,
-    db_pool: &TestDbPool,
+    db_pool: &DbPool,
     config: &Config,
     enclave_client: &EnclaveClient,
 ) -> (DefaultCredentials, TenantVendorControl) {
@@ -70,21 +68,21 @@ async fn get_tenant_vendor_control(
     )
 }
 
-#[test_db_pool]
-async fn test_update_credentials(db_pool: TestDbPool) {
-    let state = &crate::State::test_state().await;
+#[test_state]
+async fn test_update_credentials(state: &mut State) {
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let pk2 = pk.clone();
     let tenant_e_key2 = tenant_e_key.clone();
 
     // No TVC, credentials should be the same
-    let tenant_with_no_tvc = db_pool
+    let tenant_with_no_tvc = state
+        .db_pool
         .db_query(move |conn| db::tests::fixtures::tenant::create_with_keys(conn, pk2, tenant_e_key2))
         .await
         .unwrap();
     let (default_creds_from_state, updated) = get_tenant_vendor_control(
         tenant_with_no_tvc.id,
-        &db_pool,
+        &state.db_pool,
         &state.config,
         &state.enclave_client,
     )
@@ -97,7 +95,7 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     // -------------------
     // if experian enabled, and a sub code provided, we update
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         false,
@@ -109,7 +107,7 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(
         updated.experian_credentials().subscriber_code,
         "sub_code123".into()
@@ -118,7 +116,7 @@ async fn test_update_credentials(db_pool: TestDbPool) {
 
     // if experian isn't enabled, we shouldn't change credentials, even if provided
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         false,
@@ -129,12 +127,12 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     )
     .await;
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
 
     // if experian sub code isn't provided, we shouldn't change credentials,
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         false,
@@ -145,14 +143,14 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     )
     .await;
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
     // -------------------
     // ---- Idology -------
     // -------------------
     // if idology enabled, update un/pw
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         true,
@@ -165,14 +163,14 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_ne!(default_creds_from_state.idology, updated.idology_credentials());
     assert_eq!(updated.idology_credentials().password, "id_password".into());
     assert_eq!(updated.idology_credentials().username, "id_username".into());
 
     // if idology not enabled, don't update
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         false,
@@ -184,12 +182,12 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
 
     // If only pw provided, don't update
     let t = create_db_vendor_control(
-        &db_pool,
+        &state.db_pool,
         pk.clone(),
         tenant_e_key.clone(),
         false,
@@ -202,7 +200,7 @@ async fn test_update_credentials(db_pool: TestDbPool) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
 }
 

@@ -19,6 +19,7 @@ use feature_flag::FeatureFlagClient;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_db_pool;
+use macros::test_state;
 use newtypes::KycConfig;
 use newtypes::WorkflowConfig;
 use newtypes::{KycState, WorkflowId, WorkflowState};
@@ -58,12 +59,8 @@ async fn get_wf(state: &State, wfid: WorkflowId) -> (Workflow, Vec<WorkflowEvent
         .unwrap()
 }
 
-#[test_db_pool]
-async fn valid_action(db_pool: TestDbPool) {
-    // TODO: make a proper TestState / macro, lots of tests need it
-    let state = &mut State::test_state().await;
-    state.set_db_pool((*db_pool).clone());
-
+#[test_state]
+async fn valid_action(state: &mut State) {
     let wf = create_wf(state, KycState::DataCollection.into()).await;
     let wfid = wf.id.clone();
 
@@ -90,11 +87,8 @@ async fn valid_action(db_pool: TestDbPool) {
     assert!(wfe.to_state == WorkflowState::Kyc(KycState::VendorCalls));
 }
 
-#[test_db_pool]
-async fn invalid_action(db_pool: TestDbPool) {
-    let state = &mut State::test_state().await;
-    state.set_db_pool((*db_pool).clone());
-
+#[test_state]
+async fn invalid_action(state: &mut State) {
     let wf = create_wf(state, KycState::DataCollection.into()).await;
     let wfid = wf.id.clone();
 
@@ -144,11 +138,8 @@ async fn invalid_action(db_pool: TestDbPool) {
 //     );
 // }
 
-#[test_db_pool]
-async fn authorize(db_pool: TestDbPool) {
-    let state = &mut State::test_state().await;
-    state.set_db_pool((*db_pool).clone());
-
+#[test_state]
+async fn authorize(state: &mut State) {
     let wf = create_wf(state, KycState::DataCollection.into()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
@@ -183,25 +174,4 @@ async fn authorize(db_pool: TestDbPool) {
         })
         .await
         .unwrap();
-}
-
-#[tokio::test]
-async fn test_test_state() {
-    let state = &mut State::test_state().await;
-
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-
-    mock_ff_client
-        .expect_flag()
-        .times(1)
-        .withf(move |f| *f == BoolFlag::DisableAllSocure)
-        .return_once(|_| true);
-
-    state.set_ff_client(Arc::new(mock_ff_client));
-
-    do_flag(state.feature_flag_client.clone());
-}
-
-fn do_flag(ff_client: Arc<dyn FeatureFlagClient>) -> bool {
-    ff_client.flag(BoolFlag::DisableAllSocure)
 }

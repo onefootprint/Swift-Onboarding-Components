@@ -190,6 +190,46 @@ pub fn test_db_pool(
 }
 
 #[proc_macro_attribute]
+/// Wraps a function that takes in a `TestDbPool` and turns it into a rust `#[test]` function
+/// that takes no arguments with the same name
+pub fn test_state(args: proc_macro::TokenStream, stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ItemFn {
+        attrs,
+        vis: _,
+        sig,
+        block,
+    } = parse_macro_input!(stream as ItemFn);
+    let args = parse_macro_input!(args as AttributeArgs);
+
+    let retain = if let Some(a) = args.first() {
+        matches!(a, syn::NestedMeta::Meta(Meta::Path(nv)) if nv.is_ident("retain"))
+    } else {
+        false
+    };
+
+    let stmts = &block.stmts;
+    let fn_name = &sig.ident;
+
+    let out = quote! {
+        mod #fn_name {
+            use super::*;
+            #(#attrs)* pub(super) #sig {
+                #(#stmts)*
+            }
+        }
+
+        #[tokio::test]
+        async fn #fn_name() {
+            let test_db_pool = TestDbPool::new(#retain);
+            let state = &mut State::test_state().await;
+            state.set_db_pool((*test_db_pool).clone());
+            #fn_name::#fn_name(state).await;
+        }
+    };
+    out.into()
+}
+
+#[proc_macro_attribute]
 /// creates an alias of paperclip route with another path
 pub fn route_alias(
     args: proc_macro::TokenStream,

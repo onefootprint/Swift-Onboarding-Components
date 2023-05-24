@@ -141,7 +141,8 @@ mod task_tests {
     use super::*;
     use chrono::Utc;
     use db::test_helpers::have_same_elements;
-    use db::test_helpers::test_db_pool;
+    use db::tests::test_db_pool::TestDbPool;
+    use macros::test_state;
     use newtypes::{LogMessageTaskArgs, TaskData};
 
     fn task_data(message: &str) -> TaskData {
@@ -150,14 +151,11 @@ mod task_tests {
         })
     }
 
-    #[tokio::test]
-    async fn basic_end_to_end() {
-        let db_pool = test_db_pool();
-        let state = &State::test_state().await;
-        // TODO: need to create a test State so can pass to poll_and_execute_tasks
-
+    #[test_state]
+    async fn basic_end_to_end(state: &mut State) {
         // Setup
-        let tasks = db_pool
+        let tasks = state
+            .db_pool
             .db_query(move |conn| -> Result<Vec<Task>, DbError> {
                 Ok(vec![
                     Task::create(conn, Utc::now(), task_data("task1 yo"))?,
@@ -185,7 +183,7 @@ mod task_tests {
         ));
 
         // Teardown
-        cleanup(&db_pool, tasks).await.unwrap();
+        cleanup(&state.db_pool, tasks).await.unwrap();
     }
 
     async fn cleanup(db_pool: &DbPool, tasks: Vec<Task>) -> Result<(), DbError> {

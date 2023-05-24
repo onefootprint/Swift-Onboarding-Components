@@ -271,33 +271,33 @@ pub async fn build_business_data_from_verification_request(
 
 
 #[cfg(test)]
+#[allow(unused)]
 mod tests {
-    use db::{test_helpers::test_db_pool, models::verification_request::VerificationRequest};
+    use db::{models::verification_request::VerificationRequest};
+    use macros::test_state;
     use newtypes::VerificationRequestId;
-
+    use db::tests::test_db_pool::TestDbPool;
     use crate::State;
     use super::build_idv_data_from_verification_request;
 
-    /// Helper to debug IdvData being built from verification request while testing bifrost flows
-    /// 
-    /// Place a breakpoint on the line indicated below to view the struct (can't println since we scrub prints)
-    #[ignore]
-    #[tokio::test]
-    async fn debug_build_idv_data_from_verification_request() {
-        let db_pool = test_db_pool();
-        let state = &State::test_state().await;
-        
-        let vr = db_pool.db_query(move |conn| {
-            VerificationRequest::get(conn, VerificationRequestId::from("your vreq here".to_string())).unwrap()
-        }).await.unwrap();
+    // Helper to debug IdvData being built from verification request while testing bifrost flows
+    // 
+    // Place a breakpoint on the line indicated below to view the struct (can't println since we scrub prints)
+    // #[ignore]
+    // Manually commented out since #[test_state] doesn't support #[ignore] currently 
+    // #[test_state]
+    // async fn debug_build_idv_data_from_verification_request(state: &mut State) {        
+    //     let vr = state.db_pool.db_query(move |conn| {
+    //         VerificationRequest::get(conn, VerificationRequestId::from("your vreq here".to_string())).unwrap()
+    //     }).await.unwrap();
 
 
-        let b = build_idv_data_from_verification_request(&db_pool, &state.enclave_client, vr).await.unwrap();
+    //     let b = build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client, vr).await.unwrap();
 
-        // place breakpoint on the line below this
-        assert!(b.first_name.is_none())
+    //     // place breakpoint on the line below this
+    //     assert!(b.first_name.is_none())
 
         
 
-    }
+    // }
 }
