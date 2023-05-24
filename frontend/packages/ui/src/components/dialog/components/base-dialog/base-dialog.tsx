@@ -113,7 +113,7 @@ const BaseDialog = ({
               </CloseContainer>
               <Typography variant="label-2">{title}</Typography>
             </Header>
-            <ScrollArea>{children}</ScrollArea>
+            <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
             {linkButton || primaryButton || secondaryButton ? (
               <Footer>
                 <Box>

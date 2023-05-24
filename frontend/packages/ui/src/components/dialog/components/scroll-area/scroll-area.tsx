@@ -3,11 +3,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener } from 'usehooks-ts';
 
+import { SXStyleProps, SXStyles, useSX } from '../../../../hooks';
+
 type ScrollAreaProps = {
   children: React.ReactNode;
+  sx?: SXStyleProps;
 };
 
-const ScrollArea = ({ children }: ScrollAreaProps) => {
+const ScrollArea = ({ children, sx }: ScrollAreaProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -28,6 +31,8 @@ const ScrollArea = ({ children }: ScrollAreaProps) => {
     setScrollTop(e.currentTarget.scrollTop);
   };
 
+  const sxStyles = useSX(sx);
+
   useEffect(() => {
     if (noOverflow) {
       setShowLine(false);
@@ -44,7 +49,7 @@ const ScrollArea = ({ children }: ScrollAreaProps) => {
       data-line={showLine}
       onScroll={handleScroll}
     >
-      <StyledViewport asChild ref={viewportRef}>
+      <StyledViewport sx={sxStyles} asChild ref={viewportRef}>
         {children}
       </StyledViewport>
       <ScrollAreaRadix.Scrollbar orientation="vertical">
@@ -69,11 +74,11 @@ const StyledRoot = styled(ScrollAreaRadix.Root)`
   `}
 `;
 
-const StyledViewport = styled(ScrollAreaRadix.Viewport)`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[7]};
+const StyledViewport = styled(ScrollAreaRadix.Viewport)<{ sx?: SXStyles }>`
+  ${({ sx }) => css`
     height: 100%;
     width: 100%;
+    ${sx}
   `}
 `;
 

@@ -8,6 +8,7 @@ import {
 } from 'usehooks-ts';
 
 import Button from '../../../../../button';
+import ScrollArea from '../../../../../dialog/components/scroll-area';
 import Typography from '../../../../../typography';
 
 export type PopoverProps = {
@@ -42,7 +43,9 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
         <Header id={headerId}>
           <Typography variant="label-3">{title}</Typography>
         </Header>
-        <Body id={bodyId}>{children}</Body>
+        <Body id={bodyId}>
+          <ScrollArea>{children}</ScrollArea>
+        </Body>
         <Footer>
           <Button onClick={onClose} size="small" variant="secondary">
             Cancel
@@ -84,7 +87,9 @@ const Header = styled.header`
 const Body = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[6]};
+    max-height: 50vh;
   `}
+  overflow: auto;
 `;
 
 const Footer = styled.footer`
