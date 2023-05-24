@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use super::tenant_vendor_control::TenantVendorControl;
 
-use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
+use super::vendor_trait::VendorAPIResponse;
 use super::*;
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
@@ -50,7 +50,7 @@ pub async fn send_idv_request(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     experian_client: VendorClient<
         ExperianCrossCoreRequest,
@@ -245,7 +245,7 @@ pub async fn send_socure_idv_request(
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if ff_client.flag(BoolFlag::DisableAllSocure) {
@@ -378,7 +378,7 @@ pub async fn make_idv_request(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     experian_client: VendorClient<
         ExperianCrossCoreRequest,
@@ -471,7 +471,7 @@ pub async fn make_vendor_requests(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     experian_client: VendorClient<
         ExperianCrossCoreRequest,

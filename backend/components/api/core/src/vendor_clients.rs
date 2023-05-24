@@ -36,18 +36,16 @@ pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;
 #[derive(Clone)]
 pub struct VendorClients {
     pub socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    pub twilio_lookup_v2:
-        Arc<dyn VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>>,
+    pub twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     pub experian_cross_core:
         VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>,
     pub middesk_create_business:
         VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>,
     pub middesk_get_business:
-        Arc<dyn VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>>,
+        VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
     pub idology_expect_id:
         VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
-    pub idology_pa:
-        Arc<dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>>,
+    pub idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
     pub incode_start_onboarding: VendorClient<
         IncodeStartOnboardingRequest,
         IncodeResponse<OnboardingStartResponse>,

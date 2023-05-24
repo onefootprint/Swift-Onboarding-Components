@@ -9,7 +9,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::utils::webhook_app::IntoWebhookApp;
 use crate::vendor_clients::VendorClient;
 use crate::{
-    decision::{self, vendor::vendor_trait::VendorAPICall},
+    decision::{self},
     enclave_client::EnclaveClient,
     task::{ExecuteTask, TaskError},
 };
@@ -47,8 +47,7 @@ pub(crate) struct WatchlistCheckTask {
     db_pool: DbPool,
     task_id: TaskId,
     enclave_client: EnclaveClient,
-    idology_client:
-        Arc<dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>>,
+    idology_client: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
     webhook_client: Arc<dyn WebhookClient>,
     config: Config,
 }

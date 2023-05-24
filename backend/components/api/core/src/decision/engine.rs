@@ -7,7 +7,6 @@ use super::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
         vendor_result::VendorResult,
-        vendor_trait::VendorAPICall,
         verification_result,
     },
     *,
@@ -57,7 +56,7 @@ pub async fn run(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     experian_client: VendorClient<
         ExperianCrossCoreRequest,
@@ -352,7 +351,7 @@ pub async fn make_vendor_requests(
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
     twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     experian_client: VendorClient<
         ExperianCrossCoreRequest,

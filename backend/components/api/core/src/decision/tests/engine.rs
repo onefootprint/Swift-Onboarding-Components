@@ -1,13 +1,14 @@
 use std::sync::Arc;
 
+use super::test_helpers::create_user_and_onboarding;
 use crate::decision::engine;
 use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::State;
+use db::tests::test_db_pool::TestDbPool;
 use db::{
     models::{onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
-    test_helpers::test_db_pool,
     DbError,
 };
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
@@ -15,38 +16,34 @@ use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
+use macros::test_state_case;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor};
-
-#[cfg(test)]
-use test_case::test_case;
-
-use super::test_helpers::create_user_and_onboarding;
 
 //
 // A smattering of e2e integration tests for Decision Engine :)
 //
-#[test_case(
+#[test_state_case(
     "result.match".to_string(),
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Pass,
     vec![FootprintReasonCode::EmailRecentlyVerified]
 )]
-#[test_case(
+#[test_state_case(
     "result.no.match".to_string(),
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Fail,
     vec![FootprintReasonCode::IdNotLocated, FootprintReasonCode::EmailRecentlyVerified]
 )]
-#[test_case(
+#[test_state_case(
     "result.match".to_string(),
     Some("resultcode.input.address.is.po.box".to_string()),
     SocureEnabled::Yes,
     DecisionStatus::Fail,
     vec![FootprintReasonCode::AddressInputIsPoBox]
 )]
-#[test_case(
+#[test_state_case(
     "result.match.restricted".to_string(),
     Some("resultcode.high.risk.email.recently.verified".to_string()),
     SocureEnabled::No,
@@ -55,6 +52,7 @@ use super::test_helpers::create_user_and_onboarding;
 )]
 #[tokio::test]
 async fn test_run(
+    state: &mut State,
     idology_result: String,
     idology_qualifier: Option<String>,
     socure_enabled: SocureEnabled,
@@ -64,15 +62,16 @@ async fn test_run(
     //
     // Setup
     //
-    let db_pool = test_db_pool();
-    let state = State::test_state().await;
-
-    let (tenant, onboarding, uv, _, _) =
-        create_user_and_onboarding(&db_pool, &state.enclave_client, None).await;
-    let tenant_vendor_control =
-        TenantVendorControl::new(tenant.id.clone(), &db_pool, &state.enclave_client, &state.config)
-            .await
-            .unwrap();
+    let (tenant, onboarding, _, _, _) =
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, None).await;
+    let tenant_vendor_control = TenantVendorControl::new(
+        tenant.id.clone(),
+        &state.db_pool,
+        &state.enclave_client,
+        &state.config,
+    )
+    .await
+    .unwrap();
 
     //
     // Mocking
@@ -140,21 +139,33 @@ async fn test_run(
             .return_once(|_| Ok(idv::tests::fixtures::socure::create_response()));
     }
 
-    let onboarding_id = onboarding.id.clone();
+    let mock_ff_client = Arc::new(mock_ff_client);
+    let mock_idology_api_call = Arc::new(mock_idology_api_call);
+    let mock_socure_api_call = Arc::new(mock_socure_api_call);
+    let mock_twilio_api_call = Arc::new(mock_twilio_api_call);
+    let mock_experian_api_call = Arc::new(mock_experian_api_call);
+
+    state.set_ff_client(mock_ff_client.clone());
+    state.set_idology_expect_id(mock_idology_api_call.clone());
+    state.set_socure_id_plus(mock_socure_api_call.clone());
+    state.set_twilio_lookup_v2(mock_twilio_api_call.clone());
+    state.set_experian_cross_core(mock_experian_api_call.clone());
+
     //
     // Function Under Test
     //
+    let onboarding_id = onboarding.id.clone();
 
     engine::run(
         onboarding,
-        &db_pool,
+        &state.db_pool,
         &state.enclave_client,
         is_production,
-        Arc::new(mock_ff_client),
-        Arc::new(mock_idology_api_call),
-        Arc::new(mock_socure_api_call),
-        Arc::new(mock_twilio_api_call),
-        Arc::new(mock_experian_api_call),
+        mock_ff_client,
+        mock_idology_api_call,
+        mock_socure_api_call,
+        mock_twilio_api_call,
+        mock_experian_api_call,
         tenant_vendor_control,
     )
     .await
@@ -163,7 +174,8 @@ async fn test_run(
     //
     // Assertions
     //
-    db_pool
+    state
+        .db_pool
         .db_transaction(move |conn| -> Result<(), DbError> {
             let onboarding_decisions = OnboardingDecision::list_by_onboarding_id(conn, &onboarding_id)
                 .expect("OnboardingDecision should be created");
@@ -182,7 +194,6 @@ async fn test_run(
                 .all(|r| rs_reason_codes.contains(r)));
             assert_eq!(vec![Vendor::Idology], risk_signals[0].vendors);
 
-            db::private_cleanup_integration_tests(conn, uv.id).unwrap();
             Ok(())
         })
         .await

@@ -443,7 +443,7 @@ impl State {
 mod test {
     use feature_flag::{BoolFlag, MockFeatureFlagClient};
     use idv::socure::SocureIDPlusRequest;
-    use macros::test_state;
+    use macros::{test_state, test_state_case};
     use newtypes::IdvData;
 
     use super::*;
@@ -496,5 +496,26 @@ mod test {
     pub async fn some_db_stuff(state: &State) {
         let tenants = state.db_pool.db_query(Tenant::list_live).await.unwrap().unwrap();
         println!("some_db_stuff, tenants: {:?}", tenants);
+    }
+
+    #[test_state_case(false => false; "false false yo")]
+    #[test_state_case(true => true; "true true yo")]
+    #[tokio::test]
+    async fn test_test_state_case(state: &mut State, flag_value: bool) -> bool {
+        // State Mocking
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+
+        mock_ff_client
+            .expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::DisableAllSocure)
+            .return_once(move |_| flag_value);
+
+        state.set_ff_client(Arc::new(mock_ff_client));
+
+        // Test
+        let flag_res = state.feature_flag_client.flag(BoolFlag::DisableAllSocure);
+        some_db_stuff(state).await; // just for good measure
+        flag_res
     }
 }

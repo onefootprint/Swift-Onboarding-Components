@@ -4,16 +4,13 @@ use crate::State;
 use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
-use macros::test_db_pool;
+use macros::test_state;
 use newtypes::{DecisionStatus, OnboardingStatus, PhoneNumber};
 use std::sync::Arc;
 use test_case::test_case;
 
-#[test_db_pool]
-async fn test_handle_setup(db_pool: TestDbPool) {
-    let state = &mut State::test_state().await;
-    state.set_db_pool((*db_pool).clone());
-
+#[test_state]
+async fn test_handle_setup(state: &mut State) {
     //
     // PROD
     //
@@ -37,8 +34,9 @@ async fn test_handle_setup(db_pool: TestDbPool) {
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .times(1)
         .return_once(|_| false);
+    state.set_ff_client(Arc::new(mock_ff_client));
 
-    let res = utils::get_fixture_data_decision(state, Arc::new(mock_ff_client), &sv.id, &tenant.id)
+    let res = utils::get_fixture_data_decision(state, state.feature_flag_client.clone(), &sv.id, &tenant.id)
         .await
         .unwrap();
     assert!(res.is_none()); // No fixture decision
@@ -67,8 +65,9 @@ async fn test_handle_setup(db_pool: TestDbPool) {
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .times(1)
         .return_once(|_| true);
+    state.set_ff_client(Arc::new(mock_ff_client));
 
-    let res = utils::get_fixture_data_decision(state, Arc::new(mock_ff_client), &sv.id, &tenant.id)
+    let res = utils::get_fixture_data_decision(state, state.feature_flag_client.clone(), &sv.id, &tenant.id)
         .await
         .unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
