@@ -1,11 +1,15 @@
 pub struct Authorize;
 pub struct MakeVendorCalls;
 pub struct MakeDecision;
-pub struct MakeAdverseMediaCall;
+pub struct MakeWatchlistCheckCall; // OFAC, PEP, Adverse Media
+pub struct ReviewCompleted;
+pub struct DocCollected;
 
 pub enum WorkflowActions {
     Authorize(Authorize),
     MakeVendorCalls(MakeVendorCalls),
     MakeDecision(MakeDecision),
-    MakeAdverseMediaCall(MakeAdverseMediaCall),
+    MakeWatchlistCheckCall(MakeWatchlistCheckCall),
+    ReviewCompleted(ReviewCompleted),
+    DocCollected(DocCollected),
 }

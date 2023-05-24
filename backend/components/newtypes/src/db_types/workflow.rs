@@ -149,9 +149,13 @@ impl From<KycState> for WorkflowState {
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum AlpacaKycState {
-    KycDecisioning,
-    AdverseMediaCall,
-    AlpacaCall,
+    DataCollection,
+    VendorCalls,
+    Decisioning,
+    WatchlistCheck,
+    PendingReview,
+    DocCollection,
+    Complete,
 }
 
 crate::util::impl_enum_str_diesel!(AlpacaKycState);

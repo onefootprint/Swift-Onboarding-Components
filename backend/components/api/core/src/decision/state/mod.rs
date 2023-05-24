@@ -134,10 +134,22 @@ impl WorkflowWrapper {
                 (_, _) => Err(StateError::UnexpectedActionForState.into()),
             },
             WorkflowStates::AlpacaKyc(s) => match (s, action) {
-                (alpaca_kyc::States::KycDecisioning(s), WorkflowActions::MakeDecision(a)) => {
+                (alpaca_kyc::States::DataCollection(s), WorkflowActions::Authorize(a)) => {
                     Self::do_action(state, s, a, self.workflow_id).await
                 }
-                (alpaca_kyc::States::AdverseMediaCall(s), WorkflowActions::MakeAdverseMediaCall(a)) => {
+                (alpaca_kyc::States::VendorCalls(s), WorkflowActions::MakeVendorCalls(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (alpaca_kyc::States::Decisioning(s), WorkflowActions::MakeDecision(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (alpaca_kyc::States::WatchlistCheck(s), WorkflowActions::MakeWatchlistCheckCall(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (alpaca_kyc::States::PendingReview(s), WorkflowActions::ReviewCompleted(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (alpaca_kyc::States::DocCollection(s), WorkflowActions::DocCollected(a)) => {
                     Self::do_action(state, s, a, self.workflow_id).await
                 }
                 (_, _) => Err(StateError::UnexpectedActionForState.into()),
