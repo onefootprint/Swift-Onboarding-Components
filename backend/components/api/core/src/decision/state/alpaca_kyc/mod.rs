@@ -1,6 +1,9 @@
 pub mod states;
 
-use super::{HasStateName, StateError, WorkflowActions, WorkflowStates};
+use super::{
+    actions::{MakeAdverseMediaCall, MakeDecision},
+    HasStateName, StateError, WorkflowActions, WorkflowStates,
+};
 use crate::{errors::ApiResult, State};
 use db::models::workflow::Workflow;
 
@@ -26,24 +29,6 @@ impl From<States> for WorkflowStates {
     }
 }
 
-///
-/// Actions
-///
-
-pub struct MakeKycDecision;
-pub struct MakeAdverseMediaCall;
-
-pub enum Actions {
-    MakeKycDecision(MakeKycDecision),
-    MakeAdverseMediaCall(MakeAdverseMediaCall),
-}
-
-impl From<Actions> for WorkflowActions {
-    fn from(value: Actions) -> Self {
-        WorkflowActions::AlpacaKyc(value)
-    }
-}
-
 impl States {
     pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::AlpacaKyc(s) = workflow.state else {
@@ -60,10 +45,10 @@ impl States {
         }
     }
 
-    pub fn default_action(&self) -> Option<Actions> {
+    pub fn default_action(&self) -> Option<WorkflowActions> {
         match self {
-            States::KycDecisioning(_) => Some(Actions::MakeKycDecision(MakeKycDecision)),
-            States::AdverseMediaCall(_) => Some(Actions::MakeAdverseMediaCall(MakeAdverseMediaCall)),
+            States::KycDecisioning(_) => Some(WorkflowActions::MakeDecision(MakeDecision)),
+            States::AdverseMediaCall(_) => Some(WorkflowActions::MakeAdverseMediaCall(MakeAdverseMediaCall)),
             States::AlpacaCall(_) => None,
         }
     }
@@ -100,18 +85,6 @@ impl HasStateName for AdverseMediaCall {
 impl HasStateName for AlpacaCall {
     fn state_name(&self) -> newtypes::WorkflowState {
         newtypes::AlpacaKycState::AlpacaCall.into()
-    }
-}
-
-impl From<MakeKycDecision> for Actions {
-    fn from(value: MakeKycDecision) -> Self {
-        Actions::MakeKycDecision(value)
-    }
-}
-
-impl From<MakeAdverseMediaCall> for Actions {
-    fn from(value: MakeAdverseMediaCall) -> Self {
-        Actions::MakeAdverseMediaCall(value)
     }
 }
 

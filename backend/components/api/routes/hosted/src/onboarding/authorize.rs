@@ -11,8 +11,7 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::user::UserObSession;
-use api_core::decision::state::kyc;
-use api_core::decision::state::WorkflowActions;
+use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::EmptyResponse;
@@ -28,6 +27,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
+use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -76,9 +76,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
 
     if let Ok(wf) = user_auth.workflow() {
         let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-        let ww = ww
-            .run(&state, WorkflowActions::from(kyc::Actions::from(kyc::Authorize)))
-            .await?;
+        let ww = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
 
         tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran state machine");
         return ResponseData::ok(EmptyResponse {}).json();

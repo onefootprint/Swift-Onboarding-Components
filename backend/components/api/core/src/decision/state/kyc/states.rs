@@ -7,12 +7,10 @@ use db::models::{
 };
 use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
 
-use super::{
-    Authorize, Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls,
-};
+use super::{Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-    state::WorkflowStates,
+    state::{actions::Authorize, WorkflowStates},
 };
 use crate::{
     decision::{

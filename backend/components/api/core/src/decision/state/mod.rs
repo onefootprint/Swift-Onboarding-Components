@@ -5,6 +5,10 @@ use thiserror::Error;
 
 use crate::{errors::ApiResult, State};
 
+use self::actions::WorkflowActions;
+
+pub mod actions;
+pub use actions::*;
 pub mod alpaca_kyc;
 pub mod kyc;
 
@@ -54,15 +58,10 @@ impl WorkflowStates {
     // that singular outgoing action. And progress in that fashion until we get to a state that is either (1) terminal or (2) requires awaiting
     pub fn default_action(&self) -> Option<WorkflowActions> {
         match self {
-            WorkflowStates::Kyc(v) => v.default_action().map(|x| x.into()),
-            WorkflowStates::AlpacaKyc(v) => v.default_action().map(|x| x.into()),
+            WorkflowStates::Kyc(v) => v.default_action(),
+            WorkflowStates::AlpacaKyc(v) => v.default_action(),
         }
     }
-}
-
-pub enum WorkflowActions {
-    Kyc(kyc::Actions),
-    AlpacaKyc(alpaca_kyc::Actions),
 }
 
 impl From<&WorkflowStates> for newtypes::WorkflowState {
@@ -120,30 +119,30 @@ impl WorkflowWrapper {
 
     pub async fn action(self, state: &State, action: WorkflowActions) -> ApiResult<WorkflowWrapper> {
         let wf_id = self.workflow_id.clone();
-        let new_state = match (self.state, action) {
+        let new_state = match self.state {
             // (WorkflowStates::Kyc(s), WorklowActions::Kyc(a)) => Ok(s.action(state, a).await?.into()),
-            (WorkflowStates::Kyc(s), WorkflowActions::Kyc(a)) => match (s, a) {
-                (kyc::States::DataCollection(s), kyc::Actions::Authorize(a)) => {
+            WorkflowStates::Kyc(s) => match (s, action) {
+                (kyc::States::DataCollection(s), WorkflowActions::Authorize(a)) => {
                     Self::do_action(state, s, a, self.workflow_id).await
                 }
-                (kyc::States::VendorCalls(s), kyc::Actions::MakeVendorCalls(a)) => {
+                (kyc::States::VendorCalls(s), WorkflowActions::MakeVendorCalls(a)) => {
                     Self::do_action(state, s, a, self.workflow_id).await
                 }
-                (kyc::States::Decisioning(s), kyc::Actions::MakeDecision(a)) => {
-                    Self::do_action(state, s, a, self.workflow_id).await
-                }
-                (_, _) => Err(StateError::UnexpectedActionForState.into()),
-            },
-            (WorkflowStates::AlpacaKyc(s), WorkflowActions::AlpacaKyc(a)) => match (s, a) {
-                (alpaca_kyc::States::KycDecisioning(s), alpaca_kyc::Actions::MakeKycDecision(a)) => {
-                    Self::do_action(state, s, a, self.workflow_id).await
-                }
-                (alpaca_kyc::States::AdverseMediaCall(s), alpaca_kyc::Actions::MakeAdverseMediaCall(a)) => {
+                (kyc::States::Decisioning(s), WorkflowActions::MakeDecision(a)) => {
                     Self::do_action(state, s, a, self.workflow_id).await
                 }
                 (_, _) => Err(StateError::UnexpectedActionForState.into()),
             },
-            (_, _) => Err(StateError::UnexpectedActionForState.into()),
+            WorkflowStates::AlpacaKyc(s) => match (s, action) {
+                (alpaca_kyc::States::KycDecisioning(s), WorkflowActions::MakeDecision(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (alpaca_kyc::States::AdverseMediaCall(s), WorkflowActions::MakeAdverseMediaCall(a)) => {
+                    Self::do_action(state, s, a, self.workflow_id).await
+                }
+                (_, _) => Err(StateError::UnexpectedActionForState.into()),
+            },
+            (_) => Err(StateError::UnexpectedActionForState.into()),
         }?;
         Ok(WorkflowWrapper {
             state: new_state,

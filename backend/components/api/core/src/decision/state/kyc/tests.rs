@@ -1,5 +1,4 @@
-use std::sync::Arc;
-
+use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowStates;
 use crate::decision::state::WorkflowWrapper;
@@ -23,6 +22,7 @@ use macros::test_state;
 use newtypes::KycConfig;
 use newtypes::WorkflowConfig;
 use newtypes::{KycState, WorkflowId, WorkflowState};
+use std::sync::Arc;
 
 async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
     let (_, _, _, sv, _) =
@@ -71,7 +71,7 @@ async fn valid_action(state: &mut State) {
     ));
 
     let ww = ww
-        .action(state, WorkflowActions::from(kyc::Actions::from(kyc::Authorize)))
+        .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
     assert!(matches!(
@@ -94,10 +94,7 @@ async fn invalid_action(state: &mut State) {
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     let _e = ww
-        .action(
-            state,
-            WorkflowActions::from(kyc::Actions::from(kyc::MakeVendorCalls)),
-        )
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .err()
         .unwrap();
@@ -146,7 +143,7 @@ async fn authorize(state: &mut State) {
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     let ww = ww
-        .action(state, WorkflowActions::from(kyc::Actions::from(kyc::Authorize)))
+        .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
     assert!(matches!(

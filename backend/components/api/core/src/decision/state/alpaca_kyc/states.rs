@@ -2,12 +2,15 @@ use async_trait::async_trait;
 use db::models::workflow::Workflow;
 
 use crate::{
-    decision::state::{OnAction, WorkflowStates},
+    decision::state::{
+        actions::{MakeAdverseMediaCall, MakeDecision},
+        OnAction, WorkflowStates,
+    },
     errors::ApiResult,
     State,
 };
 
-use super::{AdverseMediaCall, AlpacaCall, KycDecisioning, MakeAdverseMediaCall, MakeKycDecision, States};
+use super::{AdverseMediaCall, AlpacaCall, KycDecisioning, States};
 
 /////////////////////
 /// KycDecisioning
@@ -19,12 +22,12 @@ impl KycDecisioning {
 }
 
 #[async_trait]
-impl OnAction<MakeKycDecision> for KycDecisioning {
+impl OnAction<MakeDecision> for KycDecisioning {
     type AsyncRes = ();
 
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeKycDecision,
+        _action: MakeDecision,
         _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok(())
