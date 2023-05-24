@@ -11,27 +11,27 @@ pub use std::borrow::Cow;
 pub use telemetry::TelemetrySpanBuilder;
 pub use tracing_actix_web::TracingLogger;
 
-pub mod config;
-pub mod fingerprinter;
-pub mod metrics;
-pub mod prometheus;
-pub mod telemetry;
-
 pub mod auth;
+pub mod config;
 pub mod decision;
 pub mod enclave_client;
 pub mod errors;
+pub mod fingerprinter;
+pub mod metrics;
+pub mod prometheus;
 pub mod proxy;
 pub mod s3;
 pub mod serializers;
 pub mod state;
 pub mod task;
+pub mod telemetry;
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests;
 pub mod types;
 pub mod utils;
+pub mod vendor_clients;
 
 pub use crate::errors::ApiError;
 pub use paperclip::actix::{web, OpenApiExt};

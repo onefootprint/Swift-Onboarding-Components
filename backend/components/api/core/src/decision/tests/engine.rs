@@ -151,10 +151,10 @@ async fn test_run(
         &state.enclave_client,
         is_production,
         Arc::new(mock_ff_client),
-        &mock_idology_api_call,
-        &mock_socure_api_call,
-        &mock_twilio_api_call,
-        &mock_experian_api_call,
+        Arc::new(mock_idology_api_call),
+        Arc::new(mock_socure_api_call),
+        Arc::new(mock_twilio_api_call),
+        Arc::new(mock_experian_api_call),
         tenant_vendor_control,
     )
     .await

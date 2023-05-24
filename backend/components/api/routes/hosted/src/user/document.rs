@@ -323,7 +323,7 @@ async fn handle_incode_request(
     .await?; // TODO: handle this with better requirement checking
 
     machine
-        .run(&state.db_pool, &state.footprint_vendor_http_client)
+        .run(&state.db_pool, &state.fp_client)
         .await
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 

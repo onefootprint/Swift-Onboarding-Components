@@ -7,6 +7,7 @@ use crate::{
     fingerprinter::AwsHmacClient,
     s3,
     utils::{email::SendgridClient, twilio::TwilioClient},
+    vendor_clients::VendorClients,
     GIT_HASH,
 };
 use crypto::aead::ScopedSealingKey;
@@ -18,6 +19,34 @@ use idv::{
 };
 
 use workos::{ApiKey, WorkOs};
+
+#[cfg(test)]
+use crate::vendor_clients::VendorClient;
+#[cfg(test)]
+use idv::{
+    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
+    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    incode::{
+        doc::{
+            response::{
+                AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
+                FetchScoresResponse, ProcessIdResponse,
+            },
+            IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
+            IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
+            IncodeFetchScoresRequest, IncodeProcessIdRequest,
+        },
+        response::OnboardingStartResponse,
+        watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
+        IncodeResponse, IncodeStartOnboardingRequest,
+    },
+    middesk::{
+        MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, MiddeskGetBusinessRequest,
+        MiddeskGetBusinessResponse,
+    },
+    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
+    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+};
 
 #[derive(Clone)]
 pub struct State {
@@ -32,18 +61,14 @@ pub struct State {
     pub session_sealing_key: ScopedSealingKey,
     pub idology_client: IdologyClient,
     pub s3_client: s3::S3Client,
-    #[allow(unused)]
-    pub socure_sandbox_client: SocureClient,
-    #[allow(unused)]
-    pub socure_production_client: SocureClient,
     pub feature_flag_client: Arc<dyn FeatureFlagClient>,
     pub feature_flag_client_raw: LaunchDarklyFeatureFlagClient, // hack for now cause JsonFlag isn't working on the trait
     pub webhook_service_client: webhooks::WebhookServiceClient,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
     pub fingerprintjs_client: FingerprintJSClient,
-    pub middesk_client: MiddeskClient,
-    pub footprint_vendor_http_client: FootprintVendorHttpClient,
+    pub vendor_clients: VendorClients,
+    pub fp_client: FootprintVendorHttpClient, // hack for now until Incode state machine removes dependency from this
 }
 impl State {
     /// initialize global state in test context
@@ -64,6 +89,9 @@ impl State {
 
         let mut s = Self::init_or_die(config).await;
         s.set_ff_client(Arc::new(mock_ff_client));
+
+        s.set_vendor_clients(VendorClients::new_with_mocks());
+
         s
     }
 
@@ -114,9 +142,6 @@ impl State {
             config.idology_config.password.clone().into(),
         )
         .expect("failed to build idology client");
-
-        let socure_sandbox_client = SocureClient::new(config.socure_config.sandbox_api_key.clone(), true)
-            .expect("failed to build socure sandbox client");
 
         let socure_production_client =
             SocureClient::new(config.socure_config.production_api_key.clone(), false)
@@ -178,6 +203,13 @@ impl State {
             )
         };
 
+        let vendor_clients = VendorClients::new(
+            socure_production_client,
+            twilio_client.clone(),
+            footprint_vendor_http_client.clone(),
+            middesk_client,
+        );
+
         State {
             config,
             enclave_client,
@@ -190,15 +222,13 @@ impl State {
             session_sealing_key,
             idology_client,
             s3_client,
-            socure_sandbox_client,
-            socure_production_client,
             feature_flag_client: Arc::new(feature_flag_client.clone()),
             feature_flag_client_raw: feature_flag_client,
             webhook_service_client,
             billing_client,
             fingerprintjs_client,
-            middesk_client,
-            footprint_vendor_http_client,
+            vendor_clients,
+            fp_client: footprint_vendor_http_client,
         }
     }
 
@@ -211,5 +241,254 @@ impl State {
     #[cfg(test)]
     pub fn set_ff_client(&mut self, ff_client: Arc<dyn FeatureFlagClient>) {
         self.feature_flag_client = ff_client;
+    }
+
+    #[cfg(test)]
+    pub fn set_vendor_clients(&mut self, vendor_clients: VendorClients) {
+        self.vendor_clients = vendor_clients;
+    }
+
+    #[cfg(test)]
+    pub fn set_socure_id_plus(
+        &mut self,
+        socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    ) {
+        self.vendor_clients.socure_id_plus = socure_id_plus;
+    }
+
+    #[cfg(test)]
+    pub fn set_twilio_lookup_v2(
+        &mut self,
+        twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    ) {
+        self.vendor_clients.twilio_lookup_v2 = twilio_lookup_v2;
+    }
+
+    #[cfg(test)]
+    pub fn set_experian_cross_core(
+        &mut self,
+        experian_cross_core: VendorClient<
+            ExperianCrossCoreRequest,
+            ExperianCrossCoreResponse,
+            idv::experian::error::Error,
+        >,
+    ) {
+        self.vendor_clients.experian_cross_core = experian_cross_core;
+    }
+
+    #[cfg(test)]
+    pub fn set_middesk_create_business(
+        &mut self,
+        middesk_create_business: VendorClient<
+            MiddeskCreateBusinessRequest,
+            MiddeskCreateBusinessResponse,
+            idv::middesk::Error,
+        >,
+    ) {
+        self.vendor_clients.middesk_create_business = middesk_create_business;
+    }
+
+    #[cfg(test)]
+    pub fn set_middesk_get_business(
+        &mut self,
+        middesk_get_business: VendorClient<
+            MiddeskGetBusinessRequest,
+            MiddeskGetBusinessResponse,
+            idv::middesk::Error,
+        >,
+    ) {
+        self.vendor_clients.middesk_get_business = middesk_get_business;
+    }
+
+    #[cfg(test)]
+    pub fn set_idology_expect_id(
+        &mut self,
+        idology_expect_id: VendorClient<
+            IdologyExpectIDRequest,
+            IdologyExpectIDAPIResponse,
+            idv::idology::error::Error,
+        >,
+    ) {
+        self.vendor_clients.idology_expect_id = idology_expect_id;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_start_onboarding(
+        &mut self,
+        incode_start_onboarding: VendorClient<
+            IncodeStartOnboardingRequest,
+            IncodeResponse<OnboardingStartResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_start_onboarding = incode_start_onboarding;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_add_front(
+        &mut self,
+        incode_add_front: VendorClient<
+            IncodeAddFrontRequest,
+            IncodeResponse<AddSideResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_add_front = incode_add_front;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_add_back(
+        &mut self,
+        incode_add_back: VendorClient<
+            IncodeAddBackRequest,
+            IncodeResponse<AddSideResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_add_back = incode_add_back;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_process_id(
+        &mut self,
+        incode_process_id: VendorClient<
+            IncodeProcessIdRequest,
+            IncodeResponse<ProcessIdResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_process_id = incode_process_id;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_fetch_scores(
+        &mut self,
+        incode_fetch_scores: VendorClient<
+            IncodeFetchScoresRequest,
+            IncodeResponse<FetchScoresResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_fetch_scores = incode_fetch_scores;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_add_privacy_consent(
+        &mut self,
+        incode_add_privacy_consent: VendorClient<
+            IncodeAddPrivacyConsentRequest,
+            IncodeResponse<AddConsentResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_add_privacy_consent = incode_add_privacy_consent;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_add_ml_consent(
+        &mut self,
+        incode_add_ml_consent: VendorClient<
+            IncodeAddMLConsentRequest,
+            IncodeResponse<AddConsentResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_add_ml_consent = incode_add_ml_consent;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_fetch_ocr(
+        &mut self,
+        incode_fetch_ocr: VendorClient<
+            IncodeFetchOCRRequest,
+            IncodeResponse<FetchOCRResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_fetch_ocr = incode_fetch_ocr;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_add_selfie(
+        &mut self,
+        incode_add_selfie: VendorClient<
+            IncodeAddSelfieRequest,
+            IncodeResponse<AddSelfieResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_add_selfie = incode_add_selfie;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_watchlist_check(
+        &mut self,
+        incode_watchlist_check: VendorClient<
+            IncodeWatchlistCheckRequest,
+            IncodeResponse<WatchlistResultResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode_watchlist_check = incode_watchlist_check;
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use feature_flag::{BoolFlag, MockFeatureFlagClient};
+    use idv::socure::SocureIDPlusRequest;
+    use macros::test_state;
+    use newtypes::IdvData;
+
+    use super::*;
+    use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+    use db::{models::tenant::Tenant, tests::test_db_pool::TestDbPool};
+
+    #[test_state]
+    async fn test_test_state(state: &mut State) {
+        // State Mocking
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+
+        mock_ff_client
+            .expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::DisableAllSocure)
+            .return_once(|_| true);
+
+        state.set_ff_client(Arc::new(mock_ff_client));
+
+        let mut mock_socure_api_call =
+            MockVendorAPICall::<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>::new();
+
+        mock_socure_api_call
+            .expect_make_request()
+            .times(1)
+            .return_once(|_| Ok(idv::tests::fixtures::socure::create_response()));
+
+        state.set_socure_id_plus(Arc::new(mock_socure_api_call));
+
+        // Test
+        let flag_res = state.feature_flag_client.flag(BoolFlag::DisableAllSocure);
+
+        let socure_res = state
+            .vendor_clients
+            .socure_id_plus
+            .make_request(SocureIDPlusRequest {
+                idv_data: IdvData::default(),
+                socure_device_session_id: None,
+                ip_address: None,
+            })
+            .await
+            .unwrap();
+
+        some_db_stuff(state).await;
+
+        println!("flag_res: {:?}", flag_res);
+        println!("socure_res.parsed_response: {:?}", socure_res.parsed_response);
+    }
+
+    pub async fn some_db_stuff(state: &State) {
+        let tenants = state.db_pool.db_query(Tenant::list_live).await.unwrap().unwrap();
+        println!("some_db_stuff, tenants: {:?}", tenants);
     }
 }

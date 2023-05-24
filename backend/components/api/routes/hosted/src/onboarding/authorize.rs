@@ -144,7 +144,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             let kyb_res = decision::vendor::middesk::run_kyb(
                 &state.db_pool,
                 &state.enclave_client,
-                &state.middesk_client,
+                state.vendor_clients.middesk_create_business.clone(),
                 state.feature_flag_client.clone(),
                 biz_ob.id,
             )
@@ -279,10 +279,10 @@ async fn run_kyc(
             &state.enclave_client,
             state.config.service_config.is_production(),
             state.feature_flag_client.clone(),
-            &state.footprint_vendor_http_client,
-            &state.socure_production_client,
-            &state.twilio_client.client,
-            &state.footprint_vendor_http_client,
+            state.vendor_clients.idology_expect_id.clone(),
+            state.vendor_clients.socure_id_plus.clone(),
+            state.vendor_clients.twilio_lookup_v2.clone(),
+            state.vendor_clients.experian_cross_core.clone(),
             tenant_vendor_control,
         )
         .await?;

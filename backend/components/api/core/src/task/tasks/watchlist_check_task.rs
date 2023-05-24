@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::config::Config;
 use crate::decision::vendor;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
@@ -5,6 +7,7 @@ use crate::decision::vendor::vendor_trait::VendorAPIResponse;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::utils::webhook_app::IntoWebhookApp;
+use crate::vendor_clients::VendorClient;
 use crate::{
     decision::{self, vendor::vendor_trait::VendorAPICall},
     enclave_client::EnclaveClient,
@@ -44,9 +47,8 @@ pub(crate) struct WatchlistCheckTask {
     db_pool: DbPool,
     task_id: TaskId,
     enclave_client: EnclaveClient,
-    idology_client: Box<
-        dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error> + Send + Sync,
-    >,
+    idology_client:
+        Arc<dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>>,
     webhook_client: Box<dyn WebhookClient + Send + Sync>,
     config: Config,
 }
@@ -56,11 +58,7 @@ impl WatchlistCheckTask {
         db_pool: DbPool,
         task_id: TaskId,
         enclave_client: EnclaveClient,
-        idology_client: Box<
-            dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>
-                + Send
-                + Sync,
-        >,
+        idology_client: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
         webhook_client: Box<dyn WebhookClient + Send + Sync>,
         config: Config,
     ) -> Self {
@@ -280,11 +278,7 @@ impl WatchlistCheckTask {
     async fn make_vendor_call(
         db_pool: &DbPool,
         enclave_client: &EnclaveClient,
-        idology_client: &Box<
-            dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>
-                + Send
-                + Sync,
-        >,
+        idology_client: &VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
         vreq: &VerificationRequest,
         sv_id: &ScopedVaultId,
         tenant_id: &TenantId,

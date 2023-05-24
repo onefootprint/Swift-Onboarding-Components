@@ -1,7 +1,7 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
-use api_core::*;
+use api_core::{config::Config, *};
 mod custom_migrations;
 
 #[actix_web::main]
@@ -52,7 +52,7 @@ async fn run_server() -> std::io::Result<()> {
 
     // only perform Socure Reason Code API check on prod startups
     if config.service_config.is_production() {
-        socure_reason_code_check(&state.socure_production_client).await;
+        socure_reason_code_check(&state.config).await;
     }
 
     log::info!("starting server on port {}", config.port);
@@ -121,10 +121,14 @@ async fn default_not_found() -> impl actix_web::Responder {
     ApiError::EndpointNotFound.error_response()
 }
 
-#[tracing::instrument]
-async fn socure_reason_code_check(socure_client: &SocureClient) {
+#[allow(clippy::expect_used)]
+#[tracing::instrument(skip(config))]
+async fn socure_reason_code_check(config: &Config) {
+    let socure_client = SocureClient::new(config.socure_config.production_api_key.clone(), false)
+        .expect("failed to build socure certification client");
+
     tracing::info!("[Socure Reason Code check] Beginning check");
-    match query_socure_reason_code_endpoint_and_compare_against_enum(socure_client).await {
+    match query_socure_reason_code_endpoint_and_compare_against_enum(&socure_client).await {
         Ok(reason_code_discrepancies) => {
             if reason_code_discrepancies.missing_reason_codes.is_empty()
                 && reason_code_discrepancies

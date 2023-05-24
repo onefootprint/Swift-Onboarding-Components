@@ -107,10 +107,10 @@ async fn make_vendor_calls(
         state.config.service_config.is_production(),
         requests,
         state.feature_flag_client.clone(),
-        &state.footprint_vendor_http_client,
-        &state.socure_production_client,
-        &state.twilio_client.client,
-        &state.footprint_vendor_http_client,
+        state.vendor_clients.idology_expect_id.clone(),
+        state.vendor_clients.socure_id_plus.clone(),
+        state.vendor_clients.twilio_lookup_v2.clone(),
+        state.vendor_clients.experian_cross_core.clone(),
         tenant_vendor_control,
     )
     .await?;
@@ -279,10 +279,10 @@ async fn shadow_run(
         state.config.service_config.is_production(),
         requests,
         state.feature_flag_client.clone(),
-        &state.footprint_vendor_http_client,
-        &state.socure_production_client,
-        &state.twilio_client.client,
-        &state.footprint_vendor_http_client,
+        state.vendor_clients.idology_expect_id.clone(),
+        state.vendor_clients.socure_id_plus.clone(),
+        state.vendor_clients.twilio_lookup_v2.clone(),
+        state.vendor_clients.experian_cross_core.clone(),
         tenant_vendor_control,
     )
     .await?;

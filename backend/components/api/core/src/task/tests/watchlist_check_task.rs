@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::config::Config;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::enclave_client::EnclaveClient;
@@ -381,7 +383,7 @@ async fn run_task(
         db_pool.clone(),
         task_id.clone(),
         enclave_client,
-        Box::new(mock_pa_client),
+        Arc::new(mock_pa_client),
         Box::new(mock_webhook_client),
         config,
     );

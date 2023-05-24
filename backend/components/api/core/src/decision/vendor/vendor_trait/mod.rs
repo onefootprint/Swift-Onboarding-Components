@@ -22,11 +22,11 @@ pub trait VendorAPIResponse {
 // A trait representing a VendorAPICall
 #[cfg_attr(test, automock)]
 #[async_trait]
-pub trait VendorAPICall<T, U, E>
+pub trait VendorAPICall<T, U, E>: Send + Sync
 where
     T: Send + Sync + Sized,
-    U: VendorAPIResponse + Sync,
-    E: Sync,
+    U: VendorAPIResponse + Send + Sync,
+    E: Send + Sync,
 {
     async fn make_request(&self, request_data: T) -> Result<U, E>;
 }

@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
+use super::vendor_trait::VendorAPIResponse;
 use super::*;
 
 use crate::decision;
@@ -10,6 +10,7 @@ use crate::enclave_client::EnclaveClient;
 
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
+use crate::vendor_clients::VendorClient;
 
 use db::models::decision_intent::DecisionIntent;
 use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
@@ -195,7 +196,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         db_pool: &DbPool,
         enclave_client: &EnclaveClient,
         ff_client: Arc<dyn FeatureFlagClient>,
-        middesk_client: &impl VendorAPICall<
+        middesk_client: VendorClient<
             MiddeskCreateBusinessRequest,
             MiddeskCreateBusinessResponse,
             idv::middesk::Error,
@@ -402,7 +403,7 @@ impl MiddeskState<PendingGetBusinessCall> {
     pub async fn make_get_business_call(
         self,
         db_pool: &DbPool,
-        middesk_client: &impl VendorAPICall<
+        middesk_client: VendorClient<
             MiddeskGetBusinessRequest,
             MiddeskGetBusinessResponse,
             idv::middesk::Error,
@@ -504,7 +505,7 @@ impl MiddeskState<Complete> {
 pub async fn run_kyb(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
-    middesk_client: &impl VendorAPICall<
+    middesk_client: VendorClient<
         MiddeskCreateBusinessRequest,
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,
@@ -565,11 +566,7 @@ pub async fn init_middesk_request(
 pub async fn handle_middesk_webhook(
     db_pool: &DbPool,
     ff_client: Arc<dyn FeatureFlagClient>,
-    middesk_client: &impl VendorAPICall<
-        MiddeskGetBusinessRequest,
-        MiddeskGetBusinessResponse,
-        idv::middesk::Error,
-    >,
+    middesk_client: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
     enclave_client: &EnclaveClient,
     res: serde_json::Value,
 ) -> Result<(), ApiError> {
@@ -608,7 +605,7 @@ pub async fn handle_middesk_webhook(
 
 async fn send_middesk_call(
     business_data: BusinessData,
-    middesk_client: &impl VendorAPICall<
+    middesk_client: VendorClient<
         MiddeskCreateBusinessRequest,
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,

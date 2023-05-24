@@ -16,6 +16,7 @@ use crate::{
     enclave_client::EnclaveClient,
     errors::{ApiError, ApiResult},
     metrics,
+    vendor_clients::VendorClient,
 };
 use db::{
     models::{
@@ -51,14 +52,14 @@ pub async fn run(
     enclave_client: &EnclaveClient,
     is_production: bool,
     ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: &impl VendorAPICall<
+    idology_client: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: &impl VendorAPICall<
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
@@ -346,14 +347,14 @@ pub async fn make_vendor_requests(
     is_production: bool,
     requests: Vec<VerificationRequest>,
     ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: &impl VendorAPICall<
+    idology_client: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: &impl VendorAPICall<
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,

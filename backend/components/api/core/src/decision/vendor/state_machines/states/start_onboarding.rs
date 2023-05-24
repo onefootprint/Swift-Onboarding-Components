@@ -3,7 +3,6 @@ use super::{
     SaveVerificationResultArgs,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use crate::State;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
@@ -38,7 +37,11 @@ impl StartOnboarding {
             session_id: None,
             custom_name_fields: Some(custom_name_fields),
         };
-        let res = state.footprint_vendor_http_client.make_request(request).await;
+        let res = state
+            .vendor_clients
+            .incode_start_onboarding
+            .make_request(request)
+            .await;
 
         //
         // Save our result

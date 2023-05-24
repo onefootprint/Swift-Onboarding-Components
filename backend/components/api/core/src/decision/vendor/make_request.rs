@@ -7,6 +7,7 @@ use super::vendor_trait::{VendorAPICall, VendorAPIResponse};
 use super::*;
 use crate::enclave_client::EnclaveClient;
 use crate::metrics;
+use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
 use db::DbPool;
 use db::{
@@ -44,14 +45,14 @@ pub async fn send_idv_request(
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
     ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: &impl VendorAPICall<
+    idology_client: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: &impl VendorAPICall<
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
@@ -70,7 +71,7 @@ pub async fn send_idv_request(
             )
             .await
         }
-        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client).await,
+        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client.clone()).await,
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(
                 idv_data,
@@ -144,13 +145,10 @@ pub async fn send_docv_request(
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn send_twilio_lookupv2_request<T>(
+pub async fn send_twilio_lookupv2_request(
     idv_data: IdvData,
-    twilio_api_call: &T,
-) -> Result<VendorResponse, idv::Error>
-where
-    T: VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-{
+    twilio_api_call: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+) -> Result<VendorResponse, idv::Error> {
     twilio_api_call
         .make_request(TwilioLookupV2Request { idv_data })
         .await
@@ -171,7 +169,7 @@ pub async fn send_idology_idv_request(
     request: IdologyExpectIDRequest,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
-    idology_api_call: &impl VendorAPICall<
+    idology_api_call: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
@@ -247,7 +245,7 @@ pub async fn send_socure_idv_request(
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if ff_client.flag(BoolFlag::DisableAllSocure) {
@@ -294,7 +292,7 @@ pub async fn send_experian_idv_request(
     request: ExperianCrossCoreRequest,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
-    experian_api_call: &impl VendorAPICall<
+    experian_api_call: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
@@ -375,14 +373,14 @@ pub async fn make_idv_request(
     ob_configuration_key: ObConfigurationKey,
     is_production: bool,
     ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: &impl VendorAPICall<
+    idology_client: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: &impl VendorAPICall<
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
@@ -468,14 +466,14 @@ pub async fn make_vendor_requests(
     enclave_client: &EnclaveClient,
     is_production: bool,
     ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: &impl VendorAPICall<
+    idology_client: VendorClient<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
         idv::idology::error::Error,
     >,
-    socure_client: &impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: &impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: &impl VendorAPICall<
+    socure_client: Arc<dyn VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>>,
+    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+    experian_client: VendorClient<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
         idv::experian::error::Error,
@@ -519,10 +517,10 @@ pub async fn make_vendor_requests(
                 ob_configuration_key.clone(),
                 is_production,
                 ff_client.clone(),
-                idology_client,
-                socure_client,
-                twilio_client,
-                experian_client,
+                idology_client.clone(),
+                socure_client.clone(),
+                twilio_client.clone(),
+                experian_client.clone(),
                 &tenant_vendor_control,
             ),
         )
@@ -618,7 +616,7 @@ mod tests {
             tvc.build_idology_request(IdvData::default()),
             is_production,
             ob_configuration_key,
-            &mock_api,
+            Arc::new(mock_api),
             Arc::new(mock_ff_client),
         )
         .await
