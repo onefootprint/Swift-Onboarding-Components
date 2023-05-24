@@ -39,6 +39,7 @@ export enum IdDI {
   state = 'id.state',
   country = 'id.country',
   zip = 'id.zip',
+  nationality = 'id.nationality',
 }
 
 export enum DocumentDI {

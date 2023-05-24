@@ -14,6 +14,7 @@ export type KycData = Partial<{
   [IdDI.country]: DataValue;
   [IdDI.zip]: DataValue;
   [IdDI.phoneNumber]: DataValue;
+  [IdDI.nationality]: DataValue;
 }>;
 
 export type DataValue = {

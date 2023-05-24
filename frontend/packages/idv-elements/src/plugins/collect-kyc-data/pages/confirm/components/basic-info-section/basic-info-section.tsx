@@ -1,11 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
-import { IdDI } from '@onefootprint/types';
+import { IdDI, isCountryCode } from '@onefootprint/types';
 import React from 'react';
 
 import { Section } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
+import getInitialCountry from '../../../../utils/get-initial-country';
 
 type BasicInfoSectionProps = {
   onEdit: () => void;
@@ -39,6 +40,17 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     basicInfo.push({
       text: t('basic-info.dob'),
       subtext: dob,
+    });
+  }
+
+  const countryVal = data[IdDI.nationality]?.value;
+  const defaultCountry =
+    countryVal && isCountryCode(countryVal) ? countryVal : undefined;
+  const nationality = getInitialCountry(defaultCountry).label;
+  if (nationality) {
+    basicInfo.push({
+      text: t('basic-info.nationality'),
+      subtext: nationality,
     });
   }
 

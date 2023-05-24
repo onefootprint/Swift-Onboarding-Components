@@ -37,6 +37,10 @@
           "label": "Date of Birth",
           "placeholder": "MM/DD/YYYY",
           "error": "Date of birth cannot be empty or is invalid"
+        },
+        "nationality": {
+          "label": "Nationality",
+          "placeholder": "Select nationality"
         }
       }
     },
@@ -133,7 +137,8 @@
         "title": "Basic data",
         "first-name": "First name",
         "last-name": "Last name",
-        "dob": "Date of birth"
+        "dob": "Date of birth",
+        "nationality": "Nationality"
       },
       "address": {
         "title": "Address"

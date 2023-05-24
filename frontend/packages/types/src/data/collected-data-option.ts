@@ -30,6 +30,7 @@ export enum CollectedKycDataOption {
   partialAddress = 'partial_address',
   email = 'email',
   phoneNumber = 'phone_number',
+  nationality = 'nationality',
 }
 
 export enum CollectedDocumentDataOption {
@@ -60,6 +61,7 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   full_address: CollectedKycDataOption.fullAddress,
   partial_address: CollectedKycDataOption.partialAddress,
   phone_number: CollectedKycDataOption.phoneNumber,
+  nationality: CollectedKycDataOption.nationality,
   document: CollectedDocumentDataOption.document,
   document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
   business_name: CollectedKybDataOption.name,
@@ -113,4 +115,5 @@ export const CollectedKycDataOptionToRequiredAttributes: Record<
   [CollectedKycDataOption.partialAddress]: [IdDI.zip, IdDI.country],
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
+  [CollectedKycDataOption.nationality]: [IdDI.nationality],
 };

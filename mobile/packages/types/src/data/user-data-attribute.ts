@@ -13,6 +13,7 @@ enum UserDataAttribute {
   state = 'state',
   country = 'country',
   zip = 'zip',
+  nationality = 'nationality',
 }
 
 export default UserDataAttribute;

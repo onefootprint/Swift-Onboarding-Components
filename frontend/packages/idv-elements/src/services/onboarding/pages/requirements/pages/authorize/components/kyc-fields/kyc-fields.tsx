@@ -6,6 +6,7 @@ import {
   IcoDollar24,
   IcoEmail24,
   IcoFileText24,
+  IcoFlag24,
   IcoIdCard24,
   Icon,
   IcoPassport24,
@@ -35,6 +36,7 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.dob]: IcoCake24,
   [CollectedKycDataOption.fullAddress]: IcoBuilding24,
   [CollectedKycDataOption.partialAddress]: IcoBuilding24,
+  [CollectedKycDataOption.nationality]: IcoFlag24,
 };
 
 const IconByIdDocType: Record<IdDocType, Icon> = {
@@ -65,6 +67,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [CollectedKycDataOption.dob]: t('data-labels.dob'),
     [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
     [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
+    [CollectedKycDataOption.nationality]: t('data-labels.nationality'),
   };
   const docTypeLabels: Record<IdDocType, string> = {
     [IdDocType.idCard]: t('data-labels.id-card'),

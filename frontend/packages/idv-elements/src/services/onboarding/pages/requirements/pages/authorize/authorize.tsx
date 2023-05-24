@@ -52,6 +52,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     | CollectedDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[];
+
   const kybData = canAccessData.filter(data =>
     isKybCdo(data),
   ) as CollectedKybDataOption[];

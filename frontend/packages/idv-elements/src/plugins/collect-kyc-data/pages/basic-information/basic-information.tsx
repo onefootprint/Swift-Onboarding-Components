@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  isCountryCode,
+} from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -10,8 +14,10 @@ import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import allAttributes from '../../utils/all-attributes/all-attributes';
+import getInitialCountry from '../../utils/get-initial-country';
 import DobField from './components/dob-field';
 import NameFields from './components/name-fields';
+import NationalityField from './components/nationality-field';
 import useConvertFormData from './hooks/use-convert-form-data';
 import { FormData } from './types';
 
@@ -33,16 +39,26 @@ const BasicInformation = ({
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);
+  const requiresNationality = attributes.includes(
+    CollectedKycDataOption.nationality,
+  );
   const convertFormData = useConvertFormData();
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
+  const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
+  const nationalityValue = data?.[IdDI.nationality]?.value;
+  const defaultNationality =
+    nationalityValue && isCountryCode(nationalityValue)
+      ? nationalityValue
+      : undefined;
 
   const methods = useForm<FormData>({
     defaultValues: {
       firstName: data[IdDI.firstName]?.value,
       lastName: data[IdDI.lastName]?.value,
       dob: data[IdDI.dob]?.value,
+      nationality: getInitialCountry(defaultNationality),
     },
   });
 
@@ -82,6 +98,9 @@ const BasicInformation = ({
             />
           )}
           {requiresDob && <DobField disabled={isDobDisabled} />}
+          {requiresNationality && (
+            <NationalityField disabled={isNationalityDisabled} />
+          )}
           <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
         </Form>
       </FormProvider>

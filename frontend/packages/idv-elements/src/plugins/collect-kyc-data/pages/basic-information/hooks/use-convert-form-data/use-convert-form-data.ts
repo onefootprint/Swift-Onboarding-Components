@@ -11,13 +11,17 @@ const useConvertFormData = () => {
   const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
   const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
+  const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);
+  const requiresNationality = attributes.includes(
+    CollectedKycDataOption.nationality,
+  );
 
   return (formData: FormData) => {
     const convertedData: KycData = {};
-    const { firstName, lastName, dob } = formData;
+    const { firstName, lastName, dob, nationality } = formData;
 
     if (requiresName && firstName && !isFirstNameDisabled) {
       convertedData[IdDI.firstName] = {
@@ -34,6 +38,12 @@ const useConvertFormData = () => {
     if (requiresDob && dob && !isDobDisabled) {
       convertedData[IdDI.dob] = {
         value: dob,
+      };
+    }
+
+    if (requiresNationality && nationality && !isNationalityDisabled) {
+      convertedData[IdDI.nationality] = {
+        value: nationality.value,
       };
     }
 

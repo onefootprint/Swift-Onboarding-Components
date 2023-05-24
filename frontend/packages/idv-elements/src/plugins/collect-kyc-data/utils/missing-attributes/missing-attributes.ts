@@ -10,6 +10,7 @@ import { KycData } from '../data-types';
 const BASIC_ATTRIBUTES = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
+  CollectedKycDataOption.nationality,
 ];
 
 // The list of CollectedKycDataOption that may be input on the residential screen

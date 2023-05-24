@@ -48,6 +48,7 @@
         "dob": "Date of birth",
         "address-full": "Address",
         "address-partial": "Country & Zip Code",
+        "nationality": "Nationality",
         "id-card": "ID Card",
         "passport": "Passport",
         "driversLicense": "Driver's License",

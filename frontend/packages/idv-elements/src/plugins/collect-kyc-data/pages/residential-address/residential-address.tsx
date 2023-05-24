@@ -15,6 +15,7 @@ import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import allAttributes from '../../utils/all-attributes/all-attributes';
+import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
 import CityField from './components/city-field';
 import CountryField from './components/country-field';
@@ -22,7 +23,6 @@ import StateField from './components/state-field';
 import ZipField from './components/zip-field';
 import useConvertFormData from './hooks/use-convert-form-data';
 import { FormData } from './types';
-import getInitialCountry from './utils/get-initial-country';
 import getInitialState from './utils/get-initial-state';
 
 type ResidentialAddressProps = {
