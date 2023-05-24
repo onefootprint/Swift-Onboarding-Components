@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-
+use async_trait::async_trait;
 use events::WebhookEvent;
 use mockall::automock;
 use newtypes::{TenantId, WebhookServiceId};
+use std::fmt::Debug;
 use svix::api::{AppPortalAccessIn, ApplicationIn, MessageIn, PostOptions, Svix};
 pub mod events;
 
@@ -108,29 +108,9 @@ impl WebhookServiceClient {
             .await?;
         Ok(())
     }
-
-    /// Get the portal URL to edit webhooks
-    #[tracing::instrument(skip(self))]
-    pub async fn portal_url_for_tenant(&self, tenant: WebhookApp) -> Result<PortalResponse, Error> {
-        let app_id = self.get_or_create_for_tenant(&tenant).await?;
-        let client = self.client();
-        let out = client
-            .authentication()
-            .app_portal_access(
-                app_id.to_string(),
-                AppPortalAccessIn { feature_flags: None },
-                None,
-            )
-            .await?;
-
-        Ok(PortalResponse {
-            app_id,
-            url: out.url,
-            token: out.token,
-        })
-    }
 }
 
+#[async_trait]
 impl WebhookClient for WebhookServiceClient {
     /// Send a webhook event to tenant if it's been configured
     /// Note this spawns a task so it wont block
@@ -152,6 +132,27 @@ impl WebhookClient for WebhookServiceClient {
                 });
         });
     }
+
+    /// Get the portal URL to edit webhooks
+    #[tracing::instrument(skip(self))]
+    async fn portal_url_for_tenant(&self, tenant: WebhookApp) -> Result<PortalResponse, Error> {
+        let app_id = self.get_or_create_for_tenant(&tenant).await?;
+        let client = self.client();
+        let out = client
+            .authentication()
+            .app_portal_access(
+                app_id.to_string(),
+                AppPortalAccessIn { feature_flags: None },
+                None,
+            )
+            .await?;
+
+        Ok(PortalResponse {
+            app_id,
+            url: out.url,
+            token: out.token,
+        })
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -162,11 +163,14 @@ pub struct PortalResponse {
 }
 
 #[automock]
-pub trait WebhookClient {
+#[async_trait]
+pub trait WebhookClient: Send + Sync {
     fn send_event_to_tenant_non_blocking(
         &self,
         tenant: WebhookApp,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     );
+
+    async fn portal_url_for_tenant(&self, tenant: WebhookApp) -> Result<PortalResponse, Error>;
 }

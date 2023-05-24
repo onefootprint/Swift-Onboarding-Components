@@ -49,7 +49,7 @@ pub(crate) struct WatchlistCheckTask {
     enclave_client: EnclaveClient,
     idology_client:
         Arc<dyn VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>>,
-    webhook_client: Box<dyn WebhookClient + Send + Sync>,
+    webhook_client: Arc<dyn WebhookClient>,
     config: Config,
 }
 
@@ -59,7 +59,7 @@ impl WatchlistCheckTask {
         task_id: TaskId,
         enclave_client: EnclaveClient,
         idology_client: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-        webhook_client: Box<dyn WebhookClient + Send + Sync>,
+        webhook_client: Arc<dyn WebhookClient>,
         config: Config,
     ) -> Self {
         Self {

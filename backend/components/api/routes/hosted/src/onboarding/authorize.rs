@@ -33,7 +33,6 @@ use newtypes::OnboardingStatus;
 use paperclip::actix::{self, api_v2_operation, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
-use webhooks::WebhookClient;
 
 #[api_v2_operation(
     tags(Hosted, Bifrost),
@@ -182,7 +181,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             requires_manual_review: manual_review.is_some(),
         });
 
-        state.webhook_service_client.send_event_to_tenant_non_blocking(
+        state.webhook_client.send_event_to_tenant_non_blocking(
             WebhookApp {
                 id: su.tenant_id.clone(),
                 is_live: su.is_live,

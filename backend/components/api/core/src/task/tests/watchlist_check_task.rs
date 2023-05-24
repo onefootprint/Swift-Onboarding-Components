@@ -384,7 +384,7 @@ async fn run_task(
         task_id.clone(),
         enclave_client,
         Arc::new(mock_pa_client),
-        Box::new(mock_webhook_client),
+        Arc::new(mock_webhook_client),
         config,
     );
     let args = WatchlistCheckArgs {

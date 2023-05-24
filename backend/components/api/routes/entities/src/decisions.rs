@@ -18,7 +18,6 @@ use newtypes::DbActor;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 use webhooks::events::WebhookEvent;
-use webhooks::WebhookClient;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
@@ -98,7 +97,7 @@ pub async fn post(
 
     // notify any webhook listeners of the change
     if let Some((decision, scoped_vault)) = decision {
-        state.webhook_service_client.send_event_to_tenant_non_blocking(
+        state.webhook_client.send_event_to_tenant_non_blocking(
             scoped_vault.webhook_app(),
             WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
                 fp_id: fp_id_clone.clone(),

@@ -24,7 +24,7 @@ async fn get(
     let is_live = auth.is_live()?;
 
     let PortalResponse { app_id, url, token } = state
-        .webhook_service_client
+        .webhook_client
         .portal_url_for_tenant(WebhookApp {
             id: auth.tenant().id.clone(),
             is_live,

@@ -11,6 +11,7 @@ doctest = false
 [dependencies]
 svix = "0.78.0"
 serde = { workspace = true }
+async-trait = "0.1"
 serde_json = { workspace = true }
 derive_more = { workspace = true }
 paperclip = { workspace = true }

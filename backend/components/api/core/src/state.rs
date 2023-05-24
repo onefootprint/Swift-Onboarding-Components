@@ -18,6 +18,7 @@ use idv::{
     idology::client::IdologyClient, middesk::client::MiddeskClient, socure::client::SocureClient,
 };
 
+use webhooks::WebhookClient;
 use workos::{ApiKey, WorkOs};
 
 #[cfg(test)]
@@ -59,11 +60,11 @@ pub struct State {
     pub enclave_client: EnclaveClient,
     pub challenge_sealing_key: ScopedSealingKey,
     pub session_sealing_key: ScopedSealingKey,
-    pub idology_client: IdologyClient,
+    pub idology_client: IdologyClient, // TOOD: remove, only used for now unused idology endpoints
     pub s3_client: s3::S3Client,
     pub feature_flag_client: Arc<dyn FeatureFlagClient>,
     pub feature_flag_client_raw: LaunchDarklyFeatureFlagClient, // hack for now cause JsonFlag isn't working on the trait
-    pub webhook_service_client: webhooks::WebhookServiceClient,
+    pub webhook_client: Arc<dyn WebhookClient>,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
     pub fingerprintjs_client: FingerprintJSClient,
@@ -76,6 +77,7 @@ impl State {
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
         use feature_flag::MockFeatureFlagClient;
+        use webhooks::MockWebhookClient;
 
         use crate::utils::mock_enclave::MockEnclave;
         let mut config = Config::load_from_env().expect("failed to load config");
@@ -85,10 +87,9 @@ impl State {
         let enclave_client = EnclaveClient::new(config.clone()).await;
         let _ = enclave_client.pong().await.expect("failed to ping");
 
-        let mock_ff_client = MockFeatureFlagClient::new();
-
         let mut s = Self::init_or_die(config).await;
-        s.set_ff_client(Arc::new(mock_ff_client));
+        s.set_ff_client(Arc::new(MockFeatureFlagClient::new()));
+        s.set_webhook_client(Arc::new(MockWebhookClient::new()));
 
         s.set_vendor_clients(VendorClients::new_with_mocks());
 
@@ -224,7 +225,7 @@ impl State {
             s3_client,
             feature_flag_client: Arc::new(feature_flag_client.clone()),
             feature_flag_client_raw: feature_flag_client,
-            webhook_service_client,
+            webhook_client: Arc::new(webhook_service_client),
             billing_client,
             fingerprintjs_client,
             vendor_clients,
@@ -241,6 +242,11 @@ impl State {
     #[cfg(test)]
     pub fn set_ff_client(&mut self, ff_client: Arc<dyn FeatureFlagClient>) {
         self.feature_flag_client = ff_client;
+    }
+
+    #[cfg(test)]
+    pub fn set_webhook_client(&mut self, webhook_client: Arc<dyn WebhookClient>) {
+        self.webhook_client = webhook_client;
     }
 
     #[cfg(test)]
