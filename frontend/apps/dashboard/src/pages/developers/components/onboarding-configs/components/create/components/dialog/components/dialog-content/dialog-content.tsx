@@ -6,7 +6,6 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
 
 import useCreateOnboardingConfig from '../../../../hooks/use-create-onboarding-config';
 import KybAccess from '../../../../pages/kyb-access';
@@ -21,7 +20,6 @@ import getOnboardingConfigFromContext from '../../../../utils/get-onboarding-con
 import { useOnboardingConfigMachine } from '../../../machine-provider';
 
 type DialogContentProps = {
-  hideKyb?: boolean;
   onClose: () => void;
   onCreate: () => void;
 };
@@ -29,14 +27,14 @@ type DialogContentProps = {
 // We should never need this fallback name but it's here for typecheck safety
 const DEFAULT_ONBOARDING_CONFIG_NAME = 'Unnamed Onboarding Config';
 
-const DialogContent = ({ hideKyb, onClose, onCreate }: DialogContentProps) => {
+const DialogContent = ({ onClose, onCreate }: DialogContentProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create',
   );
   const mutation = useCreateOnboardingConfig();
   const [state, send] = useOnboardingConfigMachine();
   const { name, type } = state.context;
-  const isFirstStep = hideKyb ? state.matches('name') : state.matches('type');
+  const isFirstStep = state.matches('type');
   const isFinalStep =
     (type === 'kyb' && state.matches('kybAccess')) ||
     (type === 'kyc' && state.matches('kycAccess'));
@@ -44,17 +42,6 @@ const DialogContent = ({ hideKyb, onClose, onCreate }: DialogContentProps) => {
   const confirmationDialog = useConfirmationDialog();
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
-
-  useEffectOnce(() => {
-    if (hideKyb) {
-      send({
-        type: 'typeSubmitted',
-        payload: {
-          type: 'kyc',
-        },
-      });
-    }
-  });
 
   const confirmBeforeClosing = () => {
     confirmationDialog.open({
