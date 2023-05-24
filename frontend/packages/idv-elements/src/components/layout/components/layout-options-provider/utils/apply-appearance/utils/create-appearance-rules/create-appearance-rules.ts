@@ -1,12 +1,68 @@
+import { FootprintAppearanceRules } from '@onefootprint/footprint-js';
+
 import footprintClassNamesMap from './constants/footprint-class-names-map';
 import rulesWhitelist from './constants/rules-whitelist';
 
-const createAppearanceRules = (rules: string) => {
-  const parsedRules = getParsedValue(rules);
-  if (!parsedRules) return null;
-  const filteredRules = filterNonWhitelistRules(parsedRules);
+// if fixContainerSizeAndPosition provided, the following CSS rules and
+// selectors are blacklisted to preserve the original layout
+const BLACKLISTED_CONTAINER_SIZE_SELECTORS = new Set([
+  'height',
+  'minHeight',
+  'maxHeight',
+  'width',
+  'minWidth',
+  'maxWidth',
+  'top',
+  'bottom',
+  'left',
+  'right',
+  'position',
+  'margin',
+  'overflow',
+]);
+
+const BLACKLISTED_CONTAINER_POSITION_RULES: Record<string, string[]> = {
+  margin: ['auto', 'unset', 'inherit'],
+  display: ['none'],
+};
+
+const createAppearanceRules = (
+  rules: FootprintAppearanceRules,
+  fixContainerSizeAndPosition?: boolean,
+) => {
+  let filteredRules = rules;
+  if (fixContainerSizeAndPosition) {
+    filteredRules = filterContainerSizeRules(rules);
+  }
+  filteredRules = filterNonWhitelistRules(filteredRules);
   const styles = createStylesFromRules(filteredRules);
   return styles;
+};
+
+const filterContainerSizeRules = (rules: FootprintAppearanceRules) => {
+  const containerRules = rules.container;
+  if (!containerRules) {
+    return rules;
+  }
+
+  const withoutContainerSize = Object.entries(containerRules).filter(
+    ([key, value]) => {
+      if (BLACKLISTED_CONTAINER_SIZE_SELECTORS.has(key)) {
+        return false;
+      }
+      if (key in BLACKLISTED_CONTAINER_POSITION_RULES) {
+        const blackListedValues = BLACKLISTED_CONTAINER_POSITION_RULES[key];
+        return !blackListedValues.includes(value);
+      }
+      return true;
+    },
+  );
+  const fileredContainerRules = Object.fromEntries(withoutContainerSize);
+
+  return {
+    ...rules,
+    container: fileredContainerRules,
+  };
 };
 
 export const filterNonWhitelistRules = (
@@ -66,18 +122,6 @@ export const createStylesFromRules = (rules: Record<string, any>) => {
     styles = `${styles}${fpSelector}{${css}} `;
   });
   return styles.trim();
-};
-
-export const getParsedValue = (params: string) => {
-  try {
-    const parsedParams = JSON.parse(decodeURIComponent(params));
-    return parsedParams;
-  } catch (_) {
-    console.warn(
-      `Could not parse appearance appearance rules. They will be ignored`,
-    );
-    return null;
-  }
 };
 
 export default createAppearanceRules;

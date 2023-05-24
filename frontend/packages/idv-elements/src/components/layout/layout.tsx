@@ -12,14 +12,14 @@ import SandboxBanner, {
   SandboxBannerHandler,
 } from './components/sandbox-banner';
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from './constants';
-import { LayoutOptions } from './types';
+import { Options } from './types';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
 const SHIMMER_HEIGHT = '296px';
 
 type LayoutProps = {
   children: React.ReactNode;
-  options?: LayoutOptions;
+  options?: Options;
   appearance?: Record<string, any>;
   tenantPk?: string;
   isSandbox?: boolean;

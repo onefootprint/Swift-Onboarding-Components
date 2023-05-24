@@ -2,30 +2,38 @@ import { FootprintAppearance } from '@onefootprint/footprint-js';
 import constate from 'constate';
 import { useEffect, useState } from 'react';
 
-import type { LayoutOptions } from '../../types';
+import type { Options } from '../../types';
 import applyAppearance from './utils/apply-appearance';
 
-type LayoutOptionsParams = {
+type LayoutOptionsArgs = {
+  options?: Options;
   appearance?: FootprintAppearance;
   onClose?: () => void;
-  options: LayoutOptions;
 };
 
-const useLocalLayoutOptions = ({
-  appearance: initialAppearance = {},
-  onClose,
-  options,
-}: LayoutOptionsParams) => {
-  const [appearance, setAppearance] =
-    useState<FootprintAppearance>(initialAppearance);
+const useLocalLayoutOptions = (args: LayoutOptionsArgs) => {
+  const { options, onClose, appearance: defaultAppearance } = args;
+  const fixContainerSize = options?.fixContainerSize;
+  const [appearance, setAppearance] = useState<FootprintAppearance | undefined>(
+    args.appearance || {},
+  );
 
   useEffect(() => {
-    applyAppearance(appearance);
-  }, [appearance]);
+    if (defaultAppearance) {
+      setAppearance(defaultAppearance);
+    }
+  }, [defaultAppearance]);
 
-  return { appearance, setAppearance, onClose, options };
+  useEffect(() => {
+    applyAppearance(appearance, fixContainerSize);
+  }, [appearance, fixContainerSize, args]);
+
+  return {
+    appearance,
+    options,
+    onClose,
+  };
 };
-
 const [LayoutOptionsProvider, useLayoutOptions] = constate(
   useLocalLayoutOptions,
 );

@@ -1,5 +1,6 @@
-export type LayoutOptions = {
+export type Options = {
   hideDesktopSandboxBanner?: boolean;
   hideDesktopFooter?: boolean;
   hasDesktopBorderRadius?: boolean;
+  fixContainerSize?: boolean;
 };

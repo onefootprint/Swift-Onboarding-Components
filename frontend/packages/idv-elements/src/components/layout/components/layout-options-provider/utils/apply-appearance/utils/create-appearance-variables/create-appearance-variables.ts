@@ -1,10 +1,10 @@
+import { FootprintAppearanceVariables } from '@onefootprint/footprint-js';
+
 import variablesMap from './constants/variables-map';
 
-export const generateAppearanceVariables = (variables: string) => {
-  const parsedVariables = getParsedValue(variables);
-  if (!parsedVariables) return null;
-  return generateStyles(parsedVariables);
-};
+export const generateAppearanceVariables = (
+  variables: FootprintAppearanceVariables,
+) => generateStyles(variables);
 
 const addStyleRow = (options: {
   styles: string;
@@ -56,16 +56,6 @@ const generateStyles = (variables: Record<string, any>) => {
       iterateOverVariables({ styles, variables, tokenName, tokenValue }),
     initialValue,
   );
-};
-
-export const getParsedValue = (params: string) => {
-  try {
-    const parsedParams = JSON.parse(decodeURIComponent(params));
-    return parsedParams;
-  } catch (_) {
-    console.warn(`Could not parse appearance variables. They will be ignored`);
-    return null;
-  }
 };
 
 export default generateAppearanceVariables;
