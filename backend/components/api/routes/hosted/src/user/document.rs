@@ -25,7 +25,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId, IncodeConfigurationId,
+    DecisionIntentId, DocumentRequestId, DocumentSide, IdentityDocumentId, IncodeConfigurationId,
     SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web};
@@ -136,14 +136,12 @@ pub async fn post(
             // Check if all documents are uploaded before proceeding
             // In the future, we'll proceed until the state machine reaches the end
             let existing_sides = id_doc.images(conn)?.into_iter().map(|u| u.side).collect_vec();
-            let required_sides = match id_doc.document_type {
-                IdDocKind::DriverLicense => vec![DocumentSide::Front, DocumentSide::Back],
-                IdDocKind::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
-                IdDocKind::Passport => vec![DocumentSide::Front],
-            }
-            .into_iter()
-            .chain(doc_request.should_collect_selfie.then_some(DocumentSide::Selfie))
-            .collect_vec();
+            let required_sides = id_doc
+                .document_type
+                .sides()
+                .into_iter()
+                .chain(doc_request.should_collect_selfie.then_some(DocumentSide::Selfie))
+                .collect_vec();
             let has_all_required_images = required_sides.into_iter().all(|s| existing_sides.contains(&s));
             let result = if has_all_required_images {
                 // Mark the document request as Uploaded
@@ -153,7 +151,6 @@ pub async fn post(
                 if should_initiate_reqs {
                     // Initiate IDV reqs once and only once for this id_doc
                     let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                                                               // TODO i think we rm this
                     let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
                     Some((decision_intent, doc_request.into_inner(), id_doc.id))
                 } else {

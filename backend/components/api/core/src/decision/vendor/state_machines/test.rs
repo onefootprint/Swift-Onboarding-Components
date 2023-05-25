@@ -65,9 +65,9 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     // Run the incode verification machine
     //
     let docv_data = DocVData {
-        front_image: Some(PiiString::from(small_image())),
+        front_image: Some(PiiString::from(small_front_image())),
         back_image: None, // only upload one document at a time
-        document_type: Some(IdDocKind::Passport),
+        document_type: Some(IdDocKind::DriverLicense),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
         ..Default::default()
@@ -107,7 +107,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     // Now, simulate uploading the back and continuing
     //
     let mut ctx = machine.ctx;
-    ctx.docv_data.back_image = Some(PiiString::from(small_image()));
+    ctx.docv_data.back_image = Some(PiiString::from(small_back_image()));
     let machine = IncodeStateMachine::init(&state, tenant.id, config_id, ctx)
         .await
         .unwrap();
@@ -154,9 +154,9 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 .collect();
             let expected_states = vec![
                 Some(IncodeVerificationSessionState::StartOnboarding),
-                is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
                 Some(IncodeVerificationSessionState::AddFront),
                 Some(IncodeVerificationSessionState::AddBack),
+                is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::FetchScores),
                 Some(IncodeVerificationSessionState::FetchOCR),
@@ -286,8 +286,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     // Now, simulate retrying with non-blurry
     //
     let mut ctx = machine.ctx;
-    ctx.docv_data.front_image = Some(PiiString::from(small_image()));
-    ctx.docv_data.back_image = Some(PiiString::from(small_image()));
+    ctx.docv_data.front_image = Some(PiiString::from(small_front_image()));
     let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
@@ -305,25 +304,26 @@ async fn test_fail(state: &State, is_selfie: bool) {
             assert!(session.latest_failure_reason.is_none());
 
             let incode_events = IncodeVerificationSessionEvent::get_for_session_id(conn, &session.id)?;
-            let incode_events = incode_events
+            let states = incode_events
                 .into_iter()
                 .map(|i| i.incode_verification_session_state)
                 .collect();
-            let expected_events = vec![
-                IncodeVerificationSessionState::StartOnboarding,
-                IncodeVerificationSessionState::AddConsent,
-                IncodeVerificationSessionState::AddFront,
-                IncodeVerificationSessionState::AddFront,
-                IncodeVerificationSessionState::AddBack,
-                IncodeVerificationSessionState::ProcessId,
-                IncodeVerificationSessionState::FetchScores,
-                IncodeVerificationSessionState::FetchOCR,
-                IncodeVerificationSessionState::Complete,
+
+            let expected_states = vec![
+                Some(IncodeVerificationSessionState::StartOnboarding),
+                Some(IncodeVerificationSessionState::AddFront),
+                Some(IncodeVerificationSessionState::AddFront), // Repeated since we failed the first time
+                // Passport has no back
+                is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
+                Some(IncodeVerificationSessionState::ProcessId),
+                Some(IncodeVerificationSessionState::FetchScores),
+                Some(IncodeVerificationSessionState::FetchOCR),
+                Some(IncodeVerificationSessionState::Complete),
             ]
             .into_iter()
-            .filter(|s| is_selfie || !(s == &IncodeVerificationSessionState::AddConsent))
+            .flatten()
             .collect();
-            assert_have_same_elements(incode_events, expected_events);
+            assert_have_same_elements(states, expected_states);
 
             // Check score res
             let (_, score_vres) = VerificationRequest::list_by_decision_intent(conn, &di.id)?

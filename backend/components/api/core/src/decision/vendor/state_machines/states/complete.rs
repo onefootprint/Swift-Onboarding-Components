@@ -132,6 +132,7 @@ impl IncodeStateTransition for Complete {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
+        _: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         Err(ApiError::AssertionError("Incode machine already complete".into()))
     }

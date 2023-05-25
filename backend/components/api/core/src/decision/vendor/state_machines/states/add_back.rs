@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition, ProcessId,
+    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
@@ -53,13 +53,7 @@ impl IncodeStateTransition for AddBack {
             .map_err(map_to_api_err)?;
 
         // Incode returns 200 for upload failures, so catch these here
-        let failure_reason = response.add_side_failure_reason().and_then(|r| {
-            if r != IncodeFailureReason::WrongOneSidedDocument {
-                Some(r)
-            } else {
-                None
-            }
-        });
+        let failure_reason = response.add_side_failure_reason();
 
         Ok(Some(Self { failure_reason }))
     }
@@ -68,12 +62,13 @@ impl IncodeStateTransition for AddBack {
         self,
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         let next_state = if let Some(reason) = self.failure_reason {
             super::on_upload_fail(conn, ctx, vec![DocumentSide::Back])?;
             (Self::new(), Some(reason))
         } else {
-            let next_state = ProcessId::new();
+            let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
             (next_state, None)
         };
 

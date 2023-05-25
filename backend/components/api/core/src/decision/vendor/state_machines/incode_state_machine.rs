@@ -120,6 +120,7 @@ impl IncodeStateMachine {
                 .ok_or(AssertionError("missing token"))?;
             VerificationSession {
                 id: session.id,
+                kind: session.kind,
                 credentials: IncodeCredentialsWithToken {
                     credentials: tenant_vendor_control.incode_credentials(),
                     authentication_token: token.into(),

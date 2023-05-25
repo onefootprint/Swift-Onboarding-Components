@@ -95,15 +95,20 @@ pub enum IncodeFailureReason {
 #[diesel(sql_type = Text)]
 pub enum IncodeVerificationSessionKind {
     IdDocument,
+    // TODO: Should this be something like IdDocAndSelfie?
     Selfie,
 }
 
 impl IncodeVerificationSessionKind {
-    pub fn requires_consent(&self) -> bool {
+    pub fn requires_selfie(&self) -> bool {
         match self {
             IncodeVerificationSessionKind::IdDocument => false,
             IncodeVerificationSessionKind::Selfie => true,
         }
+    }
+
+    pub fn requires_consent(&self) -> bool {
+        self.requires_selfie()
     }
 }
 

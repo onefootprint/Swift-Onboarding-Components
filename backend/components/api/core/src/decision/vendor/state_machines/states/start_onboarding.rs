@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, AddFront, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, AddFront, IncodeStateTransition,
     SaveVerificationResultArgs,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
@@ -57,12 +57,7 @@ impl StartOnboarding {
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                // We only need to add consent if the session is of kind=Selfie
-                let next_state = if incode_session.kind.requires_consent() {
-                    AddConsent::new()
-                } else {
-                    AddFront::new()
-                };
+                let next_state = AddFront::new();
 
                 // Update our state to the next stage, saving the auth token needed for all other
                 // states

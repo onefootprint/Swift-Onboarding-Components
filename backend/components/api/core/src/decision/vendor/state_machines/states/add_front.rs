@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddBack, IncodeState, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
@@ -68,15 +68,14 @@ impl IncodeStateTransition for AddFront {
         self,
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
+        session: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         // If there's failure, we move to retry upload
         let result = if let Some(reason) = self.failure_reason {
             super::on_upload_fail(conn, ctx, vec![DocumentSide::Front])?;
             (Self::new(), Some(reason))
         } else {
-            // TODO skip AddBack depending on what is required for the doc type
-            // Add an ::enter that will decide given the context if we need to do add back
-            let next_state = AddBack::new();
+            let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
             (next_state, None)
         };
 

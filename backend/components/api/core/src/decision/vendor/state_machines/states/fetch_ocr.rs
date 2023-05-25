@@ -51,6 +51,7 @@ impl IncodeStateTransition for FetchOCR {
         self,
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
+        _: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         let result = match self.response.document_kind() {
             Ok(dk) => {

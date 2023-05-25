@@ -1,7 +1,9 @@
 mod start_onboarding;
+
 use db::models::document_upload::DocumentUpload;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
+use itertools::Itertools;
 pub use start_onboarding::*;
 
 mod add_consent;
@@ -28,6 +30,7 @@ pub use complete::*;
 use super::incode_state_machine::IncodeContext;
 use super::state::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
+use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::verification_result::VerificationResult;
@@ -35,13 +38,14 @@ use db::{DbPool, TxnPgConn};
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId, PiiJsonValue, ScrubbedJsonValue,
-    VendorAPI,
+    DocVData, DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId,
+    IncodeVerificationSessionKind, PiiJsonValue, ScrubbedJsonValue, VendorAPI,
 };
 
 #[derive(Clone)]
 pub struct VerificationSession {
     pub id: IncodeVerificationSessionId,
+    pub kind: IncodeVerificationSessionKind,
     pub credentials: IncodeCredentialsWithToken,
 }
 
@@ -141,4 +145,36 @@ fn on_upload_fail(conn: &mut TxnPgConn, ctx: &IncodeContext, sides: Vec<Document
     // Deactivate the failed sides to require re-uploading
     DocumentUpload::deactivate(conn, &ctx.id_doc_id, sides)?;
     Ok(())
+}
+
+fn next_side_to_collect(
+    current_side: DocumentSide,
+    docv_data: &DocVData,
+    session: &VerificationSession,
+) -> ApiResult<IncodeState> {
+    let doc_type = docv_data.document_type.ok_or(UserError::NoDocumentType)?;
+    let required_sides = doc_type
+        .sides()
+        .into_iter()
+        .chain(session.kind.requires_selfie().then_some(DocumentSide::Selfie))
+        .collect_vec();
+
+    // Hardcode the order since we can't trust above
+    let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
+        .into_iter()
+        .filter(|s| required_sides.contains(s))
+        .collect_vec()
+        .windows(2)
+        .find(|s| s[0] == current_side)
+        .map(|s| s[1]);
+
+    let next = match next_side_to_collect {
+        // Should never happen
+        Some(DocumentSide::Front) => AddFront::new(),
+        Some(DocumentSide::Back) => AddBack::new(),
+        Some(DocumentSide::Selfie) => AddConsent::new(), // AddConsent goes to AddSelfie
+        // No next side to collect, move on to scores
+        None => ProcessId::new(),
+    };
+    Ok(next)
 }

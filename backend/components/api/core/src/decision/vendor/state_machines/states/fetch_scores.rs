@@ -48,6 +48,7 @@ impl IncodeStateTransition for FetchScores {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
+        _: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         Ok((FetchOCR::new(), None))
     }

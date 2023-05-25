@@ -44,6 +44,7 @@ pub trait IncodeStateTransition: Sized {
         self,
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
+        session: &VerificationSession,
         // TODO could probably represent this with a Result<IncodeState, IncodeFailureReason>, but
         // also have the outer ApiResult<>...
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)>;
@@ -87,7 +88,7 @@ where
         ctx: IncodeContext,
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, IncodeContext, VerificationSession, IsReady)> {
-        let uninit_state = self.into();
+        let uninit_state: IncodeState = self.into();
         let init_state = T::init(db_pool, http_client, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
@@ -97,7 +98,7 @@ where
 
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (next_state, failure_reason) = init_state.transition(conn, &ctx)?;
+                let (next_state, failure_reason) = init_state.transition(conn, &ctx, &session)?;
                 let is_ready = failure_reason.is_none();
                 // Atomically update the state of the session in the DB
                 let update = UpdateIncodeVerificationSession::set_state(next_state.name(), failure_reason);

@@ -15,4 +15,6 @@ pub enum UserError {
     CannotDecrypt(DataIdentifier),
     #[error("Cannot send SMS communications to a phone number that isn't verified")]
     PhoneNumberNotVerified,
+    #[error("Document type not provided")]
+    NoDocumentType,
 }

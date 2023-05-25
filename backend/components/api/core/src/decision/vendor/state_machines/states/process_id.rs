@@ -44,6 +44,7 @@ impl IncodeStateTransition for ProcessId {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
+        _: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
         Ok((FetchScores::new(), None))
     }
