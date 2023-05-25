@@ -35,12 +35,12 @@ flat_api_object_map_type!(
 #[tracing::instrument(skip(state, auth))]
 #[route_alias(
     post(
-        "/users/{footprint_user_id}/vault/decrypt",
+        "/users/{fp_id}/vault/decrypt",
         tags(Users, Vault, PublicApi),
         description = "Decrypts the specified list of fields from the provided vault."
     ),
     post(
-        "/businesses/{footprint_business_id}/vault/decrypt",
+        "/businesses/{fp_bid}/vault/decrypt",
         tags(Businesses, Vault, PublicApi),
         description = "Decrypts the specified list of fields from the provided vault."
     )

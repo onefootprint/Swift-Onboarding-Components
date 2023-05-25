@@ -15,12 +15,12 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[route_alias(
     actix::post(
-        "/users/{footprint_user_id}/vault/validate",
+        "/users/{fp_id}/vault/validate",
         tags(Users, Vault, PublicApi),
         description = "Checks if provided data is valid before adding it to the vault."
     ),
     actix::post(
-        "/businesses/{footprint_biz_id}/vault/validate",
+        "/businesses/{fp_bid}/vault/validate",
         tags(Businesses, Vault, PublicApi),
         description = "Checks if provided data is valid before adding it to the vault."
     )

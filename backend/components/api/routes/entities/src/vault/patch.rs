@@ -24,7 +24,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
         tags(Users, Vault, PublicApi)
     ),
     actix::patch(
-        "/businesses/{fp_id}/vault",
+        "/businesses/{fp_bid}/vault",
         description = "Updates data in a business vault.",
         tags(Businesses, Vault, PublicApi)
     )

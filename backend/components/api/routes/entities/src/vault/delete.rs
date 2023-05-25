@@ -45,7 +45,7 @@ flat_api_object_map_type!(
         tags(Users, Vault, PublicApi)
     ),
     actix::delete(
-        "/businesses/{fp_id}/vault",
+        "/businesses/{fp_bid}/vault",
         description = "Deletes data in a business vault.",
         tags(Businesses, Vault, PublicApi)
     )

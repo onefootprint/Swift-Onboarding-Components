@@ -30,12 +30,12 @@ flat_api_object_map_type!(
 
 #[route_alias(
     actix::get(
-        "/users/{footprint_user_id}/vault",
+        "/users/{fp_id}/vault",
         description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
         tags(Users, Vault, PublicApi)
     ),
     actix::get(
-        "/businesses/{footprint_biz_id}/vault",
+        "/businesses/{fp_bid}/vault",
         description = "Given a list of fields, checks for their existence in the business vault without decrypting them.",
         tags(Businesses, Vault, PublicApi)
     )
