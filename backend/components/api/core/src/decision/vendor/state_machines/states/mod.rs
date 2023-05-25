@@ -34,8 +34,8 @@ use db::{DbPool, TxnPgConn};
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DocumentRequestStatus, DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId,
-    PiiJsonValue, ScrubbedJsonValue, VendorAPI,
+    DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId, PiiJsonValue, ScrubbedJsonValue,
+    VendorAPI,
 };
 
 #[derive(Clone)]

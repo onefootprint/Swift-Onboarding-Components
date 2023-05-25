@@ -25,10 +25,11 @@ use crate::{
         tests::test_helpers::create_user_and_onboarding,
         vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine},
     },
-    utils::mock_enclave::StateWithMockEnclave,
+    State,
 };
 use test_case::test_case;
 
+// TODO need to bring these tests back now that we have TestState
 #[ignore]
 #[test_case(true)]
 #[test_case(false)]
@@ -38,7 +39,7 @@ async fn test_run_machine(is_selfie: bool) {
     // Set up
     //
     let db_pool = test_db_pool();
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &State::test_state().await;
     let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
     let must_collect_data = if is_selfie {
@@ -188,7 +189,7 @@ async fn test_fail(is_selfie: bool) {
     // Set up
     //
     let db_pool = test_db_pool();
-    let state = &StateWithMockEnclave::init().await.state;
+    let state = &State::test_state().await;
     let vendor_client = FootprintVendorHttpClient::new().unwrap();
 
     let must_collect_data = if is_selfie {
@@ -201,22 +202,18 @@ async fn test_fail(is_selfie: bool) {
     let suid = su.id.clone();
 
     // Needed for db constraints
-    let (id_doc, doc_request) = db_pool
-        .db_transaction(
-            move |conn| -> Result<(IdentityDocument, DocumentRequest), DbError> {
-                let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
-                if is_selfie {
-                    let note = "I, Bob Boberto, consent to NOTHING".into();
-                    UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
-                }
-                let id_doc =
-                    db::tests::fixtures::identity_document::create(conn, Some(doc_request.id.clone()));
-                assert!(!id_doc.images(conn)?.is_empty());
-                println!("id doc id: {:?}", id_doc.id);
+    let id_doc = db_pool
+        .db_transaction(move |conn| -> Result<_, DbError> {
+            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
+            if is_selfie {
+                let note = "I, Bob Boberto, consent to NOTHING".into();
+                UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
+            }
+            let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id.clone()));
+            assert!(!id_doc.images(conn)?.is_empty());
 
-                Ok((id_doc, doc_request))
-            },
-        )
+            Ok(id_doc)
+        })
         .await
         .unwrap();
 
