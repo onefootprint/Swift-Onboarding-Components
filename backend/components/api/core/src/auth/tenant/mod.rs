@@ -16,7 +16,6 @@ pub use self::firm_employee::*;
 mod client;
 pub use client::*;
 
-use super::session::tenant::WorkOsSession;
 use super::Any;
 use super::AuthError;
 use super::Either;
@@ -30,7 +29,7 @@ use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
 
-pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSession>, TenantSessionAuth>;
+pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
 
 impl AnyTenantSessionAuth {
     /// The different types of session auths have very different purposes, so we have to do some

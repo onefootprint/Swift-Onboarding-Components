@@ -101,6 +101,7 @@ def get_apis(open_api_spec, tag):
     used_schemas = {
         name: open_api_spec["components"]["schemas"][name] for name in used_entity_names
     }
+    # TODO: could also filter for only security definitions used in the subset of APIs
     return {
         **open_api_spec,
         "components": {
@@ -113,7 +114,8 @@ def get_apis(open_api_spec, tag):
 
 if __name__ == "__main__":
     # If running this script, actually output the new open api spec
-    open_api_spec = requests.get("https://api.onefootprint.com/docs-spec-v3").json()
+    BASE_URL = os.environ.get("TEST_URL") or "https://api.onefootprint.com"
+    open_api_spec = requests.get(f"{BASE_URL}/docs-spec-v3").json()
     os.makedirs("out", exist_ok=True)
     public_open_api_spec = get_apis(open_api_spec, "PublicApi")
     with open("out/API Docs.json", "w") as f:

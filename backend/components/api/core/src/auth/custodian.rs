@@ -2,21 +2,20 @@ use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
 use futures_util::Future;
-use paperclip::actix::Apiv2Header;
+use paperclip::actix::Apiv2Security;
 
 use crate::{auth::AuthError, State};
 
-#[derive(Debug, Clone, Apiv2Header)]
 /// Custodian context guards custodian APIs
+#[derive(Debug, Clone, Apiv2Security)]
+#[openapi(
+    apiKey,
+    alias = "Custodian API Key",
+    in = "header",
+    name = "X-Fp-Protected-Custodian-Key",
+    description = "The custodian key"
+)]
 pub struct CustodianAuthContext {
-    #[allow(unused)]
-    #[openapi(
-        name = "X-Footprint-Custodian-Key",
-        description = "The footprint custodian key"
-    )]
-    // This isn't used anywhere, just need it for the open API specs
-    custodian_key: bool,
-    #[openapi(skip)]
     phantom: PhantomData<()>,
 }
 
@@ -44,10 +43,7 @@ impl FromRequest for CustodianAuthContext {
         Box::pin(async move {
             let custodian_key = custodian_key?;
             if crypto::safe_compare(custodian_key.as_bytes(), expected_custodian_key.as_bytes()) {
-                Ok(Self {
-                    custodian_key: true,
-                    phantom: PhantomData,
-                })
+                Ok(Self { phantom: PhantomData })
             } else {
                 Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into())
             }

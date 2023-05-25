@@ -11,14 +11,15 @@ use crate::auth::{
     SessionContext,
 };
 use crate::{auth::AuthError, errors::ApiError};
-use feature_flag::{FeatureFlagClient};
+use feature_flag::FeatureFlagClient;
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "Onboarding Config Token",
     in = "header",
     name = "X-Onboarding-Session-Token",
-    description = "Auth token for a dashboard user"
+    description = "Short-lived token representing an onboarding configuration"
 )]
 pub struct ParsedOnboardingSession {
     pub tenant: Tenant,

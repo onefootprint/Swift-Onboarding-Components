@@ -18,9 +18,10 @@ use std::pin::Pin;
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "Secret API Key",
     in = "header",
     name = "X-Footprint-Secret-Key",
-    description = "The client's secret key"
+    description = "Secret API key issued via the dashboard. This key should never be sent to your client and should be treated as a secret on your server."
 )]
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Footprint-Secret-Key header
 /// which authenticates the client as a tenant.

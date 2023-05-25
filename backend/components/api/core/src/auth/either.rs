@@ -3,6 +3,7 @@ use std::pin::Pin;
 use actix_web::FromRequest;
 use db::models::{tenant::Tenant, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
+use paperclip::{actix::OperationModifier, v2::schema::Apiv2Schema};
 
 use crate::errors::ApiError;
 
@@ -67,32 +68,35 @@ where
     }
 }
 
-impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schema>
-    paperclip::v2::schema::Apiv2Schema for Either<A, B>
-{
+impl<A: Apiv2Schema, B: Apiv2Schema> Apiv2Schema for Either<A, B> {
     fn name() -> Option<String> {
         let a = A::name().unwrap_or_default();
         let b = B::name().unwrap_or_default();
-        Some(format!("Either {a} or {b}"))
+        Some(format!("{a} OR {b}"))
     }
 
     fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
+        let a_description = A::security_scheme()?.description.unwrap_or_default();
+        let b_description = B::security_scheme()?.description.unwrap_or_default();
         Some(paperclip::v2::models::SecurityScheme {
             type_: "apiKey".to_string(),
-            name: None,
+            // TODO implement any of these?
+            name: None, // This is the name of the header, can't actually give an example since it could be any
             in_: None,
             flow: None,
             auth_url: None,
             token_url: None,
             scopes: std::collections::BTreeMap::new(),
-            description: Some(format!("One of: {:} or {:}", A::description(), B::description())),
+            description: Some(format!(
+                "{:}\n==============OR==============\n{:}",
+                a_description, b_description,
+            )),
         })
     }
+
+    // TODO other functions?
 }
-impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schema>
-    paperclip::actix::OperationModifier for Either<A, B>
-{
-}
+impl<A: Apiv2Schema, B: Apiv2Schema> OperationModifier for Either<A, B> {}
 
 impl<A, B> TenantAuth for Either<A, B>
 where

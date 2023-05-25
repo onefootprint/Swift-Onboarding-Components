@@ -48,9 +48,10 @@ pub struct FirmEmployeeAuth {
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "Firm Employee Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Auth token for a dashboard user"
+    description = "Short-lived auth token for a firm employee dashboard user"
 )]
 pub struct ParsedFirmEmployeeAuth(FirmEmployeeAuth);
 

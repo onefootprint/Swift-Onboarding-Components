@@ -1,5 +1,4 @@
 use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId};
-use paperclip::actix::Apiv2Schema;
 
 use crate::auth::tenant::ClientTenantScope;
 
@@ -20,7 +19,7 @@ pub struct FirmEmployeeSession {
     pub tenant_id: TenantId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Represents a session where a user has logged in but is part of multiple tenants and hasn't yet
 /// selected the tenant whose dashboard they want to view
 pub struct WorkOsSession {

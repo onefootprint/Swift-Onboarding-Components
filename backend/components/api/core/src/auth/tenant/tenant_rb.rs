@@ -38,9 +38,10 @@ pub struct TenantRbAuth {
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "Dashboard Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Auth token for a dashboard user"
+    description = "Short-lived auth token for a dashboard user"
 )]
 pub struct ParsedTenantRbAuth(TenantRbAuth);
 

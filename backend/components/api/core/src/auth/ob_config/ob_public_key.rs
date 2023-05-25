@@ -3,26 +3,23 @@ use std::{marker::PhantomData, pin::Pin};
 use actix_web::{web, FromRequest};
 use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
 use futures_util::Future;
-use newtypes::ObConfigurationKey;
-use paperclip::actix::Apiv2Header;
+use paperclip::actix::Apiv2Security;
 
 use crate::{auth::AuthError, State};
 
-#[derive(Debug, Clone, Apiv2Header)]
 /// Extracts a publishable key from the X-Onboarding-Config-Key header
 /// which indicates the tenant and onboarding configuration context
+#[derive(Debug, Clone, Apiv2Security)]
+#[openapi(
+    apiKey,
+    alias = "Onboarding Config Publishable Key",
+    in = "header",
+    name = "X-Fp-Authorization",
+    description = "Short-lived client token to perform actions for a given user"
+)]
 pub struct PublicOnboardingContext {
-    #[allow(unused)]
-    #[openapi(
-        name = "X-Onboarding-Config-Key",
-        description = "The onboarding publishable key"
-    )]
-    onboarding_key: ObConfigurationKey,
-    #[openapi(skip)]
     pub tenant: Tenant,
-    #[openapi(skip)]
     pub ob_config: ObConfiguration,
-    #[openapi(skip)]
     phantom: PhantomData<()>,
 }
 
@@ -62,7 +59,6 @@ impl FromRequest for PublicOnboardingContext {
             tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
 
             Ok(PublicOnboardingContext {
-                onboarding_key: ob_config.key.clone(),
                 tenant,
                 ob_config,
                 phantom: PhantomData,

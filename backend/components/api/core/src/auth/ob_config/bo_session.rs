@@ -18,9 +18,10 @@ use paperclip::actix::Apiv2Security;
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "Business Owner Token",
     in = "header",
     name = "X-Kyb-Bo-Token",
-    description = "Token to initialize KYC of a business owner"
+    description = "Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner"
 )]
 pub struct ParsedBoSession {
     pub tenant: Tenant,

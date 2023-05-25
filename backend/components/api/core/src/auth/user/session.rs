@@ -14,7 +14,7 @@ use crate::{
     },
     errors::ApiError,
 };
-use feature_flag::{FeatureFlagClient};
+use feature_flag::FeatureFlagClient;
 
 #[derive(Debug, Clone)]
 pub struct UserSessionContext {
@@ -75,9 +75,10 @@ impl UserSessionContext {
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "User Token",
     in = "header",
     name = "X-Fp-Authorization",
-    description = "Auth token for user"
+    description = "Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions"
 )]
 pub struct ParsedUserSessionContext(pub(super) UserSessionContext);
 
