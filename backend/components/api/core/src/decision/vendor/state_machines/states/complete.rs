@@ -14,7 +14,6 @@ use db::DbPool;
 use db::TxnPgConn;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchOCRResponse;
-use idv::incode::doc::response::FetchScoresResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
@@ -28,10 +27,7 @@ use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
 use std::collections::HashMap;
 
-pub struct Complete {
-    pub fetch_scores_response: FetchScoresResponse,
-    pub fetch_ocr_response: FetchOCRResponse,
-}
+pub struct Complete {}
 
 impl Complete {
     /// Must call this before instantiating Complete
@@ -41,7 +37,6 @@ impl Complete {
         sv_id: &ScopedVaultId,
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
-        fetch_scores_response: FetchScoresResponse,
         fetch_ocr_response: FetchOCRResponse,
     ) -> ApiResult<Self> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
@@ -79,14 +74,12 @@ impl Complete {
         IdentityDocument::update(conn, id_doc_id, update)?;
 
         // Add some extracted OCR data to the vault.
-        let r = fetch_ocr_response.clone();
-
         fn di<I: Into<DataIdentifier>>(i: I, pii: Option<PiiString>) -> Option<(DataIdentifier, PiiString)> {
             pii.map(|x| (i.into(), x))
         }
 
         use DocumentKind::*;
-
+        let r = fetch_ocr_response;
         let data = match dk {
             IdDocKind::IdCard => vec![
                 di(IdCardExpiration, r.expiration_date().ok()),
@@ -115,10 +108,7 @@ impl Complete {
 
         // TODO: still need to fingerprint data afterwards!
 
-        Ok(Self {
-            fetch_scores_response,
-            fetch_ocr_response,
-        })
+        Ok(Self {})
     }
 }
 

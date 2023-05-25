@@ -10,13 +10,10 @@ use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::doc::IncodeFetchOCRRequest;
 use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState, VendorAPI};
 
-pub struct FetchOCR {
-    pub fetch_scores_response: FetchScoresResponse,
-}
+pub struct FetchOCR {}
 
 #[async_trait]
 impl IncodeStateTransition for FetchOCR {
@@ -42,7 +39,7 @@ impl IncodeStateTransition for FetchOCR {
         save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        let fetch_ocr_response = res
+        let response = res
             .map_err(map_to_api_err)?
             .result
             .into_success()
@@ -52,23 +49,14 @@ impl IncodeStateTransition for FetchOCR {
         let session_id = session.id.clone();
         let next_step = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let next_step = match fetch_ocr_response.document_kind() {
+                let next_step = match response.document_kind() {
                     Ok(dk) => {
                         let update = UpdateIncodeVerificationSession::set_state(
                             IncodeVerificationSessionState::Complete,
                         );
                         IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                        Complete::enter(
-                            conn,
-                            &ctx.vault,
-                            &ctx.sv_id,
-                            &ctx.id_doc_id,
-                            dk,
-                            self.fetch_scores_response,
-                            fetch_ocr_response,
-                        )?
-                        .into()
+                        Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, response)?.into()
                     }
                     Err(_) => {
                         let update = UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(

@@ -4,32 +4,18 @@ use super::{
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
-use crate::errors::ApiResult;
+use crate::errors::{ApiResult, AssertionError};
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
+use db::models::user_consent::UserConsent;
 use db::DbPool;
-use db::{models::user_consent::UserConsent, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
 use newtypes::{IncodeVerificationSessionState, VendorAPI};
 
 /// Add Consent
-pub struct AddConsent {
-    pub user_consent_text: String,
-}
-
-impl AddConsent {
-    pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext) -> ApiResult<Self> {
-        // we need consent in order to proceed, so we error
-        let consent = UserConsent::latest_for_scoped_vault(conn, &ctx.sv_id)?
-            .ok_or(ApiError::AssertionError("User consent not found".into()))?;
-
-        Ok(Self {
-            user_consent_text: consent.consent_language_text,
-        })
-    }
-}
+pub struct AddConsent {}
 
 #[async_trait]
 impl IncodeStateTransition for AddConsent {
@@ -40,10 +26,15 @@ impl IncodeStateTransition for AddConsent {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> Result<IncodeState, ApiError> {
+        let sv_id = ctx.sv_id.clone();
+        let consent = db_pool
+            .db_query(move |conn| UserConsent::latest_for_scoped_vault(conn, &sv_id))
+            .await??
+            .ok_or(AssertionError("User consent not found"))?;
         let privacy_request = IncodeAddPrivacyConsentRequest {
             credentials: session.credentials.clone(),
             title: "Service Consent".into(),
-            content: self.user_consent_text,
+            content: consent.consent_language_text,
         };
         // TODO this should be separated out from privacy in bifrost
         let ml_request = IncodeAddMLConsentRequest {

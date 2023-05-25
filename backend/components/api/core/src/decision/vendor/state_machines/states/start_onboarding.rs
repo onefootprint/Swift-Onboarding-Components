@@ -57,13 +57,12 @@ impl StartOnboarding {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        let ctx = ctx.clone();
         let next_state = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<IncodeState> {
                 // We only need to add consent if the session is of kind=Selfie
                 let next_state: IncodeState = if incode_session.kind.requires_consent() {
-                    AddConsent::enter(conn, &ctx)?.into()
+                    AddConsent {}.into()
                 } else {
                     AddFront {}.into()
                 };

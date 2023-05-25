@@ -61,7 +61,7 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 
 /// Response from fetch scores
 // TODO!
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
     pub id_validation: Option<IdValidation>,
@@ -121,11 +121,6 @@ impl FetchScoresResponse {
                 key.and_then(|k| status.map(|s| (k, s)))
             })
             .collect()
-    }
-
-    #[allow(non_snake_case)]
-    pub fn TEST_ONLY_FIXTURE() -> Self {
-        Self { ..Default::default() }
     }
 }
 

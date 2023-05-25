@@ -39,8 +39,7 @@ impl IncodeStateTransition for FetchScores {
         save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        let fetch_scores_response = res
-            .map_err(map_to_api_err)?
+        res.map_err(map_to_api_err)?
             .result
             .into_success()
             .map_err(map_to_api_err)?;
@@ -56,9 +55,6 @@ impl IncodeStateTransition for FetchScores {
             })
             .await?;
 
-        Ok(FetchOCR {
-            fetch_scores_response,
-        }
-        .into())
+        Ok(FetchOCR {}.into())
     }
 }
