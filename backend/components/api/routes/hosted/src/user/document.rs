@@ -1,7 +1,7 @@
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
-use crate::types::response::{EmptyResponse, ResponseData};
+use crate::types::response::ResponseData;
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
@@ -9,6 +9,7 @@ use api_core::auth::user::UserObAuthContext;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IncodeStateMachine};
 use api_core::decision::vendor::state_machines::states::Complete;
+use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse};
@@ -22,13 +23,12 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
-use db::DbError;
 use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId, IncodeConfigurationId,
     SealedVaultDataKey, TenantId, VaultId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::{self, api_v2_operation, web};
 
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
@@ -39,7 +39,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserObAuthContext,
     request: LargeJson<DocumentRequest, 15_728_640>,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let request = request.0;
 
@@ -177,7 +177,24 @@ pub async fn post(
         handle_incode_request(&state, id_doc_id, t_id, di.id, uvw.vault, doc_request).await?;
     }
 
-    EmptyResponse::ok().json()
+    let (doc_request, session) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let su_id = &user_auth.scoped_user.id;
+            let doc_request = DbDocumentRequest::get(conn, su_id)?;
+            let session = IncodeVerificationSession::get(conn, su_id)?;
+            Ok((doc_request, session))
+        })
+        .await??;
+
+    let status = doc_request.status.into();
+    let errors = session
+        .and_then(|s| s.latest_failure_reason)
+        .into_iter()
+        .map(DocumentImageError::from)
+        .collect();
+
+    ResponseData::ok(DocumentResponse { status, errors }).json()
 }
 
 /// Uploads the provided image to s3.
@@ -195,45 +212,30 @@ async fn upload_image(
     Ok((side, s3_url))
 }
 
-// This just can pull the latest for the scoped_user_id and lock
+// TODO deprecate this
 #[api_v2_operation(description = "GET a document request status", tags(Hosted))]
 #[actix::get("/hosted/user/document/status")]
-pub async fn get(
-    state: web::Data<State>,
-    user_auth: UserObAuthContext,
-) -> actix_web::Result<Json<ResponseData<DocumentResponse>>, ApiError> {
+pub async fn get(state: web::Data<State>, user_auth: UserObAuthContext) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
-    let (status, errors) = state
+    let (doc_request, session) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let su_id = &user_auth.scoped_user.id;
             let doc_request = DbDocumentRequest::get(conn, su_id)?;
-
-            let status = doc_request.status.into();
-
-            let session = IncodeVerificationSession::get(conn, su_id)?.ok_or(DbError::ObjectNotFound)?;
-            let errors = session
-                .latest_failure_reason
-                .into_iter()
-                .map(DocumentImageError::from)
-                .collect();
-
-            Ok((status, errors))
+            let session = IncodeVerificationSession::get(conn, su_id)?;
+            Ok((doc_request, session))
         })
         .await??;
 
-    let response = DocumentResponse {
-        status,
-        errors,
-        // TODO: Remove these fields
-        front_image_error: None,
-        back_image_error: None,
-    };
+    let status = doc_request.status.into();
+    let errors = session
+        .and_then(|s| s.latest_failure_reason)
+        .into_iter()
+        .map(DocumentImageError::from)
+        .collect();
 
-    // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
-    // otherwise, we'll pass through the status
-    ResponseData::ok(response).json()
+    ResponseData::ok(DocumentResponse { status, errors }).json()
 }
 
 #[allow(clippy::too_many_arguments)]

@@ -205,8 +205,6 @@ class BifrostClient:
         body = get(f"hosted/user/document/status", None, self.auth_token)
         assert body["status"]["kind"] == "complete"
         assert not body["errors"]
-        assert not body["front_image_error"]
-        assert not body["back_image_error"]
 
     def handle_liveness(self):
         """Register the biometric credential"""

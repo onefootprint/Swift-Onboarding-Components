@@ -57,9 +57,6 @@ pub enum DocumentErrorReason {
 pub struct DocumentResponse {
     pub status: DocumentResponseStatus,
     pub errors: Vec<DocumentImageError>,
-    // To be Deprecated
-    pub front_image_error: Option<String>,
-    pub back_image_error: Option<String>,
 }
 
 /// Image errors from idology. See status_code/idology.rs for descriptions
