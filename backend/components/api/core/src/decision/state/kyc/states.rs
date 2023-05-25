@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
@@ -5,12 +7,14 @@ use db::models::{
     scoped_vault::ScopedVault,
     workflow::Workflow,
 };
+use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
 
 use super::{Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
     state::{actions::Authorize, common, WorkflowStates},
+    utils::FixtureDecision,
 };
 use crate::{
     decision::{
@@ -137,12 +141,7 @@ impl Decisioning {
 type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision> for Decisioning {
-    type AsyncRes = (
-        OnboardingRulesDecisionOutput,
-        Vec<(FootprintReasonCode, Vec<Vendor>)>,
-        Vec<VerificationResultId>,
-        IsSandbox,
-    );
+    type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -157,6 +156,11 @@ impl OnAction<MakeDecision> for Decisioning {
         )
         .await?;
 
+        Ok((fixture_decision, state.feature_flag_client.clone()))
+    }
+
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+        let (fixture_decision, ff_client) = async_res;
         let verification_result_ids = self
             .vendor_results
             .iter()
@@ -172,19 +176,11 @@ impl OnAction<MakeDecision> for Decisioning {
         } else {
             let (rules_output, fv) = decision::engine::calculate_decision(self.vendor_results.clone())?;
 
-            let obid = self.ob_id.clone();
             // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
-            let reason_codes =
-                engine::reason_codes_for_tenant(&state.db_pool, state.feature_flag_client.clone(), obid, &fv)
-                    .await?;
+            let reason_codes = engine::reason_codes_for_tenant(ff_client, &self.t_id, &fv)?;
             (rules_output, reason_codes, false)
         };
 
-        Ok((rules_output, reason_codes, verification_result_ids, is_sandbox))
-    }
-
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        let (rules_output, reason_codes, verification_result_ids, is_sandbox) = async_res;
         let (ob, _, _, _) = Onboarding::get(conn, &self.ob_id)?;
         engine::save_onboarding_decision(
             conn,

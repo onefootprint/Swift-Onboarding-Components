@@ -39,7 +39,8 @@ use strum::IntoEnumIterator;
 
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ScopedVaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+    FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VendorAPI, VerificationRequestId,
+    VerificationResultId,
 };
 use prometheus::labels;
 ///
@@ -124,7 +125,11 @@ where
     let rules_output = fv.evaluate()?;
 
     let obid = ob.id.clone();
-    let reason_codes = reason_codes_for_tenant(db_pool, ff_client, obid, &fv).await?;
+    let tenant_id = db_pool
+        .db_query(move |conn| ScopedVault::get(conn, &obid))
+        .await??
+        .tenant_id;
+    let reason_codes = reason_codes_for_tenant(ff_client, &tenant_id, &fv)?;
     let verification_result_ids = fv.verification_results();
 
     let ob = ob.clone();
@@ -145,20 +150,15 @@ where
 }
 
 // TODO: probably make this a direct output of rules eval or something
-pub async fn reason_codes_for_tenant<T>(
-    db_pool: &DbPool,
+pub fn reason_codes_for_tenant<T>(
     ff_client: Arc<dyn FeatureFlagClient>,
-    obid: OnboardingId,
+    tenant_id: &TenantId,
     fv: &T,
 ) -> ApiResult<Vec<(FootprintReasonCode, Vec<Vendor>)>>
 where
     T: FeatureVector,
 {
-    let tenant_id = db_pool
-        .db_query(move |conn| ScopedVault::get(conn, &obid))
-        .await??
-        .tenant_id;
-    let tenant_can_view_socure_risk_signal = ff_client.flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
+    let tenant_can_view_socure_risk_signal = ff_client.flag(BoolFlag::CanViewSocureRiskSignals(tenant_id));
 
     let mut visible_vendor_apis: Vec<VendorAPI> = VendorAPI::iter()
         .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
