@@ -163,8 +163,17 @@ impl IncodeStateMachine {
 
         // Recover the session session and pick up where we left off
         let initial_state = match session.state {
+            IncodeVerificationSessionState::AddConsent => AddConsent {}.into(),
+            IncodeVerificationSessionState::AddFront => AddFront {}.into(),
+            IncodeVerificationSessionState::AddBack => AddBack {}.into(),
+            IncodeVerificationSessionState::ProcessId => ProcessId {}.into(),
+            IncodeVerificationSessionState::FetchScores => FetchScores {}.into(),
+            IncodeVerificationSessionState::FetchOCR => FetchOCR {}.into(),
+            IncodeVerificationSessionState::Complete => Complete {}.into(),
             IncodeVerificationSessionState::RetryUpload => RetryUpload {}.into(),
-            _ => return Err(AssertionError("wrong state").into()),
+            IncodeVerificationSessionState::StartOnboarding => {
+                return Err(AssertionError("Should have already run StartOnboarding").into())
+            }
         };
 
         Ok(Self {
