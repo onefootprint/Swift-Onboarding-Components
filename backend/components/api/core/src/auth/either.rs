@@ -1,9 +1,15 @@
-use std::pin::Pin;
+use std::{collections::BTreeMap, pin::Pin};
 
 use actix_web::FromRequest;
 use db::models::{tenant::Tenant, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
-use paperclip::{actix::OperationModifier, v2::schema::Apiv2Schema};
+use paperclip::{
+    actix::OperationModifier,
+    v2::{
+        models::{DefaultOperationRaw, DefaultSchemaRaw, SecurityScheme},
+        schema::Apiv2Schema,
+    },
+};
 
 use crate::errors::ApiError;
 
@@ -70,33 +76,42 @@ where
 
 impl<A: Apiv2Schema, B: Apiv2Schema> Apiv2Schema for Either<A, B> {
     fn name() -> Option<String> {
-        let a = A::name().unwrap_or_default();
-        let b = B::name().unwrap_or_default();
-        Some(format!("{a} OR {b}"))
+        panic!("Should never try to get the name of an Either<> since we override OperationModifier");
     }
 
     fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
-        let a_description = A::security_scheme()?.description.unwrap_or_default();
-        let b_description = B::security_scheme()?.description.unwrap_or_default();
-        Some(paperclip::v2::models::SecurityScheme {
-            type_: "apiKey".to_string(),
-            // TODO implement any of these?
-            name: None, // This is the name of the header, can't actually give an example since it could be any
-            in_: None,
-            flow: None,
-            auth_url: None,
-            token_url: None,
-            scopes: std::collections::BTreeMap::new(),
-            description: Some(format!(
-                "{:}\n==============OR==============\n{:}",
-                a_description, b_description,
-            )),
-        })
+        panic!("Should never try to get the name of an Either<> since we override OperationModifier");
+    }
+}
+
+// This trait controls how schemas are registered globally and with specific operations - we just
+// proxy to both A and B's registration functionality
+impl<A: OperationModifier, B: OperationModifier> OperationModifier for Either<A, B> {
+    fn update_parameter(op: &mut DefaultOperationRaw) {
+        A::update_parameter(op);
+        B::update_parameter(op);
     }
 
-    // TODO other functions?
+    fn update_response(op: &mut DefaultOperationRaw) {
+        A::update_response(op);
+        B::update_response(op);
+    }
+
+    fn update_definitions(map: &mut BTreeMap<String, DefaultSchemaRaw>) {
+        A::update_definitions(map);
+        B::update_definitions(map);
+    }
+
+    fn update_security(op: &mut DefaultOperationRaw) {
+        A::update_security(op);
+        B::update_security(op);
+    }
+
+    fn update_security_definitions(map: &mut BTreeMap<String, SecurityScheme>) {
+        A::update_security_definitions(map);
+        B::update_security_definitions(map);
+    }
 }
-impl<A: Apiv2Schema, B: Apiv2Schema> OperationModifier for Either<A, B> {}
 
 impl<A, B> TenantAuth for Either<A, B>
 where
