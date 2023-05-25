@@ -18,6 +18,8 @@ const App = ({ context, onDone }: IdDocProps) => {
     authToken,
     device,
     requirement: customData.requirement,
+    idDoc: {},
+    selfie: {},
   };
 
   return (

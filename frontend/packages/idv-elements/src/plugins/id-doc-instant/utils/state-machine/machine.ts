@@ -26,23 +26,120 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         frontImage: {
           on: {
-            receivedImage: [
+            receivedImage: {
+              target: 'frontImageProcessing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        frontImageProcessing: {
+          on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
+            processingSucceeded: [
               {
                 target: 'backImage',
-                cond: context =>
-                  !!context.type &&
-                  !!ImagesRequiredByIdDocType[context.type].back,
+                cond: context => {
+                  const { type } = context;
+                  return type ? !!ImagesRequiredByIdDocType[type].back : false;
+                },
+              },
+              {
+                target: 'selfiePrompt',
+                cond: context => context.requirement.shouldCollectSelfie,
               },
               {
                 target: 'success',
               },
             ],
+            processingErrored: {
+              target: 'frontImageRetry',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        frontImageRetry: {
+          on: {
+            receivedImage: {
+              target: 'frontImageProcessing',
+              actions: 'assignImage',
+            },
           },
         },
         backImage: {
           on: {
             receivedImage: {
+              target: 'backImageProcessing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        backImageProcessing: {
+          on: {
+            processingSucceeded: [
+              {
+                target: 'selfiePrompt',
+                cond: context => context.requirement.shouldCollectSelfie,
+              },
+              {
+                target: 'success',
+              },
+            ],
+            processingErrored: {
+              target: 'backImageRetry',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        backImageRetry: {
+          on: {
+            receivedImage: {
+              target: 'backImageProcessing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        selfiePrompt: {
+          on: {
+            consentReceived: {
+              actions: 'assignConsent',
+            },
+            startSelfieCapture: {
+              target: 'selfieImage',
+            },
+          },
+        },
+        selfieImage: {
+          on: {
+            cameraErrored: {
+              target: 'selfiePrompt',
+            },
+            receivedImage: {
+              target: 'selfieImageProcessing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        selfieImageProcessing: {
+          on: {
+            processingSucceeded: {
               target: 'success',
+            },
+            processingErrored: {
+              target: 'selfieImageRetry',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        selfieImageRetry: {
+          on: {
+            cameraErrored: {
+              target: 'selfiePrompt',
+            },
+            receivedImage: {
+              target: 'selfieImageProcessing',
+              actions: 'assignImage',
             },
           },
         },
@@ -58,6 +155,19 @@ const createIdDocMachine = (args: MachineContext) =>
           type: event.payload.type,
           country: event.payload.country,
         })),
+        assignImage: assign((context, event) => {
+          context.image = event.payload.image;
+          return context;
+        }),
+        assignIdDocImageErrors: assign((context, event) => {
+          context.error = event.payload.error;
+          context.image = undefined;
+          return context;
+        }),
+        assignConsent: assign(context => {
+          context.selfie.consentRequired = false;
+          return context;
+        }),
       },
     },
   );

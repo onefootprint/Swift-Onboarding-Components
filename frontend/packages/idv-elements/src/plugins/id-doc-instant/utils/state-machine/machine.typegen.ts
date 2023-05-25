@@ -13,11 +13,26 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignConsent: 'consentReceived';
     assignCountryAndType: 'receivedCountryAndType';
+    assignIdDocImageErrors: 'processingErrored';
+    assignImage: 'receivedImage';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'backImage' | 'countryAndType' | 'frontImage' | 'success';
+  matchesStates:
+    | 'backImage'
+    | 'backImageProcessing'
+    | 'backImageRetry'
+    | 'countryAndType'
+    | 'frontImage'
+    | 'frontImageProcessing'
+    | 'frontImageRetry'
+    | 'selfieImage'
+    | 'selfieImageProcessing'
+    | 'selfieImageRetry'
+    | 'selfiePrompt'
+    | 'success';
   tags: never;
 }
