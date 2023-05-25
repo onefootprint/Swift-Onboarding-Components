@@ -42,4 +42,6 @@ pub enum OnboardingError {
     MissingBoOnboardingDecision(Csv<OnboardingId>),
     #[error("Need to provide onboarding public key auth in order to start a sign-up session")]
     MissingObPkAuth,
+    #[error("Not expecting a selfie image to be uploaded")]
+    NotExpectingSelfie,
 }

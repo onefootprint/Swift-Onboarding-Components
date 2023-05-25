@@ -1,5 +1,4 @@
 mod start_onboarding;
-use db::models::document_request::{DocumentRequest, DocumentRequestUpdate};
 use db::models::document_upload::DocumentUpload;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
@@ -130,14 +129,13 @@ fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
 
 fn on_upload_fail(conn: &mut TxnPgConn, ctx: &IncodeContext, sides: Vec<DocumentSide>) -> ApiResult<()> {
     // TODO implement retry limit
-    // TODO Might want to change the appearance of this timeline event. Do we want to show _every_ fail?
+    // TODO Change the appearance of this timeline event. Do we want to show _every_ fail?
+    // If so, right now we are not including any info on the state of the upload since we link
+    // to a mutable object
     let info = IdentityDocumentUploadedInfo {
         id: ctx.id_doc_id.clone(),
     };
     UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.sv_id.clone())?;
-    // TODO do we care about the doc request status anymore?
-    let update = DocumentRequestUpdate::status(DocumentRequestStatus::UploadFailed);
-    DocumentRequest::update_by_id(conn, &ctx.doc_request_id, update)?;
 
     // Deactivate the failed sides to require re-uploading
     DocumentUpload::deactivate(conn, &ctx.id_doc_id, sides)?;

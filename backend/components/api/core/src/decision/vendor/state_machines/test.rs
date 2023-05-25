@@ -335,7 +335,7 @@ async fn test_fail(is_selfie: bool) {
             assert!(score_result.id_validation.is_some());
 
             // Check business logic bookkeeping
-            let doc_request = DocumentRequest::get(conn, &su.id, &doc_request.id)?;
+            let doc_request = DocumentRequest::get(conn, &su.id)?;
             assert_eq!(doc_request.status, DocumentRequestStatus::Complete);
 
             Ok(())

@@ -1,6 +1,5 @@
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::{EmptyResponse, ResponseData};
 use crate::utils::large_json::LargeJson;
@@ -12,23 +11,22 @@ use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeCon
 use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
+use api_wire_types::{DocumentImageError, DocumentResponse};
 use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestUpdate};
+use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
-use db::{DbError, DbPool, DbResult, PgConn};
+use db::DbError;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, DocumentSide, IdDocKind, IdentityDocumentId,
-    IncodeConfigurationId, IncodeVerificationFailureReason, ScopedVaultId, SealedVaultDataKey, TenantId,
-    VaultId,
+    DecisionIntentId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId, IncodeConfigurationId,
+    SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -61,10 +59,10 @@ pub async fn post(
 
     if request.selfie_image.is_some() {
         if !doc_request.should_collect_selfie {
-            return Err(TenantError::NotExpectingSelfie.into());
+            return Err(OnboardingError::NotExpectingSelfie.into());
         }
         if user_consent.is_none() {
-            return Err(ApiError::from(OnboardingError::UserConsentNotFound));
+            return Err(OnboardingError::UserConsentNotFound.into());
         }
     }
 
@@ -110,14 +108,7 @@ pub async fn post(
         .map(|(side, e_data)| upload_image(&state, side, e_data, &doc_request.id, &uvw.vault.id, bucket))
         .collect_vec();
 
-    let su_id = user_auth.scoped_user.id.clone();
-    let s3_urls = match futures::future::try_join_all(s3_upload_futs).await {
-        Ok(s) => Ok(s),
-        Err(e) => {
-            handle_upload_error(&state.db_pool, doc_request.id.clone(), su_id).await?;
-            Err(e)
-        }
-    }?;
+    let s3_urls = futures::future::try_join_all(s3_upload_futs).await?;
 
     // write a identity_document
     let doc_request_id = doc_request.id.clone();
@@ -133,7 +124,6 @@ pub async fn post(
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
             };
-            // TODO: get or create
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             // Create each of the uploads
             s3_urls
@@ -157,10 +147,6 @@ pub async fn post(
             let has_all_required_images = required_sides.into_iter().all(|s| existing_sides.contains(&s));
             let result = if has_all_required_images {
                 // Mark the document request as Uploaded
-                // TODO we won't want to necessarily do this... this stops us from rendering
-                // the onboarding requirement
-                let update = DocumentRequestUpdate::status(DocumentRequestStatus::Uploaded);
-                let doc_request = doc_request.into_inner().update(conn.conn(), update)?;
                 //
                 // Now that the document is created, either initiate IDV reqs or create fixture data
                 //
@@ -169,7 +155,7 @@ pub async fn post(
                     let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                                                                // TODO i think we rm this
                     let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
-                    Some((decision_intent, doc_request, id_doc.id))
+                    Some((decision_intent, doc_request.into_inner(), id_doc.id))
                 } else {
                     // Create fixture data
                     let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
@@ -220,7 +206,21 @@ pub async fn get(
 
     let (status, errors) = state
         .db_pool
-        .db_query(move |conn| construct_get_response(conn, &user_auth.scoped_user.id))
+        .db_query(move |conn| -> ApiResult<_> {
+            let su_id = &user_auth.scoped_user.id;
+            let doc_request = DbDocumentRequest::get(conn, su_id)?;
+
+            let status = doc_request.status.into();
+
+            let session = IncodeVerificationSession::get(conn, su_id)?.ok_or(DbError::ObjectNotFound)?;
+            let errors = session
+                .latest_failure_reason
+                .into_iter()
+                .map(DocumentImageError::from)
+                .collect();
+
+            Ok((status, errors))
+        })
         .await??;
 
     let response = DocumentResponse {
@@ -234,61 +234,6 @@ pub async fn get(
     // in the case of a new doc request, this will have status=Error with errors populated from the prior one.
     // otherwise, we'll pass through the status
     ResponseData::ok(response).json()
-}
-
-pub fn construct_get_response(
-    conn: &mut PgConn,
-    scoped_user_id: &ScopedVaultId,
-) -> Result<(DocumentResponseStatus, Vec<DocumentImageError>), ApiError> {
-    // Get the latest document request for the scoped user, and the previous result (for errors).
-    // We don't just stash the errors on the document request because with multiple vendors, we'll need
-    // to handle each set of errors appropriately
-    let (current_request, previous_request, _) =
-        DbDocumentRequest::get_latest_with_previous_request_and_result(conn, scoped_user_id)?;
-
-    // TODO
-    let retry_limit_exceeded = false;
-
-    let should_return_errors = matches!(
-        current_request.status,
-        DocumentRequestStatus::Pending | DocumentRequestStatus::UploadFailed
-    );
-    let mut previous_request_errors: Vec<IncodeVerificationFailureReason> = vec![];
-    let mut current_request_internal_errors_needing_retry: Vec<DocumentImageError> = vec![];
-    let mut status = current_request.status.into();
-
-    if should_return_errors {
-        let incode_verification_session =
-            IncodeVerificationSession::get(conn, scoped_user_id)?.ok_or(DbError::ObjectNotFound)?;
-
-        if let Some(error) = incode_verification_session.latest_failure_reason {
-            previous_request_errors.push(error)
-        }
-
-        // If s3 or postgres errors when writing an identity document, we should ask client to retry (we handle retry limit exceeded below)
-        if previous_request
-            .map(|d| d.status == DocumentRequestStatus::UploadFailed)
-            .unwrap_or(false)
-        {
-            current_request_internal_errors_needing_retry.push(DocumentImageError::InternalError)
-        }
-    };
-    // handle retries
-    if retry_limit_exceeded {
-        status = DocumentResponseStatus::RetryLimitExceeded
-    }
-
-    let errors: Vec<DocumentImageError> = previous_request_errors
-        .into_iter()
-        .map(DocumentImageError::from)
-        .chain(current_request_internal_errors_needing_retry.into_iter())
-        .collect();
-
-    if !errors.is_empty() {
-        status = DocumentResponseStatus::Error;
-    }
-
-    Ok((status, errors))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -326,32 +271,4 @@ async fn handle_incode_request(
         .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
 
     Ok(())
-}
-
-async fn handle_upload_error(
-    db_pool: &DbPool,
-    document_request_id: DocumentRequestId,
-    scoped_user_id: ScopedVaultId,
-) -> DbResult<()> {
-    // In the case of an s3 or other error, we move our status to UploadFailed
-    db_pool
-        .db_transaction(move |conn| -> Result<(), DbError> {
-            let doc = DbDocumentRequest::lock(conn, &scoped_user_id, &document_request_id)?;
-
-            let update = DocumentRequestUpdate::status(DocumentRequestStatus::UploadFailed);
-            let current_doc = doc.into_inner().update(conn, update)?;
-
-            // Create a new document request.
-            // ref_id is None here since we are retrying scan onboarding!
-            DbDocumentRequest::create(
-                conn,
-                scoped_user_id,
-                None,
-                current_doc.should_collect_selfie,
-                Some(current_doc.id),
-            )?;
-
-            Ok(())
-        })
-        .await
 }

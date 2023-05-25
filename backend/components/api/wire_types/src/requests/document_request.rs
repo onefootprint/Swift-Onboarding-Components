@@ -29,7 +29,6 @@ pub enum DocumentResponseStatus {
     Pending,
     Complete,
     Error,
-    RetryLimitExceeded,
 }
 
 // This is temporary
@@ -39,10 +38,6 @@ impl From<DocumentRequestStatus> for DocumentResponseStatus {
             DocumentRequestStatus::Pending => Self::Pending,
             DocumentRequestStatus::Failed => Self::Error,
             DocumentRequestStatus::Complete => Self::Complete,
-            // We still are waiting for vendor when in Uploaded, but for now just map to Complete
-            DocumentRequestStatus::Uploaded => Self::Pending,
-            // Something happened on footprint side that caused a failure
-            DocumentRequestStatus::UploadFailed => Self::Error,
         }
     }
 }

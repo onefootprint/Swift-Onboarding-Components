@@ -70,7 +70,6 @@ pub fn create(
         opts.previous_document_request_id,
     )
     .unwrap();
-    let doc_req_id = doc_request.id.clone();
     let mut verification_info = None;
 
     // If we want to simulate having collected an id document
@@ -114,7 +113,7 @@ pub fn create(
     }
 
     // Set our desired status
-    let reloaded_doc_req = DocumentRequest::get(conn, &opts.scoped_user_id, &doc_req_id).unwrap();
+    let reloaded_doc_req = DocumentRequest::get(conn, &opts.scoped_user_id).unwrap();
     let update = DocumentRequestUpdate::status(opts.desired_status);
 
     (

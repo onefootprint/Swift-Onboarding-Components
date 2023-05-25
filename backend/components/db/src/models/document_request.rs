@@ -1,20 +1,18 @@
-use crate::schema::{identity_document, verification_request, verification_result};
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestStatus, IdentityDocumentId, Locked, ScopedVaultId};
+use newtypes::{DocumentRequestId, DocumentRequestStatus, Locked, ScopedVaultId};
 use serde::{Deserialize, Serialize};
-
-use super::verification_result::VerificationResult;
 
 pub type DocRefId = String;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
+    // TODO keep unique
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<DocRefId>,
     pub status: DocumentRequestStatus,
@@ -85,14 +83,9 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        request_id: &DocumentRequestId,
-    ) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
         let result = document_request::table
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .filter(document_request::id.eq(request_id))
             .first(conn)?;
 
         Ok(result)
@@ -130,48 +123,6 @@ impl DocumentRequest {
             .count()
             .get_result(conn)?;
         Ok(num_status)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn get_latest_with_previous_request_and_result(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<(
-        DocumentRequest,
-        Option<DocumentRequest>,
-        Option<VerificationResult>,
-    )> {
-        let latest_doc_request: Self = document_request::table
-            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .order_by(document_request::created_at.desc())
-            .first(conn)?;
-
-        if let Some(previous_doc_request_id) = latest_doc_request.previous_document_request_id.clone() {
-            let (previous_identity_doc, previous_doc_request): (
-                Option<IdentityDocumentId>,
-                Option<DocumentRequest>,
-            ) = document_request::table
-                .filter(document_request::id.eq(previous_doc_request_id))
-                .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-                .inner_join(identity_document::table)
-                .select((identity_document::id, document_request::all_columns))
-                .first::<(IdentityDocumentId, DocumentRequest)>(conn)
-                .ok()
-                .map(|(id_doc, doc_req)| (Some(id_doc), Some(doc_req)))
-                .unwrap_or((None, None));
-
-            // TODO: this breaks when we have more than 1 verification result corresponding to a single identity document
-            let previous_verif_result: Option<VerificationResult> = verification_request::table
-            .filter(verification_request::identity_document_id.eq(previous_identity_doc))
-            .inner_join(verification_result::table)
-            .select(verification_result::all_columns)
-            .first::<VerificationResult>(conn) // <-- this needs to go away with multiple vendors, and we should return a vec of results
-            .ok();
-
-            Ok((latest_doc_request, previous_doc_request, previous_verif_result))
-        } else {
-            Ok((latest_doc_request, None, None))
-        }
     }
 
     #[tracing::instrument(skip_all)]

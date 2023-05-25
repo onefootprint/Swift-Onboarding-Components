@@ -22,6 +22,4 @@ pub enum TenantError {
     InvalidExpiry,
     #[error("Must provide at least one scope")]
     MustProvideScope,
-    #[error("Not expecting a selfie image to be uploaded")]
-    NotExpectingSelfie,
 }
