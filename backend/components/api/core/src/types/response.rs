@@ -80,8 +80,10 @@ where
 /// Metadata required for a cursor-paginated response.
 pub struct CursorPaginatedResponseMeta<C> {
     /// The cursor to be provided in the next request to fetch the next page
+    // TODO need a reasonable openapi example. This doesn't work for every C
+    #[openapi(example = "12345")]
     pub next: Option<C>,
-    // TODO why is this optional?
+    #[openapi(example = "11")]
     pub count: Option<i64>,
 }
 
@@ -161,7 +163,9 @@ where
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 /// Metadata required for an offset-paginated response.
 pub struct OffsetPaginatedResponseMeta {
+    #[openapi(example = "12345")]
     pub next_page: Option<usize>,
+    #[openapi(example = "11")]
     pub count: i64,
 }
 
