@@ -36,46 +36,8 @@ class Endpoint:
     @property
     def schemas(self):
         """Computes the schemas that are used for the endpoint"""
-        request_type = (
-            self._path_info.get("requestBody", {})
-            .get("content", {})
-            .get("application/json", {})
-            .get("schema", {})
-            .get("$ref")
-        )
-        response_types = [
-            resp.get("content", {})
-            .get("application/json", {})
-            .get("schema", {})
-            .get("$ref")
-            for (_, resp) in self._path_info.get("responses", {}).items()
-        ]
-        # TODO should probably just traverse whole JSON structure for ref-looking things
-        other_response_types = [
-            resp.get("content", {})
-            .get("application/json", {})
-            .get("schema", {})
-            .get("properties", {})
-            .get("data", {})
-            .get("items", {})
-            .get("$ref", {})
-            for (_, resp) in self._path_info.get("responses", {}).items()
-        ]
-        more_other_response_types = [
-            resp.get("content", {})
-            .get("application/json", {})
-            .get("schema", {})
-            .get("items", {})
-            .get("$ref", {})
-            for (_, resp) in self._path_info.get("responses", {}).items()
-        ]
-        all_types = (
-            response_types
-            + other_response_types
-            + more_other_response_types
-            + [request_type]
-        )
-        return [unquote(t) for t in all_types if t]
+        all_refs = list(find_keys(self._path_info, "$ref"))
+        return [unquote(t) for t in all_refs]
 
     @property
     def security_schemes(self):
@@ -107,6 +69,20 @@ class Endpoint:
             "firm" in k.lower() for s in security for k in s
         ), "Couldn't scrub out firm employee auth from security - maybe you changed the name of the security?"
         return {**self._path_info, "description": description, "security": security}
+
+
+def find_keys(node, key):
+    """
+    Recursively traverse the provided node to yield an iterator of all dictionary values with the provided key
+    """
+    if isinstance(node, list):
+        for item in node:
+            yield from find_keys(item, key)
+    if isinstance(node, dict):
+        for _, value in node.items():
+            yield from find_keys(value, key)
+        if node.get(key):
+            yield node.get(key)
 
 
 def get_apis(open_api_spec, tag):
