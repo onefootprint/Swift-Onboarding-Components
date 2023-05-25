@@ -19,11 +19,11 @@ use newtypes::{
     IncodeConfigurationId, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, Vendor, VendorAPI,
 };
 
-use super::incode_state_machine::{IncodeContext, IncodeState};
+use super::incode_state_machine::IncodeContext;
 use crate::{
     decision::{
         tests::test_helpers::create_user_and_onboarding,
-        vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine},
+        vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine, state::IncodeState},
     },
     State,
 };
@@ -49,13 +49,12 @@ async fn test_run_machine(is_selfie: bool) {
     };
     let (tenant, ob, uv, su, di) =
         create_user_and_onboarding(&db_pool, &state.enclave_client, must_collect_data).await;
-    let suid = su.id.clone();
-    let suid2 = su.id.clone();
 
     // Needed for db constraints
+    let su_id = su.id.clone();
     let id_doc = db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
+            let doc_request = DocumentRequest::create(conn.conn(), su_id, None, false).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
@@ -82,7 +81,7 @@ async fn test_run_machine(is_selfie: bool) {
     };
     let ctx = IncodeContext {
         di_id: di.id.clone(),
-        sv_id: su.id,
+        sv_id: su.id.clone(),
         id_doc_id: id_doc.id,
         vault: uv.clone(),
         docv_data,
@@ -96,6 +95,19 @@ async fn test_run_machine(is_selfie: bool) {
 
     // Assert machine stops at AddBack until we add the back
     assert!(matches!(machine.state, IncodeState::AddBack(_)));
+
+    let su_id = su.id.clone();
+    db_pool
+        .db_query(move |conn| -> Result<_, DbError> {
+            // Make sure we're in the right state
+            let session = IncodeVerificationSession::get(conn, &su_id)?.unwrap();
+            assert_eq!(session.state, IncodeVerificationSessionState::AddBack);
+            assert!(session.latest_failure_reason.is_none());
+            Ok(())
+        })
+        .await
+        .unwrap()
+        .unwrap();
 
     //
     // Now, simulate uploading the back and continuing
@@ -127,8 +139,9 @@ async fn test_run_machine(is_selfie: bool) {
             assert_have_same_elements(vendor_apis, expected_apis);
 
             // Make sure we're in the right state
-            let session = IncodeVerificationSession::get(conn, &suid2)?.unwrap();
+            let session = IncodeVerificationSession::get(conn, &su.id)?.unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::Complete);
+            assert!(session.latest_failure_reason.is_none());
 
             // Assert the state machine visited all states we expect
             let events = IncodeVerificationSessionEvent::get_for_session_id(conn, &session.id)?;

@@ -2,32 +2,38 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddBack, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
-use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::DbPool;
+use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddFrontRequest;
-use newtypes::{DocVData, DocumentSide, IncodeVerificationSessionState, VendorAPI};
+use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
 
-pub struct AddFront {}
+pub struct AddFront {
+    failure_reason: Option<IncodeFailureReason>,
+}
 
 #[async_trait]
 impl IncodeStateTransition for AddFront {
-    async fn run(
-        self,
+    /// Initializes a state of this type, performing all async operations needed before the atomic
+    /// bookkeeping and state transition.
+    /// If None is returned, the state is not ready to run
+    async fn init(
         db_pool: &DbPool,
-        footprint_http_client: &FootprintVendorHttpClient,
+        http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<(IncodeState, IsReady)> {
-        //
+    ) -> ApiResult<Option<Self>> {
+        let Some(front_image) = ctx.docv_data.front_image.clone() else {
+            // Not ready to run
+            return Ok(None);
+        };
+
         // make the request to incode
-        //
         let docv_data = DocVData {
-            front_image: ctx.docv_data.front_image.clone(),
+            front_image: Some(front_image),
             country_code: ctx.docv_data.country_code.clone(),
             document_type: ctx.docv_data.document_type,
             ..Default::default()
@@ -36,11 +42,9 @@ impl IncodeStateTransition for AddFront {
             credentials: session.credentials.clone(),
             docv_data,
         };
-        let res = footprint_http_client.make_request(request).await;
+        let res = http_client.make_request(request).await;
 
-        //
         // Save our result
-        //
 
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeAddFront, ctx);
         save_incode_verification_result(db_pool, args).await?;
@@ -55,37 +59,27 @@ impl IncodeStateTransition for AddFront {
         // Incode returns 200 for upload failures, so catch these here
         let failure_reason = response.add_side_failure_reason();
 
-        let ctx = ctx.clone();
-        let session_id = session.id.clone();
-        let result = db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
-                // If there's failure, we move to retry upload
-                let result = if let Some(reason) = failure_reason {
-                    // If we failed, save the reason, stay in the same state, and clear the front image
-                    let update = UpdateIncodeVerificationSession::set_failure_reason(reason);
-                    IncodeVerificationSession::update(conn, &session_id, update)?;
-
-                    super::on_upload_fail(conn, &ctx, vec![DocumentSide::Front])?;
-                    (self.into(), false)
-                } else {
-                    let update =
-                        UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
-                    IncodeVerificationSession::update(conn, &session_id, update)?;
-
-                    // TODO skip AddBack depending on what is required for the doc type
-                    // Add an ::enter that will decide given the context if we need to do add back
-                    let next_state = AddBack {};
-                    (next_state.into(), true)
-                };
-
-                Ok(result)
-            })
-            .await?;
-
-        Ok(result)
+        Ok(Some(Self { failure_reason }))
     }
 
-    fn is_ready(&self, ctx: &IncodeContext) -> bool {
-        ctx.docv_data.front_image.is_some()
+    /// Perform any bookkeeping that must be atomic with the state transition. Can access any
+    /// context created in `init`
+    fn transition(
+        self,
+        conn: &mut TxnPgConn,
+        ctx: &IncodeContext,
+    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+        // If there's failure, we move to retry upload
+        let result = if let Some(reason) = self.failure_reason {
+            super::on_upload_fail(conn, ctx, vec![DocumentSide::Front])?;
+            (Self::new(), Some(reason))
+        } else {
+            // TODO skip AddBack depending on what is required for the doc type
+            // Add an ::enter that will decide given the context if we need to do add back
+            let next_state = AddBack::new();
+            (next_state, None)
+        };
+
+        Ok(result)
     }
 }

@@ -1,7 +1,7 @@
+use super::IncodeStateTransition;
 use super::VerificationSession;
-use super::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
-use crate::decision::vendor::state_machines::incode_state_machine::IsReady;
+use crate::decision::vendor::state_machines::state::IncodeState;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
@@ -23,11 +23,15 @@ use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
+use newtypes::IncodeFailureReason;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
 use std::collections::HashMap;
 
+// TODO this is more like the other workflow state transitions where it's actually a function
+// of previous states. Our incode state machine workflow doesn't have a general way to handle
+// it yet so we do it in a custom way
 pub struct Complete {}
 
 impl Complete {
@@ -115,18 +119,20 @@ impl Complete {
 
 #[async_trait]
 impl IncodeStateTransition for Complete {
-    async fn run(
-        self,
-        _db_pool: &DbPool,
-        _footprint_http_client: &FootprintVendorHttpClient,
-        _ctx: &IncodeContext,
+    async fn init(
+        _: &DbPool,
+        _: &FootprintVendorHttpClient,
+        _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<(IncodeState, IsReady)> {
-        Err(ApiError::AssertionError("Incode machine already complete".into()))
+    ) -> ApiResult<Option<Self>> {
+        Ok(None)
     }
 
-    fn is_ready(&self, _: &IncodeContext) -> bool {
-        // Should never run this state, it's terminal
-        false
+    fn transition(
+        self,
+        _: &mut TxnPgConn,
+        _: &IncodeContext,
+    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+        Err(ApiError::AssertionError("Incode machine already complete".into()))
     }
 }

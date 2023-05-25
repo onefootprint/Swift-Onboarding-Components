@@ -4,7 +4,7 @@ use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToI
 use chrono::NaiveDateTime;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    IdDocKind, IncodeVerificationFailureReason, PiiString,
+    IdDocKind, IncodeFailureReason, PiiString,
 };
 
 /// Response we get back from adding a document image
@@ -30,10 +30,9 @@ pub struct AddSideResponse {
 
 impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
-    pub fn add_side_failure_reason(&self) -> Option<IncodeVerificationFailureReason> {
+    pub fn add_side_failure_reason(&self) -> Option<IncodeFailureReason> {
         self.fail_reason.as_ref().map(|e| {
-            IncodeVerificationFailureReason::try_from(e.as_str())
-                .unwrap_or(IncodeVerificationFailureReason::Other(e.clone()))
+            IncodeFailureReason::try_from(e.as_str()).unwrap_or(IncodeFailureReason::Other(e.clone()))
         })
     }
 }
@@ -327,7 +326,7 @@ pub struct OCRAddress {
 mod tests {
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
-        IncodeVerificationFailureReason,
+        IncodeFailureReason,
     };
 
     use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse};
@@ -399,7 +398,7 @@ mod tests {
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
         let failure = parsed.add_side_failure_reason().unwrap();
-        assert_eq!(failure, IncodeVerificationFailureReason::WrongDocumentSide);
+        assert_eq!(failure, IncodeFailureReason::WrongDocumentSide);
 
         // No failure
         let raw_response = serde_json::json!({

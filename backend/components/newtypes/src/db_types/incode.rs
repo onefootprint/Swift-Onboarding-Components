@@ -56,7 +56,7 @@ pub enum IncodeVerificationSessionState {
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum IncodeVerificationFailureReason {
+pub enum IncodeFailureReason {
     #[strum(serialize = "UNKNOWN_DOCUMENT_TYPE")]
     UnknownDocumentType,
     #[strum(serialize = "WRONG_DOCUMENT_SIDE")]
@@ -108,5 +108,5 @@ impl IncodeVerificationSessionKind {
 }
 
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionState);
-crate::util::impl_enum_str_diesel!(IncodeVerificationFailureReason);
+crate::util::impl_enum_str_diesel!(IncodeFailureReason);
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionKind);

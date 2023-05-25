@@ -2,38 +2,35 @@ use super::{
     map_to_api_err, save_incode_verification_result, FetchOCR, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
+use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
-use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::DbPool;
+use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchScoresRequest;
-use newtypes::{IncodeVerificationSessionState, VendorAPI};
+use newtypes::{IncodeFailureReason, VendorAPI};
 
 pub struct FetchScores {}
 
 #[async_trait]
 impl IncodeStateTransition for FetchScores {
-    async fn run(
-        self,
+    /// Initializes a state of this type, performing all async operations needed before the atomic
+    /// bookkeeping and state transition.
+    /// If None is returned, the state is not ready to run
+    async fn init(
         db_pool: &DbPool,
-        footprint_http_client: &FootprintVendorHttpClient,
+        http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<(IncodeState, IsReady)> {
-        //
+    ) -> ApiResult<Option<Self>> {
         // make the request to incode
-        //
         let request = IncodeFetchScoresRequest {
             credentials: session.credentials.clone(),
         };
-        let res = footprint_http_client.make_request(request).await;
+        let res = http_client.make_request(request).await;
 
-        //
         // Save our result
-        //
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeFetchScores, ctx);
         save_incode_verification_result(db_pool, args).await?;
 
@@ -42,23 +39,16 @@ impl IncodeStateTransition for FetchScores {
             .result
             .into_success()
             .map_err(map_to_api_err)?;
-
-        let session_id = session.id.clone();
-        db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
-                let update =
-                    UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::FetchOCR);
-                IncodeVerificationSession::update(conn, &session_id, update)?;
-
-                Ok(())
-            })
-            .await?;
-
-        let next_state = FetchOCR {}.into();
-        Ok((next_state, true))
+        Ok(Some(Self {}))
     }
 
-    fn is_ready(&self, _: &IncodeContext) -> bool {
-        true
+    /// Perform any bookkeeping that must be atomic with the state transition. Can access any
+    /// context created in `init`
+    fn transition(
+        self,
+        _: &mut TxnPgConn,
+        _: &IncodeContext,
+    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+        Ok((FetchOCR::new(), None))
     }
 }

@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, AddFront, IncodeState,
+    map_to_api_err, save_incode_verification_result, AddConsent, AddFront, IncodeStateTransition,
     SaveVerificationResultArgs,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
@@ -22,7 +22,7 @@ impl StartOnboarding {
         incode_session: IncodeVerificationSession,
         incode_credentials: IncodeCredentials,
         configuration_id: IncodeConfigurationId,
-    ) -> ApiResult<IncodeState> {
+    ) -> ApiResult<()> {
         //
         // make the request to incode
         //
@@ -57,14 +57,14 @@ impl StartOnboarding {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        let next_state = state
+        state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<IncodeState> {
+            .db_transaction(move |conn| -> ApiResult<_> {
                 // We only need to add consent if the session is of kind=Selfie
-                let next_state: IncodeState = if incode_session.kind.requires_consent() {
-                    AddConsent {}.into()
+                let next_state = if incode_session.kind.requires_consent() {
+                    AddConsent::new()
                 } else {
-                    AddFront {}.into()
+                    AddFront::new()
                 };
 
                 // Update our state to the next stage, saving the auth token needed for all other
@@ -76,10 +76,10 @@ impl StartOnboarding {
                 );
                 IncodeVerificationSession::update(conn, &incode_session.id, update)?;
 
-                Ok(next_state)
+                Ok(())
             })
             .await?;
 
-        Ok(next_state)
+        Ok(())
     }
 }

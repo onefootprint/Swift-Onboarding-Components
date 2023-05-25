@@ -1,8 +1,8 @@
 use chrono::{DateTime, Duration, Utc};
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
-    IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId,
-    IncodeVerificationFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
+    IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, ScopedVaultId,
 };
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ pub struct IncodeVerificationSession {
     pub identity_document_id: IdentityDocumentId,
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
-    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
+    pub latest_failure_reason: Option<IncodeFailureReason>,
     pub kind: IncodeVerificationSessionKind,
 }
 
@@ -55,34 +55,21 @@ pub struct UpdateIncodeVerificationSession {
     pub identity_document_id: Option<IdentityDocumentId>,
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
-    pub latest_failure_reason: Option<Option<IncodeVerificationFailureReason>>,
+    pub latest_failure_reason: Option<Option<IncodeFailureReason>>,
 }
 
 impl UpdateIncodeVerificationSession {
-    pub fn set_state(state: IncodeVerificationSessionState) -> Self {
-        Self {
-            state: Some(state),
-            completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
-            latest_failure_reason: Some(None),
-            ..Self::default()
-        }
-    }
-    pub fn set_failure_reason(failure_reason: IncodeVerificationFailureReason) -> Self {
-        Self {
-            latest_failure_reason: Some(Some(failure_reason)),
-            ..Self::default()
-        }
-    }
-
-    pub fn set_state_and_identity_document(
+    pub fn set_state(
         state: IncodeVerificationSessionState,
-        identity_document_id: IdentityDocumentId,
+        failure_reason: Option<IncodeFailureReason>,
     ) -> Self {
         Self {
             state: Some(state),
             completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
-            identity_document_id: Some(identity_document_id),
-            latest_failure_reason: Some(None),
+            // NOTE: this is tricky to read - this could be `Some(None)`, which would wipe the
+            // failure reason. Need to wrap in outer option since by default, a diesel changeset
+            // ignores any updates with value None
+            latest_failure_reason: Some(failure_reason),
             ..Self::default()
         }
     }

@@ -1,7 +1,6 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, IncodeVerificationFailureReason,
-    PiiString,
+    idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, IncodeFailureReason, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -92,9 +91,9 @@ impl From<IdologyImageCaptureErrors> for DocumentImageError {
     }
 }
 
-impl From<IncodeVerificationFailureReason> for DocumentImageError {
+impl From<IncodeFailureReason> for DocumentImageError {
     // TODO: fix enum on frontend
-    fn from(_err: IncodeVerificationFailureReason) -> Self {
+    fn from(_err: IncodeFailureReason) -> Self {
         Self::ImageError
         // match err {
         //     IncodeVerificationFailureReason::UnknownDocumentType => Self::ImageError,
