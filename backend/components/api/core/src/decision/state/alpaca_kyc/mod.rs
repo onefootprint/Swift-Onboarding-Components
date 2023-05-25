@@ -4,8 +4,9 @@ use super::{
     actions::MakeDecision, HasStateName, MakeVendorCalls, MakeWatchlistCheckCall, StateError,
     WorkflowActions, WorkflowStates,
 };
-use crate::{errors::ApiResult, State};
+use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use db::models::workflow::Workflow;
+use newtypes::{OnboardingId, ScopedVaultId, TenantId};
 
 // For illustrative purposes currently
 
@@ -13,9 +14,22 @@ use db::models::workflow::Workflow;
 /// States
 ///
 
-pub struct DataCollection;
-pub struct VendorCalls;
-pub struct Decisioning;
+pub struct DataCollection {
+    sv_id: ScopedVaultId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
+}
+pub struct VendorCalls {
+    sv_id: ScopedVaultId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
+}
+pub struct Decisioning {
+    ob_id: OnboardingId,
+    sv_id: ScopedVaultId,
+    t_id: TenantId,
+    vendor_results: Vec<VendorResult>,
+}
 pub struct WatchlistCheck;
 pub struct PendingReview;
 pub struct DocCollection;

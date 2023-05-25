@@ -10,7 +10,7 @@ use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationRe
 use super::{Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-    state::{actions::Authorize, WorkflowStates},
+    state::{actions::Authorize, common, WorkflowStates},
 };
 use crate::{
     decision::{
@@ -31,14 +31,8 @@ use crate::{
 /// ////////////////
 impl DataCollection {
     pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
-        let (ob, sv) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let sv = ScopedVault::get(conn, &workflow.scoped_vault_id)?;
-                let (ob, _, _, _) = Onboarding::get(conn, (&sv.id, &sv.vault_id))?;
-                Ok((ob, sv))
-            })
-            .await??;
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
         Ok(DataCollection {
             is_redo: config.is_redo,
             sv_id: sv.id,
@@ -65,27 +59,7 @@ impl OnAction<Authorize> for DataCollection {
     }
 
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        let ob = Onboarding::lock(conn, &self.ob_id)?;
-        // redundant with new workflow state updates, will eventually remove when Onboarding is removed
-        if !self.is_redo {
-            if ob.idv_reqs_initiated_at.is_some() {
-                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-            }
-            ob.into_inner()
-                .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
-        }
-        // TODO: create new DI if is_redo
-        let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &self.sv_id)?;
-
-        let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&self.sv_id))?;
-
-        decision::vendor::build_verification_requests_and_checkpoint(
-            conn,
-            &uvw,
-            &self.sv_id,
-            &decision_intent.id,
-            &tvc,
-        )?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
         Ok(States::from(VendorCalls {
             is_redo: self.is_redo,
@@ -102,15 +76,8 @@ impl OnAction<Authorize> for DataCollection {
 /// ////////////////
 impl VendorCalls {
     pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
-        // TODO: consolidate with other init
-        let (ob, sv) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let sv = ScopedVault::get(conn, &workflow.scoped_vault_id)?;
-                let (ob, _, _, _) = Onboarding::get(conn, (&sv.id, &sv.vault_id))?;
-                Ok((ob, sv))
-            })
-            .await??;
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
         Ok(VendorCalls {
             is_redo: config.is_redo,
             sv_id: sv.id,
@@ -129,78 +96,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state,
-            state.feature_flag_client.clone(),
-            &self.sv_id,
-            &self.t_id,
-        )
-        .await?;
-
-        let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-            &self.ob_id,
-            &self.sv_id,
-            &state.db_pool,
-            &state.enclave_client,
-        )
-        .await?;
-
-        // If we are Sandbox/Demo, we do not make real vendor calls and instead just artificially produce some canned vendor responses
-        let vendor_results = if let (Some(fixture_decision)) = fixture_decision {
-            decision::sandbox::get_fixture_vendor_results(vendor_requests.outstanding_requests)?
-        } else {
-            let tvc = TenantVendorControl::new(
-                self.t_id.clone(),
-                &state.db_pool,
-                &state.enclave_client,
-                &state.config,
-            )
-            .await?;
-            // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
-            decision::engine::make_vendor_requests(
-                &state.db_pool,
-                &self.ob_id,
-                &state.enclave_client,
-                state.config.service_config.is_production(),
-                vendor_requests.outstanding_requests,
-                state.feature_flag_client.clone(),
-                state.vendor_clients.idology_expect_id.clone(),
-                state.vendor_clients.socure_id_plus.clone(),
-                state.vendor_clients.twilio_lookup_v2.clone(),
-                state.vendor_clients.experian_cross_core.clone(),
-                tvc,
-            )
-            .await?
-        };
-
-        let has_critical_error = !vendor_results.critical_errors.is_empty();
-        let error_message = format!("{:?}", vendor_results.all_errors());
-
-        // 🤔 I think if we are doing bulk vendor calls, we want to save every VRes we can, even if there is a critical error that is blocking us from transitioning
-        // to `Decisioning`- so I think we should save the VRes's here and not in the on_commit txn. Alternatively we could have a `VendorError` state,
-        // but that just introduces so many extra states to cover errors
-        // TODO: For failed vres's, we should create new Vreq's for those
-        let err_vres = vendor_results.all_errors_with_parsable_requests();
-        let completed_oustanding_vendor_responses = decision::engine::save_vendor_responses(
-            &state.db_pool,
-            &vendor_results.successful,
-            err_vres,
-            &self.ob_id,
-        )
-        .await?;
-
-        if has_critical_error {
-            tracing::error!(errors = error_message, "VendorRequestsFailed");
-            return Err(ApiError::VendorRequestsFailed);
-        }
-
-        let all_vendor_results: Vec<VendorResult> = vendor_requests
-            .completed_requests
-            .into_iter()
-            .chain(completed_oustanding_vendor_responses.into_iter())
-            .collect();
-
-        Ok(all_vendor_results)
+        common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
     }
 
     fn on_commit(
@@ -224,30 +120,9 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
 /// ////////////////
 impl Decisioning {
     pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
-        let (ob, sv) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let sv = ScopedVault::get(conn, &workflow.scoped_vault_id)?;
-                let (ob, _, _, _) = Onboarding::get(conn, (&sv.id, &sv.vault_id))?;
-                Ok((ob, sv))
-            })
-            .await??;
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-            &ob.id,
-            &sv.id,
-            &state.db_pool,
-            &state.enclave_client,
-        )
-        .await?;
-        if !vendor_requests.outstanding_requests.is_empty() {
-            return Err(StateError::StateInitError(
-                "Decisioning".to_owned(),
-                "outstanding vreqs found".to_owned(),
-            )
-            .into());
-        }
-        let vendor_results = vendor_requests.completed_requests;
+        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
         Ok(Decisioning {
             is_redo: config.is_redo,

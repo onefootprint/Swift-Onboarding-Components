@@ -10,6 +10,7 @@ use self::actions::WorkflowActions;
 pub mod actions;
 pub use actions::*;
 pub mod alpaca_kyc;
+pub mod common;
 pub mod kyc;
 
 pub trait HasStateName {
