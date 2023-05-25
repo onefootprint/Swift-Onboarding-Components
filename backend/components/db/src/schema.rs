@@ -169,7 +169,6 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
-        previous_document_request_id -> Nullable<Text>,
     }
 }
 

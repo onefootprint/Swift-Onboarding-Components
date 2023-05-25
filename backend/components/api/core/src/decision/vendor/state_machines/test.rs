@@ -54,7 +54,7 @@ async fn test_run_machine(is_selfie: bool) {
     // Needed for db constraints
     let id_doc = db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
+            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
@@ -204,7 +204,7 @@ async fn test_fail(is_selfie: bool) {
     let (id_doc, doc_request) = db_pool
         .db_transaction(
             move |conn| -> Result<(IdentityDocument, DocumentRequest), DbError> {
-                let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
+                let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
                 if is_selfie {
                     let note = "I, Bob Boberto, consent to NOTHING".into();
                     UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;

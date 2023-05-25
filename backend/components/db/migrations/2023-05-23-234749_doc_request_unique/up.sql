@@ -1,0 +1,3 @@
+DROP INDEX document_request_pending_scoped_user_unique_idx;
+ALTER TABLE document_request ADD UNIQUE (scoped_vault_id);
+ALTER TABLE document_request DROP COLUMN previous_document_request_id;

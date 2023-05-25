@@ -94,7 +94,7 @@ pub async fn post(
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
                 let must_collect_selfie = ob_config.must_collect_selfie();
-                DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie, None)?;
+                DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie)?;
             }
 
             let mut new_scopes = vec![];

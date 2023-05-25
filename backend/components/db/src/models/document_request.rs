@@ -12,7 +12,6 @@ pub type DocRefId = String;
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
-    // TODO keep unique
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<DocRefId>,
     pub status: DocumentRequestStatus,
@@ -20,8 +19,6 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
-    // We keep track of the previous document request in the case we want to not recollect selfie, we can copy over the s3 path
-    pub previous_document_request_id: Option<DocumentRequestId>,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
@@ -42,7 +39,6 @@ impl DocumentRequest {
         scoped_vault_id: ScopedVaultId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
-        previous_document_request_id: Option<DocumentRequestId>,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
             scoped_vault_id,
@@ -50,7 +46,6 @@ impl DocumentRequest {
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
             should_collect_selfie,
-            previous_document_request_id,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -154,5 +149,4 @@ pub struct NewDocumentRequest {
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
-    pub previous_document_request_id: Option<DocumentRequestId>,
 }

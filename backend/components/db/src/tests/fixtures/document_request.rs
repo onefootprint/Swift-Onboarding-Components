@@ -8,8 +8,8 @@ use crate::{
     tests::prelude::TestPgConn,
 };
 use newtypes::{
-    DecisionIntentId, DocumentRequestId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedVaultId,
-    VaultId, VendorAPI, VerificationRequestId, VerificationResultId,
+    DecisionIntentId, DocumentRequestStatus, OnboardingId, PiiJsonValue, ScopedVaultId, VaultId, VendorAPI,
+    VerificationRequestId, VerificationResultId,
 };
 use std::str::FromStr;
 
@@ -19,7 +19,6 @@ pub struct DocumentRequestFixtureCreateOpts {
     pub user_vault_id: VaultId,
     pub onboarding_id: OnboardingId,
     pub collected_doc_opts: CollectedDocOpts,
-    pub previous_document_request_id: Option<DocumentRequestId>,
     pub desired_status: DocumentRequestStatus,
     pub should_collect_selfie: bool,
 }
@@ -47,7 +46,6 @@ impl Default for DocumentRequestFixtureCreateOpts {
             user_vault_id: "uv1".to_string().into(),
             onboarding_id: "ob1".to_string().into(),
             collected_doc_opts: CollectedDocOpts::default(),
-            previous_document_request_id: None,
             desired_status: DocumentRequestStatus::Pending,
             should_collect_selfie: false,
         }
@@ -67,7 +65,6 @@ pub fn create(
         opts.scoped_user_id.clone(),
         None,
         opts.should_collect_selfie,
-        opts.previous_document_request_id,
     )
     .unwrap();
     let mut verification_info = None;
