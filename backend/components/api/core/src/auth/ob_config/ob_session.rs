@@ -19,7 +19,7 @@ use feature_flag::FeatureFlagClient;
     alias = "Onboarding Config Token",
     in = "header",
     name = "X-Onboarding-Session-Token",
-    description = "Short-lived token representing an onboarding configuration"
+    description = "Short-lived token representing an onboarding configuration."
 )]
 pub struct ParsedOnboardingSession {
     pub tenant: Tenant,

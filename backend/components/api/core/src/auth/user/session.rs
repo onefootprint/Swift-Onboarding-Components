@@ -78,7 +78,7 @@ impl UserSessionContext {
     alias = "User Token",
     in = "header",
     name = "X-Fp-Authorization",
-    description = "Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions"
+    description = "Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions."
 )]
 pub struct ParsedUserSessionContext(pub(super) UserSessionContext);
 

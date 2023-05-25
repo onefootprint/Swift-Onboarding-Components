@@ -21,12 +21,12 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
     "/users/{fp_id}/client_token",
-    tags(Users, Preview),
+    tags(Client, PublicApi),
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
 ))]
 #[api_v2_operation(
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[post("/entities/{fp_id}/client_token")]
 pub async fn post(

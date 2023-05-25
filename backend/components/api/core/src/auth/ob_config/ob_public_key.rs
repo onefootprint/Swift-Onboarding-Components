@@ -15,7 +15,7 @@ use crate::{auth::AuthError, State};
     alias = "Onboarding Config Publishable Key",
     in = "header",
     name = "X-Fp-Authorization",
-    description = "Short-lived client token to perform actions for a given user"
+    description = "Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard."
 )]
 pub struct PublicOnboardingContext {
     pub tenant: Tenant,

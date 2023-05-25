@@ -20,7 +20,7 @@ use paperclip::actix::Apiv2Security;
     alias = "WorkOS Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Short-lived auth token for a dashboard user before selecting an individual tenant"
+    description = "Short-lived auth token for a dashboard user before selecting an individual tenant."
 )]
 pub struct WorkOsSessionData {
     pub tenant_user_id: TenantUserId,

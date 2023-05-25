@@ -41,7 +41,7 @@ pub struct TenantRbAuth {
     alias = "Dashboard Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Short-lived auth token for a dashboard user"
+    description = "Short-lived token for an authenticated dashboard user."
 )]
 pub struct ParsedTenantRbAuth(TenantRbAuth);
 

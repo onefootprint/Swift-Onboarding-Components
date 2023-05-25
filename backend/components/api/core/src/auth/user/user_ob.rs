@@ -46,7 +46,7 @@ pub struct UserObSession {
     alias = "User Onboarding Token",
     in = "header",
     name = "X-Fp-Authorization",
-    description = "Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions"
+    description = "Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions."
 )]
 pub struct ParsedUserObSession(UserObSession);
 

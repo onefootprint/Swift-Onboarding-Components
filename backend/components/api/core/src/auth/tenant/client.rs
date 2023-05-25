@@ -29,7 +29,7 @@ pub struct ClientTenantData {
     alias = "Client Token",
     in = "header",
     name = "X-Fp-Authorization",
-    description = "Short-lived client token to perform actions for a given user"
+    description = "Short-lived client token to perform actions for a given user."
 )]
 pub struct ParsedClientTenantData(ClientTenantData);
 

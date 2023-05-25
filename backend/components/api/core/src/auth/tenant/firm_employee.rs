@@ -51,7 +51,7 @@ pub struct FirmEmployeeAuth {
     alias = "Firm Employee Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Short-lived auth token for a firm employee dashboard user"
+    description = "Short-lived auth token for a firm-employee dashboard user."
 )]
 pub struct ParsedFirmEmployeeAuth(FirmEmployeeAuth);
 

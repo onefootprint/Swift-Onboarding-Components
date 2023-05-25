@@ -45,12 +45,12 @@ pub async fn post(
 #[tracing::instrument(skip(state, auth))]
 #[route_alias(actix::post(
     "/users/vault/validate",
-    tags(Vault, Users, Preview),
+    tags(Client, Vault, Users, PublicApi),
     description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token"
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault given a short-lived, entity-scoped client token.",
-    tags(Vault, Entities, Private)
+    tags(Client, Vault, Entities, Private)
 )]
 #[actix::post("/entities/vault/validate")]
 pub async fn post_client(
