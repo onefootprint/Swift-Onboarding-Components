@@ -6,7 +6,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{schema::incode_verification_session_event, DbResult, TxnPgConn};
+use crate::{schema::incode_verification_session_event, DbResult, PgConn, TxnPgConn};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session_event)]
@@ -61,12 +61,12 @@ impl IncodeVerificationSessionEvent {
 
     #[tracing::instrument(skip_all)]
     pub fn get_for_session_id(
-        conn: &mut TxnPgConn,
-        session_id: IncodeVerificationSessionId,
+        conn: &mut PgConn,
+        session_id: &IncodeVerificationSessionId,
     ) -> DbResult<Vec<Self>> {
         let res = incode_verification_session_event::table
             .filter(incode_verification_session_event::incode_verification_session_id.eq(session_id))
-            .get_results(conn.conn())?;
+            .get_results(conn)?;
 
         Ok(res)
     }

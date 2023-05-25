@@ -16,6 +16,8 @@ use newtypes::{
     IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId, TenantId,
 };
 
+pub type IsReady = bool;
+
 /// Various context fields needed by ever stage of the state machine
 #[derive(Clone)]
 pub struct IncodeContext {
@@ -37,7 +39,12 @@ pub trait IncodeStateTransition {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> Result<IncodeState, ApiError>;
+    ) -> ApiResult<(IncodeState, IsReady)>;
+
+    // TODO maybe we want an interface like the workflow machines where we have an async function
+    // that loads any context and then a synchronous function that performs any db operations and
+    // returns the next state transition
+    fn is_ready(&self, ctx: &IncodeContext) -> bool;
 }
 
 // These are concrete structs that implement `IncodeStateTransition`. By using `enum_dispatch`,
@@ -47,7 +54,6 @@ pub enum IncodeState {
     AddConsent,
     AddFront,
     AddBack,
-    RetryUpload,
     ProcessId,
     FetchScores,
     FetchOCR,
@@ -60,19 +66,11 @@ impl IncodeState {
             IncodeState::AddFront(_) => IncodeVerificationSessionState::AddFront,
             IncodeState::AddConsent(_) => IncodeVerificationSessionState::AddConsent,
             IncodeState::AddBack(_) => IncodeVerificationSessionState::AddBack,
-            IncodeState::RetryUpload(_) => IncodeVerificationSessionState::RetryUpload,
             IncodeState::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
             IncodeState::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
             IncodeState::FetchOCR(_) => IncodeVerificationSessionState::FetchOCR,
             IncodeState::Complete(_) => IncodeVerificationSessionState::Complete,
         }
-    }
-
-    fn is_terminal_state(&self) -> bool {
-        matches!(
-            self.name(),
-            IncodeVerificationSessionState::RetryUpload | IncodeVerificationSessionState::Complete
-        )
     }
 }
 
@@ -170,7 +168,6 @@ impl IncodeStateMachine {
             IncodeVerificationSessionState::FetchScores => FetchScores {}.into(),
             IncodeVerificationSessionState::FetchOCR => FetchOCR {}.into(),
             IncodeVerificationSessionState::Complete => Complete {}.into(),
-            IncodeVerificationSessionState::RetryUpload => RetryUpload {}.into(),
             IncodeVerificationSessionState::StartOnboarding => {
                 return Err(AssertionError("Should have already run StartOnboarding").into())
             }
@@ -190,10 +187,18 @@ impl IncodeStateMachine {
     ) -> Result<Self, IncodeMachineError> {
         let mut machine = self;
         loop {
-            machine = machine.step(db_pool, footprint_http_client).await?;
+            // First, check if the state is ready to run. It's possible we're in a state like
+            // AddBack but haven't yet collected the back image
+            if !machine.state.is_ready(&machine.ctx) {
+                break;
+            }
 
-            // Break if in `Complete` or `RetryUpload`
-            if machine.state.is_terminal_state() {
+            let is_ready;
+            (machine, is_ready) = machine.step(db_pool, footprint_http_client).await?;
+
+            // Check if the last state specifically requested to abort. This may happen if we need
+            // some user input to re-run the current step
+            if !is_ready {
                 break;
             }
         }
@@ -206,21 +211,23 @@ impl IncodeStateMachine {
         self,
         db_pool: &DbPool,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<Self, IncodeMachineError> {
+    ) -> Result<(Self, IsReady), IncodeMachineError> {
         let Self { state, ctx, session } = self;
         let current_state = state.name();
 
-        let result = { state.run(db_pool, footprint_http_client, &ctx, &session).await };
-
-        result
-            .map(|s| Self {
-                state: s,
-                ctx,
-                session,
-            })
+        let (s, is_ready) = state
+            .run(db_pool, footprint_http_client, &ctx, &session)
+            .await
             .map_err(|e| IncodeMachineError {
                 state_name: current_state,
                 error: e,
-            })
+            })?;
+
+        let state = Self {
+            state: s,
+            ctx,
+            session,
+        };
+        Ok((state, is_ready))
     }
 }

@@ -43,11 +43,7 @@ impl DocumentUpload {
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         // Deactivate existing upload, if any
-        diesel::update(document_upload::table)
-            .filter(document_upload::document_id.eq(&document_id))
-            .filter(document_upload::side.eq(side))
-            .set(document_upload::deactivated_at.eq(Utc::now()))
-            .execute(conn.conn())?;
+        Self::deactivate(conn, &document_id, vec![side])?;
 
         // Add the new upload
         let new = NewDocumentUploadRow {
@@ -61,5 +57,18 @@ impl DocumentUpload {
             .values(new)
             .get_result(conn.conn())?;
         Ok(result)
+    }
+
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        document_id: &IdentityDocumentId,
+        sides: Vec<DocumentSide>,
+    ) -> DbResult<()> {
+        diesel::update(document_upload::table)
+            .filter(document_upload::document_id.eq(document_id))
+            .filter(document_upload::side.eq_any(sides))
+            .set(document_upload::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+        Ok(())
     }
 }

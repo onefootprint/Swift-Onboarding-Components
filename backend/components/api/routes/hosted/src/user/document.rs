@@ -9,7 +9,6 @@ use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IncodeStateMachine};
-use api_core::decision::vendor::state_machines::states::document_retry_limit_exceeded;
 use api_core::decision::vendor::state_machines::states::Complete;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
@@ -247,8 +246,8 @@ pub fn construct_get_response(
     let (current_request, previous_request, _) =
         DbDocumentRequest::get_latest_with_previous_request_and_result(conn, scoped_user_id)?;
 
-    let retry_limit_exceeded =
-        document_retry_limit_exceeded(conn, &current_request.scoped_vault_id).unwrap_or(false);
+    // TODO
+    let retry_limit_exceeded = false;
 
     let should_return_errors = matches!(
         current_request.status,

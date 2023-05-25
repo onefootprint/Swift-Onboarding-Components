@@ -1,10 +1,13 @@
 use std::str::FromStr;
 
 use crate::{
-    models::identity_document::{IdentityDocument, NewIdentityDocumentArgs},
+    models::{
+        document_upload::DocumentUpload,
+        identity_document::{IdentityDocument, NewIdentityDocumentArgs},
+    },
     TxnPgConn,
 };
-use newtypes::{DocumentRequestId, IdDocKind};
+use newtypes::{DocumentRequestId, DocumentSide, IdDocKind, SealedVaultDataKey};
 
 pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> IdentityDocument {
     let args = NewIdentityDocumentArgs {
@@ -12,5 +15,8 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
         document_type: IdDocKind::DriverLicense,
         country_code: "Flerp country code".to_owned(),
     };
-    IdentityDocument::get_or_create(conn, args).unwrap()
+    let doc = IdentityDocument::get_or_create(conn, args).unwrap();
+    let key = SealedVaultDataKey(vec![]);
+    DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, "".into(), key).unwrap();
+    doc
 }

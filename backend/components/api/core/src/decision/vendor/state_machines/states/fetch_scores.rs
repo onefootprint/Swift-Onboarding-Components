@@ -2,10 +2,9 @@ use super::{
     map_to_api_err, save_incode_verification_result, FetchOCR, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::DbPool;
@@ -23,7 +22,7 @@ impl IncodeStateTransition for FetchScores {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> Result<IncodeState, ApiError> {
+    ) -> ApiResult<(IncodeState, IsReady)> {
         //
         // make the request to incode
         //
@@ -55,6 +54,11 @@ impl IncodeStateTransition for FetchScores {
             })
             .await?;
 
-        Ok(FetchOCR {}.into())
+        let next_state = FetchOCR {}.into();
+        Ok((next_state, true))
+    }
+
+    fn is_ready(&self, _: &IncodeContext) -> bool {
+        true
     }
 }

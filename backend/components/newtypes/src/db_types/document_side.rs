@@ -1,5 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use strum_macros::AsRefStr;
+use strum_macros::{AsRefStr, EnumIter};
 
 #[derive(
     Debug,
@@ -13,6 +13,7 @@ use strum_macros::AsRefStr;
     AsRefStr,
     AsExpression,
     FromSqlRow,
+    EnumIter,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

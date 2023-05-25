@@ -1,18 +1,17 @@
 use super::{
     map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition, ProcessId,
-    RetryUpload, SaveVerificationResultArgs, VerificationSession,
+    SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddBackRequest;
-use newtypes::IncodeVerificationFailureReason;
 use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
+use newtypes::{DocumentSide, IncodeVerificationFailureReason};
 
 pub struct AddBack {}
 
@@ -24,7 +23,7 @@ impl IncodeStateTransition for AddBack {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> Result<IncodeState, ApiError> {
+    ) -> ApiResult<(IncodeState, IsReady)> {
         //
         // make the request to incode
         //
@@ -68,27 +67,32 @@ impl IncodeStateTransition for AddBack {
         // Save the next stage's Vreq
         let ctx = ctx.clone();
         let session_id = session.id.clone();
-        let next_state = db_pool
+        let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                // If there's failure, we move to retry upload
                 let next_state = if let Some(reason) = failure_reason {
-                    let update =
-                        UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
+                    // If we failed, save the reason, stay in the same state, and clear the back image
+                    let update = UpdateIncodeVerificationSession::set_failure_reason(reason);
                     IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    RetryUpload::enter(conn, &ctx)?.into()
+                    super::on_upload_fail(conn, &ctx, vec![DocumentSide::Back])?;
+                    (self.into(), false)
                 } else {
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::ProcessId);
                     IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    ProcessId {}.into()
+                    let next_state = ProcessId {};
+                    (next_state.into(), true)
                 };
 
                 Ok(next_state)
             })
             .await?;
 
-        Ok(next_state)
+        Ok(result)
+    }
+
+    fn is_ready(&self, ctx: &IncodeContext) -> bool {
+        ctx.docv_data.back_image.is_some()
     }
 }

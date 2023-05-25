@@ -67,10 +67,9 @@ impl UpdateIncodeVerificationSession {
             ..Self::default()
         }
     }
-    pub fn set_state_to_retry_with_failure_reason(failure_reason: IncodeVerificationFailureReason) -> Self {
+    pub fn set_failure_reason(failure_reason: IncodeVerificationFailureReason) -> Self {
         Self {
             latest_failure_reason: Some(failure_reason),
-            state: Some(IncodeVerificationSessionState::RetryUpload),
             ..Self::default()
         }
     }

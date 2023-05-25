@@ -1,17 +1,17 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, Complete, IncodeState, IncodeStateTransition,
-    RetryUpload, SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeState, IncodeStateTransition,
+    SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchOCRRequest;
-use newtypes::{IncodeVerificationFailureReason, IncodeVerificationSessionState, VendorAPI};
+use newtypes::{DocumentSide, IncodeVerificationFailureReason, IncodeVerificationSessionState, VendorAPI};
+use strum::IntoEnumIterator;
 
 pub struct FetchOCR {}
 
@@ -23,7 +23,7 @@ impl IncodeStateTransition for FetchOCR {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> Result<IncodeState, ApiError> {
+    ) -> ApiResult<(IncodeState, IsReady)> {
         //
         // make the request to incode
         //
@@ -47,33 +47,40 @@ impl IncodeStateTransition for FetchOCR {
 
         let ctx = ctx.clone();
         let session_id = session.id.clone();
-        let next_step = db_pool
+        let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let next_step = match response.document_kind() {
+                let result = match response.document_kind() {
                     Ok(dk) => {
                         let update = UpdateIncodeVerificationSession::set_state(
                             IncodeVerificationSessionState::Complete,
                         );
                         IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                        Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, response)?.into()
+                        let next_step =
+                            Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, response)?;
+                        (next_step.into(), true)
                     }
                     Err(_) => {
-                        let update = UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(
+                        // If we got a different document kind, fail and make a new document request
+                        let update = UpdateIncodeVerificationSession::set_failure_reason(
                             IncodeVerificationFailureReason::UnknownDocumentType,
                         );
                         IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                        // TODO If the document uploaded isn't supported, retry.
-                        // Should we include some context on the error here?
-                        RetryUpload::enter(conn, &ctx)?.into()
+                        super::on_upload_fail(conn, &ctx, DocumentSide::iter().collect())?;
+                        let next_step = AddFront {};
+                        (next_step.into(), false)
                     }
                 };
 
-                Ok(next_step)
+                Ok(result)
             })
             .await?;
 
-        Ok(next_step)
+        Ok(result)
+    }
+
+    fn is_ready(&self, _: &IncodeContext) -> bool {
+        true
     }
 }

@@ -1,4 +1,7 @@
 mod start_onboarding;
+use db::models::document_request::{DocumentRequest, DocumentRequestUpdate};
+use db::models::document_upload::DocumentUpload;
+use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
 pub use start_onboarding::*;
 
@@ -23,18 +26,18 @@ pub use fetch_ocr::*;
 mod complete;
 pub use complete::*;
 
-mod retry_upload;
-pub use retry_upload::*;
-
 use super::incode_state_machine::{IncodeContext, IncodeState, IncodeStateTransition};
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::verification_result::VerificationResult;
-use db::DbPool;
+use db::{DbPool, TxnPgConn};
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{IncodeVerificationSessionId, PiiJsonValue, ScrubbedJsonValue, VendorAPI};
+use newtypes::{
+    DocumentRequestStatus, DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId,
+    PiiJsonValue, ScrubbedJsonValue, VendorAPI,
+};
 
 #[derive(Clone)]
 pub struct VerificationSession {
@@ -123,4 +126,20 @@ async fn save_incode_verification_result<'a>(
 
 fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
+}
+
+fn on_upload_fail(conn: &mut TxnPgConn, ctx: &IncodeContext, sides: Vec<DocumentSide>) -> ApiResult<()> {
+    // TODO implement retry limit
+    // TODO Might want to change the appearance of this timeline event. Do we want to show _every_ fail?
+    let info = IdentityDocumentUploadedInfo {
+        id: ctx.id_doc_id.clone(),
+    };
+    UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.sv_id.clone())?;
+    // TODO do we care about the doc request status anymore?
+    let update = DocumentRequestUpdate::status(DocumentRequestStatus::UploadFailed);
+    DocumentRequest::update_by_id(conn, &ctx.doc_request_id, update)?;
+
+    // Deactivate the failed sides to require re-uploading
+    DocumentUpload::deactivate(conn, &ctx.id_doc_id, sides)?;
+    Ok(())
 }

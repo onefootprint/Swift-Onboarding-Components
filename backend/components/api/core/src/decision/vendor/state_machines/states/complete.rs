@@ -1,6 +1,7 @@
 use super::VerificationSession;
 use super::{IncodeState, IncodeStateTransition};
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::state_machines::incode_state_machine::IsReady;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
@@ -120,7 +121,12 @@ impl IncodeStateTransition for Complete {
         _footprint_http_client: &FootprintVendorHttpClient,
         _ctx: &IncodeContext,
         _: &VerificationSession,
-    ) -> Result<IncodeState, ApiError> {
-        Err(ApiError::AssertionError("incode already complete".into()))
+    ) -> ApiResult<(IncodeState, IsReady)> {
+        Err(ApiError::AssertionError("Incode machine already complete".into()))
+    }
+
+    fn is_ready(&self, _: &IncodeContext) -> bool {
+        // Should never run this state, it's terminal
+        false
     }
 }

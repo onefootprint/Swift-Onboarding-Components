@@ -1,17 +1,16 @@
 use super::{
     map_to_api_err, save_incode_verification_result, AddBack, IncodeState, IncodeStateTransition,
-    RetryUpload, SaveVerificationResultArgs, VerificationSession,
+    SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::state_machines::incode_state_machine::{IncodeContext, IsReady};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use async_trait::async_trait;
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddFrontRequest;
-use newtypes::{DocVData, IncodeVerificationSessionState, VendorAPI};
+use newtypes::{DocVData, DocumentSide, IncodeVerificationSessionState, VendorAPI};
 
 pub struct AddFront {}
 
@@ -23,7 +22,7 @@ impl IncodeStateTransition for AddFront {
         footprint_http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> Result<IncodeState, ApiError> {
+    ) -> ApiResult<(IncodeState, IsReady)> {
         //
         // make the request to incode
         //
@@ -58,15 +57,16 @@ impl IncodeStateTransition for AddFront {
 
         let ctx = ctx.clone();
         let session_id = session.id.clone();
-        let next_state = db_pool
+        let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 // If there's failure, we move to retry upload
-                let next_state = if let Some(reason) = failure_reason {
-                    let update =
-                        UpdateIncodeVerificationSession::set_state_to_retry_with_failure_reason(reason);
+                let result = if let Some(reason) = failure_reason {
+                    // If we failed, save the reason, stay in the same state, and clear the front image
+                    let update = UpdateIncodeVerificationSession::set_failure_reason(reason);
                     IncodeVerificationSession::update(conn, &session_id, update)?;
 
-                    RetryUpload::enter(conn, &ctx)?.into()
+                    super::on_upload_fail(conn, &ctx, vec![DocumentSide::Front])?;
+                    (self.into(), false)
                 } else {
                     let update =
                         UpdateIncodeVerificationSession::set_state(IncodeVerificationSessionState::AddBack);
@@ -74,13 +74,18 @@ impl IncodeStateTransition for AddFront {
 
                     // TODO skip AddBack depending on what is required for the doc type
                     // Add an ::enter that will decide given the context if we need to do add back
-                    AddBack {}.into()
+                    let next_state = AddBack {};
+                    (next_state.into(), true)
                 };
 
-                Ok(next_state)
+                Ok(result)
             })
             .await?;
 
-        Ok(next_state)
+        Ok(result)
+    }
+
+    fn is_ready(&self, ctx: &IncodeContext) -> bool {
+        ctx.docv_data.front_image.is_some()
     }
 }
