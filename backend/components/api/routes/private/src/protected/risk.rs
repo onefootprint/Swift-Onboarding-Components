@@ -127,10 +127,7 @@ async fn make_vendor_calls(
     )
     .await?;
 
-    let (rules_output, _) = crate::decision::engine::calculate_decision(
-        vendor_results.clone(),
-        state.feature_flag_client.clone(),
-    )?;
+    let (rules_output, _) = crate::decision::engine::calculate_decision(vendor_results.clone())?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()
@@ -309,8 +306,7 @@ async fn shadow_run(
         })
         .collect();
 
-    let (rules_output, _) =
-        decision::engine::calculate_decision(vendor_results, state.feature_flag_client.clone())?;
+    let (rules_output, _) = decision::engine::calculate_decision(vendor_results)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision_status,

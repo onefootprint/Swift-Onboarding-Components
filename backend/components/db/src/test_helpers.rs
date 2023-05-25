@@ -37,6 +37,7 @@ where
     l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()
 }
 
+#[track_caller]
 pub fn assert_have_same_elements<T>(l: Vec<T>, r: Vec<T>)
 where
     T: Eq + std::fmt::Debug + Clone,

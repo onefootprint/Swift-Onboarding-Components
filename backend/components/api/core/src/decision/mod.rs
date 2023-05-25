@@ -1,7 +1,5 @@
 use newtypes::{Vendor, VendorAPI};
 
-use self::rule::RuleSetName;
-
 pub mod biz_risk;
 pub mod engine;
 pub mod features;
@@ -19,12 +17,12 @@ pub mod vendor;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
-    #[error("Missing data for rules_set {0}")]
-    MissingDataForRuleSet(RuleSetName),
     #[error("TenantVendorControl error {0}")]
     TenantVendorControlError(#[from] TenantVendorControlError),
     #[error("Fixture data not found for: {0}")]
     FixtureDataNotFound(VendorAPI),
+    #[error("Rule error {0}")]
+    RuleError(#[from] RuleError),
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -33,4 +31,12 @@ pub enum TenantVendorControlError {
     MissingCredentialsForVendor(Vendor),
     #[error("Enclave error {0}")]
     EnclaveError(#[from] crate::errors::enclave::EnclaveError),
+}
+
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
+pub enum RuleError {
+    #[error("Missing input for rules")]
+    MissingInputForRules,
+    #[error("AssertionError {0}")]
+    AssertionError(String),
 }

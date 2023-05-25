@@ -121,7 +121,7 @@ where
     T: FeatureVector + Send + Sync,
 {
     // Calculate output from rules + features
-    let rules_output = fv.evaluate(ff_client.clone())?;
+    let rules_output = fv.evaluate()?;
 
     let obid = ob.id.clone();
     let reason_codes = reason_codes_for_tenant(db_pool, ff_client, obid, &fv).await?;
@@ -382,11 +382,10 @@ pub async fn make_vendor_requests(
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
-    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<(OnboardingRulesDecisionOutput, KycFeatureVector)> {
     // From our results, create a FeatureVector for the final decision output
     let fv = features::kyc_features::create_features(vendor_results);
-    let decision = fv.evaluate(ff_client)?;
+    let decision = fv.evaluate()?;
 
     Ok((decision, fv))
 }

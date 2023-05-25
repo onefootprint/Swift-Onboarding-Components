@@ -1,7 +1,6 @@
 use std::string::ToString;
 use strum::Display;
 
-pub mod actionable_rule_set;
 pub mod kyb_rules;
 pub mod onboarding_rules;
 pub mod rule_set;

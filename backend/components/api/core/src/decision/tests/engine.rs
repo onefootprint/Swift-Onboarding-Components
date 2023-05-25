@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use super::test_helpers::create_user_and_onboarding;
 use crate::decision::engine;
-use crate::decision::rule::RuleSetName;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::State;
@@ -99,12 +98,6 @@ async fn test_run(
         .times(1)
         .withf(move |f| *f == BoolFlag::CanViewSocureRiskSignals(&tenant.id))
         .return_once(|_| false);
-
-    mock_ff_client
-        .expect_flag()
-        .times(1)
-        .withf(|f| *f == BoolFlag::EnableRuleSetForDecision(&RuleSetName::IdologyConservativeFailingRules))
-        .returning(|_| true);
 
     mock_twilio_api_call
         .expect_make_request()

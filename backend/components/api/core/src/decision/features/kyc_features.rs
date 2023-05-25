@@ -1,11 +1,8 @@
-use std::sync::Arc;
-
-use feature_flag::FeatureFlagClient;
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
 use idv::ParsedResponse;
 
-use crate::decision::Error::MissingDataForRuleSet;
+use crate::decision::{rule::rule_set::Action, Error, RuleError};
 use itertools::Itertools;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
@@ -13,18 +10,18 @@ use strum::IntoEnumIterator;
 use crate::{
     decision::{
         onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        rule::{
-            self, actionable_rule_set::ActionableRuleSetBuilder, onboarding_rules, rule_set::EvaluateRuleSet,
-            RuleName,
-        },
+        rule::{self, onboarding_rules, rule_set::EvaluateRuleSet, RuleName},
         vendor::vendor_result::VendorResult,
     },
     errors::ApiResult,
 };
 
 use super::{
-    experian::ExperianFeatures, idology_expectid::IDologyFeatures,
-    idology_scan_onboarding::IDologyScanOnboardingFeatures, socure_idplus::SocureFeatures,
+    experian::ExperianFeatures,
+    idology_expectid::IDologyFeatures,
+    idology_scan_onboarding::IDologyScanOnboardingFeatures,
+    socure_idplus::SocureFeatures,
+    waterfall_logic::{OnboardingEvaluationResultWithVendorAPI, WaterFallLogic},
 };
 
 // TODO!
@@ -220,42 +217,48 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 }
 
 impl FeatureVector for KycFeatureVector {
-    fn evaluate(&self, ff_client: Arc<dyn FeatureFlagClient>) -> ApiResult<OnboardingRulesDecisionOutput> {
-        // Run our rules and log
-        let idology_features = self
-            .idology_features
-            .as_ref()
-            .ok_or_else(|| MissingDataForRuleSet(onboarding_rules::idology_base_rule_set().name))?;
-
+    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         // The set of rules that determine if a user passes onboarding
-        let idology_rules: Vec<Box<dyn EvaluateRuleSet<IDologyFeatures>>> = vec![
-            Box::new(onboarding_rules::idology_base_rule_set()),
-            // Additional sets of rules that might be toggled on via a FF or by tenant
-            Box::new(
-                ActionableRuleSetBuilder::new(onboarding_rules::idology_conservative_rule_set())
-                    .build(ff_client),
-            ),
-        ];
-
-        //
-        // PROD
-        // Evaluate our rules
-        let idology_onboarding_rule_evaluation_result =
-            rule::rules_engine::evaluate_onboarding_rules(idology_rules, idology_features);
-
-        //
-        // TESTING
+        let idology_rules: Vec<Box<dyn EvaluateRuleSet<IDologyFeatures>>> =
+            vec![Box::new(onboarding_rules::idology_base_rule_set())];
         let experian_rules: Vec<Box<dyn EvaluateRuleSet<ExperianFeatures>>> =
             vec![Box::new(onboarding_rules::experian_rules())];
-        self.experian_features
-            .as_ref()
-            .map(|e| rule::rules_engine::evaluate_onboarding_rules(experian_rules, e));
 
+        // Evaluate rules
+        let idology_rule_result = self.idology_features.as_ref().map(|f| {
+            OnboardingEvaluationResultWithVendorAPI::new(
+                VendorAPI::IdologyExpectID,
+                rule::rules_engine::evaluate_onboarding_rules(idology_rules, f),
+            )
+        });
+
+        // TODO: add in experian once we have rules for them
+        self.experian_features.as_ref().map(|e| {
+            OnboardingEvaluationResultWithVendorAPI::new(
+                VendorAPI::ExperianPreciseID,
+                rule::rules_engine::evaluate_onboarding_rules(experian_rules, e),
+            )
+        });
+
+        // TODO: add experian in here
+        // TODO: add Ord so we have a vendor preference
+        let rule_results: Vec<OnboardingEvaluationResultWithVendorAPI> =
+            vec![idology_rule_result].into_iter().flatten().collect();
+        if rule_results.is_empty() {
+            Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
+        }
+
+        // TODO: move reason code creation and use returned VendorAPI
+
+        let result = WaterFallLogic::get_kyc_rules_result(rule_results).map_err(Error::from)?;
         // If we no rules that triggered, we consider that a pass
-        let decision_status = if idology_onboarding_rule_evaluation_result.triggered {
-            DecisionStatus::Fail
-        } else {
-            DecisionStatus::Pass
+        let decision_status = match result.triggered_action.as_ref() {
+            Some(a) => match a {
+                Action::StepUp => DecisionStatus::Fail,
+                Action::ManualReview => DecisionStatus::Fail,
+                Action::Fail => DecisionStatus::Fail,
+            },
+            None => DecisionStatus::Pass,
         };
 
         // For now, we just queue up failures so we can see until we have a better sense of
@@ -263,11 +266,11 @@ impl FeatureVector for KycFeatureVector {
         let create_manual_review = decision_status == DecisionStatus::Fail;
 
         let output = OnboardingRulesDecisionOutput {
-            should_commit: Self::should_commit(&idology_onboarding_rule_evaluation_result.rules_triggered),
+            should_commit: Self::should_commit(&result.rules_triggered),
             decision_status,
             create_manual_review,
-            rules_triggered: idology_onboarding_rule_evaluation_result.rules_triggered,
-            rules_not_triggered: idology_onboarding_rule_evaluation_result.rules_not_triggered,
+            rules_triggered: result.rules_triggered.to_owned(),
+            rules_not_triggered: result.rules_not_triggered.to_owned(),
         };
         Ok(output)
     }
@@ -341,7 +344,8 @@ impl FeatureVector for KycFeatureVector {
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests {
-    use std::{fmt::Debug, panic, str::FromStr};
+    use db::test_helpers::assert_have_same_elements;
+    use std::str::FromStr;
 
     use crate::decision::features::socure_idplus::SocureBaselineIdPlusLogicV6Result;
 
@@ -561,17 +565,5 @@ mod tests {
             ),
         ];
         assert_have_same_elements(expected_codes, idology_reason_codes_with_info);
-    }
-
-    fn assert_have_same_elements<T>(l: Vec<T>, r: Vec<T>)
-    where
-        T: Eq + Debug + Clone,
-    {
-        if !(l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()) {
-            panic!(
-                "{}",
-                format!("\nleft={:?} does not equal\nright={:?}\n", l.to_vec(), r.to_vec())
-            )
-        }
     }
 }

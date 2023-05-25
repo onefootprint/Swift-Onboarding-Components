@@ -1,7 +1,7 @@
 use crate::decision::features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
 
 use super::{
-    rule_set::{Rule, RuleSet},
+    rule_set::{Action, Rule, RuleSet},
     RuleName, RuleSetName,
 };
 use newtypes::FootprintReasonCode;
@@ -17,6 +17,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::IdNotLocated,
+            action: Action::Fail,
         },
         //
         // These rules fire when the id is located, but there's red flags
@@ -30,6 +31,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::SubjectDeceased,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -39,6 +41,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::AddressInputIsPoBox,
+            action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
@@ -49,6 +52,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::CoppaAlert,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -58,6 +62,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::SsnDoesNotMatch,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -67,6 +72,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::SsnInputIsInvalid,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -76,6 +82,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::SsnLocatedIsInvalid,
+            action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
@@ -86,6 +93,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::MultipleRecordsFound,
+            action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
@@ -96,6 +104,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::SsnIssuedPriorToDob,
+            action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
@@ -112,6 +121,7 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::WatchlistHit,
+            action: Action::Fail,
         },
     ];
 
@@ -126,6 +136,7 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
         Rule {
             rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FootprintReasonCode::ThinFile) },
             name: RuleName::ThinFile,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -135,6 +146,7 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::AddressDoesNotMatch,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -156,6 +168,7 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::AddressLocatedIsWarm,
+            action: Action::Fail,
         },
         Rule {
             rule: {
@@ -165,6 +178,7 @@ pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
                 }
             },
             name: RuleName::AddressLocatedIsHighRiskAddress,
+            action: Action::Fail,
         },
     ];
 
@@ -181,6 +195,7 @@ pub fn experian_rules() -> RuleSet<ExperianFeatures> {
                 .contains(&FootprintReasonCode::IdNotLocated)
         },
         name: RuleName::IdNotLocated,
+        action: Action::Fail,
     };
     RuleSet {
         rules: vec![rule],

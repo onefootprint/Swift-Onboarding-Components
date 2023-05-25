@@ -6,3 +6,4 @@ pub mod kyb_features;
 pub mod kyc_features;
 pub mod middesk;
 pub mod socure_idplus;
+pub mod waterfall_logic;

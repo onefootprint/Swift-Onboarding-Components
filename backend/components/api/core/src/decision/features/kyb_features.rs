@@ -1,14 +1,14 @@
-use std::sync::Arc;
-
 use db::models::onboarding_decision::OnboardingDecision;
-use feature_flag::FeatureFlagClient;
 use idv::middesk::response::business::BusinessResponse;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
 use crate::{
     decision::{
         onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        rule::{self, kyb_rules, rule_set::EvaluateRuleSet},
+        rule::{
+            self, kyb_rules,
+            rule_set::{Action, EvaluateRuleSet},
+        },
     },
     errors::ApiResult,
 };
@@ -52,7 +52,7 @@ impl KybFeatureVector {
 }
 
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(&self, _ff_client: Arc<dyn FeatureFlagClient>) -> ApiResult<OnboardingRulesDecisionOutput> {
+    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         let middesk_rules: Vec<Box<dyn EvaluateRuleSet<KybFeatureVector>>> = vec![
             Box::new(kyb_rules::middesk_base_rule_set()),
             Box::new(kyb_rules::bos_pass_kyc_rule_set()),
@@ -60,10 +60,13 @@ impl FeatureVector for KybFeatureVector {
 
         let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);
 
-        let decision_status = if eval_result.triggered {
-            DecisionStatus::Fail
-        } else {
-            DecisionStatus::Pass
+        let decision_status = match eval_result.triggered_action {
+            Some(a) => match a {
+                Action::StepUp => DecisionStatus::Fail,
+                Action::ManualReview => DecisionStatus::Fail,
+                Action::Fail => DecisionStatus::Fail,
+            },
+            None => DecisionStatus::Pass,
         };
         let create_manual_review = decision_status == DecisionStatus::Fail;
 

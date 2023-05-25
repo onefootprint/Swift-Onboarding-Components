@@ -1,4 +1,3 @@
-use newtypes::decision::RuleSetName;
 use newtypes::{ObConfigurationKey, OrgMemberEmail, PiiString, TenantId};
 use serde_json::json;
 
@@ -12,8 +11,6 @@ pub enum BoolFlag<'a> {
     ShouldBill(&'a TenantId),
     #[strum(to_string = "TenantCanViewSocureRiskSignal")]
     CanViewSocureRiskSignals(&'a TenantId),
-    #[strum(to_string = "EnableRuleSetForDecision")]
-    EnableRuleSetForDecision(&'a RuleSetName),
     #[strum(to_string = "EnableIdologyIdvCallsInNonProdEnvironment")]
     EnableIdologyInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "EnableSocureIdvCallsInNonProdEnvironment")]
@@ -49,7 +46,6 @@ impl<'a> BoolFlag<'a> {
             Self::IsDemoTenant(k) => Some(k.to_string()),
             Self::ShouldBill(k) => Some(k.to_string()),
             Self::CanViewSocureRiskSignals(k) => Some(k.to_string()),
-            Self::EnableRuleSetForDecision(k) => Some(k.to_string()),
             Self::EnableScanOnboardingInNonProd(k) => Some(k.to_string()),
             Self::EnableIdologyInNonProd(k) => Some(k.to_string()),
             Self::EnableMiddeskInNonProd(k) => Some(k.to_string()),
@@ -70,7 +66,6 @@ impl<'a> BoolFlag<'a> {
             Self::IsDemoTenant(_) => false,
             Self::ShouldBill(_) => false,
             Self::CanViewSocureRiskSignals(_) => false,
-            Self::EnableRuleSetForDecision(_) => false,
             Self::EnableScanOnboardingInNonProd(_) => false,
             Self::EnableIdologyInNonProd(_) => false,
             Self::EnableMiddeskInNonProd(_) => false,

@@ -295,10 +295,7 @@ impl OnAction<MakeDecision> for Decisioning {
                 decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
             (rules_output, reason_codes, true)
         } else {
-            let (rules_output, fv) = decision::engine::calculate_decision(
-                self.vendor_results.clone(),
-                state.feature_flag_client.clone(),
-            )?;
+            let (rules_output, fv) = decision::engine::calculate_decision(self.vendor_results.clone())?;
 
             let obid = self.ob_id.clone();
             // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit

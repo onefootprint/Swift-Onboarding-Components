@@ -1,6 +1,3 @@
-use std::sync::Arc;
-
-use feature_flag::FeatureFlagClient;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
 use crate::errors::ApiResult;
@@ -17,7 +14,7 @@ pub struct OnboardingRulesDecisionOutput {
 }
 
 pub trait FeatureVector {
-    fn evaluate(&self, ff_client: Arc<dyn FeatureFlagClient>) -> ApiResult<OnboardingRulesDecisionOutput>;
+    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput>;
     fn verification_results(&self) -> Vec<VerificationResultId>;
     fn reason_codes(&self, visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)>;
 }
