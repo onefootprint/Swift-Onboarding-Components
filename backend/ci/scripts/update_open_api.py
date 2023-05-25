@@ -63,6 +63,11 @@ class Endpoint:
         all_types = response_types + other_response_types + [request_type]
         return [unquote(t) for t in all_types if t]
 
+    @property
+    def security_schemes(self):
+        """Computes the security schemes that are used for the endpoint"""
+        return [unquote(k) for i in self.path_info.get("security") for k in i.keys()]
+
     def serialize(self):
         """
         Serializes the Endpoint back into open-api JSON path info
@@ -92,20 +97,27 @@ def get_apis(open_api_spec, tag):
     # Track the paths and entity refs that have a matching tag
     paths_dict = defaultdict(dict)
     used_entity_refs = set()
+    used_security_schemes = set()
     for endpoint in endpoints:
         if endpoint.identifying_tag == tag:
             paths_dict[endpoint.url][endpoint.method] = endpoint.serialize()
             used_entity_refs |= set(endpoint.schemas)
+            used_security_schemes |= set(endpoint.security_schemes)
     # Create the final list of all schemas used by the matching endpoints
     used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]
     used_schemas = {
         name: open_api_spec["components"]["schemas"][name] for name in used_entity_names
     }
-    # TODO: could also filter for only security definitions used in the subset of APIs
+    # Create final list of securitySchemes used by the matching endpoints
+    used_security_schemes = {
+        name: open_api_spec["components"]["securitySchemes"][name]
+        for name in used_security_schemes
+    }
     return {
         **open_api_spec,
         "components": {
             **open_api_spec["components"],
+            "securitySchemes": used_security_schemes,
             "schemas": used_schemas,
         },
         "paths": paths_dict,
