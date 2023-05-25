@@ -6,12 +6,13 @@ use chrono::{DateTime, Utc};
 use derive_more::Deref;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
-use paperclip::actix::Apiv2Security;
+use paperclip::actix::OperationModifier;
+use paperclip::v2::models::{DefaultSchemaRaw, Parameter, SecurityScheme};
+use paperclip::v2::schema::Apiv2Schema;
 use std::{marker::PhantomData, pin::Pin};
 
 /// Abstract Session Context Type
-#[derive(Debug, Clone, Apiv2Security, Deref)]
-#[openapi(apiKey, description = "Session authentication key")]
+#[derive(Debug, Clone, Deref)]
 pub struct SessionContext<T> {
     #[deref]
     pub data: T,
@@ -21,6 +22,39 @@ pub struct SessionContext<T> {
     // prevents external construction
     pub(super) phantom: PhantomData<()>,
 }
+
+// Pass along T's implementation of ApiV2Schema for SessionContext<T>
+impl<T: Apiv2Schema> Apiv2Schema for SessionContext<T> {
+    fn name() -> Option<String> {
+        T::name()
+    }
+
+    fn description() -> &'static str {
+        T::description()
+    }
+
+    fn required() -> bool {
+        T::required()
+    }
+
+    fn raw_schema() -> DefaultSchemaRaw {
+        T::raw_schema()
+    }
+
+    fn schema_with_ref() -> DefaultSchemaRaw {
+        T::schema_with_ref()
+    }
+
+    fn security_scheme() -> Option<SecurityScheme> {
+        T::security_scheme()
+    }
+
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        T::header_parameter_schema()
+    }
+}
+
+impl<T: Apiv2Schema> OperationModifier for SessionContext<T> {}
 
 impl<T> SessionContext<T> {
     pub fn expires_at(&self) -> DateTime<Utc> {

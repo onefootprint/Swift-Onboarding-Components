@@ -26,6 +26,7 @@ pub struct ClientTenantData {
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
+    alias = "clientToken",
     in = "header",
     name = "X-Fp-Authorization",
     description = "Short-lived client token to perform actions for a given user"
