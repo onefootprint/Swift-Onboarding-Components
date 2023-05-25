@@ -4,7 +4,7 @@ use crate::errors::ApiResult;
 
 use super::rule::RuleName;
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct OnboardingRulesDecisionOutput {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,

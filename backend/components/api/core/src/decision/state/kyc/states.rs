@@ -161,35 +161,14 @@ impl OnAction<MakeDecision> for Decisioning {
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         let (fixture_decision, ff_client) = async_res;
-        let verification_result_ids = self
-            .vendor_results
-            .iter()
-            .map(|vr| vr.verification_result_id.clone())
-            .collect();
-
-        // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
-        let (rules_output, reason_codes, is_sandbox) = if let Some(fixture_decision) = fixture_decision {
-            let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-            let reason_codes =
-                decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-            (rules_output, reason_codes, true)
-        } else {
-            let (rules_output, fv) = decision::engine::calculate_decision(self.vendor_results.clone())?;
-
-            // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
-            let reason_codes = engine::reason_codes_for_tenant(ff_client, &self.t_id, &fv)?;
-            (rules_output, reason_codes, false)
-        };
-
-        let (ob, _, _, _) = Onboarding::get(conn, &self.ob_id)?;
-        engine::save_onboarding_decision(
+        let _decision_output = common::create_kyc_decision(
             conn,
-            &ob,
-            rules_output,
-            reason_codes,
-            verification_result_ids,
-            !self.is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
-            is_sandbox,
+            ff_client,
+            &self.t_id,
+            &self.ob_id,
+            fixture_decision,
+            self.vendor_results,
+            self.is_redo,
         )?;
         Ok(States::from(Complete).into())
     }

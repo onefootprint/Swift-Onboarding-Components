@@ -89,7 +89,7 @@ async fn create_cip_request(
 
                     match obd.status {
                         DecisionStatus::Pass => (risk_signals, obd, None),
-                        DecisionStatus::Fail => {
+                        DecisionStatus::Fail | DecisionStatus::StepUp => {
                             // footprint decided as fail, see if a manual decision override exists
                             let (_, obd_manual) = ManualReview::find_completed(conn, &obd.onboarding_id)?
                                 .ok_or(CipError::EntityDecisionStatusNotPass)?;

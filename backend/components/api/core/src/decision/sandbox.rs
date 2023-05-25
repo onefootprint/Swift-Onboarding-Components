@@ -77,6 +77,8 @@ pub fn get_fixture_reason_codes(
         (DecisionStatus::Fail, true) => {
             choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
         }
+        // TODO: probably need to pass in Alpaca specific context here to get reason codes that make sense for that workflow
+        (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
     };

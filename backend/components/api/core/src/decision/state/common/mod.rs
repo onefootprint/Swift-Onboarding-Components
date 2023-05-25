@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{
         decision_intent::DecisionIntent,
@@ -7,11 +9,14 @@ use db::{
     },
     DbPool, DbResult, TxnPgConn,
 };
-use newtypes::{OnboardingId, ScopedVaultId, TenantId};
+use feature_flag::FeatureFlagClient;
+use newtypes::{OnboardingId, ScopedVaultId, TenantId, VaultKind};
 
 use crate::{
     decision::{
-        self,
+        self, engine,
+        onboarding::OnboardingRulesDecisionOutput,
+        utils::FixtureDecision,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
     errors::{onboarding::OnboardingError, ApiResult},
@@ -154,4 +159,44 @@ pub async fn assert_kyc_vendor_calls_completed(
         .into());
     }
     Ok(vendor_requests.completed_requests)
+}
+
+pub fn create_kyc_decision(
+    conn: &mut TxnPgConn,
+    ff_client: Arc<dyn FeatureFlagClient>,
+    t_id: &TenantId,
+    ob_id: &OnboardingId,
+    fixture_decision: Option<FixtureDecision>,
+    vendor_results: Vec<VendorResult>,
+    is_redo: bool,
+) -> ApiResult<OnboardingRulesDecisionOutput> {
+    let verification_result_ids = vendor_results
+        .iter()
+        .map(|vr| vr.verification_result_id.clone())
+        .collect();
+
+    // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
+    let (rules_output, reason_codes, is_sandbox) = if let Some(fixture_decision) = fixture_decision {
+        let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+        let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
+        (rules_output, reason_codes, true)
+    } else {
+        let (rules_output, fv) = decision::engine::calculate_decision(vendor_results)?;
+
+        // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
+        let reason_codes = engine::reason_codes_for_tenant(ff_client, t_id, &fv)?;
+        (rules_output, reason_codes, false)
+    };
+
+    let (ob, _, _, _) = Onboarding::get(conn, ob_id)?;
+    engine::save_onboarding_decision(
+        conn,
+        &ob,
+        rules_output.clone(),
+        reason_codes,
+        verification_result_ids,
+        !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
+        is_sandbox,
+    )?;
+    Ok(rules_output)
 }

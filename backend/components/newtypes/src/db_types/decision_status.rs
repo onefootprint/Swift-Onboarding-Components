@@ -30,6 +30,7 @@ pub enum DecisionStatus {
     // The ordering of this enum matters
     Fail,
     Pass,
+    StepUp,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionStatus);

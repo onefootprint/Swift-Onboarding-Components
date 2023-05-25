@@ -1,12 +1,21 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
-use db::models::workflow::Workflow;
+use db::models::{
+    decision_intent::DecisionIntent, document_request::DocumentRequest,
+    verification_request::VerificationRequest, workflow::Workflow,
+};
+use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
+use newtypes::{DecisionStatus, VendorAPI};
 
 use crate::{
     decision::{
+        self,
         state::{
             actions::MakeDecision, common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall,
             OnAction, ReviewCompleted, WorkflowStates,
         },
+        utils::FixtureDecision,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
     errors::ApiResult,
@@ -123,18 +132,63 @@ impl Decisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision> for Decisioning {
-    type AsyncRes = ();
+    type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
 
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeDecision,
-        _state: &State,
+        action: MakeDecision,
+        state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(())
+        let fixture_decision = decision::utils::get_fixture_data_decision(
+            state,
+            state.feature_flag_client.clone(),
+            &self.sv_id,
+            &self.t_id,
+        )
+        .await?;
+
+        Ok((fixture_decision, state.feature_flag_client.clone()))
     }
 
-    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        Ok(States::from(WatchlistCheck).into())
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+        let (fixture_decision, ff_client) = async_res;
+
+        // TODO: pass in/otherwise specify Alpaca Rules
+        // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
+        let decision_output = common::create_kyc_decision(
+            conn,
+            ff_client,
+            &self.t_id,
+            &self.ob_id,
+            fixture_decision,
+            self.vendor_results,
+            false,
+        )?;
+
+        match decision_output.decision_status {
+            DecisionStatus::Fail => Ok(States::from(Complete).into()),
+            DecisionStatus::Pass => {
+                // TODO: maybe create a new DI..?
+                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &self.sv_id)?;
+                // Create Vreq for Incode watchlist result call
+                let vreq = VerificationRequest::create(
+                    conn,
+                    &self.sv_id,
+                    &di.id,
+                    VendorAPI::IncodeAddMLConsent, // TODO: replace with IncodeWatchlistResult when merged in
+                )?;
+                Ok(States::from(WatchlistCheck).into())
+            }
+            DecisionStatus::StepUp => {
+                let doc_req = DocumentRequest::create(
+                    conn,
+                    self.sv_id.clone(),
+                    None,
+                    true, // TODO: maybe should_collect_selfie should come from a config
+                )?;
+                Ok(States::from(DocCollection).into())
+            }
+        }
     }
 }
 
