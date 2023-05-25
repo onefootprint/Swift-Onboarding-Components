@@ -582,12 +582,8 @@
         "title": "Customize your plan",
         "features": {
           "drivers-license": "Driver's license scan",
-          "kba": "KBA (Knowledge based answers)",
           "continuous-ofac": {
             "title": "Continuous OFAC monitoring"
-          },
-          "ach-verification": {
-            "title": "ACH verification"
           }
         }
       },

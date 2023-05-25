@@ -42,17 +42,10 @@ const AddOns = () => {
           unitFirst={t('units.scan')}
         />
         <FeatureRow
-          title={t('add-ons.features.kba')}
-          cost={1}
-          unitFirst={t('units.person')}
-        />
-        <FeatureRow
           title={t('add-ons.features.continuous-ofac.title')}
-          labelRight={t('labels.contact-us')}
-        />
-        <FeatureRow
-          title={t('add-ons.features.ach-verification.title')}
-          labelRight={t('labels.contact-us')}
+          cost={0.03}
+          unitFirst={t('units.person')}
+          unitSecond={t('units.month')}
         />
       </Box>
     </TableContainer>
