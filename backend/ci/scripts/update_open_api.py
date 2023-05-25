@@ -50,6 +50,7 @@ class Endpoint:
             .get("$ref")
             for (_, resp) in self._path_info.get("responses", {}).items()
         ]
+        # TODO should probably just traverse whole JSON structure for ref-looking things
         other_response_types = [
             resp.get("content", {})
             .get("application/json", {})
@@ -60,7 +61,20 @@ class Endpoint:
             .get("$ref", {})
             for (_, resp) in self._path_info.get("responses", {}).items()
         ]
-        all_types = response_types + other_response_types + [request_type]
+        more_other_response_types = [
+            resp.get("content", {})
+            .get("application/json", {})
+            .get("schema", {})
+            .get("items", {})
+            .get("$ref", {})
+            for (_, resp) in self._path_info.get("responses", {}).items()
+        ]
+        all_types = (
+            response_types
+            + other_response_types
+            + more_other_response_types
+            + [request_type]
+        )
         return [unquote(t) for t in all_types if t]
 
     @property
