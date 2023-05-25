@@ -12,6 +12,7 @@ use crate::State;
 use api_core::auth::IsGuardMet;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::DbToApi;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
@@ -44,7 +45,7 @@ pub async fn post(
         .scoped_user_id()
         .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
     let uv_id = user_auth.user_vault_id().clone();
-    let (scoped_user, ob_config) = state
+    let (scoped_user, ob_config, tenant) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
@@ -53,8 +54,8 @@ pub async fn post(
                 .as_ref()
                 .ok_or(OnboardingError::NonPortableScopedUser)?;
             // Check that the ob configuration is still active
-            let (ob_config, _) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
-            Ok((su, ob_config))
+            let (ob_config, tenant) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
+            Ok((su, ob_config, tenant))
         })
         .await??;
 
@@ -74,6 +75,7 @@ pub async fn post(
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
+    let obc = ob_config.clone();
     let ob = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
@@ -82,18 +84,16 @@ pub async fn post(
             // Create the onboarding for this scoped user
             let ob_create_args = OnboardingCreateArgs {
                 scoped_vault_id: scoped_user.id,
-                ob_configuration_id: ob_config.id.clone(),
+                ob_configuration_id: obc.id.clone(),
                 insight_event: insight_event.clone(),
             };
 
             let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, should_create_workflow)?;
 
-            if matches!(is_new_ob, IsNew::Yes(_))
-                && ob_config.must_collect(DataIdentifierDiscriminant::Document)
-            {
+            if matches!(is_new_ob, IsNew::Yes(_)) && obc.must_collect(DataIdentifierDiscriminant::Document) {
                 // Create a `DocumentRequest` if specified in the ob config.
                 // To prevent duplicate document requests, only create a doc request if the onboarding is new
-                let must_collect_selfie = ob_config.must_collect_selfie();
+                let must_collect_selfie = obc.must_collect_selfie();
                 DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie)?;
             }
 
@@ -105,8 +105,7 @@ pub async fn post(
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
             if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
-                let existing_businesses =
-                    BusinessOwner::list_businesses(conn, &user_vault.id, &ob_config.id)?;
+                let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
                 let sb = if let Some(existing) = existing_businesses.into_iter().next() {
                     // If the user has already started onboarding their business onto this exact
                     // ob config, we should locate it.
@@ -130,7 +129,7 @@ pub async fn post(
                     let sb = ScopedVault::get_or_create(conn, &business_vault, ob_config_id)?;
                     let ob_create_args = OnboardingCreateArgs {
                         scoped_vault_id: sb.id.clone(),
-                        ob_configuration_id: ob_config.id.clone(),
+                        ob_configuration_id: obc.id.clone(),
                         insight_event: insight_event.clone(),
                     };
                     Onboarding::get_or_create(conn, ob_create_args, false)?;
@@ -147,6 +146,11 @@ pub async fn post(
         })
         .await?;
 
-    let already_authorized = ob.authorized_at.is_some();
-    ResponseData::ok(OnboardingResponse { already_authorized }).json()
+    // Omit appearance serialization here
+    let onboarding_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
+    ResponseData::ok(OnboardingResponse {
+        already_authorized: ob.authorized_at.is_some(),
+        onboarding_config,
+    })
+    .json()
 }
