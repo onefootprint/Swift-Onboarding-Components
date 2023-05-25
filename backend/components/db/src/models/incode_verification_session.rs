@@ -55,7 +55,7 @@ pub struct UpdateIncodeVerificationSession {
     pub identity_document_id: Option<IdentityDocumentId>,
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
-    pub latest_failure_reason: Option<IncodeVerificationFailureReason>,
+    pub latest_failure_reason: Option<Option<IncodeVerificationFailureReason>>,
 }
 
 impl UpdateIncodeVerificationSession {
@@ -63,13 +63,13 @@ impl UpdateIncodeVerificationSession {
         Self {
             state: Some(state),
             completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
-            latest_failure_reason: None,
+            latest_failure_reason: Some(None),
             ..Self::default()
         }
     }
     pub fn set_failure_reason(failure_reason: IncodeVerificationFailureReason) -> Self {
         Self {
-            latest_failure_reason: Some(failure_reason),
+            latest_failure_reason: Some(Some(failure_reason)),
             ..Self::default()
         }
     }
@@ -82,7 +82,7 @@ impl UpdateIncodeVerificationSession {
             state: Some(state),
             completed_at: (state == IncodeVerificationSessionState::Complete).then_some(Utc::now()),
             identity_document_id: Some(identity_document_id),
-            latest_failure_reason: None,
+            latest_failure_reason: Some(None),
             ..Self::default()
         }
     }

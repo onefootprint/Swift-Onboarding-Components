@@ -111,7 +111,7 @@ impl MiddeskStates {
     async fn init(db_pool: &DbPool, middesk_request: MiddeskRequest) -> ApiResult<MiddeskStates> {
         let di_id = middesk_request.decision_intent_id.clone();
         let all_vreq_vres = db_pool
-            .db_query(move |conn| VerificationRequest::list_successful_by_decision_intent_id(conn, &di_id))
+            .db_query(move |conn| VerificationRequest::list_by_decision_intent(conn, &di_id))
             .await??;
 
         let mut middesk_vreq_vres: Vec<_> = all_vreq_vres
@@ -127,7 +127,7 @@ impl MiddeskStates {
         middesk_vreq_vres.sort_by_key(|v| v.0);
         let latest_vreq_vres = middesk_vreq_vres.pop();
 
-        let Some((api, (vreq, vres, _))) = latest_vreq_vres else {
+        let Some((api, (vreq, vres))) = latest_vreq_vres else {
             return Err(MiddeskError::UnexpectedState("No Middesk vreq's found".into()).into());
         };
 

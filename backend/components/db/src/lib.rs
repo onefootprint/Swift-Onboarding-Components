@@ -194,7 +194,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
     use schema::{
         access_event, annotation, business_owner, contact_info, data_lifetime, document_data,
-        document_request, fingerprint, fingerprint_visit_event, identity_document,
+        document_request, document_upload, fingerprint, fingerprint_visit_event, identity_document,
         incode_verification_session, liveness_event, manual_review, middesk_request, onboarding,
         onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_vault,
         socure_device_session, user_timeline, vault, vault_data, verification_request, verification_result,
@@ -233,10 +233,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(data_lifetime::vault_id.eq_any(&v_ids))
             .select(data_lifetime::id);
 
-        let dl_ids_nullable = data_lifetime::table
-            .filter(data_lifetime::vault_id.eq_any(&v_ids))
-            .select(data_lifetime::id.nullable());
-
         deleted_rows += diesel::delete(vault_data::table)
             .filter(vault_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
@@ -247,18 +243,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(contact_info::table)
             .filter(contact_info::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
-        deleted_rows += diesel::delete(identity_document::table)
-            .filter(identity_document::front_lifetime_id.eq_any(dl_ids_nullable.clone()))
-            .execute(conn.conn())?;
-
-        deleted_rows += diesel::delete(identity_document::table)
-            .filter(identity_document::back_lifetime_id.eq_any(dl_ids_nullable.clone()))
-            .execute(conn.conn())?;
-
-        deleted_rows += diesel::delete(identity_document::table)
-            .filter(identity_document::selfie_lifetime_id.eq_any(dl_ids_nullable))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(document_data::table)
@@ -296,9 +280,20 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(document_request::scoped_vault_id.eq_any(su_ids.clone()))
             .select(document_request::id);
 
-        deleted_rows += diesel::delete(identity_document::table)
-            .filter(identity_document::request_id.eq_any(dr_ids))
-            .execute(conn.conn())?;
+        // Id documents
+        {
+            let id_doc_ids = identity_document::table
+                .filter(identity_document::request_id.eq_any(dr_ids.clone()))
+                .select(identity_document::id);
+
+            deleted_rows += diesel::delete(document_upload::table)
+                .filter(document_upload::document_id.eq_any(id_doc_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(identity_document::table)
+                .filter(identity_document::request_id.eq_any(dr_ids))
+                .execute(conn.conn())?;
+        }
 
         deleted_rows += diesel::delete(document_request::table)
             .filter(document_request::scoped_vault_id.eq_any(su_ids.clone()))

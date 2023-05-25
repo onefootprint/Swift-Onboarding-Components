@@ -1,4 +1,4 @@
-use crate::schema::{decision_intent, scoped_vault, vault, verification_request, verification_result};
+use crate::schema::{scoped_vault, vault, verification_request, verification_result};
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
@@ -11,7 +11,6 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
-use super::decision_intent::DecisionIntent;
 use super::vault::Vault;
 use super::verification_result::VerificationResult;
 
@@ -194,20 +193,18 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn list_successful_by_decision_intent_id(
+    pub fn list_by_decision_intent(
         conn: &mut PgConn,
         decision_intent_id: &DecisionIntentId,
-    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)>> {
-        let res: Vec<(VerificationRequest, Option<VerificationResult>, DecisionIntent)> =
-            verification_request::table
-                .left_join(
-                    verification_result::table.on(verification_result::request_id
-                        .eq(verification_request::id)
-                        .and(verification_result::is_error.eq(false))),
-                )
-                .inner_join(decision_intent::table)
-                .filter(decision_intent::id.eq(decision_intent_id))
-                .get_results(conn)?;
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+        let res = verification_request::table
+            .left_join(
+                verification_result::table.on(verification_result::request_id
+                    .eq(verification_request::id)
+                    .and(verification_result::is_error.eq(false))),
+            )
+            .filter(verification_request::decision_intent_id.eq(decision_intent_id))
+            .get_results(conn)?;
 
         Ok(res)
     }
