@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
@@ -19,6 +20,7 @@ export type ToggleProps = {
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   required?: boolean;
   sx?: SXStyleProps;
+  size?: 'default' | 'compact';
 };
 
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
@@ -37,6 +39,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
       onFocus,
       required,
       sx,
+      size = 'default',
     }: ToggleProps,
     ref,
   ) => {
@@ -75,7 +78,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
         sx={sxStyles}
       >
         {label && (
-          <Label data-placement={labelPlacement} htmlFor={id}>
+          <Label data-placement={labelPlacement} htmlFor={id} size={size}>
             {label}
           </Label>
         )}
@@ -100,10 +103,22 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
           onBlur={onBlur}
           onClick={handleClick}
           onFocus={onFocus}
+          size={size}
           role="switch"
           type="button"
         >
-          <StyledIcoToggleKnob16 checked={checked} disabled={disabled} />
+          <StyledIcoToggleKnob16
+            checked={checked}
+            disabled={disabled}
+            size={size}
+            transition={{
+              duration: 0.2,
+              type: 'spring',
+              stiffness: 700,
+              damping: 30,
+            }}
+            layout
+          />
         </Button>
       </ToggleContainer>
     );
@@ -137,9 +152,11 @@ const ToggleContainer = styled.div<{
   `}
 `;
 
-const Label = styled.label`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')};
+const Label = styled.label<{ size: 'default' | 'compact' }>`
+  ${({ theme, size }) => css`
+    ${size === 'compact'
+      ? createFontStyles('label-4')
+      : createFontStyles('label-3')};
     color: ${theme.color.primary};
     cursor: pointer;
 
@@ -163,18 +180,23 @@ const Input = styled.input`
   width: 36px;
 `;
 
-const Button = styled.button<{ checked?: boolean }>`
-  ${({ theme, checked }) => css`
+const Button = styled.button<{
+  checked?: boolean;
+  size?: 'default' | 'compact';
+}>`
+  ${({ theme, checked, size }) => css`
     background: ${theme.backgroundColor[checked ? 'accent' : 'secondary']};
     border-color: ${theme.borderColor[checked ? 'transparent' : 'primary']};
     border-radius: ${theme.borderRadius.full};
     border-style: solid;
     border-width: ${theme.borderWidth[2]};
     cursor: pointer;
-    height: 24px;
+    height: ${size === 'compact' ? 20 : 24}px;
     outline-offset: ${theme.spacing[2]};
     padding: ${theme.spacing[1]};
-    width: 36px;
+    width: ${size === 'compact' ? 30 : 36}px;
+    display: flex;
+    justify-content: ${checked ? 'flex-end' : 'flex-start'};
 
     &:hover {
       ${createOverlayBackground('darken-1', checked ? 'accent' : 'secondary')}
@@ -190,18 +212,17 @@ const Button = styled.button<{ checked?: boolean }>`
   `}
 `;
 
-const StyledIcoToggleKnob16 = styled.div<{
+const StyledIcoToggleKnob16 = styled(motion.div)<{
   disabled?: boolean;
   checked?: boolean;
+  size?: 'default' | 'compact';
 }>`
-  ${({ theme, disabled, checked }) => css`
+  ${({ theme, disabled, checked, size }) => css`
     background: ${theme.color[checked ? 'quinary' : 'tertiary']};
     border-radius: ${theme.borderRadius.full};
     display: block;
-    height: 16px;
-    transform: ${checked ? 'translateX(12px)' : 'translateX(0px)'};
-    transition: 0.2s all ease;
-    width: 16px;
+    height: ${size === 'compact' ? 12 : 16}px;
+    width: ${size === 'compact' ? 12 : 16}px;
 
     ${disabled &&
     css`

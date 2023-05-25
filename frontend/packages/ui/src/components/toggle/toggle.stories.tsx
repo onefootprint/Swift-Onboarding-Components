@@ -75,6 +75,13 @@ export default {
       description: 'The callback invoked when the checkbox is focused',
       required: false,
     },
+    size: {
+      control: {
+        type: 'select',
+        required: false,
+      },
+      options: ['default', 'compact'],
+    },
   },
 } as Meta;
 
@@ -91,6 +98,7 @@ const Template: Story<ToggleProps> = ({
   onChange,
   onFocus,
   required,
+  size,
 }: ToggleProps) => {
   const [checked, setChecked] = useState<boolean | undefined>(initialChecked);
 
@@ -112,6 +120,7 @@ const Template: Story<ToggleProps> = ({
       }}
       onFocus={onFocus}
       required={required}
+      size={size}
     />
   );
 };
@@ -130,4 +139,5 @@ Base.args = {
   onChange: console.log,
   onFocus: console.log,
   required: false,
+  size: 'default',
 };

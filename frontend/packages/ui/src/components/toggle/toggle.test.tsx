@@ -16,6 +16,7 @@ describe('<Toggle />', () => {
     onChange = jest.fn(),
     onFocus,
     required,
+    size,
   }: Partial<ToggleProps>) =>
     customRender(
       <Toggle
@@ -29,6 +30,7 @@ describe('<Toggle />', () => {
         onChange={onChange}
         onFocus={onFocus}
         required={required}
+        size={size}
       />,
     );
 
@@ -40,6 +42,19 @@ describe('<Toggle />', () => {
           hidden: true,
         }) as HTMLInputElement;
         expect(input.checked).toBeTruthy();
+      });
+    });
+
+    describe('when it is compact size', () => {
+      it('should have the right size', () => {
+        renderToggle({
+          size: 'compact',
+        });
+        const toggle = screen.getByRole('switch');
+        expect(toggle).toHaveStyle({
+          width: '30px',
+          height: '20px',
+        });
       });
     });
 
