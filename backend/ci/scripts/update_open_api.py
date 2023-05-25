@@ -17,11 +17,11 @@ class Endpoint:
     def __init__(self, url, method, path_info):
         self.url = url
         self.method = method
-        self.path_info = path_info
+        self._path_info = path_info
 
     @property
     def identifying_tag(self):
-        tags = self.path_info["tags"]
+        tags = self._path_info["tags"]
         identifying_tags = set(tags) & set(IDENTIFYING_TAG_VALUES)
         # Enforce that every API has one and only one "identifying tag"
         assert (
@@ -37,7 +37,7 @@ class Endpoint:
     def schemas(self):
         """Computes the schemas that are used for the endpoint"""
         request_type = (
-            self.path_info.get("requestBody", {})
+            self._path_info.get("requestBody", {})
             .get("content", {})
             .get("application/json", {})
             .get("schema", {})
@@ -48,7 +48,7 @@ class Endpoint:
             .get("application/json", {})
             .get("schema", {})
             .get("$ref")
-            for (_, resp) in self.path_info.get("responses", {}).items()
+            for (_, resp) in self._path_info.get("responses", {}).items()
         ]
         other_response_types = [
             resp.get("content", {})
@@ -58,7 +58,7 @@ class Endpoint:
             .get("data", {})
             .get("items", {})
             .get("$ref", {})
-            for (_, resp) in self.path_info.get("responses", {}).items()
+            for (_, resp) in self._path_info.get("responses", {}).items()
         ]
         all_types = response_types + other_response_types + [request_type]
         return [unquote(t) for t in all_types if t]
@@ -66,20 +66,33 @@ class Endpoint:
     @property
     def security_schemes(self):
         """Computes the security schemes that are used for the endpoint"""
-        return [unquote(k) for i in self.path_info.get("security") for k in i.keys()]
+        # Read specifically from path_info and not _path_info to get the mutated security
+        return [k for i in self.path_info.get("security") for k in i.keys()]
 
-    def serialize(self):
+    @property
+    def path_info(self):
         """
         Serializes the Endpoint back into open-api JSON path info
         """
-        description = self.path_info["description"]
+        # Update the description
+        description = self._path_info["description"]
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"
-        if "Deprecated" in self.path_info["tags"]:
+        if "Deprecated" in self._path_info["tags"]:
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
-        return {**self.path_info, "description": description}
+
+        # Update the security to filter out Firm Employee Token
+        security = [
+            security
+            for security in self._path_info["security"]
+            if not any(k == "Firm Employee Token" for k in security)
+        ]
+        assert not any(
+            "firm" in k.lower() for s in security for k in s
+        ), "Couldn't scrub out firm employee auth from security - maybe you changed the name of the security?"
+        return {**self._path_info, "description": description, "security": security}
 
 
 def get_apis(open_api_spec, tag):
@@ -100,7 +113,7 @@ def get_apis(open_api_spec, tag):
     used_security_schemes = set()
     for endpoint in endpoints:
         if endpoint.identifying_tag == tag:
-            paths_dict[endpoint.url][endpoint.method] = endpoint.serialize()
+            paths_dict[endpoint.url][endpoint.method] = endpoint.path_info
             used_entity_refs |= set(endpoint.schemas)
             used_security_schemes |= set(endpoint.security_schemes)
     # Create the final list of all schemas used by the matching endpoints
