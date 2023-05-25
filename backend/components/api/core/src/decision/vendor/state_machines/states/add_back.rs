@@ -18,7 +18,7 @@ pub struct AddBack {
 
 #[async_trait]
 impl IncodeStateTransition for AddBack {
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,

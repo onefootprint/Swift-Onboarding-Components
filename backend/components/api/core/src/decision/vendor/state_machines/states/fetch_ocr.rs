@@ -19,7 +19,7 @@ pub struct FetchOCR {
 
 #[async_trait]
 impl IncodeStateTransition for FetchOCR {
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
@@ -45,8 +45,6 @@ impl IncodeStateTransition for FetchOCR {
         Ok(Some(Self { response }))
     }
 
-    /// Perform any bookkeeping that must be atomic with the state transition. Can access any
-    /// context created in `init`
     fn transition(
         self,
         conn: &mut TxnPgConn,

@@ -29,7 +29,7 @@ pub trait IncodeStateTransition: Sized {
     /// Initializes a state of this type, performing all async operations needed before the atomic
     /// bookkeeping and state transition.
     /// If None is returned, the state is not ready to run
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
@@ -37,7 +37,7 @@ pub trait IncodeStateTransition: Sized {
     ) -> ApiResult<Option<Self>>;
 
     /// Perform any bookkeeping that must be atomic with the state transition upon exiting a state.
-    /// Can access any context created in `init`.
+    /// Can access any context created in `run`.
     /// If an optional IncodeFailureReason is returned, the machine will break out of running
     /// until the error is addressed
     fn transition(
@@ -89,7 +89,7 @@ where
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, IncodeContext, VerificationSession, IsReady)> {
         let uninit_state: IncodeState = self.into();
-        let init_state = T::init(db_pool, http_client, &ctx, &session).await?;
+        let init_state = T::run(db_pool, http_client, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
             // AddBack but haven't yet collected the back image

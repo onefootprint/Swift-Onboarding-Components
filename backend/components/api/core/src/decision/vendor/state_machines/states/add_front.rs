@@ -20,7 +20,7 @@ impl IncodeStateTransition for AddFront {
     /// Initializes a state of this type, performing all async operations needed before the atomic
     /// bookkeeping and state transition.
     /// If None is returned, the state is not ready to run
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,

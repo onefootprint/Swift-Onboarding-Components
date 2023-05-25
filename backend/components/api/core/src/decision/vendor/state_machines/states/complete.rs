@@ -119,7 +119,7 @@ impl Complete {
 
 #[async_trait]
 impl IncodeStateTransition for Complete {
-    async fn init(
+    async fn run(
         _: &DbPool,
         _: &FootprintVendorHttpClient,
         _: &IncodeContext,

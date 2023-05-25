@@ -15,7 +15,7 @@ pub struct ProcessId {}
 
 #[async_trait]
 impl IncodeStateTransition for ProcessId {
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,

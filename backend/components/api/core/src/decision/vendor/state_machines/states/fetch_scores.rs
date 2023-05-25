@@ -15,10 +15,7 @@ pub struct FetchScores {}
 
 #[async_trait]
 impl IncodeStateTransition for FetchScores {
-    /// Initializes a state of this type, performing all async operations needed before the atomic
-    /// bookkeeping and state transition.
-    /// If None is returned, the state is not ready to run
-    async fn init(
+    async fn run(
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
         ctx: &IncodeContext,
@@ -42,8 +39,6 @@ impl IncodeStateTransition for FetchScores {
         Ok(Some(Self {}))
     }
 
-    /// Perform any bookkeeping that must be atomic with the state transition. Can access any
-    /// context created in `init`
     fn transition(
         self,
         _: &mut TxnPgConn,
