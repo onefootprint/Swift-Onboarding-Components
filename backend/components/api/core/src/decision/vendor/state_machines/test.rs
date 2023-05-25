@@ -6,17 +6,15 @@ use db::{
         incode_verification_session_event::IncodeVerificationSessionEvent, user_consent::UserConsent,
         verification_request::VerificationRequest,
     },
-    test_helpers::{assert_have_same_elements, test_db_pool},
+    test_helpers::assert_have_same_elements,
     DbError, DbResult,
 };
-use idv::{
-    footprint_http_client::FootprintVendorHttpClient,
-    incode::{doc::response::FetchScoresResponse, IncodeAPIResult},
-};
+use idv::incode::{doc::response::FetchScoresResponse, IncodeAPIResult};
+use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    vendor_apis_from_vendor, CollectedDataOption, DocVData, DocumentRequestStatus, DocumentSide, IdDocKind,
-    IncodeConfigurationId, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, Vendor, VendorAPI,
+    CollectedDataOption, DocVData, DocumentRequestStatus, DocumentSide, IdDocKind, IncodeConfigurationId,
+    IncodeVerificationSessionState, PiiString, SealedVaultDataKey, VendorAPI,
 };
 
 use super::incode_state_machine::IncodeContext;
@@ -27,32 +25,27 @@ use crate::{
     },
     State,
 };
-use test_case::test_case;
 
-// TODO need to bring these tests back now that we have TestState
 #[ignore]
-#[test_case(true)]
-#[test_case(false)]
+#[test_state_case(true)]
+#[test_state_case(false)]
 #[tokio::test]
-async fn test_run_machine(is_selfie: bool) {
+async fn test_run_machine(state: &State, is_selfie: bool) {
     //
     // Set up
     //
-    let db_pool = test_db_pool();
-    let state = &State::test_state().await;
-    let vendor_client = FootprintVendorHttpClient::new().unwrap();
-
     let must_collect_data = if is_selfie {
         Some(vec![CollectedDataOption::DocumentAndSelfie])
     } else {
         None
     };
     let (tenant, ob, uv, su, di) =
-        create_user_and_onboarding(&db_pool, &state.enclave_client, must_collect_data).await;
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data).await;
 
     // Needed for db constraints
     let su_id = su.id.clone();
-    let id_doc = db_pool
+    let id_doc = state
+        .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
             let doc_request = DocumentRequest::create(conn.conn(), su_id, None, false).unwrap();
             if is_selfie {
@@ -91,13 +84,14 @@ async fn test_run_machine(is_selfie: bool) {
     let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    let machine = machine.run(&db_pool, &vendor_client).await.unwrap();
+    let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
 
     // Assert machine stops at AddBack until we add the back
     assert!(matches!(machine.state, IncodeState::AddBack(_)));
 
     let su_id = su.id.clone();
-    db_pool
+    state
+        .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             // Make sure we're in the right state
             let session = IncodeVerificationSession::get(conn, &su_id)?.unwrap();
@@ -119,10 +113,11 @@ async fn test_run_machine(is_selfie: bool) {
         .unwrap();
     assert!(matches!(machine.state, IncodeState::AddBack(_)));
 
-    let machine = machine.run(&db_pool, &vendor_client).await.unwrap();
+    let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
     assert!(matches!(machine.state, IncodeState::Complete(_)));
 
-    db_pool
+    state
+        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let db_verifications = VerificationRequest::list_by_decision_intent(conn, &di.id)?;
 
@@ -131,11 +126,19 @@ async fn test_run_machine(is_selfie: bool) {
                 .iter()
                 .filter_map(|(req, res)| res.as_ref().map(|_| req.vendor_api))
                 .collect();
+
             let consent_apis = vec![VendorAPI::IncodeAddMLConsent, VendorAPI::IncodeAddPrivacyConsent];
-            let expected_apis = vendor_apis_from_vendor(Vendor::Incode)
-                .into_iter()
-                .filter(|v| is_selfie || !consent_apis.contains(v))
-                .collect();
+            let expected_apis = vec![
+                VendorAPI::IncodeStartOnboarding,
+                VendorAPI::IncodeAddFront,
+                VendorAPI::IncodeAddBack,
+                VendorAPI::IncodeProcessId,
+                VendorAPI::IncodeFetchScores,
+                VendorAPI::IncodeFetchOCR,
+            ]
+            .into_iter()
+            .chain(if is_selfie { consent_apis } else { vec![] })
+            .collect();
             assert_have_same_elements(vendor_apis, expected_apis);
 
             // Make sure we're in the right state
@@ -194,28 +197,25 @@ async fn test_run_machine(is_selfie: bool) {
 }
 
 #[ignore]
-#[test_case(true)]
-#[test_case(false)]
+#[test_state_case(true)]
+#[test_state_case(false)]
 #[tokio::test]
-async fn test_fail(is_selfie: bool) {
+async fn test_fail(state: &State, is_selfie: bool) {
     //
     // Set up
     //
-    let db_pool = test_db_pool();
-    let state = &State::test_state().await;
-    let vendor_client = FootprintVendorHttpClient::new().unwrap();
-
     let must_collect_data = if is_selfie {
         Some(vec![CollectedDataOption::DocumentAndSelfie])
     } else {
         None
     };
     let (tenant, ob, uv, su, di) =
-        create_user_and_onboarding(&db_pool, &state.enclave_client, must_collect_data).await;
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data).await;
     let suid = su.id.clone();
 
     // Needed for db constraints
-    let id_doc = db_pool
+    let id_doc = state
+        .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
             if is_selfie {
@@ -253,14 +253,15 @@ async fn test_fail(is_selfie: bool) {
     let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    let machine = machine.run(&db_pool, &vendor_client).await.unwrap();
+    let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
 
     // Assert machine is in the correct state
     assert!(matches!(machine.state, IncodeState::AddFront(_)));
 
     let s_id = machine.session.id;
     let s_id2 = s_id.clone();
-    db_pool
+    state
+        .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let session = IncodeVerificationSession::get(conn, &s_id2).unwrap().unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::AddFront);
@@ -292,11 +293,12 @@ async fn test_fail(is_selfie: bool) {
         .unwrap();
     assert!(matches!(machine.state, IncodeState::AddFront(_)));
 
-    let machine = machine.run(&db_pool, &vendor_client).await.unwrap();
+    let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
     assert!(matches!(machine.state, IncodeState::Complete(_)));
 
     // Check we have the right things in the db
-    db_pool
+    state
+        .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let session = IncodeVerificationSession::get(conn, &s_id).unwrap().unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::Complete);
@@ -355,7 +357,8 @@ async fn test_fail(is_selfie: bool) {
         .unwrap();
 
     // Clean up
-    db_pool
+    state
+        .db_pool
         .db_transaction(move |conn| db::private_cleanup_integration_tests(conn, uv.id))
         .await
         .unwrap();

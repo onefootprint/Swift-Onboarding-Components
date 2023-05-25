@@ -5,7 +5,6 @@ use crate::decision::engine;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::State;
-use db::tests::test_db_pool::TestDbPool;
 use db::{
     models::{onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
     DbError,

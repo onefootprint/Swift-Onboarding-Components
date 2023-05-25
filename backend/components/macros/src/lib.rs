@@ -315,7 +315,7 @@ fn render_test_state_cases(test_cases: &[TestCase], mut test_fn: ItemFn) -> Toke
         // This function will be called by each individual test case and wraps the test_fn_stmts
         // inside a closure that also accepts the conn as an argument
         #test_fn_sig {
-            let test_db_pool = TestDbPool::new(false);
+            let test_db_pool = db::tests::test_db_pool::TestDbPool::new(false);
             let state = &mut State::test_state().await;
             state.set_db_pool((*test_db_pool).clone());
             #(#test_fn_stmts)*

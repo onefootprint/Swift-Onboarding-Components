@@ -90,9 +90,7 @@ impl State {
         let mut s = Self::init_or_die(config).await;
         s.set_ff_client(Arc::new(MockFeatureFlagClient::new()));
         s.set_webhook_client(Arc::new(MockWebhookClient::new()));
-
         s.set_vendor_clients(VendorClients::new_with_mocks());
-
         s
     }
 
