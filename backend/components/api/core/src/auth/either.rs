@@ -1,6 +1,7 @@
 use std::{collections::BTreeMap, pin::Pin};
 
 use actix_web::FromRequest;
+use async_trait::async_trait;
 use db::models::{tenant::Tenant, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
 use paperclip::{
@@ -11,10 +12,13 @@ use paperclip::{
     },
 };
 
-use crate::errors::ApiError;
+use crate::{
+    errors::{ApiError, ApiResult},
+    State,
+};
 
 use super::{
-    tenant::{GetFirmEmployee, TenantAuth},
+    tenant::{GetFirmEmployee, InvalidateAuth, TenantAuth},
     AuthError,
 };
 
@@ -156,6 +160,21 @@ where
         match self {
             Either::Left(l) => l.firm_employee_user(),
             Either::Right(r) => r.firm_employee_user(),
+        }
+    }
+}
+
+#[async_trait]
+impl<A, B> InvalidateAuth for Either<A, B>
+where
+    A: InvalidateAuth + Send,
+    B: InvalidateAuth + Send,
+{
+    /// invalidate the session token for logout purposes
+    async fn invalidate(self, state: &State) -> ApiResult<()> {
+        match self {
+            Either::Left(l) => l.invalidate(state).await,
+            Either::Right(r) => r.invalidate(state).await,
         }
     }
 }

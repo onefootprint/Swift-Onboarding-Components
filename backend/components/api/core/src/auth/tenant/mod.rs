@@ -2,6 +2,7 @@ mod guards;
 pub use self::guards::*;
 mod workos;
 pub use self::workos::*;
+use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
@@ -25,6 +26,7 @@ use super::SessionContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use crate::State;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
@@ -64,6 +66,11 @@ pub trait GetFirmEmployee {
     /// Escape hatch to get the `TenantUser` for an auth session, if and only if the authed user
     /// is a firm employee.
     fn firm_employee_user(&self) -> ApiResult<TenantUser>;
+}
+
+#[async_trait]
+pub trait InvalidateAuth {
+    async fn invalidate(self, state: &State) -> ApiResult<()>;
 }
 
 #[derive(Clone)]

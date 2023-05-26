@@ -35,6 +35,11 @@ describe('useSession', () => {
       path: '/org/member',
       response: getOrgMemberResponse,
     });
+    mockRequest({
+      method: 'post',
+      path: '/org/auth/logout',
+      response: {},
+    });
   });
 
   describe('when the state is empty', () => {

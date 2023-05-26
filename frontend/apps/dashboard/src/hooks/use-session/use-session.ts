@@ -30,6 +30,15 @@ const getUser = async (auth: string) => {
   return response.data;
 };
 
+const logoutUser = (auth: string) =>
+  request({
+    headers: {
+      [DASHBOARD_AUTHORIZATION_HEADER]: auth,
+    },
+    method: 'POST',
+    url: '/org/auth/logout',
+  });
+
 export const useStore = create<UserSessionState>()(
   persist(
     set => ({
@@ -111,6 +120,10 @@ const useSession = () => {
   };
 
   const logOut = () => {
+    if (data.auth) {
+      // eslint-disable-next-line no-console
+      logoutUser(data.auth).catch(console.error);
+    }
     reset();
   };
 

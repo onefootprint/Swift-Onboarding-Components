@@ -1,8 +1,12 @@
 use super::{AllowSessionUpdate, ExtractableAuthSession, GetSessionForUpdate};
+use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
+use crate::errors::ApiResult;
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
+use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
@@ -152,6 +156,21 @@ impl<A> SessionContext<A> {
             session,
             phantom,
         }
+    }
+}
+
+#[async_trait]
+impl<T> InvalidateAuth for SessionContext<T>
+where
+    T: Send,
+{
+    /// invalidate the session token for logout purposes
+    async fn invalidate(self, state: &State) -> ApiResult<()> {
+        let key = self.session.key;
+        Ok(state
+            .db_pool
+            .db_query(move |conn| Session::invalidate(key, conn))
+            .await??)
     }
 }
 

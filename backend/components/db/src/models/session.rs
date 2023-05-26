@@ -69,4 +69,13 @@ impl Session {
             .get_result::<Session>(conn)?;
         Ok(session)
     }
+
+    pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> Result<(), crate::DbError> {
+        let now = Utc::now();
+        diesel::update(session::table)
+            .filter(session::key.eq(key))
+            .set((session::expires_at.eq(&now),))
+            .execute(conn)?;
+        Ok(())
+    }
 }

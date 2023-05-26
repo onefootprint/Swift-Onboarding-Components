@@ -81,7 +81,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         doc_request_id: id_doc.request_id,
     };
     let config_id = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
-    let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
     let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
@@ -222,7 +222,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
             }
-            let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id.clone()));
+            let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
             assert!(!id_doc.images(conn)?.is_empty());
 
             Ok(id_doc)
@@ -250,7 +250,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         doc_request_id: id_doc.request_id.clone(),
     };
     let config_id = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
-    let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
     let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
