@@ -55,5 +55,6 @@ fn test_evaluate_onboarding_rules(
     };
 
     // function under test
-    feature_vector.evaluate().unwrap()
+    let (decision, _) = feature_vector.evaluate().unwrap();
+    decision
 }

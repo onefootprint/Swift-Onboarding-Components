@@ -2,7 +2,7 @@
 /// we can use to make decisions
 use idv::ParsedResponse;
 
-use crate::decision::{rule::rule_set::Action, Error, RuleError};
+use crate::decision::{onboarding::DecisionReasonCodes, rule::rule_set::Action, Error, RuleError};
 use itertools::Itertools;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
@@ -125,6 +125,36 @@ impl KycFeatureVector {
         rules_triggered.is_empty()
             || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
     }
+
+    fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+        let all_codes = vendor_apis
+            .iter()
+            .flat_map(|v| {
+                self.reason_codes_for_vendor_api(v).map(|rcs| {
+                    rcs.iter()
+                        .map(|rc| (Vendor::from(v.to_owned()), rc.to_owned()))
+                        .collect::<Vec<(Vendor, FootprintReasonCode)>>()
+                })
+            })
+            .flatten();
+
+        all_codes
+            .into_iter()
+            .sorted()
+            .group_by(|t| t.1.clone())
+            .into_iter()
+            .map(|(footprint_reason_code, group)| {
+                (
+                    footprint_reason_code,
+                    group
+                        .into_iter()
+                        .map(|(vendor, _)| vendor)
+                        .unique()
+                        .collect::<Vec<Vendor>>(),
+                )
+            })
+            .collect()
+    }
 }
 
 impl From<VendorResult> for KycFeatureVector {
@@ -217,7 +247,7 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 }
 
 impl FeatureVector for KycFeatureVector {
-    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // The set of rules that determine if a user passes onboarding
         let idology_rules: Vec<Box<dyn EvaluateRuleSet<IDologyFeatures>>> =
             vec![Box::new(onboarding_rules::idology_base_rule_set())];
@@ -265,6 +295,9 @@ impl FeatureVector for KycFeatureVector {
         // what reviews we want to be doing
         let create_manual_review = decision_status == DecisionStatus::Fail;
 
+        // TODO: derive this better
+        let reason_codes = self.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
+
         let output = OnboardingRulesDecisionOutput {
             should_commit: Self::should_commit(&result.rules_triggered),
             decision_status,
@@ -272,7 +305,7 @@ impl FeatureVector for KycFeatureVector {
             rules_triggered: result.rules_triggered.to_owned(),
             rules_not_triggered: result.rules_not_triggered.to_owned(),
         };
-        Ok(output)
+        Ok((output, reason_codes))
     }
 
     fn verification_results(&self) -> Vec<newtypes::VerificationResultId> {
@@ -307,36 +340,6 @@ impl FeatureVector for KycFeatureVector {
         .into_iter()
         .flatten()
         .collect()
-    }
-
-    fn reason_codes(&self, visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
-        let all_codes = visible_vendor_apis
-            .iter()
-            .flat_map(|v| {
-                self.reason_codes_for_vendor_api(v).map(|rcs| {
-                    rcs.iter()
-                        .map(|rc| (Vendor::from(v.to_owned()), rc.to_owned()))
-                        .collect::<Vec<(Vendor, FootprintReasonCode)>>()
-                })
-            })
-            .flatten();
-
-        all_codes
-            .into_iter()
-            .sorted()
-            .group_by(|t| t.1.clone())
-            .into_iter()
-            .map(|(footprint_reason_code, group)| {
-                (
-                    footprint_reason_code,
-                    group
-                        .into_iter()
-                        .map(|(vendor, _)| vendor)
-                        .unique()
-                        .collect::<Vec<Vendor>>(),
-                )
-            })
-            .collect()
     }
 }
 

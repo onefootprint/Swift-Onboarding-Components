@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use super::{
     features::kyc_features::KycFeatureVector,
-    onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+    onboarding::{DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
@@ -20,7 +20,6 @@ use crate::{
 use db::{
     models::{
         onboarding::Onboarding,
-        scoped_vault::ScopedVault,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -28,19 +27,17 @@ use db::{
     DbError, DbPool, TxnPgConn,
 };
 use either::Either;
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::FeatureFlagClient;
 use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
     socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
-use strum::IntoEnumIterator;
 
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VendorAPI, VerificationRequestId,
-    VerificationResultId,
+    FootprintReasonCode, OnboardingId, ScopedVaultId, VerificationRequestId, VerificationResultId,
 };
 use prometheus::labels;
 ///
@@ -109,27 +106,16 @@ pub async fn run(
         .collect();
 
     let fv = features::kyc_features::create_features(all_vendor_results);
-    make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+    make_onboarding_decision(&ob, fv, db_pool).await
 }
 
-pub async fn make_onboarding_decision<T>(
-    ob: &Onboarding,
-    fv: T,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    db_pool: &DbPool,
-) -> ApiResult<()>
+pub async fn make_onboarding_decision<T>(ob: &Onboarding, fv: T, db_pool: &DbPool) -> ApiResult<()>
 where
     T: FeatureVector + Send + Sync,
 {
     // Calculate output from rules + features
-    let rules_output = fv.evaluate()?;
+    let (rules_output, reason_codes) = fv.evaluate()?;
 
-    let obid = ob.id.clone();
-    let tenant_id = db_pool
-        .db_query(move |conn| ScopedVault::get(conn, &obid))
-        .await??
-        .tenant_id;
-    let reason_codes = reason_codes_for_tenant(ff_client, &tenant_id, &fv)?;
     let verification_result_ids = fv.verification_results();
 
     let ob = ob.clone();
@@ -147,27 +133,6 @@ where
             )
         })
         .await
-}
-
-// TODO: probably make this a direct output of rules eval or something
-pub fn reason_codes_for_tenant<T>(
-    ff_client: Arc<dyn FeatureFlagClient>,
-    tenant_id: &TenantId,
-    fv: &T,
-) -> ApiResult<Vec<(FootprintReasonCode, Vec<Vendor>)>>
-where
-    T: FeatureVector,
-{
-    let tenant_can_view_socure_risk_signal = ff_client.flag(BoolFlag::CanViewSocureRiskSignals(tenant_id));
-
-    let mut visible_vendor_apis: Vec<VendorAPI> = VendorAPI::iter()
-        .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
-        .collect();
-
-    if tenant_can_view_socure_risk_signal {
-        visible_vendor_apis.push(VendorAPI::SocureIDPlus)
-    }
-    Ok(fv.reason_codes(visible_vendor_apis))
 }
 
 pub async fn save_vendor_responses(
@@ -382,12 +347,16 @@ pub async fn make_vendor_requests(
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
-) -> ApiResult<(OnboardingRulesDecisionOutput, KycFeatureVector)> {
+) -> ApiResult<(
+    OnboardingRulesDecisionOutput,
+    DecisionReasonCodes,
+    KycFeatureVector,
+)> {
     // From our results, create a FeatureVector for the final decision output
     let fv = features::kyc_features::create_features(vendor_results);
-    let decision = fv.evaluate()?;
+    let (decision, reason_codes) = fv.evaluate()?;
 
-    Ok((decision, fv))
+    Ok((decision, reason_codes, fv))
 }
 
 /// Create and save an onboarding decision

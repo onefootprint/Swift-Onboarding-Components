@@ -1,4 +1,4 @@
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VerificationResultId};
 
 use crate::errors::ApiResult;
 
@@ -13,8 +13,8 @@ pub struct OnboardingRulesDecisionOutput {
     pub rules_not_triggered: Vec<RuleName>,
 }
 
+pub type DecisionReasonCodes = Vec<(FootprintReasonCode, Vec<Vendor>)>;
 pub trait FeatureVector {
-    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput>;
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)>;
     fn verification_results(&self) -> Vec<VerificationResultId>;
-    fn reason_codes(&self, visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)>;
 }

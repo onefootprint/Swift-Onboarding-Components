@@ -163,7 +163,6 @@ pub async fn assert_kyc_vendor_calls_completed(
 
 pub fn create_kyc_decision(
     conn: &mut TxnPgConn,
-    ff_client: Arc<dyn FeatureFlagClient>,
     t_id: &TenantId,
     ob_id: &OnboardingId,
     fixture_decision: Option<FixtureDecision>,
@@ -181,10 +180,7 @@ pub fn create_kyc_decision(
         let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
         (rules_output, reason_codes, true)
     } else {
-        let (rules_output, fv) = decision::engine::calculate_decision(vendor_results)?;
-
-        // TODO: refactor DE code so we *only* do the FF call here but do calculate_decision and the reason_code creation within on_commit
-        let reason_codes = engine::reason_codes_for_tenant(ff_client, t_id, &fv)?;
+        let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results)?;
         (rules_output, reason_codes, false)
     };
 

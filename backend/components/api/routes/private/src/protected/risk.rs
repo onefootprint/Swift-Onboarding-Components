@@ -127,7 +127,7 @@ async fn make_vendor_calls(
     )
     .await?;
 
-    let (rules_output, _) = crate::decision::engine::calculate_decision(vendor_results.clone())?;
+    let (rules_output, _, _) = crate::decision::engine::calculate_decision(vendor_results.clone())?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()
@@ -201,8 +201,7 @@ async fn make_decision(
         .collect();
 
     let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
-    decision::engine::make_onboarding_decision(&ob, fv, state.feature_flag_client.clone(), &state.db_pool)
-        .await?;
+    decision::engine::make_onboarding_decision(&ob, fv, &state.db_pool).await?;
 
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }
@@ -306,7 +305,7 @@ async fn shadow_run(
         })
         .collect();
 
-    let (rules_output, _) = decision::engine::calculate_decision(vendor_results)?;
+    let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision_status,

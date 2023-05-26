@@ -163,7 +163,6 @@ impl OnAction<MakeDecision> for Decisioning {
         let (fixture_decision, ff_client) = async_res;
         let _decision_output = common::create_kyc_decision(
             conn,
-            ff_client,
             &self.t_id,
             &self.ob_id,
             fixture_decision,

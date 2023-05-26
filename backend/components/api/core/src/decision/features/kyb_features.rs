@@ -1,10 +1,10 @@
 use db::models::onboarding_decision::OnboardingDecision;
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VerificationResultId};
 
 use crate::{
     decision::{
-        onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+        onboarding::{DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
         rule::{
             self, kyb_rules,
             rule_set::{Action, EvaluateRuleSet},
@@ -51,8 +51,18 @@ impl KybFeatureVector {
     }
 }
 
+impl KybFeatureVector {
+    fn reason_codes(&self) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+        self.middesk_features
+            .footprint_reason_codes
+            .iter()
+            .map(|r| (r.clone(), vec![Vendor::Middesk]))
+            .collect()
+    }
+}
+
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         let middesk_rules: Vec<Box<dyn EvaluateRuleSet<KybFeatureVector>>> = vec![
             Box::new(kyb_rules::middesk_base_rule_set()),
             Box::new(kyb_rules::bos_pass_kyc_rule_set()),
@@ -77,22 +87,12 @@ impl FeatureVector for KybFeatureVector {
             rules_triggered: eval_result.rules_triggered,
             rules_not_triggered: eval_result.rules_not_triggered,
         };
-        Ok(output)
+
+        let reason_codes = self.reason_codes();
+        Ok((output, reason_codes))
     }
 
     fn verification_results(&self) -> Vec<newtypes::VerificationResultId> {
         vec![self.middesk_features.verification_result_id.clone()]
-    }
-
-    fn reason_codes(&self, visible_vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
-        if visible_vendor_apis.contains(&VendorAPI::MiddeskBusinessUpdateWebhook) {
-            self.middesk_features
-                .footprint_reason_codes
-                .iter()
-                .map(|r| (r.clone(), vec![Vendor::Middesk]))
-                .collect()
-        } else {
-            vec![]
-        }
     }
 }

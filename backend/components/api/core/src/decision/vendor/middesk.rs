@@ -458,7 +458,6 @@ impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(
         self,
         db_pool: &DbPool,
-        ff_client: Arc<dyn FeatureFlagClient>,
         enclave_client: &EnclaveClient,
     ) -> ApiResult<()> {
         let obid = self.middesk_request.onboarding_id.clone();
@@ -491,7 +490,6 @@ impl MiddeskState<Complete> {
 
         decision::biz_risk::make_kyb_decision(
             db_pool,
-            ff_client,
             enclave_client,
             self.middesk_request.onboarding_id,
             &business_response,
@@ -565,7 +563,6 @@ pub async fn init_middesk_request(
 // Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from Middesk
 pub async fn handle_middesk_webhook(
     db_pool: &DbPool,
-    ff_client: Arc<dyn FeatureFlagClient>,
     middesk_client: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
     enclave_client: &EnclaveClient,
     res: serde_json::Value,
@@ -598,7 +595,7 @@ pub async fn handle_middesk_webhook(
     }?;
 
     match next_state {
-        MiddeskStates::Complete(c) => c.run_kyb_decisioning(db_pool, ff_client, enclave_client).await,
+        MiddeskStates::Complete(c) => c.run_kyb_decisioning(db_pool, enclave_client).await,
         _ => Ok(()),
     }
 }

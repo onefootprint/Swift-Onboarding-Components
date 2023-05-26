@@ -1,10 +1,7 @@
-use std::sync::Arc;
-
 use db::{
     models::{onboarding::Onboarding, onboarding_decision::OnboardingDecision},
     DbPool,
 };
-use feature_flag::FeatureFlagClient;
 use idv::middesk::response::business::BusinessResponse;
 use newtypes::{OnboardingId, VerificationResultId};
 
@@ -19,7 +16,6 @@ use super::{engine, features::kyb_features::KybFeatureVector};
 
 pub async fn make_kyb_decision(
     db_pool: &DbPool,
-    ff_client: Arc<dyn FeatureFlagClient>,
     enclave_client: &EnclaveClient,
     ob_id: OnboardingId,
     business_response: &BusinessResponse,
@@ -89,5 +85,5 @@ pub async fn make_kyb_decision(
     }
 
     let fv = KybFeatureVector::new(business_response, vres_id, obds);
-    engine::make_onboarding_decision(&ob, fv, ff_client, db_pool).await
+    engine::make_onboarding_decision(&ob, fv, db_pool).await
 }

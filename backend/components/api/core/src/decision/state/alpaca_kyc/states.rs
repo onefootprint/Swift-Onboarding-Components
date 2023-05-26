@@ -132,7 +132,7 @@ impl Decisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision> for Decisioning {
-    type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
+    type AsyncRes = Option<FixtureDecision>;
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -147,17 +147,16 @@ impl OnAction<MakeDecision> for Decisioning {
         )
         .await?;
 
-        Ok((fixture_decision, state.feature_flag_client.clone()))
+        Ok(fixture_decision)
     }
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        let (fixture_decision, ff_client) = async_res;
+        let fixture_decision = async_res;
 
         // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
         let decision_output = common::create_kyc_decision(
             conn,
-            ff_client,
             &self.t_id,
             &self.ob_id,
             fixture_decision,

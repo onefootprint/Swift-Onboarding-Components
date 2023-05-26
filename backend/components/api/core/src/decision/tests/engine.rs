@@ -92,12 +92,6 @@ async fn test_run(
         idv::experian::error::Error,
     >::new();
 
-    mock_ff_client
-        .expect_flag()
-        .times(1)
-        .withf(move |f| *f == BoolFlag::CanViewSocureRiskSignals(&tenant.id))
-        .return_once(|_| false);
-
     mock_twilio_api_call
         .expect_make_request()
         .times(1)
