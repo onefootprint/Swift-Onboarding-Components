@@ -8,7 +8,7 @@ import {
   createFontStyles,
   createOverlayBackground,
 } from '../../../../utils/mixins';
-import Flag from '../../../internal/flag';
+import Flag from '../../../flag';
 import type { CountrySelectOption } from '../../country-select.types';
 
 export interface OptionProps<

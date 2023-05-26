@@ -25,7 +25,6 @@ export enum Guard {
 
 export enum Action {
   assignFields = 'assignFields',
-  assignDI = 'assignDI',
   assignReason = 'assignReason',
 }
 

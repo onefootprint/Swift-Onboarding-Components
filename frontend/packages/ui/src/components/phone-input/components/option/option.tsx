@@ -8,7 +8,7 @@ import {
   createFontStyles,
   createOverlayBackground,
 } from '../../../../utils/mixins';
-import Flag from '../../../internal/flag';
+import Flag from '../../../flag';
 import type { PhoneSelectOption } from '../../phone-input.types';
 
 export interface OptionProps<

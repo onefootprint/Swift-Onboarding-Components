@@ -44,6 +44,7 @@ export const entityFixture: Entity = {
     IdDI.ssn9,
     IdDI.ssn4,
     IdDI.dob,
+    IdDI.nationality,
     IdDI.state,
     IdDI.city,
     IdDI.zip,

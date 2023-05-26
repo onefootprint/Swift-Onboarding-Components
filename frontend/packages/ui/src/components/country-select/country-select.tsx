@@ -3,12 +3,12 @@ import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Flag from '../flag';
 import BaseSelect, {
   BaseSelectOption,
   BaseSelectProps,
 } from '../internal/base-select';
 import BaseSelectTrigger from '../internal/base-select-trigger';
-import Flag from '../internal/flag';
 import Option from './components/option';
 import { CountrySelectOption } from './country-select.types';
 

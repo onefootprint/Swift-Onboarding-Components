@@ -33,7 +33,7 @@ export const createDecryptStateMachine = () =>
             [Event.submittedFields]: [
               {
                 target: State.confirmingReason,
-                actions: [Action.assignFields, Action.assignDI],
+                actions: [Action.assignFields],
                 cond: Guard.hasAtLeastOneFieldSelected,
               },
             ],

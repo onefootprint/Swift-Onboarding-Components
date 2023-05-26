@@ -45,6 +45,7 @@
     "id.last_name": "Last name",
     "id.ssn9": "SSN (Full)",
     "id.ssn4": "SSN (Last 4)",
+    "id.nationality": "Nationality",
     "id.dob": "Date of birth",
     "id.address_line1": "Address line 1",
     "id.address_line2": "Address line 2",

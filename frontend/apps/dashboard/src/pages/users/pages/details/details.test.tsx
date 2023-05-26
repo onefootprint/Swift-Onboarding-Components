@@ -36,7 +36,7 @@ afterAll(() => {
 const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
 
-describe.skip('<Details />', () => {
+describe('<Details />', () => {
   const fileSaverMock = fileSaverSpy();
 
   beforeEach(() => {
@@ -357,6 +357,13 @@ describe.skip('<Details />', () => {
             container,
           });
           expect(dob).toBeInTheDocument();
+
+          const nationality = getTextByRow({
+            name: 'Nationality',
+            value: '•••••••••',
+            container,
+          });
+          expect(nationality).toBeInTheDocument();
         });
 
         describe('when clicking on the decrypt button', () => {
@@ -365,6 +372,7 @@ describe.skip('<Details />', () => {
               [IdDI.ssn4]: '6578',
               [IdDI.ssn9]: '123456578',
               [IdDI.dob]: '1967-09-29',
+              [IdDI.nationality]: 'US',
             });
           });
 
@@ -404,6 +412,15 @@ describe.skip('<Details />', () => {
                 container,
               });
               expect(dob).toBeInTheDocument();
+            });
+
+            await waitFor(() => {
+              const nationality = getTextByRow({
+                name: 'Nationality',
+                value: 'United States of America',
+                container,
+              });
+              expect(nationality).toBeInTheDocument();
             });
           });
         });

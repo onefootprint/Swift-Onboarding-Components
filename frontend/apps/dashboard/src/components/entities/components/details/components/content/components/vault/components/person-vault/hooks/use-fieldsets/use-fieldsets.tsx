@@ -6,8 +6,10 @@ import {
   IcoUsers24,
 } from '@onefootprint/icons';
 import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
+import React from 'react';
 
 import type { Fieldset } from '../../../../vault.types';
+import Nationality from './components/nationality';
 
 const useFieldsets = (): Fieldset => {
   const { t } = useTranslation('pages.user.vault');
@@ -25,7 +27,17 @@ const useFieldsets = (): Fieldset => {
     identity: {
       title: t('identity.title'),
       iconComponent: IcoUsers24,
-      fields: [{ di: IdDI.ssn9 }, { di: IdDI.ssn4 }, { di: IdDI.dob }],
+      fields: [
+        { di: IdDI.ssn9 },
+        { di: IdDI.ssn4 },
+        { di: IdDI.dob },
+        {
+          di: IdDI.nationality,
+          renderCustomField: ({ di, entity }) => (
+            <Nationality di={di} entity={entity} />
+          ),
+        },
+      ],
     },
     address: {
       title: t('address.title'),

@@ -3,7 +3,7 @@ import type { CountryCode } from '@onefootprint/types';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import Flag from '../../../internal/flag';
+import Flag from '../../../flag';
 import Input from '../../../internal/input';
 import LoadingIndicator from '../../../loading-indicator';
 import type { PhoneInputProps } from '../../phone-input.types';

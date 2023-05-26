@@ -38,6 +38,8 @@ export { default as EmptyState } from './empty-state';
 export { default as Fade } from './fade';
 export * from './filters';
 export { default as Filters } from './filters';
+export * from './flag';
+export { default as Flag } from './flag';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
 export { default as FormControl } from './form-control';
