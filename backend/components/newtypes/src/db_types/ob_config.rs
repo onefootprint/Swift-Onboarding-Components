@@ -1,4 +1,5 @@
 use crate::util::impl_enum_str_diesel;
+use crate::CollectedDataOption as CDO;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -39,6 +40,7 @@ impl_enum_str_diesel!(ApiKeyStatus);
     Serialize,
     Deserialize,
     Debug,
+    Display,
     Clone,
     Apiv2Schema,
     AsExpression,
@@ -56,3 +58,12 @@ pub enum CipKind {
 }
 
 impl_enum_str_diesel!(CipKind);
+
+impl CipKind {
+    pub fn required_cdos(&self) -> Vec<CDO> {
+        match self {
+            CipKind::Alpaca => vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Nationality],
+            CipKind::Apex => vec![],
+        }
+    }
+}

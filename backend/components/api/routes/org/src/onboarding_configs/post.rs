@@ -129,6 +129,10 @@ pub async fn post(
     let is_alpaca_tenant = state
         .feature_flag_client
         .flag(BoolFlag::IsAlpacaTenant(&tenant_id));
+    let cip_kind = is_alpaca_tenant.then_some(CipKind::Alpaca);
+    if let Some(cip_kind) = cip_kind {
+        validate_for_cip(cip_kind, &must_collect_data)?
+    }
     let obc = state
         .db_pool
         .db_query(move |conn| {
@@ -149,9 +153,22 @@ pub async fn post(
     )))
 }
 
+fn validate_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), TenantError> {
+    let missing_cdos = kind
+        .required_cdos()
+        .into_iter()
+        .filter(|c| !must_collect_data.contains(c))
+        .collect_vec();
+    if !missing_cdos.is_empty() {
+        Err(TenantError::MissingCdosForCip(missing_cdos.into(), kind))
+    } else {
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use super::CreateOnboardingConfigurationRequest;
+    use super::*;
     use newtypes::CollectedDataOption as CDO;
     use test_case::test_case;
 
@@ -173,5 +190,15 @@ mod test {
             can_access_data,
         };
         req.validate_inner().is_ok()
+    }
+
+    #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob] => false)]
+    #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress] => false)]
+    #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Nationality] => true)]
+    #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn4, CDO::FullAddress, CDO::Nationality] => false)]
+    #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::PartialAddress, CDO::Nationality] => false)]
+    #[test_case(CipKind::Apex, vec![] => true)]
+    fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
+        validate_for_cip(kind, &must_collect_data).is_ok()
     }
 }

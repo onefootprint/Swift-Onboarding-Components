@@ -1,3 +1,4 @@
+use newtypes::{output::Csv, CipKind, CollectedDataOption};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -22,4 +23,7 @@ pub enum TenantError {
     InvalidExpiry,
     #[error("Must provide at least one scope")]
     MustProvideScope,
+
+    #[error("Missing required data options: {0} for cip: {1}")]
+    MissingCdosForCip(Csv<CollectedDataOption>, CipKind),
 }
