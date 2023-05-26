@@ -11,6 +11,8 @@ use crate::types::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::user::UserObAuthContext;
+use api_core::auth::Any;
 use api_core::types::JsonApiResponse;
 use chrono::DateTime;
 use chrono::Utc;
@@ -28,10 +30,26 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/org/onboarding_config")]
 pub fn get_bifrost(
     state: web::Data<State>,
-    ob_pk_auth: ObConfigAuth,
+    auth: Either<ObConfigAuth, UserObAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
-    let appearance_id = ob_pk_auth.ob_config().appearance_id.clone();
-    let tenant_id = ob_pk_auth.tenant().id.clone();
+    let (tenant, ob_config) = match auth {
+        Either::Left(ob_pk_auth) => {
+            // Support auth that identifies an ob config
+            let tenant = ob_pk_auth.tenant().clone();
+            let ob_config = ob_pk_auth.ob_config().clone();
+            (tenant, ob_config)
+        }
+        Either::Right(user_ob_auth) => {
+            // Also take in a user auth token that has the onboarding scope that identifies an ob
+            // config
+            let user_ob_auth = user_ob_auth.check_guard(Any)?;
+            let ob_config = user_ob_auth.data.ob_config()?.clone();
+            let tenant = user_ob_auth.data.tenant()?.clone();
+            (tenant, ob_config)
+        }
+    };
+    let tenant_id = tenant.id.clone();
+    let appearance_id = ob_config.appearance_id.clone();
     let appearance = if let Some(appearance_id) = appearance_id {
         let appearance = state
             .db_pool
@@ -42,11 +60,7 @@ pub fn get_bifrost(
         None
     };
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((
-            ob_pk_auth.ob_config().clone(),
-            ob_pk_auth.tenant().clone(),
-            appearance,
-        )),
+        api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, appearance)),
     )))
 }
 

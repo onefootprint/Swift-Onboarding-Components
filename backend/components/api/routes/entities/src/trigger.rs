@@ -62,6 +62,8 @@ pub async fn post(
                     let wf = Workflow::create_redo_kyc(conn, &sv.id)?;
                     let scopes = vec![
                         UserAuthScope::SignUp,
+                        // NOTE: when we remove this OrgOnboarding scope, make sure we're able to
+                        // look up the ob_config and tenant on UserObAuth via the Workflow scope
                         UserAuthScope::OrgOnboarding { id: sv.id },
                         UserAuthScope::Workflow { wf_id: wf.id },
                     ];
