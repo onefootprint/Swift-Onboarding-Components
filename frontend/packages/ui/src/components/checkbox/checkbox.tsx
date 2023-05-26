@@ -1,4 +1,4 @@
-import React, { forwardRef, useId } from 'react';
+import React, { forwardRef, ReactNode, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -13,7 +13,7 @@ export type CheckboxProps = {
   hasError?: boolean;
   hint?: string;
   id?: string;
-  label: string;
+  label?: ReactNode;
   name?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
