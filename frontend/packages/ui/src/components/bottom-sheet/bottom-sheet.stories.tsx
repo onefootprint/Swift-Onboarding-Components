@@ -91,7 +91,7 @@ Base.args = {
   children: 'Content',
   closeAriaLabel: 'Close',
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
   open: false,
   testID: 'bottom-sheet-test-id',
@@ -103,7 +103,7 @@ OnlyPrimary.args = {
   open: false,
   title: 'Title',
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
 };
 
@@ -140,6 +140,6 @@ PrimaryAndLink.args = {
   open: false,
   title: 'Title',
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
 };

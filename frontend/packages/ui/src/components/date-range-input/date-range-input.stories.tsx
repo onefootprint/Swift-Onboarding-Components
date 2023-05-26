@@ -33,6 +33,6 @@ const Template: Story<DateRangeInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   endDate: new Date('10/10/2021'),
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   startDate: new Date('10/05/2021'),
 };

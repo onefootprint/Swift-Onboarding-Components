@@ -59,7 +59,7 @@ const Template: Story<SegmentedControlProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   'aria-label': 'Segmented Control',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   options: [
     {
       label: 'Option 1',

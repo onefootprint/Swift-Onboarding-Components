@@ -14,7 +14,7 @@ const sendObservePayload = async (data: Record<string, any>[]) => {
       credentials: 'include',
     },
   ).catch(error => {
-    console.log('Sending frontend telemetry failed: ', error);
+    console.log('Sending frontend telemetry failed: ', error); // eslint-disable-line no-console
   });
 };
 

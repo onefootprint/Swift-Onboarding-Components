@@ -99,7 +99,7 @@ export const Base = Template.bind({});
 Base.args = {
   hasError: false,
   hint: '',
-  onComplete: console.log,
+  onComplete: console.log, // eslint-disable-line no-console
   testID: 'pin-input-test-id',
 };
 
@@ -107,5 +107,5 @@ export const WithError = Template.bind({});
 WithError.args = {
   hasError: true,
   hint: 'Incorrect verification code',
-  onComplete: console.log,
+  onComplete: console.log, // eslint-disable-line no-console
 };

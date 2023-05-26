@@ -63,6 +63,6 @@ const Template: Story<RadioSelectProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   testID: 'radio-select-test-id',
 };

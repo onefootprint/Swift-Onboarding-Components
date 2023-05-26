@@ -135,9 +135,9 @@ Base.args = {
   label: 'Toggle',
   labelPlacement: 'left',
   name: 'toggle',
-  onBlur: console.log,
-  onChange: console.log,
-  onFocus: console.log,
+  onBlur: console.log, // eslint-disable-line no-console
+  onChange: console.log, // eslint-disable-line no-console
+  onFocus: console.log, // eslint-disable-line no-console
   required: false,
   size: 'default',
 };

@@ -81,7 +81,7 @@ Base.args = {
   hasError: false,
   hint: '',
   invalidMessage: 'Invalid card number',
-  onChange: console.log,
-  onChangeText: console.log,
+  onChange: console.log, // eslint-disable-line no-console
+  onChangeText: console.log, // eslint-disable-line no-console
   value: '',
 };

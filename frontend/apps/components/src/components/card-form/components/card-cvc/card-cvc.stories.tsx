@@ -59,7 +59,7 @@ export const Base = Template.bind({});
 Base.args = {
   hasError: false,
   hint: '',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   testID: 'card-cvc-test-id',
   numDigits: 3,
 };

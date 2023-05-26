@@ -112,7 +112,7 @@ Base.args = {
   closeAriaLabel: 'Close',
   description: 'Toast description',
   onClose: () => {
-    console.log('toast was closed');
+    console.log('toast was closed'); // eslint-disable-line no-console
   },
   testID: 'input-test-id',
   title: 'Toast title',
@@ -120,7 +120,7 @@ Base.args = {
   cta: {
     label: 'Continue',
     onClick: () => {
-      console.log('cta was clicked');
+      console.log('cta was clicked'); // eslint-disable-line no-console
     },
   },
 };

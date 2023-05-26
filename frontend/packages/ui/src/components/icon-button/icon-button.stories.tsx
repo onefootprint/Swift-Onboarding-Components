@@ -54,6 +54,6 @@ export const Base = Template.bind({});
 Base.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  onClick: console.log,
+  onClick: console.log, // eslint-disable-line no-console
   testID: 'icon-button-test-id',
 };

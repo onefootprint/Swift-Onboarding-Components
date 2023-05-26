@@ -38,12 +38,12 @@ const Form = ({ html, onSuccess }: FormProps) => {
   const { register, getValues } = useForm<FormData>();
 
   const handleFootprintCompleted = (validationToken: string) => {
-    console.log('on completed', validationToken);
+    console.log('on completed', validationToken); // eslint-disable-line no-console
     onSuccess();
   };
 
   const handleFootprintCanceled = () => {
-    console.log('user canceled!');
+    console.log('user canceled!'); // eslint-disable-line no-console
   };
 
   const getUserData = (): FootprintUserData => {

@@ -64,10 +64,10 @@ const Template: Story<SearchInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   onReset: () => {
-    console.log('onReset');
+    console.log('onReset'); // eslint-disable-line no-console
   },
-  onChange: console.log,
-  onChangeText: console.log,
+  onChange: console.log, // eslint-disable-line no-console
+  onChangeText: console.log, // eslint-disable-line no-console
   placeholder: 'Search...',
   testID: 'search-input-test-id',
   value: '',

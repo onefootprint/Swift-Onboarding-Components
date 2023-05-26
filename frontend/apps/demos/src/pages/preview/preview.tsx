@@ -55,7 +55,7 @@ const Preview = ({ tenant }: PreviewProps) => {
                 <FootprintButton
                   publicKey={tenant.key}
                   onCompleted={validationToken => {
-                    console.log('validationToken', validationToken);
+                    console.log('validationToken', validationToken); // eslint-disable-line no-console
                     setConfirmation(true);
                   }}
                 />

@@ -108,9 +108,9 @@ const Template: Story = ({ onClear, onChange }) => {
 export const Base = Template.bind({});
 Base.args = {
   onChange: (query: string, newOptions: string[]) => {
-    console.log('changed', { query, newOptions });
+    console.log('changed', { query, newOptions }); // eslint-disable-line no-console
   },
   onClear: () => {
-    console.log('clear');
+    console.log('clear'); // eslint-disable-line no-console
   },
 };

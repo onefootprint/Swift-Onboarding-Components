@@ -43,6 +43,7 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(
       () => ({
         remove: handleRemove,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     );
 

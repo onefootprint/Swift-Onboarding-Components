@@ -89,7 +89,7 @@ Base.args = {
   disabled: false,
   hint: '',
   label: 'Address line 1',
-  onSelect: console.log,
+  onSelect: console.log, // eslint-disable-line no-console
   placeholder: 'Street and house number',
   testID: 'input-test-id',
   value: '',
@@ -99,7 +99,7 @@ Base.args = {
 export const WithInitialValue = Template.bind({});
 WithInitialValue.args = {
   label: 'Address line 1',
-  onSelect: console.log,
+  onSelect: console.log, // eslint-disable-line no-console
   placeholder: 'Street and house number',
   value: '14 linda street',
 };
@@ -108,7 +108,7 @@ export const WithHint = Template.bind({});
 WithHint.args = {
   hint: 'Hint',
   label: 'Address line 1',
-  onSelect: console.log,
+  onSelect: console.log, // eslint-disable-line no-console
   placeholder: 'Street and house number',
   value: '',
 };
@@ -118,7 +118,7 @@ WithError.args = {
   hasError: true,
   hint: 'Hint',
   label: 'Address line 1',
-  onSelect: console.log,
+  onSelect: console.log, // eslint-disable-line no-console
   placeholder: 'Street and house number',
   value: '',
 };
@@ -127,7 +127,7 @@ export const Disabled = Template.bind({});
 Disabled.args = {
   disabled: true,
   label: 'Address line 1',
-  onSelect: console.log,
+  onSelect: console.log, // eslint-disable-line no-console
   placeholder: 'Street and house number',
   value: '',
 };

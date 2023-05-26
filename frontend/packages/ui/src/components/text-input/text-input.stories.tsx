@@ -131,7 +131,7 @@ Base.args = {
   mask: undefined,
   maxLength: 100,
   minLength: 0,
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   placeholder: 'your.email@email.com',
   size: 'default',
   testID: 'input-test-id',

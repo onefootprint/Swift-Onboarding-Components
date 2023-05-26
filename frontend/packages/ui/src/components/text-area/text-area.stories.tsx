@@ -90,8 +90,8 @@ Base.args = {
   disabled: false,
   hint: '',
   label: 'Specify the reason',
-  onChange: console.log,
-  onChangeText: console.log,
+  onChange: console.log, // eslint-disable-line no-console
+  onChangeText: console.log, // eslint-disable-line no-console
   placeholder: 'Give a detailed reason',
   value: '',
   hasError: false,

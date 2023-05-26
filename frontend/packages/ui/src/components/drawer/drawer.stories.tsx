@@ -103,7 +103,7 @@ Base.args = {
   closeAriaLabel: 'Close',
   closeIconComponent: IcoClose24,
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
   open: false,
   testID: 'drawer-test-id',

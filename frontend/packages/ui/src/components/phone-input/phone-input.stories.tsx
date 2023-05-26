@@ -53,12 +53,12 @@ Base.args = {
   disabled: false,
   hasError: false,
   hint: 'Enter your phone number',
-  onChange: console.log,
-  onChangeText: console.log,
+  onChange: console.log, // eslint-disable-line no-console
+  onChangeText: console.log, // eslint-disable-line no-console
   placeholder: '202 555 5555',
   testID: 'phone-input-test-id',
   value: '',
   onReset: () => {
-    console.log('onReset');
+    console.log('onReset'); // eslint-disable-line no-console
   },
 };

@@ -53,6 +53,7 @@ const DesktopIllustration = () => {
       controls.start('visible');
     }
   }, [controls, isInView]);
+
   return (
     <IllustrationContainer ref={ref}>
       <motion.div

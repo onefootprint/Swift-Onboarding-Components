@@ -80,7 +80,7 @@ export default async function handler(req: NextRequest) {
       },
     );
   } catch (e: any) {
-    console.log(`${e.message}`);
+    console.log(`${e.message}`); // eslint-disable-line no-console
     return new Response(`Failed to generate the image`, {
       status: 500,
     });

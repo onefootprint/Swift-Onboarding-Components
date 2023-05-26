@@ -52,7 +52,7 @@ Base.args = {
   hasError: false,
   hint: '',
   label: 'State',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   options: STATES,
   placeholder: 'Select',
   searchPlaceholder: 'Search',

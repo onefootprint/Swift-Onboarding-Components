@@ -18,6 +18,7 @@ const useLogStateMachine = (name: string, state: any) => {
         done: stateData.done,
       },
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.value, state.done]);
 };
 

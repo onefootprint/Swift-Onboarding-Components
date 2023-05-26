@@ -32,6 +32,7 @@ const Permissions = () => {
       setValue('scopes', scopesWithoutDecryptFields);
       setValue('decryptFields', []);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDecryptSelect]);
 
   return (

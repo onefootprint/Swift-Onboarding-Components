@@ -50,6 +50,7 @@ const usePermissionsByRoute = (options: {
         privateRoute.onError({ isLoggedIn: false, requiresOnboarding: false });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isLoggedIn]);
 };
 

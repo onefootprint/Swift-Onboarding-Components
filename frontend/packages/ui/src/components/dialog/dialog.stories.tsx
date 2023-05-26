@@ -172,12 +172,12 @@ Base.args = {
   headerIcon: {
     component: IcoClose24,
     onClick: () => {
-      console.log('close');
+      console.log('close'); // eslint-disable-line no-console
     },
     ariaLabel: 'Close',
   },
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
   open: false,
   primaryButton: {
@@ -261,7 +261,7 @@ OnlyPrimary.args = {
     label: 'Primary',
   },
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
   isConfirmation: false,
 };
@@ -316,6 +316,6 @@ PrimaryAndLink.args = {
     label: 'Link button',
   },
   onClose: () => {
-    console.log('close');
+    console.log('close'); // eslint-disable-line no-console
   },
 };

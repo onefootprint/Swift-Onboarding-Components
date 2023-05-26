@@ -175,10 +175,10 @@ Base.args = {
   id: 'multi-select-id',
   label: 'Permissible attributes',
   name: 'multi-select',
-  onBlur: console.log,
-  onChange: console.log,
-  onFocus: console.log,
-  onInputChange: console.log,
+  onBlur: console.log, // eslint-disable-line no-console
+  onChange: console.log, // eslint-disable-line no-console
+  onFocus: console.log, // eslint-disable-line no-console
+  onInputChange: console.log, // eslint-disable-line no-console
   options: defaultOptions,
   placeholder: 'Select...',
   required: false,

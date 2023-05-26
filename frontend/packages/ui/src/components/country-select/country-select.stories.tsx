@@ -118,7 +118,7 @@ Base.args = {
   hint: 'Hint',
   id: 'select-field',
   label: 'Country',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
   testID: 'select-test-id',

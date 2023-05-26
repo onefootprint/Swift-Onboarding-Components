@@ -79,7 +79,7 @@ Base.args = {
   id: 'checkbox-id',
   label: 'This is a checkbox label',
   name: 'checkbox-name',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   required: false,
   testID: 'checkbox-test-id',
 };

@@ -83,7 +83,7 @@ Base.args = {
   id: 'radio-button-id',
   label: 'This is a Radio label',
   name: 'checkbox-name',
-  onChange: console.log,
+  onChange: console.log, // eslint-disable-line no-console
   required: false,
   testID: 'checkbox-test-id',
 };

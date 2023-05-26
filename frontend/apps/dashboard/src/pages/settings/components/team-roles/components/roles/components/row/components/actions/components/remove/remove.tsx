@@ -56,6 +56,7 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
     () => ({
       remove: handleRemove,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

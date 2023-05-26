@@ -43,12 +43,14 @@ const FingerprintIntegration = ({ page, fpAuthToken }: FingerprintProps) => {
         path: page,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, page]);
 
   useEffect(() => {
     if (error) {
       observeCollector.logError('error', error, { isFingerprintError: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   return null;
