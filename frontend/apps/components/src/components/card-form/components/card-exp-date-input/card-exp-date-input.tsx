@@ -25,7 +25,7 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
       onChange,
       onBlur,
       invalidMessage = 'Date must be in the future',
-      label = 'Exp. Date',
+      label = 'Expiry Date',
       value,
       ...props
     }: CardExpDateInputProps,
@@ -57,7 +57,6 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
         label={label}
         mask={{
           date: true,
-
           datePattern: ['m', 'y'],
         }}
         onBlur={handleBlur}

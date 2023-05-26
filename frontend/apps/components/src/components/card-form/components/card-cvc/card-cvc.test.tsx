@@ -1,3 +1,4 @@
+import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React, { useState } from 'react';
 
@@ -104,13 +105,17 @@ describe('<CardCvc />', () => {
     expect(screen.getByPlaceholderText('1234')).toBeInTheDocument();
   });
 
-  it('should not show hint when there is no error', () => {
+  it('should show hint', () => {
     renderCardCvc({ hint: 'hint' });
-    expect(screen.queryByText('hint')).not.toBeInTheDocument();
+    expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
-  it('should show hint when there is an error', () => {
+  it('should show hint in error styling when there is an error', () => {
     renderCardCvc({ hint: 'hint', hasError: true });
-    expect(screen.getByText('hint')).toBeInTheDocument();
+    const hint = screen.getByText('hint');
+    expect(hint).toBeInTheDocument();
+    expect(hint).toHaveStyle({
+      color: themes.light.color.error,
+    });
   });
 });
