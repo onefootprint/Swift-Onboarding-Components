@@ -11,7 +11,7 @@ on:
         type: string
 
 concurrency:
-  group: 'ephem-stack-group-${{ github.head_ref }}'
+  group: 'ephem-stack-group-${{ github.event.inputs.branchName || github.head_ref || github.run_id }}'
 
 jobs:
   destroy_ephemeral_stack:
@@ -72,7 +72,14 @@ jobs:
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url
 
-      # bring up the ephemeral stack
+      - uses: pulumi/actions@v3
+        with:
+          command: refresh
+          work-dir: ./backend/infra
+          stack-name: 'footprint/${{ steps.get_stack_name.outputs.stack }}'
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
       - uses: pulumi/actions@v3
         with:
           command: destroy

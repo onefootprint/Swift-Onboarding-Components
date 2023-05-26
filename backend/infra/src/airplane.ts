@@ -24,8 +24,12 @@ export function CreateAirplaneAgentStack(g: GlobalState): AirplaneOutput {
   let envSlug: string;
   switch (g.stackMetadata.environment) {
     case StackEnvironment.DevEphemeral: {
-      envSlug = 'dev_ephem'; //TODO: update once airplane supports epehemeral envs
-      break;
+      // TODO: eventually support ephem airpalne
+      // for now we can skip this.
+      envSlug = 'dev_ephem';
+      return {
+        envSlug,
+      };
     }
     case StackEnvironment.Dev: {
       envSlug = 'dev';
