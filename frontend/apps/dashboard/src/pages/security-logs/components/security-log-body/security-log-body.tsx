@@ -96,6 +96,7 @@ const AccessEventBodyContainer = styled.div`
 
 const CodeContainer = styled.div`
   display: flex;
+  grid-column: 2 / span 3;
 `;
 
 export default SecurityLogBody;
