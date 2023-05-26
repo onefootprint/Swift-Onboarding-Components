@@ -1,0 +1,121 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
+import React, { useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
+
+import useHandleCameraError from '../../hooks/use-handle-camera-error';
+import useProcessImage from '../../hooks/use-process-image';
+
+type IdDocPhotoButtonsProp = {
+  onComplete: (image: string) => void;
+};
+
+const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
+  const { t } = useTranslation('components.id-doc-photo-upload-buttons');
+  const takePhotoRef = useRef<HTMLInputElement | undefined>();
+  const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
+  const onCameraError = useHandleCameraError();
+  const { processImageFile, convertImageFileToStrippedBase64 } =
+    useProcessImage();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [captureMethod, setCaptureMethod] = useState<
+    'take' | 'upload' | undefined
+  >();
+
+  const onProcessingDone = () => {
+    setIsLoading(false);
+    setCaptureMethod(undefined);
+  };
+
+  const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true);
+    const { files } = event.target;
+    if (!files?.length) {
+      onProcessingDone();
+      return;
+    }
+
+    const processedImageFile = await processImageFile(files[0]);
+    if (!processedImageFile) {
+      onProcessingDone();
+      return;
+    }
+
+    const imageString = await convertImageFileToStrippedBase64(
+      processedImageFile,
+    );
+    if (!imageString) {
+      onProcessingDone();
+      return;
+    }
+
+    onComplete(imageString);
+    onProcessingDone();
+  };
+
+  const handleUpload = () => {
+    setCaptureMethod('upload');
+    uploadPhotoRef.current?.click();
+  };
+
+  const handleTake = () => {
+    setCaptureMethod('take');
+    try {
+      takePhotoRef.current?.click();
+    } catch (err) {
+      onCameraError(err);
+      onProcessingDone();
+    }
+  };
+
+  return (
+    <ButtonsContainer>
+      <Button
+        fullWidth
+        onClick={handleTake}
+        loading={isLoading && captureMethod === 'take'}
+        disabled={isLoading}
+      >
+        {t('take-photo.title')}
+      </Button>
+      <StyledInput
+        ref={takePhotoRef as React.RefObject<HTMLInputElement>}
+        type="file"
+        accept="image/*,.heic,.heif"
+        capture="environment"
+        onChange={handleImage}
+      />
+      <Button
+        fullWidth
+        variant="secondary"
+        onClick={handleUpload}
+        loading={isLoading && captureMethod === 'upload'}
+        disabled={isLoading}
+      >
+        {t('upload-photo.title')}
+      </Button>
+      <StyledInput
+        ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
+        type="file"
+        accept="image/*,.heic,.heif"
+        onChange={handleImage}
+      />
+    </ButtonsContainer>
+  );
+};
+
+const StyledInput = styled.input`
+  display: none;
+`;
+
+const ButtonsContainer = styled.div`
+  ${({ theme }) => css`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[4]};
+  `}
+`;
+
+export default IdDocPhotoButtons;

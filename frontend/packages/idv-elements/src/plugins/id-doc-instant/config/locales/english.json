@@ -2,6 +2,69 @@
   "global": {
     "errors": {}
   },
-  "components": {},
+  "components": {
+    "media-errors": {
+      "not-found": "We couldn't find a camera on your device. Please use another device.",
+      "already-in-use": "Another application is using your camera, please close the other application and try again.",
+      "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
+      "other-error": "There was an error accessing your camera. Please try again."
+    },
+    "missing-permissions": {
+      "title": "Allow access to your camera",
+      "subtitle": "This lets you submit photos of your documents, and we can use them to properly verify your ID.",
+      "cta": "Open settings to give camera permissions"
+    },
+    "id-doc-photo-prompt": {
+      "title": "Scan or upload the {{side}} side of your {{type}}",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-document": {
+          "title": "Get the whole document in the photo",
+          "description": "We recommend that you place your document on a flat surface."
+        }
+      }
+    },
+    "loading": {
+      "processing-id-doc-front": "Processing image...",
+      "processing-id-doc-back": "Processing image...",
+      "processing-one-side": "Processing image...",
+      "processing-selfie": "Processing your selfie..."
+    },
+    "error": {
+      "title": "We couldn't process your image",
+      "description": "Please submit a new image."
+    },
+    "success": {
+      "id-doc-front-upload": "Front side image uploaded",
+      "id-doc-back-upload": "Back side image uploaded",
+      "one-side-upload": "Image uploaded",
+      "selfie-upload": "Selfie uploaded"
+    },
+    "selfie-consent": {
+      "title": "We need a selfie to verify your identity",
+      "subtitle": "By continuing, you're agreeing to Footprint collecting and processing your biometric data from your selfie and identity document.",
+      "cta": "Agree",
+      "continue": "Continue",
+      "third-party-consent": "Optional: Allow Footprint's third-party providers to improve their products with this data. <a>Privacy Policy</a>."
+    },
+    "id-doc-photo-upload-buttons": {
+      "take-photo": {
+        "title": "Take photo",
+        "take": "Take photo"
+      },
+      "upload-photo": {
+        "title": "Upload photo"
+      }
+    }
+  },
   "pages": {}
 }
