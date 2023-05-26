@@ -1,4 +1,4 @@
-import type { BorderRadiuses } from '../types/types';
+import type { BorderRadiuses } from '../types';
 
 const borderRadius: BorderRadiuses = {
   none: '0px',

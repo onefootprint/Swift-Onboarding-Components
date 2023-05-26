@@ -2,7 +2,7 @@ import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate, { Scope } from 'src/components/permission-gate';
-import SectionHeader from 'src/components/section-header/section-header';
+import SectionHeader from 'src/components/section-header';
 
 import CreateDialog from './components/create-dialog';
 import Table from './components/table';

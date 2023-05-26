@@ -3,7 +3,7 @@ import { LinkButton, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Sparkles from '../sparkles/sparkles';
+import Sparkles from '../sparkles';
 
 type BannerPropsTypes = {
   title: string;

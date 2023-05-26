@@ -4,10 +4,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import Calculator from './components/calculator/calculator';
+import Calculator from './components/calculator';
 import Faq from './components/faq';
-import AddOns from './components/plan-tables/add-ons/add-ons';
-import CorePlan from './components/plan-tables/core-plan/core-plan';
+import AddOns from './components/plan-tables/add-ons';
+import CorePlan from './components/plan-tables/core-plan';
 
 const Pricing = () => {
   const { t } = useTranslation('pages.pricing');

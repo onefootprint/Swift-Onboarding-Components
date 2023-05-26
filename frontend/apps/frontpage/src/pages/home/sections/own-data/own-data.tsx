@@ -9,7 +9,7 @@ import { Container } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React from 'react';
 
-import Blob from '../../components/blobs/blobs';
+import Blob from '../../components/blobs';
 import FeatureElement from '../../components/feature-element';
 import FeatureStack from '../../components/features-stack';
 import DetailsLayout from '../../components/layout/details-layout';

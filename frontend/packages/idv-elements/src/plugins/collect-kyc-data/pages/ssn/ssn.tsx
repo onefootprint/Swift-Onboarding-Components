@@ -9,10 +9,10 @@ import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import allAttributes from '../../utils/all-attributes/all-attributes';
-import SSN4 from './components/ssn4/ssn4';
-import SSN9 from './components/ssn9/ssn9';
-import useConvertFormData from './hooks/use-convert-form-data/use-convert-form-data';
+import allAttributes from '../../utils/all-attributes';
+import SSN4 from './components/ssn4';
+import SSN9 from './components/ssn9';
+import useConvertFormData from './hooks/use-convert-form-data';
 import { FormData } from './types';
 
 type SSNProps = {

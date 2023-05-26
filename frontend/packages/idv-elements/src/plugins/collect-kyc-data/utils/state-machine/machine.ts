@@ -1,8 +1,8 @@
 import { assign, createMachine } from 'xstate';
 
-import allAttributes from '../all-attributes/all-attributes';
+import allAttributes from '../all-attributes';
 import mergeData from '../merge-data/merge-data';
-import mergeInitialData from '../merge-initial-data/merge-initial-data';
+import mergeInitialData from '../merge-initial-data';
 import {
   isMissingBasicAttribute,
   isMissingEmailAttribute,

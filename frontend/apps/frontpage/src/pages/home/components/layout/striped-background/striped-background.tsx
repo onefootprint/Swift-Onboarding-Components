@@ -4,7 +4,7 @@ import times from 'lodash/times';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import LineDraw from '../../line/line';
+import LineDraw from '../../line';
 
 type StripedBackgroundType = {
   color: string;

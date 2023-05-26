@@ -14,7 +14,7 @@ import KybCollect from '../../../../pages/kyb-collect';
 import KycAccess from '../../../../pages/kyc-access';
 import KycCollect from '../../../../pages/kyc-collect';
 import Name from '../../../../pages/name';
-import Type from '../../../../pages/type/type';
+import Type from '../../../../pages/type';
 import getFormIdForState from '../../../../utils/get-form-id-for-state';
 import getOnboardingConfigFromContext from '../../../../utils/get-onboarding-config-from-context';
 import { useOnboardingConfigMachine } from '../../../machine-provider';

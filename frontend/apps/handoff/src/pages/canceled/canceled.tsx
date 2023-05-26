@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import React from 'react';
 
-import useHandoffMachine from '../../hooks/use-handoff-machine/use-handoff-machine';
+import useHandoffMachine from '../../hooks/use-handoff-machine';
 
 const Canceled = () => {
   const [state] = useHandoffMachine();

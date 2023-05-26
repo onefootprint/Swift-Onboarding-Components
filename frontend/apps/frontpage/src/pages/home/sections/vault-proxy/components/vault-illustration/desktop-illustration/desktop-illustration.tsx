@@ -4,7 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HorizontalBeam from '../components/horizontal-beam';
-import Knob from '../components/knob/knob';
+import Knob from '../components/knob';
 
 const values = {
   cc: {

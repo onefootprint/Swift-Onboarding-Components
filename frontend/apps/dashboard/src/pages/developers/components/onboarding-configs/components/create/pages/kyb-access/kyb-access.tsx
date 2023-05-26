@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import AnimatedContainer from '../../components/animated-container';
-import FormTitle from '../../components/form-title/form-title';
+import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
-import getDefaultKycAccess from '../../utils/get-default-kyc-access/get-default-kyc-access';
+import getDefaultKycAccess from '../../utils/get-default-kyc-access';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = {

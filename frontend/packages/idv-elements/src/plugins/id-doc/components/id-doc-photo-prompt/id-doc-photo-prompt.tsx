@@ -15,7 +15,7 @@ import IdAnimation from '../../../../components/animations/id-animation';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import useHandleCameraError from '../../hooks/use-handle-camera-error';
-import useProcessImage from '../../hooks/use-process-image/use-process-image';
+import useProcessImage from '../../hooks/use-process-image';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;

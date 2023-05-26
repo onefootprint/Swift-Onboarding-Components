@@ -5,7 +5,7 @@ import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import LineDraw from '../../../../components/line/line';
+import LineDraw from '../../../../components/line';
 
 const wrapper = {
   visible: {

@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import SEO from '../../components/seo';
 import FeatureCard from './components/feature-card';
 import Footer from './components/footer';
-import Illustration from './components/illustration/illustration';
+import Illustration from './components/illustration';
 import Navigation from './components/navigation';
 
 const Ending = () => {

@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import Timeline from 'src/components/timeline/timeline';
+import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
 
 import WatchlistCheckEventBody from '../../../../watchlist-check-event-body';

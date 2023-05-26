@@ -3,7 +3,7 @@ import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-import Blob from '../../components/blobs/blobs';
+import Blob from '../../components/blobs';
 import DetailsLayout from '../../components/layout/details-layout';
 import SquaredFeatureCard from '../../components/squared-feature-card';
 import Illustration1 from './components/illustration-1';

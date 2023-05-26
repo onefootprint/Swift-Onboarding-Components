@@ -1,4 +1,4 @@
-import type { ZIndexes } from '../types/types';
+import type { ZIndexes } from '../types';
 
 const zIndexes: ZIndexes = {
   sticky: 5,

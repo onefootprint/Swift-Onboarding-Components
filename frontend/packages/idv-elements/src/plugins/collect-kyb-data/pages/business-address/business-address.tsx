@@ -4,7 +4,7 @@ import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header/collect-kyb-data-navigation-header';
+import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import { BusinessAddressData } from '../../utils/state-machine/types';

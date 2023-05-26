@@ -8,7 +8,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import Error from './components/error';
-import Loading from './components/loading/loading';
+import Loading from './components/loading';
 import RetryLimitExceeded from './components/retry-limit-exceeded';
 import Success from './components/success';
 import usePollDocStatus from './hooks/use-poll-doc-status';

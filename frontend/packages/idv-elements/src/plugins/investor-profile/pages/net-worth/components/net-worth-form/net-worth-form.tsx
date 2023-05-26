@@ -8,7 +8,7 @@ import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import CustomForm from '../../../../components/custom-form/custom-form';
+import CustomForm from '../../../../components/custom-form';
 import { NetWorthData } from '../../../../utils/state-machine/types';
 
 export type NetWorthFormProps = {

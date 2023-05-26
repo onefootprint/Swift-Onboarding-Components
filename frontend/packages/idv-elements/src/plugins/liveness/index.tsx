@@ -3,8 +3,9 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import MachineProvider from './components/machine-provider';
-import { useLivenessMachine } from './components/machine-provider/machine-provider';
+import MachineProvider, {
+  useLivenessMachine,
+} from './components/machine-provider';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';

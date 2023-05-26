@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Circle from '../circle/circle';
+import Circle from '../circle';
 
 const DefaultIcon = () => (
   <Container>

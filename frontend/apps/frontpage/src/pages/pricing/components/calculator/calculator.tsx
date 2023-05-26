@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Banner from '../banner/banner';
-import Row from './components/row/row';
+import Banner from '../banner';
+import Row from './components/row';
 import TotalRow from './components/total-row';
 import * as constants from './constants';
 

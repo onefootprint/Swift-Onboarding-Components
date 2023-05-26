@@ -6,14 +6,14 @@ import { useCallback, useEffect } from 'react';
 import UAParser from 'ua-parser-js';
 import { useEffectOnce, useEventListener } from 'usehooks-ts';
 
-import getSessionId from '../../utils/session-id/session-id';
+import getSessionId from '../../utils/session-id';
 import {
   getClickedElementContextInPage,
   getClickedElementInfo,
 } from './utils/get-click-element-info';
 import getErrorEventInfo from './utils/get-error-event-info';
 import getNavigatorProperties from './utils/get-navigator-properties';
-import sendObservePayload from './utils/send-observe-payload/send-observe-payload';
+import sendObservePayload from './utils/send-observe-payload';
 
 const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 const MAX_DEBOUNCE = 30000; // 30 seconds

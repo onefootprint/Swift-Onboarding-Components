@@ -7,7 +7,7 @@ import getCurrentStepFromMissingAttributes from '../../components/navigation-hea
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncEmail from '../../hooks/use-sync-email';
-import { isMissingEmailAttribute } from '../../utils/missing-attributes/missing-attributes';
+import { isMissingEmailAttribute } from '../../utils/missing-attributes';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
 import EditSheet, { EditSection } from './components/edit-sheet';

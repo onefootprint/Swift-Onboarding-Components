@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import CopyButton from '../copy-button/copy-button';
+import CopyButton from '../copy-button';
 
 export type CodeInlineProps = {
   ariaLabel?: string;

@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import CompanyPhotos from './components/company-photos';
-import JoinUs from './components/join-us/join-us';
+import JoinUs from './components/join-us';
 import Team from './components/team';
 import Values from './components/values';
 

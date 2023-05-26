@@ -7,7 +7,7 @@ import Timeline from 'src/components/timeline';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useEntityMatchSignals from '../../hooks/use-entity-match-signals/use-entity-match-signals';
+import useEntityMatchSignals from '../../hooks/use-entity-match-signals';
 import {
   ValidationTimelineItemBody,
   ValidationTimelineItemHeader,

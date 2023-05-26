@@ -14,8 +14,8 @@ import { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import Card from './components/card/card';
-import PostEmpty from './components/card/components/post-empty/post-empty';
+import Card from './components/card';
+import PostEmpty from './components/card/components/post-empty';
 import Chip from './components/chip';
 
 export const getStaticProps = async () => {

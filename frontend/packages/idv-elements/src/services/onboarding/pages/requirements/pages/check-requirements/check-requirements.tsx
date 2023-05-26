@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useGetOnboardingStatus from '../authorize/hooks/use-get-onboarding-status';
-import computeRequirementsToShow from './utils/compute-requirements-to-show/compute-requirements-to-show';
+import computeRequirementsToShow from './utils/compute-requirements-to-show';
 
 const CheckRequirements = () => {
   const { t } = useTranslation('pages.check-requirements');

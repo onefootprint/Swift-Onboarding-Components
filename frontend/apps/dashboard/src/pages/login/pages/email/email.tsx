@@ -8,7 +8,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import BackButton from '../../components/back-button/back-button';
+import BackButton from '../../components/back-button';
 import useLoginEmail from './hooks/use-login-email';
 
 type FormData = {

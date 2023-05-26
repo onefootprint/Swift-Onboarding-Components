@@ -5,8 +5,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Content from './components/content';
-import Error from './components/error/error';
-import WebhooksPortalLoading from './components/loading/loading';
+import Error from './components/error';
+import WebhooksPortalLoading from './components/loading';
 import useWebhookPortal from './hooks/use-webhooks-portal';
 
 const Webhooks = () => {

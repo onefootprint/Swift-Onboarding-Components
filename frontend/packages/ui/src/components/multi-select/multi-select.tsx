@@ -10,7 +10,7 @@ import { useTheme } from 'styled-components';
 
 import Box from '../box';
 import Label from '../form-label';
-import Hint from '../internal/hint/hint';
+import Hint from '../internal/hint';
 import {
   ClearIndicator,
   DropdownIndicator,

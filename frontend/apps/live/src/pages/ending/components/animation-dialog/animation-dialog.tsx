@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import Sparkles from '../sparkles/sparkles';
+import Sparkles from '../sparkles';
 
 const ID_ANIMATION_DURATION = 2500;
 const SUCCESS_ANIMATION_DURATION = 2000;

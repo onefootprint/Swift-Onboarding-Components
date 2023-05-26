@@ -9,7 +9,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import CustomForm from '../../../../components/custom-form/custom-form';
+import CustomForm from '../../../../components/custom-form';
 import { RiskToleranceData } from '../../../../utils/state-machine/types';
 
 export type RiskToleranceFormProps = {

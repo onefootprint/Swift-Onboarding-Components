@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import hasCustomHeightInAppearance from '../../utils/has-custom-height-in-appearance';
-import FootprintFooter from '../footprint-footer/footprint-footer';
+import FootprintFooter from '../footprint-footer';
 import { useLayoutOptions } from '../layout-options-provider';
 import Body from './components/body';
 import Header from './components/header';

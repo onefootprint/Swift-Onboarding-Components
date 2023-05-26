@@ -3,11 +3,10 @@ import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
-import { getInitialPosts } from 'src/utils/ghost';
+import { getInitialPosts, PostType } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import { PostType } from '../../utils/ghost/ghost';
 import type { Post } from '../../utils/ghost/types';
 import PostPreview from './components/post-preview';
 

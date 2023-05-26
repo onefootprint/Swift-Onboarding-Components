@@ -5,7 +5,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import CustomCheckIcon from './custom-check-icon/custom-check-icon';
+import CustomCheckIcon from './custom-check-icon';
 import {
   firstIconContainerVariants,
   firstTextContainerVariants,

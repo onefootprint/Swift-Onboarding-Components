@@ -1,4 +1,4 @@
-import type { Typographies } from '../types/types';
+import type { Typographies } from '../types';
 
 const typographies: Typographies = {
   'display-1': 'var(--fp-typography-display1)',

@@ -53,7 +53,7 @@ import {
 } from './components/watchlist-check-event';
 import mergeAuditTrailTimelineEvents, {
   AuditTrailTimelineEvent,
-} from './utils/merge-audit-trail-timeline-events/merge-audit-trail-timeline-events';
+} from './utils/merge-audit-trail-timeline-events';
 
 export type AuditTrailTimelineProps = {
   timeline: EntityTimeline;

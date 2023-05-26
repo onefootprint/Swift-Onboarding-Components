@@ -9,7 +9,7 @@ import {
   MachineStates,
   State,
 } from './types';
-import getDiFields from './utils/get-di-fields/get-di-fields';
+import getDiFields from './utils/get-di-fields';
 
 export const createDecryptStateMachine = () =>
   createMachine<Context, MachineEvents, MachineStates>(

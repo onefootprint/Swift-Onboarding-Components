@@ -4,7 +4,7 @@ import React from 'react';
 import { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
-import CardContent from './components/card-content/card-content';
+import CardContent from './components/card-content';
 import Progress from './components/progress';
 
 const DEFAULT_BLUR_COLOR = 'rgba(171, 255, 163, .15)';

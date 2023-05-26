@@ -1,4 +1,4 @@
-import type { Elevations } from '../types/types';
+import type { Elevations } from '../types';
 
 const elevations: Elevations = {
   0: 'none',

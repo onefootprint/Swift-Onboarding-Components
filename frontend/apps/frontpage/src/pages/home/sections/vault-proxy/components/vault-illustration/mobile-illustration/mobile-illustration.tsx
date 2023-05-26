@@ -3,7 +3,7 @@ import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Knob from '../components/knob/knob';
+import Knob from '../components/knob';
 import VerticalBeam from '../components/vertical-beam';
 
 const values = {

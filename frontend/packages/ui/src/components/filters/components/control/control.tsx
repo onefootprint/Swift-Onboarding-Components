@@ -11,15 +11,14 @@ import ClearPill from './components/clear-pill';
 import DateForm from './components/date-form';
 import MultiSelectGroupedForm from './components/multi-select-grouped-form';
 import Popover from './components/popover';
-import SelectForm from './components/select-form';
-import { SelectFormKind } from './components/select-form/select-form';
+import SelectForm, { SelectFormKind } from './components/select-form';
 import SelectedPill from './components/selected-pill';
 import useDateOptions from './hooks/use-date-options';
 import usePopper from './hooks/use-popper';
 import getDateLabel from './utils/get-date-label';
 import getMultiSelectGroupedLabel from './utils/get-multi-select-grouped-label';
 import getMultiSelectLabel from './utils/get-multi-select-label';
-import getSingleSelectLabel from './utils/get-single-select-label/get-single-select-label';
+import getSingleSelectLabel from './utils/get-single-select-label';
 
 export type ControlProps = {
   control: FilterControl;

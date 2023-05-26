@@ -4,7 +4,7 @@ import { Checkbox, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import CdoTagList from 'src/components/cdo-tag-list';
-import useSession from 'src/hooks/use-session/use-session';
+import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 import FormTitle from '../../components/form-title';

@@ -5,4 +5,4 @@ export default {
   dark: light,
 };
 
-export * from './themes/types/types';
+export * from './themes/types';

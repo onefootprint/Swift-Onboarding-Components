@@ -18,7 +18,7 @@ import {
   isKycCdo,
 } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
-import Button from './components/button/button';
+import Button from './components/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
 import useOnboardingAuthorize from './hooks/use-onboarding-authorize';

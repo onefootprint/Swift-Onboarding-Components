@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import IdAnimation from '../../../../components/animations/id-animation';
-import InfoBox from '../../../../components/info-box/info-box';
+import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import SelfieConsent from '../../components/selfie-consent';

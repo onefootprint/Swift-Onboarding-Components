@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import FeatureElement from '../../components/feature-element/feature-element';
+import FeatureElement from '../../components/feature-element';
 
 const DynamicDesktopIllustration = dynamic(
   () => import('./components/vault-illustration/desktop-illustration'),

@@ -1,4 +1,4 @@
-import type { Spacings } from '../types/types';
+import type { Spacings } from '../types';
 
 const spacings: Spacings = {
   0: 'var(--fp-spacing-0)',

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { NavigationHeader } from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import useProcessImage from '../../hooks/use-process-image/use-process-image';
+import useProcessImage from '../../hooks/use-process-image';
 import Camera from './components/camera';
 import Preview from './components/preview';
 

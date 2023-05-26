@@ -14,7 +14,7 @@ import styled, { css } from 'styled-components';
 
 import SEO from '../../../../components/seo';
 import type { PostDetails } from '../../../../utils/ghost/types';
-import Author from '../../components/card/components/author/author';
+import Author from '../../components/card/components/author';
 import Chip from '../../components/chip';
 import HtmlContent from '../../components/html-content';
 

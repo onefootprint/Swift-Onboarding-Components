@@ -6,16 +6,16 @@ import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import ComparisonTable from './components/comparison-table/comparison-table';
-import HorizontalCard from './components/horizontal-card/horizontal-card';
+import ComparisonTable from './components/comparison-table';
+import HorizontalCard from './components/horizontal-card';
 import Biometrics from './components/illustrations/biometrics';
 import BoostConversions from './components/illustrations/boost-conversions';
-import CodeSnippet from './components/illustrations/code-snippet/code-snippet';
-import PiiVaulting from './components/illustrations/pii-vaulting/pii-vaulting';
-import SaveMoney from './components/illustrations/save-money/save-money';
-import SecurityLogs from './components/illustrations/security-logs/security-logs';
-import Shield from './components/illustrations/shield/shield';
-import VerticalCard from './components/vertical-card/vertical-card';
+import CodeSnippet from './components/illustrations/code-snippet';
+import PiiVaulting from './components/illustrations/pii-vaulting';
+import SaveMoney from './components/illustrations/save-money';
+import SecurityLogs from './components/illustrations/security-logs';
+import Shield from './components/illustrations/shield';
+import VerticalCard from './components/vertical-card';
 
 const Compare = () => {
   const { t } = useTranslation('pages.compare');

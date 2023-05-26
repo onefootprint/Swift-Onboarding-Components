@@ -1,7 +1,7 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import OnboardingConfigMachine from '../../utils/machine/machine';
+import OnboardingConfigMachine from '../../utils/machine';
 
 const useLocalOnboardingConfigMachine = () =>
   useMachine(OnboardingConfigMachine);

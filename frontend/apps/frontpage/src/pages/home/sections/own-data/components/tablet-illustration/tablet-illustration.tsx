@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
 
-import BaseIllustration from '../../../../components/base-illustration/base-illustration';
+import BaseIllustration from '../../../../components/base-illustration';
 
 const TabletIllustration = () => {
   const { t } = useTranslation('pages.home.own-data-section');
