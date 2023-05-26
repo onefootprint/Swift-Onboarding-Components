@@ -1,4 +1,5 @@
 import { Layout as AppLayout } from '@onefootprint/idv-elements';
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled from 'styled-components';
@@ -19,7 +20,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <Container>
       <SandboxBanner />
-      <div>
+      <Content>
         <AppLayout
           tenantPk={key}
           isSandbox={isSandbox}
@@ -33,7 +34,7 @@ const Layout = ({ children }: LayoutProps) => {
         >
           {children}
         </AppLayout>
-      </div>
+      </Content>
       <Footer />
     </Container>
   );
@@ -44,6 +45,19 @@ const Container = styled.div`
   flex-direction: column;
   height: 100vh;
   justify-content: space-between;
+`;
+
+const Content = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1;
+
+  ${media.greaterThan('md')`
+    --footer-height: 130px;
+    height: calc(100% - var(--footer-height));
+  `}
 `;
 
 export default Layout;

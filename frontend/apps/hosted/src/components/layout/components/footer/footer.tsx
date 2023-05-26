@@ -64,10 +64,10 @@ const Container = styled.footer`
     display: none;
     align-items: center;
     justify-content: space-between;
-    margin: ${theme.spacing[7]} 0 ${theme.spacing[5]};
+    margin: 0 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-    display: flex;
+      display: flex;
       padding: 0 ${theme.spacing[11]};
     `}
   `};

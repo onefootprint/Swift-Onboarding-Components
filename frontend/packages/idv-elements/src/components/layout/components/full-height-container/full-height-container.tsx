@@ -44,12 +44,18 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     overflow-y: auto;
     position: relative;
     height: ${height};
+    width: 100%;
 
     ${media.greaterThan('md')`
       height: auto;
-      margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
-      max-height: calc(100vh - (2 * ${theme.spacing[9]}));
-      max-width: 480px;
+      max-height: calc(100% - (2 * ${theme.spacing[9]}));
+      width: 480px;
+      margin: ${theme.spacing[9]};
+      transform: translate(-50%, -50%);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0;
     `}
   `}
 
@@ -57,8 +63,8 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     hasBorderRadius &&
     css`
       ${media.greaterThan('md')`
-      border-radius: ${theme.components.bifrost.dialog.borderRadius};
-    `}
+        border-radius: ${theme.components.bifrost.dialog.borderRadius};
+      `}
     `}
 `;
 
