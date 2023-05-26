@@ -1,4 +1,4 @@
-import { IcoClipboard24 } from '@onefootprint/icons';
+import { IcoCopy24 } from '@onefootprint/icons';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -82,9 +82,7 @@ const CopyButton = ({
         disabled={disable}
         onClick={handleClick}
       >
-        {children || (
-          <IcoClipboard24 color={disable ? 'tertiary' : undefined} />
-        )}
+        {children || <IcoCopy24 color={disable ? 'tertiary' : undefined} />}
       </Button>
     </Tooltip>
   );
