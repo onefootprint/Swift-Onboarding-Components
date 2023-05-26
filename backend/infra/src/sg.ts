@@ -35,16 +35,8 @@ export function CreateCoreSecurityGroups(
     `fpc-service-lb-sg-${stackMetadata.shortStackName}`,
     {
       vpc: vpc.vpc,
-
-      ingress: [
-        {
-          protocol: 'tcp',
-          fromPort: 0,
-          toPort: 0,
-          cidrBlocks: ['0.0.0.0/0'],
-          description: 'Open internet ingress as cloudfront is the frontend',
-        },
-      ],
+      //NOTE: tcp 443 0.0.0.0/0 already added.
+      ingress: [],
       egress: [EGRESS_ALL],
     },
     { provider },
@@ -74,7 +66,7 @@ export function CreateCoreSecurityGroups(
     `db-jumpbox-sg-${stackMetadata.shortStackName}`,
     {
       vpc: vpc.vpc,
-
+      ingress: [],
       egress: [EGRESS_ALL],
     },
     { provider },
@@ -84,17 +76,16 @@ export function CreateCoreSecurityGroups(
     `airplane-sg-${stackMetadata.shortStackName}`,
     {
       vpc: vpc.vpc,
-
+      ingress: [],
       egress: [EGRESS_ALL],
     },
     { provider },
   );
 
-
   return {
     fpcServiceLoadBalancer,
     fpcService,
     jumpbox,
-    airplane
+    airplane,
   };
 }
