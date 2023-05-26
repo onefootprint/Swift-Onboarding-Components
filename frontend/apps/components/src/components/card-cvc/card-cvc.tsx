@@ -1,6 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
+import { InputProps, InternalInput } from '@onefootprint/ui';
 import React, { forwardRef } from 'react';
-
-import Input, { InputProps } from '../internal/input';
 
 export type CvcLengthType = 3 | 4;
 
@@ -20,7 +20,7 @@ export type CardCvcProps = Omit<
 
 const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
   ({ hasError, numDigits, hint, ...props }: CardCvcProps, ref) => (
-    <Input
+    <InternalInput
       {...props}
       placeholder={numDigits === 3 ? '123' : '1234'}
       label="CVC"

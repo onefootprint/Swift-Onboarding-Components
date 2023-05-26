@@ -1,9 +1,8 @@
-/* eslint-disable no-param-reassign */
-
+/* eslint-disable react/jsx-props-no-spreading */
+import { InputProps, InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React, { forwardRef, useState } from 'react';
 
-import Input, { InputProps } from '../internal/input';
 import CardIcon from './components/card-icon';
 
 export type CardNumberInputProps = Omit<
@@ -51,7 +50,7 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     };
 
     return (
-      <Input
+      <InternalInput
         {...props}
         autoComplete="cc-number"
         className="fp-input-credit-card"

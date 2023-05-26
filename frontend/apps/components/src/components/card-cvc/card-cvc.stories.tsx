@@ -50,7 +50,7 @@ const Template: Story<CardCvcProps> = ({
       testID={testID}
       numDigits={numDigits}
       value={value}
-      sx={{ width: '101px' }}
+      sx={{ width: '100px' }}
     />
   );
 };

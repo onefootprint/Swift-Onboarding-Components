@@ -1,8 +1,7 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable react/jsx-props-no-spreading */
+import { InputProps, InternalInput } from '@onefootprint/ui';
 import { isPast, parse } from 'date-fns';
 import React, { forwardRef, useState } from 'react';
-
-import Input, { InputProps } from '../internal/input';
 
 export type CardExpDateInputProps = Omit<
   InputProps,
@@ -48,7 +47,7 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
     };
 
     return (
-      <Input
+      <InternalInput
         {...props}
         autoComplete="cc-exp"
         className="fp-input-exp-date"

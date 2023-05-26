@@ -54,6 +54,8 @@ export * from './inline-alert';
 export { default as InlineAlert } from './inline-alert';
 export { default as InputAddon } from './input-addon';
 export { default as InputGroup } from './input-group';
+export * from './internal/input';
+export { default as InternalInput } from './internal/input';
 export * from './link-button';
 export { default as LinkButton } from './link-button';
 export * from './loading-indicator';
