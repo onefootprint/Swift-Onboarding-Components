@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/types';
 import { Flag, Typography } from '@onefootprint/ui';
 import React from 'react';
-import EncryptedCell from '../../../../../../../../../../../../../encrypted-cell';
+import { EncryptedCell } from 'src/components';
 import styled, { css } from 'styled-components';
 
 import Field from '../../../../../field';
