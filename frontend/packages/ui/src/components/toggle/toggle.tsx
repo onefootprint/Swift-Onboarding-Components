@@ -106,6 +106,8 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
           size={size}
           role="switch"
           type="button"
+          layout
+          layoutRoot
         >
           <StyledIcoToggleKnob16
             checked={checked}
@@ -180,7 +182,7 @@ const Input = styled.input`
   width: 36px;
 `;
 
-const Button = styled.button<{
+const Button = styled(motion.button)<{
   checked?: boolean;
   size?: 'default' | 'compact';
 }>`
