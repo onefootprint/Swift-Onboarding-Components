@@ -121,6 +121,7 @@ const NavMenu = styled.div`
     background: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[4]};
     height: calc(100vh - var(--header-height));
+    overflow: auto;
   `};
 `;
 
