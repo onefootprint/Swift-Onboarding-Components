@@ -1,1 +1,2 @@
-export { type CardExpDateInputProps, default } from './card-exp-date-input';
+export type { CardExpDateInputProps } from './card-exp-date-input';
+export { default } from './card-exp-date-input';

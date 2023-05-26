@@ -43,7 +43,7 @@ export type MultiSelectProps<Option, Group extends GroupBase<Option>> = {
 };
 
 const MultiSelect = <
-  Option = unknown,
+  Option,
   Group extends GroupBase<Option> = GroupBase<Option>,
 >({
   autoFocus,
