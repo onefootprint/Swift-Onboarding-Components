@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useTranslation } from '@onefootprint/hooks';
 import { Grid } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React from 'react';
@@ -18,6 +19,7 @@ const DEFAULT_CVC_NUM_DIGITS = 3;
 const AMEX_CVC_NUM_DIGITS = 4;
 
 const Card = () => {
+  const { t } = useTranslation('components.secure-form.card.form');
   const {
     register,
     watch,
@@ -43,7 +45,7 @@ const Card = () => {
           {...register('number', {
             required: {
               value: true,
-              message: 'Card number cannot be empty.',
+              message: t('number.error'),
             },
           })}
         />
@@ -56,7 +58,7 @@ const Card = () => {
           {...register('expiry', {
             required: {
               value: true,
-              message: 'Expiry date cannot be empty.',
+              message: t('expiry.error'),
             },
           })}
         />
@@ -70,7 +72,7 @@ const Card = () => {
           {...register('cvc', {
             required: {
               value: true,
-              message: 'CVC cannot be empty',
+              message: t('cvc.error'),
             },
           })}
         />

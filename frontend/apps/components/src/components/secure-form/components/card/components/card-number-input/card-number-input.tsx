@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useTranslation } from '@onefootprint/hooks';
 import { InputProps, InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React, { forwardRef, useEffect, useState } from 'react';
@@ -35,13 +36,14 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
       hint,
       onChange,
       onBlur,
-      invalidMessage = 'Invalid card number',
-      label = 'Card number',
+      invalidMessage,
+      label,
       value,
       ...props
     }: CardNumberInputProps,
     ref,
   ) => {
+    const { t } = useTranslation('components.secure-form.card.number');
     const brand = creditcardutils.parseCardType(value || '');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
@@ -74,11 +76,11 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
         hasError={inputHasError}
         hint={errorMessage ?? hint}
         inputMode="numeric"
-        label={label}
+        label={label ?? t('label')}
         mask={{ creditCard: true }}
         onBlur={handleBlur}
         onChange={handleChange}
-        placeholder="1234 5678 9012 3456"
+        placeholder={t('placeholder')}
         ref={ref}
         size="default"
         suffixComponent={<CardIcon brand={brand} />}

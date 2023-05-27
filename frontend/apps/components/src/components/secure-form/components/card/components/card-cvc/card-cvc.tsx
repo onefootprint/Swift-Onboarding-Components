@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useTranslation } from '@onefootprint/hooks';
 import { InputProps, InternalInput } from '@onefootprint/ui';
 import React, { forwardRef } from 'react';
 
@@ -29,28 +30,32 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
       hint,
       onChange,
       onBlur,
-      label = 'CVC',
+      label,
       value,
       ...props
     }: CardCvcProps,
     ref,
-  ) => (
-    <InternalInput
-      {...props}
-      autoComplete="cc-csc"
-      className="fp-input-cvc"
-      hasError={hasError}
-      hint={hint}
-      inputMode="numeric"
-      label={label}
-      mask={{ numericOnly: true, blocks: [numDigits] }}
-      placeholder={numDigits === 3 ? '123' : '1234'}
-      ref={ref}
-      size="default"
-      value={value}
-      key={numDigits}
-    />
-  ),
+  ) => {
+    const { t } = useTranslation('components.secure-form.card.cvc');
+
+    return (
+      <InternalInput
+        {...props}
+        autoComplete="cc-csc"
+        className="fp-input-cvc"
+        hasError={hasError}
+        hint={hint}
+        inputMode="numeric"
+        label={label ?? t('label')}
+        mask={{ numericOnly: true, blocks: [numDigits] }}
+        placeholder={numDigits === 3 ? '123' : '1234'}
+        ref={ref}
+        size="default"
+        value={value}
+        key={numDigits}
+      />
+    );
+  },
 );
 
 export default CardCvc;

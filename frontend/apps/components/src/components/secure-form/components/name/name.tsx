@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -10,7 +11,8 @@ export type NameProps = {
   label?: string;
 };
 
-const Name = ({ label = 'Cardholder name' }: NameProps) => {
+const Name = ({ label }: NameProps) => {
+  const { t } = useTranslation('components.secure-form.name.form');
   const {
     register,
     formState: { errors },
@@ -21,12 +23,12 @@ const Name = ({ label = 'Cardholder name' }: NameProps) => {
       data-private
       hasError={!!errors.name}
       hint={errors.name?.message}
-      label={label}
-      placeholder="Jane Doe"
+      label={label ?? t('label')}
+      placeholder={t('placeholder')}
       {...register('name', {
         required: {
           value: true,
-          message: 'Name cannot be empty',
+          message: t('error'),
         },
       })}
     />

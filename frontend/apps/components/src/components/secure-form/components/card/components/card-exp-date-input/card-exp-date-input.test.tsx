@@ -1,10 +1,6 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
+import { renderComponents } from 'src/config/tests';
 
 import CardExpDateInput, { CardExpDateInputProps } from './card-exp-date-input';
 
@@ -16,7 +12,7 @@ describe('CardExpDateInput', () => {
     value,
     label = 'Expiration date',
   }: Partial<CardExpDateInputProps>) =>
-    customRender(
+    renderComponents(
       <CardExpDateInput
         hasError={hasError}
         hint={hint}

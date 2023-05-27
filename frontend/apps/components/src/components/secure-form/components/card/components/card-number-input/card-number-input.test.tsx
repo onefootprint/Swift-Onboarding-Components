@@ -1,10 +1,6 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
+import { renderComponents } from 'src/config/tests';
 
 import CardNumberInput, { CardNumberInputProps } from './card-number-input';
 import InteractiveCardNumberInput from './card-number-input.test.config';
@@ -16,7 +12,7 @@ const renderCardNumberInput = ({
   value,
   invalidMessage,
 }: Partial<CardNumberInputProps>) =>
-  customRender(
+  renderComponents(
     <CardNumberInput
       hasError={hasError}
       hint={hint}
@@ -29,7 +25,9 @@ const renderCardNumberInput = ({
 const renderInteractiveInput = ({
   invalidMessage,
 }: Partial<CardNumberInputProps> = {}) =>
-  customRender(<InteractiveCardNumberInput invalidMessage={invalidMessage} />);
+  renderComponents(
+    <InteractiveCardNumberInput invalidMessage={invalidMessage} />,
+  );
 
 const getCardNumberInput = () =>
   screen.getByLabelText('Card number') as HTMLInputElement;

@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useTranslation } from '@onefootprint/hooks';
 import { InputProps, InternalInput } from '@onefootprint/ui';
 import { isPast, isValid, parse } from 'date-fns';
 import React, { forwardRef, useEffect, useState } from 'react';
@@ -41,6 +42,7 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
     }: CardExpDateInputProps,
     ref,
   ) => {
+    const { t } = useTranslation('components.secure-form.card.expiry');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
       value ? checkIsInvalid(value) : false,
@@ -72,7 +74,7 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
         hasError={inputHasError}
         hint={errorMessage ?? hint}
         inputMode="numeric"
-        label={label}
+        label={label ?? t('label')}
         mask={{
           date: true,
           datePattern: ['m', 'y'],

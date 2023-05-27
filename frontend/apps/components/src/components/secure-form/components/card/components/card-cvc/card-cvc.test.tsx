@@ -1,6 +1,7 @@
 import themes from '@onefootprint/design-tokens';
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { screen, userEvent } from '@onefootprint/test-utils';
 import React, { useState } from 'react';
+import { renderComponents } from 'src/config/tests';
 
 import CardCvc, { CardCvcProps } from './card-cvc';
 
@@ -41,7 +42,7 @@ const renderCardCvc = ({
   testID,
   value,
 }: Partial<CardCvcProps>) =>
-  customRender(
+  renderComponents(
     <Wrapper
       hasError={hasError}
       numDigits={numDigits}

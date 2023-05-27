@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -8,16 +9,22 @@ type ModalHeaderProps = {
   onClose: () => void;
 };
 
-const ModalHeader = ({ title, onClose }: ModalHeaderProps) => (
-  <Header>
-    <CloseContainer>
-      <IconButton aria-label="Close" onClick={onClose}>
-        <IcoClose24 />
-      </IconButton>
-    </CloseContainer>
-    {title && <Typography variant="label-2">{title}</Typography>}
-  </Header>
-);
+const ModalHeader = ({ title, onClose }: ModalHeaderProps) => {
+  const { t } = useTranslation(
+    'components.secure-form.form-dialog.modal-header',
+  );
+
+  return (
+    <Header>
+      <CloseContainer>
+        <IconButton aria-label={t('close-aria-label')} onClick={onClose}>
+          <IcoClose24 />
+        </IconButton>
+      </CloseContainer>
+      {title && <Typography variant="label-2">{title}</Typography>}
+    </Header>
+  );
+};
 
 const CloseContainer = styled.div`
   ${({ theme }) => css`

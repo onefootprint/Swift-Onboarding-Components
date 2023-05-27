@@ -1,10 +1,6 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
+import { renderComponents } from 'src/config/tests';
 
 import FormDialog, { FormDialogProps } from './form-dialog';
 
@@ -19,7 +15,7 @@ describe('<FormFormDialog />', () => {
     testID,
     children = 'content',
   }: Partial<FormDialogProps>) =>
-    customRender(
+    renderComponents(
       <FormDialog
         onClose={onClose}
         primaryButton={primaryButton}

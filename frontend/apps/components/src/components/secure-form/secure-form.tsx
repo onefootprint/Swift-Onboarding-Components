@@ -1,8 +1,10 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoCreditcard24 } from '@onefootprint/icons';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import Address, { AddressData } from './components/address';
 import Card, { CardData } from './components/card';
 import FormDialog from './components/form-dialog';
 import Name, { NameData } from './components/name';
@@ -11,9 +13,13 @@ import Title from './components/title';
 export enum SecureFormType {
   cardOnly = 'cardOnly',
   cardAndName = 'cardAndName',
+  cardAndNameAndAddress = 'cardAndNameAndAddress',
 }
 
-export type SecureFormData = CardData | (CardData & NameData);
+export type SecureFormData =
+  | CardData
+  | (CardData & NameData)
+  | (CardData & NameData & AddressData);
 
 export type SecureFormProps = {
   title?: string;
@@ -34,6 +40,7 @@ const SecureForm = ({
   onCancel,
   onClose,
 }: SecureFormProps) => {
+  const { t } = useTranslation('components.secure-form');
   const handleBeforeSubmit = (data: SecureFormData) => {
     onSave?.(data);
   };
@@ -47,12 +54,12 @@ const SecureForm = ({
       variant={variant}
       primaryButton={{
         form: FORM_ID,
-        label: 'Save',
+        label: t('buttons.save'),
         type: 'submit',
       }}
       secondaryButton={
         onCancel && {
-          label: 'Cancel',
+          label: t('buttons.cancel'),
           type: 'reset',
           onClick: onCancel,
         }
@@ -61,23 +68,35 @@ const SecureForm = ({
     >
       <FormProvider {...methods}>
         <Form id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
+          {type === SecureFormType.cardOnly && (
+            <>
+              <Title
+                label={t('section-title.card-information')}
+                iconComponent={<IcoCreditcard24 />}
+              />
+              <Card />
+            </>
+          )}
           {type === SecureFormType.cardAndName && (
             <>
               <Title
-                label="Card Information"
+                label={t('section-title.card-information')}
                 iconComponent={<IcoCreditcard24 />}
               />
               <Name />
               <Card />
             </>
           )}
-          {type === SecureFormType.cardOnly && (
+          {type === SecureFormType.cardAndNameAndAddress && (
             <>
               <Title
-                label="Card Information"
+                label={t('section-title.card-information')}
                 iconComponent={<IcoCreditcard24 />}
               />
+              <Name />
               <Card />
+              <Title label={t('section-title.billing-address')} />
+              <Address />
             </>
           )}
         </Form>
