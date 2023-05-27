@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { InputProps, InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 
 import CardIcon from './components/card-icon';
 
@@ -10,6 +10,7 @@ export type CardNumberInputProps = Omit<
   | 'autoComplete'
   | 'inputMode'
   | 'mask'
+  | 'value'
   | 'maxLength'
   | 'minLength'
   | 'placeholder'
@@ -17,6 +18,14 @@ export type CardNumberInputProps = Omit<
   | 'type'
 > & {
   invalidMessage?: string;
+  value?: string;
+};
+
+const checkIsInvalid = (cardNumber?: string) => {
+  if (!cardNumber) {
+    return false;
+  }
+  return !isValidCardNumber(cardNumber);
 };
 
 const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
@@ -33,19 +42,27 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     }: CardNumberInputProps,
     ref,
   ) => {
-    const [blurred, setBlurred] = useState(false);
     const brand = creditcardutils.parseCardType(value || '');
-    const isValid = isValidCardNumber(value);
-    const shouldShowError = blurred && (hasError || !isValid);
-    const errorMessage = shouldShowError ? invalidMessage : undefined;
+    const [blurred, setBlurred] = useState(false);
+    const [isInvalid, setIsInvalid] = useState(
+      value ? checkIsInvalid(value) : false,
+    );
+    const inputHasError = hasError || (blurred && isInvalid);
+    const errorMessage = blurred && isInvalid ? invalidMessage : undefined;
+
+    useEffect(() => {
+      setIsInvalid(value ? checkIsInvalid(value) : false);
+    }, [value]);
 
     const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
       setBlurred(true);
+      setIsInvalid(checkIsInvalid(event.target.value));
       onBlur?.(event);
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setBlurred(false);
+      setIsInvalid(false);
       onChange?.(event);
     };
 
@@ -54,8 +71,8 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
         {...props}
         autoComplete="cc-number"
         className="fp-input-credit-card"
-        hasError={shouldShowError}
-        hint={errorMessage || hint}
+        hasError={inputHasError}
+        hint={errorMessage ?? hint}
         inputMode="numeric"
         label={label}
         mask={{ creditCard: true }}

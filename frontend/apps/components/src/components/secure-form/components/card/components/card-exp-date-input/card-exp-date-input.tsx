@@ -1,13 +1,14 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { InputProps, InternalInput } from '@onefootprint/ui';
-import { isPast, parse } from 'date-fns';
-import React, { forwardRef, useState } from 'react';
+import { isPast, isValid, parse } from 'date-fns';
+import React, { forwardRef, useEffect, useState } from 'react';
 
 export type CardExpDateInputProps = Omit<
   InputProps,
   | 'autoComplete'
   | 'inputMode'
   | 'mask'
+  | 'value'
   | 'maxLength'
   | 'minLength'
   | 'placeholder'
@@ -15,6 +16,15 @@ export type CardExpDateInputProps = Omit<
   | 'type'
 > & {
   invalidMessage?: string;
+  value?: string;
+};
+
+const checkIsInvalid = (dateValue: string) => {
+  if (!dateValue) {
+    return false;
+  }
+  const parsedDate = parse(dateValue, 'MM/yy', new Date());
+  return isPast(parsedDate) || !isValid(parsedDate);
 };
 
 const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
@@ -24,25 +34,33 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
       hint,
       onChange,
       onBlur,
-      invalidMessage = 'Date must be in the future',
+      invalidMessage = 'Date must be valid and in the future',
       label = 'Expiry Date',
       value,
       ...props
     }: CardExpDateInputProps,
     ref,
   ) => {
-    const parsedDate = parse(value || '', 'MM/yy', new Date());
     const [blurred, setBlurred] = useState(false);
-    const shouldShowError = blurred && (hasError || isPast(parsedDate));
-    const errorMessage = shouldShowError ? invalidMessage : undefined;
+    const [isInvalid, setIsInvalid] = useState(
+      value ? checkIsInvalid(value) : false,
+    );
+    const inputHasError = hasError || (blurred && isInvalid);
+    const errorMessage = blurred && isInvalid ? invalidMessage : undefined;
+
+    useEffect(() => {
+      setIsInvalid(value ? checkIsInvalid(value) : false);
+    }, [value]);
 
     const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
       setBlurred(true);
+      setIsInvalid(checkIsInvalid(event.target.value));
       onBlur?.(event);
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setBlurred(false);
+      setIsInvalid(false);
       onChange?.(event);
     };
 
@@ -51,8 +69,8 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
         {...props}
         autoComplete="cc-exp"
         className="fp-input-exp-date"
-        hasError={shouldShowError}
-        hint={errorMessage || hint}
+        hasError={inputHasError}
+        hint={errorMessage ?? hint}
         inputMode="numeric"
         label={label}
         mask={{
