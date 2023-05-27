@@ -4,6 +4,7 @@
   },
   "components": {
     "secure-form": {
+      "title": "Add credit card",
       "section-title": {
         "card-information": "Card information",
         "billing-address": "Billing address"
@@ -16,21 +17,24 @@
         }
       },
       "card": {
-        "number": {
-          "label": "Card number",
-          "placeholder": "1234 5678 9012 3456",
-          "error": "Card number cannot be empty"
-        },
-        "expiry": {
-          "label": "Expiry date",
-          "placeholder": "MM/YY",
-          "error": "Expiry date cannot be empty",
-          "is-past": "Date must be in the future"
-        },
-        "cvc": {
-          "label": "CVC",
-          "placeholder": "123",
-          "error": "CVC cannot be empty"
+        "form": {
+          "number": {
+            "label": "Card number",
+            "placeholder": "1234 5678 9012 3456",
+            "error": "Card number cannot be empty",
+            "invalid": "Invalid card number"
+          },
+          "expiry": {
+            "label": "Expiry date",
+            "placeholder": "MM/YY",
+            "error": "Expiry date cannot be empty",
+            "invalid": "Date must be valid and in the future"
+          },
+          "cvc": {
+            "label": "CVC",
+            "placeholder": "123",
+            "error": "CVC cannot be empty"
+          }
         }
       },
       "address": {

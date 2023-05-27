@@ -44,6 +44,9 @@ const Header = styled.header`
     z-index: 1;
     padding: ${theme.spacing[4]};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
   `}
 `;
 

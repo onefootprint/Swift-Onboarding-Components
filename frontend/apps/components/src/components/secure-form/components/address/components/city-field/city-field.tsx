@@ -3,11 +3,7 @@ import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-type CityFieldProps = {
-  disabled?: boolean;
-};
-
-const CityField = ({ disabled }: CityFieldProps) => {
+const CityField = () => {
   const {
     register,
     formState: { errors },
@@ -18,7 +14,6 @@ const CityField = ({ disabled }: CityFieldProps) => {
     <TextInput
       data-private
       autoComplete="address-level2"
-      disabled={disabled}
       hasError={!!errors.city}
       hint={errors.city && t('error')}
       label={t('label')}

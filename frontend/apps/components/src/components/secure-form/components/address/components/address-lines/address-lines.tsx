@@ -9,10 +9,9 @@ import getAddressComponent from './utils/get-address-components';
 
 type AddressLinesProps = {
   countryCode: CountryCode;
-  disabled?: boolean;
 };
 
-const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
+const AddressLines = ({ countryCode }: AddressLinesProps) => {
   const {
     register,
     formState: { errors },
@@ -58,7 +57,6 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
     <>
       <AddressInput
         data-private
-        disabled={disabled}
         country={countryCode}
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
@@ -72,7 +70,6 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
       />
       <TextInput
         data-private
-        disabled={disabled}
         autoComplete="address-line2"
         label={t('address-line-2.label')}
         placeholder={t('address-line-2.placeholder')}

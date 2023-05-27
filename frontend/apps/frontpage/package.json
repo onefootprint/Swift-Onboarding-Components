@@ -54,10 +54,10 @@
     "@vercel/og": "^0.1.0",
     "csstype": "^3.1.0",
     "eslint-config-footprint": "*",
-    "i18next": "^22.0.4",
+    "i18next": "^22.5.0",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
-    "react-i18next": "^12.2.0",
+    "react-i18next": "^12.3.1",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },

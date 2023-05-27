@@ -8,10 +8,9 @@ import useInputValidations from './hooks/use-input-validations';
 
 type ZipFieldProps = {
   countryCode: CountryCode;
-  disabled?: boolean;
 };
 
-const ZipField = ({ countryCode, disabled }: ZipFieldProps) => {
+const ZipField = ({ countryCode }: ZipFieldProps) => {
   const {
     register,
     formState: { errors },
@@ -24,7 +23,6 @@ const ZipField = ({ countryCode, disabled }: ZipFieldProps) => {
     <TextInput
       data-private
       autoComplete="postal-code"
-      disabled={disabled}
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}
       label={t('label')}

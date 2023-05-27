@@ -43,14 +43,15 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     }: CardNumberInputProps,
     ref,
   ) => {
-    const { t } = useTranslation('components.secure-form.card.number');
+    const { t } = useTranslation('components.secure-form.card.form.number');
     const brand = creditcardutils.parseCardType(value || '');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
       value ? checkIsInvalid(value) : false,
     );
     const inputHasError = hasError || (blurred && isInvalid);
-    const errorMessage = blurred && isInvalid ? invalidMessage : undefined;
+    const errorMessageText = invalidMessage ?? t('invalid');
+    const errorMessage = blurred && isInvalid ? errorMessageText : undefined;
 
     useEffect(() => {
       setIsInvalid(value ? checkIsInvalid(value) : false);

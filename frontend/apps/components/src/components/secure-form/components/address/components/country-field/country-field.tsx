@@ -5,10 +5,9 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 type CountryFieldProps = {
   onChange: () => void;
-  disabled?: boolean;
 };
 
-const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
+const CountryField = ({ onChange }: CountryFieldProps) => {
   const { control } = useFormContext();
   const { t } = useTranslation('components.secure-form.address.form.country');
 
@@ -20,7 +19,6 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
       render={({ field }) => (
         <CountrySelect
           label={t('label')}
-          disabled={disabled}
           onBlur={field.onBlur}
           onChange={nextValue => {
             field.onChange(nextValue);

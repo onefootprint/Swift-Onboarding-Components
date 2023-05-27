@@ -44,8 +44,8 @@
     "eslint-config-footprint": "*",
     "glob": "^8.0.3",
     "gray-matter": "^4.0.3",
-    "i18next": "^22.0.4",
-    "react-i18next": "^12.2.0",
+    "i18next": "^22.5.0",
+    "react-i18next": "^12.3.1",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },

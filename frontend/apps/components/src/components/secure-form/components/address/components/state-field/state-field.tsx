@@ -6,10 +6,9 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 type StateFieldProps = {
   inputKind: 'dropdown' | 'text';
-  disabled?: boolean;
 };
 
-const StateField = ({ inputKind, disabled }: StateFieldProps) => {
+const StateField = ({ inputKind }: StateFieldProps) => {
   const {
     control,
     register,
@@ -27,7 +26,6 @@ const StateField = ({ inputKind, disabled }: StateFieldProps) => {
         return (
           <Select
             isPrivate
-            disabled={disabled}
             label={t('label')}
             onBlur={field.onBlur}
             options={STATES}
@@ -45,7 +43,6 @@ const StateField = ({ inputKind, disabled }: StateFieldProps) => {
   ) : (
     <TextInput
       data-private
-      disabled={disabled}
       autoComplete="address-level1"
       hasError={!!errors.state}
       hint={errors.state && t('error')}

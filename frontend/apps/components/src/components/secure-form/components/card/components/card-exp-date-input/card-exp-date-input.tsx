@@ -35,20 +35,21 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
       hint,
       onChange,
       onBlur,
-      invalidMessage = 'Date must be valid and in the future',
-      label = 'Expiry Date',
+      invalidMessage,
+      label,
       value,
       ...props
     }: CardExpDateInputProps,
     ref,
   ) => {
-    const { t } = useTranslation('components.secure-form.card.expiry');
+    const { t } = useTranslation('components.secure-form.card.form.expiry');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
       value ? checkIsInvalid(value) : false,
     );
     const inputHasError = hasError || (blurred && isInvalid);
-    const errorMessage = blurred && isInvalid ? invalidMessage : undefined;
+    const errorMessageText = invalidMessage ?? t('invalid');
+    const errorMessage = blurred && isInvalid ? errorMessageText : undefined;
 
     useEffect(() => {
       setIsInvalid(value ? checkIsInvalid(value) : false);

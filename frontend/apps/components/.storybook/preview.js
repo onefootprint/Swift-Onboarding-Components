@@ -2,6 +2,7 @@ import React from 'react';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import '@onefootprint/design-tokens/src/output/theme.css';
+import i18n from './i18next.js';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -9,6 +10,15 @@ export const parameters = {
     matchers: {
       color: /(background|color)$/i,
       date: /Date$/,
+    },
+  },
+  parameters: {
+    i18n,
+  },
+  globals: {
+    locale: 'english',
+    locales: {
+      english: 'English',
     },
   },
 };

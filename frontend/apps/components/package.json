@@ -33,7 +33,12 @@
     "creditcardutils": "^1.0.0",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.12.16",
-    "usehooks-ts": "^2.9.1"
+    "i18next": "^22.5.0",
+    "i18next-browser-languagedetector": "^7.0.1",
+    "i18next-http-backend": "^2.2.1",
+    "react-i18next": "^12.3.1",
+    "usehooks-ts": "^2.9.1",
+    "use-places-autocomplete": "^4.0.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.3.4",
@@ -53,14 +58,15 @@
     "@types/styled-components": "^5.1.26",
     "constate": "^3.3.2",
     "eslint-config-footprint": "*",
-    "i18next": "^22.0.4",
+    "i18next": "^22.5.0",
     "lodash": "^4.17.21",
     "next": "13.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-error-boundary": "^3.1.4",
     "react-hook-form": "^7.43.9",
-    "react-i18next": "^12.2.0",
+    "react-i18next": "^12.3.1",
+    "storybook-react-i18next": "^2.0.1",
     "styled-components": "^5.3.8",
     "tsconfig": "*",
     "typescript": "4.9.5"

@@ -19,6 +19,9 @@ const Header = styled.header`
     top: 0;
     flex-shrink: 0;
     z-index: 1;
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
   `}
 `;
 

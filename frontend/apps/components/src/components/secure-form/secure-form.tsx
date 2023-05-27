@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCreditcard24 } from '@onefootprint/icons';
+import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
+import { Divider } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -33,7 +34,7 @@ export type SecureFormProps = {
 const FORM_ID = 'secure-form';
 
 const SecureForm = ({
-  title = 'Add credit card',
+  title,
   type = SecureFormType.cardAndName,
   variant = 'modal',
   onSave,
@@ -50,7 +51,7 @@ const SecureForm = ({
 
   return (
     <FormDialog
-      title={title}
+      title={title ?? t('title')}
       variant={variant}
       primaryButton={{
         form: FORM_ID,
@@ -95,7 +96,11 @@ const SecureForm = ({
               />
               <Name />
               <Card />
-              <Title label={t('section-title.billing-address')} />
+              <StyledDivider />
+              <Title
+                label={t('section-title.billing-address')}
+                iconComponent={<IcoBuilding24 />}
+              />
               <Address />
             </>
           )}
@@ -109,6 +114,12 @@ const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[5]};
+  `}
+`;
+
+const StyledDivider = styled(Divider)`
+  ${({ theme }) => css`
+    margin: ${theme.spacing[4]} 0;
   `}
 `;
 

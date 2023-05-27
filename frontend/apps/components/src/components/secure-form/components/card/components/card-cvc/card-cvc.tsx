@@ -36,7 +36,7 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
     }: CardCvcProps,
     ref,
   ) => {
-    const { t } = useTranslation('components.secure-form.card.cvc');
+    const { t } = useTranslation('components.secure-form.card.form.cvc');
 
     return (
       <InternalInput

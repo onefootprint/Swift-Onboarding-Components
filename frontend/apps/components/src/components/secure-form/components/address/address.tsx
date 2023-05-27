@@ -1,3 +1,4 @@
+import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { CountrySelectOption, Grid, SelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -20,7 +21,7 @@ export type AddressData = {
 const Address = () => {
   const methods = useFormContext<AddressData>();
   const { watch, setFocus, setValue } = methods;
-  const country = watch('country');
+  const country = watch('country') ?? DEFAULT_COUNTRY;
 
   const handleCountryChange = () => {
     setFocus('addressLine1');
