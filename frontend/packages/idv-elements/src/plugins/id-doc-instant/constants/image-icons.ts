@@ -6,8 +6,8 @@ import {
 } from '@onefootprint/icons';
 
 export enum ImageTypes {
-  front = 'id-doc-front',
-  back = 'id-doc-back',
+  front = 'front',
+  back = 'back',
   selfie = 'selfie',
   oneSide = 'one-side',
 }

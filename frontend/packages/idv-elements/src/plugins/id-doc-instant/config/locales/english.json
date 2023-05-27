@@ -15,7 +15,7 @@
       "cta": "Open settings to give camera permissions"
     },
     "id-doc-photo-prompt": {
-      "title": "Scan or upload the {{side}} side of your {{type}}",
+      "title": "Scan or upload the {{side}} of your {{type}}",
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
       "guidelines": {
@@ -34,8 +34,8 @@
       }
     },
     "loading": {
-      "processing-id-doc-front": "Processing image...",
-      "processing-id-doc-back": "Processing image...",
+      "processing-front": "Processing image...",
+      "processing-back": "Processing image...",
       "processing-one-side": "Processing image...",
       "processing-selfie": "Processing your selfie..."
     },
@@ -44,8 +44,8 @@
       "description": "Please submit a new image."
     },
     "success": {
-      "id-doc-front-upload": "Front side image uploaded",
-      "id-doc-back-upload": "Back side image uploaded",
+      "front-upload": "Front side image uploaded",
+      "back-upload": "Back side image uploaded",
       "one-side-upload": "Image uploaded",
       "selfie-upload": "Selfie uploaded"
     },

@@ -7,21 +7,18 @@ import { useTimeout } from 'usehooks-ts';
 
 import { imageIcons, ImageTypes } from '../../constants/image-icons';
 import TRANSITION_DELAY from '../../constants/transition-delay.constants';
-import { MachineEvents } from '../../utils/state-machine';
-import FeedbackIcon from '../feedback-icon/feedback-icon';
-import { useIdDocMachine } from '../machine-provider';
+import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
   imageType: ImageTypes;
-  event: MachineEvents;
+  onComplete: () => void;
 };
 
-const Success = ({ imageType, event }: SuccessProps) => {
+const Success = ({ imageType, onComplete }: SuccessProps) => {
   const { t } = useTranslation('components.success');
-  const [, send] = useIdDocMachine();
 
   useTimeout(() => {
-    send(event);
+    onComplete();
   }, TRANSITION_DELAY);
 
   return (

@@ -8,11 +8,11 @@ import styled, { css } from 'styled-components';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
 import { imageIcons, ImageTypes } from '../../constants/image-icons';
-import FeedbackIcon from '../feedback-icon/feedback-icon';
+import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: ImageTypes;
-  error: IdDocImageError;
+  error?: IdDocImageError;
 };
 
 const Error = ({ error, imageType }: ErrorProps) => {
@@ -43,7 +43,7 @@ const Error = ({ error, imageType }: ErrorProps) => {
             textAlign: 'center',
           }}
         >
-          {BadImageErrorLabel[error] || t('description')}
+          {(!!error && BadImageErrorLabel[error]) || t('description')}
         </Typography>
       </ErrorMessage>
     </Container>

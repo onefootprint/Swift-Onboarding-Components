@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { Icon } from '@onefootprint/icons';
 import {
   IcoSmartphone24,
   IcoSquareFrame24,
@@ -12,28 +11,30 @@ import styled, { css } from 'styled-components';
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
+import { imageIcons, ImageTypes } from '../../constants/image-icons';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
   type: IdDocType;
-  iconComponent: Icon;
-  side: 'front' | 'back';
+  imageType: ImageTypes;
   onComplete: (image: string) => void;
 };
 
 const IdDocPhotoPrompt = ({
   showGuidelines,
   onComplete,
-  iconComponent: Icon,
+  imageType,
   type,
-  side,
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
+  const ImageIcon = imageIcons[imageType];
+  const side =
+    imageType === ImageTypes.oneSide ? 'photo page' : `${imageType} side`;
 
   return (
     <Container>
-      <Icon />
+      <ImageIcon />
       <HeaderTitle
         title={t('title', {
           type: IdDocTypeToLabel[type],
@@ -74,6 +75,7 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+
     > button {
       margin-top: -${theme.spacing[4]};
     }

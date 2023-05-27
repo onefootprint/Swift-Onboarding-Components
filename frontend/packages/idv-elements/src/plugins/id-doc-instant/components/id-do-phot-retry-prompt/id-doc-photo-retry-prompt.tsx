@@ -8,7 +8,7 @@ import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoRetryPromptProps = {
   imageType: ImageTypes;
-  error: IdDocImageError;
+  error?: IdDocImageError;
   onComplete: (image: string) => void;
 };
 
