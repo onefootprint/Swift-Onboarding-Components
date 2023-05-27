@@ -76,6 +76,7 @@ export * from './radio';
 export { default as Radio } from './radio';
 export { default as RadioSelect } from './radio-select';
 export * from './radio-select';
+export { default as ScrollArea } from './scroll-area';
 export * from './search-input';
 export { default as SearchInput } from './search-input';
 export { default as SegmentedControl } from './segmented-control';

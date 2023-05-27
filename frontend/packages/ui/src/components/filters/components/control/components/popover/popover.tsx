@@ -8,7 +8,7 @@ import {
 } from 'usehooks-ts';
 
 import Button from '../../../../../button';
-import ScrollArea from '../../../../../dialog/components/scroll-area';
+import ScrollArea from '../../../../../scroll-area';
 import Typography from '../../../../../typography';
 
 export type PopoverProps = {

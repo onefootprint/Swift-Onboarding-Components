@@ -16,8 +16,8 @@ import IconButton from '../../../icon-button';
 import LinkButton from '../../../link-button';
 import Overlay from '../../../overlay';
 import Portal from '../../../portal';
+import ScrollArea from '../../../scroll-area';
 import Typography from '../../../typography';
-import ScrollArea from '../scroll-area';
 import {
   AllButtons,
   DialogHeaderIcon,

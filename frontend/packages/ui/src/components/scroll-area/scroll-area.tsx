@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener } from 'usehooks-ts';
 
-import { SXStyleProps, SXStyles, useSX } from '../../../../hooks';
+import { SXStyleProps, SXStyles, useSX } from '../../hooks';
 
 type ScrollAreaProps = {
   children: React.ReactNode;
