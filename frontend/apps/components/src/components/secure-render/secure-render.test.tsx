@@ -11,9 +11,9 @@ const CARD_AMEX_VALUE = '378282246310005';
 const CARD_AMEX_FORMATTED = '3782 822463 10005';
 const CARD_AMEX_HIDDEN = '•••• •••••• •••••';
 
-const CARD_CVV_VALUE = '123';
-const CARD_CVV_FORMATTED = '123';
-const CARD_CVV_HIDDEN = '•••';
+const CARD_CVC_VALUE = '123';
+const CARD_CVC_FORMATTED = '123';
+const CARD_CVC_HIDDEN = '•••';
 
 const CARD_EXP_DATE = '1223';
 const CARD_EXP_DATE_FORMATTED = '12 / 23';
@@ -38,13 +38,13 @@ describe('<SecureRender />', () => {
     );
 
   it('should render value', () => {
-    renderSecureRender({ value: CARD_CVV_VALUE, isHidden: false, mask: 'cvv' });
-    const value = screen.getByText(CARD_CVV_VALUE);
+    renderSecureRender({ value: CARD_CVC_VALUE, isHidden: false, mask: 'cvc' });
+    const value = screen.getByText(CARD_CVC_VALUE);
     expect(value).toBeInTheDocument();
   });
 
   it('should render the label', () => {
-    renderSecureRender({ label: 'label', isHidden: false, mask: 'cvv' });
+    renderSecureRender({ label: 'label', isHidden: false, mask: 'cvc' });
     const customLabel = screen.getByText('label');
     expect(customLabel).toBeInTheDocument();
   });
@@ -89,23 +89,23 @@ describe('<SecureRender />', () => {
     expect(hiddenValue).toBeInTheDocument();
   });
 
-  it('should format the cvv value when isHidden is false', () => {
+  it('should format the cvc value when isHidden is false', () => {
     renderSecureRender({
       isHidden: false,
-      mask: 'cvv',
-      value: CARD_CVV_VALUE,
+      mask: 'cvc',
+      value: CARD_CVC_VALUE,
     });
-    const formattedValue = screen.getByText(CARD_CVV_FORMATTED);
+    const formattedValue = screen.getByText(CARD_CVC_FORMATTED);
     expect(formattedValue).toBeInTheDocument();
   });
 
-  it('should hide the cvv value when isHidden is true', () => {
+  it('should hide the cvc value when isHidden is true', () => {
     renderSecureRender({
       isHidden: true,
-      mask: 'cvv',
-      value: CARD_CVV_VALUE,
+      mask: 'cvc',
+      value: CARD_CVC_VALUE,
     });
-    const hiddenValue = screen.getByText(CARD_CVV_HIDDEN);
+    const hiddenValue = screen.getByText(CARD_CVC_HIDDEN);
     expect(hiddenValue).toBeInTheDocument();
   });
 

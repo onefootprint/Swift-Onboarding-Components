@@ -24,7 +24,7 @@ export default {
     },
     mask: {
       control: 'select',
-      options: ['creditCard', 'cvv', 'date'],
+      options: ['creditCard', 'cvc', 'date'],
       description: 'Mask the value',
       required: false,
     },
@@ -64,11 +64,11 @@ CreditCard.args = {
   value: '4242424242424242',
 };
 
-export const CVV = Template.bind({});
-CVV.args = {
+export const Cvc = Template.bind({});
+Cvc.args = {
   isHidden: true,
-  label: 'CVV',
-  mask: 'cvv',
+  label: 'CVC',
+  mask: 'cvc',
   onShow: () => {},
   value: '123',
 };

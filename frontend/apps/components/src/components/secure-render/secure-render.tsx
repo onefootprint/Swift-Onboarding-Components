@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 export type SecureRenderProps = {
   isHidden?: boolean;
   label?: string;
-  mask?: 'creditCard' | 'cvv' | 'date';
+  mask?: 'creditCard' | 'cvc' | 'date';
   onShow?: () => void;
   value: string;
 };
@@ -31,7 +31,7 @@ const SecureRender = ({
           hiddenValue: formatCardNumber(value).replace(/\d/g, '•'),
         });
         break;
-      case 'cvv':
+      case 'cvc':
         setValues({
           showValue: value,
           hiddenValue: value.replace(/\d/g, '•'),
