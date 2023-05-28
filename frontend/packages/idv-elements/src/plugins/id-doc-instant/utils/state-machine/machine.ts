@@ -41,7 +41,9 @@ const createIdDocMachine = (args: MachineContext) =>
               {
                 target: 'backImage',
                 cond: context => {
-                  const { type } = context;
+                  const {
+                    idDoc: { type },
+                  } = context;
                   return type ? !!ImagesRequiredByIdDocType[type].back : false;
                 },
               },
@@ -150,17 +152,19 @@ const createIdDocMachine = (args: MachineContext) =>
     },
     {
       actions: {
-        assignCountryAndType: assign((context, event) => ({
-          ...context,
-          type: event.payload.type,
-          country: event.payload.country,
-        })),
+        assignCountryAndType: assign((context, event) => {
+          context.idDoc = {
+            type: event.payload.type,
+            country: event.payload.country,
+          };
+          return context;
+        }),
         assignImage: assign((context, event) => {
           context.image = event.payload.image;
           return context;
         }),
         assignIdDocImageErrors: assign((context, event) => {
-          context.error = event.payload.error;
+          context.errors = event.payload.errors;
           context.image = undefined;
           return context;
         }),

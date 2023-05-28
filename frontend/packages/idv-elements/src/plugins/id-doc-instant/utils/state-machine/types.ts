@@ -9,17 +9,17 @@ import {
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
-  type?: IdDocType;
   requirement: IdDocRequirement;
   image?: string;
   idDoc: {
+    type?: IdDocType;
     country?: CountryCode3;
   };
   selfie: {
     consentRequired?: boolean;
     required?: boolean;
   };
-  error?: IdDocImageError;
+  errors?: IdDocImageError[];
 };
 
 export type MachineEvents =
@@ -42,7 +42,7 @@ export type MachineEvents =
   | {
       type: 'processingErrored';
       payload: {
-        error: IdDocImageError;
+        errors: IdDocImageError[];
       };
     }
   | {

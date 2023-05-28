@@ -12,11 +12,15 @@ import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: ImageTypes;
-  error?: IdDocImageError;
+  errors: IdDocImageError[];
 };
 
-const Error = ({ error, imageType }: ErrorProps) => {
+const Error = ({ errors, imageType }: ErrorProps) => {
   const { t } = useTranslation('components.error');
+
+  const cleanedErrors =
+    errors?.filter(error => !!BadImageErrorLabel[error]) ?? [];
+  const hasErrors = cleanedErrors.length > 0;
 
   return (
     <Container>
@@ -36,15 +40,25 @@ const Error = ({ error, imageType }: ErrorProps) => {
         >
           {t('title')}
         </Typography>
-        <Typography
-          variant="body-2"
-          color="secondary"
-          sx={{
-            textAlign: 'center',
-          }}
-        >
-          {(!!error && BadImageErrorLabel[error]) || t('description')}
-        </Typography>
+        {cleanedErrors.length < 2 ? (
+          <Typography
+            variant="body-2"
+            color="secondary"
+            sx={{
+              textAlign: 'center',
+            }}
+          >
+            {hasErrors
+              ? BadImageErrorLabel[cleanedErrors[0]] || t('description')
+              : t('description')}
+          </Typography>
+        ) : (
+          cleanedErrors.map(error => (
+            <Typography key={error} variant="body-2" color="secondary" as="li">
+              {BadImageErrorLabel[error]}
+            </Typography>
+          ))
+        )}
       </ErrorMessage>
     </Container>
   );
