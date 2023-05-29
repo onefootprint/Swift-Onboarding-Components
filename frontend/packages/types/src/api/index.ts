@@ -1,6 +1,7 @@
 export * from './biometric-register';
 export * from './business';
 export * from './business-data';
+export * from './users-vault';
 export * from './consent';
 export * from './create-org-member';
 export * from './create-org-role';

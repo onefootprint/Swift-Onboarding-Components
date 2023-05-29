@@ -5,7 +5,7 @@ import creditcardutils from 'creditcardutils';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import CardCvc from './components/card-cvc';
+import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';
 import CardNumberInput from './components/card-number-input';
 
@@ -15,25 +15,20 @@ export type CardData = {
   cvc: string;
 };
 
-const DEFAULT_CVC_NUM_DIGITS = 3;
-const AMEX_CVC_NUM_DIGITS = 4;
+const DEFAULT_CVC_NUM_DIGITS = CvcLength.three;
+const AMEX_CVC_NUM_DIGITS = CvcLength.four;
 
 const Card = () => {
   const { t } = useTranslation('components.secure-form.card.form');
-  const {
-    register,
-    watch,
-    formState: { errors },
-  } = useFormContext<CardData>();
+  const { register, watch, formState } = useFormContext<CardData>();
+  const { errors } = formState;
 
   const cardNumber = watch('number');
-  const getNumDigits = () => {
-    const cardType = creditcardutils.parseCardType(cardNumber);
-    if (cardType === 'amex') {
-      return AMEX_CVC_NUM_DIGITS;
-    }
-    return DEFAULT_CVC_NUM_DIGITS;
-  };
+  let numDigits = DEFAULT_CVC_NUM_DIGITS;
+  const cardType = creditcardutils.parseCardType(cardNumber);
+  if (cardType === 'amex') {
+    numDigits = AMEX_CVC_NUM_DIGITS;
+  }
 
   return (
     <Grid.Row>
@@ -68,7 +63,7 @@ const Card = () => {
           data-private
           hasError={!!errors.cvc}
           hint={errors.cvc?.message}
-          numDigits={getNumDigits()}
+          numDigits={numDigits}
           {...register('cvc', {
             required: {
               value: true,

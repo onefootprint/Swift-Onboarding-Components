@@ -63,6 +63,13 @@ export enum DocumentDI {
   latestIdCardSelfie = 'document.latest_upload.id_card.selfie',
 }
 
+export enum CardDI {
+  number = 'card.*.number',
+  cvc = 'card.*.cvc',
+  expiration = 'card.*.expiration',
+  name = 'card.*.name',
+}
+
 export const DataIdentifierKeys = [
   ...Object.values(BusinessDI),
   ...Object.values(InvestorProfileDI),

@@ -2,6 +2,7 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { AppErrorBoundary } from '@onefootprint/idv-elements';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
@@ -19,8 +20,10 @@ const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
     <ObserveCollectorProvider appName="components">
       <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <Component {...pageProps} />
+        <AppErrorBoundary>
+          <GlobalStyle />
+          <Component {...pageProps} />
+        </AppErrorBoundary>
       </DesignSystemProvider>
     </ObserveCollectorProvider>
   </QueryClientProvider>

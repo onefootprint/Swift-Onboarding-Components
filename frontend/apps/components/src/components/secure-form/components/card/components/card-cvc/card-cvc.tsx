@@ -3,7 +3,10 @@ import { useTranslation } from '@onefootprint/hooks';
 import { InputProps, InternalInput } from '@onefootprint/ui';
 import React, { forwardRef } from 'react';
 
-export type CvcLength = 3 | 4;
+export enum CvcLength {
+  three = 3,
+  four = 4,
+}
 
 export type CardCvcProps = Omit<
   InputProps,
@@ -47,8 +50,13 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
         hint={hint}
         inputMode="numeric"
         label={label ?? t('label')}
-        mask={{ numericOnly: true, blocks: [numDigits] }}
-        placeholder={numDigits === 3 ? '123' : '1234'}
+        mask={{
+          numericOnly: true,
+          blocks: [numDigits],
+        }}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={numDigits === CvcLength.three ? '123' : '1234'}
         ref={ref}
         size="default"
         value={value}

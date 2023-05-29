@@ -18,6 +18,8 @@ export enum SecureFormType {
   cardAndNameAndAddress = 'cardAndNameAndAddress',
 }
 
+export type SecureFormVariant = 'modal' | 'card';
+
 export type SecureFormData =
   | CardData
   | (CardData & NameData)
@@ -26,7 +28,7 @@ export type SecureFormData =
 export type SecureFormProps = {
   title?: string;
   type?: SecureFormType;
-  variant?: 'modal' | 'card';
+  variant?: SecureFormVariant;
   onSave?: (data: SecureFormData) => void;
   onCancel?: () => void;
   onClose?: () => void;

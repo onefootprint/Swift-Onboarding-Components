@@ -67,6 +67,8 @@ const Template: Story<SecureFormProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
+  type: SecureFormType.cardOnly,
+  variant: 'card',
   onSave: console.log, // eslint-disable-line no-console
   onCancel: () => console.log('canceled'), // eslint-disable-line no-console
   onClose: () => console.log('closed'), // eslint-disable-line no-console
