@@ -1,6 +1,6 @@
 use super::{
     states::{
-        AddBack, AddConsent, AddFront, AddSelfie, Complete, FetchOCR, FetchScores, ProcessId,
+        AddBack, AddConsent, AddFront, AddSelfie, Complete, Fail, FetchOCR, FetchScores, ProcessId,
         VerificationSession,
     },
     IncodeContext,
@@ -11,13 +11,12 @@ use db::{
     models::{
         document_upload::DocumentUpload,
         incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession},
-        user_timeline::UserTimeline,
     },
     DbPool, TxnPgConn,
 };
 use enum_dispatch::enum_dispatch;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use newtypes::{DocumentSide, IdentityDocumentUploadedInfo, IncodeFailureReason};
+use newtypes::{DocumentSide, IncodeFailureReason};
 use std::marker::PhantomData;
 
 pub struct Uninitialized<T>(PhantomData<T>);
@@ -39,6 +38,7 @@ pub enum StateResult {
     Retry {
         next_state: IncodeState,
         reasons: Vec<IncodeFailureReason>,
+        /// The list of sides to wipe clear for this identity document in order to retry uploading
         clear_sides: Vec<DocumentSide>,
     },
 }
@@ -135,20 +135,25 @@ where
                         (next_state, vec![])
                     }
                     StateResult::Retry {
-                        next_state,
+                        mut next_state,
                         reasons,
                         clear_sides,
                     } => {
-                        // TODO implement retry limit
-                        // TODO Change the appearance of this timeline event. Do we want to show _every_ fail?
-                        let info = IdentityDocumentUploadedInfo {
-                            id: ctx.id_doc_id.clone(),
-                        };
-                        UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.sv_id.clone())?;
-
-                        // Deactivate the failed sides to require re-uploading. Otherwise, the user
+                        // Mark the sides as failed to require re-uploading. Otherwise, the user
                         // could re-initiate the incode machine without uploading a new doc
                         DocumentUpload::deactivate(conn, &ctx.id_doc_id, clear_sides)?;
+
+                        // AFTER marking the uploads as failed, count if we have failed too many times
+                        let attempts_by_side = DocumentUpload::count_failed_attempts(conn, &ctx.id_doc_id)?;
+                        if attempts_by_side
+                            .iter()
+                            .any(|(_, c)| *c >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE)
+                        {
+                            // Override the next state to a failed state if we've reached the max
+                            // attempts
+                            Fail::enter(conn, &ctx)?;
+                            next_state = Fail::new();
+                        }
                         (next_state, reasons)
                     }
                 };
@@ -180,4 +185,5 @@ pub enum IncodeState {
     FetchScores(Uninitialized<FetchScores>),
     FetchOCR(Uninitialized<FetchOCR>),
     Complete(Uninitialized<Complete>),
+    Fail(Uninitialized<Fail>),
 }

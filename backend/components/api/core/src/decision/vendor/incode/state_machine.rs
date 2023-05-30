@@ -40,6 +40,7 @@ impl IncodeState {
             Self::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
             Self::FetchOCR(_) => IncodeVerificationSessionState::FetchOCR,
             Self::Complete(_) => IncodeVerificationSessionState::Complete,
+            Self::Fail(_) => IncodeVerificationSessionState::Fail,
         }
     }
 }
@@ -142,6 +143,7 @@ impl IncodeStateMachine {
             IncodeVerificationSessionState::FetchScores => FetchScores::new(),
             IncodeVerificationSessionState::FetchOCR => FetchOCR::new(),
             IncodeVerificationSessionState::Complete => Complete::new(),
+            IncodeVerificationSessionState::Fail => Fail::new(),
             IncodeVerificationSessionState::StartOnboarding => {
                 return Err(AssertionError("Should have already run StartOnboarding").into())
             }

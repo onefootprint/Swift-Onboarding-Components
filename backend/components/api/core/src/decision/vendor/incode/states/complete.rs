@@ -1,7 +1,7 @@
 use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::vendor::incode::state::StateResult;
-use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
@@ -42,7 +42,7 @@ impl Complete {
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
         fetch_ocr_response: FetchOCRResponse,
-    ) -> ApiResult<Self> {
+    ) -> ApiResult<()> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
         let (id_doc, doc_req) = IdentityDocument::get(conn, id_doc_id)?;
 
@@ -112,7 +112,7 @@ impl Complete {
 
         // TODO: still need to fingerprint data afterwards!
 
-        Ok(Self {})
+        Ok(())
     }
 }
 

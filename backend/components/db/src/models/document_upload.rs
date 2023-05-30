@@ -1,7 +1,10 @@
 use crate::schema::document_upload;
 use crate::DbResult;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use diesel::dsl::count_star;
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::{DocumentSide, DocumentUploadId, IdentityDocumentId, SealedVaultDataKey};
@@ -34,6 +37,9 @@ struct NewDocumentUploadRow {
 }
 
 impl DocumentUpload {
+    /// Max number attempts to upload a given side before we fail the document request
+    pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
+
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
@@ -70,5 +76,20 @@ impl DocumentUpload {
             .set(document_upload::deactivated_at.eq(Utc::now()))
             .execute(conn.conn())?;
         Ok(())
+    }
+
+    /// Count how many deactivated (= failed) attempts there were to upload each side of the
+    /// provided document
+    pub fn count_failed_attempts(
+        conn: &mut PgConn,
+        document_id: &IdentityDocumentId,
+    ) -> DbResult<Vec<(DocumentSide, i64)>> {
+        let results = document_upload::table
+            .filter(document_upload::document_id.eq(document_id))
+            .filter(not(document_upload::deactivated_at.is_null()))
+            .group_by(document_upload::side)
+            .select((document_upload::side, count_star()))
+            .get_results(conn)?;
+        Ok(results)
     }
 }

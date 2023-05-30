@@ -28,6 +28,9 @@ pub use fetch_ocr::*;
 mod complete;
 pub use complete::*;
 
+mod fail;
+pub use fail::*;
+
 use super::state::{IncodeState, IncodeStateTransition};
 use super::IncodeContext;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;

@@ -36,6 +36,7 @@ pub enum IncodeVerificationSessionState {
     FetchScores,
     FetchOCR,
     Complete,
+    Fail,
 }
 
 #[derive(
