@@ -194,9 +194,12 @@ def sandbox_user_real_phone(sandbox_tenant, twilio):
     """
     from tests.bifrost_client import BifrostClient
 
-    seed = _gen_random_n_digit_number(10)
-    phone_number = f"{LIVE_PHONE_NUMBER}#sandbox{seed}"
+    phone_number = generate_real_phone_number()
     bifrost = BifrostClient(
         sandbox_tenant.default_ob_config, twilio, override_create_phone=phone_number
     )
     return bifrost.run()
+
+def generate_real_phone_number():
+    seed = _gen_random_n_digit_number(10)
+    return f"{LIVE_PHONE_NUMBER}#sandbox{seed}"

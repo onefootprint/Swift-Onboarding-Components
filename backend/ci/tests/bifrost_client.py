@@ -30,6 +30,8 @@ class BifrostClient:
         override_ob_config_auth=None,
         override_inherit_phone=None,
         override_create_phone=None,
+        override_auth=None,
+        data=None,
     ):
         """
         Creates a BifrostClient associated with a specific ob config and a specific user with
@@ -44,7 +46,11 @@ class BifrostClient:
         # Now, we do the old init_for_onboarding in the constructor
 
         ob_config_auth = override_ob_config_auth or self.ob_config.key
-        if override_inherit_phone:
+        if override_auth:
+            self.auth_token = override_auth
+            phone_number = override_inherit_phone
+            pass
+        elif override_inherit_phone:
             # Inherit the sandbox/prod user
             auth = inherit_user(twilio, override_inherit_phone, ob_config_auth)
             self.auth_token = auth
@@ -82,6 +88,7 @@ class BifrostClient:
             "business.name": business_name,
             "id.phone_number": phone_number,
             "id.email": email,
+            **(data or {}),
         }
 
         # After running bifrost, this will be the list of requirements satisfied
