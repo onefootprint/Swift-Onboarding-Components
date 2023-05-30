@@ -2,11 +2,15 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
-    decision_intent::DecisionIntent, document_request::DocumentRequest,
+    decision_intent::DecisionIntent, document_request::DocumentRequest, vault::Vault,
     verification_request::VerificationRequest, workflow::Workflow,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{DecisionStatus, VendorAPI};
+use idv::incode::{
+    watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
+    IncodeStartOnboardingRequest,
+};
+use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, VendorAPI};
 
 use crate::{
     decision::{
@@ -16,7 +20,7 @@ use crate::{
             OnAction, ReviewCompleted, WorkflowStates,
         },
         utils::FixtureDecision,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+        vendor::{self, tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
     errors::ApiResult,
     State,
@@ -166,18 +170,11 @@ impl OnAction<MakeDecision> for Decisioning {
 
         match decision_output.decision_status {
             DecisionStatus::Fail => Ok(States::from(Complete).into()),
-            DecisionStatus::Pass => {
-                // TODO: maybe create a new DI..?
-                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &self.sv_id)?;
-                // Create Vreq for Incode watchlist result call
-                let vreq = VerificationRequest::create(
-                    conn,
-                    &self.sv_id,
-                    &di.id,
-                    VendorAPI::IncodeAddMLConsent, // TODO: replace with IncodeWatchlistResult when merged in
-                )?;
-                Ok(States::from(WatchlistCheck).into())
-            }
+            DecisionStatus::Pass => Ok(States::from(WatchlistCheck {
+                sv_id: self.sv_id,
+                t_id: self.t_id,
+            })
+            .into()),
             DecisionStatus::StepUp => {
                 let doc_req = DocumentRequest::create(
                     conn,
@@ -185,7 +182,11 @@ impl OnAction<MakeDecision> for Decisioning {
                     None,
                     true, // TODO: maybe should_collect_selfie should come from a config
                 )?;
-                Ok(States::from(DocCollection).into())
+                Ok(States::from(DocCollection {
+                    sv_id: self.sv_id,
+                    t_id: self.t_id,
+                })
+                .into())
             }
         }
     }
@@ -195,24 +196,60 @@ impl OnAction<MakeDecision> for Decisioning {
 /// WatchlistCheck
 /// ////////////////
 impl WatchlistCheck {
-    pub async fn init(_state: &State, workflow: Workflow) -> ApiResult<Self> {
-        Ok(WatchlistCheck)
+    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(WatchlistCheck {
+            sv_id: sv.id,
+            t_id: sv.tenant_id,
+        })
     }
 }
 
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
-    type AsyncRes = ();
+    type AsyncRes = WatchlistResultResponse;
 
     async fn execute_async_idempotent_actions(
         &self,
         _action: MakeWatchlistCheckCall,
-        _state: &State,
+        state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(())
+        // TODO: query for already complete (Vreq/Vres) for edge case where server crashes after `make_watchlist_result_call` but before `on_commit` commits
+        let sv_id = self.sv_id.clone();
+        let (di, vault) = state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id)?;
+                let uv = Vault::get(conn, &sv_id)?;
+                Ok((di, uv))
+            })
+            .await?;
+        let tvc = TenantVendorControl::new(
+            self.t_id.clone(),
+            &state.db_pool,
+            &state.enclave_client,
+            &state.config,
+        )
+        .await?;
+
+        let watchlist_res = vendor::incode_watchlist::make_watchlist_result_call(
+            state,
+            &tvc,
+            &self.sv_id,
+            &di.id,
+            &vault.public_key,
+        )
+        .await?;
+        Ok(watchlist_res)
     }
 
-    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(
+        self,
+        watchlist_res: WatchlistResultResponse,
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<WorkflowStates> {
+        // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         Ok(States::from(PendingReview).into())
     }
 }
@@ -247,8 +284,13 @@ impl OnAction<ReviewCompleted> for PendingReview {
 /// DocCollection
 /// ////////////////
 impl DocCollection {
-    pub async fn init(_state: &State, workflow: Workflow) -> ApiResult<Self> {
-        Ok(DocCollection)
+    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(DocCollection {
+            sv_id: sv.id,
+            t_id: sv.tenant_id,
+        })
     }
 }
 
@@ -265,7 +307,11 @@ impl OnAction<DocCollected> for DocCollection {
     }
 
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        Ok(States::from(WatchlistCheck).into())
+        Ok(States::from(WatchlistCheck {
+            sv_id: self.sv_id,
+            t_id: self.t_id,
+        })
+        .into())
     }
 }
 

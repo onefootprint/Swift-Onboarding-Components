@@ -30,9 +30,15 @@ pub struct Decisioning {
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
 }
-pub struct WatchlistCheck;
+pub struct WatchlistCheck {
+    sv_id: ScopedVaultId,
+    t_id: TenantId,
+}
 pub struct PendingReview;
-pub struct DocCollection;
+pub struct DocCollection {
+    sv_id: ScopedVaultId,
+    t_id: TenantId,
+}
 pub struct Complete;
 
 pub enum States {
