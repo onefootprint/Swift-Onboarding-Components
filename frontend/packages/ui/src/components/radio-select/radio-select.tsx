@@ -9,7 +9,7 @@ import RadioSelectOption, {
 export type RadioSelectProps = {
   options: RadioSelectOptionFields[];
   value?: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   testID?: string;
 };
 
@@ -25,7 +25,7 @@ const RadioSelect = ({ options, value, onChange, testID }: RadioSelectProps) =>
             description={description}
             IconComponent={IconComponent}
             onClick={() => {
-              onChange(optionValue);
+              onChange?.(optionValue);
             }}
             selected={optionValue === value}
           />

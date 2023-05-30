@@ -6,6 +6,8 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import haptic from '../../utils/haptic';
+
 export type PressableProps = {
   children: React.ReactNode;
   disabled?: boolean;
@@ -13,6 +15,7 @@ export type PressableProps = {
   onPressIn?: (event: GestureResponderEvent) => void;
   onPressOut?: (event: GestureResponderEvent) => void;
   style?: ViewStyle;
+  withImpact?: boolean;
 };
 
 const Pressable = ({
@@ -22,7 +25,13 @@ const Pressable = ({
   onPressIn,
   onPressOut,
   style = {},
+  withImpact,
 }: PressableProps) => {
+  const handlePress = (event: GestureResponderEvent) => {
+    if (withImpact) haptic.impact();
+    onPress?.(event);
+  };
+
   return (
     <RNPressable
       disabled={disabled}
@@ -30,7 +39,7 @@ const Pressable = ({
         ios: undefined,
         default: { top: 16, right: 16, bottom: 16, left: 16 },
       })}
-      onPress={disabled ? undefined : onPress}
+      onPress={disabled ? undefined : handlePress}
       onPressIn={disabled ? undefined : onPressIn}
       onPressOut={disabled ? undefined : onPressOut}
       style={style}

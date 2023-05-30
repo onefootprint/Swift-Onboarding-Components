@@ -3,6 +3,7 @@
  */
 export { default as IcoBolt24 } from './ico-bolt-24';
 export { default as IcoBuilding24 } from './ico-building-24';
+export { default as IcoCar24 } from './ico-car-24';
 export { default as IcoCheck24 } from './ico-check-24';
 export { default as IcoCheckCircle40 } from './ico-check-circle-40';
 export { default as IcoChevronLeftBig24 } from './ico-chevron-left-big-24';
@@ -17,6 +18,7 @@ export { default as IcoIdCard24 } from './ico-id-card-24';
 export { default as IcoIdGeneric40 } from './ico-id-generic-40';
 export { default as IcoInfo16 } from './ico-info-16';
 export { default as IcoInfo24 } from './ico-info-24';
+export { default as IcoPassport24 } from './ico-passport-24';
 export { default as IcoPhone24 } from './ico-phone-24';
 export { default as IcoSettings24 } from './ico-settings-24';
 export { default as IcoShare24 } from './ico-share-24';

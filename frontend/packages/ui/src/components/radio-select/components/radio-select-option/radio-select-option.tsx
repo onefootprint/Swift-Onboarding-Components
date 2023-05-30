@@ -25,13 +25,13 @@ const RadioSelectOption = ({
   onClick,
   IconComponent,
 }: RadioSelectOptionProps) => {
+  const optionRef = useRef(null);
+  const isHovered = useHover(optionRef);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onClick();
   };
-
-  const optionRef = useRef(null);
-  const isHovered = useHover(optionRef);
 
   return (
     <Option

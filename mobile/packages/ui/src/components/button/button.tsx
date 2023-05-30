@@ -23,12 +23,13 @@ const Button = ({
   disabled = false,
   loading = false,
   loadingAriaLabel,
+  onPress,
   size = 'default',
   variant = 'primary',
-  onPress,
   ...props
 }: ButtonProps) => {
   const [active, setActive] = useState(false);
+
   const handlePress = (event: GestureResponderEvent) => {
     if (loading || disabled) return;
     onPress?.(event);

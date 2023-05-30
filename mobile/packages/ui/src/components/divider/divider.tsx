@@ -1,11 +1,20 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import styled, { css } from '@onefootprint/styled';
+import React from 'react';
 
-export type DividerProps = {};
+import { Box, BoxProps } from '../box';
 
-const Divider = styled.View<DividerProps>`
+export type DividerProps = BoxProps;
+
+const Divider = ({ children, ...props }: DividerProps) => {
+  return <StyledBox {...props}>{children}</StyledBox>;
+};
+
+const StyledBox = styled(Box)`
   ${({ theme }) => css`
-    background-color: ${theme.borderColor.primary};
-    height: ${theme.borderWidth[1]};
+    width: 100%;
+    height: 1px;
+    background: ${theme.borderColor.tertiary};
   `}
 `;
 
