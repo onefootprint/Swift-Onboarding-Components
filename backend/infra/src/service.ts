@@ -131,6 +131,16 @@ export async function CreateApiService(
   );
 
   // build the fargate service
+  let serviceDependsOn: pulumi.Resource[] = [
+    lb.targetGroup,
+    lb.lb,
+    cluster,
+    ...g.database.instances,
+  ];
+  if (g.database.db) {
+    serviceDependsOn.push(g.database.db);
+  }
+
   const service = new aws.ecs.Service(
     `svc-${stackMetadata.shortStackName}`,
     {
@@ -162,12 +172,7 @@ export async function CreateApiService(
     },
     {
       provider,
-      dependsOn: [
-        lb.targetGroup,
-        lb.lb,
-        g.database.db,
-        ...g.database.instances,
-      ],
+      dependsOn: serviceDependsOn,
     },
   );
 

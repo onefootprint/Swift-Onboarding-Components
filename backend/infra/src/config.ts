@@ -2,7 +2,7 @@ export interface Config {
   resources: Resources;
   domain: Domains;
   elastic: Elastic;
-  enclaveCertPCR8: string;
+  enclave: Enclave;
   containers: Containers;
   rpId: string;
   workos: Workos;
@@ -59,4 +59,10 @@ export interface Sendgrid {
 
 export interface Airplane {
   teamId: string;
+}
+
+export interface Enclave {
+  certPCR8: string;
+  encryptionSealedIkek: string;
+  signingSealedIkek: string;
 }

@@ -275,11 +275,11 @@ export async function LoadSecrets(
     ),
     enclaveSealedEncIkek: createSecretParameter(
       `enclaveSealedIkek-${stack}`,
-      enclaveKeyDescriptor.sealedEncIkek.hexValue,
+      enclaveKeyDescriptor.sealedEncIkek,
     ),
     enclaveSealedHmacIkek: createSecretParameter(
       `enclaveSealedHmacIkek-${stack}`,
-      enclaveKeyDescriptor.sealedHmacIkek.hexValue,
+      enclaveKeyDescriptor.sealedHmacIkek,
     ),
     grafanaPrometheusPushAuth: createSecretParameter(
       `grafanaPrometheusPushAuth-${stack}`,
@@ -374,6 +374,7 @@ function createSecretParameter(
     type: 'SecureString',
     value: secretVal,
     name: `/static_secrets/${name}`,
+    description: name,
   });
 
   return secret;

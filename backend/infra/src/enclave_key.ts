@@ -4,12 +4,13 @@ import { Region } from '@pulumi/aws';
 import { Config } from './config';
 import * as kms from '@aws-sdk/client-kms';
 import { SealedIkek } from './sealed_ikek';
+import { StackEnvironment, StackMetadata } from './stack_metadata';
 
 export interface EnclaveKeyDescriptor {
   rootKeyId: pulumi.Output<string>;
   rootKeyArn: pulumi.Output<string>;
-  sealedEncIkek: SealedIkek;
-  sealedHmacIkek: SealedIkek;
+  sealedEncIkek: pulumi.Output<string>;
+  sealedHmacIkek: pulumi.Output<string>;
   enclaveKmsCredentials: EnclaveKmsCredentials;
 }
 
@@ -19,6 +20,7 @@ export interface EnclaveKmsCredentials {
 }
 
 export async function Initialize(
+  stackMetadata: StackMetadata,
   config: Config,
   replicaRegions: Region[],
 ): Promise<EnclaveKeyDescriptor> {
@@ -48,7 +50,7 @@ export async function Initialize(
           Resource: '*',
           Condition: {
             StringEqualsIgnoreCase: {
-              'kms:RecipientAttestation:PCR8': config.enclaveCertPCR8,
+              'kms:RecipientAttestation:PCR8': config.enclave.certPCR8,
             },
           },
         },
@@ -67,19 +69,34 @@ export async function Initialize(
 
   // Generate our sealed enclave ikeks
 
-  // For encryption
-  const sealedEncIkek = new SealedIkek(
-    `enclave_master_root_key_sealed_ikek`,
-    { rootKeyId: rootKey.keyId },
-    { parent: rootKey },
-  );
+  let sealedEncIkekHex: pulumi.Output<string>,
+    sealedHmacIkekHex: pulumi.Output<string>;
 
-  // For HMAC signing
-  const sealedHmacIkek = new SealedIkek(
-    `enclave_master_root_key_sealed_ikek_hmac`,
-    { rootKeyId: rootKey.keyId },
-    { parent: rootKey },
-  );
+  switch (stackMetadata.environment) {
+    // for emphemeral environments we need to create the IKEKs
+    case StackEnvironment.DevEphemeral:
+      // For encryption
+      const sealedEncIkek = new SealedIkek(
+        `enclave_master_root_key_sealed_ikek`,
+        { rootKeyId: rootKey.keyId },
+        { parent: rootKey },
+      );
+      sealedEncIkekHex = sealedEncIkek.hexValue;
+
+      // For HMAC signing
+      const sealedHmacIkek = new SealedIkek(
+        `enclave_master_root_key_sealed_ikek_hmac`,
+        { rootKeyId: rootKey.keyId },
+        { parent: rootKey },
+      );
+      sealedHmacIkekHex = sealedHmacIkek.hexValue;
+
+      break;
+    // for non-ephemeral, we want to ensure we use our fixed values
+    default:
+      sealedEncIkekHex = pulumi.output(config.enclave.encryptionSealedIkek);
+      sealedHmacIkekHex = pulumi.output(config.enclave.signingSealedIkek);
+  }
 
   const replicas = replicaRegions.map(region => {
     const provider = new aws.Provider(`kms-provider-${region}`, { region });
@@ -101,8 +118,8 @@ export async function Initialize(
   return {
     rootKeyId: rootKey.id,
     rootKeyArn: rootKey.arn,
-    sealedEncIkek,
-    sealedHmacIkek,
+    sealedEncIkek: sealedEncIkekHex,
+    sealedHmacIkek: sealedHmacIkekHex,
     enclaveKmsCredentials: {
       access_key_id: enclaveUserKey.id,
       access_secret_key: pulumi.secret(enclaveUserKey.secret),

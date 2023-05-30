@@ -15,7 +15,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ""
+      prefix: ''
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -24,7 +24,10 @@ config:
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
       heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
       id: omacKoQBB6pi8-b5UVPY
-    enclaveCertPCR8: e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96
+    enclave:
+      certPCR8: e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96
+      encryptionSealedIkek: 0102010078d60908a902e09468073c42ef11aec9d74032ecf5883ca24187d76552bdb7e5df01818033e8ec593ebe2c7db7fa15ebe0720000007e307c06092a864886f70d010706a06f306d020100306806092a864886f70d010701301e060960864801650304012e3011040cc7e25a39b26a33ccdecfc7bb020110803b380a6c909048507f2b0655d5ed175d679235f95b55aa3d0b6362c7896129e4efa7e7591a34d1277d2dc9a8c5a1e938273a0058222da35a4e271545
+      signingSealedIkek: 0102010078d60908a902e09468073c42ef11aec9d74032ecf5883ca24187d76552bdb7e5df0107a5f5e67bd7aec30e66842e4f85feb10000007e307c06092a864886f70d010706a06f306d020100306806092a864886f70d010701301e060960864801650304012e3011040c477422e72e1878522107e16f020110803be8ab2eee542229e0f8dd2f128dc7e1bf980f324041570168d1f2a545481f787be91f6542526a87e3005a65d3228ecfa9404ad09518b5bf93fa59cb
     experian:
       authClientId:
         secure: v1:nKH6gAZEyJmAV3v+:i53g5Yqq4/bwPZTY2l8bKnebzJjcK2P2reAbWD8ySBi2uqumN1+EksM7Ay9sCvqT
@@ -102,8 +105,8 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: "+13393311410"
-      phoneNumber: "+15105883668"
+      integrationTestPhoneNumber: '+13393311410'
+      phoneNumber: '+15105883668'
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

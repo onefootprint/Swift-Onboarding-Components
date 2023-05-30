@@ -13,6 +13,7 @@ jobs:
     outputs:
       stackName: ${{ steps.constants.outputs.branch }}
       hasInfraChanges: ${{ steps.detect.outputs.ephemeral }}
+      needsFullInfra: ${{ steps.detect.outputs.full_ephemeral}}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,10 +37,16 @@ jobs:
           git --version          
           code_hash="$(git log -n 1 --format="%h" ./)"
           infra_hash="$(git log -n 1 --format="%h" ./backend/infra)"
+          infra_db_hash="$(git log -n 1 --format="%h" ./backend/infra/src/db.ts)"
           echo "code=${code_hash} infra=${infra_hash}"
 
           if [ "$code_hash" == "$infra_hash" ]; then
             echo "ephemeral=true" >> $GITHUB_OUTPUT
+            if [ "$infra_db_hash" == "$infra_hash" ]; then
+              echo "full_ephemeral=true" >> $GITHUB_OUTPUT
+            else
+              echo "full_ephemeral=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "ephemeral=false" >> $GITHUB_OUTPUT
           fi
@@ -49,7 +56,7 @@ jobs:
     needs: [ephemeral_stack]
     uses: ./.github/workflows/backend_build_and_deploy.yml
     # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
-    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'ephemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
+    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
     permissions:
       contents: write
       pull-requests: write
@@ -59,6 +66,7 @@ jobs:
       createStack: true
       stackName: 'dev-${{ needs.ephemeral_stack.outputs.stackName }}'
       prefixDomain: 'api-${{ needs.ephemeral_stack.outputs.stackName }}.'
+      useNeonDB: ${{ !contains(github.event.pull_request.labels.*.name, 'FullEphemeral') && !(needs.ephemeral_stack.outputs.needsFullInfra == 'true') }}
 
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
