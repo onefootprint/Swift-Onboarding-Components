@@ -30,8 +30,8 @@ pub use fetch_ocr::*;
 mod complete;
 pub use complete::*;
 
-use super::incode_state_machine::IncodeContext;
 use super::state::{IncodeState, IncodeStateTransition};
+use super::IncodeContext;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;

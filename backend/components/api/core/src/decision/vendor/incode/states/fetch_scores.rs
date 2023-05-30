@@ -2,7 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, FetchOCR, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
+use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;

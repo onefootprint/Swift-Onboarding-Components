@@ -17,11 +17,11 @@ use newtypes::{
     IncodeVerificationSessionState, PiiString, SealedVaultDataKey, VendorAPI,
 };
 
-use super::incode_state_machine::IncodeContext;
+use super::IncodeContext;
 use crate::{
     decision::{
         tests::test_helpers::create_user_and_onboarding,
-        vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine},
+        vendor::incode::{images::*, IncodeStateMachine},
     },
     State,
 };

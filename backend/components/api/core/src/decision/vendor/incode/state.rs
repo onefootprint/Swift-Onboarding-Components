@@ -1,9 +1,9 @@
 use super::{
-    incode_state_machine::IncodeContext,
     states::{
         AddBack, AddConsent, AddFront, AddSelfie, Complete, FetchOCR, FetchScores, ProcessId,
         VerificationSession,
     },
+    IncodeContext,
 };
 use crate::errors::ApiResult;
 use async_trait::async_trait;

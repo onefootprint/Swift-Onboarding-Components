@@ -1,6 +1,8 @@
-pub mod incode_state_machine;
-pub mod state;
+mod state;
+mod state_machine;
 pub mod states;
+
+pub use state_machine::*;
 
 #[cfg(test)]
 mod images;

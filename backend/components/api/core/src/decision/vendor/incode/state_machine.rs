@@ -1,6 +1,6 @@
 use super::state::{IncodeState, IncodeStateTransition, RunTransition};
 use super::states::*;
-use crate::decision::vendor::state_machines::states::VerificationSession;
+use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::{ApiResult, AssertionError};
 use crate::{ApiError, State};

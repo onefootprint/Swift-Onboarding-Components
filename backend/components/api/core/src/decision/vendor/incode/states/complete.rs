@@ -1,7 +1,6 @@
-use super::IncodeStateTransition;
 use super::VerificationSession;
-use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
-use crate::decision::vendor::state_machines::state::IncodeState;
+use super::{IncodeState, IncodeStateTransition};
+use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
