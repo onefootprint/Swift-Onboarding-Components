@@ -6,6 +6,7 @@ import useTranslation from '@/hooks/use-translation';
 
 import useRegisterBiometric from '../../hooks/use-register-biometric';
 import Success from '../success';
+import About from './components/about';
 
 export type RegisterProps = {
   authToken: string;
@@ -24,19 +25,20 @@ const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
   return (
     <Container center>
       <IcoFaceid40 />
-      <Typography variant="heading-3" marginBottom={3} marginTop={4}>
+      <Typography variant="heading-3" marginBottom={3} marginTop={4} center>
         {t('title')}
       </Typography>
-      <Typography variant="body-3" marginBottom={9} center>
+      <Typography variant="body-3" marginBottom={9} center color="secondary">
         {t('subtitle')}
       </Typography>
       {registerBiometric.isSuccess ? (
         <Success />
       ) : (
-        <Box width="100%">
+        <Box width="100%" gap={4}>
           <Button onPress={handlePress} loading={registerBiometric.isLoading}>
             {t('cta')}
           </Button>
+          <About ctaDisabled={registerBiometric.isLoading} />
         </Box>
       )}
     </Container>

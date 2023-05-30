@@ -36,9 +36,14 @@
     },
     "liveness": {
       "register": {
-        "title": "Liveness check",
-        "subtitle": "We need to verify that you're a real person.",
-        "cta": "Launch Verification"
+        "title": "Confirm liveness using your passkey",
+        "subtitle": "We use this secure method for making sure your data is only accessed by you. ",
+        "cta": "Launch phone's passkeys",
+        "about": {
+          "cta": "More about passkeys",
+          "title": "About passkeys",
+          "content": "Aliqua cupidatat nostrud pariatur ad cillum in culpa est esse proident. Proident voluptate eu pariatur deserunt id sit esse. Cillum eu incididunt cillum ad sint sint est fugiat cillum Lorem sit Lorem eiusmod nulla. Esse aliquip aute culpa non consectetur eu do. Culpa minim sunt elit commodo ex tempor duis aliqua excepteur officia. Nisi adipisicing ea commodo aliqua aliquip nostrud mollit proident cillum esse nisi voluptate irure ullamco."
+        }
       },
       "retry": {
         "title": "Biometrics not recognized",

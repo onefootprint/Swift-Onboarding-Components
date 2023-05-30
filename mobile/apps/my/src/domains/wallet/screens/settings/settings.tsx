@@ -1,5 +1,4 @@
 import {
-  IcoBook24,
   IcoChevronRight24,
   IcoInfo24,
   IcoShare24,
@@ -51,7 +50,7 @@ const Settings = ({ navigation }) => {
             options: [
               {
                 'aria-label': 'Terms of service',
-                startIcon: IcoBook24,
+                startIcon: IcoSun24,
                 content: 'Terms of service',
                 endIcon: IcoShare24,
                 onPress: () => {
@@ -62,7 +61,7 @@ const Settings = ({ navigation }) => {
               },
               {
                 'aria-label': 'Privacy Policy',
-                startIcon: IcoBook24,
+                startIcon: IcoSun24,
                 content: 'Privacy Policy',
                 endIcon: IcoShare24,
                 onPress: () => {

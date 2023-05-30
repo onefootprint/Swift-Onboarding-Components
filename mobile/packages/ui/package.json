@@ -31,6 +31,7 @@
     "react-merge-refs": "^1.1.0",
     "react-native": "^0.71.6",
     "react-native-flash-message": "^0.4.1",
+    "react-native-modal": "^13.0.1",
     "react-native-portalize": "^1.0.7",
     "react-native-safe-area-context": "^4.5.1",
     "styled-components": "^5.3.8",

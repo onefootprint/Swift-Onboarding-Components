@@ -2,6 +2,7 @@ export * from './box';
 export * from './button';
 export * from './container';
 export * from './design-system-provider';
+export * from './dialog';
 export * from './dismiss-keyboard';
 export * from './hint';
 export * from './icon-button';
