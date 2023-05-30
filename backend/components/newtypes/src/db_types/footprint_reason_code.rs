@@ -122,6 +122,10 @@ footprint_reason_code_enum! {
  #[note = "PEP hit", severity = SignalSeverity::High,  description = "A strong potential match as a Politically Exposed Person"]
  WatchlistHitPep,
 
+ #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+ #[note = "Adverse media hit", severity = SignalSeverity::High,  description = "A strong potential match with adverse media found"]
+ AdverseMediaHit,
+
  #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = Some(MatchLevel::CouldNotMatch)]
  #[note = "Identity not located", severity = SignalSeverity::High,  description = "Identity could not be located with the information provided"]
  IdNotLocated,

@@ -17,6 +17,7 @@ pub use signal::*;
 pub use signal_attribute::*;
 pub use socure::*;
 
+#[macro_export]
 macro_rules! vendor_reason_code_enum {
     (
         $(#[$macros:meta])*
@@ -47,7 +48,7 @@ macro_rules! vendor_reason_code_enum {
 
     }
 }
-pub(crate) use vendor_reason_code_enum;
+pub use vendor_reason_code_enum;
 
 macro_rules! experian_reason_code_enum {
     (
