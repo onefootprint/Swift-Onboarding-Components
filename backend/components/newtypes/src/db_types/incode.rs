@@ -28,9 +28,9 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
 pub enum IncodeVerificationSessionState {
     /// This state is orchestrated manually
     StartOnboarding,
-    AddConsent,
     AddFront,
     AddBack,
+    AddConsent,
     ProcessId,
     FetchScores,
     FetchOCR,
@@ -71,6 +71,16 @@ pub enum IncodeFailureReason {
     IdTypeNotAcceptable,
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
     UnexpectedErrorOccurred,
+    #[strum(serialize = "SELFIE_LOW_CONFIDENCE")]
+    SelfieLowConfidence,
+    #[strum(serialize = "SELFIE_TOO_DARK")]
+    SelfieTooDark,
+    #[strum(serialize = "SELFIE_GLARE")]
+    SelfieGlare,
+    #[strum(serialize = "SELFIE_HAS_LENSES")]
+    SelfieHasLenses,
+    #[strum(serialize = "SELFIE_HAS_FACE_MASK")]
+    SelfieHasFaceMask,
     Other(String),
 }
 

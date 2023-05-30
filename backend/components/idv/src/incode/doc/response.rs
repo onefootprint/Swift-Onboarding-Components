@@ -32,7 +32,8 @@ impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
     pub fn add_side_failure_reason(&self) -> Option<IncodeFailureReason> {
         self.fail_reason.as_ref().map(|e| {
-            IncodeFailureReason::try_from(e.as_str()).unwrap_or(IncodeFailureReason::Other(e.clone()))
+            IncodeFailureReason::try_from(e.as_str())
+                .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
         })
     }
 }
@@ -185,6 +186,20 @@ pub struct AddSelfieResponse {
     pub error: Option<Error>,
 }
 
+impl AddSelfieResponse {
+    pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
+        [
+            (self.confidence == Some(1.0)).then_some(IncodeFailureReason::SelfieLowConfidence),
+            (self.is_bright == Some(false)).then_some(IncodeFailureReason::SelfieTooDark),
+            (self.has_lenses == Some(true)).then_some(IncodeFailureReason::SelfieHasLenses),
+            (self.has_face_mask == Some(true)).then_some(IncodeFailureReason::SelfieHasFaceMask),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
+    }
+}
+
 impl APIResponseToIncodeError for AddSelfieResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
@@ -329,6 +344,8 @@ mod tests {
         IncodeFailureReason,
     };
 
+    use crate::incode::doc::response::AddSelfieResponse;
+
     use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse};
 
     #[test]
@@ -415,6 +432,47 @@ mod tests {
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
         let failure = parsed.add_side_failure_reason();
         assert!(failure.is_none())
+    }
+
+    #[test]
+    fn test_parse_add_selfie_failure() {
+        use IncodeFailureReason::*;
+
+        // One set of errors
+        let raw_response_with_failure = serde_json::json!({
+            "confidence": 1,
+            "isBright": true,
+            "hasLenses": true,
+            "hasFaceMask": null,
+        });
+
+        let parsed: AddSelfieResponse = serde_json::from_value(raw_response_with_failure).unwrap();
+        assert_eq!(
+            parsed.failure_reasons(),
+            vec![SelfieLowConfidence, SelfieHasLenses]
+        );
+
+        // And another
+        let raw_response_with_failure = serde_json::json!({
+            "confidence": 0,
+            "isBright": false,
+            "hasLenses": null,
+            "hasFaceMask": true,
+        });
+
+        let parsed: AddSelfieResponse = serde_json::from_value(raw_response_with_failure).unwrap();
+        assert_eq!(parsed.failure_reasons(), vec![SelfieTooDark, SelfieHasFaceMask]);
+
+        // No failure
+        let raw_response = serde_json::json!({
+            "confidence": 0,
+            "isBright": true,
+            "hasLenses": false,
+            "hasFaceMask": null,
+        });
+
+        let parsed: AddSelfieResponse = serde_json::from_value(raw_response).unwrap();
+        assert!(parsed.failure_reasons().is_empty());
     }
 
     #[test]
