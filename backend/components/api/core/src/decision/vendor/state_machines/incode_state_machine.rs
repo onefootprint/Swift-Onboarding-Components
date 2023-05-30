@@ -32,8 +32,9 @@ impl IncodeState {
     pub fn name(&self) -> IncodeVerificationSessionState {
         match self {
             Self::AddFront(_) => IncodeVerificationSessionState::AddFront,
-            Self::AddConsent(_) => IncodeVerificationSessionState::AddConsent,
             Self::AddBack(_) => IncodeVerificationSessionState::AddBack,
+            Self::AddConsent(_) => IncodeVerificationSessionState::AddConsent,
+            Self::AddSelfie(_) => IncodeVerificationSessionState::AddSelfie,
             Self::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
             Self::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
             Self::FetchOCR(_) => IncodeVerificationSessionState::FetchOCR,
@@ -130,9 +131,10 @@ impl IncodeStateMachine {
 
         // Recover the session session and pick up where we left off
         let initial_state = match session.state {
-            IncodeVerificationSessionState::AddConsent => AddConsent::new(),
             IncodeVerificationSessionState::AddFront => AddFront::new(),
             IncodeVerificationSessionState::AddBack => AddBack::new(),
+            IncodeVerificationSessionState::AddConsent => AddConsent::new(),
+            IncodeVerificationSessionState::AddSelfie => AddSelfie::new(),
             IncodeVerificationSessionState::ProcessId => ProcessId::new(),
             IncodeVerificationSessionState::FetchScores => FetchScores::new(),
             IncodeVerificationSessionState::FetchOCR => FetchOCR::new(),

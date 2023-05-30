@@ -31,6 +31,7 @@ pub enum IncodeVerificationSessionState {
     AddFront,
     AddBack,
     AddConsent,
+    AddSelfie,
     ProcessId,
     FetchScores,
     FetchOCR,

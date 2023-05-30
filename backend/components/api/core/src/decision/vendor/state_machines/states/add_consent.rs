@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, AddSelfie, IncodeState, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::state_machines::incode_state_machine::IncodeContext;
@@ -10,7 +10,7 @@ use db::models::user_consent::UserConsent;
 use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::{DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{IncodeFailureReason, VendorAPI};
 
 /// Add Consent
 pub struct AddConsent {}
@@ -69,11 +69,10 @@ impl IncodeStateTransition for AddConsent {
     fn transition(
         self,
         _: &mut TxnPgConn,
-        ctx: &IncodeContext,
-        session: &VerificationSession,
+        _: &IncodeContext,
+        _: &VerificationSession,
     ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
-        // TODO move to AddSelfie when it exists
-        let next = super::next_side_to_collect(DocumentSide::Selfie, &ctx.docv_data, session)?;
+        let next = AddSelfie::new();
         Ok((next, None))
     }
 }

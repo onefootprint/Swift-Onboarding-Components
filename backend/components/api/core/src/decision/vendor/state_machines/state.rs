@@ -1,7 +1,8 @@
 use super::{
     incode_state_machine::IncodeContext,
     states::{
-        AddBack, AddConsent, AddFront, Complete, FetchOCR, FetchScores, ProcessId, VerificationSession,
+        AddBack, AddConsent, AddFront, AddSelfie, Complete, FetchOCR, FetchScores, ProcessId,
+        VerificationSession,
     },
 };
 use crate::errors::ApiResult;
@@ -115,9 +116,10 @@ where
 /// until they are run.
 #[enum_dispatch(RunTransition)]
 pub enum IncodeState {
-    AddConsent(Uninitialized<AddConsent>),
     AddFront(Uninitialized<AddFront>),
     AddBack(Uninitialized<AddBack>),
+    AddConsent(Uninitialized<AddConsent>),
+    AddSelfie(Uninitialized<AddSelfie>),
     ProcessId(Uninitialized<ProcessId>),
     FetchScores(Uninitialized<FetchScores>),
     FetchOCR(Uninitialized<FetchOCR>),

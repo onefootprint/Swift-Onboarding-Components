@@ -21,7 +21,7 @@ use super::incode_state_machine::IncodeContext;
 use crate::{
     decision::{
         tests::test_helpers::create_user_and_onboarding,
-        vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine, state::IncodeState},
+        vendor::state_machines::{images::*, incode_state_machine::IncodeStateMachine},
     },
     State,
 };
@@ -30,7 +30,7 @@ use crate::{
 #[test_state_case(true)]
 #[test_state_case(false)]
 #[tokio::test]
-async fn test_run_machine(state: &State, is_selfie: bool) {
+async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     //
     // Set up
     //
@@ -67,6 +67,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let docv_data = DocVData {
         front_image: Some(PiiString::from(small_front_image())),
         back_image: None, // only upload one document at a time
+        selfie_image: None,
         document_type: Some(IdDocKind::DriverLicense),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
@@ -87,7 +88,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
 
     // Assert machine stops at AddBack until we add the back
-    assert!(matches!(machine.state, IncodeState::AddBack(_)));
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
 
     let su_id = su.id.clone();
     state
@@ -108,13 +109,26 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     //
     let mut ctx = machine.ctx;
     ctx.docv_data.back_image = Some(PiiString::from(small_back_image()));
-    let machine = IncodeStateMachine::init(&state, tenant.id, config_id, ctx)
+    let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    assert!(matches!(machine.state, IncodeState::AddBack(_)));
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
 
-    let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
-    assert!(matches!(machine.state, IncodeState::Complete(_)));
+    let mut machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+
+    // If we are uploading a selfie, the machine will have stopped to wait for an upload
+    if is_selfie {
+        assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddSelfie);
+        let mut ctx = machine.ctx;
+        ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
+        machine = IncodeStateMachine::init(&state, tenant.id, config_id, ctx)
+            .await
+            .unwrap();
+        assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddSelfie);
+        machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+    }
+
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::Complete);
 
     state
         .db_pool
@@ -127,7 +141,11 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 .filter_map(|(req, res)| res.as_ref().map(|_| req.vendor_api))
                 .collect();
 
-            let consent_apis = vec![VendorAPI::IncodeAddMLConsent, VendorAPI::IncodeAddPrivacyConsent];
+            let selfie_aps = vec![
+                VendorAPI::IncodeAddMLConsent,
+                VendorAPI::IncodeAddPrivacyConsent,
+                VendorAPI::IncodeAddSelfie,
+            ];
             let expected_apis = vec![
                 VendorAPI::IncodeStartOnboarding,
                 VendorAPI::IncodeAddFront,
@@ -137,7 +155,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 VendorAPI::IncodeFetchOCR,
             ]
             .into_iter()
-            .chain(if is_selfie { consent_apis } else { vec![] })
+            .chain(if is_selfie { selfie_aps } else { vec![] })
             .collect();
             assert_have_same_elements(vendor_apis, expected_apis);
 
@@ -157,6 +175,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 Some(IncodeVerificationSessionState::AddFront),
                 Some(IncodeVerificationSessionState::AddBack),
                 is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
+                is_selfie.then_some(IncodeVerificationSessionState::AddSelfie),
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::FetchScores),
                 Some(IncodeVerificationSessionState::FetchOCR),
@@ -200,7 +219,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
 #[test_state_case(true)]
 #[test_state_case(false)]
 #[tokio::test]
-async fn test_fail(state: &State, is_selfie: bool) {
+async fn test_fail_passport(state: &State, is_selfie: bool) {
     //
     // Set up
     //
@@ -236,6 +255,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     let docv_data = DocVData {
         front_image: Some(PiiString::from(small_blurry_image())),
         back_image: None,
+        selfie_image: None,
         document_type: Some(IdDocKind::Passport),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
@@ -256,7 +276,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
 
     // Assert machine is in the correct state
-    assert!(matches!(machine.state, IncodeState::AddFront(_)));
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
 
     let s_id = machine.session.id;
     let s_id2 = s_id.clone();
@@ -287,13 +307,14 @@ async fn test_fail(state: &State, is_selfie: bool) {
     //
     let mut ctx = machine.ctx;
     ctx.docv_data.front_image = Some(PiiString::from(small_front_image()));
+    ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
     let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    assert!(matches!(machine.state, IncodeState::AddFront(_)));
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
 
     let machine = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
-    assert!(matches!(machine.state, IncodeState::Complete(_)));
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::Complete);
 
     // Check we have the right things in the db
     state
@@ -315,6 +336,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 Some(IncodeVerificationSessionState::AddFront), // Repeated since we failed the first time
                 // Passport has no back
                 is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
+                is_selfie.then_some(IncodeVerificationSessionState::AddSelfie),
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::FetchScores),
                 Some(IncodeVerificationSessionState::FetchOCR),

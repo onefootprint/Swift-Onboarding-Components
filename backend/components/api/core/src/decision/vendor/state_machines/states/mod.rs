@@ -6,14 +6,17 @@ use db::models::verification_request::VerificationRequest;
 use itertools::Itertools;
 pub use start_onboarding::*;
 
-mod add_consent;
-pub use add_consent::*;
-
 mod add_front;
 pub use add_front::*;
 
 mod add_back;
 pub use add_back::*;
+
+mod add_consent;
+pub use add_consent::*;
+
+mod add_selfie;
+pub use add_selfie::*;
 
 mod process_id;
 pub use process_id::*;
@@ -61,6 +64,7 @@ struct SaveVerificationResultArgs<'a> {
 impl<'a> SaveVerificationResultArgs<'a> {
     fn from<T: APIResponseToIncodeError + serde::Serialize>(
         request_result: &'a Result<IncodeResponse<T>, idv::incode::error::Error>,
+        // TODO make VendorAPI a function of T
         vendor_api: VendorAPI,
         ctx: &'a IncodeContext,
     ) -> Self {
