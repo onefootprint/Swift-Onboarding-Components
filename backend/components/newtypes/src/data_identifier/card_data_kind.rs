@@ -13,14 +13,11 @@ pub enum CardDataKind {
     Expiration,
     Cvc,
 
-    // TODO: remove serialize after migrate DB
-    #[strum(to_string = "expiration.month", serialize = "exp_month")]
+    #[strum(to_string = "expiration.month")]
     ExpMonth,
-    // TODO: remove serialize after migrate DB
-    #[strum(to_string = "expiration.year", serialize = "exp_year")]
+    #[strum(to_string = "expiration.year")]
     ExpYear,
-    // TODO: remove serialize after migrate DB
-    #[strum(to_string = "number.last4", serialize = "last4")]
+    #[strum(to_string = "number.last4")]
     Last4,
 
     Name,
