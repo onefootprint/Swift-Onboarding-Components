@@ -130,8 +130,8 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
         (machine, failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
     }
 
-    assert_eq!(machine.state.name(), IncodeVerificationSessionState::Complete);
     assert!(failure_reasons.is_empty());
+    assert_eq!(machine.state.name(), IncodeVerificationSessionState::Complete);
 
     state
         .db_pool

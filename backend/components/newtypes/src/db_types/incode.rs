@@ -57,6 +57,10 @@ pub enum IncodeVerificationSessionState {
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// The list of strongly-typed errors we can extract from incode responses that are specifcially
+/// retryable.
+/// Each of these corresponds to an error message we'll display on the client prompting them to
+/// re-upload an image.
 pub enum IncodeFailureReason {
     #[strum(serialize = "UNKNOWN_DOCUMENT_TYPE")]
     UnknownDocumentType,
@@ -73,6 +77,7 @@ pub enum IncodeFailureReason {
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
     UnexpectedErrorOccurred,
     // These aren't deserialized with strum
+    SelfieFaceNotFound,
     SelfieLowConfidence,
     SelfieTooDark,
     SelfieGlare,

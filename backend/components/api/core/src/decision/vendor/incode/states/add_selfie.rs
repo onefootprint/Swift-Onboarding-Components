@@ -47,20 +47,18 @@ impl IncodeStateTransition for AddSelfie {
         save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        // TODO Some of these errors are real failure reasons, like no faces found
-        let response = request_result
-            .map_err(map_to_api_err)?
-            .result
-            .into_success()
-            .map_err(map_to_api_err)?;
-
-        // Incode returns 200 for upload failures, so catch these here
-        // TODO there could technically be multiple failure reasons but we only surface one at
-        // a time.
-        // Maybe if we start returning failure reasons as a result we could add more metadata.
-        // I don't think we need to store the latest failure reason on the session table since
-        // we return info in the POST endpoint now
-        let failure_reasons = response.failure_reasons();
+        let response = request_result.map_err(map_to_api_err)?.result;
+        let failure_reasons = match response.into_success() {
+            // Incode returns 200 for upload failures, so catch these here
+            Ok(response) => Ok(response.failure_reasons()),
+            Err(idv::incode::error::Error::APIResponseError(e)) => match e.error.as_str() {
+                "Face not found." => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+                // TODO there are probably more retryable errors in here
+                _ => Err(idv::incode::error::Error::APIResponseError(e)),
+            },
+            Err(e) => Err(e),
+        }
+        .map_err(map_to_api_err)?;
 
         Ok(Some(Self { failure_reasons }))
     }
