@@ -219,7 +219,8 @@ pub async fn get(
 
     let status = doc_request.status.into();
     let errors = session
-        .and_then(|s| s.latest_failure_reason)
+        .map(|s| s.latest_failure_reasons)
+        .unwrap_or_default()
         .into_iter()
         .map(DocumentImageError::from)
         .collect();
@@ -256,7 +257,7 @@ async fn handle_incode_request(
     )
     .await?; // TODO: handle this with better requirement checking
 
-    let (machine, retry_reason) = machine
+    let (machine, retry_reasons) = machine
         .run(&state.db_pool, &state.fp_client)
         .await
         .map_err(|e| e.error)?;
@@ -269,7 +270,7 @@ async fn handle_incode_request(
         // We shouldn't cleanly break from the machine in any other state
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
-    let errors = retry_reason.into_iter().map(DocumentImageError::from).collect();
+    let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
     let result = DocumentResponse {
         next_side_to_collect,
         errors,

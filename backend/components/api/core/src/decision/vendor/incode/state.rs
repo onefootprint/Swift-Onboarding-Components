@@ -38,7 +38,7 @@ pub enum StateResult {
     /// retried
     Retry {
         next_state: IncodeState,
-        reason: IncodeFailureReason,
+        reasons: Vec<IncodeFailureReason>,
         clear_sides: Vec<DocumentSide>,
     },
 }
@@ -100,7 +100,7 @@ pub enum StepResult {
     /// Break out of running the machine - we aren't ready for the next state
     Break,
     /// Break out of running the machine and prompt the user to retry
-    Retry(IncodeFailureReason),
+    Retry(Vec<IncodeFailureReason>),
 }
 
 /// Convenience trait to make enum_dispatch easier - wraps the pretty `IncodeState` trait to
@@ -129,14 +129,14 @@ where
 
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (next_state, retry_reason) = match init_state.transition(conn, &ctx, &session)? {
+                let (next_state, retry_reasons) = match init_state.transition(conn, &ctx, &session)? {
                     StateResult::Ok(next_state) => {
                         // Atomically update the state of the session in the DB
-                        (next_state, None)
+                        (next_state, vec![])
                     }
                     StateResult::Retry {
                         next_state,
-                        reason,
+                        reasons,
                         clear_sides,
                     } => {
                         // TODO implement retry limit
@@ -149,15 +149,16 @@ where
                         // Deactivate the failed sides to require re-uploading. Otherwise, the user
                         // could re-initiate the incode machine without uploading a new doc
                         DocumentUpload::deactivate(conn, &ctx.id_doc_id, clear_sides)?;
-                        (next_state, Some(reason))
+                        (next_state, reasons)
                     }
                 };
                 let update =
-                    UpdateIncodeVerificationSession::set_state(next_state.name(), retry_reason.clone());
+                    UpdateIncodeVerificationSession::set_state(next_state.name(), retry_reasons.clone());
                 IncodeVerificationSession::update(conn, &session.id, update)?;
-                let result = match retry_reason {
-                    None => StepResult::Ready,
-                    Some(reason) => StepResult::Retry(reason),
+                let result = if retry_reasons.is_empty() {
+                    StepResult::Ready
+                } else {
+                    StepResult::Retry(retry_reasons)
                 };
                 Ok((next_state, result, ctx, session))
             })

@@ -62,7 +62,7 @@ impl IncodeStateTransition for FetchOCR {
                 // to the AddFront state
                 return Ok(StateResult::Retry {
                     next_state: AddFront::new(),
-                    reason: IncodeFailureReason::UnknownDocumentType,
+                    reasons: vec![IncodeFailureReason::UnknownDocumentType],
                     clear_sides: DocumentSide::iter().collect(),
                 });
             }

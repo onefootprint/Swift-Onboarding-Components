@@ -31,8 +31,9 @@ pub struct IncodeVerificationSession {
     pub identity_document_id: IdentityDocumentId,
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
-    pub latest_failure_reason: Option<IncodeFailureReason>,
     pub kind: IncodeVerificationSessionKind,
+    /// Not used by application code anywhere, just used for debugging
+    pub latest_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -44,6 +45,7 @@ pub struct NewIncodeVerificationSession {
     pub incode_configuration_id: IncodeConfigurationId,
     pub identity_document_id: IdentityDocumentId,
     pub kind: IncodeVerificationSessionKind,
+    pub latest_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -55,13 +57,13 @@ pub struct UpdateIncodeVerificationSession {
     pub identity_document_id: Option<IdentityDocumentId>,
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
-    pub latest_failure_reason: Option<Option<IncodeFailureReason>>,
+    pub latest_failure_reasons: Option<Vec<IncodeFailureReason>>,
 }
 
 impl UpdateIncodeVerificationSession {
     pub fn set_state(
         state: IncodeVerificationSessionState,
-        failure_reason: Option<IncodeFailureReason>,
+        failure_reasons: Vec<IncodeFailureReason>,
     ) -> Self {
         Self {
             state: Some(state),
@@ -69,7 +71,7 @@ impl UpdateIncodeVerificationSession {
             // NOTE: this is tricky to read - this could be `Some(None)`, which would wipe the
             // failure reason. Need to wrap in outer option since by default, a diesel changeset
             // ignores any updates with value None
-            latest_failure_reason: Some(failure_reason),
+            latest_failure_reasons: Some(failure_reasons),
             ..Self::default()
         }
     }
@@ -107,6 +109,7 @@ impl IncodeVerificationSession {
             incode_configuration_id: configuration_id,
             identity_document_id,
             kind: kind.clone(),
+            latest_failure_reasons: vec![],
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)
@@ -118,45 +121,11 @@ impl IncodeVerificationSession {
             res.id.clone(),
             res.state,
             res.identity_document_id.clone(),
-            None,
+            vec![],
             kind,
         )?;
 
         Ok(res)
-    }
-
-    #[tracing::instrument(skip(conn))]
-    pub fn get_or_create(
-        conn: &mut TxnPgConn,
-        scoped_vault_id: ScopedVaultId,
-        configuration_id: IncodeConfigurationId,
-        identity_document_id: IdentityDocumentId,
-        kind: IncodeVerificationSessionKind,
-    ) -> DbResult<Self> {
-        let existing_session = Self::get(conn, &scoped_vault_id)?;
-
-        if let Some(existing) = existing_session {
-            Ok(existing)
-        } else {
-            let new = Self::create(
-                conn,
-                scoped_vault_id,
-                configuration_id,
-                identity_document_id,
-                kind.clone(),
-            )?;
-
-            IncodeVerificationSessionEvent::create(
-                conn,
-                new.id.clone(),
-                new.state,
-                new.identity_document_id.clone(),
-                None,
-                kind,
-            )?;
-
-            Ok(new)
-        }
     }
 
     #[tracing::instrument(skip_all)]
@@ -175,9 +144,7 @@ impl IncodeVerificationSession {
             res.id.clone(),
             res.state,
             res.identity_document_id.clone(),
-            // This is the only useful place to keep the failure reason. Maybe we keep a special
-            // error handler to do this
-            res.latest_failure_reason.clone(),
+            res.latest_failure_reasons.clone(),
             res.kind.clone(),
         )?;
 

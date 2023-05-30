@@ -158,9 +158,9 @@ impl IncodeStateMachine {
         self,
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
-    ) -> Result<(Self, Option<IncodeFailureReason>), IncodeMachineError> {
+    ) -> Result<(Self, Vec<IncodeFailureReason>), IncodeMachineError> {
         let mut machine = self;
-        let failure_reason = loop {
+        let failure_reasons = loop {
             let Self { state, ctx, session } = machine;
             let state_name = state.name();
             let (state, result, ctx, session) = state
@@ -170,11 +170,11 @@ impl IncodeStateMachine {
             machine = Self { state, ctx, session };
             match result {
                 StepResult::Ready => {}
-                StepResult::Break => break None,
-                StepResult::Retry(reason) => break Some(reason),
+                StepResult::Break => break vec![],
+                StepResult::Retry(reasons) => break reasons,
             }
         };
 
-        Ok((machine, failure_reason))
+        Ok((machine, failure_reasons))
     }
 }

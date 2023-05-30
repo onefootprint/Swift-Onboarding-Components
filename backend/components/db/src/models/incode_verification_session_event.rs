@@ -18,8 +18,9 @@ pub struct IncodeVerificationSessionEvent {
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
     pub identity_document_id: IdentityDocumentId,
-    pub latest_failure_reason: Option<IncodeFailureReason>,
     pub kind: IncodeVerificationSessionKind,
+    /// Not used by application code anywhere, just used for debugging
+    pub latest_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -29,8 +30,8 @@ pub struct NewIncodeVerificationSessionEvent {
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
     pub identity_document_id: IdentityDocumentId,
-    pub latest_failure_reason: Option<IncodeFailureReason>,
     pub kind: IncodeVerificationSessionKind,
+    pub latest_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 impl IncodeVerificationSessionEvent {
@@ -40,7 +41,7 @@ impl IncodeVerificationSessionEvent {
         incode_verification_session_id: IncodeVerificationSessionId,
         incode_verification_session_state: IncodeVerificationSessionState,
         identity_document_id: IdentityDocumentId,
-        latest_failure_reason: Option<IncodeFailureReason>,
+        latest_failure_reasons: Vec<IncodeFailureReason>,
         kind: IncodeVerificationSessionKind,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSessionEvent {
@@ -48,7 +49,7 @@ impl IncodeVerificationSessionEvent {
             incode_verification_session_id,
             incode_verification_session_state,
             identity_document_id,
-            latest_failure_reason,
+            latest_failure_reasons,
             kind,
         };
 

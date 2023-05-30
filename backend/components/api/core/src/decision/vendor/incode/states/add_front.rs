@@ -74,7 +74,7 @@ impl IncodeStateTransition for AddFront {
         if let Some(reason) = self.failure_reason {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
-                reason,
+                reasons: vec![reason],
                 clear_sides: vec![DocumentSide::Front],
             });
         }
