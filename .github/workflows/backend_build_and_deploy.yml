@@ -39,6 +39,12 @@ on:
         type: string
         required: false
 
+      useNeonDB:
+        description: 'uses NeonDB for faster ephemeral env'
+        type: boolean
+        required: false
+        default: false
+
     outputs:
       url:
         description: 'stack url'
@@ -229,7 +235,7 @@ jobs:
 
   deploy_stack:
     name: deploy stack
-    runs-on: ubuntu-latest
+    runs-on: beast
     outputs:
       url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
     environment:
@@ -245,7 +251,7 @@ jobs:
       # pulumi setup
       - uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 18.x
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -276,6 +282,12 @@ jobs:
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: 'use fast ephemeral db'
+        if: ${{ inputs.createStack && inputs.useNeonDB }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set useNeonEphemeralDbProjectId bitter-shape-200807
 
       - name: 'override base domain'
         if: ${{ inputs.baseDomain || false }}

@@ -359,7 +359,7 @@ async function userData(
   const enclaveProxyImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${constants.containers.enclaveVersion}`;
 
   const pulumiConfig = new pulumi.Config();
-  const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
+  const tailscaleAuthKey = pulumiConfig.getSecret('serverTailscaleKey');
   const hostName = `nitro-server-${pulumi.getStack()}`;
 
   // TODO: if enclave unhealthy after restart fail health check on ASG.
