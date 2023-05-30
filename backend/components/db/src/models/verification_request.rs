@@ -192,17 +192,14 @@ impl VerificationRequest {
         Ok(res)
     }
 
+    /// Get the list of VReqs for a given DI, including the VRes for each VReq if it exists
     #[tracing::instrument(skip_all)]
-    pub fn list_by_decision_intent(
+    pub fn list(
         conn: &mut PgConn,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
         let res = verification_request::table
-            .left_join(
-                verification_result::table.on(verification_result::request_id
-                    .eq(verification_request::id)
-                    .and(verification_result::is_error.eq(false))),
-            )
+            .left_join(verification_result::table)
             .filter(verification_request::decision_intent_id.eq(decision_intent_id))
             .get_results(conn)?;
 

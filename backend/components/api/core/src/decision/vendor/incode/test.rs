@@ -136,12 +136,13 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let db_verifications = VerificationRequest::list_by_decision_intent(conn, &di.id)?;
+            let db_verifications = VerificationRequest::list(conn, &di.id)?;
 
             // Assert we've made all the requests we expect
-            let vendor_apis = db_verifications
+            let successful_vendor_apis = db_verifications
                 .iter()
-                .filter_map(|(req, res)| res.as_ref().map(|_| req.vendor_api))
+                .filter_map(|(req, res)| res.as_ref().map(|res| (req.vendor_api, res)))
+                .filter_map(|(api, res)| (!res.is_error).then_some(api))
                 .collect();
 
             let selfie_aps = vec![
@@ -160,7 +161,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
             .into_iter()
             .chain(if is_selfie { selfie_aps } else { vec![] })
             .collect();
-            assert_have_same_elements(vendor_apis, expected_apis);
+            assert_have_same_elements(successful_vendor_apis, expected_apis);
 
             // Make sure we're in the right state
             let session = IncodeVerificationSession::get(conn, &su.id)?.unwrap();
@@ -353,7 +354,7 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
             assert_have_same_elements(states, expected_states);
 
             // Check score res
-            let (_, score_vres) = VerificationRequest::list_by_decision_intent(conn, &di.id)?
+            let (_, score_vres) = VerificationRequest::list(conn, &di.id)?
                 .into_iter()
                 .find(|(req, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
                 .unwrap();

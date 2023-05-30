@@ -111,7 +111,7 @@ impl MiddeskStates {
     async fn init(db_pool: &DbPool, middesk_request: MiddeskRequest) -> ApiResult<MiddeskStates> {
         let di_id = middesk_request.decision_intent_id.clone();
         let all_vreq_vres = db_pool
-            .db_query(move |conn| VerificationRequest::list_by_decision_intent(conn, &di_id))
+            .db_query(move |conn| VerificationRequest::list(conn, &di_id))
             .await??;
 
         let mut middesk_vreq_vres: Vec<_> = all_vreq_vres
