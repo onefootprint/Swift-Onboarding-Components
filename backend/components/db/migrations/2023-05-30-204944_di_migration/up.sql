@@ -35,7 +35,7 @@ WHERE kind like 'card.%.exp_year';
 
 UPDATE data_lifetime
 SET kind = REPLACE(kind, '.last4', '.number.last4')
-WHERE kind like 'card.%.last4';
+WHERE kind like 'card.%.last4' and kind not ilike 'card.%.number.last4'; -- since the legacy suffix is the suffix of the new suffix :')
 
 
 UPDATE vault_data
@@ -48,4 +48,4 @@ WHERE kind like 'card.%.exp_year';
 
 UPDATE vault_data
 SET kind = REPLACE(kind, '.last4', '.number.last4')
-WHERE kind like 'card.%.last4';
+WHERE kind like 'card.%.last4' and kind not ilike 'card.%.number.last4';
