@@ -82,8 +82,6 @@ pub trait IncodeStateTransition: Sized {
     }
 }
 
-pub type IsReady = bool;
-
 #[async_trait]
 #[enum_dispatch]
 pub trait RunTransition {
@@ -93,7 +91,16 @@ pub trait RunTransition {
         http_client: &FootprintVendorHttpClient,
         ctx: IncodeContext,
         session: VerificationSession,
-    ) -> ApiResult<(IncodeState, IncodeContext, VerificationSession, IsReady)>;
+    ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)>;
+}
+
+pub enum StepResult {
+    /// Proceed to run the next IncodeState
+    Ready,
+    /// Break out of running the machine - we aren't ready for the next state
+    Break,
+    /// Break out of running the machine and prompt the user to retry
+    Retry(IncodeFailureReason),
 }
 
 /// Convenience trait to make enum_dispatch easier - wraps the pretty `IncodeState` trait to
@@ -111,18 +118,18 @@ where
         http_client: &FootprintVendorHttpClient,
         ctx: IncodeContext,
         session: VerificationSession,
-    ) -> ApiResult<(IncodeState, IncodeContext, VerificationSession, IsReady)> {
-        let starting_state: IncodeState = self.into();
+    ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
+        let starting_state = self.into();
         let init_state = T::run(db_pool, http_client, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
             // AddBack but haven't yet collected the back image
-            return Ok((starting_state, ctx, session, false));
+            return Ok((starting_state, StepResult::Break, ctx, session));
         };
 
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (next_state, failure_reason) = match init_state.transition(conn, &ctx, &session)? {
+                let (next_state, retry_reason) = match init_state.transition(conn, &ctx, &session)? {
                     StateResult::Ok(next_state) => {
                         // Atomically update the state of the session in the DB
                         (next_state, None)
@@ -145,11 +152,14 @@ where
                         (next_state, Some(reason))
                     }
                 };
-                let is_ready = failure_reason.is_none();
-                let update = UpdateIncodeVerificationSession::set_state(next_state.name(), failure_reason);
+                let update =
+                    UpdateIncodeVerificationSession::set_state(next_state.name(), retry_reason.clone());
                 IncodeVerificationSession::update(conn, &session.id, update)?;
-                // TODO return an Err here with the reason
-                Ok((next_state, ctx, session, is_ready))
+                let result = match retry_reason {
+                    None => StepResult::Ready,
+                    Some(reason) => StepResult::Retry(reason),
+                };
+                Ok((next_state, result, ctx, session))
             })
             .await?;
         Ok(result)

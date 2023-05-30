@@ -12,7 +12,7 @@ use api_core::decision::vendor::incode::{IncodeContext, IncodeStateMachine};
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{DocumentImageError, DocumentResponse};
+use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
 use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
@@ -26,7 +26,7 @@ use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DocumentRequestId, DocumentSide, IdentityDocumentId, IncodeConfigurationId,
-    SealedVaultDataKey, TenantId, VaultId,
+    IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -168,30 +168,18 @@ pub async fn post(
         })
         .await?;
 
-    if let Some((di, doc_request, id_doc_id)) = created_reqs {
-        // Make our request!
+    let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
+        // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, uvw.vault, doc_request).await?;
-    }
-
-    let (doc_request, session) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let su_id = &user_auth.scoped_user.id;
-            let doc_request = DbDocumentRequest::get(conn, su_id)?;
-            let session = IncodeVerificationSession::get(conn, su_id)?;
-            Ok((doc_request, session))
-        })
-        .await??;
-
-    let status = doc_request.status.into();
-    let errors = session
-        .and_then(|s| s.latest_failure_reason)
-        .into_iter()
-        .map(DocumentImageError::from)
-        .collect();
-
-    ResponseData::ok(DocumentResponse { status, errors }).json()
+        handle_incode_request(&state, id_doc_id, t_id, di.id, uvw.vault, doc_request).await?
+    } else {
+        // Fixture response - we always complete successfully!
+        DocumentResponse {
+            status: DocumentResponseStatus::Complete,
+            errors: vec![],
+        }
+    };
+    ResponseData::ok(response).json()
 }
 
 /// Uploads the provided image to s3.
@@ -243,7 +231,7 @@ async fn handle_incode_request(
     decision_intent_id: DecisionIntentId,
     vault: Vault,
     doc_request: DbDocumentRequest,
-) -> Result<(), ApiError> {
+) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
     // Initialize our state machine
@@ -264,10 +252,20 @@ async fn handle_incode_request(
     )
     .await?; // TODO: handle this with better requirement checking
 
-    machine
+    let (machine, retry_reason) = machine
         .run(&state.db_pool, &state.fp_client)
         .await
         .map_err(|e| e.error)?;
 
-    Ok(())
+    let status = match (&retry_reason, machine.state.name()) {
+        // TODO is this how the client uses Error?
+        (Some(_), _) => DocumentResponseStatus::Error,
+        (None, IncodeVerificationSessionState::Complete) => DocumentResponseStatus::Complete,
+        (None, _) => DocumentResponseStatus::Pending,
+    };
+    let errors = retry_reason.into_iter().map(DocumentImageError::from).collect();
+    // TODO probably need to tell the client what document side to collect next, maybe get rid of
+    // this status in favor of the next side to collect
+    let result = DocumentResponse { status, errors };
+    Ok(result)
 }

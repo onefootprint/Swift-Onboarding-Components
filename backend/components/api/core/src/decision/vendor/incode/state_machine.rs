@@ -1,4 +1,4 @@
-use super::state::{IncodeState, IncodeStateTransition, RunTransition};
+use super::state::{IncodeState, IncodeStateTransition, RunTransition, StepResult};
 use super::states::*;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
@@ -12,7 +12,8 @@ use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
-    IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId, TenantId,
+    IncodeFailureReason, IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId,
+    TenantId,
 };
 
 pub type IsReady = bool;
@@ -157,22 +158,23 @@ impl IncodeStateMachine {
         self,
         db_pool: &DbPool,
         http_client: &FootprintVendorHttpClient,
-    ) -> Result<Self, IncodeMachineError> {
+    ) -> Result<(Self, Option<IncodeFailureReason>), IncodeMachineError> {
         let mut machine = self;
-        loop {
+        let failure_reason = loop {
             let Self { state, ctx, session } = machine;
             let state_name = state.name();
-            let (state, ctx, session, is_ready) = state
+            let (state, result, ctx, session) = state
                 .step(db_pool, http_client, ctx, session)
                 .await
                 .map_err(|e| IncodeMachineError { state_name, error: e })?;
             machine = Self { state, ctx, session };
+            match result {
+                StepResult::Ready => {}
+                StepResult::Break => break None,
+                StepResult::Retry(reason) => break Some(reason),
+            }
+        };
 
-            if !is_ready {
-                break;
-            };
-        }
-
-        Ok(machine)
+        Ok((machine, failure_reason))
     }
 }
