@@ -1,8 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeState, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
@@ -50,18 +50,21 @@ impl IncodeStateTransition for FetchOCR {
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+    ) -> ApiResult<StateResult> {
         let result = match self.response.document_kind() {
             Ok(dk) => {
                 // TODO could represent enter inside the state transition
                 Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, self.response)?;
-                (Complete::new(), None)
+                Complete::new().into()
             }
             Err(_) => {
-                // If we got a different document kind, fail and make a new document request
-                super::on_upload_fail(conn, ctx, DocumentSide::iter().collect())?;
-                let next_step = AddFront::new();
-                (next_step, Some(IncodeFailureReason::UnknownDocumentType))
+                // If we got a different document kind, wipe all uploaded documents and send back
+                // to the AddFront state
+                return Ok(StateResult::Retry {
+                    next_state: AddFront::new(),
+                    reason: IncodeFailureReason::UnknownDocumentType,
+                    clear_sides: DocumentSide::iter().collect(),
+                });
             }
         };
 

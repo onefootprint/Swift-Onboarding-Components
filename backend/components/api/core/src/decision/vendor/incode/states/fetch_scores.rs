@@ -1,15 +1,15 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, FetchOCR, IncodeState, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, FetchOCR, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchScoresRequest;
-use newtypes::{IncodeFailureReason, VendorAPI};
+use newtypes::VendorAPI;
 
 pub struct FetchScores {}
 
@@ -44,7 +44,7 @@ impl IncodeStateTransition for FetchScores {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
-        Ok((FetchOCR::new(), None))
+    ) -> ApiResult<StateResult> {
+        Ok(FetchOCR::new().into())
     }
 }

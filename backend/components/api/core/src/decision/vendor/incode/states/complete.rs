@@ -1,5 +1,6 @@
+use super::IncodeStateTransition;
 use super::VerificationSession;
-use super::{IncodeState, IncodeStateTransition};
+use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -22,7 +23,6 @@ use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
-use newtypes::IncodeFailureReason;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
@@ -132,7 +132,7 @@ impl IncodeStateTransition for Complete {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+    ) -> ApiResult<StateResult> {
         Err(ApiError::AssertionError("Incode machine already complete".into()))
     }
 }

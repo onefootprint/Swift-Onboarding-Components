@@ -1,7 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition,
-    SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
+    VerificationSession,
 };
+use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
@@ -60,18 +61,18 @@ impl IncodeStateTransition for AddBack {
 
     fn transition(
         self,
-        conn: &mut TxnPgConn,
+        _: &mut TxnPgConn,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
-        let next_state = if let Some(reason) = self.failure_reason {
-            super::on_upload_fail(conn, ctx, vec![DocumentSide::Back])?;
-            (Self::new(), Some(reason))
-        } else {
-            let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
-            (next_state, None)
-        };
-
-        Ok(next_state)
+    ) -> ApiResult<StateResult> {
+        if let Some(reason) = self.failure_reason {
+            return Ok(StateResult::Retry {
+                next_state: Self::new(),
+                reason,
+                clear_sides: vec![DocumentSide::Back],
+            });
+        }
+        let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
+        Ok(next_state.into())
     }
 }

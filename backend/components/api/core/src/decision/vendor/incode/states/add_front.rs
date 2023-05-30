@@ -1,8 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeState, IncodeStateTransition,
-    SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
+    VerificationSession,
 };
-use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
@@ -66,19 +66,19 @@ impl IncodeStateTransition for AddFront {
     /// context created in `init`
     fn transition(
         self,
-        conn: &mut TxnPgConn,
+        _: &mut TxnPgConn,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+    ) -> ApiResult<StateResult> {
         // If there's failure, we move to retry upload
-        let result = if let Some(reason) = self.failure_reason {
-            super::on_upload_fail(conn, ctx, vec![DocumentSide::Front])?;
-            (Self::new(), Some(reason))
-        } else {
-            let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
-            (next_state, None)
-        };
-
-        Ok(result)
+        if let Some(reason) = self.failure_reason {
+            return Ok(StateResult::Retry {
+                next_state: Self::new(),
+                reason,
+                clear_sides: vec![DocumentSide::Front],
+            });
+        }
+        let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
+        Ok(next_state.into())
     }
 }

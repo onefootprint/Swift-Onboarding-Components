@@ -43,6 +43,8 @@ impl IncodeState {
     }
 }
 
+/// Special error struct that shows in which state a given error occured while we are running
+/// through multiple states
 pub struct IncodeMachineError {
     pub error: ApiError,
     pub state_name: IncodeVerificationSessionState,

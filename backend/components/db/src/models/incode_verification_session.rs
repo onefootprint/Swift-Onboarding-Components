@@ -175,6 +175,8 @@ impl IncodeVerificationSession {
             res.id.clone(),
             res.state,
             res.identity_document_id.clone(),
+            // This is the only useful place to keep the failure reason. Maybe we keep a special
+            // error handler to do this
             res.latest_failure_reason.clone(),
             res.kind.clone(),
         )?;

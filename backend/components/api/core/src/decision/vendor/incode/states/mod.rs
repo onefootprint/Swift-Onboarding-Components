@@ -1,9 +1,7 @@
-mod start_onboarding;
-
-use db::models::document_upload::DocumentUpload;
-use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
 use itertools::Itertools;
+
+mod start_onboarding;
 pub use start_onboarding::*;
 
 mod add_front;
@@ -37,12 +35,12 @@ use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::verification_result::VerificationResult;
-use db::{DbPool, TxnPgConn};
+use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DocVData, DocumentSide, IdentityDocumentUploadedInfo, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, PiiJsonValue, ScrubbedJsonValue, VendorAPI,
+    DocVData, DocumentSide, IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue,
+    ScrubbedJsonValue, VendorAPI,
 };
 
 #[derive(Clone)]
@@ -134,21 +132,6 @@ async fn save_incode_verification_result<'a>(
 
 fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
-}
-
-fn on_upload_fail(conn: &mut TxnPgConn, ctx: &IncodeContext, sides: Vec<DocumentSide>) -> ApiResult<()> {
-    // TODO implement retry limit
-    // TODO Change the appearance of this timeline event. Do we want to show _every_ fail?
-    // If so, right now we are not including any info on the state of the upload since we link
-    // to a mutable object
-    let info = IdentityDocumentUploadedInfo {
-        id: ctx.id_doc_id.clone(),
-    };
-    UserTimeline::create(conn, info, ctx.vault.id.clone(), ctx.sv_id.clone())?;
-
-    // Deactivate the failed sides to require re-uploading
-    DocumentUpload::deactivate(conn, &ctx.id_doc_id, sides)?;
-    Ok(())
 }
 
 fn next_side_to_collect(

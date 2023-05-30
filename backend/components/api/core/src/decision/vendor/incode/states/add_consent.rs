@@ -1,7 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddSelfie, IncodeState, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, AddSelfie, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::{ApiResult, AssertionError};
@@ -10,7 +11,7 @@ use db::models::user_consent::UserConsent;
 use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::{IncodeFailureReason, VendorAPI};
+use newtypes::VendorAPI;
 
 /// Add Consent
 pub struct AddConsent {}
@@ -71,8 +72,8 @@ impl IncodeStateTransition for AddConsent {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<(IncodeState, Option<IncodeFailureReason>)> {
+    ) -> ApiResult<StateResult> {
         let next = AddSelfie::new();
-        Ok((next, None))
+        Ok(next.into())
     }
 }
