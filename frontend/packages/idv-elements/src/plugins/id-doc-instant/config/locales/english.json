@@ -64,6 +64,12 @@
       "upload-photo": {
         "title": "Upload photo"
       }
+    },
+    "next-side": {
+      "front": "Now the front side",
+      "back": "Now the back side",
+      "selfie": "Now we need a selfie",
+      "one-side": "Now the photo page of your passport"
     }
   },
   "pages": {}

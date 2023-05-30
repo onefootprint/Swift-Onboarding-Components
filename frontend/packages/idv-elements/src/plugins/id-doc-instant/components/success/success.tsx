@@ -3,23 +3,16 @@ import { IcoCheck16 } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
-import { useTimeout } from 'usehooks-ts';
 
 import { imageIcons, ImageTypes } from '../../constants/image-icons';
-import TRANSITION_DELAY from '../../constants/transition-delay.constants';
 import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
   imageType: ImageTypes;
-  onComplete: () => void;
 };
 
-const Success = ({ imageType, onComplete }: SuccessProps) => {
+const Success = ({ imageType }: SuccessProps) => {
   const { t } = useTranslation('components.success');
-
-  useTimeout(() => {
-    onComplete();
-  }, TRANSITION_DELAY);
 
   return (
     <Container>
