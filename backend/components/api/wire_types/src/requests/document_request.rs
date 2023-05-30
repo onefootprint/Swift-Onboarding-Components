@@ -62,16 +62,40 @@ pub struct DocumentResponse {
 #[derive(Debug, Apiv2Schema, JsonSchema, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentImageError {
+    // Legacy, wil delete
+    /// Deprecated
     ImageTooSmall,
+    /// Deprecated
     DocumentMissingFourCorners,
+    /// Deprecated
     DocumentTooSmall,
+    /// Deprecated
     DocumentBorderTooSmall,
+    /// Deprecated
     FaceImageNotDetected,
+    /// Deprecated
     BarcodeNotDetected,
-    ImageError,
+    /// Deprecated
     InvalidJpeg,
+    /// Deprecated
     DocumentIsSkewed,
+    /// Deprecated
     InternalError,
+    /// Deprecated
+    ImageError,
+
+    UnknownDocumentType,
+    WrongDocumentSide,
+    WrongOneSidedDocument,
+    DocumentNotReadable,
+    UnableToAlignDocument,
+    IdTypeNotAcceptable,
+    SelfieLowConfidence,
+    SelfieTooDark,
+    SelfieGlare,
+    SelfieHasLenses,
+    SelfieHasFaceMask,
+    UnknownError,
 }
 export_schema!(DocumentImageError);
 
@@ -92,18 +116,21 @@ impl From<IdologyImageCaptureErrors> for DocumentImageError {
 }
 
 impl From<IncodeFailureReason> for DocumentImageError {
-    // TODO: fix enum on frontend
-    fn from(_err: IncodeFailureReason) -> Self {
-        Self::ImageError
-        // match err {
-        //     IncodeVerificationFailureReason::UnknownDocumentType => Self::ImageError,
-        //     IncodeVerificationFailureReason::WrongDocumentSide => Self::ImageError,
-        //     IncodeVerificationFailureReason::WrongOneSidedDocument => Self::ImageError,
-        //     IncodeVerificationFailureReason::DocumentNotReadable => Self::ImageError,
-        //     IncodeVerificationFailureReason::UnableToAlignDocument => todo!(),
-        //     IncodeVerificationFailureReason::IdTypeNotAcceptable => todo!(),
-        //     IncodeVerificationFailureReason::UnexpectedErrorOccurred => Self::ImageError,
-        //     IncodeVerificationFailureReason::Other(_) => todo!(),
-        // }
+    fn from(err: IncodeFailureReason) -> Self {
+        match err {
+            IncodeFailureReason::UnknownDocumentType => Self::UnknownDocumentType,
+            IncodeFailureReason::WrongDocumentSide => Self::WrongDocumentSide,
+            IncodeFailureReason::WrongOneSidedDocument => Self::WrongOneSidedDocument,
+            IncodeFailureReason::DocumentNotReadable => Self::DocumentNotReadable,
+            IncodeFailureReason::UnableToAlignDocument => Self::UnableToAlignDocument,
+            IncodeFailureReason::IdTypeNotAcceptable => Self::IdTypeNotAcceptable,
+            IncodeFailureReason::UnexpectedErrorOccurred => Self::UnknownError,
+            IncodeFailureReason::SelfieLowConfidence => Self::SelfieLowConfidence,
+            IncodeFailureReason::SelfieTooDark => Self::SelfieTooDark,
+            IncodeFailureReason::SelfieGlare => Self::SelfieGlare,
+            IncodeFailureReason::SelfieHasLenses => Self::SelfieHasLenses,
+            IncodeFailureReason::SelfieHasFaceMask => Self::SelfieHasFaceMask,
+            IncodeFailureReason::Other(_) => Self::UnknownError,
+        }
     }
 }

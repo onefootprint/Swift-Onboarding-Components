@@ -267,7 +267,7 @@ async fn handle_incode_request(
     machine
         .run(&state.db_pool, &state.fp_client)
         .await
-        .map_err(|e| e.error)?; // TODO: handle this error by cancelling session and putting doc request into failed
+        .map_err(|e| e.error)?;
 
     Ok(())
 }

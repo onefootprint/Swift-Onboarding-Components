@@ -72,15 +72,11 @@ pub enum IncodeFailureReason {
     IdTypeNotAcceptable,
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
     UnexpectedErrorOccurred,
-    #[strum(serialize = "SELFIE_LOW_CONFIDENCE")]
+    // These aren't deserialized with strum
     SelfieLowConfidence,
-    #[strum(serialize = "SELFIE_TOO_DARK")]
     SelfieTooDark,
-    #[strum(serialize = "SELFIE_GLARE")]
     SelfieGlare,
-    #[strum(serialize = "SELFIE_HAS_LENSES")]
     SelfieHasLenses,
-    #[strum(serialize = "SELFIE_HAS_FACE_MASK")]
     SelfieHasFaceMask,
     Other(String),
 }
