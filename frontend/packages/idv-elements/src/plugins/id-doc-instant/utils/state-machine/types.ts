@@ -1,25 +1,31 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CountryCode3,
+  CountryCode,
   IdDocImageError,
   IdDocRequirement,
   IdDocType,
 } from '@onefootprint/types';
+
+import { ImageTypes } from '../../constants/image-icons';
 
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
   image?: string;
+  currSide?: ImageTypes;
   idDoc: {
     type?: IdDocType;
-    country?: CountryCode3;
-  };
-  selfie: {
-    consentRequired?: boolean;
-    required?: boolean;
+    country?: CountryCode;
   };
   errors?: IdDocImageError[];
+};
+
+export type ProccessingSucceededEvent = {
+  type: 'processingSucceeded';
+  payload: {
+    nextSideToCollect: string;
+  };
 };
 
 export type MachineEvents =
@@ -27,7 +33,7 @@ export type MachineEvents =
       type: 'receivedCountryAndType';
       payload: {
         type?: IdDocType;
-        country?: CountryCode3;
+        country?: CountryCode;
       };
     }
   | {
@@ -37,7 +43,10 @@ export type MachineEvents =
       };
     }
   | {
-      type: 'processingSucceeded';
+      type: 'nextSide';
+      payload: {
+        nextSideToCollect: string;
+      };
     }
   | {
       type: 'processingErrored';
@@ -56,4 +65,5 @@ export type MachineEvents =
     }
   | {
       type: 'navigatedToPrev';
-    };
+    }
+  | ProccessingSucceededEvent;

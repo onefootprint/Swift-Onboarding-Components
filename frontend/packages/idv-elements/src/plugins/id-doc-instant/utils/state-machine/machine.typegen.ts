@@ -25,6 +25,7 @@ export interface Typegen0 {
     | 'backImage'
     | 'backImageProcessing'
     | 'backImageRetry'
+    | 'complete'
     | 'countryAndType'
     | 'frontImage'
     | 'frontImageProcessing'
@@ -32,7 +33,6 @@ export interface Typegen0 {
     | 'selfieImage'
     | 'selfieImageProcessing'
     | 'selfieImageRetry'
-    | 'selfiePrompt'
-    | 'success';
+    | 'selfiePrompt';
   tags: never;
 }

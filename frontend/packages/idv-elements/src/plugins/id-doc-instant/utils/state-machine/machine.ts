@@ -1,6 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
-import ImagesRequiredByIdDocType from '../../constants/images-required-by-id-doc-type';
+import NextSideTargets from './machine.utils';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (args: MachineContext) =>
@@ -26,6 +26,9 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         frontImage: {
           on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
             receivedImage: {
               target: 'frontImageProcessing',
               actions: 'assignImage',
@@ -34,27 +37,7 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         frontImageProcessing: {
           on: {
-            navigatedToPrev: {
-              target: 'countryAndType',
-            },
-            processingSucceeded: [
-              {
-                target: 'backImage',
-                cond: context => {
-                  const {
-                    idDoc: { type },
-                  } = context;
-                  return type ? !!ImagesRequiredByIdDocType[type].back : false;
-                },
-              },
-              {
-                target: 'selfiePrompt',
-                cond: context => context.requirement.shouldCollectSelfie,
-              },
-              {
-                target: 'success',
-              },
-            ],
+            processingSucceeded: NextSideTargets,
             processingErrored: {
               target: 'frontImageRetry',
               actions: 'assignIdDocImageErrors',
@@ -79,15 +62,7 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         backImageProcessing: {
           on: {
-            processingSucceeded: [
-              {
-                target: 'selfiePrompt',
-                cond: context => context.requirement.shouldCollectSelfie,
-              },
-              {
-                target: 'success',
-              },
-            ],
+            processingSucceeded: NextSideTargets,
             processingErrored: {
               target: 'backImageRetry',
               actions: 'assignIdDocImageErrors',
@@ -125,9 +100,7 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         selfieImageProcessing: {
           on: {
-            processingSucceeded: {
-              target: 'success',
-            },
+            processingSucceeded: NextSideTargets,
             processingErrored: {
               target: 'selfieImageRetry',
               actions: 'assignIdDocImageErrors',
@@ -145,7 +118,7 @@ const createIdDocMachine = (args: MachineContext) =>
             },
           },
         },
-        success: {
+        complete: {
           type: 'final',
         },
       },
@@ -169,7 +142,7 @@ const createIdDocMachine = (args: MachineContext) =>
           return context;
         }),
         assignConsent: assign(context => {
-          context.selfie.consentRequired = false;
+          context.requirement.shouldCollectConsent = false;
           return context;
         }),
       },
