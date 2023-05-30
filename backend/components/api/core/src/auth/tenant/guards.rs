@@ -209,7 +209,7 @@ mod test {
     }
 
     #[test_case(TG::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
-    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<[Id(Ssn9), Id(FirstName)]>,ApiKeys>")]
+    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<id.ssn9, id.first_name>,ApiKeys>")]
     #[test_case(Any.or_admin() => "Or<Any,Admin>")]
     fn test_display<T: IsGuardMet<TS>>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met

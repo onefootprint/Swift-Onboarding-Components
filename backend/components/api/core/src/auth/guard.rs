@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use newtypes::DataIdentifier;
+use newtypes::{output::Csv, DataIdentifier};
 
 pub trait IsGuardMet<ScopeT>: Display {
     /// Given the `token_scopes` that exist on the auth token, checks if the required permission
@@ -73,7 +73,7 @@ impl CanDecrypt {
 
 impl Display for CanDecrypt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "CanDecrypt<{:?}>", self.0)
+        write!(f, "CanDecrypt<{}>", Csv::from(self.0.clone()))
     }
 }
 
@@ -92,6 +92,21 @@ impl CanVault {
 
 impl Display for CanVault {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "CanEncrypt<{:?}>", self.0)
+        write!(f, "CanVault<{}>", Csv::from(self.0.clone()))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::fmt::Display;
+
+    use super::{CanDecrypt, CanVault};
+    use newtypes::IdentityDataKind as IDK;
+    use test_case::test_case;
+
+    #[test_case(CanDecrypt::new(vec![IDK::FirstName, IDK::LastName]) => "CanDecrypt<id.first_name, id.last_name>".to_owned())]
+    #[test_case(CanVault::new(vec![IDK::FirstName, IDK::LastName]) => "CanVault<id.first_name, id.last_name>".to_owned())]
+    fn test_display<T: Display>(guard: T) -> String {
+        format!("{}", guard)
     }
 }
