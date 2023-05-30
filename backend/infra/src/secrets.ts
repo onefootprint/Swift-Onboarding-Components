@@ -374,8 +374,6 @@ function createSecretParameter(
     type: 'SecureString',
     value: secretVal,
     name: `/static_secrets/${name}`,
-    overwrite: true,
-    description: name,
   });
 
   return secret;

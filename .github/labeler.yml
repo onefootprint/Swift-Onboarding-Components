@@ -16,16 +16,13 @@ API:
 Enclave:
   - backend/components/enclave/**/*
 
-FastEphemeral:
+ephemeral:
   - 'backend/infra/**/*'
   - 'backend/infra/*'
 
-FullEphemeral:
-  - 'backend/infra/src/db.ts'
-
 Mobile:
   - mobile/**/*
-
+  
 Frontend:
   - frontend/**/*
 

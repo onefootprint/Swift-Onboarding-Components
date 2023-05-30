@@ -42,7 +42,7 @@ export type DatabaseOutput = {
   readOnlyDatabaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
   databaseUrlSecretName: string;
-  db: aws.rds.Cluster | undefined;
+  db: aws.rds.Cluster;
   instances: aws.rds.ClusterInstance[];
 };
 

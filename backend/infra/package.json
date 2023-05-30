@@ -1,8 +1,7 @@
 {
     "name": "infra",
     "devDependencies": {
-        "@types/crypto-js": "^4.1.1",
-        "@types/node": "18.14.0"
+        "@types/node": "^14.18.12"
     },
     "dependencies": {
         "@aws-sdk/client-kms": "3.159.0",
@@ -11,9 +10,7 @@
         "@pulumi/awsx": "0.40.0",
         "@pulumi/pulumi": "3.48.0",
         "@pulumi/random": "4.4.2",
-        "axios": "^1.2.1",
-        "axios-retry": "^3.5.0",
-        "crypto-js": "^4.1.1"
+        "axios": "^1.2.1"
     },
     "resolutions": {
         "xml2js": "^0.5.0"

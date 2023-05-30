@@ -2,8 +2,7 @@ import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 import { Region } from '@pulumi/aws';
 import * as kms from '@aws-sdk/client-kms';
-import * as sha256 from 'crypto-js/sha256';
-import * as hex from 'crypto-js/enc-hex';
+import * as crypto from 'crypto';
 
 export interface CreateSealedIkekResourceInputs {
   rootKeyId: pulumi.Input<string>;
@@ -36,12 +35,13 @@ const sealedIkekProvider: pulumi.dynamic.ResourceProvider = {
     const ciphertext = response.CiphertextBlob;
     const ciphertextHex = Buffer.from(ciphertext!).toString('hex');
 
-    const id = sha256(ciphertextHex).toString(hex);
+    const id = crypto
+      .createHash('sha256')
+      .update(ciphertextHex)
+      .digest('hex')
+      .substring(0, 16);
 
     return { id, outs: { hexValue: ciphertextHex } };
-  },
-  async update(id, olds: CreateSealedIkekInputs, news: CreateSealedIkekInputs) {
-    return this.create(news);
   },
 };
 

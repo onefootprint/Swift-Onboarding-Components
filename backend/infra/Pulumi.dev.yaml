@@ -102,8 +102,8 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
@@ -113,6 +113,3 @@ config:
     secure: v1:YBhIVkjgy+ZPhPEJ:+AT6qs41kdA+kWaQUhMooSAC9ETulX8+7EX6MIpJR/gAQxEDlrCORv4oorz061KD5xwljnJ4pbPwPiaG5XUcRuCG+SwR2sKg6g==
   infra:tailscaleKey:
     secure: v1:/iSkf00jwJxz6Psy:oAWHYMOZlNg1Rk95qTownA3fb1RA+xtZg7oc6ma3Hv+74K5b84RUfkKrfGQ5IuKTEuFXgntMLfMTpCkOFaf4rP7SudP6PVKA
-  infra:neon:
-    apiKey:
-      secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=

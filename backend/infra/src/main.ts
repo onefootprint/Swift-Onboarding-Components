@@ -8,20 +8,14 @@ import { Config } from './config';
 import * as svc from './service';
 import * as enclaveKey from './enclave_key';
 import * as db from './db';
-import * as neon_db from './db_neon';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
-import {
-  GetStackMetadata,
-  StackEnvironment,
-  StackMetadata,
-} from './stack_metadata';
+import { GetStackMetadata, StackMetadata } from './stack_metadata';
 import * as nitroService from './nitro_service';
 import * as dns from './dns';
 import * as airplane from './airplane';
 import * as assets from './asset_cdn';
-import { DatabaseOutput } from './db';
 
 /**
  * Convenient type to pass shared global resources
@@ -90,28 +84,17 @@ export default async function main() {
   );
 
   // Setup database
-  let database: DatabaseOutput;
-
-  let neonProjectId = config.get('useNeonEphemeralDbProjectId');
-
-  if (
-    stackMetadata.environment === StackEnvironment.DevEphemeral &&
-    neonProjectId
-  ) {
-    database = neon_db.NeonDBOutput(stackMetadata, neonProjectId);
-  } else {
-    database = await db.CreateDB(
-      vpc,
-      provider,
-      `db-${stackMetadata.shortStackName}`,
-      secretsStore,
-      {
-        protectDeletion: constants.deletionProtection,
-      },
-      coreSecurityGroups,
-      stackMetadata,
-    );
-  }
+  const database = await db.CreateDB(
+    vpc,
+    provider,
+    `db-${stackMetadata.shortStackName}`,
+    secretsStore,
+    {
+      protectDeletion: constants.deletionProtection,
+    },
+    coreSecurityGroups,
+    stackMetadata,
+  );
 
   // Create our s3 buckets
   const s3Buckets = s3.CreateServiceBuckets(provider, constants, stackMetadata);
