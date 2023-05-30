@@ -1,4 +1,6 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, EnumIter};
 
 #[derive(
@@ -10,6 +12,9 @@ use strum_macros::{AsRefStr, EnumIter};
     Clone,
     strum_macros::EnumString,
     strum_macros::Display,
+    SerializeDisplay,
+    DeserializeFromStr,
+    Apiv2Schema,
     AsRefStr,
     AsExpression,
     FromSqlRow,

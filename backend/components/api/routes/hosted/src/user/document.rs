@@ -9,10 +9,11 @@ use api_core::auth::user::UserObAuthContext;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::Complete;
 use api_core::decision::vendor::incode::{IncodeContext, IncodeStateMachine};
+use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{DocumentImageError, DocumentResponse, DocumentResponseStatus};
+use api_wire_types::{DocumentImageError, DocumentResponse, LegacyDocumentResponse};
 use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
@@ -175,7 +176,7 @@ pub async fn post(
     } else {
         // Fixture response - we always complete successfully!
         DocumentResponse {
-            status: DocumentResponseStatus::Complete,
+            next_side_to_collect: None,
             errors: vec![],
         }
     };
@@ -200,7 +201,10 @@ async fn upload_image(
 // TODO deprecate this
 #[api_v2_operation(description = "GET a document request status", tags(Hosted))]
 #[actix::get("/hosted/user/document/status")]
-pub async fn get(state: web::Data<State>, user_auth: UserObAuthContext) -> JsonApiResponse<DocumentResponse> {
+pub async fn get(
+    state: web::Data<State>,
+    user_auth: UserObAuthContext,
+) -> JsonApiResponse<LegacyDocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let (doc_request, session) = state
@@ -220,7 +224,7 @@ pub async fn get(state: web::Data<State>, user_auth: UserObAuthContext) -> JsonA
         .map(DocumentImageError::from)
         .collect();
 
-    ResponseData::ok(DocumentResponse { status, errors }).json()
+    ResponseData::ok(LegacyDocumentResponse { status, errors }).json()
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -257,15 +261,18 @@ async fn handle_incode_request(
         .await
         .map_err(|e| e.error)?;
 
-    let status = match (&retry_reason, machine.state.name()) {
-        // TODO is this how the client uses Error?
-        (Some(_), _) => DocumentResponseStatus::Error,
-        (None, IncodeVerificationSessionState::Complete) => DocumentResponseStatus::Complete,
-        (None, _) => DocumentResponseStatus::Pending,
+    let next_side_to_collect = match machine.state.name() {
+        IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
+        IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
+        IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
+        IncodeVerificationSessionState::Complete => None,
+        // We shouldn't cleanly break from the machine in any other state
+        s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
     let errors = retry_reason.into_iter().map(DocumentImageError::from).collect();
-    // TODO probably need to tell the client what document side to collect next, maybe get rid of
-    // this status in favor of the next side to collect
-    let result = DocumentResponse { status, errors };
+    let result = DocumentResponse {
+        next_side_to_collect,
+        errors,
+    };
     Ok(result)
 }

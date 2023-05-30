@@ -1,6 +1,7 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentRequestStatus, IdDocKind, IncodeFailureReason, PiiString,
+    idology::IdologyImageCaptureErrors, DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason,
+    PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -41,20 +42,20 @@ impl From<DocumentRequestStatus> for DocumentResponseStatus {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub enum DocumentErrorReason {
-    // TODO(argoff): These are just temporary values to test frontend
-    Blurry,
-    Invalid,
-    ImageError,
+// TODO deprecate after getting rid of GET /document/status API
+/// Response for a identity document request. Errors are non-optional if the identity vendor
+/// requires additional images be collected.
+#[derive(Debug, Apiv2Schema, serde::Serialize)]
+pub struct LegacyDocumentResponse {
+    pub status: DocumentResponseStatus,
+    pub errors: Vec<DocumentImageError>,
 }
 
 /// Response for a identity document request. Errors are non-optional if the identity vendor
 /// requires additional images be collected.
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
 pub struct DocumentResponse {
-    pub status: DocumentResponseStatus,
+    pub next_side_to_collect: Option<DocumentSide>,
     pub errors: Vec<DocumentImageError>,
 }
 
