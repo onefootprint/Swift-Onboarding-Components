@@ -115,7 +115,7 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
-    let created_reqs = state
+    let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
@@ -151,8 +151,11 @@ pub async fn post(
                 .into_iter()
                 .chain(doc_request.should_collect_selfie.then_some(DocumentSide::Selfie))
                 .collect_vec();
-            let has_all_required_images = required_sides.into_iter().all(|s| existing_sides.contains(&s));
-            let result = if has_all_required_images {
+            let missing_sides = required_sides
+                .into_iter()
+                .filter(|s| !existing_sides.contains(s))
+                .collect_vec();
+            let result = if missing_sides.is_empty() {
                 // Mark the document request as Uploaded
                 //
                 // Now that the document is created, either initiate IDV reqs or create fixture data
@@ -173,7 +176,7 @@ pub async fn post(
                 None
             };
 
-            Ok(result)
+            Ok((missing_sides, result))
         })
         .await?;
 
@@ -183,8 +186,11 @@ pub async fn post(
         handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request).await?
     } else {
         // Fixture response - we always complete successfully!
+        let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
+            .into_iter()
+            .find(|s| missing_sides.contains(s));
         DocumentResponse {
-            next_side_to_collect: None,
+            next_side_to_collect,
             errors: vec![],
             is_retry_limit_exceeded: false,
         }

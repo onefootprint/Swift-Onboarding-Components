@@ -196,17 +196,21 @@ class BifrostClient:
             "document_type": "driver_license",
             "country_code": "USA",
         }
-        images = [
-            dict(front_image=test_image),
-            dict(back_image=test_image),
+        sides = [
+            "front",
+            "back",
         ]
         if requirement["should_collect_selfie"]:
-            images.append(dict(selfie_image=test_image))
+            sides.append("selfie")
 
         # Upload the documents consecutively in separate requests
-        for image in images:
+        for i, side in enumerate(sides):
+            image = {f"{side}_image": test_image}
             data = {**common_data, **image}
-            post("hosted/user/document", data, self.auth_token)
+            body = post("hosted/user/document", data, self.auth_token)
+            next_side = sides[i + 1] if i + 1 < len(sides) else None
+            assert body["next_side_to_collect"] == next_side
+            assert not body["errors"]
 
         # Check the status of uploading the doc
         body = get(f"hosted/user/document/status", None, self.auth_token)
