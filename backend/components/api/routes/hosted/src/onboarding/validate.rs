@@ -30,9 +30,10 @@ pub async fn post(
 
     // Verify there are no unmet requirements
     let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
-    if reqs.iter().any(|r| !r.is_met()) {
-        let unmet_requirements = reqs.into_iter().map(|x| x.into()).collect_vec();
-        return Err(OnboardingError::UnmetRequirements(unmet_requirements.into()).into());
+    let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
+    if !unmet_reqs.is_empty() {
+        let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
+        return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
     let session_key = state.session_sealing_key.clone();
