@@ -1,36 +1,10 @@
 use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
-#[derive(
-    Debug,
-    Display,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Apiv2Schema,
-    Serialize,
-    Deserialize,
-    Hash,
-    Clone,
-    Copy,
-    AsExpression,
-    FromSqlRow,
-    EnumIter,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
-)]
+#[derive(Debug, Display, Eq, PartialEq, Hash, Clone, Copy, EnumIter, EnumString)]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[diesel(sql_type = Text)]
 /// Represents the kind of a piece of "identity data" - data which is on your virtual
 /// "Footprint ID card" and that we send off to be verified by data vendors.
-/// This data is stored in potentiall different underlying database tables.
 pub enum IdentityDataKind {
     FirstName,
     LastName,
@@ -47,8 +21,6 @@ pub enum IdentityDataKind {
     PhoneNumber,
     Nationality,
 }
-
-crate::util::impl_enum_str_diesel!(IdentityDataKind);
 
 impl From<IdentityDataKind> for DataIdentifier {
     fn from(value: IdentityDataKind) -> Self {

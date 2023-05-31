@@ -12,8 +12,6 @@ use crate::{
 #[derive(
     Debug,
     Clone,
-    Ord,
-    PartialOrd,
     Eq,
     Hash,
     PartialEq,

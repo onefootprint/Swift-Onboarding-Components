@@ -1,5 +1,5 @@
-use crate::{api_schema_helper::string_api_data_type_alias, KvDataKey};
-use crate::{DataIdentifier, IdentityDataKind, TenantRoleId, TenantScope};
+use crate::api_schema_helper::string_api_data_type_alias;
+use crate::{DataIdentifier, TenantRoleId, TenantScope};
 use derive_more::Deref;
 use schemars::JsonSchema;
 use serde::de::IntoDeserializer;
@@ -22,8 +22,6 @@ impl<T: DeserializeOwned> IntoIterator for Csv<T> {
     }
 }
 
-string_api_data_type_alias!(Csv<KvDataKey>);
-string_api_data_type_alias!(Csv<IdentityDataKind>);
 string_api_data_type_alias!(Csv<DataIdentifier>);
 string_api_data_type_alias!(Csv<TenantRoleId>);
 string_api_data_type_alias!(Csv<TenantScope>);
@@ -52,23 +50,24 @@ where
 mod tests {
     use super::Csv;
 
-    use crate::IdentityDataKind;
+    use crate::DataIdentifier;
+    use crate::IdentityDataKind as IDK;
     #[test]
     fn test_data_kinds() {
         #[derive(serde::Deserialize)]
         struct Test {
-            fields: Csv<IdentityDataKind>,
+            fields: Csv<DataIdentifier>,
         }
-        let test = r#"{ "fields": "last_name, first_name, address_line1,city" }"#;
+        let test = r#"{ "fields": "id.last_name, id.first_name, id.address_line1,id.city" }"#;
         let test: Test = serde_json::from_str(test).unwrap();
 
         assert_eq!(
             test.fields.0,
             vec![
-                IdentityDataKind::LastName,
-                IdentityDataKind::FirstName,
-                IdentityDataKind::AddressLine1,
-                IdentityDataKind::City
+                IDK::LastName.into(),
+                IDK::FirstName.into(),
+                IDK::AddressLine1.into(),
+                IDK::City.into()
             ]
         );
     }

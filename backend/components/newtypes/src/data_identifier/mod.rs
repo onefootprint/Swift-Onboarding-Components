@@ -57,8 +57,6 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
     Debug,
     Eq,
     PartialEq,
-    Ord,
-    PartialOrd,
     Hash,
     Clone,
     AsExpression,

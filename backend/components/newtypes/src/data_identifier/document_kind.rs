@@ -4,9 +4,8 @@ use crate::{
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use mime::Mime;
-use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
@@ -14,13 +13,10 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     Display,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
+    DeserializeFromStr,
+    SerializeDisplay,
     PartialEq,
     Eq,
-    Ord,
-    PartialOrd,
     Hash,
     AsExpression,
     FromSqlRow,
@@ -30,7 +26,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DocumentKind {
     Passport,
@@ -69,6 +64,7 @@ pub enum DocumentKind {
     IdCardNumber,
     #[strum(to_string = "id_card.expiration")]
     IdCardExpiration,
+    // LatestUpload(IdDocKind, DocumentSide),
 }
 // TODO: one day merge IdDocKind into here
 

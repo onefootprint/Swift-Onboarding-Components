@@ -1,12 +1,9 @@
 use crate::{AliasId, CollectedData, DataIdentifier, EnumDotNotationError, IsDataIdentifierDiscriminant};
-use paperclip::actix::Apiv2Schema;
 use std::str::FromStr;
 use strum::EnumIter;
 use strum_macros::{Display, EnumString};
 
-#[derive(
-    Debug, Display, Clone, Copy, Apiv2Schema, PartialEq, Eq, Ord, PartialOrd, Hash, EnumString, EnumIter,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumString, EnumIter)]
 #[strum(serialize_all = "snake_case")]
 pub enum CardDataKind {
     Number,
@@ -23,7 +20,7 @@ pub enum CardDataKind {
     Name,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Ord, PartialOrd, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CardInfo {
     pub alias: AliasId,
     pub kind: CardDataKind,

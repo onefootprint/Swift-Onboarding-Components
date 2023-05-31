@@ -1,30 +1,9 @@
-use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
 
-#[derive(
-    Debug,
-    Display,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Apiv2Schema,
-    Serialize,
-    Deserialize,
-    Hash,
-    Clone,
-    Copy,
-    EnumIter,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumString, EnumIter)]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 /// Represents data that is collected about a particular Business
 pub enum BusinessDataKind {
     Name,
