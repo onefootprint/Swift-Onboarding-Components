@@ -186,6 +186,7 @@ pub async fn post(
         DocumentResponse {
             next_side_to_collect: None,
             errors: vec![],
+            is_retry_limit_exceeded: false,
         }
     };
     ResponseData::ok(response).json()
@@ -275,13 +276,16 @@ async fn handle_incode_request(
         IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
         IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::Complete => None,
+        IncodeVerificationSessionState::Fail => None,
         // We shouldn't cleanly break from the machine in any other state
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
+    let is_retry_limit_exceeded = machine.state.name() == IncodeVerificationSessionState::Fail;
     let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
     let result = DocumentResponse {
         next_side_to_collect,
         errors,
+        is_retry_limit_exceeded,
     };
     Ok(result)
 }

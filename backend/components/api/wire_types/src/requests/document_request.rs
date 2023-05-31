@@ -57,6 +57,7 @@ pub struct LegacyDocumentResponse {
 pub struct DocumentResponse {
     pub next_side_to_collect: Option<DocumentSide>,
     pub errors: Vec<DocumentImageError>,
+    pub is_retry_limit_exceeded: bool,
 }
 
 /// Image errors from idology. See status_code/idology.rs for descriptions
