@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   GestureResponderEvent,
-  Platform,
   Pressable as RNPressable,
   ViewStyle,
 } from 'react-native';
@@ -35,10 +34,7 @@ const Pressable = ({
   return (
     <RNPressable
       disabled={disabled}
-      hitSlop={Platform.select({
-        ios: undefined,
-        default: { top: 16, right: 16, bottom: 16, left: 16 },
-      })}
+      hitSlop={{ top: 16, right: 16, bottom: 16, left: 16 }}
       onPress={disabled ? undefined : handlePress}
       onPressIn={disabled ? undefined : onPressIn}
       onPressOut={disabled ? undefined : onPressOut}

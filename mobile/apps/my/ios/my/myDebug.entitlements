@@ -14,8 +14,6 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:handoff.preview.onefootprint.com</string>
-		<string>webcredentials:handoff.onefootprint.com</string>
 		<string>webcredentials:onefootprint.com</string>
 	</array>
 </dict>

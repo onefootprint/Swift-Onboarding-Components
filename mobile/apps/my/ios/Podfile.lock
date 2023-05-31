@@ -425,6 +425,8 @@ PODS:
     - ExpoModulesCore
   - RNCAsyncStorage (1.17.11):
     - React-Core
+  - RNFlashList (1.4.0):
+    - React-Core
   - RNScreens (3.20.0):
     - React-Core
     - React-RCTImage
@@ -487,6 +489,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - ReactNativeAppClip (from `../../../node_modules/react-native-app-clip/ios`)
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -602,6 +605,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-app-clip/ios"
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-async-storage/async-storage"
+  RNFlashList:
+    :path: "../../../node_modules/@shopify/flash-list"
   RNScreens:
     :path: "../../../node_modules/react-native-screens"
   RNSVG:
@@ -664,6 +669,7 @@ SPEC CHECKSUMS:
   ReactCommon: 7efec56db1e74f34e24beadcdda6942829d19c4c
   ReactNativeAppClip: 232bba84d78e03d38473006fbf3bb2abdec49b14
   RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
+  RNFlashList: 399bf6a0db68f594ad2c86aaff3ea39564f39f8a
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
   Yoga: d56980c8914db0b51692f55533409e844b66133c

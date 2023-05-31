@@ -1,65 +1,85 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Box } from '../box';
 import { Flag } from '../flag';
+import { Hint } from '../hint';
 import { Label } from '../label';
+import { Pressable } from '../pressable';
 import { Typography } from '../typography';
+import Picker from './components/picker';
 
 export type SelectProps = {
-  // disabled?: boolean;
-  // hasError?: boolean;
-  // hint?: string;
+  hasError?: boolean;
+  hint?: string;
   label?: string;
-  // id?: string;
-  // onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   placeholder?: string;
-  // searchPlaceholder?: string;
+  searchPlaceholder?: string;
   value: any;
-  // emptyStateText?: string;
+  emptyStateText?: string;
 };
 
 const Select = ({
   placeholder = 'Select...',
-  // disabled,
-  // hasError,
-  // hint,
-  // label,
-  // id,
-  // onChange,
-  // searchPlaceholder,
+  hasError,
+  hint,
+  label,
+  searchPlaceholder = 'Search...',
+  emptyStateText = 'No results found',
   value,
-}: // emptyStateText,
-SelectProps) => {
+}: SelectProps) => {
+  const [open, setOpen] = useState(false);
   const selectedValueText = value ? value.label : placeholder;
 
-  const handleLabelPress = () => {};
+  const showPicker = () => {
+    setOpen(true);
+  };
+
+  const hidePicker = () => {
+    setOpen(false);
+  };
 
   return (
     <Box>
-      <Label onPress={handleLabelPress} marginBottom={3}>
-        Country
-      </Label>
-      <Box
-        alignItems="center"
-        backgroundColor="primary"
-        borderColor="primary"
-        borderRadius="default"
-        borderStyle="solid"
-        borderWidth={1}
-        flexDirection="row"
-        height={48}
-        justifyContent="space-between"
-        paddingHorizontal={5}
-      >
-        <Box gap={4} flexDirection="row" center>
-          <Flag code="US" />
-          <Typography variant="body-4">
-            {selectedValueText || placeholder}
-          </Typography>
+      <Pressable onPress={showPicker} withImpact>
+        {label && (
+          <Label marginBottom={3} onPress={showPicker}>
+            {label}
+          </Label>
+        )}
+        <Box
+          alignItems="center"
+          backgroundColor="primary"
+          borderColor="primary"
+          borderRadius="default"
+          borderStyle="solid"
+          borderWidth={1}
+          flexDirection="row"
+          height={48}
+          justifyContent="space-between"
+          paddingHorizontal={5}
+        >
+          <Box gap={4} flexDirection="row" center>
+            <Flag code="US" />
+            <Typography variant="body-4">
+              {selectedValueText || placeholder}
+            </Typography>
+          </Box>
+          <IcoChevronDown16 />
         </Box>
-        <IcoChevronDown16 />
-      </Box>
+      </Pressable>
+      {!!hint && (
+        <Hint marginTop={3} hasError={hasError}>
+          {hint}
+        </Hint>
+      )}
+      <Picker
+        emptyStateText={emptyStateText}
+        onClose={hidePicker}
+        open={open}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+      />
     </Box>
   );
 };

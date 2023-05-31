@@ -21,6 +21,7 @@ export { default as IcoInfo16 } from './ico-info-16';
 export { default as IcoInfo24 } from './ico-info-24';
 export { default as IcoPassport24 } from './ico-passport-24';
 export { default as IcoPhone24 } from './ico-phone-24';
+export { default as IcoSearch24 } from './ico-search-24';
 export { default as IcoSettings24 } from './ico-settings-24';
 export { default as IcoShare24 } from './ico-share-24';
 export { default as IcoShield40 } from './ico-shield-40';

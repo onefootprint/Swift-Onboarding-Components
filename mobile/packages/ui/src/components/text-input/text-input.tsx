@@ -14,6 +14,7 @@ import { Hint } from '../hint';
 import { Label } from '../label';
 
 export type TextInputProps = {
+  prefixComponent?: React.ReactNode;
   disabled?: boolean;
   hasError?: boolean;
   hint?: string;
@@ -22,8 +23,19 @@ export type TextInputProps = {
   BoxProps;
 
 const TextInput = forwardRef<RNTextInput, TextInputProps>(
-  ({ hasError = false, hint, label, disabled = false, ...props }, ref) => {
-    const { onBlur, onFocus } = props;
+  (
+    {
+      hasError = false,
+      prefixComponent,
+      hint,
+      label,
+      disabled = false,
+      onBlur,
+      onFocus,
+      ...props
+    },
+    ref,
+  ) => {
     const [isFocused, setFocus] = useState(false);
     const localRef = useRef<RNTextInput>(null);
     const {
@@ -55,17 +67,22 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
             {label}
           </Label>
         )}
-        <Input
-          {...props}
-          disabled={disabled}
-          hasError={hasError}
-          hasFocus={isFocused}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          placeholderTextColor={input.global.placeholderColor}
-          ref={mergeRefs([ref, localRef])}
-          underlineColorAndroid="transparent"
-        />
+        <Box position="relative">
+          {prefixComponent && (
+            <PrefixContainer>{prefixComponent}</PrefixContainer>
+          )}
+          <Input
+            {...props}
+            disabled={disabled}
+            hasError={hasError}
+            hasFocus={isFocused}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
+            placeholderTextColor={input.global.placeholderColor}
+            ref={mergeRefs([ref, localRef])}
+            underlineColorAndroid="transparent"
+          />
+        </Box>
         {!!hint && (
           <Hint marginTop={3} hasError={hasError}>
             {hint}
@@ -116,6 +133,13 @@ const Input = styled.TextInput<{
       `}
     `;
   }}
+`;
+
+const PrefixContainer = styled.View`
+  position: absolute;
+  height: 100%;
+  z-index: 1;
+  justify-content: center;
 `;
 
 export default TextInput;

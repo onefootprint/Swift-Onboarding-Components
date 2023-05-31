@@ -27,7 +27,7 @@ const Scan = () => {
           Select the option that works best for you
         </Typography>
       </Box>
-      <Select label="Country" value="lorem" />
+      <Select label="Country" placeholder="Select country" value="lorem" />
       <Divider marginVertical={7} />
       <RadioSelect
         value={value}
