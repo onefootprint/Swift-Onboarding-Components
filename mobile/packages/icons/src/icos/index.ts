@@ -6,6 +6,7 @@ export { default as IcoBuilding24 } from './ico-building-24';
 export { default as IcoCar24 } from './ico-car-24';
 export { default as IcoCheck24 } from './ico-check-24';
 export { default as IcoCheckCircle40 } from './ico-check-circle-40';
+export { default as IcoChevronDown16 } from './ico-chevron-down-16';
 export { default as IcoChevronLeftBig24 } from './ico-chevron-left-big-24';
 export { default as IcoChevronRight24 } from './ico-chevron-right-24';
 export { default as IcoClose32 } from './ico-close-32';

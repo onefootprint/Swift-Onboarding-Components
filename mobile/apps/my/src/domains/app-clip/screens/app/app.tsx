@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React from 'react';
 
+// import Scan from '../../components/scan/scan';
 import Error from '../error';
 import Router from '../router';
 import ThemeProvider from './components/theme-provider';

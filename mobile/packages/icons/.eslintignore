@@ -1,2 +1,4 @@
 src/scripts/icos/templates/
 src/scripts/icos/generate.js
+src/scripts/flags/templates/
+src/scripts/flags/generate.js

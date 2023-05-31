@@ -50,7 +50,11 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
 
     return (
       <Box>
-        {label && <Label onPress={handleLabelPress}>{label}</Label>}
+        {label && (
+          <Label onPress={handleLabelPress} marginBottom={3}>
+            {label}
+          </Label>
+        )}
         <Input
           {...props}
           disabled={disabled}

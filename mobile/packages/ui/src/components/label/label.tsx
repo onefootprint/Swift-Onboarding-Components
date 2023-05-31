@@ -1,18 +1,19 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { Box } from '../box';
+import { Box, BoxProps } from '../box';
 import { Pressable } from '../pressable';
 
-export type LabelProps = {
+export type LabelProps = BoxProps & {
   children: string;
   hasError?: boolean;
   onPress?: () => void;
 };
 
-const Label = ({ children, onPress, hasError = false }: LabelProps) => {
+const Label = ({ children, onPress, hasError, ...props }: LabelProps) => {
   return (
-    <Box marginBottom={3}>
+    <Box {...props}>
       <Pressable onPress={onPress}>
         <Text hasError={hasError}>{children}</Text>
       </Pressable>
@@ -20,21 +21,17 @@ const Label = ({ children, onPress, hasError = false }: LabelProps) => {
   );
 };
 
-const Text = styled.Text<{ hasError: boolean }>`
-  ${({ theme }) => {
+const Text = styled.Text<{ hasError?: boolean }>`
+  ${({ theme, hasError }) => {
     const { label } = theme.components;
+    const color = hasError
+      ? label.states.error.color
+      : label.states.default.color;
+
     return css`
-      color: ${label.states.default.color};
+      color: ${color};
       font: ${label.size.default.typography};
     `;
   }}
-  ${({ theme, hasError }) => {
-    if (!hasError) return;
-    const { label } = theme.components;
-    return css`
-      color: ${label.states.error.color};
-    `;
-  }}
 `;
-
 export default Label;

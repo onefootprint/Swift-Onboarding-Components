@@ -14,12 +14,11 @@ yarn create expo-app --template expo-template-storybook AwesomeStorybook
 
 # app
 
-
 ```sh
 yarn start
 ```
 
-# Ondevice    
+# Ondevice
 
 In this template you can now run `yarn storybook` to start ondevice storybook or `yarn start` to start your expo app.
 This works via env variables and expo constants.

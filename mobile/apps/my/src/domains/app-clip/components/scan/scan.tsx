@@ -10,6 +10,7 @@ import {
   Container,
   Divider,
   RadioSelect,
+  Select,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -18,14 +19,15 @@ const Scan = () => {
   const [value, setValue] = useState('front-and-back');
 
   return (
-    <Container>
-      <Box center>
+    <Container scroll>
+      <Box center marginBottom={7} marginTop={8}>
         <IcoIdGeneric40 />
         <Typography variant="heading-3">We need a photo of your ID</Typography>
         <Typography variant="body-3">
           Select the option that works best for you
         </Typography>
       </Box>
+      <Select label="Country" value="lorem" />
       <Divider marginVertical={7} />
       <RadioSelect
         value={value}
