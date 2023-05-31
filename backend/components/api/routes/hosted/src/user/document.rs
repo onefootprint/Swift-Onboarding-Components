@@ -11,7 +11,6 @@ use api_core::decision::vendor::incode::states::Complete;
 use api_core::decision::vendor::incode::{IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
-use api_core::utils::vault_wrapper::{Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::{DocumentImageError, DocumentResponse, LegacyDocumentResponse};
 use crypto::aead::AeadSealedBytes;
@@ -26,8 +25,8 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentRequestId, DocumentSide, IdentityDocumentId, IncodeConfigurationId,
-    IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
+    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
+    IncodeConfigurationId, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -46,15 +45,15 @@ pub async fn post(
 
     let su_id = user_auth.scoped_user.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
-    let (uvw, doc_request, user_consent) = state
+    let (vault, doc_request, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
             let doc_request = DbDocumentRequest::get_active(conn, &su_id)?
                 .ok_or(OnboardingError::NoPendingDocumentRequestFound)?;
-            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
+            let vault = Vault::get(conn, &su_id)?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
-            Ok((uvw, doc_request, user_consent))
+            Ok((vault, doc_request, user_consent))
         })
         .await??;
 
@@ -70,7 +69,7 @@ pub async fn post(
     // generate a sealed data key (with its plaintext)
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
-            uvw.vault.public_key.as_ref(),
+            vault.public_key.as_ref(),
         )?;
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
     let bucket = &state.config.document_s3_bucket.clone();
@@ -106,7 +105,7 @@ pub async fn post(
     //
     let s3_upload_futs = e_imgs
         .into_iter()
-        .map(|(side, e_data)| upload_image(&state, side, e_data, &doc_request.id, &uvw.vault.id, bucket))
+        .map(|(side, e_data)| upload_image(&state, side, e_data, &doc_request.id, &vault.id, bucket))
         .collect_vec();
 
     let s3_urls = futures::future::try_join_all(s3_upload_futs).await?;
@@ -115,10 +114,12 @@ pub async fn post(
     let doc_request_id = doc_request.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let vault = uvw.vault.clone();
+    let vault2 = vault.clone();
     let created_reqs = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
+            // Get or create the identity document
             let doc_request = DbDocumentRequest::lock_active(conn, &su_id)?;
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request_id,
@@ -126,6 +127,13 @@ pub async fn post(
                 country_code: request.country_code.clone(),
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
+            // Vault the images under latest uploads
+            for (side, s3_url) in s3_urls.iter() {
+                let kind = DocumentKind::LatestUpload(id_doc.document_type, *side);
+                let name = format!("{}.png", kind);
+                let mime_type = "image/png".to_string();
+                uvw.put_document_unsafe(conn, kind, mime_type, name, e_data_key.clone(), s3_url.clone())?;
+            }
             // Create each of the uploads
             s3_urls
                 .into_iter()
@@ -158,7 +166,7 @@ pub async fn post(
                     // Create fixture data
                     let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
                     let doc_type = request.document_type;
-                    Complete::enter(conn, &vault, &su_id, &id_doc.id, doc_type, ocr)?;
+                    Complete::enter(conn, &vault2, &su_id, &id_doc.id, doc_type, ocr)?;
                     None
                 }
             } else {
@@ -172,7 +180,7 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, uvw.vault, doc_request).await?
+        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request).await?
     } else {
         // Fixture response - we always complete successfully!
         DocumentResponse {

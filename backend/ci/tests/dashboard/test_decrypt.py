@@ -118,6 +118,7 @@ def test_tenant_document_decrypt(user_with_documents):
 
     tenant = user_with_documents.tenant
     fields = [
+        "document.latest_upload.drivers_license.front",
         "document.drivers_license.front",
         "document.drivers_license.number",
         "document.drivers_license.issuing_state",
@@ -136,6 +137,7 @@ def test_tenant_document_decrypt(user_with_documents):
         status_code=200,
     )
 
+    assert resp["document.latest_upload.drivers_license.front"] == test_image
     assert resp["document.drivers_license.front"] == test_image
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.number"] == "Y12341234"

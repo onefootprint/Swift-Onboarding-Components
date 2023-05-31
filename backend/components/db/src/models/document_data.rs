@@ -27,7 +27,9 @@ pub struct DocumentData {
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
     pub kind: DocumentKind,
+    // TODO rm
     pub mime_type: String,
+    // TODO rm
     pub filename: String,
     pub s3_url: String,
     pub e_data_key: SealedVaultDataKey,
