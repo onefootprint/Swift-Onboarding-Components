@@ -72,5 +72,28 @@
       "one-side": "Now the photo page of your passport"
     }
   },
-  "pages": {}
+  "pages": {
+    "country-and-type-selection": {
+      "title": "Scan or upload your ID",
+      "subtitle": "We need some more information about your identity.",
+      "form": {
+        "country": "Country",
+        "type": {
+          "passport": {
+            "title": "Passport",
+            "description": "Photo page"
+          },
+          "idCard": {
+            "title": "Identity card",
+            "description": "Front & Back"
+          },
+          "driversLicense": {
+            "title": "Driver's license",
+            "description": "Front & Back"
+          }
+        },
+        "cta": "Continue"
+      }
+    }
+  }
 }

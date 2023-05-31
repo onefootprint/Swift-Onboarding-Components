@@ -1,7 +1,8 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import IdDocCountryAndType from '../id-doc-country-and-type';
 
 type RouterProps = {
   onDone: () => void;
@@ -17,6 +18,10 @@ const Router = ({ onDone }: RouterProps) => {
       onDone();
     }
   }, [isDone, onDone]);
+
+  if (state.matches('countryAndType')) {
+    return <IdDocCountryAndType />;
+  }
 
   return null;
 };
