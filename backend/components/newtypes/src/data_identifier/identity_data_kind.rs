@@ -76,10 +76,6 @@ impl IdentityDataKind {
         ]
     }
 
-    pub fn is_searchable(&self) -> bool {
-        Self::searchable().contains(self)
-    }
-
     // Some kinds we may be more surprised than others seeing show up in multiple distinct vaults
     pub fn should_have_unique_fingerprint(&self) -> bool {
         matches!(self, Self::Ssn9)

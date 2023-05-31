@@ -8,7 +8,6 @@ use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use std::str::FromStr;
 use strum::Display;
 use strum::EnumDiscriminants;
 

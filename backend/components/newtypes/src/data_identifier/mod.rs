@@ -183,9 +183,10 @@ impl DataIdentifier {
                 DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),
-                DataIdentifierDiscriminant::Document => {
-                    DocumentKind::iter().map(DataIdentifier::from).collect_vec()
-                }
+                DataIdentifierDiscriminant::Document => DocumentKind::api_examples()
+                    .into_iter()
+                    .map(DataIdentifier::from)
+                    .collect_vec(),
                 DataIdentifierDiscriminant::Card => CardDataKind::iter()
                     .map(|k| {
                         DataIdentifier::from(CardInfo {
@@ -287,22 +288,28 @@ impl DataIdentifier {
     /// Returns true if the DI can be fingerprinted. Will automatically fingerprint non-document
     /// data with these types when added to the vault
     pub fn is_fingerprintable(&self) -> bool {
-        match self {
-            DataIdentifier::Id(idk) => idk.is_searchable(),
-            DataIdentifier::Business(bdk) => bdk.is_searchable(),
-            DataIdentifier::Document(dk) => dk.is_searchable(),
-            DataIdentifier::Custom(_) | DataIdentifier::InvestorProfile(_) | DataIdentifier::Card(_) => false,
-        }
+        Self::fingerprintable().contains(self)
     }
 
     /// collect fingerprintable DIs
     pub fn fingerprintable() -> Vec<Self> {
-        IdentityDataKind::iter()
-            .map(DataIdentifier::from)
-            .chain(BusinessDataKind::iter().map(DataIdentifier::from))
-            .chain(DocumentKind::iter().map(DataIdentifier::from))
-            .filter(Self::is_fingerprintable)
-            .collect()
+        vec![
+            IdentityDataKind::searchable()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
+            BusinessDataKind::searchable()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
+            DocumentKind::searchable()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
     }
 
     /// Returns true if the DI is allowed to be inserted into the specified vault kind
@@ -397,7 +404,10 @@ mod tests {
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
             BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            DocumentKind::iter().map(DataIdentifier::from).collect_vec(),
+            DocumentKind::api_examples()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
             vec![KvDataKey::from("hayes valley".to_owned()).into()],
         ]
         .into_iter()
@@ -418,7 +428,10 @@ mod tests {
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
             BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            DocumentKind::iter().map(DataIdentifier::from).collect_vec(),
+            DocumentKind::api_examples()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
         ]
         .into_iter()
         .flatten()

@@ -66,7 +66,8 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             | DataIdentifier::Document(DocumentKind::IdCardFront)
             | DataIdentifier::Document(DocumentKind::IdCardBack)
             | DataIdentifier::Document(DocumentKind::IdCardNumber)
-            | DataIdentifier::Document(DocumentKind::IdCardExpiration) => {
+            | DataIdentifier::Document(DocumentKind::IdCardExpiration)
+            | DataIdentifier::Document(DocumentKind::LatestUpload(_, _)) => {
                 let can_decrypt = token_scopes.contains(&TenantScope::Decrypt(CDO::Document))
                     || token_scopes.contains(&TenantScope::Decrypt(CDO::DocumentAndSelfie));
                 Right(can_decrypt)

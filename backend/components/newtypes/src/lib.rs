@@ -178,9 +178,8 @@ pub mod util {
 
             impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for $type {
                 fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-                    use std::str::FromStr;
                     let str = String::from_sql(value)?;
-                    Ok(Self::from_str(&str).map_err(|_| {
+                    Ok(<Self as std::str::FromStr>::from_str(&str).map_err(|_| {
                         format!(
                             "Variant = {} not found for Type = {}",
                             &str,
@@ -210,7 +209,7 @@ pub mod util {
             impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for $type {
                 fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
                     let str = String::from_sql(value)?;
-                    Ok(Self::from_str(&str).map_err(|_| {
+                    Ok(<Self as std::str::FromStr>::from_str(&str).map_err(|_| {
                         format!(
                             "Variant = {} not found for Type = {}",
                             &str,
