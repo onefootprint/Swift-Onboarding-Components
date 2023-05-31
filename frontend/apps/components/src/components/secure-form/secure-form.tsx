@@ -1,3 +1,4 @@
+import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
 import { Divider } from '@onefootprint/ui';
@@ -46,7 +47,15 @@ const SecureForm = ({
     onSave?.(data);
   };
 
-  const methods = useForm<SecureFormData>();
+  const defaultValues =
+    type === SecureFormType.cardAndNameAndAddress
+      ? {
+          country: DEFAULT_COUNTRY,
+        }
+      : undefined;
+  const methods = useForm<SecureFormData>({
+    defaultValues,
+  });
   const { handleSubmit } = methods;
 
   return (

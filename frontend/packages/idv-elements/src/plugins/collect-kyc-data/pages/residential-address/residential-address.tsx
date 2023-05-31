@@ -71,7 +71,7 @@ const ResidentialAddress = ({
   const methods = useForm<FormData>({
     defaultValues,
   });
-  const { watch, handleSubmit, setFocus, setValue } = methods;
+  const { watch, handleSubmit, setFocus, resetField } = methods;
   const country = watch('country');
 
   const onSubmitFormData = (formData: FormData) => {
@@ -91,11 +91,11 @@ const ResidentialAddress = ({
 
   const handleCountryChange = () => {
     setFocus('addressLine1');
-    setValue('addressLine1', '');
-    setValue('addressLine2', '');
-    setValue('city', '');
-    setValue('state', '');
-    setValue('zip', '');
+    resetField('addressLine1');
+    resetField('addressLine2');
+    resetField('city');
+    resetField('state');
+    resetField('zip');
   };
 
   return (

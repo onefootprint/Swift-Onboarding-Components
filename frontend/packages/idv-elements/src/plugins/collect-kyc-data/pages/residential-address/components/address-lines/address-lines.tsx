@@ -17,39 +17,47 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
     register,
     formState: { errors },
     setValue,
+    resetField,
   } = useFormContext();
   const { t } = useTranslation('pages.residential-address.form');
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,
   ) => {
-    if (prediction) {
-      const formattedStreetAddress =
-        prediction?.structured_formatting.main_text;
-      if (formattedStreetAddress) {
-        setValue('addressLine1', formattedStreetAddress);
-      }
+    if (!prediction) {
+      return;
+    }
 
-      const result = await getAddressComponent(prediction);
-      if (result) {
-        if (result.city) {
-          setValue('city', result.city);
-        }
-        if (result.state) {
-          if (countryCode === 'US') {
-            const possibleState = STATES.find(
-              stateOption => stateOption.label === result.state,
-            );
-            if (possibleState) {
-              setValue('state', possibleState);
-            }
-          } else {
-            setValue('state', result.state);
+    resetField('addressLine1');
+    resetField('addressLine2');
+    resetField('city');
+    resetField('state');
+    resetField('zip');
+
+    const formattedStreetAddress = prediction?.structured_formatting.main_text;
+    if (formattedStreetAddress) {
+      setValue('addressLine1', formattedStreetAddress);
+    }
+
+    const result = await getAddressComponent(prediction);
+    if (result) {
+      if (result.city) {
+        setValue('city', result.city);
+      }
+      if (result.state) {
+        if (countryCode === 'US') {
+          const possibleState = STATES.find(
+            stateOption => stateOption.label === result.state,
+          );
+          if (possibleState) {
+            setValue('state', possibleState);
           }
+        } else {
+          setValue('state', result.state);
         }
-        if (result.zip) {
-          setValue('zip', result.zip);
-        }
+      }
+      if (result.zip) {
+        setValue('zip', result.zip);
       }
     }
   };

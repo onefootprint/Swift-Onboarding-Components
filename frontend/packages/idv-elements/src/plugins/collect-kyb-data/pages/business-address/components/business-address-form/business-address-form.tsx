@@ -71,6 +71,7 @@ const BusinessAddressForm = ({
     register,
     handleSubmit,
     formState: { errors },
+    resetField,
     setFocus,
     setValue,
   } = methods;
@@ -91,45 +92,52 @@ const BusinessAddressForm = ({
     });
   };
 
+  const resetFieldsExcludingCountry = () => {
+    resetField('addressLine1');
+    resetField('addressLine2');
+    resetField('city');
+    resetField('state');
+    resetField('zip');
+  };
+
   const handleCountryChange = () => {
     setFocus('addressLine1');
-    setValue('addressLine1', '');
-    setValue('addressLine2', '');
-    setValue('city', '');
-    setValue('state', '');
-    setValue('zip', '');
+    resetFieldsExcludingCountry();
   };
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,
   ) => {
-    if (prediction) {
-      const formattedStreetAddress =
-        prediction?.structured_formatting.main_text;
-      if (formattedStreetAddress) {
-        setValue('addressLine1', formattedStreetAddress);
-      }
+    if (!prediction) {
+      return;
+    }
 
-      const result = await getAddressComponent(prediction);
-      if (result) {
-        if (result.city) {
-          setValue('city', result.city);
-        }
-        if (result.state) {
-          if (country.value === 'US') {
-            const possibleState = STATES.find(
-              stateOption => stateOption.label === result.state,
-            );
-            if (possibleState) {
-              setValue('state', possibleState);
-            }
-          } else {
-            setValue('state', result.state);
+    resetFieldsExcludingCountry();
+
+    const formattedStreetAddress = prediction?.structured_formatting.main_text;
+    if (formattedStreetAddress) {
+      setValue('addressLine1', formattedStreetAddress);
+    }
+
+    const result = await getAddressComponent(prediction);
+    if (result) {
+      if (result.city) {
+        setValue('city', result.city);
+      }
+      if (result.state) {
+        if (country.value === 'US') {
+          const possibleState = STATES.find(
+            stateOption => stateOption.label === result.state,
+          );
+          if (possibleState) {
+            setValue('state', possibleState);
           }
+        } else {
+          setValue('state', result.state);
         }
-        if (result.zip) {
-          setValue('zip', result.zip);
-        }
+      }
+      if (result.zip) {
+        setValue('zip', result.zip);
       }
     }
   };
