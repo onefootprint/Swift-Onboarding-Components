@@ -1,8 +1,8 @@
-use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::State;
+use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
 use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},
@@ -29,15 +29,15 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
-    let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
+    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
     let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
     if !unmet_reqs.is_empty() {
         let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    let session_key = state.session_sealing_key.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
+    let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {

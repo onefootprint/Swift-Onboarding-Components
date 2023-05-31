@@ -5,6 +5,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::onboarding::get_requirements;
+use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
@@ -60,7 +61,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     );
 
     // Verify there are no unmet requirements
-    let (reqs, user_auth) = get_requirements(&state, user_auth).await?;
+    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())

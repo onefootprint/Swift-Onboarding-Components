@@ -1,9 +1,9 @@
-use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
 use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
 use api_core::auth::user::UserObAuthContext;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use feature_flag::BoolFlag;
@@ -17,8 +17,8 @@ pub async fn get(
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
-    let (requirements, user_auth) = get_requirements(&state, user_auth).await?;
-    let (met_requirements, requirements) = requirements.into_iter().partition(|r| r.is_met());
+    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
+    let (met_requirements, requirements) = reqs.into_iter().partition(|r| r.is_met());
     let is_demo_tenant = state
         .feature_flag_client
         .flag(BoolFlag::IsDemoTenant(&user_auth.scoped_user.tenant_id));

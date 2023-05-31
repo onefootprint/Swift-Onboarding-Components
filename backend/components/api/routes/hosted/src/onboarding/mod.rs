@@ -1,6 +1,6 @@
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
-    auth::user::{CheckedUserObAuthContext, UserObSession},
+    auth::user::CheckedUserObAuthContext,
     errors::{business::BusinessError, ApiResult},
     State,
 };
@@ -8,7 +8,8 @@ use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, Onboarding
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, user_consent::UserConsent,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        user_consent::UserConsent,
     },
     PgConn,
 };
@@ -44,6 +45,22 @@ pub fn routes(config: &mut web::ServiceConfig) {
     d2p::routes(config);
 }
 
+pub struct GetRequirementsArgs {
+    pub ob_config: ObConfiguration,
+    pub onboarding: Onboarding,
+    pub sb_id: Option<ScopedVaultId>,
+}
+
+impl GetRequirementsArgs {
+    fn from(value: &CheckedUserObAuthContext) -> ApiResult<Self> {
+        Ok(Self {
+            ob_config: value.ob_config()?.clone(),
+            onboarding: value.onboarding()?.clone(),
+            sb_id: value.scoped_business_id(),
+        })
+    }
+}
+
 #[tracing::instrument(skip_all)]
 /// Gets a list of requirements to onboard onto this ob config.
 /// NOTE: this returns a list of both met and unmet requirements - you should check.
@@ -51,10 +68,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
 /// met requirements
 pub async fn get_requirements(
     state: &State,
-    user_auth: CheckedUserObAuthContext,
-) -> ApiResult<(Vec<OnboardingRequirement>, CheckedUserObAuthContext)> {
+    args: GetRequirementsArgs,
+) -> ApiResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let su_id = user_auth.scoped_user.id.clone();
+    let su_id = args.onboarding.scoped_vault_id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -66,16 +83,14 @@ pub async fn get_requirements(
         .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
         .await?;
 
-    let (requirements, user_auth) = state
+    let requirements = state
         .db_pool
         .db_query(|conn| -> ApiResult<_> {
-            let scoped_business_id = user_auth.scoped_business_id();
-            let requirements =
-                get_requirements_inner(conn, uvw, &user_auth, scoped_business_id, declarations)?;
-            Ok((requirements, user_auth))
+            let requirements = get_requirements_inner(conn, uvw, args, declarations)?;
+            Ok(requirements)
         })
         .await??;
-    Ok((requirements, user_auth))
+    Ok(requirements)
 }
 
 struct RequirementProgress {
@@ -113,11 +128,10 @@ fn get_progress<Type>(
 fn get_requirements_inner(
     conn: &mut PgConn,
     uvw: VaultWrapper<Person>,
-    ob_info: &UserObSession,
-    scoped_business_id: Option<ScopedVaultId>,
+    args: GetRequirementsArgs,
     declarations: Option<PiiString>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
-    let ob_config = ob_info.ob_config()?;
+    let ob_config = &args.ob_config;
     let id_req = ob_config.must_collect(DID::Id).then(|| {
         let RequirementProgress {
             populated_attributes,
@@ -157,7 +171,7 @@ fn get_requirements_inner(
         .must_collect(DID::Business)
         .then(|| -> ApiResult<_> {
             // Use the bvw to determine which fields still need to be collected
-            let scoped_business_id = scoped_business_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+            let scoped_business_id = args.sb_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
             let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
             let RequirementProgress {
                 populated_attributes,
@@ -184,18 +198,18 @@ fn get_requirements_inner(
         // In various places in the codebase, we will determine if a DocumentRequest should be created
         //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
         //      we will create a DocumentRequest row.
-        let user_consent = UserConsent::latest_for_onboarding(conn, &ob_info.onboarding()?.id)?;
-        let doc_request = DocumentRequest::get_active(conn, &ob_info.scoped_user.id)?;
+        let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
+        let doc_request = DocumentRequest::get_active(conn, &args.onboarding.scoped_vault_id)?;
         doc_request.map(|dr| OnboardingRequirement::CollectDocument {
             document_request_id: dr.id,
             should_collect_selfie: dr.should_collect_selfie,
             should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
         })
     };
-    let authorize_req = if ob_info.onboarding()?.authorized_at.is_none() {
+    let authorize_req = if args.onboarding.authorized_at.is_none() {
         let identity_document_types = if ob_config.can_access_document() {
             // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-            let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &ob_info.scoped_user.id)?;
+            let id_docs = IdentityDocument::get_for_scoped_vault_id(conn, &args.onboarding.scoped_vault_id)?;
             id_docs.iter().map(|id| id.document_type).unique().collect()
         } else {
             vec![]
@@ -215,7 +229,7 @@ fn get_requirements_inner(
         .flatten()
         .collect();
 
-    tracing::info!(onboarding_id=%ob_info.onboarding()?.id, requirements=%format!("{:?}", requirements), scoped_user_id=%ob_info.scoped_user.id, "get_requirements result");
+    tracing::info!(onboarding_id=%args.onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.onboarding.scoped_vault_id, "get_requirements result");
 
     Ok(requirements)
 }

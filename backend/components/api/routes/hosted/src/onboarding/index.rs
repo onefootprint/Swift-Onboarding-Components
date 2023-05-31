@@ -6,6 +6,7 @@ use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
+use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
@@ -76,7 +77,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let ob = state
+    let (ob, sb) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
@@ -104,7 +105,7 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
+            let sb = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
                 let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
                 let sb = if let Some(existing) = existing_businesses.into_iter().next() {
                     // If the user has already started onboarding their business onto this exact
@@ -136,20 +137,36 @@ pub async fn post(
                     sb
                 };
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                new_scopes.push(UserAuthScope::Business(sb.id));
-            }
+                new_scopes.push(UserAuthScope::Business(sb.id.clone()));
+                Some(sb)
+            } else {
+                None
+            };
 
             let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;
 
-            Ok(ob)
+            Ok((ob, sb))
         })
         .await?;
 
-    // Omit appearance serialization here
+    let already_authorized = if ob.authorized_at.is_some() {
+        // If the onboarding is authorized, double check that we don't have any remaining
+        // requirements before telling the frontend to skip processing requirements
+        let args = GetRequirementsArgs {
+            ob_config: ob_config.clone(),
+            onboarding: ob,
+            sb_id: sb.map(|sb| sb.id),
+        };
+        let reqs = crate::onboarding::get_requirements(&state, args).await?;
+        reqs.into_iter().all(|r| r.is_met())
+    } else {
+        false
+    };
     let onboarding_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
     ResponseData::ok(OnboardingResponse {
-        already_authorized: ob.authorized_at.is_some(),
+        already_authorized,
+        // Omit appearance serialization here
         onboarding_config,
     })
     .json()
