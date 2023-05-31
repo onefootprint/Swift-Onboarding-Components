@@ -31,11 +31,13 @@ pub struct Decisioning {
     vendor_results: Vec<VendorResult>,
 }
 pub struct WatchlistCheck {
+    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
 pub struct PendingReview;
 pub struct DocCollection {
+    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }

@@ -1,16 +1,20 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::{
-    decision_intent::DecisionIntent, document_request::DocumentRequest, vault::Vault,
-    verification_request::VerificationRequest, workflow::Workflow,
+use db::{
+    models::{
+        decision_intent::DecisionIntent, document_request::DocumentRequest, manual_review::ManualReview,
+        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
+        vault::Vault, verification_request::VerificationRequest, workflow::Workflow,
+    },
+    DbError,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::incode::{
     watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
     IncodeStartOnboardingRequest,
 };
-use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, VendorAPI};
+use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, Vendor, VendorAPI};
 
 use crate::{
     decision::{
@@ -171,6 +175,7 @@ impl OnAction<MakeDecision> for Decisioning {
         match decision_output.decision_status {
             DecisionStatus::Fail => Ok(States::from(Complete).into()),
             DecisionStatus::Pass => Ok(States::from(WatchlistCheck {
+                ob_id: self.ob_id,
                 sv_id: self.sv_id,
                 t_id: self.t_id,
             })
@@ -183,6 +188,7 @@ impl OnAction<MakeDecision> for Decisioning {
                     true, // TODO: maybe should_collect_selfie should come from a config
                 )?;
                 Ok(States::from(DocCollection {
+                    ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
                 })
@@ -200,6 +206,7 @@ impl WatchlistCheck {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(WatchlistCheck {
+            ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
         })
@@ -247,10 +254,37 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
     fn on_commit(
         self,
         watchlist_res: WatchlistResultResponse,
-        _conn: &mut db::TxnPgConn,
+        conn: &mut db::TxnPgConn,
     ) -> ApiResult<WorkflowStates> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
-        Ok(States::from(PendingReview).into())
+
+        let reason_codes =
+            decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
+        let signals = reason_codes
+            .clone()
+            .into_iter()
+            .map(|r| (r, vec![Vendor::Incode]))
+            .collect::<Vec<_>>();
+        if !signals.is_empty() {
+            // TODO: this is sketch and we should probably rethink the data models around OBD/risk signals/reviews/etc
+            let sv = ScopedVault::get(conn, &self.sv_id)?;
+            let obd = OnboardingDecision::latest_footprint_actor_decision(
+                conn,
+                &sv.fp_id,
+                &sv.tenant_id,
+                sv.is_live,
+            )?
+            .ok_or(DbError::RelatedObjectNotFound)?;
+            let _risk_signals = RiskSignal::bulk_create(conn, obd.id, signals)?;
+        }
+
+        // TODO: also always go to PendingReview if doc was collected
+        if reason_codes.is_empty() {
+            Ok(States::from(Complete).into())
+        } else {
+            let _review = ManualReview::create(conn, self.ob_id)?; // TODO: this will crash if a review already exists- which it shouldn't- but still kinda sketch
+            Ok(States::from(PendingReview).into())
+        }
     }
 }
 
@@ -288,6 +322,7 @@ impl DocCollection {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocCollection {
+            ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
         })
@@ -308,6 +343,7 @@ impl OnAction<DocCollected> for DocCollection {
 
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         Ok(States::from(WatchlistCheck {
+            ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
         })
