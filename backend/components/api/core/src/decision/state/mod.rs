@@ -3,7 +3,7 @@ use db::{models::workflow::Workflow, TxnPgConn};
 use newtypes::WorkflowId;
 use thiserror::Error;
 
-use crate::{errors::ApiResult, State};
+use crate::{errors::ApiResult, ApiError, State};
 
 use self::actions::WorkflowActions;
 

@@ -1,20 +1,21 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::decision;
+use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::ReviewCompleted;
+use api_core::decision::state::StateError;
+use api_core::decision::state::WorkflowWrapper;
 use api_core::utils::webhook_app::IntoWebhookApp;
-use api_wire_types::CreateAnnotationRequest;
+use api_core::ApiError;
 use api_wire_types::DecisionRequest;
-use db::models::annotation::Annotation;
-use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingUpdate;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
-use newtypes::DbActor;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::Workflow;
+use db::DbResult;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 use webhooks::events::WebhookEvent;
@@ -35,73 +36,62 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let actor = auth.actor();
     let fp_id = fp_id.into_inner();
-    let fp_id_clone = fp_id.clone();
+    let request = request.into_inner();
+    let status = request.status;
 
-    let DecisionRequest {
-        annotation: CreateAnnotationRequest { note, is_pinned },
-        status,
-    } = request.into_inner();
+    let fpid = fp_id.clone();
+    let tid = tenant_id.clone();
+    let wf = state
+        .db_pool
+        .db_query(move |conn| -> DbResult<Option<Workflow>> {
+            let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
+            Workflow::latest(conn, &sv.id)
+        })
+        .await??;
 
+    if let Some(wf) = wf {
+        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+        let curr_state = newtypes::WorkflowState::from(&ww.state);
+        // TODO: add a ww.expects_action method here to check if the workflow is expecting ReviewCompleted or not. If not, for now we should probably gracefully
+        // just continue and do what this route would have done anyway (ie call save_review_decision). But in the future, we may instead query here for
+        // an existing *active* workflow and if there is one, then strictly error if a review is being made when that workflow isn't expecting it
+        let request = request.clone();
+        let actor = actor.clone();
+        let res = ww
+            .run(
+                &state,
+                WorkflowActions::ReviewCompleted(ReviewCompleted {
+                    decision: request,
+                    actor,
+                }),
+            )
+            .await;
+        match res {
+            Ok(_) => return EmptyResponse::ok().json(),
+            Err(ApiError::StateError(StateError::UnexpectedActionForState)) => {
+                tracing::error!(workflow_id=?wf.id, state=?curr_state, "ReviewCompleted called on workflow not expecting it");
+            }
+            Err(e) => Err(e)?,
+        }
+    }
+
+    let fpid = fp_id.clone();
     let decision = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
-            let (ob, su, manual_review, decision) =
-                Onboarding::lock_for_tenant(conn, &fp_id, &tenant_id, is_live)?;
-
-            if !ob.is_complete() {
-                // Can't make a decision on an onboarding that doesn't already have one
-                return Err(TenantError::CannotMakeDecision.into());
-            }
-
-            let need_to_clear_manual_review = manual_review.is_some();
-            // The status changed if either there is no current decision OR the status of the existing decision is different
-            let status_changed = decision.map(|d| d.status != status.into()).unwrap_or(true);
-
-            if !need_to_clear_manual_review && !status_changed {
-                // The operation is a no-op
-                return Ok(None);
-            }
-            // If a manual review will be cleared or we will create a new decision, the operation
-            // is not a no-op and we should create an annotation in the DB
-            let annotation = Annotation::create(conn, note, is_pinned, su.id.clone(), actor.clone())?;
-
-            let decision = if status_changed {
-                // Create a new decision if the status is different
-                let new_decision = OnboardingDecisionCreateArgs {
-                    vault_id: su.vault_id.clone(),
-                    onboarding: &ob,
-                    logic_git_hash: crate::GIT_HASH.to_string(),
-                    result_ids: vec![],
-                    status: status.into(),
-                    annotation_id: Some(annotation.0.id),
-                    actor: DbActor::from(actor.clone()),
-                    seqno: None,
-                };
-                let decision = OnboardingDecision::create(conn, new_decision)?;
-                ob.into_inner()
-                    .update(conn, OnboardingUpdate::set_decision(status.into()))?;
-                Some(decision)
-            } else {
-                // TODO should create some kind of UserTimeline event here since we are clearing a manual review
-                None
-            };
-
-            // If there is an outstanding review, creating this override decision clears it
-            if let Some(manual_review) = manual_review {
-                manual_review.complete(conn, actor.clone(), decision.as_ref().map(|d| d.id.clone()))?;
-            }
-
-            Ok(decision.map(|d| (d, su)))
+            let fpid = fpid.clone();
+            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor)
         })
         .await?;
 
+    // TODO: move this webhook into Onboarding::update call itself
     // notify any webhook listeners of the change
     if let Some((decision, scoped_vault)) = decision {
         state.webhook_client.send_event_to_tenant_non_blocking(
             scoped_vault.webhook_app(),
             WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
-                fp_id: fp_id_clone.clone(),
-                footprint_user_id: auth.tenant().uses_legacy_serialization().then_some(fp_id_clone),
+                fp_id: fp_id.clone(),
+                footprint_user_id: auth.tenant().uses_legacy_serialization().then_some(fp_id),
                 timestamp: decision.created_at,
                 new_status: status.into(),
             }),

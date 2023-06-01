@@ -35,7 +35,9 @@ pub struct WatchlistCheck {
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
-pub struct PendingReview;
+pub struct PendingReview {
+    sv_id: ScopedVaultId,
+}
 pub struct DocCollection {
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,

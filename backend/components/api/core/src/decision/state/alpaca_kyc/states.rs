@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use api_wire_types::DecisionRequest;
 use async_trait::async_trait;
 use db::{
     models::{
@@ -17,8 +18,10 @@ use idv::incode::{
 use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, Vendor, VendorAPI};
 
 use crate::{
+    auth::tenant::AuthActor,
     decision::{
         self,
+        review::save_review_decision,
         state::{
             actions::MakeDecision, common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall,
             OnAction, ReviewCompleted, WorkflowStates,
@@ -283,7 +286,7 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
             Ok(States::from(Complete).into())
         } else {
             let _review = ManualReview::create(conn, self.ob_id)?; // TODO: this will crash if a review already exists- which it shouldn't- but still kinda sketch
-            Ok(States::from(PendingReview).into())
+            Ok(States::from(PendingReview { sv_id: self.sv_id }).into())
         }
     }
 }
@@ -292,24 +295,31 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
 /// PendingReview
 /// ////////////////
 impl PendingReview {
-    pub async fn init(_state: &State, workflow: Workflow) -> ApiResult<Self> {
-        Ok(PendingReview)
+    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+        let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        Ok(PendingReview { sv_id: sv.id })
     }
 }
 
 #[async_trait]
 impl OnAction<ReviewCompleted> for PendingReview {
-    type AsyncRes = ();
+    type AsyncRes = (DecisionRequest, AuthActor);
 
     async fn execute_async_idempotent_actions(
         &self,
-        _action: ReviewCompleted,
+        action: ReviewCompleted,
         _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(())
+        // TODO: maybe Action can be passed into on_commit too?
+        let ReviewCompleted { decision, actor } = action;
+
+        Ok((decision, actor))
     }
 
-    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+        let (decision, actor) = async_res;
+        let sv = ScopedVault::get(conn, &self.sv_id)?;
+        let _obd = save_review_decision(conn, &sv.fp_id, &sv.tenant_id, sv.is_live, decision, actor)?;
         Ok(States::from(Complete).into())
     }
 }

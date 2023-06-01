@@ -118,15 +118,11 @@ impl Workflow {
         Ok(result)
     }
 
+    // TODO: maybe in future we have a concept of only 1 active workflow at a time and this queries for that instead
     #[tracing::instrument(skip_all)]
-    pub fn latest_by_kind(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        kind: WorkflowKind,
-    ) -> DbResult<Option<Self>> {
+    pub fn latest(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
-            .filter(workflow::kind.eq(kind))
             .order_by(workflow::created_at.desc())
             .first(conn)
             .optional()?;
