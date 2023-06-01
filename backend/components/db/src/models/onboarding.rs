@@ -14,8 +14,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId,
-    TenantScope, VaultId,
+    CipKind, DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId,
+    TenantId, TenantScope, VaultId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -313,7 +313,7 @@ impl Onboarding {
         let insight_event = args.insight_event.insert_with_conn(conn)?;
         let new_ob = NewOnboarding {
             scoped_vault_id: args.scoped_vault_id.clone(),
-            ob_configuration_id: args.ob_configuration_id,
+            ob_configuration_id: args.ob_configuration_id.clone(),
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
             status: OnboardingStatus::Incomplete,
@@ -326,7 +326,13 @@ impl Onboarding {
 
         // TODO: later have a KYB workflow and create that here as well
         let wf = if matches!(v.kind, VaultKind::Person) && should_create_workflow {
-            Some(Workflow::create_kyc(conn, &args.scoped_vault_id)?)
+            let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
+
+            if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+                Some(Workflow::create_alpaca_kyc(conn, &args.scoped_vault_id)?)
+            } else {
+                Some(Workflow::create_kyc(conn, &args.scoped_vault_id)?)
+            }
         } else {
             None
         };

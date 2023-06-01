@@ -183,7 +183,9 @@ pub struct KycConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 
-pub struct AlpacaKycConfig;
+pub struct AlpacaKycConfig {
+    pub is_redo: bool,
+}
 
 #[cfg(test)]
 mod tests {

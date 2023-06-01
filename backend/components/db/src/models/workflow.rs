@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use newtypes::{AlpacaKycConfig, AlpacaKycState};
 use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use serde::{Deserialize, Serialize};
 
@@ -62,6 +63,19 @@ impl Workflow {
             kind: WorkflowKind::Kyc,
             state: WorkflowState::Kyc(KycState::DataCollection),
             config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+        };
+
+        Self::create(conn, new_workflow)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn create_alpaca_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+        let new_workflow = NewWorkflow {
+            created_at: Utc::now(),
+            scoped_vault_id: scoped_vault_id.clone(),
+            kind: WorkflowKind::AlpacaKyc,
+            state: WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
+            config: WorkflowConfig::AlpacaKyc(AlpacaKycConfig { is_redo: false }),
         };
 
         Self::create(conn, new_workflow)
