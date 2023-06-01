@@ -1,4 +1,4 @@
-use crate::utils::vault_wrapper::{VaultWrapper, Any};
+use crate::utils::vault_wrapper::{Any, VaultWrapper};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::scoped_vault::ScopedVault;
@@ -26,6 +26,7 @@ pub fn random_phone_number() -> String {
     )
 }
 
+// TODO: this is duplicative with other text fixture
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     is_live: bool,
@@ -48,7 +49,14 @@ pub fn create_user_and_populate_vault(
 
     let idks = idks.into_iter().map(DataIdentifier::from).collect_vec();
     let update: Vec<(DataIdentifier, PiiString)> = vec![
-        (IDK::PhoneNumber.into(), PiiString::new(random_phone_number())),
+        (
+            IDK::PhoneNumber.into(),
+            PiiString::new(format!(
+                "{}{}",
+                random_phone_number(),
+                (!is_live).then(|| "#pass".to_string()).unwrap_or_default()
+            )),
+        ),
         (IDK::FirstName.into(), PiiString::new("Bob".to_owned())),
         (IDK::LastName.into(), PiiString::new("Boberto".to_owned())),
         (IDK::AddressLine1.into(), PiiString::new("123 Main st".to_owned())),
@@ -61,7 +69,7 @@ pub fn create_user_and_populate_vault(
     let update = update.into_iter().filter(|i| idks.contains(&i.0)).collect();
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.patch_data_test(conn, update).unwrap();
+    uvw.patch_data_test(conn, update, is_live).unwrap();
 
     (uv.into_inner(), su)
 }

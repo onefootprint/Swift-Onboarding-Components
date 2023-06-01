@@ -165,13 +165,13 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     // Add an email
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let email = PiiString::from_str("test@onefootprint.com").unwrap();
-    uvw.patch_data_test(conn, vec![(IDK::Email.into(), email)])
+    uvw.patch_data_test(conn, vec![(IDK::Email.into(), email)], true)
         .unwrap();
 
     // Allow replacing the email
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let email = PiiString::from_str("test2@onefootprint.com").unwrap();
-    uvw.patch_data_test(conn, vec![(IDK::Email.into(), email)])
+    uvw.patch_data_test(conn, vec![(IDK::Email.into(), email)], true)
         .unwrap();
 
     // Add a phone number
@@ -180,7 +180,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
         (IDK::FirstName.into(), PiiString::new("Flerp".to_owned())),
         (IDK::LastName.into(), PiiString::new("Derp".to_owned())),
     ];
-    uvw.patch_data_test(conn, update).unwrap();
+    uvw.patch_data_test(conn, update, true).unwrap();
 
     // Make the user can't see the name and email until it's portable
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
@@ -222,17 +222,17 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     // Add a business name
     let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
     let data = vec![(BDK::Name.into(), PiiString::new("Flerp Inc.".to_owned()))];
-    uvw.patch_data_test(conn, data).unwrap();
+    uvw.patch_data_test(conn, data, true).unwrap();
 
     // Allow replacing the business email
     let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
     let data = vec![(BDK::Name.into(), PiiString::new("Derp Inc.".to_owned()))];
-    uvw.patch_data_test(conn, data).unwrap();
+    uvw.patch_data_test(conn, data, true).unwrap();
 
     // Add a phone_number
     let uvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
     let data = vec![(BDK::PhoneNumber.into(), PiiString::new("+14155551234".to_owned()))];
-    uvw.patch_data_test(conn, data).unwrap();
+    uvw.patch_data_test(conn, data, true).unwrap();
 
     // Make sure the vault view can't see the data until its portable
     let uvw = VaultWrapper::<Business>::build(conn, VwArgs::Vault(&bv.id)).unwrap();
@@ -385,7 +385,7 @@ fn test_bvw_update_business_data_validation(conn: &mut TestPgConn) {
     for (i, test) in tests.into_iter().enumerate() {
         let Test { update, is_allowed } = test;
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
-        let result = bvw.patch_data_test(conn, update.clone());
+        let result = bvw.patch_data_test(conn, update.clone(), true);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -429,7 +429,7 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
 
     for update in updates {
         let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb.id).unwrap();
-        bvw.patch_data_test(conn, update.clone()).unwrap();
+        bvw.patch_data_test(conn, update.clone(), true).unwrap();
         // Make sure fields are set
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
         for (di, _) in update {
@@ -596,7 +596,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             is_allowed,
         } = test;
         let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, su_id).unwrap();
-        let result = uvw.patch_data_test(conn, update);
+        let result = uvw.patch_data_test(conn, update, true);
         assert_eq!(result.is_ok(), is_allowed, "Incorrect status {}: {:?}", i, result);
     }
 }
@@ -624,7 +624,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
         (IDK::Ssn4.into(), PiiString::new("1234".to_owned())),
     ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    uvw.patch_data_test(conn, update).unwrap();
+    uvw.patch_data_test(conn, update, true).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let ssn4_tenant1 = uvw.get_e_data(IDK::Ssn4);
@@ -633,7 +633,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     // Add speculative ssn9 by tenant 2
     let update = vec![(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su2.id).unwrap();
-    uvw.patch_data_test(conn, update).unwrap();
+    uvw.patch_data_test(conn, update, true).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
     let ssn4_tenant2 = uvw.get_e_data(IDK::Ssn4);
@@ -691,7 +691,7 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
 
     for update in updates {
         let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-        uvw.patch_data_test(conn, update.clone()).unwrap();
+        uvw.patch_data_test(conn, update.clone(), true).unwrap();
         // Make sure fields are set
         let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
         for (di, _) in update {
@@ -721,14 +721,14 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
         (k1.clone().into(), PiiString::from("BLERP")),
         (k2.clone().into(), PiiString::from("FLERP")),
     ];
-    uvw.patch_data_test(conn, custom_data).unwrap();
+    uvw.patch_data_test(conn, custom_data, true).unwrap();
 
     // Update k1 and make sure only it changed
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let v1 = uvw.get_e_data(k1.clone()).unwrap().clone();
     let v2 = uvw.get_e_data(k2.clone()).unwrap().clone();
     let custom_data = vec![(k1.clone().into(), PiiString::from("MERP"))];
-    uvw.patch_data_test(conn, custom_data).unwrap();
+    uvw.patch_data_test(conn, custom_data, true).unwrap();
 
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let new_v1 = uvw.get_e_data(k1.clone()).unwrap().clone();
@@ -741,7 +741,7 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
         (k1.clone().into(), PiiString::from("hi")),
         (k2.clone().into(), PiiString::from("bye")),
     ];
-    uvw.patch_data_test(conn, custom_data).unwrap();
+    uvw.patch_data_test(conn, custom_data, true).unwrap();
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     let newest_v1 = uvw.get_e_data(k1).unwrap().clone();
     let newest_v2 = uvw.get_e_data(k2).unwrap().clone();
@@ -788,7 +788,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         )
         .unwrap();
 
-    uvw.patch_data_test(conn, update).unwrap();
+    uvw.patch_data_test(conn, update, true).unwrap();
 
     // Commit the identity data
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();

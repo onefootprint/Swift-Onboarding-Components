@@ -128,9 +128,11 @@ mod test {
             self,
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
+            is_live: bool,
         ) -> ApiResult<Vec<NewContactInfo>> {
             let data = HashMap::from_iter(data.into_iter());
-            let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(true))?;
+            let request =
+                DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
             // Add fingerprints for ID data
             let fingerprints = request
                 .iter()

@@ -19,6 +19,7 @@ pub async fn create_user_and_onboarding(
     enclave_client: &EnclaveClient,
     must_collect_data: Option<Vec<CollectedDataOption>>,
     is_live: bool,
+    phone_suffix: Option<String>,
 ) -> (
     Tenant,
     Onboarding,
@@ -35,7 +36,7 @@ pub async fn create_user_and_onboarding(
                 fixtures::ob_configuration::create_with_opts(conn, &tenant.id, is_live, must_collect_data);
             let ob_config_id = ob_config.id.clone();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone());
+            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), is_live, phone_suffix);
 
             let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id);
 
@@ -53,6 +54,8 @@ pub async fn create_user_and_onboarding(
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
+    is_live: bool,
+    phone_suffix: Option<String>,
 ) -> (Vault, ScopedVault) {
     let uv = fixtures::vault::create_person(conn, ob_config.is_live);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
@@ -60,7 +63,11 @@ pub fn create_user_and_populate_vault(
     let update = vec![
         (
             IdentityDataKind::PhoneNumber.into(),
-            PiiString::new(random_phone_number()),
+            PiiString::new(format!(
+                "{}{}",
+                random_phone_number(),
+                phone_suffix.map(|s| format!("#{}", s)).unwrap_or_default()
+            )),
         ),
         (
             IdentityDataKind::FirstName.into(),
@@ -88,7 +95,7 @@ pub fn create_user_and_populate_vault(
     ];
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
-    let new_ci = uvw.patch_data_test(conn, update).unwrap();
+    let new_ci = uvw.patch_data_test(conn, update, is_live).unwrap();
     let (_, ci) = new_ci
         .into_iter()
         .find(|(di, _)| di == &DataIdentifier::from(IdentityDataKind::PhoneNumber))

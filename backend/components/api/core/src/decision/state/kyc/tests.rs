@@ -26,7 +26,8 @@ use std::sync::Arc;
 
 async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
     let (_, _, _, sv, _, _) =
-        test_helpers::create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true).await;
+        test_helpers::create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true, None)
+            .await;
 
     state
         .db_pool
