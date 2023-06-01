@@ -112,10 +112,10 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-  infra:serverTailscaleKey:
-    secure: v1:YBhIVkjgy+ZPhPEJ:+AT6qs41kdA+kWaQUhMooSAC9ETulX8+7EX6MIpJR/gAQxEDlrCORv4oorz061KD5xwljnJ4pbPwPiaG5XUcRuCG+SwR2sKg6g==
-  infra:tailscaleKey:
-    secure: v1:/iSkf00jwJxz6Psy:oAWHYMOZlNg1Rk95qTownA3fb1RA+xtZg7oc6ma3Hv+74K5b84RUfkKrfGQ5IuKTEuFXgntMLfMTpCkOFaf4rP7SudP6PVKA
   infra:neon:
     apiKey:
       secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=
+  infra:serverTailscaleKey:
+    secure: v1:c0ihJZFCM5gTow8e:glADH70XuRsaKrdMImkUI2YrH5wp2tKJf2ACtVq8Hs7AuJsXL7rXbPjYiZKj7MIiteDmkz2ibyxMHazegolM5RdpqDoUoq/V
+  infra:tailscaleKey:
+    secure: v1:LugjtwdSpINaX+pN:qYThPPztuSbW9vNGWJ4y3O/zzNzPBfQ7oNFAdd+LvEsFuDzeccSsOdDp3QN+6JjPsH7Heq7TtMjMN9GZYu/nCYcygNJeJBv7

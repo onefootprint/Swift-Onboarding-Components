@@ -113,6 +113,6 @@ config:
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
   infra:serverTailscaleKey:
-    secure: v1:74fYef0kxnzqqVdG:dI4iBlokPSB9a81jK25wCB0bxARp1Mp3oEJ2N4Gsgek4eQ9PuNTBOpaan6UK8zX5djbZHm7UBoN2YUF0QCO0yBeUt1b2oDtl
+    secure: v1:zRw0LH2Ah+YRTxmE:RHwU/0V0aUF3wesqLamjwk9c7cMWp4oCAuGkQ5MZHqPHW+dgEz0X0NQ9M8gof3YIlba2cFua6YOd2qlLHrCxSwP5UVmRMFIb
   infra:tailscaleKey:
-    secure: v1:yMtykcvg7+KpmJH2:uovCcKOtdANStsy+dUD0MkaSjKh3Uh6AHXz1CxR9yuKDWcNIWmYbiCSXFp8uCrelR48AVEzLb8zvQMLzUnoUTru+Ir8ksc2k
+    secure: v1:CAXjTeypjanGw1iz:Xy2dX8cvfnGNOfUlHVi4VHVBoR2bNMwUDd1PPAu/DpeowExqgeUGRqh6rCPw5yQ2q4lqFpnqSl2lFS6n58wFLNbf8r38X5Uz
