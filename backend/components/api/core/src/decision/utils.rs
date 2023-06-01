@@ -99,6 +99,8 @@ pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> Fixture
         (DecisionStatus::Fail, false)
     } else if phone_number.sandbox_suffix.starts_with("manualreview") {
         (DecisionStatus::Fail, true)
+    } else if phone_number.sandbox_suffix.starts_with("stepup") {
+        (DecisionStatus::StepUp, false)
     } else {
         (DecisionStatus::Pass, false)
     }
