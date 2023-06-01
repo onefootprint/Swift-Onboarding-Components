@@ -87,7 +87,7 @@ impl IncodeStateMachine {
         let session = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let session = IncodeVerificationSession::get(conn, &sv_id)?;
+                let session = IncodeVerificationSession::get(conn, &id_doc_id)?;
                 let session = if let Some(existing) = session {
                     existing
                 } else {
@@ -100,7 +100,7 @@ impl IncodeStateMachine {
                     };
 
                     // Initialize the incode state
-                    IncodeVerificationSession::create(conn, sv_id, config_id, id_doc_id, session_kind)?
+                    IncodeVerificationSession::create(conn, id_doc_id, config_id, session_kind)?
                 };
                 Ok(session)
             })
@@ -113,10 +113,10 @@ impl IncodeStateMachine {
         }
 
         // Refetch the session since it may have changed if we ran the start
-        let sv_id = ctx.sv_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
         let session = state
             .db_pool
-            .db_query(move |conn| IncodeVerificationSession::get(conn, &sv_id))
+            .db_query(move |conn| IncodeVerificationSession::get(conn, &id_doc_id))
             .await??
             .ok_or(AssertionError("missing session"))?;
         let v_session = {

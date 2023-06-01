@@ -76,7 +76,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     let ctx = IncodeContext {
         di_id: di.id.clone(),
         sv_id: su.id.clone(),
-        id_doc_id: id_doc.id,
+        id_doc_id: id_doc.id.clone(),
         vault: uv.clone(),
         docv_data,
         doc_request_id: id_doc.request_id,
@@ -91,12 +91,12 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
     assert!(failure_reasons.is_empty());
 
-    let su_id = su.id.clone();
+    let id_doc_id = id_doc.id.clone();
     state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             // Make sure we're in the right state
-            let session = IncodeVerificationSession::get(conn, &su_id)?.unwrap();
+            let session = IncodeVerificationSession::get(conn, &id_doc_id)?.unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::AddBack);
             assert!(session.latest_failure_reasons.is_empty());
             Ok(())
@@ -164,7 +164,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
             assert_have_same_elements(successful_vendor_apis, expected_apis);
 
             // Make sure we're in the right state
-            let session = IncodeVerificationSession::get(conn, &su.id)?.unwrap();
+            let session = IncodeVerificationSession::get(conn, &id_doc.id)?.unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::Complete);
             assert!(session.latest_failure_reasons.is_empty());
 
@@ -283,12 +283,12 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
     assert!(!failure_reasons.is_empty());
 
+    let id_doc_id = id_doc.id.clone();
     let s_id = machine.session.id;
-    let s_id2 = s_id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let session = IncodeVerificationSession::get(conn, &s_id2).unwrap().unwrap();
+            let session = IncodeVerificationSession::get(conn, &id_doc_id).unwrap().unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::AddFront);
             assert!(!session.latest_failure_reasons.is_empty());
 

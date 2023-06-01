@@ -3,7 +3,7 @@ use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
     IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, ScopedVaultId,
+    IncodeVerificationSessionState,
 };
 use serde::{Deserialize, Serialize};
 
@@ -21,13 +21,13 @@ pub struct IncodeVerificationSession {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
-    pub scoped_vault_id: ScopedVaultId,
 
     pub incode_session_id: Option<IncodeSessionId>,
     pub incode_configuration_id: IncodeConfigurationId,
     pub incode_authentication_token: Option<IncodeAuthorizationToken>,
     pub incode_authentication_token_expires_at: Option<DateTime<Utc>>,
 
+    /// There is one IncodeVerificationSession for each IdentityDocument
     pub identity_document_id: IdentityDocumentId,
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
@@ -40,7 +40,6 @@ pub struct IncodeVerificationSession {
 #[diesel(table_name = incode_verification_session)]
 pub struct NewIncodeVerificationSession {
     pub created_at: DateTime<Utc>,
-    pub scoped_vault_id: ScopedVaultId,
     pub state: IncodeVerificationSessionState,
     pub incode_configuration_id: IncodeConfigurationId,
     pub identity_document_id: IdentityDocumentId,
@@ -97,14 +96,12 @@ impl IncodeVerificationSession {
     #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
-        scoped_vault_id: ScopedVaultId,
-        configuration_id: IncodeConfigurationId,
         identity_document_id: IdentityDocumentId,
+        configuration_id: IncodeConfigurationId,
         kind: IncodeVerificationSessionKind,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSession {
             created_at: Utc::now(),
-            scoped_vault_id,
             state: IncodeVerificationSessionState::StartOnboarding,
             incode_configuration_id: configuration_id,
             identity_document_id,
@@ -156,8 +153,8 @@ impl IncodeVerificationSession {
             IncodeSessionIdentifier::Id(id) => incode_verification_session::table
                 .filter(incode_verification_session::id.eq(id))
                 .into_boxed(),
-            IncodeSessionIdentifier::ScopedVaultId(scoped_vault_id) => incode_verification_session::table
-                .filter(incode_verification_session::scoped_vault_id.eq(scoped_vault_id))
+            IncodeSessionIdentifier::IdDoc(id) => incode_verification_session::table
+                .filter(incode_verification_session::identity_document_id.eq(id))
                 .into_boxed(),
         }
     }
@@ -167,7 +164,6 @@ impl IncodeVerificationSession {
     where
         T: Into<IncodeSessionIdentifier<'a>>,
     {
-        // TODO: need to grab something like non-complete
         let vs = Self::query(id.into()).first(conn).optional()?;
         Ok(vs)
     }
@@ -175,7 +171,7 @@ impl IncodeVerificationSession {
 
 pub enum IncodeSessionIdentifier<'a> {
     Id(&'a IncodeVerificationSessionId),
-    ScopedVaultId(&'a ScopedVaultId),
+    IdDoc(&'a IdentityDocumentId),
 }
 
 impl<'a> From<&'a IncodeVerificationSessionId> for IncodeSessionIdentifier<'a> {
@@ -184,8 +180,8 @@ impl<'a> From<&'a IncodeVerificationSessionId> for IncodeSessionIdentifier<'a> {
     }
 }
 
-impl<'a> From<&'a ScopedVaultId> for IncodeSessionIdentifier<'a> {
-    fn from(id: &'a ScopedVaultId) -> Self {
-        Self::ScopedVaultId(id)
+impl<'a> From<&'a IdentityDocumentId> for IncodeSessionIdentifier<'a> {
+    fn from(id: &'a IdentityDocumentId) -> Self {
+        Self::IdDoc(id)
     }
 }

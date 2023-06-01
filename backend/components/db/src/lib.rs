@@ -287,7 +287,19 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .select(identity_document::id);
 
             deleted_rows += diesel::delete(document_upload::table)
-                .filter(document_upload::document_id.eq_any(id_doc_ids))
+                .filter(document_upload::document_id.eq_any(id_doc_ids.clone()))
+                .execute(conn.conn())?;
+
+            let incode_ids = incode_verification_session::table
+                .filter(incode_verification_session::identity_document_id.eq_any(id_doc_ids.clone()))
+                .select(incode_verification_session::id);
+
+            deleted_rows += diesel::delete(incode_verification_session_event::table)
+                .filter(incode_verification_session_event::incode_verification_session_id.eq_any(incode_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(incode_verification_session::table)
+                .filter(incode_verification_session::identity_document_id.eq_any(id_doc_ids))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(identity_document::table)
@@ -308,16 +320,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(decision_intent::table)
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
-            .execute(conn.conn())?;
-
-        let incode_ids = incode_verification_session::table
-            .filter(incode_verification_session::scoped_vault_id.eq_any(su_ids.clone()))
-            .select(incode_verification_session::id);
-        deleted_rows += diesel::delete(incode_verification_session_event::table)
-            .filter(incode_verification_session_event::incode_verification_session_id.eq_any(incode_ids))
-            .execute(conn.conn())?;
-        deleted_rows += diesel::delete(incode_verification_session::table)
-            .filter(incode_verification_session::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         // Onboardings

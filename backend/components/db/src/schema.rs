@@ -272,7 +272,6 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
-        scoped_vault_id -> Text,
         incode_session_id -> Nullable<Text>,
         incode_configuration_id -> Text,
         incode_authentication_token -> Nullable<Text>,
@@ -929,7 +928,6 @@ joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
 joinable!(identity_document -> document_request (request_id));
-joinable!(incode_verification_session -> scoped_vault (scoped_vault_id));
 joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));

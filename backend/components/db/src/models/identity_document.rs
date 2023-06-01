@@ -133,10 +133,7 @@ impl IdentityDocument {
 
     /// Get all the documents collected for a given onboarding
     #[tracing::instrument(skip_all)]
-    pub fn get_for_scoped_vault_id(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Vec<Self>> {
+    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))

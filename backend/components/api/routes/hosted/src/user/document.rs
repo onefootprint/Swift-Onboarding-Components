@@ -234,7 +234,12 @@ pub async fn get(
         .db_query(move |conn| -> ApiResult<_> {
             let su_id = &user_auth.scoped_user.id;
             let doc_request = DbDocumentRequest::get(conn, su_id)?.ok_or(DbError::ObjectNotFound)?;
-            let session = IncodeVerificationSession::get(conn, su_id)?;
+            // TODO this will break with workflows. Should deprecate this API before then
+            let id_doc = IdentityDocument::list(conn, su_id)?
+                .into_iter()
+                .next()
+                .ok_or(ApiError::ResourceNotFound)?;
+            let session = IncodeVerificationSession::get(conn, &id_doc.id)?;
             Ok((doc_request, session))
         })
         .await??;
