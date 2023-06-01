@@ -88,6 +88,8 @@ pub enum VendorAPI {
     IncodeFetchOCR,
     IncodeAddSelfie,
     IncodeWatchlistCheck,
+    IncodeGetOnboardingStatus,
+    IncodeProcessFace,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -116,6 +118,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeFetchOCR => Self::Incode,
             VendorAPI::IncodeAddSelfie => Self::Incode,
             VendorAPI::IncodeWatchlistCheck => Self::Incode,
+            VendorAPI::IncodeGetOnboardingStatus => Self::Incode,
+            VendorAPI::IncodeProcessFace => Self::Incode,
         }
     }
 }
@@ -152,6 +156,8 @@ impl VendorAPI {
             VendorAPI::IncodeFetchOCR => false,
             VendorAPI::IncodeAddSelfie => false,
             VendorAPI::IncodeWatchlistCheck => false,
+            VendorAPI::IncodeGetOnboardingStatus => false,
+            VendorAPI::IncodeProcessFace => false,
         }
     }
 }

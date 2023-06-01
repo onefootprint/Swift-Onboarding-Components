@@ -92,6 +92,8 @@ impl KycFeatureVector {
             VendorAPI::IncodeAddSelfie => None,
             // TODO!
             VendorAPI::IncodeWatchlistCheck => None,
+            VendorAPI::IncodeGetOnboardingStatus => None,
+            VendorAPI::IncodeProcessFace => None,
         }
     }
 

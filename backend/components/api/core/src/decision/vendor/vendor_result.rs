@@ -98,6 +98,10 @@ fn deserialize_from_vendor_api(
         VendorAPI::IncodeFetchOCR => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
         VendorAPI::IncodeAddSelfie => ParsedResponse::from_incode_add_selfie(raw_response)?,
         VendorAPI::IncodeWatchlistCheck => ParsedResponse::from_incode_watchlist_check(raw_response)?,
+        VendorAPI::IncodeGetOnboardingStatus => {
+            ParsedResponse::from_incode_get_onboarding_status(raw_response)?
+        }
+        VendorAPI::IncodeProcessFace => ParsedResponse::from_incode_process_face(raw_response)?,
     };
 
     Ok(res)

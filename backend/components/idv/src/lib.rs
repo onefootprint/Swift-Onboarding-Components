@@ -8,7 +8,7 @@ use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::pa::response::PaResponse;
 use incode::doc::response::{
     AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-    ProcessIdResponse,
+    GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
 };
 use incode::response::OnboardingStartResponse;
 use incode::watchlist::response::WatchlistResultResponse;
@@ -64,6 +64,8 @@ pub enum ParsedResponse {
     IncodeAddSelfie(AddSelfieResponse),
     IncodeWatchlistCheck(WatchlistResultResponse),
     IncodeRawResponse(PiiJsonValue),
+    IncodeGetOnboardingStatus(GetOnboardingStatusResponse),
+    IncodeProcessFace(ProcessFaceResponse),
 }
 
 impl ParsedResponse {
@@ -199,6 +201,16 @@ impl ParsedResponse {
     pub fn from_incode_watchlist_check(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: WatchlistResultResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeWatchlistCheck(parsed))
+    }
+    // We should never need this
+    pub fn from_incode_get_onboarding_status(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: GetOnboardingStatusResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeGetOnboardingStatus(parsed))
+    }
+    // We should never need this
+    pub fn from_incode_process_face(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed: ProcessFaceResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeProcessFace(parsed))
     }
 }
 

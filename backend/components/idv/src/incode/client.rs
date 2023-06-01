@@ -300,7 +300,7 @@ impl AuthenticatedIncodeClientAdapter {
 
     // Note: should be called _after_ selfie, front, back and process-id
     #[allow(unused)]
-    async fn process_face(
+    pub async fn process_face(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
     ) -> Result<serde_json::Value, IncodeError> {

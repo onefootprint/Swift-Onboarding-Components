@@ -7,7 +7,11 @@ use idv::{
         doc::response::{
             AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
         },
-        doc::{request::DocumentSide, response::AddSelfieResponse, IncodeAddSelfieRequest},
+        doc::{
+            request::DocumentSide,
+            response::{AddSelfieResponse, GetOnboardingStatusResponse, ProcessFaceResponse},
+            IncodeAddSelfieRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
+        },
         doc::{
             IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
             IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
@@ -396,6 +400,86 @@ impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultRe
 impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
     fn vendor_api(self) -> newtypes::VendorAPI {
         VendorAPI::IncodeWatchlistCheck
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeProcessFaceRequest,
+    ) -> Result<IncodeResponse<ProcessFaceResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client.process_face(self).await?;
+
+        let result = IncodeResponse::<ProcessFaceResponse> {
+            result: IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<ProcessFaceResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeProcessFace
+    }
+
+    fn raw_response(self) -> newtypes::PiiJsonValue {
+        self.raw_response
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response)
+    }
+}
+
+#[async_trait]
+impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardingStatusResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    async fn make_request(
+        &self,
+        request: IncodeGetOnboardingStatusRequest,
+    ) -> Result<IncodeResponse<GetOnboardingStatusResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client
+            .poll_get_onboarding_status(self, request.session_kind)
+            .await?;
+
+        let result = IncodeResponse::<GetOnboardingStatusResponse> {
+            result: IncodeAPIResult::<GetOnboardingStatusResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<GetOnboardingStatusResponse> {
+    fn vendor_api(self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeGetOnboardingStatus
     }
 
     fn raw_response(self) -> newtypes::PiiJsonValue {
