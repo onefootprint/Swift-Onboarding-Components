@@ -2,6 +2,8 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import IdDocBackPhoto from '../id-doc-back-photo';
+import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
 import IdDocFrontPhoto from '../id-doc-front-photo';
 import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
@@ -30,12 +32,20 @@ const Router = ({ onDone }: RouterProps) => {
     return <IdDocFrontPhoto />;
   }
 
-  if (state.matches('processing')) {
-    return <Processing />;
+  if (state.matches('frontImageRetry')) {
+    return <IdDocFrontPhotoRetry />;
+  }
+
+  if (state.matches('backImage')) {
+    return <IdDocBackPhoto />;
   }
 
   if (state.matches('frontImageRetry')) {
-    return <IdDocFrontPhotoRetry />;
+    return <IdDocBackPhotoRetry />;
+  }
+
+  if (state.matches('processing')) {
+    return <Processing />;
   }
 
   return null;

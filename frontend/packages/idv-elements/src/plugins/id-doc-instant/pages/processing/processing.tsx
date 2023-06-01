@@ -64,19 +64,18 @@ const Processing = () => {
       return;
     }
 
-    if (currSide === ImageTypes.front)
-      submitDocMutation.mutate(
-        {
-          [imageRequestFields[currSide]]: image,
-          authToken,
-          documentType: type,
-          countryCode: country,
-        },
-        {
-          onSuccess: handleSubmitDocSuccess,
-          onError: handleSubmitDocError,
-        },
-      );
+    submitDocMutation.mutate(
+      {
+        [imageRequestFields[currSide]]: image,
+        authToken,
+        documentType: type,
+        countryCode: country,
+      },
+      {
+        onSuccess: handleSubmitDocSuccess,
+        onError: handleSubmitDocError,
+      },
+    );
   });
 
   const onSuccessComplete = () => {
