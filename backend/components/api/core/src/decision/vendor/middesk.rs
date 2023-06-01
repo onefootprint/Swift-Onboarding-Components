@@ -589,9 +589,13 @@ pub async fn handle_middesk_webhook(
             let state = s.handle_tin_retried_response(db_pool, t, res).await?;
             state.make_get_business_call(db_pool, middesk_client).await
         }
-        (s, r) => {
-            Err(MiddeskError::UnexpectedState(format!("state = {:?}, webhook_res = {:?}", s, r)).into())
-        }
+        (s, r) => Err(MiddeskError::UnexpectedState(format!(
+            "state = {:?}, webhook_id = {:?}, business_id = {:?}",
+            s,
+            r.webhook_id(),
+            r.business_id()
+        ))
+        .into()),
     }?;
 
     match next_state {

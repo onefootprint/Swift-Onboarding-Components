@@ -48,6 +48,10 @@ impl MiddeskBusinessUpdateWebhookResponse {
             .and_then(|o| o.id.clone())
     }
 
+    pub fn webhook_id(&self) -> Option<String> {
+        self.id.clone()
+    }
+
     pub fn has_tin_error(&self) -> bool {
         self.data
             .as_ref()
@@ -96,6 +100,10 @@ impl MiddeskTinRetriedWebhookResponse {
             .and_then(|d| d.object.as_ref())
             .and_then(|t| t.business_id.clone())
     }
+
+    pub fn webhook_id(&self) -> Option<String> {
+        self.id.clone()
+    }
 }
 
 impl MiddeskWebhookResponse {
@@ -103,6 +111,13 @@ impl MiddeskWebhookResponse {
         match self {
             MiddeskWebhookResponse::BusinessUpdate(v) => v.business_id(),
             MiddeskWebhookResponse::TinRetried(v) => v.business_id(),
+        }
+    }
+
+    pub fn webhook_id(&self) -> Option<String> {
+        match self {
+            MiddeskWebhookResponse::BusinessUpdate(v) => v.webhook_id(),
+            MiddeskWebhookResponse::TinRetried(v) => v.webhook_id(),
         }
     }
 }
