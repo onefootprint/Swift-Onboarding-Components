@@ -37,7 +37,7 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ScopedVaultId, VerificationRequestId, VerificationResultId,
+    FootprintReasonCode, OnboardingId, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 ///
@@ -130,6 +130,7 @@ where
                 verification_result_ids,
                 true,
                 false,
+                None,
             )
         })
         .await
@@ -360,6 +361,7 @@ pub fn calculate_decision(
 }
 
 /// Create and save an onboarding decision
+#[allow(clippy::too_many_arguments)]
 pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
@@ -368,6 +370,7 @@ pub fn save_onboarding_decision(
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,
+    workflow_id: Option<WorkflowId>,
 ) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
@@ -377,6 +380,7 @@ pub fn save_onboarding_decision(
         verification_result_ids,
         &rules_output,
         assert_is_first_decision_for_onboarding,
+        workflow_id,
     )?;
 
     let status = onboarding_decision.status.to_string();

@@ -440,6 +440,7 @@ table! {
         status -> Text,
         actor -> Jsonb,
         seqno -> Nullable<Int8>,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -942,6 +943,7 @@ joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
 joinable!(onboarding -> scoped_vault (scoped_vault_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
+joinable!(onboarding_decision -> workflow (workflow_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(proxy_config -> tenant (tenant_id));

@@ -1,4 +1,4 @@
-use newtypes::{DbActor, FootprintReasonCode, OnboardingId, Vendor, VerificationResultId};
+use newtypes::{DbActor, FootprintReasonCode, OnboardingId, Vendor, VerificationResultId, WorkflowId};
 
 use db::{
     models::{
@@ -29,6 +29,7 @@ pub fn save_final_decision(
     verification_result_ids: Vec<VerificationResultId>,
     decision: &OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,
+    workflow_id: Option<WorkflowId>,
 ) -> ApiResult<OnboardingDecision> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
@@ -60,6 +61,7 @@ pub fn save_final_decision(
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
+        workflow_id,
     };
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 

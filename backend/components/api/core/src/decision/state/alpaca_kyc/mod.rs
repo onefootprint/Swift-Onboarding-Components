@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use db::models::workflow::Workflow;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId};
+use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 // For illustrative purposes currently
 
@@ -15,30 +15,36 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId};
 ///
 
 pub struct DataCollection {
+    wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
 pub struct VendorCalls {
+    wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
 pub struct Decisioning {
+    wf_id: WorkflowId,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
 }
 pub struct WatchlistCheck {
+    wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
 pub struct PendingReview {
+    wf_id: WorkflowId,
     sv_id: ScopedVaultId,
 }
 pub struct DocCollection {
+    wf_id: WorkflowId,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,

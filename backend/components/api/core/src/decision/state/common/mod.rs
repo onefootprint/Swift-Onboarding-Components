@@ -10,7 +10,7 @@ use db::{
     DbPool, DbResult, TxnPgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, VaultKind};
+use newtypes::{OnboardingId, ScopedVaultId, TenantId, VaultKind, WorkflowId};
 
 use crate::{
     decision::{
@@ -168,6 +168,7 @@ pub fn create_kyc_decision(
     fixture_decision: Option<FixtureDecision>,
     vendor_results: Vec<VendorResult>,
     is_redo: bool,
+    workflow_id: &WorkflowId,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     let verification_result_ids = vendor_results
         .iter()
@@ -193,6 +194,7 @@ pub fn create_kyc_decision(
         verification_result_ids,
         !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,
+        Some(workflow_id.clone()),
     )?;
     Ok(rules_output)
 }

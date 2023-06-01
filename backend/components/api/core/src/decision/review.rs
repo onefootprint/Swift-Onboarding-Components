@@ -13,6 +13,7 @@ use db::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::FpId;
 use newtypes::TenantId;
+use newtypes::WorkflowId;
 
 pub fn save_review_decision(
     conn: &mut TxnPgConn,
@@ -21,6 +22,7 @@ pub fn save_review_decision(
     is_live: bool,
     decision_request: DecisionRequest,
     actor: AuthActor,
+    workflow_id: Option<WorkflowId>,
 ) -> ApiResult<Option<(OnboardingDecision, ScopedVault)>> {
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
@@ -57,6 +59,7 @@ pub fn save_review_decision(
             annotation_id: Some(annotation.0.id),
             actor: DbActor::from(actor.clone()),
             seqno: None,
+            workflow_id,
         };
         let decision = OnboardingDecision::create(conn, new_decision)?;
         ob.into_inner()

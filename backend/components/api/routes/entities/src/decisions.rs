@@ -80,7 +80,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let fpid = fpid.clone();
-            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor)
+            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, None)
         })
         .await?;
 

@@ -38,6 +38,7 @@ impl DataCollection {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DataCollection {
+            wf_id: workflow.id,
             is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
@@ -66,6 +67,7 @@ impl OnAction<Authorize> for DataCollection {
         common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
         Ok(States::from(VendorCalls {
+            wf_id: self.wf_id,
             is_redo: self.is_redo,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
@@ -83,6 +85,7 @@ impl VendorCalls {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(VendorCalls {
+            wf_id: workflow.id,
             is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
@@ -109,6 +112,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         _conn: &mut db::TxnPgConn,
     ) -> ApiResult<WorkflowStates> {
         Ok(States::from(Decisioning {
+            wf_id: self.wf_id,
             is_redo: self.is_redo,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
@@ -129,6 +133,7 @@ impl Decisioning {
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
         Ok(Decisioning {
+            wf_id: workflow.id,
             is_redo: config.is_redo,
             ob_id: ob.id,
             sv_id: sv.id,
@@ -168,6 +173,7 @@ impl OnAction<MakeDecision> for Decisioning {
             fixture_decision,
             self.vendor_results,
             self.is_redo,
+            &self.wf_id,
         )?;
         Ok(States::from(Complete).into())
     }

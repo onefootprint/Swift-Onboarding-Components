@@ -17,6 +17,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::TenantId;
+use newtypes::WorkflowId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, Locked, OnboardingDecisionId,
     OnboardingDecisionInfo, OnboardingId, VaultId, VerificationResultId,
@@ -41,6 +42,7 @@ pub struct OnboardingDecision {
     pub actor: DbActor,
     // Only non-null for pass decisions made by footprint
     pub seqno: Option<DataLifetimeSeqno>,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -52,6 +54,7 @@ struct NewOnboardingDecisionRow {
     status: DecisionStatus,
     actor: DbActor,
     seqno: Option<DataLifetimeSeqno>,
+    workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -71,6 +74,7 @@ pub struct OnboardingDecisionCreateArgs<'a> {
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -98,6 +102,7 @@ impl OnboardingDecision {
             status: args.status,
             actor: args.actor,
             seqno: args.seqno,
+            workflow_id: args.workflow_id,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)

@@ -171,6 +171,7 @@ pub async fn setup_test_fixtures(
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno,
+                workflow_id: None,
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
@@ -192,6 +193,7 @@ pub async fn setup_test_fixtures(
                     annotation_id: None,
                     actor: DbActor::Footprint,
                     seqno,
+                    workflow_id: None,
                 };
                 let biz_obd = OnboardingDecision::create(conn, new_decision)?;
 

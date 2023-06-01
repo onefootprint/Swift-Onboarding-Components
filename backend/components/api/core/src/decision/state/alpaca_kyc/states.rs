@@ -46,6 +46,7 @@ impl DataCollection {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DataCollection {
+            wf_id: workflow.id,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -73,6 +74,7 @@ impl OnAction<Authorize> for DataCollection {
         common::setup_kyc_onboarding_vreqs(conn, tvc, false, &self.ob_id, &self.sv_id)?;
 
         Ok(States::from(VendorCalls {
+            wf_id: self.wf_id,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
@@ -89,6 +91,7 @@ impl VendorCalls {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(VendorCalls {
+            wf_id: workflow.id,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -114,6 +117,7 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<WorkflowStates> {
         Ok(States::from(Decisioning {
+            wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
@@ -133,6 +137,7 @@ impl Decisioning {
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
         Ok(Decisioning {
+            wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -173,11 +178,13 @@ impl OnAction<MakeDecision> for Decisioning {
             fixture_decision,
             self.vendor_results,
             false,
+            &self.wf_id,
         )?;
 
         match decision_output.decision_status {
             DecisionStatus::Fail => Ok(States::from(Complete).into()),
             DecisionStatus::Pass => Ok(States::from(WatchlistCheck {
+                wf_id: self.wf_id,
                 ob_id: self.ob_id,
                 sv_id: self.sv_id,
                 t_id: self.t_id,
@@ -191,6 +198,7 @@ impl OnAction<MakeDecision> for Decisioning {
                     true, // TODO: maybe should_collect_selfie should come from a config
                 )?;
                 Ok(States::from(DocCollection {
+                    wf_id: self.wf_id,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
@@ -209,6 +217,7 @@ impl WatchlistCheck {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(WatchlistCheck {
+            wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -288,7 +297,11 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
             Ok(States::from(Complete).into())
         } else {
             let _review = ManualReview::create(conn, self.ob_id)?; // TODO: this will crash if a review already exists- which it shouldn't- but still kinda sketch
-            Ok(States::from(PendingReview { sv_id: self.sv_id }).into())
+            Ok(States::from(PendingReview {
+                sv_id: self.sv_id,
+                wf_id: self.wf_id,
+            })
+            .into())
         }
     }
 }
@@ -299,7 +312,10 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
 impl PendingReview {
     pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
         let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
-        Ok(PendingReview { sv_id: sv.id })
+        Ok(PendingReview {
+            sv_id: sv.id,
+            wf_id: workflow.id,
+        })
     }
 }
 
@@ -321,7 +337,15 @@ impl OnAction<ReviewCompleted> for PendingReview {
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         let (decision, actor) = async_res;
         let sv = ScopedVault::get(conn, &self.sv_id)?;
-        let _obd = save_review_decision(conn, &sv.fp_id, &sv.tenant_id, sv.is_live, decision, actor)?;
+        let _obd = save_review_decision(
+            conn,
+            &sv.fp_id,
+            &sv.tenant_id,
+            sv.is_live,
+            decision,
+            actor,
+            Some(self.wf_id),
+        )?;
         Ok(States::from(Complete).into())
     }
 }
@@ -334,6 +358,7 @@ impl DocCollection {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocCollection {
+            wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -355,6 +380,7 @@ impl OnAction<DocCollected> for DocCollection {
 
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         Ok(States::from(WatchlistCheck {
+            wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,

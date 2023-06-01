@@ -9,13 +9,14 @@ use super::{
 };
 use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use db::models::workflow::Workflow;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId};
+use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 ///
 /// States
 ///
 
 pub struct DataCollection {
+    wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
@@ -23,6 +24,7 @@ pub struct DataCollection {
 }
 
 pub struct VendorCalls {
+    wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
@@ -30,6 +32,7 @@ pub struct VendorCalls {
 }
 
 pub struct Decisioning {
+    wf_id: WorkflowId,
     is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,

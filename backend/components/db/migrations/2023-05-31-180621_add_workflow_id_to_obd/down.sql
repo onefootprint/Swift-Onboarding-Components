@@ -1,0 +1,1 @@
+ALTER TABLE onboarding_decision DROP COLUMN workflow_id;
