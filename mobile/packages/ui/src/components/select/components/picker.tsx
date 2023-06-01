@@ -36,6 +36,14 @@ const Picker = ({
   value,
 }: PickerProps) => {
   const [search, setSearch] = useState('');
+  const selectedIndex = useMemo(() => {
+    if (!value) return undefined;
+    const index = options.findIndex(option => option.value === value?.value);
+    if (index === -1 || index < 15) return undefined;
+    // we want to show the item above the selected item, to make
+    // clear users can scroll up
+    return index - 2;
+  }, [value, options]);
   const filteredOptions = useMemo(() => {
     if (!search) return options;
     return options.filter(option => {
@@ -85,7 +93,8 @@ const Picker = ({
         <FlashList
           contentContainerStyle={contentContainerStyle}
           data={filteredOptions}
-          estimatedItemSize={options.length}
+          estimatedItemSize={48}
+          initialScrollIndex={selectedIndex}
           keyboardShouldPersistTaps="always"
           ListEmptyComponent={
             <EmptyState
