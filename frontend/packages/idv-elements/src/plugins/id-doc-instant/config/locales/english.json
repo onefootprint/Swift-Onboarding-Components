@@ -92,6 +92,7 @@
             "description": "Front & Back"
           }
         },
+        "not-supported": "Sorry, we don't support IDs for your country yet.",
         "cta": "Continue"
       }
     }

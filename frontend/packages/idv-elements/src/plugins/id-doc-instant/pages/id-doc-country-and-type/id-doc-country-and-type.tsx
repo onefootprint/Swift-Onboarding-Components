@@ -18,6 +18,7 @@ import {
   Divider,
   RadioSelect,
   RadioSelectOptionFields,
+  Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -111,15 +112,26 @@ const IdDocCountryAndType = () => {
           value={country}
         />
         <Divider />
-        <RadioSelect
-          value={optionByDocType[docType].value}
-          options={options}
-          onChange={handleDocTypeChange}
-        />
+        {options.length > 0 ? (
+          <RadioSelect
+            value={optionByDocType[docType].value}
+            options={options}
+            onChange={handleDocTypeChange}
+          />
+        ) : (
+          <Typography
+            variant="body-4"
+            sx={{ textAlign: 'center', marginLeft: 5, marginRight: 5 }}
+          >
+            {t('form.not-supported')}
+          </Typography>
+        )}
       </InputsContainer>
-      <Button fullWidth onClick={handleSubmit}>
-        {t('form.cta')}
-      </Button>
+      {options.length > 0 && (
+        <Button fullWidth onClick={handleSubmit}>
+          {t('form.cta')}
+        </Button>
+      )}
     </Container>
   );
 };
