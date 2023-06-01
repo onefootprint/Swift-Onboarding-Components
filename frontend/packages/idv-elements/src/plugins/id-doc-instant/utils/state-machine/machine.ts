@@ -30,24 +30,15 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'frontImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
-            },
-          },
-        },
-        frontImageProcessing: {
-          on: {
-            processingSucceeded: NextSideTargets,
-            processingErrored: {
-              target: 'frontImageRetry',
-              actions: 'assignIdDocImageErrors',
             },
           },
         },
         frontImageRetry: {
           on: {
             receivedImage: {
-              target: 'frontImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
             },
           },
@@ -55,24 +46,15 @@ const createIdDocMachine = (args: MachineContext) =>
         backImage: {
           on: {
             receivedImage: {
-              target: 'backImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
-            },
-          },
-        },
-        backImageProcessing: {
-          on: {
-            processingSucceeded: NextSideTargets,
-            processingErrored: {
-              target: 'backImageRetry',
-              actions: 'assignIdDocImageErrors',
             },
           },
         },
         backImageRetry: {
           on: {
             receivedImage: {
-              target: 'backImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
             },
           },
@@ -93,17 +75,8 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'selfiePrompt',
             },
             receivedImage: {
-              target: 'selfieImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
-            },
-          },
-        },
-        selfieImageProcessing: {
-          on: {
-            processingSucceeded: NextSideTargets,
-            processingErrored: {
-              target: 'selfieImageRetry',
-              actions: 'assignIdDocImageErrors',
             },
           },
         },
@@ -113,9 +86,31 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'selfiePrompt',
             },
             receivedImage: {
-              target: 'selfieImageProcessing',
+              target: 'processing',
               actions: 'assignImage',
             },
+          },
+        },
+        processing: {
+          on: {
+            processingSucceeded: NextSideTargets,
+            processingErrored: [
+              {
+                target: 'frontImageRetry',
+                cond: context => context.currSide === 'front',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'backImageRetry',
+                cond: context => context.currSide === 'back',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'selfieImageRetry',
+                cond: context => context.currSide === 'selfie',
+                actions: 'assignIdDocImageErrors',
+              },
+            ],
           },
         },
         complete: {

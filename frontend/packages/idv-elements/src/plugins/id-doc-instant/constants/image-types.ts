@@ -9,7 +9,6 @@ export enum ImageTypes {
   front = 'front',
   back = 'back',
   selfie = 'selfie',
-  oneSide = 'one-side',
 }
 
 export type ImageIconsType = {
@@ -18,7 +17,6 @@ export type ImageIconsType = {
 
 export const imageIcons: ImageIconsType = {
   [ImageTypes.front]: IcoIdFront40,
-  [ImageTypes.oneSide]: IcoIdFront40,
   [ImageTypes.back]: IcoIdBack40,
   [ImageTypes.selfie]: IcoSelfie40,
 };

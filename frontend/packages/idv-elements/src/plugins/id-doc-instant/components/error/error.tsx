@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import BadImageErrorLabel from '../../constants/bad-image-error-label';
-import { imageIcons, ImageTypes } from '../../constants/image-icons';
+import { imageIcons, ImageTypes } from '../../constants/image-types';
 import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {

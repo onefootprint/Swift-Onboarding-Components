@@ -1,4 +1,4 @@
-import { ImageTypes } from '../../constants/image-icons';
+import { ImageTypes } from '../../constants/image-types';
 import { MachineContext, ProccessingSucceededEvent } from './types';
 
 type MachineTarget = {

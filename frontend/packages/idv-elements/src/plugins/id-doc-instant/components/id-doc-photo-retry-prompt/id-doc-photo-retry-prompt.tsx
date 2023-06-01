@@ -2,7 +2,7 @@ import { IdDocImageError } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
-import { ImageTypes } from '../../constants/image-icons';
+import { ImageTypes } from '../../constants/image-types';
 import Error from '../error';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 

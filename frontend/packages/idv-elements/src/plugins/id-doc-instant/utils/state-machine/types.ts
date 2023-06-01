@@ -6,7 +6,7 @@ import {
   IdDocType,
 } from '@onefootprint/types';
 
-import { ImageTypes } from '../../constants/image-icons';
+import { ImageTypes } from '../../constants/image-types';
 
 export type MachineContext = {
   authToken: string;
@@ -24,7 +24,7 @@ export type MachineContext = {
 export type ProccessingSucceededEvent = {
   type: 'processingSucceeded';
   payload: {
-    nextSideToCollect: string;
+    nextSideToCollect?: string;
   };
 };
 

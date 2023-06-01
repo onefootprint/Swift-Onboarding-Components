@@ -3,6 +3,9 @@ import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import IdDocCountryAndType from '../id-doc-country-and-type';
+import IdDocFrontPhoto from '../id-doc-front-photo';
+import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
+import Processing from '../processing';
 
 type RouterProps = {
   onDone: () => void;
@@ -21,6 +24,18 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('countryAndType')) {
     return <IdDocCountryAndType />;
+  }
+
+  if (state.matches('frontImage')) {
+    return <IdDocFrontPhoto />;
+  }
+
+  if (state.matches('processing')) {
+    return <Processing />;
+  }
+
+  if (state.matches('frontImageRetry')) {
+    return <IdDocFrontPhotoRetry />;
   }
 
   return null;

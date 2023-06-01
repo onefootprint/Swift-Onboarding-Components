@@ -23,15 +23,13 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'backImage'
-    | 'backImageProcessing'
     | 'backImageRetry'
     | 'complete'
     | 'countryAndType'
     | 'frontImage'
-    | 'frontImageProcessing'
     | 'frontImageRetry'
+    | 'processing'
     | 'selfieImage'
-    | 'selfieImageProcessing'
     | 'selfieImageRetry'
     | 'selfiePrompt';
   tags: never;

@@ -5,6 +5,7 @@ enum IdDocImageError {
   documentNotReadable = 'document_not_readable',
   documentNotReadableGlare = 'document_not_readable_glare',
   unableToAlignDocument = 'unable_to_align_document',
+  unrecognizedError = 'unrecognized-error',
 }
 
 export default IdDocImageError;

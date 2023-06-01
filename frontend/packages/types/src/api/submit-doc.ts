@@ -1,12 +1,15 @@
-import { CountryCode3, IdDocType } from '../data';
+import { CountryCode, CountryCode3, IdDocImageError, IdDocType } from '../data';
 
 export type SubmitDocRequest = {
   authToken: string;
-  frontImage: string;
+  frontImage?: string;
   backImage?: string;
   selfieImage?: string;
   documentType: IdDocType;
-  countryCode: CountryCode3;
+  countryCode: CountryCode | CountryCode3;
 };
 
-export type SubmitDocResponse = {};
+export type SubmitDocResponse = {
+  errors: IdDocImageError[];
+  nextSideToCollect: 'front' | 'back' | 'selfie';
+};

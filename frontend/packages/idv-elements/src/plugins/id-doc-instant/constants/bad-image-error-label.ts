@@ -13,6 +13,8 @@ const BadImageErrorLabel: Record<IdDocImageError, string> = {
     'Your document was not readable because of image glare. Please adjust the lighting and try again.',
   [IdDocImageError.unableToAlignDocument]:
     'One or more corners of the document not within the borders of the image. Note: This happens when the document is not centered in the frame and edges bleed past the frame of the picture.',
+  [IdDocImageError.unrecognizedError]:
+    'An error occurred while processing the photo. Please try again.',
 };
 
 export default BadImageErrorLabel;

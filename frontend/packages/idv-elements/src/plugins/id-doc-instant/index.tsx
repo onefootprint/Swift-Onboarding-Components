@@ -5,8 +5,10 @@ import { I18nextProvider } from 'react-i18next';
 import { MachineProvider } from './components/machine-provider';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
+import { ImageTypes } from './constants/image-types';
 import { IdDocProps } from './id-doc.types';
 import Router from './pages/router';
+import { MachineContext } from './utils/state-machine';
 
 const App = ({ context, onDone }: IdDocProps) => {
   const { authToken, device, customData } = context;
@@ -14,12 +16,12 @@ const App = ({ context, onDone }: IdDocProps) => {
     return null;
   }
 
-  const initialContext = {
+  const initialContext: MachineContext = {
     authToken,
     device,
+    currSide: ImageTypes.front,
     requirement: customData.requirement,
     idDoc: {},
-    selfie: {},
   };
 
   return (

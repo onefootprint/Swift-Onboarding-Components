@@ -11,7 +11,7 @@ import styled, { css } from 'styled-components';
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { imageIcons, ImageTypes } from '../../constants/image-icons';
+import { imageIcons, ImageTypes } from '../../constants/image-types';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoPromptProps = {
@@ -30,7 +30,9 @@ const IdDocPhotoPrompt = ({
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const ImageIcon = imageIcons[imageType];
   const side =
-    imageType === ImageTypes.oneSide ? 'photo page' : `${imageType} side`;
+    imageType === (type === IdDocType.passport && ImageTypes.front)
+      ? 'photo page'
+      : `${imageType} side`;
 
   return (
     <Container>

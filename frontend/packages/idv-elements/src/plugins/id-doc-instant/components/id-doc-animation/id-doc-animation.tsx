@@ -1,4 +1,3 @@
-import { DocStatusKind } from '@onefootprint/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -6,10 +5,10 @@ import styled from 'styled-components';
 import TRANSITION_DELAY from '../../constants/transition-delay.constants';
 
 type IdDocAnimationProps = {
+  mode: 'loading' | 'success';
   loadingComponent: ReactNode;
   successComponent: ReactNode;
-  nextSideComponent: ReactNode;
-  status: DocStatusKind;
+  nextSideComponent?: ReactNode;
 };
 
 const successFeedbackVariants = {
@@ -39,28 +38,32 @@ const nextSideVariants = {
 };
 
 const IdDocAnimation = ({
+  mode,
   loadingComponent,
   successComponent,
   nextSideComponent,
-  status,
 }: IdDocAnimationProps) => {
   const [isShowingSuccess, setIsShowingSuccess] = useState(false);
   const [isShowingNextSide, setIsShowingNextSide] = useState(false);
 
+  // We start with loading mode
+  // When the mode becomes "success", we show "success"
+  // and start a timer after which we show nextSide component
+  // There are animations in the way how the components appear and disappear
   useEffect(() => {
-    if (status === DocStatusKind.complete) {
+    if (mode === 'success') {
       setIsShowingSuccess(true);
       setTimeout(() => {
         setIsShowingSuccess(false);
-        setIsShowingNextSide(true);
+        if (nextSideComponent) setIsShowingNextSide(true);
       }, TRANSITION_DELAY);
     }
-  }, [status]);
+  }, [mode, nextSideComponent]);
 
   return (
     <>
       <AnimatePresence>
-        {status === DocStatusKind.pending && (
+        {mode === 'loading' && (
           <motion.div exit={{ opacity: 0 }}>{loadingComponent}</motion.div>
         )}
       </AnimatePresence>
