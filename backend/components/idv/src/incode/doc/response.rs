@@ -336,6 +336,36 @@ impl GetOnboardingStatusResponse {
     }
 }
 
+impl APIResponseToIncodeError for GetOnboardingStatusResponse {
+    // no custom error codes here
+    // TODO: in future PR handle http errors
+    fn to_error(&self) -> Option<Error> {
+        None
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct ProcessFaceResponse {
+    // Value can be 0 or 1. Value 0 means that selfie doesn't match face photo from ID.
+    pub confidence: Option<f32>,
+    // Flag indicating if this user already exists in the system.
+    pub existing_user: Option<bool>,
+    // Session id where user is approved previously (existingUser=true).
+    pub existing_interview_id: Option<String>,
+    // In case user is approved previously (existingUser=true), flag indicating if names are matching.
+    pub name_matched: Option<bool>,
+    // In case the session does have an externalId which can be assigned at start call.
+    pub existing_external_id: Option<String>,
+}
+impl APIResponseToIncodeError for ProcessFaceResponse {
+    // no custom error codes here
+    // TODO: in future PR handle http errors
+    fn to_error(&self) -> Option<Error> {
+        None
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRName {

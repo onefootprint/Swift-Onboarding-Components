@@ -298,6 +298,27 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    // Note: should be called _after_ selfie, front, back and process-id
+    #[allow(unused)]
+    async fn process_face(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/process/face")?;
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        Ok(response)
+    }
+
     async fn get_onboarding_status(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -431,7 +452,10 @@ mod tests {
         footprint_http_client::FootprintVendorHttpClient,
         incode::{
             doc::request::DocumentSide,
-            doc::response::{AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse},
+            doc::response::{
+                AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessFaceResponse,
+                ProcessIdResponse,
+            },
             response::OnboardingStartResponse,
             watchlist::response::WatchlistResultResponse,
             IncodeAPIResult,
@@ -550,7 +574,26 @@ mod tests {
             .unwrap()
             .into_success()
             .unwrap();
+        //
+        // Process face now
+        //
+        let raw_process_face = authenticated_client
+            .process_face(&fp_client)
+            .await
+            .expect("process face failed");
 
+        IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_process_face)
+            .unwrap()
+            .into_success()
+            .unwrap();
+
+        //
+        // check status
+        //
+        authenticated_client
+            .poll_get_onboarding_status(&fp_client, IncodeVerificationSessionKind::Selfie)
+            .await
+            .expect("results weren't ready after polling!");
         //
         // Fetch Scores
         //
