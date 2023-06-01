@@ -38,6 +38,8 @@ pub async fn get_fixture_data_decision(
     scoped_vault_id: &ScopedVaultId,
     tenant_id: &TenantId,
 ) -> ApiResult<Option<FixtureDecision>> {
+    let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
+
     let svid = scoped_vault_id.clone();
     let uvw: VaultWrapper<Person> = state
         .db_pool
@@ -52,7 +54,6 @@ pub async fn get_fixture_data_decision(
         return Ok(Some(fixture_decision));
     }
 
-    let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
     if is_demo_tenant {
         // For our tenant we use for demos, always make a fixture pass
         let fixture_decision = (DecisionStatus::Pass, false);

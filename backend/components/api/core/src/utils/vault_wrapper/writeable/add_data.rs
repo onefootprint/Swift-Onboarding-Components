@@ -120,13 +120,15 @@ mod test {
     };
     use std::collections::HashMap;
 
+    use super::NewContactInfo;
+
     impl<Type> WriteableVw<Type> {
         /// Shorthand to add data to a vault in tests
         pub fn patch_data_test(
             self,
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
-        ) -> ApiResult<()> {
+        ) -> ApiResult<Vec<NewContactInfo>> {
             let data = HashMap::from_iter(data.into_iter());
             let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(true))?;
             // Add fingerprints for ID data
@@ -152,8 +154,7 @@ mod test {
                 })
                 .collect();
             let request = request.manual_fingerprints(fingerprints);
-            self.patch_data(conn, request)?;
-            Ok(())
+            self.patch_data(conn, request)
         }
     }
 }

@@ -48,7 +48,6 @@ pub fn get_vendor_apis_for_verification_requests(
         // filter available vendor apis by whether or not this vendor is enabled for a tenant
         .filter(|v| tenant_vendor_control.enabled_vendor_apis().contains(v))
         .collect::<Vec<_>>();
-
     if vendor_apis.is_empty() {
         return Err(ApiError::AssertionError(
             "Not enough information to send to any vendors".into(),

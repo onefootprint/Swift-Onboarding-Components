@@ -39,8 +39,8 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, di) =
-        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data).await;
+    let (tenant, ob, uv, su, di, _) =
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data, true).await;
 
     // Needed for db constraints
     let su_id = su.id.clone();
@@ -232,8 +232,8 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, di) =
-        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data).await;
+    let (tenant, ob, uv, su, di, _) =
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, must_collect_data, true).await;
     let suid = su.id.clone();
 
     // Needed for db constraints

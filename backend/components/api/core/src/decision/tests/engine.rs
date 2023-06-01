@@ -7,6 +7,7 @@ use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::State;
 use db::{
     models::{onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
+    tests::fixtures,
     DbError,
 };
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
@@ -15,7 +16,7 @@ use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use macros::test_state_case;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
 
 //
 // A smattering of e2e integration tests for Decision Engine :)
@@ -60,8 +61,28 @@ async fn test_run(
     //
     // Setup
     //
-    let (tenant, onboarding, _, _, _) =
-        create_user_and_onboarding(&state.db_pool, &state.enclave_client, None).await;
+    let (tenant, onboarding, _, _, di, _) =
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true).await;
+    let svid = onboarding.scoped_vault_id.clone();
+    let diid = di.id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| {
+            fixtures::verification_request::bulk_create(
+                conn,
+                &svid,
+                vec![
+                    VendorAPI::TwilioLookupV2,
+                    VendorAPI::IdologyExpectID,
+                    VendorAPI::SocureIDPlus,
+                    VendorAPI::ExperianPreciseID,
+                ],
+                &diid,
+            );
+        })
+        .await
+        .unwrap();
+
     let tenant_vendor_control = TenantVendorControl::new(
         tenant.id.clone(),
         &state.db_pool,
