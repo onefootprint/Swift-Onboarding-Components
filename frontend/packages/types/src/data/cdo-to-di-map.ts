@@ -57,6 +57,12 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
     DocumentDI.driversLicenseFront,
     DocumentDI.idCardBack,
     DocumentDI.idCardFront,
+
+    DocumentDI.latestPassport,
+    DocumentDI.latestDriversLicenseBack,
+    DocumentDI.latestDriversLicenseFront,
+    DocumentDI.latestIdCardBack,
+    DocumentDI.latestIdCardFront,
   ],
   [CollectedDocumentDataOption.documentAndSelfie]: [
     ...Object.values(DocumentDI).map(value => value),

@@ -9,36 +9,32 @@ const getDocDis = (
   dis: DataIdentifier[],
   vaultData?: Partial<Record<DataIdentifier, VaultValue>>,
 ) => {
-  if (dis.includes(DocumentDI.idCardFront)) {
-    if (vaultData && !isVaultDataEmpty(vaultData?.[DocumentDI.idCardBack])) {
-      dis.push(DocumentDI.idCardBack);
+  const extraFieldsToDecrypt: Partial<Record<DocumentDI, DocumentDI[]>> = {
+    [DocumentDI.idCardFront]: [DocumentDI.idCardBack, DocumentDI.idCardSelfie],
+    [DocumentDI.driversLicenseFront]: [
+      DocumentDI.driversLicenseBack,
+      DocumentDI.driversLicenseSelfie,
+    ],
+    [DocumentDI.passport]: [DocumentDI.passportSelfie],
+    [DocumentDI.latestIdCardFront]: [
+      DocumentDI.latestIdCardBack,
+      DocumentDI.latestIdCardSelfie,
+    ],
+    [DocumentDI.latestDriversLicenseFront]: [
+      DocumentDI.latestDriversLicenseBack,
+      DocumentDI.latestDriversLicenseSelfie,
+    ],
+    [DocumentDI.latestPassport]: [DocumentDI.latestPassportSelfie],
+  };
+  Object.entries(extraFieldsToDecrypt).forEach(([mainDi, otherDis]) => {
+    if (dis.includes(mainDi as DataIdentifier)) {
+      otherDis.forEach(di => {
+        if (vaultData && !isVaultDataEmpty(vaultData[di])) {
+          dis.push(di);
+        }
+      });
     }
-    if (vaultData && !isVaultDataEmpty(vaultData?.[DocumentDI.idCardSelfie])) {
-      dis.push(DocumentDI.idCardSelfie);
-    }
-  }
-  if (dis.includes(DocumentDI.driversLicenseFront)) {
-    if (
-      vaultData &&
-      !isVaultDataEmpty(vaultData?.[DocumentDI.driversLicenseBack])
-    ) {
-      dis.push(DocumentDI.driversLicenseBack);
-    }
-    if (
-      vaultData &&
-      !isVaultDataEmpty(vaultData?.[DocumentDI.driversLicenseSelfie])
-    ) {
-      dis.push(DocumentDI.driversLicenseSelfie);
-    }
-  }
-  if (dis.includes(DocumentDI.passport)) {
-    if (
-      vaultData &&
-      !isVaultDataEmpty(vaultData?.[DocumentDI.passportSelfie])
-    ) {
-      dis.push(DocumentDI.passportSelfie);
-    }
-  }
+  });
 
   return dis;
 };

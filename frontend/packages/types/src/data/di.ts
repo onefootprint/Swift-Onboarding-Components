@@ -52,6 +52,15 @@ export enum DocumentDI {
   idCardFront = 'document.id_card.front',
   idCardBack = 'document.id_card.back',
   idCardSelfie = 'document.id_card.selfie',
+
+  latestPassport = 'document.latest_upload.passport.front',
+  latestPassportSelfie = 'document.latest_upload.passport.selfie',
+  latestDriversLicenseFront = 'document.latest_upload.drivers_license.front',
+  latestDriversLicenseBack = 'document.latest_upload.drivers_license.back',
+  latestDriversLicenseSelfie = 'document.latest_upload.drivers_license.selfie',
+  latestIdCardFront = 'document.latest_upload.id_card.front',
+  latestIdCardBack = 'document.latest_upload.id_card.back',
+  latestIdCardSelfie = 'document.latest_upload.id_card.selfie',
 }
 
 export const DataIdentifierKeys = [

@@ -14,27 +14,27 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
   const { data } = useEntityVault(entity.id, entity);
   const fields = [
     {
-      main: DocumentDI.idCardFront,
+      main: DocumentDI.latestIdCardFront,
       label: 'Id card',
       dis: [
-        DocumentDI.idCardFront,
-        DocumentDI.idCardBack,
-        DocumentDI.idCardSelfie,
+        DocumentDI.latestIdCardFront,
+        DocumentDI.latestIdCardBack,
+        DocumentDI.latestIdCardSelfie,
       ],
     },
     {
-      main: DocumentDI.driversLicenseFront,
+      main: DocumentDI.latestDriversLicenseFront,
       label: 'Drivers license',
       dis: [
-        DocumentDI.driversLicenseFront,
-        DocumentDI.driversLicenseBack,
-        DocumentDI.driversLicenseSelfie,
+        DocumentDI.latestDriversLicenseFront,
+        DocumentDI.latestDriversLicenseBack,
+        DocumentDI.latestDriversLicenseSelfie,
       ],
     },
     {
-      main: DocumentDI.passport,
+      main: DocumentDI.latestPassport,
       label: 'Passport',
-      dis: [DocumentDI.passport, DocumentDI.passportSelfie],
+      dis: [DocumentDI.latestPassport, DocumentDI.latestPassportSelfie],
     },
   ];
 

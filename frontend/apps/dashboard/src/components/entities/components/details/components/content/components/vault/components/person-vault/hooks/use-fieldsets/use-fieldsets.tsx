@@ -70,9 +70,9 @@ const useFieldsets = (): Fieldset => {
       title: t('documents.title'),
       iconComponent: IcoDollar24,
       fields: [
-        { di: DocumentDI.driversLicenseFront },
-        { di: DocumentDI.idCardFront },
-        { di: DocumentDI.passport },
+        { di: DocumentDI.latestDriversLicenseFront },
+        { di: DocumentDI.latestIdCardFront },
+        { di: DocumentDI.latestPassport },
       ],
     },
   };

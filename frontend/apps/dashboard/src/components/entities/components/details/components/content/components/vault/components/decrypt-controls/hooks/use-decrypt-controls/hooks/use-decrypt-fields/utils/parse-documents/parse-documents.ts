@@ -20,6 +20,14 @@ const images = [
   DocumentDI.idCardSelfie,
   DocumentDI.passport,
   DocumentDI.passportSelfie,
+  DocumentDI.latestDriversLicenseBack,
+  DocumentDI.latestDriversLicenseFront,
+  DocumentDI.latestDriversLicenseSelfie,
+  DocumentDI.latestIdCardBack,
+  DocumentDI.latestIdCardFront,
+  DocumentDI.latestIdCardSelfie,
+  DocumentDI.latestPassport,
+  DocumentDI.latestPassportSelfie,
 ];
 
 const parseDocuments = (
