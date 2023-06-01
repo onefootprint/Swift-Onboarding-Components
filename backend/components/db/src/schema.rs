@@ -169,6 +169,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -923,6 +924,7 @@ joinable!(data_lifetime -> vault (vault_id));
 joinable!(decision_intent -> scoped_vault (scoped_vault_id));
 joinable!(document_data -> data_lifetime (lifetime_id));
 joinable!(document_request -> scoped_vault (scoped_vault_id));
+joinable!(document_request -> workflow (workflow_id));
 joinable!(document_upload -> identity_document (document_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));

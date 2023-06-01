@@ -4,10 +4,12 @@ use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::WorkflowId;
 use newtypes::{DocumentRequestId, DocumentRequestStatus, Locked, ScopedVaultId};
 use serde::{Deserialize, Serialize};
 
 pub type DocRefId = String;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
@@ -19,6 +21,7 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
+    pub workflow_id: Option<WorkflowId>,
 }
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
@@ -39,6 +42,7 @@ impl DocumentRequest {
         scoped_vault_id: ScopedVaultId,
         ref_id: Option<String>,
         should_collect_selfie: bool,
+        workflow_id: Option<WorkflowId>,
     ) -> DbResult<Self> {
         let new = NewDocumentRequest {
             scoped_vault_id,
@@ -46,6 +50,7 @@ impl DocumentRequest {
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
             should_collect_selfie,
+            workflow_id,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -53,7 +58,6 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
     pub fn lock_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let result = document_request::table
@@ -65,7 +69,6 @@ impl DocumentRequest {
         Ok(Locked::new(result))
     }
 
-    /// Note: we only allow a single pending DocumentRequest per scoped user id (there's a unique index)
     #[tracing::instrument(skip_all)]
     pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = document_request::table
@@ -150,4 +153,5 @@ pub struct NewDocumentRequest {
     pub status: DocumentRequestStatus,
     pub created_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
+    pub workflow_id: Option<WorkflowId>,
 }

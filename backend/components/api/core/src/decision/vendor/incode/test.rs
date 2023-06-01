@@ -47,7 +47,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), su_id, None, false).unwrap();
+            let doc_request = DocumentRequest::create(conn.conn(), su_id, None, false, None).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
@@ -240,7 +240,7 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false).unwrap();
+            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;

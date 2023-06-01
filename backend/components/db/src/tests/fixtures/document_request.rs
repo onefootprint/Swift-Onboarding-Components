@@ -65,6 +65,7 @@ pub fn create(
         opts.scoped_user_id.clone(),
         None,
         opts.should_collect_selfie,
+        None,
     )
     .unwrap();
     let mut verification_info = None;

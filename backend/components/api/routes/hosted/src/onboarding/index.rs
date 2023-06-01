@@ -91,11 +91,14 @@ pub async fn post(
 
             let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, should_create_workflow)?;
 
-            if matches!(is_new_ob, IsNew::Yes(_)) && obc.must_collect(DataIdentifierDiscriminant::Document) {
-                // Create a `DocumentRequest` if specified in the ob config.
-                // To prevent duplicate document requests, only create a doc request if the onboarding is new
-                let must_collect_selfie = obc.must_collect_selfie();
-                DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, must_collect_selfie)?;
+            if let IsNew::Yes(ref wf) = is_new_ob {
+                if obc.must_collect(DataIdentifierDiscriminant::Document) {
+                    // Create a `DocumentRequest` if specified in the ob config.
+                    // To prevent duplicate document requests, only create a doc request if the onboarding is new
+                    let collect_selfie = obc.must_collect_selfie();
+                    let wf_id = wf.as_ref().map(|wf| wf.id.clone());
+                    DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, collect_selfie, wf_id)?;
+                }
             }
 
             let mut new_scopes = vec![];
