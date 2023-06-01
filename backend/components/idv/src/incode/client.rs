@@ -1,6 +1,7 @@
 use super::doc::request::{
     AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide,
 };
+use super::doc::response::GetOnboardingStatusResponse;
 use super::watchlist::request::WatchlistResultRequest;
 use super::{
     request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
@@ -8,11 +9,15 @@ use super::{
     IncodeAPIResult,
 };
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
+use newtypes::IncodeVerificationSessionKind;
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
     PiiString,
 };
 use reqwest::header;
+
+use tokio_retry::strategy::FixedInterval;
+use tokio_retry::RetryIf;
 
 #[allow(unused)]
 const INCODE_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
@@ -293,6 +298,53 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    async fn get_onboarding_status(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        session_kind: IncodeVerificationSessionKind,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/get/onboarding/status")?;
+        let response: serde_json::Value = footprint_http_client
+            .client
+            .get(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?
+            .json()
+            .await?;
+
+        let parsed: GetOnboardingStatusResponse = serde_json::from_value(response.clone())?;
+        if !parsed.ready(session_kind) {
+            return Err(IncodeError::ResultsNotReady);
+        }
+
+        Ok(response)
+    }
+
+    fn session_results_are_not_ready(error: &IncodeError) -> bool {
+        matches!(error, IncodeError::ResultsNotReady)
+    }
+
+    // TODO: make this a reusable strategy across vendor requests, either on http client or on VendorAPICall
+    pub async fn poll_get_onboarding_status(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        session_kind: IncodeVerificationSessionKind,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let retry_strategy = FixedInterval::from_millis(1000).take(14);
+
+        let response = RetryIf::spawn(
+            retry_strategy,
+            || self.get_onboarding_status(footprint_http_client, session_kind.to_owned()),
+            Self::session_results_are_not_ready,
+        )
+        .await
+        .map_err(IncodeError::from)?;
+
+        Ok(response)
+    }
+
     pub async fn watchlist_result(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -371,7 +423,8 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, PiiString,
+        vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId,
+        IncodeVerificationSessionKind, PiiString,
     };
 
     use crate::{
@@ -477,6 +530,13 @@ mod tests {
             .unwrap()
             .into_success()
             .unwrap();
+        //
+        // check status
+        //
+        let status_res = authenticated_client
+            .poll_get_onboarding_status(&fp_client, IncodeVerificationSessionKind::Selfie)
+            .await;
+        assert!(status_res.is_err());
 
         //
         // Process the ID

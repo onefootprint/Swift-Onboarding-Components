@@ -4,7 +4,7 @@ use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToI
 use chrono::NaiveDateTime;
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
-    IncodeFailureReason, PiiString,
+    IncodeFailureReason, IncodeVerificationSessionKind, PiiString,
 };
 
 /// Response we get back from adding a document image
@@ -320,6 +320,22 @@ fn get_document_kind(type_of_id: &Option<PiiString>) -> Result<IncodeDocumentTyp
         }),
     )
 }
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct GetOnboardingStatusResponse {
+    pub onboarding_status: String,
+}
+impl GetOnboardingStatusResponse {
+    pub fn ready(&self, session_kind: IncodeVerificationSessionKind) -> bool {
+        match session_kind {
+            IncodeVerificationSessionKind::IdDocument => {
+                self.onboarding_status == *"POST_PROCESSING_FINISHED"
+            }
+            IncodeVerificationSessionKind::Selfie => self.onboarding_status == *"FACE_VALIDATION_FINISHED",
+        }
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRName {

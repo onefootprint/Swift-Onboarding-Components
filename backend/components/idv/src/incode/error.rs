@@ -24,4 +24,6 @@ pub enum Error {
     StringParseFloatError(#[from] std::num::ParseFloatError),
     #[error("{0}")]
     ChronoParseError(#[from] chrono::ParseError),
+    #[error("Results not ready")]
+    ResultsNotReady,
 }
