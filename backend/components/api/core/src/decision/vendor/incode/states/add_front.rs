@@ -2,17 +2,19 @@ use super::{
     map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
     VerificationSession,
 };
+use crate::decision::vendor::incode::id_doc_kind_from_incode_document_type;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::incode::doc::response::AddSideResponse;
 use idv::incode::doc::IncodeAddFrontRequest;
 use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
 
 pub struct AddFront {
-    failure_reason: Option<IncodeFailureReason>,
+    response: AddSideResponse,
 }
 
 #[async_trait]
@@ -56,10 +58,7 @@ impl IncodeStateTransition for AddFront {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        // Incode returns 200 for upload failures, so catch these here
-        let failure_reason = response.add_side_failure_reason();
-
-        Ok(Some(Self { failure_reason }))
+        Ok(Some(Self { response }))
     }
 
     /// Perform any bookkeeping that must be atomic with the state transition. Can access any
@@ -71,14 +70,27 @@ impl IncodeStateTransition for AddFront {
         session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         // If there's failure, we move to retry upload
-        if let Some(reason) = self.failure_reason {
+        if let Some(reason) = self.response.add_side_failure_reason() {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
                 reasons: vec![reason],
                 clear_sides: vec![DocumentSide::Front],
             });
         }
-        let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
-        Ok(next_state.into())
+
+        // Ensure we've gotten a doc type we can support
+        // TODO: support checking against acceptable doc types and countries from OBC
+        match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
+        {
+            Ok(_) => {
+                let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
+                Ok(next_state.into())
+            }
+            Err(_) => Ok(StateResult::Retry {
+                next_state: AddFront::new(),
+                reasons: vec![IncodeFailureReason::UnknownDocumentType],
+                clear_sides: vec![DocumentSide::Front],
+            }),
+        }
     }
 }

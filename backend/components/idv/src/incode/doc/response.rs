@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError};
 use chrono::NaiveDateTime;
 use newtypes::{
-    incode::{IncodeStatus, IncodeTest},
-    IdDocKind, IncodeFailureReason, PiiString,
+    incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
+    IncodeFailureReason, PiiString,
 };
 
 /// Response we get back from adding a document image
@@ -14,15 +14,15 @@ pub struct AddSideResponse {
     pub classification: Option<bool>,
     pub correct_glare: Option<bool>,
     pub correct_sharpness: Option<bool>,
-    pub country_code: Option<String>,
+    pub country_code: Option<PiiString>,
     pub glare: Option<i32>,
     pub horizontal_resolution: Option<i32>,
-    pub issue_name: Option<String>,
+    pub issue_name: Option<PiiString>,
     pub issue_year: Option<i32>,
     pub readability: Option<bool>,
     pub session_status: Option<String>,
     pub sharpness: Option<i32>,
-    pub type_of_id: Option<String>,
+    pub type_of_id: Option<PiiString>,
     pub fail_reason: Option<String>,
     #[serde(flatten)]
     pub error: Option<Error>,
@@ -35,6 +35,10 @@ impl AddSideResponse {
             IncodeFailureReason::try_from(e.as_str())
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
         })
+    }
+
+    pub fn document_kind(&self) -> Result<IncodeDocumentType, IncodeError> {
+        get_document_kind(&self.type_of_id)
     }
 }
 
@@ -281,17 +285,8 @@ impl FetchOCRResponse {
         Ok(PiiString::from(naive.format("%Y-%m-%d")))
     }
 
-    pub fn document_kind(&self) -> Result<IdDocKind, IncodeError> {
-        let Some(type_of_id) = self.type_of_id.as_ref() else {
-            return Err(IncodeError::OcrError("Missing type_of_id".into()));
-        };
-        let result = match type_of_id.leak() {
-            "Passport" => IdDocKind::Passport,
-            "DriversLicense" => IdDocKind::DriverLicense,
-            "IdentificationCard" => IdDocKind::IdCard,
-            t => return Err(IncodeError::OcrError(format!("Unsupported document type: {}", t))),
-        };
-        Ok(result)
+    pub fn document_kind(&self) -> Result<IncodeDocumentType, IncodeError> {
+        get_document_kind(&self.type_of_id)
     }
 
     #[allow(non_snake_case)]
@@ -312,6 +307,19 @@ impl APIResponseToIncodeError for FetchOCRResponse {
     }
 }
 
+fn get_document_kind(type_of_id: &Option<PiiString>) -> Result<IncodeDocumentType, IncodeError> {
+    let Some(type_of_id) = type_of_id else {
+        return Err(IncodeError::OcrError("Missing type_of_id".into()));
+    };
+
+    Ok(
+        IncodeDocumentType::try_from(type_of_id.leak()).unwrap_or_else(|_| {
+            tracing::error!(doc_type=%type_of_id.leak(), "non parsable doc type");
+
+            IncodeDocumentType::NonParsableDocType(type_of_id.leak_to_string())
+        }),
+    )
+}
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRName {

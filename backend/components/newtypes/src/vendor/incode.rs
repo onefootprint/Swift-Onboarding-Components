@@ -97,4 +97,45 @@ pub enum IncodeTest {
     LastNameMatch,
 }
 
-
+#[derive(Display, Debug, EnumString, Eq, PartialEq, Hash)]
+pub enum IncodeDocumentType {
+    #[strum(serialize = "Unknown")]
+    Unknown,
+    #[strum(serialize = "Passport")]
+    Passport,
+    #[strum(serialize = "Visa")]
+    Visa,
+    #[strum(serialize = "DriversLicense")]
+    DriversLicense,
+    #[strum(serialize = "IdentificationCard")]
+    IdentificationCard,
+    #[strum(serialize = "Permit")]
+    Permit,
+    #[strum(serialize = "Currency")]
+    Currency,
+    #[strum(serialize = "ResidenceDocument")]
+    ResidenceDocument,
+    #[strum(serialize = "TravelDocument")]
+    TravelDocument,
+    #[strum(serialize = "BirthCertificate")]
+    BirthCertificate,
+    #[strum(serialize = "VehicleRegistration")]
+    VehicleRegistration,
+    #[strum(serialize = "Other")]
+    Other,
+    #[strum(serialize = "WeaponLicense")]
+    WeaponLicense,
+    #[strum(serialize = "TribalIdentification")]
+    TribalIdentification,
+    #[strum(serialize = "VoterIdentification")]
+    VoterIdentification,
+    #[strum(serialize = "Military")]
+    Military,
+    #[strum(serialize = "TaxIdentification")]
+    TaxIdentification,
+    #[strum(serialize = "FederalID")]
+    FederalID,
+    #[strum(serialize = "MedicalCard")]
+    MedicalCard,
+    NonParsableDocType(String),
+}

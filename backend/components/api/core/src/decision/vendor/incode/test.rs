@@ -110,7 +110,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
     //
     let mut ctx = machine.ctx;
     ctx.docv_data.back_image = Some(PiiString::from(small_back_image()));
-    let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
@@ -123,7 +123,7 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
         assert!(failure_reasons.is_empty());
         let mut ctx = machine.ctx;
         ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
-        machine = IncodeStateMachine::init(&state, tenant.id, config_id, ctx)
+        machine = IncodeStateMachine::init(state, tenant.id, config_id, ctx)
             .await
             .unwrap();
         assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddSelfie);
@@ -313,7 +313,7 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
     let mut ctx = machine.ctx;
     ctx.docv_data.front_image = Some(PiiString::from(small_front_image()));
     ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
-    let machine = IncodeStateMachine::init(&state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);

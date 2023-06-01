@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::incode::id_doc_kind_from_incode_document_type;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
@@ -51,7 +52,9 @@ impl IncodeStateTransition for FetchOCR {
         ctx: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        let result = match self.response.document_kind() {
+        let result = match id_doc_kind_from_incode_document_type(
+            self.response.document_kind().map_err(idv::Error::from)?,
+        ) {
             Ok(dk) => {
                 // TODO could represent enter inside the state transition
                 Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, self.response)?;
@@ -60,6 +63,8 @@ impl IncodeStateTransition for FetchOCR {
             Err(_) => {
                 // If we got a different document kind, wipe all uploaded documents and send back
                 // to the AddFront state
+                //
+                // Since we do this in AddFront and AddBack as well, we will hopefully never hit this case.
                 return Ok(StateResult::Retry {
                     next_state: AddFront::new(),
                     reasons: vec![IncodeFailureReason::UnknownDocumentType],

@@ -3,18 +3,19 @@ use super::{
     VerificationSession,
 };
 use crate::decision::vendor::incode::state::StateResult;
-use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::{id_doc_kind_from_incode_document_type, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::incode::doc::response::AddSideResponse;
 use idv::incode::doc::IncodeAddBackRequest;
 use newtypes::{DocVData, VendorAPI};
 use newtypes::{DocumentSide, IncodeFailureReason};
 
 pub struct AddBack {
-    failure_reason: Option<IncodeFailureReason>,
+    response: AddSideResponse,
 }
 
 #[async_trait]
@@ -53,10 +54,7 @@ impl IncodeStateTransition for AddBack {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        // Incode returns 200 for upload failures, so catch these here
-        let failure_reason = response.add_side_failure_reason();
-
-        Ok(Some(Self { failure_reason }))
+        Ok(Some(Self { response }))
     }
 
     fn transition(
@@ -65,14 +63,32 @@ impl IncodeStateTransition for AddBack {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        if let Some(reason) = self.failure_reason {
+        if let Some(reason) = self.response.add_side_failure_reason() {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
                 reasons: vec![reason],
                 clear_sides: vec![DocumentSide::Back],
             });
         }
-        let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
-        Ok(next_state.into())
+        // Ensure we've gotten a doc type we can support
+        //
+        // Theoretically if we progressed to back fine, and are _now_ getting this error, it
+        // means the user switched document types halfway through or incode is bugging out. One option is
+        // to require them to go back to AddFront, but we'll assume that having a front and back from different documents will
+        // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
+        //
+        // TODO: support checking against acceptable doc types and countries from OBC
+        match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
+        {
+            Ok(_) => {
+                let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
+                Ok(next_state.into())
+            }
+            Err(_) => Ok(StateResult::Retry {
+                next_state: AddBack::new(),
+                reasons: vec![IncodeFailureReason::UnknownDocumentType],
+                clear_sides: vec![DocumentSide::Back],
+            }),
+        }
     }
 }

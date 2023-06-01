@@ -1,4 +1,4 @@
-use newtypes::{Vendor, VendorAPI};
+use newtypes::{incode::IncodeDocumentType, Vendor, VendorAPI};
 
 pub mod biz_risk;
 pub mod engine;
@@ -23,6 +23,8 @@ pub enum Error {
     FixtureDataNotFound(VendorAPI),
     #[error("Rule error {0}")]
     RuleError(#[from] RuleError),
+    #[error("Incode document type not supported {0}")]
+    IncodeDocumentTypeNotSupported(IncodeDocumentType),
 }
 
 #[derive(thiserror::Error, Debug)]
