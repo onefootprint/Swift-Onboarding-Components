@@ -2,3 +2,4 @@
 
 /frontend @onefootprint/frontend
 /backend @onefootprint/backend
+/backend/components/enclave @agrinman
