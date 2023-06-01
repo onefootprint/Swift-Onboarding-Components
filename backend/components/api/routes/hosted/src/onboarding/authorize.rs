@@ -75,7 +75,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
 
     let ob_id = user_auth.onboarding()?.id.clone();
 
-    if let Ok(wf) = user_auth.workflow() {
+    if let Some(wf) = user_auth.workflow() {
         let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
         let ww = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
 

@@ -35,6 +35,14 @@ impl DocumentRequestUpdate {
     }
 }
 
+// A document request is uniquely identified by this weird combination while we are in progress
+// migrating to Workflows.
+// TODO use the workflow ID
+pub struct DocRequestIdentifier<'a> {
+    pub sv_id: &'a ScopedVaultId,
+    pub wf_id: Option<&'a WorkflowId>,
+}
+
 impl DocumentRequest {
     #[tracing::instrument(skip_all)]
     pub fn create(
@@ -59,23 +67,34 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn lock_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
+    pub fn lock_active(conn: &mut TxnPgConn, id: DocRequestIdentifier) -> DbResult<Locked<Self>> {
+        let doc = Self::get_active(conn, id)?.ok_or(crate::DbError::ObjectNotFound)?;
+        // Can't use into_boxed with locks
         let result = document_request::table
-            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .filter(document_request::status.eq(DocumentRequestStatus::Pending))
+            .filter(document_request::id.eq(&doc.id))
             .for_no_key_update()
-            .first::<Self>(conn)?;
+            .first::<Self>(conn.conn())?;
 
         Ok(Locked::new(result))
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
-        let result = document_request::table
-            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
+    pub fn get_active(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
+        let mut query = document_request::table
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
-            .first(conn)
-            .optional()?;
+            .into_boxed();
+
+        if let Some(wf_id) = id.wf_id {
+            query = query.filter(document_request::workflow_id.eq(wf_id))
+        } else {
+            // For legacy codepaths with no workflow, we want to make sure we don't find doc
+            // requests belonging to a re-collect document workflow
+            query = query
+                .filter(document_request::scoped_vault_id.eq(id.sv_id))
+                .filter(document_request::workflow_id.is_null())
+        }
+
+        let result = query.first(conn).optional()?;
 
         Ok(result)
     }

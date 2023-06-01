@@ -183,9 +183,8 @@ impl UserObSession {
         Ok(tenant)
     }
 
-    pub fn workflow(&self) -> ApiResult<&Workflow> {
-        let wf = self.workflow.as_ref().ok_or(OnboardingError::NoWorkflow)?;
-        Ok(wf)
+    pub fn workflow(&self) -> Option<&Workflow> {
+        self.workflow.as_ref()
     }
 
     pub fn user(&self) -> &Vault {

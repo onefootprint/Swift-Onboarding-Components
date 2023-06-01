@@ -19,14 +19,13 @@ use api_wire_types::{DocumentImageError, DocumentResponse, LegacyDocumentRespons
 use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::DocumentRequest as DbDocumentRequest;
+use db::models::document_request::{DocRequestIdentifier, DocumentRequest as DbDocumentRequest};
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
-use db::models::workflow::Workflow;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::DataIdentifierDiscriminant;
@@ -50,12 +49,17 @@ pub async fn post(
     let request = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();
+    let wf_id = user_auth.workflow().map(|wf| wf.id.clone());
     let ob_id = user_auth.onboarding()?.id.clone();
     let (vault, doc_request, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
-            let doc_request = DbDocumentRequest::get_active(conn, &su_id)?
+            let identifier = DocRequestIdentifier {
+                sv_id: &su_id,
+                wf_id: wf_id.as_ref(),
+            };
+            let doc_request = DbDocumentRequest::get_active(conn, identifier)?
                 .ok_or(OnboardingError::NoPendingDocumentRequestFound)?;
             let vault = Vault::get(conn, &su_id)?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
@@ -120,13 +124,18 @@ pub async fn post(
     let doc_request_id = doc_request.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
+    let wf_id = user_auth.workflow().map(|wf| wf.id.clone());
     let vault2 = vault.clone();
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
             // Get or create the identity document
-            let doc_request = DbDocumentRequest::lock_active(conn, &su_id)?;
+            let identifier = DocRequestIdentifier {
+                sv_id: &su_id,
+                wf_id: wf_id.as_ref(),
+            };
+            let doc_request = DbDocumentRequest::lock_active(conn, identifier)?;
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request_id,
                 document_type: request.document_type,
@@ -317,8 +326,7 @@ async fn advance_workflow_if_needed(
     state: &State,
     user_auth: &SessionContext<UserObSession>,
 ) -> ApiResult<()> {
-    let wf: Result<&Workflow, ApiError> = user_auth.workflow();
-    if let Ok(wf) = wf {
+    if let Some(wf) = user_auth.workflow() {
         let ww = WorkflowWrapper::init(state, wf.clone()).await?;
         let curr_state = newtypes::WorkflowState::from(&ww.state);
         // This is kind of hacky but in some cases when we are collecting a doc, that is because we step'd up and are reflecting that with a DocCollection state in a workflow

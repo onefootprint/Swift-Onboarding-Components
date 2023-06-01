@@ -7,8 +7,11 @@ use api_core::{
 use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 use db::{
     models::{
-        document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        document_request::{DocRequestIdentifier, DocumentRequest},
+        identity_document::IdentityDocument,
+        liveness_event::LivenessEvent,
+        ob_configuration::ObConfiguration,
+        onboarding::Onboarding,
         user_consent::UserConsent,
     },
     PgConn,
@@ -17,7 +20,7 @@ use either::Either;
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
-    InvestorProfileKind as IPK, PiiString, ScopedVaultId,
+    InvestorProfileKind as IPK, PiiString, ScopedVaultId, WorkflowId,
 };
 use paperclip::actix::web;
 
@@ -48,6 +51,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 pub struct GetRequirementsArgs {
     pub ob_config: ObConfiguration,
     pub onboarding: Onboarding,
+    pub wf_id: Option<WorkflowId>,
     pub sb_id: Option<ScopedVaultId>,
 }
 
@@ -56,6 +60,7 @@ impl GetRequirementsArgs {
         Ok(Self {
             ob_config: value.ob_config()?.clone(),
             onboarding: value.onboarding()?.clone(),
+            wf_id: value.workflow().map(|wf| wf.id.clone()),
             sb_id: value.scoped_business_id(),
         })
     }
@@ -199,7 +204,11 @@ fn get_requirements_inner(
         //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
         //      we will create a DocumentRequest row.
         let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
-        let doc_request = DocumentRequest::get_active(conn, &args.onboarding.scoped_vault_id)?;
+        let identifier = DocRequestIdentifier {
+            sv_id: &args.onboarding.scoped_vault_id,
+            wf_id: args.wf_id.as_ref(),
+        };
+        let doc_request = DocumentRequest::get_active(conn, identifier)?;
         doc_request.map(|dr| OnboardingRequirement::CollectDocument {
             document_request_id: dr.id,
             should_collect_selfie: dr.should_collect_selfie,

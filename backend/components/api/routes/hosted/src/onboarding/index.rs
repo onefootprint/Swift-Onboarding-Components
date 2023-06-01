@@ -77,7 +77,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let (ob, sb) = state
+    let (ob, sb, wf) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
@@ -103,8 +103,12 @@ pub async fn post(
 
             let mut new_scopes = vec![];
 
-            if let IsNew::Yes(Some(wf)) = is_new_ob {
-                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id });
+            let wf = match is_new_ob {
+                IsNew::Yes(Some(wf)) => Some(wf),
+                _ => None,
+            };
+            if let Some(ref wf) = wf {
+                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
@@ -149,7 +153,7 @@ pub async fn post(
             let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;
 
-            Ok((ob, sb))
+            Ok((ob, sb, wf))
         })
         .await?;
 
@@ -159,6 +163,7 @@ pub async fn post(
         let args = GetRequirementsArgs {
             ob_config: ob_config.clone(),
             onboarding: ob,
+            wf_id: wf.map(|wf| wf.id),
             sb_id: sb.map(|sb| sb.id),
         };
         let reqs = crate::onboarding::get_requirements(&state, args).await?;
