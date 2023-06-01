@@ -110,7 +110,7 @@ pub fn create(
     }
 
     // Set our desired status
-    let reloaded_doc_req = DocumentRequest::get(conn, &opts.scoped_user_id).unwrap();
+    let reloaded_doc_req = DocumentRequest::get(conn, &opts.scoped_user_id).unwrap().unwrap();
     let update = DocumentRequestUpdate::status(opts.desired_status);
 
     (

@@ -78,10 +78,11 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .first(conn)?;
+            .first(conn)
+            .optional()?;
 
         Ok(result)
     }

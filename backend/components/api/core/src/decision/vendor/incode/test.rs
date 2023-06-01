@@ -375,7 +375,7 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
             assert!(score_result.id_validation.is_some());
 
             // Check business logic bookkeeping
-            let doc_request = DocumentRequest::get(conn, &su.id)?;
+            let doc_request = DocumentRequest::get(conn, &su.id)?.unwrap();
             assert_eq!(doc_request.status, DocumentRequestStatus::Complete);
 
             Ok(())

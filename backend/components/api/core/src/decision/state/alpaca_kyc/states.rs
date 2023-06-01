@@ -281,8 +281,10 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
             let _risk_signals = RiskSignal::bulk_create(conn, obd.id, signals)?;
         }
 
-        // TODO: also always go to PendingReview if doc was collected
-        if reason_codes.is_empty() {
+        let doc_req = DocumentRequest::get(conn, &self.sv_id)?;
+
+        // also always go to PendingReview if doc was collected
+        if reason_codes.is_empty() && doc_req.is_none() {
             Ok(States::from(Complete).into())
         } else {
             let _review = ManualReview::create(conn, self.ob_id)?; // TODO: this will crash if a review already exists- which it shouldn't- but still kinda sketch

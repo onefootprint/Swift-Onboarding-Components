@@ -27,6 +27,7 @@ use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use db::DbError;
 use itertools::Itertools;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::{
@@ -232,7 +233,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let su_id = &user_auth.scoped_user.id;
-            let doc_request = DbDocumentRequest::get(conn, su_id)?;
+            let doc_request = DbDocumentRequest::get(conn, su_id)?.ok_or(DbError::ObjectNotFound)?;
             let session = IncodeVerificationSession::get(conn, su_id)?;
             Ok((doc_request, session))
         })
