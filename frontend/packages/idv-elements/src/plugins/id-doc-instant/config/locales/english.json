@@ -11,7 +11,7 @@
     },
     "missing-permissions": {
       "title": "Allow access to your camera",
-      "subtitle": "This lets you submit photos of your documents, and we can use them to properly verify your ID.",
+      "subtitle": "We will need you to take photos of your document to properly verify your identity.",
       "cta": "Open settings to give camera permissions"
     },
     "id-doc-photo-prompt": {
