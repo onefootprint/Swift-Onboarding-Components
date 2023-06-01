@@ -181,7 +181,7 @@ impl TwilioClient {
         &self,
         state: &State,
         destination: &PhoneNumber,
-        first_name: Option<PiiString>,
+        note: Option<String>,
         org_name: String,
         kind: TriggerKind,
         link: PiiString,
@@ -189,10 +189,8 @@ impl TwilioClient {
         // TODO copy
         let message_body = match kind {
             TriggerKind::RedoKyc => PiiString::from(format!(
-                "{} your identity for {} here: {}",
-                first_name
-                    .map(|n| format!("{}, re-verify", n.leak()))
-                    .unwrap_or("Re-verify".to_owned()),
+                "{}Re-verify your identity for {} here: {}",
+                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
                 org_name,
                 link.leak()
             )),

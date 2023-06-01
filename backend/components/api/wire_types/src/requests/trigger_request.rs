@@ -15,6 +15,8 @@ export_schema!(TriggerKind);
 pub struct TriggerRequest {
     // TODO we'll one day replace this will workflow information
     pub kind: TriggerKind,
+    /// Optional note with more context on what we're asking the user to do
+    pub note: Option<String>,
 }
 
 export_schema!(TriggerRequest);

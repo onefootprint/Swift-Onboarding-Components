@@ -31,7 +31,6 @@ class BifrostClient:
         override_inherit_phone=None,
         override_create_phone=None,
         override_auth=None,
-        data=None,
     ):
         """
         Creates a BifrostClient associated with a specific ob config and a specific user with
@@ -88,7 +87,6 @@ class BifrostClient:
             "business.name": business_name,
             "id.phone_number": phone_number,
             "id.email": email,
-            **(data or {}),
         }
 
         # After running bifrost, this will be the list of requirements satisfied

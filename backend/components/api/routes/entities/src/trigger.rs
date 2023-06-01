@@ -21,7 +21,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::FpId;
-use newtypes::IdentityDataKind as IDK;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -37,7 +36,7 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
-    let TriggerRequest { kind } = request.into_inner();
+    let TriggerRequest { kind, note } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -81,14 +80,11 @@ pub async fn post(
         .await??;
 
     let phone_number = vw.get_decrypted_primary_phone(&state).await?;
-    let first_name = vw
-        .decrypt_unchecked_single(&state.enclave_client, IDK::FirstName.into())
-        .await?;
     let url = state.config.service_config.generate_verify_link(auth_token);
     let org_name = auth.tenant().name.clone();
     state
         .twilio_client
-        .send_trigger(&state, &phone_number, first_name, org_name, kind, url)
+        .send_trigger(&state, &phone_number, note, org_name, kind, url)
         .await?;
 
     ResponseData::ok(EmptyResponse {}).json()
