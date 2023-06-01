@@ -38,12 +38,12 @@ const Button = ({
   return (
     <Box {...props}>
       <StyledPressable
+        active={active}
         disabled={disabled}
         loading={loading}
         onPress={handlePress}
         onPressIn={() => setActive(true)}
         onPressOut={() => setActive(false)}
-        active={active}
         size={size}
         variant={variant}
       >

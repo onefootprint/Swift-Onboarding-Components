@@ -1,6 +1,7 @@
 export * from './box';
 export * from './button';
 export * from './container';
+export * from './country-select';
 export * from './design-system-provider';
 export * from './dialog';
 export * from './dismiss-keyboard';

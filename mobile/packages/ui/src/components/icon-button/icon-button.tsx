@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Box } from '../box';
 import { Pressable } from '../pressable';
@@ -14,20 +14,28 @@ const IconButton = ({
   'aria-label': ariaLabel,
   children,
   onPress,
-}: IconButtonProps) => (
-  <Pressable onPress={onPress}>
-    <Box
-      aria-label={ariaLabel}
-      backgroundColor="secondary"
-      borderRadius="full"
-      center
-      height={32}
-      role="button"
-      width={32}
+}: IconButtonProps) => {
+  const [active, setActive] = useState(false);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => setActive(true)}
+      onPressOut={() => setActive(false)}
     >
-      {children}
-    </Box>
-  </Pressable>
-);
+      <Box
+        aria-label={ariaLabel}
+        backgroundColor={active ? 'senary' : 'secondary'}
+        borderRadius="full"
+        center
+        height={32}
+        role="button"
+        width={32}
+      >
+        {children}
+      </Box>
+    </Pressable>
+  );
+};
 
 export default IconButton;

@@ -9,9 +9,9 @@ import {
   Box,
   Button,
   Container,
+  CountrySelect,
   Divider,
   RadioSelect,
-  Select,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -31,13 +31,7 @@ const Scan = () => {
       </Box>
       <Box justifyContent="space-between" flex={1}>
         <Box>
-          <Select
-            label="Country"
-            onChange={setCountry}
-            placeholder="Select country"
-            emptyStateTitle="No countries found"
-            value={country}
-          />
+          <CountrySelect onChange={setCountry} value={country} />
           <Divider marginVertical={7} />
           <RadioSelect
             value={value}

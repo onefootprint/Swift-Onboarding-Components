@@ -1,4 +1,3 @@
-import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 
@@ -8,34 +7,40 @@ import { Label } from '../label';
 import { Pressable } from '../pressable';
 import { Typography } from '../typography';
 import Picker from './components/picker';
-import { SelectOption } from './select.types';
+import type { SelectOption, StringOrNumber } from './select.types';
 
-export type SelectProps = {
+export type SelectProps<T extends StringOrNumber = string> = {
   emptyStateResetText?: string;
   emptyStateTitle?: string;
   hasError?: boolean;
   hint?: string;
   label?: string;
-  onChange?: (newValue: SelectOption) => void;
-  options?: SelectOption[];
+  onChange?: (newValue: SelectOption<T>) => void;
+  options?: SelectOption<T>[];
   placeholder?: string;
   searchPlaceholder?: string;
-  value?: SelectOption;
+  value?: SelectOption<T>;
+  renderTrigger?: (
+    placeholder: string,
+    selectedOption?: SelectOption<T>,
+  ) => React.ReactNode;
 };
 
-const Select = ({
+const Select = <T extends StringOrNumber = string>({
   emptyStateResetText = 'Reset search',
   emptyStateTitle = 'No results found',
   hasError,
   hint,
   label,
   onChange,
-  options = COUNTRIES,
+  options = [],
   placeholder = 'Select...',
   searchPlaceholder = 'Search...',
   value,
-}: SelectProps) => {
+  renderTrigger,
+}: SelectProps<T>) => {
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(false);
   const selectedValueText = value ? value.label : placeholder;
 
   const showPicker = () => {
@@ -46,22 +51,27 @@ const Select = ({
     setOpen(false);
   };
 
-  const handleChange = (newValue: SelectOption) => {
+  const handleChange = (newValue: SelectOption<T>) => {
     onChange?.(newValue);
     hidePicker();
   };
 
   return (
     <Box>
-      <Pressable onPress={showPicker} withImpact>
-        {label && (
-          <Label marginBottom={3} onPress={showPicker}>
-            {label}
-          </Label>
-        )}
+      {label && (
+        <Label marginBottom={3} onPress={showPicker}>
+          {label}
+        </Label>
+      )}
+      <Pressable
+        onPress={showPicker}
+        onPressIn={() => setActive(true)}
+        onPressOut={() => setActive(false)}
+        withImpact
+      >
         <Box
           alignItems="center"
-          backgroundColor="primary"
+          backgroundColor={active ? 'secondary' : 'primary'}
           borderColor="primary"
           borderRadius="default"
           borderStyle="solid"
@@ -71,11 +81,13 @@ const Select = ({
           justifyContent="space-between"
           paddingHorizontal={5}
         >
-          <Box gap={4} flexDirection="row" center>
+          {renderTrigger ? (
+            renderTrigger(placeholder, value)
+          ) : (
             <Typography variant="body-4">
               {selectedValueText || placeholder}
             </Typography>
-          </Box>
+          )}
           <IcoChevronDown16 />
         </Box>
       </Pressable>
@@ -84,7 +96,7 @@ const Select = ({
           {hint}
         </Hint>
       )}
-      <Picker
+      <Picker<T>
         emptyStateResetText={emptyStateResetText}
         emptyStateTitle={emptyStateTitle}
         onChange={handleChange}

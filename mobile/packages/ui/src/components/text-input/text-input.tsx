@@ -15,11 +15,12 @@ import { Hint } from '../hint';
 import { Label } from '../label';
 
 export type TextInputProps = {
-  prefixComponent?: React.ReactNode;
   disabled?: boolean;
   hasError?: boolean;
   hint?: string;
   label?: string;
+  prefixComponent?: React.ReactNode;
+  suffixComponent?: React.ReactNode;
 } & RNTextInputProps &
   BoxProps;
 
@@ -27,13 +28,14 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
   (
     {
       autoFocus,
+      disabled = false,
       hasError = false,
-      prefixComponent,
       hint,
       label,
-      disabled = false,
       onBlur,
       onFocus,
+      prefixComponent,
+      suffixComponent,
       ...props
     },
     ref,
@@ -90,6 +92,9 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
             ref={mergeRefs([ref, localRef])}
             underlineColorAndroid="transparent"
           />
+          {suffixComponent && (
+            <SuffixContainer>{suffixComponent}</SuffixContainer>
+          )}
         </Box>
         {!!hint && (
           <Hint marginTop={3} hasError={hasError}>
@@ -148,6 +153,10 @@ const PrefixContainer = styled.View`
   height: 100%;
   z-index: 1;
   justify-content: center;
+`;
+
+const SuffixContainer = styled(PrefixContainer)`
+  right: 0;
 `;
 
 export default TextInput;

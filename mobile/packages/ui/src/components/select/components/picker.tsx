@@ -1,4 +1,4 @@
-import { IcoClose32, IcoSearch24 } from '@onefootprint/icons';
+import { IcoClose24, IcoClose32, IcoSearch24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { FlashList } from '@shopify/flash-list';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -6,25 +6,26 @@ import { Modal } from 'react-native';
 
 import { Box } from '../../box';
 import { IconButton } from '../../icon-button';
+import { Pressable } from '../../pressable';
 import { TextInput } from '../../text-input';
 import { Typography } from '../../typography';
-import type { SelectOption } from '../select.types';
+import type { SelectOption, StringOrNumber } from '../select.types';
 import EmptyState from './empty-state';
 import Item from './item';
 
-export type PickerProps = {
+export type PickerProps<T extends StringOrNumber = string> = {
   emptyStateResetText: string;
   emptyStateTitle: string;
-  onChange?: (newValue: SelectOption) => void;
+  onChange?: (newValue: SelectOption<T>) => void;
   onClose: () => void;
   open: boolean;
-  options: SelectOption[];
+  options: SelectOption<T>[];
   placeholder: string;
   searchPlaceholder: string;
-  value?: SelectOption;
+  value?: SelectOption<T>;
 };
 
-const Picker = ({
+const Picker = <T extends StringOrNumber = string>({
   emptyStateResetText,
   emptyStateTitle,
   onChange,
@@ -34,7 +35,7 @@ const Picker = ({
   placeholder,
   searchPlaceholder,
   value,
-}: PickerProps) => {
+}: PickerProps<T>) => {
   const [search, setSearch] = useState('');
   const selectedIndex = useMemo(() => {
     if (!value) return undefined;
@@ -44,6 +45,7 @@ const Picker = ({
     // clear users can scroll up
     return index - 2;
   }, [value, options]);
+
   const filteredOptions = useMemo(() => {
     if (!search) return options;
     return options.filter(option => {
@@ -52,8 +54,12 @@ const Picker = ({
   }, [search, options]);
 
   useEffect(() => {
-    if (!open) setSearch('');
+    if (!open) resetSearch();
   }, [open]);
+
+  const resetSearch = () => {
+    setSearch('');
+  };
 
   return (
     <Modal
@@ -82,11 +88,20 @@ const Picker = ({
             autoFocus
             onChangeText={setSearch}
             placeholder={searchPlaceholder}
+            blurOnSubmit
+            returnKeyType="search"
             value={search}
             prefixComponent={
               <Box marginLeft={4} marginVertical={5}>
                 <IcoSearch24 />
               </Box>
+            }
+            suffixComponent={
+              <Pressable onPress={resetSearch}>
+                <Box marginRight={4} marginVertical={5}>
+                  <IcoClose24 color="tertiary" />
+                </Box>
+              </Pressable>
             }
           />
         </Box>
@@ -101,11 +116,11 @@ const Picker = ({
               title={emptyStateTitle}
               cta={{
                 label: emptyStateResetText,
-                onPress: () => setSearch(''),
+                onPress: resetSearch,
               }}
             />
           }
-          keyExtractor={item => item.value}
+          keyExtractor={item => item.value.toString()}
           renderItem={({ item }) => {
             return (
               <Item
