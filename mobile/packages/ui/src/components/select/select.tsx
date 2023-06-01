@@ -1,31 +1,38 @@
+import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 
 import { Box } from '../box';
-import { Flag } from '../flag';
 import { Hint } from '../hint';
 import { Label } from '../label';
 import { Pressable } from '../pressable';
 import { Typography } from '../typography';
 import Picker from './components/picker';
+import { SelectOption } from './select.types';
 
 export type SelectProps = {
+  emptyStateResetText?: string;
+  emptyStateTitle?: string;
   hasError?: boolean;
   hint?: string;
   label?: string;
+  onChange?: (newValue: SelectOption) => void;
+  options?: SelectOption[];
   placeholder?: string;
   searchPlaceholder?: string;
-  value: any;
-  emptyStateText?: string;
+  value?: SelectOption;
 };
 
 const Select = ({
-  placeholder = 'Select...',
+  emptyStateResetText = 'Reset search',
+  emptyStateTitle = 'No results found',
   hasError,
   hint,
   label,
+  onChange,
+  options = COUNTRIES,
+  placeholder = 'Select...',
   searchPlaceholder = 'Search...',
-  emptyStateText = 'No results found',
   value,
 }: SelectProps) => {
   const [open, setOpen] = useState(false);
@@ -37,6 +44,11 @@ const Select = ({
 
   const hidePicker = () => {
     setOpen(false);
+  };
+
+  const handleChange = (newValue: SelectOption) => {
+    onChange?.(newValue);
+    hidePicker();
   };
 
   return (
@@ -60,7 +72,6 @@ const Select = ({
           paddingHorizontal={5}
         >
           <Box gap={4} flexDirection="row" center>
-            <Flag code="US" />
             <Typography variant="body-4">
               {selectedValueText || placeholder}
             </Typography>
@@ -74,11 +85,15 @@ const Select = ({
         </Hint>
       )}
       <Picker
-        emptyStateText={emptyStateText}
+        emptyStateResetText={emptyStateResetText}
+        emptyStateTitle={emptyStateTitle}
+        onChange={handleChange}
         onClose={hidePicker}
         open={open}
+        options={options}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
+        value={value}
       />
     </Box>
   );

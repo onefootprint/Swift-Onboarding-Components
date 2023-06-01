@@ -377,3 +377,8 @@ export const baseInputsElevationFocus =
 export const baseInputsElevationFocusError =
   '0px 0px 4px rgba(191,20,10,0.12156862745098039)';
 export const baseInputsBorderWidth = 1;
+
+// Dropdown
+export const dropdownBaseBg = '#FDFDFD';
+export const dropdownBaseBgActive = '#F7F7F7';
+export const dropdownBaseColor = '#000000';

@@ -1,42 +1,51 @@
-import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoClose32, IcoSearch24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { FlashList } from '@shopify/flash-list';
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'react-native';
 
 import { Box } from '../../box';
-import { Flag } from '../../flag';
 import { IconButton } from '../../icon-button';
 import { TextInput } from '../../text-input';
 import { Typography } from '../../typography';
-
-const Item = ({ item }: any) => {
-  return (
-    <Box margin={4} flexDirection="row" gap={4} alignItems="center">
-      <Flag code={item.value} />
-      <Typography variant="body-4">{item.label}</Typography>
-    </Box>
-  );
-};
+import type { SelectOption } from '../select.types';
+import EmptyState from './empty-state';
+import Item from './item';
 
 export type PickerProps = {
-  emptyStateText: string;
+  emptyStateResetText: string;
+  emptyStateTitle: string;
+  onChange?: (newValue: SelectOption) => void;
   onClose: () => void;
   open: boolean;
+  options: SelectOption[];
   placeholder: string;
   searchPlaceholder: string;
+  value?: SelectOption;
 };
 
 const Picker = ({
-  emptyStateText,
+  emptyStateResetText,
+  emptyStateTitle,
+  onChange,
   onClose,
   open,
+  options,
   placeholder,
   searchPlaceholder,
+  value,
 }: PickerProps) => {
-  console.log(emptyStateText);
-  // const [search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
+  const filteredOptions = useMemo(() => {
+    if (!search) return options;
+    return options.filter(option => {
+      return option.label.toLowerCase().includes(search.toLowerCase());
+    });
+  }, [search, options]);
+
+  useEffect(() => {
+    if (!open) setSearch('');
+  }, [open]);
 
   return (
     <Modal
@@ -45,7 +54,7 @@ const Picker = ({
       presentationStyle="formSheet"
       visible={open}
     >
-      <Box backgroundColor="primary" borderRadius="large" height="100%">
+      <PickerContainer>
         <Box flexDirection="row" margin={5} center position="relative">
           <Typography variant="label-2">{placeholder}</Typography>
           <Box position="absolute" right={0}>
@@ -61,7 +70,11 @@ const Picker = ({
           paddingVertical={5}
         >
           <StyledTextInput
+            autoCorrect={false}
+            autoFocus
+            onChangeText={setSearch}
             placeholder={searchPlaceholder}
+            value={search}
             prefixComponent={
               <Box marginLeft={4} marginVertical={5}>
                 <IcoSearch24 />
@@ -71,15 +84,44 @@ const Picker = ({
         </Box>
         <FlashList
           contentContainerStyle={contentContainerStyle}
-          data={COUNTRIES}
-          estimatedItemSize={COUNTRIES.length}
+          data={filteredOptions}
+          estimatedItemSize={options.length}
+          keyboardShouldPersistTaps="always"
+          ListEmptyComponent={
+            <EmptyState
+              title={emptyStateTitle}
+              cta={{
+                label: emptyStateResetText,
+                onPress: () => setSearch(''),
+              }}
+            />
+          }
           keyExtractor={item => item.value}
-          renderItem={Item}
+          renderItem={({ item }) => {
+            return (
+              <Item
+                label={item.label}
+                value={item.value}
+                selected={value?.value === item.value}
+                onPress={() => onChange?.(item)}
+              />
+            );
+          }}
         />
-      </Box>
+      </PickerContainer>
     </Modal>
   );
 };
+
+const PickerContainer = styled(Box)`
+  ${({ theme }) => {
+    const { dropdown } = theme.components;
+    return css`
+      background-color: ${dropdown.bg};
+      height: 100%;
+    `;
+  }}
+`;
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => {
@@ -90,7 +132,6 @@ const StyledTextInput = styled(TextInput)`
 `;
 
 const contentContainerStyle = {
-  paddingHorizontal: 8,
   paddingVertical: 16,
 };
 

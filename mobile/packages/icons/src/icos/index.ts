@@ -9,6 +9,7 @@ export { default as IcoCheckCircle40 } from './ico-check-circle-40';
 export { default as IcoChevronDown16 } from './ico-chevron-down-16';
 export { default as IcoChevronLeftBig24 } from './ico-chevron-left-big-24';
 export { default as IcoChevronRight24 } from './ico-chevron-right-24';
+export { default as IcoClose24 } from './ico-close-24';
 export { default as IcoClose32 } from './ico-close-32';
 export { default as IcoCloseSmall24 } from './ico-close-small-24';
 export { default as IcoFaceid24 } from './ico-faceid-24';

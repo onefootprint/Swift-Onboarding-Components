@@ -8,6 +8,7 @@ import {
   TextInputFocusEventData,
   TextInputProps as RNTextInputProps,
 } from 'react-native';
+import { useTimeout } from 'usehooks-ts';
 
 import { Box, BoxProps } from '../box';
 import { Hint } from '../hint';
@@ -25,6 +26,7 @@ export type TextInputProps = {
 const TextInput = forwardRef<RNTextInput, TextInputProps>(
   (
     {
+      autoFocus,
       hasError = false,
       prefixComponent,
       hint,
@@ -41,6 +43,12 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
     const {
       components: { input },
     } = useTheme();
+
+    useTimeout(() => {
+      if (autoFocus) {
+        localRef.current?.focus();
+      }
+    }, 400);
 
     const handleLabelPress = () => {
       localRef.current?.focus();
