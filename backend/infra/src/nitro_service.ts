@@ -103,6 +103,8 @@ export async function CreateNitroService(
     { provider },
   );
 
+  const ebsKmsKey = await aws.kms.getKey({ keyId: 'alias/aws/ebs' });
+
   const launchTemplate = new aws.ec2.LaunchTemplate(
     `i-template-${serviceName}`,
     {
@@ -119,6 +121,17 @@ export async function CreateNitroService(
         arn: instanceProfile.arn,
       },
       updateDefaultVersion: true,
+      blockDeviceMappings: [
+        {
+          deviceName: '/dev/xvda',
+          ebs: {
+            volumeSize: 30,
+            encrypted: 'true',
+            kmsKeyId: ebsKmsKey.arn,
+          },
+        },
+      ],
+
       vpcSecurityGroupIds: [instanceSecurityGroup.id],
       tags: {
         name: serviceName,
