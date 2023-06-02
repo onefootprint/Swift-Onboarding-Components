@@ -6,7 +6,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::decision::features;
-use api_core::decision::onboarding::OnboardingRulesDecisionOutput;
+use api_core::decision::onboarding::{Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
 use chrono::Utc;
@@ -45,11 +45,14 @@ struct DecisionOutput {
 impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
     fn from(d: OnboardingRulesDecisionOutput) -> Self {
         let OnboardingRulesDecisionOutput {
-            decision_status,
-            create_manual_review,
+            decision:
+                Decision {
+                    decision_status,
+                    create_manual_review,
+                    should_commit: _,
+                },
             rules_triggered,
             rules_not_triggered,
-            should_commit: _,
         } = d;
 
         Self {
@@ -308,6 +311,6 @@ async fn shadow_run(
     let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
-        decision_status: rules_output.decision_status,
+        decision_status: rules_output.decision.decision_status,
     })))
 }

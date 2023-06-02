@@ -166,14 +166,21 @@ impl OnAction<MakeDecision> for Decisioning {
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         let (fixture_decision, ff_client) = async_res;
-        let _decision_output = common::create_kyc_decision(
+
+        let (decision, reason_codes) =
+            common::get_kyc_decision(conn, fixture_decision, self.vendor_results.clone())?;
+
+        common::save_kyc_decision(
             conn,
-            &self.t_id,
             &self.ob_id,
-            fixture_decision,
-            self.vendor_results,
-            self.is_redo,
             &self.wf_id,
+            self.vendor_results
+                .iter()
+                .map(|vr| vr.verification_result_id.clone())
+                .collect(),
+            &(decision, reason_codes),
+            self.is_redo,
+            fixture_decision.is_some(),
         )?;
         Ok(States::from(Complete).into())
     }

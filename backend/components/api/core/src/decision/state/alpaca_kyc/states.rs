@@ -4,9 +4,16 @@ use api_wire_types::DecisionRequest;
 use async_trait::async_trait;
 use db::{
     models::{
-        decision_intent::DecisionIntent, document_request::DocumentRequest, manual_review::ManualReview,
-        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
-        vault::Vault, verification_request::VerificationRequest, workflow::Workflow,
+        decision_intent::DecisionIntent,
+        document_request::DocumentRequest,
+        manual_review::ManualReview,
+        onboarding::{Onboarding, OnboardingUpdate},
+        onboarding_decision::OnboardingDecision,
+        risk_signal::RiskSignal,
+        scoped_vault::ScopedVault,
+        vault::Vault,
+        verification_request::VerificationRequest,
+        workflow::Workflow,
     },
     DbError,
 };
@@ -15,12 +22,15 @@ use idv::incode::{
     watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
     IncodeStartOnboardingRequest,
 };
-use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, Vendor, VendorAPI};
+use newtypes::{
+    vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, OnboardingStatus, Vendor, VendorAPI,
+};
 
 use crate::{
     auth::tenant::AuthActor,
     decision::{
         self,
+        onboarding::{Decision, OnboardingRulesDecisionOutput},
         review::save_review_decision,
         state::{
             actions::MakeDecision, common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall,
@@ -171,26 +181,47 @@ impl OnAction<MakeDecision> for Decisioning {
 
         // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
-        let decision_output = common::create_kyc_decision(
-            conn,
-            &self.t_id,
-            &self.ob_id,
-            fixture_decision,
-            self.vendor_results,
-            false,
-            &self.wf_id,
-        )?;
+        let kyc_decision = common::get_kyc_decision(conn, fixture_decision, self.vendor_results.clone())?;
 
-        match decision_output.decision_status {
-            DecisionStatus::Fail => Ok(States::from(Complete).into()),
-            DecisionStatus::Pass => Ok(States::from(WatchlistCheck {
-                wf_id: self.wf_id,
-                ob_id: self.ob_id,
-                sv_id: self.sv_id,
-                t_id: self.t_id,
-            })
-            .into()),
+        match kyc_decision.0.decision.decision_status {
+            DecisionStatus::Fail => {
+                // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
+                common::save_kyc_decision(
+                    conn,
+                    &self.ob_id,
+                    &self.wf_id,
+                    self.vendor_results
+                        .iter()
+                        .map(|vr| vr.verification_result_id.clone())
+                        .collect(),
+                    &kyc_decision,
+                    false,
+                    fixture_decision.is_some(),
+                )?;
+                Ok(States::from(Complete).into())
+            }
+            DecisionStatus::Pass => {
+                // we update ob.status = Pending but cannot write an OBD yet (need to do watchlist checks next)
+                Onboarding::update_by_id(
+                    conn,
+                    &self.ob_id,
+                    OnboardingUpdate::set_status(OnboardingStatus::Pending),
+                )?;
+                Ok(States::from(WatchlistCheck {
+                    wf_id: self.wf_id,
+                    ob_id: self.ob_id,
+                    sv_id: self.sv_id,
+                    t_id: self.t_id,
+                })
+                .into())
+            }
             DecisionStatus::StepUp => {
+                // we set ob.status = incomplete (should be a no-op) but don't write an OBD yet
+                Onboarding::update_by_id(
+                    conn,
+                    &self.ob_id,
+                    OnboardingUpdate::set_status(OnboardingStatus::Incomplete),
+                )?;
                 let doc_req = DocumentRequest::create(
                     conn,
                     self.sv_id.clone(),
@@ -228,7 +259,11 @@ impl WatchlistCheck {
 
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
-    type AsyncRes = WatchlistResultResponse;
+    type AsyncRes = (
+        WatchlistResultResponse,
+        Option<FixtureDecision>,
+        Vec<VendorResult>,
+    );
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -253,6 +288,14 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
         )
         .await?;
 
+        let fixture_decision = decision::utils::get_fixture_data_decision(
+            state,
+            state.feature_flag_client.clone(),
+            &self.sv_id,
+            &self.t_id,
+        )
+        .await?;
+
         let watchlist_res = vendor::incode_watchlist::make_watchlist_result_call(
             state,
             &tvc,
@@ -261,43 +304,92 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
             &vault.public_key,
         )
         .await?;
-        Ok(watchlist_res)
+
+        let vendor_results =
+            common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
+
+        Ok((watchlist_res, fixture_decision, vendor_results))
     }
 
-    fn on_commit(
-        self,
-        watchlist_res: WatchlistResultResponse,
-        conn: &mut db::TxnPgConn,
-    ) -> ApiResult<WorkflowStates> {
-        // TODO save Risk Signals + determine if we transition to PendingReview or Complete
+    fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+        let (watchlist_res, fixture_decision, vendor_results) = res;
 
-        let reason_codes =
-            decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
-        let signals = reason_codes
+        // TODO: !! Hack: this will retrieve VRes's from every vendor api, including watchlist check + doc scan.
+        // Soon, we will migrate RiskSignal to point to VRes and then we will just write risk signals when we save the vres
+        // but for now we need to do this hack where we write all risk signals at once when we write an OBD.
+        // The reason codes for the risk signals based on the KYC vendor calls are generated via kyc_features. So for now, we
+        // need to filter all the Vres's we have to just the ones from the KYC vendor calls so we can pass those to kyc_features and generate
+        // the KYC reason_codes we need to write.
+        // A nice alternative here might be to make a new DI for KYC vs Incode flow vs watchlist check. But im not sure if thats worth the effort
+        // given the migration of RiskSignal to VRes will remove the need for this hack anyway
+        let kyc_vendor_results: Vec<_> = vendor_results
             .clone()
+            .into_iter()
+            .filter(|vr| VendorAPI::from(&vr.response.response).is_kyc_call())
+            .collect();
+
+        // Watchlist reason codes
+        let wc_reason_codes =
+            decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
+        let wc_reason_codes = wc_reason_codes
             .into_iter()
             .map(|r| (r, vec![Vendor::Incode]))
             .collect::<Vec<_>>();
-        if !signals.is_empty() {
-            // TODO: this is sketch and we should probably rethink the data models around OBD/risk signals/reviews/etc
-            let sv = ScopedVault::get(conn, &self.sv_id)?;
-            let obd = OnboardingDecision::latest_footprint_actor_decision(
-                conn,
-                &sv.fp_id,
-                &sv.tenant_id,
-                sv.is_live,
-            )?
-            .ok_or(DbError::RelatedObjectNotFound)?;
-            let _risk_signals = RiskSignal::bulk_create(conn, obd.id, signals)?;
-        }
 
+        // For now, we need to re-run the KYC decisioning so we can get reason codes
+        // and have these written at the same time as the Watchlist reason codes
+        // and our OBD. (In future, we migrate risk_signal to point to VRes and can remove this temp hack)
+        let is_sandbox = false; // fixture_decision.is_some()
+        let (kyc_decision, kyc_reason_codes) =
+            common::get_kyc_decision(conn, fixture_decision, kyc_vendor_results)?; // TODO: we need to filter vendor_results down to just the original KYC VRes's or bad stuff will happen here
+
+        // If we collected a doc, we go to review and fail OBD even if no hits
+        // TODO: query by wf_id instead
         let doc_req = DocumentRequest::get(conn, &self.sv_id)?;
 
-        // also always go to PendingReview if doc was collected
-        if reason_codes.is_empty() && doc_req.is_none() {
+        // TODO: in future could express this as a Rule or at least an engine decision
+        let final_decision = if wc_reason_codes.is_empty() && doc_req.is_none() {
+            Decision {
+                decision_status: DecisionStatus::Pass,
+                should_commit: true,
+                create_manual_review: false,
+            }
+        } else {
+            Decision {
+                decision_status: DecisionStatus::Fail,
+                should_commit: false,
+                create_manual_review: true,
+            }
+        };
+
+        let decision = (
+            OnboardingRulesDecisionOutput {
+                decision: final_decision.clone(),
+                // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
+                rules_triggered: kyc_decision.rules_triggered,
+                rules_not_triggered: kyc_decision.rules_not_triggered,
+            },
+            kyc_reason_codes
+                .into_iter()
+                .chain(wc_reason_codes.into_iter())
+                .collect(),
+        );
+        common::save_kyc_decision(
+            conn,
+            &self.ob_id,
+            &self.wf_id,
+            vendor_results
+                .iter()
+                .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
+                .collect(),
+            &decision,
+            false,
+            is_sandbox,
+        )?;
+
+        if final_decision.decision_status == DecisionStatus::Pass {
             Ok(States::from(Complete).into())
         } else {
-            let _review = ManualReview::create(conn, self.ob_id)?; // TODO: this will crash if a review already exists- which it shouldn't- but still kinda sketch
             Ok(States::from(PendingReview {
                 sv_id: self.sv_id,
                 wf_id: self.wf_id,

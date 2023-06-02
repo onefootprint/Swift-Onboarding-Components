@@ -4,7 +4,7 @@ use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VerificationResultId
 
 use crate::{
     decision::{
-        onboarding::{DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
+        onboarding::{Decision, DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
         rule::{
             self, kyb_rules,
             rule_set::{Action, EvaluateRuleSet},
@@ -81,9 +81,11 @@ impl FeatureVector for KybFeatureVector {
         let create_manual_review = decision_status == DecisionStatus::Fail;
 
         let output = OnboardingRulesDecisionOutput {
-            decision_status,
-            should_commit: false, // never commit business data for now
-            create_manual_review,
+            decision: Decision {
+                decision_status,
+                should_commit: false, // never commit business data for now
+                create_manual_review,
+            },
             rules_triggered: eval_result.rules_triggered,
             rules_not_triggered: eval_result.rules_not_triggered,
         };

@@ -19,7 +19,7 @@ use idology::expectid::response::ExpectIDResponse;
 use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
 use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 
-use newtypes::PiiJsonValue;
+use newtypes::{PiiJsonValue, VendorAPI};
 
 use socure::response::SocureIDPlusResponse;
 
@@ -247,4 +247,36 @@ pub enum Error {
     MiddeskError(#[from] middesk::Error),
     #[error("Assertion error: {0}")]
     AssertionError(String),
+}
+
+impl From<&ParsedResponse> for VendorAPI {
+    fn from(value: &ParsedResponse) -> Self {
+        match value {
+            ParsedResponse::IDologyExpectID(_) => VendorAPI::IdologyExpectID,
+            ParsedResponse::IDologyScanVerifyResult(_) => VendorAPI::IdologyScanVerifyResults,
+            ParsedResponse::IDologyScanVerifySubmission(_) => VendorAPI::IdologyScanVerifySubmission,
+            ParsedResponse::IDologyScanOnboarding(_) => VendorAPI::IdologyScanOnboarding,
+            ParsedResponse::IDologyPa(_) => VendorAPI::IdologyPa,
+            ParsedResponse::TwilioLookupV2(_) => VendorAPI::TwilioLookupV2,
+            ParsedResponse::SocureIDPlus(_) => VendorAPI::SocureIDPlus,
+            ParsedResponse::ExperianPreciseID(_) => VendorAPI::ExperianPreciseID,
+            ParsedResponse::MiddeskCreateBusiness(_) => VendorAPI::MiddeskCreateBusiness,
+            ParsedResponse::MiddeskGetBusiness(_) => VendorAPI::MiddeskGetBusiness,
+            ParsedResponse::MiddeskBusinessUpdateWebhook(_) => VendorAPI::MiddeskBusinessUpdateWebhook,
+            ParsedResponse::MiddeskTinRetriedWebhook(_) => VendorAPI::MiddeskTinRetriedWebhook,
+            ParsedResponse::IncodeOnboardingStart(_) => VendorAPI::IncodeStartOnboarding,
+            ParsedResponse::IncodeAddFront(_) => VendorAPI::IncodeAddFront,
+            ParsedResponse::IncodeAddBack(_) => VendorAPI::IncodeAddBack,
+            ParsedResponse::IncodeFetchScores(_) => VendorAPI::IncodeFetchScores,
+            ParsedResponse::IncodeProcessId(_) => VendorAPI::IncodeProcessId,
+            ParsedResponse::IncodeAddPrivacyConsent(_) => VendorAPI::IncodeAddPrivacyConsent,
+            ParsedResponse::IncodeAddMLConsent(_) => VendorAPI::IncodeAddMLConsent,
+            ParsedResponse::IncodeFetchOCR(_) => VendorAPI::IncodeFetchOCR,
+            ParsedResponse::IncodeAddSelfie(_) => VendorAPI::IncodeAddSelfie,
+            ParsedResponse::IncodeWatchlistCheck(_) => VendorAPI::IncodeWatchlistCheck,
+            ParsedResponse::IncodeRawResponse(_) => VendorAPI::IncodeGetOnboardingStatus, // TODO: i think we decided we'd remove IncodeRawResponse
+            ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
+            ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
+        }
+    }
 }

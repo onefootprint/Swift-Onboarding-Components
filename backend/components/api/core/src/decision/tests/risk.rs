@@ -1,4 +1,4 @@
-use crate::decision::onboarding::FeatureVector;
+use crate::decision::onboarding::{Decision, FeatureVector};
 use crate::decision::{
     features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
     onboarding::OnboardingRulesDecisionOutput, rule::onboarding_rules, rule::RuleName,
@@ -21,9 +21,11 @@ fn create_onboarding_rules_decision_output(
     let all_non_triggering_rules = base.filter(|r| !expected_triggered_rules.contains(r)).collect();
 
     OnboardingRulesDecisionOutput {
-        decision_status: expected_decision_status,
-        should_commit: expected_should_commit,
-        create_manual_review: expected_create_manual_review,
+        decision: Decision {
+            decision_status: expected_decision_status,
+            should_commit: expected_should_commit,
+            create_manual_review: expected_create_manual_review,
+        },
         rules_triggered: expected_triggered_rules,
         rules_not_triggered: all_non_triggering_rules,
     }

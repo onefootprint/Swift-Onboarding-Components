@@ -115,6 +115,13 @@ impl OnboardingUpdate {
             status: Some(decision_status.into()),
         }
     }
+
+    pub fn set_status(status: OnboardingStatus) -> Self {
+        Self {
+            status: Some(status),
+            ..Self::default()
+        }
+    }
 }
 
 #[derive(Debug)]

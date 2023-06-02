@@ -207,6 +207,7 @@ pub async fn get_latest_verification_requests_and_results(
         &uv.e_private_key,
     )
     .await?;
+
     let requests: Vec<VerificationRequest> = requests_and_results
         .into_iter()
         .filter_map(|(request, result)| {
@@ -394,8 +395,8 @@ pub fn save_onboarding_decision(
         tracing::info!(
            rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
            rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
-           create_manual_review=%rules_output.create_manual_review,
-           decision=%rules_output.decision_status,
+           create_manual_review=%rules_output.decision.create_manual_review,
+           decision=%rules_output.decision.decision_status,
            onboarding_id=%ob.id,
            scoped_user_id=%ob.scoped_vault_id,
            ob_configuration_id=%ob.ob_configuration_id,

@@ -8,7 +8,10 @@ use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
 
 use super::{
-    engine::VendorResults, onboarding::OnboardingRulesDecisionOutput, utils::FixtureDecision, Error,
+    engine::VendorResults,
+    onboarding::{Decision, OnboardingRulesDecisionOutput},
+    utils::FixtureDecision,
+    Error,
 };
 
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
@@ -16,7 +19,7 @@ use super::{
 fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorResponse> {
     match vendor_api {
         VendorAPI::IdologyExpectID => {
-            let v = idv::test_fixtures::idology_fake_data_expectid_response();
+            let v = idv::test_fixtures::test_idology_expectid_response();
             Ok(VendorResponse {
                 response: ParsedResponse::IDologyExpectID(serde_json::value::from_value(v.clone())?),
                 raw_response: v.into(),
@@ -125,9 +128,11 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
     fn from(value: FixtureDecision) -> Self {
         let (decision_status, create_manual_review) = value;
         OnboardingRulesDecisionOutput {
-            decision_status,
-            should_commit: decision_status == DecisionStatus::Pass,
-            create_manual_review,
+            decision: Decision {
+                decision_status,
+                should_commit: decision_status == DecisionStatus::Pass,
+                create_manual_review,
+            },
             rules_triggered: vec![],
             rules_not_triggered: vec![],
         }

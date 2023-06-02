@@ -221,7 +221,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -275,10 +275,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
-    // !!! TODO: this is currently incorrect. We create a OBD immediatly when we make a KYC decision but we need to change this for the Alpaca flow
-    assert!(obd.is_some()); // assert!(obd.is_none());
-    assert_eq!(OnboardingStatus::Pass, ob.status); // assert_eq!(OnboardingStatus::Pending, ob.status);
-    assert!(ob.decision_made_at.is_some()); // assert!(ob.decision_made_at.is_none());
+    assert!(obd.is_none());
+    assert_eq!(OnboardingStatus::Pending, ob.status);
+    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
     /// MakeWatchlistCheckCall
@@ -353,7 +352,7 @@ async fn pass_then_watchlist_hit(
 
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -407,10 +406,9 @@ async fn pass_then_watchlist_hit(
 
     let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
-    // !!! TODO: this is currently incorrect. We create a OBD immediatly when we make a KYC decision but we need to change this for the Alpaca flow
-    assert!(obd.is_some()); // assert!(obd.is_none());
-    assert_eq!(OnboardingStatus::Pass, ob.status); // assert_eq!(OnboardingStatus::Pending, ob.status);
-    assert!(ob.decision_made_at.is_some()); // assert!(ob.decision_made_at.is_none());
+    assert!(obd.is_none());
+    assert_eq!(OnboardingStatus::Pending, ob.status);
+    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
     /// MakeWatchlistCheckCall
@@ -424,8 +422,7 @@ async fn pass_then_watchlist_hit(
 
     let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
-    // !!! TODO: this is currently wrong, if we raise review then ob status should be Fail
-    assert_eq!(OnboardingStatus::Pass, ob.status);
+    assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(mr.is_some());
 
     match user_kind {
@@ -483,12 +480,10 @@ async fn pass_then_watchlist_hit(
     match review_decision {
         TerminalDecisionStatus::Pass => {
             assert_eq!(OnboardingStatus::Pass, ob.status);
-            // !!! TODO: this is currently wrong. Since ob.status = Pass when we raised the review, there is no status change so no new OBD is created.
-            assert!(matches!(obd.unwrap().actor, DbActor::Footprint)); // assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+            assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
         }
         TerminalDecisionStatus::Fail => {
             assert_eq!(OnboardingStatus::Fail, ob.status);
-            assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
         }
     }
 }
@@ -510,7 +505,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -540,11 +535,9 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     // Assert no OBD is created yet and ob status is pending
-    // !!! TODO: this is currently incorrect. We create a OBD immediatly when we make a KYC decision but we need to change this for the Alpaca flow
-    assert!(obd.is_some()); // assert!(obd.is_none());
-    /// !!! TODO: this is currently incorrect, we want the user to remain in `incomplete` when we step them up
-    assert_eq!(OnboardingStatus::Pending, ob.status); // assert_eq!(OnboardingStatus::Incomplete, ob.status);
-    assert!(ob.decision_made_at.is_some()); // assert!(ob.decision_made_at.is_none());
+    assert!(obd.is_none());
+    assert_eq!(OnboardingStatus::Incomplete, ob.status);
+    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
     /// DocCollected
@@ -558,8 +551,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
-    // !!! TODO: this is currently wrong, if we raise review then ob status should be Fail
-    assert_eq!(OnboardingStatus::Pending, ob.status); // assert_eq!(OnboardingStatus::Fail, ob.status);
+    assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(mr.is_some());
 
     // TODO: maybe assert risk signals here

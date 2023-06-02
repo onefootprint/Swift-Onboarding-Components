@@ -10,7 +10,10 @@ use db::{
     DbPool, DbResult, TxnPgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, VaultKind, WorkflowId};
+use newtypes::{
+    FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VaultKind, Vendor, VerificationResultId,
+    WorkflowId,
+};
 
 use crate::{
     decision::{
@@ -161,40 +164,47 @@ pub async fn assert_kyc_vendor_calls_completed(
     Ok(vendor_requests.completed_requests)
 }
 
-pub fn create_kyc_decision(
+pub type KycDecision = (
+    OnboardingRulesDecisionOutput,
+    Vec<(FootprintReasonCode, Vec<Vendor>)>,
+);
+
+pub fn get_kyc_decision(
     conn: &mut TxnPgConn,
-    t_id: &TenantId,
-    ob_id: &OnboardingId,
     fixture_decision: Option<FixtureDecision>,
     vendor_results: Vec<VendorResult>,
-    is_redo: bool,
-    workflow_id: &WorkflowId,
-) -> ApiResult<OnboardingRulesDecisionOutput> {
-    let verification_result_ids = vendor_results
-        .iter()
-        .map(|vr| vr.verification_result_id.clone())
-        .collect();
-
+) -> ApiResult<KycDecision> {
     // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
-    let (rules_output, reason_codes, is_sandbox) = if let Some(fixture_decision) = fixture_decision {
+    if let Some(fixture_decision) = fixture_decision {
         let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
         let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-        (rules_output, reason_codes, true)
+        Ok((rules_output, reason_codes))
     } else {
         let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results)?;
-        (rules_output, reason_codes, false)
-    };
+        Ok((rules_output, reason_codes))
+    }
+}
+
+pub fn save_kyc_decision(
+    conn: &mut TxnPgConn,
+    ob_id: &OnboardingId,
+    workflow_id: &WorkflowId,
+    verification_result_ids: Vec<VerificationResultId>,
+    decision: &KycDecision,
+    is_redo: bool,
+    is_sandbox: bool,
+) -> ApiResult<()> {
+    let (rules_output, reason_codes) = decision;
 
     let (ob, _, _, _) = Onboarding::get(conn, ob_id)?;
     engine::save_onboarding_decision(
         conn,
         &ob,
         rules_output.clone(),
-        reason_codes,
+        reason_codes.clone(),
         verification_result_ids,
         !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,
         Some(workflow_id.clone()),
-    )?;
-    Ok(rules_output)
+    )
 }

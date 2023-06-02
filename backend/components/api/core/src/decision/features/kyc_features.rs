@@ -2,7 +2,11 @@
 /// we can use to make decisions
 use idv::ParsedResponse;
 
-use crate::decision::{onboarding::DecisionReasonCodes, rule::rule_set::Action, Error, RuleError};
+use crate::decision::{
+    onboarding::{Decision, DecisionReasonCodes},
+    rule::rule_set::Action,
+    Error, RuleError,
+};
 use itertools::Itertools;
 use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
@@ -301,9 +305,11 @@ impl FeatureVector for KycFeatureVector {
         let reason_codes = self.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
 
         let output = OnboardingRulesDecisionOutput {
-            should_commit: Self::should_commit(&result.rules_triggered),
-            decision_status,
-            create_manual_review,
+            decision: Decision {
+                should_commit: Self::should_commit(&result.rules_triggered),
+                decision_status,
+                create_manual_review,
+            },
             rules_triggered: result.rules_triggered.to_owned(),
             rules_not_triggered: result.rules_not_triggered.to_owned(),
         };

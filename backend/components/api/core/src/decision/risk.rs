@@ -43,7 +43,7 @@ pub fn save_final_decision(
     }
 
     // If we should commit, mark all data as verified for the onboarding
-    let seqno = if decision.should_commit {
+    let seqno = if decision.decision.should_commit {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
         let seqno = uvw.portablize_identity_data(conn)?;
         Some(seqno)
@@ -56,7 +56,7 @@ pub fn save_final_decision(
         vault_id: scoped_user.vault_id,
         onboarding: &ob,
         logic_git_hash: crate::GIT_HASH.to_string(),
-        status: decision.decision_status,
+        status: decision.decision.decision_status,
         result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,
@@ -69,11 +69,11 @@ pub fn save_final_decision(
     // Make a billable event here
     ob.update(
         conn,
-        OnboardingUpdate::set_has_final_decision(decision.decision_status),
+        OnboardingUpdate::set_has_final_decision(decision.decision.decision_status),
     )?;
 
     // Create ManualReview row if requested
-    if decision.create_manual_review {
+    if decision.decision.create_manual_review {
         ManualReview::create(conn, ob_id)?;
     }
 

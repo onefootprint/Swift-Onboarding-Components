@@ -160,4 +160,34 @@ impl VendorAPI {
             VendorAPI::IncodeProcessFace => false,
         }
     }
+
+    // temporary hack to allow us to filter to just vendor calls that are made in a batch of KYC vendor calls
+    pub fn is_kyc_call(&self) -> bool {
+        match self {
+            VendorAPI::IdologyExpectID
+            | VendorAPI::TwilioLookupV2
+            | VendorAPI::SocureIDPlus
+            | VendorAPI::ExperianPreciseID => true,
+            VendorAPI::IdologyScanVerifySubmission
+            | VendorAPI::IdologyScanVerifyResults
+            | VendorAPI::IdologyScanOnboarding
+            | VendorAPI::IdologyPa
+            | VendorAPI::MiddeskCreateBusiness
+            | VendorAPI::MiddeskGetBusiness
+            | VendorAPI::MiddeskBusinessUpdateWebhook
+            | VendorAPI::MiddeskTinRetriedWebhook
+            | VendorAPI::IncodeStartOnboarding
+            | VendorAPI::IncodeAddFront
+            | VendorAPI::IncodeAddBack
+            | VendorAPI::IncodeProcessId
+            | VendorAPI::IncodeFetchScores
+            | VendorAPI::IncodeAddPrivacyConsent
+            | VendorAPI::IncodeAddMLConsent
+            | VendorAPI::IncodeFetchOCR
+            | VendorAPI::IncodeAddSelfie
+            | VendorAPI::IncodeWatchlistCheck
+            | VendorAPI::IncodeGetOnboardingStatus
+            | VendorAPI::IncodeProcessFace => false,
+        }
+    }
 }
