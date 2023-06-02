@@ -8,6 +8,9 @@ import IdDocCountryAndType from '../id-doc-country-and-type';
 import IdDocFrontPhoto from '../id-doc-front-photo';
 import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
 import Processing from '../processing';
+import SelfiePhoto from '../selfie-photo';
+import SelfiePrompt from '../selfie-prompt';
+import SelfieRetryPrompt from '../selfie-retry-prompt';
 
 type RouterProps = {
   onDone: () => void;
@@ -40,8 +43,20 @@ const Router = ({ onDone }: RouterProps) => {
     return <IdDocBackPhoto />;
   }
 
-  if (state.matches('frontImageRetry')) {
+  if (state.matches('backImageRetry')) {
     return <IdDocBackPhotoRetry />;
+  }
+
+  if (state.matches('selfiePrompt')) {
+    return <SelfiePrompt />;
+  }
+
+  if (state.matches('selfieImage')) {
+    return <SelfiePhoto />;
+  }
+
+  if (state.matches('selfieImageRetry')) {
+    return <SelfieRetryPrompt />;
   }
 
   if (state.matches('processing')) {

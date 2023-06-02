@@ -3,6 +3,7 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { MachineProvider } from './components/machine-provider';
+import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { ImageTypes } from './constants/image-types';
@@ -28,7 +29,9 @@ const App = ({ context, onDone }: IdDocProps) => {
     <MachineProvider args={initialContext}>
       <I18nextProvider i18n={configureI18next()}>
         <QueryClientProvider client={queryClient}>
-          <Router onDone={onDone} />
+          <MissingPermissionsSheetProvider>
+            <Router onDone={onDone} />
+          </MissingPermissionsSheetProvider>
         </QueryClientProvider>
       </I18nextProvider>
     </MachineProvider>

@@ -82,12 +82,8 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         selfieImageRetry: {
           on: {
-            cameraErrored: {
-              target: 'selfiePrompt',
-            },
-            receivedImage: {
-              target: 'processing',
-              actions: 'assignImage',
+            startSelfieCapture: {
+              target: 'selfieImage',
             },
           },
         },

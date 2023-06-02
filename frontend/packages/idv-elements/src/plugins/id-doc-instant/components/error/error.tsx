@@ -38,7 +38,7 @@ const Error = ({ errors, imageType }: ErrorProps) => {
           color="error"
           sx={{ textAlign: 'center' }}
         >
-          {t('title')}
+          {t(`title-${imageType}`)}
         </Typography>
         {cleanedErrors.length < 2 ? (
           <Typography

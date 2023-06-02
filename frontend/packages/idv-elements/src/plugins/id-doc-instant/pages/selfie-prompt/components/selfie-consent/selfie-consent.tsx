@@ -32,12 +32,15 @@ const SelfieConsent = ({ open, onConsent, onClose }: SelfieConsentProps) => {
       return;
     }
 
-    const consentLanguageText = [
-      t('title'),
-      t('subtitle'),
-      t('cta'),
-      t('third-party-consent'),
-    ].join(' ');
+    const consentLanguages = [t('title'), t('subtitle')];
+
+    if (isThirdPartyConsented) {
+      consentLanguages.push(t('third-party-consent-text'));
+    }
+    consentLanguages.push(t('cta'));
+
+    const consentLanguageText = consentLanguages.join(' ');
+
     consentMutation.mutate(
       { consentLanguageText, authToken },
       {

@@ -1,2 +1,5 @@
 export { default } from './missing-permissions-sheet';
-export { useMissingPermissionsSheet } from './missing-permissions-sheet-provider';
+export {
+  default as MissingPermissionsSheetProvider,
+  useMissingPermissionsSheet,
+} from './missing-permissions-sheet-provider';

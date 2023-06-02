@@ -40,7 +40,9 @@
       "processing-selfie": "Processing your selfie..."
     },
     "error": {
-      "title": "We couldn't process your image",
+      "title-front": "We couldn't process your image",
+      "title-back": "We couldn't process your image",
+      "title-selfie": "We couldn't process your selfie",
       "description": "Please submit a new image."
     },
     "success": {
@@ -54,7 +56,8 @@
       "subtitle": "By continuing, you're agreeing to Footprint collecting and processing your biometric data from your selfie and identity document.",
       "cta": "Agree",
       "continue": "Continue",
-      "third-party-consent": "Optional: Allow Footprint's third-party providers to improve their products with this data. <a>Privacy Policy</a>."
+      "third-party-consent": "Optional: Allow Footprint's third-party providers to improve their products with this data. <a>Privacy Policy</a>.",
+      "third-party-consent-text": "Allow Footprint's third-party providers to improve their products with this data."
     },
     "id-doc-photo-upload-buttons": {
       "take-photo": {
@@ -95,6 +98,48 @@
         "not-supported": "Sorry, we don't support IDs for your country yet.",
         "cta": "Continue"
       }
+    },
+    "selfie-photo-prompt": {
+      "title": "Take a selfie",
+      "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "cta": "Take photo",
+      "animation-selfie": {
+        "first-text": "Back image captured",
+        "second-text": "Now we need a selfie"
+      },
+      "animation-selfie-from-passport": {
+        "first-text": "Document image captured",
+        "second-text": "Now we need a selfie"
+      },
+      "guidelines": {
+        "check-lighting": {
+          "title": "Check your lighting",
+          "description": "It can't be too bright or too dark."
+        },
+        "device-steady": {
+          "title": "Hold your device steady",
+          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+        },
+        "whole-face": {
+          "title": "Make sure your face is clearly visible and centered",
+          "description": "You should face the camera directly and capture your whole head."
+        }
+      }
+    },
+    "selfie-photo": {
+      "camera": {
+        "instructions": "Center your face in the area",
+        "take": "Take photo"
+      },
+      "preview": {
+        "retake": "Retake",
+        "confirm": "Use photo"
+      }
+    },
+    "selfie-retry-prompt": {
+      "cta": "Take photo"
     }
   }
 }
