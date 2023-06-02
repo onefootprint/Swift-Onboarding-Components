@@ -1,10 +1,11 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { BusinessDI } from '@onefootprint/types';
-import { Button, PhoneInput, TextInput } from '@onefootprint/ui';
+import { PhoneInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { BasicData } from '../../../../utils/state-machine/types';
 import PHONE_REGEX from './constants';
 
@@ -21,6 +22,7 @@ export type BasicDataFormProps = {
   optionalFields?: (BusinessDI.phoneNumber | BusinessDI.website)[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
+  onCancel?: () => void;
   ctaLabel?: string;
 };
 
@@ -29,9 +31,10 @@ const BasicDataForm = ({
   optionalFields,
   isLoading,
   onSubmit,
+  onCancel,
   ctaLabel,
 }: BasicDataFormProps) => {
-  const { allT, t } = useTranslation('pages.basic-data.form');
+  const { t } = useTranslation('pages.basic-data.form');
   const {
     register,
     handleSubmit,
@@ -146,9 +149,11 @@ const BasicDataForm = ({
           })}
         />
       )}
-      <Button type="submit" fullWidth loading={isLoading}>
-        {ctaLabel ?? allT('pages.cta-continue')}
-      </Button>
+      <EditableFormButtonContainer
+        onCancel={onCancel}
+        isLoading={isLoading}
+        ctaLabel={ctaLabel}
+      />
     </Form>
   );
 };
@@ -157,6 +162,7 @@ const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]};
+    width: 100%;
   `}
 `;
 

@@ -9,8 +9,8 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -28,12 +28,14 @@ import getInitialState from './utils/get-initial-state';
 type ResidentialAddressProps = {
   ctaLabel?: string;
   onComplete?: () => void;
+  onCancel?: () => void;
   hideHeader?: boolean;
 };
 
 const ResidentialAddress = ({
   ctaLabel,
   onComplete,
+  onCancel,
   hideHeader,
 }: ResidentialAddressProps) => {
   const [state, send] = useCollectKycDataMachine();
@@ -139,7 +141,11 @@ const ResidentialAddress = ({
               <ZipField countryCode={country.value} disabled={isZipDisabled} />
             </>
           )}
-          <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
+          <EditableFormButtonContainer
+            isLoading={mutation.isLoading}
+            onCancel={onCancel}
+            ctaLabel={ctaLabel}
+          />
         </Form>
       </FormProvider>
     </>

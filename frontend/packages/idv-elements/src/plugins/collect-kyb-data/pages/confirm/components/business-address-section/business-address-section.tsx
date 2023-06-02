@@ -2,14 +2,15 @@ import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { BusinessDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  type SectionItemProps,
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
-
-type BusinessAddressSectionProps = {
-  onEdit: () => void;
-};
+import BusinessAddress from '../../../business-address/business-address';
 
 const createAddressLine = (address: Array<string | undefined | null>) =>
   address
@@ -17,7 +18,7 @@ const createAddressLine = (address: Array<string | undefined | null>) =>
     .filter((value: string | undefined | null) => !!value)
     .join(', ');
 
-const BusinessAddressSection = ({ onEdit }: BusinessAddressSectionProps) => {
+const BusinessAddressSection = () => {
   const { allT, t } = useTranslation('pages.confirm.business-address');
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
@@ -28,6 +29,8 @@ const BusinessAddressSection = ({ onEdit }: BusinessAddressSectionProps) => {
   const stateName = data[BusinessDI.state];
   const country = data[BusinessDI.country];
   const zip = data[BusinessDI.zip];
+
+  const [editing, setEditing] = useState(false);
 
   if (
     !addressLine1 &&
@@ -48,13 +51,48 @@ const BusinessAddressSection = ({ onEdit }: BusinessAddressSectionProps) => {
     },
   ];
 
+  const viewItems = address.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return viewItems;
+    }
+
+    return (
+      <BusinessAddress
+        ctaLabel={allT('pages.confirm.summary.save')}
+        onComplete={stopEditing}
+        onCancel={stopEditing}
+        hideHeader
+      />
+    );
+  };
+
   return (
     <Section
       title={t('title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={onEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoBuilding24}
-      items={address}
+      content={getSectionContent()}
+      testID="business-address"
     />
   );
 };

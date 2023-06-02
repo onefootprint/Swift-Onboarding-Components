@@ -18,9 +18,15 @@ type BasicDataProps = {
   hideHeader?: boolean;
   ctaLabel?: string;
   onComplete?: () => void;
+  onCancel?: () => void;
 };
 
-const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
+const BasicData = ({
+  ctaLabel,
+  hideHeader,
+  onComplete,
+  onCancel,
+}: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
@@ -92,6 +98,7 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete }: BasicDataProps) => {
         optionalFields={optionalFields}
         onSubmit={handleSubmit}
         isLoading={mutation.isLoading}
+        onCancel={onCancel}
         ctaLabel={ctaLabel}
       />
     </>

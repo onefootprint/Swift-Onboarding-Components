@@ -1,21 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import { IdDI, isCountryCode } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  type SectionItemProps,
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
 import getInitialCountry from '../../../../utils/get-initial-country';
+import BasicInformation from '../../../basic-information/basic-information';
 
-type BasicInfoSectionProps = {
-  onEdit: () => void;
-};
-
-const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
+const BasicInfoSection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
+  const [editing, setEditing] = useState(false);
 
   const basicInfo = [];
 
@@ -47,7 +49,8 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
   const defaultCountry =
     countryVal && isCountryCode(countryVal) ? countryVal : undefined;
   const nationality = getInitialCountry(defaultCountry).label;
-  if (nationality) {
+  // we only want to display nationality / the default country if we collected it
+  if (countryVal && nationality) {
     basicInfo.push({
       text: t('basic-info.nationality'),
       subtext: nationality,
@@ -58,17 +61,46 @@ const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
     return null;
   }
 
-  const handleEdit = () => {
-    onEdit();
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const basicInfoItem = basicInfo.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return basicInfoItem;
+    }
+    return (
+      <BasicInformation
+        onComplete={stopEditing}
+        onCancel={stopEditing}
+        hideHeader
+      />
+    );
   };
 
   return (
     <Section
       title={t('basic-info.title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={handleEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoFileText24}
-      items={basicInfo}
+      content={getSectionContent()}
+      testID="basic-info-section"
     />
   );
 };

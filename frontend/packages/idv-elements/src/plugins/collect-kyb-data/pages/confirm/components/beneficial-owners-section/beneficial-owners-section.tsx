@@ -5,19 +5,19 @@ import {
   BusinessDI,
   CollectedKybDataOption,
 } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
+  type SectionItemProps,
   MultiSection,
+  Section,
+  SectionItem,
   SectionProps,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
+import BeneficialOwners from '../../../beneficial-owners/beneficial-owners';
 
-type BeneficialOwnersSectionProps = {
-  onEdit: () => void;
-};
-
-const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
+const BeneficialOwnersSection = () => {
   const { t, allT } = useTranslation('pages.confirm.beneficial-owners');
   const [state] = useCollectKybDataMachine();
   const {
@@ -27,6 +27,7 @@ const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
   const isMultiKyc = missingAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
+  const [editing, setEditing] = useState(false);
 
   const beneficialOwners =
     (isMultiKyc
@@ -67,17 +68,48 @@ const BeneficialOwnersSection = ({ onEdit }: BeneficialOwnersSectionProps) => {
     sections.push({
       title:
         index === 0 ? t('beneficial-owner-you') : t('beneficial-owner-other'),
-      items,
+      content: items.map(({ text, subtext, textColor }: SectionItemProps) => (
+        <SectionItem
+          key={text}
+          text={text}
+          subtext={subtext}
+          textColor={textColor}
+        />
+      )),
     });
   });
 
-  return (
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  return editing ? (
+    <Section
+      title={t('title')}
+      editLabel={allT('pages.confirm.summary.edit')}
+      IconComponent={IcoUserCircle24}
+      content={
+        <BeneficialOwners
+          hideHeader
+          ctaLabel={allT('pages.confirm.summary.save')}
+          onComplete={stopEditing}
+          onCancel={stopEditing}
+        />
+      }
+      testID="beneficial-owners"
+    />
+  ) : (
     <MultiSection
       title={t('title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={onEdit}
+      onEdit={startEditing}
       IconComponent={IcoUserCircle24}
       sections={sections}
+      testID="beneficial-owners"
     />
   );
 };

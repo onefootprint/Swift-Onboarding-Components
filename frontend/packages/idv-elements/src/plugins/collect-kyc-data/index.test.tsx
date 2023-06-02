@@ -6,6 +6,7 @@ import {
   screen,
   userEvent,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import {
   CollectedKycDataOption,
@@ -193,6 +194,118 @@ describe('<CollectKycData />', () => {
 
       ssn4 = screen.getByText('1234');
       expect(ssn4).toBeInTheDocument();
+
+      // check that we can edit a field, cancel it, and the original value stays as it was
+
+      let basicInfoSection = screen.getByTestId('basic-info-section');
+      let basicInfoSectionEdit = within(basicInfoSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(basicInfoSectionEdit);
+
+      // make sure editing screen has loaded
+      await waitFor(() => {
+        expect(screen.getByLabelText('First name')).toBeInTheDocument();
+      });
+
+      firstName = screen.getByLabelText('First name');
+      // await userEvent.clear(firstName);
+      await userEvent.type(firstName, 'Test first name');
+
+      let cancel = screen.getByRole('button', { name: 'Cancel' });
+      await userEvent.click(cancel);
+      await waitFor(() => {
+        expect(screen.getByText('Piip')).toBeInTheDocument();
+      });
+
+      // now, edit and make sure the value saves and changes
+      basicInfoSection = screen.getByTestId('basic-info-section');
+      basicInfoSectionEdit = within(basicInfoSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(basicInfoSectionEdit);
+
+      // make sure editing screen has loaded
+      await waitFor(() => {
+        expect(screen.getByText('Save')).toBeInTheDocument();
+      });
+
+      firstName = screen.getByLabelText('First name');
+      await userEvent.clear(firstName);
+      await userEvent.type(firstName, 'Test first name');
+
+      let save = within(basicInfoSection).getByRole('button', {
+        name: 'Save',
+      });
+      await userEvent.click(save);
+      await waitFor(() => {
+        expect(screen.getByText('Test first name')).toBeInTheDocument();
+      });
+
+      // see if edit button shows up in basic info section again
+      basicInfoSection = screen.getByTestId('basic-info-section');
+      basicInfoSectionEdit = within(basicInfoSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await waitFor(() => {
+        expect(basicInfoSectionEdit).toBeInTheDocument();
+      });
+
+      // same tests on identity form
+      let identitySection = screen.getByTestId('identity-section');
+      let identitySectionEdit = within(identitySection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(identitySectionEdit);
+
+      // make sure editing screen has loaded
+      await waitFor(() => {
+        expect(screen.getByLabelText('SSN (last 4)')).toBeInTheDocument();
+      });
+
+      // check that we can edit SSN section, cancel the change, and the original value persists
+      ssn4 = screen.getByLabelText('SSN (last 4)');
+      await userEvent.clear(ssn4);
+      await userEvent.type(ssn4, '5678');
+
+      cancel = screen.getByRole('button', { name: 'Cancel' });
+      await userEvent.click(cancel);
+      await waitFor(() => {
+        expect(screen.getByText('1234')).toBeInTheDocument();
+      });
+
+      // now, edit SSN, save the change, and show that changed value persists
+      identitySection = screen.getByTestId('identity-section');
+      identitySectionEdit = within(identitySection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(identitySectionEdit);
+
+      // make sure editing screen has loaded
+      await waitFor(() => {
+        expect(screen.getByText('Save')).toBeInTheDocument();
+      });
+
+      ssn4 = screen.getByLabelText('SSN (last 4)');
+      await userEvent.clear(ssn4);
+      await userEvent.type(ssn4, '5678');
+      save = within(identitySection).getByRole('button', {
+        name: 'Save',
+      });
+      await userEvent.click(save);
+      await waitFor(() => {
+        expect(screen.getByText('5678')).toBeInTheDocument();
+      });
+
+      // see if edit button shows up in identity section again (because we are done editing)
+
+      identitySection = screen.getByTestId('identity-section');
+      identitySectionEdit = within(identitySection).getByRole('button', {
+        name: 'Edit',
+      });
+      await waitFor(() => {
+        expect(identitySectionEdit).toBeInTheDocument();
+      });
 
       submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
       expect(submitButton).toBeInTheDocument();

@@ -20,14 +20,10 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'addressEditDesktop'
-    | 'basicInfoEditDesktop'
     | 'basicInformation'
     | 'completed'
     | 'confirm'
     | 'email'
-    | 'emailEditDesktop'
-    | 'identityEditDesktop'
     | 'init'
     | 'residentialAddress'
     | 'router'

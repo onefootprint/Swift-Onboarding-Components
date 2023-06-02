@@ -4,10 +4,6 @@ import React, { useEffect } from 'react';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
-import EditAddressDesktop from '../edit-address-desktop';
-import EditBasicInfoDesktop from '../edit-basic-info-desktop';
-import EditEmailDesktop from '../edit-email-desktop';
-import EditIdentityDesktop from '../edit-identity-desktop';
 import Email from '../email';
 import Init from '../init';
 import Address from '../residential-address';
@@ -45,18 +41,6 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('confirm')) {
     return <Confirm />;
-  }
-  if (state.matches('emailEditDesktop')) {
-    return <EditEmailDesktop />;
-  }
-  if (state.matches('basicInfoEditDesktop')) {
-    return <EditBasicInfoDesktop />;
-  }
-  if (state.matches('addressEditDesktop')) {
-    return <EditAddressDesktop />;
-  }
-  if (state.matches('identityEditDesktop')) {
-    return <EditIdentityDesktop />;
   }
 
   return null;

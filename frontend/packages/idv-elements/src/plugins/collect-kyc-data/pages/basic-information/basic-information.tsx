@@ -8,8 +8,8 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -25,12 +25,14 @@ type BasicInformationProps = {
   hideHeader?: boolean;
   ctaLabel?: string;
   onComplete?: () => void;
+  onCancel?: () => void;
 };
 
 const BasicInformation = ({
   ctaLabel,
   hideHeader,
   onComplete,
+  onCancel,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
@@ -101,7 +103,11 @@ const BasicInformation = ({
           {requiresNationality && (
             <NationalityField disabled={isNationalityDisabled} />
           )}
-          <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
+          <EditableFormButtonContainer
+            isLoading={mutation.isLoading}
+            onCancel={onCancel}
+            ctaLabel={ctaLabel}
+          />
         </Form>
       </FormProvider>
     </>

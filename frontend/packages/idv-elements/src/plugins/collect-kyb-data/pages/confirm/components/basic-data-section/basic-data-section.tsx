@@ -1,19 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import { BusinessDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
+import { type SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
+import BasicData from '../../../basic-data';
 
-type BasicDataSectionProps = {
-  onEdit: () => void;
-};
-
-const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
+const BasicDataSection = () => {
   const { allT, t } = useTranslation('pages.confirm.basic-data');
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
+  const [editing, setEditing] = useState(false);
 
   const basicInfo = [];
 
@@ -22,6 +24,14 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     basicInfo.push({
       text: t('business-name'),
       subtext: name,
+    });
+  }
+
+  const doingBusinessAs = data[BusinessDI.doingBusinessAs];
+  if (doingBusinessAs) {
+    basicInfo.push({
+      text: t('doing-business-as'),
+      subtext: doingBusinessAs,
     });
   }
 
@@ -53,19 +63,48 @@ const BasicDataSection = ({ onEdit }: BasicDataSectionProps) => {
     return null;
   }
 
-  const handleEdit = () => {
-    onEdit();
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const basicInfoDetails = basicInfo.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return basicInfoDetails;
+    }
+    return (
+      <BasicData
+        hideHeader
+        ctaLabel={allT('pages.confirm.summary.save')}
+        onComplete={stopEditing}
+        onCancel={stopEditing}
+      />
+    );
   };
 
   return (
     <Section
+      testID="basic-data"
       title={t('title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={handleEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoFileText24}
-      items={basicInfo}
+      content={getSectionContent()}
     />
   );
 };
-
 export default BasicDataSection;

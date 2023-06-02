@@ -11,6 +11,7 @@ type MultiSectionProps = {
   onEdit: () => void;
   sections: SectionProps[];
   IconComponent: Icon;
+  testID?: string;
 };
 
 const MultiSection = ({
@@ -19,8 +20,9 @@ const MultiSection = ({
   onEdit,
   sections,
   IconComponent,
+  testID,
 }: MultiSectionProps) => (
-  <Container>
+  <Container data-testid={testID}>
     <Header>
       <TitleContainer>
         <IconComponent />
@@ -37,7 +39,7 @@ const MultiSection = ({
             editLabel={section.editLabel}
             key={section.title}
             title={section.title}
-            items={section.items}
+            content={section.content}
           />
           {index !== sections.length - 1 && <Divider />}
         </React.Fragment>

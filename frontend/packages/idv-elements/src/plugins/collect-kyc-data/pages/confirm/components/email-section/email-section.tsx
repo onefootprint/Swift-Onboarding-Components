@@ -1,17 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  type SectionItemProps,
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
+import Email from '../../../email';
 
-type EmailSectionProps = {
-  onEdit: () => void;
-};
-
-const EmailSection = ({ onEdit }: EmailSectionProps) => {
+const EmailSection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const {
@@ -20,6 +21,7 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
   } = state.context;
   const emailEntry = data[IdDI.email];
   const email = getDisplayValue(emailEntry);
+  const [editing, setEditing] = useState(false);
   const receivedEmail = emailEntry?.bootstrap;
   // We don't use allAttributes here -
   // We allow editing most pieces of information, but we don't yet support updating a piece of
@@ -31,22 +33,54 @@ const EmailSection = ({ onEdit }: EmailSectionProps) => {
     return null;
   }
 
-  const handleEdit = () => {
-    onEdit();
+  const emailElement = [
+    {
+      text: t('email.text'),
+      subtext: email,
+    },
+  ];
+
+  const emailItem = emailElement.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return emailItem;
+    }
+    return (
+      <Email
+        onComplete={stopEditing}
+        onCancel={stopEditing}
+        ctaLabel={allT('pages.cta.continue')}
+        hideHeader
+      />
+    );
   };
 
   return (
     <Section
       title={t('email.title')}
+      testID="email-section"
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={handleEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoEmail24}
-      items={[
-        {
-          text: t('email.text'),
-          subtext: email,
-        },
-      ]}
+      content={getSectionContent()}
     />
   );
 };

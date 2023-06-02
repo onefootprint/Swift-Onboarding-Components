@@ -4,8 +4,8 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import CtaButton from '../../components/cta-button';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -17,6 +17,7 @@ import { FormData } from './types';
 
 type SSNProps = {
   onComplete?: () => void;
+  onCancel?: () => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
   hideHeader?: boolean;
@@ -27,6 +28,7 @@ const SSN = ({
   ctaLabel,
   hideHeader,
   onComplete,
+  onCancel,
 }: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
@@ -75,7 +77,11 @@ const SSN = ({
           ) : (
             <SSN4 disabled={isSsn4Disabled} />
           )}
-          <CtaButton isLoading={mutation.isLoading} label={ctaLabel} />
+          <EditableFormButtonContainer
+            isLoading={mutation.isLoading}
+            onCancel={onCancel}
+            ctaLabel={ctaLabel}
+          />
         </Form>
       </FormProvider>
     </>
@@ -86,6 +92,7 @@ const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]};
+    width: 100%;
   `}
 `;
 

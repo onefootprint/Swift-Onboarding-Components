@@ -6,6 +6,7 @@ import {
   screen,
   userEvent,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import {
   CollectedDataOption,
@@ -149,7 +150,11 @@ describe('<CollectKybData />', () => {
             CollectedKycDataOption.dob,
             CollectedKycDataOption.ssn4,
           ],
-          [CollectedKybDataOption.beneficialOwners],
+          [
+            CollectedKybDataOption.name,
+            CollectedKybDataOption.tin,
+            CollectedKybDataOption.beneficialOwners,
+          ],
         ),
         onDone,
       });
@@ -164,6 +169,27 @@ describe('<CollectKybData />', () => {
 
       let submitButton = screen.getByRole('button', { name: 'Continue' });
       expect(submitButton).toBeInTheDocument();
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('We need some information about your business.'),
+        ).toBeInTheDocument();
+      });
+
+      let businessName = screen.getByLabelText('Business name');
+      expect(businessName).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Acme Bank Inc.')).toBeInTheDocument();
+      await userEvent.type(businessName, 'New Biz Inc.');
+
+      const TIN = screen.getByLabelText('Taxpayer Identification Number (TIN)');
+      expect(TIN).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
+      await userEvent.type(TIN, '987654321');
+
+      submitButton = screen.getByRole('button', {
+        name: 'Continue',
+      });
       userEvent.click(submitButton);
 
       await waitFor(() => {
@@ -208,12 +234,113 @@ describe('<CollectKybData />', () => {
       ownershipStake = screen.getByText('50%');
       expect(ownershipStake).toBeInTheDocument();
 
+      let basicDataSection = screen.getByTestId('basic-data');
+      let basicDataEdit = within(basicDataSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(basicDataEdit);
+
+      // check that we can edit a field, cancel it, and the original value stays as it was
+      businessName = screen.getByLabelText('Business name');
+      await userEvent.type(businessName, 'Newer Biz Inc.');
+
+      let cancel = screen.getByRole('button', { name: 'Cancel' });
+      await userEvent.click(cancel);
+      expect(screen.getByText('New Biz Inc.')).toBeInTheDocument();
+
+      // now, edit and make sure the value saves and changes
+      basicDataSection = screen.getByTestId('basic-data');
+      basicDataEdit = within(basicDataSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await userEvent.click(basicDataEdit);
+
+      businessName = screen.getByLabelText('Business name');
+      await userEvent.clear(businessName);
+      await userEvent.type(businessName, 'Newer Biz Inc.');
+
+      let save = within(basicDataSection).getByRole('button', {
+        name: 'Save',
+      });
+      await userEvent.click(save);
+      await waitFor(() => {
+        expect(screen.getByText('Newer Biz Inc.')).toBeInTheDocument();
+      });
+
+      // see if edit button shows up in basic section again
+      basicDataSection = screen.getByTestId('basic-data');
+      basicDataEdit = within(basicDataSection).getByRole('button', {
+        name: 'Edit',
+      });
+      await waitFor(() => {
+        expect(basicDataEdit).toBeInTheDocument();
+      });
+
+      // edit a beneficial owner
+      let beneficialOwnersSection = screen.getByTestId('beneficial-owners');
+      let beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
+        'button',
+        { name: 'Edit' },
+      );
+      await userEvent.click(beneficialOwnersEdit);
+
+      // check that we can edit approximate ownership, cancel the change, and the original value persists
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Approximate ownership stake (%)'),
+        ).toBeInTheDocument();
+      });
+      ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
+      await userEvent.clear(ownershipStake);
+      await userEvent.type(ownershipStake, '40');
+
+      cancel = screen.getByRole('button', { name: 'Cancel' });
+      await userEvent.click(cancel);
+      await waitFor(() => {
+        expect(screen.getByText('50%')).toBeInTheDocument();
+      });
+
+      // now, edit approximate ownership, save the change, and show that changed value persists
+      beneficialOwnersSection = screen.getByTestId('beneficial-owners');
+      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
+        'button',
+        { name: 'Edit' },
+      );
+      await userEvent.click(beneficialOwnersEdit);
+
+      ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
+      await waitFor(() => {
+        expect(ownershipStake).toBeInTheDocument();
+      });
+
+      await userEvent.clear(ownershipStake);
+      await userEvent.type(ownershipStake, '40');
+      save = screen.getByRole('button', { name: 'Save' });
+      await userEvent.click(save);
+      await waitFor(() => {
+        expect(screen.getByText('40%')).toBeInTheDocument();
+      });
+
+      // see if edit button shows up in beneficial owners section again (because we are done editing)
+      beneficialOwnersSection = screen.getByTestId('beneficial-owners');
+      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
+        'button',
+        { name: 'Edit' },
+      );
+      await waitFor(() => {
+        expect(beneficialOwnersEdit).toBeInTheDocument();
+      });
+
       submitButton = screen.getByRole('button', { name: 'Confirm & Continue' });
       expect(submitButton).toBeInTheDocument();
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Basic Data')).toBeInTheDocument();
+        expect(beneficialOwnersEdit).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(`Basic Data`)).toBeInTheDocument();
       });
 
       firstName = screen.getByLabelText('First name');

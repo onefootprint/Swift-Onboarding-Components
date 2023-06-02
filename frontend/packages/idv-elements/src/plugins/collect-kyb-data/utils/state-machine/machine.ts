@@ -68,7 +68,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             basicDataSubmitted: [
               {
                 target: 'businessAddress',
-                actions: 'assignBasicData',
+                actions: 'assignData',
                 cond: context =>
                   isMissingBusinessAddressAttribute(
                     context.kybRequirement.missingAttributes,
@@ -76,7 +76,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               },
               {
                 target: 'beneficialOwners',
-                actions: 'assignBasicData',
+                actions: 'assignData',
                 cond: context =>
                   isMissingBeneficialOwnerAttribute(
                     context.kybRequirement.missingAttributes,
@@ -84,7 +84,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               },
               {
                 target: 'confirm',
-                actions: 'assignBasicData',
+                actions: 'assignData',
               },
             ],
             navigatedToPrevPage: {
@@ -97,7 +97,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             businessAddressSubmitted: [
               {
                 target: 'beneficialOwners',
-                actions: 'assignBusinessAddress',
+                actions: 'assignData',
                 cond: context =>
                   isMissingBeneficialOwnerAttribute(
                     context.kybRequirement.missingAttributes,
@@ -105,7 +105,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               },
               {
                 target: 'confirm',
-                actions: 'assignBusinessAddress',
+                actions: 'assignData',
               },
             ],
             navigatedToPrevPage: [
@@ -127,7 +127,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             beneficialOwnersSubmitted: [
               {
                 target: 'confirm',
-                actions: 'assignBeneficialOwners',
+                actions: 'assignData',
               },
             ],
             navigatedToPrevPage: [
@@ -162,31 +162,14 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
                 target: 'completed',
               },
             ],
-            // Desktop transitions
-            editBasicData: {
-              target: 'basicDataEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
-            },
-            editBusinessAddress: {
-              target: 'businessAddressEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
-            },
-            editBeneficialOwners: {
-              target: 'beneficialOwnersEditDesktop',
-              cond: context => context.device?.type !== 'mobile',
-            },
-            // Mobile transitions
             basicDataSubmitted: {
-              actions: 'assignBasicData',
-              cond: context => context.device?.type === 'mobile',
+              actions: 'assignData',
             },
             businessAddressSubmitted: {
-              actions: 'assignBusinessAddress',
-              cond: context => context.device?.type === 'mobile',
+              actions: 'assignData',
             },
             beneficialOwnersSubmitted: {
-              actions: 'assignBeneficialOwners',
-              cond: context => context.device?.type === 'mobile',
+              actions: 'assignData',
             },
             navigatedToPrevPage: [
               {
@@ -216,60 +199,6 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             ],
           },
         },
-        basicDataEditDesktop: {
-          on: {
-            basicDataSubmitted: [
-              {
-                target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
-                actions: 'assignBasicData',
-              },
-              {
-                actions: 'assignBasicData',
-              },
-            ],
-            returnToSummary: {
-              target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
-            },
-          },
-        },
-        businessAddressEditDesktop: {
-          on: {
-            businessAddressSubmitted: [
-              {
-                target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
-                actions: 'assignBusinessAddress',
-              },
-              {
-                actions: 'assignBusinessAddress',
-              },
-            ],
-            returnToSummary: {
-              target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
-            },
-          },
-        },
-        beneficialOwnersEditDesktop: {
-          on: {
-            beneficialOwnersSubmitted: [
-              {
-                target: 'confirm',
-                cond: context => context.device?.type !== 'mobile',
-                actions: 'assignBeneficialOwners',
-              },
-              {
-                actions: 'assignBeneficialOwners',
-              },
-            ],
-            returnToSummary: {
-              target: 'confirm',
-              cond: context => context.device?.type !== 'mobile',
-            },
-          },
-        },
         beneficialOwnerKyc: {
           on: {
             beneficialOwnerKycSubmitted: {
@@ -284,21 +213,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
     },
     {
       actions: {
-        assignBasicData: assign((context, event) => {
-          context.data = {
-            ...context.data,
-            ...event.payload,
-          };
-          return context;
-        }),
-        assignBusinessAddress: assign((context, event) => {
-          context.data = {
-            ...context.data,
-            ...event.payload,
-          };
-          return context;
-        }),
-        assignBeneficialOwners: assign((context, event) => {
+        assignData: assign((context, event) => {
           context.data = {
             ...context.data,
             ...event.payload,

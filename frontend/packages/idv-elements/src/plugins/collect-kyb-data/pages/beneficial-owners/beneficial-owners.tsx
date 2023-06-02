@@ -20,12 +20,14 @@ type BeneficialOwnersProps = {
   hideHeader?: boolean;
   ctaLabel?: string;
   onComplete?: () => void;
+  onCancel?: () => void;
 };
 
 const BeneficialOwners = ({
   ctaLabel,
   hideHeader,
   onComplete,
+  onCancel,
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
@@ -113,6 +115,7 @@ const BeneficialOwners = ({
       <BeneficialOwnersForm
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
+        onCancel={onCancel}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
         requireMultiKyc={requireMultiKyc}

@@ -3,7 +3,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type SectionItemProps = {
+export type SectionItemProps = {
   text: string;
   textColor?: Color;
   subtext?: string;

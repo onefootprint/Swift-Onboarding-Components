@@ -6,11 +6,12 @@ import EmailCollect from './components/email-collect';
 
 type EmailProps = {
   onComplete?: () => void;
+  onCancel?: () => void;
   ctaLabel?: string;
   hideHeader?: boolean;
 };
 
-const Email = ({ onComplete, ctaLabel, hideHeader }: EmailProps) => {
+const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, config } = state.context;
 
@@ -28,6 +29,7 @@ const Email = ({ onComplete, ctaLabel, hideHeader }: EmailProps) => {
     <EmailCollect
       authToken={authToken}
       onComplete={handleSubmit}
+      onCancel={onCancel}
       ctaLabel={ctaLabel}
       config={config}
       hideHeader={hideHeader}

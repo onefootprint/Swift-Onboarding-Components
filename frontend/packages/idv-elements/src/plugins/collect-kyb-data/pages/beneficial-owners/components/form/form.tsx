@@ -4,11 +4,12 @@ import {
   BeneficialOwner,
   BeneficialOwnerDataAttribute,
 } from '@onefootprint/types';
-import { Button, Divider, Typography, useToast } from '@onefootprint/ui';
+import { Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import AddButton from './components/add-button';
 import FormInvalidError from './components/error';
 import Fields from './components/fields';
@@ -18,6 +19,7 @@ export type FormProps = {
   defaultValues?: BeneficialOwner[];
   isLoading: boolean;
   onSubmit: (data: BeneficialOwner[]) => void;
+  onCancel?: () => void;
   ctaLabel?: string;
   requireMultiKyc?: boolean;
 };
@@ -26,11 +28,12 @@ const Form = ({
   defaultValues,
   isLoading,
   onSubmit,
+  onCancel,
   ctaLabel,
   requireMultiKyc,
 }: FormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
-  const { t, allT } = useTranslation('pages.beneficial-owners.form');
+  const { t } = useTranslation('pages.beneficial-owners.form');
   const toast = useToast();
   const defaultBeneficialOwnersData = defaultValues ?? [
     {
@@ -130,9 +133,11 @@ const Form = ({
         <Divider />
         <AddButton onClick={handleAddMore} />
         {shouldShowError && <FormInvalidError />}
-        <Button type="submit" fullWidth loading={isLoading}>
-          {ctaLabel ?? allT('pages.cta-continue')}
-        </Button>
+        <EditableFormButtonContainer
+          onCancel={onCancel}
+          isLoading={isLoading}
+          ctaLabel={ctaLabel}
+        />
       </StyledForm>
     </FormProvider>
   );
@@ -142,6 +147,7 @@ const StyledForm = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[6]};
+    width: 100%;
   `}
 `;
 

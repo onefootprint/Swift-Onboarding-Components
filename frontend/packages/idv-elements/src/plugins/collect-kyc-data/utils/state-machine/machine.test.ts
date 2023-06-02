@@ -40,7 +40,7 @@ describe('Collect KYC Data Machine Tests', () => {
         populatedAttributes: [],
       },
       device: {
-        type: deviceType ?? 'mobile',
+        type: deviceType ?? 'desktop',
         hasSupportForWebauthn: false,
       },
       config: { ...TestOnboardingConfig },
@@ -583,7 +583,7 @@ describe('Collect KYC Data Machine Tests', () => {
   });
 
   describe('Confirm flow', () => {
-    it('when on mobile', () => {
+    it('completes flow correctly', () => {
       const machine = createMachine([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
@@ -634,7 +634,7 @@ describe('Collect KYC Data Machine Tests', () => {
 
       expect(state.value).toEqual('confirm');
 
-      // On mobile, these events shouldn't trigger any state changes
+      // These events shouldn't trigger any state changes
       state = machine.send({
         type: 'editEmail',
       });
@@ -652,7 +652,7 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.value).toEqual('confirm');
 
-      // On mobile, we should be able to edit the data from the confirm state
+      // We should be able to edit the data from the confirm state
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
@@ -692,201 +692,6 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.context.data[IdDI.ssn9]).toEqual({ value: '99999999' });
       expect(state.value).toEqual('confirm');
-    });
-
-    it('when on desktop', () => {
-      const machine = createMachine(
-        [
-          CollectedKycDataOption.email,
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.fullAddress,
-          CollectedKycDataOption.ssn9,
-        ],
-        undefined,
-        undefined,
-        'unknown',
-      );
-      machine.send({ type: 'initialized', payload: {} });
-      let { state } = machine;
-      const { context } = state;
-      expect(context.requirement.missingAttributes).toEqual([
-        CollectedKycDataOption.email,
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
-        CollectedKycDataOption.ssn9,
-      ]);
-      expect(context.data[IdDI.email]).toBeUndefined();
-
-      // Collect all fields first
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.email]: { value: 'piip@onefootprint.com' },
-        },
-      });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.firstName]: { value: 'Otto' },
-          [IdDI.lastName]: { value: 'Footprint' },
-        },
-      });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.country]: { value: 'US' },
-          [IdDI.zip]: { value: '94107' },
-        },
-      });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.ssn9]: { value: '101010101' },
-        },
-      });
-
-      expect(state.value).toEqual('confirm');
-
-      // On desktop, these events shouldn't trigger any state changes
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.email]: { value: 'new-email' },
-        },
-      });
-      expect(state.value).toEqual('confirm');
-      expect(state.context.data[IdDI.email]).toEqual({
-        value: 'piip@onefootprint.com',
-      });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.firstName]: { value: 'NEW' },
-          [IdDI.lastName]: { value: 'NAME' },
-        },
-      });
-      expect(state.value).toEqual('confirm');
-      expect(state.context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
-      expect(state.context.data[IdDI.lastName]).toEqual({ value: 'Footprint' });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.country]: { value: 'TR' },
-          [IdDI.zip]: { value: '02118' },
-        },
-      });
-      expect(state.value).toEqual('confirm');
-      expect(state.context.data[IdDI.country]).toEqual({ value: 'US' });
-      expect(state.context.data[IdDI.zip]).toEqual({ value: '94107' });
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.ssn4]: { value: '9999' },
-        },
-      });
-      expect(state.value).toEqual('confirm');
-      expect(state.context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
-      expect(state.context.data[IdDI.ssn4]).toBeUndefined();
-
-      // The following actions on desktop should take the user to edit states
-      state = machine.send({
-        type: 'editEmail',
-      });
-      expect(state.value).toEqual('emailEditDesktop');
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.email]: { value: 'new-email' },
-        },
-      });
-      expect(state.context.data[IdDI.email]).toEqual({ value: 'new-email' });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editEmail',
-      });
-      expect(state.value).toEqual('emailEditDesktop');
-      state = machine.send({
-        type: 'returnToSummary',
-      });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editBasicInfo',
-      });
-      expect(state.value).toEqual('basicInfoEditDesktop');
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.firstName]: { value: 'Belce' },
-          [IdDI.lastName]: { value: 'Dogru' },
-        },
-      });
-      expect(state.context.data[IdDI.firstName]).toEqual({ value: 'Belce' });
-      expect(state.context.data[IdDI.lastName]).toEqual({ value: 'Dogru' });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editBasicInfo',
-      });
-      expect(state.value).toEqual('basicInfoEditDesktop');
-      state = machine.send({
-        type: 'returnToSummary',
-      });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editAddress',
-      });
-      expect(state.value).toEqual('addressEditDesktop');
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.country]: { value: 'TR' },
-          [IdDI.zip]: { value: '00000' },
-        },
-      });
-      expect(state.context.data[IdDI.country]).toEqual({ value: 'TR' });
-      expect(state.context.data[IdDI.zip]).toEqual({ value: '00000' });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editAddress',
-      });
-      expect(state.value).toEqual('addressEditDesktop');
-      state = machine.send({
-        type: 'returnToSummary',
-      });
-      expect(state.value).toBe('confirm');
-
-      state = machine.send({
-        type: 'editIdentity',
-      });
-      expect(state.value).toEqual('identityEditDesktop');
-
-      state = machine.send({
-        type: 'dataSubmitted',
-        payload: {
-          [IdDI.ssn9]: { value: '99999999' },
-        },
-      });
-      expect(state.context.data[IdDI.ssn9]).toEqual({ value: '99999999' });
-      expect(state.value).toEqual('confirm');
-
-      state = machine.send({
-        type: 'editIdentity',
-      });
-      expect(state.value).toEqual('identityEditDesktop');
-      state = machine.send({
-        type: 'returnToSummary',
-      });
-      expect(state.value).toBe('confirm');
     });
   });
 });

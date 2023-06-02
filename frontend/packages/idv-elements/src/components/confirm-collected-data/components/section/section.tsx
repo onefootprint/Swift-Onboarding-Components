@@ -1,21 +1,15 @@
-import { Color } from '@onefootprint/design-tokens';
 import { Icon } from '@onefootprint/icons';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import SectionItem from '../section-item';
-
 export type SectionProps = {
   title: string;
-  items: {
-    text: string;
-    subtext?: string;
-    textColor?: Color;
-  }[];
   editLabel?: string;
   onEdit?: () => void;
   IconComponent?: Icon;
+  content: React.ReactNode;
+  testID?: string;
 };
 
 const Section = ({
@@ -23,9 +17,10 @@ const Section = ({
   editLabel,
   IconComponent,
   onEdit,
-  items,
+  content,
+  testID,
 }: SectionProps) => (
-  <Container>
+  <Container data-testid={testID}>
     <Header>
       <TitleContainer>
         {IconComponent && <IconComponent />}
@@ -37,20 +32,11 @@ const Section = ({
         <LinkButton onClick={onEdit}>{editLabel}</LinkButton>
       )}
     </Header>
-    <SectionContent>
-      {items.map(({ text, subtext, textColor }) => (
-        <SectionItem
-          key={text}
-          text={text}
-          subtext={subtext}
-          textColor={textColor}
-        />
-      ))}
-    </SectionContent>
+    <Content>{content}</Content>
   </Container>
 );
 
-const SectionContent = styled.div`
+const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

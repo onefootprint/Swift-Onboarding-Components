@@ -13,21 +13,19 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignBasicData: 'basicDataSubmitted';
-    assignBeneficialOwners: 'beneficialOwnersSubmitted';
-    assignBusinessAddress: 'businessAddressSubmitted';
+    assignData:
+      | 'basicDataSubmitted'
+      | 'beneficialOwnersSubmitted'
+      | 'businessAddressSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
     | 'basicData'
-    | 'basicDataEditDesktop'
     | 'beneficialOwnerKyc'
     | 'beneficialOwners'
-    | 'beneficialOwnersEditDesktop'
     | 'businessAddress'
-    | 'businessAddressEditDesktop'
     | 'completed'
     | 'confirm'
     | 'init'

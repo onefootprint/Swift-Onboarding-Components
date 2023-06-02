@@ -1,9 +1,10 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IdDI, OnboardingConfig } from '@onefootprint/types';
-import { Box, Button, TextInput } from '@onefootprint/ui';
+import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
+import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
@@ -12,6 +13,7 @@ import useSyncEmail from '../../../../hooks/use-sync-email';
 type EmailCollectProps = {
   authToken?: string;
   onComplete: (email: string) => void;
+  onCancel?: () => void;
   hideHeader?: boolean;
   config?: OnboardingConfig;
   ctaLabel?: string;
@@ -25,11 +27,12 @@ const EmailCollect = ({
   hideHeader,
   authToken,
   onComplete,
+  onCancel,
   ctaLabel,
 }: EmailCollectProps) => {
   const [state] = useCollectKycDataMachine();
   const { data, sandboxSuffix, config } = state.context;
-  const { t, allT } = useTranslation('pages.email');
+  const { t } = useTranslation('pages.email');
   const showRequestErrorToast = useRequestErrorToast();
   const { mutation, syncEmail } = useSyncEmail();
   const isSandbox = !config.isLive;
@@ -97,9 +100,11 @@ const EmailCollect = ({
             })}
           />
         </Box>
-        <Button type="submit" fullWidth loading={mutation.isLoading}>
-          {ctaLabel || allT('pages.cta.continue')}
-        </Button>
+        <EditableFormButtonContainer
+          onCancel={onCancel}
+          isLoading={mutation.isLoading}
+          ctaLabel={ctaLabel}
+        />
       </form>
     </>
   );

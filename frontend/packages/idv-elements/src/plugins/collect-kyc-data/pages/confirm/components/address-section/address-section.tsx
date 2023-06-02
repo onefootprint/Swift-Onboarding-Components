@@ -2,18 +2,19 @@ import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  type SectionItemProps,
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
+import Address from '../../../residential-address/residential-address';
 import createAddressLine from './utils/create-address-line';
 
-type AddressSectionProps = {
-  onEdit: () => void;
-};
-
-const AddressSection = ({ onEdit }: AddressSectionProps) => {
+const AddressSection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
@@ -27,6 +28,8 @@ const AddressSection = ({ onEdit }: AddressSectionProps) => {
   const zip = getDisplayValue(data[IdDI.zip]);
   const hasFullAddress = addressLine1 && city && stateName && country && zip;
   const hasCountryAndZip = country && zip;
+  const [editing, setEditing] = useState(false);
+
   if (hasFullAddress) {
     address.push({
       text: createAddressLine([addressLine1, addressLine2]),
@@ -42,17 +45,42 @@ const AddressSection = ({ onEdit }: AddressSectionProps) => {
     return null;
   }
 
-  const handleEdit = () => {
-    onEdit();
+  const addressItem = address.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return addressItem;
+    }
+    return (
+      <Address onCancel={stopEditing} onComplete={stopEditing} hideHeader />
+    );
   };
 
   return (
     <Section
       title={t('address.title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={handleEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoBuilding24}
-      items={address}
+      content={getSectionContent()}
+      testID="address-section"
     />
   );
 };

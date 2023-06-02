@@ -38,7 +38,7 @@ const Introduction = () => {
         ]}
       />
       <Button fullWidth onClick={handleClick}>
-        {allT('pages.cta-continue')}
+        {allT('pages.cta.continue')}
       </Button>
     </Container>
   );

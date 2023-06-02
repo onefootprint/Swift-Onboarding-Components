@@ -1,1 +1,1 @@
-export { default } from './section-item';
+export { type SectionItemProps, default } from './section-item';

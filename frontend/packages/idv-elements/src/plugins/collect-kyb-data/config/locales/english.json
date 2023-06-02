@@ -158,11 +158,13 @@
         "title": "Confirm your business data",
         "subtitle": "Please make sure that your business data is accurate and there are no typos before continuing.",
         "edit": "Edit",
+        "save": "Save",
         "cta": "Confirm & Continue"
       },
       "basic-data": {
         "title": "Basic data",
         "business-name": "Business name",
+        "doing-business-as": "Doing Business As (optional)",
         "tin": "Taxpayer Identification Number (TIN)",
         "website": "Website",
         "phone-number": "Phone number"
@@ -193,6 +195,10 @@
       "title": "An error occurred",
       "description": "An error occurred while saving data. Please fix the inputs and try again."
     },
-    "cta-continue": "Continue"
+    "cta": {
+      "continue": "Continue",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
   }
 }

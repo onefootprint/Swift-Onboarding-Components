@@ -3,7 +3,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { BusinessDI, CountryCode } from '@onefootprint/types';
 import {
   AddressInput,
-  Button,
   CountrySelectOption,
   Grid,
   SelectOption,
@@ -13,6 +12,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { BusinessAddressData } from '../../../../utils/state-machine/types';
 import getAddressComponent from '../../utils/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country';
@@ -44,6 +44,7 @@ export type BusinessAddressFormProps = {
   defaultValues?: Partial<DefaultValues>;
   isLoading: boolean;
   onSubmit: (businessAddress: BusinessAddressData) => void;
+  onCancel?: () => void;
   ctaLabel?: string;
 };
 
@@ -52,8 +53,9 @@ const BusinessAddressForm = ({
   isLoading,
   ctaLabel,
   onSubmit,
+  onCancel,
 }: BusinessAddressFormProps) => {
-  const { allT, t } = useTranslation('pages.business-address.form');
+  const { t } = useTranslation('pages.business-address.form');
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -172,9 +174,11 @@ const BusinessAddressForm = ({
           </Grid.Column>
         </Grid.Row>
         <StateField countryCode={country.value} />
-        <Button type="submit" fullWidth loading={isLoading}>
-          {ctaLabel ?? allT('pages.cta-continue')}
-        </Button>
+        <EditableFormButtonContainer
+          onCancel={onCancel}
+          isLoading={isLoading}
+          ctaLabel={ctaLabel}
+        />
       </Form>
     </FormProvider>
   );
@@ -184,6 +188,7 @@ const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]};
+    width: 100%;
   `}
 `;
 

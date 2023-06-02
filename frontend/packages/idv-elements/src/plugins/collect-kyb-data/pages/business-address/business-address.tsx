@@ -13,12 +13,14 @@ import BusinessAddressForm from './components/business-address-form';
 type BusinessAddressProps = {
   ctaLabel?: string;
   onComplete?: () => void;
+  onCancel?: () => void;
   hideHeader?: boolean;
 };
 
 const BusinessAddress = ({
   ctaLabel,
   onComplete,
+  onCancel,
   hideHeader,
 }: BusinessAddressProps) => {
   const { allT, t } = useTranslation('pages.business-address');
@@ -82,6 +84,7 @@ const BusinessAddress = ({
       <BusinessAddressForm
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
+        onCancel={onCancel}
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
       />

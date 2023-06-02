@@ -1,20 +1,22 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Section } from '../../../../../../components/confirm-collected-data';
+import {
+  type SectionItemProps,
+  Section,
+  SectionItem,
+} from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import { getDisplayValue } from '../../../../utils/data-types';
+import Ssn from '../../../ssn';
 
-type IdentitySectionProps = {
-  onEdit: () => void;
-};
-
-const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
+const IdentitySection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
+  const [editing, setEditing] = useState(false);
 
   const identity = [];
   const ssn9 = getDisplayValue(data[IdDI.ssn9]);
@@ -34,17 +36,47 @@ const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
     return null;
   }
 
-  const handleEdit = () => {
-    onEdit();
+  const startEditing = () => {
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    setEditing(false);
+  };
+
+  const identityItems = identity.map(
+    ({ text, subtext, textColor }: SectionItemProps) => (
+      <SectionItem
+        key={text}
+        text={text}
+        subtext={subtext}
+        textColor={textColor}
+      />
+    ),
+  );
+
+  const getSectionContent = () => {
+    if (!editing) {
+      return identityItems;
+    }
+    return (
+      <Ssn
+        onCancel={stopEditing}
+        onComplete={stopEditing}
+        hideHeader
+        hideDisclaimer
+      />
+    );
   };
 
   return (
     <Section
       title={t('identity.title')}
       editLabel={allT('pages.confirm.summary.edit')}
-      onEdit={handleEdit}
+      onEdit={editing ? undefined : startEditing}
       IconComponent={IcoUserCircle24}
-      items={identity}
+      content={getSectionContent()}
+      testID="identity-section"
     />
   );
 };
