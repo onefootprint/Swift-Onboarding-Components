@@ -7,6 +7,7 @@
       "@/*": ["./src/*"],
       "@/app-clip/*": ["./src/domains/app-clip/*"],
       "@/wallet/*": ["./src/domains/wallet/*"],
+      "@/scan/*": ["./src/domains/app-clip/components/scan/*"],
     },
   }
 }

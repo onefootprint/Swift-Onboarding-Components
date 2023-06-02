@@ -3,7 +3,7 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      ["module:react-native-dotenv"],
+      ['module:react-native-dotenv'],
       [
         'module-resolver',
         {
@@ -22,6 +22,7 @@ module.exports = function (api) {
             '@': './src',
             '@/app-clip': './src/domains/app-clip',
             '@/wallet': './src/domains/wallet',
+            '@/scan': './src/domains/app-clip/components/scan',
           },
         },
       ],

@@ -4,17 +4,22 @@ import React from 'react';
 import Modal from 'react-native-modal';
 
 import { Box } from '../box';
+import { Button } from '../button';
 import { IconButton } from '../icon-button';
 import { Typography } from '../typography';
 
 export type DialogProps = {
-  open?: boolean;
-  onClose?: () => void;
-  title: string;
   children: React.ReactNode;
+  cta?: {
+    label: string;
+    onPress: () => void;
+  };
+  onClose?: () => void;
+  open?: boolean;
+  title: string;
 };
 
-const Dialog = ({ open, onClose, title, children }: DialogProps) => {
+const Dialog = ({ children, cta, onClose, open, title }: DialogProps) => {
   return (
     <StyledModal
       backdropOpacity={0.3}
@@ -42,6 +47,11 @@ const Dialog = ({ open, onClose, title, children }: DialogProps) => {
           <Typography variant="body-3" center>
             {children}
           </Typography>
+          {cta && (
+            <Button onPress={cta.onPress} marginTop={7}>
+              {cta.label}
+            </Button>
+          )}
         </Box>
       </Box>
     </StyledModal>
