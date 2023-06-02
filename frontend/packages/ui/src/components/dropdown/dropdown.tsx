@@ -4,33 +4,77 @@ import styled, { css } from 'styled-components';
 import { createFontStyles, createOverlayBackground } from '../../utils';
 import Divider from '../divider';
 
-const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
-  ${({ theme }) => css`
-    align-items: center;
-    background: none;
-    border-radius: ${theme.borderRadius.full};
-    border: none;
-    cursor: pointer;
-    display: flex;
-    height: 24px;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-    width: 24px;
+const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
+  $asButton?: boolean;
+}>`
+  ${({ theme, $asButton }) => {
+    const { button } = theme.components;
 
-    &[data-state='open'] {
-      ${createOverlayBackground('darken-2', 'primary')};
+    if ($asButton) {
+      return css`
+        align-items: center;
+        background-color: ${button.variant.secondary.bg};
+        border-color: ${button.variant.secondary.borderColor};
+        border-radius: ${button.global.borderRadius};
+        border-style: solid;
+        border-width: ${button.global.borderWidth};
+        cursor: pointer;
+        display: flex;
+        height: 32px;
+        padding: 0 ${theme.spacing[2]};
+
+        &:hover:enabled {
+          background-color: ${button.variant.secondary.hover.bg};
+          border-color: ${button.variant.secondary.hover.borderColor};
+          color: ${button.variant.secondary.hover.color};
+        }
+
+        &:active:enabled {
+          background-color: ${button.variant.secondary.active.bg};
+          border-color: ${button.variant.secondary.active.borderColor};
+          color: ${button.variant.secondary.active.color};
+        }
+
+        &:disabled {
+          cursor: initial;
+          background-color: ${button.variant.secondary.disabled.bg};
+          border-color: ${button.variant.secondary.disabled.borderColor};
+          color: ${button.variant.secondary.disabled.color};
+
+          path {
+            fill: ${button.variant.secondary.disabled.color};
+          }
+        }
+      `;
     }
 
-    &:enabled:hover {
-      ${createOverlayBackground('darken-1', 'primary')};
-    }
+    return css`
+      align-items: center;
+      background: none;
+      border-radius: ${theme.borderRadius.full};
+      border: none;
+      cursor: pointer;
+      display: flex;
+      height: 24px;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      width: 24px;
 
-    &:disabled {
-      cursor: initial;
-      opacity: 0.5;
-    }
-  `}
+      &[data-state='open'] {
+        ${createOverlayBackground('darken-2', 'primary')};
+      }
+
+      &:enabled:hover {
+        ${createOverlayBackground('darken-1', 'primary')};
+      }
+
+      &:disabled {
+        cursor: initial;
+        opacity: 0.5;
+      }
+    `;
+  }}
 `;
 
 const StyledDropdownContent = styled(RadixDropdown.Content)`

@@ -40,11 +40,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const sxStyles = useSX(sx);
-
-    // The button can be in a loading state (showing the spinner) or a non-loading state (showing the button text).
-    // For non-loading state, keep the button text as a direct child in order for tests to be able get the button by text.
-    // For loading buttons, the texts are kept hidden, but not removed, so that the button size doesn't change, and
-    // we can wrap the text in a Box component since we don't need to get the button by text when it's in loading state.
     return (
       <ButtonContainer
         className="fp-button"

@@ -9,6 +9,7 @@ import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 import ManualReview from './components/manual-review';
+import RetriggerKYC from './components/retrigger-kyc';
 
 type HeaderProps = WithEntityProps;
 
@@ -39,8 +40,10 @@ const Header = ({ entity }: HeaderProps) => {
           </Typography>
           <CodeInline isPrivate>{entity.id}</CodeInline>
         </Row>
-        <Row id={HEADER_ACTIONS_ID}>
+        <Row>
+          <div id={HEADER_ACTIONS_ID} />
           <ManualReview />
+          <RetriggerKYC />
         </Row>
       </SubHeader>
     </HeaderContainer>
