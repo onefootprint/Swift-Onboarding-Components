@@ -16,8 +16,6 @@ const Template: Story<PhoneInputProps> = ({
   onChange,
   onChangeText,
   onReset,
-  placeholder,
-  testID,
   value: initialValue,
 }: PhoneInputProps) => {
   const [value, setValue] = useState<string | undefined>(initialValue);
@@ -38,11 +36,10 @@ const Template: Story<PhoneInputProps> = ({
       hasError={hasError}
       hint={hint}
       label="Phone"
+      name="phone"
       onChange={handleChange}
       onChangeText={onChangeText}
       onReset={handleReset}
-      placeholder={placeholder}
-      testID={testID}
       value={value}
     />
   );
@@ -53,10 +50,8 @@ Base.args = {
   disabled: false,
   hasError: false,
   hint: 'Enter your phone number',
-  onChange: console.log, // eslint-disable-line no-console
-  onChangeText: console.log, // eslint-disable-line no-console
-  placeholder: '202 555 5555',
-  testID: 'phone-input-test-id',
+  onChange: console.log,
+  onChangeText: console.log,
   value: '',
   onReset: () => {
     console.log('onReset'); // eslint-disable-line no-console

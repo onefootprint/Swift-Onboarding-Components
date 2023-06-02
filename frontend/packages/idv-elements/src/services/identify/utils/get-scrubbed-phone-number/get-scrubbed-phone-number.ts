@@ -16,26 +16,20 @@ const getScrubbedPhoneNumber = ({
       ? phoneNumber
       : null;
 
-  // Manually scrub the phone number
   if (identifyPhone) {
-    const regex = /([0-9]{2,})/gi;
-    const lastTwoChars = identifyPhone.slice(-2);
-    const scrubbed = identifyPhone.replaceAll(regex, (substring: string) =>
-      Array(substring.length).fill('•').join(''),
-    );
-    const withLastTwo = `${scrubbed.slice(0, -2)}${lastTwoChars}`;
-    const paranthesesStart = withLastTwo.indexOf('•');
-    const paranthesesEnd = paranthesesStart + 3;
-    return `${withLastTwo.slice(0, paranthesesStart)}(${withLastTwo.slice(
-      paranthesesStart,
-      paranthesesEnd,
-    )})${withLastTwo.slice(paranthesesEnd)}`;
+    const match = identifyPhone.match(/(\+\d{1,3} )?(.*)/);
+    if (!match) {
+      return '';
+    }
+    const countryCode = match[1] ? match[1] : '';
+    const number = match[2];
+    const scrubbed = number.replace(/\d(?!\d{0,1}$)/g, '•');
+    return countryCode + scrubbed;
   }
 
-  // Fix the format of the scrubbed phone number from challenge
   const challengePhone = challengeData?.scrubbedPhoneNumber;
   if (challengePhone) {
-    return challengePhone.replaceAll('*', '•').replaceAll('-', ' ');
+    return challengePhone.replaceAll('*', '•');
   }
 
   return '';

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export type FormLabelProps = {
+export type LabelProps = {
   children: string;
   hasError?: boolean;
   htmlFor?: string;
@@ -9,14 +9,14 @@ export type FormLabelProps = {
   size?: 'default' | 'compact';
 };
 
-const FormLabel = ({
+const Label = ({
   children,
   hasError = false,
   htmlFor,
   id,
   size = 'default',
-}: FormLabelProps) => (
-  <Container>
+}: LabelProps) => (
+  <LabelContainer>
     <StyledLabel
       className="fp-label"
       data-has-error={hasError}
@@ -26,10 +26,10 @@ const FormLabel = ({
     >
       {children}
     </StyledLabel>
-  </Container>
+  </LabelContainer>
 );
 
-const Container = styled.div`
+const LabelContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[3]};
   `}
@@ -54,4 +54,4 @@ const StyledLabel = styled.label`
   }}
 `;
 
-export default FormLabel;
+export default Label;

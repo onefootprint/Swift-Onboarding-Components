@@ -1,22 +1,18 @@
-import {
-  COUNTRIES,
-  DEFAULT_COUNTRY,
-  REGION_CODES,
-} from '@onefootprint/global-constants';
+import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
+import { useUpdateEffect } from 'usehooks-ts';
 
 import BaseSelect, { BaseSelectOption } from '../internal/base-select';
 import Input from './components/input';
 import Option from './components/option';
-import useInputMask from './hooks/use-input-mask';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';
+import { detectCountry } from './phone-input.utils';
 
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
     {
-      disableMask,
       hasError,
       hint,
       onReset,
@@ -28,67 +24,44 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     ref,
   ) => {
     const localRef = useRef<HTMLInputElement>(null);
-    const [selectedCountry, setCountry] =
-      useState<PhoneSelectOption>(DEFAULT_COUNTRY);
+    const [selectedCountry, setCountry] = useState<PhoneSelectOption>(
+      detectCountry(value),
+    );
     const countryCode = selectedCountry.value;
-    const { isLoading, masks } = useInputMask(countryCode);
-    const masksCount = Object.keys(masks).length;
 
     const handleCountryChange = (newOption: PhoneSelectOption) => {
       setCountry(newOption);
+      onReset?.();
     };
 
-    useEffect(() => {
-      if (!isLoading && masksCount > 1) {
-        if (localRef.current) {
-          localRef.current.focus();
-          onReset?.();
-        }
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoading, masksCount]);
+    useUpdateEffect(() => {
+      localRef.current?.focus();
+    }, [countryCode]);
 
     return (
       <BaseSelect<BaseSelectOption<CountryCode>>
         emptyStateText={selectEmptyStateText}
+        hasError={hasError}
+        hint={hint}
         onChange={handleCountryChange}
         OptionComponent={Option}
         options={COUNTRIES}
-        hint={hint}
-        hasError={hasError}
+        renderTrigger={trigger => (
+          <Input
+            {...props}
+            countryCode={countryCode}
+            hasError={hasError}
+            prefix={REGION_CODES[countryCode]}
+            ref={mergeRefs([ref, localRef])}
+            value={value}
+            selectTrigger={{
+              isOpen: trigger.isOpen,
+              onClick: trigger.onClick,
+            }}
+          />
+        )}
         searchPlaceholder={searchPlaceholder}
         value={selectedCountry}
-        renderTrigger={trigger =>
-          // This is a bit hacky, but was the only way to get the mask updating when the
-          // country changes, given some limitations on the cleave.js package
-          isLoading ? (
-            <div>
-              <Input
-                {...props}
-                countryCode={countryCode}
-                hasMask={disableMask ? undefined : masks[countryCode]}
-                prefix={REGION_CODES[countryCode]}
-                ref={mergeRefs([ref, localRef])}
-                hasError={hasError}
-                value={value}
-              />
-            </div>
-          ) : (
-            <Input
-              {...props}
-              countryCode={countryCode}
-              hasMask={disableMask ? undefined : masks[countryCode]}
-              prefix={REGION_CODES[countryCode]}
-              ref={mergeRefs([ref, localRef])}
-              value={value}
-              hasError={hasError}
-              selectTrigger={{
-                isOpen: trigger.isOpen,
-                onClick: trigger.onClick,
-              }}
-            />
-          )
-        }
       />
     );
   },

@@ -9,6 +9,7 @@ import {
   createFontStyles,
   Divider,
   PhoneInput,
+  PhoneInputRegex,
   TextInput,
   Typography,
 } from '@onefootprint/ui';
@@ -24,8 +25,6 @@ type FormData = {
   phoneNumber?: string;
   name?: string;
 };
-
-export const PHONE_REGEX = /^(\+)?([ 0-9]){10,16}$/;
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 
@@ -116,10 +115,9 @@ const Form = ({ html, onSuccess }: FormProps) => {
           />
           <PhoneInput
             label="Phone number"
-            placeholder="+1 (123) 123 1234"
             {...register('phoneNumber', {
               pattern: {
-                value: PHONE_REGEX,
+                value: PhoneInputRegex,
                 message: 'Phone number format is incorrect',
               },
               onChange: debouncedHandleChange,
@@ -169,7 +167,7 @@ const FormContainer = styled.div`
     margin-right: auto;
     max-width: 450px;
 
-    button {
+    .footprint-button {
       width: 100%;
     }
   `}

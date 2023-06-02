@@ -1,13 +1,12 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { BusinessDI } from '@onefootprint/types';
-import { PhoneInput, TextInput } from '@onefootprint/ui';
+import { PhoneInput, PhoneInputRegex, TextInput } from '@onefootprint/ui';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { BasicData } from '../../../../utils/state-machine/types';
-import PHONE_REGEX from './constants';
 
 type FormData = {
   name: string;
@@ -36,6 +35,7 @@ const BasicDataForm = ({
 }: BasicDataFormProps) => {
   const { t } = useTranslation('pages.basic-data.form');
   const {
+    control,
     register,
     handleSubmit,
     getValues,
@@ -85,7 +85,6 @@ const BasicDataForm = ({
       />
       <TextInput
         data-private
-        hasError={!!errors.doingBusinessAs}
         label={t('doing-business-as.label')}
         placeholder={t('doing-business-as.placeholder')}
         {...register('doingBusinessAs')}
@@ -127,26 +126,37 @@ const BasicDataForm = ({
         />
       )}
       {optionalFields?.includes(BusinessDI.phoneNumber) && (
-        <PhoneInput
-          data-private
-          hasError={hasPhoneNumberError}
-          hint={phoneNumberHint}
-          label={t('phone-number.label')}
-          placeholder={t('phone-number.placeholder')}
-          onReset={() => {
-            setValue('phoneNumber', undefined);
-          }}
-          value={getValues('phoneNumber')}
-          {...register('phoneNumber', {
+        <Controller
+          control={control}
+          name="phoneNumber"
+          rules={{
             required: {
               value: true,
               message: t('phone-number.errors.required'),
             },
             pattern: {
-              value: PHONE_REGEX,
+              value: PhoneInputRegex,
               message: t('phone-number.errors.pattern'),
             },
-          })}
+          }}
+          render={({
+            field: { onChange, onBlur, value, name },
+            fieldState: { error },
+          }) => (
+            <PhoneInput
+              data-private
+              hasError={!!error}
+              hint={phoneNumberHint}
+              label={t('phone-number.label')}
+              name={name}
+              onBlur={onBlur}
+              onChange={onChange}
+              onReset={() => {
+                setValue('phoneNumber', undefined);
+              }}
+              value={value}
+            />
+          )}
         />
       )}
       <EditableFormButtonContainer

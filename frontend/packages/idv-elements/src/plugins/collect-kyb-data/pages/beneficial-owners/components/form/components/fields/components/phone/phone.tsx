@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
-import { PhoneInput } from '@onefootprint/ui';
+import { PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { FormData } from '../../../../types';
-import PHONE_REGEX from './constants';
 
 type PhoneProps = {
   index: number;
@@ -14,7 +13,7 @@ type PhoneProps = {
 const Phone = ({ index }: PhoneProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields.phone');
   const {
-    register,
+    control,
     formState: { errors },
   } = useFormContext<FormData>();
 
@@ -22,29 +21,36 @@ const Phone = ({ index }: PhoneProps) => {
     errors.beneficialOwners?.[index]?.[
       BeneficialOwnerDataAttribute.phoneNumber
     ];
-  const hasError = !!phoneErrors;
-  const hint = hasError ? phoneErrors?.message : undefined;
   const shouldHide = index === 0;
 
   return shouldHide ? null : (
-    <PhoneInput
-      data-private
-      hasError={hasError}
-      hint={hint}
-      label={t('label')}
-      placeholder={t('placeholder')}
-      {...register(
-        `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.phoneNumber}`,
-        {
-          required: {
-            value: true,
-            message: t('errors.required'),
-          },
-          pattern: {
-            value: PHONE_REGEX,
-            message: t('errors.pattern'),
-          },
+    <Controller
+      control={control}
+      name={`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.phoneNumber}`}
+      rules={{
+        required: {
+          value: true,
+          message: t('errors.required'),
         },
+        pattern: {
+          value: PhoneInputRegex,
+          message: t('errors.pattern'),
+        },
+      }}
+      render={({
+        field: { onChange, onBlur, value, name },
+        fieldState: { error },
+      }) => (
+        <PhoneInput
+          data-private
+          hasError={!!error}
+          hint={error ? phoneErrors?.message : undefined}
+          label={t('label')}
+          name={name}
+          onBlur={onBlur}
+          onChange={onChange}
+          value={value}
+        />
       )}
     />
   );

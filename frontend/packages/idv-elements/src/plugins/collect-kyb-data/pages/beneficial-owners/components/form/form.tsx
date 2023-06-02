@@ -44,7 +44,6 @@ const Form = ({
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];
-
   const methods = useForm<FormData>({
     defaultValues: {
       beneficialOwners: [...defaultBeneficialOwnersData],

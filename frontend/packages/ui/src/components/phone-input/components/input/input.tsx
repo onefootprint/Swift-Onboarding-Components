@@ -1,18 +1,18 @@
-import { IcoChevronDown24 } from '@onefootprint/icons';
 import type { CountryCode } from '@onefootprint/types';
-import React, { forwardRef } from 'react';
+import Cleave from 'cleave.js/react';
+import React, { forwardRef, useId, useRef, useState } from 'react';
+import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
-import Flag from '../../../flag';
-import Input from '../../../internal/input';
-import LoadingIndicator from '../../../loading-indicator';
+import Box from '../../../box';
+import Label from '../../../label';
 import type { PhoneInputProps } from '../../phone-input.types';
-import getIndicatorColor from './input.utils';
+import { getNationalNumber } from '../../phone-input.utils';
+import CountryPicker from './components/country-picker';
+import { defaultPreference, preferences } from './input.constants';
 
 type InputProps = PhoneInputProps & {
   countryCode: CountryCode;
-  hasMask?: boolean;
-  isLoading?: boolean;
   prefix: string;
   selectTrigger?: {
     isOpen?: boolean;
@@ -20,98 +20,184 @@ type InputProps = PhoneInputProps & {
   };
 };
 
-const PhoneInput = forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      value,
-      hasError,
       countryCode,
-      hasMask,
-      isLoading,
+      defaultValue,
+      disabled = false,
+      hasError = false,
+      id: baseId,
+      label,
+      onBlur,
+      onChange,
+      onChangeText,
+      onFocus,
       prefix,
       selectTrigger,
+      size,
+      value,
       ...props
     }: InputProps,
     ref,
   ) => {
-    const mask = {
-      phone: true,
-      phoneRegionCode: countryCode,
-      prefix,
+    const [isFocused, setFocus] = useState(false);
+    const localRef = useRef<HTMLInputElement>(null);
+    const internalId = useId();
+    const id = baseId || internalId;
+    const countryPreferences = preferences[countryCode] || defaultPreference;
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+      setFocus(false);
+      onBlur?.(event);
+    };
+
+    const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+      setFocus(true);
+      onBlur?.(event);
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const inputValueWithCountryCode = `${prefix} ${event.target.value}`;
+      const modifiedEvent = {
+        ...event,
+        target: {
+          ...event.target,
+          value: inputValueWithCountryCode,
+        },
+      };
+      onChange?.(modifiedEvent);
+      onChangeText?.(modifiedEvent.target.value);
     };
 
     return (
-      <InputContainer>
-        <Input
-          {...props}
-          autoComplete="tel"
-          hasError={hasError}
-          hasFocus={selectTrigger?.isOpen}
-          mask={hasMask ? mask : { prefix }}
-          placeholder=""
-          readOnly={isLoading}
-          className="fp-input-phone"
-          prefixComponent={
-            <Trigger
-              onClick={isLoading ? undefined : selectTrigger?.onClick}
-              tabIndex={isLoading ? -1 : 0}
-              type="button"
-            >
-              <Flag code={countryCode} />
-              <DropdownIndicator
-                color={getIndicatorColor(!!hasError, !!selectTrigger?.isOpen)}
-              />
-            </Trigger>
-          }
-          ref={ref}
-          suffixComponent={
-            isLoading && (
-              <LoadingContainer>
-                <LoadingIndicator color="quaternary" size="compact" />
-              </LoadingContainer>
-            )
-          }
-          tabIndex={isLoading ? -1 : 0}
-          type="tel"
-          value={value}
-        />
-      </InputContainer>
+      <Box>
+        {label ? <Label htmlFor={id}>{label}</Label> : null}
+        <FakeInput
+          data-has-error={hasError}
+          data-has-focus={isFocused}
+          data-disabled={disabled}
+          onClick={() => {
+            localRef.current?.focus();
+          }}
+        >
+          <CountryPicker
+            code={countryCode}
+            disabled={disabled}
+            onClick={selectTrigger?.onClick}
+            prefix={prefix}
+          />
+          <RealInput
+            {...props}
+            autoComplete="tel-national"
+            data-has-error={hasError}
+            data-has-focus={isFocused}
+            defaultValue={getNationalNumber(prefix, defaultValue) || undefined}
+            disabled={disabled}
+            htmlRef={mergeRefs([localRef, ref])}
+            id={id}
+            key={countryCode}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            options={countryPreferences.mask}
+            placeholder={countryPreferences.placeholder}
+            type="tel"
+            value={getNationalNumber(prefix, value) || undefined}
+          />
+        </FakeInput>
+      </Box>
     );
   },
 );
 
-const InputContainer = styled.div`
-  ${({ theme }) => css`
-    position: relative;
+const FakeInput = styled.div`
+  ${({ theme }) => {
+    const {
+      components: { input },
+    } = theme;
 
-    input[type='tel'] {
-      padding-left: calc(${theme.spacing[10]} + ${theme.spacing[3]});
-    }
-  `}
+    return css`
+      background: ${input.state.default.initial.bg};
+      border-color: ${input.state.default.initial.border};
+      border-radius: ${input.global.borderRadius};
+      border-style: solid;
+      border-width: ${input.global.borderWidth};
+      color: ${input.global.color};
+      display: flex;
+      height: ${input.size.default.height};
+      outline: none;
+      width: 100%;
+
+      &[data-disabled='false'] {
+        &[data-has-error='false'] {
+          &:hover {
+            background: ${input.state.default.hover.bg};
+            border-color: ${input.state.default.hover.border};
+          }
+
+          &[data-has-focus='true'] {
+            background: ${input.state.default.focus.bg};
+            border-color: ${input.state.default.focus.border};
+            box-shadow: ${input.state.default.focus.elevation};
+          }
+        }
+
+        &[data-has-error='true'] {
+          background: ${input.state.error.initial.bg};
+          border-color: ${input.state.error.initial.border};
+
+          &:hover {
+            background: ${input.state.error.hover.bg};
+            border-color: ${input.state.error.hover.border};
+          }
+
+          &[data-has-focus='true'] {
+            background: ${input.state.error.focus.bg};
+            border-color: ${input.state.error.focus.border};
+            box-shadow: ${input.state.error.focus.elevation};
+          }
+        }
+      }
+
+      &[data-disabled='true'] {
+        background: ${input.state.disabled.bg};
+        border-color: ${input.state.disabled.border};
+      }
+    `;
+  }}
 `;
 
-const Trigger = styled.button`
-  ${({ theme }) => css`
-    align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    gap: ${theme.spacing[2]};
-    height: 100%;
-    justify-content: center;
-    padding-left: ${theme.spacing[5]};
-  `}
+const RealInput = styled(Cleave)`
+  ${({ theme }) => {
+    const {
+      components: { input },
+    } = theme;
+
+    return css`
+      background: transparent;
+      border: unset;
+      font: ${input.size.default.typography};
+      outline: none;
+      width: 100%;
+
+      ::placeholder {
+        color: ${input.global.placeholderColor};
+      }
+
+      :-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+      }
+
+      :-webkit-autofill {
+        transition: background-color 5000s ease-in-out 0s;
+        color: ${input.global.color};
+      }
+    `;
+  }}
 `;
 
-const DropdownIndicator = styled(IcoChevronDown24)``;
-
-const LoadingContainer = styled.div`
-  ${({ theme }) => css`
-    height: 100%;
-    display: flex;
-    padding-right: ${theme.spacing[5]};
-  `}
-`;
-
-export default PhoneInput;
+export default Input;

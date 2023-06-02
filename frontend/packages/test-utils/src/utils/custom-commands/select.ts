@@ -27,8 +27,10 @@ const search = async (trigger: HTMLElement, search: string) => {
 
 const select = async (trigger: HTMLElement, optionLabel: string) => {
   const select = await openMenu(trigger);
-  const option = within(select).getByRole('option', { name: optionLabel });
-  await fireEvent.click(option);
+  act(() => {
+    const option = within(select).getByRole('option', { name: optionLabel });
+    fireEvent.click(option);
+  });
 };
 
 const selectEvents = {

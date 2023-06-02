@@ -2,7 +2,7 @@ import React, { forwardRef, TextareaHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import Box from '../box';
-import Label from '../form-label';
+import Label from '../label';
 import Hint from '../internal/hint';
 
 export type TextAreaProps = {

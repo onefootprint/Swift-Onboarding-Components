@@ -28,9 +28,13 @@ describe('<BasicDataForm />', () => {
     );
   };
 
-  // TODO: unskip test when bug resolved, and add tests for phone number error state below
-  // https://linear.app/footprint/issue/FP-2843/phoneinput-dynamic-import-causes-node-segfault
-  it.skip('onsubmit gets called when submitting basic data', async () => {
+  it('render a custom cta label', () => {
+    renderForm({ ctaLabel: 'Save' });
+    const continueButton = screen.getByRole('button', { name: 'Save' });
+    expect(continueButton).toBeInTheDocument();
+  });
+
+  it('should call onSubmit after submit the user data', async () => {
     const onSubmit = jest.fn();
     renderForm({
       onSubmit,
@@ -38,126 +42,119 @@ describe('<BasicDataForm />', () => {
     });
 
     const name = screen.getByLabelText('Business name');
-    expect(screen.getByPlaceholderText('Acme Bank Inc.')).toBeInTheDocument();
-    expect(name).toBeInTheDocument();
     await userEvent.type(name, 'Acme Inc.');
 
     const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
-    expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
-    expect(tin).toBeInTheDocument();
     await userEvent.type(tin, '129876543');
 
     const phoneNumber = screen.getByLabelText('Phone number');
-    expect(phoneNumber).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('123-456-7890')).toBeInTheDocument();
     await userEvent.type(phoneNumber, '6594539494');
 
-    const website = screen.getByLabelText('Business website');
-    expect(website).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('www.acme.com')).toBeInTheDocument();
-    await userEvent.type(website, 'www.acme.com');
+    const website = screen.getByLabelText('Website');
+    await userEvent.type(website, 'https://acme.com');
 
     const continueButton = screen.getByRole('button', { name: 'Continue' });
-    expect(continueButton).toBeInTheDocument();
     await userEvent.click(continueButton);
+
     await waitFor(() => {
       expect(onSubmit).toBeCalledWith({
-        [BusinessDI.name]: 'Acme Inc.',
-        [BusinessDI.tin]: '12-9876543',
-        [BusinessDI.phoneNumber]: '6594539494',
-        [BusinessDI.website]: 'www.acme.com',
+        'business.dba': undefined,
+        'business.name': 'Acme Inc.',
+        'business.phone_number': '+1 (659) 453-9494',
+        'business.tin': '12-9876543',
+        'business.website': 'https://acme.com',
       });
     });
   });
 
-  it('hides some attributes', async () => {
-    const onSubmit = jest.fn();
-    renderForm({
-      onSubmit,
-    });
+  describe('when phone number and website are not included in the optional fields', () => {
+    it('should hide both', async () => {
+      const onSubmit = jest.fn();
+      renderForm({
+        onSubmit,
+      });
 
-    const name = screen.getByLabelText('Business name');
-    expect(screen.getByPlaceholderText('Acme Bank Inc.')).toBeInTheDocument();
-    expect(name).toBeInTheDocument();
-    await userEvent.type(name, 'Acme Inc.');
+      const name = screen.getByLabelText('Business name');
+      await userEvent.type(name, 'Acme Inc.');
 
-    const dba = screen.getByLabelText('Doing Business As (optional)');
-    expect(dba).toBeInTheDocument();
-    await userEvent.type(dba, 'Acme');
+      const dba = screen.getByLabelText('Doing Business As (optional)');
+      await userEvent.type(dba, 'Acme');
 
-    const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
-    expect(screen.getByPlaceholderText('12-3456789')).toBeInTheDocument();
-    expect(tin).toBeInTheDocument();
-    await userEvent.type(tin, '129876543');
+      const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
+      await userEvent.type(tin, '129876543');
 
-    const phoneNumber = screen.queryByLabelText('Phone number');
-    expect(phoneNumber).not.toBeInTheDocument();
+      const phoneNumber = screen.queryByLabelText('Phone number');
+      expect(phoneNumber).not.toBeInTheDocument();
 
-    const website = screen.queryByLabelText('Website');
-    expect(website).not.toBeInTheDocument();
+      const website = screen.queryByLabelText('Website');
+      expect(website).not.toBeInTheDocument();
 
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    expect(continueButton).toBeInTheDocument();
-    await userEvent.click(continueButton);
-    await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
-        [BusinessDI.name]: 'Acme Inc.',
-        [BusinessDI.doingBusinessAs]: 'Acme',
-        [BusinessDI.tin]: '12-9876543',
+      const continueButton = screen.getByRole('button', { name: 'Continue' });
+      expect(continueButton).toBeInTheDocument();
+      await userEvent.click(continueButton);
+
+      await waitFor(() => {
+        expect(onSubmit).toBeCalledWith({
+          [BusinessDI.name]: 'Acme Inc.',
+          [BusinessDI.doingBusinessAs]: 'Acme',
+          [BusinessDI.tin]: '12-9876543',
+        });
       });
     });
   });
 
-  it('renders custom cta label', () => {
-    renderForm({ ctaLabel: 'Save' });
-    const continueButton = screen.getByRole('button', { name: 'Save' });
-    expect(continueButton).toBeInTheDocument();
-  });
+  describe('when defaultValues is set', () => {
+    it('should prefill the fields', async () => {
+      const onSubmit = jest.fn();
+      renderForm({
+        defaultValues: {
+          name: 'Acme Inc.',
+          tin: '98-7654321',
+        },
+        onSubmit,
+      });
 
-  it('renders default values', async () => {
-    const onSubmit = jest.fn();
-    renderForm({
-      defaultValues: {
-        name: 'Acme Inc.',
-        tin: '98-7654321',
-      },
-      onSubmit,
-    });
-    const name = screen.getByLabelText('Business name');
-    expect(name).toHaveValue('Acme Inc.');
-    const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
-    expect(tin).toHaveValue('98-7654321');
+      const name = screen.getByLabelText('Business name');
+      expect(name).toHaveValue('Acme Inc.');
 
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    expect(continueButton).toBeInTheDocument();
-    await userEvent.click(continueButton);
-    await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
-        [BusinessDI.name]: 'Acme Inc.',
-        [BusinessDI.tin]: '98-7654321',
+      const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
+      expect(tin).toHaveValue('98-7654321');
+
+      const continueButton = screen.getByRole('button', { name: 'Continue' });
+      expect(continueButton).toBeInTheDocument();
+      await userEvent.click(continueButton);
+
+      await waitFor(() => {
+        expect(onSubmit).toBeCalledWith({
+          [BusinessDI.name]: 'Acme Inc.',
+          [BusinessDI.tin]: '98-7654321',
+        });
       });
     });
   });
 
-  it('renders error when submitting empty form', async () => {
-    const onSubmit = jest.fn();
-    renderForm({ onSubmit });
+  describe('when the form is submitted incorrectly', () => {
+    it('should show an error message', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
 
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    expect(continueButton).toBeInTheDocument();
-    await userEvent.click(continueButton);
-    await waitFor(() => {
-      expect(onSubmit).not.toBeCalled();
-    });
-    await waitFor(() => {
-      expect(
-        screen.getByText('Business name cannot be empty or is invalid'),
-      ).toBeInTheDocument();
-    });
-    await waitFor(() => {
-      expect(
-        screen.getByText('TIN cannot be empty or is invalid'),
-      ).toBeInTheDocument();
+      const continueButton = screen.getByRole('button', { name: 'Continue' });
+      expect(continueButton).toBeInTheDocument();
+
+      await userEvent.click(continueButton);
+      await waitFor(() => {
+        expect(onSubmit).not.toBeCalled();
+      });
+      await waitFor(() => {
+        expect(
+          screen.getByText('Business name cannot be empty or is invalid'),
+        ).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        expect(
+          screen.getByText('TIN cannot be empty or is invalid'),
+        ).toBeInTheDocument();
+      });
     });
   });
 });

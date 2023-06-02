@@ -10524,7 +10524,7 @@ globby@^9.2.0:
     pify "^4.0.1"
     slash "^2.0.0"
 
-google-libphonenumber@^3.2.29, google-libphonenumber@^3.2.31, google-libphonenumber@^3.2.32:
+google-libphonenumber@^3.2.32:
   version "3.2.32"
   resolved "https://registry.npmjs.org/google-libphonenumber/-/google-libphonenumber-3.2.32.tgz"
   integrity sha512-mcNgakausov/B/eTgVeX8qc8IwWjRrupk9UzZZ/QDEvdh5fAjE7Aa211bkZpZj42zKkeS6MTT8avHUwjcLxuGQ==

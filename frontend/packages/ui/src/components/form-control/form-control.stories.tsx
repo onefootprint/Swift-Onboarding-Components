@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import FormLabel from '../form-label';
+import FormLabel from '../label';
 import InputAddon from '../input-addon';
 import InputGroup from '../input-group';
 import TextInput from '../text-input';

@@ -1,10 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Button, PhoneInput } from '@onefootprint/ui';
+import { Button, PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-
-import PHONE_REGEX from './constants';
 
 type FormData = {
   phoneNumber: string;
@@ -19,10 +17,9 @@ export type FormProps = {
 const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
   const { t } = useTranslation('pages.phone-identification.form');
   const {
+    control,
     setValue,
-    register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -34,26 +31,37 @@ const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
 
   return (
     <StyledForm onSubmit={handleSubmit(onSubmit)}>
-      <PhoneInput
-        data-private
-        hasError={hasError}
-        hint={hint}
-        label={t('phone.label')}
-        placeholder={t('phone.placeholder')}
-        onReset={() => {
-          setValue('phoneNumber', '');
-        }}
-        value={getValues('phoneNumber')}
-        {...register('phoneNumber', {
+      <Controller
+        control={control}
+        name="phoneNumber"
+        rules={{
           required: {
             value: true,
             message: t('phone.errors.required'),
           },
           pattern: {
-            value: PHONE_REGEX,
+            value: PhoneInputRegex,
             message: t('phone.errors.pattern'),
           },
-        })}
+        }}
+        render={({
+          field: { onChange, onBlur, value, name },
+          fieldState: { error },
+        }) => (
+          <PhoneInput
+            name={name}
+            data-private
+            hasError={!!error}
+            hint={hint}
+            label={t('phone.label')}
+            onReset={() => {
+              setValue('phoneNumber', '');
+            }}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        )}
       />
       <Button fullWidth loading={isLoading} type="submit">
         {t('cta')}

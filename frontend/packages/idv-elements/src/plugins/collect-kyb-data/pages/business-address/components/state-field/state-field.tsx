@@ -30,9 +30,7 @@ const StateField = ({ countryCode }: StateFieldProps) => {
             label={t('label')}
             onBlur={field.onBlur}
             options={STATES}
-            onChange={nextOption => {
-              field.onChange(nextOption);
-            }}
+            onChange={field.onChange}
             hint={error && t('error')}
             hasError={!!error}
             placeholder={t('placeholder')}

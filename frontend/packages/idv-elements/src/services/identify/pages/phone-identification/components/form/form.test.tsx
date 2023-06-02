@@ -1,10 +1,10 @@
-import { screen, userEvent } from '@onefootprint/test-utils';
+import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderIdentify } from '../../../../config/tests/render';
 import Form, { FormProps } from './form';
 
-describe.skip('<Form />', () => {
+describe('<Form />', () => {
   const renderForm = ({
     defaultPhone,
     isLoading,
@@ -20,56 +20,65 @@ describe.skip('<Form />', () => {
 
   it('should render correctly', async () => {
     renderForm({});
-    expect(screen.getByText('Phone number')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('123-456-7890')).toBeInTheDocument();
-    const button = screen.getByRole('button');
+
+    const inputPhone = screen.getByText('Phone number');
+    expect(inputPhone).toBeInTheDocument();
+
+    const button = screen.getByRole('button', { name: 'Continue' });
     expect(button).toBeInTheDocument();
   });
 
   it('should render correctly with default phone number', async () => {
-    renderForm({ defaultPhone: '111-111-1111' });
-    expect(screen.getByLabelText('111-111-111')).toBeInTheDocument();
+    renderForm({ defaultPhone: '(111) 111-1111' });
+
+    const inputPhone = screen.getByDisplayValue('(111) 111-1111');
+    expect(inputPhone).toBeInTheDocument();
   });
+
   it('should render correctly in loading state', async () => {
     renderForm({ isLoading: true });
-    const button = screen.getByRole('button');
+
+    const button = screen.getByLabelText('Loading...');
     expect(button).toBeInTheDocument();
   });
 
   it('should call onSubmit when the form is submitted', async () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
-    const input = screen.getByPlaceholderText('123-456-7890');
-    await userEvent.type(input, '9999999999');
-    const button = screen.getByRole('button');
+
+    const inputPhone = screen.getByText('Phone number');
+    await userEvent.type(inputPhone, '9999999999');
+
+    const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
-    expect(onSubmit).toHaveBeenCalledWith(
-      {
-        phone_number: '9999999999',
-      },
-      expect.anything(),
-    );
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          phoneNumber: '+1 (999) 999-9999',
+        },
+        expect.anything(),
+      );
+    });
   });
 
   it('should show error message when phone number is invalid', async () => {
     renderForm({});
-    const input = screen.getByPlaceholderText('123-456-7890');
-    await userEvent.type(input, '1234567890');
-    const button = screen.getByRole('button');
+    const input = screen.getByText('Phone number');
+    await userEvent.type(input, '12');
+
+    const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
-    expect(
-      screen.getByText('Please enter a valid phone number.'),
-    ).toBeInTheDocument();
+
+    const errorMessage = screen.getByText('Phone number is invalid');
+    expect(errorMessage).toBeInTheDocument();
   });
 
   it('should show error message when phone number is empty', async () => {
     renderForm({});
-    const input = screen.getByPlaceholderText('123-456-7890');
-    await userEvent.clear(input);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
-    expect(
-      screen.getByText('Please enter a valid phone number.'),
-    ).toBeInTheDocument();
+
+    const errorMessage = screen.getByText('Phone number cannot be empty');
+    expect(errorMessage).toBeInTheDocument();
   });
 });

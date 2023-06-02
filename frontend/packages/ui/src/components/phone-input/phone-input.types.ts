@@ -5,12 +5,15 @@ import { InputProps as BaseInputProps } from '../internal/input';
 
 export type InputProps = Omit<BaseInputProps, 'mask' | 'placeholder'>;
 
-export type PhoneInputProps = InputProps & {
-  disableMask?: boolean;
+export type PhoneInputProps = Omit<
+  InputProps,
+  'placeholder' | 'minLength' | 'maxLength' | 'type' | 'autoComplete'
+> & {
+  defaultValue?: string;
   onReset?: () => void;
-  placeholder?: string;
   searchPlaceholder?: string;
   selectEmptyStateText?: string;
+  value?: string;
 };
 
 export type PhoneSelectOption = BaseSelectOption<CountryCode>;

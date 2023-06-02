@@ -4,7 +4,7 @@ import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
-import Label from '../../form-label';
+import Label from '../../label';
 import Field, { FieldProps } from '../field';
 import Hint from '../hint';
 
