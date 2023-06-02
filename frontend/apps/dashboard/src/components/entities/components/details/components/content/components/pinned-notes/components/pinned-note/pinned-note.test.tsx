@@ -51,7 +51,7 @@ describe('<PinnedNote />', () => {
       timestamp: '4/27/23, 3:24 PM',
       noteId: '1',
     });
-    const author = screen.getByText('Note from jane.doe@acme.com');
+    const author = screen.getByText('From jane.doe@acme.com');
     expect(author).toBeInTheDocument();
   });
 

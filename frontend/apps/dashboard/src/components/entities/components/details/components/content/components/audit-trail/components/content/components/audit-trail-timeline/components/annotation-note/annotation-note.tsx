@@ -56,6 +56,7 @@ const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
           checked={isNotePinned}
           onChange={handlePinNoteChange}
           labelPlacement="right"
+          size="compact"
           label={t('org-overwrite.drawer.pin-note')}
         />
       </PinButtonContainer>
@@ -108,9 +109,9 @@ const NoteContainer = styled.div`
 const PinButtonContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
     width: 100%;
-    height: 48px;
+    height: 36px;
     background: ${theme.backgroundColor.secondary};
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.none} ${theme.borderRadius.none}

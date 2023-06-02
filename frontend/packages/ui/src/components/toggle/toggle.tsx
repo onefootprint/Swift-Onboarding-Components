@@ -157,7 +157,7 @@ const ToggleContainer = styled.div<{
 const Label = styled.label<{ size: 'default' | 'compact' }>`
   ${({ theme, size }) => css`
     ${size === 'compact'
-      ? createFontStyles('label-4')
+      ? createFontStyles('body-4')
       : createFontStyles('label-3')};
     color: ${theme.color.primary};
     cursor: pointer;

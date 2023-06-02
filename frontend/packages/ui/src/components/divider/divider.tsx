@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 
 const Divider = styled.div.attrs({
   role: 'separator',
-  'aria-orientation': 'vertical',
+  'aria-orientation': 'horizontal',
 })`
   ${({ theme }) => css`
     background-color: ${theme.borderColor.tertiary};

@@ -20,14 +20,14 @@ const Content = () => (
     <Box sx={{ marginBottom: 7 }}>
       <Breadcrumb />
     </Box>
+    <Box>
+      <PinnedNotes />
+    </Box>
     <Box sx={{ marginBottom: 5 }}>
       <Header />
     </Box>
     <Box sx={{ marginBottom: 5 }}>
       <Divider />
-    </Box>
-    <Box sx={{ marginBottom: 5 }}>
-      <PinnedNotes />
     </Box>
     <Box sx={{ marginBottom: 9 }}>
       <Vault />

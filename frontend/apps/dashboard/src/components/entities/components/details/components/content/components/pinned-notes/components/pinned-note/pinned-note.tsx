@@ -32,7 +32,6 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
       <Header>
         <TitleContainer>
           <Typography variant="label-3">
-            {t('note')}
             {author && t('title-by-author', { author })}
           </Typography>
           <Typography variant="label-3" sx={{ marginLeft: 2 }}>
@@ -70,12 +69,10 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    background-color: rgba(74, 36, 219, 0.06);
     display: flex;
     flex-direction: column;
     padding: ${theme.spacing[5]};
     gap: ${theme.spacing[4]};
-    border-radius: ${theme.borderRadius.default};
   `}
 `;
 

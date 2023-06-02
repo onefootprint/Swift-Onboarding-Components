@@ -435,7 +435,7 @@
       },
       "pinned-notes": {
         "title": "Pinned notes",
-        "title-by-author": " from {{author}}",
+        "title-by-author": "From {{author}}",
         "note": "Note",
         "unpin-button-text": "Unpin note",
         "carousel-buttons": {
