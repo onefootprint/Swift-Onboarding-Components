@@ -31,7 +31,7 @@ from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DA
         (
             "card.flerp.number",
             "4026123412341233",
-            "InvalidLuhn",
+            "Invalid checksum. Please verify that the number is correct",
         ),
     ],
 )

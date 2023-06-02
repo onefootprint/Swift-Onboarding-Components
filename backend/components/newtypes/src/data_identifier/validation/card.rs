@@ -21,7 +21,23 @@ impl Validate for CI {
 }
 
 fn validate_card_number(value: PiiString) -> VResult<PiiString> {
-    CardValidate::from(value.leak()).map_err(|e| Error::CardError(format!("{:?}", e)))?;
+    CardValidate::from(value.leak()).map_err(|e| {
+        Error::CardError(match e {
+            card_validate::ValidateError::InvalidLuhn => {
+                "Invalid checksum. Please verify that the number is correct".to_owned()
+            }
+            card_validate::ValidateError::InvalidLength => {
+                "Invalid length. Please verify that the number is correct".to_owned()
+            }
+            card_validate::ValidateError::InvalidFormat => {
+                "Invalid format. Please verify that the number is correct".to_owned()
+            }
+            card_validate::ValidateError::UnknownType => {
+                "Unknown type. Please verify that the number is correct".to_owned()
+            }
+            _ => format!("{:?}", e),
+        })
+    })?;
     Ok(value)
 }
 
