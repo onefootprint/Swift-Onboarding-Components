@@ -5,6 +5,7 @@ use db::models::verification_request::VerificationRequest;
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::{DecisionStatus, FootprintReasonCode, SignalSeverity, VaultKind, Vendor, VendorAPI};
 use rand::seq::SliceRandom;
+use rand::Rng;
 use strum::IntoEnumIterator;
 
 use super::{
@@ -84,6 +85,48 @@ pub fn get_fixture_reason_codes(
         (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
+    };
+    reason_codes
+        .into_iter()
+        .map(|r| (r, vec![Vendor::Idology]))
+        .collect()
+}
+
+// For AlpacaKYC workflow, we want fixtures to be:
+// #pass => KYC passes, no WL/AM hits (KYC reason_codes should just be strong matches)
+// #manualreview => KYC passes but then there is a watchlist hit (KYC reason_codes should be strong matches)
+// #stepup => KYC fails and there is no watchlist hit (KYC reason_code should be name/dob/address mismatch)
+// #fail => KYC hard fails (KYC reason_code should be SSN does not match or something else catastrophic)
+pub fn get_fixture_reason_codes_alpaca(
+    fixture_decision: FixtureDecision,
+) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+    let (decision_status, create_manual_review) = fixture_decision;
+    let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
+        // #pass | #manualreview
+        (DecisionStatus::Pass, _) | (DecisionStatus::Fail, true) => {
+            // TODO: later could randomize some other innocuous reason codes here if we wanted
+            vec![
+                FootprintReasonCode::AddressMatches,
+                FootprintReasonCode::DobMatches,
+                FootprintReasonCode::SsnMatches,
+                FootprintReasonCode::NameFirstMatches,
+                FootprintReasonCode::NameLastMatches,
+            ]
+        }
+        // #stepup
+        (DecisionStatus::StepUp, _) => {
+            let mismatch_reason_codes = vec![
+                FootprintReasonCode::AddressDoesNotMatch,
+                FootprintReasonCode::DobDoesNotMatch,
+                FootprintReasonCode::NameFirstDoesNotMatch,
+                FootprintReasonCode::NameLastDoesNotMatch,
+            ];
+            let rng = &mut rand::thread_rng();
+            let n = rng.gen_range(0..=mismatch_reason_codes.len());
+            mismatch_reason_codes.choose_multiple(rng, n).cloned().collect()
+        }
+        // #fail
+        (DecisionStatus::Fail, false) => vec![FootprintReasonCode::SsnDoesNotMatch],
     };
     reason_codes
         .into_iter()

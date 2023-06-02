@@ -17,13 +17,15 @@ use db::{
     },
     DbError,
 };
+use either::Either;
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::incode::{
     watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, OnboardingStatus, Vendor, VendorAPI,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, FootprintReasonCode, OnboardingStatus,
+    Vendor, VendorAPI, WorkflowKind,
 };
 
 use crate::{
@@ -181,7 +183,11 @@ impl OnAction<MakeDecision> for Decisioning {
 
         // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
-        let kyc_decision = common::get_kyc_decision(conn, fixture_decision, self.vendor_results.clone())?;
+        let kyc_decision = if let Some(fixture_decision) = fixture_decision {
+            common::alpaca_kyc_decision_from_fixture(fixture_decision)
+        } else {
+            common::get_kyc_decision(conn, self.vendor_results.clone())?
+        };
 
         match kyc_decision.0.decision.decision_status {
             DecisionStatus::Fail => {
@@ -260,8 +266,7 @@ impl WatchlistCheck {
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
     type AsyncRes = (
-        WatchlistResultResponse,
-        Option<FixtureDecision>,
+        Either<WatchlistResultResponse, FixtureDecision>,
         Vec<VendorResult>,
     );
 
@@ -296,23 +301,29 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
         )
         .await?;
 
-        let watchlist_res = vendor::incode_watchlist::make_watchlist_result_call(
-            state,
-            &tvc,
-            &self.sv_id,
-            &di.id,
-            &vault.public_key,
-        )
-        .await?;
+        let watchlist_res = if let Some(fixture_decision) = fixture_decision {
+            Either::Right(fixture_decision)
+        } else {
+            Either::Left(
+                vendor::incode_watchlist::make_watchlist_result_call(
+                    state,
+                    &tvc,
+                    &self.sv_id,
+                    &di.id,
+                    &vault.public_key,
+                )
+                .await?,
+            )
+        };
 
         let vendor_results =
             common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
 
-        Ok((watchlist_res, fixture_decision, vendor_results))
+        Ok((watchlist_res, vendor_results))
     }
 
     fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        let (watchlist_res, fixture_decision, vendor_results) = res;
+        let (watchlist_res, vendor_results) = res;
 
         // TODO: !! Hack: this will retrieve VRes's from every vendor api, including watchlist check + doc scan.
         // Soon, we will migrate RiskSignal to point to VRes and then we will just write risk signals when we save the vres
@@ -329,19 +340,31 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
             .collect();
 
         // Watchlist reason codes
-        let wc_reason_codes =
-            decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
-        let wc_reason_codes = wc_reason_codes
-            .into_iter()
-            .map(|r| (r, vec![Vendor::Incode]))
-            .collect::<Vec<_>>();
+        let wc_reason_codes = match &watchlist_res {
+            Either::Left(watchlist_res) => {
+                let wc_reason_codes =
+                    decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
+                wc_reason_codes
+                    .into_iter()
+                    .map(|r| (r, vec![Vendor::Incode]))
+                    .collect::<Vec<_>>()
+            }
+            Either::Right(fixture_decision) => match fixture_decision.0 {
+                // For Alpaca sandbox fixtures, we treat "#fail" as meaning there was a watchlist hit. If we stepup (or pass), we don't simulate watchlist hits
+                DecisionStatus::StepUp | DecisionStatus::Pass => vec![],
+                DecisionStatus::Fail => vec![(FootprintReasonCode::WatchlistHitOfac, vec![Vendor::Incode])],
+            },
+        };
 
         // For now, we need to re-run the KYC decisioning so we can get reason codes
         // and have these written at the same time as the Watchlist reason codes
         // and our OBD. (In future, we migrate risk_signal to point to VRes and can remove this temp hack)
-        let is_sandbox = false; // fixture_decision.is_some()
-        let (kyc_decision, kyc_reason_codes) =
-            common::get_kyc_decision(conn, fixture_decision, kyc_vendor_results)?; // TODO: we need to filter vendor_results down to just the original KYC VRes's or bad stuff will happen here
+        let is_sandbox = watchlist_res.is_right();
+        let (kyc_decision, kyc_reason_codes) = if let Some(fixture_decision) = watchlist_res.right() {
+            common::alpaca_kyc_decision_from_fixture(fixture_decision)
+        } else {
+            common::get_kyc_decision(conn, kyc_vendor_results)?
+        };
 
         // If we collected a doc, we go to review and fail OBD even if no hits
         // TODO: query by wf_id instead

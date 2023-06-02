@@ -149,7 +149,7 @@ pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
     }
 }
 
-pub fn reason_codes_from_watchlist_result(res: WatchlistResultResponse) -> Vec<FootprintReasonCode> {
+pub fn reason_codes_from_watchlist_result(res: &WatchlistResultResponse) -> Vec<FootprintReasonCode> {
     let hits = res
         .content
         .as_ref()
@@ -203,7 +203,7 @@ mod test {
 
     fn test_reason_codes_from_watchlist_result(hits: Vec<(f32, Vec<&str>)>) -> Vec<FootprintReasonCode> {
         let res = make_watchlist_res(hits);
-        reason_codes_from_watchlist_result(res)
+        reason_codes_from_watchlist_result(&res)
     }
 
     fn make_watchlist_res(hits: Vec<(f32, Vec<&str>)>) -> WatchlistResultResponse {

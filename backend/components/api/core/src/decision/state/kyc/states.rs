@@ -8,7 +8,7 @@ use db::models::{
     workflow::Workflow,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
+use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId, WorkflowKind};
 
 use super::{Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls};
 use crate::decision::{
@@ -167,8 +167,11 @@ impl OnAction<MakeDecision> for Decisioning {
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
         let (fixture_decision, ff_client) = async_res;
 
-        let (decision, reason_codes) =
-            common::get_kyc_decision(conn, fixture_decision, self.vendor_results.clone())?;
+        let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
+            common::kyc_decision_from_fixture(fixture_decision)
+        } else {
+            common::get_kyc_decision(conn, self.vendor_results.clone())?
+        };
 
         common::save_kyc_decision(
             conn,

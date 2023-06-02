@@ -11,14 +11,14 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VaultKind, Vendor, VerificationResultId,
-    WorkflowId,
+    DecisionStatus, FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VaultKind, Vendor,
+    VerificationResultId, WorkflowId, WorkflowKind,
 };
 
 use crate::{
     decision::{
         self, engine,
-        onboarding::OnboardingRulesDecisionOutput,
+        onboarding::{Decision, OnboardingRulesDecisionOutput},
         utils::FixtureDecision,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
@@ -169,20 +169,41 @@ pub type KycDecision = (
     Vec<(FootprintReasonCode, Vec<Vendor>)>,
 );
 
-pub fn get_kyc_decision(
-    conn: &mut TxnPgConn,
-    fixture_decision: Option<FixtureDecision>,
-    vendor_results: Vec<VendorResult>,
-) -> ApiResult<KycDecision> {
-    // If we are Sandbox/Demo, we use the predefined decision output and generate random reason codes. Else we run our rules engine for realsies
-    if let Some(fixture_decision) = fixture_decision {
-        let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-        let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-        Ok((rules_output, reason_codes))
-    } else {
-        let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results)?;
-        Ok((rules_output, reason_codes))
-    }
+pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
+    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+    let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
+
+    (rules_output, reason_codes)
+}
+
+pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
+    let decision_status = match fixture_decision {
+        // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
+        (newtypes::DecisionStatus::Fail, true) => DecisionStatus::Pass,
+        // #fail
+        (newtypes::DecisionStatus::Fail, false) => DecisionStatus::Fail,
+        // #pass
+        (newtypes::DecisionStatus::Pass, _) => DecisionStatus::Pass,
+        // #stepup
+        (newtypes::DecisionStatus::StepUp, _) => DecisionStatus::StepUp,
+    };
+    let rules_output = OnboardingRulesDecisionOutput {
+        decision: Decision {
+            decision_status,
+            should_commit: false,
+            create_manual_review: false,
+        },
+        rules_triggered: vec![],
+        rules_not_triggered: vec![],
+    };
+    let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fixture_decision);
+
+    (rules_output, reason_codes)
+}
+
+pub fn get_kyc_decision(conn: &mut TxnPgConn, vendor_results: Vec<VendorResult>) -> ApiResult<KycDecision> {
+    let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results)?;
+    Ok((rules_output, reason_codes))
 }
 
 pub fn save_kyc_decision(

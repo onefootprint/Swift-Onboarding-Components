@@ -210,7 +210,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         user_kind,
         matches!(user_kind, UserKind::Sandbox).then(|| "pass".to_owned()),
     )
-    .await; // TODO later pass "fail" here for phone_suffix if Sandbox
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -227,10 +227,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {
-            // !!! TODO: this is incorrect, we are currently making Incode watchlist calls in Demo/Sandbox when we shouldn't be
-            mock_incode(state, WithHit(false));
-        }
+        UserKind::Demo | UserKind::Sandbox => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -296,11 +293,16 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox => {
-            // In Demo + Sandbox, we create a random set of reason codes. We may want to change this (ie for Alpaca show the expected strong match reason codes and not just 4 random ones)
-            assert!(!rs.is_empty());
-            assert!(rs
-                .into_iter()
-                .all(|rs| rs.reason_code.severity() == SignalSeverity::Info));
+            assert_have_same_elements(
+                vec![
+                    FootprintReasonCode::AddressMatches,
+                    FootprintReasonCode::DobMatches,
+                    FootprintReasonCode::SsnMatches,
+                    FootprintReasonCode::NameFirstMatches,
+                    FootprintReasonCode::NameLastMatches,
+                ],
+                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+            );
         }
         UserKind::Live => {
             assert_have_same_elements(
@@ -339,7 +341,7 @@ async fn pass_then_watchlist_hit(
     let (wf, tenant, obc, tu) = setup_data(
         state,
         user_kind,
-        matches!(user_kind, UserKind::Sandbox).then(|| "pass".to_owned()), // !!! TODO: when we fix OBD/ob.status logic for Live, we should change this to "fail"
+        matches!(user_kind, UserKind::Sandbox).then(|| "manualreview".to_owned()),
     )
     .await;
     let wfid = wf.id.clone();
@@ -358,10 +360,7 @@ async fn pass_then_watchlist_hit(
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {
-            // !!! TODO: this is incorrect, we are currently making Incode watchlist calls in Demo/Sandbox when we shouldn't be
-            mock_incode(state, WithHit(true));
-        }
+        UserKind::Demo | UserKind::Sandbox => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -511,10 +510,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {
-            // !!! TODO: this is incorrect, we are currently making Incode watchlist calls in Demo/Sandbox when we shouldn't be
-            mock_incode(state, WithHit(false));
-        }
+        UserKind::Demo | UserKind::Sandbox => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             todo!();
