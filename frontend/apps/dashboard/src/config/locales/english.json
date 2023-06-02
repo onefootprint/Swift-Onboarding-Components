@@ -407,7 +407,8 @@
           "options": {
             "verified": "Verified",
             "failed": "Failed",
-            "incomplete": "Incomplete"
+            "incomplete": "Incomplete",
+            "vaultOnly": "Vault"
           }
         },
         "date-range": {

@@ -8,6 +8,7 @@ import {
   entityIncomplete,
   entityOnWatchlist,
   entityPassed,
+  entityVaultOnly,
 } from './row.test.config';
 
 describe('User table row <Row />', () => {
@@ -34,9 +35,14 @@ describe('User table row <Row />', () => {
     expect(screen.getByText('Verified')).toBeInTheDocument();
   });
 
-  it('should show Failed when the user is could not be verified', () => {
+  it('should show Failed when the user could not be verified', () => {
     renderRow(entityFailed);
     expect(screen.getByText('Failed')).toBeInTheDocument();
+  });
+
+  it('should show Vault when the user is vault only', () => {
+    renderRow(entityVaultOnly);
+    expect(screen.getByText('Vault')).toBeInTheDocument();
   });
 
   it('should show Incomplete when the user status is incomplete', () => {

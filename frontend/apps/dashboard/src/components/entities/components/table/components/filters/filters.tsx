@@ -34,6 +34,10 @@ const Filters = () => {
               value: EntityStatus.incomplete,
               label: t('status.options.incomplete'),
             },
+            {
+              value: EntityStatus.vaultOnly,
+              label: t('status.options.vaultOnly'),
+            },
           ],
           selectedOptions: filters.values.status,
         },
