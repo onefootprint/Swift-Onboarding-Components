@@ -6,15 +6,15 @@ import {
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-export enum TokenKind {
-  beneficialOwner = 'bo',
+export enum TokenType {
+  beneficialOwner = 'kyb_bo',
   onboardingConfigPublicKey = 'ob_pk',
   user = 'user',
 }
 
 const ObConfigAuthHeaderByTokenKind = {
-  [TokenKind.beneficialOwner]: KYB_BO_SESSION_AUTHORIZATION_HEADER,
-  [TokenKind.onboardingConfigPublicKey]: CLIENT_PUBLIC_KEY_HEADER,
+  [TokenType.beneficialOwner]: KYB_BO_SESSION_AUTHORIZATION_HEADER,
+  [TokenType.onboardingConfigPublicKey]: CLIENT_PUBLIC_KEY_HEADER,
 };
 
 export type UseParseUrlParamOptions = {
@@ -31,11 +31,11 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
       return;
     }
 
-    const { kind } = router.query ?? {};
+    const { type } = router.query ?? {};
     if (
-      !kind ||
-      typeof kind !== 'string' ||
-      !Object.values(TokenKind).includes(kind as TokenKind)
+      !type ||
+      typeof type !== 'string' ||
+      !Object.values(TokenType).includes(type as TokenType)
     ) {
       onError?.();
       return;
@@ -53,8 +53,8 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
       return;
     }
 
-    const tokenKind = kind as TokenKind;
-    if (tokenKind === TokenKind.user) {
+    const tokenKind = type as TokenType;
+    if (tokenKind === TokenType.user) {
       onSuccess?.(undefined, token);
     } else {
       const authHeader = ObConfigAuthHeaderByTokenKind[tokenKind];

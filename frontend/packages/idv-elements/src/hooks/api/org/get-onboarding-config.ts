@@ -5,12 +5,16 @@ import {
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
+import { AUTH_HEADER } from '../../../config/constants';
+
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
-  const { obConfigAuth } = payload;
+  const { obConfigAuth, authToken } = payload;
   const response = await request<GetOnboardingConfigResponse>({
     method: 'GET',
     url: '/org/onboarding_config',
-    headers: obConfigAuth,
+    headers: obConfigAuth ?? {
+      [AUTH_HEADER]: authToken,
+    },
   });
 
   return response.data;
@@ -23,15 +27,13 @@ const useGetOnboardingConfig = (
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
-  const headers = Object.values(payload?.obConfigAuth || {}).filter(
-    val => !!val,
-  );
+  const { obConfigAuth, authToken } = payload;
 
   return useQuery(
-    ['get-onboarding-config', ...headers],
+    ['get-onboarding-config', obConfigAuth, authToken],
     () => getOnboardingConfig(payload),
     {
-      enabled: headers.length > 0,
+      enabled: !!obConfigAuth || !!authToken,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },

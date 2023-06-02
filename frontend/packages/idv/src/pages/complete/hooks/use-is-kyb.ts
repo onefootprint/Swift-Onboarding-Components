@@ -13,8 +13,8 @@ const isKybCdo = (data: CollectedDataOption) =>
 
 const useIsKyb = () => {
   const [state] = useIdvMachine();
-  const { obConfigAuth } = state.context;
-  const result = useGetOnboardingConfig({ obConfigAuth });
+  const { obConfigAuth, authToken } = state.context;
+  const result = useGetOnboardingConfig({ obConfigAuth, authToken });
   const config = result.data;
   const isKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
 

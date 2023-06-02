@@ -11,15 +11,18 @@ import useParseUrl from './hooks/use-url-params';
 
 const Init = () => {
   const [state, send] = useHostedMachine();
-  const { obConfigAuth } = state.context;
+  const { obConfigAuth, authToken } = state.context;
   const showRequestError = useRequestErrorToast();
 
   useParseUrl({
-    onSuccess: (parsedObConfigAuth?: ObConfigAuth, authToken?: string) => {
+    onSuccess: (
+      parsedObConfigAuth?: ObConfigAuth,
+      parsedAuthToken?: string,
+    ) => {
       send({
         type: 'initContextUpdated',
         payload: {
-          authToken,
+          authToken: parsedAuthToken,
           obConfigAuth: parsedObConfigAuth,
         },
       });
@@ -48,7 +51,7 @@ const Init = () => {
   );
 
   useGetOnboardingConfig(
-    { obConfigAuth },
+    { obConfigAuth, authToken },
     {
       onSuccess: onboardingConfig => {
         send({

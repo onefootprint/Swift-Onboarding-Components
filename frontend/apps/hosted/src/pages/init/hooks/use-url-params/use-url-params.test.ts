@@ -9,7 +9,7 @@ import {
 } from '@onefootprint/types';
 
 import useParseUrl, {
-  TokenKind,
+  TokenType,
   UseParseUrlParamOptions,
 } from './use-url-params';
 
@@ -22,7 +22,7 @@ describe('useUrlParams', () => {
 
   it('parses ob pk token correctly', async () => {
     useRouterSpy({
-      query: { kind: TokenKind.onboardingConfigPublicKey },
+      query: { type: TokenType.onboardingConfigPublicKey },
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
@@ -40,7 +40,7 @@ describe('useUrlParams', () => {
 
   it('parses user token correctly', async () => {
     useRouterSpy({
-      query: { kind: TokenKind.user },
+      query: { type: TokenType.user },
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
@@ -53,7 +53,7 @@ describe('useUrlParams', () => {
 
   it('parses beneficial owner token correctly', async () => {
     useRouterSpy({
-      query: { kind: TokenKind.beneficialOwner },
+      query: { type: TokenType.beneficialOwner },
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
@@ -68,7 +68,7 @@ describe('useUrlParams', () => {
 
   it('handles misformatted kinds correctly', async () => {
     useRouterSpy({
-      query: { kind: [TokenKind.beneficialOwner, TokenKind.user] },
+      query: { type: [TokenType.beneficialOwner, TokenType.user] },
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
@@ -81,7 +81,7 @@ describe('useUrlParams', () => {
 
   it('handles invalid kinds correctly', async () => {
     useRouterSpy({
-      query: { kind: 'hello' },
+      query: { type: 'hello' },
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
