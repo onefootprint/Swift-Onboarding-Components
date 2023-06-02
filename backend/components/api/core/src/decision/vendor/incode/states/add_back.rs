@@ -1,6 +1,6 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
-    VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessId,
+    SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::{id_doc_kind_from_incode_document_type, IncodeContext};
@@ -60,8 +60,8 @@ impl IncodeStateTransition for AddBack {
     fn transition(
         self,
         _: &mut TxnPgConn,
-        ctx: &IncodeContext,
-        session: &VerificationSession,
+        _ctx: &IncodeContext,
+        _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         if let Some(reason) = self.response.add_side_failure_reason() {
             return Ok(StateResult::Retry {
@@ -80,10 +80,7 @@ impl IncodeStateTransition for AddBack {
         // TODO: support checking against acceptable doc types and countries from OBC
         match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
         {
-            Ok(_) => {
-                let next_state = super::next_side_to_collect(DocumentSide::Back, &ctx.docv_data, session)?;
-                Ok(next_state.into())
-            }
+            Ok(_) => Ok(ProcessId::new().into()),
             Err(_) => Ok(StateResult::Retry {
                 next_state: AddBack::new(),
                 reasons: vec![IncodeFailureReason::UnknownDocumentType],

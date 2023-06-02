@@ -1,5 +1,4 @@
 use db::models::verification_request::VerificationRequest;
-use itertools::Itertools;
 
 mod start_onboarding;
 pub use start_onboarding::*;
@@ -31,10 +30,15 @@ pub use complete::*;
 mod fail;
 pub use fail::*;
 
-use super::state::{IncodeState, IncodeStateTransition};
+mod get_onboarding_status;
+pub use get_onboarding_status::*;
+
+mod process_face;
+pub use process_face::*;
+
+use super::state::IncodeStateTransition;
 use super::IncodeContext;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::verification_result::VerificationResult;
@@ -42,8 +46,7 @@ use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DocVData, DocumentSide, IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue,
-    ScrubbedJsonValue, VendorAPI,
+    IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue, ScrubbedJsonValue, VendorAPI,
 };
 
 #[derive(Clone)]
@@ -135,36 +138,4 @@ async fn save_incode_verification_result<'a>(
 
 fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
-}
-
-fn next_side_to_collect(
-    current_side: DocumentSide,
-    docv_data: &DocVData,
-    session: &VerificationSession,
-) -> ApiResult<IncodeState> {
-    let doc_type = docv_data.document_type.ok_or(UserError::NoDocumentType)?;
-    let required_sides = doc_type
-        .sides()
-        .into_iter()
-        .chain(session.kind.requires_selfie().then_some(DocumentSide::Selfie))
-        .collect_vec();
-
-    // Hardcode the order since we can't trust above
-    let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
-        .into_iter()
-        .filter(|s| required_sides.contains(s))
-        .collect_vec()
-        .windows(2)
-        .find(|s| s[0] == current_side)
-        .map(|s| s[1]);
-
-    let next = match next_side_to_collect {
-        // Should never happen
-        Some(DocumentSide::Front) => AddFront::new(),
-        Some(DocumentSide::Back) => AddBack::new(),
-        Some(DocumentSide::Selfie) => AddConsent::new(), // AddConsent goes to AddSelfie
-        // No next side to collect, move on to scores
-        None => ProcessId::new(),
-    };
-    Ok(next)
 }

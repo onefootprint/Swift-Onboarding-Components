@@ -33,6 +33,8 @@ pub enum IncodeVerificationSessionState {
     AddConsent,
     AddSelfie,
     ProcessId,
+    ProcessFace,
+    GetOnboardingStatus,
     FetchScores,
     FetchOCR,
     Complete,

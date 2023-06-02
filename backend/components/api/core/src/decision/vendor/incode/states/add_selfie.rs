@@ -1,6 +1,6 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
-    VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessFace,
+    SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
@@ -66,8 +66,8 @@ impl IncodeStateTransition for AddSelfie {
     fn transition(
         self,
         _: &mut TxnPgConn,
-        ctx: &IncodeContext,
-        session: &VerificationSession,
+        _ctx: &IncodeContext,
+        _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         if !self.failure_reasons.is_empty() {
             return Ok(StateResult::Retry {
@@ -76,8 +76,8 @@ impl IncodeStateTransition for AddSelfie {
                 clear_sides: vec![DocumentSide::Selfie],
             });
         }
-        // TODO need to also send the `/process/face` request
-        let next = super::next_side_to_collect(DocumentSide::Selfie, &ctx.docv_data, session)?;
+
+        let next = ProcessFace::new();
         Ok(next.into())
     }
 }

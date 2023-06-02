@@ -1,10 +1,12 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
-    VerificationSession,
+    map_to_api_err, save_incode_verification_result, AddBack, IncodeStateTransition, ProcessId,
+    SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::id_doc_kind_from_incode_document_type;
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
+use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
@@ -67,7 +69,7 @@ impl IncodeStateTransition for AddFront {
         self,
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
-        session: &VerificationSession,
+        _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         // If there's failure, we move to retry upload
         if let Some(reason) = self.response.add_side_failure_reason() {
@@ -83,7 +85,7 @@ impl IncodeStateTransition for AddFront {
         match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
         {
             Ok(_) => {
-                let next_state = super::next_side_to_collect(DocumentSide::Front, &ctx.docv_data, session)?;
+                let next_state = should_collect_back_or_process_id(&ctx.docv_data)?;
                 Ok(next_state.into())
             }
             Err(_) => Ok(StateResult::Retry {
@@ -93,4 +95,15 @@ impl IncodeStateTransition for AddFront {
             }),
         }
     }
+}
+
+fn should_collect_back_or_process_id(docv_data: &DocVData) -> ApiResult<IncodeState> {
+    let doc_type = docv_data.document_type.ok_or(UserError::NoDocumentType)?;
+    let next = if doc_type.sides().contains(&DocumentSide::Back) {
+        AddBack::new()
+    } else {
+        ProcessId::new()
+    };
+
+    Ok(next)
 }

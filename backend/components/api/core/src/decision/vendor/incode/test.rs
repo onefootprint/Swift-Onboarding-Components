@@ -155,12 +155,14 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
                 VendorAPI::IncodeAddMLConsent,
                 VendorAPI::IncodeAddPrivacyConsent,
                 VendorAPI::IncodeAddSelfie,
+                VendorAPI::IncodeProcessFace,
             ];
             let expected_apis = vec![
                 VendorAPI::IncodeStartOnboarding,
                 VendorAPI::IncodeAddFront,
                 VendorAPI::IncodeAddBack,
                 VendorAPI::IncodeProcessId,
+                VendorAPI::IncodeGetOnboardingStatus,
                 VendorAPI::IncodeFetchScores,
                 VendorAPI::IncodeFetchOCR,
             ]
@@ -186,7 +188,9 @@ async fn test_run_machine_dl(state: &State, is_selfie: bool) {
                 Some(IncodeVerificationSessionState::AddBack),
                 is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
                 is_selfie.then_some(IncodeVerificationSessionState::AddSelfie),
+                is_selfie.then_some(IncodeVerificationSessionState::ProcessFace),
                 Some(IncodeVerificationSessionState::ProcessId),
+                Some(IncodeVerificationSessionState::GetOnboardingStatus),
                 Some(IncodeVerificationSessionState::FetchScores),
                 Some(IncodeVerificationSessionState::FetchOCR),
                 Some(IncodeVerificationSessionState::Complete),
@@ -355,8 +359,10 @@ async fn test_fail_passport(state: &State, is_selfie: bool) {
                 // Passport has no back
                 is_selfie.then_some(IncodeVerificationSessionState::AddConsent),
                 is_selfie.then_some(IncodeVerificationSessionState::AddSelfie),
+                is_selfie.then_some(IncodeVerificationSessionState::ProcessFace),
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::FetchScores),
+                Some(IncodeVerificationSessionState::GetOnboardingStatus),
                 Some(IncodeVerificationSessionState::FetchOCR),
                 Some(IncodeVerificationSessionState::Complete),
             ]
