@@ -9,7 +9,6 @@ export type SectionItemProps = {
   subtext?: string;
 };
 
-// TODO: delete?
 const SectionItem = ({
   text,
   subtext,

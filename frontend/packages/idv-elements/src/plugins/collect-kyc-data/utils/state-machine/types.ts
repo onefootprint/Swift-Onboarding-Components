@@ -28,7 +28,7 @@ export type MachineEvents =
       };
     }
   | {
-      type: 'decrpytedData';
+      type: 'decryptedData';
       payload: KycData;
     }
   | {

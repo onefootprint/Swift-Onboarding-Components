@@ -180,15 +180,6 @@
         "last-name": "Last name",
         "email": "Email",
         "ownership-stake": "Ownership stake"
-      },
-      "edit-sheet": {
-        "title": "Edit {{name}}",
-        "save": "Save",
-        "name": {
-          "basic-data": "basic data",
-          "business-address": "business address",
-          "beneficial-owners": "beneficial owners"
-        }
       }
     },
     "sync-data-error": {

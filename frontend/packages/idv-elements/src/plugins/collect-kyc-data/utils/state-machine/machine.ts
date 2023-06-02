@@ -229,7 +229,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
             stepUpCompleted: {
               actions: ['assignAuthToken'],
             },
-            decrpytedData: {
+            decryptedData: {
               actions: ['assignData'],
             },
             confirmed: [

@@ -81,7 +81,7 @@ const IdentitySection = () => {
     });
 
     send({
-      type: 'decrpytedData',
+      type: 'decryptedData',
       payload: decryptedData,
     });
   };

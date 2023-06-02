@@ -150,16 +150,6 @@
         "title": "Identity",
         "ssn9": "SSN",
         "ssn4": "SSN (last 4)"
-      },
-      "edit-sheet": {
-        "title": "Edit {{name}}",
-        "save": "Save",
-        "name": {
-          "email": "email",
-          "basic-info": "basic information",
-          "address": "address",
-          "identity": "identity"
-        }
       }
     }
   }

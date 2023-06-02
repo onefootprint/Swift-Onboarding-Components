@@ -14,7 +14,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'stepUpCompleted';
-    assignData: 'dataSubmitted' | 'decrpytedData';
+    assignData: 'dataSubmitted' | 'decryptedData';
     assignInitialData: 'initialized';
   };
   eventsCausingDelays: {};
