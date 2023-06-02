@@ -1,7 +1,8 @@
 export enum UserTokenScope {
-  signup = 'SignUp',
-  sensitiveProfile = 'SensitiveProfile',
-  orgOnboarding = 'OrgOnboarding',
+  signup = 'sign_up',
+  basicProfile = 'basic_profile',
+  sensitiveProfile = 'sensitive_profile',
+  orgOnboarding = 'org_onboarding',
 }
 
 export type UserTokenRequest = {

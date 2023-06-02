@@ -11,7 +11,7 @@ import useIdentifyVerify, {
 import useLoginChallenge, {
   LoginChallengeResponse,
 } from './hooks/use-login-challenge';
-import { getBiometricChallengeResponse } from './utils/get-biometric-challenge-response';
+import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
 
 type UseStepUpArgs = {
   authToken: string;

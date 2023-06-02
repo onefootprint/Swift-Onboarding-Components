@@ -2,7 +2,6 @@ import {
   CdoToDiMap,
   CollectedKycDataOption,
   DataIdentifier,
-  DecryptUserResponse,
   IdDI,
   UserTokenResponse,
   UserTokenScope,
@@ -15,7 +14,12 @@ import { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
-const SENSITIVE_DIS: DataIdentifier[] = [IdDI.ssn4, IdDI.ssn9];
+const SENSITIVE_DIS: DataIdentifier[] = [
+  IdDI.ssn4,
+  IdDI.ssn9,
+  IdDI.email,
+  IdDI.phoneNumber,
+];
 const BASIC_PROFILE_DIS: DataIdentifier[] = [...Object.values(IdDI)].filter(
   di => !SENSITIVE_DIS.includes(di),
 );
@@ -66,7 +70,9 @@ const useDecryptKycData = ({
 
   const handleTokenSuccess = (response: UserTokenResponse) => {
     const { scopes } = response;
-    const canDecryptBasic = scopes.includes(UserTokenScope.signup);
+    const canDecryptBasic =
+      scopes.includes(UserTokenScope.signup) ||
+      scopes.includes(UserTokenScope.basicProfile);
     const canDecryptSensitive = scopes.includes(
       UserTokenScope.sensitiveProfile,
     );
@@ -91,8 +97,6 @@ const useDecryptKycData = ({
   };
 
   useEffectOnce(() => {
-    // First check if we have the sensitive profile scope. If we do, we can decrypt all the fields
-    // without any additional auth
     userTokenMutation.mutate(
       {
         authToken,

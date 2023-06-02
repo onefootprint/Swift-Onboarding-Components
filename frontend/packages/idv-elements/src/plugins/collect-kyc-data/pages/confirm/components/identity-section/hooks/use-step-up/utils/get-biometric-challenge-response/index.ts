@@ -1,1 +1,1 @@
-export * from './get-biometric-challenge-response';
+export { default } from './get-biometric-challenge-response';

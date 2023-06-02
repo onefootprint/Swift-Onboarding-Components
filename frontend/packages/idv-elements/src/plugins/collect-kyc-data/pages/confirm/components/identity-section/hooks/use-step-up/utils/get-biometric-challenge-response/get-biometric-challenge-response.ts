@@ -1,7 +1,7 @@
 import { BiometricLoginChallengeJson } from '@onefootprint/types';
 import base64url from 'base64url';
 
-export const getPublicKeyCredential = async (challenge: string) => {
+const getPublicKeyCredential = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricLoginChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
@@ -17,7 +17,7 @@ export const getPublicKeyCredential = async (challenge: string) => {
   return publicKeyCredential;
 };
 
-export const getBiometricChallengeResponse = async (challengeJson: string) => {
+const getBiometricChallengeResponse = async (challengeJson: string) => {
   const publicKeyCredential = await getPublicKeyCredential(challengeJson);
   const signature = base64url.encode(
     (publicKeyCredential.response as any).signature as Buffer,
@@ -40,3 +40,5 @@ export const getBiometricChallengeResponse = async (challengeJson: string) => {
   };
   return JSON.stringify(pk);
 };
+
+export default getBiometricChallengeResponse;

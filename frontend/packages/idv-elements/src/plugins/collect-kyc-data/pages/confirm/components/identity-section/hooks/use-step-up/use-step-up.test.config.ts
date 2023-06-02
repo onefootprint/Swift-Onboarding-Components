@@ -1,6 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 
-import * as getBiometricChallengeResponse from './utils/get-biometric-challenge-response/get-biometric-challenge-response';
+import * as getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
 
 // This needs to be mocked here and in the test itself as it is a esModule
 jest.mock('./utils/get-biometric-challenge-response', () => ({
@@ -17,7 +17,7 @@ const mockGenerateBiometricResponse = (): Promise<string> =>
 
 export const mockGetBiometricChallengeResponse = () =>
   jest
-    .spyOn(getBiometricChallengeResponse, 'getBiometricChallengeResponse')
+    .spyOn(getBiometricChallengeResponse, 'default')
     .mockImplementation(mockGenerateBiometricResponse);
 
 export const withUserToken = (scopes: string[]) =>
