@@ -18,12 +18,39 @@ Install Rust:
 AWS creds are used along with Pulumi (see below) and also for encrypting/decrypting the local development .env file
 
 1. You'll need the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). With homebrew `$ brew install awscli`
-2. Generate your credentials in the AWS Console
-   - Log in to the AWS Management console via [Rippling](https://www.rippling.com/) using Single Sign On for Amazon
-   - Navigate to Services => Security, Identity, & Compliance => IAM
-   - Click "users" on the left hand sidebar
-   - Generate a new user (yourname). No need to add tags or anything, just copy the permissions from an existing user
-   - Run `$ aws configure` and enter your access key and secret access key to configure your aws profile. Pulumi had trouble reading credentials I configured using the aws CLI, so I would also recommend setting your AWS_ACCESS_KEY_ID annd AWS_SECRET_ACCESS_KEY environment variables
+2. Setup your AWS Profile
+
+```bash
+aws configure sso
+```
+
+Use the following configuration values:
+
+```
+SSO start URL [None]: https://onefootprint.awsapps.com/start
+SSO Region [None]: us-east-1
+```
+
+You will then be asked to assume a role: you will want to select the dev role.
+(if you have access, a role to modify production secrets in the `Pulumi.prod.yaml` file will also be present).
+
+You will then see some more options, set a profile name like `dev`:
+
+```
+The only role available to you is: XYZ
+Using the role name "XYZ"
+CLI default client Region [us-east-1]:
+CLI default output format [None]:
+CLI profile name [XYZ-800859428444]: dev
+```
+
+This will configure an aws profile for you: `cat ~/.aws/config`.
+
+Finally make sure you tell aws about the profile:
+
+```
+export AWS_PROFILE=dev
+```
 
 ## Local development
 
