@@ -114,6 +114,11 @@ watch-local: run-enclave-local
 
 watch: watch-local
 
+configure-aws:
+	@aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+	@aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+	@aws configure set default.region ${AWS_REGION}
+	
 update-dot-env:
 	@AWS_REGION=us-east-1 aws kms encrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
 		--plaintext fileb://.env \

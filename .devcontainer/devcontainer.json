@@ -5,16 +5,18 @@
 		"--security-opt",
 		"seccomp=unconfined"
 	],
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"remoteEnv": {
 		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
 		"GITHUB_USER": "${localEnv:GITHUB_USER}",
 		"AWS_REGION": "${localEnv:AWS_REGION}",
 		"AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
-		"AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}"
+		"AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
+		"LC_ALL": "C"
 	},
-	"postStartCommand": "make set-dot-env",
+	"postStartCommand": "./.devcontainer/startup.sh",
 	// Add the IDs of extensions you want installed when the container is created.
 	"customizations": {
 		"vscode": {
@@ -25,6 +27,7 @@
 					"**/target/**": true
 				},
 				"terminal.integrated.localEchoLatencyThreshold": 0,
+				"terminal.integrated.defaultProfile.linux": "zsh"
 			},
 			"extensions": [
 				"ms-vscode.vscode-typescript-next",
@@ -38,13 +41,10 @@
 				"edonet.vscode-command-runner",
 				"styled-components.vscode-styled-components",
 				"ms-python.black-formatter",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"vadimcn.vscode-lldb",
+				"rust-lang.rust-analyzer"
 			]
 		}
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [
-		8000,
-		5432
-	]
+	}
 }

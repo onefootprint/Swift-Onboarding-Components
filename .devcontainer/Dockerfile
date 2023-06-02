@@ -1,20 +1,9 @@
-# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/rust/.devcontainer/base.Dockerfile
-# [Choice] Debian OS version (use bullseye on local arm64/Apple Silicon): buster, bullseye
-ARG VARIANT="bullseye"
-FROM mcr.microsoft.com/vscode/devcontainers/rust:1-bullseye
+FROM ubuntu:20.04
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends curl gnupg ca-certificates libssl-dev libpq-dev postgresql
+WORKDIR /home/
 
-RUN git config --global alias.s "status -s"
-RUN git config --global alias.pr "!git pull --rebase; git submodule update --init --recursive"
-RUN git config --global alias.l "log --oneline --graph"
+COPY . .
 
-RUN curl -fsSL https://get.pulumi.com | sh
+RUN bash ./setup.sh
 
-RUN cargo install diesel_cli --no-default-features --features postgres
-
-RUN curl -L https://deb.nodesource.com/setup_current.x | bash && apt-get install -yq nodejs
-RUN npm install -g yarn
-
-RUN sudo apt-get -y install python3-pip python3-venv
+ENV PATH="/root/.cargo/bin:$PATH"

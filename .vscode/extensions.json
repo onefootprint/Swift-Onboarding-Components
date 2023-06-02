@@ -11,6 +11,8 @@
         "edonet.vscode-command-runner",
         "styled-components.vscode-styled-components",
         "ms-python.black-formatter",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "vadimcn.vscode-lldb",
+        "rust-lang.rust-analyzer"
     ]
 }
