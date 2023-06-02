@@ -215,7 +215,7 @@ impl ServiceEnvironmentConfig {
     }
 
     /// Generate a link to hosted bifrost based on the environment in which we are running
-    pub fn generate_verify_link(&self, token: SessionAuthToken) -> PiiString {
+    pub fn generate_verify_link(&self, token: SessionAuthToken, kind: &str) -> PiiString {
         // TODO right now, for simplicity, we determine the verify link from the environment running
         // in the backend. Ideally, if you are testing a local frontend, we should send you a link
         // to your local frontend. In the future, migrate to have the client provide info on the
@@ -231,7 +231,7 @@ impl ServiceEnvironmentConfig {
         let r = rand::thread_rng().gen_range(0..1000);
         // Send the auth token in the url fragment #, which isn't logged by default.
         // The auth token is a secret
-        PiiString::new(format!("{}?r={}#{}", base_url, r, token))
+        PiiString::new(format!("{}?type={}&r={}#{}", base_url, kind, r, token))
     }
 }
 

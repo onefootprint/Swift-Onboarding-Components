@@ -70,7 +70,7 @@ pub async fn send_secondary_bo_links(
             let bo_data = secondary_bos_from_vault
                 .get(&l_id)
                 .ok_or(BusinessError::BoNotFound)?;
-            let url = state.config.service_config.generate_verify_link(token);
+            let url = state.config.service_config.generate_verify_link(token, "kyb_bo");
             let sms = BoSessionSmsInfo {
                 destination: &bo_data.phone_number,
                 inviter: &inviter,

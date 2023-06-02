@@ -80,7 +80,10 @@ pub async fn post(
         .await??;
 
     let phone_number = vw.get_decrypted_primary_phone(&state).await?;
-    let url = state.config.service_config.generate_verify_link(auth_token);
+    let url = state
+        .config
+        .service_config
+        .generate_verify_link(auth_token, "user");
     let org_name = auth.tenant().name.clone();
     state
         .twilio_client
