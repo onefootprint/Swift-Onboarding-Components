@@ -4,10 +4,10 @@ pub mod states;
 mod tests;
 
 use super::{
-    actions::MakeDecision, HasStateName, MakeVendorCalls, MakeWatchlistCheckCall, StateError,
-    WorkflowActions, WorkflowStates,
+    actions::MakeDecision, DoAction, MakeVendorCalls, MakeWatchlistCheckCall, StateError, WorkflowActions,
 };
 use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
+use async_trait::async_trait;
 use db::models::workflow::Workflow;
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
@@ -17,18 +17,21 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 /// States
 ///
 
+#[derive(Clone)]
 pub struct DataCollection {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
+#[derive(Clone)]
 pub struct VendorCalls {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
 }
+#[derive(Clone)]
 pub struct Decisioning {
     wf_id: WorkflowId,
     ob_id: OnboardingId,
@@ -36,24 +39,29 @@ pub struct Decisioning {
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
 }
+#[derive(Clone)]
 pub struct WatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
+#[derive(Clone)]
 pub struct PendingReview {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
 }
+#[derive(Clone)]
 pub struct DocCollection {
     wf_id: WorkflowId,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
+#[derive(Clone)]
 pub struct Complete;
 
+#[derive(Clone)]
 pub enum States {
     DataCollection(DataCollection),
     VendorCalls(VendorCalls),
@@ -64,17 +72,13 @@ pub enum States {
     Complete(Complete),
 }
 
-impl From<States> for WorkflowStates {
-    fn from(value: States) -> Self {
-        WorkflowStates::AlpacaKyc(value)
-    }
-}
-
-impl States {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+#[async_trait]
+impl super::WorkflowState for States {
+    async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::AlpacaKyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
         };
+        // TODO could get rid of this with enum_dispatch
         match s {
             newtypes::AlpacaKycState::DataCollection => {
                 DataCollection::init(state, workflow).await.map(States::from)
@@ -98,7 +102,7 @@ impl States {
         }
     }
 
-    pub fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self) -> Option<WorkflowActions> {
         match self {
             States::DataCollection(_) => None, // have to wait for user to complete Bifrost
             States::VendorCalls(_) => Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls)),
@@ -110,6 +114,38 @@ impl States {
             States::DocCollection(_) => None, // have to wait for doc collection flow to finish
             States::Complete(_) => None,      // terminal state
         }
+    }
+
+    async fn action(
+        self,
+        state: &State,
+        action: WorkflowActions,
+        workflow_id: WorkflowId,
+    ) -> ApiResult<Self> {
+        // TODO could get rid of this with enum_dispatch if actions are not typed
+        // or if DoAction takes in a `WorkflowActions`
+        let new_state = match (self, action) {
+            (Self::DataCollection(s), WorkflowActions::Authorize(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::VendorCalls(s), WorkflowActions::MakeVendorCalls(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::Decisioning(s), WorkflowActions::MakeDecision(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::WatchlistCheck(s), WorkflowActions::MakeWatchlistCheckCall(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::PendingReview(s), WorkflowActions::ReviewCompleted(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::DocCollection(s), WorkflowActions::DocCollected(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (_, _) => return Err(StateError::UnexpectedActionForState.into()),
+        };
+        Ok(new_state)
     }
 }
 
@@ -154,58 +190,17 @@ impl From<Complete> for States {
     }
 }
 
-impl HasStateName for DataCollection {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::DataCollection.into()
-    }
-}
-
-impl HasStateName for VendorCalls {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::VendorCalls.into()
-    }
-}
-
-impl HasStateName for Decisioning {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::Decisioning.into()
-    }
-}
-
-impl HasStateName for WatchlistCheck {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::WatchlistCheck.into()
-    }
-}
-
-impl HasStateName for PendingReview {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::PendingReview.into()
-    }
-}
-
-impl HasStateName for DocCollection {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::DocCollection.into()
-    }
-}
-
-impl HasStateName for Complete {
-    fn state_name(&self) -> newtypes::WorkflowState {
-        newtypes::AlpacaKycState::Complete.into()
-    }
-}
-
-impl From<&States> for newtypes::AlpacaKycState {
-    fn from(value: &States) -> Self {
-        match value {
-            States::DataCollection(_) => Self::DataCollection,
-            States::VendorCalls(_) => Self::VendorCalls,
-            States::Decisioning(_) => Self::Decisioning,
-            States::WatchlistCheck(_) => Self::WatchlistCheck,
-            States::PendingReview(_) => Self::PendingReview,
-            States::DocCollection(_) => Self::DocCollection,
-            States::Complete(_) => Self::Complete,
-        }
+impl From<States> for newtypes::WorkflowState {
+    fn from(value: States) -> Self {
+        let alpaca_kyc_state = match value {
+            States::DataCollection(_) => newtypes::AlpacaKycState::DataCollection,
+            States::VendorCalls(_) => newtypes::AlpacaKycState::VendorCalls,
+            States::Decisioning(_) => newtypes::AlpacaKycState::Decisioning,
+            States::WatchlistCheck(_) => newtypes::AlpacaKycState::WatchlistCheck,
+            States::PendingReview(_) => newtypes::AlpacaKycState::PendingReview,
+            States::DocCollection(_) => newtypes::AlpacaKycState::DocCollection,
+            States::Complete(_) => newtypes::AlpacaKycState::Complete,
+        };
+        newtypes::WorkflowState::from(alpaca_kyc_state)
     }
 }

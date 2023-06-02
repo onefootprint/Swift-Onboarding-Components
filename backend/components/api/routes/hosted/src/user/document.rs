@@ -328,7 +328,6 @@ async fn advance_workflow_if_needed(
 ) -> ApiResult<()> {
     if let Some(wf) = user_auth.workflow() {
         let ww = WorkflowWrapper::init(state, wf.clone()).await?;
-        let curr_state = newtypes::WorkflowState::from(&ww.state);
         // This is kind of hacky but in some cases when we are collecting a doc, that is because we step'd up and are reflecting that with a DocCollection state in a workflow
         // In other cases, the OBC might be configured to just always collect doc. If that's the case, then we expect the workflow to just be in the generic DataCollection state
         // and we don't need to run the workflow (Bifrost will run the workflow by pinging /authorize when all required data is collected)
@@ -338,7 +337,7 @@ async fn advance_workflow_if_needed(
                 .run(state, WorkflowActions::DocCollected(DocCollected {}))
                 .await?;
         } else {
-            tracing::info!(curr_state=?curr_state,"OBC must collect document, skipping running workflow");
+            tracing::info!(curr_state=?wf.state, "OBC must collect document, skipping running workflow");
         }
     } else {
         // for now gracefully allow this since we are still FF'ing creation of workflows

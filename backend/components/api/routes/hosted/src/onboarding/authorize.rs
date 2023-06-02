@@ -79,7 +79,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
         let ww = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
 
-        tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran state machine");
+        tracing::info!(new_state = ?newtypes::WorkflowState::from(ww.state), "Ran state machine");
         return ResponseData::ok(EmptyResponse {}).json();
     }
 

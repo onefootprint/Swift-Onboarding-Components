@@ -3,8 +3,8 @@ use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::DocCollected;
 use crate::decision::state::ReviewCompleted;
 use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowStates;
 use crate::decision::state::WorkflowWrapper;
+use crate::decision::state::WorkflowWrapperState;
 use crate::decision::tests::test_helpers;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::utils::mock_enclave::MockEnclave;
@@ -247,7 +247,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     /// TESTS
     ///
     /// Authorize
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
@@ -259,13 +259,13 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
 
     /// MakeVendorCalls
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
     /// MakeDecision
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
@@ -278,7 +278,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none());
 
     /// MakeWatchlistCheckCall
-    let ww = ww
+    let (ww, _) = ww
         .action(
             state,
             WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
@@ -380,7 +380,7 @@ async fn pass_then_watchlist_hit(
     /// TESTS
     ///
     /// Authorize
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
@@ -392,13 +392,13 @@ async fn pass_then_watchlist_hit(
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
 
     /// MakeVendorCalls
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
     /// MakeDecision
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
@@ -411,7 +411,7 @@ async fn pass_then_watchlist_hit(
     assert!(mr.is_none());
 
     /// MakeWatchlistCheckCall
-    let ww = ww
+    let (ww, _) = ww
         .action(
             state,
             WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
@@ -456,7 +456,7 @@ async fn pass_then_watchlist_hit(
     };
 
     // ReviewCompleted
-    let ww = ww
+    let (ww, _) = ww
         .action(
             state,
             WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
@@ -553,7 +553,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     // TODO: maybe assert risk signals here
 
     // ReviewCompleted
-    let ww = ww
+    let (ww, _) = ww
         .action(
             state,
             WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {

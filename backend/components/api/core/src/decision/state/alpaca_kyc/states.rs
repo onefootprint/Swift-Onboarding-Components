@@ -36,7 +36,7 @@ use crate::{
         review::save_review_decision,
         state::{
             actions::MakeDecision, common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall,
-            OnAction, ReviewCompleted, WorkflowStates,
+            OnAction, ReviewCompleted,
         },
         utils::FixtureDecision,
         vendor::{self, tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
@@ -67,7 +67,7 @@ impl DataCollection {
 }
 
 #[async_trait]
-impl OnAction<Authorize> for DataCollection {
+impl OnAction<Authorize, States> for DataCollection {
     type AsyncRes = TenantVendorControl;
 
     async fn execute_async_idempotent_actions(
@@ -82,15 +82,15 @@ impl OnAction<Authorize> for DataCollection {
         Ok(tvc)
     }
 
-    fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<States> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, false, &self.ob_id, &self.sv_id)?;
 
-        Ok(States::from(VendorCalls {
+        Ok(VendorCalls {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
-        })
+        }
         .into())
     }
 }
@@ -112,7 +112,7 @@ impl VendorCalls {
 }
 
 #[async_trait]
-impl OnAction<MakeVendorCalls> for VendorCalls {
+impl OnAction<MakeVendorCalls, States> for VendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
     async fn execute_async_idempotent_actions(
@@ -123,18 +123,14 @@ impl OnAction<MakeVendorCalls> for VendorCalls {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
     }
 
-    fn on_commit(
-        self,
-        vendor_results: Vec<VendorResult>,
-        conn: &mut db::TxnPgConn,
-    ) -> ApiResult<WorkflowStates> {
-        Ok(States::from(Decisioning {
+    fn on_commit(self, vendor_results: Vec<VendorResult>, conn: &mut db::TxnPgConn) -> ApiResult<States> {
+        Ok(Decisioning {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-        })
+        }
         .into())
     }
 }
@@ -159,7 +155,7 @@ impl Decisioning {
 }
 
 #[async_trait]
-impl OnAction<MakeDecision> for Decisioning {
+impl OnAction<MakeDecision, States> for Decisioning {
     type AsyncRes = Option<FixtureDecision>;
 
     async fn execute_async_idempotent_actions(
@@ -178,7 +174,7 @@ impl OnAction<MakeDecision> for Decisioning {
         Ok(fixture_decision)
     }
 
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<States> {
         let fixture_decision = async_res;
 
         // TODO: pass in/otherwise specify Alpaca Rules
@@ -204,7 +200,7 @@ impl OnAction<MakeDecision> for Decisioning {
                     false,
                     fixture_decision.is_some(),
                 )?;
-                Ok(States::from(Complete).into())
+                Ok(States::from(Complete))
             }
             DecisionStatus::Pass => {
                 // we update ob.status = Pending but cannot write an OBD yet (need to do watchlist checks next)
@@ -218,8 +214,7 @@ impl OnAction<MakeDecision> for Decisioning {
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
-                })
-                .into())
+                }))
             }
             DecisionStatus::StepUp => {
                 // we set ob.status = incomplete (should be a no-op) but don't write an OBD yet
@@ -235,12 +230,12 @@ impl OnAction<MakeDecision> for Decisioning {
                     true, // TODO: maybe should_collect_selfie should come from a config
                     None,
                 )?;
-                Ok(States::from(DocCollection {
+                Ok(DocCollection {
                     wf_id: self.wf_id,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
-                })
+                }
                 .into())
             }
         }
@@ -264,7 +259,7 @@ impl WatchlistCheck {
 }
 
 #[async_trait]
-impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
+impl OnAction<MakeWatchlistCheckCall, States> for WatchlistCheck {
     type AsyncRes = (
         Either<WatchlistResultResponse, FixtureDecision>,
         Vec<VendorResult>,
@@ -322,7 +317,8 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
         Ok((watchlist_res, vendor_results))
     }
 
-    fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<States> {
+        // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results) = res;
 
         // TODO: !! Hack: this will retrieve VRes's from every vendor api, including watchlist check + doc scan.
@@ -411,13 +407,12 @@ impl OnAction<MakeWatchlistCheckCall> for WatchlistCheck {
         )?;
 
         if final_decision.decision_status == DecisionStatus::Pass {
-            Ok(States::from(Complete).into())
+            Ok(States::from(Complete))
         } else {
             Ok(States::from(PendingReview {
                 sv_id: self.sv_id,
                 wf_id: self.wf_id,
-            })
-            .into())
+            }))
         }
     }
 }
@@ -436,7 +431,7 @@ impl PendingReview {
 }
 
 #[async_trait]
-impl OnAction<ReviewCompleted> for PendingReview {
+impl OnAction<ReviewCompleted, States> for PendingReview {
     type AsyncRes = (DecisionRequest, AuthActor);
 
     async fn execute_async_idempotent_actions(
@@ -450,7 +445,7 @@ impl OnAction<ReviewCompleted> for PendingReview {
         Ok((decision, actor))
     }
 
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<States> {
         let (decision, actor) = async_res;
         let sv = ScopedVault::get(conn, &self.sv_id)?;
         let _obd = save_review_decision(
@@ -462,7 +457,7 @@ impl OnAction<ReviewCompleted> for PendingReview {
             actor,
             Some(self.wf_id),
         )?;
-        Ok(States::from(Complete).into())
+        Ok(Complete.into())
     }
 }
 
@@ -483,7 +478,7 @@ impl DocCollection {
 }
 
 #[async_trait]
-impl OnAction<DocCollected> for DocCollection {
+impl OnAction<DocCollected, States> for DocCollection {
     type AsyncRes = ();
 
     async fn execute_async_idempotent_actions(
@@ -494,13 +489,13 @@ impl OnAction<DocCollected> for DocCollection {
         Ok(())
     }
 
-    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<WorkflowStates> {
-        Ok(States::from(WatchlistCheck {
+    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<States> {
+        Ok(WatchlistCheck {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
-        })
+        }
         .into())
     }
 }

@@ -51,7 +51,6 @@ pub async fn post(
 
     if let Some(wf) = wf {
         let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-        let curr_state = newtypes::WorkflowState::from(&ww.state);
         // TODO: add a ww.expects_action method here to check if the workflow is expecting ReviewCompleted or not. If not, for now we should probably gracefully
         // just continue and do what this route would have done anyway (ie call save_review_decision). But in the future, we may instead query here for
         // an existing *active* workflow and if there is one, then strictly error if a review is being made when that workflow isn't expecting it
@@ -69,7 +68,7 @@ pub async fn post(
         match res {
             Ok(_) => return EmptyResponse::ok().json(),
             Err(ApiError::StateError(StateError::UnexpectedActionForState)) => {
-                tracing::error!(workflow_id=?wf.id, state=?curr_state, "ReviewCompleted called on workflow not expecting it");
+                tracing::error!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
             }
             Err(e) => Err(e)?,
         }

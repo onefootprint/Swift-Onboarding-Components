@@ -1,7 +1,8 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowStates;
+use crate::decision::state::WorkflowState;
 use crate::decision::state::WorkflowWrapper;
+use crate::decision::state::WorkflowWrapperState;
 use crate::decision::tests::test_helpers;
 use crate::utils::mock_enclave::MockEnclave;
 use crate::{decision::state::kyc, State};
@@ -21,10 +22,10 @@ use macros::test_db_pool;
 use macros::test_state;
 use newtypes::KycConfig;
 use newtypes::WorkflowConfig;
-use newtypes::{KycState, WorkflowId, WorkflowState};
+use newtypes::{KycState, WorkflowId};
 use std::sync::Arc;
 
-async fn create_wf(state: &State, s: WorkflowState) -> Workflow {
+async fn create_wf(state: &State, s: newtypes::WorkflowState) -> Workflow {
     let (_, _, _, sv, _, _) =
         test_helpers::create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true, None)
             .await;
@@ -68,24 +69,24 @@ async fn valid_action(state: &mut State) {
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowStates::Kyc(kyc::States::DataCollection(_))
+        WorkflowWrapperState::Kyc(kyc::States::DataCollection(_))
     ));
 
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowStates::Kyc(kyc::States::VendorCalls(_))
+        WorkflowWrapperState::Kyc(kyc::States::VendorCalls(_))
     ));
 
     let (wf, wfe) = get_wf(state, wfid).await;
-    assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
+    assert_eq!(newtypes::WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert_eq!(1, wfe.len());
     let wfe = wfe.first().unwrap();
-    assert!(wfe.from_state == WorkflowState::Kyc(KycState::DataCollection));
-    assert!(wfe.to_state == WorkflowState::Kyc(KycState::VendorCalls));
+    assert!(wfe.from_state == newtypes::WorkflowState::Kyc(KycState::DataCollection));
+    assert!(wfe.to_state == newtypes::WorkflowState::Kyc(KycState::VendorCalls));
 }
 
 #[test_state]
@@ -101,7 +102,7 @@ async fn invalid_action(state: &mut State) {
         .unwrap();
 
     let (wf, wfe) = get_wf(state, wfid).await;
-    assert_eq!(WorkflowState::Kyc(KycState::DataCollection), wf.state);
+    assert_eq!(newtypes::WorkflowState::Kyc(KycState::DataCollection), wf.state);
     assert_eq!(0, wfe.len());
 }
 
@@ -143,17 +144,17 @@ async fn authorize(state: &mut State) {
     let svid = wf.scoped_vault_id.clone();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
-    let ww = ww
+    let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowStates::Kyc(kyc::States::VendorCalls(_))
+        WorkflowWrapperState::Kyc(kyc::States::VendorCalls(_))
     ));
 
     let (wf, _) = get_wf(state, wfid).await;
-    assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
+    assert_eq!(newtypes::WorkflowState::Kyc(KycState::VendorCalls), wf.state);
 
     state
         .db_pool
