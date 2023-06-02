@@ -10,6 +10,7 @@
         "wayou.vscode-todo-highlight",
         "edonet.vscode-command-runner",
         "styled-components.vscode-styled-components",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "ms-azuretools.vscode-docker"
     ]
 }

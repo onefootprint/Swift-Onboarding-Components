@@ -14,7 +14,7 @@ RUN curl -fsSL https://get.pulumi.com | sh
 
 RUN cargo install diesel_cli --no-default-features --features postgres
 
-RUN curl -L https://deb.nodesource.com/setup_16.x | bash && apt-get install -yq nodejs
+RUN curl -L https://deb.nodesource.com/setup_current.x | bash && apt-get install -yq nodejs
 RUN npm install -g yarn
 
 RUN sudo apt-get -y install python3-pip python3-venv

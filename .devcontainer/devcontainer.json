@@ -1,67 +1,50 @@
 {
-	"name": "Default FPC",
-	// "build": {
-	// 	"dockerfile": "Dockerfile",
-	// 	"args": {
-	// 		// Use the VARIANT arg to pick a Debian OS version: buster, bullseye
-	// 		// Use bullseye when on local on arm64/Apple Silicon.
-	// 		"VARIANT": "bullseye"
-	// 	}
-	// },
-	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
-
+	"name": "Default",
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined"
+	],
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-  
-	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"lldb.executable": "/usr/bin/lldb",
-		// VS Code don't watch files under ./target
-		"files.watcherExclude": {
-			"**/target/**": true
-		},
-		"rust-analyzer.checkOnSave.command": "clippy",
-    	"terminal.integrated.localEchoLatencyThreshold": 0,
-    	"cSpell.words": [
-			"actix",
-			"awsx",
-			"envconfig",
-			"pulumi",
-			"sqlx",
-			"thiserror",
-			"vsock"
-    	],
-		// "sqltools.connections": [
-		// 	{
-		// 		"name": "Container database",
-		// 		"driver": "PostgreSQL",
-		// 		"previewLimit": 50,
-		// 		"server": "localhost",
-		// 		"port": 5432,
-		// 		"database": "postgres",
-		// 		"username": "postgres",
-		// 		"password": "postgres"
-		// 	}
-		// ],
+	"remoteEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+		"GITHUB_USER": "${localEnv:GITHUB_USER}",
+		"AWS_REGION": "${localEnv:AWS_REGION}",
+		"AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
+		"AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}"
 	},
-  "containerEnv": {
-    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
-    "GITHUB_USER": "${localEnv:GITHUB_USER}",
-  },
+	"postStartCommand": "make set-dot-env",
 	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"vadimcn.vscode-lldb",
-		"mutantdino.resourcemonitor",
-		"matklad.rust-analyzer",
-		"tamasfe.even-better-toml",
-		"serayuzgur.crates",    
-    	"panicbit.cargo",
-    	"bungcip.better-toml",
-		"mtxr.sqltools",
-		"mtxr.sqltools-driver-pg",		
-	],
-
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"lldb.executable": "/usr/bin/lldb",
+				// VS Code don't watch files under ./target
+				"files.watcherExclude": {
+					"**/target/**": true
+				},
+				"terminal.integrated.localEchoLatencyThreshold": 0,
+			},
+			"extensions": [
+				"ms-vscode.vscode-typescript-next",
+				"steoates.autoimport",
+				"formulahendry.auto-rename-tag",
+				"streetsidesoftware.code-spell-checker",
+				"naumovs.color-highlight",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"wayou.vscode-todo-highlight",
+				"edonet.vscode-command-runner",
+				"styled-components.vscode-styled-components",
+				"ms-python.black-formatter",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8000, 5432],
-
+	"forwardPorts": [
+		8000,
+		5432
+	]
 }
