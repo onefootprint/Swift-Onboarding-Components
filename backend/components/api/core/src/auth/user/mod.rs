@@ -12,8 +12,9 @@ pub use user_ob::*;
     serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
 )]
 #[strum_discriminants(name(UserAuthGuard))]
-#[strum_discriminants(derive(Apiv2Schema, serde::Serialize, strum_macros::Display, Hash))]
+#[strum_discriminants(derive(Apiv2Schema, serde_with::SerializeDisplay, strum_macros::Display, Hash))]
 #[strum_discriminants(vis(pub))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[serde(rename = "snake_case")]
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
