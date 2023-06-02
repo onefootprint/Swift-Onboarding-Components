@@ -10,7 +10,7 @@ use db::models::{
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId, WorkflowKind};
 
-use super::{Complete, DataCollection, Decisioning, MakeDecision, MakeVendorCalls, States, VendorCalls};
+use super::{Complete, DataCollection, Decisioning, KycState, MakeDecision, MakeVendorCalls, VendorCalls};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
     state::{actions::Authorize, common},
@@ -48,7 +48,7 @@ impl DataCollection {
 }
 
 #[async_trait]
-impl OnAction<Authorize, States> for DataCollection {
+impl OnAction<Authorize, KycState> for DataCollection {
     type AsyncRes = TenantVendorControl;
 
     async fn execute_async_idempotent_actions(
@@ -63,7 +63,7 @@ impl OnAction<Authorize, States> for DataCollection {
         Ok(tvc)
     }
 
-    fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<States> {
+    fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
         Ok(VendorCalls {
@@ -95,7 +95,7 @@ impl VendorCalls {
 }
 
 #[async_trait]
-impl OnAction<MakeVendorCalls, States> for VendorCalls {
+impl OnAction<MakeVendorCalls, KycState> for VendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
     async fn execute_async_idempotent_actions(
@@ -106,7 +106,7 @@ impl OnAction<MakeVendorCalls, States> for VendorCalls {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
     }
 
-    fn on_commit(self, vendor_results: Vec<VendorResult>, _conn: &mut db::TxnPgConn) -> ApiResult<States> {
+    fn on_commit(self, vendor_results: Vec<VendorResult>, _conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         Ok(Decisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
@@ -141,7 +141,7 @@ impl Decisioning {
 
 type IsSandbox = bool;
 #[async_trait]
-impl OnAction<MakeDecision, States> for Decisioning {
+impl OnAction<MakeDecision, KycState> for Decisioning {
     type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
 
     async fn execute_async_idempotent_actions(
@@ -160,7 +160,7 @@ impl OnAction<MakeDecision, States> for Decisioning {
         Ok((fixture_decision, state.feature_flag_client.clone()))
     }
 
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<States> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (fixture_decision, ff_client) = async_res;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {

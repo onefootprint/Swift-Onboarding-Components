@@ -83,30 +83,28 @@ pub enum StateError {
 }
 
 #[async_trait]
-pub trait WorkflowState: Clone + Into<newtypes::WorkflowState> + std::marker::Send + 'static {
-    async fn init(state: &State, workflow: Workflow) -> ApiResult<Self>;
-
+#[enum_dispatch]
+pub trait WorkflowState:
+    Clone + Into<newtypes::WorkflowState> + Into<WorkflowWrapperState> + std::marker::Send + 'static
+{
     fn default_action(&self) -> Option<WorkflowActions>;
 
-    async fn action(self, state: &State, action: WorkflowActions, workflow_id: WorkflowId)
-        -> ApiResult<Self>;
+    async fn action(
+        self,
+        state: &State,
+        action: WorkflowActions,
+        workflow_id: WorkflowId,
+    ) -> ApiResult<WorkflowWrapperState>;
 }
 
+use alpaca_kyc::AlpacaKycState;
+use kyc::KycState;
+
+#[enum_dispatch(WorkflowState)]
+#[derive(Clone)]
 pub enum WorkflowWrapperState {
-    Kyc(kyc::States),
-    AlpacaKyc(alpaca_kyc::States),
-}
-
-impl From<kyc::States> for WorkflowWrapperState {
-    fn from(value: kyc::States) -> Self {
-        Self::Kyc(value)
-    }
-}
-
-impl From<alpaca_kyc::States> for WorkflowWrapperState {
-    fn from(value: alpaca_kyc::States) -> Self {
-        Self::AlpacaKyc(value)
-    }
+    Kyc(KycState),
+    AlpacaKyc(AlpacaKycState),
 }
 
 impl From<WorkflowWrapperState> for newtypes::WorkflowState {
@@ -129,8 +127,10 @@ impl WorkflowWrapper {
     pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
-            newtypes::WorkflowState::Kyc(s) => kyc::States::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::AlpacaKyc(s) => alpaca_kyc::States::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Kyc(s) => kyc::KycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::AlpacaKyc(s) => {
+                alpaca_kyc::AlpacaKycState::init(state, workflow).await?.into()
+            }
         };
         Ok(Self {
             state: s,
@@ -143,22 +143,12 @@ impl WorkflowWrapper {
         state: &State,
         action: WorkflowActions,
     ) -> ApiResult<(Self, Option<WorkflowActions>)> {
-        // TODO get rid of this with enum_dispatch
         let Self {
             state: wf_state,
             workflow_id,
         } = self;
-        let wf_id = workflow_id.clone();
-        let (next_action, next_state) = match wf_state {
-            WorkflowWrapperState::Kyc(wf_state) => {
-                let next_state = wf_state.action(state, action, wf_id).await?;
-                (next_state.default_action(), next_state.into())
-            }
-            WorkflowWrapperState::AlpacaKyc(wf_state) => {
-                let next_state = wf_state.action(state, action, wf_id).await?;
-                (next_state.default_action(), next_state.into())
-            }
-        };
+        let next_state = wf_state.action(state, action, workflow_id.clone()).await?;
+        let next_action = next_state.default_action();
         let next = Self {
             state: next_state,
             workflow_id,

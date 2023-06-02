@@ -69,7 +69,7 @@ async fn valid_action(state: &mut State) {
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::States::DataCollection(_))
+        WorkflowWrapperState::Kyc(kyc::KycState::DataCollection(_))
     ));
 
     let (ww, _) = ww
@@ -78,7 +78,7 @@ async fn valid_action(state: &mut State) {
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::States::VendorCalls(_))
+        WorkflowWrapperState::Kyc(kyc::KycState::VendorCalls(_))
     ));
 
     let (wf, wfe) = get_wf(state, wfid).await;
@@ -150,7 +150,7 @@ async fn authorize(state: &mut State) {
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::States::VendorCalls(_))
+        WorkflowWrapperState::Kyc(kyc::KycState::VendorCalls(_))
     ));
 
     let (wf, _) = get_wf(state, wfid).await;

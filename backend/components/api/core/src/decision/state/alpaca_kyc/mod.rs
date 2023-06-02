@@ -5,6 +5,7 @@ mod tests;
 
 use super::{
     actions::MakeDecision, DoAction, MakeVendorCalls, MakeWatchlistCheckCall, StateError, WorkflowActions,
+    WorkflowWrapperState,
 };
 use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use async_trait::async_trait;
@@ -62,7 +63,7 @@ pub struct DocCollection {
 pub struct Complete;
 
 #[derive(Clone)]
-pub enum States {
+pub enum AlpacaKycState {
     DataCollection(DataCollection),
     VendorCalls(VendorCalls),
     Decisioning(Decisioning),
@@ -72,47 +73,51 @@ pub enum States {
     Complete(Complete),
 }
 
-#[async_trait]
-impl super::WorkflowState for States {
-    async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycState {
+    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::AlpacaKyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
         };
         // TODO could get rid of this with enum_dispatch
         match s {
-            newtypes::AlpacaKycState::DataCollection => {
-                DataCollection::init(state, workflow).await.map(States::from)
-            }
+            newtypes::AlpacaKycState::DataCollection => DataCollection::init(state, workflow)
+                .await
+                .map(AlpacaKycState::from),
             newtypes::AlpacaKycState::VendorCalls => {
-                VendorCalls::init(state, workflow).await.map(States::from)
+                VendorCalls::init(state, workflow).await.map(AlpacaKycState::from)
             }
             newtypes::AlpacaKycState::Decisioning => {
-                Decisioning::init(state, workflow).await.map(States::from)
+                Decisioning::init(state, workflow).await.map(AlpacaKycState::from)
             }
-            newtypes::AlpacaKycState::WatchlistCheck => {
-                WatchlistCheck::init(state, workflow).await.map(States::from)
+            newtypes::AlpacaKycState::WatchlistCheck => WatchlistCheck::init(state, workflow)
+                .await
+                .map(AlpacaKycState::from),
+            newtypes::AlpacaKycState::PendingReview => PendingReview::init(state, workflow)
+                .await
+                .map(AlpacaKycState::from),
+            newtypes::AlpacaKycState::DocCollection => DocCollection::init(state, workflow)
+                .await
+                .map(AlpacaKycState::from),
+            newtypes::AlpacaKycState::Complete => {
+                Complete::init(state, workflow).await.map(AlpacaKycState::from)
             }
-            newtypes::AlpacaKycState::PendingReview => {
-                PendingReview::init(state, workflow).await.map(States::from)
-            }
-            newtypes::AlpacaKycState::DocCollection => {
-                DocCollection::init(state, workflow).await.map(States::from)
-            }
-            newtypes::AlpacaKycState::Complete => Complete::init(state, workflow).await.map(States::from),
         }
     }
+}
 
+#[async_trait]
+impl super::WorkflowState for AlpacaKycState {
     fn default_action(&self) -> Option<WorkflowActions> {
         match self {
-            States::DataCollection(_) => None, // have to wait for user to complete Bifrost
-            States::VendorCalls(_) => Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls)),
-            States::Decisioning(_) => Some(WorkflowActions::MakeDecision(MakeDecision)),
-            States::WatchlistCheck(_) => {
+            AlpacaKycState::DataCollection(_) => None, // have to wait for user to complete Bifrost
+            AlpacaKycState::VendorCalls(_) => Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls)),
+            AlpacaKycState::Decisioning(_) => Some(WorkflowActions::MakeDecision(MakeDecision)),
+            AlpacaKycState::WatchlistCheck(_) => {
                 Some(WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall))
             }
-            States::PendingReview(_) => None, // have to wait for user to complete review
-            States::DocCollection(_) => None, // have to wait for doc collection flow to finish
-            States::Complete(_) => None,      // terminal state
+            AlpacaKycState::PendingReview(_) => None, // have to wait for user to complete review
+            AlpacaKycState::DocCollection(_) => None, // have to wait for doc collection flow to finish
+            AlpacaKycState::Complete(_) => None,      // terminal state
         }
     }
 
@@ -121,7 +126,7 @@ impl super::WorkflowState for States {
         state: &State,
         action: WorkflowActions,
         workflow_id: WorkflowId,
-    ) -> ApiResult<Self> {
+    ) -> ApiResult<WorkflowWrapperState> {
         // TODO could get rid of this with enum_dispatch if actions are not typed
         // or if DoAction takes in a `WorkflowActions`
         let new_state = match (self, action) {
@@ -145,61 +150,61 @@ impl super::WorkflowState for States {
             }
             (_, _) => return Err(StateError::UnexpectedActionForState.into()),
         };
-        Ok(new_state)
+        Ok(new_state.into())
     }
 }
 
-impl From<DataCollection> for States {
+impl From<DataCollection> for AlpacaKycState {
     fn from(value: DataCollection) -> Self {
-        States::DataCollection(value)
+        AlpacaKycState::DataCollection(value)
     }
 }
 
-impl From<VendorCalls> for States {
+impl From<VendorCalls> for AlpacaKycState {
     fn from(value: VendorCalls) -> Self {
-        States::VendorCalls(value)
+        AlpacaKycState::VendorCalls(value)
     }
 }
 
-impl From<Decisioning> for States {
+impl From<Decisioning> for AlpacaKycState {
     fn from(value: Decisioning) -> Self {
-        States::Decisioning(value)
+        AlpacaKycState::Decisioning(value)
     }
 }
 
-impl From<WatchlistCheck> for States {
+impl From<WatchlistCheck> for AlpacaKycState {
     fn from(value: WatchlistCheck) -> Self {
-        States::WatchlistCheck(value)
+        AlpacaKycState::WatchlistCheck(value)
     }
 }
 
-impl From<PendingReview> for States {
+impl From<PendingReview> for AlpacaKycState {
     fn from(value: PendingReview) -> Self {
-        States::PendingReview(value)
+        AlpacaKycState::PendingReview(value)
     }
 }
 
-impl From<DocCollection> for States {
+impl From<DocCollection> for AlpacaKycState {
     fn from(value: DocCollection) -> Self {
-        States::DocCollection(value)
+        AlpacaKycState::DocCollection(value)
     }
 }
-impl From<Complete> for States {
+impl From<Complete> for AlpacaKycState {
     fn from(value: Complete) -> Self {
-        States::Complete(value)
+        AlpacaKycState::Complete(value)
     }
 }
 
-impl From<States> for newtypes::WorkflowState {
-    fn from(value: States) -> Self {
+impl From<AlpacaKycState> for newtypes::WorkflowState {
+    fn from(value: AlpacaKycState) -> Self {
         let alpaca_kyc_state = match value {
-            States::DataCollection(_) => newtypes::AlpacaKycState::DataCollection,
-            States::VendorCalls(_) => newtypes::AlpacaKycState::VendorCalls,
-            States::Decisioning(_) => newtypes::AlpacaKycState::Decisioning,
-            States::WatchlistCheck(_) => newtypes::AlpacaKycState::WatchlistCheck,
-            States::PendingReview(_) => newtypes::AlpacaKycState::PendingReview,
-            States::DocCollection(_) => newtypes::AlpacaKycState::DocCollection,
-            States::Complete(_) => newtypes::AlpacaKycState::Complete,
+            AlpacaKycState::DataCollection(_) => newtypes::AlpacaKycState::DataCollection,
+            AlpacaKycState::VendorCalls(_) => newtypes::AlpacaKycState::VendorCalls,
+            AlpacaKycState::Decisioning(_) => newtypes::AlpacaKycState::Decisioning,
+            AlpacaKycState::WatchlistCheck(_) => newtypes::AlpacaKycState::WatchlistCheck,
+            AlpacaKycState::PendingReview(_) => newtypes::AlpacaKycState::PendingReview,
+            AlpacaKycState::DocCollection(_) => newtypes::AlpacaKycState::DocCollection,
+            AlpacaKycState::Complete(_) => newtypes::AlpacaKycState::Complete,
         };
         newtypes::WorkflowState::from(alpaca_kyc_state)
     }
