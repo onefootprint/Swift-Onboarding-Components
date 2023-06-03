@@ -87,3 +87,22 @@ impl IdDocKind {
 }
 
 crate::util::impl_enum_str_diesel!(IdDocKind);
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AlpacaDocumentType {
+    DriversLicense,
+    NationalId,
+    Passport,
+    Visa,
+}
+
+impl From<IdDocKind> for AlpacaDocumentType {
+    fn from(value: IdDocKind) -> Self {
+        match value {
+            IdDocKind::IdCard => AlpacaDocumentType::NationalId,
+            IdDocKind::DriverLicense => AlpacaDocumentType::DriversLicense,
+            IdDocKind::Passport => AlpacaDocumentType::Passport,
+        }
+    }
+}

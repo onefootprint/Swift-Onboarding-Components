@@ -11,7 +11,7 @@ mod images;
 mod test;
 
 // Checks if the document type we received from incode OCR is supported in footprint
-fn id_doc_kind_from_incode_document_type(
+pub fn id_doc_kind_from_incode_document_type(
     doc_type: IncodeDocumentType,
 ) -> Result<IdDocKind, crate::decision::Error> {
     match doc_type {

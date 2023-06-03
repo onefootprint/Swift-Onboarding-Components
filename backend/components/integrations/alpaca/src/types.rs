@@ -1,6 +1,6 @@
 use chrono::Utc;
 use newtypes::macros::pii;
-use newtypes::{FpId, PiiJsonValue, PiiString, Vendor};
+use newtypes::{AlpacaDocumentType, FpId, PiiJsonValue, PiiString, Vendor};
 /// Represents a request to upload CIP information for an alpaca Account
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CipRequest {
@@ -103,15 +103,6 @@ pub enum CipStatus {
     Withdrawn,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum DocumentType {
-    DriversLicense,
-    NationalId,
-    Passport,
-    Visa,
-}
-
 /// Document (photo ID)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DocumentPhotoId {
@@ -133,7 +124,7 @@ pub struct DocumentPhotoId {
     pub date_of_expiry: PiiString,
     pub issuing_country: PiiString,
     pub document_numbers: Vec<PiiString>,
-    pub document_type: DocumentType,
+    pub document_type: AlpacaDocumentType,
 
     /// Checks whether the age calculated from the document’s date of birth data point is greater than or equal to the minimum accepted age. Unless otherwise discussed with Alpaca, users must be 18 years old to open an account.
     pub age_validation: CipResult,
@@ -325,7 +316,7 @@ pub mod fixtures {
                     date_of_expiry: pii!("2025-02-02"),
                     issuing_country: pii!("USA"),
                     document_numbers: vec![pii!("12121212")],
-                    document_type: DocumentType::DriversLicense,
+                    document_type: AlpacaDocumentType::DriversLicense,
                     age_validation: CipResult::Clear,
                     data_comparison: CipResult::Clear,
                     data_comparison_breakdown: Default::default(),

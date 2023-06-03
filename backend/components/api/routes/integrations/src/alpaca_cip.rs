@@ -1,26 +1,33 @@
 use std::collections::HashSet;
 
-use alpaca::{AlpacaCip, CipRequest, CipResult};
+use alpaca::{
+    AlpacaCip, CipRequest, CipResult, DataComparsionBreakDown, ImageIntegrityBreakdown, VisualAuthenticity,
+};
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     decision::field_validations::create_field_validation_results,
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{TenantVw, VaultWrapper},
-    State,
+    ApiError, State,
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse};
+use chrono::Utc;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
         annotation::Annotation, insight_event::InsightEvent, manual_review::ManualReview,
         onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        verification_result::VerificationResult,
     },
+    DbError,
 };
+use idv::ParsedResponse;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId,
-    IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, SignalScope, TenantId, Vendor,
+    format_pii, pii, AlpacaDocumentType, DataIdentifier, DecisionStatus, DocumentKind,
+    EncryptedVaultPrivateKey, FootprintReasonCode, FpId, IdentityDataKind, MatchLevel, PiiJsonValue,
+    PiiString, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -125,6 +132,7 @@ async fn create_cip_request(
         })
         .await??;
 
+    let user_vault_private_key = uvw.vault.e_private_key.clone();
     // build the cip object components
     let kyc = kyc(
         state,
@@ -140,15 +148,15 @@ async fn create_cip_request(
     .await?;
     let watchlist = watchlist(&scoped_vault, &onboarding, &risk_signals);
     let identity = identity(&scoped_vault, &onboarding, risk_signals);
+    let (document, photo) = document_and_photo(state, scoped_vault.clone(), &user_vault_private_key).await?;
 
     let cip = CipRequest {
         provider_name: vec![alpaca::Provider::Footprint],
         kyc,
         watchlist,
         identity,
-        // TODO: support doc + photo CIP
-        document: None,
-        photo: None,
+        document,
+        photo,
     };
 
     Ok(cip)
@@ -320,4 +328,124 @@ fn watchlist(
         // TODO: FP-4192 (pull vres and parse them)
         records: vec![],
     }
+}
+
+async fn document_and_photo(
+    state: &State,
+    scoped_vault: ScopedVault,
+    user_vault_private_key: &EncryptedVaultPrivateKey,
+) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
+    let su_id = scoped_vault.id.clone();
+    let incode_apis = newtypes::vendor_apis_from_vendor(Vendor::Incode);
+    let incode_results: Vec<(VerificationRequest, Option<VerificationResult>)> = state
+        .db_pool
+        .db_query(
+            move |conn| -> Result<Vec<(VerificationRequest, Option<VerificationResult>)>, DbError> {
+                VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, su_id)
+            },
+        )
+        .await??
+        .into_iter()
+        .filter(|(req, _)| incode_apis.contains(&req.vendor_api))
+        .collect();
+
+    if incode_results.is_empty() {
+        // nothing to do here if we haven't collected a doc
+        return Ok((None, None));
+    }
+
+    // pick a reasonable timestamp
+    let score_request_created_at = incode_results
+        .iter()
+        .find(|(r, _)| r.vendor_api == VendorAPI::IncodeFetchScores)
+        .map(|(r, _)| r._created_at)
+        .unwrap_or(Utc::now());
+
+    let incode_results =
+        crate::decision::vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
+            incode_results,
+            &state.enclave_client,
+            user_vault_private_key,
+        )
+        .await?;
+
+    let ParsedResponse::IncodeFetchOCR(ocr) = incode_results
+        .iter()
+        .find(|pr| matches!(pr.response.response, ParsedResponse::IncodeFetchOCR(_)))
+        .ok_or(DbError::ObjectNotFound)?
+        .response
+        .response
+        .to_owned() else {
+            return Err(ApiError::AssertionError("ocr not found".into()))
+        };
+
+    let ocr_name = ok_or(ocr.name.as_ref(), "missing ocr name".into())?;
+    let document_type: AlpacaDocumentType = ocr
+        .document_kind()
+        .map(crate::decision::vendor::incode::id_doc_kind_from_incode_document_type)
+        .map_err(|e| ApiError::from(idv::Error::from(e)))??
+        .into();
+    let dob = ocr.dob().map_err(|e| ApiError::from(idv::Error::from(e)))?;
+
+    let document_photo_id = alpaca::DocumentPhotoId {
+        id: scoped_vault.fp_id.clone(),
+        result: CipResult::Clear,
+        status: alpaca::CipStatus::Complete,
+        created_at: score_request_created_at,
+        first_name: ok_or(ocr_name.first_name.clone(), "first name missing".into())?.into(),
+        last_name: ok_or(ocr_name.paternal_last_name.clone(), "last name missing".into())?.into(),
+        gender: ok_or(ocr.gender.clone(), "missing gender".into())?,
+        date_of_birth: dob,
+        date_of_expiry: ocr
+            .expiration_date()
+            .map_err(|e| ApiError::from(idv::Error::from(e)))?,
+        issuing_country: ok_or(ocr.issuing_country.clone(), "missing issuing_country".into())?,
+        document_numbers: vec![ok_or(
+            ocr.document_number.clone(),
+            "missing document_number".into(),
+        )?],
+        document_type,
+        // TODO: these should all be computed from actual response
+        age_validation: CipResult::Clear,
+        data_comparison: CipResult::Clear,
+        data_comparison_breakdown: DataComparsionBreakDown {
+            first_name: CipResult::Clear,
+            last_name: CipResult::Clear,
+            date_of_birth: CipResult::Clear,
+            address: Some(CipResult::Clear),
+        },
+        image_integrity: CipResult::Clear,
+        image_integrity_breakdown: ImageIntegrityBreakdown {
+            image_quality: CipResult::Clear,
+            supported_document: CipResult::Clear,
+            colour_picture: None,
+            conclusive_document_quality: None,
+        },
+        visual_authenticity: VisualAuthenticity {
+            digital_tampering: CipResult::Clear,
+            face_detection: CipResult::Clear,
+            fonts: CipResult::Clear,
+            picture_face_integrity: CipResult::Clear,
+            security_features: CipResult::Clear,
+            template: CipResult::Clear,
+        },
+    };
+
+    let photo_selfie = alpaca::PhotoSelfie {
+        id: scoped_vault.fp_id.clone(),
+        result: CipResult::Clear,
+        status: alpaca::CipStatus::Complete,
+        created_at: score_request_created_at,
+        face_comparison: CipResult::Clear,
+        image_integrity: CipResult::Clear,
+        visual_authenticity: CipResult::Clear,
+    };
+
+    Ok((Some(document_photo_id), Some(photo_selfie)))
+}
+
+fn ok_or<T>(o: Option<T>, assert_msg: String) -> ApiResult<T> {
+    let unwrapped = o.ok_or(ApiError::AssertionError(assert_msg))?;
+
+    Ok(unwrapped)
 }
