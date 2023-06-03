@@ -196,6 +196,7 @@ export { default as IcoPlusSmall24 } from './ico-plus-small-24';
 export { default as IcoQuote40 } from './ico-quote-40';
 export { default as IcoQuoteLeft16 } from './ico-quote-left-16';
 export { default as IcoQuoteLeft24 } from './ico-quote-left-24';
+export { default as IcoRepeat40 } from './ico-repeat-40';
 export { default as IcoSearch16 } from './ico-search-16';
 export { default as IcoSearch24 } from './ico-search-24';
 export { default as IcoSearchSmall16 } from './ico-search-small-16';
