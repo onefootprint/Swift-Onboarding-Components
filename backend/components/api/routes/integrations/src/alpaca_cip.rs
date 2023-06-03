@@ -192,6 +192,7 @@ async fn kyc(
                 Id(AddressLine2),
                 Id(Zip),
                 Id(Country),
+                // todo: make latest
                 Document(PassportNumber),
                 Document(IdCardNumber),
                 Document(DriversLicenseNumber),
@@ -392,8 +393,8 @@ async fn document_and_photo(
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: score_request_created_at,
-        first_name: ok_or(ocr_name.first_name.clone(), "first name missing".into())?.into(),
-        last_name: ok_or(ocr_name.paternal_last_name.clone(), "last name missing".into())?.into(),
+        first_name: ok_or(ocr_name.first_name.clone(), "first name missing".into())?,
+        last_name: ok_or(ocr_name.paternal_last_name.clone(), "last name missing".into())?,
         gender: ok_or(ocr.gender.clone(), "missing gender".into())?,
         date_of_birth: dob,
         date_of_expiry: ocr

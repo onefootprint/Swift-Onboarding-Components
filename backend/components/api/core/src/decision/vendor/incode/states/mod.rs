@@ -1,3 +1,5 @@
+use chrono::NaiveDate;
+use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
@@ -38,15 +40,18 @@ pub use process_face::*;
 
 use super::state::IncodeStateTransition;
 use super::IncodeContext;
+use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
 use crate::errors::ApiResult;
-use crate::ApiError;
+use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
+use crate::{ApiError, State};
 use db::models::verification_result::VerificationResult;
 use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue, ScrubbedJsonValue, VendorAPI,
+    DataIdentifier, IdentityDataKind, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, VendorAPI,
 };
 
 #[derive(Clone)]
@@ -138,4 +143,74 @@ async fn save_incode_verification_result<'a>(
 
 fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
+}
+
+pub async fn save_fixture_ocr(
+    state: &State,
+    scoped_vault_id: &ScopedVaultId,
+) -> ApiResult<serde_json::Value> {
+    let suid = scoped_vault_id.clone();
+    let suid2 = scoped_vault_id.clone();
+    let (decision_intent, uvw): (DecisionIntent, TenantVw) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let vw = VaultWrapper::build_for_tenant(conn, &suid)?;
+            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid)?;
+
+            Ok((decision_intent, vw))
+        })
+        .await?;
+
+    // get first name and dob
+    let mut vd = uvw
+        .decrypt_unchecked(
+            &state.enclave_client,
+            &[
+                DataIdentifier::Id(IdentityDataKind::FirstName),
+                DataIdentifier::Id(IdentityDataKind::LastName),
+                DataIdentifier::Id(IdentityDataKind::Dob),
+            ],
+        )
+        .await?;
+    let first_name = vd.rm(IdentityDataKind::FirstName)?;
+    let last_name = vd.rm(IdentityDataKind::LastName)?;
+    let dob = vd.rm(IdentityDataKind::Dob)?;
+    let date_of_birth_timestamp = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+        .map_err(|_| ApiError::AssertionError("invalid date in fixture".into()))?
+        .and_hms_milli_opt(0, 0, 0, 0)
+        .map(|d| d.timestamp_millis());
+
+    let ocr = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let request = VerificationRequest::bulk_create(
+                conn,
+                suid2.clone(),
+                vec![VendorAPI::IncodeFetchOCR],
+                &decision_intent.id,
+            )?
+            .pop()
+            .ok_or(ApiError::ResourceNotFound)?;
+            let raw_response =
+                serde_json::to_value(&idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
+                    Some(first_name),
+                    Some(last_name),
+                    date_of_birth_timestamp,
+                ))?;
+
+            // Verification result response is encrypted
+            let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
+            let e_response = vendor::verification_result::encrypt_verification_result_response(
+                &raw_response.clone().into(),
+                &uv.public_key,
+            )?;
+
+            let _result =
+                VerificationResult::create(conn, request.id, raw_response.clone().into(), e_response, false)?;
+
+            Ok(raw_response)
+        })
+        .await?;
+
+    Ok(ocr)
 }

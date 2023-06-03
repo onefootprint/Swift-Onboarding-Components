@@ -290,12 +290,22 @@ impl FetchOCRResponse {
     }
 
     #[allow(non_snake_case)]
-    pub fn TEST_ONLY_FIXTURE() -> Self {
+    pub fn TEST_ONLY_FIXTURE(
+        first_name: Option<PiiString>,
+        last_name: Option<PiiString>,
+        dob: Option<i64>,
+    ) -> Self {
+        let name = OCRName {
+            first_name: first_name.or_else(|| Some(PiiString::from("Bobby"))),
+            paternal_last_name: last_name.or_else(|| Some(PiiString::from("Bobierto"))),
+            ..Default::default()
+        };
         Self {
             document_number: Some(PiiString::from("Y12341234")),
             issuing_state: Some(PiiString::from("MA")),
             expire_at: Some("1728950400000".to_owned()),
-            birth_date: Some(529873860000),
+            birth_date: dob.or(Some(529873860000)),
+            name: Some(name),
             ..Default::default()
         }
     }
@@ -366,29 +376,29 @@ impl APIResponseToIncodeError for ProcessFaceResponse {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRName {
-    pub full_name: Option<String>,
-    pub first_name: Option<String>,
-    pub paternal_last_name: Option<String>,
-    pub maternal_last_name: Option<String>,
-    pub given_name: Option<String>,
-    pub middle_name: Option<String>,
-    pub name_suffix: Option<String>,
-    pub machine_readable_full_name: Option<String>,
-    pub given_name_mrz: Option<String>,
-    pub last_name_mrz: Option<String>,
+    pub full_name: Option<PiiString>,
+    pub first_name: Option<PiiString>,
+    pub paternal_last_name: Option<PiiString>,
+    pub maternal_last_name: Option<PiiString>,
+    pub given_name: Option<PiiString>,
+    pub middle_name: Option<PiiString>,
+    pub name_suffix: Option<PiiString>,
+    pub machine_readable_full_name: Option<PiiString>,
+    pub given_name_mrz: Option<PiiString>,
+    pub last_name_mrz: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRAddress {
-    pub street: Option<String>,
-    pub colony: Option<String>,
-    pub postal_code: Option<String>,
-    pub city: Option<String>,
-    pub state: Option<String>,
+    pub street: Option<PiiString>,
+    pub colony: Option<PiiString>,
+    pub postal_code: Option<PiiString>,
+    pub city: Option<PiiString>,
+    pub state: Option<PiiString>,
 }
 
 #[cfg(test)]

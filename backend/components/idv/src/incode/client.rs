@@ -623,7 +623,7 @@ mod tests {
         assert!(ocr.name.clone().unwrap().full_name.is_some());
         assert_eq!(
             ocr.address_fields.clone().unwrap().state.unwrap(),
-            "MA".to_string()
+            "MA".to_string().into()
         );
 
         assert_eq!(ocr.expiration_date().unwrap().leak(), "2024-10-15");

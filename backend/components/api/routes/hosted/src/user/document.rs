@@ -10,7 +10,7 @@ use api_core::auth::SessionContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::{DocCollected, WorkflowWrapper};
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use api_core::decision::vendor::incode::states::Complete;
+use api_core::decision::vendor::incode::states::{save_fixture_ocr, Complete};
 use api_core::decision::vendor::incode::{IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
@@ -182,7 +182,8 @@ pub async fn post(
                     Some((decision_intent, doc_request.into_inner(), id_doc.id))
                 } else {
                     // Create fixture data
-                    let ocr = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE();
+                    let ocr =
+                        idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None);
                     let doc_type = request.document_type;
                     Complete::enter(conn, &vault2, &su_id, &id_doc.id, doc_type, ocr)?;
                     None
@@ -202,6 +203,8 @@ pub async fn post(
     } else {
         // Fixture response - we always complete successfully!
         advance_workflow_if_needed(&state, &user_auth).await?;
+        // Save fixture VRes
+        save_fixture_ocr(&state, &user_auth.scoped_user.id.clone()).await?;
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
             .into_iter()
             .find(|s| missing_sides.contains(s));
