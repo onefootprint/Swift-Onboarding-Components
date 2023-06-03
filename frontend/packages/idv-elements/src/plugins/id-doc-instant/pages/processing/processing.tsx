@@ -114,6 +114,7 @@ const Processing = () => {
         )
       }
       mode={mode}
+      hasNextSide={!!nextSide}
     />
   ) : null;
 };

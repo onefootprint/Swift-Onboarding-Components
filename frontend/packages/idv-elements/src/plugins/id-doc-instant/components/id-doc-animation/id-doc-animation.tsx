@@ -6,6 +6,7 @@ import TRANSITION_DELAY from '../../constants/transition-delay.constants';
 
 type IdDocAnimationProps = {
   mode: 'loading' | 'success';
+  hasNextSide: boolean;
   loadingComponent: ReactNode;
   successComponent: ReactNode;
   nextSideComponent?: ReactNode;
@@ -39,6 +40,7 @@ const nextSideVariants = {
 
 const IdDocAnimation = ({
   mode,
+  hasNextSide,
   loadingComponent,
   successComponent,
   nextSideComponent,
@@ -55,10 +57,10 @@ const IdDocAnimation = ({
       setIsShowingSuccess(true);
       setTimeout(() => {
         setIsShowingSuccess(false);
-        if (nextSideComponent) setIsShowingNextSide(true);
+        if (hasNextSide) setIsShowingNextSide(true);
       }, TRANSITION_DELAY);
     }
-  }, [mode, nextSideComponent]);
+  }, [mode, hasNextSide]);
 
   return (
     <>
