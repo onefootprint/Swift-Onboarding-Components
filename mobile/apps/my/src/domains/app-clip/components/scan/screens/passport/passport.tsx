@@ -4,6 +4,7 @@ import React from 'react';
 import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../../components/camera';
+import Frame from './components/frame';
 
 export type PassportProps = {
   onSubmit: () => void;
@@ -14,7 +15,7 @@ const Passport = ({ onSubmit }: PassportProps) => {
 
   return (
     <Camera
-      type="back"
+      Frame={Frame}
       instructions={{
         description: t('instructions.description'),
         IconComponent: IcoPassport24,
@@ -23,6 +24,7 @@ const Passport = ({ onSubmit }: PassportProps) => {
       onSubmit={onSubmit}
       subtitle={t('subtitle')}
       title={t('title')}
+      type="back"
     />
   );
 };
