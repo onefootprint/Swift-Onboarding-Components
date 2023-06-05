@@ -342,6 +342,7 @@ async function createCdnFrontedLoadBalancer(
     domain: g.dnsConfig.apiDomain,
     origin: albDomainName,
     hostedZoneId: g.dnsConfig.hostedZone.id,
+    stack: g.stackMetadata
   });
 
   return {

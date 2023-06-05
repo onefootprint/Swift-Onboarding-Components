@@ -2,6 +2,7 @@ import { route53 } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { Certificate } from './certs';
+import { StackMetadata } from './stack_metadata';
 
 export type CdnConfig = {
   cert: Certificate;
@@ -10,6 +11,7 @@ export type CdnConfig = {
   cdnToAlbSecretHeaderName: string;
   cdnToAlbSecret: pulumi.Output<string>;
   hostedZoneId: string;
+  stack: StackMetadata;
 };
 
 /**
@@ -141,7 +143,7 @@ export function CreateAppCloudfrontDistribution(
   }
 
   const waf = new aws.wafv2.WebAcl('app-cdb-waf', {
-    name: 'AppCDNWAF',
+    name: `AppCDNWAF-${config.stack.shortStackName}`,
     visibilityConfig: {
       metricName: 'appCdnWAF',
       cloudwatchMetricsEnabled: true,
