@@ -107,9 +107,15 @@ const createIdDocMachine = (args: MachineContext) =>
                 actions: 'assignIdDocImageErrors',
               },
             ],
+            retryLimitExceeded: {
+              target: 'failure',
+            },
           },
         },
         complete: {
+          type: 'final',
+        },
+        failure: {
           type: 'final',
         },
       },

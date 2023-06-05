@@ -12,4 +12,5 @@ export type SubmitDocRequest = {
 export type SubmitDocResponse = {
   errors: IdDocImageError[];
   nextSideToCollect: 'front' | 'back' | 'selfie';
+  isRetryLimitExceeded: boolean;
 };

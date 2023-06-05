@@ -26,6 +26,7 @@ export interface Typegen0 {
     | 'backImageRetry'
     | 'complete'
     | 'countryAndType'
+    | 'failure'
     | 'frontImage'
     | 'frontImageRetry'
     | 'processing'

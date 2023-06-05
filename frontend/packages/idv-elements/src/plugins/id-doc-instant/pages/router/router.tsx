@@ -18,7 +18,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdDocMachine();
-  const isDone = state.matches('complete');
+  const isDone = state.matches('complete') || state.matches('failure');
   useLogStateMachine('id-doc', state);
 
   useEffect(() => {

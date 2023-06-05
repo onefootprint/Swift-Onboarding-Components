@@ -143,6 +143,10 @@
     },
     "selfie-retry-prompt": {
       "cta": "Take photo"
+    },
+    "retry-limit-exceeded": {
+      "title": "Too many attempts",
+      "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
     }
   }
 }

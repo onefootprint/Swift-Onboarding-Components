@@ -8,6 +8,7 @@ import NextSide from '../../components/next-side';
 import Success from '../../components/success';
 import { ImageTypes } from '../../constants/image-types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import RetryLimitExceeded from './components/retry-limit-exceeded';
 import useSubmitDoc from './hooks/use-submit-doc';
 
 const imageRequestFields = {
@@ -21,6 +22,7 @@ const Processing = () => {
   const submitDocMutation = useSubmitDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<ImageTypes | undefined>();
+  const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
 
   const {
     idDoc: { type, country },
@@ -30,12 +32,14 @@ const Processing = () => {
   } = state.context;
 
   const handleSubmitDocSuccess = (data: SubmitDocResponse) => {
-    const { errors, nextSideToCollect } = data;
+    const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
     // If we are staying on the same side, we show error
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
-    if (nextSideToCollect === state.context.currSide) {
+    if (isRetryLimitExceeded) {
+      setRetryLimitExceeded(true);
+    } else if (nextSideToCollect === state.context.currSide) {
       send({
         type: 'processingErrored',
         payload: {
@@ -92,7 +96,11 @@ const Processing = () => {
     });
   };
 
-  return type && currSide ? (
+  if (retryLimitExceeded) return <RetryLimitExceeded />;
+
+  if (!type || !currSide) return null;
+
+  return (
     <IdDocAnimation
       loadingComponent={<Loading imageType={currSide} docType={type} />}
       successComponent={
@@ -116,7 +124,7 @@ const Processing = () => {
       mode={mode}
       hasNextSide={!!nextSide}
     />
-  ) : null;
+  );
 };
 
 export default Processing;

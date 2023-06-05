@@ -66,4 +66,7 @@ export type MachineEvents =
   | {
       type: 'navigatedToPrev';
     }
+  | {
+      type: 'retryLimitExceeded';
+    }
   | ProccessingSucceededEvent;
