@@ -36,9 +36,6 @@ fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCo
 }
 
 fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode> {
-    // TODO: these aren't appearing in the response where the docs say they should be
-    let model_reason_codes: Vec<FootprintReasonCode> = vec![];
-
     let fraud_shield_reason_codes: Vec<FootprintReasonCode> = resp
         .fraud_shield_reason_codes()
         .ok()
@@ -90,12 +87,20 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         };
     }
 
-    let mut reason_codes: Vec<FootprintReasonCode> = model_reason_codes
+    let watchlist_codes = if let Ok(code) = resp.watchlist_match_reason_codes() {
+        vec![std::convert::Into::<Option<FootprintReasonCode>>::into(&code)]
+    } else {
+        vec![]
+    }
+    .into_iter()
+    .flatten();
+
+    let mut reason_codes: Vec<FootprintReasonCode> = fraud_shield_reason_codes
         .into_iter()
-        .chain(fraud_shield_reason_codes.into_iter())
         .chain(dob_reason_codes)
         .chain(name_and_address_reason_codes.into_iter())
         .chain(ssn_reason_codes.into_iter())
+        .chain(watchlist_codes.into_iter())
         .unique()
         .collect();
 
@@ -115,10 +120,13 @@ mod tests {
     use idv::experian::{
         cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore,
     };
-    use newtypes::{ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, FootprintReasonCode};
+    use newtypes::{
+        ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
+        FootprintReasonCode,
+    };
     use test_case::test_case;
 
-    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA => vec![
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA, ExperianWatchlistReasonCodes::R1 => vec![
         // from fraud shield
         FootprintReasonCode::SubjectDeceased,
         // dob match
@@ -135,7 +143,7 @@ mod tests {
         // from score
         FootprintReasonCode::IdNotLocated,
     ]; "address code says no match, but we opt for ssn codes since it's present")]
-    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::MX =>             vec![
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::MX, ExperianWatchlistReasonCodes::R7 => vec![
         // from fraud shield
         FootprintReasonCode::SubjectDeceased,
         // dob match
@@ -148,17 +156,23 @@ mod tests {
         FootprintReasonCode::AddressCityDoesNotMatch,
         FootprintReasonCode::AddressStateDoesNotMatch,
         FootprintReasonCode::AddressZipCodeDoesNotMatch,
+        // from watchlist
+        FootprintReasonCode::WatchlistHitOfac,
         // from score
         FootprintReasonCode::IdNotLocated,
     ]; "no ssn is provided, so we take address codes")]
     fn test_reason_codes(
         address_code: ExperianAddressAndNameMatchReasonCodes,
         ssn_code: ExperianSSNReasonCodes,
+        watchlist_code: ExperianWatchlistReasonCodes,
     ) -> Vec<FootprintReasonCode> {
-        let r: CrossCoreAPIResponse = serde_json::from_value(
-            idv::test_fixtures::cross_core_response_with_fraud_shield_codes(address_code, ssn_code),
-        )
-        .expect("could not parse");
+        let r: CrossCoreAPIResponse =
+            serde_json::from_value(idv::test_fixtures::cross_core_response_with_fraud_shield_codes(
+                address_code,
+                ssn_code,
+                watchlist_code,
+            ))
+            .expect("could not parse");
 
         assert_eq!(
             r.precise_id_response().unwrap().score().unwrap(),

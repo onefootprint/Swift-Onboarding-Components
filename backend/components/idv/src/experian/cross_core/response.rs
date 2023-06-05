@@ -1,6 +1,6 @@
 use newtypes::{
     ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
-    ExperianSSNReasonCodes,
+    ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
 };
 
 use crate::experian::{
@@ -76,7 +76,13 @@ impl CrossCoreAPIResponse {
     pub fn name_and_address_match_reason_codes(
         &self,
     ) -> Result<ExperianAddressAndNameMatchReasonCodes, Error> {
-        let code = self.get_precise_id_decision_element()?.into_address_reason_code();
+        let code = self.get_precise_id_decision_element()?.address_reason_code();
+
+        Ok(code)
+    }
+
+    pub fn watchlist_match_reason_codes(&self) -> Result<ExperianWatchlistReasonCodes, Error> {
+        let code = self.get_precise_id_decision_element()?.watchlist_reason_code();
 
         Ok(code)
     }
@@ -160,20 +166,25 @@ pub struct DecisionElement {
 }
 
 impl DecisionElement {
-    pub fn into_address_reason_code(&self) -> ExperianAddressAndNameMatchReasonCodes {
-        self.matches
-            .clone()
-            .and_then(|match_values| {
-                match_values.into_iter().find(|mv| {
-                    mv.name
-                        .as_ref()
-                        .map(|n| n.as_str() == "pmAddressVerificationResult1")
-                        .unwrap_or(false)
-                })
-            })
+    fn get_match_value(&self, name: &str) -> Option<MatchValue> {
+        self.matches.clone().and_then(|match_values| {
+            match_values
+                .into_iter()
+                .find(|mv| mv.name.as_ref().map(|n| n.as_str() == name).unwrap_or(false))
+        })
+    }
+    pub fn address_reason_code(&self) -> ExperianAddressAndNameMatchReasonCodes {
+        self.get_match_value("pmAddressVerificationResult1")
             .and_then(|mv| mv.value)
             .and_then(|val| ExperianAddressAndNameMatchReasonCodes::try_from(val.as_str()).ok())
             .unwrap_or(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch)
+    }
+
+    pub fn watchlist_reason_code(&self) -> ExperianWatchlistReasonCodes {
+        self.get_match_value("pmOFACVerificationResult")
+            .and_then(|mv| mv.value)
+            .and_then(|val| ExperianWatchlistReasonCodes::try_from(val.as_str()).ok())
+            .unwrap_or(ExperianWatchlistReasonCodes::R1)
     }
 }
 
@@ -269,6 +280,7 @@ mod tests {
         let response = cross_core_response_with_fraud_shield_codes(
             ExperianAddressAndNameMatchReasonCodes::A1,
             ExperianSSNReasonCodes::EA,
+            ExperianWatchlistReasonCodes::R1,
         );
         assert!(response.to_string().contains("BRIAN"));
 
@@ -284,6 +296,7 @@ mod tests {
         let response = cross_core_response_with_fraud_shield_codes(
             ExperianAddressAndNameMatchReasonCodes::A1,
             ExperianSSNReasonCodes::EA,
+            ExperianWatchlistReasonCodes::R1,
         );
         let r: CrossCoreAPIResponse =
             serde_json::from_value(response).expect("could not parse experian cross core");
@@ -292,6 +305,7 @@ mod tests {
         let dob_match = r.dob_match_reason_codes().unwrap();
         let address_and_name_match = r.name_and_address_match_reason_codes().unwrap();
         let ssn_match = r.ssn_match_reason_codes().unwrap();
+        let watchlist_match = r.watchlist_match_reason_codes().unwrap();
 
         assert_have_same_elements(
             fs_matches,
@@ -306,10 +320,12 @@ mod tests {
         assert_eq!(dob_match, ExperianDobMatchReasonCodes::YobOnlyExactMatch);
         assert_eq!(address_and_name_match, ExperianAddressAndNameMatchReasonCodes::A1);
         assert_eq!(ssn_match, ExperianSSNReasonCodes::EA);
+        assert_eq!(watchlist_match, ExperianWatchlistReasonCodes::R1);
 
         let response_with_not_parsable_address = cross_core_response_with_fraud_shield_codes(
             ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch,
             ExperianSSNReasonCodes::EA,
+            ExperianWatchlistReasonCodes::R1,
         );
         let r2_not_parsable: CrossCoreAPIResponse =
             serde_json::from_value(response_with_not_parsable_address)

@@ -1,6 +1,6 @@
 use newtypes::{
     idology::IdologyScanOnboardingCaptureResult, ExperianAddressAndNameMatchReasonCodes,
-    ExperianSSNReasonCodes,
+    ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
 };
 
 pub fn test_idology_expectid_response() -> serde_json::Value {
@@ -1148,6 +1148,7 @@ pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> se
 pub fn cross_core_response_with_fraud_shield_codes(
     address_code: ExperianAddressAndNameMatchReasonCodes,
     ssn_code: ExperianSSNReasonCodes,
+    watchlist_code: ExperianWatchlistReasonCodes,
 ) -> serde_json::Value {
     serde_json::json!({
         "responseHeader": {
@@ -1762,7 +1763,7 @@ pub fn cross_core_response_with_fraud_shield_codes(
                         },
                         {
                             "name": "pmOFACVerificationResult",
-                            "value": "1"
+                            "value": watchlist_code.to_string(),
                         },
                         {
                             "name": "glbFSIndicator01",

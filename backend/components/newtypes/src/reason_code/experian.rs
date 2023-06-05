@@ -213,3 +213,83 @@ impl serde::Serialize for ExperianDobMatchReasonCodes {
         serializer.collect_str(self)
     }
 }
+
+vendor_reason_code_enum! {
+    #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
+    #[serde(try_from = "&str")]
+    pub enum ExperianWatchlistReasonCodes {
+        // Inquiry name not on OFAC list - no hit
+        #[ser = "1", description = "No match"]
+        #[footprint_reason_code = None]
+        R1,
+        // Inquiry name matches name on OFAC list
+        #[ser = "2", description = "Match to full name only"]
+        #[footprint_reason_code = None]
+        R2,
+        // Inquiry SSN matches SSN on OFAC list
+        #[ser = "3", description = "Match to SSN only"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R3,
+        // Inquiry name and SSN matches record on list
+        #[ser = "4", description = "Match to name and SSN"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R4,
+        // Inquiry name and DOB matches record on list
+        #[ser = "5", description = "Match to name and DOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R5,
+        // Inquiry name and YOB matches record on list
+        #[ser = "6", description = "Match to name and YOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R6,
+        // Inquiry SSN and DOB match record on list
+        #[ser = "7", description = "Match to SSN and DOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R7,
+        // Inquiry SSN and YOB match record on list
+        #[ser = "8", description = "Match to SSN and YOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R8,
+        // Inquiry name, SSN and DOB match record on list
+        #[ser = "9", description = "Match to name, SSN, and DOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R9,
+        // Inquiry name, SSN and YOB match record on list
+        #[ser = "10", description = "Match to name, SSN, and YOB"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitOfac)]
+        R10,
+        // Used for business searches only. Business name on inquiry matches record on list
+        #[ser = "11", description = "Match to company name only"]
+        #[footprint_reason_code = None]
+        R11,
+        // "Used for business searches only. Business address on inquiry matches record on list	"
+        #[ser = "12", description = "Match to company address only"]
+        #[footprint_reason_code = None]
+        R12,
+        // "Used for business searches only. Business name and address on inquiry matches record on list	"
+        #[ser = "13", description = "Match to company name and address"]
+        #[footprint_reason_code = None]
+        R13,
+        // Inquiry last name matches name on OFAC list. First name match may be first initial or similar
+        #[ser = "14", description = "Match to surname and first name"]
+        #[footprint_reason_code = None]
+        R14,
+        // Inquiry full name matches name on OFAC PLC list.
+        #[ser = "15", description = "Match to full name only - PLC NS List"]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitNonSdn)]
+        R15,
+        // Inquiry last name matches name on OFAC PLC list. Inquiry first name matches to first initial on OFAC PLC LisT
+        #[ser = "16", description = "Match to surname and first initial - PLC NS list"]
+        #[footprint_reason_code = None]
+        R16
+    }
+}
+
+impl serde::Serialize for ExperianWatchlistReasonCodes {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.collect_str(self)
+    }
+}
