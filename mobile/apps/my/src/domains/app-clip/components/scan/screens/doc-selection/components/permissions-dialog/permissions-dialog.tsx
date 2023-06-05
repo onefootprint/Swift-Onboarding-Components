@@ -1,7 +1,7 @@
 import { Box, Button, Dialog } from '@onefootprint/ui';
-import { Camera } from 'expo-camera';
 import * as Linking from 'expo-linking';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Camera } from 'react-native-vision-camera';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -14,12 +14,26 @@ const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
     'components.scan.doc-selection.permissions-dialog',
   );
   const [open, setOpen] = useState(false);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [permissions, setPermission] = useState(null);
+  const isNonDetermined = permissions === 'not-determined';
+
+  const setInitialPermissions = async () => {
+    try {
+      const newPermissions = await Camera.getCameraPermissionStatus();
+      setPermission(newPermissions);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    setInitialPermissions();
+  }, []);
 
   const handleAskPermission = async () => {
     try {
-      const response = await requestPermission();
-      if (response.granted) {
+      const response = await Camera.requestCameraPermission();
+      if (response === 'authorized') {
         setOpen(false);
       }
     } catch (error) {}
@@ -37,21 +51,26 @@ const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
     setOpen(true);
   };
 
-  const cta = permission?.canAskAgain
-    ? {
-        label: t('continue'),
-        onPress: handleAskPermission,
-      }
-    : {
-        label: t('open-settings'),
-        onPress: handleOpenSettings,
-      };
-
-  return permission && permission.granted ? (
+  return permissions == null || permissions === 'authorized' ? (
     <Box>{children}</Box>
   ) : (
     <>
-      <Dialog title={t('title')} open={open} onClose={handleClose} cta={cta}>
+      <Dialog
+        title={t('title')}
+        open={open}
+        onClose={handleClose}
+        cta={
+          isNonDetermined
+            ? {
+                label: t('continue'),
+                onPress: handleAskPermission,
+              }
+            : {
+                label: t('open-settings'),
+                onPress: handleOpenSettings,
+              }
+        }
+      >
         {t('description')}
       </Dialog>
       <Button onPress={handlePress}>{t('cta')}</Button>

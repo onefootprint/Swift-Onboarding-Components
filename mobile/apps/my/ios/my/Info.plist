@@ -17,7 +17,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.5.60</string>
+    <string>1.5.70</string>
     <key>ITSAppUsesNonExemptEncryption</key>  
     <false/>
     <key>CFBundleSignature</key>
@@ -57,7 +57,7 @@
     <key>UIRequiresFullScreen</key>
     <false/>
     <key>NSCameraUsageDescription</key>
-    <string>Need to access your camera to capture a photo add and update profile picture.</string>
+    <string>$(PRODUCT_NAME) needs access to your Camera.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Need to access your photo library to select a photo add and update profile picture</string>
     <key>UIStatusBarStyle</key>

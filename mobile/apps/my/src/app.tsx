@@ -1,3 +1,5 @@
+import 'react-native-reanimated';
+
 import { useFonts } from '@expo-google-fonts/dm-sans';
 import { QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';

@@ -80,6 +80,36 @@
           "open-settings": "Open settings"
         },
         "cta": "Continue"
+      },
+      "camera": {
+        "continue": "Continue",
+        "retake": "Retake",
+        "instructions": {
+          "steady": "Hold your device steady",
+          "capture": "Image will be captured automatically"
+        }
+      },
+      "drivers-license": {
+        "title": "Driver's license",
+        "subtitle": "Front side",
+        "instructions": {
+          "title": "Position the your id in the frame",
+          "description": "Make sure it's the front side."
+        }
+      },
+      "passport": {
+        "title": "Passport",
+        "subtitle": "Photo page",
+        "instructions": {
+          "title": "Position the your passport in the frame",
+          "description": "Make sure it's open in the photo page"
+        }
+      },
+      "selfie": {
+        "title": "Selfie",
+        "instructions": {
+          "title": "Position your face within the frame",
+        }
       }
     }
   },

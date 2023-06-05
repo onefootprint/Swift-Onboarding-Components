@@ -1,25 +1,25 @@
-import { IcoIdCard24 } from '@onefootprint/icons';
+import { IcoPassport24 } from '@onefootprint/icons';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
 import Camera, { CameraKind } from '../../components/camera';
 
-export type DriversLicenseProps = {
+export type PassportProps = {
   onSubmit: () => void;
 };
 
-const DriversLicense = ({ onSubmit }: DriversLicenseProps) => {
-  const { t } = useTranslation('components.scan.drivers-license');
+const Passport = ({ onSubmit }: PassportProps) => {
+  const { t } = useTranslation('components.scan.passport');
 
   return (
     <Camera
       instructions={{
         description: t('instructions.description'),
-        IconComponent: IcoIdCard24,
+        IconComponent: IcoPassport24,
         title: t('instructions.title'),
       }}
-      kind={CameraKind.DriversLicense}
+      kind={CameraKind.Passport}
       onSubmit={onSubmit}
       subtitle={t('subtitle')}
       title={t('title')}
@@ -27,4 +27,4 @@ const DriversLicense = ({ onSubmit }: DriversLicenseProps) => {
   );
 };
 
-export default DriversLicense;
+export default Passport;
