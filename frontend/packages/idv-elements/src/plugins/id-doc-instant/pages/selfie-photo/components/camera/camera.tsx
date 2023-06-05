@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoBolt24, IcoEmojiHappy24 } from '@onefootprint/icons';
 import { Button, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -7,6 +8,10 @@ import Flash from './components/flash';
 import Overlay from './components/overlay';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
+import getImageStringFromVideo from './utils/get-image-string-from-video';
+
+const MAX_VIDEO_HEIGHT = 288;
+const FACE_OUTLINE_BY_HEIGHT_RATIO = 0.7;
 
 type CameraProps = {
   onCapture: (image: string) => void;
@@ -53,22 +58,21 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
       return;
     }
 
-    setShowInstructions(false);
     setIsFlashing(true);
-    context.drawImage(
-      videoRef.current,
-      0,
-      0,
-      videoRef.current?.clientWidth,
-      videoRef.current?.clientHeight,
-    );
 
     // Capture the image when the flash starts but only call the onCapture
     // callback when flash animation is done This gives animation enough time
     // to complete. Taking the photo at the end of the animation would be
     // buggy if the user moved during the flash.
-    const imageString = canvasRef.current.toDataURL();
-    setImage(imageString);
+    const imageString = getImageStringFromVideo({
+      context,
+      videoRef,
+      canvasRef,
+      desiredImageWidth: videoRef.current?.clientWidth,
+      desiredImageHeight: videoRef.current?.clientHeight,
+    });
+
+    setImage(imageString || undefined);
   };
 
   const clearCanvas = () => {
@@ -84,6 +88,7 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
 
   const handleFlashEnd = () => {
     if (image) {
+      setShowInstructions(false);
       onCapture(image);
     }
     clearCanvas();
@@ -102,6 +107,7 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
             ref={videoRef as React.Ref<HTMLVideoElement>}
             hidden={!isVideoPlaying}
             onCanPlay={handleCanPlay}
+            maxHeight={MAX_VIDEO_HEIGHT}
             autoPlay
             playsInline
             muted
@@ -109,6 +115,7 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
           <Overlay
             width={videoSize?.width ?? 0}
             height={videoSize?.height ?? 0}
+            faceOutlineByHeightRatio={FACE_OUTLINE_BY_HEIGHT_RATIO}
           />
           <Canvas
             ref={canvasRef as React.Ref<HTMLCanvasElement>}
@@ -117,7 +124,26 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
           />
           <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
           {showInstructions && (
-            <Typography variant="label-3">{t('instructions')}</Typography>
+            <InstructionsContainer>
+              <Typography
+                variant="label-4"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                }}
+              >
+                <IcoEmojiHappy24 />
+                {t('instructions.position')}
+              </Typography>
+              <Typography
+                variant="label-4"
+                sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+              >
+                <IcoBolt24 />
+                {t('instructions.readiness')}
+              </Typography>
+            </InstructionsContainer>
           )}
         </VideoContainer>
         <Button fullWidth onClick={handleClick} variant="primary">
@@ -159,10 +185,12 @@ const VideoContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    width: 100%;
     flex-grow: 1;
     flex-direction: column;
+    width: calc(100% + ${theme.spacing[8]});
     row-gap: ${theme.spacing[5]};
+    margin-left: calc(-1 * ${theme.spacing[5]});
+    margin-right: calc(-1 * ${theme.spacing[5]});
   `}
 `;
 
@@ -171,17 +199,31 @@ export const Canvas = styled.canvas`
   position: absolute;
 `;
 
-export const Video = styled.video`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    max-height: 100%;
+const Video = styled.video<{ maxHeight: number }>`
+  ${({ maxHeight }) => css`
+    max-height: ${maxHeight}px;
     width: 100%;
     transform: scaleX(-1);
+    object-fit: cover; // Should be "cover" for the math to work
 
     &::-webkit-media-controls-play-button {
       display: none !important;
       -webkit-appearance: none;
     }
+  `}
+`;
+
+const InstructionsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: ${theme.spacing[5]};
+    gap: ${theme.spacing[6]};
+    background-color: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.default};
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 

@@ -130,12 +130,15 @@
     },
     "selfie-photo": {
       "camera": {
-        "instructions": "Center your face in the area",
+        "instructions": {
+          "position": "Position your face within the frame",
+          "readiness": "Take the photo when you're ready"
+        },
         "take": "Take photo"
       },
       "preview": {
         "retake": "Retake",
-        "confirm": "Use photo"
+        "confirm": "Confirm"
       }
     },
     "selfie-retry-prompt": {

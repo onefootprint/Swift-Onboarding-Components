@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { NavigationHeader } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import Camera from './components/camera';

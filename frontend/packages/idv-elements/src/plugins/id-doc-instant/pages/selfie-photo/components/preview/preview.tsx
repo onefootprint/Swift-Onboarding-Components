@@ -59,11 +59,14 @@ const Container = styled.div`
 `;
 
 const PreviewContainer = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  flex-grow: 1;
+  ${({ theme }) => css`
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    padding-bottom: ${theme.spacing[11]};
+  `}
 `;
 
 const ButtonsContainer = styled.div`
@@ -79,8 +82,7 @@ const ButtonsContainer = styled.div`
 
 const ImagePreview = styled.img`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    max-height: 100%;
+    border-radius: ${theme.borderRadius.large};
     width: 100%;
     transform: scaleX(-1); // Mirror images feel more natural to the user
   `}
