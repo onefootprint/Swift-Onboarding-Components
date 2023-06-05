@@ -36,7 +36,7 @@ const MultiSection = ({
       {sections.map((section: SectionProps, index: number) => (
         <React.Fragment key={section.title}>
           <Section
-            editLabel={section.editLabel}
+            actions={section.actions}
             key={section.title}
             title={section.title}
             content={section.content}

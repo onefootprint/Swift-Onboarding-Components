@@ -90,7 +90,6 @@ const BeneficialOwnersSection = () => {
   return editing ? (
     <Section
       title={t('title')}
-      editLabel={allT('pages.confirm.summary.edit')}
       IconComponent={IcoUserCircle24}
       content={
         <BeneficialOwners

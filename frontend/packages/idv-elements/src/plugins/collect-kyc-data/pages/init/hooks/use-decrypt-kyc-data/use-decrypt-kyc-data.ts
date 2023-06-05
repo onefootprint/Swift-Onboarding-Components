@@ -77,7 +77,11 @@ const useDecryptKycData = ({
       UserTokenScope.sensitiveProfile,
     );
 
-    if (!canDecryptBasic && !canDecryptSensitive) {
+    // If can't decrypt or there is nothing to decrypt, return empty data
+    if (
+      populatedDis.length === 0 ||
+      (!canDecryptBasic && !canDecryptSensitive)
+    ) {
       handleDecryptedData({});
       return;
     }

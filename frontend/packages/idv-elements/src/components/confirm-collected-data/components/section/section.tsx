@@ -11,7 +11,7 @@ export type SectionAction = {
 
 export type SectionProps = {
   title: string;
-  actions: SectionAction[];
+  actions?: SectionAction[];
   IconComponent?: Icon;
   content: React.ReactNode;
   testID?: string;
@@ -32,17 +32,19 @@ const Section = ({
           {title}
         </Typography>
       </TitleContainer>
-      <ActionsContainer>
-        {actions.map(({ label, onClick, isLoading }) =>
-          isLoading ? (
-            <LoadingIndicator key={label} />
-          ) : (
-            <LinkButton key={label} onClick={onClick} disabled={isLoading}>
-              {label}
-            </LinkButton>
-          ),
-        )}
-      </ActionsContainer>
+      {actions?.length && (
+        <ActionsContainer>
+          {actions.map(({ label, onClick, isLoading }) =>
+            isLoading ? (
+              <LoadingIndicator key={label} />
+            ) : (
+              <LinkButton key={label} onClick={onClick} disabled={isLoading}>
+                {label}
+              </LinkButton>
+            ),
+          )}
+        </ActionsContainer>
+      )}
     </Header>
     <Content>{content}</Content>
   </Container>

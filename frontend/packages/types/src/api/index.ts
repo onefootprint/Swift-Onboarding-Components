@@ -1,7 +1,6 @@
 export * from './biometric-register';
 export * from './business';
 export * from './business-data';
-export * from './users-vault';
 export * from './consent';
 export * from './create-org-member';
 export * from './create-org-role';
@@ -69,3 +68,4 @@ export * from './user-email-verify';
 export * from './user-token';
 export * from './user-update';
 export * from './users-update-annotation';
+export * from './users-vault';

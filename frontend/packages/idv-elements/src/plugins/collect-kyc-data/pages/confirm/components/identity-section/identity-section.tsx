@@ -30,6 +30,8 @@ const IdentitySection = () => {
   const ssn4 = data[IdDI.ssn4];
   const ssn4DisplayVal = getDisplayValue(ssn4);
 
+  const isSsnEncrypted = ssn4?.scrubbed || ssn9?.scrubbed;
+
   if (ssn9DisplayVal) {
     identity.push({
       text: t('identity.ssn9'),
@@ -94,6 +96,11 @@ const IdentitySection = () => {
       },
     });
 
+    // If the user has already decrypted their SSN, we don't need to do it again
+    if (!isSsnEncrypted) {
+      return;
+    }
+
     const fields = ssn9DisplayVal ? [IdDI.ssn9] : [IdDI.ssn4];
     decryptUserMutation.mutate(
       {
@@ -127,7 +134,6 @@ const IdentitySection = () => {
     });
   }
 
-  const isSsnEncrypted = ssn4?.scrubbed || ssn9?.scrubbed;
   const shouldShowReveal = isSsnEncrypted && needsStepUp && canStepUp;
   if (isStepUpLoading || shouldShowReveal) {
     actions.unshift({

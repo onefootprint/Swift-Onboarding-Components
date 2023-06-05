@@ -27,7 +27,9 @@ import { Layout } from 'src/components/layout';
 import { PluginContext } from '../base-plugin';
 import CollectKycData from './index';
 import {
+  withIdentify,
   withOnboardingConfig,
+  withUserToken,
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
@@ -121,9 +123,11 @@ describe('<CollectKycData />', () => {
 
   describe('when there are missing attributes', () => {
     beforeEach(() => {
+      withUserToken();
       withOnboardingConfig();
       withUserVaultValidate();
       withUserVault();
+      withIdentify();
     });
 
     it('takes user through all of the pages', async () => {
