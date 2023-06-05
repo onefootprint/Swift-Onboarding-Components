@@ -31,5 +31,5 @@ fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeature
 #[test_case(idology_features(vec![FootprintReasonCode::SsnIssuedPriorToDob]) => Some(Action::Fail))]
 
 fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> Option<Action> {
-    evaluate_onboarding_rules(vec![Box::new(idology_base_rule_set())], &idology_features).triggered_action
+    evaluate_onboarding_rules(vec![idology_base_rule_set()], &idology_features).triggered_action
 }

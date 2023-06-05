@@ -115,7 +115,6 @@ mod tests {
     #[test_case(middesk_features(vec![FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch]) => Some(Action::Fail); "no tin match")]
     #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch, FootprintReasonCode::BusinessNameWatchlistHit]) => Some(Action::Fail); "watchlist hit")]
     fn test_middesk_base_rule_set(kyb_fv: KybFeatureVector) -> Option<Action> {
-        rules_engine::evaluate_onboarding_rules(vec![Box::new(middesk_base_rule_set())], &kyb_fv)
-            .triggered_action
+        rules_engine::evaluate_onboarding_rules(vec![middesk_base_rule_set()], &kyb_fv).triggered_action
     }
 }

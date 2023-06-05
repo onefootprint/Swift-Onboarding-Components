@@ -8,7 +8,7 @@ use crate::{
 
         rule::{
             self, kyb_rules,
-            rule_set::{Action, EvaluateRuleSet},
+            rule_set::{Action, RuleSet},
         },
     },
     errors::ApiResult,
@@ -76,9 +76,9 @@ impl KybFeatureVector {
 
 impl FeatureVector for KybFeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
-        let middesk_rules: Vec<Box<dyn EvaluateRuleSet<KybFeatureVector>>> = vec![
-            Box::new(kyb_rules::middesk_base_rule_set()),
-            Box::new(kyb_rules::bos_pass_kyc_rule_set()),
+        let middesk_rules: Vec<RuleSet<KybFeatureVector>> = vec![
+            kyb_rules::middesk_base_rule_set(),
+            kyb_rules::bos_pass_kyc_rule_set(),
         ];
 
         let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);

@@ -23,13 +23,8 @@ pub struct RuleSet<T: Clone> {
     pub rules: Vec<Rule<T>>,
 }
 
-/// Trait representing the evaluation of a RuleSet
-pub trait EvaluateRuleSet<T> {
-    fn evaluate(&self, rule_input: &T) -> RuleSetResult;
-}
-
-impl<T: Clone> EvaluateRuleSet<T> for RuleSet<T> {
-    fn evaluate(&self, rule_input: &T) -> RuleSetResult {
+impl<T: Clone> RuleSet<T> {
+    pub fn evaluate(&self, rule_input: &T) -> RuleSetResult {
         // for the rules in the rule set, evaluate each rule
         let evaluated = self.rules.iter().cloned().map(|rule| RuleEvaluationSummary {
             name: rule.name,

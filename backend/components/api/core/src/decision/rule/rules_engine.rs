@@ -1,17 +1,14 @@
 use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 
 use super::{
-    rule_set::{Action, EvaluateRuleSet, RuleSetResult},
+    rule_set::{Action, RuleSet, RuleSetResult},
     *,
 };
 
 /// Evaluate a list of rulesets for a given input type T
-pub fn evaluate_onboarding_rules<T>(
-    rulesets: Vec<Box<dyn EvaluateRuleSet<T>>>,
-    rule_input: &T,
-) -> OnboardingEvaluationResult
+pub fn evaluate_onboarding_rules<T>(rulesets: Vec<RuleSet<T>>, rule_input: &T) -> OnboardingEvaluationResult
 where
-    T: FeatureSet,
+    T: FeatureSet + Clone,
 {
     let evaluated_rulesets: Vec<RuleSetResult> = rulesets
         .into_iter()
@@ -78,7 +75,7 @@ mod tests {
             triggered_action: Some(Action::Fail),
         };
         let result = evaluate_onboarding_rules(
-            vec![Box::new(test_ruleset_a()), Box::new(test_ruleset_b())],
+            vec![test_ruleset_a(), test_ruleset_b()],
             &TestFeatures::new("hello"),
         );
 

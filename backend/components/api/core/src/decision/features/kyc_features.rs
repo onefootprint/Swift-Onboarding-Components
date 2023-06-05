@@ -4,7 +4,7 @@ use idv::ParsedResponse;
 
 use crate::decision::{
     onboarding::{Decision, DecisionReasonCodes, FeatureSet},
-    rule::rule_set::Action,
+    rule::rule_set::{Action, RuleSet},
     Error, RuleError,
 };
 use itertools::Itertools;
@@ -14,7 +14,7 @@ use strum::IntoEnumIterator;
 use crate::{
     decision::{
         onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        rule::{self, onboarding_rules, rule_set::EvaluateRuleSet, RuleName},
+        rule::{self, onboarding_rules, RuleName},
         vendor::vendor_result::VendorResult,
     },
     errors::ApiResult,
@@ -255,10 +255,8 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 impl FeatureVector for KycFeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // The set of rules that determine if a user passes onboarding
-        let idology_rules: Vec<Box<dyn EvaluateRuleSet<IDologyFeatures>>> =
-            vec![Box::new(onboarding_rules::idology_base_rule_set())];
-        let experian_rules: Vec<Box<dyn EvaluateRuleSet<ExperianFeatures>>> =
-            vec![Box::new(onboarding_rules::experian_rules())];
+        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![onboarding_rules::idology_base_rule_set()];
+        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![onboarding_rules::experian_rules()];
 
         // Evaluate rules
         let idology_rule_result = self.idology_features.as_ref().map(|f| {
