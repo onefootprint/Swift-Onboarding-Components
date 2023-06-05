@@ -5,7 +5,8 @@ use newtypes::{FootprintReasonCode, VerificationResultId};
 use crate::decision::{
     features::idology_expectid::IDologyFeatures,
     rule::{
-        onboarding_rules::idology_base_rule_set, rule_set::Action, rules_engine::evaluate_onboarding_rules,
+        rule_set::Action, rule_sets::kyc::idology_base_rule_set,
+        rules_engine::evaluate_onboarding_rules,
     },
 };
 use test_case::test_case;

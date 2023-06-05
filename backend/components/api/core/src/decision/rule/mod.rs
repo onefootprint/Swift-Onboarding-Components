@@ -1,9 +1,8 @@
 use std::string::ToString;
 use strum::Display;
 
-pub mod kyb_rules;
-pub mod onboarding_rules;
 pub mod rule_set;
+pub mod rule_sets;
 pub mod rules_engine;
 #[cfg(test)]
 pub mod test_fixtures;

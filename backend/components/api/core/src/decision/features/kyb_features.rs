@@ -4,11 +4,13 @@ use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, Verificat
 
 use crate::{
     decision::{
-        onboarding::{Decision, DecisionReasonCodes, FeatureSet, FeatureVector, OnboardingRulesDecisionOutput},
-
+        onboarding::{
+            Decision, DecisionReasonCodes, FeatureSet, FeatureVector, OnboardingRulesDecisionOutput,
+        },
         rule::{
-            self, kyb_rules,
+            self,
             rule_set::{Action, RuleSet},
+            rule_sets,
         },
     },
     errors::ApiResult,
@@ -77,8 +79,8 @@ impl KybFeatureVector {
 impl FeatureVector for KybFeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         let middesk_rules: Vec<RuleSet<KybFeatureVector>> = vec![
-            kyb_rules::middesk_base_rule_set(),
-            kyb_rules::bos_pass_kyc_rule_set(),
+            rule_sets::kyb::middesk_base_rule_set(),
+            rule_sets::kyb::bos_pass_kyc_rule_set(),
         ];
 
         let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);

@@ -17,7 +17,7 @@ use strum::IntoEnumIterator;
 use crate::{
     decision::{
         onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        rule::{self, onboarding_rules, RuleName},
+        rule::{self, rule_sets, RuleName},
         vendor::vendor_result::VendorResult,
     },
     errors::ApiResult,
@@ -256,8 +256,8 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 impl FeatureVector for KycFeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // The set of rules that determine if a user passes onboarding
-        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![onboarding_rules::idology_base_rule_set()];
-        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![onboarding_rules::experian_rules()];
+        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![rule_sets::kyc::idology_base_rule_set()];
+        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![rule_sets::kyc::experian_rules()];
 
         // Evaluate rules
         let idology_rule_result = self

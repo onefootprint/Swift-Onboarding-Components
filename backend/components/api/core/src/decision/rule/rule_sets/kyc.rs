@@ -1,10 +1,12 @@
-use crate::decision::features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
-
-use super::{
-    rule_set::{Action, Rule, RuleSet},
-    RuleName, RuleSetName,
+use crate::decision::{
+    features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures},
+    rule::{
+        rule_set::{Action, Rule, RuleSet},
+        RuleName,
+    },
 };
-use newtypes::FootprintReasonCode;
+
+use newtypes::{FootprintReasonCode, RuleSetName};
 
 pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
     let rules = vec![
@@ -132,16 +134,33 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
 }
 
 pub fn experian_rules() -> RuleSet<ExperianFeatures> {
-    let rule = Rule {
-        rule: |f: &ExperianFeatures| {
-            f.footprint_reason_codes
-                .contains(&FootprintReasonCode::IdNotLocated)
+    let rules = vec![
+        Rule {
+            rule: |f: &ExperianFeatures| {
+                f.footprint_reason_codes
+                    .contains(&FootprintReasonCode::IdNotLocated)
+            },
+            name: RuleName::IdNotLocated,
+            action: Action::Fail,
         },
-        name: RuleName::IdNotLocated,
-        action: Action::Fail,
-    };
+        Rule {
+            rule: |f: &ExperianFeatures| {
+                f.footprint_reason_codes.iter().any(|rc| {
+                    vec![
+                        FootprintReasonCode::WatchlistHitOfac,
+                        FootprintReasonCode::WatchlistHitNonSdn,
+                        FootprintReasonCode::WatchlistHitPep,
+                    ]
+                    .contains(rc)
+                })
+            },
+            name: RuleName::WatchlistHit,
+            action: Action::Fail,
+        },
+    ];
+
     RuleSet {
-        rules: vec![rule],
+        rules,
         name: RuleSetName::ExperianRules,
     }
 }

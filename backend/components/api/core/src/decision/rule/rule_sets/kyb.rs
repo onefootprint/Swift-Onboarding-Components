@@ -1,10 +1,10 @@
 use crate::decision::features::kyb_features::KybFeatureVector;
 
-use super::{
+use crate::decision::rule::{
     rule_set::{Action, Rule, RuleSet},
-    RuleName, RuleSetName,
+    RuleName,
 };
-use newtypes::{DecisionStatus, FootprintReasonCode};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleSetName};
 
 pub fn bos_pass_kyc_rule_set() -> RuleSet<KybFeatureVector> {
     let rules = vec![Rule {

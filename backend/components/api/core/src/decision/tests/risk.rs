@@ -1,7 +1,7 @@
 use crate::decision::onboarding::{Decision, FeatureVector};
 use crate::decision::{
     features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
-    onboarding::OnboardingRulesDecisionOutput, rule::onboarding_rules, rule::RuleName,
+    onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName,
 };
 use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
 use std::str::FromStr;
@@ -13,7 +13,7 @@ fn create_onboarding_rules_decision_output(
     expected_should_commit: bool,
     expected_triggered_rules: Vec<RuleName>,
 ) -> OnboardingRulesDecisionOutput {
-    let base = onboarding_rules::idology_base_rule_set()
+    let base = rule_sets::kyc::idology_base_rule_set()
         .rules
         .into_iter()
         .map(|r| r.name);
