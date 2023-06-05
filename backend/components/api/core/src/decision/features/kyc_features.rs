@@ -3,7 +3,7 @@
 use idv::ParsedResponse;
 
 use crate::decision::{
-    onboarding::{Decision, DecisionReasonCodes},
+    onboarding::{Decision, DecisionReasonCodes, FeatureSet},
     rule::rule_set::Action,
     Error, RuleError,
 };
@@ -263,7 +263,7 @@ impl FeatureVector for KycFeatureVector {
         // Evaluate rules
         let idology_rule_result = self.idology_features.as_ref().map(|f| {
             OnboardingEvaluationResultWithVendorAPI::new(
-                VendorAPI::IdologyExpectID,
+                f.vendor_api(),
                 rule::rules_engine::evaluate_onboarding_rules(idology_rules, f),
             )
         });
@@ -271,7 +271,7 @@ impl FeatureVector for KycFeatureVector {
         // TODO: add in experian once we have rules for them
         self.experian_features.as_ref().map(|e| {
             OnboardingEvaluationResultWithVendorAPI::new(
-                VendorAPI::ExperianPreciseID,
+                e.vendor_api(),
                 rule::rules_engine::evaluate_onboarding_rules(experian_rules, e),
             )
         });

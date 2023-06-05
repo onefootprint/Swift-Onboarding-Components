@@ -1,4 +1,4 @@
-use crate::decision::rule::RULE_LOG_LINE;
+use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 
 use super::{
     rule_set::{Action, EvaluateRuleSet, RuleSetResult},
@@ -9,7 +9,10 @@ use super::{
 pub fn evaluate_onboarding_rules<T>(
     rulesets: Vec<Box<dyn EvaluateRuleSet<T>>>,
     rule_input: &T,
-) -> OnboardingEvaluationResult {
+) -> OnboardingEvaluationResult
+where
+    T: FeatureSet,
+{
     let evaluated_rulesets: Vec<RuleSetResult> = rulesets
         .into_iter()
         .map(|rs| {

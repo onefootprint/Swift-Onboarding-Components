@@ -1,3 +1,7 @@
+use newtypes::{FootprintReasonCode, VerificationResultId};
+
+use crate::decision::onboarding::FeatureSet;
+
 use super::{
     rule_set::{Action, Rule, RuleSet},
     RuleName, RuleSetName,
@@ -6,10 +10,30 @@ use super::{
 #[derive(Clone)]
 pub struct TestFeatures {
     pub name: String,
+    pub frcs: Vec<FootprintReasonCode>,
+    pub vres: VerificationResultId,
+}
+
+impl FeatureSet for TestFeatures {
+    fn footprint_reason_codes(&self) -> &Vec<newtypes::FootprintReasonCode> {
+        &self.frcs
+    }
+
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        newtypes::VendorAPI::TwilioLookupV2
+    }
+
+    fn verification_result_id(&self) -> &newtypes::VerificationResultId {
+        &self.vres
+    }
 }
 impl TestFeatures {
     pub fn new(s: &str) -> Self {
-        TestFeatures { name: s.into() }
+        TestFeatures {
+            name: s.into(),
+            frcs: vec![],
+            vres: VerificationResultId::from("vr".to_string()),
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 use idv::idology::expectid::response::ExpectIDResponse;
-use newtypes::{FootprintReasonCode, VerificationResultId};
+use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
+
+use crate::decision::onboarding::FeatureSet;
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -8,6 +10,18 @@ pub struct IDologyFeatures {
     pub id_number_for_scan_required: Option<u64>,
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
+}
+
+impl FeatureSet for IDologyFeatures {
+    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
+        &self.footprint_reason_codes
+    }
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::IdologyExpectID
+    }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.verification_result
+    }
 }
 
 impl IDologyFeatures {

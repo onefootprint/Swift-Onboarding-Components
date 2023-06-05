@@ -1,10 +1,11 @@
 use db::models::onboarding_decision::OnboardingDecision;
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
 
 use crate::{
     decision::{
-        onboarding::{Decision, DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
+        onboarding::{Decision, DecisionReasonCodes, FeatureSet, FeatureVector, OnboardingRulesDecisionOutput},
+
         rule::{
             self, kyb_rules,
             rule_set::{Action, EvaluateRuleSet},
@@ -29,6 +30,18 @@ impl MiddeskFeatures {
             verification_result_id: verification_result_id.clone(),
             footprint_reason_codes,
         }
+    }
+}
+
+impl FeatureSet for KybFeatureVector {
+    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
+        &self.middesk_features.footprint_reason_codes
+    }
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::MiddeskBusinessUpdateWebhook
+    }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.middesk_features.verification_result_id
     }
 }
 
