@@ -7,7 +7,7 @@ import { MissingPermissionsSheetProvider } from './components/missing-permission
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { ImageTypes } from './constants/image-types';
-import { IdDocProps } from './id-doc.types';
+import { IdDocProps } from './types';
 import Router from './pages/router';
 import { MachineContext } from './utils/state-machine';
 

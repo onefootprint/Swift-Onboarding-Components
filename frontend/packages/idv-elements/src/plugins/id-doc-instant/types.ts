@@ -2,7 +2,7 @@ import { IdDocRequirement } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
-type IdDocCustomData = {
+export type IdDocCustomData = {
   requirement: IdDocRequirement;
 };
 
