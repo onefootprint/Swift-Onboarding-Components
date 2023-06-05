@@ -117,6 +117,51 @@ export function CreateAppCloudfrontDistribution(
     },
   );
 
+  // Create the WAF (Web Application Firewall)
+
+  function awsManagedRule(name: string, priority: number, sample: boolean) {
+    return {
+      name: name,
+      priority: priority,
+      overrideAction: {
+        count: {},
+      },
+      statement: {
+        managedRuleGroupStatement: {
+          name: name,
+          vendorName: 'AWS',
+        },
+      },
+      visibilityConfig: {
+        metricName: name,
+        cloudwatchMetricsEnabled: true,
+        sampledRequestsEnabled: sample,
+      },
+    };
+  }
+
+  const waf = new aws.wafv2.WebAcl('app-cdb-waf', {
+    name: 'AppCDNWAF',
+    visibilityConfig: {
+      metricName: 'appCdnWAF',
+      cloudwatchMetricsEnabled: true,
+      sampledRequestsEnabled: false,
+    },
+    defaultAction: {
+      allow: {
+        customRequestHandling: {
+          insertHeaders: [{ name: 'cloudfront-waf-action', value: 'allow' }],
+        },
+      },
+    },
+    scope: 'CLOUDFRONT',
+    rules: [
+      awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0, true),
+      awsManagedRule('AWSManagedRulesCommonRuleSet', 1, false),
+      awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2, true),
+    ],
+  });
+
   const cdn = new aws.cloudfront.Distribution('app-cdn', {
     enabled: true,
     aliases: [config.domain],
@@ -167,6 +212,7 @@ export function CreateAppCloudfrontDistribution(
         restrictionType: 'none',
       },
     },
+    webAclId: waf.arn,
   });
 
   new route53.Record(`cdn-record`, {
