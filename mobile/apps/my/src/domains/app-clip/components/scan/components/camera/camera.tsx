@@ -2,15 +2,14 @@ import { IcoBolt24, Icon, IcoSmartphone224 } from '@onefootprint/icons';
 import styled, { css, useTheme } from '@onefootprint/styled';
 import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
-import { Dimensions } from 'react-native';
-import Reanimated, {
+import { Dimensions, ViewStyle } from 'react-native';
+import {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import {
   Camera as VisionCamera,
-  Frame,
   PhotoFile,
   useCameraDevices,
   useFrameProcessor,
@@ -23,40 +22,32 @@ import processDocument from './frame-processors/process-document';
 
 let timerId: NodeJS.Timeout | null = null;
 
-export enum CameraKind {
-  Id = 'id',
-  DriversLicense = 'drivers-license',
-  Selfie = 'selfie',
-  Passport = 'passport',
-}
-
 type CameraProps = {
+  type: 'front' | 'back';
   title: string;
   subtitle?: string;
-  kind: CameraKind;
   instructions: {
     description?: string;
     IconComponent: Icon;
     title: string;
   };
   onSubmit: () => void;
+  Frame?: ({ style }: { style: ViewStyle }) => JSX.Element;
 };
 
 const Camera = ({
+  type,
   title,
   subtitle,
-  kind,
   instructions,
   onSubmit,
+  Frame,
 }: CameraProps) => {
-  // TODO:
-  console.log(kind);
-
   const theme = useTheme();
   const { t } = useTranslation('components.scan.camera');
   const camera = useRef<VisionCamera>(null);
   const devices = useCameraDevices();
-  const device = devices.back;
+  const device = devices[type];
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
   const detector = useSharedValue(false);
   const frameStyles = useAnimatedStyle(
@@ -82,7 +73,7 @@ const Camera = ({
   };
 
   const frameProcessor = useFrameProcessor(
-    (frame: Frame) => {
+    frame => {
       'worklet';
 
       const options = {
@@ -127,11 +118,11 @@ const Camera = ({
               {photo && <Preview source={{ uri: photo.path }} />}
               {showCamera && (
                 <>
-                  <DocFrame style={frameStyles} />
+                  {Frame && <Frame style={frameStyles} />}
                   <StyledCamera
                     device={device}
                     frameProcessor={frameProcessor}
-                    isActive={true}
+                    isActive
                     photo
                     ref={camera}
                   />
@@ -181,17 +172,6 @@ const CameraContainer = styled.View`
     margin-left: -${theme.spacing[5]};
     position: relative;
     width: ${windowWidth}px;
-  `}
-`;
-
-const DocFrame = styled(Reanimated.View)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.large};
-    border: ${theme.borderWidth[2]} solid ${theme.borderColor.primary};
-    height: 220px;
-    position: absolute;
-    width: ${windowWidth - 32}px;
-    z-index: 1;
   `}
 `;
 

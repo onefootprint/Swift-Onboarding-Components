@@ -3,7 +3,7 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera, { CameraKind } from '../../components/camera';
+import Camera from '../../components/camera';
 
 export type DriversLicenseProps = {
   onSubmit: () => void;
@@ -14,12 +14,12 @@ const DriversLicense = ({ onSubmit }: DriversLicenseProps) => {
 
   return (
     <Camera
+      type="back"
       instructions={{
         description: t('instructions.description'),
         IconComponent: IcoIdCard24,
         title: t('instructions.title'),
       }}
-      kind={CameraKind.DriversLicense}
       onSubmit={onSubmit}
       subtitle={t('subtitle')}
       title={t('title')}

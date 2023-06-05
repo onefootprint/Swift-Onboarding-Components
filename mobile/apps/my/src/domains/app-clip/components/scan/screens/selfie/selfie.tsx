@@ -3,7 +3,8 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera, { CameraKind } from '../../components/camera';
+import Camera from '../../components/camera';
+import Frame from './components/frame';
 
 export type SelfieProps = {
   onSubmit: () => void;
@@ -14,13 +15,14 @@ const Selfie = ({ onSubmit }: SelfieProps) => {
 
   return (
     <Camera
+      Frame={Frame}
       instructions={{
         IconComponent: IcoEmojiHappy24,
         title: t('instructions.title'),
       }}
-      kind={CameraKind.Passport}
       onSubmit={onSubmit}
       title={t('title')}
+      type="front"
     />
   );
 };
