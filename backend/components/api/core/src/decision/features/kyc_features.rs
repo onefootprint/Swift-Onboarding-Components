@@ -3,8 +3,11 @@
 use idv::ParsedResponse;
 
 use crate::decision::{
-    onboarding::{Decision, DecisionReasonCodes, FeatureSet},
-    rule::rule_set::{Action, RuleSet},
+    onboarding::{Decision, DecisionReasonCodes},
+    rule::{
+        rule_set::{Action, RuleSet},
+        rules_engine::OnboardingEvaluationResult,
+    },
     Error, RuleError,
 };
 use itertools::Itertools;
@@ -21,11 +24,9 @@ use crate::{
 };
 
 use super::{
-    experian::ExperianFeatures,
-    idology_expectid::IDologyFeatures,
-    idology_scan_onboarding::IDologyScanOnboardingFeatures,
-    socure_idplus::SocureFeatures,
-    waterfall_logic::{OnboardingEvaluationResultWithVendorAPI, WaterFallLogic},
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures,
+    idology_scan_onboarding::IDologyScanOnboardingFeatures, socure_idplus::SocureFeatures,
+    waterfall_logic::get_kyc_rules_result,
 };
 
 // TODO!
@@ -259,24 +260,19 @@ impl FeatureVector for KycFeatureVector {
         let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![onboarding_rules::experian_rules()];
 
         // Evaluate rules
-        let idology_rule_result = self.idology_features.as_ref().map(|f| {
-            OnboardingEvaluationResultWithVendorAPI::new(
-                f.vendor_api(),
-                rule::rules_engine::evaluate_onboarding_rules(idology_rules, f),
-            )
-        });
+        let idology_rule_result = self
+            .idology_features
+            .as_ref()
+            .map(|f| rule::rules_engine::evaluate_onboarding_rules(idology_rules, f));
 
         // TODO: add in experian once we have rules for them
-        self.experian_features.as_ref().map(|e| {
-            OnboardingEvaluationResultWithVendorAPI::new(
-                e.vendor_api(),
-                rule::rules_engine::evaluate_onboarding_rules(experian_rules, e),
-            )
-        });
+        self.experian_features
+            .as_ref()
+            .map(|e| rule::rules_engine::evaluate_onboarding_rules(experian_rules, e));
 
         // TODO: add experian in here
         // TODO: add Ord so we have a vendor preference
-        let rule_results: Vec<OnboardingEvaluationResultWithVendorAPI> =
+        let rule_results: Vec<OnboardingEvaluationResult> =
             vec![idology_rule_result].into_iter().flatten().collect();
         if rule_results.is_empty() {
             Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
@@ -284,7 +280,7 @@ impl FeatureVector for KycFeatureVector {
 
         // TODO: move reason code creation and use returned VendorAPI
 
-        let result = WaterFallLogic::get_kyc_rules_result(rule_results).map_err(Error::from)?;
+        let result = get_kyc_rules_result(rule_results).map_err(Error::from)?;
         // If we no rules that triggered, we consider that a pass
         let decision_status = match result.triggered_action.as_ref() {
             Some(a) => match a {

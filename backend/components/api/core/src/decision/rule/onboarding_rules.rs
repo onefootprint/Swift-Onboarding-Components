@@ -131,63 +131,6 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
     }
 }
 
-pub fn idology_conservative_rule_set() -> RuleSet<IDologyFeatures> {
-    let rules = vec![
-        Rule {
-            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FootprintReasonCode::ThinFile) },
-            name: RuleName::ThinFile,
-            action: Action::Fail,
-        },
-        Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::AddressDoesNotMatch)
-                }
-            },
-            name: RuleName::AddressDoesNotMatch,
-            action: Action::Fail,
-        },
-        Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes.iter().any(|rc| {
-                        vec![
-                            FootprintReasonCode::AddressLocatedIsNotStandardCampground,
-                            FootprintReasonCode::AddressLocatedIsNotStandardCollege,
-                            FootprintReasonCode::AddressLocatedIsNotStandardGeneralDelivery,
-                            FootprintReasonCode::AddressLocatedIsNotStandardHospital,
-                            FootprintReasonCode::AddressLocatedIsNotStandardHotel,
-                            FootprintReasonCode::AddressLocatedIsNotStandardMailDrop,
-                            FootprintReasonCode::AddressLocatedIsNotStandardPrison,
-                            FootprintReasonCode::AddressLocatedIsNotStandardUniversity,
-                            FootprintReasonCode::AddressLocatedIsNotStandardUspo,
-                        ]
-                        .contains(rc)
-                    })
-                }
-            },
-            name: RuleName::AddressLocatedIsWarm,
-            action: Action::Fail,
-        },
-        Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::AddressLocatedIsHighRiskAddress)
-                }
-            },
-            name: RuleName::AddressLocatedIsHighRiskAddress,
-            action: Action::Fail,
-        },
-    ];
-
-    RuleSet {
-        rules,
-        name: RuleSetName::IdologyConservativeFailingRules,
-    }
-}
-
 pub fn experian_rules() -> RuleSet<ExperianFeatures> {
     let rule = Rule {
         rule: |f: &ExperianFeatures| {

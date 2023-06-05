@@ -1,3 +1,5 @@
+use newtypes::VendorAPI;
+
 use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 
 use super::{
@@ -48,6 +50,7 @@ where
         rules_triggered,
         rules_not_triggered,
         triggered_action,
+        vendor_api: rule_input.vendor_api(),
     }
 }
 
@@ -57,6 +60,7 @@ pub struct OnboardingEvaluationResult {
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
     pub triggered_action: Option<Action>,
+    pub vendor_api: VendorAPI,
 }
 
 #[cfg(test)]
@@ -66,6 +70,7 @@ mod tests {
 
     #[test]
     fn test_evaluate_onboarding_rules() {
+        let features = TestFeatures::new("hello");
         let expected = OnboardingEvaluationResult {
             rules_triggered: vec![
                 RuleName::Test("test.hello".into()),
@@ -73,11 +78,9 @@ mod tests {
             ],
             rules_not_triggered: vec![RuleName::Test("test.world".into())],
             triggered_action: Some(Action::Fail),
+            vendor_api: features.vendor_api(),
         };
-        let result = evaluate_onboarding_rules(
-            vec![test_ruleset_a(), test_ruleset_b()],
-            &TestFeatures::new("hello"),
-        );
+        let result = evaluate_onboarding_rules(vec![test_ruleset_a(), test_ruleset_b()], &features);
 
         assert_eq!(expected, result)
     }
