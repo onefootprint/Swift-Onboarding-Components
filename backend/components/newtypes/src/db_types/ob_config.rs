@@ -42,6 +42,7 @@ impl_enum_str_diesel!(ApiKeyStatus);
     Debug,
     Display,
     Clone,
+    Copy,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,

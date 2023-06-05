@@ -202,12 +202,14 @@ pub async fn post(
         handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request, &user_auth).await?
     } else {
         // Fixture response - we always complete successfully!
-        advance_workflow_if_needed(&state, &user_auth).await?;
-        // Save fixture VRes
-        save_fixture_ocr(&state, &user_auth.scoped_user.id.clone()).await?;
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
             .into_iter()
             .find(|s| missing_sides.contains(s));
+        if next_side_to_collect.is_none() {
+            // Save fixture VRes
+            save_fixture_ocr(&state, &user_auth.scoped_user.id.clone()).await?;
+            advance_workflow_if_needed(&state, &user_auth).await?;
+        }
         DocumentResponse {
             next_side_to_collect,
             errors: vec![],

@@ -28,6 +28,7 @@ pub struct CreateOnboardingConfigurationRequest {
     name: String,
     must_collect_data: Vec<CDO>,
     can_access_data: Vec<CDO>,
+    cip_kind: Option<CipKind>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -123,13 +124,15 @@ pub async fn post(
         name,
         must_collect_data,
         can_access_data,
+        cip_kind,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
     let is_alpaca_tenant = state
         .feature_flag_client
         .flag(BoolFlag::IsAlpacaTenant(&tenant_id));
-    let cip_kind = is_alpaca_tenant.then_some(CipKind::Alpaca);
+    // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
+    let cip_kind = cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
     if let Some(cip_kind) = cip_kind {
         validate_for_cip(cip_kind, &must_collect_data)?
     }
@@ -143,7 +146,7 @@ pub async fn post(
                 must_collect_data,
                 can_access_data,
                 is_live,
-                is_alpaca_tenant.then_some(CipKind::Alpaca),
+                cip_kind,
             )
         })
         .await??;
@@ -188,6 +191,7 @@ mod test {
             name: "Flerp".to_owned(),
             must_collect_data,
             can_access_data,
+            cip_kind: None,
         };
         req.validate_inner().is_ok()
     }

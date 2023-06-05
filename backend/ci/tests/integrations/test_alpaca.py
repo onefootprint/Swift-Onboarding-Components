@@ -1,3 +1,7 @@
+import pytest
+from tests.auth import DashboardAuthIsLive
+from tests.bifrost_client import BifrostClient
+from tests.utils import create_ob_config
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number, create_sandbox_user
 from tests.utils import post
@@ -17,10 +21,47 @@ ALPACA_SANDBOX_API_KEY = "CK9ANXZG595Q7CHXAXX3"
 ALPACA_SANDBOX_API_SECRET = "WBJf7VgZmE0oFBdFFCItK49p41jwpdLX9tcg9gsV"
 
 
-def test_alpaca_cip(sandbox_tenant, twilio):
+@pytest.fixture(scope="session")
+def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+    return create_ob_config(
+        sandbox_tenant,
+        "Alpaca",
+        must_collect_data,
+        can_access_data,
+        "alpaca"
+    )
+
+@pytest.mark.parametrize(
+    "sandbox_suffix,expected_error",
+    [
+        ("pass", None),
+        ("manualreview", None),
+        # ("stepup", None), failing due to bugs which are fixed in following PR :)
+        ("fail", "The entity must have an approved decision status")
+    ],
+)
+def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error):
     # create a new user that has onboarded
-    user = create_sandbox_user(sandbox_tenant, twilio)
+    bifrost = BifrostClient(alpaca_kyc_ob_config, twilio, sandbox_suffix=sandbox_suffix)
+    user = bifrost.run()
     d = user.client.data
+    
+    review_annotation = None
+    if sandbox_suffix == "stepup":
+        review_annotation = "Documentary identity verification was manually conducted and approved"
+    elif sandbox_suffix == "manualreview":
+        review_annotation = "Watchlist deemed false-positive"
+
+    if review_annotation:
+        post(
+            f"entities/{user.fp_id}/decisions",
+            dict(
+                annotation=dict(note=review_annotation, is_pinned=False),
+                status="pass",
+            ),
+            sandbox_tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
 
     # create a new alpaca account
     broker_client = BrokerClient(ALPACA_SANDBOX_API_KEY, ALPACA_SANDBOX_API_SECRET)
@@ -88,19 +129,20 @@ def test_alpaca_cip(sandbox_tenant, twilio):
     }
 
     # send cip
-    body = post("integrations/alpaca_cip", alpaca_data, sandbox_tenant.sk.key)
+    body = post("integrations/alpaca_cip", alpaca_data, sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
+    if expected_error:
+        assert body["error"]["message"] == expected_error
+    else:
+        assert body["alpaca_response"]
 
-    assert body["status_code"] == 200
-    assert body["alpaca_response"]
+        # retrieve cip from alpaca
+        broker_client.get_cip_data_for_account_by_id(account_id=account.id)
 
-    # retrieve cip from alpaca
-    broker_client.get_cip_data_for_account_by_id(account_id=account.id)
-
-    assert body["alpaca_response"]["id"]
-    assert (
-        body["alpaca_response"]["kyc"]["applicant_name"]
-        == f"{d['id.first_name']} {d['id.last_name']}"
-    )
+        assert body["alpaca_response"]["id"]
+        assert (
+            body["alpaca_response"]["kyc"]["applicant_name"]
+            == f"{d['id.first_name']} {d['id.last_name']}"
+        )
 
 
 # TODO: Test scenarios to add

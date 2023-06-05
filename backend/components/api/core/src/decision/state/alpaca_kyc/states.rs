@@ -233,7 +233,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for Decisioning {
                     self.sv_id.clone(),
                     None,
                     true, // TODO: maybe should_collect_selfie should come from a config
-                    None,
+                    Some(self.wf_id.clone()),
                 )?;
                 Ok(DocCollection {
                     wf_id: self.wf_id,

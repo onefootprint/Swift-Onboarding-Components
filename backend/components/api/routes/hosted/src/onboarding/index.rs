@@ -72,7 +72,8 @@ pub async fn post(
     };
     let should_create_workflow = state
         .feature_flag_client
-        .flag(BoolFlag::CreateOnboardingWorkflows(&ob_config.key));
+        .flag(BoolFlag::CreateOnboardingWorkflows(&ob_config.key))
+        || ob_config.cip_kind.is_some();
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
