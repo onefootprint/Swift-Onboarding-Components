@@ -18,8 +18,10 @@ const StyledLink = styled(Link)`
     color: ${theme.color.accent};
     text-decoration: none;
 
-    &:hover {
-      text-decoration: underline;
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
     }
   `};
 `;

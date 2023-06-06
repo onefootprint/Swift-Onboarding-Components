@@ -28,10 +28,12 @@ const LinkingButton = styled(Link)<LinkingButtonProps>`
         text-decoration: none;
         user-select: none;
 
-        &:hover:enabled {
-          background-color: ${button.variant.primary.hover.bg};
-          border-color: ${button.variant.primary.hover.borderColor};
-          color: ${button.variant.primary.hover.color};
+        @media (hover: hover) {
+          &:hover:enabled {
+            background-color: ${button.variant.primary.hover.bg};
+            border-color: ${button.variant.primary.hover.borderColor};
+            color: ${button.variant.primary.hover.color};
+          }
         }
       `;
     }}

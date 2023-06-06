@@ -75,9 +75,11 @@ const OptionContainer = styled.div`
       top: 0;
       width: 100%;
 
-      &[data-highlighted='true'],
-      &:hover {
-        background: ${dropdown.hover.bg};
+      @media (hover: hover) {
+        &[data-highlighted='true'],
+        &:hover {
+          background: ${dropdown.hover.bg};
+        }
       }
     `;
   }}

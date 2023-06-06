@@ -149,9 +149,11 @@ const RecapCard = styled(Link)`
     color: ${theme.color.primary};
     transition: all 0.2s ease-in-out;
 
-    &:hover {
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-      box-shadow: ${theme.elevation[1]};
+    @media (hover: hover) {
+      &:hover {
+        border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+        box-shadow: ${theme.elevation[1]};
+      }
     }
   `}
 `;

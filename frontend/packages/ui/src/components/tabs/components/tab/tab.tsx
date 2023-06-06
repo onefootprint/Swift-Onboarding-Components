@@ -96,9 +96,11 @@ const TabContainer = styled.a`
     &[data-variant='underlined'] {
       margin-right: ${theme.spacing[5]};
 
-      &:hover {
-        .label {
-          color: ${theme.color.secondary};
+      @media (hover: hover) {
+        &:hover {
+          .label {
+            color: ${theme.color.secondary};
+          }
         }
       }
     }
@@ -106,8 +108,10 @@ const TabContainer = styled.a`
     &[data-variant='pill'] {
       border-radius: ${theme.borderRadius.full};
       background-color: ${theme.backgroundColor.transparent};
-      &:hover {
-        background-color: ${theme.backgroundColor.senary};
+      @media (hover: hover) {
+        &:hover {
+          background-color: ${theme.backgroundColor.senary};
+        }
       }
     }
   `}

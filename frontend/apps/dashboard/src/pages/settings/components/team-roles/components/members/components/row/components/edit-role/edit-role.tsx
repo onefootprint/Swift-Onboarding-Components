@@ -115,8 +115,10 @@ const Item = styled(Select.Item)`
         background: ${dropdown.hover.bg};
       }
 
-      &:hover {
-        background: ${dropdown.hover.bg};
+      @media (hover: hover) {
+        &:hover {
+          background: ${dropdown.hover.bg};
+        }
       }
 
       > span:first-of-type {

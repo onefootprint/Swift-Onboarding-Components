@@ -36,8 +36,10 @@ const Pill = styled.button<PillProps>`
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     white-space: nowrap;
 
-    &:hover {
-      background: ${theme.backgroundColor.secondary};
+    @media (hover: hover) {
+      &:hover {
+        background: ${theme.backgroundColor.secondary};
+      }
     }
   `}
 `;

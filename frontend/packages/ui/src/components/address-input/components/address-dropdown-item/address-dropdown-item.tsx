@@ -63,8 +63,10 @@ const AddressDropdownItemContainer = styled.li`
       }
 
       &[data-disable-hover-styles='false'] {
-        &:hover {
-          background: ${dropdown.hover.bg};
+        @media (hover: hover) {
+          &:hover {
+            background: ${dropdown.hover.bg};
+          }
         }
       }
 

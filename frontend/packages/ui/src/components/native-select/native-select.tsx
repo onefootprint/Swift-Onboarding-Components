@@ -22,9 +22,11 @@ const NativeSelect = styled.select`
       resize: none;
       width: 100%;
 
-      &:enabled:hover {
-        background-color: ${input.state.default.hover.bg};
-        border-color: ${input.state.default.hover.border};
+      @media (hover: hover) {
+        &:enabled:hover {
+          background-color: ${input.state.default.hover.bg};
+          border-color: ${input.state.default.hover.border};
+        }
       }
 
       &:enabled:focus {
@@ -37,9 +39,11 @@ const NativeSelect = styled.select`
         background-color: ${input.state.error.initial.bg};
         border-color: ${input.state.error.initial.border};
 
-        &:enabled:hover {
-          background-color: ${input.state.error.hover.bg};
-          border-color: ${input.state.error.hover.border};
+        @media (hover: hover) {
+          &:enabled:hover {
+            background-color: ${input.state.error.hover.bg};
+            border-color: ${input.state.error.hover.border};
+          }
         }
 
         &:enabled:focus {

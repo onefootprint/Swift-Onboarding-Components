@@ -214,8 +214,10 @@ const Tr = styled.tr`
     &[data-clickable='true'] {
       cursor: pointer;
 
-      &:hover {
-        background-color: ${theme.backgroundColor.secondary};
+      @media (hover: hover) {
+        &:hover {
+          background-color: ${theme.backgroundColor.secondary};
+        }
       }
     }
   `}

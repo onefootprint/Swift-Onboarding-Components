@@ -225,9 +225,11 @@ const Button = styled.button`
     padding: ${theme.spacing[1]};
     cursor: pointer;
 
-    &:hover {
-      background-color: ${theme.backgroundColor.secondary};
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    @media (hover: hover) {
+      &:hover {
+        background-color: ${theme.backgroundColor.secondary};
+        border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      }
     }
 
     &:active {

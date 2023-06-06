@@ -5,8 +5,10 @@ const a = styled.a`
     color: ${theme.color.accent};
     text-decoration: none;
 
-    &:hover {
-      text-decoration: underline;
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
     }
   `}
 `;

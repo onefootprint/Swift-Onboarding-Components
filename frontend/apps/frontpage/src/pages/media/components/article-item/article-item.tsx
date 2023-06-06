@@ -53,8 +53,10 @@ const Anchor = styled.a`
     text-decoration: none;
 
     ${media.greaterThan('lg')`
-      &:hover {
-        background: ${theme.backgroundColor.secondary};
+      @media (hover: hover) {
+        &:hover {
+          background: ${theme.backgroundColor.secondary};
+        }
       }
     `}
   `}

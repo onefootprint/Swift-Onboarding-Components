@@ -40,9 +40,11 @@ const Nav = styled.nav`
       a {
         text-decoration: none;
 
-        &:hover {
-          color: ${theme.color.tertiary};
-          text-decoration: underline;
+        @media (hover: hover) {
+          &:hover {
+            color: ${theme.color.tertiary};
+            text-decoration: underline;
+          }
         }
       }
     }

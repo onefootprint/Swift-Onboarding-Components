@@ -23,7 +23,11 @@ const ButtonGroup = styled.div<{ isLoading?: boolean }>`
 
       ${!isLoading &&
       css`
-        &:hover,
+        @media (hover: hover) {
+          &:hover {
+            background-color: ${theme.backgroundColor.secondary};
+          }
+        }
         &:focus {
           background-color: ${theme.backgroundColor.secondary};
         }

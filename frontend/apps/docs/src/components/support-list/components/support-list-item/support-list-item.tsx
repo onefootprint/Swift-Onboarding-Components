@@ -33,13 +33,15 @@ const Item = styled.button`
     display: flex;
     gap: ${theme.spacing[3]};
 
-    &:hover {
-      > * {
-        color: ${theme.color.secondary};
-      }
+    @media (hover: hover) {
+      &:hover {
+        > * {
+          color: ${theme.color.secondary};
+        }
 
-      path {
-        fill: ${theme.color.secondary};
+        path {
+          fill: ${theme.color.secondary};
+        }
       }
     }
   `}

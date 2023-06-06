@@ -18,8 +18,10 @@ export const createPseudoStyles = ({
   activeOverlay,
   background,
 }: CreatePseudoStyles) => css`
-  &:hover:enabled {
-    ${createOverlayBackground(hoverOverlay, background)};
+  @media (hover: hover) {
+    &:hover:enabled {
+      ${createOverlayBackground(hoverOverlay, background)};
+    }
   }
 
   &:active:enabled {

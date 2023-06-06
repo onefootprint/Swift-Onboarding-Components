@@ -61,9 +61,11 @@ const InlineAlertContainer = styled.div<{
       cursor: pointer;
       text-decoration: underline;
 
-      &:hover {
-        color: currentColor;
-        opacity: 0.7;
+      @media (hover: hover) {
+        &:hover {
+          color: currentColor;
+          opacity: 0.7;
+        }
       }
 
       &:active {

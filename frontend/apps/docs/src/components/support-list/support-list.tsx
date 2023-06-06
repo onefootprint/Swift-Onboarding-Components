@@ -34,11 +34,13 @@ const Container = styled.ul`
       padding-left: ${theme.spacing[3]};
       text-decoration: none;
 
-      &:hover {
-        color: ${theme.color.secondary};
+      @media (hover: hover) {
+        &:hover {
+          color: ${theme.color.secondary};
 
-        path {
-          fill: ${theme.color.secondary};
+          path {
+            fill: ${theme.color.secondary};
+          }
         }
       }
     }

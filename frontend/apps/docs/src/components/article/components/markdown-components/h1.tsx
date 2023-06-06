@@ -25,7 +25,13 @@ const Anchor = styled.a`
     color: currentColor;
     text-decoration: none;
 
-    &:hover svg,
+    @media (hover: hover) {
+      &:hover svg {
+        opacity: 1;
+        transform: translateX(${theme.spacing[2]});
+        visibility: visible;
+      }
+    }
     &:focus svg {
       opacity: 1;
       transform: translateX(${theme.spacing[2]});

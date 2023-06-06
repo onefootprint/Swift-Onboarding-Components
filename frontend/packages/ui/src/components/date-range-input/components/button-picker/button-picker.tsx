@@ -127,8 +127,10 @@ const ButtonPickerContainer = styled.button`
     cursor: pointer;
     padding: ${theme.spacing[1]} ${theme.spacing[3]};
 
-    &:hover {
-      ${createOverlayBackground('darken-1', 'primary')};
+    @media (hover: hover) {
+      &:hover {
+        ${createOverlayBackground('darken-1', 'primary')};
+      }
     }
 
     &[data-open='true'] {

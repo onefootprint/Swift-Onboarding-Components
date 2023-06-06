@@ -87,11 +87,13 @@ const Item = styled(Link)`
     text-decoration: none;
     transition: all 0.1s ease-in;
 
-    &:hover {
-      background: ${theme.backgroundColor.secondary};
+    @media (hover: hover) {
+      &:hover {
+        background: ${theme.backgroundColor.secondary};
 
-      ${IconOpen} {
-        opacity: 1;
+        ${IconOpen} {
+          opacity: 1;
+        }
       }
     }
   `};

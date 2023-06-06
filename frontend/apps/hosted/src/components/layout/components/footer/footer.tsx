@@ -84,8 +84,10 @@ const LinksContainer = styled.ul`
       text-decoration: none;
       color: ${theme.color.secondary};
 
-      &:hover {
-        text-decoration: underline;
+      @media (hover: hover) {
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   `}

@@ -92,9 +92,11 @@ const AccordionContainer = styled(AccordionRadix.Item)`
     overflow: hidden;
     transition: all 0.2s ease-out;
 
-    &:hover {
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-      box-shadow: ${theme.elevation[1]};
+    @media (hover: hover) {
+      &:hover {
+        border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+        box-shadow: ${theme.elevation[1]};
+      }
     }
   `}
 `;
@@ -128,8 +130,10 @@ const StyledTrigger = styled(AccordionRadix.Trigger)`
       transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
     }
 
-    &:hover {
-      border-color: ${theme.borderColor.primary};
+    @media (hover: hover) {
+      &:hover {
+        border-color: ${theme.borderColor.primary};
+      }
     }
 
     &[data-state='open'] {

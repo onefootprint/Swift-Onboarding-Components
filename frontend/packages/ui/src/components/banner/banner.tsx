@@ -29,8 +29,10 @@ const Banner = styled.div.attrs<BannerProps>({
 
     a,
     button {
-      &:hover {
-        opacity: 0.7;
+      @media (hover: hover) {
+        &:hover {
+          opacity: 0.7;
+        }
       }
 
       &:active {

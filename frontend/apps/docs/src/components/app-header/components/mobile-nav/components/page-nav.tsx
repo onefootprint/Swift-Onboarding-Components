@@ -83,8 +83,10 @@ const StyledLink = styled(Link)`
     &[data-selected='false'] {
       color: ${theme.color.tertiary};
 
-      &:hover {
-        background: ${theme.backgroundColor.secondary};
+      @media (hover: hover) {
+        &:hover {
+          background: ${theme.backgroundColor.secondary};
+        }
       }
     }
 

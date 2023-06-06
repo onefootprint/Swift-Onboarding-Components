@@ -61,9 +61,11 @@ const CloseContainer = styled.div`
     margin-right: -${theme.spacing[3]};
     cursor: pointer;
 
-    &:hover {
-      text-decoration: underline;
-      color: ${theme.color.quinary};
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+        color: ${theme.color.quinary};
+      }
     }
   `}
 `;

@@ -58,8 +58,10 @@ const Container = styled.button`
     opacity: 0.5;
   }
 
-  &:hover:enabled {
-    ${createOverlayBackground('darken-1', 'primary')};
+  @media (hover: hover) {
+    &:hover:enabled {
+      ${createOverlayBackground('darken-1', 'primary')};
+    }
   }
 
   &:active:enabled {

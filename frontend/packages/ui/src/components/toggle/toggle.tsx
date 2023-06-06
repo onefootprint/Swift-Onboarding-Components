@@ -200,8 +200,10 @@ const Button = styled(motion.button)<{
     display: flex;
     justify-content: ${checked ? 'flex-end' : 'flex-start'};
 
-    &:hover {
-      ${createOverlayBackground('darken-1', checked ? 'accent' : 'secondary')}
+    @media (hover: hover) {
+      &:hover {
+        ${createOverlayBackground('darken-1', checked ? 'accent' : 'secondary')}
+      }
     }
 
     &:disabled {

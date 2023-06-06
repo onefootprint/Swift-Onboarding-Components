@@ -108,10 +108,12 @@ const ButtonContainer = styled.button<{
       user-select: none;
       ${sx};
 
-      &:hover:enabled {
-        background-color: ${button.variant[variant].hover.bg};
-        border-color: ${button.variant[variant].hover.borderColor};
-        color: ${button.variant[variant].hover.color};
+      @media (hover: hover) {
+        &:hover:enabled {
+          background-color: ${button.variant[variant].hover.bg};
+          border-color: ${button.variant[variant].hover.borderColor};
+          color: ${button.variant[variant].hover.color};
+        }
       }
 
       &:active:enabled {

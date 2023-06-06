@@ -119,8 +119,10 @@ const StyledButtonLink = styled(Link)`
     text-decoration: none;
     transition: opacity 0.2s ease-out;
 
-    &:hover {
-      opacity: 0.8;
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     &[data-theme='dark'] {

@@ -25,7 +25,11 @@ const StyledLink = styled(NavigationMenu.Link)`
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     transition: opacity 0.2s ease-in;
 
-    :hover,
+    @media (hover: hover) {
+      :hover {
+        opacity: 0.7;
+      }
+    }
     :focus {
       opacity: 0.7;
   `}

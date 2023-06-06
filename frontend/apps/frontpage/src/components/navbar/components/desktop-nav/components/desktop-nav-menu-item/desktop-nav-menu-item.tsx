@@ -42,7 +42,11 @@ const StyledLink = styled(NavigationMenu.Link)`
     text-decoration: none;
     transition: all 0.1s ease-in-out;
 
-    :hover,
+    @media (hover: hover) {
+      :hover {
+        background-color: ${theme.backgroundColor.secondary};
+      }
+    }
     :focus {
       background-color: ${theme.backgroundColor.secondary};
     }

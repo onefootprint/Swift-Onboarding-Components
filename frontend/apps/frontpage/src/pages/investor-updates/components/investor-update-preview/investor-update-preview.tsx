@@ -86,9 +86,11 @@ const Article = styled.article`
     border: none;
   `}
 
-  &:hover {
-    box-shadow: ${theme.elevation[0]};
-   }
+  @media (hover: hover) {
+    &:hover {
+      box-shadow: ${theme.elevation[0]};
+    }
+  }
 
   @media (hover: hover) {
     &:hover {

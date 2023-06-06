@@ -74,14 +74,16 @@ const BannerContainer = styled.div`
         }
       }
 
-      &:hover {
-        color: ${theme.color.success};
-        opacity: 0.8;
+      @media (hover: hover) {
+        &:hover {
+          color: ${theme.color.success};
+          opacity: 0.8;
 
-        svg {
-          path {
-            fill: ${theme.color.success};
-            opacity: 0.8;
+          svg {
+            path {
+              fill: ${theme.color.success};
+              opacity: 0.8;
+            }
           }
         }
       }

@@ -29,8 +29,10 @@ const ClearButtonContainer = styled.button`
     padding: 0;
     transition: 0.2s opacity;
 
-    :hover {
-      opacity: 0.7;
+    @media (hover: hover) {
+      :hover {
+        opacity: 0.7;
+      }
     }
   `};
 `;

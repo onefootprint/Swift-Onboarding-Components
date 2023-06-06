@@ -111,8 +111,10 @@ const Container = styled.aside`
         white-space: nowrap;
         color: ${theme.color.tertiary};
 
-        &:hover {
-          color: ${theme.color.secondary};
+        @media (hover: hover) {
+          &:hover {
+            color: ${theme.color.secondary};
+          }
         }
       }
 

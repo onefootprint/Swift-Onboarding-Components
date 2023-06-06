@@ -67,9 +67,11 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       width: 100%;
 
       &[data-has-error='false'] {
-        &:enabled:hover {
-          background: ${input.state.default.hover.bg};
-          border-color: ${input.state.default.hover.border};
+        @media (hover: hover) {
+          &:enabled:hover {
+            background: ${input.state.default.hover.bg};
+            border-color: ${input.state.default.hover.border};
+          }
         }
 
         &[data-has-focus='true'],
@@ -84,9 +86,11 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
         background: ${input.state.error.initial.bg};
         border-color: ${input.state.error.initial.border};
 
-        &:enabled:hover {
-          background: ${input.state.error.hover.bg};
-          border-color: ${input.state.error.hover.border};
+        @media (hover: hover) {
+          &:enabled:hover {
+            background: ${input.state.error.hover.bg};
+            border-color: ${input.state.error.hover.border};
+          }
         }
 
         &:enabled:focus {

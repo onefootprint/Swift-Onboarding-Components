@@ -65,8 +65,10 @@ const DefaultOption = styled('li')<{
   ${({ disableHoverStyles }) =>
     !disableHoverStyles &&
     css`
-      &:hover {
-        ${createOverlayBackground('darken-1', 'primary')}
+      @media (hover: hover) {
+        &:hover {
+          ${createOverlayBackground('darken-1', 'primary')}
+        }
       }
     `}
 

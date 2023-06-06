@@ -44,10 +44,12 @@ const Button = styled.button`
       top: 50%;
       transform: rotate(-90deg);
 
-      &:hover {
-        background-color: ${button.variant.primary.hover.bg};
-        border-color: ${button.variant.primary.hover.borderColor};
-        color: ${button.variant.primary.hover.color};
+      @media (hover: hover) {
+        &:hover {
+          background-color: ${button.variant.primary.hover.bg};
+          border-color: ${button.variant.primary.hover.borderColor};
+          color: ${button.variant.primary.hover.color};
+        }
       }
 
       &:active {

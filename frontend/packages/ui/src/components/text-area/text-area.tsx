@@ -79,9 +79,11 @@ const Textarea = styled.textarea`
       }
 
       &[data-has-error='false'] {
-        &:enabled:hover {
-          background: ${input.state.default.hover.bg};
-          border-color: ${input.state.default.hover.border};
+        @media (hover: hover) {
+          &:enabled:hover {
+            background: ${input.state.default.hover.bg};
+            border-color: ${input.state.default.hover.border};
+          }
         }
 
         &:enabled:focus {
@@ -95,9 +97,11 @@ const Textarea = styled.textarea`
         background: ${input.state.error.initial.bg};
         border-color: ${input.state.error.initial.border};
 
-        &:enabled:hover {
-          background: ${input.state.error.hover.bg};
-          border-color: ${input.state.error.hover.border};
+        @media (hover: hover) {
+          &:enabled:hover {
+            background: ${input.state.error.hover.bg};
+            border-color: ${input.state.error.hover.border};
+          }
         }
 
         &:enabled:focus {
