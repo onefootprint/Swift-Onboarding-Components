@@ -167,7 +167,7 @@ const windowWidth = Dimensions.get('window').width;
 const CameraContainer = styled.View`
   ${({ theme }) => css`
     align-items: center;
-    height: 280px;
+    height: 390px;
     justify-content: center;
     margin-left: -${theme.spacing[5]};
     position: relative;

@@ -38,16 +38,16 @@ const createHandoffMachine = (authToken: string) =>
       init: {
         on: {
           initCompleted: {
-            target: 'liveness',
+            target: 'requirements',
           },
           initFailed: {
             target: 'error',
           },
         },
       },
-      liveness: {
+      requirements: {
         on: {
-          requirementCompleted: {
+          requirementsCompleted: {
             target: 'completed',
           },
         },

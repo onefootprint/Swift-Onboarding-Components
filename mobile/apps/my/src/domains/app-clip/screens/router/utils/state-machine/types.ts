@@ -12,7 +12,7 @@ export type MachineEvents =
       type: 'initFailed';
     }
   | {
-      type: 'requirementCompleted';
+      type: 'requirementsCompleted';
     }
   | {
       type: 'statusReceived';

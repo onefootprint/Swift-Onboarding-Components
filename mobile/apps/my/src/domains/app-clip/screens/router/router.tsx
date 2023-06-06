@@ -1,12 +1,12 @@
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import Liveness from '../../components/liveness';
 import Canceled from '../canceled';
 import Completed from '../completed';
 import Error from '../error';
 import Expired from '../expired';
 import Init from '../init';
+import Requirements from '../requirements';
 import useGetD2PStatus from './hooks/use-get-d2p-status';
 import createMachine from './utils/state-machine';
 
@@ -38,15 +38,15 @@ const Router = ({ authToken }: RouterProps) => {
           onError={() => send({ type: 'initFailed' })}
         />
       )}
+      {state.matches('requirements') && (
+        <Requirements
+          authToken={authToken}
+          onDone={() => send({ type: 'requirementsCompleted' })}
+        />
+      )}
       {state.matches('error') && <Error />}
       {state.matches('canceled') && <Canceled />}
       {state.matches('expired') && <Expired />}
-      {state.matches('liveness') && (
-        <Liveness
-          context={{ authToken }}
-          onDone={() => send({ type: 'requirementCompleted' })}
-        />
-      )}
       {state.matches('completed') && <Completed authToken={authToken} />}
     </>
   );

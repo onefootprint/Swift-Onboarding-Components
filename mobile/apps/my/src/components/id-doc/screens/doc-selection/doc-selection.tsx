@@ -16,8 +16,8 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
+import type { ScreenProps } from '@/components/id-doc/scan.types';
 import useTranslation from '@/hooks/use-translation';
-import type { ScreenProps } from '@/scan/scan.types';
 
 import PermissionsDialog from './components/permissions-dialog';
 

@@ -6,13 +6,11 @@ import Retry from './components/retry';
 import machine from './utils/state-machine';
 
 export type LivenessProps = {
-  context: {
-    authToken: string;
-  };
+  authToken: string;
   onDone?: () => void;
 };
 
-const Liveness = ({ context: { authToken }, onDone }: LivenessProps) => {
+const Liveness = ({ authToken, onDone }: LivenessProps) => {
   const [state, send] = useMachine(machine);
 
   return (
