@@ -1,7 +1,7 @@
 import json
 import os
 from .auth import CustodianAuth
-
+from .image_fixtures import test_image_dl_front, test_image_dl_back, test_image_dl_selfie
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -164,4 +164,10 @@ CDO_TO_DIS = {
         "investor_profile.risk_tolerance",
         "investor_profile.declarations",
     ],
+}
+
+DOCUMENT_DATA = {
+    "document.drivers_license.front": test_image_dl_front,
+    "document.drivers_license.back": test_image_dl_back,
+    "document.drivers_license.selfie": test_image_dl_selfie,
 }

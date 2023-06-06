@@ -114,7 +114,7 @@ def test_tenant_document_get_decrypt(user_with_documents):
 
 # Test decryption of vaulted documents
 def test_tenant_document_decrypt(user_with_documents):
-    from tests.image_fixtures import test_image
+    from tests.image_fixtures import test_image_dl_front
 
     tenant = user_with_documents.tenant
     fields = [
@@ -137,8 +137,8 @@ def test_tenant_document_decrypt(user_with_documents):
         status_code=200,
     )
 
-    assert resp["document.latest_upload.drivers_license.front"] == test_image
-    assert resp["document.drivers_license.front"] == test_image
+    assert resp["document.latest_upload.drivers_license.front"] == test_image_dl_front
+    assert resp["document.drivers_license.front"] == test_image_dl_front
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "MA"
@@ -154,7 +154,7 @@ def test_tenant_selfie_decrypt(
     twilio,
     doc_request_sandbox_ob_config,
 ):
-    from tests.image_fixtures import test_image
+    from tests.image_fixtures import test_image_dl_front, test_image_dl_back, test_image_dl_selfie
 
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
@@ -174,9 +174,9 @@ def test_tenant_selfie_decrypt(
         sandbox_tenant.sk.key,
     )
 
-    assert resp["document.drivers_license.front"] == test_image
-    assert resp["document.drivers_license.back"] == test_image
-    assert resp["document.drivers_license.selfie"] == test_image
+    assert resp["document.drivers_license.front"] == test_image_dl_front
+    assert resp["document.drivers_license.back"] == test_image_dl_back
+    assert resp["document.drivers_license.selfie"] == test_image_dl_selfie
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {

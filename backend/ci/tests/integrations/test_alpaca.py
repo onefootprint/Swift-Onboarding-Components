@@ -5,7 +5,7 @@ from tests.utils import create_ob_config
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number, create_sandbox_user
 from tests.utils import post
-
+import uuid
 from alpaca.broker.client import BrokerClient
 from alpaca.broker.requests import (
     CreateAccountRequest,
@@ -13,6 +13,7 @@ from alpaca.broker.requests import (
     Identity,
     Disclosures,
     Agreement,
+    AccountDocument
 )
 from alpaca.broker.enums import AgreementType
 import datetime
@@ -68,6 +69,19 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
 
     alpaca_account_email_num = _gen_random_n_digit_number(10)
 
+    documents = None
+    # If we colleted doc, then we will send that in the create Alpaca account request too
+    if sandbox_suffix == "stepup":
+        documents = []
+        for side in ["front", "back", "selfie"]:
+         documents.append(AccountDocument(
+            id=uuid.uuid4(), # this shouldn't really be necessary but this python client doesn't list `id` as optional
+            document_type="identity_verification",
+            document_sub_type="drivers_license",
+            content=d[f"document.drivers_license.{side}"],
+            mime_type="image/png"
+        ))
+    
     account = broker_client.create_account(
         CreateAccountRequest(
             contact=Contact(
@@ -85,6 +99,7 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
                 date_of_birth=d["id.dob"],
                 country_of_tax_residence="USA",
             ),
+            documents=documents,
             disclosures=Disclosures(
                 immediate_family_exposed=False,
                 is_politically_exposed=False,

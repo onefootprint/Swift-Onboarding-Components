@@ -1,7 +1,7 @@
 import json
 from typing import NamedTuple, Optional
 from tests.types import Tenant
-from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS, EMAIL
+from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS, EMAIL, DOCUMENT_DATA
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
     multipart_file,
@@ -80,6 +80,7 @@ class BifrostClient:
             **ID_DATA,
             **BUSINESS_DATA,
             **IP_DATA,
+            **DOCUMENT_DATA,
             "document.finra_compliance_letter": multipart_file(
                 "example_pdf.pdf", "application/pdf"
             ),
@@ -187,7 +188,6 @@ class BifrostClient:
 
     def handle_collect_document(self, requirement):
         """Add identity documents to vault"""
-        from .image_fixtures import test_image
 
         if requirement["should_collect_consent"]:
             consent_data = {"consent_language_text": "I consent"}
@@ -206,7 +206,7 @@ class BifrostClient:
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
-            image = {f"{side}_image": test_image}
+            image = {f"{side}_image": self.data[f"document.drivers_license.{side}"]}
             data = {**common_data, **image}
             body = post("hosted/user/document", data, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
