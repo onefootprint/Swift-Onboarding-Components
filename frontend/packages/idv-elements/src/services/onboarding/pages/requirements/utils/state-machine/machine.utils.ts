@@ -71,11 +71,8 @@ const shouldRunLiveness = (context: MachineContext) =>
 const shouldRunIdDoc = (context: MachineContext) => {
   const {
     requirements: { idDoc },
-    onboardingContext: {
-      device: { type },
-    },
   } = context;
-  return !!idDoc && type === 'mobile';
+  return !!idDoc;
 };
 
 const shouldShowAuthorize = (context: MachineContext) => {

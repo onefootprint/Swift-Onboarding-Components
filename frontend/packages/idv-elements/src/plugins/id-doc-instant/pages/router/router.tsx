@@ -2,6 +2,7 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import DeviceWarning from '../device-warning';
 import IdDocBackPhoto from '../id-doc-back-photo';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
@@ -61,6 +62,10 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('processing')) {
     return <Processing />;
+  }
+
+  if (state.matches('incompatibleDevice')) {
+    return <DeviceWarning />;
   }
 
   return null;

@@ -13,7 +13,8 @@ const createIdDocMachine = (args: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'countryAndType',
+      initial:
+        args.device.type === 'mobile' ? 'countryAndType' : 'incompatibleDevice',
       context: { ...args },
       states: {
         countryAndType: {
@@ -116,6 +117,9 @@ const createIdDocMachine = (args: MachineContext) =>
           type: 'final',
         },
         failure: {
+          type: 'final',
+        },
+        incompatibleDevice: {
           type: 'final',
         },
       },

@@ -147,6 +147,9 @@
     "retry-limit-exceeded": {
       "title": "Too many attempts",
       "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
+    },
+    "device-warning": {
+      "warning": "This action can only be performed on a mobile phone. Please go back to the previous screen/tab and click the \"Cancel\" button to generate a new QR code with a new URL link. Open the new link on your phone."
     }
   }
 }

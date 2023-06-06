@@ -29,6 +29,7 @@ export interface Typegen0 {
     | 'failure'
     | 'frontImage'
     | 'frontImageRetry'
+    | 'incompatibleDevice'
     | 'processing'
     | 'selfieImage'
     | 'selfieImageRetry'
