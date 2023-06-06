@@ -34,7 +34,9 @@ import CollectKybData from './index';
 import {
   withBusinessVault,
   withBusinessVaultValidate,
+  withIdentify,
   withOnboardingConfig,
+  withUserToken,
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
@@ -133,11 +135,13 @@ describe('<CollectKybData />', () => {
 
   describe('when there are missing attribute', () => {
     beforeEach(() => {
+      withUserToken();
       withOnboardingConfig();
       withBusinessVaultValidate();
       withBusinessVault();
       withUserVaultValidate();
       withUserVault();
+      withIdentify();
     });
 
     it('takes user through all of the pages', async () => {

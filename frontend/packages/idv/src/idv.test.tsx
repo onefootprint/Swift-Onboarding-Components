@@ -19,9 +19,11 @@ import React from 'react';
 import Idv from './idv';
 import {
   sandboxOnboardingConfigFixture,
+  withIdentify,
   withOnboarding,
   withOnboardingConfig,
   withRequirements,
+  withUserToken,
 } from './idv.test.config';
 import { IdvProps } from './types';
 
@@ -83,7 +85,8 @@ describe('<Idv />', () => {
 
   describe('with auth token', () => {
     it('skips all pages when all data is bootstrapped', async () => {
-      withOnboardingConfig();
+      withUserToken();
+      withIdentify();
       withOnboarding();
       withRequirements();
 
@@ -135,7 +138,8 @@ describe('<Idv />', () => {
 
   describe('without auth token', () => {
     it('starts flow on email identification if no bootstrap is provided', async () => {
-      withOnboardingConfig();
+      withUserToken();
+      withIdentify();
       withOnboarding();
       withRequirements();
 
@@ -149,8 +153,10 @@ describe('<Idv />', () => {
     });
 
     it('starts flow on sandbox outcome if no bootstrap is provided', async () => {
+      withUserToken();
+      withIdentify();
+      withOnboarding(sandboxOnboardingConfigFixture);
       withOnboardingConfig(sandboxOnboardingConfigFixture);
-      withOnboarding();
       withRequirements();
 
       renderIdv({});

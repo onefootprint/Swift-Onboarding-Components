@@ -1,4 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
+import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 
 export const withUserVaultValidate = () => {
   mockRequest({
@@ -65,5 +66,25 @@ export const withOnboardingConfig = (data = onboardingConfigFixture) =>
     path: '/org/onboarding_config',
     response: {
       data,
+    },
+  });
+
+export const withUserToken = () =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: [UserTokenScope.sensitiveProfile],
+    },
+  });
+
+export const withIdentify = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/identify',
+    response: {
+      userFound: true,
+      availableChallengeKinds: [ChallengeKind.biometric],
+      hasSyncablePassKey: true,
     },
   });

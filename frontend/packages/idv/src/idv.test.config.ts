@@ -1,8 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import {
+  ChallengeKind,
   CollectedKycDataOption,
   OnboardingRequirement,
   OnboardingRequirementKind,
+  UserTokenScope,
 } from '@onefootprint/types';
 
 export const onboardingConfigFixture = {
@@ -50,11 +52,15 @@ export const withOnboardingConfig = (data = onboardingConfigFixture) =>
     response: data,
   });
 
-export const withOnboarding = (alreadyAuthorized?: boolean) =>
+export const withOnboarding = (
+  onboardingConfig = onboardingConfigFixture,
+  alreadyAuthorized?: boolean,
+) =>
   mockRequest({
     method: 'post',
     path: '/hosted/onboarding',
     response: {
+      onboardingConfig,
       alreadyAuthorized: alreadyAuthorized ?? false,
     },
   });
@@ -86,3 +92,23 @@ export const withRequirements = (
     },
   });
 };
+
+export const withUserToken = () =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: [UserTokenScope.sensitiveProfile],
+    },
+  });
+
+export const withIdentify = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/identify',
+    response: {
+      userFound: true,
+      availableChallengeKinds: [ChallengeKind.biometric],
+      hasSyncablePassKey: true,
+    },
+  });
