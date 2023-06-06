@@ -11,12 +11,14 @@ export type SmsChallengeVerificationProps = ResendButtonProps & {
   title?: string;
   isVerifying?: boolean;
   isSuccess?: boolean;
+  isPending?: boolean;
   hasError?: boolean;
   onComplete: (code: string) => void;
 };
 
 const SmsChallengeVerification = ({
   title,
+  isPending,
   isVerifying,
   isSuccess,
   hasError,
@@ -36,7 +38,7 @@ const SmsChallengeVerification = ({
   }
 
   return (
-    <Form autoComplete="off" role="presentation">
+    <Form autoComplete="off" role="presentation" data-pending={isPending}>
       {title && (
         <Typography variant="body-2" color="secondary" as="h3">
           {title}

@@ -190,6 +190,9 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
 
   // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
   const setAppContext = (data?: Record<string, any>) => {
+    if (IS_LOGGING_DISABLED) {
+      return;
+    }
     appContext = {
       ...appContext,
       ...data,

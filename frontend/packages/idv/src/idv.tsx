@@ -15,6 +15,7 @@ const App = ({
   bootstrapData,
   isTransfer,
   obConfigAuth,
+  hideConfetti,
   onComplete,
   onClose,
 }: IdvProps) => (
@@ -27,6 +28,7 @@ const App = ({
         obConfigAuth={obConfigAuth}
         onComplete={onComplete}
         onClose={onClose}
+        hideConfetti={hideConfetti}
       >
         <GlobalStyle />
         <Router onDone={onComplete} />

@@ -5,6 +5,7 @@ export type IdvProps = {
   authToken?: string; // If provided, will skip identify step
   bootstrapData?: IdvBootstrapData; // If provided, will bootstrap identify and pre-fill fields on onboarding
   isTransfer?: boolean;
+  hideConfetti?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
 };

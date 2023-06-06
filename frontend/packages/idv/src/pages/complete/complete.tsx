@@ -21,7 +21,7 @@ const Complete = () => {
   const { t } = useTranslation('pages.complete');
   const [state] = useIdvMachine();
   const { isLoading, isKyb } = useIsKyb();
-  const { validationToken, onClose, onComplete } = state.context;
+  const { validationToken, onClose, onComplete, hideConfetti } = state.context;
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiDimensions, setConfettiDimensions] = useState({
     width: 0,
@@ -40,7 +40,7 @@ const Complete = () => {
         left: container.offsetLeft,
         top: container.offsetTop,
       });
-      setShowConfetti(true);
+      if (!hideConfetti) setShowConfetti(true);
     }
   }, CONFETTI_DELAY);
 

@@ -15,7 +15,8 @@ import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
 import SmsChallengeVerification from '../../../sms-challenge-verification';
 
-const SUCCESS_EVENT_DELAY_MS = 1500;
+const IS_TEST = typeof jest !== 'undefined';
+const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
 
 const Sms = () => {
   const { t } = useTranslation('components.login-challenge.sms');
@@ -156,6 +157,7 @@ const Sms = () => {
   return (
     <SmsChallengeVerification
       title={title}
+      isPending={loginChallengeMutation.isLoading}
       isVerifying={identifyVerifyMutation.isLoading}
       isSuccess={isSuccess}
       hasError={identifyVerifyMutation.isError}
