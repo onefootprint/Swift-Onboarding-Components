@@ -17,12 +17,14 @@ use db::{
     PgConn,
 };
 use either::Either;
+use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
-    InvestorProfileKind as IPK, PiiString, ScopedVaultId, WorkflowId,
+    InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId, WorkflowId,
 };
 use paperclip::actix::web;
+use strum::IntoEnumIterator;
 
 mod authorize;
 mod d2p;
@@ -88,10 +90,14 @@ pub async fn get_requirements(
         .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
         .await?;
 
+    let only_us_dl = state
+        .feature_flag_client
+        .flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
+
     let requirements = state
         .db_pool
-        .db_query(|conn| -> ApiResult<_> {
-            let requirements = get_requirements_inner(conn, uvw, args, declarations)?;
+        .db_query(move |conn| -> ApiResult<_> {
+            let requirements = get_requirements_inner(conn, uvw, args, declarations, only_us_dl)?;
             Ok(requirements)
         })
         .await??;
@@ -135,6 +141,7 @@ fn get_requirements_inner(
     uvw: VaultWrapper<Person>,
     args: GetRequirementsArgs,
     declarations: Option<PiiString>,
+    only_us_dl: bool,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let ob_config = &args.ob_config;
     let id_req = ob_config.must_collect(DID::Id).then(|| {
@@ -209,10 +216,17 @@ fn get_requirements_inner(
             wf_id: args.wf_id.as_ref(),
         };
         let doc_request = DocumentRequest::get_active(conn, identifier)?;
+        let supported_document_types = if only_us_dl {
+            vec![ModernIdDocKind::DriversLicense]
+        } else {
+            ModernIdDocKind::iter().collect()
+        };
         doc_request.map(|dr| OnboardingRequirement::CollectDocument {
             document_request_id: dr.id,
             should_collect_selfie: dr.should_collect_selfie,
             should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
+            only_us_supported: only_us_dl,
+            supported_document_types,
         })
     };
     let authorize_req = if args.onboarding.authorized_at.is_none() {

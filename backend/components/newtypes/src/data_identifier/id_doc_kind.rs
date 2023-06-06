@@ -40,9 +40,11 @@ pub enum IdDocKind {
 /// of drivers_license.
 /// The legacy enum is exposed via API and serialized in the DB, so it's a larger project to
 /// migrate away from. But, we want to use the more modern representation in customer-facing APIs
-#[derive(Debug, Display, DeserializeFromStr, SerializeDisplay, EnumString)]
+#[derive(
+    Debug, Display, Clone, DeserializeFromStr, SerializeDisplay, EnumString, JsonSchema, Apiv2Schema, EnumIter,
+)]
 #[strum(serialize_all = "snake_case")]
-enum ModernIdDocKind {
+pub enum ModernIdDocKind {
     IdCard,
     DriversLicense,
     Passport,

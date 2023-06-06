@@ -1,4 +1,4 @@
-use newtypes::{CollectedDataOption, DocumentRequestId, IdDocKind};
+use newtypes::{CollectedDataOption, DocumentRequestId, IdDocKind, ModernIdDocKind};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
@@ -31,6 +31,9 @@ pub enum OnboardingRequirement {
         document_request_id: DocumentRequestId,
         should_collect_selfie: bool,
         should_collect_consent: bool,
+        /// When true, should only allow collecting documents from the US
+        only_us_supported: bool,
+        supported_document_types: Vec<ModernIdDocKind>,
     },
     Authorize {
         fields_to_authorize: AuthorizeFields,
@@ -59,6 +62,8 @@ impl OnboardingRequirement {
                 document_request_id: _,
                 should_collect_consent: _,
                 should_collect_selfie: _,
+                only_us_supported: _,
+                supported_document_types: _,
             } => false,
             Self::Authorize {
                 fields_to_authorize: _,
