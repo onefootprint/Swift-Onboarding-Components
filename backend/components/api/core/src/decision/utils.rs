@@ -92,7 +92,7 @@ pub fn create_document_verification_request(
 // If socure fails, we shouldn't fail the DE run
 pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &VendorAPI) -> bool {
     // Socure plus and Experian isn't used by anyone except Footprint (at this time)
-    !matches!(vendor_api, VendorAPI::SocureIDPlus | VendorAPI::ExperianPreciseID)
+    !matches!(vendor_api, VendorAPI::SocureIDPlus)
 }
 
 pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> FixtureDecision {
