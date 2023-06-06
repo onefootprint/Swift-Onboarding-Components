@@ -382,7 +382,7 @@ EOF
 
 chmod +x connect_db.sh`;
 
-  const ebsKmsKey = await aws.ebs.getDefaultKmsKey({ provider });
+  const ebsKmsKey = await aws.kms.getKey({ keyId: 'alias/aws/ebs' });
 
   const jumpbox = new aws.ec2.Instance(
     `jumpbox-${clusterId}`,
@@ -401,7 +401,7 @@ chmod +x connect_db.sh`;
         deleteOnTermination: true,
         encrypted: true,
         volumeSize: 10,
-        kmsKeyId: ebsKmsKey.keyArn,
+        kmsKeyId: ebsKmsKey.arn,
       },
     },
     { provider },
