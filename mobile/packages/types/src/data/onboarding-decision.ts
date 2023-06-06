@@ -1,30 +1,18 @@
+import {
+  ActorApiKey,
+  ActorFirmEmployee,
+  ActorFootprint,
+  ActorOrganization,
+} from './actor';
 import { CollectedDataOption } from './collected-data-option';
 import DecisionStatus from './decision-status';
 import Vendor from './vendor';
 
-export enum DecisionSourceKind {
-  footprint = 'footprint',
-  firmEmployee = 'firm_employee',
-  organization = 'organization',
-}
-
-export type DecisionSourceFootprint = {
-  kind: DecisionSourceKind.footprint;
-};
-
-export type DecisionSourceFirmEmployee = {
-  kind: DecisionSourceKind.firmEmployee;
-};
-
-export type DecisionSourceOrganization = {
-  kind: DecisionSourceKind.organization;
-  member: string;
-};
-
 export type DecisionSource =
-  | DecisionSourceFootprint
-  | DecisionSourceOrganization
-  | DecisionSourceFirmEmployee;
+  | ActorFootprint
+  | ActorOrganization
+  | ActorFirmEmployee
+  | ActorApiKey;
 
 export type OnboardingDecision = {
   id: string;

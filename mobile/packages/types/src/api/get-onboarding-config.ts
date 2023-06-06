@@ -1,7 +1,7 @@
-import { OnboardingConfig } from '../data';
+import { ObConfigAuth, OnboardingConfig } from '../data';
 
 export type GetOnboardingConfigRequest = {
-  tenantPk: string;
+  obConfigAuth?: ObConfigAuth;
 };
 
 export type GetOnboardingConfigResponse = OnboardingConfig;

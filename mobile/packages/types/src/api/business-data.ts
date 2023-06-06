@@ -1,7 +1,7 @@
-import { BusinessData } from '../data';
+import { BusinessDIData } from '../data';
 
 export type BusinessDataRequest = {
-  data: BusinessData;
+  data: BusinessDIData;
   authToken: string;
   speculative?: boolean;
 };

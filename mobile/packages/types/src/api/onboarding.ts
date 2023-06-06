@@ -3,7 +3,5 @@ export type OnboardingRequest = {
 };
 
 export type OnboardingResponse = {
-  // A cryptographically generated auth token to authenticate a session
-  // Returned only if the user has already authorized the configuration for tenant
-  validationToken?: string;
+  alreadyAuthorized: boolean;
 };

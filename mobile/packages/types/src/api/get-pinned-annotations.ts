@@ -1,7 +1,7 @@
-import { DecisionAnnotation } from '../data/decision-annotation';
+import { Annotation } from '../data';
 
 export type GetPinnedAnnotationsRequest = {
   entityId: string;
 };
 
-export type GetPinnedAnnotationsResponse = DecisionAnnotation[];
+export type GetPinnedAnnotationsResponse = Annotation[];

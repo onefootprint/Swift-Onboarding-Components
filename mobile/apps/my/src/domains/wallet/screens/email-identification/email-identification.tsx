@@ -29,7 +29,7 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: { email: 'rafael@onefootprint.com#1122' },
+    defaultValues: { email: '' },
   });
 
   const onSubmit = ({ email }) => {

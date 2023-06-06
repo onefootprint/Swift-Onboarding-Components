@@ -44,7 +44,11 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   ],
   [CollectedKybDataOption.phoneNumber]: [BusinessDI.phoneNumber],
   [CollectedKybDataOption.website]: [BusinessDI.website],
+  [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
   [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [
+    BusinessDI.kycedBeneficialOwners,
+  ],
 
   // Documents
   [CollectedDocumentDataOption.document]: [
@@ -53,6 +57,12 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
     DocumentDI.driversLicenseFront,
     DocumentDI.idCardBack,
     DocumentDI.idCardFront,
+
+    DocumentDI.latestPassport,
+    DocumentDI.latestDriversLicenseBack,
+    DocumentDI.latestDriversLicenseFront,
+    DocumentDI.latestIdCardBack,
+    DocumentDI.latestIdCardFront,
   ],
   [CollectedDocumentDataOption.documentAndSelfie]: [
     ...Object.values(DocumentDI).map(value => value),

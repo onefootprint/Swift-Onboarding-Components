@@ -1,9 +1,8 @@
+import { D2PMeta } from '../data';
+
 export type D2PGenerateRequest = {
   authToken: string;
-  meta?: {
-    sessionId?: string; // bifrost session id
-    opener?: string; // the device type that opened/generated the d2p session
-  };
+  meta?: D2PMeta;
 };
 
 export type D2PGenerateResponse = {

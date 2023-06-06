@@ -1,3 +1,5 @@
+import { FootprintAppearance } from '@onefootprint/footprint-js';
+
 import { CollectedDataOption } from './collected-data-option';
 
 export type OnboardingConfig = {
@@ -7,6 +9,7 @@ export type OnboardingConfig = {
   isLive: boolean;
   createdAt: string;
   status: 'enabled' | 'disabled';
+  appearance?: FootprintAppearance;
 
   orgName: string;
   logoUrl: string | null;

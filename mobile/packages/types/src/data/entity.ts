@@ -1,5 +1,6 @@
 import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
 import { Onboarding } from './onboarding';
+import { WatchlistCheckEventData } from './timeline';
 import { VaultValue } from './vault';
 
 export type EntityVault = Partial<Record<DataIdentifier, VaultValue>>;
@@ -27,6 +28,7 @@ export type Entity = {
   startTimestamp: string;
   status: EntityStatus;
   decryptedAttributes: EntityVault;
+  watchlistCheck: WatchlistCheckEventData | null;
 };
 
 export const hasEntityInvestorProfile = (entity: Entity) => {

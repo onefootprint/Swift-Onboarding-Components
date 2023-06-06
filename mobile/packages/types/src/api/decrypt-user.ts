@@ -1,11 +1,10 @@
 import { DataIdentifier } from '../data';
 
-export type DecryptRequest = {
-  entityId: string;
+export type DecryptUserRequest = {
   fields: DataIdentifier[];
-  reason: string;
+  authToken: string;
 };
 
-export type DecryptResponse = Partial<
+export type DecryptUserResponse = Partial<
   Record<DataIdentifier, string | undefined>
 >;

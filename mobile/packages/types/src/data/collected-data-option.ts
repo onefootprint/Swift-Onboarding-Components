@@ -1,5 +1,4 @@
-import BusinessDataAttribute from './business-data-attribute';
-import UserDataAttribute from './user-data-attribute';
+import { BusinessDI, IdDI } from './di';
 
 export type CollectedDataOption =
   | CollectedKybDataOption
@@ -17,7 +16,9 @@ export enum CollectedKybDataOption {
   address = 'business_address',
   phoneNumber = 'business_phone_number',
   website = 'business_website',
+  corporationType = 'business_corporation_type',
   beneficialOwners = 'business_beneficial_owners',
+  kycedBeneficialOwners = 'business_kyced_beneficial_owners',
 }
 
 export enum CollectedKycDataOption {
@@ -60,6 +61,7 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   full_address: CollectedKycDataOption.fullAddress,
   partial_address: CollectedKycDataOption.partialAddress,
   phone_number: CollectedKycDataOption.phoneNumber,
+  nationality: CollectedKycDataOption.nationality,
   document: CollectedDocumentDataOption.document,
   document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
   business_name: CollectedKybDataOption.name,
@@ -68,52 +70,50 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   business_phone_number: CollectedKybDataOption.phoneNumber,
   business_website: CollectedKybDataOption.website,
   business_beneficial_owners: CollectedKybDataOption.beneficialOwners,
+  business_kyced_beneficial_owners:
+    CollectedKybDataOption.kycedBeneficialOwners,
   investor_profile: CollectedInvestorProfileDataOption.investorProfile,
 };
 
 export const CollectedKybDataOptionToRequiredAttributes: Record<
   CollectedKybDataOption,
-  BusinessDataAttribute[]
+  BusinessDI[]
 > = {
-  [CollectedKybDataOption.name]: [BusinessDataAttribute.name],
-  [CollectedKybDataOption.tin]: [BusinessDataAttribute.tin],
+  [CollectedKybDataOption.name]: [BusinessDI.name],
+  [CollectedKybDataOption.tin]: [BusinessDI.tin],
   [CollectedKybDataOption.address]: [
-    BusinessDataAttribute.addressLine1,
-    BusinessDataAttribute.city,
-    BusinessDataAttribute.state,
-    BusinessDataAttribute.zip,
-    BusinessDataAttribute.country,
+    BusinessDI.addressLine1,
+    BusinessDI.city,
+    BusinessDI.state,
+    BusinessDI.zip,
+    BusinessDI.country,
   ],
-  [CollectedKybDataOption.phoneNumber]: [BusinessDataAttribute.phoneNumber],
-  [CollectedKybDataOption.website]: [BusinessDataAttribute.website],
-  [CollectedKybDataOption.beneficialOwners]: [
-    BusinessDataAttribute.beneficialOwners,
+  [CollectedKybDataOption.phoneNumber]: [BusinessDI.phoneNumber],
+  [CollectedKybDataOption.website]: [BusinessDI.website],
+  [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
+  [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [
+    BusinessDI.kycedBeneficialOwners,
   ],
 };
 
 export const CollectedKycDataOptionToRequiredAttributes: Record<
   CollectedKycDataOption,
-  UserDataAttribute[]
+  IdDI[]
 > = {
-  [CollectedKycDataOption.name]: [
-    UserDataAttribute.firstName,
-    UserDataAttribute.lastName,
-  ],
-  [CollectedKycDataOption.dob]: [UserDataAttribute.dob],
-  [CollectedKycDataOption.ssn4]: [UserDataAttribute.ssn4],
-  [CollectedKycDataOption.ssn9]: [UserDataAttribute.ssn9],
+  [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.lastName],
+  [CollectedKycDataOption.dob]: [IdDI.dob],
+  [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
+  [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
   [CollectedKycDataOption.fullAddress]: [
-    UserDataAttribute.addressLine1,
-    UserDataAttribute.city,
-    UserDataAttribute.state,
-    UserDataAttribute.zip,
-    UserDataAttribute.country,
+    IdDI.addressLine1,
+    IdDI.city,
+    IdDI.state,
+    IdDI.zip,
+    IdDI.country,
   ],
-  [CollectedKycDataOption.partialAddress]: [
-    UserDataAttribute.zip,
-    UserDataAttribute.country,
-  ],
-  [CollectedKycDataOption.email]: [UserDataAttribute.email],
-  [CollectedKycDataOption.phoneNumber]: [UserDataAttribute.phoneNumber],
-  [CollectedKycDataOption.nationality]: [UserDataAttribute.nationality],
+  [CollectedKycDataOption.partialAddress]: [IdDI.zip, IdDI.country],
+  [CollectedKycDataOption.email]: [IdDI.email],
+  [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
+  [CollectedKycDataOption.nationality]: [IdDI.nationality],
 };

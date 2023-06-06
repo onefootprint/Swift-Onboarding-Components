@@ -7,6 +7,7 @@ export type OrgMemberResponse = {
   firstName: string | null;
   lastName: string | null;
   isAssumedSession?: boolean;
+  isFirmEmployee?: boolean;
   scopes: RoleScope[];
   tenant: Organization;
 };

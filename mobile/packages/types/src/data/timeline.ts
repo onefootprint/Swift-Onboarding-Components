@@ -16,6 +16,8 @@ export enum TimelineEventKind {
   liveness = 'liveness',
   idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
+  freeFormNote = 'annotation',
+  combinedWatchlistChecks = 'combined_watchlist_checks',
 }
 
 export type CollectedDataEvent = {
@@ -29,6 +31,11 @@ export type CollectedDataEventData = {
     | CollectedKycDataOption
     | CollectedInvestorProfileDataOption
   )[];
+};
+
+export type FreeFormNoteEvent = {
+  kind: TimelineEventKind.freeFormNote;
+  data: Annotation;
 };
 
 export type LivenessEvent = {
@@ -77,7 +84,7 @@ export enum WatchlistCheckReasonCode {
 
 export enum WatchlistCheckStatus {
   error = 'error',
-  notNeeded = 'notNeeded',
+  notNeeded = 'not_needed',
   pass = 'pass',
   fail = 'fail',
 }
@@ -88,13 +95,26 @@ export type WatchlistCheckEventData = {
   status: WatchlistCheckStatus;
 };
 
+export type CombinedWatchlistChecksEvent = {
+  kind: TimelineEventKind.combinedWatchlistChecks;
+  data: PreviousWatchlistChecksEventData;
+  latestWatchlistEvent: WatchlistCheckEvent | null;
+};
+
+export type PreviousWatchlistChecksEventData = {
+  watchlistEvent: WatchlistCheckEvent;
+  timestamp: string;
+}[];
+
 export type TimelineEvent = {
   event:
     | CollectedDataEvent
     | LivenessEvent
     | IdDocUploadedEvent
     | OnboardingDecisionEvent
-    | WatchlistCheckEvent;
+    | WatchlistCheckEvent
+    | FreeFormNoteEvent
+    | CombinedWatchlistChecksEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };

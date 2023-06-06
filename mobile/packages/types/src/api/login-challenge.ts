@@ -1,9 +1,14 @@
-import { ChallengeData, ChallengeKind, Identifier } from '../data';
+import {
+  ChallengeData,
+  ChallengeKind,
+  Identifier,
+  ObConfigAuth,
+} from '../data';
 
 export type LoginChallengeRequest = {
   identifier: Identifier;
   preferredChallengeKind: ChallengeKind;
-  tenantPk?: string;
+  obConfigAuth: ObConfigAuth;
 };
 
 export type LoginChallengeResponse = {

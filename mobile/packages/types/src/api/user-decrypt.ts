@@ -1,3 +1,4 @@
+// TODO probably deprecated
 export type UserDecryptRequest = {
   attributes: string[];
   authToken: string;

@@ -1,4 +1,5 @@
 export enum RiskSignalAttribute {
+  // TODO(argoff): remove
   name = 'name',
   dob = 'dob',
   ssn = 'ssn',
@@ -10,7 +11,6 @@ export enum RiskSignalAttribute {
   country = 'country',
   email = 'email',
   phoneNumber = 'phone_number',
-  identity = 'identity',
   ipAddress = 'ip_address',
   document = 'document',
 }
