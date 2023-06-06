@@ -24,6 +24,11 @@ impl IncodeStateTransition for AddConsent {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
+        if ctx.docv_data.selfie_image.is_none() {
+            // Since consent is collected at the same time as the selfie image, don't run if it
+            // isn't provided
+            return Ok(None);
+        };
         let sv_id = ctx.sv_id.clone();
         let consent = db_pool
             .db_query(move |conn| UserConsent::latest_for_scoped_vault(conn, &sv_id))

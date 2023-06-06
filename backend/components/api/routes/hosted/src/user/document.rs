@@ -300,6 +300,7 @@ async fn handle_incode_request(
     let next_side_to_collect = match machine.state.name() {
         IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
         IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
+        IncodeVerificationSessionState::AddConsent => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::Fail => None,
         IncodeVerificationSessionState::Complete => {
