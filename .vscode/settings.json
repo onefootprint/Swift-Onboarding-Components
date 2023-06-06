@@ -128,4 +128,7 @@
   "rust-analyzer.cargo.features": [],
   "cargo.automaticCheck": false,
   "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.linkedProjects": [
+    "./backend/components/api/core/Cargo.toml"
+  ],
 }

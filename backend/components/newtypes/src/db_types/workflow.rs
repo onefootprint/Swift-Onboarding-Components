@@ -3,7 +3,6 @@ use crate::EnumDotNotationError;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
@@ -15,12 +14,9 @@ use strum_macros::EnumString;
 // TODO: maybe move this to new `state` crate?
 #[derive(
     Debug,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Hash,
     Clone,
+    PartialEq,
+    Eq,
     AsExpression,
     FromSqlRow,
     AsRefStr,
@@ -40,7 +36,7 @@ use strum_macros::EnumString;
         FromSqlRow,
         DeserializeFromStr,
         SerializeDisplay,
-        Apiv2Schema
+        Apiv2Schema,
     ),
     strum(serialize_all = "snake_case")
 )]
@@ -89,28 +85,8 @@ impl FromStr for WorkflowState {
     }
 }
 
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
-    PartialEq,
-    Eq,
-    Ord,
-    PartialOrd,
-    Hash,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[diesel(sql_type = Text)]
 pub enum KycState {
     DataCollection,
     VendorCalls,
@@ -118,36 +94,14 @@ pub enum KycState {
     Complete,
 }
 
-crate::util::impl_enum_str_diesel!(KycState);
-
 impl From<KycState> for WorkflowState {
     fn from(value: KycState) -> Self {
         Self::Kyc(value)
     }
 }
 
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
-    PartialEq,
-    Eq,
-    Ord,
-    PartialOrd,
-    Hash,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[diesel(sql_type = Text)]
 pub enum AlpacaKycState {
     DataCollection,
     VendorCalls,
@@ -158,8 +112,6 @@ pub enum AlpacaKycState {
     Complete,
 }
 
-crate::util::impl_enum_str_diesel!(AlpacaKycState);
-
 impl From<AlpacaKycState> for WorkflowState {
     fn from(value: AlpacaKycState) -> Self {
         Self::AlpacaKyc(value)
@@ -167,7 +119,7 @@ impl From<AlpacaKycState> for WorkflowState {
 }
 
 // TODO: probs consolidate this into WorkflowState somehow
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowConfig {
