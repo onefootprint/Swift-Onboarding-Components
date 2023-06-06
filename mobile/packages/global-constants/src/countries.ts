@@ -1599,3 +1599,8 @@ export const COUNTRIES: CountryRecord[] = [
 export const [DEFAULT_COUNTRY] = COUNTRIES;
 
 export const BANNED_COUNTRIES = [];
+
+export const getCountryFromCode = (countryCode?: CountryCode) => {
+  const match = COUNTRIES.find(country => country.value === countryCode);
+  return match;
+};

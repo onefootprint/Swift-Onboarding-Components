@@ -1,8 +1,12 @@
 import type { RemainingRequirements } from '../../../../requirement.types';
 
+export type MachineContext = {
+  remainingRequirements: RemainingRequirements;
+};
+
 export type MachineEvents =
   | {
-      type: 'requirementsReceived';
+      type: 'remainingRequirementsReceived';
       payload: {
         remainingRequirements: RemainingRequirements;
       };

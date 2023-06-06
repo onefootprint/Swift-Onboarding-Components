@@ -7,9 +7,9 @@ import { Label } from '../label';
 import { Pressable } from '../pressable';
 import { Typography } from '../typography';
 import Picker from './components/picker';
-import type { SelectOption, StringOrNumber } from './select.types';
+import type { BaseOption, SelectOption } from './select.types';
 
-export type SelectProps<T extends StringOrNumber = string> = {
+export type SelectProps<T extends BaseOption = BaseOption<string>> = {
   emptyStateResetText?: string;
   emptyStateTitle?: string;
   hasError?: boolean;
@@ -26,7 +26,7 @@ export type SelectProps<T extends StringOrNumber = string> = {
   ) => React.ReactNode;
 };
 
-const Select = <T extends StringOrNumber = string>({
+const Select = <T extends BaseOption = BaseOption<string>>({
   emptyStateResetText = 'Reset search',
   emptyStateTitle = 'No results found',
   hasError,

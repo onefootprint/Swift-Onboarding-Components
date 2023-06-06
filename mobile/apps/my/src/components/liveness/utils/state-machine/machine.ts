@@ -39,6 +39,4 @@ export const createLivenessMachine = () =>
     },
   });
 
-const livenessMachine = createLivenessMachine();
-
-export default livenessMachine;
+export default createLivenessMachine;

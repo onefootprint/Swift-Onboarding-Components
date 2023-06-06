@@ -4,21 +4,25 @@ import React, { useState } from 'react';
 import { Box } from '../../../box';
 import { Pressable } from '../../../pressable';
 import { Typography } from '../../../typography';
-import type { RadioSelectOption } from '../../radio-select.types';
+import type {
+  RadioSelectOption,
+  StringOrNumber,
+} from '../../radio-select.types';
 
-export type OptionProps = RadioSelectOption & {
-  onPress: () => void;
-  selected: boolean;
-};
+export type OptionProps<T extends StringOrNumber = string> =
+  RadioSelectOption<T> & {
+    onPress: () => void;
+    selected: boolean;
+  };
 
-const Option = ({
+const Option = <T extends StringOrNumber = string>({
   value,
   title,
   description,
   selected,
   onPress,
   IconComponent,
-}: OptionProps) => {
+}: OptionProps<T>) => {
   const [active, setActive] = useState(false);
 
   return (

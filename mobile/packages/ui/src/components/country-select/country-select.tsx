@@ -1,5 +1,4 @@
-import { COUNTRIES } from '@onefootprint/global-constants';
-import { CountryCode } from '@onefootprint/types';
+import { COUNTRIES, CountryRecord } from '@onefootprint/global-constants';
 import React from 'react';
 
 import { Box } from '../box';
@@ -10,8 +9,8 @@ import { Typography } from '../typography';
 export type CountrySelectProps = {
   hasError?: boolean;
   hint?: string;
-  onChange?: (newValue: SelectOption<CountryCode>) => void;
-  value?: SelectOption<CountryCode>;
+  onChange?: (newValue: SelectOption<CountryRecord>) => void;
+  value?: SelectOption<CountryRecord>;
 };
 
 const CountrySelect = ({
@@ -21,7 +20,7 @@ const CountrySelect = ({
   value,
 }: CountrySelectProps) => {
   return (
-    <Select<CountryCode>
+    <Select<CountryRecord>
       emptyStateTitle="No countries found"
       hasError={hasError}
       hint={hint}

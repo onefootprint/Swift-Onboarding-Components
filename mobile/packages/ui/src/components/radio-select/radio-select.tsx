@@ -3,20 +3,20 @@ import React from 'react';
 
 import { Box, BoxProps } from '../box';
 import Option from './components/option';
-import type { RadioSelectOption } from './radio-select.types';
+import type { RadioSelectOption, StringOrNumber } from './radio-select.types';
 
-export type RadioSelectProps = BoxProps & {
-  onChange?: (value: string) => void;
-  options: RadioSelectOption[];
-  value?: string;
+export type RadioSelectProps<T extends StringOrNumber = string> = BoxProps & {
+  onChange?: (value: T) => void;
+  options: RadioSelectOption<T>[];
+  value?: T;
 };
 
-const RadioSelect = ({
+const RadioSelect = <T extends StringOrNumber = string>({
   options,
   onChange,
   value,
   ...props
-}: RadioSelectProps) => {
+}: RadioSelectProps<T>) => {
   return options.length > 0 ? (
     <Box {...props} gap={3}>
       {options.map(

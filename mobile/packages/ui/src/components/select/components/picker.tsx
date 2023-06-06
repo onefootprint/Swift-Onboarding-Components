@@ -9,11 +9,11 @@ import { IconButton } from '../../icon-button';
 import { Pressable } from '../../pressable';
 import { TextInput } from '../../text-input';
 import { Typography } from '../../typography';
-import type { SelectOption, StringOrNumber } from '../select.types';
+import type { BaseOption, SelectOption } from '../select.types';
 import EmptyState from './empty-state';
 import Item from './item';
 
-export type PickerProps<T extends StringOrNumber = string> = {
+export type PickerProps<T extends BaseOption = BaseOption<string>> = {
   emptyStateResetText: string;
   emptyStateTitle: string;
   onChange?: (newValue: SelectOption<T>) => void;
@@ -25,7 +25,7 @@ export type PickerProps<T extends StringOrNumber = string> = {
   value?: SelectOption<T>;
 };
 
-const Picker = <T extends StringOrNumber = string>({
+const Picker = <T extends BaseOption = BaseOption<string>>({
   emptyStateResetText,
   emptyStateTitle,
   onChange,
@@ -125,9 +125,9 @@ const Picker = <T extends StringOrNumber = string>({
             return (
               <Item
                 label={item.label}
-                value={item.value}
-                selected={value?.value === item.value}
                 onPress={() => onChange?.(item)}
+                selected={value?.value === item.value}
+                value={item.value}
               />
             );
           }}

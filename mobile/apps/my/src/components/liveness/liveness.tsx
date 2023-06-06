@@ -3,7 +3,7 @@ import React from 'react';
 
 import Register from './components/register';
 import Retry from './components/retry';
-import machine from './utils/state-machine';
+import createMachine from './utils/state-machine';
 
 export type LivenessProps = {
   authToken: string;
@@ -11,7 +11,7 @@ export type LivenessProps = {
 };
 
 const Liveness = ({ authToken, onDone }: LivenessProps) => {
-  const [state, send] = useMachine(machine);
+  const [state, send] = useMachine(() => createMachine());
 
   return (
     <>

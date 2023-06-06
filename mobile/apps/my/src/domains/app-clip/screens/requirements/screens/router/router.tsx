@@ -19,7 +19,7 @@ const Router = ({ authToken, onDone }: RouterProps) => {
     if (state.done) {
       onDone();
     }
-  }, [state.done]);
+  }, [state.done, onDone]);
 
   return (
     <>
@@ -28,7 +28,7 @@ const Router = ({ authToken, onDone }: RouterProps) => {
           authToken={authToken}
           onSuccess={remainingRequirements => {
             send({
-              type: 'requirementsReceived',
+              type: 'remainingRequirementsReceived',
               payload: {
                 remainingRequirements,
               },
@@ -44,6 +44,7 @@ const Router = ({ authToken, onDone }: RouterProps) => {
       )}
       {state.matches('idDoc') && (
         <IdDoc
+          requirement={state.context.remainingRequirements.idDoc}
           authToken={authToken}
           onDone={() => send({ type: 'requirementCompleted' })}
         />
