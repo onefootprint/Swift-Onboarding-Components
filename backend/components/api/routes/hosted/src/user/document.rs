@@ -156,9 +156,6 @@ pub async fn post(
                     DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone())
                 })
                 .collect::<db::DbResult<Vec<_>>>()?;
-
-            // Check if all documents are uploaded before proceeding
-            // In the future, we'll proceed until the state machine reaches the end
             let existing_sides = id_doc.images(conn)?.into_iter().map(|u| u.side).collect_vec();
             let required_sides = id_doc
                 .document_type
@@ -170,25 +167,21 @@ pub async fn post(
                 .into_iter()
                 .filter(|s| !existing_sides.contains(s))
                 .collect_vec();
-            let result = if missing_sides.is_empty() {
-                // Mark the document request as Uploaded
-                //
-                // Now that the document is created, either initiate IDV reqs or create fixture data
-                //
-                if should_initiate_reqs {
-                    // Initiate IDV reqs once and only once for this id_doc
-                    let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
-                    Some((decision_intent, doc_request.into_inner(), id_doc.id))
-                } else {
-                    // Create fixture data
+
+            // Now that the document is created, either initiate IDV reqs or create fixture data
+            let result = if should_initiate_reqs {
+                // Initiate IDV reqs once and only once for this id_doc
+                let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
+                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+                Some((decision_intent, doc_request.into_inner(), id_doc.id))
+            } else {
+                if missing_sides.is_empty() {
+                    // Create fixture data once all of the sides are uploaded
                     let ocr =
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None);
                     let doc_type = request.document_type;
                     Complete::enter(conn, &vault2, &su_id, &id_doc.id, doc_type, ocr)?;
-                    None
                 }
-            } else {
                 None
             };
 
