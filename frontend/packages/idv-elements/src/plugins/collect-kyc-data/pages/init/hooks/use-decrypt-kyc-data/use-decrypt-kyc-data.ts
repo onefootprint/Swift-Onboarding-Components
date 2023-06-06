@@ -6,7 +6,6 @@ import {
   UserTokenResponse,
   UserTokenScope,
 } from '@onefootprint/types';
-import { useEffectOnce } from 'usehooks-ts';
 
 import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
@@ -38,7 +37,6 @@ const useDecryptKycData = ({
   onError,
 }: UseDecryptKycDataArgs) => {
   const decryptUserMutation = useDecryptUser();
-  const userTokenMutation = useUserToken();
   const populatedDis = populatedCdos.flatMap(cdo => CdoToDiMap[cdo]);
 
   const handleDecryptedData = (
@@ -77,18 +75,15 @@ const useDecryptKycData = ({
       UserTokenScope.sensitiveProfile,
     );
 
-    // If can't decrypt or there is nothing to decrypt, return empty data
-    if (
-      populatedDis.length === 0 ||
-      (!canDecryptBasic && !canDecryptSensitive)
-    ) {
-      handleDecryptedData({});
-      return;
-    }
-
     let fields: DataIdentifier[] = populatedDis;
     if (!canDecryptSensitive) {
       fields = fields.filter(di => BASIC_PROFILE_DIS.includes(di));
+    }
+
+    // If can't decrypt or there is nothing to decrypt, return empty data
+    if (fields.length === 0 || (!canDecryptBasic && !canDecryptSensitive)) {
+      handleDecryptedData({});
+      return;
     }
 
     decryptUserMutation.mutate(
@@ -100,17 +95,13 @@ const useDecryptKycData = ({
     );
   };
 
-  useEffectOnce(() => {
-    userTokenMutation.mutate(
-      {
-        authToken,
-      },
-      {
-        onSuccess: handleTokenSuccess,
-        onError,
-      },
-    );
-  });
+  useUserToken(
+    { authToken },
+    {
+      onSuccess: handleTokenSuccess,
+      onError,
+    },
+  );
 };
 
 export default useDecryptKycData;

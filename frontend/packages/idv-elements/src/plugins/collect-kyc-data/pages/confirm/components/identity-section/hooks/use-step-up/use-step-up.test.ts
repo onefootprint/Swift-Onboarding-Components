@@ -61,6 +61,7 @@ describe('useStepUp', () => {
   describe('when there are api errors', () => {
     it('when user token api call errors, should call onError', async () => {
       withUserTokenError();
+      withIdentify();
 
       const device = {
         type: 'mobile',

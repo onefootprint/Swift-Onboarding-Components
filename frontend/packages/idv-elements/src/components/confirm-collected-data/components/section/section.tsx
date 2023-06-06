@@ -23,32 +23,36 @@ const Section = ({
   actions,
   content,
   testID,
-}: SectionProps) => (
-  <Container data-testid={testID}>
-    <Header>
-      <TitleContainer>
-        {IconComponent && <IconComponent />}
-        <Typography sx={{ marginLeft: 2 }} variant="label-2">
-          {title}
-        </Typography>
-      </TitleContainer>
-      {actions?.length && (
-        <ActionsContainer>
-          {actions.map(({ label, onClick, isLoading }) =>
-            isLoading ? (
-              <LoadingIndicator key={label} />
-            ) : (
-              <LinkButton key={label} onClick={onClick} disabled={isLoading}>
-                {label}
-              </LinkButton>
-            ),
-          )}
-        </ActionsContainer>
-      )}
-    </Header>
-    <Content>{content}</Content>
-  </Container>
-);
+}: SectionProps) => {
+  const hasActions = actions && actions?.length > 0;
+
+  return (
+    <Container data-testid={testID}>
+      <Header>
+        <TitleContainer>
+          {IconComponent && <IconComponent />}
+          <Typography sx={{ marginLeft: 2 }} variant="label-2">
+            {title}
+          </Typography>
+        </TitleContainer>
+        {hasActions && (
+          <ActionsContainer>
+            {actions?.map(({ label, onClick, isLoading }) =>
+              isLoading ? (
+                <LoadingIndicator key={label} />
+              ) : (
+                <LinkButton key={label} onClick={onClick} disabled={isLoading}>
+                  {label}
+                </LinkButton>
+              ),
+            )}
+          </ActionsContainer>
+        )}
+      </Header>
+      <Content>{content}</Content>
+    </Container>
+  );
+};
 
 const Content = styled.div`
   ${({ theme }) => css`

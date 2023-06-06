@@ -1,6 +1,6 @@
 import request from '@onefootprint/request';
 import { UserTokenRequest, UserTokenResponse } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';
 
@@ -17,6 +17,17 @@ const userToken = async (payload: UserTokenRequest) => {
   return response.data;
 };
 
-const useUserToken = () => useMutation(userToken);
+const useUserToken = (
+  { authToken }: UserTokenRequest,
+  options: {
+    onSuccess?: (response: UserTokenResponse) => void;
+    onError?: (error: unknown) => void;
+  } = {},
+) =>
+  useQuery(['token', authToken], () => userToken({ authToken }), {
+    enabled: !!authToken,
+    onSuccess: options.onSuccess,
+    onError: options.onError,
+  });
 
 export default useUserToken;

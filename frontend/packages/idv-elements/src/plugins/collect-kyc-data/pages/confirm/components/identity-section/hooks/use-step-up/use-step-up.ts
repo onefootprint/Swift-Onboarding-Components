@@ -27,23 +27,27 @@ const useStepUp = ({
 }: UseStepUpArgs) => {
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
 
-  const userTokenMutation = useUserToken();
+  const userTokenQuery = useUserToken(
+    { authToken },
+    {
+      onError,
+    },
+  );
   const identifyMutation = useIdentify();
   const loginChallengeMutation = useLoginChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
   const isLoading =
     isRunningWebauthn ||
-    userTokenMutation.isLoading ||
+    userTokenQuery.isLoading ||
     identifyMutation.isLoading ||
     loginChallengeMutation.isLoading ||
     identifyVerifyMutation.isLoading;
 
   useEffectOnce(() => {
     identifyMutation.mutate({ authToken }, { onError });
-    userTokenMutation.mutate({ authToken }, { onError });
   });
 
-  const needsStepUp = !userTokenMutation.data?.scopes.includes(
+  const needsStepUp = !userTokenQuery.data?.scopes.includes(
     UserTokenScope.sensitiveProfile,
   );
   const canRequestBiometric =

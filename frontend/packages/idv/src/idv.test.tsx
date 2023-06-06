@@ -141,6 +141,7 @@ describe('<Idv />', () => {
       withUserToken();
       withIdentify();
       withOnboarding();
+      withOnboardingConfig();
       withRequirements();
 
       renderIdv({});

@@ -46,7 +46,12 @@ const Init = () => {
           },
         });
       },
-      onError: showRequestError,
+      onError: (error: unknown) => {
+        showRequestError(error);
+        send({
+          type: 'invalidUrlReceived',
+        });
+      },
     },
   );
 
@@ -62,7 +67,12 @@ const Init = () => {
           },
         });
       },
-      onError: showRequestError,
+      onError: (error: unknown) => {
+        showRequestError(error);
+        send({
+          type: 'invalidUrlReceived',
+        });
+      },
     },
   );
 
