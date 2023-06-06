@@ -31,7 +31,6 @@ pub fn save_final_decision(
     assert_is_first_decision_for_onboarding: bool,
     workflow_id: Option<WorkflowId>,
 ) -> ApiResult<OnboardingDecision> {
-    // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: Create our risk signals!
     // Save status
     let ob = Onboarding::lock(conn, &ob_id)?;
@@ -42,7 +41,7 @@ pub fn save_final_decision(
         return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
     }
 
-    // If we should commit, mark all data as verified for the onboarding
+    // If we should commit, portablize all data for the onboarding
     let seqno = if decision.decision.should_commit {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
         let seqno = uvw.portablize_identity_data(conn)?;

@@ -12,6 +12,7 @@ pub mod actions;
 pub use actions::*;
 pub mod alpaca_kyc;
 pub mod common;
+pub mod document;
 pub mod kyc;
 mod traits;
 
@@ -32,6 +33,7 @@ pub enum StateError {
 }
 
 use alpaca_kyc::AlpacaKycState;
+use document::DocumentState;
 use kyc::KycState;
 
 #[enum_dispatch(Workflow)]
@@ -39,6 +41,7 @@ use kyc::KycState;
 pub enum WorkflowKind {
     Kyc(KycState),
     AlpacaKyc(AlpacaKycState),
+    Document(DocumentState),
 }
 
 impl From<WorkflowKind> for newtypes::WorkflowState {
@@ -46,6 +49,7 @@ impl From<WorkflowKind> for newtypes::WorkflowState {
         match value {
             WorkflowKind::Kyc(s) => s.name(),
             WorkflowKind::AlpacaKyc(s) => s.name(),
+            WorkflowKind::Document(s) => s.name(),
         }
     }
 }
@@ -61,10 +65,9 @@ impl WorkflowWrapper {
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
-            newtypes::WorkflowState::Kyc(s) => kyc::KycState::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::AlpacaKyc(s) => {
-                alpaca_kyc::AlpacaKycState::init(state, workflow).await?.into()
-            }
+            newtypes::WorkflowState::Kyc(s) => KycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::AlpacaKyc(s) => AlpacaKycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Document(s) => DocumentState::init(state, workflow).await?.into(),
         };
         Ok(Self {
             state: s,

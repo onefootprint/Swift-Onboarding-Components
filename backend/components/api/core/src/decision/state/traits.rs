@@ -1,6 +1,4 @@
 use super::actions::WorkflowActions;
-use super::alpaca_kyc::*;
-use super::kyc::*;
 use super::StateError;
 use super::WorkflowKind;
 use crate::{errors::ApiResult, ApiError, State};
@@ -9,6 +7,11 @@ use db::{models::workflow::Workflow as DbWorkflow, TxnPgConn};
 use enum_dispatch::enum_dispatch;
 use newtypes::WorkflowId;
 use thiserror::Error;
+
+// These are needed for enum_dispatch to work properly
+use super::alpaca_kyc::*;
+use super::document::*;
+use super::kyc::*;
 
 #[enum_dispatch]
 /// Provides basic functionality that all WorkflowStates should have

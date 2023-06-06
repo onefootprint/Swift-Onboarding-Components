@@ -105,9 +105,7 @@ impl VerificationRequest {
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
         let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
             .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
-            .left_join(
-                verification_result::table.on(verification_result::request_id.eq(verification_request::id)),
-            )
+            .left_join(verification_result::table)
             .filter(
                 verification_result::id
                     .is_null()
@@ -127,14 +125,12 @@ impl VerificationRequest {
 
         let max_kyc_seq_no = kyc_requests.iter().map(|(req, _)| req.uvw_snapshot_seqno).max();
 
-        let (kyc_requests_with_max_seqno, kyc_requests_with_earlier_seqno): (
-            Vec<RequestAndMaybeResult>,
-            Vec<RequestAndMaybeResult>,
-        ) = kyc_requests.into_iter().partition(|(req, _)| {
-            max_kyc_seq_no
-                .map(|seqno| req.uvw_snapshot_seqno == seqno)
-                .unwrap_or_else(|| false)
-        });
+        let (kyc_requests_with_max_seqno, kyc_requests_with_earlier_seqno): (Vec<_>, Vec<_>) =
+            kyc_requests.into_iter().partition(|(req, _)| {
+                max_kyc_seq_no
+                    .map(|seqno| req.uvw_snapshot_seqno == seqno)
+                    .unwrap_or_default()
+            });
 
         if !kyc_requests_with_earlier_seqno.is_empty() {
             tracing::error!(kyc_requests_with_earlier_seqno=kyc_requests_with_earlier_seqno.iter().map(|(req, _)| format!("{:?}", req)).collect::<Vec<_>>().join(","), "get_latest_requests_and_results_for_onboarding: KYC vendor requests with unexpected earlier seqno");

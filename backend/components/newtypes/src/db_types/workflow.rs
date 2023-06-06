@@ -46,6 +46,7 @@ use strum_macros::EnumString;
 pub enum WorkflowState {
     Kyc(KycState),
     AlpacaKyc(AlpacaKycState),
+    Document(DocumentState),
 }
 
 impl_enum_string_diesel!(WorkflowKind);
@@ -57,6 +58,7 @@ impl std::fmt::Display for WorkflowState {
         let suffix = match self {
             WorkflowState::Kyc(s) => s.to_string(),
             WorkflowState::AlpacaKyc(s) => s.to_string(),
+            WorkflowState::Document(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -79,6 +81,9 @@ impl FromStr for WorkflowState {
             WorkflowKind::Kyc => Self::Kyc(KycState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?),
             WorkflowKind::AlpacaKyc => {
                 Self::AlpacaKyc(AlpacaKycState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+            }
+            WorkflowKind::Document => {
+                Self::Document(DocumentState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
         };
         Ok(result)
@@ -118,6 +123,20 @@ impl From<AlpacaKycState> for WorkflowState {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[strum(serialize_all = "snake_case")]
+pub enum DocumentState {
+    DataCollection,
+    Decisioning,
+    Complete,
+}
+
+impl From<DocumentState> for WorkflowState {
+    fn from(value: DocumentState) -> Self {
+        Self::Document(value)
+    }
+}
+
 // TODO: probs consolidate this into WorkflowState somehow
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -125,6 +144,7 @@ impl From<AlpacaKycState> for WorkflowState {
 pub enum WorkflowConfig {
     Kyc(KycConfig),
     AlpacaKyc(AlpacaKycConfig),
+    Document(DocumentConfig),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -138,6 +158,9 @@ pub struct KycConfig {
 pub struct AlpacaKycConfig {
     pub is_redo: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DocumentConfig {}
 
 #[cfg(test)]
 mod tests {
