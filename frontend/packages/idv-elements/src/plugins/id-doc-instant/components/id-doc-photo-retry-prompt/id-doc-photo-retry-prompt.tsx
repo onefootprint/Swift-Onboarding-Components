@@ -4,6 +4,7 @@ import React from 'react';
 
 import { ImageTypes } from '../../constants/image-types';
 import Error from '../error';
+import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoRetryPromptProps = {
@@ -17,9 +18,11 @@ const IdDocPhotoRetryPrompt = ({
   errors,
   onComplete,
 }: IdDocPhotoRetryPromptProps) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-    <Error imageType={imageType} errors={errors} />
-    <IdDocPhotoButtons onComplete={onComplete} />
-  </Box>
+  <FadeInContainer>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+      <Error imageType={imageType} errors={errors} />
+      <IdDocPhotoButtons onComplete={onComplete} />
+    </Box>
+  </FadeInContainer>
 );
 export default IdDocPhotoRetryPrompt;

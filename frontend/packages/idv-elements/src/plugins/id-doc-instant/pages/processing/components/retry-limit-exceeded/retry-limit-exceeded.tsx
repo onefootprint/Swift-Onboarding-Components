@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import FadeInContainer from '../../../../components/fade-in-container';
 import FeedbackIcon from '../../../../components/feedback-icon';
 import { useIdDocMachine } from '../../../../components/machine-provider';
 import TRANSITION_DELAY from '../../../../constants/transition-delay.constants';
@@ -22,38 +23,40 @@ const RetryLimitExceeded = () => {
   }, TRANSITION_DELAY);
 
   return (
-    <Container>
-      <NavigationHeader />
-      <FeedbackIcon
-        imageIcon={{ component: IcoRepeat40 }}
-        statusIndicator={{
-          component: <IcoWarning16 color="error" />,
-          status: 'error',
-        }}
-      />
-      <ErrorMessage>
-        <Typography
-          variant="label-1"
-          color="error"
-          sx={{ textAlign: 'center' }}
-        >
-          {t('title')}
-        </Typography>
-        <Typography
-          variant="body-2"
-          color="secondary"
-          sx={{
-            textAlign: 'center',
+    <FadeInContainer>
+      <ErrorContainer>
+        <NavigationHeader />
+        <FeedbackIcon
+          imageIcon={{ component: IcoRepeat40 }}
+          statusIndicator={{
+            component: <IcoWarning16 color="error" />,
+            status: 'error',
           }}
-        >
-          {t('description')}
-        </Typography>
-      </ErrorMessage>
-    </Container>
+        />
+        <ErrorMessage>
+          <Typography
+            variant="label-1"
+            color="error"
+            sx={{ textAlign: 'center' }}
+          >
+            {t('title')}
+          </Typography>
+          <Typography
+            variant="body-2"
+            color="secondary"
+            sx={{
+              textAlign: 'center',
+            }}
+          >
+            {t('description')}
+          </Typography>
+        </ErrorMessage>
+      </ErrorContainer>
+    </FadeInContainer>
   );
 };
 
-const Container = styled.div`
+const ErrorContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

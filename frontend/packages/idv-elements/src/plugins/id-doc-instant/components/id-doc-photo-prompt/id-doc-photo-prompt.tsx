@@ -12,6 +12,7 @@ import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons, ImageTypes } from '../../constants/image-types';
+import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoPromptProps = {
@@ -35,41 +36,43 @@ const IdDocPhotoPrompt = ({
       : `${imageType} side`;
 
   return (
-    <Container>
-      <ImageIcon />
-      <HeaderTitle
-        title={t('title', {
-          type: IdDocTypeToLabel[type],
-          side,
-        })}
-      />
-      {showGuidelines && (
-        <InfoBox
-          items={[
-            {
-              title: t('guidelines.check-lighting.title'),
-              description: t('guidelines.check-lighting.description'),
-              Icon: IcoSun24,
-            },
-            {
-              title: t('guidelines.device-steady.title'),
-              description: t('guidelines.device-steady.description'),
-              Icon: IcoSmartphone24,
-            },
-            {
-              title: t('guidelines.whole-document.title'),
-              description: t('guidelines.whole-document.description'),
-              Icon: IcoSquareFrame24,
-            },
-          ]}
+    <FadeInContainer>
+      <PromptContainer>
+        <ImageIcon />
+        <HeaderTitle
+          title={t('title', {
+            type: IdDocTypeToLabel[type],
+            side,
+          })}
         />
-      )}
-      <IdDocPhotoButtons onComplete={onComplete} />
-    </Container>
+        {showGuidelines && (
+          <InfoBox
+            items={[
+              {
+                title: t('guidelines.check-lighting.title'),
+                description: t('guidelines.check-lighting.description'),
+                Icon: IcoSun24,
+              },
+              {
+                title: t('guidelines.device-steady.title'),
+                description: t('guidelines.device-steady.description'),
+                Icon: IcoSmartphone24,
+              },
+              {
+                title: t('guidelines.whole-document.title'),
+                description: t('guidelines.whole-document.description'),
+                Icon: IcoSquareFrame24,
+              },
+            ]}
+          />
+        )}
+        <IdDocPhotoButtons onComplete={onComplete} />
+      </PromptContainer>
+    </FadeInContainer>
   );
 };
 
-const Container = styled.div`
+const PromptContainer = styled.div`
   ${({ theme }) => css`
     height: 100%;
     display: flex;
