@@ -5,15 +5,20 @@ use db::models::{
     decision_intent::DecisionIntent,
     onboarding::{Onboarding, OnboardingUpdate},
     scoped_vault::ScopedVault,
-    workflow::Workflow,
+    workflow::Workflow as DbWorkflow,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId, WorkflowKind};
+use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
 
-use super::{Complete, DataCollection, Decisioning, KycState, MakeDecision, MakeVendorCalls, VendorCalls};
+use super::{
+    KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
+};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-    state::{actions::Authorize, common},
+    state::{
+        actions::{Authorize, WorkflowActions},
+        common, WorkflowState,
+    },
     utils::FixtureDecision,
 };
 use crate::{
@@ -33,11 +38,11 @@ use crate::{
 /////////////////////
 /// DataCollection
 /// ////////////////
-impl DataCollection {
-    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
+impl KycDataCollection {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(DataCollection {
+        Ok(KycDataCollection {
             wf_id: workflow.id,
             is_redo: config.is_redo,
             sv_id: sv.id,
@@ -48,7 +53,7 @@ impl DataCollection {
 }
 
 #[async_trait]
-impl OnAction<Authorize, KycState> for DataCollection {
+impl OnAction<Authorize, KycState> for KycDataCollection {
     type AsyncRes = TenantVendorControl;
 
     async fn execute_async_idempotent_actions(
@@ -66,25 +71,34 @@ impl OnAction<Authorize, KycState> for DataCollection {
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
-        Ok(VendorCalls {
+        Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
-        }
-        .into())
+        }))
+    }
+}
+
+impl WorkflowState for KycDataCollection {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KycState::DataCollection)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None
     }
 }
 
 /////////////////////
 /// VendorCalls
 /// ////////////////
-impl VendorCalls {
-    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
+impl KycVendorCalls {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(VendorCalls {
+        Ok(KycVendorCalls {
             wf_id: workflow.id,
             is_redo: config.is_redo,
             sv_id: sv.id,
@@ -95,7 +109,7 @@ impl VendorCalls {
 }
 
 #[async_trait]
-impl OnAction<MakeVendorCalls, KycState> for VendorCalls {
+impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
     async fn execute_async_idempotent_actions(
@@ -107,28 +121,37 @@ impl OnAction<MakeVendorCalls, KycState> for VendorCalls {
     }
 
     fn on_commit(self, vendor_results: Vec<VendorResult>, _conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        Ok(Decisioning {
+        Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-        }
-        .into())
+        }))
+    }
+}
+
+impl WorkflowState for KycVendorCalls {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KycState::VendorCalls)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls))
     }
 }
 
 /////////////////////
 /// Decisioning
 /// ////////////////
-impl Decisioning {
-    pub async fn init(state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
+impl KycDecisioning {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
-        Ok(Decisioning {
+        Ok(KycDecisioning {
             wf_id: workflow.id,
             is_redo: config.is_redo,
             ob_id: ob.id,
@@ -141,7 +164,7 @@ impl Decisioning {
 
 type IsSandbox = bool;
 #[async_trait]
-impl OnAction<MakeDecision, KycState> for Decisioning {
+impl OnAction<MakeDecision, KycState> for KycDecisioning {
     type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
 
     async fn execute_async_idempotent_actions(
@@ -159,7 +182,6 @@ impl OnAction<MakeDecision, KycState> for Decisioning {
 
         Ok((fixture_decision, state.feature_flag_client.clone()))
     }
-
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (fixture_decision, ff_client) = async_res;
 
@@ -181,15 +203,35 @@ impl OnAction<MakeDecision, KycState> for Decisioning {
             self.is_redo,
             fixture_decision.is_some(),
         )?;
-        Ok(Complete.into())
+        Ok(KycState::from(KycComplete))
+    }
+}
+
+impl WorkflowState for KycDecisioning {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KycState::Decisioning)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision))
     }
 }
 
 /////////////////////
 /// Complete
 /// ////////////////
-impl Complete {
-    pub async fn init(_state: &State, workflow: Workflow, config: KycConfig) -> ApiResult<Self> {
-        Ok(Complete)
+impl KycComplete {
+    pub async fn init(_state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
+        Ok(KycComplete)
+    }
+}
+
+impl WorkflowState for KycComplete {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KycState::Complete)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None
     }
 }

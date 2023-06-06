@@ -13,7 +13,7 @@ use db::{
         scoped_vault::ScopedVault,
         vault::Vault,
         verification_request::VerificationRequest,
-        workflow::Workflow,
+        workflow::Workflow as DbWorkflow,
     },
     DbError,
 };
@@ -25,7 +25,7 @@ use idv::incode::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, FootprintReasonCode, OnboardingStatus,
-    Vendor, VendorAPI, WorkflowKind,
+    Vendor, VendorAPI,
 };
 
 use crate::{
@@ -35,8 +35,9 @@ use crate::{
         onboarding::{Decision, OnboardingRulesDecisionOutput},
         review::save_review_decision,
         state::{
-            actions::MakeDecision, common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall,
-            OnAction, ReviewCompleted,
+            actions::{MakeDecision, WorkflowActions},
+            common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall, OnAction,
+            ReviewCompleted, StateError, WorkflowState,
         },
         utils::FixtureDecision,
         vendor::{self, tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
@@ -46,19 +47,19 @@ use crate::{
 };
 
 use super::{
-    AlpacaKycState, Complete, DataCollection, Decisioning, DocCollection, PendingReview, VendorCalls,
-    WatchlistCheck,
+    AlpacaKycComplete, AlpacaKycDataCollection, AlpacaKycDecisioning, AlpacaKycDocCollection,
+    AlpacaKycPendingReview, AlpacaKycState, AlpacaKycVendorCalls, AlpacaKycWatchlistCheck,
 };
 
 /////////////////////
 /// DataCollection
 /// ////////////////
-impl DataCollection {
+impl AlpacaKycDataCollection {
     // TODO: pass in (Alpaca)KycConfig later and enable `redo`
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(DataCollection {
+        Ok(AlpacaKycDataCollection {
             wf_id: workflow.id,
             sv_id: sv.id,
             ob_id: ob.id,
@@ -68,7 +69,7 @@ impl DataCollection {
 }
 
 #[async_trait]
-impl OnAction<Authorize, AlpacaKycState> for DataCollection {
+impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
     type AsyncRes = TenantVendorControl;
 
     async fn execute_async_idempotent_actions(
@@ -86,24 +87,33 @@ impl OnAction<Authorize, AlpacaKycState> for DataCollection {
     fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, false, &self.ob_id, &self.sv_id)?;
 
-        Ok(VendorCalls {
+        Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
-        }
-        .into())
+        }))
+    }
+}
+
+impl WorkflowState for AlpacaKycDataCollection {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::DataCollection)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None // have to wait for user to complete Bifrost
     }
 }
 
 /////////////////////
 /// VendorCalls
 /// ////////////////
-impl VendorCalls {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycVendorCalls {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(VendorCalls {
+        Ok(AlpacaKycVendorCalls {
             wf_id: workflow.id,
             sv_id: sv.id,
             ob_id: ob.id,
@@ -113,7 +123,7 @@ impl VendorCalls {
 }
 
 #[async_trait]
-impl OnAction<MakeVendorCalls, AlpacaKycState> for VendorCalls {
+impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
     async fn execute_async_idempotent_actions(
@@ -129,27 +139,36 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for VendorCalls {
         vendor_results: Vec<VendorResult>,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
-        Ok(Decisioning {
+        Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-        }
-        .into())
+        }))
+    }
+}
+
+impl WorkflowState for AlpacaKycVendorCalls {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::VendorCalls)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls))
     }
 }
 
 /////////////////////
 /// Decisioning
 /// ////////////////
-impl Decisioning {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycDecisioning {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
-        Ok(Decisioning {
+        Ok(AlpacaKycDecisioning {
             wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
@@ -160,7 +179,7 @@ impl Decisioning {
 }
 
 #[async_trait]
-impl OnAction<MakeDecision, AlpacaKycState> for Decisioning {
+impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     type AsyncRes = Option<FixtureDecision>;
 
     async fn execute_async_idempotent_actions(
@@ -205,7 +224,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for Decisioning {
                     false,
                     fixture_decision.is_some(),
                 )?;
-                Ok(AlpacaKycState::from(Complete))
+                Ok(AlpacaKycState::from(AlpacaKycComplete))
             }
             DecisionStatus::Pass => {
                 // we update ob.status = Pending but cannot write an OBD yet (need to do watchlist checks next)
@@ -214,7 +233,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for Decisioning {
                     &self.ob_id,
                     OnboardingUpdate::set_status(OnboardingStatus::Pending),
                 )?;
-                Ok(AlpacaKycState::from(WatchlistCheck {
+                Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
@@ -235,26 +254,35 @@ impl OnAction<MakeDecision, AlpacaKycState> for Decisioning {
                     true, // TODO: maybe should_collect_selfie should come from a config
                     Some(self.wf_id.clone()),
                 )?;
-                Ok(DocCollection {
+                Ok(AlpacaKycState::from(AlpacaKycDocCollection {
                     wf_id: self.wf_id,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
-                }
-                .into())
+                }))
             }
         }
+    }
+}
+
+impl WorkflowState for AlpacaKycDecisioning {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::Decisioning)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision))
     }
 }
 
 /////////////////////
 /// WatchlistCheck
 /// ////////////////
-impl WatchlistCheck {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycWatchlistCheck {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(WatchlistCheck {
+        Ok(AlpacaKycWatchlistCheck {
             wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
@@ -264,7 +292,7 @@ impl WatchlistCheck {
 }
 
 #[async_trait]
-impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for WatchlistCheck {
+impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistCheck {
     type AsyncRes = (
         Either<WatchlistResultResponse, FixtureDecision>,
         Vec<VendorResult>,
@@ -272,7 +300,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for WatchlistCheck {
 
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeWatchlistCheckCall,
+        action: MakeWatchlistCheckCall,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // TODO: query for already complete (Vreq/Vres) for edge case where server crashes after `make_watchlist_result_call` but before `on_commit` commits
@@ -422,9 +450,9 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for WatchlistCheck {
         )?;
 
         if final_decision.decision_status == DecisionStatus::Pass {
-            Ok(AlpacaKycState::from(Complete))
+            Ok(AlpacaKycState::from(AlpacaKycComplete))
         } else {
-            Ok(AlpacaKycState::from(PendingReview {
+            Ok(AlpacaKycState::from(AlpacaKycPendingReview {
                 sv_id: self.sv_id,
                 wf_id: self.wf_id,
             }))
@@ -432,13 +460,23 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for WatchlistCheck {
     }
 }
 
+impl WorkflowState for AlpacaKycWatchlistCheck {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::WatchlistCheck)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall))
+    }
+}
+
 /////////////////////
 /// PendingReview
 /// ////////////////
-impl PendingReview {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycPendingReview {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
-        Ok(PendingReview {
+        Ok(AlpacaKycPendingReview {
             sv_id: sv.id,
             wf_id: workflow.id,
         })
@@ -446,7 +484,7 @@ impl PendingReview {
 }
 
 #[async_trait]
-impl OnAction<ReviewCompleted, AlpacaKycState> for PendingReview {
+impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
     type AsyncRes = (DecisionRequest, AuthActor);
 
     async fn execute_async_idempotent_actions(
@@ -472,18 +510,28 @@ impl OnAction<ReviewCompleted, AlpacaKycState> for PendingReview {
             actor,
             Some(self.wf_id),
         )?;
-        Ok(Complete.into())
+        Ok(AlpacaKycState::from(AlpacaKycComplete))
+    }
+}
+
+impl WorkflowState for AlpacaKycPendingReview {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::PendingReview)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None // have to wait for user to complete review
     }
 }
 
 /////////////////////
 /// DocCollection
 /// ////////////////
-impl DocCollection {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+impl AlpacaKycDocCollection {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(DocCollection {
+        Ok(AlpacaKycDocCollection {
             wf_id: workflow.id,
             ob_id: ob.id,
             sv_id: sv.id,
@@ -493,33 +541,52 @@ impl DocCollection {
 }
 
 #[async_trait]
-impl OnAction<DocCollected, AlpacaKycState> for DocCollection {
+impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
     type AsyncRes = ();
 
     async fn execute_async_idempotent_actions(
         &self,
-        _action: DocCollected,
+        action: DocCollected,
         _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok(())
     }
 
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        Ok(WatchlistCheck {
+        Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
-        }
-        .into())
+        }))
+    }
+}
+
+impl WorkflowState for AlpacaKycDocCollection {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::DocCollection)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None // have to wait for doc collection flow to finish
     }
 }
 
 /////////////////////
 /// Complete
 /// ////////////////
-impl Complete {
-    pub async fn init(_state: &State, workflow: Workflow) -> ApiResult<Self> {
-        Ok(Complete)
+impl AlpacaKycComplete {
+    pub async fn init(_state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+        Ok(AlpacaKycComplete)
+    }
+}
+
+impl WorkflowState for AlpacaKycComplete {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::AlpacaKycState::Complete)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None // terminal state
     }
 }

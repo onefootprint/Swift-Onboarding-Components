@@ -1,8 +1,8 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
+use crate::decision::state::Workflow;
 use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowState;
+use crate::decision::state::WorkflowKind;
 use crate::decision::state::WorkflowWrapper;
-use crate::decision::state::WorkflowWrapperState;
 use crate::decision::tests::test_helpers;
 use crate::utils::mock_enclave::MockEnclave;
 use crate::{decision::state::kyc, State};
@@ -11,7 +11,7 @@ use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::NewWorkflow;
-use db::models::workflow::Workflow;
+use db::models::workflow::Workflow as DbWorkflow;
 use db::models::workflow_event::WorkflowEvent;
 use db::tests::test_db_pool::TestDbPool;
 use feature_flag::BoolFlag;
@@ -25,7 +25,7 @@ use newtypes::WorkflowConfig;
 use newtypes::{KycState, WorkflowId};
 use std::sync::Arc;
 
-async fn create_wf(state: &State, s: newtypes::WorkflowState) -> Workflow {
+async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let (_, _, _, sv, _, _) =
         test_helpers::create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true, None)
             .await;
@@ -33,7 +33,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> Workflow {
     state
         .db_pool
         .db_query(|conn| {
-            Workflow::create(
+            DbWorkflow::create(
                 conn,
                 NewWorkflow {
                     created_at: Utc::now(),
@@ -49,11 +49,11 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> Workflow {
         .unwrap()
 }
 
-async fn get_wf(state: &State, wfid: WorkflowId) -> (Workflow, Vec<WorkflowEvent>) {
+async fn get_wf(state: &State, wfid: WorkflowId) -> (DbWorkflow, Vec<WorkflowEvent>) {
     state
         .db_pool
         .db_query(move |conn| {
-            let wf = Workflow::get(conn, &wfid).unwrap();
+            let wf = DbWorkflow::get(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
             (wf, wfe)
         })
@@ -69,7 +69,7 @@ async fn valid_action(state: &mut State) {
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::KycState::DataCollection(_))
+        WorkflowKind::Kyc(kyc::KycState::DataCollection(_))
     ));
 
     let (ww, _) = ww
@@ -78,7 +78,7 @@ async fn valid_action(state: &mut State) {
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::KycState::VendorCalls(_))
+        WorkflowKind::Kyc(kyc::KycState::VendorCalls(_))
     ));
 
     let (wf, wfe) = get_wf(state, wfid).await;
@@ -150,7 +150,7 @@ async fn authorize(state: &mut State) {
         .unwrap();
     assert!(matches!(
         ww.state,
-        WorkflowWrapperState::Kyc(kyc::KycState::VendorCalls(_))
+        WorkflowKind::Kyc(kyc::KycState::VendorCalls(_))
     ));
 
     let (wf, _) = get_wf(state, wfid).await;

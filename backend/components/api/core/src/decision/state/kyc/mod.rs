@@ -5,11 +5,12 @@ mod tests;
 
 use super::{
     actions::{MakeDecision, MakeVendorCalls},
-    DoAction, OnAction, StateError, WorkflowActions, WorkflowWrapperState,
+    DoAction, OnAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
 use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
 use async_trait::async_trait;
-use db::models::workflow::Workflow;
+use db::models::workflow::Workflow as DbWorkflow;
+use enum_dispatch::enum_dispatch;
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 ///
@@ -17,7 +18,7 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 ///
 
 #[derive(Clone)]
-pub struct DataCollection {
+pub struct KycDataCollection {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
@@ -26,7 +27,7 @@ pub struct DataCollection {
 }
 
 #[derive(Clone)]
-pub struct VendorCalls {
+pub struct KycVendorCalls {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
@@ -35,7 +36,7 @@ pub struct VendorCalls {
 }
 
 #[derive(Clone)]
-pub struct Decisioning {
+pub struct KycDecisioning {
     wf_id: WorkflowId,
     is_redo: bool,
     ob_id: OnboardingId,
@@ -45,18 +46,19 @@ pub struct Decisioning {
 }
 
 #[derive(Clone)]
-pub struct Complete;
+pub struct KycComplete;
 
 #[derive(Clone)]
+#[enum_dispatch(WorkflowState)]
 pub enum KycState {
-    DataCollection(DataCollection),
-    VendorCalls(VendorCalls),
-    Decisioning(Decisioning),
-    Complete(Complete),
+    DataCollection(KycDataCollection),
+    VendorCalls(KycVendorCalls),
+    Decisioning(KycDecisioning),
+    Complete(KycComplete),
 }
 
 impl KycState {
-    pub async fn init(state: &State, workflow: Workflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::Kyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
         };
@@ -65,29 +67,24 @@ impl KycState {
         };
         // TODO could get rid of this with enum_dispatch
         match s {
-            newtypes::KycState::DataCollection => {
-                DataCollection::init(state, workflow, c).await.map(KycState::from)
-            }
+            newtypes::KycState::DataCollection => KycDataCollection::init(state, workflow, c)
+                .await
+                .map(KycState::from),
             newtypes::KycState::VendorCalls => {
-                VendorCalls::init(state, workflow, c).await.map(KycState::from)
+                KycVendorCalls::init(state, workflow, c).await.map(KycState::from)
             }
             newtypes::KycState::Decisioning => {
-                Decisioning::init(state, workflow, c).await.map(KycState::from)
+                KycDecisioning::init(state, workflow, c).await.map(KycState::from)
             }
-            newtypes::KycState::Complete => Complete::init(state, workflow, c).await.map(KycState::from),
+            newtypes::KycState::Complete => KycComplete::init(state, workflow, c).await.map(KycState::from),
         }
     }
 }
 
 #[async_trait]
-impl super::WorkflowState for KycState {
+impl Workflow for KycState {
     fn default_action(&self) -> Option<WorkflowActions> {
-        match self {
-            KycState::DataCollection(_) => None,
-            KycState::VendorCalls(_) => Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls)),
-            KycState::Decisioning(_) => Some(WorkflowActions::MakeDecision(MakeDecision)),
-            KycState::Complete(_) => None,
-        }
+        <Self as WorkflowState>::default_action(self)
     }
 
     async fn action(
@@ -95,8 +92,7 @@ impl super::WorkflowState for KycState {
         state: &State,
         action: WorkflowActions,
         workflow_id: WorkflowId,
-    ) -> ApiResult<WorkflowWrapperState> {
-        // TODO could get rid of this with enum_dispatch if actions are not typed
+    ) -> ApiResult<WorkflowKind> {
         let new_state = match (self, action) {
             (Self::DataCollection(s), WorkflowActions::Authorize(a)) => {
                 s.do_action(state, a, workflow_id).await?
@@ -110,43 +106,5 @@ impl super::WorkflowState for KycState {
             (_, _) => return Err(StateError::UnexpectedActionForState.into()),
         };
         Ok(new_state.into())
-    }
-}
-
-// more boiling plates
-// would be nice to autogen this
-impl From<DataCollection> for KycState {
-    fn from(value: DataCollection) -> Self {
-        KycState::DataCollection(value)
-    }
-}
-
-impl From<VendorCalls> for KycState {
-    fn from(value: VendorCalls) -> Self {
-        KycState::VendorCalls(value)
-    }
-}
-
-impl From<Decisioning> for KycState {
-    fn from(value: Decisioning) -> Self {
-        KycState::Decisioning(value)
-    }
-}
-
-impl From<Complete> for KycState {
-    fn from(value: Complete) -> Self {
-        KycState::Complete(value)
-    }
-}
-
-impl From<KycState> for newtypes::WorkflowState {
-    fn from(value: KycState) -> Self {
-        let kyc_state = match value {
-            KycState::DataCollection(_) => newtypes::KycState::DataCollection,
-            KycState::VendorCalls(_) => newtypes::KycState::VendorCalls,
-            KycState::Decisioning(_) => newtypes::KycState::Decisioning,
-            KycState::Complete(_) => newtypes::KycState::Complete,
-        };
-        newtypes::WorkflowState::from(kyc_state)
     }
 }
