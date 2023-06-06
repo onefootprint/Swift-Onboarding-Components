@@ -13,6 +13,9 @@ pub enum CipError {
 
     #[error("Alpaca error: {0}")]
     AlpacaError(#[from] alpaca::Error),
+
+    #[error("Watchlist results not found")]
+    WatchlistResultsNotFoundError,
 }
 
 impl CipError {
@@ -21,7 +24,9 @@ impl CipError {
             CipError::EntityDecisionManualReviewStatusNotPass
             | CipError::EntityDecisionDoesNotExist
             | CipError::EntityDecisionStatusNotPass => StatusCode::BAD_REQUEST,
-            CipError::AlpacaError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            CipError::AlpacaError(_) | CipError::WatchlistResultsNotFoundError => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
         }
     }
 }

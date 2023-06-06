@@ -129,7 +129,7 @@ mod tests {
 
     #[test]
     pub fn test_deser() {
-        let raw_res = crate::test_fixtures::incode_watchlist_result_response();
+        let raw_res = crate::test_fixtures::incode_watchlist_result_response_large();
 
         let parsed: WatchlistResultResponse = serde_json::from_value(raw_res).unwrap();
         assert_eq!("success".to_owned(), parsed.status.unwrap());

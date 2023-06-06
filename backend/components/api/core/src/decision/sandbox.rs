@@ -1,9 +1,15 @@
 use std::collections::HashMap;
 
 use crate::errors::ApiResult;
-use db::models::verification_request::VerificationRequest;
+use db::{
+    models::{verification_request::VerificationRequest, verification_result::VerificationResult},
+    DbPool,
+};
 use idv::{ParsedResponse, VendorResponse};
-use newtypes::{DecisionStatus, FootprintReasonCode, SignalSeverity, VaultKind, Vendor, VendorAPI};
+use newtypes::{
+    DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
+    VaultPublicKey, Vendor, VendorAPI,
+};
 use rand::seq::SliceRandom;
 use rand::Rng;
 use strum::IntoEnumIterator;
@@ -12,7 +18,7 @@ use super::{
     engine::VendorResults,
     onboarding::{Decision, OnboardingRulesDecisionOutput},
     utils::FixtureDecision,
-    Error,
+    vendor, Error,
 };
 
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
@@ -123,7 +129,11 @@ pub fn get_fixture_reason_codes_alpaca(
             ];
             let rng = &mut rand::thread_rng();
             let n = rng.gen_range(0..=mismatch_reason_codes.len());
-            mismatch_reason_codes.choose_multiple(rng, n).cloned().collect()
+            mismatch_reason_codes
+                .choose_multiple(rng, n)
+                .cloned()
+                .chain(vec![FootprintReasonCode::SsnMatches])
+                .collect()
         }
         // #fail
         (DecisionStatus::Fail, false) => vec![FootprintReasonCode::SsnDoesNotMatch],
@@ -180,6 +190,43 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
             rules_not_triggered: vec![],
         }
     }
+}
+
+fn incode_watchlist_result_response_for_fixture(fixture_decision: FixtureDecision) -> serde_json::Value {
+    match fixture_decision {
+        // #manualreview
+        (newtypes::DecisionStatus::Fail, true) => {
+            idv::test_fixtures::incode_watchlist_result_response_yes_hits()
+        }
+        _ => idv::test_fixtures::incode_watchlist_result_response_no_hits(),
+    }
+}
+
+pub async fn save_fixture_incode_watchlist_result(
+    db_pool: &DbPool,
+    fixture_decision: FixtureDecision,
+    di_id: &DecisionIntentId,
+    sv_id: &ScopedVaultId,
+    vault_public_key: &VaultPublicKey,
+) -> ApiResult<()> {
+    let raw = incode_watchlist_result_response_for_fixture(fixture_decision);
+
+    let di_id = di_id.clone();
+    let sv_id = sv_id.clone();
+    let vault_public_key = vault_public_key.clone();
+    db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let vreq = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeWatchlistCheck)?;
+            let e_response = vendor::verification_result::encrypt_verification_result_response(
+                &raw.clone().into(),
+                &vault_public_key,
+            )?;
+            let _vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
+            Ok(())
+        })
+        .await?;
+
+    Ok(())
 }
 
 #[cfg(test)]

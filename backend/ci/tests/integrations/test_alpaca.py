@@ -36,7 +36,7 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     [
         ("pass", None),
         ("manualreview", None),
-        # ("stepup", None), failing due to bugs which are fixed in following PR :)
+        ("stepup", None),
         ("fail", "The entity must have an approved decision status")
     ],
 )
@@ -127,7 +127,7 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
         "account_id": f"{account.id}",
         "default_approver": "bob@boberto.com",
     }
-
+    
     # send cip
     body = post("integrations/alpaca_cip", alpaca_data, sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
     if expected_error:

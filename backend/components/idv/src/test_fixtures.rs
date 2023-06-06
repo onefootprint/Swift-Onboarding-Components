@@ -3607,7 +3607,7 @@ pub fn middesk_business_update_webhook_response() -> serde_json::Value {
     })
 }
 
-pub fn incode_watchlist_result_response() -> serde_json::Value {
+pub fn incode_watchlist_result_response_large() -> serde_json::Value {
     let s = r#"
     {
         "content":
@@ -5709,4 +5709,301 @@ pub fn incode_watchlist_result_response() -> serde_json::Value {
     }
     "#;
     serde_json::from_str(s).unwrap()
+}
+
+pub fn incode_watchlist_result_response_no_hits() -> serde_json::Value {
+    serde_json::json!({
+        "content":
+        {
+            "data":
+            {
+                "id": 23523445,
+                "ref": "23545234534-X0lf23454jZ_",
+                "searcher_id": 345820,
+                "assignee_id": 5342453,
+                "filters":
+                {
+                    "country_codes":
+                    [],
+                    "exact_match": false,
+                    "fuzziness": 0.5,
+                    "remove_deceased": 0,
+                    "types":
+                    [
+                        "adverse-media-v2-regulatory",
+                        "fitness-probity",
+                        "pep-class-1",
+                        "adverse-media-v2-property",
+                        "adverse-media-v2-other-serious",
+                        "adverse-media-v2-violence-non-aml-cft",
+                        "adverse-media-v2-financial-difficulty",
+                        "pep-class-4",
+                        "pep",
+                        "adverse-media-v2-cybercrime",
+                        "adverse-media-v2-fraud-linked",
+                        "adverse-media-v2-other-financial",
+                        "pep-class-2",
+                        "adverse-media-v2-other-minor",
+                        "adverse-media-v2-general-aml-cft",
+                        "adverse-media-v2-terrorism",
+                        "adverse-media-v2-narcotics-aml-cft",
+                        "sanction",
+                        "warning",
+                        "pep-class-3",
+                        "adverse-media-v2-financial-aml-cft",
+                        "adverse-media-v2-violence-aml-cft"
+                    ]
+                },
+                "match_status": "potential_match",
+                "risk_level": "unknown",
+                "search_term": "Piip Penguin",
+                "total_hits": 0,
+                "total_matches": 0,
+                "updated_at": "2023-05-19 23:56:10",
+                "created_at": "2023-05-19 23:56:10",
+                "tags":
+                [],
+                "limit": 100,
+                "offset": 0,
+                "hits":
+                []
+            }
+
+        },
+        "status": "success"
+    })
+}
+
+pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
+    serde_json::json!({
+        "content":
+        {
+            "data":
+            {
+                "id": 13243589,
+                "ref": "152345423570-X0lf4jZ_",
+                "searcher_id": 17656345,
+                "assignee_id": 64354356,
+                "filters":
+                {
+                    "country_codes":
+                    [],
+                    "exact_match": false,
+                    "fuzziness": 0.5,
+                    "remove_deceased": 0,
+                    "types":
+                    [
+                        "adverse-media-v2-regulatory",
+                        "fitness-probity",
+                        "pep-class-1",
+                        "adverse-media-v2-property",
+                        "adverse-media-v2-other-serious",
+                        "adverse-media-v2-violence-non-aml-cft",
+                        "adverse-media-v2-financial-difficulty",
+                        "pep-class-4",
+                        "pep",
+                        "adverse-media-v2-cybercrime",
+                        "adverse-media-v2-fraud-linked",
+                        "adverse-media-v2-other-financial",
+                        "pep-class-2",
+                        "adverse-media-v2-other-minor",
+                        "adverse-media-v2-general-aml-cft",
+                        "adverse-media-v2-terrorism",
+                        "adverse-media-v2-narcotics-aml-cft",
+                        "sanction",
+                        "warning",
+                        "pep-class-3",
+                        "adverse-media-v2-financial-aml-cft",
+                        "adverse-media-v2-violence-aml-cft"
+                    ]
+                },
+                "match_status": "potential_match",
+                "risk_level": "unknown",
+                "search_term": "Piip Penguin",
+                "total_hits": 1,
+                "total_matches": 1,
+                "updated_at": "2023-05-19 23:56:10",
+                "created_at": "2023-05-19 23:56:10",
+                "tags":
+                [],
+                "limit": 100,
+                "offset": 0,
+                "hits":
+                [
+                    {
+                        "doc":
+                        {
+                            "aka":
+                            [
+                                {
+                                    "name": "Sir Piipy the Penguin"
+                                },
+                            ],
+                            "fields":
+                            [
+                                {
+                                    "name": "Nationality",
+                                    "source": "europe-sanctions-list",
+                                    "value": "Sudan"
+                                },
+                                {
+                                    "name": "Nationality",
+                                    "source": "tresor-direction-generale",
+                                    "value": "South Sudan"
+                                },
+                                {
+                                    "name": "Nationality",
+                                    "source": "un-consolidated",
+                                    "value": "South Sudan"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "europe-sanctions-list",
+                                    "value": "Sudan"
+                                },
+                                {
+                                    "name": "Original Country Text",
+                                    "source": "europe-sanctions-list",
+                                    "value": "SUDAN"
+                                },
+                                {
+                                    "name": "Place of Birth",
+                                    "source": "europe-sanctions-list",
+                                    "value": "South Sudan"
+                                },
+                                {
+                                    "name": "Original Place of Birth Text",
+                                    "source": "europe-sanctions-list",
+                                    "value": "South Sudan"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "United Kingdom"
+                                },
+                                {
+                                    "name": "Original Country Text",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "Sudan, United Kingdom"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "Kenya"
+                                },
+                                {
+                                    "name": "Original Country Text",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "Kenya, South Sudan, Sudan, Tanzania, United States"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "Sudan"
+                                },
+                                {
+                                    "name": "Date of Birth",
+                                    "source": "europe-sanctions-list",
+                                    "tag": "date_of_birth",
+                                    "value": "1943"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "South Sudan"
+                                },
+                                {
+                                    "name": "Date of Birth",
+                                    "source": "un-consolidated",
+                                    "tag": "date_of_birth",
+                                    "value": "1943"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "Tanzania"
+                                },
+                                {
+                                    "name": "Country",
+                                    "source": "complyadvantage-adverse-media",
+                                    "value": "United States"
+                                },
+                                {
+                                    "name": "Passport",
+                                    "source": "europe-sanctions-list",
+                                    "tag": "passport",
+                                    "value": "National passport R123456789, Issuing Country SUDAN, SOUTH SUDAN"
+                                },
+                                {
+                                    "name": "Passport",
+                                    "source": "un-consolidated",
+                                    "tag": "passport",
+                                    "value": "Passport: R123456789, South Sudan"
+                                },
+                                {
+                                    "name": "Amended On",
+                                    "source": "europe-sanctions-list",
+                                    "value": "2016-02-05"
+                                },
+                                {
+                                    "name": "Designation Act",
+                                    "source": "europe-sanctions-list",
+                                    "value": "2014/302 (OJ L123)"
+                                },
+                                {
+                                    "name": "Designation Date",
+                                    "source": "europe-sanctions-list",
+                                    "value": "02-04-2014"
+                                },
+                                {
+                                    "name": "Designation Date",
+                                    "source": "un-consolidated",
+                                    "value": "2014-03-01"
+                                }
+                            ],
+                            "id": "H0SVUC5007H24TO",
+                            "last_updated_utc": "2023-02-20T18:27:43Z",
+                            "media":
+                            [
+                                {
+                                    "date": "2002-10-01T00:00:00Z",
+                                    "snippet": "\"Person of interest in fraud case",
+                                    "url": "http://www.cnn.com/"
+                                },
+                                {
+                                    "date": "2015-06-06T00:00:00Z",
+                                    "snippet": "A CEO by the name of Piip Penguin has been found guilty of fraud",
+                                    "title": "Fraudulent CEO arrested",
+                                    "url": "http://www.bbc.com/"
+                                },
+                            ],
+                            "name": "Piip Penguin",
+                            "sources":
+                            [
+                                "complyadvantage-adverse-media",
+                                "europe-sanctions-list",
+                                "un-consolidated"
+                            ],
+                            "types":
+                            [
+                                "adverse-media",
+                                "adverse-media-v2-terrorism",
+                                "adverse-media-v2-fraud-linked",
+                                "sanction"
+                            ]
+                        },
+                        "is_whitelisted": false,
+                        "match_types":
+                        [
+                            "aka_exact"
+                        ],
+                        "match_types_details": [],
+                        "score": 1.7
+                    },
+                ]
+            }
+
+        },
+        "status": "success"
+    })
 }

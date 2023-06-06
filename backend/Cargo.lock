@@ -804,6 +804,9 @@ dependencies = [
  "newtypes",
  "paperclip",
  "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
  "tokio",
  "tracing",
 ]

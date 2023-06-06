@@ -5,7 +5,9 @@ use alpaca::{
 };
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    decision::field_validations::create_field_validation_results,
+    decision::{
+        self, field_validations::create_field_validation_results, vendor::vendor_result::VendorResult,
+    },
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{TenantVw, VaultWrapper},
@@ -30,6 +32,7 @@ use newtypes::{
     PiiString, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Forward CIP information to Alpaca",
@@ -85,7 +88,7 @@ async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<CipRequest> {
-    let (uvw, onboarding, decision, scoped_vault, actor, annotations, risk_signals, insight) = state
+    let (uvw, onboarding, decision, scoped_vault, actor, annotations, risk_signals, insight, vres) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let obd = OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
@@ -128,11 +131,33 @@ async fn create_cip_request(
                 .pop()
                 .map(|(_, actor)| actor);
 
-            Ok((uvw, ob, decision, sv, actor, annotations, risk_signals, insight))
+            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
+                conn,
+                sv.id.clone(),
+            )?;
+
+            Ok((
+                uvw,
+                ob,
+                decision,
+                sv,
+                actor,
+                annotations,
+                risk_signals,
+                insight,
+                vres,
+            ))
         })
         .await??;
 
     let user_vault_private_key = uvw.vault.e_private_key.clone();
+    let vendor_results = VendorResult::from_verification_results_for_onboarding(
+        vres,
+        &state.enclave_client,
+        &user_vault_private_key,
+    )
+    .await?;
+
     // build the cip object components
     let kyc = kyc(
         state,
@@ -146,7 +171,7 @@ async fn create_cip_request(
         annotations,
     )
     .await?;
-    let watchlist = watchlist(&scoped_vault, &onboarding, &risk_signals);
+    let watchlist = watchlist(&scoped_vault, &onboarding, &risk_signals, &vendor_results)?;
     let identity = identity(&scoped_vault, &onboarding, risk_signals);
     let (document, photo) = document_and_photo(state, scoped_vault.clone(), &user_vault_private_key).await?;
 
@@ -303,7 +328,8 @@ fn watchlist(
     scoped_vault: &ScopedVault,
     onboarding: &Onboarding,
     risk_signals: &[RiskSignal],
-) -> alpaca::Watchlist {
+    vres: &[VendorResult],
+) -> ApiResult<alpaca::Watchlist> {
     let pep: bool = risk_signals
         .iter()
         .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitPep);
@@ -316,19 +342,37 @@ fn watchlist(
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitNonSdn);
 
-    alpaca::Watchlist {
+    // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
+    // so we pull them from the Vres on the fly here
+
+    let ParsedResponse::IncodeWatchlistCheck(wc) = vres
+        .iter()
+        .find(|v| matches!(v.response.response, ParsedResponse::IncodeWatchlistCheck(_)))
+        .ok_or(CipError::WatchlistResultsNotFoundError)?
+        .response
+        .response
+        .clone() else {
+            Err(CipError::WatchlistResultsNotFoundError)?
+        };
+
+    let hits = decision::features::incode_watchlist::get_hits(&wc);
+    let records: Vec<PiiJsonValue> = hits
+        .into_iter()
+        .map(|h| serde_json::to_value(&h).map(PiiJsonValue::new))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(alpaca::Watchlist {
         id: scoped_vault.fp_id.clone(),
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: onboarding.decision_made_at.unwrap_or(chrono::Utc::now()),
-        politically_exposed_person: CipResult::clear(pep),
-        monitored_lists: CipResult::clear(ofac),
-        sanction: CipResult::clear(sanctions),
+        politically_exposed_person: CipResult::clear(!pep),
+        monitored_lists: CipResult::clear(!ofac),
+        sanction: CipResult::clear(!sanctions),
         // TODO: FP-4191 (add insertion point for doing these checks)
         adverse_media: CipResult::Clear,
-        // TODO: FP-4192 (pull vres and parse them)
-        records: vec![],
-    }
+        records,
+    })
 }
 
 async fn document_and_photo(
@@ -337,7 +381,7 @@ async fn document_and_photo(
     user_vault_private_key: &EncryptedVaultPrivateKey,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let su_id = scoped_vault.id.clone();
-    let incode_apis = newtypes::vendor_apis_from_vendor(Vendor::Incode);
+    let incode_doc_apis: Vec<VendorAPI> = VendorAPI::iter().filter(|v| v.is_incode_doc_flow_api()).collect();
     let incode_results: Vec<(VerificationRequest, Option<VerificationResult>)> = state
         .db_pool
         .db_query(
@@ -347,7 +391,7 @@ async fn document_and_photo(
         )
         .await??
         .into_iter()
-        .filter(|(req, _)| incode_apis.contains(&req.vendor_api))
+        .filter(|(req, _)| incode_doc_apis.contains(&req.vendor_api))
         .collect();
 
     if incode_results.is_empty() {

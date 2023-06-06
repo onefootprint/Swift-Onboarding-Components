@@ -1,4 +1,4 @@
-use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::response::{Hit, WatchlistResultResponse};
 use itertools::Itertools;
 use newtypes::{vendor_reason_code_enum, FootprintReasonCode};
 use strum_macros::EnumString;
@@ -149,7 +149,8 @@ pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
     }
 }
 
-pub fn reason_codes_from_watchlist_result(res: &WatchlistResultResponse) -> Vec<FootprintReasonCode> {
+// TODO: probably remove filtering on `score` based on last chat w/ Incode
+pub fn get_hits(res: &WatchlistResultResponse) -> Vec<Hit> {
     let hits = res
         .content
         .as_ref()
@@ -158,10 +159,14 @@ pub fn reason_codes_from_watchlist_result(res: &WatchlistResultResponse) -> Vec<
         .cloned()
         .unwrap_or_default();
 
-    // TODO: get Incode to finally explain how `score` works and pick something better than 10.0 as a filter here
-    let unique_types_for_valid_hits = hits
-        .into_iter()
+    hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
+        .collect()
+}
+
+pub fn reason_codes_from_watchlist_result(res: &WatchlistResultResponse) -> Vec<FootprintReasonCode> {
+    let unique_types_for_valid_hits = get_hits(res)
+        .into_iter()
         .flat_map(|h| h.doc.and_then(|d| d.types).unwrap_or_default())
         .unique()
         .collect::<Vec<_>>();

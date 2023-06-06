@@ -303,9 +303,12 @@ impl FetchOCRResponse {
         Self {
             document_number: Some(PiiString::from("Y12341234")),
             issuing_state: Some(PiiString::from("MA")),
+            issuing_country: Some(PiiString::from("US")),
             expire_at: Some("1728950400000".to_owned()),
             birth_date: dob.or(Some(529873860000)),
             name: Some(name),
+            type_of_id: Some(PiiString::from("DriversLicense")),
+            gender: Some(PiiString::from("Female")),
             ..Default::default()
         }
     }

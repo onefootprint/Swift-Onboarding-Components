@@ -190,4 +190,33 @@ impl VendorAPI {
             | VendorAPI::IncodeProcessFace => false,
         }
     }
+
+    pub fn is_incode_doc_flow_api(&self) -> bool {
+        match self {
+            VendorAPI::IncodeAddFront
+            | VendorAPI::IncodeAddBack
+            | VendorAPI::IncodeProcessId
+            | VendorAPI::IncodeFetchScores
+            | VendorAPI::IncodeAddPrivacyConsent
+            | VendorAPI::IncodeAddMLConsent
+            | VendorAPI::IncodeFetchOCR
+            | VendorAPI::IncodeAddSelfie
+            | VendorAPI::IncodeGetOnboardingStatus
+            | VendorAPI::IncodeProcessFace => true,
+            VendorAPI::IncodeWatchlistCheck
+            | VendorAPI::IncodeStartOnboarding
+            | VendorAPI::IdologyScanVerifySubmission
+            | VendorAPI::IdologyScanVerifyResults
+            | VendorAPI::IdologyScanOnboarding
+            | VendorAPI::IdologyPa
+            | VendorAPI::MiddeskCreateBusiness
+            | VendorAPI::MiddeskGetBusiness
+            | VendorAPI::MiddeskBusinessUpdateWebhook
+            | VendorAPI::MiddeskTinRetriedWebhook
+            | VendorAPI::IdologyExpectID
+            | VendorAPI::TwilioLookupV2
+            | VendorAPI::SocureIDPlus
+            | VendorAPI::ExperianPreciseID => false,
+        }
+    }
 }

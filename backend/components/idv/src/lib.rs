@@ -187,7 +187,7 @@ impl ParsedResponse {
     }
 
     // We should never need this
-    pub fn from_incode_parse_ocr(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+    pub fn from_incode_fetch_ocr(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: FetchOCRResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeFetchOCR(parsed))
     }
