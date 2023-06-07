@@ -30,7 +30,9 @@ use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
 use decision::state::Authorize;
 use itertools::Itertools;
+use newtypes::OnboardingId;
 use newtypes::OnboardingStatus;
+use newtypes::ScopedVaultId;
 use paperclip::actix::{self, api_v2_operation, web};
 use webhooks::events::WebhookEvent;
 use webhooks::WebhookApp;
@@ -73,24 +75,24 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
+    // mark ob as authorized
     let ob_id = user_auth.onboarding()?.id.clone();
 
-    if let Some(wf) = user_auth.workflow() {
-        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-        let ww = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
-
-        tracing::info!(new_state = ?newtypes::WorkflowState::from(ww.state), "Ran state machine");
-        return ResponseData::ok(EmptyResponse {}).json();
-    }
-
-    // Mark the obs for the person and business as authorized
-    let (biz_ob, user_auth) = state
+    state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
             if ob.authorized_at.is_none() {
                 ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
             }
+            Ok(())
+        })
+        .await?;
+
+    // Mark the business as authorized
+    let (biz_ob, user_auth) = state
+        .db_pool
+        .db_transaction(move |c| -> ApiResult<_> {
             let biz_ob = user_auth.business_onboarding(c)?;
             let bizob = biz_ob
                 .map(|b| {
@@ -106,35 +108,50 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         })
         .await?;
 
-    let tenant_vendor_control = TenantVendorControl::new(
-        user_auth.tenant()?.id.clone(),
-        &state.db_pool,
-        &state.enclave_client,
-        &state.config,
-    )
-    .await?;
-    // We shouldn't ever actually hit onboarding/authorize if the tenant has already onboarded this user,
-    // but if we do, we should no-op and succeed
+    // Temporary hack for now so we only fire webhooks and write fingerprints 1 time. We will move this into the Workflow itself and then will no longer need this
     let should_run_kyc_checks = user_auth.onboarding()?.idv_reqs_initiated_at.is_none();
-
-    // Run KYC checks
-    let ob_id = user_auth.onboarding()?.id.clone();
-    if should_run_kyc_checks {
-        let engine_result = run_kyc(&state, &user_auth, biz_ob.clone(), tenant_vendor_control).await;
-        // We always want to return a validation to the client if the DE fails.
-        // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
-        match engine_result {
-            Ok(_) => (),
+    // Run KYC, either via Workflow or fallback to non-Workflow logic for now
+    if let Some(wf) = user_auth.workflow() {
+        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+        let res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;
+        // To be consistent with current behavior of the non-WF code, we swallow errors
+        match res {
+            Ok(ww) => {
+                tracing::info!(new_state = ?newtypes::WorkflowState::from(ww.state), "Ran workflow");
+            }
             Err(e) => {
-                tracing::error!(error=%e, "Error running decision engine")
+                tracing::error!(error=%e, "Error running workflow");
+            }
+        };
+    } else {
+        // Legacy non-WF logic
+        if should_run_kyc_checks {
+            let tenant_vendor_control = TenantVendorControl::new(
+                user_auth.tenant()?.id.clone(),
+                &state.db_pool,
+                &state.enclave_client,
+                &state.config,
+            )
+            .await?;
+
+            let engine_result = run_kyc(&state, &user_auth, biz_ob.clone(), tenant_vendor_control).await;
+            // We always want to return a validation to the client if the DE fails.
+            // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
+            match engine_result {
+                Ok(_) => (),
+                Err(e) => {
+                    tracing::error!(error=%e, "Error running decision engine")
+                }
             }
         }
     }
 
+    let ob_id = user_auth.onboarding()?.id.clone();
+    let sv_id = user_auth.scoped_user.id.clone();
     let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
-
-    // Kickoff KYB
     let tenant = user_auth.tenant()?;
+
+    // Run KYB
     if let Some(biz_ob) = biz_ob {
         let should_run_kyb = should_run_kyb(&state, &biz_ob, tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
@@ -153,67 +170,80 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     }
 
-    let (status, su, decision_timestamp, manual_review, ob_config) = state
+    if should_run_kyc_checks {
+        fire_onboarding_completed_webhook(&state, &ob_id, tenant).await?;
+        write_authorized_fingerprints(&state, &sv_id, &sv_biz_id, &ob_id).await?;
+    }
+    ResponseData::ok(EmptyResponse {}).json()
+}
+
+async fn fire_onboarding_completed_webhook(
+    state: &State,
+    ob_id: &OnboardingId,
+    tenant: &Tenant,
+) -> ApiResult<()> {
+    let ob_id = ob_id.clone();
+    let (status, su, decision_timestamp, manual_review) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Return status as well
             let (ob, scoped_user, manual_review, _) = Onboarding::get(conn, &ob_id)?;
-            let ob_config = ObConfiguration::get_by_onboarding_id(conn, &ob.id)?;
 
             let status: OnboardingStatus = ob.status;
             // we shouldn't have many cases that need to fall back to Utc::now
             let timestamp = ob.authorized_at.unwrap_or_else(Utc::now);
 
-            Ok((status, scoped_user, timestamp, manual_review, ob_config))
+            Ok((status, scoped_user, timestamp, manual_review))
         })
         .await??;
 
-    // Don't send a webhook if we already sent an onboarding.completed webhook
-    if should_run_kyc_checks {
-        // create the webhook event to fire
-        // TODO: move webhook into Workflow
-        let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
-            fp_id: su.fp_id.clone(),
-            footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),
-            timestamp: decision_timestamp,
-            status,
-            requires_manual_review: manual_review.is_some(),
-        });
+    // create the webhook event to fire
+    let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
+        fp_id: su.fp_id.clone(),
+        footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),
+        timestamp: decision_timestamp,
+        status,
+        requires_manual_review: manual_review.is_some(),
+    });
 
-        state.webhook_client.send_event_to_tenant_non_blocking(
-            WebhookApp {
-                id: su.tenant_id.clone(),
-                is_live: su.is_live,
-            },
-            wh_event,
-            None,
-        );
+    state.webhook_client.send_event_to_tenant_non_blocking(
+        WebhookApp {
+            id: su.tenant_id.clone(),
+            is_live: su.is_live,
+        },
+        wh_event,
+        None,
+    );
+    Ok(())
+}
+
+async fn write_authorized_fingerprints(
+    state: &State,
+    sv_id: &ScopedVaultId,
+    sv_biz_id: &Option<ScopedVaultId>,
+    ob_id: &OnboardingId,
+) -> ApiResult<()> {
+    let sv_id = sv_id.clone();
+    let sv_biz_id = sv_biz_id.clone();
+    let ob_id = ob_id.clone();
+    let (obc, uvw, bvw) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let obc = ObConfiguration::get_by_onboarding_id(conn, &ob_id)?;
+            let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &sv_id)?;
+            let bvw = sv_biz_id
+                .map(|id| VaultWrapper::<Business>::build_for_tenant(conn, &id))
+                .transpose()?;
+
+            Ok((obc, uvw, bvw))
+        })
+        .await??;
+
+    uvw.create_authorized_fingerprints(state, obc.clone()).await?;
+    if let Some(bvw) = bvw {
+        bvw.create_authorized_fingerprints(state, obc).await?;
     }
-
-    // If this user is onboarding to the tenant for the first time, create tenant-scoped fingerprints
-    if should_run_kyc_checks {
-        let sv_user_id = su.id.clone();
-
-        let (uvw, bvw) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &sv_user_id)?;
-                let bvw = sv_biz_id
-                    .map(|id| VaultWrapper::<Business>::build_for_tenant(conn, &id))
-                    .transpose()?;
-
-                Ok((uvw, bvw))
-            })
-            .await??;
-
-        uvw.create_authorized_fingerprints(state.clone(), ob_config.clone())
-            .await?;
-        if let Some(bvw) = bvw {
-            bvw.create_authorized_fingerprints(state, ob_config).await?;
-        }
-    }
-
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(())
 }
 
 async fn run_kyc(

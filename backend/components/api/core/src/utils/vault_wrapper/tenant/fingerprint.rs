@@ -1,7 +1,6 @@
 use db::models::{fingerprint::NewFingerprint, ob_configuration::ObConfiguration};
 use itertools::Itertools;
 use newtypes::{FingerprintScopeKind, FingerprintVersion};
-use paperclip::actix::web;
 
 use crate::{errors::ApiResult, State};
 
@@ -12,7 +11,7 @@ impl<Type> TenantVw<Type> {
     /// that the tenant has access to
     pub async fn create_authorized_fingerprints(
         self,
-        state: web::Data<State>,
+        state: &State,
         ob_config: ObConfiguration,
     ) -> ApiResult<()> {
         let tenant_id = &ob_config.tenant_id;

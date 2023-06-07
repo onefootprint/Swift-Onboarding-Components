@@ -25,7 +25,6 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
-use feature_flag::BoolFlag;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -70,11 +69,6 @@ pub async fn post(
     } else {
         None
     };
-    let should_create_workflow = state
-        .feature_flag_client
-        .flag(BoolFlag::CreateOnboardingWorkflows(&ob_config.key))
-        || ob_config.cip_kind.is_some();
-
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
@@ -90,7 +84,7 @@ pub async fn post(
                 insight_event: insight_event.clone(),
             };
 
-            let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, should_create_workflow)?;
+            let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true)?;
 
             if let IsNew::Yes(ref wf) = is_new_ob {
                 if obc.must_collect(DataIdentifierDiscriminant::Document) {

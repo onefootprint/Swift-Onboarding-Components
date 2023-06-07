@@ -21,7 +21,7 @@ def test_deterministic_onboarding(
         sandbox_tenant.default_ob_config, twilio, sandbox_suffix=suffix
     )
     bifrost.run()
-
+    
     bifrost.validate_response["user"]["status"] == expected_status
     bifrost.validate_response["user"][
         "requires_manual_review"
