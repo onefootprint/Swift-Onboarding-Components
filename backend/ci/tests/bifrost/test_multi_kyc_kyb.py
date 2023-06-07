@@ -141,6 +141,7 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     assert set(r["kind"] for r in primary_bo.client.handled_requirements) <= {
         "collect_business_data",
         "authorize",
+        "process",
     }
 
     bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
@@ -166,7 +167,8 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     # Assert we had no requirements to satisfy - business filled out by primary_bo, and identity
     # filled out in previous onboarding
     assert set(r["kind"] for r in secondary_bo.client.handled_requirements) == {
-        "authorize"
+        "authorize",
+        "process",
     }
 
     # fp_bid should be the same for each business owner
