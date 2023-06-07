@@ -194,6 +194,12 @@ impl TwilioClient {
                 org_name,
                 link.leak()
             )),
+            TriggerKind::IdDocument => PiiString::from(format!(
+                "{}To verify your identity for {}, provide a photo of your ID here: {}",
+                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
+                org_name,
+                link.leak()
+            )),
         };
 
         self.send_message(state, message_body, destination, rate_limit::DASHBOARD_TRIGGER)

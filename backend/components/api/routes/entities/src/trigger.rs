@@ -17,9 +17,11 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::TriggerKind;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
+use db::models::document_request::DocumentRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
 use newtypes::VaultKind;
@@ -46,7 +48,7 @@ pub async fn post(
     // Generate an auth token for the user and send to their phone number on file
     let (vw, auth_token) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
@@ -61,6 +63,13 @@ pub async fn post(
 
             let wf = match kind {
                 TriggerKind::RedoKyc => Workflow::create(conn, &sv.id, KycConfig { is_redo: true }.into())?,
+                TriggerKind::IdDocument => {
+                    let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into())?;
+                    // TODO how do we determine if we should collect selfie? Should we ask to provide?
+                    let collect_selfie = false;
+                    DocumentRequest::create(conn, sv.id.clone(), None, collect_selfie, Some(wf.id.clone()))?;
+                    wf
+                }
             };
             let scopes = vec![
                 UserAuthScope::SignUp,
@@ -75,7 +84,7 @@ pub async fn post(
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))
         })
-        .await??;
+        .await?;
 
     let phone_number = vw.get_decrypted_primary_phone(&state).await?;
     let url = state
