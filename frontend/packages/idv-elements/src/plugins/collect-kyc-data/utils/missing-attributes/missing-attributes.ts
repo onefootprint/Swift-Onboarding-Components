@@ -1,7 +1,6 @@
 import {
   CollectedKycDataOption,
   CollectedKycDataOptionToRequiredAttributes,
-  IdDI,
 } from '@onefootprint/types';
 
 import { KycData } from '../data-types';
@@ -68,9 +67,7 @@ export const isMissing = (
 export const isMissingEmailAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) =>
-  mustCollect.includes(CollectedKycDataOption.email) &&
-  !collectedData?.[IdDI.email]?.value;
+) => isMissing([CollectedKycDataOption.email], mustCollect, collectedData);
 
 export const isMissingBasicAttribute = (
   mustCollect: CollectedKycDataOption[],
