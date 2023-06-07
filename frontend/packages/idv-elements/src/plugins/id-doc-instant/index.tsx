@@ -7,9 +7,10 @@ import { MissingPermissionsSheetProvider } from './components/missing-permission
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { ImageTypes } from './constants/image-types';
-import { IdDocProps } from './types';
 import Router from './pages/router';
+import { IdDocProps } from './types';
 import { MachineContext } from './utils/state-machine';
+import supportedTypeToIdDocType from './utils/supported-type-to-doc-type';
 
 const App = ({ context, onDone }: IdDocProps) => {
   const { authToken, device, customData } = context;
@@ -22,7 +23,15 @@ const App = ({ context, onDone }: IdDocProps) => {
     device,
     currSide: ImageTypes.front,
     requirement: customData.requirement,
-    idDoc: {},
+    idDoc: {
+      country: customData.requirement.onlyUsSupported ? 'USA' : undefined,
+      type:
+        customData.requirement.supportedDocumentTypes.length === 1
+          ? supportedTypeToIdDocType[
+              customData.requirement.supportedDocumentTypes[0]
+            ]
+          : undefined,
+    },
   };
 
   return (

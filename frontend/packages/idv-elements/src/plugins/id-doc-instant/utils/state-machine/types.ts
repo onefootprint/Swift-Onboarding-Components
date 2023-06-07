@@ -1,6 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CountryCode,
+  CountryCode3,
   IdDocImageError,
   IdDocRequirement,
   IdDocType,
@@ -16,7 +16,7 @@ export type MachineContext = {
   currSide?: ImageTypes;
   idDoc: {
     type?: IdDocType;
-    country?: CountryCode;
+    country?: CountryCode3;
   };
   errors?: IdDocImageError[];
 };
@@ -33,7 +33,7 @@ export type MachineEvents =
       type: 'receivedCountryAndType';
       payload: {
         type?: IdDocType;
-        country?: CountryCode;
+        country?: CountryCode3;
       };
     }
   | {

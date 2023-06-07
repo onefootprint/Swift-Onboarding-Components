@@ -10,7 +10,8 @@ import {
   IcoIdGeneric40,
   IcoPassport24,
 } from '@onefootprint/icons';
-import { CountryCode, IdDocType } from '@onefootprint/types';
+import { CountryCode, CountryCode3, IdDocType } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
   CountrySelect,
@@ -33,26 +34,36 @@ const getCountryFromCode = (countryCode?: CountryCode) => {
   return match;
 };
 
+const getCountryFromCode3 = (countryCode?: CountryCode3) => {
+  const match = COUNTRIES.find(country => country.value3 === countryCode);
+  return match;
+};
+
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state, send] = useIdDocMachine();
   const { country: defaultCountry, type: defaultType } = state.context.idDoc;
   const [country, setCountry] = useState<CountryRecord>(
-    getCountryFromCode(defaultCountry) ?? DEFAULT_COUNTRY,
+    getCountryFromCode3(defaultCountry) ?? DEFAULT_COUNTRY,
   );
 
-  const types: IdDocType[] = IdDocTypesByCountry[country.value];
+  const types: IdDocType[] = IdDocTypesByCountry[country.value3];
   const firstTypeFromOptions = types.length ? types[0] : IdDocType.passport;
   const [docType, setDocType] = useState<IdDocType>(
     defaultType ?? firstTypeFromOptions,
   );
+
+  const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
+  const countryOptions = onlyUsSupported
+    ? [getCountryFromCode('US') as CountryRecord]
+    : COUNTRIES;
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value];
+      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value3];
       const nextType = typesForNextCountry.length
         ? typesForNextCountry[0]
         : IdDocType.passport;
@@ -70,34 +81,41 @@ const IdDocCountryAndType = () => {
       payload: {
         type: docType,
         country:
-          getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value,
+          getCountryFromCode3(country.value3)?.value3 ?? DEFAULT_COUNTRY.value3,
       },
     });
   };
 
-  const optionByDocType: Record<IdDocType, RadioSelectOptionFields> = {
-    [IdDocType.passport]: {
+  const optionByDocType: { [key in IdDocType]?: RadioSelectOptionFields } = {};
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passport)) {
+    optionByDocType[IdDocType.passport] = {
       title: t('form.type.passport.title'),
       description: t('form.type.passport.description'),
       IconComponent: IcoPassport24,
       value: IdDocType.passport,
-    },
-    [IdDocType.driversLicense]: {
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.driversLicense)) {
+    optionByDocType[IdDocType.driversLicense] = {
       title: t('form.type.driversLicense.title'),
       description: t('form.type.driversLicense.description'),
       IconComponent: IcoCar24,
       value: IdDocType.driversLicense,
-    },
-    [IdDocType.idCard]: {
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.idCard)) {
+    optionByDocType[IdDocType.idCard] = {
       title: t('form.type.idCard.title'),
       description: t('form.type.idCard.description'),
       IconComponent: IcoIdCard24,
       value: IdDocType.idCard,
-    },
-  };
-  const options: RadioSelectOptionFields[] = types.map(
-    type => optionByDocType[type],
-  );
+    };
+  }
+
+  // We only show the doc types supported by both the country and onboarding config
+  const options: RadioSelectOptionFields[] = types
+    .map(type => optionByDocType[type])
+    .filter((option): option is RadioSelectOptionFields => !!option);
 
   return (
     <Container>
@@ -109,12 +127,13 @@ const IdDocCountryAndType = () => {
           data-private
           label={t('form.country')}
           onChange={handleCountryChange}
+          options={countryOptions}
           value={country}
         />
         <Divider />
         {options.length > 0 ? (
           <RadioSelect
-            value={optionByDocType[docType].value}
+            value={optionByDocType[docType]?.value}
             options={options}
             onChange={handleDocTypeChange}
           />

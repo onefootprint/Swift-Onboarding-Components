@@ -13,10 +13,26 @@ const createIdDocMachine = (args: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial:
-        args.device.type === 'mobile' ? 'countryAndType' : 'incompatibleDevice',
+      initial: 'initState',
       context: { ...args },
       states: {
+        initState: {
+          always: [
+            {
+              target: 'incompatibleDevice',
+              cond: context => context.device.type !== 'mobile',
+            },
+            {
+              target: 'frontImage',
+              cond: context =>
+                !!context.requirement.onlyUsSupported &&
+                context.requirement.supportedDocumentTypes?.length === 1,
+            },
+            {
+              target: 'countryAndType',
+            },
+          ],
+        },
         countryAndType: {
           on: {
             receivedCountryAndType: {

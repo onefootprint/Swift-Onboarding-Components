@@ -3,6 +3,7 @@ import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { DeviceInfo } from '@onefootprint/hooks';
 import { createUseRouterSpy, render, screen } from '@onefootprint/test-utils';
 import { OnboardingRequirementKind } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
   QueryCache,
@@ -67,6 +68,8 @@ describe('<IdDoc />', () => {
     shouldCollectSelfie?: boolean,
     shouldCollectConsent?: boolean,
     device?: DeviceInfo,
+    onlyUsSupported?: boolean,
+    supportedDocumentTypes?: SupportedIdDocTypes[],
   ): PluginContext<IdDocCustomData> => ({
     authToken: 'token',
     customData: {
@@ -74,6 +77,12 @@ describe('<IdDoc />', () => {
         kind: OnboardingRequirementKind.idDoc,
         shouldCollectSelfie: shouldCollectSelfie ?? false,
         shouldCollectConsent: shouldCollectConsent ?? false,
+        onlyUsSupported: onlyUsSupported || false,
+        supportedDocumentTypes: supportedDocumentTypes ?? [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.passport,
+        ],
       },
     },
     device: device ?? {

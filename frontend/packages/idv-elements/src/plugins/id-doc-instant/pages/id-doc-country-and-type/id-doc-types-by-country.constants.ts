@@ -1,7 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { CountryCode, IdDocType } from '@onefootprint/types';
+import { CountryCode3, IdDocType } from '@onefootprint/types';
 
-const IdDocTypesByCountry: Record<CountryCode, IdDocType[]> =
+const IdDocTypesByCountry: Record<CountryCode3, IdDocType[]> =
   Object.fromEntries(
     COUNTRIES.map(entry => {
       const idDocTypes = [];
@@ -14,8 +14,8 @@ const IdDocTypesByCountry: Record<CountryCode, IdDocType[]> =
       if (entry.passport) {
         idDocTypes.push(IdDocType.passport);
       }
-      return [entry.value, idDocTypes];
+      return [entry.value3, idDocTypes];
     }),
-  ) as Record<CountryCode, IdDocType[]>;
+  ) as Record<CountryCode3, IdDocType[]>;
 
 export default IdDocTypesByCountry;
