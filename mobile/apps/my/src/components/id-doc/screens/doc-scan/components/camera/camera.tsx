@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   FadeIn,
+  FeedbackButton,
   Image,
   Typography,
 } from '@onefootprint/ui';
@@ -41,6 +42,7 @@ type CameraProps = {
   onSubmit: (encodedImage: string) => void;
   size?: CameraSize;
   subtitle?: string;
+  success?: boolean;
   title: string;
   type?: CameraType;
 };
@@ -55,6 +57,7 @@ const Camera = ({
   subtitle,
   title,
   type = 'back',
+  success,
 }: CameraProps) => {
   const { t } = useTranslation('components.scan.camera');
   const camera = useRef<VisionCamera>(null);
@@ -172,30 +175,41 @@ const Camera = ({
             />
           )}
         </Box>
-        {showActionButtons && (
+        {success ? (
           <Box gap={4}>
-            <Button
-              loading={loading}
-              loadingLabel={t('cta-loading')}
-              onPress={handleSubmit}
-            >
-              {t('cta')}
-            </Button>
-            <Button
-              disabled={loading}
-              onPress={handleReset}
-              variant="secondary"
-            >
+            <FeedbackButton>{t('cta-success')}</FeedbackButton>
+            <Button disabled variant="secondary">
               {t('retake')}
             </Button>
           </Box>
-        )}
-        {showTakePhotoManuallyButton && (
-          <FadeIn>
-            <Button onPress={handleTakePhotoManually}>
-              {t('take-manually')}
-            </Button>
-          </FadeIn>
+        ) : (
+          <>
+            {showActionButtons && (
+              <Box gap={4}>
+                <Button
+                  loading={loading}
+                  loadingLabel={t('cta-loading')}
+                  onPress={handleSubmit}
+                >
+                  {t('cta')}
+                </Button>
+                <Button
+                  disabled={loading}
+                  onPress={handleReset}
+                  variant="secondary"
+                >
+                  {t('retake')}
+                </Button>
+              </Box>
+            )}
+            {showTakePhotoManuallyButton && (
+              <FadeIn>
+                <Button onPress={handleTakePhotoManually}>
+                  {t('take-manually')}
+                </Button>
+              </FadeIn>
+            )}
+          </>
         )}
       </Box>
     </Container>

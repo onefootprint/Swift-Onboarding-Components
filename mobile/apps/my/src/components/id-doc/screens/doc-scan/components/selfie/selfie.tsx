@@ -11,9 +11,10 @@ export type SelfieProps = {
   authToken: string;
   loading: boolean;
   onSubmit: (image: string) => void;
+  success?: boolean;
 };
 
-const Selfie = ({ authToken, loading, onSubmit }: SelfieProps) => {
+const Selfie = ({ authToken, loading, onSubmit, success }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
   const [isCameraDisabled, setIsCameraDisable] = useState(true);
 
@@ -28,9 +29,10 @@ const Selfie = ({ authToken, loading, onSubmit }: SelfieProps) => {
         }}
         loading={loading}
         onSubmit={onSubmit}
+        size="large"
+        success={success}
         title={t('title')}
         type="front"
-        size="large"
       />
       <ConsentDialog
         authToken={authToken}

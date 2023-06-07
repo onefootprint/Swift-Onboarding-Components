@@ -11,9 +11,10 @@ export type IdCardProps = {
   loading?: boolean;
   onSubmit: (image: string) => void;
   side: SubmitDocumentSide;
+  success?: boolean;
 };
 
-const IdCard = ({ loading, onSubmit, side }: IdCardProps) => {
+const IdCard = ({ loading, onSubmit, side, success }: IdCardProps) => {
   const { t } = useTranslation('components.scan.id-card');
   const { t: sideT } = useTranslation(`components.scan.id-card.${side}`);
 
@@ -28,6 +29,7 @@ const IdCard = ({ loading, onSubmit, side }: IdCardProps) => {
       loading={loading}
       onSubmit={onSubmit}
       subtitle={sideT('subtitle')}
+      success={success}
       title={t('title')}
       type="back"
     />

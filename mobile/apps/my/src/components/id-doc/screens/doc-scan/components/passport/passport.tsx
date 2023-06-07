@@ -7,11 +7,12 @@ import Camera from '../camera';
 import Frame from './components/frame';
 
 export type PassportProps = {
+  success?: boolean;
   loading?: boolean;
   onSubmit: (image: string) => void;
 };
 
-const Passport = ({ loading, onSubmit }: PassportProps) => {
+const Passport = ({ success, loading, onSubmit }: PassportProps) => {
   const { t } = useTranslation('components.scan.passport');
 
   return (
@@ -25,6 +26,7 @@ const Passport = ({ loading, onSubmit }: PassportProps) => {
       loading={loading}
       onSubmit={onSubmit}
       subtitle={t('subtitle')}
+      success={success}
       title={t('title')}
     />
   );

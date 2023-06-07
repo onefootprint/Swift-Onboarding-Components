@@ -11,9 +11,15 @@ export type DriversLicenseProps = {
   loading?: boolean;
   onSubmit: (image: string) => void;
   side: SubmitDocumentSide;
+  success?: boolean;
 };
 
-const DriversLicense = ({ loading, onSubmit, side }: DriversLicenseProps) => {
+const DriversLicense = ({
+  loading,
+  onSubmit,
+  side,
+  success,
+}: DriversLicenseProps) => {
   const { t } = useTranslation('components.scan.drivers-license');
   const { t: sideT } = useTranslation(
     `components.scan.drivers-license.${side}`,
@@ -30,6 +36,7 @@ const DriversLicense = ({ loading, onSubmit, side }: DriversLicenseProps) => {
       loading={loading}
       onSubmit={onSubmit}
       subtitle={sideT('subtitle')}
+      success={success}
       title={t('title')}
     />
   );

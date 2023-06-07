@@ -30,7 +30,7 @@ const App = () => {
 
   return fontsLoaded ? (
     <QueryClientProvider client={queryClient}>
-      {!isClip() ? (
+      {isClip() ? (
         <AppClip onLoad={handleLoad} />
       ) : (
         <Wallet onLoad={handleLoad} />

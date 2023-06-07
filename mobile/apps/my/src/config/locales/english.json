@@ -78,13 +78,14 @@
           "title": "Allow access to your camera",
           "description": "We will need you to take photos of your document to properly verify your identity.",
           "continue": "Continue",
-          "open-settings": "Open settings"
+          "open-settings": "Open settings",
         },
         "cta": "Continue"
       },
       "camera": {
         "cta": "Continue",
         "cta-loading": "Submitting photo...",
+        "cta-success": "Photo submitted",
         "retake": "Retake",
         "take-manually": "Take manually",
         "instructions": {

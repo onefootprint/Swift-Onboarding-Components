@@ -35,11 +35,7 @@ const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
         <Success />
       ) : (
         <Box width="100%" gap={4}>
-          <Button
-            onPress={handlePress}
-            loading={registerBiometric.isLoading}
-            loadingLabel={t('cta-label')}
-          >
+          <Button onPress={handlePress} loading={registerBiometric.isLoading}>
             {t('cta')}
           </Button>
           <About ctaDisabled={registerBiometric.isLoading} />

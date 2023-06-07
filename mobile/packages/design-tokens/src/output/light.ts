@@ -235,6 +235,8 @@ export const fpButtonHeight = 56;
 export const fpButtonBorderRadius = 6;
 export const fpButtonSpacingPaddingsHorizontal = 24;
 export const fpButtonTypography = '500 17px/28px "DMSans_500Medium"';
+
+// Button primary
 export const buttonsPrimaryInitialBg = '#0e1438';
 export const buttonsPrimaryInitialText = '#ffffff';
 export const buttonsPrimaryInitialBorder = '#d4d4d400';
@@ -250,6 +252,8 @@ export const buttonsPrimaryDisabledBorder = '#d4d4d400';
 export const buttonsPrimaryLoadingBg = '#0e1438';
 export const buttonsPrimaryLoadingIcon = '#ffffff';
 export const buttonsPrimaryLoadingBorder = '#d4d4d400';
+
+// Button secondary
 export const buttonsSecondaryInitialBg = '#ffffff';
 export const buttonsSecondaryInitialText = '#000000';
 export const buttonsSecondaryInitialBorder = '#d4d4d4';
@@ -265,10 +269,9 @@ export const buttonsSecondaryDisabledBorder = '#e2e2e2';
 export const buttonsSecondaryLoadingBg = '#ffffff';
 export const buttonsSecondaryLoadingIcon = '#000000';
 export const buttonsSecondaryLoadingBorder = '#d4d4d4';
-export const buttonsHeightLarge = '60px';
+
 export const buttonsHeightDefault = '56px';
-export const buttonsHeightCompact = '40px';
-export const buttonsHeightSmall = '32px';
+
 export const buttonsBorderRadius = '6px';
 export const buttonsSpacingPaddingsHorizontalLarge = '24px';
 export const buttonsSpacingPaddingsHorizontalDefault = '24px';
@@ -382,3 +385,6 @@ export const baseInputsBorderWidth = 1;
 export const dropdownBaseBg = '#FDFDFD';
 export const dropdownBaseBgActive = '#F7F7F7';
 export const dropdownBaseColor = '#000000';
+
+// Utils
+export const transparent = 'transparent';

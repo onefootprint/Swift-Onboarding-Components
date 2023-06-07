@@ -40,7 +40,9 @@ const DocScan = ({
       },
       {
         onSuccess: response => {
-          onDone(response.nextSideToCollect);
+          setTimeout(() => {
+            onDone(response.nextSideToCollect);
+          }, 1500);
         },
       },
     );
@@ -49,6 +51,7 @@ const DocScan = ({
   if (side === SubmitDocumentSide.Selfie) {
     return (
       <Selfie
+        success={submitDocMutation.isSuccess}
         authToken={authToken}
         loading={submitDocMutation.isLoading}
         onSubmit={handleSubmit}
@@ -58,6 +61,7 @@ const DocScan = ({
   if (type === IdDocType.driversLicense) {
     return (
       <DriversLicense
+        success={submitDocMutation.isSuccess}
         loading={submitDocMutation.isLoading}
         onSubmit={handleSubmit}
         side={side}
@@ -67,6 +71,7 @@ const DocScan = ({
   if (type === IdDocType.idCard) {
     return (
       <IdCard
+        success={submitDocMutation.isSuccess}
         loading={submitDocMutation.isLoading}
         onSubmit={handleSubmit}
         side={side}
@@ -74,7 +79,11 @@ const DocScan = ({
     );
   }
   return (
-    <Passport loading={submitDocMutation.isLoading} onSubmit={handleSubmit} />
+    <Passport
+      success={submitDocMutation.isSuccess}
+      loading={submitDocMutation.isLoading}
+      onSubmit={handleSubmit}
+    />
   );
 };
 
