@@ -32,16 +32,23 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       />
     );
   }
-  if (state.matches('frontImage')) {
-    const { currentStep, collectingDocumentMeta } = state.context;
+  if (
+    state.matches('frontImage') ||
+    state.matches('backImage') ||
+    state.matches('selfie')
+  ) {
+    const { currentSide, collectingDocumentMeta } = state.context;
     return (
       <DocScan
+        key={currentSide}
         authToken={authToken}
         countryCode={collectingDocumentMeta.countryCode}
-        onDone={() => {
-          alert('image done');
+        onDone={nextSideToCollect => {
+          send('imageSubmitted', {
+            payload: { nextSideToCollect },
+          });
         }}
-        side={currentStep.side}
+        side={currentSide}
         type={collectingDocumentMeta.type}
       />
     );

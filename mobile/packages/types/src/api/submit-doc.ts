@@ -1,5 +1,11 @@
 import { CountryCode, CountryCode3, IdDocImageError, IdDocType } from '../data';
 
+export enum SubmitDocumentSide {
+  Front = 'front',
+  Back = 'back',
+  Selfie = 'selfie',
+}
+
 export type SubmitDocRequest = {
   authToken: string;
   frontImage?: string;
@@ -11,6 +17,6 @@ export type SubmitDocRequest = {
 
 export type SubmitDocResponse = {
   errors: IdDocImageError[];
-  nextSideToCollect: 'front' | 'back' | 'selfie';
+  nextSideToCollect: SubmitDocumentSide;
   isRetryLimitExceeded: boolean;
 };

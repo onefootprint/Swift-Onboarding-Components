@@ -1,11 +1,9 @@
 import {
   CountryCode,
-  IdDocImageError,
   IdDocRequirement,
   IdDocType,
+  SubmitDocumentSide,
 } from '@onefootprint/types';
-
-import { DocSide } from '../../id-doc.types';
 
 export type MachineContext = {
   requirement?: IdDocRequirement;
@@ -13,11 +11,7 @@ export type MachineContext = {
     countryCode: CountryCode;
     type: IdDocType;
   };
-  currentStep: {
-    errors: IdDocImageError[];
-    image?: string;
-    side: DocSide;
-  };
+  currentSide?: SubmitDocumentSide;
 };
 
 export type MachineEvents =
@@ -34,22 +28,6 @@ export type MachineEvents =
   | {
       type: 'imageSubmitted';
       payload: {
-        image: string;
+        nextSideToCollect?: SubmitDocumentSide;
       };
     };
-
-// | {
-//     type: 'consentReceived';
-//   }
-// | {
-//     type: 'startSelfieCapture';
-//   }
-// | {
-//     type: 'cameraErrored';
-//   }
-// | {
-//     type: 'navigatedToPrev';
-//   }
-// | {
-//     type: 'retryLimitExceeded';
-//   };

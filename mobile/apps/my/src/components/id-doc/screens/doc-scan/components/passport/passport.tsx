@@ -3,14 +3,15 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../../../../components/camera';
+import Camera from '../camera';
 import Frame from './components/frame';
 
 export type PassportProps = {
+  loading?: boolean;
   onSubmit: (image: string) => void;
 };
 
-const Passport = ({ onSubmit }: PassportProps) => {
+const Passport = ({ loading, onSubmit }: PassportProps) => {
   const { t } = useTranslation('components.scan.passport');
 
   return (
@@ -21,10 +22,10 @@ const Passport = ({ onSubmit }: PassportProps) => {
         IconComponent: IcoPassport24,
         title: t('instructions.title'),
       }}
+      loading={loading}
       onSubmit={onSubmit}
       subtitle={t('subtitle')}
       title={t('title')}
-      type="back"
     />
   );
 };

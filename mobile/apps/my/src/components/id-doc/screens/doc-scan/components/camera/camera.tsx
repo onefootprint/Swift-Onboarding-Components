@@ -25,11 +25,11 @@ import {
 
 import useTranslation from '@/hooks/use-translation';
 
-import encodeImagePath from '../../utils/encode-image-path';
 import Instructions from '../instructions';
 import type { CameraSize, CameraType } from './camera.types';
 import processDocument from './frame-processors/process-document';
 import useCanTakePhotoManually from './hooks/use-can-take-photo-manually';
+import encodeImagePath from './utils/encode-image-path';
 
 let timerId: NodeJS.Timeout | null = null;
 

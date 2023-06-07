@@ -13,7 +13,7 @@ const encodeImagePath = async (path: string) => {
   const response = await fetch(`file://${path}`);
   const blob = await response.blob();
   const base64Data = await blobToBase64(blob);
-  return base64Data;
+  return base64Data.replace('data:image/jpeg;base64,', '');
 };
 
 export default encodeImagePath;

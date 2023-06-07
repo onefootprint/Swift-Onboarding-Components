@@ -99,7 +99,7 @@
           }
         },
         "back": {
-          "subtitle": "Front side",
+          "subtitle": "Back side",
           "instructions": {
             "title": "Position the your id in the frame",
             "description": "Make sure it's the back side."
@@ -116,7 +116,7 @@
           }
         },
         "back": {
-          "subtitle": "Front side",
+          "subtitle": "Back side",
           "instructions": {
             "title": "Position the your id in the frame",
             "description": "Make sure it's the back side."

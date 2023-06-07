@@ -3,14 +3,15 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../../components/camera';
+import Camera from '../camera';
 import Frame from './components/frame';
 
 export type SelfieProps = {
-  onSubmit: () => void;
+  loading: boolean;
+  onSubmit: (image: string) => void;
 };
 
-const Selfie = ({ onSubmit }: SelfieProps) => {
+const Selfie = ({ loading, onSubmit }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
 
   return (
@@ -20,6 +21,7 @@ const Selfie = ({ onSubmit }: SelfieProps) => {
         IconComponent: IcoEmojiHappy24,
         title: t('instructions.title'),
       }}
+      loading={loading}
       onSubmit={onSubmit}
       title={t('title')}
       type="front"

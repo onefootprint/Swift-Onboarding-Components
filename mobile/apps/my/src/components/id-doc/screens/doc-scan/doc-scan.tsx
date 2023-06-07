@@ -1,17 +1,21 @@
-import { CountryCode, IdDocType } from '@onefootprint/types';
+import {
+  CountryCode,
+  IdDocType,
+  SubmitDocumentSide,
+} from '@onefootprint/types';
 import React from 'react';
 
-import { DocSide } from '../../id-doc.types';
 import DriversLicense from './components/drivers-license';
 import IdCard from './components/id-card';
 import Passport from './components/passport';
+import Selfie from './components/selfie';
 import useSubmitDoc from './hooks/use-submit-doc';
 
 export type DocScanProps = {
   authToken: string;
   countryCode: CountryCode;
-  onDone: () => void;
-  side: DocSide;
+  onDone: (nextSideToCollect: SubmitDocumentSide) => void;
+  side: SubmitDocumentSide;
   type: IdDocType;
 };
 
@@ -30,25 +34,44 @@ const DocScan = ({
         authToken,
         countryCode,
         documentType: type,
-        frontImage: side === 'front' ? image : null,
-        backImage: side === 'back' ? image : null,
+        selfieImage: side === SubmitDocumentSide.Selfie ? image : null,
+        frontImage: side === SubmitDocumentSide.Front ? image : null,
+        backImage: side === SubmitDocumentSide.Back ? image : null,
       },
       {
-        onSuccess: res => {
-          alert(JSON.stringify(res));
-          onDone();
+        onSuccess: response => {
+          onDone(response.nextSideToCollect);
         },
       },
     );
   };
 
+  if (side === SubmitDocumentSide.Selfie) {
+    return (
+      <Selfie loading={submitDocMutation.isLoading} onSubmit={handleSubmit} />
+    );
+  }
   if (type === IdDocType.driversLicense) {
-    return <DriversLicense side={side} onSubmit={handleSubmit} />;
+    return (
+      <DriversLicense
+        loading={submitDocMutation.isLoading}
+        onSubmit={handleSubmit}
+        side={side}
+      />
+    );
   }
   if (type === IdDocType.idCard) {
-    return <IdCard side={side} onSubmit={handleSubmit} />;
+    return (
+      <IdCard
+        loading={submitDocMutation.isLoading}
+        onSubmit={handleSubmit}
+        side={side}
+      />
+    );
   }
-  return <Passport onSubmit={handleSubmit} />;
+  return (
+    <Passport loading={submitDocMutation.isLoading} onSubmit={handleSubmit} />
+  );
 };
 
 export default DocScan;

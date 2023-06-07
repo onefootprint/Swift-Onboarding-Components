@@ -1,18 +1,19 @@
 import { IcoIdCard24 } from '@onefootprint/icons';
+import { SubmitDocumentSide } from '@onefootprint/types';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../../../../components/camera';
-import { DocSide } from '../../../../id-doc.types';
+import Camera from '../camera';
 import Frame from '../default-frame';
 
 export type DriversLicenseProps = {
+  loading?: boolean;
   onSubmit: (image: string) => void;
-  side: DocSide;
+  side: SubmitDocumentSide;
 };
 
-const DriversLicense = ({ onSubmit, side }: DriversLicenseProps) => {
+const DriversLicense = ({ loading, onSubmit, side }: DriversLicenseProps) => {
   const { t } = useTranslation('components.scan.drivers-license');
   const { t: sideT } = useTranslation(
     `components.scan.drivers-license.${side}`,
@@ -26,6 +27,7 @@ const DriversLicense = ({ onSubmit, side }: DriversLicenseProps) => {
         IconComponent: IcoIdCard24,
         title: sideT('instructions.title'),
       }}
+      loading={loading}
       onSubmit={onSubmit}
       subtitle={sideT('subtitle')}
       title={t('title')}

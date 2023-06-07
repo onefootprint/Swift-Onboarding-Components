@@ -1,6 +1,6 @@
+import { SubmitDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { DocSide } from '../../id-doc.types';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
@@ -15,11 +15,7 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
         requirement: undefined,
-        currentStep: {
-          image: undefined,
-          errors: [],
-          side: DocSide.Front,
-        },
+        currentSide: SubmitDocumentSide.Front,
         collectingDocumentMeta: {
           countryCode: null,
           type: null,
@@ -41,19 +37,64 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
             backButtonTapped: {
               target: 'docSelection',
             },
-            imageSubmitted: {
-              target: 'processing',
-            },
+            imageSubmitted: [
+              {
+                target: 'backImage',
+                cond: (_, event) => event.payload.nextSideToCollect === 'back',
+                actions: 'assignNextSideToCollect',
+              },
+              {
+                target: 'selfie',
+                cond: (_, event) =>
+                  event.payload.nextSideToCollect === 'selfie',
+                actions: 'assignNextSideToCollect',
+              },
+              {
+                target: 'completed',
+                actions: 'assignNextSideToCollect',
+              },
+            ],
           },
         },
-        processing: {},
-        complete: {
+        backImage: {
+          on: {
+            imageSubmitted: [
+              {
+                target: 'selfie',
+                cond: (_, event) =>
+                  event.payload.nextSideToCollect === 'selfie',
+                actions: 'assignNextSideToCollect',
+              },
+              {
+                target: 'completed',
+                actions: 'assignNextSideToCollect',
+              },
+            ],
+          },
+        },
+        selfie: {
+          on: {
+            imageSubmitted: [
+              {
+                target: 'completed',
+                actions: 'assignNextSideToCollect',
+              },
+            ],
+          },
+        },
+        completed: {
           type: 'final',
         },
       },
     },
     {
       actions: {
+        assignNextSideToCollect: assign((context, { payload }) => {
+          return {
+            ...context,
+            currentSide: payload.nextSideToCollect,
+          };
+        }),
         assignCountryAndType: assign((context, { payload }) => {
           return {
             ...context,

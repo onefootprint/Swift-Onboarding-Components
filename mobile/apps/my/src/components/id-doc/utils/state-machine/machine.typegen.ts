@@ -14,10 +14,16 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignCountryAndType: 'countryAndTypeSubmitted';
+    assignNextSideToCollect: 'imageSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'complete' | 'docSelection' | 'frontImage' | 'processing';
+  matchesStates:
+    | 'backImage'
+    | 'completed'
+    | 'docSelection'
+    | 'frontImage'
+    | 'selfie';
   tags: never;
 }
