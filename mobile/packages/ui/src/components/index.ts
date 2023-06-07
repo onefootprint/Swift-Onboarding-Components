@@ -1,5 +1,6 @@
 export * from './box';
 export * from './button';
+export * from './checkbox';
 export * from './container';
 export * from './country-select';
 export * from './design-system-provider';

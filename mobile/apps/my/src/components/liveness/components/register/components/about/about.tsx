@@ -1,4 +1,4 @@
-import { Box, Button, Dialog } from '@onefootprint/ui';
+import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
@@ -24,8 +24,12 @@ const About = ({ ctaDisabled }: AboutProps) => {
         onClose={() => setOpen(false)}
         open={open}
         title={t('about.title')}
+        cta={{
+          label: t('about.close'),
+          onPress: () => setOpen(false),
+        }}
       >
-        {t('about.content')}
+        <Typography variant="body-3">{t('about.content')}</Typography>
       </Dialog>
     </Box>
   );

@@ -42,7 +42,8 @@
         "about": {
           "cta": "More about passkeys",
           "title": "About passkeys",
-          "content": "Aliqua cupidatat nostrud pariatur ad cillum in culpa est esse proident. Proident voluptate eu pariatur deserunt id sit esse. Cillum eu incididunt cillum ad sint sint est fugiat cillum Lorem sit Lorem eiusmod nulla. Esse aliquip aute culpa non consectetur eu do. Culpa minim sunt elit commodo ex tempor duis aliqua excepteur officia. Nisi adipisicing ea commodo aliqua aliquip nostrud mollit proident cillum esse nisi voluptate irure ullamco."
+          "content": "Passkeys are unique, secure codes replacing traditional usernames and passwords. They're your digital key for registration, streamlining access to our app while enhancing security. Each passkey is distinct, offering you a personalized entry point.",
+          "close": "Close"
         }
       },
       "retry": {
@@ -135,6 +136,16 @@
         "title": "Selfie",
         "instructions": {
           "title": "Position your face within the frame"
+        },
+        "consent": {
+          "title": "We need a selfie to verify your identity",
+          "description": "By continuing, you're agreeing to Footprint collecting and processing your biometric data from your selfie and identity document.",
+          "privacy-policy": "Privacy policy",
+          "third-party": "Optional: Allow Footprint's third-party providers to improve their products with this data.",
+          "cta": "Continue",
+          "error": {
+            "title": "We couldn't save your consent"
+          }
         }
       }
     }

@@ -42,25 +42,25 @@ const Corner = styled(Reanimated.View)<{ kind: CornerKind }>`
     ${kind.includes('Top') &&
     css`
       top: 0;
-      border-top-color: ${theme.borderColor.primary};
+      border-top-color: #fff;
       border-top-width: ${theme.borderWidth[2]};
     `}
     ${kind.includes('Bottom') &&
     css`
       bottom: 0;
-      border-bottom-color: ${theme.borderColor.primary};
+      border-bottom-color: #fff;
       border-bottom-width: ${theme.borderWidth[2]};
     `}
     ${kind.includes('Left') &&
     css`
       left: 0;
-      border-left-color: ${theme.borderColor.primary};
+      border-left-color: #fff;
       border-left-width: ${theme.borderWidth[2]};
     `}
     ${kind.includes('Right') &&
     css`
       right: 0;
-      border-right-color: ${theme.borderColor.primary};
+      border-right-color: #fff;
       border-right-width: ${theme.borderWidth[2]};
     `}
     ${kind.includes('TopLeft') &&

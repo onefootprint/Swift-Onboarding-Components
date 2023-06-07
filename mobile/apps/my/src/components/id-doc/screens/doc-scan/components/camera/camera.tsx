@@ -34,6 +34,7 @@ import encodeImagePath from './utils/encode-image-path';
 let timerId: NodeJS.Timeout | null = null;
 
 type CameraProps = {
+  active?: boolean;
   Frame?: ({ style }: { style: ViewStyle }) => JSX.Element;
   instructions: { description?: string; IconComponent: Icon; title: string };
   loading?: boolean;
@@ -45,6 +46,7 @@ type CameraProps = {
 };
 
 const Camera = ({
+  active = true,
   Frame,
   instructions,
   loading,
@@ -150,7 +152,7 @@ const Camera = ({
                 <StyledCamera
                   device={device}
                   frameProcessor={frameProcessor}
-                  isActive
+                  isActive={active}
                   photo
                   ref={camera}
                 />
@@ -201,7 +203,7 @@ const windowWidth = Dimensions.get('window').width;
 const CameraContainer = styled.View<{ size: CameraSize }>`
   ${({ theme, size }) => css`
     align-items: center;
-    background: black;
+    background: ${theme.backgroundColor.senary};
     height: ${size === 'default' ? 280 : 390}px;
     justify-content: center;
     margin-left: -${theme.spacing[5]};

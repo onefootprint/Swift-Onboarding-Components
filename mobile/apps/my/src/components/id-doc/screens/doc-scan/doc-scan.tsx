@@ -48,7 +48,11 @@ const DocScan = ({
 
   if (side === SubmitDocumentSide.Selfie) {
     return (
-      <Selfie loading={submitDocMutation.isLoading} onSubmit={handleSubmit} />
+      <Selfie
+        authToken={authToken}
+        loading={submitDocMutation.isLoading}
+        onSubmit={handleSubmit}
+      />
     );
   }
   if (type === IdDocType.driversLicense) {

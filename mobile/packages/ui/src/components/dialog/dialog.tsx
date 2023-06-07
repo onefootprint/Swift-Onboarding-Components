@@ -11,21 +11,30 @@ import { Typography } from '../typography';
 export type DialogProps = {
   children: React.ReactNode;
   cta?: {
+    loading?: boolean;
     label: string;
     onPress: () => void;
   };
   onClose?: () => void;
   open?: boolean;
   title: string;
+  disableClose?: boolean;
 };
 
-const Dialog = ({ children, cta, onClose, open, title }: DialogProps) => {
+const Dialog = ({
+  children,
+  cta,
+  onClose,
+  open,
+  title,
+  disableClose,
+}: DialogProps) => {
   return (
     <StyledModal
       backdropOpacity={0.3}
       isVisible={open}
-      onBackdropPress={onClose}
-      onSwipeComplete={onClose}
+      onBackdropPress={disableClose ? onClose : undefined}
+      onSwipeComplete={disableClose ? onClose : undefined}
       swipeDirection={['down']}
       useNativeDriverForBackdrop
     >
@@ -35,20 +44,21 @@ const Dialog = ({ children, cta, onClose, open, title }: DialogProps) => {
           marginBottom={2}
           marginHorizontal={5}
           marginTop={4}
+          height={32}
         >
-          <IconButton aria-label="Close" onPress={onClose}>
-            <IcoClose32 />
-          </IconButton>
+          {disableClose ? null : (
+            <IconButton aria-label="Close" onPress={onClose}>
+              <IcoClose32 />
+            </IconButton>
+          )}
         </Box>
         <Box marginHorizontal={5} gap={3} marginBottom={6}>
           <Typography variant="heading-3" center>
             {title}
           </Typography>
-          <Typography variant="body-3" center>
-            {children}
-          </Typography>
+          <Box>{children}</Box>
           {cta && (
-            <Button onPress={cta.onPress} marginTop={7}>
+            <Button onPress={cta.onPress} marginTop={7} loading={cta.loading}>
               {cta.label}
             </Button>
           )}
