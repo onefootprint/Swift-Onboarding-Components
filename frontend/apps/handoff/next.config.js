@@ -34,7 +34,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), publickey-credentials-get=*, geolocation=()',
+    value: 'camera=*, publickey-credentials-get=*, geolocation=*',
   },
   {
     key: 'X-Content-Type-Options',

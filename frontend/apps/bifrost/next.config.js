@@ -29,7 +29,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), publickey-credentials-get=*',
+    value: 'camera=*, publickey-credentials-get=*',
   },
   {
     key: 'X-Content-Type-Options',
