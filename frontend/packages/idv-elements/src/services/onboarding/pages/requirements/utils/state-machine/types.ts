@@ -8,6 +8,7 @@ import {
   IdvBootstrapData,
   LivenessRequirement,
   OnboardingConfig,
+  ProcessRequirement,
 } from '@onefootprint/types';
 
 export type Requirements = {
@@ -18,6 +19,7 @@ export type Requirements = {
   liveness?: LivenessRequirement;
   idDoc?: IdDocRequirement;
   authorize?: AuthorizeRequirement;
+  process?: ProcessRequirement;
 };
 
 export type MachineContext = {

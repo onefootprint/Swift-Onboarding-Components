@@ -13,6 +13,7 @@ export enum OnboardingRequirementKind {
   collectKybData = 'collect_business_data',
   investorProfile = 'collect_investor_profile',
   authorize = 'authorize',
+  process = 'process',
 }
 
 export type CollectKybDataRequirement = {
@@ -48,13 +49,18 @@ export type AuthorizeRequirement = {
   fieldsToAuthorize: AuthorizeFields;
 };
 
+export type ProcessRequirement = {
+  kind: OnboardingRequirementKind.process;
+};
+
 export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
   | IdDocRequirement
   | LivenessRequirement
-  | AuthorizeRequirement;
+  | AuthorizeRequirement
+  | ProcessRequirement;
 
 export type OnboardingStatusRequest = {
   authToken: string;

@@ -36,6 +36,10 @@ export const RequirementTargets: MachineTarget[] = [
     target: 'authorize',
     cond: context => shouldShowAuthorize(context),
   },
+  {
+    target: 'process',
+    cond: context => shouldShowProcess(context),
+  },
 ];
 
 export const requiresAdditionalInfo = (context: MachineContext) => {
@@ -81,6 +85,14 @@ const shouldShowAuthorize = (context: MachineContext) => {
     onboardingContext: { isTransfer },
   } = context;
   return !isTransfer && !!authorize;
+};
+
+const shouldShowProcess = (context: MachineContext) => {
+  const {
+    requirements: { process },
+    onboardingContext: { isTransfer },
+  } = context;
+  return !isTransfer && !!process;
 };
 
 const shouldRunTransfer = (context: MachineContext) => {

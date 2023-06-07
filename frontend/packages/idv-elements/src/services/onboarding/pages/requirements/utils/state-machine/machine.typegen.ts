@@ -31,6 +31,7 @@ export interface Typegen0 {
     | 'kybData'
     | 'kycData'
     | 'liveness'
+    | 'process'
     | 'router'
     | 'success'
     | 'transfer';

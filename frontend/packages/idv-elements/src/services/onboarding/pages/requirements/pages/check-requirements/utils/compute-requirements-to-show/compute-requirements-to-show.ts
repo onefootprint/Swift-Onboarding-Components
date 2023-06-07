@@ -40,6 +40,8 @@ const computeRequirementsToShow = (
       remainingRequirements.investorProfile = req;
     } else if (req.kind === OnboardingRequirementKind.authorize) {
       remainingRequirements.authorize = req;
+    } else if (req.kind === OnboardingRequirementKind.process) {
+      remainingRequirements.process = req;
     }
   });
 

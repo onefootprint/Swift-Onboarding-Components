@@ -6,7 +6,8 @@ export type Page =
   | 'investor-profile'
   | 'id-doc'
   | 'liveness'
-  | 'authorize';
+  | 'authorize'
+  | 'process';
 
 export type SDKIntegrationProps = {
   fpAuthToken: string;
