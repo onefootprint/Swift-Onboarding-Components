@@ -83,6 +83,7 @@ const createIdDocMachine = (args: MachineContext) =>
             },
             startSelfieCapture: {
               target: 'selfieImage',
+              cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },
