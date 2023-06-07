@@ -32,6 +32,10 @@ const userDataRequest = async (payload: UserDataRequest) => {
       }),
   );
 
+  if (!Object.entries(data).length) {
+    // If there's no data to send to the backend, short circuit
+    return {} as UserDataResponse;
+  }
   const response = await requestWithoutCaseConverter<UserDataResponse>({
     method,
     url,
