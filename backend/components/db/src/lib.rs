@@ -198,7 +198,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         incode_verification_session, liveness_event, manual_review, middesk_request, onboarding,
         onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_vault,
         socure_device_session, user_timeline, vault, vault_data, verification_request, verification_result,
-        watchlist_check, webauthn_credential,
+        watchlist_check, webauthn_credential, workflow, workflow_event,
     };
     let mut deleted_rows = 0;
 
@@ -383,6 +383,21 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
             deleted_rows += diesel::delete(onboarding::table)
                 .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
+        }
+
+        // Workflows
+        {
+            let workflow_ids = workflow::table
+                .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
+                .select(workflow::id);
+
+            deleted_rows += diesel::delete(workflow_event::table)
+                .filter(workflow_event::workflow_id.eq_any(workflow_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(workflow::table)
+                .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
 
