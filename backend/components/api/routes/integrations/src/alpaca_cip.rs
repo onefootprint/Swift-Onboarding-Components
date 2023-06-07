@@ -236,7 +236,7 @@ async fn kyc(
         .unwrap_or(default_approver);
 
     // build the approved reason from the latest annotation if it exists
-    // TODO: there should be a better way to signfiy a manual review annotation
+    // TODO: FP-3990 there should be a better way to signfiy a manual review annotation
     let approved_reason = annotations
         .iter()
         .max_by(|a, b| a.timestamp.cmp(&b.timestamp))
@@ -342,6 +342,10 @@ fn watchlist(
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitNonSdn);
 
+    let adverse_media: bool = risk_signals
+        .iter()
+        .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::AdverseMediaHit);
+
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
     // so we pull them from the Vres on the fly here
 
@@ -369,8 +373,7 @@ fn watchlist(
         politically_exposed_person: CipResult::clear(!pep),
         monitored_lists: CipResult::clear(!ofac),
         sanction: CipResult::clear(!sanctions),
-        // TODO: FP-4191 (add insertion point for doing these checks)
-        adverse_media: CipResult::Clear,
+        adverse_media: CipResult::clear(!adverse_media),
         records,
     })
 }
@@ -462,7 +465,7 @@ async fn document_and_photo(
             "missing document_number".into(),
         )?],
         document_type,
-        // TODO: these should all be computed from actual response
+        // TODO: FP-4427 these should all be computed from actual response
         age_validation: CipResult::Clear,
         data_comparison: CipResult::Clear,
         data_comparison_breakdown: DataComparsionBreakDown {
