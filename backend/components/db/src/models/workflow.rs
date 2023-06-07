@@ -1,12 +1,11 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AlpacaKycConfig, AlpacaKycState};
+use newtypes::{AlpacaKycState, DocumentState};
 use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use serde::{Deserialize, Serialize};
 
 use super::workflow_event::WorkflowEvent;
 use crate::{schema::workflow, DbResult, PgConn, TxnPgConn};
-use newtypes::KycConfig;
 use newtypes::KycState;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
@@ -34,7 +33,7 @@ pub struct NewWorkflow {
 
 impl Workflow {
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
+    pub fn insert(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
         let res = diesel::insert_into(workflow::table)
             .values(new_workflow)
             .get_result(conn)?;
@@ -43,42 +42,22 @@ impl Workflow {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn create_redo_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, sv_id: &ScopedVaultId, config: WorkflowConfig) -> DbResult<Self> {
+        let kind = config.kind();
+        let initial_state = match kind {
+            WorkflowKind::AlpacaKyc => WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
+            WorkflowKind::Kyc => WorkflowState::Kyc(KycState::DataCollection),
+            WorkflowKind::Document => WorkflowState::Document(DocumentState::DataCollection),
+        };
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),
-            scoped_vault_id: scoped_vault_id.clone(),
-            kind: WorkflowKind::Kyc,
-            state: WorkflowState::Kyc(KycState::DataCollection),
-            config: WorkflowConfig::Kyc(KycConfig { is_redo: true }),
+            scoped_vault_id: sv_id.clone(),
+            kind,
+            state: initial_state,
+            config,
         };
 
-        Self::create(conn, new_workflow)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn create_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
-        let new_workflow = NewWorkflow {
-            created_at: Utc::now(),
-            scoped_vault_id: scoped_vault_id.clone(),
-            kind: WorkflowKind::Kyc,
-            state: WorkflowState::Kyc(KycState::DataCollection),
-            config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
-        };
-
-        Self::create(conn, new_workflow)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn create_alpaca_kyc(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
-        let new_workflow = NewWorkflow {
-            created_at: Utc::now(),
-            scoped_vault_id: scoped_vault_id.clone(),
-            kind: WorkflowKind::AlpacaKyc,
-            state: WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
-            config: WorkflowConfig::AlpacaKyc(AlpacaKycConfig { is_redo: false }),
-        };
-
-        Self::create(conn, new_workflow)
+        Self::insert(conn, new_workflow)
     }
 
     #[tracing::instrument(skip_all)]
@@ -144,7 +123,7 @@ mod tests {
         let state = KycState::VendorCalls;
         let wf_state: WorkflowState = state.into();
         let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
-        let wf = Workflow::create(
+        let wf = Workflow::insert(
             conn,
             NewWorkflow {
                 created_at: Utc::now(),
@@ -164,7 +143,7 @@ mod tests {
     fn test_update(conn: &mut TestPgConn) {
         let s: WorkflowState = KycState::VendorCalls.into();
         let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
-        let wf = Workflow::create(
+        let wf = Workflow::insert(
             conn,
             NewWorkflow {
                 created_at: Utc::now(),

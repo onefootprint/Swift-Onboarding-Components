@@ -43,7 +43,7 @@ use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
 use macros::{test_db_pool, test_state_case};
-use newtypes::{AlpacaKycState, DbActor, SealedVaultBytes};
+use newtypes::{AlpacaKycConfig, AlpacaKycState, DbActor, SealedVaultBytes};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use newtypes::{FootprintReasonCode, TenantUserId};
 use newtypes::{KycConfig, ScopedVaultId};
@@ -72,7 +72,8 @@ async fn setup_data(
     let (wf, tu) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let wf = Workflow::create_alpaca_kyc(conn, &sv.id).unwrap();
+            let config = AlpacaKycConfig { is_redo: false }.into();
+            let wf = Workflow::create(conn, &sv.id, config).unwrap();
             // only enable Idology for this dummy test merchant
             let tvc = TenantVendorControl::create(
                 conn,

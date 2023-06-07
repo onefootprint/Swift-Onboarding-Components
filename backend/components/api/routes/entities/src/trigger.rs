@@ -21,6 +21,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::FpId;
+use newtypes::KycConfig;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -49,30 +50,27 @@ pub async fn post(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
-            let (scopes, duration) = match kind {
-                TriggerKind::RedoKyc => {
-                    let vault = Vault::get(conn, &sv.vault_id)?;
-                    // TODO: Other validation conditions to trigger RedoKyc
-                    if vault.kind != VaultKind::Person {
-                        return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
-                    }
-                    if !vault.is_portable {
-                        return Err(TenantError::CannotTriggerKycForNonPortable.into());
-                    }
-                    let wf = Workflow::create_redo_kyc(conn, &sv.id)?;
-                    let scopes = vec![
-                        UserAuthScope::SignUp,
-                        // NOTE: when we remove this OrgOnboarding scope, make sure we're able to
-                        // look up the ob_config and tenant on UserObAuth via the Workflow scope
-                        UserAuthScope::OrgOnboarding { id: sv.id },
-                        UserAuthScope::Workflow { wf_id: wf.id },
-                    ];
-                    let duration = Duration::days(1);
-                    (scopes, duration)
+            let vault = Vault::get(conn, &sv.vault_id)?;
+            // TODO: Other validation conditions to trigger RedoKyc
+            if vault.kind != VaultKind::Person {
+                return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
+            }
+            if !vault.is_portable {
+                return Err(TenantError::CannotTriggerKycForNonPortable.into());
+            }
 
-                    // TODO make a timeline event?
-                }
+            let wf = match kind {
+                TriggerKind::RedoKyc => Workflow::create(conn, &sv.id, KycConfig { is_redo: true }.into())?,
             };
+            let scopes = vec![
+                UserAuthScope::SignUp,
+                // NOTE: when we remove this OrgOnboarding scope, make sure we're able to
+                // look up the ob_config and tenant on UserObAuth via the Workflow scope
+                UserAuthScope::OrgOnboarding { id: sv.id },
+                UserAuthScope::Workflow { wf_id: wf.id },
+            ];
+            let duration = Duration::days(1);
+            // TODO make a timeline event?
             let data = UserSession::make(sv.vault_id, scopes);
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))

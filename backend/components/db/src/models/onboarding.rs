@@ -14,8 +14,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    CipKind, DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId,
-    TenantId, TenantScope, VaultId, WorkflowId,
+    AlpacaKycConfig, CipKind, DecisionStatus, FpId, InsightEventId, KycConfig, Locked, ObConfigurationId,
+    OnboardingId, ScopedVaultId, TenantId, TenantScope, VaultId, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -324,11 +324,12 @@ impl Onboarding {
         let wf = if matches!(v.kind, VaultKind::Person) && should_create_workflow {
             let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
 
-            if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-                Some(Workflow::create_alpaca_kyc(conn, &args.scoped_vault_id)?)
+            let config = if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+                AlpacaKycConfig { is_redo: false }.into()
             } else {
-                Some(Workflow::create_kyc(conn, &args.scoped_vault_id)?)
-            }
+                KycConfig { is_redo: false }.into()
+            };
+            Some(Workflow::create(conn, &args.scoped_vault_id, config)?)
         } else {
             None
         };

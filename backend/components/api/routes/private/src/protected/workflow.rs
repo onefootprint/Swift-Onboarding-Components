@@ -39,7 +39,7 @@ async fn create_workflow(
     let wf = state
         .db_pool
         .db_query(move |conn| -> Result<Workflow, DbError> {
-            Workflow::create(
+            Workflow::insert(
                 conn,
                 NewWorkflow {
                     created_at: Utc::now(),
