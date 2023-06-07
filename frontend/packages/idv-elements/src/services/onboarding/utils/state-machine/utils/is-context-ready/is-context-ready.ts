@@ -9,16 +9,8 @@ const isContextReady = (
   }
   const device = context.device || event.payload.device;
   const config = context.config || event.payload.config;
-  const alreadyAuthorized =
-    context.alreadyAuthorized !== undefined
-      ? context.alreadyAuthorized
-      : event.payload.alreadyAuthorized;
 
-  return (
-    device !== undefined &&
-    config !== undefined &&
-    alreadyAuthorized !== undefined
-  );
+  return device !== undefined && config !== undefined;
 };
 
 export default isContextReady;

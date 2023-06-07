@@ -52,16 +52,12 @@ export const withOnboardingConfig = (data = onboardingConfigFixture) =>
     response: data,
   });
 
-export const withOnboarding = (
-  onboardingConfig = onboardingConfigFixture,
-  alreadyAuthorized?: boolean,
-) =>
+export const withOnboarding = (onboardingConfig = onboardingConfigFixture) =>
   mockRequest({
     method: 'post',
     path: '/hosted/onboarding',
     response: {
       onboardingConfig,
-      alreadyAuthorized: alreadyAuthorized ?? false,
     },
   });
 

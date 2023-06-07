@@ -50,14 +50,6 @@ const createOnboardingMachine = ({
             },
             initContextUpdated: [
               {
-                target: 'validate',
-                cond: (context, event) =>
-                  isContextReady(context, event) &&
-                  (!!event.payload.alreadyAuthorized ||
-                    !!context.alreadyAuthorized),
-                actions: ['assignInitContext'],
-              },
-              {
                 target: 'requirements',
                 cond: (context, event) => isContextReady(context, event),
                 actions: ['assignInitContext'],
@@ -103,14 +95,9 @@ const createOnboardingMachine = ({
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const { device, config, alreadyAuthorized } = event.payload;
+          const { device, config } = event.payload;
           context.device = device !== undefined ? device : context.device;
           context.config = config !== undefined ? config : context.config;
-          context.alreadyAuthorized =
-            alreadyAuthorized !== undefined
-              ? alreadyAuthorized
-              : context.alreadyAuthorized;
-
           return context;
         }),
         assignValidationToken: assign((context, event) => ({

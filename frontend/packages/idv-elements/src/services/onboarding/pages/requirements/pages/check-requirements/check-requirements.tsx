@@ -13,6 +13,7 @@ const CheckRequirements = () => {
   const { t } = useTranslation('pages.check-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
   const {
+    startedDataCollection,
     onboardingContext: { authToken, isTransfer },
     collectedKycData,
   } = state.context;
@@ -21,6 +22,7 @@ const CheckRequirements = () => {
   const handleSuccess = (response: OnboardingStatusResponse) => {
     const payload = computeRequirementsToShow(
       !!isTransfer,
+      startedDataCollection,
       { collectedKycData: !!collectedKycData },
       response,
     );

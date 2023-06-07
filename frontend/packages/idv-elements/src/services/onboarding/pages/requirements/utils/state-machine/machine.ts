@@ -69,9 +69,10 @@ const createOnboardingRequirementsMachine = ({
               target: 'success',
             },
           ],
+          // The first time (and every time after) leaving router, mark data collection as started
+          exit: ['startDataCollection'],
         },
         additionalInfoRequired: {
-          entry: ['startDataCollection'],
           on: {
             requirementCompleted: [
               ...RequirementTargets,

@@ -3,5 +3,4 @@ export type OnboardingRequest = {
 };
 
 export type OnboardingResponse = {
-  alreadyAuthorized: boolean;
 };

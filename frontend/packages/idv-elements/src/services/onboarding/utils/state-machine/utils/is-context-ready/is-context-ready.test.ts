@@ -29,7 +29,6 @@ describe('isContextReady', () => {
         config: { ...testOnboardingConfig },
         bootstrapData: {},
         validationToken: '',
-        alreadyAuthorized: false,
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -51,7 +50,6 @@ describe('isContextReady', () => {
             type: 'mobile',
             hasSupportForWebauthn: true,
           },
-          alreadyAuthorized: false,
         },
       };
       expect(isContextReady(context, event)).toEqual(true);

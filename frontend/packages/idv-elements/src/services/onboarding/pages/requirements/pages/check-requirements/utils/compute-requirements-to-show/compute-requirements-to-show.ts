@@ -13,11 +13,19 @@ type AlreadyDisplayedRequirements = {
 /// we've already displayed, computes the frontend,
 const computeRequirementsToShow = (
   isTransfer: boolean,
+  startedDataCollection: boolean,
   { collectedKycData }: AlreadyDisplayedRequirements,
   response: OnboardingStatusResponse,
 ) => {
   const { requirements, metRequirements } = response;
   const remainingRequirements = {} as Requirements;
+
+  if (!startedDataCollection && !requirements.length) {
+    // If we haven't started data collection (== this is the first time we've checked requirements),
+    // and if there are no unmet requirements, short circuit through all requirements.
+    // This handles the case where someone tries to onboard onto the exact same onboarding config.
+    return remainingRequirements;
+  }
 
   requirements.forEach(req => {
     if (req.kind === OnboardingRequirementKind.collectKybData) {

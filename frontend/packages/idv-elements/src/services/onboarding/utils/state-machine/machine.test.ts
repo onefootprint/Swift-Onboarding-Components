@@ -60,7 +60,6 @@ describe('Onboarding Machine Tests', () => {
       payload: {
         device: testDevice,
         config: testOnboardingConfig,
-        alreadyAuthorized: false,
       },
     });
     expect(state.value).toEqual('requirements');
@@ -71,7 +70,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: undefined,
-      alreadyAuthorized: false,
     });
 
     state = machine.send({
@@ -94,41 +92,6 @@ describe('Onboarding Machine Tests', () => {
       authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: 'token',
-      alreadyAuthorized: false,
-    });
-  });
-
-  it('skips requirements when already authorized', () => {
-    const machine = createMachine({});
-    let { state } = machine;
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'initContextUpdated',
-      payload: {
-        device: testDevice,
-        config: testOnboardingConfig,
-        alreadyAuthorized: true,
-      },
-    });
-    expect(state.value).toEqual('validate');
-
-    state = machine.send({
-      type: 'validationComplete',
-      payload: {
-        validationToken: 'token',
-      },
-    });
-    expect(state.value).toEqual('complete');
-
-    expect(state.context).toEqual({
-      userFound: true,
-      device: testDevice,
-      config: testOnboardingConfig,
-      authToken: 'token',
-      bootstrapData: defaultBootstrapData,
-      validationToken: 'token',
-      alreadyAuthorized: true,
     });
   });
 });

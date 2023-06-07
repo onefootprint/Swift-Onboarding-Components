@@ -30,9 +30,11 @@ export type MachineContext = {
     isTransfer?: boolean;
     bootstrapData?: IdvBootstrapData;
   };
+  /// The first time the router sends to a page, we'll mark `startedDataCollection` as true.
+  /// There are a few pieces of logic that behave differently after we've started collecting data
   startedDataCollection: boolean;
-  // TODO we might want a more generic list of requirements that have already been handled.
-  // One day, when more plugins have confirm screens, we'll need this information to determine
+  // TODO we might want a more generic list of requirement s that have already been handled.
+  // One day, when more plugins have confirm screens, we'l l need this information to determine
   // whether to render the plugin for a requirement that's already been met
   collectedKycData?: boolean;
   requirements: Requirements;

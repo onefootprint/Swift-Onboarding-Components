@@ -17,7 +17,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignRequirements: 'onboardingRequirementsReceived';
     markCollectedKycData: 'requirementCompleted' | 'xstate.stop';
-    startDataCollection: '';
+    startDataCollection: '' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

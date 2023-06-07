@@ -1,5 +1,6 @@
 import {
   CollectedKycDataOption,
+  IdDocType,
   OnboardingConfig,
   OnboardingRequirement,
   OnboardingRequirementKind,
@@ -8,9 +9,17 @@ import {
 import computeRequirementsToShow from './compute-requirements-to-show';
 
 describe('computeRequirementsToShow', () => {
-  describe('when KYC requirement is met', () => {
+  describe('with met KYC requirement, unmet authorize', () => {
     const requirementsResponse = {
-      requirements: [],
+      requirements: [
+        {
+          kind: OnboardingRequirementKind.authorize,
+          fieldsToAuthorize: {
+            collectedData: [] as CollectedKycDataOption[],
+            identityDocumentTypes: [] as IdDocType[],
+          },
+        },
+      ] as OnboardingRequirement[],
       metRequirements: [
         {
           kind: OnboardingRequirementKind.collectKycData,
@@ -27,6 +36,19 @@ describe('computeRequirementsToShow', () => {
       };
       const remainingRequirements = computeRequirementsToShow(
         false,
+        true,
+        alreadyDisplayedRequirements,
+        requirementsResponse,
+      );
+      expect(remainingRequirements.kyc).toBeTruthy();
+    });
+    it('should return KYC requirement when not yet shown havent started collecting data', () => {
+      const alreadyDisplayedRequirements = {
+        collectedKycData: false,
+      };
+      const remainingRequirements = computeRequirementsToShow(
+        false,
+        false,
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
@@ -38,6 +60,7 @@ describe('computeRequirementsToShow', () => {
       };
       const remainingRequirements = computeRequirementsToShow(
         true,
+        false,
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
@@ -48,6 +71,33 @@ describe('computeRequirementsToShow', () => {
         collectedKycData: true,
       };
       const remainingRequirements = computeRequirementsToShow(
+        false,
+        false,
+        alreadyDisplayedRequirements,
+        requirementsResponse,
+      );
+      expect(remainingRequirements.kyc).toBeFalsy();
+    });
+  });
+  describe('with met KYC requirement, no authorize', () => {
+    const requirementsResponse = {
+      requirements: [],
+      metRequirements: [
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [] as CollectedKycDataOption[],
+          populatedAttributes: [CollectedKycDataOption.name],
+        },
+      ] as OnboardingRequirement[],
+      // Not used
+      obConfiguration: {} as OnboardingConfig,
+    };
+    it('should not return KYC requirement on initial fetch', () => {
+      const alreadyDisplayedRequirements = {
+        collectedKycData: false,
+      };
+      const remainingRequirements = computeRequirementsToShow(
+        false,
         false,
         alreadyDisplayedRequirements,
         requirementsResponse,
