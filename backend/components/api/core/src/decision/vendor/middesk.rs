@@ -5,8 +5,8 @@ use std::sync::Arc;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 
-use crate::decision;
 use crate::enclave_client::EnclaveClient;
+use crate::{decision, State};
 
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -33,7 +33,7 @@ use idv::middesk::{
 
 use idv::{ParsedResponse, VendorResponse};
 
-use newtypes::{BusinessData, MiddeskRequestState, ObConfigurationKey, PiiJsonValue, VendorAPI};
+use newtypes::{BusinessData, MiddeskRequestState, ObConfigurationKey, PiiJsonValue, TenantId, VendorAPI};
 
 #[derive(Debug)]
 pub struct MiddeskState<T> {
@@ -501,22 +501,34 @@ impl MiddeskState<Complete> {
 
 // Insertion point 1: All BO's have completed Bifrost and we are now initiating the Middesk flow by making a POST /business call
 pub async fn run_kyb(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    middesk_client: VendorClient<
-        MiddeskCreateBusinessRequest,
-        MiddeskCreateBusinessResponse,
-        idv::middesk::Error,
-    >,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    ob_id: OnboardingId,
+    state: &State,
+    biz_ob_id: OnboardingId,
+    person_sv_id: ScopedVaultId,
+    tenant_id: TenantId,
 ) -> Result<(), ApiError> {
-    let state = init_middesk_request(db_pool, ob_id).await?;
+    let fixture_decision = decision::utils::get_fixture_data_decision(
+        state,
+        state.feature_flag_client.clone(),
+        &person_sv_id,
+        &tenant_id,
+    )
+    .await?;
 
-    let _state = state
-        .make_create_business_call(db_pool, enclave_client, ff_client, middesk_client)
-        .await?;
+    if let Some(fixture_decision) = fixture_decision {
+        // Don't run prod middesk requests and instead just create fixture data for this business
+        decision::utils::setup_kyb_test_fixtures(state, &biz_ob_id, fixture_decision).await?;
+    } else {
+        let middesk_state = init_middesk_request(&state.db_pool, biz_ob_id).await?;
 
+        let _middesk_state = middesk_state
+            .make_create_business_call(
+                &state.db_pool,
+                &state.enclave_client,
+                state.feature_flag_client.clone(),
+                state.vendor_clients.middesk_create_business.clone(),
+            )
+            .await?;
+    }
     Ok(())
 }
 

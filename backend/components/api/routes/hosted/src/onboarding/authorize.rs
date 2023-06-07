@@ -134,7 +134,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             )
             .await?;
 
-            let engine_result = run_kyc(&state, &user_auth, biz_ob.clone(), tenant_vendor_control).await;
+            let engine_result = run_kyc(&state, &user_auth, tenant_vendor_control).await;
             // We always want to return a validation to the client if the DE fails.
             // Since by this point we've notated authorize, saved VReqs and moved Onboarding to Pending status
             match engine_result {
@@ -156,14 +156,8 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         let should_run_kyb = should_run_kyb(&state, &biz_ob, tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
-            let kyb_res = decision::vendor::middesk::run_kyb(
-                &state.db_pool,
-                &state.enclave_client,
-                state.vendor_clients.middesk_create_business.clone(),
-                state.feature_flag_client.clone(),
-                biz_ob.id,
-            )
-            .await;
+            let kyb_res =
+                decision::vendor::middesk::run_kyb(&state, biz_ob.id, sv_id.clone(), tenant.id.clone()).await;
             if let Err(e) = kyb_res {
                 tracing::error!(error=%e, "Error kicking off KYB")
             }
@@ -249,7 +243,6 @@ async fn write_authorized_fingerprints(
 async fn run_kyc(
     state: &State,
     ob_info: &UserObSession,
-    biz_ob: Option<Onboarding>, // TODO: remove from run_kyc and setup fixtures in run_kyb instead
     tenant_vendor_control: TenantVendorControl,
 ) -> Result<(), ApiError> {
     let fixture_decision = decision::utils::get_fixture_data_decision(
@@ -264,7 +257,7 @@ async fn run_kyc(
         // Don't run prod IDV requests and instead just create fixture data for this user
         // TODO create more business fixture data
         let ob_id = ob_info.onboarding()?.id.clone();
-        decision::utils::setup_test_fixtures(state, ob_id, biz_ob, fixture_decision).await?;
+        decision::utils::setup_kyc_test_fixtures(state, ob_id, fixture_decision).await?;
     } else {
         // Run KYC + produce a decision
         // Save Verification Requests, set ob to authorized, and (TODO) set onboarding to pending

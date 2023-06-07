@@ -108,10 +108,9 @@ pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> Fixture
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn setup_test_fixtures(
+pub async fn setup_kyc_test_fixtures(
     state: &State,
     ob_id: OnboardingId,
-    biz_ob: Option<Onboarding>,
     fixture_decision: FixtureDecision,
 ) -> ApiResult<()> {
     let (decision_status, create_manual_review) = fixture_decision;
@@ -180,34 +179,6 @@ pub async fn setup_test_fixtures(
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;
-
-            if let Some(biz_ob) = biz_ob {
-                // TODO update the rest of the business ob
-                let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
-                let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
-                let new_decision = OnboardingDecisionCreateArgs {
-                    vault_id: sb.vault_id,
-                    onboarding: &biz_ob,
-                    logic_git_hash: crate::GIT_HASH.to_string(),
-                    status: decision_status,
-                    result_ids: vec![],
-                    annotation_id: None,
-                    actor: DbActor::Footprint,
-                    seqno,
-                    workflow_id: None,
-                };
-                let biz_obd = OnboardingDecision::create(conn, new_decision)?;
-
-                biz_ob.into_inner().update(
-                    conn,
-                    OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
-                )?;
-
-                let biz_risk_signals =
-                    sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
-                RiskSignal::bulk_create(conn, biz_obd.id, biz_risk_signals)?;
-            }
-
             let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
             RiskSignal::bulk_create(conn, decision.id, signals)?;
             Ok(())
@@ -215,4 +186,43 @@ pub async fn setup_test_fixtures(
         .await?;
 
     Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn setup_kyb_test_fixtures(
+    state: &State,
+    biz_ob_id: &OnboardingId,
+    fixture_decision: FixtureDecision,
+) -> ApiResult<()> {
+    let biz_ob_id = biz_ob_id.clone();
+    let (decision_status, _create_manual_review) = fixture_decision;
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            // TODO update the rest of the business ob
+            let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
+            let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+            let new_decision = OnboardingDecisionCreateArgs {
+                vault_id: sb.vault_id,
+                onboarding: &biz_ob,
+                logic_git_hash: crate::GIT_HASH.to_string(),
+                status: decision_status,
+                result_ids: vec![],
+                annotation_id: None,
+                actor: DbActor::Footprint,
+                seqno: None,
+                workflow_id: None,
+            };
+            let biz_obd = OnboardingDecision::create(conn, new_decision)?;
+
+            biz_ob.into_inner().update(
+                conn,
+                OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
+            )?;
+
+            let biz_risk_signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+            RiskSignal::bulk_create(conn, biz_obd.id, biz_risk_signals)?;
+            Ok(())
+        })
+        .await
 }
