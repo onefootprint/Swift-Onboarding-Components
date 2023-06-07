@@ -6,15 +6,14 @@ import { GestureResponderEvent, Text } from 'react-native';
 import { Box, BoxProps } from '../box';
 import { LoadingIndicator } from '../loading-indicator';
 import { Pressable } from '../pressable';
-import type { ButtonSize, ButtonVariant } from './button.types';
+import type { ButtonVariant } from './button.types';
 
 export type ButtonProps = BoxProps & {
   children: string;
   disabled?: boolean;
   loading?: boolean;
-  loadingAriaLabel?: string;
+  loadingLabel?: string;
   onPress?: (event: GestureResponderEvent) => void;
-  size?: ButtonSize;
   variant?: ButtonVariant;
 };
 
@@ -22,9 +21,8 @@ const Button = ({
   children,
   disabled = false,
   loading = false,
-  loadingAriaLabel,
+  loadingLabel,
   onPress,
-  size = 'default',
   variant = 'primary',
   ...props
 }: ButtonProps) => {
@@ -44,21 +42,33 @@ const Button = ({
         onPress={handlePress}
         onPressIn={() => setActive(true)}
         onPressOut={() => setActive(false)}
-        size={size}
         variant={variant}
       >
         {!loading ? (
-          <ButtonText variant={variant} disabled={disabled} size={size}>
+          <ButtonText variant={variant} disabled={disabled}>
             {children}
           </ButtonText>
         ) : (
           <HiddenButtonText>{children}</HiddenButtonText>
         )}
         <LoadingContainer loading={loading}>
-          <LoadingIndicator
-            aria-label={loadingAriaLabel}
-            color={variant === 'primary' ? 'quinary' : 'primary'}
-          />
+          {loadingLabel ? (
+            <Box flexDirection="row" justifyContent="space-between">
+              <LoadingIndicator
+                aria-label={loadingLabel}
+                color={variant === 'primary' ? 'quinary' : 'primary'}
+              />
+              <ButtonText variant={variant} disabled={disabled}>
+                {loadingLabel}
+              </ButtonText>
+              <Box />
+            </Box>
+          ) : (
+            <LoadingIndicator
+              aria-label={loadingLabel}
+              color={variant === 'primary' ? 'quinary' : 'primary'}
+            />
+          )}
         </LoadingContainer>
       </StyledPressable>
     </Box>
@@ -68,10 +78,9 @@ const Button = ({
 const StyledPressable = styled(Pressable)<{
   active?: boolean;
   loading: boolean;
-  size: ButtonSize;
   variant: ButtonVariant;
 }>`
-  ${({ theme, size, variant, active, disabled }) => {
+  ${({ theme, variant, active, loading, disabled }) => {
     const { button } = theme.components;
     let backgroundColor = button.variant[variant].bg;
     let { borderColor } = button.variant[variant];
@@ -88,14 +97,15 @@ const StyledPressable = styled(Pressable)<{
       align-items: center;
       background-color: ${backgroundColor};
       border-color: ${borderColor};
-      border-radius: ${button.global.borderRadius};
+      border-radius: ${button.borderRadius};
       border-style: solid;
-      border-width: ${button.global.borderWidth};
+      border-width: ${button.borderWidth};
       color: ${button.variant[variant].color};
-      height: ${button.size[size].height};
+      height: ${button.height};
       justify-content: center;
-      padding: 0 ${button.size[size].paddingHorizontal};
+      padding: 0 ${button.paddingHorizontal};
       position: relative;
+      opacity: ${loading ? 0.7 : 1};
     `;
   }}
 `;
@@ -103,10 +113,9 @@ const StyledPressable = styled(Pressable)<{
 const ButtonText = styled(Text)<{
   active?: boolean;
   disabled: boolean;
-  size: ButtonSize;
   variant: ButtonVariant;
 }>`
-  ${({ theme, size, variant, active, disabled }) => {
+  ${({ theme, variant, active, disabled }) => {
     const { button } = theme.components;
     let { color } = button.variant[variant];
 
@@ -117,7 +126,7 @@ const ButtonText = styled(Text)<{
     }
 
     return css`
-      font: ${button.size[size].typography};
+      font: ${button.typography};
       color: ${color};
     `;
   }}
@@ -132,8 +141,9 @@ const LoadingContainer = styled.View<{
 }>`
   ${({ loading }) => {
     return css`
-      position: absolute;
       opacity: ${loading ? 1 : 0};
+      position: absolute;
+      width: 100%;
     `;
   }}
 `;

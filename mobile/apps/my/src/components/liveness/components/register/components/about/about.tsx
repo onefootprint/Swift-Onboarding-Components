@@ -29,7 +29,9 @@ const About = ({ ctaDisabled }: AboutProps) => {
           onPress: () => setOpen(false),
         }}
       >
-        <Typography variant="body-3">{t('about.content')}</Typography>
+        <Typography variant="body-3" center>
+          {t('about.content')}
+        </Typography>
       </Dialog>
     </Box>
   );

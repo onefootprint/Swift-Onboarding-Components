@@ -15,12 +15,12 @@ export type SelfieProps = {
 
 const Selfie = ({ authToken, loading, onSubmit }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCameraDisabled, setIsCameraDisable] = useState(true);
 
   return (
     <>
       <Camera
-        active={isCameraActive}
+        disabled={isCameraDisabled}
         Frame={Frame}
         instructions={{
           IconComponent: IcoEmojiHappy24,
@@ -35,7 +35,7 @@ const Selfie = ({ authToken, loading, onSubmit }: SelfieProps) => {
       <ConsentDialog
         authToken={authToken}
         onSubmit={() => {
-          setIsCameraActive(true);
+          setIsCameraDisable(false);
         }}
       />
     </>

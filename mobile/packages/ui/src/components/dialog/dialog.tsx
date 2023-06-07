@@ -33,8 +33,8 @@ const Dialog = ({
     <StyledModal
       backdropOpacity={0.3}
       isVisible={open}
-      onBackdropPress={disableClose ? onClose : undefined}
-      onSwipeComplete={disableClose ? onClose : undefined}
+      onBackdropPress={disableClose ? undefined : onClose}
+      onSwipeComplete={disableClose ? undefined : onClose}
       swipeDirection={['down']}
       useNativeDriverForBackdrop
     >

@@ -49,7 +49,7 @@ const Passkey = ({ identifier, onSuccess }: PasskeyProps) => {
       >
         <IcoFaceid24 />
       </Box>
-      <Button onPress={handlePress} size="compact" loading={isLoading}>
+      <Button onPress={handlePress} loading={isLoading}>
         {isRetry ? t('cta-retry') : t('cta')}
       </Button>
     </Box>

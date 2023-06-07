@@ -34,7 +34,7 @@ import encodeImagePath from './utils/encode-image-path';
 let timerId: NodeJS.Timeout | null = null;
 
 type CameraProps = {
-  active?: boolean;
+  disabled?: boolean;
   Frame?: ({ style }: { style: ViewStyle }) => JSX.Element;
   instructions: { description?: string; IconComponent: Icon; title: string };
   loading?: boolean;
@@ -46,7 +46,7 @@ type CameraProps = {
 };
 
 const Camera = ({
-  active = true,
+  disabled = false,
   Frame,
   instructions,
   loading,
@@ -152,7 +152,7 @@ const Camera = ({
                 <StyledCamera
                   device={device}
                   frameProcessor={frameProcessor}
-                  isActive={active}
+                  isActive={!disabled}
                   photo
                   ref={camera}
                 />
@@ -174,13 +174,17 @@ const Camera = ({
         </Box>
         {showActionButtons && (
           <Box gap={4}>
-            <Button loading={loading} onPress={handleSubmit}>
-              {t('continue')}
+            <Button
+              loading={loading}
+              loadingLabel={t('cta-loading')}
+              onPress={handleSubmit}
+            >
+              {t('cta')}
             </Button>
             <Button
-              variant="secondary"
-              onPress={handleReset}
               disabled={loading}
+              onPress={handleReset}
+              variant="secondary"
             >
               {t('retake')}
             </Button>

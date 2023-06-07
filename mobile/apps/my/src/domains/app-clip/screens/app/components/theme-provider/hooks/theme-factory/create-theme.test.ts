@@ -20,7 +20,7 @@ describe('create theme', () => {
         const expectedTheme = structuredClone(defaultTheme);
         const { button, input } = expectedTheme.components;
         expectedTheme.borderRadius.default = '10px';
-        button.global.borderRadius = '10px';
+        button.borderRadius = '10px';
         input.global.borderRadius = '10px';
         expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
       });
@@ -99,7 +99,7 @@ describe('create theme', () => {
       const expectedTheme = structuredClone(defaultTheme);
       const { button, input } = expectedTheme.components;
       expectedTheme.borderRadius.default = '0px';
-      button.global.borderRadius = '0px';
+      button.borderRadius = '0px';
       input.global.borderRadius = '0px';
       button.variant.primary.bg = 'purple';
       button.variant.primary.active.bg = 'purple';

@@ -83,7 +83,8 @@
         "cta": "Continue"
       },
       "camera": {
-        "continue": "Continue",
+        "cta": "Continue",
+        "cta-loading": "Submitting photo...",
         "retake": "Retake",
         "take-manually": "Take manually",
         "instructions": {

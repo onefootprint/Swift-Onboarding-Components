@@ -2,14 +2,15 @@ import * as t from '../../../output/light';
 import type { Button } from '../../types/components';
 
 const button: Button = {
-  global: {
-    borderRadius: t.buttonsBorderRadius,
-    borderWidth: t.buttonBorderWidth,
-    elevation: {
-      initial: t.buttonElevationInitial,
-      active: t.buttonElevationActive,
-    },
+  borderRadius: t.buttonsBorderRadius,
+  borderWidth: t.buttonBorderWidth,
+  elevation: {
+    initial: t.buttonElevationInitial,
+    active: t.buttonElevationActive,
   },
+  height: t.buttonsHeightDefault,
+  paddingHorizontal: t.buttonsSpacingPaddingsHorizontalDefault,
+  typography: t.buttonsTypographyDefault,
   variant: {
     primary: {
       bg: t.buttonsPrimaryInitialBg,
@@ -50,28 +51,6 @@ const button: Button = {
         color: t.buttonsSecondaryDisabledText,
         borderColor: t.buttonsSecondaryDisabledBorder,
       },
-    },
-  },
-  size: {
-    large: {
-      height: t.buttonsHeightLarge,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalLarge,
-      typography: t.buttonsTypographyLarge,
-    },
-    compact: {
-      height: t.buttonsHeightCompact,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalCompact,
-      typography: t.buttonsTypographyCompact,
-    },
-    small: {
-      height: t.buttonsHeightSmall,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalSmall,
-      typography: t.buttonsTypographySmall,
-    },
-    default: {
-      height: t.buttonsHeightDefault,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalDefault,
-      typography: t.buttonsTypographyDefault,
     },
   },
 };

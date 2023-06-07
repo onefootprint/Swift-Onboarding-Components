@@ -12,29 +12,18 @@ export type ButtonVariant = ButtonVariantStyles & {
   disabled: ButtonVariantStyles;
 };
 
-export type ButtonSize = {
+export type Button = {
   height: CSS.Property.Height;
   paddingHorizontal: CSS.Property.PaddingLeft | CSS.Property.PaddingRight;
   typography: string;
-};
-
-export type Button = {
-  global: {
-    borderWidth: CSS.Property.BorderWidth;
-    borderRadius: CSS.Property.BorderRadius;
-    elevation: {
-      initial: CSS.Property.BoxShadow;
-      active: CSS.Property.BoxShadow;
-    };
+  borderWidth: CSS.Property.BorderWidth;
+  borderRadius: CSS.Property.BorderRadius;
+  elevation: {
+    initial: CSS.Property.BoxShadow;
+    active: CSS.Property.BoxShadow;
   };
   variant: {
     primary: ButtonVariant;
     secondary: ButtonVariant;
-  };
-  size: {
-    large: ButtonSize;
-    compact: ButtonSize;
-    small: ButtonSize;
-    default: ButtonSize;
   };
 };

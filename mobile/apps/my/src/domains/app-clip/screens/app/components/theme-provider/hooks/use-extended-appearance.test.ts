@@ -32,7 +32,7 @@ describe.skip('useExtendedAppearance', () => {
       const expectedTheme = structuredClone(defaultTheme);
       const { button, input } = expectedTheme.components;
       expectedTheme.borderRadius.default = '12px';
-      button.global.borderRadius = '12px';
+      button.borderRadius = '12px';
       input.global.borderRadius = '12px';
       button.variant.primary.bg = 'orange';
 
