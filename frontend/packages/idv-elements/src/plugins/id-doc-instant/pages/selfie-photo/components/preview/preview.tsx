@@ -65,7 +65,7 @@ const PreviewContainer = styled.div`
     justify-content: center;
     width: 100%;
     flex-grow: 1;
-    padding-bottom: ${theme.spacing[11]};
+    margin-bottom: ${theme.spacing[8]};
   `}
 `;
 

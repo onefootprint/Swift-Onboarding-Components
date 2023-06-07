@@ -1,6 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoBolt24, IcoEmojiHappy24 } from '@onefootprint/icons';
-import { Button, LoadingIndicator, Typography } from '@onefootprint/ui';
+import { Button, LoadingIndicator } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -10,7 +9,7 @@ import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
 
-const MAX_VIDEO_HEIGHT = 288;
+const MAX_VIDEO_HEIGHT = 390;
 const FACE_OUTLINE_BY_HEIGHT_RATIO = 0.7;
 
 type CameraProps = {
@@ -30,7 +29,6 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
   const videoSize = useSize(videoRef);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(true);
   const [image, setImage] = useState<string | undefined>();
 
   const mediaStream = useUserMedia(CAPTURE_OPTIONS, onError);
@@ -88,7 +86,6 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
 
   const handleFlashEnd = () => {
     if (image) {
-      setShowInstructions(false);
       onCapture(image);
     }
     clearCanvas();
@@ -123,28 +120,6 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
             height={videoSize?.height}
           />
           <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
-          {showInstructions && (
-            <InstructionsContainer>
-              <Typography
-                variant="label-4"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                }}
-              >
-                <IcoEmojiHappy24 />
-                {t('instructions.position')}
-              </Typography>
-              <Typography
-                variant="label-4"
-                sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
-              >
-                <IcoBolt24 />
-                {t('instructions.readiness')}
-              </Typography>
-            </InstructionsContainer>
-          )}
         </VideoContainer>
         <Button fullWidth onClick={handleClick} variant="primary">
           {t('take')}
@@ -191,6 +166,7 @@ const VideoContainer = styled.div`
     row-gap: ${theme.spacing[5]};
     margin-left: calc(-1 * ${theme.spacing[5]});
     margin-right: calc(-1 * ${theme.spacing[5]});
+    margin-bottom: ${theme.spacing[8]};
   `}
 `;
 
@@ -210,20 +186,6 @@ const Video = styled.video<{ maxHeight: number }>`
       display: none !important;
       -webkit-appearance: none;
     }
-  `}
-`;
-
-const InstructionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
-    padding: ${theme.spacing[5]};
-    gap: ${theme.spacing[6]};
-    background-color: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default};
-    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 
