@@ -545,7 +545,7 @@
           "prompt": "What would you like to request from user?",
           "form": {
             "id-photo": {
-              "title": "Re-upload id photo",
+              "title": "Re-upload ID photo",
               "description": "Data will be updated with this new information."
             },
             "revise-kyc": {

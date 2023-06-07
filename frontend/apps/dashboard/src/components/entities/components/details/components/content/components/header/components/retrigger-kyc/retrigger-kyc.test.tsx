@@ -66,7 +66,7 @@ describe('<RetriggerKYC />', () => {
         name: 'Request more information',
       });
       const reuploadPhotoRadio = screen.getByRole('radio', {
-        name: 'Re-upload id photo',
+        name: 'Re-upload ID photo',
       });
       await userEvent.click(reuploadPhotoRadio);
 
@@ -108,7 +108,7 @@ describe('<RetriggerKYC />', () => {
       await userEvent.click(dropdownItem);
 
       const reuploadPhotoRadio = screen.getByRole('radio', {
-        name: 'Re-upload id photo',
+        name: 'Re-upload ID photo',
       });
       await userEvent.click(reuploadPhotoRadio);
 

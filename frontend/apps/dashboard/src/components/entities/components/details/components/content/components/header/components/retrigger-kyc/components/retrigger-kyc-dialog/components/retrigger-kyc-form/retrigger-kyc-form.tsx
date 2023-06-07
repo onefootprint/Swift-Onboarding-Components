@@ -33,7 +33,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
     <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Typography variant="label-3">{t('prompt')}</Typography>
       <Radio
-        value={TriggerKind.ReuploadDl}
+        value={TriggerKind.IdDocument}
         label={t('form.id-photo.title')}
         hint={t('form.id-photo.description')}
         {...register('kind', { required: true })}

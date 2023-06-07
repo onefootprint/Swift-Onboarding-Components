@@ -6,7 +6,7 @@ export type TriggerRequest = {
 
 export enum TriggerKind {
   RedoKyc = 'redo_kyc',
-  ReuploadDl = 'reupload_dl',
+  IdDocument = 'id_document',
 }
 
 export type TriggerResponse = {};
