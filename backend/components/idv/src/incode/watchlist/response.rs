@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{scrub_pii_value, PiiJsonValue, ScrubbedPiiString};
+use newtypes::{scrub_pii_value, PiiJsonValue, PiiString, ScrubbedPiiString};
 
 use crate::incode::{response::Error, APIResponseToIncodeError};
 
@@ -9,7 +9,7 @@ impl APIResponseToIncodeError for WatchlistResultResponse {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WatchlistResultResponse {
     pub status: Option<String>,
@@ -19,13 +19,13 @@ pub struct WatchlistResultResponse {
     pub error: Option<Error>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Content {
     pub data: Option<Data>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Data {
     pub id: Option<i32>,
@@ -48,7 +48,7 @@ pub struct Data {
     pub share_url: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Filters {
     pub country_codes: Option<Vec<String>>,
@@ -58,7 +58,7 @@ pub struct Filters {
     pub types: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Hit {
     pub score: Option<f32>,
@@ -68,7 +68,7 @@ pub struct Hit {
     pub doc: Option<Doc>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
@@ -79,14 +79,14 @@ pub struct MatchTypeDetail {
     pub sources: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NameMatch {
     pub match_types: Option<Vec<String>>,
     pub query_term: Option<ScrubbedPiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Doc {
     pub aka: Option<Vec<Aka>>,
@@ -99,13 +99,13 @@ pub struct Doc {
     pub types: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Aka {
     pub name: Option<ScrubbedPiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: Option<String>,
@@ -114,13 +114,174 @@ pub struct Field {
     pub value: Option<ScrubbedPiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
     pub date: Option<DateTime<Utc>>,
     pub pdf_url: Option<String>,
     pub snippet: Option<ScrubbedPiiString>,
     pub title: Option<ScrubbedPiiString>,
+    pub url: Option<String>,
+}
+
+///
+/// LEAKED VERSIONS
+///
+/// Below is a hack to enable serializing `Hit`'s with the internal PII leaked. By default, we mark pii fields of a vendor response struct
+/// with ScrubbedPiiString so that when we serialize the struct to save it in the plaintext `verification_result.response` field in PG, it contains no PII
+/// We currently have 1 other use case to serialize a vendor response struct which is to forward Incode's watchlist results in the Alpaca CIP.
+/// It's very likely we'll need to format this for the CIP differently and write custom logic to generate a JSON blob in their preferred format
+/// so this is possibly a temporary hack anyway.
+/// We make duplicate copies of `Hit` and its containing struct which have Pii* instead of ScrubbedPii* fields. In the Alpaca CIP, we can then call
+/// hit.leak() and get a LeakedHit which we can serialize with the PII leaked.
+
+impl Hit {
+    pub fn leak(self) -> LeakedHit {
+        self.into()
+    }
+}
+
+impl From<Hit> for LeakedHit {
+    fn from(value: Hit) -> Self {
+        Self {
+            score: value.score,
+            is_whitelisted: value.is_whitelisted,
+            match_types: value.match_types,
+            match_type_details: value
+                .match_type_details
+                .map(|x| x.into_iter().map(|y| y.into()).collect()),
+            doc: value.doc.map(|x| x.into()),
+        }
+    }
+}
+
+impl From<MatchTypeDetail> for LeakedMatchTypeDetail {
+    fn from(value: MatchTypeDetail) -> Self {
+        Self {
+            aml_types: value.aml_types,
+            matching_name: value.matching_name.map(|x| x.into()),
+            names_matches: value
+                .names_matches
+                .map(|x| x.into_iter().map(|y| y.into()).collect()),
+            secondary_matches: value.secondary_matches,
+            sources: value.sources,
+        }
+    }
+}
+
+impl From<NameMatch> for LeakedNameMatch {
+    fn from(value: NameMatch) -> Self {
+        Self {
+            match_types: value.match_types,
+            query_term: value.query_term.map(|x| x.into()),
+        }
+    }
+}
+impl From<Doc> for LeakedDoc {
+    fn from(value: Doc) -> Self {
+        Self {
+            aka: value.aka.map(|x| x.into_iter().map(|y| y.into()).collect()),
+            fields: value.fields.map(|x| x.into_iter().map(|y| y.into()).collect()),
+            id: value.id,
+            last_updated_utc: value.last_updated_utc,
+            media: value.media.map(|x| x.into_iter().map(|y| y.into()).collect()),
+            name: value.name.map(|x| x.into()),
+            sources: value.sources,
+            types: value.types,
+        }
+    }
+}
+impl From<Aka> for LeakedAka {
+    fn from(value: Aka) -> Self {
+        Self {
+            name: value.name.map(|x| x.into()),
+        }
+    }
+}
+impl From<Field> for LeakedField {
+    fn from(value: Field) -> Self {
+        Self {
+            name: value.name,
+            source: value.source,
+            tag: value.tag,
+            value: value.value.map(|x| x.into()),
+        }
+    }
+}
+impl From<Media> for LeakedMedia {
+    fn from(value: Media) -> Self {
+        Self {
+            date: value.date,
+            pdf_url: value.pdf_url,
+            snippet: value.snippet.map(|x| x.into()),
+            title: value.title.map(|x| x.into()),
+            url: value.url,
+        }
+    }
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedHit {
+    pub score: Option<f32>,
+    pub is_whitelisted: Option<bool>,
+    pub match_types: Option<Vec<String>>,
+    pub match_type_details: Option<Vec<LeakedMatchTypeDetail>>,
+    pub doc: Option<LeakedDoc>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedMatchTypeDetail {
+    pub aml_types: Option<Vec<String>>,
+    pub matching_name: Option<PiiString>,
+    pub names_matches: Option<Vec<LeakedNameMatch>>,
+    pub secondary_matches: Option<PiiJsonValue>,
+    pub sources: Option<Vec<String>>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedNameMatch {
+    pub match_types: Option<Vec<String>>,
+    pub query_term: Option<PiiString>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedDoc {
+    pub aka: Option<Vec<LeakedAka>>,
+    pub fields: Option<Vec<LeakedField>>,
+    pub id: Option<String>,
+    pub last_updated_utc: Option<DateTime<Utc>>,
+    pub media: Option<Vec<LeakedMedia>>,
+    pub name: Option<PiiString>,
+    pub sources: Option<Vec<String>>,
+    pub types: Option<Vec<String>>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedAka {
+    pub name: Option<PiiString>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedField {
+    pub name: Option<String>,
+    pub source: Option<String>,
+    pub tag: Option<String>,
+    pub value: Option<PiiString>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeakedMedia {
+    pub date: Option<DateTime<Utc>>,
+    pub pdf_url: Option<String>,
+    pub snippet: Option<PiiString>,
+    pub title: Option<PiiString>,
     pub url: Option<String>,
 }
 
@@ -168,5 +329,18 @@ mod tests {
             ],
             doc.sources.unwrap()
         );
+    }
+
+    #[test]
+    pub fn test_leak_hit() {
+        let raw_res = crate::test_fixtures::incode_watchlist_result_response_yes_hits();
+        let parsed: WatchlistResultResponse = serde_json::from_value(raw_res).unwrap();
+
+        let hit = parsed.content.unwrap().data.unwrap().hits.unwrap()[0].clone();
+        let leaked_hit = hit.leak();
+
+        let json = serde_json::to_value(&leaked_hit).unwrap();
+        let s = format!("{}", json);
+        assert!(!s.contains("SCRUBBED"));
     }
 }

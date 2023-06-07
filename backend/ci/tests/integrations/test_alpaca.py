@@ -158,6 +158,8 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
             body["alpaca_response"]["kyc"]["applicant_name"]
             == f"{d['id.first_name']} {d['id.last_name']}"
         )
+        # sanity check that we aren't accidently scrubbing PII in the alpaca CIP
+        assert "SCRUBBED" not in str(body["alpaca_response"])
 
 
 # TODO: Test scenarios to add

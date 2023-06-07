@@ -191,12 +191,11 @@ pub async fn save_fixture_ocr(
             )?
             .pop()
             .ok_or(ApiError::ResourceNotFound)?;
-            let raw_response =
-                serde_json::to_value(&idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
-                    Some(first_name),
-                    Some(last_name),
-                    date_of_birth_timestamp,
-                ))?;
+            let raw_response = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
+                Some(first_name),
+                Some(last_name),
+                date_of_birth_timestamp,
+            );
 
             // Verification result response is encrypted
             let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;

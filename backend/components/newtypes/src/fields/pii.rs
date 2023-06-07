@@ -102,6 +102,12 @@ impl From<PiiString> for ScrubbedPiiString {
     }
 }
 
+impl From<ScrubbedPiiString> for PiiString {
+    fn from(value: ScrubbedPiiString) -> Self {
+        value.0
+    }
+}
+
 fn scrubbed_str<S>(_v: &PiiString, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,

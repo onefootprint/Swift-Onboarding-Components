@@ -177,8 +177,9 @@ pub async fn post(
             } else {
                 if missing_sides.is_empty() {
                     // Create fixture data once all of the sides are uploaded
-                    let ocr =
-                        idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None);
+                    let ocr = serde_json::from_value(
+                        idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
+                    )?;
                     let doc_type = request.document_type;
                     Complete::enter(conn, &vault2, &su_id, &id_doc.id, doc_type, ocr)?;
                 }

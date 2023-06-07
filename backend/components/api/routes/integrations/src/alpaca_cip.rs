@@ -359,9 +359,11 @@ fn watchlist(
             Err(CipError::WatchlistResultsNotFoundError)?
         };
 
-    let hits = decision::features::incode_watchlist::get_hits(&wc);
-    let records: Vec<PiiJsonValue> = hits
+    // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
+    let leaked_hits = decision::features::incode_watchlist::get_hits(&wc)
         .into_iter()
+        .map(|h| h.leak());
+    let records_json: Vec<PiiJsonValue> = leaked_hits
         .map(|h| serde_json::to_value(&h).map(PiiJsonValue::new))
         .collect::<Result<Vec<_>, _>>()?;
 
@@ -374,7 +376,7 @@ fn watchlist(
         monitored_lists: CipResult::clear(!ofac),
         sanction: CipResult::clear(!sanctions),
         adverse_media: CipResult::clear(!adverse_media),
-        records,
+        records: records_json,
     })
 }
 
@@ -441,7 +443,7 @@ async fn document_and_photo(
         status: alpaca::CipStatus::Complete,
         created_at: score_request_created_at,
         first_name: ok_or(
-            ocr_name.first_name.as_ref().map(|p| (**p).clone()),
+            ocr_name.first_name.as_ref().map(|p| PiiString::from(p.clone())),
             "first name missing".into(),
         )?,
         last_name: ok_or(

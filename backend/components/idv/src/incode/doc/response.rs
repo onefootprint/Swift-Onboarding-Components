@@ -294,27 +294,50 @@ impl FetchOCRResponse {
         first_name: Option<PiiString>,
         last_name: Option<PiiString>,
         dob: Option<i64>,
-    ) -> Self {
-        let name = OCRName {
-            first_name: first_name
-                .or_else(|| Some(PiiString::from("Bobby")))
-                .map(|s| s.into()),
-            paternal_last_name: last_name
-                .or_else(|| Some(PiiString::from("Bobierto")))
-                .map(|s| s.into()),
-            ..Default::default()
-        };
-        Self {
-            document_number: Some(ScrubbedPiiString::from("Y12341234")),
-            issuing_state: Some(ScrubbedPiiString::from("MA")),
-            issuing_country: Some(ScrubbedPiiString::from("US")),
-            expire_at: Some("1728950400000".to_owned()),
-            birth_date: dob.or(Some(529873860000)),
-            name: Some(name),
-            type_of_id: Some(PiiString::from("DriversLicense")),
-            gender: Some(ScrubbedPiiString::from("Female")),
-            ..Default::default()
-        }
+    ) -> serde_json::Value {
+        let first_name = first_name.unwrap_or(PiiString::from("Bobby"));
+        let last_name = last_name.unwrap_or(PiiString::from("Bobierto"));
+        let dob = dob.unwrap_or(529873860000);
+
+        serde_json::json!(
+            {"additionalTimestamps":null,
+            "address":null,
+            "addressFields":null,
+            "birthDate":dob,
+            "checkedAddress":null,
+            "checkedAddressBean":null,
+            "dlClassDetails":null,
+            "documentBackSubtype":null,
+            "documentFrontSubtype":null,
+            "documentNumber":"Y12341234",
+            "expirationDate":null,
+            "expireAt":"1728950400000",
+            "gender":"Female",
+            "issueDate":null,
+            "issuingAuthority":null,
+            "issuingCountry":"US",
+            "issuingState":"MA",
+            "name":{
+                "firstName":first_name,
+                "fullName":null,
+                "givenName":null,
+                "givenNameMrz":null,
+                "lastNameMrz":null,
+                "machineReadableFullName":null,
+                "maternalLastName":null,
+                "middleName":null,
+                "nameSuffix":null,
+                "paternalLastName":last_name
+            },
+            "nationality":null,
+            "nationalityMrz":null,
+            "ocrDataConfidence":null,
+            "personalNumber":null,
+            "refNumber":null,
+            "restrictions":null,
+            "taxIdNumber":null,
+            "typeOfId":"DriversLicense"
+        })
     }
 }
 
