@@ -26,10 +26,10 @@ const Frame = () => {
 
 const FrameContainer = styled.View`
   ${({ theme }) => css`
-    height: 100%;
+    height: 320px;
     padding-vertical: ${theme.spacing[9]};
     position: absolute;
-    width: 200px;
+    width: 260px;
     z-index: 1;
   `}
 `;
@@ -43,25 +43,25 @@ const Corner = styled(Reanimated.View)<{ kind: CornerKind }>`
     css`
       top: 0;
       border-top-color: #fff;
-      border-top-width: ${theme.borderWidth[2]};
+      border-top-width: 4px;
     `}
     ${kind.includes('Bottom') &&
     css`
       bottom: 0;
       border-bottom-color: #fff;
-      border-bottom-width: ${theme.borderWidth[2]};
+      border-bottom-width: 4px;
     `}
     ${kind.includes('Left') &&
     css`
       left: 0;
       border-left-color: #fff;
-      border-left-width: ${theme.borderWidth[2]};
+      border-left-width: 4px;
     `}
     ${kind.includes('Right') &&
     css`
       right: 0;
       border-right-color: #fff;
-      border-right-width: ${theme.borderWidth[2]};
+      border-right-width: 4px;
     `}
     ${kind.includes('TopLeft') &&
     css`
