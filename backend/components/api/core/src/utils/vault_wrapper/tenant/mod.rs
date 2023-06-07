@@ -1,6 +1,5 @@
 mod accessors;
 mod build;
-pub mod checks;
 mod decrypt;
 mod decrypt_request;
 mod delete;

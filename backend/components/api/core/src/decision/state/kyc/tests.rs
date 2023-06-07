@@ -32,7 +32,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
 
     state
         .db_pool
-        .db_query(|conn| {
+        .db_query(move |conn| {
             DbWorkflow::create(
                 conn,
                 NewWorkflow {

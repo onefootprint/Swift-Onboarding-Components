@@ -4,6 +4,7 @@ from tests.conftest import generate_real_phone_number
 from tests.utils import _gen_random_n_digit_number, post
 from tests.utils import (
     get,
+    patch,
     try_until_success,
 )
 from tests.bifrost_client import BifrostClient
@@ -58,6 +59,9 @@ def test_redo_kyc(sandbox_tenant, twilio):
         override_inherit_phone=sandbox_user.client.data["id.phone_number"],
         override_auth=auth_token,
     )
+    # Edit some data
+    data = {"id.ssn9": "999-99-9999"}
+    patch("/hosted/user/vault", data, bifrost.auth_token)
     # have to manually handle requirements for now since the bifrost client is using legacy logic
     # TODO change to bifrost.run() when process is handled normally
     bifrost.handle_process()

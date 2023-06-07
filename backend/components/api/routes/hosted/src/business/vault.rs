@@ -3,7 +3,6 @@ use std::str::FromStr;
 use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::vault_wrapper::checks::pre_add_data_checks;
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
@@ -15,7 +14,7 @@ use api_core::ApiError;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{BusinessDataKind as BDK, BusinessOwnerKind, PiiString, ScopedVaultId};
+use newtypes::{BusinessDataKind as BDK, BusinessOwnerKind, PiiString, ScopedVaultId, WorkflowGuard};
 use newtypes::{KycedBusinessOwnerData, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -30,7 +29,7 @@ pub async fn post_validate(
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
-    pre_add_data_checks(&user_auth)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let mut request = request.into_inner();
     if let Some(kyced_bos) = request.remove(&BDK::KycedBeneficialOwners.into()) {
         let sb_id = user_auth
@@ -70,7 +69,7 @@ pub async fn patch(
     user_auth: UserObAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
-    pre_add_data_checks(&user_auth)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth
         .scoped_business_id()
         .ok_or(BusinessError::NotAllowedWithoutBusiness)?;

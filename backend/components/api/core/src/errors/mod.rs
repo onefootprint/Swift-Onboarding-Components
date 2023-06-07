@@ -20,6 +20,7 @@ pub mod onboarding;
 pub mod proxy;
 pub mod tenant;
 pub mod user;
+pub mod workflow;
 pub mod workos;
 pub use assertion::*;
 
@@ -46,6 +47,8 @@ pub enum ApiError {
     KmsError(#[from] kms::KmsSignError),
     #[error("{0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
+    #[error("{0}")]
+    WorkflowError(#[from] workflow::WorkflowError),
     #[error("{0}")]
     TenantError(#[from] tenant::TenantError),
     #[error("{0}")]
@@ -217,6 +220,7 @@ impl actix_web::ResponseError for ApiError {
             },
             ApiError::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
+            ApiError::WorkflowError(_) => StatusCode::BAD_REQUEST,
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::BusinessError(_) => StatusCode::BAD_REQUEST,

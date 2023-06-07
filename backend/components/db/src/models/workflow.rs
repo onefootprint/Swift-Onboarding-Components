@@ -108,11 +108,11 @@ impl Workflow {
         let wfid = workflow.id.clone();
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(wfid))
-            .set(workflow::state.eq(new_state.clone()))
+            .set(workflow::state.eq(new_state))
             .get_result(conn.conn())?;
 
         let wfid = workflow.id.clone();
-        let curr_state = workflow.state.clone();
+        let curr_state = workflow.state;
         let _wfe = WorkflowEvent::create(conn, wfid, curr_state, new_state)?;
 
         Ok(result)

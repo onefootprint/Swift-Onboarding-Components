@@ -28,7 +28,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::{DataIdentifierDiscriminant, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
     IncodeConfigurationId, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
@@ -46,6 +46,7 @@ pub async fn post(
     request: LargeJson<DocumentRequest, 15_728_640>,
 ) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let request = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();

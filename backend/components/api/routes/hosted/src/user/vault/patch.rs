@@ -5,11 +5,10 @@ use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
-use api_core::utils::vault_wrapper::checks::pre_add_data_checks;
 use api_core::utils::vault_wrapper::{Any, TenantVw};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, ValidateArgs};
+use newtypes::{DataIdentifier, IdentityDataKind as IDK, ValidateArgs, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
 
@@ -25,7 +24,7 @@ pub async fn post_validate(
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    pre_add_data_checks(&user_auth)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let opts = ValidateArgs {
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
@@ -75,7 +74,7 @@ async fn patch_inner(
     user_auth: UserObAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    pre_add_data_checks(&user_auth)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let request = request
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;

@@ -13,6 +13,7 @@ use api_core::decision::state::kyc::KycState;
 use api_core::decision::state::DocCollected;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
+use api_core::errors::workflow::WorkflowError;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
@@ -56,7 +57,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                 ww.run(&state, WorkflowActions::DocCollected(DocCollected {}))
                     .await?;
             }
-            s => return Err(OnboardingError::WorkflowCannotProceed(s.into()).into()),
+            s => return Err(WorkflowError::WorkflowCannotProceed(s.into()).into()),
         }
     }
     ResponseData::ok(EmptyResponse {}).json()

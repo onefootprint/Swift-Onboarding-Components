@@ -7,7 +7,7 @@ use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserObAuthContext;
-use newtypes::{DataIdentifier, DocumentKind};
+use newtypes::{DataIdentifier, DocumentKind, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
@@ -24,7 +24,8 @@ pub async fn post(
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-    utils::vault_wrapper::checks::pre_add_data_checks(&user_auth)?;
+    // Specifically check for AddData permission here since this is used only for investor profile
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,

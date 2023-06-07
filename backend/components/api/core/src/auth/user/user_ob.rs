@@ -13,7 +13,7 @@ use db::{
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::{ScopedVaultId, VaultId};
+use newtypes::{ScopedVaultId, VaultId, WorkflowGuard};
 use paperclip::actix::Apiv2Security;
 
 use crate::{
@@ -21,7 +21,7 @@ use crate::{
         session::{AuthSessionData, ExtractableAuthSession},
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::{onboarding::OnboardingError, ApiResult},
+    errors::{onboarding::OnboardingError, workflow::WorkflowError, ApiResult},
     ApiError,
 };
 
@@ -185,6 +185,31 @@ impl UserObSession {
 
     pub fn workflow(&self) -> Option<&Workflow> {
         self.workflow.as_ref()
+    }
+
+    pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> ApiResult<()> {
+        // TODO we ideally want this to happen inside a locked transaction with the refreshed
+        // workflow state, otherwise this could be stale
+        let allowed_guards = if let Some(wf) = self.workflow.as_ref() {
+            wf.state.allowed_guards()
+        } else if let Ok(ob) = self.onboarding() {
+            // Some legacy logic that translates the old onboarding state to which guards are allowed
+            // TODO deprecate this when we backfill workflows
+            if ob.idv_reqs_initiated_at.is_none() {
+                vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
+            } else {
+                vec![]
+            }
+        } else {
+            // If the auth token isn't associated with a workflow, allow everything for legacy.
+            // This allows adding an email as soon as the vault is created
+            vec![WorkflowGuard::AddData]
+        };
+        if !allowed_guards.contains(&guard) {
+            Err(WorkflowError::MissingGuard(guard).into())
+        } else {
+            Ok(())
+        }
     }
 
     pub fn user(&self) -> &Vault {

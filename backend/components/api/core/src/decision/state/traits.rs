@@ -69,7 +69,7 @@ where
             .db_transaction(move |conn| -> ApiResult<_> {
                 let wf = DbWorkflow::lock(conn, &workflow_id)?;
                 if wf.state != current_state {
-                    Err(StateError::ConcurrentStateChange(current_state, wf.state.clone()))?
+                    Err(StateError::ConcurrentStateChange(current_state, wf.state))?
                 }
                 let new_state = self.on_commit(r, conn)?;
                 DbWorkflow::update_state(conn, wf, newtypes::WorkflowState::from(new_state.clone().into()))?;
