@@ -18,33 +18,33 @@ import useTranslation from '@/hooks/use-translation';
 import PermissionsDialog from './components/permissions-dialog';
 import useDocumentOptions from './hooks/use-document-options';
 import {
-  getAvailableDocumentTypesByCountry,
-  getDocumentTypeByCountry,
+  getAvailableDocTypesByCountry,
+  getDocTypeByCountry,
 } from './utils/get-documents-by-country';
 
 export type DocSelectionProps = {
-  onSubmit: (countryCode: CountryCode, documentType: IdDocType) => void;
+  onSubmit: (countryCode: CountryCode, docType: IdDocType) => void;
 };
 
 const DocSelection = ({ onSubmit }: DocSelectionProps) => {
   const { t } = useTranslation('components.scan.doc-selection');
   const [country, setCountry] = useState<CountryRecord>(DEFAULT_COUNTRY);
   const [availableTypes, setAvailableTypes] = useState<IdDocType[]>(
-    getAvailableDocumentTypesByCountry(country),
+    getAvailableDocTypesByCountry(country),
   );
-  const [documentType, setDocumentType] = useState<IdDocType>(
-    getDocumentTypeByCountry(country),
+  const [docType, setDocType] = useState<IdDocType>(
+    getDocTypeByCountry(country),
   );
   const options = useDocumentOptions(availableTypes);
 
   const handleSubmit = () => {
-    onSubmit(country.value, documentType);
+    onSubmit(country.value, docType);
   };
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
-    setAvailableTypes(getAvailableDocumentTypesByCountry(newCountry));
-    setDocumentType(getDocumentTypeByCountry(newCountry));
+    setAvailableTypes(getAvailableDocTypesByCountry(newCountry));
+    setDocType(getDocTypeByCountry(newCountry));
   };
 
   return (
@@ -60,9 +60,9 @@ const DocSelection = ({ onSubmit }: DocSelectionProps) => {
           <Divider marginVertical={7} />
           <RadioSelect<IdDocType>
             marginBottom={7}
-            onChange={setDocumentType}
+            onChange={setDocType}
             options={options}
-            value={documentType}
+            value={docType}
           />
         </Box>
         <PermissionsDialog>

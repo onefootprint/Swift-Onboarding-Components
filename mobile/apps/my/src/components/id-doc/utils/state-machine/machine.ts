@@ -1,8 +1,9 @@
 import { assign, createMachine } from 'xstate';
 
+import { DocSide } from '../../id-doc.types';
 import { MachineContext, MachineEvents } from './types';
 
-const createIdDocMachine = (initialContext: MachineContext) =>
+const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -12,7 +13,19 @@ const createIdDocMachine = (initialContext: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      context: initialContext,
+      context: {
+        requirement: undefined,
+        currentStep: {
+          image: undefined,
+          errors: [],
+          side: DocSide.Front,
+        },
+        collectingDocumentMeta: {
+          countryCode: null,
+          type: null,
+        },
+        ...initialContext,
+      },
       initial: 'docSelection',
       states: {
         docSelection: {
@@ -23,7 +36,17 @@ const createIdDocMachine = (initialContext: MachineContext) =>
             },
           },
         },
-        frontImage: {},
+        frontImage: {
+          on: {
+            backButtonTapped: {
+              target: 'docSelection',
+            },
+            imageSubmitted: {
+              target: 'processing',
+            },
+          },
+        },
+        processing: {},
         complete: {
           type: 'final',
         },
@@ -31,12 +54,14 @@ const createIdDocMachine = (initialContext: MachineContext) =>
     },
     {
       actions: {
-        assignCountryAndType: assign((context, event) => {
-          context.collectingDocumentMeta = {
-            countryCode: event.payload.countryCode,
-            type: event.payload.documentType,
+        assignCountryAndType: assign((context, { payload }) => {
+          return {
+            ...context,
+            collectingDocumentMeta: {
+              countryCode: payload.countryCode,
+              type: payload.documentType,
+            },
           };
-          return context;
         }),
       },
     },

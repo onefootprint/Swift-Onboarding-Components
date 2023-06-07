@@ -2,7 +2,7 @@ import request from '@onefootprint/request';
 import { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../../../../../config/constants';
+import AUTH_HEADER from '@/config/constants';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
   const {

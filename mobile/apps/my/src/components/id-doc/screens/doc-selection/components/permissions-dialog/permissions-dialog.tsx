@@ -21,9 +21,7 @@ const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
     try {
       const newPermissions = await Camera.getCameraPermissionStatus();
       setPermission(newPermissions);
-    } catch (error) {
-      alert(error.message);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {

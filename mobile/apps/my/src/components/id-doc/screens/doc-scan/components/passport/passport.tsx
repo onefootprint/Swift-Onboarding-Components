@@ -3,11 +3,11 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../../components/camera';
+import Camera from '../../../../components/camera';
 import Frame from './components/frame';
 
 export type PassportProps = {
-  onSubmit: () => void;
+  onSubmit: (image: string) => void;
 };
 
 const Passport = ({ onSubmit }: PassportProps) => {

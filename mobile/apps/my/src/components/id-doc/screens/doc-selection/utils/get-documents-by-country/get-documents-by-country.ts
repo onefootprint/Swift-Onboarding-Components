@@ -1,7 +1,7 @@
 import { CountryRecord } from '@onefootprint/global-constants';
 import { IdDocType } from '@onefootprint/types';
 
-export const getAvailableDocumentTypesByCountry = (country: CountryRecord) => {
+export const getAvailableDocTypesByCountry = (country: CountryRecord) => {
   const availableTypes: IdDocType[] = [];
   if (country.driversLicense) {
     availableTypes.push(IdDocType.driversLicense);
@@ -15,11 +15,11 @@ export const getAvailableDocumentTypesByCountry = (country: CountryRecord) => {
   return availableTypes;
 };
 
-export const getDocumentTypeByCountry = (
+export const getDocTypeByCountry = (
   country: CountryRecord,
   previousType?: IdDocType,
 ) => {
-  const availableDocumentTypes = getAvailableDocumentTypesByCountry(country);
+  const availableDocumentTypes = getAvailableDocTypesByCountry(country);
   if (availableDocumentTypes.includes(previousType)) {
     return previousType;
   }

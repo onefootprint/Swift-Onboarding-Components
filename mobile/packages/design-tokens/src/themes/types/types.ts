@@ -101,6 +101,7 @@ export type BorderWidths = {
   0: string;
   1: string;
   2: string;
+  3: string;
 };
 
 export type BorderWidth = keyof BorderWidths;

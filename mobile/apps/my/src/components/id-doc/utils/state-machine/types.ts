@@ -1,49 +1,43 @@
 import {
   CountryCode,
-  // IdDocImageError,
+  IdDocImageError,
   IdDocRequirement,
   IdDocType,
 } from '@onefootprint/types';
 
+import { DocSide } from '../../id-doc.types';
+
 export type MachineContext = {
-  requirement: IdDocRequirement;
+  requirement?: IdDocRequirement;
   collectingDocumentMeta?: {
     countryCode: CountryCode;
     type: IdDocType;
   };
-};
-
-export type MachineEvents = {
-  type: 'countryAndTypeSubmitted';
-  payload: {
-    documentType: IdDocType;
-    countryCode: CountryCode;
+  currentStep: {
+    errors: IdDocImageError[];
+    image?: string;
+    side: DocSide;
   };
 };
-// | {
-//     type: 'receivedImage';
-//     payload: {
-//       image: string;
-//     };
-//   }
-// | {
-//     type: 'nextSide';
-//     payload: {
-//       nextSideToCollect: string;
-//     };
-//   }
-// | {
-//     type: 'processingErrored';
-//     payload: {
-//       errors: IdDocImageError[];
-//     };
-//   }
-// | {
-//     type: 'processingSucceeded';
-//     payload: {
-//       nextSideToCollect?: string;
-//     };
-//   }
+
+export type MachineEvents =
+  | {
+      type: 'countryAndTypeSubmitted';
+      payload: {
+        documentType: IdDocType;
+        countryCode: CountryCode;
+      };
+    }
+  | {
+      type: 'backButtonTapped';
+    }
+  | {
+      type: 'imageSubmitted';
+      payload: {
+        image: string;
+      };
+    };
+
 // | {
 //     type: 'consentReceived';
 //   }

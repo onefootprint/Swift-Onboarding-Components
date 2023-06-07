@@ -18,6 +18,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'complete' | 'docSelection' | 'frontImage';
+  matchesStates: 'complete' | 'docSelection' | 'frontImage' | 'processing';
   tags: never;
 }

@@ -84,17 +84,43 @@
       "camera": {
         "continue": "Continue",
         "retake": "Retake",
+        "take-manually": "Take manually",
         "instructions": {
-          "steady": "Hold your device steady",
           "capture": "Image will be captured automatically"
         }
       },
       "drivers-license": {
         "title": "Driver's license",
-        "subtitle": "Front side",
-        "instructions": {
-          "title": "Position the your id in the frame",
-          "description": "Make sure it's the front side."
+        "front": {
+          "subtitle": "Front side",
+          "instructions": {
+            "title": "Position the your id in the frame",
+            "description": "Make sure it's the front side."
+          }
+        },
+        "back": {
+          "subtitle": "Front side",
+          "instructions": {
+            "title": "Position the your id in the frame",
+            "description": "Make sure it's the back side."
+          }
+        }
+      },
+      "id-card": {
+        "title": "ID card",
+        "front": {
+          "subtitle": "Front side",
+          "instructions": {
+            "title": "Position the your id in the frame",
+            "description": "Make sure it's the front side."
+          }
+        },
+        "back": {
+          "subtitle": "Front side",
+          "instructions": {
+            "title": "Position the your id in the frame",
+            "description": "Make sure it's the back side."
+          }
         }
       },
       "passport": {
@@ -108,7 +134,7 @@
       "selfie": {
         "title": "Selfie",
         "instructions": {
-          "title": "Position your face within the frame",
+          "title": "Position your face within the frame"
         }
       }
     }

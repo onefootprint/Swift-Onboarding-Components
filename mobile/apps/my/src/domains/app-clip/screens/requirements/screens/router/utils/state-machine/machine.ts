@@ -23,25 +23,31 @@ const createRequirementsMachine = () =>
         on: {
           remainingRequirementsReceived: [
             {
+              target: 'liveness',
+              cond: (context, { payload }) => {
+                return !!payload.remainingRequirements.liveness;
+              },
               actions: assign((context, { payload }) => {
                 context.remainingRequirements = payload.remainingRequirements;
                 return context;
               }),
             },
             {
-              target: 'liveness',
-              cond: (context, { payload }) => {
-                return !!payload.remainingRequirements.liveness;
-              },
-            },
-            {
               target: 'idDoc',
               cond: (context, { payload }) => {
                 return !!payload.remainingRequirements.idDoc;
               },
+              actions: assign((context, { payload }) => {
+                context.remainingRequirements = payload.remainingRequirements;
+                return context;
+              }),
             },
             {
               target: 'completed',
+              actions: assign((context, { payload }) => {
+                context.remainingRequirements = payload.remainingRequirements;
+                return context;
+              }),
             },
           ],
         },

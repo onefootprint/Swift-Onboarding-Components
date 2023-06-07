@@ -1,12 +1,20 @@
-import { IcoBolt24, Icon, IcoSmartphone224 } from '@onefootprint/icons';
-import styled, { css, useTheme } from '@onefootprint/styled';
-import { Box, Button, Container, Typography } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import { IcoBolt24, Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
+import {
+  Box,
+  Button,
+  Container,
+  FadeIn,
+  Image,
+  Typography,
+} from '@onefootprint/ui';
+import React, { useCallback, useRef, useState } from 'react';
 import { Dimensions, ViewStyle } from 'react-native';
 import {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import {
   Camera as VisionCamera,
@@ -17,33 +25,35 @@ import {
 
 import useTranslation from '@/hooks/use-translation';
 
+import encodeImagePath from '../../utils/encode-image-path';
 import Instructions from '../instructions';
+import type { CameraSize, CameraType } from './camera.types';
 import processDocument from './frame-processors/process-document';
+import useCanTakePhotoManually from './hooks/use-can-take-photo-manually';
 
 let timerId: NodeJS.Timeout | null = null;
 
 type CameraProps = {
-  type: 'front' | 'back';
-  title: string;
-  subtitle?: string;
-  instructions: {
-    description?: string;
-    IconComponent: Icon;
-    title: string;
-  };
-  onSubmit: () => void;
   Frame?: ({ style }: { style: ViewStyle }) => JSX.Element;
+  instructions: { description?: string; IconComponent: Icon; title: string };
+  loading?: boolean;
+  onSubmit: (encodedImage: string) => void;
+  size?: CameraSize;
+  subtitle?: string;
+  title: string;
+  type?: CameraType;
 };
 
 const Camera = ({
-  type,
-  title,
-  subtitle,
-  instructions,
-  onSubmit,
   Frame,
+  instructions,
+  loading,
+  onSubmit,
+  size = 'default',
+  subtitle,
+  title,
+  type = 'back',
 }: CameraProps) => {
-  const theme = useTheme();
   const { t } = useTranslation('components.scan.camera');
   const camera = useRef<VisionCamera>(null);
   const devices = useCameraDevices();
@@ -52,25 +62,24 @@ const Camera = ({
   const detector = useSharedValue(false);
   const frameStyles = useAnimatedStyle(
     () => ({
-      borderColor: detector.value
-        ? theme.color.success
-        : theme.borderColor.primary,
+      borderWidth: withTiming(detector.value ? 6 : 2.5, { duration: 200 }),
     }),
     [detector],
   );
-  const showButtons = photo;
+  const [canTakePhotoManually, resetCanTakePhotoManually] =
+    useCanTakePhotoManually();
+  const showActionButtons = photo;
+  const showTakePhotoManuallyButton =
+    !showActionButtons && canTakePhotoManually;
   const showInstructions = !photo;
   const showCamera = !photo && device;
 
-  const handleDetectorChange = (value: boolean) => {
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
-    }
+  const handleDetectorChange = useCallback((value: boolean) => {
+    resetAutoCapture();
     if (value) {
-      timerId = setTimeout(handleTakePhoto, 1000);
+      timerId = setTimeout(takePhoto, 1000);
     }
-  };
+  }, []);
 
   const frameProcessor = useFrameProcessor(
     frame => {
@@ -82,27 +91,41 @@ const Camera = ({
       const result = processDocument(frame, options);
       detector.value = result.is_document;
       if (detector.value !== result.is_document) {
-        detector.value = result.is_document;
+        detector.value = !!result.is_document;
         runOnJS(handleDetectorChange)(result.is_document);
       }
     },
     [detector],
   );
 
-  const handleSubmit = () => {
-    // TODO: Submit photo
-    onSubmit();
+  const takePhoto = async () => {
+    resetCanTakePhotoManually();
+    const newPhoto = await camera.current.takePhoto({
+      flash: 'auto',
+    });
+    setPhoto(newPhoto);
+  };
+
+  const resetAutoCapture = () => {
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+  };
+
+  const handleTakePhotoManually = () => {
+    resetAutoCapture();
+    takePhoto();
   };
 
   const handleReset = () => {
     setPhoto(null);
   };
 
-  const handleTakePhoto = async () => {
-    const newPhoto = await camera.current.takePhoto({
-      flash: 'auto',
-    });
-    setPhoto(newPhoto);
+  const handleSubmit = async () => {
+    if (!photo) return;
+    const encodedImage = await encodeImagePath(photo.path);
+    onSubmit(encodedImage);
   };
 
   return (
@@ -114,21 +137,25 @@ const Camera = ({
             <Typography variant="label-2">{subtitle}</Typography>
           </Box>
           <Box marginBottom={7}>
-            <CameraContainer>
-              {photo && <Preview source={{ uri: photo.path }} />}
-              {showCamera && (
-                <>
-                  {Frame && <Frame style={frameStyles} />}
-                  <StyledCamera
-                    device={device}
-                    frameProcessor={frameProcessor}
-                    isActive
-                    photo
-                    ref={camera}
-                  />
-                </>
-              )}
-            </CameraContainer>
+            {photo && (
+              <Preview
+                size={size}
+                source={{ uri: photo.path }}
+                resizeMode="cover"
+              />
+            )}
+            {showCamera && (
+              <CameraContainer size={size}>
+                {Frame && <Frame style={frameStyles} />}
+                <StyledCamera
+                  device={device}
+                  frameProcessor={frameProcessor}
+                  isActive
+                  photo
+                  ref={camera}
+                />
+              </CameraContainer>
+            )}
           </Box>
           {showInstructions && (
             <Instructions
@@ -138,24 +165,31 @@ const Camera = ({
                   title: instructions.title,
                   description: instructions.description,
                 },
-                {
-                  icon: IcoSmartphone224,
-                  title: t('instructions.steady'),
-                },
                 { icon: IcoBolt24, title: t('instructions.capture') },
               ]}
             />
           )}
         </Box>
-        {showButtons && (
+        {showActionButtons && (
           <Box gap={4}>
-            <Button variant="secondary" onPress={handleSubmit}>
+            <Button loading={loading} onPress={handleSubmit}>
               {t('continue')}
             </Button>
-            <Button variant="secondary" onPress={handleReset}>
+            <Button
+              variant="secondary"
+              onPress={handleReset}
+              disabled={loading}
+            >
               {t('retake')}
             </Button>
           </Box>
+        )}
+        {showTakePhotoManuallyButton && (
+          <FadeIn>
+            <Button onPress={handleTakePhotoManually}>
+              {t('take-manually')}
+            </Button>
+          </FadeIn>
         )}
       </Box>
     </Container>
@@ -164,10 +198,11 @@ const Camera = ({
 
 const windowWidth = Dimensions.get('window').width;
 
-const CameraContainer = styled.View`
-  ${({ theme }) => css`
+const CameraContainer = styled.View<{ size: CameraSize }>`
+  ${({ theme, size }) => css`
     align-items: center;
-    height: 390px;
+    background: black;
+    height: ${size === 'default' ? 280 : 390}px;
     justify-content: center;
     margin-left: -${theme.spacing[5]};
     position: relative;
@@ -180,9 +215,13 @@ const StyledCamera = styled(VisionCamera)`
   width: 100%;
 `;
 
-const Preview = styled.Image`
-  height: 100%;
-  width: 100%;
+const Preview = styled(Image)<{ size: CameraSize }>`
+  ${({ theme, size }) => css`
+    border-radius: ${theme.borderRadius.large};
+    height: ${size === 'default' ? 260 : 390}px;
+    margin-top: ${theme.spacing[7]};
+    width: 100%;
+  `}
 `;
 
 export default Camera;
