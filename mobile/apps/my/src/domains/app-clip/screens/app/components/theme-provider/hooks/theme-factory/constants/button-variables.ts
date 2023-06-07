@@ -2,13 +2,13 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
   [
     'buttonBorderRadius',
     {
-      var: 'components.button.global.borderRadius',
+      var: 'components.button.borderRadius',
     },
   ],
   [
     'buttonBorderWidth',
     {
-      var: 'components.button.global.borderWidth',
+      var: 'components.button.borderWidth',
     },
   ],
   [
