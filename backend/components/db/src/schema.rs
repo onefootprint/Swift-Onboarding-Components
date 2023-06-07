@@ -422,6 +422,7 @@ table! {
         idv_reqs_initiated_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
         status -> Text,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -942,6 +943,7 @@ joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
 joinable!(onboarding -> scoped_vault (scoped_vault_id));
+joinable!(onboarding -> workflow (workflow_id));
 joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision -> workflow (workflow_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));

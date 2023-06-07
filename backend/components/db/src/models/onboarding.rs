@@ -15,7 +15,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     CipKind, DecisionStatus, FpId, InsightEventId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId,
-    TenantId, TenantScope, VaultId,
+    TenantId, TenantScope, VaultId, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -40,6 +40,7 @@ pub struct Onboarding {
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
     pub status: OnboardingStatus,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -50,6 +51,7 @@ struct NewOnboarding {
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
     status: OnboardingStatus,
+    workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -316,21 +318,8 @@ impl Onboarding {
         if let Some(ob) = ob {
             return Ok((ob, IsNew::No));
         }
-        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
-        let insight_event = args.insight_event.insert_with_conn(conn)?;
-        let new_ob = NewOnboarding {
-            scoped_vault_id: args.scoped_vault_id.clone(),
-            ob_configuration_id: args.ob_configuration_id.clone(),
-            start_timestamp: Utc::now(),
-            insight_event_id: insight_event.id,
-            status: OnboardingStatus::Incomplete,
-        };
-        let ob = diesel::insert_into(onboarding::table)
-            .values(new_ob)
-            .get_result::<Onboarding>(conn.conn())?;
 
         let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
-
         // TODO: later have a KYB workflow and create that here as well
         let wf = if matches!(v.kind, VaultKind::Person) && should_create_workflow {
             let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
@@ -343,6 +332,20 @@ impl Onboarding {
         } else {
             None
         };
+
+        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
+        let insight_event = args.insight_event.insert_with_conn(conn)?;
+        let new_ob = NewOnboarding {
+            scoped_vault_id: args.scoped_vault_id.clone(),
+            ob_configuration_id: args.ob_configuration_id,
+            start_timestamp: Utc::now(),
+            insight_event_id: insight_event.id,
+            status: OnboardingStatus::Incomplete,
+            workflow_id: wf.as_ref().map(|w| w.id.clone()),
+        };
+        let ob = diesel::insert_into(onboarding::table)
+            .values(new_ob)
+            .get_result::<Onboarding>(conn.conn())?;
 
         Ok((ob, IsNew::Yes(wf)))
     }
