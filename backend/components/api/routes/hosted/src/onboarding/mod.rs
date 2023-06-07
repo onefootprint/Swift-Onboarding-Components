@@ -35,6 +35,7 @@ mod skip_liveness;
 mod socure_device;
 mod status;
 mod validate;
+mod process;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -45,6 +46,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(fingerprint_visit::post)
         .service(pat::get)
         .service(socure_device::post)
+        .service(process::post)
         .service(validate::post);
 
     d2p::routes(config);

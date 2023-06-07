@@ -55,7 +55,7 @@ impl Workflow for DocumentState {
         workflow_id: WorkflowId,
     ) -> ApiResult<WorkflowKind> {
         let new_state = match (self, action) {
-            (Self::DataCollection(s), WorkflowActions::Authorize(a)) => {
+            (Self::DataCollection(s), WorkflowActions::DocCollected(a)) => {
                 s.do_action(state, a, workflow_id).await?
             }
             (Self::Decisioning(s), WorkflowActions::MakeDecision(a)) => {

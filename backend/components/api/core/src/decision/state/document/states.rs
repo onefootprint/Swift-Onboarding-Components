@@ -15,7 +15,7 @@ use super::{DocumentState, MakeDecision};
 use crate::decision::{
     onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
     state::{
-        actions::{Authorize, WorkflowActions},
+        actions::{DocCollected, WorkflowActions},
         common, WorkflowState,
     },
     utils::FixtureDecision,
@@ -71,12 +71,12 @@ impl DocumentDataCollection {
 }
 
 #[async_trait]
-impl OnAction<Authorize, DocumentState> for DocumentDataCollection {
+impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
     type AsyncRes = TenantVendorControl;
 
     async fn execute_async_idempotent_actions(
         &self,
-        action: Authorize,
+        action: DocCollected,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         let svid = self.sv_id.clone();

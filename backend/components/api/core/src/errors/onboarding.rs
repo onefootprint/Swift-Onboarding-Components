@@ -44,4 +44,6 @@ pub enum OnboardingError {
     MissingObPkAuth,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
+    #[error("Onboarding cannot proceed in state {0}")]
+    WorkflowCannotProceed(newtypes::WorkflowState),
 }
