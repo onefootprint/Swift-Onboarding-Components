@@ -87,6 +87,21 @@ impl ScrubbedPiiString {
     }
 }
 
+impl<T> From<T> for ScrubbedPiiString
+where
+    T: Display,
+{
+    fn from(pii: T) -> Self {
+        Self(format!("{}", pii).into())
+    }
+}
+
+impl From<PiiString> for ScrubbedPiiString {
+    fn from(pii: PiiString) -> Self {
+        Self(pii)
+    }
+}
+
 fn scrubbed_str<S>(_v: &PiiString, s: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,

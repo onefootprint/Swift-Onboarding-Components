@@ -87,18 +87,18 @@ impl Complete {
         let data = match dk {
             IdDocKind::IdCard => vec![
                 di(IdCardExpiration, r.expiration_date().ok()),
-                di(IdCardNumber, r.document_number),
+                di(IdCardNumber, r.document_number.map(|p| (*p).clone())),
             ],
             IdDocKind::DriverLicense => vec![
                 di(DriversLicenseExpiration, r.expiration_date().ok()),
                 di(DriversLicenseDob, r.dob().ok()),
-                di(DriversLicenseNumber, r.document_number),
-                di(DriversLicenseIssuingState, r.issuing_state),
+                di(DriversLicenseNumber, r.document_number.map(|p| (*p).clone())),
+                di(DriversLicenseIssuingState, r.issuing_state.map(|p| (*p).clone())),
             ],
             IdDocKind::Passport => vec![
                 di(PassportExpiration, r.expiration_date().ok()),
                 di(PassportDob, r.dob().ok()),
-                di(PassportNumber, r.document_number),
+                di(PassportNumber, r.document_number.map(|p| (*p).clone())),
             ],
         }
         .into_iter()

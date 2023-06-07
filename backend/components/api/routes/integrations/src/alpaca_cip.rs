@@ -437,16 +437,28 @@ async fn document_and_photo(
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: score_request_created_at,
-        first_name: ok_or(ocr_name.first_name.clone(), "first name missing".into())?,
-        last_name: ok_or(ocr_name.paternal_last_name.clone(), "last name missing".into())?,
-        gender: ok_or(ocr.gender.clone(), "missing gender".into())?,
+        first_name: ok_or(
+            ocr_name.first_name.as_ref().map(|p| (**p).clone()),
+            "first name missing".into(),
+        )?,
+        last_name: ok_or(
+            ocr_name.paternal_last_name.as_ref().map(|p| (**p).clone()),
+            "last name missing".into(),
+        )?,
+        gender: ok_or(
+            ocr.gender.as_ref().map(|p| (**p).clone()),
+            "missing gender".into(),
+        )?,
         date_of_birth: dob,
         date_of_expiry: ocr
             .expiration_date()
             .map_err(|e| ApiError::from(idv::Error::from(e)))?,
-        issuing_country: ok_or(ocr.issuing_country.clone(), "missing issuing_country".into())?,
+        issuing_country: ok_or(
+            ocr.issuing_country.map(|p| (*p).clone()),
+            "missing issuing_country".into(),
+        )?,
         document_numbers: vec![ok_or(
-            ocr.document_number.clone(),
+            ocr.document_number.map(|p| (*p).clone()),
             "missing document_number".into(),
         )?],
         document_type,

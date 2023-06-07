@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{PiiJsonValue, PiiString};
+use newtypes::{scrub_pii_value, PiiJsonValue, ScrubbedPiiString};
 
 use crate::incode::{response::Error, APIResponseToIncodeError};
 
@@ -30,14 +30,14 @@ pub struct Content {
 pub struct Data {
     pub id: Option<i32>,
     #[serde(rename = "ref")]
-    pub ref_: Option<PiiString>,
+    pub ref_: Option<ScrubbedPiiString>,
     pub filters: Option<Filters>,
     pub hits: Option<Vec<Hit>>,
     pub searcher_id: Option<i32>,
     pub assignee_id: Option<i32>,
     pub match_status: Option<String>,
     pub risk_level: Option<String>,
-    pub search_term: Option<PiiString>,
+    pub search_term: Option<ScrubbedPiiString>,
     pub total_hits: Option<i32>,
     pub total_matches: Option<i32>,
     pub updated_at: Option<DateTime<Utc>>,
@@ -72,8 +72,9 @@ pub struct Hit {
 #[serde(rename_all = "camelCase")]
 pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
-    pub matching_name: Option<PiiString>,
+    pub matching_name: Option<ScrubbedPiiString>,
     pub names_matches: Option<Vec<NameMatch>>,
+    #[serde(serialize_with = "scrub_pii_value")]
     pub secondary_matches: Option<PiiJsonValue>, // TODO: dunno schema for this bad boy
     pub sources: Option<Vec<String>>,
 }
@@ -82,7 +83,7 @@ pub struct MatchTypeDetail {
 #[serde(rename_all = "camelCase")]
 pub struct NameMatch {
     pub match_types: Option<Vec<String>>,
-    pub query_term: Option<PiiString>,
+    pub query_term: Option<ScrubbedPiiString>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -93,7 +94,7 @@ pub struct Doc {
     pub id: Option<String>,
     pub last_updated_utc: Option<DateTime<Utc>>,
     pub media: Option<Vec<Media>>,
-    pub name: Option<PiiString>,
+    pub name: Option<ScrubbedPiiString>,
     pub sources: Option<Vec<String>>,
     pub types: Option<Vec<String>>,
 }
@@ -101,7 +102,7 @@ pub struct Doc {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Aka {
-    pub name: Option<PiiString>,
+    pub name: Option<ScrubbedPiiString>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -110,7 +111,7 @@ pub struct Field {
     pub name: Option<String>,
     pub source: Option<String>,
     pub tag: Option<String>,
-    pub value: Option<PiiString>,
+    pub value: Option<ScrubbedPiiString>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -118,8 +119,8 @@ pub struct Field {
 pub struct Media {
     pub date: Option<DateTime<Utc>>,
     pub pdf_url: Option<String>,
-    pub snippet: Option<PiiString>,
-    pub title: Option<PiiString>,
+    pub snippet: Option<ScrubbedPiiString>,
+    pub title: Option<ScrubbedPiiString>,
     pub url: Option<String>,
 }
 

@@ -4,7 +4,7 @@ use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToI
 use chrono::NaiveDateTime;
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
-    IncodeFailureReason, IncodeVerificationSessionKind, PiiString,
+    IncodeFailureReason, IncodeVerificationSessionKind, PiiString, ScrubbedPiiString,
 };
 
 /// Response we get back from adding a document image
@@ -14,15 +14,15 @@ pub struct AddSideResponse {
     pub classification: Option<bool>,
     pub correct_glare: Option<bool>,
     pub correct_sharpness: Option<bool>,
-    pub country_code: Option<PiiString>,
+    pub country_code: Option<ScrubbedPiiString>,
     pub glare: Option<i32>,
     pub horizontal_resolution: Option<i32>,
-    pub issue_name: Option<PiiString>,
+    pub issue_name: Option<ScrubbedPiiString>,
     pub issue_year: Option<i32>,
     pub readability: Option<bool>,
     pub session_status: Option<String>,
     pub sharpness: Option<i32>,
-    pub type_of_id: Option<PiiString>,
+    pub type_of_id: Option<PiiString>, // TODO: this isn't PII?
     pub fail_reason: Option<String>,
     #[serde(flatten)]
     pub error: Option<Error>,
@@ -216,25 +216,25 @@ impl APIResponseToIncodeError for AddSelfieResponse {
 pub struct FetchOCRResponse {
     pub name: Option<OCRName>,
     // Address as read from id. Address can have two or three lines. Lines are separated by \n.
-    pub address: Option<PiiString>,
-    pub checked_address: Option<PiiString>,
+    pub address: Option<ScrubbedPiiString>,
+    pub checked_address: Option<ScrubbedPiiString>,
     pub checked_address_bean: Option<serde_json::Value>,
     pub address_fields: Option<OCRAddress>,
     // Image was classified as one of the following:
     // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
     // Other, WeaponLicense, TribalIdentification, VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
-    pub type_of_id: Option<PiiString>,
+    pub type_of_id: Option<PiiString>, // TODO: this isn't PII?
     pub document_front_subtype: Option<PiiString>,
     pub document_back_subtype: Option<PiiString>,
     // Long, UTC millis
     pub birth_date: Option<i64>,
-    pub gender: Option<PiiString>,
-    pub document_number: Option<PiiString>,
-    pub personal_number: Option<PiiString>,
+    pub gender: Option<ScrubbedPiiString>,
+    pub document_number: Option<ScrubbedPiiString>,
+    pub personal_number: Option<ScrubbedPiiString>,
     // Document Reference Number.
-    pub ref_number: Option<PiiString>,
+    pub ref_number: Option<ScrubbedPiiString>,
     // Optional. Personal tax identification number.
-    pub tax_id_number: Option<PiiString>,
+    pub tax_id_number: Option<ScrubbedPiiString>,
     // UTC timestamp, in ms
     pub expire_at: Option<String>,
     // year of expiration
@@ -242,16 +242,16 @@ pub struct FetchOCRResponse {
     pub additional_timestamps: Option<serde_json::Value>,
     // year of issue
     pub issue_date: Option<i32>,
-    pub issuing_country: Option<PiiString>,
-    pub issuing_state: Option<PiiString>,
-    pub issuing_authority: Option<PiiString>,
-    pub nationality: Option<PiiString>,
+    pub issuing_country: Option<ScrubbedPiiString>,
+    pub issuing_state: Option<ScrubbedPiiString>,
+    pub issuing_authority: Option<ScrubbedPiiString>,
+    pub nationality: Option<ScrubbedPiiString>,
     // PiiString. Person's nationality as it appears in MRZ (if present).
-    pub nationality_mrz: Option<PiiString>,
+    pub nationality_mrz: Option<ScrubbedPiiString>,
     // Array. Optional. List of driver's license details elements:
     pub dl_class_details: Option<serde_json::Value>,
     pub ocr_data_confidence: Option<serde_json::Value>,
-    pub restrictions: Option<PiiString>,
+    pub restrictions: Option<ScrubbedPiiString>,
 
     #[serde(flatten)]
     pub error: Option<Error>,
@@ -296,19 +296,23 @@ impl FetchOCRResponse {
         dob: Option<i64>,
     ) -> Self {
         let name = OCRName {
-            first_name: first_name.or_else(|| Some(PiiString::from("Bobby"))),
-            paternal_last_name: last_name.or_else(|| Some(PiiString::from("Bobierto"))),
+            first_name: first_name
+                .or_else(|| Some(PiiString::from("Bobby")))
+                .map(|s| s.into()),
+            paternal_last_name: last_name
+                .or_else(|| Some(PiiString::from("Bobierto")))
+                .map(|s| s.into()),
             ..Default::default()
         };
         Self {
-            document_number: Some(PiiString::from("Y12341234")),
-            issuing_state: Some(PiiString::from("MA")),
-            issuing_country: Some(PiiString::from("US")),
+            document_number: Some(ScrubbedPiiString::from("Y12341234")),
+            issuing_state: Some(ScrubbedPiiString::from("MA")),
+            issuing_country: Some(ScrubbedPiiString::from("US")),
             expire_at: Some("1728950400000".to_owned()),
             birth_date: dob.or(Some(529873860000)),
             name: Some(name),
             type_of_id: Some(PiiString::from("DriversLicense")),
-            gender: Some(PiiString::from("Female")),
+            gender: Some(ScrubbedPiiString::from("Female")),
             ..Default::default()
         }
     }
@@ -382,26 +386,26 @@ impl APIResponseToIncodeError for ProcessFaceResponse {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRName {
-    pub full_name: Option<PiiString>,
-    pub first_name: Option<PiiString>,
-    pub paternal_last_name: Option<PiiString>,
-    pub maternal_last_name: Option<PiiString>,
-    pub given_name: Option<PiiString>,
-    pub middle_name: Option<PiiString>,
-    pub name_suffix: Option<PiiString>,
-    pub machine_readable_full_name: Option<PiiString>,
-    pub given_name_mrz: Option<PiiString>,
-    pub last_name_mrz: Option<PiiString>,
+    pub full_name: Option<ScrubbedPiiString>,
+    pub first_name: Option<ScrubbedPiiString>,
+    pub paternal_last_name: Option<ScrubbedPiiString>,
+    pub maternal_last_name: Option<ScrubbedPiiString>,
+    pub given_name: Option<ScrubbedPiiString>,
+    pub middle_name: Option<ScrubbedPiiString>,
+    pub name_suffix: Option<ScrubbedPiiString>,
+    pub machine_readable_full_name: Option<ScrubbedPiiString>,
+    pub given_name_mrz: Option<ScrubbedPiiString>,
+    pub last_name_mrz: Option<ScrubbedPiiString>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRAddress {
-    pub street: Option<PiiString>,
-    pub colony: Option<PiiString>,
-    pub postal_code: Option<PiiString>,
-    pub city: Option<PiiString>,
-    pub state: Option<PiiString>,
+    pub street: Option<ScrubbedPiiString>,
+    pub colony: Option<ScrubbedPiiString>,
+    pub postal_code: Option<ScrubbedPiiString>,
+    pub city: Option<ScrubbedPiiString>,
+    pub state: Option<ScrubbedPiiString>,
 }
 
 #[cfg(test)]

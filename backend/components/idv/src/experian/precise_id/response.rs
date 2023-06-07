@@ -12,6 +12,7 @@ use std::str::FromStr;
 pub struct PreciseIDAPIResponse {
     #[serde(rename(deserialize = "sessionID"))]
     pub session_id: Option<String>,
+    #[serde(serialize_with = "scrub_pii_value")] // TODO: can we just make all these ScrubbedPiiJsonValue
     pub header: Option<PiiJsonValue>,
     pub summary: Option<Summary>,
     // Gives per-data attribute matching details and summaries
@@ -30,6 +31,7 @@ pub struct PreciseIDAPIResponse {
     pub on_file_ssn: Option<PiiJsonValue>,
     // in the docs this is included but isn't populated yet as it's
     // a future feature. Might as well start recording it
+    #[serde(serialize_with = "scrub_pii_value")]
     pub ip_address: Option<PiiJsonValue>,
     // GLB refers to the Gramm-Leach-Bliley Act. Experian uses this terminology
     // to refer to their data around consumers (as opposed to Credit-related-FCRA-regulated data. or something.)
