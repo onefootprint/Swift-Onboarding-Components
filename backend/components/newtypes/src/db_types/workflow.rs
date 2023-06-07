@@ -49,6 +49,27 @@ pub enum WorkflowState {
     Document(DocumentState),
 }
 
+impl WorkflowState {
+    pub fn requires_user_input(&self) -> bool {
+        match self {
+            Self::Kyc(KycState::DataCollection)
+            | Self::AlpacaKyc(AlpacaKycState::DataCollection)
+            | Self::AlpacaKyc(AlpacaKycState::DocCollection)
+            | Self::Document(DocumentState::DataCollection) => true,
+            Self::Kyc(KycState::Complete)
+            | Self::Kyc(KycState::Decisioning)
+            | Self::Kyc(KycState::VendorCalls)
+            | Self::AlpacaKyc(AlpacaKycState::Complete)
+            | Self::AlpacaKyc(AlpacaKycState::Decisioning)
+            | Self::AlpacaKyc(AlpacaKycState::PendingReview)
+            | Self::AlpacaKyc(AlpacaKycState::VendorCalls)
+            | Self::AlpacaKyc(AlpacaKycState::WatchlistCheck)
+            | Self::Document(DocumentState::Complete)
+            | Self::Document(DocumentState::Decisioning) => false,
+        }
+    }
+}
+
 impl_enum_string_diesel!(WorkflowKind);
 impl_enum_string_diesel!(WorkflowState);
 

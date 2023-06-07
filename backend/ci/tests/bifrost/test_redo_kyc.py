@@ -58,9 +58,11 @@ def test_redo_kyc(sandbox_tenant, twilio):
         override_inherit_phone=sandbox_user.client.data["id.phone_number"],
         override_auth=auth_token,
     )
-    bifrost.run()
-    bifrost.handle_authorize()  # have to manually hit /authorize for now, since this isn't currently going to be recognized as an outstanding requirement
-    assert len(bifrost.handled_requirements) == 0
+    # have to manually handle requirements for now since the bifrost client is using legacy logic
+    # TODO change to bifrost.run() when process is handled normally
+    bifrost.handle_process()
+    validation_token = bifrost.validate()["validation_token"]
+    bifrost.validate_token(validation_token)
 
     # we should have re-run KYC and now have 2 OBDs
     timeline = get(

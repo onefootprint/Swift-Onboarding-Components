@@ -158,7 +158,7 @@ pub async fn post(
         let args = GetRequirementsArgs {
             ob_config: ob_config.clone(),
             onboarding: ob,
-            wf_id: wf.map(|wf| wf.id),
+            workflow: wf,
             sb_id: sb.map(|sb| sb.id),
         };
         let reqs = crate::onboarding::get_requirements(&state, args).await?;

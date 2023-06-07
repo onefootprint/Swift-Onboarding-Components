@@ -13,6 +13,7 @@ use db::{
         ob_configuration::ObConfiguration,
         onboarding::Onboarding,
         user_consent::UserConsent,
+        workflow::Workflow,
     },
     PgConn,
 };
@@ -21,7 +22,7 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
-    InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId, WorkflowId,
+    InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
 };
 use paperclip::actix::web;
 use strum::IntoEnumIterator;
@@ -31,11 +32,11 @@ mod d2p;
 mod fingerprint_visit;
 mod index;
 mod pat;
+mod process;
 mod skip_liveness;
 mod socure_device;
 mod status;
 mod validate;
-mod process;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -55,7 +56,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 pub struct GetRequirementsArgs {
     pub ob_config: ObConfiguration,
     pub onboarding: Onboarding,
-    pub wf_id: Option<WorkflowId>,
+    pub workflow: Option<Workflow>,
     pub sb_id: Option<ScopedVaultId>,
 }
 
@@ -64,7 +65,7 @@ impl GetRequirementsArgs {
         Ok(Self {
             ob_config: value.ob_config()?.clone(),
             onboarding: value.onboarding()?.clone(),
-            wf_id: value.workflow().map(|wf| wf.id.clone()),
+            workflow: value.workflow().cloned(),
             sb_id: value.scoped_business_id(),
         })
     }
@@ -146,7 +147,7 @@ fn get_requirements_inner(
     only_us_dl: bool,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let ob_config = &args.ob_config;
-    let id_req = ob_config.must_collect(DID::Id).then(|| {
+    let id = ob_config.must_collect(DID::Id).then(|| {
         let RequirementProgress {
             populated_attributes,
             missing_attributes,
@@ -157,7 +158,7 @@ fn get_requirements_inner(
             populated_attributes,
         }
     });
-    let ip_req = ob_config
+    let ip = ob_config
         .must_collect(DID::InvestorProfile)
         .then(|| -> ApiResult<_> {
             let RequirementProgress {
@@ -181,7 +182,7 @@ fn get_requirements_inner(
         })
         .transpose()?;
 
-    let biz_req = ob_config
+    let biz = ob_config
         .must_collect(DID::Business)
         .then(|| -> ApiResult<_> {
             // Use the bvw to determine which fields still need to be collected
@@ -199,7 +200,7 @@ fn get_requirements_inner(
         .transpose()?;
 
     // TODO the below requirements we will never include when met, kind of confusing
-    let liveness_req = {
+    let liveness = {
         // TODO: force liveness checks to be re-done and not shared across tenants
         // RELATED: FP-1802 and FP-1800
         let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
@@ -207,7 +208,7 @@ fn get_requirements_inner(
             .is_empty()
             .then_some(OnboardingRequirement::Liveness)
     };
-    let doc_req = {
+    let doc = {
         // Document requirements are determined by the presence of DocumentRequest database objects.
         // In various places in the codebase, we will determine if a DocumentRequest should be created
         //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
@@ -215,7 +216,7 @@ fn get_requirements_inner(
         let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
         let identifier = DocRequestIdentifier {
             sv_id: &args.onboarding.scoped_vault_id,
-            wf_id: args.wf_id.as_ref(),
+            wf_id: args.workflow.as_ref().map(|wf| &wf.id),
         };
         let doc_request = DocumentRequest::get_active(conn, identifier)?;
         let supported_document_types = if only_us_dl {
@@ -231,7 +232,7 @@ fn get_requirements_inner(
             supported_document_types,
         })
     };
-    let authorize_req = if args.onboarding.authorized_at.is_none() {
+    let authorize = if args.onboarding.authorized_at.is_none() {
         let identity_document_types = if ob_config.can_access_document() {
             // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
             let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
@@ -249,7 +250,15 @@ fn get_requirements_inner(
         None
     };
 
-    let requirements = vec![id_req, ip_req, biz_req, liveness_req, doc_req, authorize_req]
+    // TODO make Workflow non-optional one day
+    let process = if args.workflow.map(|wf| wf.state.requires_user_input()) == Some(true) {
+        // If the worfklow is in a state that requires user input, make a Process requirement
+        Some(OnboardingRequirement::Process)
+    } else {
+        None
+    };
+
+    let requirements = vec![id, ip, biz, liveness, doc, authorize, process]
         .into_iter()
         .flatten()
         .collect();

@@ -27,6 +27,7 @@ pub enum OnboardingRequirement {
     },
     /// Perform liveness checks
     Liveness,
+    /// A document needs to be collected
     CollectDocument {
         document_request_id: DocumentRequestId,
         should_collect_selfie: bool,
@@ -35,9 +36,10 @@ pub enum OnboardingRequirement {
         only_us_supported: bool,
         supported_document_types: Vec<ModernIdDocKind>,
     },
-    Authorize {
-        fields_to_authorize: AuthorizeFields,
-    },
+    /// The client needs to display the authorization consent page and confirm the user authorizes access
+    Authorize { fields_to_authorize: AuthorizeFields },
+    /// The client needs to tell us when user input is done in order for us to continue processing
+    Process,
 }
 
 impl OnboardingRequirement {
@@ -68,6 +70,7 @@ impl OnboardingRequirement {
             Self::Authorize {
                 fields_to_authorize: _,
             } => false,
+            Self::Process => false,
         }
     }
 }

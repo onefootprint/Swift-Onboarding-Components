@@ -1,7 +1,15 @@
 import json
 from typing import NamedTuple, Optional
 from tests.types import Tenant
-from tests.constants import TEST_URL, ID_DATA, BUSINESS_DATA, IP_DATA, CDO_TO_DIS, EMAIL, DOCUMENT_DATA
+from tests.constants import (
+    TEST_URL,
+    ID_DATA,
+    BUSINESS_DATA,
+    IP_DATA,
+    CDO_TO_DIS,
+    EMAIL,
+    DOCUMENT_DATA,
+)
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
     multipart_file,
@@ -122,7 +130,9 @@ class BifrostClient:
             body = self.get_status()
             requirements = body["requirements"]
             requirements_to_handle = (
-                requirements if not kind else [i for i in requirements if i["kind"] == kind]
+                requirements
+                if not kind
+                else [i for i in requirements if i["kind"] == kind]
             )
             if len(requirements_to_handle) == 0:
                 break
@@ -149,6 +159,12 @@ class BifrostClient:
             self.handle_liveness()
         elif requirement["kind"] == "authorize":
             self.handle_authorize()
+        elif requirement["kind"] == "process":
+            # For now, the process requirement is usually handled inline during the handling of other
+            # requirements. Will move it out of line.
+            # TODO handle this automatically
+            # self.handle_process()
+            pass
         else:
             kind = requirement["kind"]
             assert False, f"Unknown requirement {kind}"
@@ -232,6 +248,9 @@ class BifrostClient:
 
     def handle_authorize(self, **kwargs):
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
+
+    def handle_process(self, **kwargs):
+        post("hosted/onboarding/process", None, self.auth_token, **kwargs)
 
     def validate(self, **kwargs):
         return post("hosted/onboarding/validate", None, self.auth_token, **kwargs)

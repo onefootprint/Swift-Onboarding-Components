@@ -67,8 +67,8 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())
-        // An Authorize requirement shouldn't block the authorize endpoint!
-        .filter(|r| !matches!(r, OnboardingRequirement::Authorize { .. }))
+        // An Authorize/Process requirement shouldn't block the authorize endpoint!
+        .filter(|r| !matches!(r, OnboardingRequirement::Authorize { .. } | OnboardingRequirement::Process))
         .collect_vec();
     if !unmet_reqs.is_empty() {
         let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();

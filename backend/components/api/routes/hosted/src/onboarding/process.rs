@@ -15,6 +15,7 @@ use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
+use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
 use decision::state::Authorize;
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -23,13 +24,18 @@ use paperclip::actix::{self, api_v2_operation, web};
     tags(Hosted, Bifrost),
     description = "Continue processing the onboarding after user this stage of user input has finished"
 )]
-#[actix::post("/hosted/onboarding/proceed")]
+#[actix::post("/hosted/onboarding/process")]
 pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
-    let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
+    let unmet_reqs = reqs
+        .into_iter()
+        .filter(|r| !r.is_met())
+        // Process requirement shouldn't block the process endpoint
+        .filter(|r| !matches!(r, OnboardingRequirement::Process))
+        .collect_vec();
     if !unmet_reqs.is_empty() {
         let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
