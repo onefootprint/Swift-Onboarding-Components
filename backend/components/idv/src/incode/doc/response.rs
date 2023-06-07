@@ -20,9 +20,9 @@ pub struct AddSideResponse {
     pub issue_name: Option<ScrubbedPiiString>,
     pub issue_year: Option<i32>,
     pub readability: Option<bool>,
-    pub session_status: Option<String>,
+    pub session_status: Option<PiiString>,
     pub sharpness: Option<i32>,
-    pub type_of_id: Option<PiiString>, // TODO: this isn't PII?
+    pub type_of_id: Option<IncodeDocumentType>,
     pub fail_reason: Option<String>,
     #[serde(flatten)]
     pub error: Option<Error>,
@@ -30,15 +30,11 @@ pub struct AddSideResponse {
 
 impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
-    pub fn add_side_failure_reason(&self) -> Option<IncodeFailureReason> {
+    pub fn failure_reason(&self) -> Option<IncodeFailureReason> {
         self.fail_reason.as_ref().map(|e| {
             IncodeFailureReason::try_from(e.as_str())
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
         })
-    }
-
-    pub fn document_kind(&self) -> Result<IncodeDocumentType, IncodeError> {
-        get_document_kind(&self.type_of_id)
     }
 }
 
@@ -223,7 +219,7 @@ pub struct FetchOCRResponse {
     // Image was classified as one of the following:
     // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
     // Other, WeaponLicense, TribalIdentification, VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
-    pub type_of_id: Option<PiiString>, // TODO: this isn't PII?
+    pub type_of_id: Option<IncodeDocumentType>,
     pub document_front_subtype: Option<PiiString>,
     pub document_back_subtype: Option<PiiString>,
     // Long, UTC millis
@@ -285,10 +281,6 @@ impl FetchOCRResponse {
         Ok(PiiString::from(naive.format("%Y-%m-%d")))
     }
 
-    pub fn document_kind(&self) -> Result<IncodeDocumentType, IncodeError> {
-        get_document_kind(&self.type_of_id)
-    }
-
     #[allow(non_snake_case)]
     pub fn TEST_ONLY_FIXTURE(
         first_name: Option<PiiString>,
@@ -347,19 +339,6 @@ impl APIResponseToIncodeError for FetchOCRResponse {
     }
 }
 
-fn get_document_kind(type_of_id: &Option<PiiString>) -> Result<IncodeDocumentType, IncodeError> {
-    let Some(type_of_id) = type_of_id else {
-        return Err(IncodeError::OcrError("Missing type_of_id".into()));
-    };
-
-    Ok(
-        IncodeDocumentType::try_from(type_of_id.leak()).unwrap_or_else(|_| {
-            tracing::error!(doc_type=%type_of_id.leak(), "non parsable doc type");
-
-            IncodeDocumentType::NonParsableDocType(type_of_id.leak_to_string())
-        }),
-    )
-}
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingStatusResponse {
@@ -435,7 +414,7 @@ pub struct OCRAddress {
 mod tests {
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
-        IncodeFailureReason,
+        IdDocKind, IncodeFailureReason,
     };
 
     use crate::incode::doc::response::AddSelfieResponse;
@@ -508,7 +487,7 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
-        let failure = parsed.add_side_failure_reason().unwrap();
+        let failure = parsed.failure_reason().unwrap();
         assert_eq!(failure, IncodeFailureReason::WrongDocumentSide);
 
         // No failure
@@ -524,7 +503,7 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
-        let failure = parsed.add_side_failure_reason();
+        let failure = parsed.failure_reason();
         assert!(failure.is_none())
     }
 

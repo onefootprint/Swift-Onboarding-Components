@@ -86,7 +86,10 @@ pub enum DocumentImageError {
     /// Deprecated
     ImageError,
 
+    /// The document provided doesn't match the type of document we were expecting
+    DocTypeMismatch,
     UnknownDocumentType,
+    UnsupportedDocumentType,
     WrongDocumentSide,
     WrongOneSidedDocument,
     DocumentNotReadable,
@@ -122,11 +125,13 @@ impl From<IncodeFailureReason> for DocumentImageError {
     fn from(err: IncodeFailureReason) -> Self {
         match err {
             IncodeFailureReason::UnknownDocumentType => Self::UnknownDocumentType,
+            IncodeFailureReason::UnsupportedDocumentType => Self::UnsupportedDocumentType,
             IncodeFailureReason::WrongDocumentSide => Self::WrongDocumentSide,
             IncodeFailureReason::WrongOneSidedDocument => Self::WrongOneSidedDocument,
             IncodeFailureReason::DocumentNotReadable => Self::DocumentNotReadable,
             IncodeFailureReason::UnableToAlignDocument => Self::UnableToAlignDocument,
             IncodeFailureReason::IdTypeNotAcceptable => Self::IdTypeNotAcceptable,
+            IncodeFailureReason::DocTypeMismatch => Self::DocTypeMismatch,
             IncodeFailureReason::UnexpectedErrorOccurred => Self::UnknownError,
             IncodeFailureReason::SelfieFaceNotFound => Self::SelfieFaceNotFound,
             IncodeFailureReason::SelfieLowConfidence => Self::SelfieLowConfidence,

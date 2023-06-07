@@ -2,7 +2,6 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddBack, IncodeStateTransition, ProcessId,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::id_doc_kind_from_incode_document_type;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
@@ -13,7 +12,7 @@ use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::AddSideResponse;
 use idv::incode::doc::IncodeAddFrontRequest;
-use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{DocVData, DocumentSide, VendorAPI};
 
 pub struct AddFront {
     response: AddSideResponse,
@@ -72,7 +71,9 @@ impl IncodeStateTransition for AddFront {
         _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         // If there's failure, we move to retry upload
-        if let Some(reason) = self.response.add_side_failure_reason() {
+        let mismatch_reason = super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())?.err();
+        let failure_reason = self.response.failure_reason();
+        if let Some(reason) = mismatch_reason.or(failure_reason) {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
                 reasons: vec![reason],
@@ -82,18 +83,8 @@ impl IncodeStateTransition for AddFront {
 
         // Ensure we've gotten a doc type we can support
         // TODO: support checking against acceptable doc types and countries from OBC
-        match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
-        {
-            Ok(_) => {
-                let next_state = should_collect_back_or_process_id(&ctx.docv_data)?;
-                Ok(next_state.into())
-            }
-            Err(_) => Ok(StateResult::Retry {
-                next_state: AddFront::new(),
-                reasons: vec![IncodeFailureReason::UnknownDocumentType],
-                clear_sides: vec![DocumentSide::Front],
-            }),
-        }
+        let next_state = should_collect_back_or_process_id(&ctx.docv_data)?;
+        Ok(next_state.into())
     }
 }
 

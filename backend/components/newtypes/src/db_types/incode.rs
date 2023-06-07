@@ -80,6 +80,8 @@ pub enum IncodeFailureReason {
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
     UnexpectedErrorOccurred,
     // These aren't deserialized with strum
+    UnsupportedDocumentType,
+    DocTypeMismatch,
     SelfieFaceNotFound,
     SelfieLowConfidence,
     SelfieTooDark,

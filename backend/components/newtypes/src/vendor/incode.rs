@@ -1,5 +1,8 @@
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
 use strum_macros::EnumString;
+
+use crate::IdDocKind;
 
 #[derive(Display, Debug, EnumString, Eq, PartialEq)]
 pub enum IncodeStatus {
@@ -97,7 +100,7 @@ pub enum IncodeTest {
     LastNameMatch,
 }
 
-#[derive(Display, Debug, EnumString, Eq, PartialEq, Hash)]
+#[derive(Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay)]
 pub enum IncodeDocumentType {
     #[strum(serialize = "Unknown")]
     Unknown,
@@ -138,4 +141,19 @@ pub enum IncodeDocumentType {
     #[strum(serialize = "MedicalCard")]
     MedicalCard,
     NonParsableDocType(String),
+}
+
+impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
+    type Error = crate::Error;
+    fn try_from(value: &'a IncodeDocumentType) -> Result<Self, Self::Error> {
+        match value {
+            IncodeDocumentType::Passport => Ok(Self::Passport),
+            IncodeDocumentType::DriversLicense => Ok(Self::DriverLicense),
+            IncodeDocumentType::IdentificationCard => Ok(Self::IdCard),
+            _ => Err(crate::Error::Custom(format!(
+                "Incode document type {} not supported",
+                value
+            ))),
+        }
+    }
 }

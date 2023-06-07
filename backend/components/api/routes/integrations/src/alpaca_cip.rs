@@ -27,9 +27,9 @@ use db::{
 };
 use idv::ParsedResponse;
 use newtypes::{
-    format_pii, pii, AlpacaDocumentType, DataIdentifier, DecisionStatus, DocumentKind,
-    EncryptedVaultPrivateKey, FootprintReasonCode, FpId, IdentityDataKind, MatchLevel, PiiJsonValue,
-    PiiString, SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, EncryptedVaultPrivateKey,
+    FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, SignalScope,
+    TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use strum::IntoEnumIterator;
@@ -430,11 +430,10 @@ async fn document_and_photo(
         };
 
     let ocr_name = ok_or(ocr.name.as_ref(), "missing ocr name".into())?;
-    let document_type: AlpacaDocumentType = ocr
-        .document_kind()
-        .map(crate::decision::vendor::incode::id_doc_kind_from_incode_document_type)
-        .map_err(|e| ApiError::from(idv::Error::from(e)))??
-        .into();
+    let type_of_id = ocr.type_of_id.as_ref().ok_or_else(|| {
+        idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
+    })?;
+    let document_type = IdDocKind::try_from(type_of_id)?.into();
     let dob = ocr.dob().map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
     let document_photo_id = alpaca::DocumentPhotoId {

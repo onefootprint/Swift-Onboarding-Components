@@ -3,7 +3,7 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::StateResult;
-use crate::decision::vendor::incode::{id_doc_kind_from_incode_document_type, IncodeContext};
+use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
@@ -11,8 +11,8 @@ use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::AddSideResponse;
 use idv::incode::doc::IncodeAddBackRequest;
+use newtypes::DocumentSide;
 use newtypes::{DocVData, VendorAPI};
-use newtypes::{DocumentSide, IncodeFailureReason};
 
 pub struct AddBack {
     response: AddSideResponse,
@@ -60,10 +60,12 @@ impl IncodeStateTransition for AddBack {
     fn transition(
         self,
         _: &mut TxnPgConn,
-        _ctx: &IncodeContext,
+        ctx: &IncodeContext,
         _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        if let Some(reason) = self.response.add_side_failure_reason() {
+        let mismatch_reason = super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())?.err();
+        let failure_reason = self.response.failure_reason();
+        if let Some(reason) = mismatch_reason.or(failure_reason) {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
                 reasons: vec![reason],
@@ -78,14 +80,6 @@ impl IncodeStateTransition for AddBack {
         // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
         //
         // TODO: support checking against acceptable doc types and countries from OBC
-        match id_doc_kind_from_incode_document_type(self.response.document_kind().map_err(idv::Error::from)?)
-        {
-            Ok(_) => Ok(ProcessId::new().into()),
-            Err(_) => Ok(StateResult::Retry {
-                next_state: AddBack::new(),
-                reasons: vec![IncodeFailureReason::UnknownDocumentType],
-                clear_sides: vec![DocumentSide::Back],
-            }),
-        }
+        Ok(ProcessId::new().into())
     }
 }

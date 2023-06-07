@@ -3,6 +3,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
+use newtypes::incode::IncodeDocumentType;
 pub use start_onboarding::*;
 
 mod add_front;
@@ -42,7 +43,7 @@ use super::state::IncodeStateTransition;
 use super::IncodeContext;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::ApiResult;
+use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
 use crate::{ApiError, State};
 use db::models::verification_result::VerificationResult;
@@ -50,8 +51,8 @@ use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DataIdentifier, IdentityDataKind, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, VendorAPI,
+    DataIdentifier, IdDocKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
+    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, VendorAPI,
 };
 
 #[derive(Clone)]
@@ -212,4 +213,28 @@ pub async fn save_fixture_ocr(
         .await?;
 
     Ok(ocr)
+}
+
+/// Parses the IdDocKind from the response. Returns an Err IncodeFailureReason if we can't parse
+fn parse_type_of_id(
+    ctx: &IncodeContext,
+    type_of_id: Option<&IncodeDocumentType>,
+) -> ApiResult<Result<IdDocKind, IncodeFailureReason>> {
+    let expected_doc_type = ctx
+        .docv_data
+        .document_type
+        .ok_or(AssertionError("Docv data has no document_type"))?;
+
+    let Some(type_of_id) = type_of_id else {
+        return Ok(Err(IncodeFailureReason::UnknownDocumentType));
+    };
+    let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
+        println!("UNSUPPORTED DOC TYPE {}", type_of_id);
+        return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
+    };
+    if id_doc_kind != expected_doc_type {
+        Ok(Err(IncodeFailureReason::DocTypeMismatch))
+    } else {
+        Ok(Ok(id_doc_kind))
+    }
 }

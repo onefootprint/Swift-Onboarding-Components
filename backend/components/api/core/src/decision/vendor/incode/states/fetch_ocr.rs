@@ -2,7 +2,6 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::id_doc_kind_from_incode_document_type;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
@@ -11,7 +10,7 @@ use db::{DbPool, TxnPgConn};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::IncodeFetchOCRRequest;
-use newtypes::{DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{DocumentSide, VendorAPI};
 use strum::IntoEnumIterator;
 
 pub struct FetchOCR {
@@ -52,27 +51,17 @@ impl IncodeStateTransition for FetchOCR {
         ctx: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        let result = match id_doc_kind_from_incode_document_type(
-            self.response.document_kind().map_err(idv::Error::from)?,
-        ) {
+        match super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())? {
             Ok(dk) => {
                 // TODO could represent enter inside the state transition
                 Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, self.response)?;
-                Complete::new().into()
+                Ok(Complete::new().into())
             }
-            Err(_) => {
-                // If we got a different document kind, wipe all uploaded documents and send back
-                // to the AddFront state
-                //
-                // Since we do this in AddFront and AddBack as well, we will hopefully never hit this case.
-                return Ok(StateResult::Retry {
-                    next_state: AddFront::new(),
-                    reasons: vec![IncodeFailureReason::UnknownDocumentType],
-                    clear_sides: DocumentSide::iter().collect(),
-                });
-            }
-        };
-
-        Ok(result)
+            Err(reason) => Ok(StateResult::Retry {
+                next_state: AddFront::new(),
+                reasons: vec![reason],
+                clear_sides: DocumentSide::iter().collect(),
+            }),
+        }
     }
 }
