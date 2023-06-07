@@ -202,7 +202,6 @@ const DialogContainer = styled(Fade)<{
     ${isResponsive &&
     media.lessThan('sm')`
         top: 0;
-        left: 0;
         max-height: none;
         width: 100vw;
         height: 100vh;
