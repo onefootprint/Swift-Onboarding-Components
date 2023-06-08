@@ -14,9 +14,11 @@ pub struct CreateProxyConfigRequest {
     pub method: String,
 
     /// Custom headers
+    #[serde(default)]
     pub headers: Vec<PlainCustomHeader>,
 
     /// Custom headers containing auth secrets
+    #[serde(default)]
     pub secret_headers: Vec<SecretCustomHeader>,
 
     /// A certificate and key to authenticate via mTLS
@@ -27,6 +29,7 @@ pub struct CreateProxyConfigRequest {
     /// that are either CAs or self-signed. These certificates
     /// will be used to verify the root-of-trust of the certificate
     /// presented by the proxy
+    #[serde(default)]
     pub pinned_server_certificates: Vec<String>,
 
     /// access reason to use during proxy decryptions

@@ -1,4 +1,4 @@
-use super::{Error, VResult};
+use super::{utils, Error, VResult};
 use crate::{CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
@@ -15,6 +15,7 @@ impl Validate for CI {
             CDK::ExpYear => Expiration::validate_year(value.leak())?,
             CDK::Last4 => validate_card_number_last4(value)?,
             CDK::Name => validate_card_name(value)?,
+            CDK::BillingZip => utils::clean_and_validate_zip(value)?,
         };
         Ok(result)
     }

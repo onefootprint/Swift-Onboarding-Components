@@ -130,6 +130,8 @@ async fn invoke_vault_proxy(
     )
     .await?;
 
+    tracing::info!(status=%response.status_code, "proxy destination response");
+
     // 4. build the ingress response
     let mut builder = HttpResponse::build(response.status_code);
 

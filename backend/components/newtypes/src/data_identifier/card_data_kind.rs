@@ -18,6 +18,9 @@ pub enum CardDataKind {
     Last4,
 
     Name,
+
+    #[strum(to_string = "billing_address.zip")]
+    BillingZip,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

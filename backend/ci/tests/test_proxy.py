@@ -46,6 +46,8 @@ class ProxyIngressContentType(BaseAuth):
 class ProxyTokenAssignment(BaseAuth):
     HEADER_NAME = "x-fp-proxy-footprint-token"
 
+class ProxyPathAndQuery(BaseAuth):
+    HEADER_NAME = "x-fp-path-and-query"
 
 def read_file(name):
     import os

@@ -29,9 +29,15 @@ impl AsRef<[u8]> for SealedSessionBytes {
 }
 
 /// Asymmetric (vault public key, sealed bytes)
-#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct SealedVaultBytes(pub Vec<u8>);
+
+impl std::fmt::Debug for SealedVaultBytes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        crypto::hex::encode(&self.0).fmt(f)
+    }
+}
 
 impl AsRef<[u8]> for SealedVaultBytes {
     fn as_ref(&self) -> &[u8] {

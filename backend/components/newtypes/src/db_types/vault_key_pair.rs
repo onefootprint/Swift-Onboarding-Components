@@ -5,10 +5,15 @@ use serde::{Deserialize, Serialize};
 use crate::{PiiString, SealedVaultBytes};
 
 /// Bytes of a vault public key
-#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct VaultPublicKey(Vec<u8>);
 
+impl std::fmt::Debug for VaultPublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        crypto::hex::encode(&self.0).fmt(f)
+    }
+}
 impl VaultPublicKey {
     pub fn from_der_bytes(bytes: &[u8]) -> Result<Self, crypto::Error> {
         let ec_pk_uncompressed = crypto::conversion::public_key_der_to_raw_uncompressed(bytes)?;
@@ -49,14 +54,26 @@ impl VaultPublicKey {
 }
 
 /// Bytes of a sealed vault private key
-#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct EncryptedVaultPrivateKey(pub Vec<u8>);
 
+impl std::fmt::Debug for EncryptedVaultPrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        crypto::hex::encode(&self.0).fmt(f)
+    }
+}
+
 /// Bytes of a sealed vault private key
-#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct SealedVaultDataKey(pub Vec<u8>);
+
+impl std::fmt::Debug for SealedVaultDataKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        crypto::hex::encode(&self.0).fmt(f)
+    }
+}
 
 impl TryFrom<EciesP256Sha256AesGcmSealed> for SealedVaultDataKey {
     type Error = crypto::Error;
