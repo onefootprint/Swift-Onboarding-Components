@@ -57,6 +57,9 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         frontImageCapture: {
           on: {
+            navigatedToPrev: {
+              target: 'frontImage',
+            },
             cameraErrored: {
               target: 'frontImage',
             },
@@ -90,6 +93,9 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         backImageCapture: {
           on: {
+            navigatedToPrev: {
+              target: 'backImage',
+            },
             cameraErrored: {
               target: 'backImage',
             },
@@ -123,6 +129,9 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         selfieImage: {
           on: {
+            navigatedToPrev: {
+              target: 'selfiePrompt',
+            },
             cameraErrored: {
               target: 'selfiePrompt',
             },

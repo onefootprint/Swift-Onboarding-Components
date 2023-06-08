@@ -22,9 +22,15 @@ const SelfiePhoto = () => {
       },
     });
 
+  const handleClickBack = () => {
+    send({
+      type: 'navigatedToPrev',
+    });
+  };
+
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
       <TitleContainer>
         <HeaderTitle title={t('title')} />
       </TitleContainer>
