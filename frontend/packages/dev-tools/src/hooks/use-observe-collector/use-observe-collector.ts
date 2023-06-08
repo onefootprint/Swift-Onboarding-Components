@@ -17,8 +17,8 @@ import sendObservePayload from './utils/send-observe-payload';
 
 const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 const MAX_DEBOUNCE = 30000; // 30 seconds
-
-const IS_LOGGING_DISABLED = IS_SERVER || IS_DEV;
+const IS_TEST = typeof jest !== 'undefined';
+const IS_LOGGING_DISABLED = IS_SERVER || IS_DEV || IS_TEST;
 
 type ObserveCollectorProps = {
   appName: string;

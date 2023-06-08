@@ -7,13 +7,26 @@ import {
 import {
   ChallengeKind,
   CollectedKycDataOption,
+  D2PStatus,
   DataIdentifier,
   OnboardingRequirement,
   OnboardingRequirementKind,
   UserTokenScope,
 } from '@onefootprint/types';
 
-export const getOnboardingConfig = (isLive?: boolean) => ({
+export const TestAuthorizeRequirement: OnboardingRequirement = {
+  kind: OnboardingRequirementKind.authorize,
+  fieldsToAuthorize: {
+    collectedData: [
+      CollectedKycDataOption.name,
+      CollectedKycDataOption.dob,
+      CollectedKycDataOption.ssn9,
+    ],
+    identityDocumentTypes: [],
+  },
+};
+
+export const getKycOnboardingConfig = (isLive?: boolean) => ({
   id: 'ob_config_id_18RIzpIPRAL3pYlnO4Cgeb',
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   name: 'Acme Bank',
@@ -36,14 +49,14 @@ export const getOnboardingConfig = (isLive?: boolean) => ({
   status: 'enabled',
 });
 
-export const withOnboardingConfig = (data = getOnboardingConfig(true)) =>
+export const withOnboardingConfig = (data: any) =>
   mockRequest({
     method: 'get',
     path: '/org/onboarding_config',
     response: data,
   });
 
-export const withOnboarding = (onboardingConfig = getOnboardingConfig(true)) =>
+export const withOnboarding = (onboardingConfig: any) =>
   mockRequest({
     method: 'post',
     path: '/hosted/onboarding',
@@ -85,7 +98,7 @@ export const withRequirements = (
     response: {
       requirements,
       metRequirements,
-      obConfiguration: getOnboardingConfig(true),
+      obConfiguration: getKycOnboardingConfig(true),
     },
   });
 };
@@ -160,6 +173,29 @@ export const withAuthorize = () =>
     response: {
       data: {
         data: 'success',
+      },
+    },
+  });
+
+export const withD2PGenerate = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/onboarding/d2p/generate',
+    response: {
+      data: {
+        authToken: 'token',
+      },
+    },
+  });
+
+export const withD2PStatus = (status: D2PStatus) =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/onboarding/d2p/status',
+    response: {
+      data: {
+        status,
+        meta: {},
       },
     },
   });
@@ -269,6 +305,35 @@ export const identifyNewUser = async () => {
   });
 };
 
+export const completeKyc = async () => {
+  await waitFor(() => {
+    expect(screen.getByText(`Basic Data`)).toBeInTheDocument();
+  });
+  const firstName = screen.getByLabelText('First name');
+  await userEvent.type(firstName, 'Piip');
+
+  const lastName = screen.getByLabelText('Last name');
+  await userEvent.type(lastName, 'Foot');
+
+  const dob = screen.getByLabelText('Date of Birth');
+  await userEvent.type(dob, '05/23/1996');
+
+  let submitButton = screen.getByRole('button', { name: 'Continue' });
+  await userEvent.click(submitButton);
+
+  await waitFor(() => {
+    expect(
+      screen.getByText("What's your Social Security Number?"),
+    ).toBeInTheDocument();
+  });
+
+  const ssn4 = screen.getByLabelText('SSN');
+  await userEvent.type(ssn4, '123456789');
+
+  submitButton = screen.getByRole('button', { name: 'Continue' });
+  await userEvent.click(submitButton);
+};
+
 export const confirmKycData = async () => {
   await waitFor(() => {
     expect(screen.getByText('Confirm your personal data')).toBeInTheDocument();
@@ -287,7 +352,7 @@ export const confirmKycData = async () => {
 
   expect(screen.getByText('Identity')).toBeInTheDocument();
   expect(screen.getByText('SSN')).toBeInTheDocument();
-  expect(screen.getByText('123456789')).toBeInTheDocument();
+  expect(screen.getByText('123-45-6789')).toBeInTheDocument();
 
   const confirmButton = screen.getByText('Confirm & Continue');
   expect(confirmButton).toBeInTheDocument();
@@ -305,7 +370,6 @@ export const authorizeData = async () => {
   const authorizeButton = screen.getByRole('button', {
     name: 'Authorize',
   });
-  expect(authorizeButton).toBeInTheDocument();
   await userEvent.click(authorizeButton);
 };
 
@@ -327,16 +391,4 @@ export const checkComplete = async () => {
   expect(
     screen.getByText('Thanks for using Footprint to verify your identity.'),
   ).toBeInTheDocument();
-};
-
-export const TestAuthorizeRequirement: OnboardingRequirement = {
-  kind: OnboardingRequirementKind.authorize,
-  fieldsToAuthorize: {
-    collectedData: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.ssn9,
-    ],
-    identityDocumentTypes: [],
-  },
 };

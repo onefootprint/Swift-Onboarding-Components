@@ -1,3 +1,4 @@
+import { IS_SERVER } from '@onefootprint/global-constants';
 import Script from 'next/script';
 import React from 'react';
 
@@ -8,6 +9,9 @@ import type { SocureRequest, SocureResponse } from './socure.types';
 import getContextByPage from './utils/get-context-by-page';
 
 type SocureProps = SDKIntegrationProps;
+
+const IS_TEST = typeof jest !== 'undefined';
+const IS_DISABLED = IS_SERVER || IS_TEST;
 
 const Socure = ({ page, fpAuthToken }: SocureProps) => {
   const sendDeviceIdMutation = useSendDeviceSessionId(fpAuthToken);
@@ -41,6 +45,9 @@ const Socure = ({ page, fpAuthToken }: SocureProps) => {
   };
 
   const handleReady = () => {
+    if (IS_DISABLED) {
+      return;
+    }
     if (SOCURE_PUBLIC_KEY) {
       initializeSdk(SOCURE_PUBLIC_KEY);
     } else {

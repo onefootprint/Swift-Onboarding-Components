@@ -173,7 +173,7 @@ describe('<CollectKybData />', () => {
 
       let submitButton = screen.getByRole('button', { name: 'Continue' });
       expect(submitButton).toBeInTheDocument();
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(
@@ -194,7 +194,7 @@ describe('<CollectKybData />', () => {
       submitButton = screen.getByRole('button', {
         name: 'Continue',
       });
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(
@@ -221,7 +221,7 @@ describe('<CollectKybData />', () => {
 
       submitButton = screen.getByRole('button', { name: 'Continue' });
       expect(submitButton).toBeInTheDocument();
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(
@@ -364,7 +364,7 @@ describe('<CollectKybData />', () => {
 
       submitButton = screen.getByRole('button', { name: 'Continue' });
       expect(submitButton).toBeInTheDocument();
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(

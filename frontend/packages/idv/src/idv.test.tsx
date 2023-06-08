@@ -13,6 +13,7 @@ import {
 import {
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
+  D2PStatus,
   IdDI,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
@@ -30,10 +31,12 @@ import {
   checkAdditionalDataRequired,
   checkComplete,
   confirmKycData,
-  getOnboardingConfig,
+  getKycOnboardingConfig,
   identifyUserByPhone,
   TestAuthorizeRequirement,
   withAuthorize,
+  withD2PGenerate,
+  withD2PStatus,
   withDecrypt,
   withIdentify,
   withOnboarding,
@@ -107,10 +110,11 @@ describe('<Idv />', () => {
       it('can one-click when given an auth token', async () => {
         const validationToken = 'validation-token';
         const closeDelay = 6000;
-
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
         withOnboardingValidate(validationToken);
+        withRequirements([], []);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -131,8 +135,9 @@ describe('<Idv />', () => {
       });
 
       it('can onboard directly after identify if already authorized', async () => {
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -153,8 +158,9 @@ describe('<Idv />', () => {
       });
 
       it('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -168,15 +174,11 @@ describe('<Idv />', () => {
         withUserToken();
         withIdentify(true);
         withRequirements(
-          [],
+          [TestAuthorizeRequirement],
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
-              missingAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
+              missingAttributes: [],
               populatedAttributes: [
                 CollectedKycDataOption.name,
                 CollectedKycDataOption.dob,
@@ -189,7 +191,7 @@ describe('<Idv />', () => {
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
           [IdDI.dob]: '05/23/1996',
-          [IdDI.ssn9]: '123456789',
+          [IdDI.ssn9]: '123-45-6789',
         });
         withUserVault();
 
@@ -199,6 +201,25 @@ describe('<Idv />', () => {
         const closeDelay = 6000;
         withOnboardingValidate(validationToken);
 
+        withAuthorize();
+        withRequirements(
+          [],
+          [
+            {
+              kind: OnboardingRequirementKind.collectKycData,
+              missingAttributes: [],
+              populatedAttributes: [
+                CollectedKycDataOption.name,
+                CollectedKycDataOption.dob,
+                CollectedKycDataOption.ssn9,
+              ],
+            },
+            TestAuthorizeRequirement,
+          ],
+        );
+
+        await authorizeData();
+
         await checkComplete();
         expect(onComplete).toBeCalledWith(validationToken, closeDelay);
       });
@@ -206,8 +227,9 @@ describe('<Idv />', () => {
 
     describe('When onboarding to a new config', () => {
       it('skips identify flow when provided an auth token', async () => {
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
         withUserToken();
         withIdentify();
         withRequirements();
@@ -222,8 +244,9 @@ describe('<Idv />', () => {
       });
 
       it('can onboard after identify, confirm and authorize', async () => {
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -254,7 +277,7 @@ describe('<Idv />', () => {
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
           [IdDI.dob]: '05/23/1996',
-          [IdDI.ssn9]: '123456789',
+          [IdDI.ssn9]: '123-45-6789',
         });
         withUserVault();
         const validationToken = 'validation-token';
@@ -287,8 +310,9 @@ describe('<Idv />', () => {
       });
 
       it('can onboard after filling remaining missing attributes', async () => {
-        withOnboarding();
-        withOnboardingConfig();
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -318,7 +342,7 @@ describe('<Idv />', () => {
         withUserToken();
         withDecrypt({
           [IdDI.dob]: '05/23/1996',
-          [IdDI.ssn9]: '123456789',
+          [IdDI.ssn9]: '123-45-6789',
         });
         await checkAdditionalDataRequired();
 
@@ -390,7 +414,7 @@ describe('<Idv />', () => {
   describe('When onboarding with a new user', () => {
     describe('When in sandbox onboarding config', () => {
       it('starts flow on sandbox outcome page', async () => {
-        const sandboxConfig = getOnboardingConfig();
+        const sandboxConfig = getKycOnboardingConfig();
         withOnboarding(sandboxConfig);
         withOnboardingConfig(sandboxConfig);
 
@@ -403,39 +427,201 @@ describe('<Idv />', () => {
     });
   });
 
-  describe('When on mobile', () => {
-    it('completes flow when it has all requirements except liveness', async () => {});
+  describe('When there is bootstrap data', () => {
+    describe('When there is partial bootstrap KYC data', () => {
+      it('collects missing data before confirm', async () => {
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.firstName]: 'Piip',
+            [IdDI.lastName]: 'Foot',
+            [IdDI.dob]: '05/23/1996',
+          },
+        });
 
-    it('transfers when there is a liveness requirement', () => {});
-  });
+        withRequirements(
+          [
+            {
+              kind: OnboardingRequirementKind.collectKycData,
+              missingAttributes: [
+                CollectedKycDataOption.name,
+                CollectedKycDataOption.dob,
+                CollectedKycDataOption.ssn9,
+              ],
+              populatedAttributes: [],
+            },
+            TestAuthorizeRequirement,
+          ],
+          [],
+        );
+        withUserToken();
+        withIdentify(true);
 
-  describe('When on desktop', () => {
-    it('completes flow when it has all requirements except liveness and id doc', async () => {});
+        await waitFor(() => {
+          expect(
+            screen.getByText("What's your Social Security Number?"),
+          ).toBeInTheDocument();
+        });
+        // Fill SSN
+        const ssn = screen.getByLabelText('SSN');
+        await userEvent.type(ssn, '123-45-6789');
 
-    it('transfers when there is a liveness requirement', async () => {});
+        withUserVaultValidate();
+        const submitButton = screen.getByRole('button', { name: 'Continue' });
+        await userEvent.click(submitButton);
 
-    it('transfers when there is an id doc requirement', async () => {});
-  });
+        withUserVault();
+        await confirmKycData();
+      });
+    });
 
-  describe('When in transfer (handoff)', () => {
-    describe('When on mobile with webauthn support', () => {});
+    describe('When there is bootstrap and decrypted data', () => {
+      it('bootstrap data takes precendence over decryption', async () => {
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.firstName]: 'Piip',
+            [IdDI.lastName]: 'Foot',
+            [IdDI.dob]: '05/23/1996',
+            [IdDI.ssn9]: '123-45-6789',
+          },
+        });
 
-    describe('When on mobile without webauthn support', () => {});
+        withRequirements(
+          [
+            {
+              kind: OnboardingRequirementKind.collectKycData,
+              missingAttributes: [
+                CollectedKycDataOption.dob,
+                CollectedKycDataOption.ssn9,
+              ],
+              populatedAttributes: [CollectedKycDataOption.name],
+            },
+            TestAuthorizeRequirement,
+          ],
+          [],
+        );
+        withUserToken();
+        withIdentify(true);
+        withDecrypt({
+          [IdDI.firstName]: 'SomeName',
+          [IdDI.lastName]: 'OtherName',
+        });
 
-    describe('When on desktop', () => {
-      it('does not transfer again if there is a liveness or id doc requirement', async () => {});
+        withUserVault();
+        await confirmKycData();
+      });
+
+      it('skips pages with bootstrap or decrypted data', async () => {
+        const config = getKycOnboardingConfig(true);
+        withOnboarding(config);
+        withOnboardingConfig(config);
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.dob]: '05/23/1996',
+          },
+        });
+
+        withRequirements(
+          [
+            {
+              kind: OnboardingRequirementKind.collectKycData,
+              missingAttributes: [
+                CollectedKycDataOption.dob,
+                CollectedKycDataOption.ssn9,
+              ],
+              populatedAttributes: [CollectedKycDataOption.name],
+            },
+            TestAuthorizeRequirement,
+          ],
+          [],
+        );
+        withUserToken();
+        withIdentify(true);
+        withDecrypt({
+          [IdDI.firstName]: 'Piip',
+          [IdDI.lastName]: 'Foot',
+        });
+
+        await waitFor(() => {
+          expect(
+            screen.getByText("What's your Social Security Number?"),
+          ).toBeInTheDocument();
+        });
+
+        // Fill in SSN
+        const ssn = screen.getByLabelText('SSN');
+        await userEvent.type(ssn, '123-45-6789');
+
+        withUserVaultValidate();
+        const submitButton = screen.getByRole('button', { name: 'Continue' });
+        await userEvent.click(submitButton);
+
+        withUserVault();
+        await confirmKycData();
+      });
     });
   });
 
-  describe('When there is bootstrap data', () => {
-    describe('When there is partial bootstrap KYC data', () => {});
+  describe('When on desktop', () => {
+    it('transfers when there is a liveness requirement', async () => {
+      const config = getKycOnboardingConfig(true);
+      withOnboarding(config);
+      withOnboardingConfig(config);
+      withRequirements(
+        [
+          {
+            kind: OnboardingRequirementKind.liveness,
+          },
+        ],
+        [],
+      );
+      withD2PGenerate();
+      withD2PStatus(D2PStatus.inProgress);
 
-    describe('When there is bootstrap and decrypted data', () => {
-      it('only applies full CDOs decrypted at once', () => {});
+      renderIdv({
+        authToken: 'token',
+      });
 
-      it('bootstrap data takes precendence over decryption', () => {});
+      await waitFor(() => {
+        expect(screen.getByText('Liveness check')).toBeInTheDocument();
+      });
+    });
 
-      it('skips pages with bootstrap or decrypted data', () => {});
+    it('transfers when there is an id doc requirement', async () => {
+      const config = getKycOnboardingConfig(true);
+      withOnboarding(config);
+      withOnboardingConfig(config);
+      renderIdv({
+        authToken: 'token',
+      });
+
+      withRequirements(
+        [
+          {
+            kind: OnboardingRequirementKind.idDoc,
+            shouldCollectConsent: false,
+            shouldCollectSelfie: false,
+            onlyUsSupported: false,
+            supportedDocumentTypes: [],
+          },
+        ],
+        [],
+      );
+
+      withD2PGenerate();
+      withD2PStatus(D2PStatus.waiting);
+
+      await waitFor(() => {
+        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
+      });
     });
   });
 });
