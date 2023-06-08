@@ -10,22 +10,18 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::common;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
-use api_core::utils::vault_wrapper::Person;
-use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
 use decision::state::Authorize;
 use itertools::Itertools;
-use newtypes::OnboardingId;
-use newtypes::ScopedVaultId;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -69,13 +65,16 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     // mark person and business ob as authorized
     let ob_id = user_auth.onboarding()?.id.clone();
 
-    let (biz_ob, user_auth) = state
+    let (biz_ob, user_auth, set_biz_is_authorized) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
-            if ob.authorized_at.is_none() {
+            let set_biz_is_authorized = if ob.authorized_at.is_none() {
                 ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
-            }
+                true
+            } else {
+                false
+            };
 
             let biz_ob = user_auth.business_onboarding(c)?;
             let bizob = biz_ob
@@ -87,12 +86,16 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                     }
                 })
                 .transpose()?;
-            Ok((bizob, user_auth))
+            Ok((bizob, user_auth, set_biz_is_authorized))
         })
         .await?;
 
-    // Temporary hack for now so we only fire webhooks and write fingerprints 1 time. We will move this into the Workflow itself and then will no longer need this
-    let should_run_kyc_checks = user_auth.onboarding()?.idv_reqs_initiated_at.is_none();
+    let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
+    if let Some(sv_biz_id) = sv_biz_id {
+        if set_biz_is_authorized {
+            common::write_authorized_fingerprints(&state, &sv_biz_id).await?;
+        }
+    }
 
     let wf = user_auth.workflow().ok_or(OnboardingError::NoWorkflow)?;
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
@@ -107,9 +110,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     };
 
-    let ob_id = user_auth.onboarding()?.id.clone();
     let sv_id = user_auth.scoped_user.id.clone();
-    let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
     let tenant = user_auth.tenant()?;
 
     // Run KYB
@@ -125,39 +126,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     }
 
-    if should_run_kyc_checks {
-        write_authorized_fingerprints(&state, &sv_id, &sv_biz_id, &ob_id).await?;
-    }
     ResponseData::ok(EmptyResponse {}).json()
-}
-
-async fn write_authorized_fingerprints(
-    state: &State,
-    sv_id: &ScopedVaultId,
-    sv_biz_id: &Option<ScopedVaultId>,
-    ob_id: &OnboardingId,
-) -> ApiResult<()> {
-    let sv_id = sv_id.clone();
-    let sv_biz_id = sv_biz_id.clone();
-    let ob_id = ob_id.clone();
-    let (obc, uvw, bvw) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let obc = ObConfiguration::get_by_onboarding_id(conn, &ob_id)?;
-            let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &sv_id)?;
-            let bvw = sv_biz_id
-                .map(|id| VaultWrapper::<Business>::build_for_tenant(conn, &id))
-                .transpose()?;
-
-            Ok((obc, uvw, bvw))
-        })
-        .await??;
-
-    uvw.create_authorized_fingerprints(state, obc.clone()).await?;
-    if let Some(bvw) = bvw {
-        bvw.create_authorized_fingerprints(state, obc).await?;
-    }
-    Ok(())
 }
 
 #[tracing::instrument(skip(state))]

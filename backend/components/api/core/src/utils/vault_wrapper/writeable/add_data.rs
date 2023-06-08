@@ -128,7 +128,7 @@ mod test {
             self,
             conn: &mut TxnPgConn,
             data: Vec<(DataIdentifier, PiiString)>,
-            _is_live: bool,
+            create_fingerprints: bool,
         ) -> ApiResult<Vec<NewContactInfo>> {
             let data = HashMap::from_iter(data.into_iter());
             let request =
@@ -155,7 +155,11 @@ mod test {
                     }
                 })
                 .collect();
-            let request = request.manual_fingerprints(fingerprints);
+            let request = if create_fingerprints {
+                request.manual_fingerprints(fingerprints)
+            } else {
+                request.no_fingerprints()
+            };
             self.patch_data(conn, request)
         }
     }

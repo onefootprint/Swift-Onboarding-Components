@@ -79,6 +79,10 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         action: Authorize,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        // Write fingerprints
+        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+
+        // Create TVC for use in writing vreqs in `on_commit`
         let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;

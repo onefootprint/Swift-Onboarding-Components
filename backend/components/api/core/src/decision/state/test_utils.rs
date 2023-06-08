@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::errors::ApiResult;
 use crate::{decision::tests::test_helpers, State};
+use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -88,12 +89,14 @@ pub async fn query_data(
     sv_id: &ScopedVaultId,
     wf_id: &WorkflowId,
 ) -> (
+    // TODO: probably make a struct for this output
     Onboarding,
     Workflow,
     Vec<WorkflowEvent>,
     Option<ManualReview>,
     Option<OnboardingDecision>,
     Vec<RiskSignal>,
+    Vec<Fingerprint>,
 ) {
     let svid = sv_id.clone();
     let wfid = wf_id.clone();
@@ -110,7 +113,10 @@ pub async fn query_data(
 
             let wf = Workflow::get(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
-            (ob, wf, wfe, mr, obd, rs)
+
+            let fps = Fingerprint::_list_for_scoped_vault(conn, &svid).unwrap();
+
+            (ob, wf, wfe, mr, obd, rs, fps)
         })
         .await
         .unwrap()

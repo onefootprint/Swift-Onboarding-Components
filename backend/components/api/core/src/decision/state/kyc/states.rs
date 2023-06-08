@@ -3,25 +3,19 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
+    ob_configuration::ObConfiguration,
     onboarding::{Onboarding, OnboardingUpdate},
     scoped_vault::ScopedVault,
     tenant::Tenant,
     workflow::Workflow as DbWorkflow,
 };
+
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
 use webhooks::WebhookClient;
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
-};
-use crate::decision::{
-    onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-    state::{
-        actions::{Authorize, WorkflowActions},
-        common, WorkflowState,
-    },
-    utils::FixtureDecision,
 };
 use crate::{
     decision::{
@@ -32,6 +26,17 @@ use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
     ApiError, State,
+};
+use crate::{
+    decision::{
+        onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+        state::{
+            actions::{Authorize, WorkflowActions},
+            common, WorkflowState,
+        },
+        utils::FixtureDecision,
+    },
+    utils::vault_wrapper::TenantVw,
 };
 
 // TODO: how do we want to model sandbox here 🤔? Could (1) do entirely seperatly from workflow, (2) special case it within workflow, (3) model it as an immediate transition from DataCollection -> Complete
@@ -63,6 +68,10 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         action: Authorize,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        // Write fingerprints
+        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+
+        // Create TVC for use in writing vreqs in `on_commit`
         let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;

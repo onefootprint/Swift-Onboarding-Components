@@ -4,12 +4,13 @@ use chrono::Utc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
+        ob_configuration::ObConfiguration,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         tenant::Tenant,
         workflow::Workflow,
     },
-    DbPool, DbResult, TxnPgConn,
+    DbError, DbPool, DbResult, TxnPgConn,
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
@@ -26,7 +27,7 @@ use crate::{
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, Person, TenantVw, VaultWrapper, VwArgs},
     ApiError, State,
 };
 
@@ -256,4 +257,17 @@ pub fn fire_onboarding_completed_webhook(
         wh_event,
         None,
     );
+}
+
+pub async fn write_authorized_fingerprints(state: &State, sv_id: &ScopedVaultId) -> ApiResult<()> {
+    let sv_id = sv_id.clone();
+    let (obc, vw) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let uvw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv_id)?;
+            let obc = uvw.onboarding.clone().ok_or(DbError::ObjectNotFound)?;
+            Ok((obc.1, uvw))
+        })
+        .await??;
+    vw.create_authorized_fingerprints(state, obc.clone()).await
 }

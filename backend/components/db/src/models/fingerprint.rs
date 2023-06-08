@@ -9,6 +9,7 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::FingerprintScopeKind;
 use newtypes::FingerprintVersion;
+use newtypes::ScopedVaultId;
 use newtypes::{DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
 use serde::{Deserialize, Serialize};
 
@@ -83,5 +84,15 @@ impl Fingerprint {
             .get_results(conn)?;
 
         Ok(res)
+    }
+
+    // for tests
+    pub fn _list_for_scoped_vault(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let results = fingerprint::table
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::scoped_vault_id.eq(sv_id))
+            .select(fingerprint::all_columns)
+            .get_results(conn)?;
+        Ok(results)
     }
 }

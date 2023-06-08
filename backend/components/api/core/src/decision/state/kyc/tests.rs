@@ -171,11 +171,12 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
+    assert!(!fps.is_empty()); //fingerprints were written
 
     /// MakeVendorCalls
     let (ww, _) = ww
@@ -183,7 +184,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::Decisioning), wf.state);
 
@@ -200,7 +201,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(mr.is_none());

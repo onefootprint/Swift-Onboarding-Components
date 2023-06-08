@@ -42,7 +42,7 @@ pub async fn create_user_and_onboarding(
             );
             let ob_config_id = ob_config.id.clone();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), is_live, phone_suffix);
+            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), phone_suffix);
 
             let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id);
 
@@ -60,7 +60,6 @@ pub async fn create_user_and_onboarding(
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
-    is_live: bool,
     phone_suffix: Option<String>,
 ) -> (Vault, ScopedVault) {
     let uv = fixtures::vault::create_person(conn, ob_config.is_live);
@@ -101,7 +100,7 @@ pub fn create_user_and_populate_vault(
     ];
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
-    let new_ci = uvw.patch_data_test(conn, update, is_live).unwrap();
+    let new_ci = uvw.patch_data_test(conn, update, false).unwrap();
     let (_, ci) = new_ci
         .into_iter()
         .find(|(di, _)| di == &DataIdentifier::from(IdentityDataKind::PhoneNumber))
