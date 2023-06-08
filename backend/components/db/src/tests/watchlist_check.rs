@@ -116,9 +116,8 @@ fn make_vault(
         }
         sv
     } else {
-        let uv = fixtures::vault::create(conn, VaultKind::Person, is_live, false);
-        let uvid = uv.id.clone();
-        fixtures::scoped_vault::create_non_portable(conn, &uvid, tenant_id)
+        let args = fixtures::vault::new_vault_args(VaultKind::Person, is_live, false);
+        fixtures::scoped_vault::create_non_portable(conn, args, tenant_id).0
     };
 
     for t in watchlist_checks_created_at {

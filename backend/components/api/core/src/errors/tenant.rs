@@ -26,4 +26,7 @@ pub enum TenantError {
 
     #[error("Missing required data options: {0} for cip: {1}")]
     MissingCdosForCip(Csv<CollectedDataOption>, CipKind),
+
+    #[error("Cannot provide an HTTP body alongside an idempotency ID - behavior would be undefined if the user already exists.")]
+    CannotProvideBodyAndIdempotencyId,
 }

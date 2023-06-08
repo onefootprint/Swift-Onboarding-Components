@@ -35,16 +35,13 @@ pub fn create_user_and_populate_vault(
     idks: Vec<IDK>,
 ) -> (Vault, ScopedVault) {
     let (uv, su) = if let Some(ob_config) = ob_config {
-        let uv = fixtures::vault::create_person(conn, is_live);
+        let uv = fixtures::vault::create_person(conn, is_live).into_inner();
         let uvid = uv.id.clone();
         (uv, fixtures::scoped_vault::create(conn, &uvid, &ob_config.id))
     } else {
-        let uv = fixtures::vault::create(conn, VaultKind::Person, is_live, false);
-        let uvid = uv.id.clone();
-        (
-            uv,
-            fixtures::scoped_vault::create_non_portable(conn, &uvid, &tenant_id),
-        )
+        let args = fixtures::vault::new_vault_args(VaultKind::Person, is_live, false);
+        let (su, uv) = fixtures::scoped_vault::create_non_portable(conn, args, &tenant_id);
+        (uv, su)
     };
 
     let idks = idks.into_iter().map(DataIdentifier::from).collect_vec();
@@ -71,7 +68,7 @@ pub fn create_user_and_populate_vault(
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.patch_data_test(conn, update, true).unwrap();
 
-    (uv.into_inner(), su)
+    (uv, su)
 }
 
 pub fn create_user_and_onboarding(

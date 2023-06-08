@@ -44,3 +44,7 @@ class DashboardAuthIsLive(BaseAuth):
     """
 
     HEADER_NAME = "x-is-live"
+
+
+class IdempotencyId(BaseAuth):
+    HEADER_NAME = "x-idempotency-id"

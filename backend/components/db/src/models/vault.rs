@@ -9,13 +9,14 @@ use diesel::prelude::*;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FpId, Locked, OnboardingId, ScopedVaultId, TenantId, VaultId,
-    VaultKind, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, OnboardingId, ScopedVaultId,
+    TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
 pub type IsFixture = bool;
+pub type IsNew = bool;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable, PartialEq)]
 #[diesel(table_name = vault)]
@@ -32,6 +33,7 @@ pub struct Vault {
     /// the fixture phone number. They have a few special properties, like they should never make
     /// global fingerprints so they can not be identified outside of the tenant that created them
     pub is_fixture: IsFixture,
+    pub idempotency_id: Option<IdempotencyId>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -147,6 +149,29 @@ impl Vault {
 
     #[tracing::instrument(skip_all)]
     pub fn create(conn: &mut PgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
+        let (uv, _) = Self::insert(conn, new_user, None)?;
+        Ok(uv)
+    }
+
+    pub(super) fn insert(
+        conn: &mut PgConn,
+        new_user: NewVaultArgs,
+        idempotency_id: Option<IdempotencyId>,
+    ) -> DbResult<(Locked<Vault>, IsNew)> {
+        let existing_vault = idempotency_id
+            .as_ref()
+            .map(|i_id| {
+                vault::table
+                    .filter(vault::idempotency_id.eq(i_id))
+                    .for_no_key_update()
+                    .first(conn)
+                    .optional()
+            })
+            .transpose()?
+            .flatten();
+        if let Some(existing_vault) = existing_vault {
+            return Ok((Locked::new(existing_vault), false));
+        }
         let NewVaultArgs {
             e_private_key,
             public_key,
@@ -163,11 +188,12 @@ impl Vault {
             is_portable,
             kind,
             is_fixture,
+            idempotency_id,
         };
         let vault = diesel::insert_into(vault::table)
             .values(new_user)
             .get_result::<Vault>(conn)?;
-        Ok(Locked::new(vault))
+        Ok((Locked::new(vault), true))
     }
 
     /// Look for the portable user vault with a matching fingerprint
@@ -215,6 +241,7 @@ struct NewVaultRow {
     is_portable: bool,
     kind: VaultKind,
     is_fixture: IsFixture,
+    idempotency_id: Option<IdempotencyId>,
 }
 
 pub struct NewVaultArgs {

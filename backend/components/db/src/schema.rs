@@ -792,6 +792,7 @@ table! {
         is_portable -> Bool,
         kind -> Text,
         is_fixture -> Bool,
+        idempotency_id -> Nullable<Text>,
     }
 }
 

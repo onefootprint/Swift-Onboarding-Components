@@ -114,6 +114,8 @@ pub enum ApiError {
     #[error("{0}")]
     AssertionError(String),
     #[error("{0}")]
+    ValidationError(String),
+    #[error("{0}")]
     FeatureFlagError(#[from] feature_flag::Error),
     #[error("Invalid body: proxy requests must contain utf8 only")]
     InvalidProxyBody,
@@ -239,6 +241,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
             ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
             ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,

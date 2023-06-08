@@ -556,6 +556,7 @@ dependencies = [
  "privacy_pass",
  "prometheus",
  "rand 0.8.5",
+ "regex",
  "reqwest",
  "sentry-tracing",
  "serde",

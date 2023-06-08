@@ -64,6 +64,7 @@ reqwest = { workspace = true }
 
 itertools = { workspace = true }
 lazy_static = { workspace = true }
+regex = "1.5"
 strum = { workspace = true }
 
 workos = "0.2"

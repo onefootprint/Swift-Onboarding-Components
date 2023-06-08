@@ -1,5 +1,6 @@
 import pytest
 from tests.utils import post, get, patch, delete
+from tests.auth import IdempotencyId
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
@@ -194,3 +195,28 @@ def test_vault_create_write_decrypt(tenant):
     assert events == ["card.valley.cvc"]
 
     assert access_events[1]["kind"] == "delete"
+
+
+def test_idempotency_id(tenant, sandbox_tenant):
+    # Can't create the user inline with invalid data
+    idempotency_id = IdempotencyId("1234567890Aa._-")
+    body = post("users/", None, tenant.sk.key, idempotency_id)
+    fp_id = body["id"]
+
+    # When making vault with same idempotency id, should get same fp_id
+    body = post("users/", None, tenant.sk.key, idempotency_id)
+    assert body["id"] == fp_id
+
+    # Cannot provide data alongisde idempotency ID since result would be undefined
+    data = {"id.dob": "1998-12-25"}
+    post("users/", data, tenant.sk.key, idempotency_id, status_code=400)
+
+    # Can use the same idempotency ID at another tenant to get a different vault
+    body = post("users/", None, sandbox_tenant.sk.key, idempotency_id)
+    assert body["id"] != fp_id
+
+    invalid_idempotency_id = IdempotencyId("1234")
+    post("users/", None, sandbox_tenant.sk.key, invalid_idempotency_id, status_code=400)
+
+    invalid_idempotency_id = IdempotencyId("1234567890000!")
+    post("users/", None, sandbox_tenant.sk.key, invalid_idempotency_id, status_code=400)

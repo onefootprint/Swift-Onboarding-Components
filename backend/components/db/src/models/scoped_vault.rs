@@ -1,5 +1,12 @@
 use std::collections::HashMap;
 
+use super::insight_event::InsightEvent;
+use super::manual_review::ManualReview;
+use super::ob_configuration::{IsLive, ObConfiguration};
+use super::onboarding::Onboarding;
+use super::vault::NewVaultArgs;
+use super::vault::Vault;
+use super::watchlist_check::WatchlistCheck;
 use crate::schema::scoped_vault;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
@@ -7,15 +14,10 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FpId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId};
+use newtypes::{
+    FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId,
+};
 use serde::{Deserialize, Serialize};
-
-use super::insight_event::InsightEvent;
-use super::manual_review::ManualReview;
-use super::ob_configuration::{IsLive, ObConfiguration};
-use super::onboarding::Onboarding;
-use super::vault::Vault;
-use super::watchlist_check::WatchlistCheck;
 
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
@@ -143,36 +145,47 @@ impl ScopedVault {
             is_live: ob_config.is_live,
             ob_configuration_id: Some(ob_configuration_id),
         };
-        let ob = diesel::insert_into(scoped_vault::table)
+        let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
-        Ok(ob)
+        Ok(sv)
     }
 
     /// Used to create a ScopedUser for a non-portable vault
     #[tracing::instrument(skip_all)]
-    pub fn create_non_portable(
+    pub fn get_or_create_non_portable(
         conn: &mut TxnPgConn,
-        uv: Locked<Vault>,
+        new_user: NewVaultArgs,
         tenant_id: TenantId,
-    ) -> DbResult<Self> {
-        let uv = uv.into_inner();
+        idempotency_id: Option<String>,
+    ) -> DbResult<(Self, Vault)> {
+        // Since the idempotency id is stored on the vault, concatenate it with the tenant ID to
+        // make sure they are scoped per tenant
+        let idempotency_id = idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+        let (uv, is_new_vault) = Vault::insert(conn, new_user, idempotency_id)?;
         if uv.is_portable {
             return Err(DbError::CannotCreatedScopedUser);
         }
-        let new = NewScopedVault {
-            id: ScopedVaultId::generate(uv.kind),
-            fp_id: FpId::generate(uv.kind),
-            vault_id: uv.id,
-            start_timestamp: Utc::now(),
-            tenant_id,
-            is_live: uv.is_live,
-            ob_configuration_id: None,
+        let su = if is_new_vault {
+            let new = NewScopedVault {
+                id: ScopedVaultId::generate(uv.kind),
+                fp_id: FpId::generate(uv.kind),
+                start_timestamp: Utc::now(),
+                tenant_id,
+                is_live: uv.is_live,
+                vault_id: uv.id.clone(),
+                ob_configuration_id: None,
+            };
+            diesel::insert_into(scoped_vault::table)
+                .values(new)
+                .get_result(conn.conn())?
+        } else {
+            scoped_vault::table
+                .filter(scoped_vault::vault_id.eq(&uv.id))
+                .filter(scoped_vault::tenant_id.eq(&tenant_id))
+                .get_result(conn.conn())?
         };
-        let ob = diesel::insert_into(scoped_vault::table)
-            .values(new)
-            .get_result::<ScopedVault>(conn.conn())?;
-        Ok(ob)
+        Ok((su, uv.into_inner()))
     }
 
     #[tracing::instrument(skip_all)]

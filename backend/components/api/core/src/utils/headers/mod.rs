@@ -9,6 +9,9 @@ pub use telemetry::*;
 mod allow_extra_fields;
 pub use allow_extra_fields::*;
 
+mod idempotency_id;
+pub use idempotency_id::*;
+
 use crate::errors::{ApiError, ApiResult};
 
 pub fn get_header(name: &str, req: &HeaderMap) -> Option<String> {

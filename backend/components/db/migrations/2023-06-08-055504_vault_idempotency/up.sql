@@ -1,0 +1,1 @@
+ALTER TABLE vault ADD COLUMN idempotency_id TEXT UNIQUE;

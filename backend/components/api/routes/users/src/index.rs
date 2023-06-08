@@ -11,9 +11,11 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::tenant::TenantError;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::actix::OptionalJson;
+use api_core::utils::headers::IdempotencyId;
 use api_core::utils::vault_wrapper::Any;
 use api_route_entities::parse_search;
 use api_wire_types::SearchUsersRequest;
@@ -21,7 +23,6 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
-use db::models::vault::Vault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
@@ -40,6 +41,7 @@ pub async fn post(
     request: OptionalJson<RawDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
+    idempotency_id: IdempotencyId,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let principal = auth.actor().into();
@@ -72,19 +74,23 @@ pub async fn post(
         None
     };
 
+    if idempotency_id.is_some() && request_info.is_some() {
+        return Err(TenantError::CannotProvideBodyAndIdempotencyId.into());
+    }
+
     let scoped_user = state
         .db_pool
         .db_transaction(|conn| -> ApiResult<_> {
-            let user_vault = Vault::create(conn, new_user)?;
-            let scoped_user = ScopedVault::create_non_portable(conn, user_vault, tenant_id)?;
+            let (su, _) =
+                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0)?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
-                let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
+                let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
                 uvw.patch_data(conn, request)?;
                 // Create an access event to show data was added
                 NewAccessEvent {
-                    scoped_vault_id: scoped_user.id.clone(),
+                    scoped_vault_id: su.id.clone(),
                     reason: None,
                     principal,
                     insight,
@@ -94,7 +100,7 @@ pub async fn post(
                 .create(conn)?;
             }
 
-            Ok(scoped_user)
+            Ok(su)
         })
         .await?;
 

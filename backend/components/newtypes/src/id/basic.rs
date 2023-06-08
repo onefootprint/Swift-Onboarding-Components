@@ -34,7 +34,8 @@ define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");
 define_newtype_id!(ContactInfoId, String, "Identifier for contact info");
 define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(IdentityDataId, String, "Identifier for user identity data row");
-define_newtype_id!(ScopedVaultId, String, "Identifier for an ScopedUser");
+define_newtype_id!(ScopedVaultId, String, "Identifier for a ScopedUser");
+define_newtype_id!(IdempotencyId, String, "User-provided ID. When the same operation occurs with the same idempotency id, the same result is returned");
 define_newtype_id!(OnboardingId, String, "Identifier for an OnboardingLink");
 define_newtype_id!(FpId, String, "Identifier for a ScopedUser");
 define_newtype_id!(
