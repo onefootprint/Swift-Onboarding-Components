@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  IcoEmojiHappy24,
   IcoSelfie40,
   IcoSmartphone24,
-  IcoSquareFrame24,
   IcoSun24,
 } from '@onefootprint/icons';
 import { Button } from '@onefootprint/ui';
@@ -54,14 +54,12 @@ const SelfiePrompt = () => {
               Icon: IcoSun24,
             },
             {
-              title: t('guidelines.device-steady.title'),
-              description: t('guidelines.device-steady.description'),
-              Icon: IcoSmartphone24,
+              title: t('guidelines.whole-face.title'),
+              Icon: IcoEmojiHappy24,
             },
             {
-              title: t('guidelines.whole-face.title'),
-              description: t('guidelines.whole-face.description'),
-              Icon: IcoSquareFrame24,
+              title: t('guidelines.device-steady.title'),
+              Icon: IcoSmartphone24,
             },
           ]}
         />

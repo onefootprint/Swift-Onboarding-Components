@@ -24,12 +24,11 @@
           "description": "It can't be too bright or too dark."
         },
         "device-steady": {
-          "title": "Hold your device steady",
-          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+          "title": "Hold your device steady"
         },
-        "whole-document": {
-          "title": "Get the whole document in the photo",
-          "description": "We recommend that you place your document on a flat surface."
+        "position-document": {
+          "title": "Position your {{document}} in the frame",
+          "description": "Make sure it's the {{side}}."
         }
       }
     },
@@ -146,12 +145,10 @@
           "description": "It can't be too bright or too dark."
         },
         "device-steady": {
-          "title": "Hold your device steady",
-          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+          "title": "Hold your device steady"
         },
         "whole-face": {
-          "title": "Make sure your face is clearly visible and centered",
-          "description": "You should face the camera directly and capture your whole head."
+          "title": "Position your face within the frame"
         }
       }
     },

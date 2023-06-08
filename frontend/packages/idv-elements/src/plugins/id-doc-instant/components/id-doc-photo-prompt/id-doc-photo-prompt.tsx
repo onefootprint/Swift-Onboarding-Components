@@ -1,9 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  IcoSmartphone24,
-  IcoSquareFrame24,
-  IcoSun24,
-} from '@onefootprint/icons';
+import { IcoIdCard24, IcoSmartphone24, IcoSun24 } from '@onefootprint/icons';
 import { IdDocType } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -54,14 +50,17 @@ const IdDocPhotoPrompt = ({
                 Icon: IcoSun24,
               },
               {
-                title: t('guidelines.device-steady.title'),
-                description: t('guidelines.device-steady.description'),
-                Icon: IcoSmartphone24,
+                title: t('guidelines.position-document.title', {
+                  document: type === IdDocType.passport ? 'passport' : 'id',
+                }),
+                description: t('guidelines.position-document.description', {
+                  side,
+                }),
+                Icon: IcoIdCard24,
               },
               {
-                title: t('guidelines.whole-document.title'),
-                description: t('guidelines.whole-document.description'),
-                Icon: IcoSquareFrame24,
+                title: t('guidelines.device-steady.title'),
+                Icon: IcoSmartphone24,
               },
             ]}
           />
@@ -80,10 +79,6 @@ const PromptContainer = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
-
-    > button {
-      margin-top: -${theme.spacing[4]};
-    }
   `}
 `;
 

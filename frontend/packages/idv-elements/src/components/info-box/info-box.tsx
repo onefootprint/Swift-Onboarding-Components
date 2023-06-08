@@ -4,7 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 export type InfoBoxProps = {
-  items: { title: string; description: string; Icon: Icon }[];
+  items: { title: string; description?: string; Icon: Icon }[];
 };
 
 const InfoBox = ({ items }: InfoBoxProps) => (
@@ -22,9 +22,11 @@ const InfoBox = ({ items }: InfoBoxProps) => (
           >
             {title}
           </Typography>
-          <Typography color="secondary" variant="body-3">
-            {description}
-          </Typography>
+          {description && (
+            <Typography color="secondary" variant="body-3">
+              {description}
+            </Typography>
+          )}
         </Box>
       </Item>
     ))}
@@ -38,6 +40,7 @@ const Container = styled.ul`
     display: grid;
     gap: ${theme.spacing[7]};
     padding: ${theme.spacing[5]};
+    width: 100%;
   `}
 `;
 
