@@ -40,6 +40,7 @@ impl NameAttribute {
 pub(crate) enum NameGrouping {
     FirstAndLast((MatchLevel, MatchLevel)),
     FullName(MatchLevel),
+    FullNameSimple(MatchLevel),
 }
 impl NameGrouping {
     fn codes(self) -> Vec<FootprintReasonCode> {
@@ -48,9 +49,28 @@ impl NameGrouping {
                 let first = NameAttribute::First.codes(fn_ml).into_iter();
                 let last = NameAttribute::Last.codes(ln_ml).into_iter();
 
-                first.chain(last).collect()
+                // If both match, we infer the main reason code from one of them
+                let overall_frc = if fn_ml == ln_ml {
+                    match fn_ml {
+                        MatchLevel::NoMatch => vec![FootprintReasonCode::NameDoesNotMatch],
+                        MatchLevel::Partial => vec![FootprintReasonCode::NamePartiallyMatches],
+                        MatchLevel::Exact => vec![FootprintReasonCode::NameMatches],
+                        _ => vec![],
+                    }
+                } else {
+                    // they are both different, so no matter what it's partial
+                    vec![FootprintReasonCode::NamePartiallyMatches]
+                };
+
+                first.chain(last).chain(overall_frc.into_iter()).collect()
             }
             NameGrouping::FullName(ml) => Self::FirstAndLast((ml, ml)).codes(),
+            NameGrouping::FullNameSimple(ml) => match ml {
+                MatchLevel::NoMatch => vec![FootprintReasonCode::NameDoesNotMatch],
+                MatchLevel::Partial => vec![FootprintReasonCode::NamePartiallyMatches],
+                MatchLevel::Exact => vec![FootprintReasonCode::NameMatches],
+                _ => vec![],
+            },
         }
     }
 }
@@ -118,15 +138,27 @@ pub(crate) enum AddressGrouping {
     SingleAddress((AddressAttribute, MatchLevel)),
     FullAddress(MatchLevel),
     AddressExactExcept(Vec<(AddressAttribute, MatchLevel)>),
+    FullAddressSimple(MatchLevel),
 }
 
 impl AddressGrouping {
     fn codes(self) -> Vec<FootprintReasonCode> {
         match self {
             AddressGrouping::SingleAddress((a, ml)) => a.codes(ml),
-            AddressGrouping::FullAddress(ml) => AddressAttribute::iter()
-                .flat_map(|a| Self::SingleAddress((a, ml)).codes())
-                .collect(),
+            AddressGrouping::FullAddress(ml) => {
+                let codes: Vec<FootprintReasonCode> = AddressAttribute::iter()
+                    .flat_map(|a| Self::SingleAddress((a, ml)).codes())
+                    .collect();
+
+                let overall = match ml {
+                    MatchLevel::NoMatch => vec![FootprintReasonCode::AddressDoesNotMatch],
+                    MatchLevel::Partial => vec![FootprintReasonCode::AddressPartiallyMatches],
+                    MatchLevel::Exact => vec![FootprintReasonCode::AddressMatches],
+                    _ => vec![],
+                };
+
+                codes.into_iter().chain(overall.into_iter()).collect()
+            }
             AddressGrouping::AddressExactExcept(e) => {
                 let except_attributes: Vec<AddressAttribute> = e.iter().map(|(a, _)| a).cloned().collect();
                 let except_codes = e
@@ -140,8 +172,20 @@ impl AddressGrouping {
                         Self::SingleAddress((a, MatchLevel::Exact)).codes()
                     }
                 });
-                except_codes.chain(rest_codes).collect()
+                except_codes
+                    .chain(rest_codes)
+                    // this is always partial for overall address
+                    .chain(vec![FootprintReasonCode::AddressPartiallyMatches].into_iter())
+                    .collect()
             }
+
+            // For SSN reason codes, we don't expect codes to be broken down by individual address attributes
+            AddressGrouping::FullAddressSimple(ml) => match ml {
+                MatchLevel::NoMatch => vec![FootprintReasonCode::AddressDoesNotMatch],
+                MatchLevel::Partial => vec![FootprintReasonCode::AddressPartiallyMatches],
+                MatchLevel::Exact => vec![FootprintReasonCode::AddressMatches],
+                _ => vec![],
+            },
         }
     }
 }
@@ -225,18 +269,21 @@ mod tests {
     use test_case::test_case;
     use FootprintReasonCode::*;
 
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::Exact)) => vec![NameFirstMatches, NameLastMatches])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::NoMatch)) => vec![NameFirstMatches, NameLastDoesNotMatch])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::CouldNotMatch)) => vec![NameFirstMatches, NameLastDoesNotMatch])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::NoMatch, MatchLevel::Exact)) => vec![NameFirstDoesNotMatch, NameLastMatches])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::CouldNotMatch, MatchLevel::Exact)) => vec![NameFirstDoesNotMatch, NameLastMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Exact) => vec![NameFirstMatches, NameLastMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::NoMatch) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Partial) => vec![NameFirstPartiallyMatches, NameLastPartiallyMatches])]
+    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::Exact)) => vec![NameFirstMatches, NameLastMatches, NameMatches])]
+    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::NoMatch)) => vec![NameFirstMatches, NameLastDoesNotMatch, NamePartiallyMatches])]
+    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::CouldNotMatch)) => vec![NameFirstMatches, NameLastDoesNotMatch, NamePartiallyMatches])]
+    #[test_case(NameGrouping::FirstAndLast((MatchLevel::NoMatch, MatchLevel::Exact)) => vec![NameFirstDoesNotMatch, NameLastMatches, NamePartiallyMatches])]
+    #[test_case(NameGrouping::FirstAndLast((MatchLevel::CouldNotMatch, MatchLevel::Exact)) => vec![NameFirstDoesNotMatch, NameLastMatches, NamePartiallyMatches])]
+    #[test_case(NameGrouping::FullName(MatchLevel::Exact) => vec![NameFirstMatches, NameLastMatches, NameMatches])]
+    #[test_case(NameGrouping::FullName(MatchLevel::NoMatch) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch, NameDoesNotMatch])]
+    #[test_case(NameGrouping::FullName(MatchLevel::Partial) => vec![NameFirstPartiallyMatches, NameLastPartiallyMatches, NamePartiallyMatches])]
     // don't apply to name
     #[test_case(NameGrouping::FullName(MatchLevel::Verified) => Vec::<FootprintReasonCode>::new())]
     #[test_case(NameGrouping::FullName(MatchLevel::NotVerified) => Vec::<FootprintReasonCode>::new())]
     #[test_case(NameGrouping::FullName(MatchLevel::CouldNotMatch) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch])]
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::Exact) => vec![NameMatches])]
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::NoMatch) => vec![NameDoesNotMatch])]
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::Partial) => vec![NamePartiallyMatches])]
 
     fn test_name(name_grouping: NameGrouping) -> Vec<FootprintReasonCode> {
         name_grouping.codes()
@@ -260,11 +307,14 @@ mod tests {
     #[test_case(AddressGrouping::SingleAddress((AddressAttribute::State, MatchLevel::NoMatch)) => vec![AddressStateDoesNotMatch])]
     #[test_case(AddressGrouping::SingleAddress((AddressAttribute::State, MatchLevel::CouldNotMatch)) => vec![AddressStateDoesNotMatch])]
     // Full
-    #[test_case(AddressGrouping::FullAddress(MatchLevel::Exact) => vec![AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(AddressGrouping::FullAddress(MatchLevel::NoMatch) => vec![AddressStreetNameDoesNotMatch, AddressStreetNumberDoesNotMatch, AddressCityDoesNotMatch, AddressStateDoesNotMatch, AddressZipCodeDoesNotMatch])]
+    #[test_case(AddressGrouping::FullAddress(MatchLevel::Exact) => vec![AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches, AddressMatches])]
+    #[test_case(AddressGrouping::FullAddress(MatchLevel::NoMatch) => vec![AddressStreetNameDoesNotMatch, AddressStreetNumberDoesNotMatch, AddressCityDoesNotMatch, AddressStateDoesNotMatch, AddressZipCodeDoesNotMatch, AddressDoesNotMatch])]
     // All Except
-    #[test_case(AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial)]) => vec![AddressStreetNamePartiallyMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial), (AddressAttribute::Zip, MatchLevel::NoMatch)]) => vec![AddressStreetNamePartiallyMatches, AddressZipCodeDoesNotMatch, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches])]
+    #[test_case(AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial)]) => vec![AddressStreetNamePartiallyMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches, AddressPartiallyMatches])]
+    #[test_case(AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial), (AddressAttribute::Zip, MatchLevel::NoMatch)]) => vec![AddressStreetNamePartiallyMatches, AddressZipCodeDoesNotMatch, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressPartiallyMatches])]
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::NoMatch) => vec![AddressDoesNotMatch])]
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::Partial) => vec![AddressPartiallyMatches])]
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::Exact) => vec![AddressMatches])]
     fn test_address(address_grouping: AddressGrouping) -> Vec<FootprintReasonCode> {
         address_grouping.codes()
     }
@@ -276,21 +326,5 @@ mod tests {
     #[test_case(SsnTypes::Ssn9(MatchLevel::NoMatch) => vec![SsnDoesNotMatch])]
     fn test_ssn(ssn_type: SsnTypes) -> Vec<FootprintReasonCode> {
         ssn_type.codes()
-    }
-
-    #[test_case(NameGrouping::FullName(MatchLevel::Exact), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstMatches, NameLastMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Exact), AddressGrouping::FullAddress(MatchLevel::NoMatch) => vec![NameFirstMatches, NameLastMatches, AddressStreetNameDoesNotMatch, AddressStreetNumberDoesNotMatch, AddressCityDoesNotMatch, AddressStateDoesNotMatch, AddressZipCodeDoesNotMatch])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Partial), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstPartiallyMatches, NameLastPartiallyMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Exact), AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial)]) => vec![NameFirstMatches, NameLastMatches, AddressStreetNamePartiallyMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::Partial), AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial)]) => vec![NameFirstPartiallyMatches, NameLastPartiallyMatches, AddressStreetNamePartiallyMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FullName(MatchLevel::NoMatch), AddressGrouping::AddressExactExcept(vec![(AddressAttribute::StreetName, MatchLevel::Partial)]) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch, AddressStreetNamePartiallyMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::Exact, MatchLevel::NoMatch)), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstMatches, NameLastDoesNotMatch, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-    #[test_case(NameGrouping::FirstAndLast((MatchLevel::NoMatch, MatchLevel::Exact)), AddressGrouping::FullAddress(MatchLevel::Exact) => vec![NameFirstDoesNotMatch, NameLastMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
-
-    fn test_experian_address_reason_code_helper(
-        name: NameGrouping,
-        address: AddressGrouping,
-    ) -> Vec<FootprintReasonCode> {
-        ExpAddressRCH::new(name, address).into()
     }
 }

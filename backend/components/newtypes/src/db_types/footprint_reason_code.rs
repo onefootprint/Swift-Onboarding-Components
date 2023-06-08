@@ -136,6 +136,10 @@ footprint_reason_code_enum! {
  #[note = "Address does not match", severity = SignalSeverity::High,  description = "Address located does not match address input."]
  AddressDoesNotMatch,
 
+ #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "Address partially matches", severity = SignalSeverity::Medium,  description = "Address located partially matches address input."]
+ AddressPartiallyMatches,
+
  #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::Zip], match_level = Some(MatchLevel::NoMatch)]
  #[note = "ZIP code does not match", severity = SignalSeverity::Medium,  description = "ZIP code located does not match the ZIP code input."]
  AddressZipCodeDoesNotMatch,
@@ -370,6 +374,16 @@ footprint_reason_code_enum! {
  #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
  #[note = "Last name partially matches", severity = SignalSeverity::Low,  description = "The located last name partially matches the input last name."]
  NameLastPartiallyMatches,
+
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+ #[note = "Name matches", severity = SignalSeverity::Info,  description = "The located name matches the input name."]
+ NameMatches,
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+ #[note = "Name does not matches", severity = SignalSeverity::Medium,  description = "The located name does not match the input name."]
+ NameDoesNotMatch,
+ #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+ #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
+ NamePartiallyMatches,
 
  // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
 

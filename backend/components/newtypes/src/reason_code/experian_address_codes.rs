@@ -306,7 +306,7 @@ mod tests {
     use FootprintReasonCode::*;
 
     // TODO: add more tests
-    #[test_case(ExperianAddressAndNameMatchReasonCodes::A1 => vec![NameFirstMatches, NameLastMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches])]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::A1 => vec![NameFirstMatches, NameLastMatches, NameMatches, AddressStreetNameMatches, AddressStreetNumberMatches, AddressCityMatches, AddressStateMatches, AddressZipCodeMatches, AddressMatches])]
     fn test_experian_address_and_name_match_reason_codes(
         reason_code: ExperianAddressAndNameMatchReasonCodes,
     ) -> Vec<FootprintReasonCode> {

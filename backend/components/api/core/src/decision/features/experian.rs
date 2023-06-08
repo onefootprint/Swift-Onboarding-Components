@@ -146,13 +146,8 @@ mod tests {
         // dob match
         FootprintReasonCode::DobMobDoesNotMatch,
         // from SSN
-        FootprintReasonCode::NameFirstMatches,
-        FootprintReasonCode::NameLastMatches,
-        FootprintReasonCode::AddressStreetNameMatches,
-        FootprintReasonCode::AddressStreetNumberMatches,
-        FootprintReasonCode::AddressCityMatches,
-        FootprintReasonCode::AddressStateMatches,
-        FootprintReasonCode::AddressZipCodeMatches,
+        FootprintReasonCode::NameMatches,
+        FootprintReasonCode::AddressMatches,
         FootprintReasonCode::SsnMatches,
         // from score
         FootprintReasonCode::IdNotLocated,
@@ -165,11 +160,13 @@ mod tests {
         // from address + name
         FootprintReasonCode::NameFirstDoesNotMatch,
         FootprintReasonCode::NameLastDoesNotMatch,
+        FootprintReasonCode::NameDoesNotMatch,
         FootprintReasonCode::AddressStreetNameDoesNotMatch,
         FootprintReasonCode::AddressStreetNumberDoesNotMatch,
         FootprintReasonCode::AddressCityDoesNotMatch,
         FootprintReasonCode::AddressStateDoesNotMatch,
         FootprintReasonCode::AddressZipCodeDoesNotMatch,
+        FootprintReasonCode::AddressDoesNotMatch,
         // from watchlist
         FootprintReasonCode::WatchlistHitOfac,
         // from score
