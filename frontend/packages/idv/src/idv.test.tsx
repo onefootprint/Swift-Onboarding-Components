@@ -428,12 +428,6 @@ describe('<Idv />', () => {
   });
 
   describe('When there is bootstrap data', () => {
-    describe('When there is bootstrap email', () => {});
-
-    describe('When there is bootstrap phone', () => {});
-
-    describe('When there is bootstrap email and phone', () => {});
-
     describe('When there is partial bootstrap KYC data', () => {});
 
     describe('When there is bootstrap and decrypted data', () => {
