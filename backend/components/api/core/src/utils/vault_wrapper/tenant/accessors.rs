@@ -1,41 +1,16 @@
 use super::TenantVw;
-use crate::auth::{tenant::TenantGuardDsl, CanDecrypt, IsGuardMet};
-use itertools::Itertools;
-use newtypes::{DataIdentifier, TenantScope};
+use newtypes::DataIdentifier;
 
 impl<Type> TenantVw<Type> {
-    /// Returns the list of TenantScopes representing permissions to see data on this user vault.
-    /// For portable vaults, the visible data is granted by approved onboarding configurations.
-    /// For non-portable vaults, all data is visible
-    pub(super) fn can_see_scopes(&self) -> Vec<TenantScope> {
-        if !self.vault.is_portable {
-            // All fields are visible in non-portable vaults
-            return vec![TenantScope::Admin];
-        }
-
-        // Visibility of fields in portable vaults is controlled by onboarding configs.
-        self.onboarding
-            .iter()
-            .flat_map(|ob| ob.visible_scopes())
-            // Always allowed to see custom data
-            .chain([TenantScope::DecryptCustom])
-            .collect_vec()
-    }
-
-    /// Retrieve the fields that the tenant is allowed to see exist. Any field that was requested
-    /// to be collected (by an authorized ob config) is visible to the tenant.
+    /// Retrieve the fields that the tenant is allowed to see exist.
     ///
     /// NOTE: This is different from whether the tenant can decrypt the data
     pub fn get_visible_populated_fields(&self) -> Vec<DataIdentifier> {
-        let can_see_scopes = self.can_see_scopes();
-
+        // Right now, this is a simple shim method, but we might change this logic in the future
+        // so it helps to group callsites
+        // TODO do we want to filter out portable data added by other tenants that isn't requested
+        // by the ob config?
+        // For ex, if another tenant adds a portable credit card, should this tenant be able to see it?
         self.populated_dis()
-        .into_iter()
-        // Reuse the tenant auth codepaths to filter out DataIdentifiers on this VaultWrapper
-        // that are visible given the approved onboarding configurations
-        .filter(|x| {
-            CanDecrypt::single(x.clone()).or_admin().is_met(&can_see_scopes)
-        })
-        .collect()
     }
 }

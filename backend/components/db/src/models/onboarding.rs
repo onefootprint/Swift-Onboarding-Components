@@ -424,6 +424,7 @@ impl OnboardingAndConfig {
     /// to decrypt.
     /// Don't use this on Onboardings that have not been authorized
     pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
+        // TODO fix decryption permissions for id docs collected progressively
         let Self(ob, obc) = &self;
         if ob.authorized_at.is_none() {
             // Only authorized onboardings give permission to decrypt data
@@ -432,17 +433,5 @@ impl OnboardingAndConfig {
             let cdos = obc.can_access_data.clone();
             cdos.into_iter().map(TenantScope::Decrypt).collect()
         }
-    }
-
-    /// Returns the TenantScopes that represent the data this ObConfiguration grants access to see.
-    /// NOTE: this is not the same as the data that is allowed to be decrypted.
-    /// If an ob config intended to collect a field, a tenant is able to see that it exists whether
-    /// or not they can decrypt it.
-    /// Don't use this on Onboardings that have not been authorized
-    pub fn visible_scopes(&self) -> Vec<TenantScope> {
-        // Even un-approved onboardings give permissions to see data, just not decrypt
-        let Self(_, obc) = &self;
-        let cdos = obc.must_collect_data.clone();
-        cdos.into_iter().map(TenantScope::Decrypt).collect()
     }
 }
