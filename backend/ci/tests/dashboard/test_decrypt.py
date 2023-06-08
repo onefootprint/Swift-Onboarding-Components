@@ -118,7 +118,7 @@ def test_tenant_document_decrypt(user_with_documents):
 
     tenant = user_with_documents.tenant
     fields = [
-        "document.latest_upload.drivers_license.front",
+        "document.drivers_license.front.latest_upload",
         "document.drivers_license.front",
         "document.drivers_license.number",
         "document.drivers_license.issuing_state",
@@ -137,7 +137,7 @@ def test_tenant_document_decrypt(user_with_documents):
         status_code=200,
     )
 
-    assert resp["document.latest_upload.drivers_license.front"] == test_image_dl_front
+    assert resp["document.drivers_license.front.latest_upload"] == test_image_dl_front
     assert resp["document.drivers_license.front"] == test_image_dl_front
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.number"] == "Y12341234"
@@ -154,7 +154,11 @@ def test_tenant_selfie_decrypt(
     twilio,
     doc_request_sandbox_ob_config,
 ):
-    from tests.image_fixtures import test_image_dl_front, test_image_dl_back, test_image_dl_selfie
+    from tests.image_fixtures import (
+        test_image_dl_front,
+        test_image_dl_back,
+        test_image_dl_selfie,
+    )
 
     bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
@@ -164,6 +168,7 @@ def test_tenant_selfie_decrypt(
             "document.drivers_license.front",
             "document.drivers_license.back",
             "document.drivers_license.selfie",
+            "document.drivers_license.front.mime_type",
         ],
         "reason": "Responding to a customer request",
     }
@@ -177,6 +182,7 @@ def test_tenant_selfie_decrypt(
     assert resp["document.drivers_license.front"] == test_image_dl_front
     assert resp["document.drivers_license.back"] == test_image_dl_back
     assert resp["document.drivers_license.selfie"] == test_image_dl_selfie
+    assert resp["document.drivers_license.front.mime_type"] == "image/png"
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {

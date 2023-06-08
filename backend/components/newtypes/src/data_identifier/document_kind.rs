@@ -7,6 +7,7 @@ use itertools::Itertools;
 use mime::Mime;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::IntoEnumIterator;
+use strum_macros::AsRefStr;
 use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString};
 
 #[derive(
@@ -23,19 +24,21 @@ use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString};
     EnumDiscriminants,
 )]
 #[strum_discriminants(name(DocumentKindDiscriminant))]
-#[strum_discriminants(derive(EnumString, Display, EnumIter))]
+#[strum_discriminants(derive(EnumString, AsRefStr, Display, EnumIter))]
 #[diesel(sql_type = Text)]
 pub enum DocumentKind {
     #[strum_discriminants(strum(to_string = "passport"))]
     Passport,
     #[strum_discriminants(strum(to_string = "passport.selfie"))]
     PassportSelfie,
+
     #[strum_discriminants(strum(to_string = "drivers_license.front"))]
     DriversLicenseFront,
     #[strum_discriminants(strum(to_string = "drivers_license.back"))]
     DriversLicenseBack,
     #[strum_discriminants(strum(to_string = "drivers_license.selfie"))]
     DriversLicenseSelfie,
+
     #[strum_discriminants(strum(to_string = "id_card.front"))]
     IdCardFront,
     #[strum_discriminants(strum(to_string = "id_card.back"))]
@@ -66,10 +69,15 @@ pub enum DocumentKind {
     #[strum_discriminants(strum(to_string = "id_card.expiration"))]
     IdCardExpiration,
 
-    // NOTE: not included in API docs because it's funky. Need to come up with a better pattern
-    /// Represents the latest upload for a given id doc type and side, verified or not.
+    /// represents the latest upload of a document
+    /// document.[doc_kind].[side].latest_upload
     #[strum_discriminants(strum(to_string = "latest_upload"))]
     LatestUpload(IdDocKind, DocumentSide),
+
+    /// represents the mime type of a document
+    /// document.[doc_kind].[side].mime_type
+    #[strum_discriminants(strum(to_string = "mime_type"))]
+    MimeType(IdDocKind, DocumentSide),
 }
 
 crate::util::impl_enum_string_diesel!(DocumentKind);
@@ -119,7 +127,8 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             | DocumentKind::DriversLicenseIssuingState
             | DocumentKind::IdCardNumber
             | DocumentKind::IdCardExpiration
-            | DocumentKind::LatestUpload(_, _) => true,
+            | DocumentKind::MimeType(_, _) => true,
+            DocumentKind::LatestUpload(_, _) => true,
         }
     }
 
@@ -143,6 +152,7 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             | DocumentKind::DriversLicenseIssuingState
             | DocumentKind::IdCardNumber
             | DocumentKind::IdCardExpiration
+            | DocumentKind::MimeType(_, _)
             | DocumentKind::LatestUpload(_, _) => None,
             DocumentKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
@@ -172,6 +182,7 @@ impl DocumentKind {
             | DocumentKind::DriversLicenseIssuingState
             | DocumentKind::IdCardNumber
             | DocumentKind::IdCardExpiration
+            | DocumentKind::MimeType(_, _)
             | DocumentKind::LatestUpload(_, _) => vec![],
         }
     }
@@ -204,7 +215,8 @@ impl DocumentKind {
             | DocumentKind::IdCardBack
             | DocumentKind::IdCardSelfie
             | DocumentKind::FinraComplianceLetter
-            | DocumentKind::LatestUpload(_, _) => StorageType::S3,
+            | DocumentKind::LatestUpload(_, _) => StorageType::DocumentData,
+            DocumentKind::MimeType(_, _) => StorageType::DocumentMetadata,
             DocumentKind::PassportNumber
             | DocumentKind::PassportExpiration
             | DocumentKind::PassportDob
@@ -250,7 +262,7 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
             DocumentKindDiscriminant::DriversLicenseIssuingState => DocumentKind::DriversLicenseIssuingState,
             DocumentKindDiscriminant::IdCardNumber => DocumentKind::IdCardNumber,
             DocumentKindDiscriminant::IdCardExpiration => DocumentKind::IdCardExpiration,
-            DocumentKindDiscriminant::LatestUpload => {
+            DocumentKindDiscriminant::MimeType | DocumentKindDiscriminant::LatestUpload => {
                 return Err(crate::Error::Custom("Cannot convert".to_owned()))
             }
         };
@@ -264,17 +276,34 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
 impl std::str::FromStr for DocumentKind {
     type Err = strum::ParseError;
     fn from_str(s: &str) -> Result<DocumentKind, <Self as std::str::FromStr>::Err> {
-        let variant = if s.starts_with(&DocumentKindDiscriminant::LatestUpload.to_string()) {
-            let parts = s.split('.').collect_vec();
-            let prefix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-            let suffix = parts.get(2).ok_or(strum::ParseError::VariantNotFound)?;
+        let parts = s.split('.').collect_vec();
+        let suffix = parts.last().ok_or(strum::ParseError::VariantNotFound)?;
+        let variant = DocumentKindDiscriminant::from_str(suffix);
+
+        let get_parts = || -> Result<(IdDocKind, DocumentSide), _> {
+            let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
+            let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
             let prefix = IdDocKind::correct_from_str(prefix)?;
             let suffix = DocumentSide::from_str(suffix)?;
-            Self::LatestUpload(prefix, suffix)
-        } else {
-            let discriminant = <DocumentKindDiscriminant as std::str::FromStr>::from_str(s)?;
-            Self::try_from(discriminant).map_err(|_| strum::ParseError::VariantNotFound)?
+            Ok((prefix, suffix))
         };
+
+        let variant: DocumentKind = match variant {
+            Ok(DocumentKindDiscriminant::LatestUpload) => {
+                let (prefix, suffix) = get_parts()?;
+                DocumentKind::LatestUpload(prefix, suffix)
+            }
+            Ok(DocumentKindDiscriminant::MimeType) => {
+                let (prefix, suffix) = get_parts()?;
+                DocumentKind::MimeType(prefix, suffix)
+            }
+            _ => {
+                let variant =
+                    DocumentKindDiscriminant::from_str(s).map_err(|_| strum::ParseError::VariantNotFound)?;
+                Self::try_from(variant).map_err(|_| strum::ParseError::VariantNotFound)?
+            }
+        };
+
         Ok(variant)
     }
 }
@@ -282,13 +311,13 @@ impl std::str::FromStr for DocumentKind {
 impl std::fmt::Display for DocumentKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            DocumentKind::LatestUpload(id_doc_kind, side) => {
+            DocumentKind::LatestUpload(id_doc_kind, side) | DocumentKind::MimeType(id_doc_kind, side) => {
                 write!(
                     f,
                     "{}.{}.{}",
-                    DocumentKindDiscriminant::from(self),
                     id_doc_kind.correct_fmt(),
-                    side
+                    side,
+                    DocumentKindDiscriminant::from(self),
                 )
             }
             _ => write!(f, "{}", DocumentKindDiscriminant::from(self)),

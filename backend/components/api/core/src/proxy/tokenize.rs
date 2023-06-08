@@ -51,18 +51,39 @@ pub async fn vault_pii(
         let principal = auth.actor().into();
         let insight = CreateInsightEvent::from(insights.clone());
 
+        // extract our mime types
+        let mime_types = values
+            .iter()
+            .filter_map(|(di, pii)| {
+                if let DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = di {
+                    Some((
+                        DocumentKind::from_id_doc_kind(*doc_kind, *side),
+                        pii.leak_to_string(),
+                    ))
+                } else {
+                    None
+                }
+            })
+            .collect::<HashMap<_, _>>();
+
         // build the update request
-        let (data, documents): (Vec<_>, Vec<_>) = values.into_iter().partition_map(|(di, value)| match di {
-            DataIdentifier::Document(doc_kind) => match doc_kind.storage_type() {
-                StorageType::VaultData => Either::Left((di, value)),
-                StorageType::S3 => Either::Right((doc_kind, value)),
-            },
-            DataIdentifier::InvestorProfile(_)
-            | DataIdentifier::Business(_)
-            | DataIdentifier::Id(_)
-            | DataIdentifier::Custom(_)
-            | DataIdentifier::Card(_) => Either::Left((di, value)),
-        });
+        let (data, documents): (Vec<_>, Vec<_>) = values
+            .into_iter()
+            .filter_map(|(di, value)| match di {
+                DataIdentifier::Document(doc_kind) => match doc_kind.storage_type() {
+                    StorageType::VaultData => Some(Either::Left((di, value))),
+                    StorageType::DocumentData => {
+                        Some(Either::Right((doc_kind, (mime_types.get(&doc_kind), value))))
+                    }
+                    StorageType::DocumentMetadata => None,
+                },
+                DataIdentifier::InvestorProfile(_)
+                | DataIdentifier::Business(_)
+                | DataIdentifier::Id(_)
+                | DataIdentifier::Custom(_)
+                | DataIdentifier::Card(_) => Some(Either::Left((di, value))),
+            })
+            .partition_map(|r| r);
 
         let data: HashMap<_, _> = data.into_iter().collect();
         let documents: HashMap<_, _> = documents.into_iter().collect();
@@ -77,8 +98,16 @@ pub async fn vault_pii(
         let data = data.build_tenant_fingerprints(state, &tenant_id).await?;
 
         // prepare the documents
-        let documents = try_join_all(documents.into_iter().map(|(doc_kind, pii)| {
-            encrypt_document(state, pii, doc_kind, fp_id.clone(), tenant_id.clone(), is_live)
+        let documents = try_join_all(documents.into_iter().map(|(doc_kind, (mime_type, pii))| {
+            encrypt_document(
+                state,
+                pii,
+                doc_kind,
+                mime_type,
+                fp_id.clone(),
+                tenant_id.clone(),
+                is_live,
+            )
         }))
         .await?;
 
@@ -159,6 +188,7 @@ async fn encrypt_document(
     state: &State,
     file_data: PiiString,
     doc_kind: DocumentKind,
+    mime_type: Option<&String>,
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
@@ -175,7 +205,7 @@ async fn encrypt_document(
     let file = utils::file_upload::FileUpload::new_simple(
         file_data.try_decode_base64().map_err(crypto::Error::from)?,
         format!("{}", doc_kind),
-        "image", // todo: have a way to specify an image for vaulting
+        mime_type.as_ref().map(|s| s.as_str()).unwrap_or("image/png"),
     );
 
     let (e_data_key, s3_url) = utils::vault_wrapper::encrypt_to_s3(

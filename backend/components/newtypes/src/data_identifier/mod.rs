@@ -338,8 +338,10 @@ impl DataIdentifier {
 pub enum StorageType {
     /// in the database as 'vault_data'
     VaultData,
-    /// as an s3 object (larger data)
-    S3,
+    /// larger data stored in the `document_data` table with content bytes `s3`
+    DocumentData,
+    /// document metadata
+    DocumentMetadata,
 }
 
 impl DataIdentifier {

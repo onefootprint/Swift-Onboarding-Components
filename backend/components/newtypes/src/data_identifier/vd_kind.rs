@@ -67,7 +67,9 @@ impl TryFrom<DataIdentifier> for VdKind {
             DataIdentifier::Card(k) => Ok(Self::Card(k)),
             DataIdentifier::Document(doc) => match doc.storage_type() {
                 StorageType::VaultData => Ok(Self::Document(doc)),
-                StorageType::S3 => Err(ConversionError::Error(value)),
+                StorageType::DocumentMetadata | StorageType::DocumentData => {
+                    Err(ConversionError::Error(value))
+                }
             },
         }
     }

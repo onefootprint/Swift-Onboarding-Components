@@ -53,14 +53,14 @@ export enum DocumentDI {
   idCardBack = 'document.id_card.back',
   idCardSelfie = 'document.id_card.selfie',
 
-  latestPassport = 'document.latest_upload.passport.front',
-  latestPassportSelfie = 'document.latest_upload.passport.selfie',
-  latestDriversLicenseFront = 'document.latest_upload.drivers_license.front',
-  latestDriversLicenseBack = 'document.latest_upload.drivers_license.back',
-  latestDriversLicenseSelfie = 'document.latest_upload.drivers_license.selfie',
-  latestIdCardFront = 'document.latest_upload.id_card.front',
-  latestIdCardBack = 'document.latest_upload.id_card.back',
-  latestIdCardSelfie = 'document.latest_upload.id_card.selfie',
+  latestPassport = 'document.passport.front.latest_upload',
+  latestPassportSelfie = 'document.passport.selfie.latest_upload',
+  latestDriversLicenseFront = 'document.drivers_license.front.latest_upload',
+  latestDriversLicenseBack = 'document.drivers_license.back.latest_upload',
+  latestDriversLicenseSelfie = 'document.drivers_license.selfie.latest_upload',
+  latestIdCardFront = 'document.id_card.front.latest_upload',
+  latestIdCardBack = 'document.id_card.back.latest_upload',
+  latestIdCardSelfie = 'document.id_card.selfie.latest_upload',
 }
 
 export enum CardDI {

@@ -469,11 +469,7 @@ class TestVaultProxy:
         # ditto will simulate this data for the proxy to ingress vault
         from .image_fixtures import test_image
 
-        data = {
-            "data": {
-                "id_card": test_image,
-            }
-        }
+        data = {"data": {"id_card": test_image, "type": "image/jpeg"}}
 
         response = _make_request(
             method=requests.post,
@@ -486,7 +482,9 @@ class TestVaultProxy:
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
                 ProxyTokenAssignment(fp_id),
-                ProxyIngressRule("document.drivers_license.front=$.data.id_card"),
+                ProxyIngressRule(
+                    "document.drivers_license.front=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
+                ),
                 ProxyIngressContentType("json"),
             ],
             files=None,
@@ -494,15 +492,21 @@ class TestVaultProxy:
 
         result = response.json()
         assert result["data"]["id_card"] == f"{fp_id}.document.drivers_license.front"
+        assert (
+            result["data"]["type"]
+            == f"{fp_id}.document.drivers_license.front.mime_type"
+        )
 
         data = dict(
             reason="test",
             fields=[
                 "document.drivers_license.front",
+                "document.drivers_license.front.mime_type",
             ],
         )
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["document.drivers_license.front"] == test_image
+        assert response["document.drivers_license.front.mime_type"] == "image/jpeg"
 
 
 ### Tests to do ###

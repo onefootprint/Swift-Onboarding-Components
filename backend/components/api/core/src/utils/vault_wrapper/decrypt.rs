@@ -13,8 +13,9 @@ use either::Either;
 use enclave_proxy::DataTransform;
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString, StorageType,
+    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, DocumentKind,
+    IdentityDataKind as IDK, KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
+    StorageType,
 };
 use std::collections::HashMap;
 
@@ -49,8 +50,16 @@ impl<Type> VaultWrapper<Type> {
     ) -> ApiResult<DecryptUncheckedResult> {
         // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
         let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| match di {
-            DataIdentifier::Document(kind) if matches!(kind.storage_type(), StorageType::S3) => {
+            DataIdentifier::Document(kind) if matches!(kind.storage_type(), StorageType::DocumentData) => {
                 either::Either::Left(kind)
+            }
+            DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) => {
+                let doc_di = DocumentKind::from_id_doc_kind(*doc_kind, *side);
+                let mime_type = self
+                    .get_document(doc_di)
+                    .map(|data| PiiString::from(&data.mime_type))
+                    .map(|mt| Either::Right((di.clone(), mt)));
+                either::Either::Right(mime_type)
             }
             _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
                 VaultedData::Sealed(e_data) => Either::Left((di.clone(), e_data)),
