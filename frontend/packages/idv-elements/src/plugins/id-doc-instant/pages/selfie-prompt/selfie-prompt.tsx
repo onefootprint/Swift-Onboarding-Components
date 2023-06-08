@@ -29,14 +29,14 @@ const SelfiePrompt = () => {
   const handleConsent = () => {
     send({ type: 'consentReceived' });
     setConsentVisible(false);
-    send({ type: 'startSelfieCapture' });
+    send({ type: 'startImageCapture' });
   };
 
   const handleClick = () => {
     if (consentRequired) {
       setConsentVisible(true);
     } else {
-      send({ type: 'startSelfieCapture' });
+      send({ type: 'startImageCapture' });
     }
   };
 

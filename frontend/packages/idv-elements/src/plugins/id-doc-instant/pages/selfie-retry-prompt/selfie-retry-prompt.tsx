@@ -13,7 +13,7 @@ const SelfieRetryPrompt = () => {
   const { t } = useTranslation('pages.selfie-retry-prompt');
 
   const handleClick = () => {
-    send({ type: 'startSelfieCapture' });
+    send({ type: 'startImageCapture' });
   };
 
   return (

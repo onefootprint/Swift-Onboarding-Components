@@ -110,6 +110,22 @@
         "cta": "Continue"
       }
     },
+    "front-photo-capture": {
+      "title": {
+        "driversLicense": "Driver's license",
+        "idCard": "ID card",
+        "passport": "Passport"
+      },
+      "subtitle": "Front side"
+    },
+    "back-photo-capture": {
+      "title": {
+        "driversLicense": "Driver's license",
+        "idCard": "ID card",
+        "passport": "Passport"
+      },
+      "subtitle": "Back side"
+    },
     "selfie-photo-prompt": {
       "title": "Take a selfie",
       "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",

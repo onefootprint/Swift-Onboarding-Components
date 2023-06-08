@@ -3,8 +3,8 @@ import { Button } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import useHandleCameraError from '../../hooks/use-handle-camera-error';
 import useProcessImage from '../../hooks/use-process-image';
+import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
   onComplete: (image: string) => void;
@@ -12,9 +12,8 @@ type IdDocPhotoButtonsProp = {
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('components.id-doc-photo-upload-buttons');
-  const takePhotoRef = useRef<HTMLInputElement | undefined>();
+  const [, send] = useIdDocMachine();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const onCameraError = useHandleCameraError();
   const { processImageFile, convertImageFileToStrippedBase64 } =
     useProcessImage();
 
@@ -60,32 +59,14 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
   };
 
   const handleTake = () => {
-    setCaptureMethod('take');
-    try {
-      takePhotoRef.current?.click();
-    } catch (err) {
-      onCameraError(err);
-      onProcessingDone();
-    }
+    send({ type: 'startImageCapture' });
   };
 
   return (
     <ButtonsContainer>
-      <Button
-        fullWidth
-        onClick={handleTake}
-        loading={isLoading && captureMethod === 'take'}
-        disabled={isLoading}
-      >
+      <Button fullWidth onClick={handleTake}>
         {t('take-photo.title')}
       </Button>
-      <StyledInput
-        ref={takePhotoRef as React.RefObject<HTMLInputElement>}
-        type="file"
-        accept="image/*,.heic,.heif"
-        capture="environment"
-        onChange={handleImage}
-      />
       <Button
         fullWidth
         variant="secondary"

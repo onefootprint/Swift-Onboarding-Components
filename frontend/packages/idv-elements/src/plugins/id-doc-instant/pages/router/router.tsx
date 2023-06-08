@@ -2,7 +2,9 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import BackPhotoCapture from '../back-photo-capture';
 import DeviceWarning from '../device-warning';
+import FrontPhotoCapture from '../front-photo-capture';
 import IdDocBackPhoto from '../id-doc-back-photo';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
@@ -36,12 +38,20 @@ const Router = ({ onDone }: RouterProps) => {
     return <IdDocFrontPhoto />;
   }
 
+  if (state.matches('frontImageCapture')) {
+    return <FrontPhotoCapture />;
+  }
+
   if (state.matches('frontImageRetry')) {
     return <IdDocFrontPhotoRetry />;
   }
 
   if (state.matches('backImage')) {
     return <IdDocBackPhoto />;
+  }
+
+  if (state.matches('backImageCapture')) {
+    return <BackPhotoCapture />;
   }
 
   if (state.matches('backImageRetry')) {

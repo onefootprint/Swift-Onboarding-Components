@@ -116,7 +116,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.context.requirement.shouldCollectConsent).toEqual(false);
 
       state = machine.send({
-        type: 'startSelfieCapture',
+        type: 'startImageCapture',
       });
       expect(state.value).toEqual('selfieImage');
 
@@ -272,7 +272,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
         {
-          type: 'startSelfieCapture',
+          type: 'startImageCapture',
         },
         {
           type: 'cameraErrored',
@@ -311,7 +311,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
-          type: 'startSelfieCapture',
+          type: 'startImageCapture',
         },
       ]);
       expect(state.value).toEqual('selfiePrompt');

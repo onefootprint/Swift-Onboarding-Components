@@ -23,11 +23,13 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'backImage'
+    | 'backImageCapture'
     | 'backImageRetry'
     | 'complete'
     | 'countryAndType'
     | 'failure'
     | 'frontImage'
+    | 'frontImageCapture'
     | 'frontImageRetry'
     | 'incompatibleDevice'
     | 'initState'

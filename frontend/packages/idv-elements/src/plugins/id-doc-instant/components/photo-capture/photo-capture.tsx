@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import Camera from '../camera';
@@ -15,8 +14,6 @@ type PhotoCaptureProps = {
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
   onComplete: (imageString: string) => void;
-  title: string;
-  subtitle?: string;
 };
 
 const PhotoCapture = ({
@@ -26,8 +23,6 @@ const PhotoCapture = ({
   outlineHeightRatio,
   cameraKind,
   onComplete,
-  title,
-  subtitle,
 }: PhotoCaptureProps) => {
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
@@ -76,32 +71,23 @@ const PhotoCapture = ({
     setImage(newImage);
   };
 
-  return (
-    <>
-      <NavigationHeader />
-      {image ? (
-        <Preview
-          imageSrc={image}
-          onRetake={handleRetake}
-          onConfirm={handleConfirm}
-          isLoading={isLoading}
-          title={title}
-          subtitle={subtitle}
-        />
-      ) : (
-        <Camera
-          onCapture={handleCapture}
-          onError={handleError}
-          cameraKind={cameraKind}
-          title={title}
-          subtitle={subtitle}
-          maxVideoHeight={maxVideoHeight}
-          outlineWidthRatio={outlineWidthRatio}
-          outlineHeightRatio={outlineHeightRatio}
-          outlineKind={outlineKind}
-        />
-      )}
-    </>
+  return image ? (
+    <Preview
+      imageSrc={image}
+      onRetake={handleRetake}
+      onConfirm={handleConfirm}
+      isLoading={isLoading}
+    />
+  ) : (
+    <Camera
+      onCapture={handleCapture}
+      onError={handleError}
+      cameraKind={cameraKind}
+      maxVideoHeight={maxVideoHeight}
+      outlineWidthRatio={outlineWidthRatio}
+      outlineHeightRatio={outlineHeightRatio}
+      outlineKind={outlineKind}
+    />
   );
 };
 

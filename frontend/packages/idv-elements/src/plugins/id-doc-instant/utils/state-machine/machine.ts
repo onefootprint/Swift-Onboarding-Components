@@ -50,6 +50,20 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'processing',
               actions: 'assignImage',
             },
+            startImageCapture: {
+              target: 'frontImageCapture',
+            },
+          },
+        },
+        frontImageCapture: {
+          on: {
+            cameraErrored: {
+              target: 'frontImage',
+            },
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
           },
         },
         frontImageRetry: {
@@ -58,10 +72,27 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'processing',
               actions: 'assignImage',
             },
+            startImageCapture: {
+              target: 'frontImageCapture',
+            },
           },
         },
         backImage: {
           on: {
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+            startImageCapture: {
+              target: 'backImageCapture',
+            },
+          },
+        },
+        backImageCapture: {
+          on: {
+            cameraErrored: {
+              target: 'backImage',
+            },
             receivedImage: {
               target: 'processing',
               actions: 'assignImage',
@@ -74,6 +105,9 @@ const createIdDocMachine = (args: MachineContext) =>
               target: 'processing',
               actions: 'assignImage',
             },
+            startImageCapture: {
+              target: 'backImageCapture',
+            },
           },
         },
         selfiePrompt: {
@@ -81,7 +115,7 @@ const createIdDocMachine = (args: MachineContext) =>
             consentReceived: {
               actions: 'assignConsent',
             },
-            startSelfieCapture: {
+            startImageCapture: {
               target: 'selfieImage',
               cond: context => !context.requirement.shouldCollectConsent,
             },
@@ -100,7 +134,7 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         selfieImageRetry: {
           on: {
-            startSelfieCapture: {
+            startImageCapture: {
               target: 'selfieImage',
             },
           },

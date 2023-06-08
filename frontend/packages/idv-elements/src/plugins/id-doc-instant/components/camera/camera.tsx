@@ -3,7 +3,6 @@ import { Button, LoadingIndicator } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { HeaderTitle } from '../../../../components';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
 import { OutlineKind } from './components/overlay/overlay';
@@ -21,8 +20,6 @@ type CameraProps = {
   outlineWidthRatio: number; // with respect to the video height (not width)
   outlineHeightRatio: number; // with respect to the video height
   outlineKind: OutlineKind;
-  title: string;
-  subtitle?: string;
 };
 
 const FRONT_CAMERA_OPTIONS = {
@@ -43,8 +40,6 @@ const Camera = ({
   outlineWidthRatio,
   outlineHeightRatio,
   outlineKind,
-  title,
-  subtitle,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
@@ -125,7 +120,6 @@ const Camera = ({
         </LoadingContainer>
       )}
       <Container data-visible={isCameraVisible}>
-        <HeaderTitle title={title} subtitle={subtitle} />
         <VideoContainer>
           <Video
             ref={videoRef as React.Ref<HTMLVideoElement>}

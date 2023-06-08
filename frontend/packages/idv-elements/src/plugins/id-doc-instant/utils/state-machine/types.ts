@@ -58,7 +58,7 @@ export type MachineEvents =
       type: 'consentReceived';
     }
   | {
-      type: 'startSelfieCapture';
+      type: 'startImageCapture';
     }
   | {
       type: 'cameraErrored';
