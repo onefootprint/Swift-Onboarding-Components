@@ -1,12 +1,10 @@
 use crate::idology::{
-    common::response::{
-        from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse, WarmAddressType,
-    },
+    common::response::{from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
     error as IdologyError,
     IdologyError::RequestError,
 };
-use newtypes::{DecisionStatus, FootprintReasonCode, IDologyReasonCode};
-use std::{collections::HashSet, str::FromStr};
+use newtypes::{DecisionStatus, FootprintReasonCode};
+use std::collections::HashSet;
 
 // Given a raw response, deserialize
 pub fn parse_response(value: serde_json::Value) -> Result<ExpectIDResponse, IdologyError::Error> {
@@ -210,41 +208,6 @@ impl Response {
             Some(ref id_scan) => id_scan.as_str() == "yes",
             None => false,
         }
-    }
-
-    pub fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        let qualifier_reason_codes = if let Some(ref qualifiers) = self.qualifiers {
-            qualifiers
-                .parse_qualifiers()
-                .into_iter()
-                .flat_map(|q| match q.1 {
-                    IDologyReasonCode::WarmInputAddressAlert => {
-                        q.0.warm_address_list
-                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
-                            .map(|t| t.to_input_address_footprint_reason_code())
-                    }
-                    IDologyReasonCode::WarmAddressAlert => {
-                        q.0.warm_address_list
-                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
-                            .map(|t| t.to_located_address_footprint_reason_code())
-                    }
-                    _ => Into::<Option<FootprintReasonCode>>::into(&q.1),
-                })
-                .collect()
-        } else {
-            vec![]
-        };
-
-        let restriction_reason_codes = self
-            .restriction
-            .as_ref()
-            .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
-            .unwrap_or_default();
-
-        qualifier_reason_codes
-            .into_iter()
-            .chain(restriction_reason_codes.into_iter())
-            .collect()
     }
 
     fn error(&self) -> Option<RequestError> {
@@ -493,41 +456,6 @@ mod tests {
         assert!(response_malformed.watchlists().is_empty());
 
         assert!(response_malformed_score.watchlists().is_empty());
-    }
-
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardMailDrop])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hospital"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardHospital])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hotel"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardHotel])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "prison"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardPrison])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "campground"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardCampground])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "college"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardCollege])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "university"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardUniversity])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "USPO"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardUspo])]
-    #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "General Delivery"}) => vec![FootprintReasonCode::AddressLocatedIsNotStandardGeneralDelivery])]
-    #[test_case(json!([
-        {
-          "key": "resultcode.warm.input.address.alert",
-          "warm-address-list": "General Delivery"
-        },
-        {
-          "key": "resultcode.address.velocity.alert",
-        },
-        {
-            "key": "resultcode.warm.input.address.alert",
-            "warm-address-list": "hotel"
-        },
-      ]) => vec![FootprintReasonCode::AddressInputIsNotStandardGeneralDelivery, FootprintReasonCode::AddressAlertVelocity, FootprintReasonCode::AddressInputIsNotStandardHotel])]
-    fn test_parse_footprint_reason_codes(qualifier: serde_json::Value) -> Vec<FootprintReasonCode> {
-        Response {
-            qualifiers: Some(IDologyQualifiers { qualifier }),
-            results: None,
-            summary_result: None,
-            id_number: None,
-            id_scan: None,
-            error: None,
-            restriction: None,
-        }
-        .footprint_reason_codes()
     }
 
     #[test_case("result.match" => true)]

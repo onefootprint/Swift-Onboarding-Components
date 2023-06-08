@@ -374,12 +374,14 @@ mod tests {
 
         let feature_vector = create_features(vendor_results);
         let expected_idology_features = IDologyFeatures {
-            is_id_scan_required: false,
-            id_number_for_scan_required: Some(3010453),
             footprint_reason_codes: vec![
                 FootprintReasonCode::IpNotLocated,
                 FootprintReasonCode::AddressStreetNameDoesNotMatch,
                 FootprintReasonCode::WatchlistHitOfac,
+                FootprintReasonCode::AddressPartiallyMatches,
+                FootprintReasonCode::DobMatches,
+                FootprintReasonCode::SsnMatches,
+                FootprintReasonCode::NameMatches,
             ],
             verification_result: idology_result.verification_result_id,
         };
@@ -470,8 +472,6 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IdNotLocated,
                 ],
-                id_number_for_scan_required: None,
-                is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
             }),
             idology_scan_onboarding_features: None,
@@ -530,8 +530,6 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IpStateDoesNotMatch,
                 ],
-                id_number_for_scan_required: None,
-                is_id_scan_required: false,
                 verification_result: VerificationResultId::from("123".to_owned()),
             }),
             ..Default::default()

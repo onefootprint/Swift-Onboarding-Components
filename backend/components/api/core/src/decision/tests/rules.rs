@@ -5,8 +5,7 @@ use newtypes::{FootprintReasonCode, VerificationResultId};
 use crate::decision::{
     features::idology_expectid::IDologyFeatures,
     rule::{
-        rule_set::Action, rule_sets::kyc::idology_base_rule_set,
-        rules_engine::evaluate_onboarding_rules,
+        rule_set::Action, rule_sets::kyc::idology_base_rule_set, rules_engine::evaluate_onboarding_rules,
     },
 };
 use test_case::test_case;
@@ -14,8 +13,6 @@ use test_case::test_case;
 fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeatures {
     IDologyFeatures {
         footprint_reason_codes: fp_reason_codes,
-        id_number_for_scan_required: None,
-        is_id_scan_required: false,
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     }
 }

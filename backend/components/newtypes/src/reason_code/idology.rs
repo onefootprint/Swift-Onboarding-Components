@@ -4,6 +4,41 @@ use super::{OldSignalSeverity, Signal};
 use strum::EnumIter;
 use strum_macros::EnumString;
 
+pub mod idology_match_codes {
+    use crate::FootprintReasonCode;
+
+    pub const ADDRESS_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 1] =
+        [FootprintReasonCode::AddressDoesNotMatch];
+    pub const ADDRESS_PARTIALLY_MATCHES_CODES: [FootprintReasonCode; 4] = [
+        FootprintReasonCode::AddressZipCodeDoesNotMatch,
+        FootprintReasonCode::AddressStreetNameDoesNotMatch,
+        FootprintReasonCode::AddressStreetNumberDoesNotMatch,
+        FootprintReasonCode::AddressStateDoesNotMatch,
+    ];
+    pub const DOB_YOB_CODES: [FootprintReasonCode; 3] = [
+        FootprintReasonCode::DobYobDoesNotMatch,
+        FootprintReasonCode::DobYobNotAvailable,
+        FootprintReasonCode::DobYobDoesNotMatchWithin1Year,
+    ];
+    pub const DOB_MOB_CODES: [FootprintReasonCode; 2] = [
+        FootprintReasonCode::DobMobDoesNotMatch,
+        FootprintReasonCode::DobMobNotAvailable,
+    ];
+    pub const SSN_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 5] = [
+        FootprintReasonCode::SsnDoesNotMatch,
+        FootprintReasonCode::SsnNotAvailable,
+        FootprintReasonCode::SsnInputIsItin,
+        FootprintReasonCode::SsnLocatedIsInvalid,
+        FootprintReasonCode::SsnLocatedIsItin,
+    ];
+    pub const SSN_PARTIALLY_MATCHES_CODES: [FootprintReasonCode; 1] =
+        [FootprintReasonCode::SsnDoesNotMatchWithin1Digit];
+    pub const NAME_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 2] = [
+        FootprintReasonCode::NameLastDoesNotMatch,
+        FootprintReasonCode::NameFirstDoesNotMatch,
+    ];
+}
+
 vendor_reason_code_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
     #[serde(try_from = "&str")]
@@ -157,7 +192,7 @@ vendor_reason_code_enum! {
         ActivationDateAlert,
 
         #[ser = "resultcode.first.name.does.not.match", description = "This indicates that the located first name does not match the input first name. Note: This ID Note must be enabled by a Customer Success account manager for use in your enterprise."]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(FootprintReasonCode::NameFirstDoesNotMatch)]
         FirstNameDoesNotMatch,
 
         #[ser = "resultcode.last.name.does.not.match", description = "This indicates that the located last name does not match the input last name."]
@@ -529,7 +564,10 @@ impl IDologyReasonCode {
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
+
     use crate::db_types::FootprintReasonCode;
+    use crate::idology_match_codes;
     use crate::reason_code::idology::IDologyReasonCode;
 
     #[test]
@@ -554,5 +592,34 @@ mod tests {
         assert_eq!(None, Into::<Option<FootprintReasonCode>>::into(&reason_code2));
 
         IDologyReasonCode::try_from("resultcode.keagan.is.a.beast").expect_err("should err");
+    }
+
+    #[test]
+    fn test_match_codes_being_produced() {
+        let footprint_reason_codes: Vec<FootprintReasonCode> = IDologyReasonCode::iter()
+            .filter_map(|i| Into::<Option<FootprintReasonCode>>::into(&i))
+            .collect();
+
+        assert!(idology_match_codes::ADDRESS_DOES_NOT_MATCH_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::ADDRESS_PARTIALLY_MATCHES_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::DOB_YOB_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::DOB_MOB_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::SSN_DOES_NOT_MATCH_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::SSN_PARTIALLY_MATCHES_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
+        assert!(idology_match_codes::NAME_DOES_NOT_MATCH_CODES
+            .iter()
+            .all(|r| footprint_reason_codes.contains(r)));
     }
 }

@@ -45,8 +45,6 @@ fn test_evaluate_onboarding_rules(
 ) -> OnboardingRulesDecisionOutput {
     // Set up a feature vector
     let idology_features = IDologyFeatures {
-        is_id_scan_required: false,
-        id_number_for_scan_required: Some(3010453),
         footprint_reason_codes: fp_reason_codes,
         verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     };
