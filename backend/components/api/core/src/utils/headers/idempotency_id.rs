@@ -5,7 +5,10 @@ use actix_web::{http::header::HeaderMap, FromRequest};
 use derive_more::Deref;
 use futures_util::Future;
 use lazy_static::lazy_static;
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::{
+    models::{DefaultSchemaRaw, Parameter},
+    schema::{Apiv2Schema, TypedData},
+};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
@@ -20,11 +23,32 @@ lazy_static! {
     pub static ref IDEMPOTENCY_ID_CHARS: Regex = idempotency_id_regex();
 }
 
-#[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]
+#[derive(Debug, Clone, Serialize, Deserialize, Deref)]
 /// To safely support retrying requests without accidentally performing the same operation multiple times,
 /// provide a client-generated `x-idempotency-id`. Requests made with the same x-idempotency-id value
 /// will no-op and return the same result
 pub struct IdempotencyId(pub Option<String>);
+
+impl Apiv2Schema for IdempotencyId {
+    fn required() -> bool {
+        false
+    }
+
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        vec![
+            paperclip::v2::models::Parameter::<DefaultSchemaRaw>{
+                name: "x-idempotency-id".to_owned(),
+                in_: paperclip::v2::models::ParameterIn::Header,
+                description: Some("To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
+                data_type: Some(newtypes::IdempotencyId::data_type()),
+                format: newtypes::IdempotencyId::format(),
+                required: Self::required(),
+                ..Default::default()
+            }
+        ]
+    }
+}
+impl paperclip::actix::OperationModifier for IdempotencyId {}
 
 impl IdempotencyId {
     const HEADER_NAME: &str = "x-idempotency-id";

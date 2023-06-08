@@ -109,7 +109,25 @@ In some circumstances, you may need to vault PII user data for users that did no
 
 Standalone Footprint user vaults can store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make searchable. Unstructured data are custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
 
-The first step is to create a new vault for one of your users. You may optionally initialize it with any data you already have for the user:
+The first step is to create a new vault for one of your users.
+
+```bash
+curl https://api.onefootprint.com/users \
+	-X POST \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
+}
+```
+
+Save this `id` and associate it with the corresponding user in your database.
+
+### Initial data
+
+If you have initial data to seed in the vault, you may provide it in the HTTP body:
 
 ```bash
 curl https://api.onefootprint.com/users \
@@ -130,7 +148,26 @@ curl https://api.onefootprint.com/users \
 }
 ```
 
-Save this `id` and associate it with the corresponding user in your database.
+### Idempotency ID
+
+To safely support retrying this `POST /user` request without creating a second user, we support an `x-idempotency-id` header. Requests made with the same `x-idempotency-id` value will no-op and return the same `fp_id`.
+
+If you are creating a user vault in Footprint for an existing user record in your database, we recommend using your user record's unique ID as the `x-idempotency-id` to guarantee that only one Footprint user vault is ever created per user.
+
+Note, when using `x-idempotency-id`, you are not able to provide initial data in the HTTP body.
+
+```bash
+curl https://api.onefootprint.com/users \
+	-X POST \
+	-H 'x-idempotency-id: my_user_id_1234'
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
+}
+```
 
 <inline-alert variant='info'>This value is safe to store in plaintext!</inline-alert>
 
