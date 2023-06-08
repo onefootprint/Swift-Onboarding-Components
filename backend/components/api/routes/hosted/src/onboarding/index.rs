@@ -123,6 +123,7 @@ pub async fn post(
                         is_live: user_vault.is_live,
                         is_portable: true,
                         kind: VaultKind::Business,
+                        is_fixture: false,
                     };
                     let business_vault = Vault::create(conn, args)?;
                     BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;

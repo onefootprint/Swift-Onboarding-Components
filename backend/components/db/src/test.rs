@@ -105,6 +105,7 @@ mod test {
             is_live: false,
             is_portable: true,
             kind: VaultKind::Person,
+            is_fixture: false,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();

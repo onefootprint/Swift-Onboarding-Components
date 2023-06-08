@@ -53,6 +53,7 @@ pub async fn post(
         is_live,
         is_portable: false,
         kind: VaultKind::Person,
+        is_fixture: false,
     };
 
     // Parse optional request

@@ -22,6 +22,7 @@ pub fn create(conn: &mut TxnPgConn, kind: VaultKind, is_live: bool, is_portable:
         is_live,
         is_portable,
         kind,
+        is_fixture: false,
     };
     Vault::create(conn, new_user_vault).unwrap()
 }

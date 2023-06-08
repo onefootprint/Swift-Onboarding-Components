@@ -78,13 +78,16 @@ async fn patch_inner(
     let request = request
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let is_fixture = user_auth.user().is_fixture;
     let su_id = user_auth.data.scoped_user.id;
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
 
-    let request = request.build_global_fingerprints(state.as_ref()).await?;
+    let request = request
+        .build_global_fingerprints(state.as_ref(), is_fixture)
+        .await?;
 
     let new_ci = state
         .db_pool

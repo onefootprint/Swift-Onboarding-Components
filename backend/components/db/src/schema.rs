@@ -791,6 +791,7 @@ table! {
         is_live -> Bool,
         is_portable -> Bool,
         kind -> Text,
+        is_fixture -> Bool,
     }
 }
 

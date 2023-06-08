@@ -81,7 +81,10 @@ pub async fn patch(
     }
 
     let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
-    let request = request.build_global_fingerprints(state.as_ref()).await?;
+    let is_fixture = user_auth.user().is_fixture;
+    let request = request
+        .build_global_fingerprints(state.as_ref(), is_fixture)
+        .await?;
 
     state
         .db_pool

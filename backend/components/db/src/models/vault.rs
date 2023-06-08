@@ -15,6 +15,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
+pub type IsFixture = bool;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable, PartialEq)]
 #[diesel(table_name = vault)]
@@ -27,6 +28,10 @@ pub struct Vault {
     pub is_live: IsLive,
     pub is_portable: bool,
     pub kind: VaultKind,
+    /// A subset of the sandbox, non-is-live users are "fixture" users created specifically with
+    /// the fixture phone number. They have a few special properties, like they should never make
+    /// global fingerprints so they can not be identified outside of the tenant that created them
+    pub is_fixture: IsFixture,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -148,6 +153,7 @@ impl Vault {
             is_live,
             is_portable,
             kind,
+            is_fixture,
         } = new_user;
         let new_user = NewVaultRow {
             id: VaultId::generate(kind),
@@ -156,6 +162,7 @@ impl Vault {
             is_live,
             is_portable,
             kind,
+            is_fixture,
         };
         let vault = diesel::insert_into(vault::table)
             .values(new_user)
@@ -207,6 +214,7 @@ struct NewVaultRow {
     is_live: IsLive,
     is_portable: bool,
     kind: VaultKind,
+    is_fixture: IsFixture,
 }
 
 pub struct NewVaultArgs {
@@ -215,10 +223,5 @@ pub struct NewVaultArgs {
     pub is_live: IsLive,
     pub is_portable: bool,
     pub kind: VaultKind,
-}
-
-pub struct NewVaultInfo {
-    pub e_private_key: EncryptedVaultPrivateKey,
-    pub public_key: VaultPublicKey,
-    pub is_live: IsLive,
+    pub is_fixture: IsFixture,
 }

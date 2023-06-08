@@ -43,6 +43,7 @@ impl VaultWrapper<Person> {
             is_live: ob_config.is_live, // Must derive is_live from the ob config used to create it
             is_portable: true,
             kind: VaultKind::Person,
+            is_fixture: phone_number_parsed.is_fixture_phone_number(),
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
@@ -58,7 +59,7 @@ impl VaultWrapper<Person> {
             [
                 // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise
                 // these test users' data will become portable across tenants
-                (!phone_number_parsed.is_fixture_phone_number()).then_some(FingerprintRequest {
+                (!uv.is_fixture).then_some(FingerprintRequest {
                     kind: IDK::PhoneNumber.into(),
                     fingerprint: global_sh_phone_number,
                     scope: FingerprintScopeKind::Global,

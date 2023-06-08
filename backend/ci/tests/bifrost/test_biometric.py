@@ -103,7 +103,7 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     data = dict(
         identifier=identifier,
     )
-    body = post("hosted/identify", data)
+    body = post("hosted/identify", data, sandbox_user.client.ob_config.key)
     assert body["user_found"]
     assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 

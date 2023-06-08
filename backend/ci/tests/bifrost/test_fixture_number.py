@@ -14,7 +14,8 @@ def ob_config2(sandbox_tenant, must_collect_data, can_access_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_one_click(sandbox_tenant, ob_config2, tenant, twilio):
+@pytest.mark.parametrize("use_phone", [True, False])
+def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     seed = _gen_random_n_digit_number(10)
     phone_number = f"{FIXTURE_PHONE_NUMBER}#sandbox{seed}"
     ob_config = sandbox_tenant.default_ob_config
@@ -28,11 +29,17 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio):
     assert bifrost.handled_requirements
 
     # User exists now, but shouldn't be able to find it without exact tenant auth
-    body = post("hosted/identify", identify_data)
+    if use_phone:
+        identifier = dict(phone_number=bifrost.data["id.phone_number"])
+    else:
+        identifier = dict(email=bifrost.data["id.email"])
+    print(identifier)
+    data = dict(identifier=identifier)
+    body = post("hosted/identify", data)
     assert not body["user_found"]
-    body = post("hosted/identify", identify_data, tenant.default_ob_config.key)
+    body = post("hosted/identify", data, tenant.default_ob_config.key)
     assert not body["user_found"]
-    body = post("hosted/identify", identify_data, ob_config.key)
+    body = post("hosted/identify", data, ob_config.key)
     assert body["user_found"]
 
     bifrost2 = BifrostClient(ob_config2, twilio, override_inherit_phone=phone_number)
