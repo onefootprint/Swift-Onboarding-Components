@@ -4,6 +4,7 @@ use actix_web::FromRequest;
 use async_trait::async_trait;
 use db::models::{tenant::Tenant, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
+use newtypes::TenantScope;
 use paperclip::{
     actix::OperationModifier,
     v2::{
@@ -147,6 +148,13 @@ where
         match self {
             Either::Left(l) => l.actor(),
             Either::Right(r) => r.actor(),
+        }
+    }
+
+    fn scopes(&self) -> Vec<TenantScope> {
+        match self {
+            Either::Left(l) => l.scopes(),
+            Either::Right(r) => r.scopes(),
         }
     }
 }

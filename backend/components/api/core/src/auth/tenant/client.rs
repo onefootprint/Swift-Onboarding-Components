@@ -89,6 +89,11 @@ impl TenantAuth for SessionContext<ClientTenantData> {
     fn rolebinding(&self) -> Option<&db::models::tenant_rolebinding::TenantRolebinding> {
         None
     }
+
+    fn scopes(&self) -> Vec<newtypes::TenantScope> {
+        // This is false in some cases. Maybe ClientTenantAuth shouldn't implement TenantAuth
+        vec![]
+    }
 }
 
 // Some custom permissions only used by ClientTenant auth

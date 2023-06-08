@@ -60,6 +60,7 @@ pub trait TenantAuth {
     /// The rolebinding that ties the authed principal to the role. Will be None for firm employee
     /// auth and API key auth
     fn rolebinding(&self) -> Option<&TenantRolebinding>;
+    fn scopes(&self) -> Vec<TenantScope>;
 }
 
 pub trait GetFirmEmployee {

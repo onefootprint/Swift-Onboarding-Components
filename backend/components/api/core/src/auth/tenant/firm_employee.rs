@@ -112,24 +112,30 @@ impl GetFirmEmployee for FirmEmployeeAuthContext {
 // for impersonation
 impl AllowSessionUpdate for ParsedFirmEmployeeAuth {}
 
+impl FirmEmployeeAuth {
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        // TODO check if there's a header that approves write access
+        let extra_permissions_for_user = if self.is_risk_ops {
+            risk_ops_permissions()
+        } else {
+            vec![]
+        };
+        self.role
+            .scopes
+            .iter()
+            .cloned()
+            .chain(extra_permissions_for_user)
+            .collect()
+    }
+}
+
 impl CanCheckTenantGuard for FirmEmployeeAuthContext {
     fn role(&self) -> &TenantRole {
         &self.0.role
     }
 
     fn token_scopes(&self) -> Vec<TenantScope> {
-        // TODO check if there's a header that approves write access
-        let extra_permissions_for_user = if self.0.is_risk_ops {
-            risk_ops_permissions()
-        } else {
-            vec![]
-        };
-        self.role()
-            .scopes
-            .iter()
-            .cloned()
-            .chain(extra_permissions_for_user)
-            .collect()
+        self.0.token_scopes()
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
@@ -167,6 +173,10 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
 
     fn actor(&self) -> AuthActor {
         AuthActor::FirmEmployee(self.tenant_user.id.clone())
+    }
+
+    fn scopes(&self) -> Vec<TenantScope> {
+        self.token_scopes()
     }
 }
 

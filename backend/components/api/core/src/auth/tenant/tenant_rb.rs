@@ -135,6 +135,10 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     fn actor(&self) -> AuthActor {
         AuthActor::from(self.tenant_user.id.clone())
     }
+
+    fn scopes(&self) -> Vec<TenantScope> {
+        self.tenant_role.scopes.clone()
+    }
 }
 
 impl GetFirmEmployee for TenantRbAuthContext {

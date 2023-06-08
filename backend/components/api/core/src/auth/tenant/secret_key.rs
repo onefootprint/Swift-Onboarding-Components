@@ -118,6 +118,10 @@ impl TenantAuth for SecretTenantAuthContext {
     fn actor(&self) -> AuthActor {
         AuthActor::TenantApiKey(self.api_key().id.clone())
     }
+
+    fn scopes(&self) -> Vec<TenantScope> {
+        self.role.scopes.clone()
+    }
 }
 
 impl CanCheckTenantGuard for SecretTenantAuthContext {
