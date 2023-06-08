@@ -1,6 +1,12 @@
-use crate::utils::{
-    db2api::DbToApi,
-    vault_wrapper::{Any, TenantVw},
+use crate::{
+    auth::{
+        tenant::{TenantAuth, TenantGuardDsl},
+        CanDecrypt, IsGuardMet,
+    },
+    utils::{
+        db2api::DbToApi,
+        vault_wrapper::{Any, TenantVw},
+    },
 };
 use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
@@ -9,13 +15,21 @@ use db::models::{
 use newtypes::{BusinessDataKind as BDK, DataIdentifier};
 use std::collections::HashMap;
 
-pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>);
+pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>, &'a Box<dyn TenantAuth>);
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
-    fn from_db((entity, vw): EntityDetail) -> Self {
+    fn from_db((entity, vw, auth): EntityDetail) -> Self {
         let (sv, watchlist_check, onboarding_info) = entity;
-        // We only allow tenants to see data in the vault that they have requested to collected and ob config has been authorized
         let attributes = vw.get_visible_populated_fields();
+
+        let auth_scopes = auth.scopes();
+        let decryptable_attributes = vw.populated_dis()
+            .into_iter()
+            // Filter out the attributes that are not decryptable by the tenant at all
+            .filter(|x| vw.can_decrypt(x.clone()))
+            // Then, filter out attributes that the authed user doesn't have permissions to decrypt
+            .filter(|x| CanDecrypt::single(x.clone()).or_admin().is_met(&auth_scopes))
+            .collect();
 
         // Don't require any permissions to decrypt business name - always show it in plaintext
         let plaintext_dis: Vec<DataIdentifier> = vec![BDK::Name.into()];
@@ -45,6 +59,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
             ordering_id,
             decrypted_attributes,
+            decryptable_attributes,
         }
     }
 }

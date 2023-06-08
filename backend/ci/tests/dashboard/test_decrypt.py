@@ -74,18 +74,13 @@ def test_tenant_decrypt_no_permissions(sandbox_user):
 def test_tenant_document_decrypt_no_permissions(sandbox_user):
     tenant = sandbox_user.tenant
     data = {
-        "fields": ["document.drivers_license.front"],
+        "fields": ["id.dob"],
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
-    get_user_resp = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
-    assert (
-        not "decrypt.document" in get_user_resp["onboarding"]["can_access_permissions"]
-    )
-    assert (
-        not "decrypt.document_and_selfie"
-        in get_user_resp["onboarding"]["can_access_permissions"]
-    )
+    body = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
+    assert not "decrypt.dob" in body["onboarding"]["can_access_permissions"]
+    assert not "id.dob" in body["decryptable_attributes"]
 
     post(
         f"users/{sandbox_user.fp_id}/vault/decrypt",

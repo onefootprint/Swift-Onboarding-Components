@@ -56,6 +56,6 @@ pub async fn get(
             Ok((entity, vw))
         })
         .await??;
-    let result = api_wire_types::Entity::from_db((entity, &vw));
+    let result = api_wire_types::Entity::from_db((entity, &vw, &auth));
     ResponseData::ok(result).json()
 }

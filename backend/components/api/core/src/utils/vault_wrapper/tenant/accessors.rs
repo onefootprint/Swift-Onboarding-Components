@@ -1,4 +1,7 @@
+use crate::auth::{CanDecrypt, IsGuardMet};
+
 use super::TenantVw;
+use itertools::Itertools;
 use newtypes::DataIdentifier;
 
 impl<Type> TenantVw<Type> {
@@ -12,5 +15,29 @@ impl<Type> TenantVw<Type> {
         // by the ob config?
         // For ex, if another tenant adds a portable credit card, should this tenant be able to see it?
         self.populated_dis()
+    }
+
+    /// Determines if a provided DI is decryptable.
+    /// Only DIs that were not authorized by the onboarding config are unable to be decrypted.
+    pub fn can_decrypt(&self, di: DataIdentifier) -> bool {
+        if self.portable.populated_dis().contains(&di) {
+            // TODO this condition should include `&& not added by this tenant` to support the case
+            // where progressively collected data is made portable
+            let can_decrypt_scopes = self
+                .onboarding
+                .iter()
+                .flat_map(|ob| ob.can_decrypt_scopes())
+                .collect_vec();
+            // If portable (TODO and not added by this tenant), decryptable if the ob config allows it
+            CanDecrypt::single(di).is_met(&can_decrypt_scopes)
+        } else {
+            let cannot_decrypt_scopes = self
+                .onboarding
+                .iter()
+                .flat_map(|ob| ob.cannot_decrypt_scopes())
+                .collect_vec();
+            // If not portable (TODO or added by this tenant), decryptable if the ob config doesn't _dis_allow it.
+            !CanDecrypt::single(di).is_met(&cannot_decrypt_scopes)
+        }
     }
 }

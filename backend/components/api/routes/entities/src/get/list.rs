@@ -106,7 +106,7 @@ pub async fn get(
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
-        .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw)))
+        .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw, &auth)))
         .collect();
     Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
 }

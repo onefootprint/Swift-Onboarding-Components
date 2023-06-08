@@ -12,17 +12,18 @@ from tests.constants import TENANT_ID3
 
 
 @pytest.fixture(scope="session")
-def foo_sandbox_tenant(must_collect_data, can_access_data):
+def foo_sandbox_tenant():
     org_data = {
         "id": TENANT_ID3,
         "name": "Footprint Sandbox Integration Testing Foo",
         "is_live": False,
     }
-
+    # Specifically don't request nationality
+    fields = ["name", "ssn9", "full_address", "email", "phone_number"]
     ob_conf_data = {
         "name": "Foo Credit Card",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
+        "must_collect_data": fields,
+        "can_access_data": fields,
     }
 
     return create_tenant(org_data, ob_conf_data)
@@ -61,12 +62,9 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
         "process",
     }
 
-    """
-    TODO: reinstate when we start serializing met requirements for demo tenant
     assert set(i["kind"] for i in foo_bifrost.already_met_requirements) == {
         "collect_data"
     }
-    """
 
     return DualOnboardedUser(fp_id, foo_fp_id)
 
@@ -143,3 +141,14 @@ def test_cant_see_speculative_fingerprints(
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
         body = get(f"/entities", data, foo_sandbox_tenant.sk.key)
         assert not len(body["data"])
+
+
+def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):
+    # Now, we shouldn't be able to decrypt nationality since it wasn't requested by foo_sandbox_tenant
+    data = dict(fields=["id.nationality"], reason="Hello")
+    post(
+        f"entities/{dual_onboarded_user.foo_fp_id}/vault/decrypt",
+        data,
+        foo_sandbox_tenant.sk.key,
+        status_code=401,
+    )

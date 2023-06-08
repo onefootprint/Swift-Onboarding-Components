@@ -39,8 +39,8 @@ pub enum AuthError {
     MissingScope(Csv<UserAuthGuard>),
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(String),
-    #[error("Not allowed: onboarding configuration does not have permissions to decrypt attributes: {0}")]
-    ObConfigMissingDecryptPermission(String),
+    #[error("Not allowed: insufficient permissions to decrypt attributes: {0}")]
+    MissingDecryptPermission(String),
     #[error("Cannot modify global properties on portable user")]
     CannotModifyPortableUser,
     #[error("Not allowed: handoff tokens cannot create other handoff tokens")]

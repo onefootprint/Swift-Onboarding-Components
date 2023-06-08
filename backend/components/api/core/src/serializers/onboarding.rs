@@ -29,6 +29,7 @@ impl DbToApi<SerializableOnboarding> for api_wire_types::Onboarding {
             status,
             timestamp: start_timestamp,
             insight_event: api_wire_types::InsightEvent::from_db(insight),
+            // TODO deprecate
             can_access_permissions: can_decrypt_scopes,
         }
     }

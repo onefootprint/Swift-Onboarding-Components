@@ -16,7 +16,7 @@ impl<Type> VaultWrapper<Type> {
         &self.vault
     }
 
-    pub(super) fn populated_dis(&self) -> Vec<DataIdentifier> {
+    pub fn populated_dis(&self) -> Vec<DataIdentifier> {
         self.speculative
             .populated_dis()
             .into_iter()

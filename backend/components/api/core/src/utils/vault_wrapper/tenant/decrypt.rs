@@ -1,35 +1,21 @@
 use super::{DecryptRequest, TenantVw};
 use crate::auth::AuthError;
-use crate::auth::{CanDecrypt, IsGuardMet};
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
-use newtypes::{DataIdentifier, PiiString, TenantScope};
+use newtypes::{DataIdentifier, PiiString};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
     pub fn check_ob_config_access(&self, ids: &[DataIdentifier]) -> ApiResult<()> {
-        if !self.vault.is_portable {
-            // tenants can do what they wish with NON-portable vaults they own
-            return Ok(());
-        }
-
-        let can_decrypt_scopes: Vec<_> = self
-            .onboarding
+        let cannot_access = ids
             .iter()
-            .flat_map(|ob| ob.can_decrypt_scopes())
-            // All custom data belonging to the tenant is allowed to be decrypted
-            .chain([TenantScope::DecryptCustom])
-            .collect();
-
-        let cannot_access_fields = ids
-            .iter()
-            .filter(|x| !CanDecrypt::single((*x).clone()).is_met(&can_decrypt_scopes))
+            .filter(|x| !self.can_decrypt((*x).clone()))
             .collect_vec();
-        if !cannot_access_fields.is_empty() {
-            let cannot_access_fields_str = cannot_access_fields.into_iter().map(|x| x.to_string()).join(", ");
-            return Err(AuthError::ObConfigMissingDecryptPermission(cannot_access_fields_str).into());
+        if !cannot_access.is_empty() {
+            let cannot_access_fields_str = cannot_access.into_iter().map(|x| x.to_string()).join(", ");
+            return Err(AuthError::MissingDecryptPermission(cannot_access_fields_str).into());
         }
 
         Ok(())

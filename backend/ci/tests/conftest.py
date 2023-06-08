@@ -200,6 +200,7 @@ def sandbox_user_real_phone(sandbox_tenant, twilio):
     )
     return bifrost.run()
 
+
 def generate_real_phone_number():
     seed = _gen_random_n_digit_number(10)
     return f"{LIVE_PHONE_NUMBER}#sandbox{seed}"
