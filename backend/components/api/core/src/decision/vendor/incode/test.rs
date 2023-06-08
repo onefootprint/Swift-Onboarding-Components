@@ -43,6 +43,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
+        None,
         true,
         None,
     )
@@ -246,6 +247,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
+        None,
         true,
         None,
     )

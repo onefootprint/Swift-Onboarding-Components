@@ -17,7 +17,8 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     )
     bifrost.run()
     # TODO: later assert that data cannot be edited (since we aren't in a redo workflow)
-    bifrost.handle_authorize() # have to manually hit /authorize for now, since this isn't currently going to be recognized as an outstanding requirement
+    body = post("hosted/onboarding/authorize", None, bifrost.auth_token, status_code=400)
+    assert body["error"]["message"] == "Workflow does not exist"
     assert len(bifrost.handled_requirements) == 0
 
     # no new KYC checks should be run, we should still only 1 OBD

@@ -14,6 +14,8 @@ pub mod alpaca_kyc;
 pub mod common;
 pub mod document;
 pub mod kyc;
+#[cfg(test)]
+pub mod test_utils;
 mod traits;
 
 use traits::{DoAction, OnAction, Workflow, WorkflowState};

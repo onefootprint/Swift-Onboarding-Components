@@ -62,7 +62,7 @@ async fn test_run(
     // Setup
     //
     let (tenant, onboarding, _, _, di, _) =
-        create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, true, None).await;
+        create_user_and_onboarding(&state.db_pool, &state.enclave_client, None, None, true, None).await;
     let svid = onboarding.scoped_vault_id.clone();
     let diid = di.id.clone();
     state

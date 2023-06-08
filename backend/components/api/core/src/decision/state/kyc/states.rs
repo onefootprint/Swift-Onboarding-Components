@@ -5,10 +5,12 @@ use db::models::{
     decision_intent::DecisionIntent,
     onboarding::{Onboarding, OnboardingUpdate},
     scoped_vault::ScopedVault,
+    tenant::Tenant,
     workflow::Workflow as DbWorkflow,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
+use webhooks::WebhookClient;
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -165,7 +167,11 @@ impl KycDecisioning {
 type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = (Option<FixtureDecision>, Arc<dyn FeatureFlagClient>);
+    type AsyncRes = (
+        Option<FixtureDecision>,
+        Arc<dyn FeatureFlagClient>,
+        Arc<dyn WebhookClient>,
+    );
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -180,16 +186,31 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         )
         .await?;
 
-        Ok((fixture_decision, state.feature_flag_client.clone()))
+        Ok((
+            fixture_decision,
+            state.feature_flag_client.clone(),
+            state.webhook_client.clone(),
+        ))
     }
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        let (fixture_decision, ff_client) = async_res;
+        let (fixture_decision, ff_client, webhook_client) = async_res;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)
         } else {
             common::get_kyc_decision(conn, self.vendor_results.clone())?
         };
+
+        let su = ScopedVault::get(conn, &self.sv_id)?;
+        let tenant = Tenant::get(conn, &su.tenant_id)?;
+
+        common::fire_onboarding_completed_webhook(
+            webhook_client,
+            &su,
+            &tenant,
+            decision.decision.decision_status.into(),
+            decision.decision.create_manual_review,
+        );
 
         common::save_kyc_decision(
             conn,

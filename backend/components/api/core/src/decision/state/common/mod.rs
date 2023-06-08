@@ -1,19 +1,22 @@
 use std::sync::Arc;
 
+use chrono::Utc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
+        tenant::Tenant,
         workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, OnboardingId, ScopedVaultId, TenantId, VaultKind, Vendor,
-    VerificationResultId, WorkflowId, WorkflowKind,
+    DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ScopedVaultId, TenantId, VaultKind,
+    Vendor, VerificationResultId, WorkflowId, WorkflowKind,
 };
+use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 
 use crate::{
     decision::{
@@ -228,4 +231,29 @@ pub fn save_kyc_decision(
         is_sandbox,
         Some(workflow_id.clone()),
     )
+}
+
+pub fn fire_onboarding_completed_webhook(
+    webhook_client: Arc<dyn WebhookClient>,
+    su: &ScopedVault,
+    tenant: &Tenant,
+    status: OnboardingStatus,
+    requires_manual_review: bool,
+) {
+    let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
+        fp_id: su.fp_id.clone(),
+        footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),
+        timestamp: Utc::now(),
+        status,
+        requires_manual_review,
+    });
+
+    webhook_client.send_event_to_tenant_non_blocking(
+        WebhookApp {
+            id: su.tenant_id.clone(),
+            is_live: su.is_live,
+        },
+        wh_event,
+        None,
+    );
 }

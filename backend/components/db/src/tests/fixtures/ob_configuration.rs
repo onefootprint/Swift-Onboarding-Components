@@ -1,5 +1,5 @@
 use crate::PgConn;
-use newtypes::{CollectedDataOption, TenantId};
+use newtypes::{CipKind, CollectedDataOption, TenantId};
 
 use crate::models::ob_configuration::ObConfiguration;
 
@@ -21,6 +21,7 @@ pub fn create_with_opts(
     tenant_id: &TenantId,
     is_live: bool,
     must_collect_options: Option<Vec<CollectedDataOption>>,
+    cip_kind: Option<CipKind>,
 ) -> ObConfiguration {
     let must_collect = if let Some(mc) = must_collect_options {
         mc
@@ -35,7 +36,7 @@ pub fn create_with_opts(
         must_collect,
         vec![CollectedDataOption::PhoneNumber],
         is_live,
-        None,
+        cip_kind,
     )
     .expect("Could not create ob config")
 }

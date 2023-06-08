@@ -11,6 +11,7 @@ use db::{
         onboarding_decision::OnboardingDecision,
         risk_signal::RiskSignal,
         scoped_vault::ScopedVault,
+        tenant::Tenant,
         vault::Vault,
         verification_request::VerificationRequest,
         workflow::Workflow as DbWorkflow,
@@ -27,6 +28,7 @@ use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, FootprintReasonCode, OnboardingStatus,
     Vendor, VendorAPI,
 };
+use webhooks::WebhookClient;
 
 use crate::{
     auth::tenant::AuthActor,
@@ -296,6 +298,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     type AsyncRes = (
         Either<WatchlistResultResponse, FixtureDecision>,
         Vec<VendorResult>,
+        Arc<dyn WebhookClient>,
     );
 
     async fn execute_async_idempotent_actions(
@@ -357,12 +360,12 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let vendor_results =
             common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
 
-        Ok((watchlist_res, vendor_results))
+        Ok((watchlist_res, vendor_results, state.webhook_client.clone()))
     }
 
     fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
-        let (watchlist_res, vendor_results) = res;
+        let (watchlist_res, vendor_results, webhook_client) = res;
 
         // TODO: !! Hack: this will retrieve VRes's from every vendor api, including watchlist check + doc scan.
         // Soon, we will migrate RiskSignal to point to VRes and then we will just write risk signals when we save the vres
@@ -448,6 +451,17 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             false,
             is_sandbox,
         )?;
+
+        let su = ScopedVault::get(conn, &self.sv_id)?;
+        let tenant = Tenant::get(conn, &su.tenant_id)?;
+
+        common::fire_onboarding_completed_webhook(
+            webhook_client,
+            &su,
+            &tenant,
+            decision.0.decision.decision_status.into(),
+            decision.0.decision.create_manual_review,
+        );
 
         if final_decision.decision_status == DecisionStatus::Pass {
             Ok(AlpacaKycState::from(AlpacaKycComplete))

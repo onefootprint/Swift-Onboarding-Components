@@ -414,7 +414,7 @@ pub struct OCRAddress {
 mod tests {
     use newtypes::{
         incode::{IncodeStatus, IncodeTest},
-        IdDocKind, IncodeFailureReason,
+        IncodeFailureReason,
     };
 
     use crate::incode::doc::response::AddSelfieResponse;

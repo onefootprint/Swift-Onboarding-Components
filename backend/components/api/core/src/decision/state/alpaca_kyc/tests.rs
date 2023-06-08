@@ -1,5 +1,9 @@
 use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
+use crate::decision::state::test_utils::{
+    mock_idology, mock_incode, mock_twilio, mock_webhook, query_data, setup_data,
+    ExpectedRequiresManualReview, ExpectedStatus, UserKind, WithHit,
+};
 use crate::decision::state::DocCollected;
 use crate::decision::state::ReviewCompleted;
 use crate::decision::state::WorkflowActions;
@@ -43,7 +47,7 @@ use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
 use macros::{test_db_pool, test_state_case};
-use newtypes::{AlpacaKycConfig, AlpacaKycState, DbActor, SealedVaultBytes};
+use newtypes::{AlpacaKycState, CipKind, DbActor, SealedVaultBytes};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use newtypes::{FootprintReasonCode, TenantUserId};
 use newtypes::{KycConfig, ScopedVaultId};
@@ -52,153 +56,10 @@ use newtypes::{SignalSeverity, WorkflowConfig};
 use std::str::FromStr;
 use std::sync::Arc;
 
-async fn setup_data(
-    state: &State,
-    user_kind: UserKind,
-    phone_suffix: Option<String>,
-) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
-    // TODO: create sandbox vs demo vs real, diff sandbox fixues
-    let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, _, _, sv, _, obc) = test_helpers::create_user_and_onboarding(
-        &state.db_pool,
-        &state.enclave_client,
-        Some(vec![CDO::FullAddress]), // so we can meet min req for kyc vendor calls
-        is_live,
-        phone_suffix,
-    )
-    .await;
-
-    let tid = tenant.id.clone();
-    let (wf, tu) = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let config = AlpacaKycConfig { is_redo: false }.into();
-            let wf = Workflow::create(conn, &sv.id, config).unwrap();
-            // only enable Idology for this dummy test merchant
-            let tvc = TenantVendorControl::create(
-                conn,
-                tid,
-                true,
-                Some("un123".to_owned()),
-                Some(SealedVaultBytes(vec![])),
-                false,
-                None,
-            )
-            .unwrap();
-
-            let tu = fixtures::tenant_user::create(conn);
-
-            Ok((wf, tu))
-        })
-        .await
-        .unwrap();
-
-    (wf, tenant, obc, tu)
-}
-
-async fn query_data(
-    state: &State,
-    sv_id: &ScopedVaultId,
-    wf_id: &WorkflowId,
-) -> (
-    Onboarding,
-    Workflow,
-    Vec<WorkflowEvent>,
-    Option<ManualReview>,
-    Option<OnboardingDecision>,
-    Vec<RiskSignal>,
-) {
-    let svid = sv_id.clone();
-    let wfid = wf_id.clone();
-    state
-        .db_pool
-        .db_query(move |conn| {
-            let sv = ScopedVault::get(conn, &svid).unwrap();
-            let (ob, _, mr, obd) = Onboarding::get(conn, (&sv.id, &sv.vault_id)).unwrap();
-
-            let rs = obd
-                .as_ref()
-                .map(|obd| RiskSignal::list_by_onboarding_decision_id(conn, &obd.id).unwrap())
-                .unwrap_or_default();
-
-            let wf = Workflow::get(conn, &wfid).unwrap();
-            let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
-            (ob, wf, wfe, mr, obd, rs)
-        })
-        .await
-        .unwrap()
-}
-
-struct WithHit(bool);
-fn mock_incode(state: &mut State, with_hit: WithHit) {
-    let mut mock_incode_start_onboarding = MockVendorAPICall::<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_incode_start_onboarding
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::start_onboarding_response()));
-    state.set_incode_start_onboarding(Arc::new(mock_incode_start_onboarding));
-
-    let mut mock_incode_watchlist_check = MockVendorAPICall::<
-        idv::incode::watchlist::IncodeWatchlistCheckRequest,
-        IncodeResponse<idv::incode::watchlist::response::WatchlistResultResponse>,
-        idv::incode::error::Error,
-    >::new();
-
-    let res = if with_hit.0 {
-        idv::tests::fixtures::incode::watchlist_result_response_with_hit()
-    } else {
-        idv::tests::fixtures::incode::watchlist_result_response()
-    };
-
-    mock_incode_watchlist_check
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(res));
-    state.set_incode_watchlist_check(Arc::new(mock_incode_watchlist_check));
-}
-
-fn mock_idology(state: &mut State) {
-    let mut mock_idology_expect_id = MockVendorAPICall::<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >::new();
-    mock_idology_expect_id
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| {
-            Ok(idv::tests::fixtures::idology::create_response(
-                "result.match".to_string(),
-                None,
-            ))
-        });
-    state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
-}
-
-fn mock_twilio(state: &mut State) {
-    let mut mock_twilio_lookup_v2 =
-        MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>::new();
-    mock_twilio_lookup_v2
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::twilio::create_response()));
-    state.set_twilio_lookup_v2(Arc::new(mock_twilio_lookup_v2));
-}
-
 ///
 ///
 ///
 ///
-#[derive(Clone, Copy)]
-enum UserKind {
-    Demo,
-    Sandbox,
-    Live,
-}
 
 #[test_state_case(UserKind::Demo)]
 #[test_state_case(UserKind::Sandbox)]
@@ -209,6 +70,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     let (wf, tenant, obc, _tu) = setup_data(
         state,
         user_kind,
+        Some(CipKind::Alpaca),
         matches!(user_kind, UserKind::Sandbox).then(|| "pass".to_owned()),
     )
     .await;
@@ -278,6 +140,13 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
+    // Expect Webhook
+    mock_webhook(
+        state,
+        ExpectedStatus(OnboardingStatus::Pass),
+        ExpectedRequiresManualReview(false),
+    );
+
     /// MakeWatchlistCheckCall
     let (ww, _) = ww
         .action(
@@ -342,6 +211,7 @@ async fn pass_then_watchlist_hit(
     let (wf, tenant, obc, tu) = setup_data(
         state,
         user_kind,
+        Some(CipKind::Alpaca),
         matches!(user_kind, UserKind::Sandbox).then(|| "manualreview".to_owned()),
     )
     .await;
@@ -410,6 +280,13 @@ async fn pass_then_watchlist_hit(
     assert_eq!(OnboardingStatus::Pending, ob.status);
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
+
+    // Expect Webhook
+    mock_webhook(
+        state,
+        ExpectedStatus(OnboardingStatus::Fail),
+        ExpectedRequiresManualReview(true),
+    );
 
     /// MakeWatchlistCheckCall
     let (ww, _) = ww
@@ -494,7 +371,8 @@ async fn pass_then_watchlist_hit(
 #[tokio::test]
 async fn step_up(state: &mut State, user_kind: UserKind) {
     /// DATA SETUP
-    let (wf, tenant, obc, tu) = setup_data(state, user_kind, Some("stepup".to_owned())).await;
+    let (wf, tenant, obc, tu) =
+        setup_data(state, user_kind, Some(CipKind::Alpaca), Some("stepup".to_owned())).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -536,6 +414,13 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert_eq!(OnboardingStatus::Incomplete, ob.status);
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
+
+    // Expect Webhook
+    mock_webhook(
+        state,
+        ExpectedStatus(OnboardingStatus::Fail),
+        ExpectedRequiresManualReview(true),
+    );
 
     /// DocCollected
     let ww = ww
