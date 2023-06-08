@@ -11,10 +11,12 @@ import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
 
+export type CameraKind = 'front' | 'back';
+
 type CameraProps = {
   onCapture: (image: string) => void;
   onError: () => void;
-  cameraKind: 'front' | 'back';
+  cameraKind: CameraKind;
   maxVideoHeight: number;
   outlineWidthRatio: number; // with respect to the video height (not width)
   outlineHeightRatio: number; // with respect to the video height
