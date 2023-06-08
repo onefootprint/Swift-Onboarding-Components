@@ -3,11 +3,15 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { HeaderTitle } from '../../../../components';
+
 type PreviewProps = {
   imageSrc: string;
   onRetake: () => void;
   onConfirm: () => void;
   isLoading: boolean;
+  title: string;
+  subtitle?: string;
 };
 
 const Preview = ({
@@ -15,11 +19,14 @@ const Preview = ({
   onRetake,
   onConfirm,
   isLoading,
+  title,
+  subtitle,
 }: PreviewProps) => {
-  const { t } = useTranslation('pages.selfie-photo.preview');
+  const { t } = useTranslation('components.preview');
 
   return (
     <Container>
+      <HeaderTitle title={title} subtitle={subtitle} />
       <PreviewContainer>
         <ImagePreview src={imageSrc} />
       </PreviewContainer>

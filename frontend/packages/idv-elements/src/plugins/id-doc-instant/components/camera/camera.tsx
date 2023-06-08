@@ -3,27 +3,48 @@ import { Button, LoadingIndicator } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import { HeaderTitle } from '../../../../components';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
+import { OutlineKind } from './components/overlay/overlay';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
 
-const MAX_VIDEO_HEIGHT = 390;
-const FACE_OUTLINE_BY_HEIGHT_RATIO = 0.7;
-
 type CameraProps = {
   onCapture: (image: string) => void;
   onError: () => void;
+  cameraKind: 'front' | 'back';
+  maxVideoHeight: number;
+  outlineWidthRatio: number; // with respect to the video height (not width)
+  outlineHeightRatio: number; // with respect to the video height
+  outlineKind: OutlineKind;
+  title: string;
+  subtitle?: string;
 };
 
-const CAPTURE_OPTIONS = {
+const FRONT_CAMERA_OPTIONS = {
   audio: false,
   video: { facingMode: 'user' },
 };
 
-const Camera = ({ onCapture, onError }: CameraProps) => {
-  const { t } = useTranslation('pages.selfie-photo.camera');
+const BACK_CAMERA_OPTIONS = {
+  audio: false,
+  video: { facingMode: 'environment' },
+};
+
+const Camera = ({
+  onCapture,
+  onError,
+  cameraKind,
+  maxVideoHeight,
+  outlineWidthRatio,
+  outlineHeightRatio,
+  outlineKind,
+  title,
+  subtitle,
+}: CameraProps) => {
+  const { t } = useTranslation('components.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
   const videoRef = useRef<HTMLVideoElement>();
   const videoSize = useSize(videoRef);
@@ -31,7 +52,10 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
   const [isFlashing, setIsFlashing] = useState(false);
   const [image, setImage] = useState<string | undefined>();
 
-  const mediaStream = useUserMedia(CAPTURE_OPTIONS, onError);
+  const mediaStream = useUserMedia(
+    cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
+    onError,
+  );
   const isCameraVisible = !!mediaStream && isVideoPlaying;
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
@@ -99,12 +123,13 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
         </LoadingContainer>
       )}
       <Container data-visible={isCameraVisible}>
+        <HeaderTitle title={title} subtitle={subtitle} />
         <VideoContainer>
           <Video
             ref={videoRef as React.Ref<HTMLVideoElement>}
             hidden={!isVideoPlaying}
             onCanPlay={handleCanPlay}
-            maxHeight={MAX_VIDEO_HEIGHT}
+            maxHeight={maxVideoHeight}
             autoPlay
             playsInline
             muted
@@ -112,7 +137,11 @@ const Camera = ({ onCapture, onError }: CameraProps) => {
           <Overlay
             width={videoSize?.width ?? 0}
             height={videoSize?.height ?? 0}
-            faceOutlineByHeightRatio={FACE_OUTLINE_BY_HEIGHT_RATIO}
+            outlineKind={outlineKind}
+            outlineWidth={videoSize ? videoSize.height * outlineWidthRatio : 0}
+            outlineHeight={
+              videoSize ? videoSize.height * outlineHeightRatio : 0
+            }
           />
           <Canvas
             ref={canvasRef as React.Ref<HTMLCanvasElement>}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import useHandleCameraError from '../../../../../hooks/use-handle-camera-error';
+import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 
 const useUserMedia = (
   requestedMedia: MediaStreamConstraints,

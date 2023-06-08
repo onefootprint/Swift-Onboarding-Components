@@ -1,12 +1,17 @@
+import { useTranslation } from '@onefootprint/hooks';
 import React, { useState } from 'react';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
+import Camera from '../../components/camera';
+import Preview from '../../components/preview';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
-import Camera from './components/camera';
-import Preview from './components/preview';
+
+const MAX_VIDEO_HEIGHT = 390;
+const FACE_OUTLINE_TO_HEIGHT_RATIO = 0.7;
 
 const SelfiePhoto = () => {
+  const { t } = useTranslation('pages.selfie-photo');
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
   const { processImageUrl, convertImageFileToStrippedBase64 } =
@@ -68,9 +73,19 @@ const SelfiePhoto = () => {
           onRetake={handleRetake}
           onConfirm={handleConfirm}
           isLoading={isLoading}
+          title={t('title')}
         />
       ) : (
-        <Camera onCapture={handleCapture} onError={handleError} />
+        <Camera
+          onCapture={handleCapture}
+          onError={handleError}
+          cameraKind="front"
+          title={t('title')}
+          maxVideoHeight={MAX_VIDEO_HEIGHT}
+          outlineWidthRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
+          outlineHeightRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
+          outlineKind="corner"
+        />
       )}
     </>
   );

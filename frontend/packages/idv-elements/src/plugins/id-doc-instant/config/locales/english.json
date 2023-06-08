@@ -73,6 +73,17 @@
       "back": "Now the back side",
       "selfie": "Now we need a selfie",
       "one-side": "Now the photo page of your passport"
+    },
+    "camera": {
+      "instructions": {
+        "position": "Position your face within the frame",
+        "readiness": "Take the photo when you're ready"
+      },
+      "take": "Take photo"
+    },
+    "preview": {
+      "retake": "Retake",
+      "confirm": "Confirm"
     }
   },
   "pages": {
@@ -128,21 +139,11 @@
         }
       }
     },
-    "selfie-photo": {
-      "camera": {
-        "instructions": {
-          "position": "Position your face within the frame",
-          "readiness": "Take the photo when you're ready"
-        },
-        "take": "Take photo"
-      },
-      "preview": {
-        "retake": "Retake",
-        "confirm": "Confirm"
-      }
-    },
     "selfie-retry-prompt": {
       "cta": "Take photo"
+    },
+    "selfie-photo": {
+      "title": "Selfie photo"
     },
     "retry-limit-exceeded": {
       "title": "Too many attempts",
