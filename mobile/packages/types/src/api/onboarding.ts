@@ -2,5 +2,4 @@ export type OnboardingRequest = {
   authToken: string;
 };
 
-export type OnboardingResponse = {
-};
+export type OnboardingResponse = {};

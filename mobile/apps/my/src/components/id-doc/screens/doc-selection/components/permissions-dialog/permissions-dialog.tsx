@@ -1,4 +1,4 @@
-import { Box, Button, Dialog } from '@onefootprint/ui';
+import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
 import * as Linking from 'expo-linking';
 import React, { useEffect, useState } from 'react';
 import { Camera } from 'react-native-vision-camera';
@@ -6,10 +6,14 @@ import { Camera } from 'react-native-vision-camera';
 import useTranslation from '@/hooks/use-translation';
 
 type PermissionsDialogProps = {
+  onContinue: () => void;
   children: React.ReactNode;
 };
 
-const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
+const PermissionsDialog = ({
+  children,
+  onContinue,
+}: PermissionsDialogProps) => {
   const { t } = useTranslation(
     'components.scan.doc-selection.permissions-dialog',
   );
@@ -32,7 +36,7 @@ const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
     try {
       const response = await Camera.requestCameraPermission();
       if (response === 'authorized') {
-        setOpen(false);
+        onContinue();
       }
     } catch (error) {}
   };
@@ -69,7 +73,9 @@ const PermissionsDialog = ({ children }: PermissionsDialogProps) => {
               }
         }
       >
-        {t('description')}
+        <Typography variant="body-3" center>
+          {t('description')}
+        </Typography>
       </Dialog>
       <Button onPress={handlePress}>{t('cta')}</Button>
     </>

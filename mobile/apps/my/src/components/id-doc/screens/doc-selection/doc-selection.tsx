@@ -65,7 +65,7 @@ const DocSelection = ({ onSubmit }: DocSelectionProps) => {
             value={docType}
           />
         </Box>
-        <PermissionsDialog>
+        <PermissionsDialog onContinue={handleSubmit}>
           <Button onPress={handleSubmit}>{t('cta')}</Button>
         </PermissionsDialog>
       </Box>

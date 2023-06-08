@@ -79,6 +79,7 @@
           "description": "We will need you to take photos of your document to properly verify your identity.",
           "continue": "Continue",
           "open-settings": "Open settings",
+          "cta": "Continue"
         },
         "cta": "Continue"
       },
