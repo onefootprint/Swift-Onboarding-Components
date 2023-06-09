@@ -554,6 +554,20 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
+    // Expect Webhook
+    let expect_review = match user_kind {
+        UserKind::Demo | UserKind::Sandbox => false,
+        UserKind::Live => {
+            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
+            true
+        }
+    };
+    mock_webhook(
+        state,
+        ExpectedStatus(OnboardingStatus::Fail),
+        ExpectedRequiresManualReview(expect_review),
+    );
+
     /// MakeDecision
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))

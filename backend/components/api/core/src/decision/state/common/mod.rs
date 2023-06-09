@@ -211,9 +211,12 @@ pub fn get_kyc_decision(conn: &mut TxnPgConn, vendor_results: Vec<VendorResult>)
     Ok((rules_output, reason_codes))
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
+    webhook_client: Arc<dyn WebhookClient>,
     ob_id: &OnboardingId,
+    sv_id: &ScopedVaultId,
     workflow_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &KycDecision,
@@ -232,10 +235,24 @@ pub fn save_kyc_decision(
         !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,
         Some(workflow_id.clone()),
-    )
+    )?;
+
+    if !is_redo {
+        let su = ScopedVault::get(conn, sv_id)?;
+        let tenant = Tenant::get(conn, &su.tenant_id)?;
+
+        fire_onboarding_completed_webhook(
+            webhook_client,
+            &su,
+            &tenant,
+            decision.0.decision.decision_status.into(),
+            decision.0.decision.create_manual_review,
+        );
+    }
+    Ok(())
 }
 
-pub fn fire_onboarding_completed_webhook(
+fn fire_onboarding_completed_webhook(
     webhook_client: Arc<dyn WebhookClient>,
     su: &ScopedVault,
     tenant: &Tenant,

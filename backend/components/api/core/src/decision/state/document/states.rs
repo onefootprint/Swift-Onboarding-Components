@@ -10,6 +10,7 @@ use db::models::{
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::{DocumentConfig, FootprintReasonCode, VaultKind, Vendor, VerificationResultId};
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
+use webhooks::WebhookClient;
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::{
@@ -129,6 +130,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         Option<FixtureDecision>,
         Arc<dyn FeatureFlagClient>,
         Vec<VendorResult>,
+        Arc<dyn WebhookClient>,
     );
 
     async fn execute_async_idempotent_actions(
@@ -152,10 +154,11 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             fixture_decision,
             state.feature_flag_client.clone(),
             vendor_results,
+            state.webhook_client.clone(),
         ))
     }
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
-        let (fixture_decision, ff_client, vendor_results) = async_res;
+        let (fixture_decision, ff_client, vendor_results, webhook_client) = async_res;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)
@@ -163,9 +166,12 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             common::get_kyc_decision(conn, vendor_results.clone())?
         };
 
+        // TODO: doc wf shouldn't really be calling this
         common::save_kyc_decision(
             conn,
+            webhook_client,
             &self.ob_id,
+            &self.sv_id,
             &self.wf_id,
             vendor_results
                 .into_iter()

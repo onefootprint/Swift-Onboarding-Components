@@ -190,7 +190,7 @@ impl AlpacaKycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
-    type AsyncRes = Option<FixtureDecision>;
+    type AsyncRes = (Option<FixtureDecision>, Arc<dyn WebhookClient>);
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -205,11 +205,11 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         )
         .await?;
 
-        Ok(fixture_decision)
+        Ok((fixture_decision, state.webhook_client.clone()))
     }
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        let fixture_decision = async_res;
+        let (fixture_decision, webhook_client) = async_res;
 
         // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
@@ -224,7 +224,9 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
                     conn,
+                    webhook_client,
                     &self.ob_id,
+                    &self.sv_id,
                     &self.wf_id,
                     self.vendor_results
                         .iter()
@@ -452,7 +454,9 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         );
         common::save_kyc_decision(
             conn,
+            webhook_client,
             &self.ob_id,
+            &self.sv_id,
             &self.wf_id,
             vendor_results
                 .iter()
@@ -462,19 +466,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             self.is_redo,
             is_sandbox,
         )?;
-
-        let su = ScopedVault::get(conn, &self.sv_id)?;
-        let tenant = Tenant::get(conn, &su.tenant_id)?;
-
-        if !self.is_redo {
-            common::fire_onboarding_completed_webhook(
-                webhook_client,
-                &su,
-                &tenant,
-                decision.0.decision.decision_status.into(),
-                decision.0.decision.create_manual_review,
-            );
-        }
 
         if final_decision.decision_status == DecisionStatus::Pass {
             Ok(AlpacaKycState::from(AlpacaKycComplete))
