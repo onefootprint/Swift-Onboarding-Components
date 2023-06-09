@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/test-utils';
 import { Entity, EntityKind } from '@onefootprint/types';
 import React from 'react';
+import Provider from 'src/components/entities/components/details/hooks/use-entity-context';
 
 import { entityFixture } from '../../../../details.test.config';
 import DeviceInsights from './device-insights';
@@ -32,7 +33,11 @@ describe('<DeviceInsights />', () => {
   });
 
   const renderDeviceInsights = (enitity: Entity) => {
-    customRender(<DeviceInsights entity={enitity} />);
+    customRender(
+      <Provider kind={entity.kind} listPath="">
+        <DeviceInsights entity={enitity} />
+      </Provider>,
+    );
   };
 
   describe('When liveness request fails', () => {

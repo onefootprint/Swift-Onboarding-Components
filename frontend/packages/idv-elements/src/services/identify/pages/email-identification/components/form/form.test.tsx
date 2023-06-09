@@ -1,4 +1,4 @@
-import { screen, userEvent, within } from '@onefootprint/test-utils';
+import { screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderIdentify } from '../../../../config/tests/render';
@@ -78,6 +78,8 @@ describe('<Form />', () => {
 
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
-    expect(screen.getByText('Email is required')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Email is required')).toBeInTheDocument();
+    });
   });
 });
