@@ -1,6 +1,4 @@
-import IdDocType, {
-  SupportedIdDocTypes,
-} from '@onefootprint/types/src/data/id-doc-type';
+import { IdDocType, SupportedIdDocTypes } from '@onefootprint/types';
 
 const supportedTypeToIdDocType = {
   [SupportedIdDocTypes.idCard]: IdDocType.idCard,

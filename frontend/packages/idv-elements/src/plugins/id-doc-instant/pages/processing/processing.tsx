@@ -1,4 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { SubmitDocResponse } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -18,11 +20,13 @@ const imageRequestFields = {
 };
 
 const Processing = () => {
+  const { t } = useTranslation('pages.processing');
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<ImageTypes | undefined>();
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
+  const [isMissingRequirements, setIsMissingRequirements] = useState(false);
 
   const {
     idDoc: { type, country },
@@ -65,6 +69,7 @@ const Processing = () => {
 
   useEffectOnce(() => {
     if (!image || !authToken || !type || !country || !currSide) {
+      setIsMissingRequirements(true);
       return;
     }
 
@@ -95,6 +100,14 @@ const Processing = () => {
       payload: { nextSideToCollect: nextSide },
     });
   };
+
+  if (isMissingRequirements) {
+    return (
+      <Typography variant="label-1" color="error" sx={{ textAlign: 'center' }}>
+        {t('missing-requirement-error')}
+      </Typography>
+    );
+  }
 
   if (retryLimitExceeded) return <RetryLimitExceeded />;
 

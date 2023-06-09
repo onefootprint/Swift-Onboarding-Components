@@ -1,4 +1,4 @@
-import IdDocType from '@onefootprint/types/src/data/id-doc-type';
+import { IdDocType } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';

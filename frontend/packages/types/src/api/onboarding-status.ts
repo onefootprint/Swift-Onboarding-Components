@@ -3,7 +3,7 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
-import IdDocType, { SupportedIdDocTypes } from '../data/id-doc-type';
+import { IdDocType, SupportedIdDocTypes } from '../data/id-doc-type';
 import { OnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {

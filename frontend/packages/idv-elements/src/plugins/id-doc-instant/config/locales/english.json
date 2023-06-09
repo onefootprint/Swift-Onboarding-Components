@@ -158,6 +158,9 @@
     "selfie-photo": {
       "title": "Selfie photo"
     },
+    "processing": {
+      "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
+    },
     "retry-limit-exceeded": {
       "title": "Too many attempts",
       "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
