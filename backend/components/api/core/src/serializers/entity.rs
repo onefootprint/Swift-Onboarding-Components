@@ -12,7 +12,6 @@ use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
     vault::Vault,
 };
-use newtypes::{BusinessDataKind as BDK, DataIdentifier};
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>, &'a Box<dyn TenantAuth>);
@@ -31,10 +30,11 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .filter(|x| CanDecrypt::single(x.clone()).or_admin().is_met(&auth_scopes))
             .collect();
 
-        // Don't require any permissions to decrypt business name - always show it in plaintext
-        let plaintext_dis: Vec<DataIdentifier> = vec![BDK::Name.into()];
-        let decrypted_attributes: HashMap<_, _> = plaintext_dis
+        // Don't require any permissions to decrypt plaintext attributes - always show them
+        let decrypted_attributes: HashMap<_, _> = vw
+            .populated_dis()
             .into_iter()
+            .filter(|di| di.store_plaintext())
             .flat_map(|di| vw.get_p_data(di.clone()).map(|p_data| (di, p_data.clone())))
             .collect();
 

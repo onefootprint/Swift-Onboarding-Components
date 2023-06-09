@@ -1,9 +1,10 @@
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CardDataKind as CDK, CardInfo, CollectedDataOption, DataIdentifier, Error, Fingerprint,
+    CardDataKind as CDK, CardInfo, CardIssuer, CollectedDataOption, DataIdentifier, Error, Fingerprint,
     FingerprintScopeKind, IdentityDataKind as IDK, PiiString, TenantId, Validate, VaultKind, VdKind,
 };
 use crate::{DataValidationError, NtResult};
+use card_validate::Validate as CardValidate;
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use std::clone::Clone;
@@ -96,12 +97,26 @@ fn derived_entry(di: &DataIdentifier, v: &PiiString) -> Vec<(DataIdentifier, Pii
         DataIdentifier::Card(CardInfo { alias, kind }) => match kind {
             CDK::Number => {
                 let last4: PiiString = PiiString::new(v.leak().chars().skip(v.leak().len() - 4).collect());
-                let di = CardInfo {
+                let last4_di = CardInfo {
                     alias: alias.clone(),
                     kind: CDK::Last4,
                 }
                 .into();
-                vec![(di, last4)]
+                let last4_entry = Some((last4_di, last4));
+                // If we can't parse the number, silently fail to derive the issuer - we'll get a
+                // nicer error later on when we try to parse the number
+                let issuer_entry = CardValidate::from(v.leak())
+                    .ok()
+                    .map(|v| CardIssuer::from(v.card_type))
+                    .map(|issuer| {
+                        let di = CardInfo {
+                            alias: alias.clone(),
+                            kind: CDK::Issuer,
+                        }
+                        .into();
+                        (di, PiiString::new(issuer.to_string()))
+                    });
+                vec![last4_entry, issuer_entry].into_iter().flatten().collect()
             }
             CDK::Expiration => {
                 // TODO: derivation should encapsulate validation so we don't need this check here

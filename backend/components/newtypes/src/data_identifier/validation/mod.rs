@@ -7,7 +7,7 @@ mod investor_profile;
 mod utils;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
-pub use card::Expiration as CardExpiration;
+pub use card::{CardIssuer, Expiration as CardExpiration};
 pub use investor_profile::Declaration;
 
 pub trait Validate {

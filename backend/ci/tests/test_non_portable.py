@@ -84,7 +84,10 @@ def test_invalid_dis(key, tenant):
             {
                 "card.hayes_valley.number": "4428680502681658",
             },
-            {"card.hayes_valley.number.last4": "1658"},
+            {
+                "card.hayes_valley.number.last4": "1658",
+                "card.hayes_valley.issuer": "visa",
+            },
         ),
     ],
 )

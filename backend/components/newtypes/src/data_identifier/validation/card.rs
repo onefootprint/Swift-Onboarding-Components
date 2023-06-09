@@ -3,6 +3,8 @@ use crate::{CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 impl Validate for CI {
     fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
@@ -16,8 +18,51 @@ impl Validate for CI {
             CDK::Last4 => validate_card_number_last4(value)?,
             CDK::Name => validate_card_name(value)?,
             CDK::BillingZip => utils::clean_and_validate_zip(value)?,
+            CDK::Issuer => utils::parse_enum::<CardIssuer>(value)?,
         };
         Ok(result)
+    }
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, SerializeDisplay, EnumString, Display)]
+#[strum(serialize_all = "snake_case")]
+pub enum CardIssuer {
+    // Debit
+    VisaElectron,
+    Maestro,
+    Forbrugsforeningen,
+    Dankort,
+
+    // Credit
+    Visa,
+    Mir,
+    MasterCard,
+    Amex,
+    DinersClub,
+    Discover,
+    UnionPay,
+    Jcb,
+
+    Unknown,
+}
+
+impl From<card_validate::Type> for CardIssuer {
+    fn from(value: card_validate::Type) -> Self {
+        match value {
+            card_validate::Type::VisaElectron => Self::VisaElectron,
+            card_validate::Type::Maestro => Self::Maestro,
+            card_validate::Type::Forbrugsforeningen => Self::Forbrugsforeningen,
+            card_validate::Type::Dankort => Self::Dankort,
+            card_validate::Type::Visa => Self::Visa,
+            card_validate::Type::MIR => Self::Mir,
+            card_validate::Type::MasterCard => Self::MasterCard,
+            card_validate::Type::Amex => Self::Amex,
+            card_validate::Type::DinersClub => Self::DinersClub,
+            card_validate::Type::Discover => Self::Discover,
+            card_validate::Type::UnionPay => Self::UnionPay,
+            card_validate::Type::JCB => Self::Jcb,
+            card_validate::Type::__NonExhaustive => Self::Unknown,
+        }
     }
 }
 
@@ -44,7 +89,7 @@ fn validate_card_number(value: PiiString) -> VResult<PiiString> {
 
 fn validate_card_number_last4(value: PiiString) -> VResult<PiiString> {
     if !(value.leak().len() == 4 && value.leak().chars().all(|c| c.is_ascii_digit())) {
-        return Err(Error::CardError("card last 4 are invalid".into()));
+        return Err(Error::CardError("Card last 4 are invalid".into()));
     }
     Ok(value)
 }

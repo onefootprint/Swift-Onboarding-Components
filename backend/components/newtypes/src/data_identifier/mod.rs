@@ -128,7 +128,14 @@ impl DataIdentifier {
     /// Only add a new plaintext DI if you are 100% positive that this data doesn't need to be
     /// encrypted.
     pub fn store_plaintext(&self) -> bool {
-        matches!(self, Self::Business(BusinessDataKind::Name))
+        matches!(
+            self,
+            Self::Business(BusinessDataKind::Name)
+                | Self::Card(CardInfo {
+                    alias: _,
+                    kind: CardDataKind::Issuer
+                })
+        )
     }
 
     pub fn globally_unique(&self) -> bool {

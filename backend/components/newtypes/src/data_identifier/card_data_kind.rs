@@ -9,18 +9,18 @@ pub enum CardDataKind {
     Number,
     Expiration,
     Cvc,
+    Name,
+    #[strum(to_string = "billing_address.zip")]
+    BillingZip,
 
+    // Derived entries
     #[strum(to_string = "expiration.month")]
     ExpMonth,
     #[strum(to_string = "expiration.year")]
     ExpYear,
     #[strum(to_string = "number.last4")]
     Last4,
-
-    Name,
-
-    #[strum(to_string = "billing_address.zip")]
-    BillingZip,
+    Issuer,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
