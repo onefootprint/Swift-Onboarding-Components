@@ -555,17 +555,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .unwrap();
 
     // Expect Webhook
-    let expect_review = match user_kind {
-        UserKind::Demo | UserKind::Sandbox => false,
-        UserKind::Live => {
-            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
-            true
-        }
-    };
     mock_webhook(
         state,
         ExpectedStatus(OnboardingStatus::Fail),
-        ExpectedRequiresManualReview(expect_review),
+        ExpectedRequiresManualReview(false),
     );
 
     /// MakeDecision
@@ -581,15 +574,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
-    match user_kind {
-        UserKind::Demo | UserKind::Sandbox => {
-            assert!(mr.is_none());
-        }
-        UserKind::Live => {
-            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
-            assert!(mr.is_some());
-        }
-    }
+    assert!(mr.is_none());
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox => {

@@ -89,25 +89,16 @@ pub fn calculate_kyc_rules_output_with_waterfall(
         Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
     }
 
-    // TODO: move reason code creation and use returned VendorAPI
-
     let result = get_kyc_rules_result(rule_results).map_err(Error::from)?;
-    // If we no rules that triggered, we consider that a pass
-    let decision_status = match result.triggered_action.as_ref() {
-        Some(a) => match a {
-            Action::StepUp => DecisionStatus::Fail,
-            Action::ManualReview => DecisionStatus::Fail,
-            Action::Fail => DecisionStatus::Fail,
-        },
-        None => DecisionStatus::Pass,
-    };
-
-    // For now, we just queue up failures so we can see until we have a better sense of
-    // what reviews we want to be doing
-    let create_manual_review = decision_status == DecisionStatus::Fail;
 
     // TODO: derive this better
     let reason_codes = feature_vector.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
+
+    // If we no rules that triggered, we consider that a pass
+    let (decision_status, create_manual_review) = match result.triggered_action.as_ref() {
+        Some(a) => (a.into(), a == &Action::ManualReview),
+        None => (DecisionStatus::Pass, false),
+    };
 
     let output = OnboardingRulesDecisionOutput {
         decision: Decision {
@@ -118,5 +109,16 @@ pub fn calculate_kyc_rules_output_with_waterfall(
         rules_triggered: result.rules_triggered.to_owned(),
         rules_not_triggered: result.rules_not_triggered.to_owned(),
     };
+
     Ok((output, reason_codes))
+}
+
+impl From<&Action> for DecisionStatus {
+    fn from(value: &Action) -> Self {
+        match value {
+            Action::StepUp => DecisionStatus::StepUp,
+            Action::ManualReview => DecisionStatus::Fail,
+            Action::Fail => DecisionStatus::Fail,
+        }
+    }
 }
