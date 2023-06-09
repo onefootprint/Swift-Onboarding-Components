@@ -16,6 +16,7 @@ import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 import AssumeBanner from './components/assume-banner';
+import ManualReviewNavigator from './components/manual-review-navigator';
 import NavDropdown from './components/nav-dropdown';
 import SandboxBanner from './components/sandbox-banner';
 
@@ -56,7 +57,13 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
           </Footprint>
         </Container>
         <Nav>
-          <Container>
+          <Container
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}
+          >
             <Tabs variant="pill">
               {routes.map(({ href, Icon, text }) => (
                 <Tab
@@ -70,6 +77,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 </Tab>
               ))}
             </Tabs>
+            <ManualReviewNavigator />
           </Container>
         </Nav>
         <Container>{children}</Container>

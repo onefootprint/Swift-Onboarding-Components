@@ -10,6 +10,11 @@ export enum EntityWatchlistHitStatus {
   notOnWatchlist = 'false',
 }
 
+export enum RequiresManualReviewStatus {
+  requiresManualReview = 'true',
+  doesNotRequireManualReview = 'false',
+}
+
 const Filters = () => {
   const { t } = useTranslation('pages.entities.filters');
   const filters = useFilters();
@@ -62,6 +67,22 @@ const Filters = () => {
             },
           ],
           selectedOptions: filters.values.watchlist_hit,
+        },
+        {
+          query: 'requires_manual_review',
+          label: t('requires-manual-review.label'),
+          kind: 'single-select',
+          options: [
+            {
+              value: RequiresManualReviewStatus.requiresManualReview,
+              label: t('requires-manual-review.options.yes'),
+            },
+            {
+              value: RequiresManualReviewStatus.doesNotRequireManualReview,
+              label: t('requires-manual-review.options.no'),
+            },
+          ],
+          selectedOptions: filters.values.requires_manual_review,
         },
       ]}
       onChange={(queryKey, queryValue) => {

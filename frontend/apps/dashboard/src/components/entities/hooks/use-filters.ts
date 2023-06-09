@@ -14,6 +14,8 @@ export type EntitiesQueryParams = {
   search?: string;
   cursor?: string;
   page_size?: string;
+  // this is a boolean but we need to pass as a string for URL; incompatible w/ index signature otherwise
+  requires_manual_review?: string;
 };
 
 const defaultQueryParams: EntitiesQueryParams = {
@@ -23,6 +25,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   cursor: undefined,
   page_size: undefined,
   watchlist_hit: undefined,
+  requires_manual_review: undefined,
 };
 
 const useFilters = () => {
@@ -34,6 +37,7 @@ const useFilters = () => {
     search: filters.query.search,
     status: queryToArray(filters.query.status),
     watchlist_hit: filters.query.watchlist_hit,
+    requires_manual_review: filters.query.requires_manual_review,
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
@@ -44,6 +48,7 @@ const useFilters = () => {
     timestamp_gte: from,
     timestamp_lte: to,
     watchlist_hit: values.watchlist_hit,
+    requires_manual_review: values.requires_manual_review,
   };
   const searchParams = getSearchParams({
     cursor: filters.query.cursor,
@@ -52,6 +57,7 @@ const useFilters = () => {
     search: filters.query.search,
     status: filters.query.status,
     watchlist_hit: filters.query.watchlist_hit,
+    requires_manual_review: filters.query.requires_manual_review,
   });
   return {
     ...filters,

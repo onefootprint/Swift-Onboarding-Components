@@ -27,7 +27,7 @@ const List = () => {
         subtitle={t('header.subtitle')}
         kind={EntityKind.person}
         basePath="users"
-        defaultFilters={{ requires_manual_review: true }}
+        defaultFilters={{ requires_manual_review: 'true' }}
       >
         <ManualReviewTable
           aria-label={t('table.aria-label')}

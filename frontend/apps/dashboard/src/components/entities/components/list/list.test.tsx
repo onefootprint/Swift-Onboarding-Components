@@ -222,6 +222,32 @@ describe('<List />', () => {
     });
   });
 
+  describe('when filtering by "Requires manual review"', () => {
+    it('should apply the "requires_manual_review" in the url', async () => {
+      withEntities();
+      const push = jest.fn();
+      useRouterSpy({
+        pathname: '/entities',
+        push,
+        query: {},
+      });
+      await renderEntitiesAndWaitData();
+
+      await filterEvents.apply({
+        trigger: 'Requires manual review',
+        options: ['Yes'],
+      });
+
+      await waitFor(() => {
+        expect(push).toHaveBeenCalledWith(
+          { query: { requires_manual_review: 'true' } },
+          undefined,
+          expect.anything(),
+        );
+      });
+    });
+  });
+
   describe('when the request to fetch the entities fails', () => {
     beforeEach(() => {
       withEntitiesError();

@@ -8,7 +8,7 @@ export type GetEntitiesRequest = {
   statuses?: string;
   timestamp_gte?: string | Date;
   timestamp_lte?: string;
-  requires_manual_review?: boolean;
+  requires_manual_review?: string;
 };
 
 export type GetEntitiesResponse = Entity[];

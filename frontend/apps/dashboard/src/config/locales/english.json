@@ -421,6 +421,13 @@
             "yes": "Yes",
             "no": "No"
           }
+        },
+        "requires-manual-review": {
+          "label": "Requires manual review",
+          "options": {
+            "yes": "Yes",
+            "no": "No"
+          }
         }
       }
     },
