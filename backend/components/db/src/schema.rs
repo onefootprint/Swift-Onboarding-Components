@@ -662,6 +662,7 @@ table! {
         status -> Text,
         name -> Text,
         created_at -> Timestamptz,
+        role_id -> Text,
     }
 }
 
@@ -963,6 +964,7 @@ joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
+joinable!(tenant_api_key -> tenant_role (role_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant (tenant_id));

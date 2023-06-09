@@ -1,0 +1,1 @@
+ALTER TABLE tenant_api_key DROP COLUMN role_id;

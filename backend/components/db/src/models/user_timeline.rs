@@ -286,6 +286,7 @@ mod tests {
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
         let scoped_vault = fixtures::scoped_vault::create(conn, &vault.id, &ob_config.id);
+        let role = fixtures::tenant_role::create_admin(conn, &tenant.id);
 
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
         let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);
@@ -314,7 +315,13 @@ mod tests {
         )
         .0;
 
-        let tenant_api_key = test_tenant_api_key(conn, String::from("test key"), tenant.id.clone(), is_live);
+        let tenant_api_key = test_tenant_api_key(
+            conn,
+            String::from("test key"),
+            tenant.id.clone(),
+            is_live,
+            role.id,
+        );
 
         let user_vault_id = vault.id;
         let annotation3 = test_annotation(

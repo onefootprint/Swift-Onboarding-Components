@@ -83,10 +83,18 @@ pub async fn post(
     let e_key = secret_key.seal_to(&tenant.public_key)?;
     let new_key = state
         .db_pool
-        .db_query(move |conn| {
-            TenantApiKey::create(conn, request.into_inner().name, sh_key, e_key, tenant_id, is_live)
+        .db_transaction(move |conn| {
+            TenantApiKey::create(
+                conn,
+                request.into_inner().name,
+                sh_key,
+                e_key,
+                tenant_id,
+                is_live,
+                None,
+            )
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         new_key,

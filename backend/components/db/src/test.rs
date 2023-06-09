@@ -7,7 +7,9 @@ use crate::models::user_timeline::UserTimeline;
 use crate::PgConn;
 use crate::TxnPgConn;
 
-use newtypes::{DbActor, Fingerprint, OrgMemberEmail, ScopedVaultId, SealedVaultBytes, TenantId, VaultId};
+use newtypes::{
+    DbActor, Fingerprint, OrgMemberEmail, ScopedVaultId, SealedVaultBytes, TenantId, TenantRoleId, VaultId,
+};
 
 pub(crate) fn test_tenant_user(
     conn: &mut TxnPgConn,
@@ -52,10 +54,11 @@ where
 }
 
 pub(crate) fn test_tenant_api_key(
-    conn: &mut PgConn,
+    conn: &mut TxnPgConn,
     name: String,
     tenant_id: TenantId,
     is_live: bool,
+    role_id: TenantRoleId,
 ) -> TenantApiKey {
     TenantApiKey::create(
         conn,
@@ -64,6 +67,7 @@ pub(crate) fn test_tenant_api_key(
         SealedVaultBytes(vec![4, 5, 6]),
         tenant_id,
         is_live,
+        Some(role_id),
     )
     .unwrap()
 }

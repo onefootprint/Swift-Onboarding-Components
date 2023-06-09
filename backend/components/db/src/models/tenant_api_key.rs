@@ -7,10 +7,11 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId};
+use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId};
 
 use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
+use super::tenant_role::{ImmutableRoleKind, TenantRole};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key)]
@@ -25,6 +26,7 @@ pub struct TenantApiKey {
     pub status: ApiKeyStatus,
     pub name: String,
     pub created_at: DateTime<Utc>,
+    pub role_id: TenantRoleId,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -37,6 +39,7 @@ pub struct NewTenantApiKey {
     pub is_live: IsLive,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
+    pub role_id: TenantRoleId,
 }
 
 #[derive(AsChangeset)]
@@ -146,13 +149,26 @@ impl TenantApiKey {
 
     #[tracing::instrument(skip_all)]
     pub fn create(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         name: String,
         sh_secret_api_key: Fingerprint,
         e_secret_api_key: SealedVaultBytes,
         tenant_id: TenantId,
         is_live: IsLive,
+        role_id: Option<TenantRoleId>,
     ) -> DbResult<TenantApiKey> {
+        // For now, while role_id is optional from the API, default to the admin role for backwards
+        // compatibility
+        // TODO make this not null
+        let role_id = if let Some(role_id) = role_id {
+            // Make sure the role we are using belongs to the tenant, otherwise could make api key
+            // for another tenant's role
+            TenantRole::lock_active(conn, &role_id, &tenant_id)?
+                .into_inner()
+                .id
+        } else {
+            TenantRole::get_or_create_immutable(conn, &tenant_id, ImmutableRoleKind::Admin)?.id
+        };
         let new_key = NewTenantApiKey {
             name,
             sh_secret_api_key,
@@ -161,10 +177,11 @@ impl TenantApiKey {
             is_live,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
+            role_id,
         };
         let tenant_api_key = diesel::insert_into(tenant_api_key::table)
             .values(new_key)
-            .get_result::<TenantApiKey>(conn)?;
+            .get_result::<TenantApiKey>(conn.conn())?;
 
         Ok(tenant_api_key)
     }

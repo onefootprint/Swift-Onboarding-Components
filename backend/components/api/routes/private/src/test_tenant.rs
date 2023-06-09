@@ -108,8 +108,8 @@ async fn post(
                     if !e.is_not_found() {
                         return Err(e.into()); // Real error, return
                     }
-                    let (rb, _) =
-                        TenantRolebinding::create(conn, user.id, admin_role.id, admin_role.tenant_id)?;
+                    let role_id = admin_role.id.clone();
+                    let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, admin_role.tenant_id)?;
                     rb
                 }
             };
@@ -135,6 +135,7 @@ async fn post(
                         secret_api_key.seal_to(&tenant.public_key)?,
                         tenant.id.clone(),
                         is_live,
+                        Some(admin_role.id),
                     )?
                 }
             };
