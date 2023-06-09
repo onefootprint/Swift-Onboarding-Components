@@ -164,20 +164,21 @@ impl KycFeatureVector {
     }
 }
 
-impl From<VendorResult> for KycFeatureVector {
-    fn from(result: VendorResult) -> Self {
+impl TryFrom<VendorResult> for KycFeatureVector {
+    type Error = crate::decision::Error;
+    fn try_from(result: VendorResult) -> Result<Self, Error> {
         let response = result.response;
         let verification_result_id = result.verification_result_id;
         match response.response {
-            ParsedResponse::IDologyExpectID(resp) => Self {
+            ParsedResponse::IDologyExpectID(resp) => Ok(Self {
                 idology_features: Some(IDologyFeatures::from(resp, verification_result_id)),
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
                 experian_features: None,
-            },
+            }),
             // TODO!
-            ParsedResponse::TwilioLookupV2(_) => Self {
+            ParsedResponse::TwilioLookupV2(_) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: Some(TwilioFeatures {
@@ -185,22 +186,22 @@ impl From<VendorResult> for KycFeatureVector {
                 }),
                 socure_features: None,
                 experian_features: None,
-            },
-            ParsedResponse::SocureIDPlus(ref idplus_response) => Self {
+            }),
+            ParsedResponse::SocureIDPlus(ref idplus_response) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
                 experian_features: None,
-            },
+            }),
             // TODO
-            ParsedResponse::IDologyScanVerifySubmission(_) => Self {
+            ParsedResponse::IDologyScanVerifySubmission(_) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
                 experian_features: None,
-            },
+            }),
 
             // Writing down some context for future us:
             //
@@ -218,7 +219,7 @@ impl From<VendorResult> for KycFeatureVector {
             // TLDR;
             // For now, let's just punt on incorporating scan OB status into our footprint decision, and can revisit when we have tenants. We'll defer to expectID response since we'll send along the scan OB
             // results to that. I'll keep this around since it's useful to save to PG (when we do that)
-            ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => Self {
+            ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: Some(IDologyScanOnboardingFeatures::from(
                     scan_ob_resp,
@@ -227,15 +228,15 @@ impl From<VendorResult> for KycFeatureVector {
                 twilio_features: None,
                 socure_features: None,
                 experian_features: None,
-            },
-            ParsedResponse::ExperianPreciseID(resp) => Self {
+            }),
+            ParsedResponse::ExperianPreciseID(resp) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
                 experian_features: Some(ExperianFeatures::from(resp, verification_result_id)),
-            },
-            _ => unimplemented!(),
+            }),
+            _ => Err(Error::KycFeatureVectorConversionError(verification_result_id)),
         }
     }
 }
@@ -248,9 +249,14 @@ impl From<VendorResult> for KycFeatureVector {
 pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
     let base_features = KycFeatureVector::default();
 
-    results
-        .into_iter()
-        .fold(base_features, |acc, v| acc.merge(KycFeatureVector::from(v)))
+    results.into_iter().fold(base_features, |acc, v| {
+        if let Ok(fv) = KycFeatureVector::try_from(v) {
+            // ensures we don't error if VendorResult's are given that we don't have in KycFeatureVector yet
+            acc.merge(fv)
+        } else {
+            acc
+        }
+    })
 }
 
 impl FeatureVector for KycFeatureVector {

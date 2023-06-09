@@ -2,7 +2,7 @@ use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
     mock_idology, mock_incode, mock_twilio, mock_webhook, query_data, setup_data,
-    ExpectedRequiresManualReview, ExpectedStatus, UserKind, WithHit,
+    ExpectedRequiresManualReview, ExpectedStatus, UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::DocCollected;
 use crate::decision::state::ReviewCompleted;
@@ -47,7 +47,9 @@ use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
 use macros::{test_db_pool, test_state_case};
-use newtypes::{AlpacaKycState, CipKind, DbActor, SealedVaultBytes};
+use newtypes::{
+    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, SealedVaultBytes,
+};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use newtypes::{FootprintReasonCode, TenantUserId};
 use newtypes::{KycConfig, ScopedVaultId};
@@ -100,7 +102,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
-            mock_idology(state);
+            mock_idology(state, WithQualifier(None));
             mock_twilio(state);
             mock_incode(state, WithHit(false));
         }
@@ -160,6 +162,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
+    let obd = obd.unwrap();
+    assert!(obd.status == DecisionStatus::Pass);
+    assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(mr.is_none());
 
     match user_kind {
@@ -226,10 +231,11 @@ async fn pass_then_watchlist_hit(
     /// MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
+    let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
         .times(3)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
     match user_kind {
@@ -244,7 +250,7 @@ async fn pass_then_watchlist_hit(
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
-            mock_idology(state);
+            mock_idology(state, WithQualifier(None));
             mock_twilio(state);
             mock_incode(state, WithHit(true));
         }
@@ -367,6 +373,15 @@ async fn pass_then_watchlist_hit(
         }
         TerminalDecisionStatus::Fail => {
             assert_eq!(OnboardingStatus::Fail, ob.status);
+
+            // Test Redo as well
+            match user_kind {
+                // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
+                UserKind::Demo | UserKind::Sandbox => {}
+                UserKind::Live => {
+                    redo_and_pass(state, user_kind, &ob, &obd.unwrap(), &tenant.id, &obc.key).await;
+                }
+            }
         }
     }
 }
@@ -468,4 +483,209 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+}
+
+#[test_state_case(UserKind::Sandbox)]
+#[test_state_case(UserKind::Live)]
+#[tokio::test]
+async fn fail(state: &mut State, user_kind: UserKind) {
+    /// DATA SETUP
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        user_kind,
+        Some(CipKind::Alpaca),
+        matches!(user_kind, UserKind::Sandbox).then(|| "fail".to_owned()),
+    )
+    .await;
+    let wfid = wf.id.clone();
+    let svid = wf.scoped_vault_id.clone();
+
+    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+
+    /// MOCKING
+    let mut mock_ff_client = MockFeatureFlagClient::new();
+
+    let tenant_id = tenant.id.clone();
+    mock_ff_client
+        .expect_flag()
+        .times(2)
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+        .return_const(matches!(user_kind, UserKind::Demo));
+
+    match user_kind {
+        // If Demo or Sandbox we expect no vendor calls to be attempted
+        UserKind::Demo | UserKind::Sandbox => {}
+        // Mock vendor calls for Live users
+        UserKind::Live => {
+            let ob_config_key = obc.key.clone();
+            // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
+            mock_ff_client
+                .expect_flag()
+                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                .return_once(move |_| true);
+
+            mock_idology(
+                state,
+                WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
+            );
+            mock_twilio(state);
+        }
+    };
+    state.set_ff_client(Arc::new(mock_ff_client));
+
+    /// TESTS
+    ///
+    /// Authorize
+    let (ww, _) = ww
+        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .await
+        .unwrap();
+
+    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    assert!(ob.authorized_at.is_some());
+    assert!(ob.idv_reqs_initiated_at.is_some());
+    assert!(ob.decision_made_at.is_none());
+    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
+    assert!(!fps.is_empty()); //fingerprints were written
+
+    /// MakeVendorCalls
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .await
+        .unwrap();
+
+    /// MakeDecision
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .await
+        .unwrap();
+
+    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    let obd = obd.unwrap();
+    assert!(obd.status == DecisionStatus::Fail);
+    assert!(matches!(obd.actor, DbActor::Footprint));
+    assert_eq!(OnboardingStatus::Fail, ob.status);
+    assert!(ob.decision_made_at.is_some());
+    match user_kind {
+        UserKind::Demo | UserKind::Sandbox => {
+            assert!(mr.is_none());
+        }
+        UserKind::Live => {
+            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
+            assert!(mr.is_some());
+        }
+    }
+
+    match user_kind {
+        UserKind::Demo | UserKind::Sandbox => {
+            assert_have_same_elements(
+                vec![FootprintReasonCode::SsnDoesNotMatch],
+                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+            );
+        }
+        UserKind::Live => {
+            assert_have_same_elements(
+                vec![
+                    FootprintReasonCode::AddressMatches,
+                    FootprintReasonCode::AddressZipCodeMatches,
+                    FootprintReasonCode::AddressStreetNameMatches,
+                    FootprintReasonCode::AddressStreetNumberMatches,
+                    FootprintReasonCode::AddressStateMatches,
+                    FootprintReasonCode::DobYobMatches,
+                    FootprintReasonCode::DobMobMatches,
+                    FootprintReasonCode::DobMatches,
+                    FootprintReasonCode::SsnDoesNotMatch, // does not match
+                    FootprintReasonCode::NameLastMatches,
+                    FootprintReasonCode::NameMatches,
+                    FootprintReasonCode::IpStateMatches,
+                    FootprintReasonCode::PhoneNumberMatches,
+                    FootprintReasonCode::InputPhoneNumberMatchesInputState,
+                    FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
+                ],
+                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+            );
+        }
+    };
+
+    // Test Redo as well
+    match user_kind {
+        // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
+        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Live => {
+            redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key).await;
+        }
+    }
+}
+
+async fn redo_and_pass(
+    state: &mut State,
+    user_kind: UserKind,
+    prior_ob: &Onboarding,
+    prior_obd: &OnboardingDecision,
+    tenant_id: &TenantId,
+    ob_config_key: &ObConfigurationKey,
+) {
+    // Trigger Redo workflow
+    let sv_id = prior_ob.scoped_vault_id.clone();
+    let wf = state
+        .db_pool
+        .db_query(move |conn| {
+            Workflow::create(conn, &sv_id, AlpacaKycConfig { is_redo: true }.into()).unwrap()
+        })
+        .await
+        .unwrap();
+
+    let wfid = wf.id.clone();
+    let svid = wf.scoped_vault_id.clone();
+    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+
+    /// MOCKING
+    let mut mock_ff_client = MockFeatureFlagClient::new();
+
+    let tenant_id = tenant_id.clone();
+    mock_ff_client
+        .expect_flag()
+        .times(3)
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+        .return_const(matches!(user_kind, UserKind::Demo));
+
+    match user_kind {
+        // If Demo or Sandbox we expect no vendor calls to be attempted
+        UserKind::Demo | UserKind::Sandbox => {}
+        // Mock vendor calls for Live users
+        UserKind::Live => {
+            let ob_config_key = ob_config_key.clone();
+            // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
+            mock_ff_client
+                .expect_flag()
+                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                .return_once(move |_| true);
+
+            mock_idology(state, WithQualifier(None));
+            mock_twilio(state);
+            mock_incode(state, WithHit(false));
+        }
+    };
+    state.set_ff_client(Arc::new(mock_ff_client));
+    // webhook is specifically not mocked as we should not fire the OnboardingComplete webhook in redo
+
+    // run Authorize
+    let ww: WorkflowWrapper = ww
+        .run(state, WorkflowActions::Authorize(Authorize {}))
+        .await
+        .unwrap();
+
+    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    // new obd was written
+    let obd = obd.unwrap();
+    assert!(obd.id != prior_obd.id);
+    assert!(obd.status == DecisionStatus::Pass);
+    assert!(matches!(obd.actor, DbActor::Footprint));
+    assert_eq!(OnboardingStatus::Pass, ob.status);
+    // redo flow hasn't modified timestamps on ob
+    assert!(prior_ob.authorized_at == ob.authorized_at);
+    assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
+    assert!(prior_ob.decision_made_at == ob.decision_made_at);
 }

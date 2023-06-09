@@ -25,8 +25,8 @@ use idv::incode::{
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionStatus, FootprintReasonCode, OnboardingStatus,
-    Vendor, VendorAPI,
+    vendor_credentials::IncodeCredentialsWithToken, AlpacaKycConfig, DecisionStatus, FootprintReasonCode,
+    OnboardingStatus, Vendor, VendorAPI,
 };
 use webhooks::WebhookClient;
 
@@ -57,12 +57,12 @@ use super::{
 /// DataCollection
 /// ////////////////
 impl AlpacaKycDataCollection {
-    // TODO: pass in (Alpaca)KycConfig later and enable `redo`
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycDataCollection {
             wf_id: workflow.id,
+            is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -91,10 +91,11 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
     }
 
     fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, false, &self.ob_id, &self.sv_id)?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
         Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
+            is_redo: self.is_redo,
             sv_id: self.sv_id,
             ob_id: self.ob_id,
             t_id: self.t_id,
@@ -116,11 +117,12 @@ impl WorkflowState for AlpacaKycDataCollection {
 /// VendorCalls
 /// ////////////////
 impl AlpacaKycVendorCalls {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycVendorCalls {
             wf_id: workflow.id,
+            is_redo: config.is_redo,
             sv_id: sv.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
@@ -147,6 +149,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     ) -> ApiResult<AlpacaKycState> {
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
+            is_redo: self.is_redo,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
@@ -169,13 +172,14 @@ impl WorkflowState for AlpacaKycVendorCalls {
 /// Decisioning
 /// ////////////////
 impl AlpacaKycDecisioning {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
         Ok(AlpacaKycDecisioning {
             wf_id: workflow.id,
+            is_redo: config.is_redo,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -227,7 +231,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                         .map(|vr| vr.verification_result_id.clone())
                         .collect(),
                     &kyc_decision,
-                    false,
+                    self.is_redo,
                     fixture_decision.is_some(),
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycComplete))
@@ -241,6 +245,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
+                    is_redo: self.is_redo,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
@@ -262,6 +267,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycDocCollection {
                     wf_id: self.wf_id,
+                    is_redo: self.is_redo,
                     ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
@@ -285,11 +291,12 @@ impl WorkflowState for AlpacaKycDecisioning {
 /// WatchlistCheck
 /// ////////////////
 impl AlpacaKycWatchlistCheck {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycWatchlistCheck {
             wf_id: workflow.id,
+            is_redo: config.is_redo,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -452,20 +459,22 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
             &decision,
-            false,
+            self.is_redo,
             is_sandbox,
         )?;
 
         let su = ScopedVault::get(conn, &self.sv_id)?;
         let tenant = Tenant::get(conn, &su.tenant_id)?;
 
-        common::fire_onboarding_completed_webhook(
-            webhook_client,
-            &su,
-            &tenant,
-            decision.0.decision.decision_status.into(),
-            decision.0.decision.create_manual_review,
-        );
+        if !self.is_redo {
+            common::fire_onboarding_completed_webhook(
+                webhook_client,
+                &su,
+                &tenant,
+                decision.0.decision.decision_status.into(),
+                decision.0.decision.create_manual_review,
+            );
+        }
 
         if final_decision.decision_status == DecisionStatus::Pass {
             Ok(AlpacaKycState::from(AlpacaKycComplete))
@@ -492,7 +501,7 @@ impl WorkflowState for AlpacaKycWatchlistCheck {
 /// PendingReview
 /// ////////////////
 impl AlpacaKycPendingReview {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
         Ok(AlpacaKycPendingReview {
             sv_id: sv.id,
@@ -546,11 +555,12 @@ impl WorkflowState for AlpacaKycPendingReview {
 /// DocCollection
 /// ////////////////
 impl AlpacaKycDocCollection {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycDocCollection {
             wf_id: workflow.id,
+            is_redo: config.is_redo,
             ob_id: ob.id,
             sv_id: sv.id,
             t_id: sv.tenant_id,
@@ -573,6 +583,7 @@ impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
             wf_id: self.wf_id,
+            is_redo: self.is_redo,
             ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
@@ -594,7 +605,7 @@ impl WorkflowState for AlpacaKycDocCollection {
 /// Complete
 /// ////////////////
 impl AlpacaKycComplete {
-    pub async fn init(_state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(_state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         Ok(AlpacaKycComplete)
     }
 }

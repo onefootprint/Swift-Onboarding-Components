@@ -154,7 +154,8 @@ pub fn mock_incode(state: &mut State, with_hit: WithHit) {
     state.set_incode_watchlist_check(Arc::new(mock_incode_watchlist_check));
 }
 
-pub fn mock_idology(state: &mut State) {
+pub struct WithQualifier(pub Option<String>);
+pub fn mock_idology(state: &mut State, with_qualifier: WithQualifier) {
     let mut mock_idology_expect_id = MockVendorAPICall::<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -166,7 +167,7 @@ pub fn mock_idology(state: &mut State) {
         .return_once(move |_| {
             Ok(idv::tests::fixtures::idology::create_response(
                 "result.match".to_string(),
-                None,
+                with_qualifier.0,
             ))
         });
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));

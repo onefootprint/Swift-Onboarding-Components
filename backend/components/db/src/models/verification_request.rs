@@ -53,7 +53,7 @@ impl VerificationRequest {
         vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
     ) -> Result<Vec<Self>, crate::DbError> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
         let requests: Vec<_> = vendor_apis
             .into_iter()
             .map(|vendor_api| NewVerificationRequestRow {
@@ -114,43 +114,12 @@ impl VerificationRequest {
             .order((
                 verification_request::vendor_api,
                 verification_request::uvw_snapshot_seqno.desc(),
+                verification_request::timestamp.desc(), // tie breaker if seq_no has a tie
             ))
             .distinct_on(verification_request::vendor_api)
             .get_results(conn)?;
 
-        let (doc_scan_requests, kyc_requests): (Vec<RequestAndMaybeResult>, Vec<RequestAndMaybeResult>) =
-            req_and_res
-                .into_iter()
-                .partition(|(req, _)| req.vendor_api.is_doc_scan_call());
-
-        let max_kyc_seq_no = kyc_requests.iter().map(|(req, _)| req.uvw_snapshot_seqno).max();
-
-        let (kyc_requests_with_max_seqno, kyc_requests_with_earlier_seqno): (Vec<_>, Vec<_>) =
-            kyc_requests.into_iter().partition(|(req, _)| {
-                max_kyc_seq_no
-                    .map(|seqno| req.uvw_snapshot_seqno == seqno)
-                    .unwrap_or_default()
-            });
-
-        if !kyc_requests_with_earlier_seqno.is_empty() {
-            tracing::error!(kyc_requests_with_earlier_seqno=kyc_requests_with_earlier_seqno.iter().map(|(req, _)| format!("{:?}", req)).collect::<Vec<_>>().join(","), "get_latest_requests_and_results_for_onboarding: KYC vendor requests with unexpected earlier seqno");
-        }
-        if doc_scan_requests.len() > 1 {
-            tracing::error!(
-                doc_scan_requests = doc_scan_requests
-                    .iter()
-                    .map(|(req, _)| format!("{:?}", req))
-                    .collect::<Vec<_>>()
-                    .join(","),
-                "get_latest_requests_and_results_for_onboarding: more than 1 doc scan request found"
-            );
-        }
-
-        let ret: Vec<RequestAndMaybeResult> = kyc_requests_with_max_seqno
-            .into_iter()
-            .chain(doc_scan_requests.into_iter())
-            .collect();
-        Ok(ret)
+        Ok(req_and_res)
     }
 
     #[tracing::instrument(skip_all)]
@@ -161,7 +130,7 @@ impl VerificationRequest {
         identity_document_id: IdentityDocumentId,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Self> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
         let new_row = NewVerificationRequestRow {
             vendor_api,
             vendor: Vendor::from(vendor_api),

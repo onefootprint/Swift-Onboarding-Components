@@ -123,6 +123,7 @@ impl DataLifetime {
 
     /// Gets the current sequence number for the lifetime table without incrementing. Should be used
     /// when taking a snapshot
+    /// This DOES NOT give you the latest sequence number used in the current transaction.
     #[tracing::instrument(skip_all)]
     pub fn get_current_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno".to_owned())

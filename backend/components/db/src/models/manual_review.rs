@@ -18,7 +18,7 @@ pub struct ManualReview {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId,
+    pub onboarding_id: OnboardingId, // TODO: migrate to scoped_vault_id FP-4468
     /// When populated, means the ManualReview is no longer active
     pub completed_at: Option<DateTime<Utc>>,
     /// If the ManualReview was completed by making a new OnboardingDecision, is referenced here.
@@ -99,5 +99,14 @@ impl ManualReview {
             .first(conn)
             .optional()?;
         Ok(res)
+    }
+
+    pub fn get_active_for_onboarding(conn: &mut PgConn, ob_id: &OnboardingId) -> DbResult<Option<Self>> {
+        let result = manual_review::table
+            .filter(manual_review::onboarding_id.eq(ob_id))
+            .filter(manual_review::completed_at.is_null())
+            .get_result(conn)
+            .optional()?;
+        Ok(result)
     }
 }

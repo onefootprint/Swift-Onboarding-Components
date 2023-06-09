@@ -22,6 +22,7 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 #[derive(Clone)]
 pub struct AlpacaKycDataCollection {
     wf_id: WorkflowId,
+    is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
@@ -29,6 +30,7 @@ pub struct AlpacaKycDataCollection {
 #[derive(Clone)]
 pub struct AlpacaKycVendorCalls {
     wf_id: WorkflowId,
+    is_redo: bool,
     sv_id: ScopedVaultId,
     ob_id: OnboardingId,
     t_id: TenantId,
@@ -36,6 +38,7 @@ pub struct AlpacaKycVendorCalls {
 #[derive(Clone)]
 pub struct AlpacaKycDecisioning {
     wf_id: WorkflowId,
+    is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
@@ -44,6 +47,7 @@ pub struct AlpacaKycDecisioning {
 #[derive(Clone)]
 pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
+    is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
@@ -56,6 +60,7 @@ pub struct AlpacaKycPendingReview {
 #[derive(Clone)]
 pub struct AlpacaKycDocCollection {
     wf_id: WorkflowId,
+    is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
@@ -80,27 +85,34 @@ impl AlpacaKycState {
         let newtypes::WorkflowState::AlpacaKyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
         };
+        let newtypes::WorkflowConfig::AlpacaKyc(config) = workflow.config.clone() else {
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+        };
         // TODO could get rid of this with enum_dispatch
         match s {
-            newtypes::AlpacaKycState::DataCollection => AlpacaKycDataCollection::init(state, workflow)
+            newtypes::AlpacaKycState::DataCollection => {
+                AlpacaKycDataCollection::init(state, workflow, config)
+                    .await
+                    .map(AlpacaKycState::from)
+            }
+            newtypes::AlpacaKycState::VendorCalls => AlpacaKycVendorCalls::init(state, workflow, config)
                 .await
                 .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::VendorCalls => AlpacaKycVendorCalls::init(state, workflow)
+            newtypes::AlpacaKycState::Decisioning => AlpacaKycDecisioning::init(state, workflow, config)
                 .await
                 .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::Decisioning => AlpacaKycDecisioning::init(state, workflow)
+            newtypes::AlpacaKycState::WatchlistCheck => {
+                AlpacaKycWatchlistCheck::init(state, workflow, config)
+                    .await
+                    .map(AlpacaKycState::from)
+            }
+            newtypes::AlpacaKycState::PendingReview => AlpacaKycPendingReview::init(state, workflow, config)
                 .await
                 .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::WatchlistCheck => AlpacaKycWatchlistCheck::init(state, workflow)
+            newtypes::AlpacaKycState::DocCollection => AlpacaKycDocCollection::init(state, workflow, config)
                 .await
                 .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::PendingReview => AlpacaKycPendingReview::init(state, workflow)
-                .await
-                .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::DocCollection => AlpacaKycDocCollection::init(state, workflow)
-                .await
-                .map(AlpacaKycState::from),
-            newtypes::AlpacaKycState::Complete => AlpacaKycComplete::init(state, workflow)
+            newtypes::AlpacaKycState::Complete => AlpacaKycComplete::init(state, workflow, config)
                 .await
                 .map(AlpacaKycState::from),
         }

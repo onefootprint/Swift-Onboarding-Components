@@ -1,7 +1,7 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
     mock_idology, mock_twilio, mock_webhook, query_data, setup_data, ExpectedRequiresManualReview,
-    ExpectedStatus, UserKind,
+    ExpectedStatus, UserKind, WithQualifier,
 };
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowKind;
@@ -157,7 +157,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
-            mock_idology(state);
+            mock_idology(state, WithQualifier(None));
             mock_twilio(state);
         }
     };

@@ -94,10 +94,10 @@ impl OnboardingUpdate {
         }
     }
 
-    pub fn set_has_final_decision(decision_status: DecisionStatus) -> Self {
+    pub fn set_decision_and_decision_made_at(decision_status: DecisionStatus) -> Self {
         Self {
-            decision_made_at: Some(Some(Utc::now())),
             status: Some(decision_status.into()),
+            decision_made_at: Some(Some(Utc::now())),
             ..Self::default()
         }
     }

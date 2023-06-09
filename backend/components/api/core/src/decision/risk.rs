@@ -36,8 +36,10 @@ pub fn save_final_decision(
     let ob = Onboarding::lock(conn, &ob_id)?;
     let scoped_user = ScopedVault::get(conn, &ob.scoped_vault_id)?;
 
+    let is_first_decision_for_onboarding = ob.decision_made_at.is_none();
+
     // prevent race conditions from producing 2 decisions
-    if assert_is_first_decision_for_onboarding && ob.decision_made_at.is_some() {
+    if assert_is_first_decision_for_onboarding && !is_first_decision_for_onboarding {
         return Err(OnboardingError::OnboardingDecisionNotNeeded.into());
     }
 
@@ -66,14 +68,25 @@ pub fn save_final_decision(
 
     let ob = ob.into_inner();
     // Make a billable event here
-    ob.update(
-        conn,
-        OnboardingUpdate::set_has_final_decision(decision.decision.decision_status),
-    )?;
+    // If this is the first time setting a decision, then write decision_made_at
+    if is_first_decision_for_onboarding {
+        ob.update(
+            conn,
+            OnboardingUpdate::set_decision_and_decision_made_at(decision.decision.decision_status),
+        )?;
+    } else {
+        ob.update(
+            conn,
+            OnboardingUpdate::set_decision(decision.decision.decision_status),
+        )?;
+    }
 
-    // Create ManualReview row if requested
+    // Create ManualReview row if requested and an active one does not already exist
     if decision.decision.create_manual_review {
-        ManualReview::create(conn, ob_id)?;
+        let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
+        if existing_review.is_none() {
+            ManualReview::create(conn, ob_id)?;
+        }
     }
 
     RiskSignal::bulk_create(conn, obd.id.clone(), reason_codes)?;

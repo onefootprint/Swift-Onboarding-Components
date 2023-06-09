@@ -24,10 +24,6 @@ use std::str::FromStr;
     vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2],
     vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus],
 ], VendorAPI::ExperianPreciseID; "multiple requests and addition of new vendor call")]
-#[db_test_case(vec![
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::SocureIDPlus],
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2],
-], VendorAPI::ExperianPreciseID; "a kyc request with an unexpected earlier seqno is filtered out")]
 fn test_get_requests_and_results_for_onboarding(
     conn: &mut TestPgConn,
     input_req_res: Vec<Vec<VendorAPI>>,

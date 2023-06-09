@@ -213,13 +213,15 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let su = ScopedVault::get(conn, &self.sv_id)?;
         let tenant = Tenant::get(conn, &su.tenant_id)?;
 
-        common::fire_onboarding_completed_webhook(
-            webhook_client,
-            &su,
-            &tenant,
-            decision.decision.decision_status.into(),
-            decision.decision.create_manual_review,
-        );
+        if !self.is_redo {
+            common::fire_onboarding_completed_webhook(
+                webhook_client,
+                &su,
+                &tenant,
+                decision.decision.decision_status.into(),
+                decision.decision.create_manual_review,
+            );
+        }
 
         common::save_kyc_decision(
             conn,

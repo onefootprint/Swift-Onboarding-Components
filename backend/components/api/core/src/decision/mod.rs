@@ -1,4 +1,4 @@
-use newtypes::{incode::IncodeDocumentType, Vendor, VendorAPI};
+use newtypes::{incode::IncodeDocumentType, Vendor, VendorAPI, VerificationResultId};
 
 pub mod biz_risk;
 pub mod engine;
@@ -26,6 +26,8 @@ pub enum Error {
     RuleError(#[from] RuleError),
     #[error("Incode document type not supported {0}")]
     IncodeDocumentTypeNotSupported(IncodeDocumentType),
+    #[error("Cannot build KycFeatureVector from vres: {0}")]
+    KycFeatureVectorConversionError(VerificationResultId),
 }
 
 #[derive(thiserror::Error, Debug)]
