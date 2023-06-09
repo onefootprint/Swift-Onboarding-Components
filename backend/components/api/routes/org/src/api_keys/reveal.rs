@@ -34,14 +34,14 @@ async fn post(
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
-    let (key, last_used_at) = state
+    let (key, role, last_used_at) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let key = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
+            let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             let last_used_at = TenantApiKeyAccessLog::get(conn, vec![&key.id])?
                 .get(&key.id)
                 .map(|x| x.to_owned());
-            Ok((key, last_used_at))
+            Ok((key, role, last_used_at))
         })
         .await??;
 
@@ -57,6 +57,7 @@ async fn post(
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         key,
+        role,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
         last_used_at,
     )))))

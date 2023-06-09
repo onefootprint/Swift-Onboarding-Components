@@ -94,6 +94,14 @@ impl TenantRole {
     }
 
     #[tracing::instrument(skip_all)]
+    pub fn get(conn: &mut PgConn, id: &TenantRoleId) -> DbResult<Self> {
+        let role = tenant_role::table
+            .filter(tenant_role::id.eq(id))
+            .first::<Self>(conn)?;
+        Ok(role)
+    }
+
+    #[tracing::instrument(skip_all)]
     pub fn create(
         conn: &mut PgConn,
         tenant_id: TenantId,

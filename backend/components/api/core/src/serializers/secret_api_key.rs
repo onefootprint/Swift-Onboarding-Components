@@ -1,13 +1,18 @@
 use chrono::DateTime;
-use db::models::tenant_api_key::TenantApiKey;
+use db::models::{tenant_api_key::TenantApiKey, tenant_role::TenantRole};
 use newtypes::secret_api_key::SecretApiKey;
 
 use crate::utils::db2api::DbToApi;
 
-type DbTenantApiKey = (TenantApiKey, Option<SecretApiKey>, Option<DateTime<chrono::Utc>>);
+type DbTenantApiKey = (
+    TenantApiKey,
+    TenantRole,
+    Option<SecretApiKey>,
+    Option<DateTime<chrono::Utc>>,
+);
 
 impl DbToApi<DbTenantApiKey> for api_wire_types::SecretApiKey {
-    fn from_db(s: DbTenantApiKey) -> Self {
+    fn from_db((api_key, role, key, last_used_at): DbTenantApiKey) -> Self {
         let TenantApiKey {
             id,
             name,
@@ -15,15 +20,17 @@ impl DbToApi<DbTenantApiKey> for api_wire_types::SecretApiKey {
             created_at,
             is_live,
             ..
-        } = s.0;
+        } = api_key;
+        let role = api_wire_types::OrganizationRole::from_db(role);
         Self {
             id,
             name,
             is_live,
-            key: s.1,
+            key,
             created_at,
             status,
-            last_used_at: s.2,
+            last_used_at,
+            role,
         }
     }
 }

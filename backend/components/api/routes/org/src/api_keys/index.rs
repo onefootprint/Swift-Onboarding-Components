@@ -6,12 +6,15 @@ use crate::types::JsonApiResponse;
 use crate::types::{CursorPaginatedResponse, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::tenant::AuthActor;
+use api_core::errors::tenant::TenantError;
 use chrono::{DateTime, Utc};
 use db::models::tenant_api_key::{ApiKeyListQuery, TenantApiKey};
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
+use db::models::tenant_role::TenantRole;
 use db::DbError;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{ApiKeyStatus, TenantApiKeyId};
+use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantRoleId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, patch, web, web::Json};
 
@@ -40,19 +43,19 @@ pub async fn get(
         .db_query(move |conn| -> Result<_, DbError> {
             let keys = TenantApiKey::list(conn, &query, cursor, (page_size + 1) as i64)?;
             let count = TenantApiKey::count(conn, &query)?;
-            let tenant_api_key_ids = keys.iter().map(|x| &x.id).collect();
+            let tenant_api_key_ids = keys.iter().map(|x| &x.0.id).collect();
             let id_to_last_used = TenantApiKeyAccessLog::get(conn, tenant_api_key_ids)?;
             Ok((keys, id_to_last_used, count))
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &keys).map(|x| x.created_at);
+    let cursor = pagination.cursor_item(&state, &keys).map(|x| x.0.created_at);
     let keys = keys
         .into_iter()
         .take(page_size)
-        .map(|x| {
-            let last_used = id_to_last_used.get(&x.id).copied();
-            (x, None, last_used)
+        .map(|(key, role)| {
+            let last_used = id_to_last_used.get(&key.id).copied();
+            (key, role, None, last_used)
         })
         .map(api_wire_types::SecretApiKey::from_db)
         .collect::<Vec<api_wire_types::SecretApiKey>>();
@@ -62,6 +65,7 @@ pub async fn get(
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateApiKeyRequest {
     name: String,
+    role_id: Option<TenantRoleId>,
 }
 
 #[api_v2_operation(
@@ -71,7 +75,8 @@ pub struct CreateApiKeyRequest {
 #[actix::post("/org/api_keys")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    // Don't allow updating an API key with an API key...
+    auth: TenantSessionAuth,
     request: web::Json<CreateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
@@ -81,37 +86,29 @@ pub async fn post(
     let tenant_id = tenant.id.clone();
     let sh_key = secret_key.fingerprint(state.as_ref()).await?;
     let e_key = secret_key.seal_to(&tenant.public_key)?;
-    let new_key = state
+    let CreateApiKeyRequest { name, role_id } = request.into_inner();
+    let (api_key, role) = state
         .db_pool
-        .db_transaction(move |conn| {
-            TenantApiKey::create(
-                conn,
-                request.into_inner().name,
-                sh_key,
-                e_key,
-                tenant_id,
-                is_live,
-                None,
-            )
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let api_key = TenantApiKey::create(conn, name, sh_key, e_key, tenant_id, is_live, role_id)?;
+            let role = TenantRole::get(conn, &api_key.role_id)?;
+            Ok((api_key, role))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
-        new_key,
+        api_key,
+        role,
         Some(secret_key),
         None,
     )))))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct UpdateApiKeyPath {
-    id: TenantApiKeyId,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UpdateApiKeyRequest {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
+    role_id: Option<TenantRoleId>,
 }
 
 #[api_v2_operation(
@@ -121,21 +118,35 @@ pub struct UpdateApiKeyRequest {
 #[patch("/org/api_keys/{id}")]
 pub async fn patch(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-    path: web::Path<UpdateApiKeyPath>,
+    // Don't allow updating an API key with an API key...
+    auth: TenantSessionAuth,
+    path: web::Path<TenantApiKeyId>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
+    let id = path.into_inner();
+    if let AuthActor::TenantApiKey(key_id) = auth.actor() {
+        if key_id == id {
+            return Err(TenantError::CannotEditCurrentApiKey.into());
+        }
+    }
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let UpdateApiKeyPath { id } = path.into_inner();
-    let UpdateApiKeyRequest { name, status } = request.into_inner();
-    let result = state
+    let UpdateApiKeyRequest {
+        name,
+        status,
+        role_id,
+    } = request.into_inner();
+    let (api_key, role) = state
         .db_pool
-        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status))
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let api_key = TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id)?;
+            let role = TenantRole::get(conn, &api_key.role_id)?;
+            Ok((api_key, role))
+        })
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
-        result, None, None,
+        api_key, role, None, None,
     )))))
 }

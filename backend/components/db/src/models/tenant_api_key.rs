@@ -1,6 +1,7 @@
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::schema::tenant_api_key;
 use crate::schema::tenant_api_key::BoxedQuery;
+use crate::schema::tenant_role;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -47,6 +48,7 @@ pub struct NewTenantApiKey {
 struct TenantApiKeyUpdate {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
+    role_id: Option<TenantRoleId>,
 }
 
 #[derive(Debug, Clone)]
@@ -87,8 +89,10 @@ impl TenantApiKey {
         query: &ApiKeyListQuery,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
-    ) -> DbResult<Vec<TenantApiKey>> {
+    ) -> DbResult<Vec<(TenantApiKey, TenantRole)>> {
         let mut query = Self::list_query(query)
+            .inner_join(tenant_role::table)
+            .select((tenant_api_key::all_columns, tenant_role::all_columns))
             .order_by(tenant_api_key::created_at.desc())
             .limit(page_size);
 
@@ -96,7 +100,7 @@ impl TenantApiKey {
             query = query.filter(tenant_api_key::created_at.le(cursor))
         }
 
-        let results = query.load::<TenantApiKey>(conn)?;
+        let results = query.get_results::<(Self, TenantRole)>(conn)?;
         Ok(results)
     }
 
@@ -107,8 +111,11 @@ impl TenantApiKey {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<TenantApiKey> {
-        let mut query = tenant_api_key::table.into_boxed();
+    pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(
+        conn: &mut PgConn,
+        id: T,
+    ) -> DbResult<(TenantApiKey, TenantRole)> {
+        let mut query = tenant_api_key::table.inner_join(tenant_role::table).into_boxed();
         match id.into() {
             TenantApiKeyIdentifier::Id(id, tenant_id, is_live) => {
                 query = query
@@ -132,7 +139,7 @@ impl TenantApiKey {
         conn: &mut PgConn,
         sh_api_key: Fingerprint,
     ) -> DbResult<(TenantApiKey, Tenant, TenantRole)> {
-        use crate::schema::{tenant, tenant_role};
+        use crate::schema::tenant;
         let (api_key, tenant, role): (TenantApiKey, Tenant, TenantRole) = tenant_api_key::table
             .inner_join(tenant::table)
             .inner_join(tenant_role::table)
@@ -198,8 +205,19 @@ impl TenantApiKey {
         is_live: IsLive,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
+        role_id: Option<TenantRoleId>,
     ) -> DbResult<Self> {
-        let update = TenantApiKeyUpdate { name, status };
+        let update = TenantApiKeyUpdate {
+            name,
+            status,
+            role_id,
+        };
+        // TODO also lock the role if we change the status?
+        if let Some(role_id) = update.role_id.as_ref() {
+            // Lock the role to make sure we don't deactivate it before we update this rolebinding.
+            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
+            TenantRole::lock_active(conn, role_id, &tenant_id)?;
+        }
         let results: Vec<Self> = diesel::update(tenant_api_key::table)
             .filter(tenant_api_key::id.eq(id))
             .filter(tenant_api_key::tenant_id.eq(tenant_id))

@@ -7,6 +7,8 @@ pub enum TenantError {
     ValidationError(String),
     #[error("Cannot edit the currently logged-in user")]
     CannotEditCurrentUser,
+    #[error("Cannot edit the currently authed API key")]
+    CannotEditCurrentApiKey,
     #[error("Tenant user does not exist")]
     TenantUserDoesNotExist,
     #[error("Cannot inherit credentials for a non-integration test tenant")]

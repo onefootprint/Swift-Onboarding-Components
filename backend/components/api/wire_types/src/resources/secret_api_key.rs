@@ -13,6 +13,7 @@ pub struct SecretApiKey {
     pub key: Option<newtypes::secret_api_key::SecretApiKey>,
     pub last_used_at: Option<DateTime<Utc>>,
     pub is_live: bool,
+    pub role: OrganizationRole,
 }
 
 export_schema!(SecretApiKey);

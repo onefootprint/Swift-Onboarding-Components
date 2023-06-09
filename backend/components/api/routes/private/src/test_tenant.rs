@@ -62,7 +62,7 @@ async fn post(
     let secret_api_key = SecretApiKey::generate(is_live);
     let sh_secret_api_key = secret_api_key.fingerprint(state.as_ref()).await?;
 
-    let (tenant, rb, auth_token, api_key) = state
+    let (tenant, rb, auth_token, api_key, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             //
@@ -109,7 +109,8 @@ async fn post(
                         return Err(e.into()); // Real error, return
                     }
                     let role_id = admin_role.id.clone();
-                    let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, admin_role.tenant_id)?;
+                    let tenant_id = admin_role.tenant_id.clone();
+                    let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, tenant_id)?;
                     rb
                 }
             };
@@ -121,13 +122,13 @@ async fn post(
             // Get or create the TenantUser
             //
             let tenant_api_key_name = "Integration test API key";
-            let api_key = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
-                Ok(api_key) => api_key,
+            let (api_key, role) = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
+                Ok(r) => r,
                 Err(e) => {
                     if !e.is_not_found() {
                         return Err(e.into()); // Real error, return
                     }
-                    TenantApiKey::create(
+                    let api_key = TenantApiKey::create(
                         conn,
                         // Always create it with the same name so we find it next time
                         tenant_api_key_name.to_owned(),
@@ -135,11 +136,12 @@ async fn post(
                         secret_api_key.seal_to(&tenant.public_key)?,
                         tenant.id.clone(),
                         is_live,
-                        Some(admin_role.id),
-                    )?
+                        Some(admin_role.id.clone()),
+                    )?;
+                    (api_key, admin_role)
                 }
             };
-            Ok((tenant, rb, auth_token, api_key))
+            Ok((tenant, rb, auth_token, api_key, role))
         })
         .await?;
 
@@ -157,7 +159,7 @@ async fn post(
     Ok(Json(ResponseData {
         data: NewClientResponse {
             org_id: tenant.id,
-            key: api_wire_types::SecretApiKey::from_db((api_key, Some(decrypted_api_key), None)),
+            key: api_wire_types::SecretApiKey::from_db((api_key, role, Some(decrypted_api_key), None)),
             auth_token,
             tenant_user_id: rb.tenant_user_id,
         },

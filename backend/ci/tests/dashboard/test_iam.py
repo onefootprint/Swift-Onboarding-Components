@@ -7,26 +7,6 @@ from tests.utils import (
 )
 
 
-@pytest.fixture(scope="session")
-def limited_role(sandbox_tenant):
-    suffix = _gen_random_n_digit_number(10)
-    role_data = dict(
-        name=f"Test limited role {suffix}",
-        scopes=["read", "api_keys"],
-    )
-    body = post("org/roles", role_data, sandbox_tenant.auth_token)
-    assert body["name"] == role_data["name"]
-    assert set(i for i in body["scopes"]) == set(i for i in role_data["scopes"])
-    return body
-
-
-@pytest.fixture(scope="session")
-def admin_role(sandbox_tenant):
-    body = get("org/roles", None, sandbox_tenant.auth_token)
-    roles = body["data"]
-    return next(i for i in roles if i["scopes"][0] == "admin")
-
-
 def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
     # Since we reuse this tenant across integration test runs, an incomplete previous integration
     # test run may leave active users that cause conflict. Deactivate any old integration test
@@ -146,7 +126,7 @@ def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
         ),
     ]
 
-    for (filters, expected_user1, expected_user2) in tests:
+    for filters, expected_user1, expected_user2 in tests:
         body = get(f"org/members", filters, sandbox_tenant.auth_token)
         assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
         assert (
@@ -202,7 +182,7 @@ def test_cannot_deactivate_current_user(sandbox_tenant):
     [
         (None, True, True),  # No filters
         # Filter on scopes
-        (dict(scopes="api_keys"), False, True),
+        (dict(scopes="onboarding_configuration"), False, True),
         (dict(scopes="admin"), True, False),
         (dict(scopes="admin, read"), True, True),
         # Filter on name
