@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { LogoFpDefault } from '@onefootprint/icons';
+import { LogoFpCompact } from '@onefootprint/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -14,7 +14,7 @@ const LogoLink = ({ onClick }: LogoLinkProps) => {
   return (
     <NavigationMenu.Item>
       <StyledLink href="/" aria-label={t('aria-label')} onClick={onClick}>
-        <LogoFpDefault />
+        <LogoFpCompact />
       </StyledLink>
     </NavigationMenu.Item>
   );
