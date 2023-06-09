@@ -31,16 +31,22 @@ impl Validate for IDK {
 
 fn clean_and_validate_email(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
     let email = Email::from_str(value.leak())?;
-    if email.is_live() != args.is_live {
-        return Err(Error::InvalidSandboxState.into());
+    if email.is_live() && !args.is_live {
+        return Err(Error::LiveDataInSandboxMode.into());
+    }
+    if !email.is_live() && args.is_live {
+        return Err(Error::SandboxDataInLiveMode.into());
     }
     Ok(email.to_piistring())
 }
 
 fn clean_and_validate_phone(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
     let phone = PhoneNumber::parse(value)?;
-    if phone.is_live() != args.is_live {
-        return Err(Error::InvalidSandboxState.into());
+    if phone.is_live() && !args.is_live {
+        return Err(Error::LiveDataInSandboxMode.into());
+    }
+    if !phone.is_live() && args.is_live {
+        return Err(Error::SandboxDataInLiveMode.into());
     }
     Ok(phone.e164_with_suffix())
 }
