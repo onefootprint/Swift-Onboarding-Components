@@ -5,7 +5,7 @@ use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants, JsonSchema)]
 #[strum_discriminants(name(OnboardingRequirementKind))]
-#[strum_discriminants(derive(strum_macros::Display))]
+#[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingRequirement {

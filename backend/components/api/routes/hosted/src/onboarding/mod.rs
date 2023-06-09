@@ -19,7 +19,7 @@ use db::{
 use either::Either;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{AuthorizeFields, OnboardingRequirement};
+use newtypes::{AuthorizeFields, OnboardingRequirement, OnboardingRequirementKind};
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
@@ -146,119 +146,19 @@ fn get_requirements_inner(
     declarations: Option<PiiString>,
     only_us_dl: bool,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
-    let ob_config = &args.ob_config;
-    let id = ob_config.must_collect(DID::Id).then(|| {
-        let RequirementProgress {
-            populated_attributes,
-            missing_attributes,
-        } = get_progress(&uvw, ob_config, DID::Id);
-        // if ob config needs to collect id data
-        OnboardingRequirement::CollectData {
-            missing_attributes,
-            populated_attributes,
-        }
-    });
-    let ip = ob_config
-        .must_collect(DID::InvestorProfile)
-        .then(|| -> ApiResult<_> {
-            let RequirementProgress {
-                populated_attributes,
-                missing_attributes,
-            } = get_progress(&uvw, ob_config, DID::InvestorProfile);
-            let missing_document = if let Some(declarations) = declarations {
-                let declarations: Vec<Declaration> = declarations.deserialize()?;
-                // The finra compliance doc is missing if any of the declarations require a doc and we don't
-                // yet have one on file
-                declarations.iter().any(|d| d.requires_finra_compliance_doc())
-                    && !uvw.has_field(DocumentKind::FinraComplianceLetter)
-            } else {
-                false
-            };
-            Ok(OnboardingRequirement::CollectInvestorProfile {
-                missing_attributes,
-                populated_attributes,
-                missing_document,
-            })
-        })
-        .transpose()?;
+    // Depending on the workflow that we are running, we only want to show a subset of requirements
+    let relevant_requirement_kinds = args
+        .workflow
+        .as_ref()
+        .map(|wf| wf.state.relevant_requirements())
+        .unwrap_or_else(|| OnboardingRequirementKind::iter().collect());
 
-    let biz = ob_config
-        .must_collect(DID::Business)
-        .then(|| -> ApiResult<_> {
-            // Use the bvw to determine which fields still need to be collected
-            let scoped_business_id = args.sb_id.ok_or(BusinessError::NotAllowedWithoutBusiness)?;
-            let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&scoped_business_id))?;
-            let RequirementProgress {
-                populated_attributes,
-                missing_attributes,
-            } = get_progress(&bvw, ob_config, DID::Business);
-            Ok(OnboardingRequirement::CollectBusinessData {
-                missing_attributes,
-                populated_attributes,
-            })
-        })
-        .transpose()?;
-
-    // TODO the below requirements we will never include when met, kind of confusing
-    let liveness = {
-        // TODO: force liveness checks to be re-done and not shared across tenants
-        // RELATED: FP-1802 and FP-1800
-        let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
-        liveness_events
-            .is_empty()
-            .then_some(OnboardingRequirement::Liveness)
-    };
-    let doc = {
-        // Document requirements are determined by the presence of DocumentRequest database objects.
-        // In various places in the codebase, we will determine if a DocumentRequest should be created
-        //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
-        //      we will create a DocumentRequest row.
-        let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
-        let identifier = DocRequestIdentifier {
-            sv_id: &args.onboarding.scoped_vault_id,
-            wf_id: args.workflow.as_ref().map(|wf| &wf.id),
-        };
-        let doc_request = DocumentRequest::get_active(conn, identifier)?;
-        let supported_document_types = if only_us_dl {
-            vec![ModernIdDocKind::DriversLicense]
-        } else {
-            ModernIdDocKind::iter().collect()
-        };
-        doc_request.map(|dr| OnboardingRequirement::CollectDocument {
-            document_request_id: dr.id,
-            should_collect_selfie: dr.should_collect_selfie,
-            should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
-            only_us_supported: only_us_dl,
-            supported_document_types,
-        })
-    };
-    let authorize = if args.onboarding.authorized_at.is_none() {
-        let identity_document_types = if ob_config.can_access_document() {
-            // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-            let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
-            id_docs.iter().map(|id| id.document_type).unique().collect()
-        } else {
-            vec![]
-        };
-
-        let fields_to_authorize = AuthorizeFields {
-            collected_data: ob_config.can_access_data.clone(),
-            identity_document_types,
-        };
-        Some(OnboardingRequirement::Authorize { fields_to_authorize })
-    } else {
-        None
-    };
-
-    // TODO make Workflow non-optional one day
-    let process = if args.workflow.map(|wf| wf.state.requires_user_input()) == Some(true) {
-        // If the worfklow is in a state that requires user input, make a Process requirement
-        Some(OnboardingRequirement::Process)
-    } else {
-        None
-    };
-
-    let requirements = vec![id, ip, biz, liveness, doc, authorize, process]
+    // For each requirement kind that might be shown by this workflow, generate a requirement if
+    // necessary
+    let requirements = relevant_requirement_kinds
+        .into_iter()
+        .map(|k| get_requirement_inner(k, conn, &uvw, &args, declarations.as_ref(), only_us_dl))
+        .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
         .collect();
@@ -266,4 +166,138 @@ fn get_requirements_inner(
     tracing::info!(onboarding_id=%args.onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.onboarding.scoped_vault_id, "get_requirements result");
 
     Ok(requirements)
+}
+
+/// Generates a requirement of the given kind `k`, if one exists.
+fn get_requirement_inner(
+    k: OnboardingRequirementKind,
+    conn: &mut PgConn,
+    uvw: &VaultWrapper<Person>,
+    args: &GetRequirementsArgs,
+    declarations: Option<&PiiString>,
+    only_us_dl: bool,
+) -> ApiResult<Option<OnboardingRequirement>> {
+    let ob_config = &args.ob_config;
+    let req = match k {
+        OnboardingRequirementKind::CollectData => {
+            ob_config.must_collect(DID::Id).then(|| {
+                let RequirementProgress {
+                    populated_attributes,
+                    missing_attributes,
+                } = get_progress(uvw, ob_config, DID::Id);
+                // if ob config needs to collect id data
+                OnboardingRequirement::CollectData {
+                    missing_attributes,
+                    populated_attributes,
+                }
+            })
+        }
+        OnboardingRequirementKind::CollectInvestorProfile => {
+            ob_config
+                .must_collect(DID::InvestorProfile)
+                .then(|| -> ApiResult<_> {
+                    let RequirementProgress {
+                        populated_attributes,
+                        missing_attributes,
+                    } = get_progress(uvw, ob_config, DID::InvestorProfile);
+                    let missing_document = if let Some(declarations) = declarations.as_ref() {
+                        let declarations: Vec<Declaration> = declarations.deserialize()?;
+                        // The finra compliance doc is missing if any of the declarations require a doc and we don't
+                        // yet have one on file
+                        declarations.iter().any(|d| d.requires_finra_compliance_doc())
+                            && !uvw.has_field(DocumentKind::FinraComplianceLetter)
+                    } else {
+                        false
+                    };
+                    Ok(OnboardingRequirement::CollectInvestorProfile {
+                        missing_attributes,
+                        populated_attributes,
+                        missing_document,
+                    })
+                })
+                .transpose()?
+        }
+        OnboardingRequirementKind::CollectBusinessData => {
+            ob_config
+                .must_collect(DID::Business)
+                .then(|| -> ApiResult<_> {
+                    // Use the bvw to determine which fields still need to be collected
+                    let sb_id = args
+                        .sb_id
+                        .clone()
+                        .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+                    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb_id))?;
+                    let RequirementProgress {
+                        populated_attributes,
+                        missing_attributes,
+                    } = get_progress(&bvw, ob_config, DID::Business);
+                    Ok(OnboardingRequirement::CollectBusinessData {
+                        missing_attributes,
+                        populated_attributes,
+                    })
+                })
+                .transpose()?
+        }
+        // TODO the below requirements we will never include when met, kind of confusing
+        OnboardingRequirementKind::Liveness => {
+            // TODO: force liveness checks to be re-done and not shared across tenants
+            // RELATED: FP-1802 and FP-1800
+            let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
+            liveness_events
+                .is_empty()
+                .then_some(OnboardingRequirement::Liveness)
+        }
+        OnboardingRequirementKind::CollectDocument => {
+            // Document requirements are determined by the presence of DocumentRequest database objects.
+            // In various places in the codebase, we will determine if a DocumentRequest should be created
+            //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
+            //      we will create a DocumentRequest row.
+            let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
+            let identifier = DocRequestIdentifier {
+                sv_id: &args.onboarding.scoped_vault_id,
+                wf_id: args.workflow.as_ref().map(|wf| &wf.id),
+            };
+            let doc_request = DocumentRequest::get_active(conn, identifier)?;
+            let supported_document_types = if only_us_dl {
+                vec![ModernIdDocKind::DriversLicense]
+            } else {
+                ModernIdDocKind::iter().collect()
+            };
+            doc_request.map(|dr| OnboardingRequirement::CollectDocument {
+                document_request_id: dr.id,
+                should_collect_selfie: dr.should_collect_selfie,
+                should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
+                only_us_supported: only_us_dl,
+                supported_document_types,
+            })
+        }
+        OnboardingRequirementKind::Authorize => {
+            if args.onboarding.authorized_at.is_none() {
+                let identity_document_types = if ob_config.can_access_document() {
+                    // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
+                    let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
+                    id_docs.iter().map(|id| id.document_type).unique().collect()
+                } else {
+                    vec![]
+                };
+
+                let fields_to_authorize = AuthorizeFields {
+                    collected_data: ob_config.can_access_data.clone(),
+                    identity_document_types,
+                };
+                Some(OnboardingRequirement::Authorize { fields_to_authorize })
+            } else {
+                None
+            }
+        }
+        OnboardingRequirementKind::Process => {
+            if args.workflow.as_ref().map(|wf| wf.state.requires_user_input()) == Some(true) {
+                // If the worfklow is in a state that requires user input, make a Process requirement
+                Some(OnboardingRequirement::Process)
+            } else {
+                None
+            }
+        }
+    };
+    Ok(req)
 }

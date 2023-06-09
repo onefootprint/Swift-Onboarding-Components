@@ -167,7 +167,7 @@ impl PiiString {
         PiiString(self.0.trim().to_lowercase())
     }
 
-    pub fn deserialize<T>(self) -> serde_json::error::Result<T>
+    pub fn deserialize<T>(&self) -> serde_json::error::Result<T>
     where
         T: serde::de::DeserializeOwned,
     {
