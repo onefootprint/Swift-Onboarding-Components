@@ -131,20 +131,24 @@ impl TenantApiKey {
     pub fn get_enabled(
         conn: &mut PgConn,
         sh_api_key: Fingerprint,
-    ) -> DbResult<Option<(TenantApiKey, Tenant)>> {
-        use crate::schema::tenant;
-        let result: Option<(TenantApiKey, Tenant)> = tenant_api_key::table
+    ) -> DbResult<(TenantApiKey, Tenant, TenantRole)> {
+        use crate::schema::{tenant, tenant_role};
+        let (api_key, tenant, role): (TenantApiKey, Tenant, TenantRole) = tenant_api_key::table
             .inner_join(tenant::table)
+            .inner_join(tenant_role::table)
             .filter(tenant_api_key::sh_secret_api_key.eq(sh_api_key))
-            .first(conn)
-            .optional()?;
-        if let Some((api_key, _)) = &result {
-            if api_key.status != ApiKeyStatus::Enabled {
-                return Err(DbError::ApiKeyDisabled);
-            }
-            TenantApiKeyAccessLog::create(conn, api_key.id.clone())?;
+            .first(conn)?;
+        if api_key.status != ApiKeyStatus::Enabled {
+            return Err(DbError::ApiKeyDisabled);
         }
-        Ok(result)
+        if role.deactivated_at.is_some() {
+            return Err(DbError::TenantRoleDeactivated);
+        }
+        if role.tenant_id != api_key.tenant_id {
+            return Err(DbError::TenantRoleMismatch);
+        }
+        TenantApiKeyAccessLog::create(conn, api_key.id.clone())?;
+        Ok((api_key, tenant, role))
     }
 
     #[tracing::instrument(skip_all)]

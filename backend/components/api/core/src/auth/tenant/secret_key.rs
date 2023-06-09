@@ -1,13 +1,12 @@
 use super::{AuthActor, CanCheckTenantGuard};
 use crate::auth::{tenant::TenantAuth, AuthError};
-use crate::errors::ApiResult;
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
-use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
+use db::models::tenant_role::{TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
@@ -56,21 +55,17 @@ impl FromRequest for SecretTenantAuthContext {
 
             let (api_key, tenant, role) = state
                 .db_pool
-                .db_query(|conn| -> ApiResult<_> {
-                    let api_key = TenantApiKey::get_enabled(conn, sh_api_key)?;
-                    let result = if let Some((api_key, tenant)) = api_key {
-                        // TODO one day fetch an associated role here rather than always admin
-                        let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
-                        Some((api_key, tenant, role))
+                .db_query(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
+                .await?
+                .map_err(|e| {
+                    if e.is_not_found() {
+                        ApiError::from(AuthError::ApiKeyNotFound)
                     } else {
-                        None
-                    };
-                    Ok(result)
-                })
-                .await??
-                .ok_or(AuthError::ApiKeyNotFound)?;
+                        e.into()
+                    }
+                })?;
 
-            tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, "authenticated");
+            tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
 
             Ok(SecretTenantAuthContext {
                 tenant,
