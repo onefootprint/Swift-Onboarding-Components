@@ -7,10 +7,21 @@ import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { ImageTypes } from '../../constants/image-types';
+import { getCountryFromCode3 } from '../../utils/get-country-from-code';
 
 const SelfieRetryPrompt = () => {
   const [state, send] = useIdDocMachine();
   const { t } = useTranslation('pages.selfie-retry-prompt');
+
+  const {
+    idDoc: { type, country },
+  } = state.context;
+
+  if (!type || !country) {
+    return null;
+  }
+
+  const countryName = getCountryFromCode3(country)?.label;
 
   const handleClick = () => {
     send({ type: 'startImageCapture' });
@@ -20,6 +31,8 @@ const SelfieRetryPrompt = () => {
     <FadeInContainer>
       <PromptContainer>
         <Error
+          docType={type}
+          countryName={countryName ?? country}
           imageType={ImageTypes.selfie}
           errors={state.context.errors || []}
         />

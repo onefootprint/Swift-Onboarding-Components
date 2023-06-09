@@ -10,7 +10,7 @@ import {
   IcoIdGeneric40,
   IcoPassport24,
 } from '@onefootprint/icons';
-import { CountryCode, CountryCode3, IdDocType } from '@onefootprint/types';
+import { IdDocType } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
@@ -27,17 +27,11 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
+import {
+  getCountryFromCode,
+  getCountryFromCode3,
+} from '../../utils/get-country-from-code';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
-
-const getCountryFromCode = (countryCode?: CountryCode) => {
-  const match = COUNTRIES.find(country => country.value === countryCode);
-  return match;
-};
-
-const getCountryFromCode3 = (countryCode?: CountryCode3) => {
-  const match = COUNTRIES.find(country => country.value3 === countryCode);
-  return match;
-};
 
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');

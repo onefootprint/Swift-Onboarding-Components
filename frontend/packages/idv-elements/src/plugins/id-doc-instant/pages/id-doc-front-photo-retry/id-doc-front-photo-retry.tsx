@@ -3,16 +3,19 @@ import React from 'react';
 import IdDocPhotoRetryPrompt from '../../components/id-doc-photo-retry-prompt';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { ImageTypes } from '../../constants/image-types';
+import { getCountryFromCode3 } from '../../utils/get-country-from-code';
 
 const IdDocFrontPhotoRetry = () => {
   const [state, send] = useIdDocMachine();
   const {
-    idDoc: { type },
+    idDoc: { type, country },
   } = state.context;
 
-  if (!type) {
+  if (!type || !country) {
     return null;
   }
+
+  const countryName = getCountryFromCode3(country)?.label;
 
   const handleComplete = (image: string) => {
     send({
@@ -25,6 +28,8 @@ const IdDocFrontPhotoRetry = () => {
 
   return (
     <IdDocPhotoRetryPrompt
+      docType={type}
+      countryName={countryName ?? country}
       imageType={ImageTypes.front}
       onComplete={handleComplete}
       errors={state.context.errors || []}

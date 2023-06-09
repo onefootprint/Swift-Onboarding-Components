@@ -1,26 +1,37 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
-import { IdDocImageError } from '@onefootprint/types';
+import { IdDocImageError, IdDocType } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import BadImageErrorLabel from '../../constants/bad-image-error-label';
+import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons, ImageTypes } from '../../constants/image-types';
 import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: ImageTypes;
   errors: IdDocImageError[];
+  docType: IdDocType;
+  countryName: string;
 };
 
-const Error = ({ errors, imageType }: ErrorProps) => {
+const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
+  const side =
+    docType === IdDocType.passport && ImageTypes.front
+      ? 'photo page'
+      : `${imageType} side`;
+
   const cleanedErrors =
-    errors?.filter(error => !!BadImageErrorLabel[error]) ?? [];
-  const hasErrors = cleanedErrors.length > 0;
+    errors.filter(error =>
+      new Set(Object.values(IdDocImageError)).has(error),
+    ) ?? [];
+  if (cleanedErrors.length === 0) {
+    cleanedErrors.push(IdDocImageError.unknownError);
+  }
 
   return (
     <Container>
@@ -48,14 +59,29 @@ const Error = ({ errors, imageType }: ErrorProps) => {
               textAlign: 'center',
             }}
           >
-            {hasErrors
-              ? BadImageErrorLabel[cleanedErrors[0]] || t('description')
-              : t('description')}
+            {t(`description.${cleanedErrors[0]}`, {
+              documentType: IdDocTypeToLabel[docType],
+              side,
+              countryName,
+            })}
           </Typography>
         ) : (
           cleanedErrors.map(error => (
-            <Typography key={error} variant="body-2" color="secondary" as="li">
-              {BadImageErrorLabel[error]}
+            <Typography
+              key={error}
+              variant="body-2"
+              color="secondary"
+              as="li"
+              sx={{
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
+              {t(`description.${error}`, {
+                documentType: IdDocTypeToLabel[docType],
+                side,
+                countryName,
+              })}
             </Typography>
           ))
         )}

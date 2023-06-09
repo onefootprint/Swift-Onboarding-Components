@@ -29,7 +29,7 @@ const IdDocPhotoPrompt = ({
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const ImageIcon = imageIcons[imageType];
   const side =
-    imageType === (type === IdDocType.passport && ImageTypes.front)
+    type === IdDocType.passport && ImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 

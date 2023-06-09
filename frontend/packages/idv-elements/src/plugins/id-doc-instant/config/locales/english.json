@@ -42,7 +42,21 @@
       "title-front": "We couldn't process your image",
       "title-back": "We couldn't process your image",
       "title-selfie": "We couldn't process your selfie",
-      "description": "Please submit a new image."
+      "description": {
+        "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
+        "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
+        "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "document_not_readable": "Your document could not be read. Please try again.",
+        "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
+        "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
+        "selfie_low_confidence": "We could not verify your selfie. Please try again.",
+        "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
+        "selfie_glare": "Your selfie had image glare. Please adjust the lighting and try again.",
+        "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
+        "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
+        "unknown_error": "An error occurred. Please try again."
+      }
     },
     "success": {
       "front-upload": "Front side image uploaded",
