@@ -8,10 +8,10 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 const IdDocBackPhoto = () => {
   const [state, send] = useIdDocMachine();
   const {
-    idDoc: { type },
+    idDoc: { type, country },
   } = state.context;
 
-  if (!type) {
+  if (!type || !country) {
     return null;
   }
 
@@ -38,6 +38,7 @@ const IdDocBackPhoto = () => {
         imageType={ImageTypes.back}
         type={type}
         onComplete={handleComplete}
+        country={country}
       />
     </>
   );

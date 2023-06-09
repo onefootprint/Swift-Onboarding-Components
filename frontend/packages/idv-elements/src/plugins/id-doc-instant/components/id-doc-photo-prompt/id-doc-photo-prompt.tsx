@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24, IcoSmartphone24, IcoSun24 } from '@onefootprint/icons';
-import { IdDocType } from '@onefootprint/types';
+import { CountryCode3, IdDocType } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,6 +16,7 @@ type IdDocPhotoPromptProps = {
   type: IdDocType;
   imageType: ImageTypes;
   onComplete: (image: string) => void;
+  country: CountryCode3;
 };
 
 const IdDocPhotoPrompt = ({
@@ -23,6 +24,7 @@ const IdDocPhotoPrompt = ({
   onComplete,
   imageType,
   type,
+  country,
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const ImageIcon = imageIcons[imageType];
@@ -39,6 +41,7 @@ const IdDocPhotoPrompt = ({
           title={t('title', {
             type: IdDocTypeToLabel[type],
             side,
+            country,
           })}
         />
         {showGuidelines && (

@@ -15,7 +15,7 @@
       "cta": "Open settings to give camera permissions"
     },
     "id-doc-photo-prompt": {
-      "title": "Scan or upload the {{side}} of your {{type}}",
+      "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
       "guidelines": {
