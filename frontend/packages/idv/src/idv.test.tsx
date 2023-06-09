@@ -142,16 +142,17 @@ describe('<Idv />', () => {
         const onComplete = jest.fn();
         const onClose = jest.fn();
 
+        withRequirements([], []);
+        const validationToken = 'validation-token';
+        const closeDelay = 6000;
+        withOnboardingValidate(validationToken);
+
         renderIdv({
           onComplete,
           onClose,
         });
 
         await identifyUserByPhone();
-
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
 
         await checkComplete();
         expect(onComplete).toBeCalledWith(validationToken, closeDelay);
@@ -161,16 +162,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        renderIdv({
-          authToken: 'token',
-          onComplete,
-          onClose,
-        });
-
         withUserToken();
         withIdentify(true);
         withRequirements(
@@ -194,14 +185,29 @@ describe('<Idv />', () => {
           [IdDI.ssn9]: '123-45-6789',
         });
         withUserVault();
-
-        await confirmKycData();
-
         const validationToken = 'validation-token';
         const closeDelay = 6000;
         withOnboardingValidate(validationToken);
-
         withAuthorize();
+
+        const onComplete = jest.fn();
+        const onClose = jest.fn();
+
+        renderIdv({
+          authToken: 'token',
+          onComplete,
+          onClose,
+        });
+
+        await confirmKycData();
+
+        await waitFor(() => {
+          expect(screen.getByText('Authorize access')).toBeInTheDocument();
+        });
+
+        // Update the mock response after we entered the authorize page
+        // For next time we are checking for requirements
+        // The CollectKycData plugin will only be shown once
         withRequirements(
           [],
           [
@@ -214,12 +220,10 @@ describe('<Idv />', () => {
                 CollectedKycDataOption.ssn9,
               ],
             },
-            TestAuthorizeRequirement,
           ],
         );
 
         await authorizeData();
-
         await checkComplete();
         expect(onComplete).toBeCalledWith(validationToken, closeDelay);
       });
@@ -247,17 +251,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        renderIdv({
-          onComplete,
-          onClose,
-        });
-
-        await identifyUserByPhone();
-
         withRequirements(
           [TestAuthorizeRequirement],
           [
@@ -283,12 +276,26 @@ describe('<Idv />', () => {
         const validationToken = 'validation-token';
         const closeDelay = 6000;
         withOnboardingValidate(validationToken);
+        withAuthorize();
 
+        const onComplete = jest.fn();
+        const onClose = jest.fn();
+
+        renderIdv({
+          onComplete,
+          onClose,
+        });
+
+        await identifyUserByPhone();
         await confirmKycData();
 
-        withAuthorize();
-        await authorizeData();
+        await waitFor(() => {
+          expect(screen.getByText('Authorize access')).toBeInTheDocument();
+        });
 
+        // Update the mock response after we entered the authorize page
+        // For next time we are checking for requirements
+        // The CollectKycData plugin will only be shown once
         withRequirements(
           [],
           [
@@ -304,8 +311,8 @@ describe('<Idv />', () => {
           ],
         );
 
+        await authorizeData();
         await checkComplete();
-
         expect(onComplete).toBeCalledWith(validationToken, closeDelay);
       });
 
@@ -313,17 +320,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        renderIdv({
-          onComplete,
-          onClose,
-        });
-
-        await identifyUserByPhone();
-
         withRequirements(
           [
             {
@@ -338,12 +334,27 @@ describe('<Idv />', () => {
           ],
           [],
         );
-
         withUserToken();
         withDecrypt({
           [IdDI.dob]: '05/23/1996',
           [IdDI.ssn9]: '123-45-6789',
         });
+        withUserVaultValidate();
+        withUserVault();
+        const validationToken = 'validation-token';
+        const closeDelay = 6000;
+        withOnboardingValidate(validationToken);
+        withAuthorize();
+
+        const onComplete = jest.fn();
+        const onClose = jest.fn();
+
+        renderIdv({
+          onComplete,
+          onClose,
+        });
+
+        await identifyUserByPhone();
         await checkAdditionalDataRequired();
 
         await waitFor(() => {
@@ -360,16 +371,14 @@ describe('<Idv />', () => {
         // Should be pre-filled since it was decrypted from api
         expect(dob).toHaveValue('05/23/1996');
 
-        withUserVaultValidate();
         const submitButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(submitButton);
 
-        withUserVault();
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
-
-        await confirmKycData();
+        await waitFor(() => {
+          expect(
+            screen.getByText('Confirm your personal data'),
+          ).toBeInTheDocument();
+        });
 
         withRequirements(
           [TestAuthorizeRequirement],
@@ -386,9 +395,11 @@ describe('<Idv />', () => {
           ],
         );
 
-        withAuthorize();
-        await authorizeData();
+        await confirmKycData();
 
+        await waitFor(() => {
+          expect(screen.getByText('Authorize access')).toBeInTheDocument();
+        });
         withRequirements(
           [],
           [
@@ -404,8 +415,8 @@ describe('<Idv />', () => {
           ],
         );
 
+        await authorizeData();
         await checkComplete();
-
         expect(onComplete).toBeCalledWith(validationToken, closeDelay);
       });
     });
@@ -433,15 +444,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-        renderIdv({
-          authToken: 'token',
-          bootstrapData: {
-            [IdDI.firstName]: 'Piip',
-            [IdDI.lastName]: 'Foot',
-            [IdDI.dob]: '05/23/1996',
-          },
-        });
-
         withRequirements(
           [
             {
@@ -459,6 +461,17 @@ describe('<Idv />', () => {
         );
         withUserToken();
         withIdentify(true);
+        withUserVaultValidate();
+        withUserVault();
+
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.firstName]: 'Piip',
+            [IdDI.lastName]: 'Foot',
+            [IdDI.dob]: '05/23/1996',
+          },
+        });
 
         await waitFor(() => {
           expect(
@@ -469,11 +482,9 @@ describe('<Idv />', () => {
         const ssn = screen.getByLabelText('SSN');
         await userEvent.type(ssn, '123-45-6789');
 
-        withUserVaultValidate();
         const submitButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(submitButton);
 
-        withUserVault();
         await confirmKycData();
       });
     });
@@ -483,16 +494,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-        renderIdv({
-          authToken: 'token',
-          bootstrapData: {
-            [IdDI.firstName]: 'Piip',
-            [IdDI.lastName]: 'Foot',
-            [IdDI.dob]: '05/23/1996',
-            [IdDI.ssn9]: '123-45-6789',
-          },
-        });
-
         withRequirements(
           [
             {
@@ -513,8 +514,18 @@ describe('<Idv />', () => {
           [IdDI.firstName]: 'SomeName',
           [IdDI.lastName]: 'OtherName',
         });
-
         withUserVault();
+
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.firstName]: 'Piip',
+            [IdDI.lastName]: 'Foot',
+            [IdDI.dob]: '05/23/1996',
+            [IdDI.ssn9]: '123-45-6789',
+          },
+        });
+
         await confirmKycData();
       });
 
@@ -522,13 +533,6 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-        renderIdv({
-          authToken: 'token',
-          bootstrapData: {
-            [IdDI.dob]: '05/23/1996',
-          },
-        });
-
         withRequirements(
           [
             {
@@ -549,6 +553,15 @@ describe('<Idv />', () => {
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
         });
+        withUserVaultValidate();
+        withUserVault();
+
+        renderIdv({
+          authToken: 'token',
+          bootstrapData: {
+            [IdDI.dob]: '05/23/1996',
+          },
+        });
 
         await waitFor(() => {
           expect(
@@ -560,12 +573,57 @@ describe('<Idv />', () => {
         const ssn = screen.getByLabelText('SSN');
         await userEvent.type(ssn, '123-45-6789');
 
-        withUserVaultValidate();
         const submitButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(submitButton);
 
-        withUserVault();
         await confirmKycData();
+      });
+    });
+  });
+
+  describe('When there is a step up', () => {
+    it('shows the id doc step up after authorize', async () => {
+      const config = getKycOnboardingConfig(true);
+      withOnboarding(config);
+      withOnboardingConfig(config);
+      withUserToken();
+      withIdentify(true);
+      withRequirements([TestAuthorizeRequirement], []);
+      withOnboardingValidate('validation-token');
+      withAuthorize();
+
+      const onComplete = jest.fn();
+      const onClose = jest.fn();
+
+      renderIdv({
+        authToken: 'token',
+        onComplete,
+        onClose,
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Authorize access')).toBeInTheDocument();
+      });
+
+      // Update the mock response after we entered the authorize page
+      // For next time we are checking for requirements
+      withRequirements(
+        [
+          {
+            kind: OnboardingRequirementKind.idDoc,
+            shouldCollectConsent: false,
+            shouldCollectSelfie: false,
+            onlyUsSupported: false,
+            supportedDocumentTypes: [],
+          },
+        ],
+        [],
+      );
+
+      await authorizeData();
+
+      await waitFor(() => {
+        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
       });
     });
   });
@@ -599,10 +657,6 @@ describe('<Idv />', () => {
       const config = getKycOnboardingConfig(true);
       withOnboarding(config);
       withOnboardingConfig(config);
-      renderIdv({
-        authToken: 'token',
-      });
-
       withRequirements(
         [
           {
@@ -615,9 +669,12 @@ describe('<Idv />', () => {
         ],
         [],
       );
-
       withD2PGenerate();
       withD2PStatus(D2PStatus.waiting);
+
+      renderIdv({
+        authToken: 'token',
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
