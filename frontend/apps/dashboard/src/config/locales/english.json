@@ -156,7 +156,8 @@
         "security-logs": "Security Logs",
         "developers": "Developers",
         "settings": "Settings",
-        "log-out": "Log out"
+        "log-out": "Log out",
+        "manual-review": "Manual review"
       },
       "sandbox-banner": {
         "title": "Sandbox mode.",
@@ -801,6 +802,25 @@
         },
         "address": {
           "title": "Registered business address"
+        }
+      }
+    },
+    "manual-review": {
+      "page-title": "Footprint | Manual Review",
+      "header": {
+        "title": "Pending manual reviews",
+        "subtitle": "Users that need to be manually reviewed to either be onboarded or able to keep using your service."
+      },
+      "table": {
+        "aria-label": "Manual review table",
+        "empty-state": "No pending manual reviews",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "email": "Email",
+          "pending-since": "Pending since",
+          "reason": "Reason"
         }
       }
     },

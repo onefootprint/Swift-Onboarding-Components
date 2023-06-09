@@ -30,13 +30,21 @@ const getEntities = async (
   return response;
 };
 
-const useEntities = (kind: EntityKind) => {
+const useEntities = (
+  kind: EntityKind,
+  defaultFilters?: Record<string, any>,
+) => {
   const { authHeaders } = useSession();
   const filters = useFilters();
   const { requestParams } = filters;
   const query = useQuery(
     ['entities', kind, requestParams, authHeaders],
-    () => getEntities(authHeaders, { ...requestParams, kind }),
+    () =>
+      getEntities(authHeaders, {
+        ...requestParams,
+        ...defaultFilters,
+        kind,
+      }),
     {
       enabled: filters.isReady,
       select: (response: PaginatedRequestResponse<GetEntitiesResponse>) => ({

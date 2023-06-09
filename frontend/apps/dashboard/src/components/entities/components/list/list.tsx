@@ -12,10 +12,19 @@ export type ListProps = {
   children: React.ReactNode;
   kind: EntityKind;
   title: string;
+  subtitle?: string;
   basePath: string;
+  defaultFilters?: Record<string, any>;
 };
 
-const List = ({ children, title, kind, basePath }: ListProps) => {
+const List = ({
+  children,
+  title,
+  subtitle,
+  kind,
+  basePath,
+  defaultFilters,
+}: ListProps) => {
   const router = useRouter();
   const filters = useFilters();
   const {
@@ -23,7 +32,7 @@ const List = ({ children, title, kind, basePath }: ListProps) => {
     isLoading,
     errorMessage,
     pagination,
-  } = useEntities(kind);
+  } = useEntities(kind, defaultFilters);
 
   const handleRowClick = (entity: Entity) => {
     router.push({
@@ -45,9 +54,14 @@ const List = ({ children, title, kind, basePath }: ListProps) => {
       onRowClick={handleRowClick}
       onSearchChange={handleSearchChange}
     >
-      <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
+      <Typography variant="heading-3" sx={{ marginBottom: subtitle ? 2 : 5 }}>
         {title}
       </Typography>
+      {subtitle && (
+        <Typography variant="body-2" sx={{ marginBottom: 7 }}>
+          {subtitle}
+        </Typography>
+      )}
       {children}
       {response && response.meta.count > 0 && (
         <Pagination

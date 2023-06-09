@@ -10,9 +10,9 @@ type UseEntitiesContext = {
   onSearchChange: (search: string) => void;
 };
 
-const useEntities = (options: UseEntitiesContext) => options;
+const useLocalEntitiesContext = (options: UseEntitiesContext) => options;
 
-const [Provider, useEntitiesContext] = constate(useEntities);
+const [Provider, useEntitiesContext] = constate(useLocalEntitiesContext);
 
 export default Provider;
 export { useEntitiesContext };
