@@ -43,7 +43,7 @@ describe('Id Doc Machine Tests', () => {
     });
   });
 
-  describe('Full flow test', () => {
+  describe('Full flow test with image upload and navigate back', () => {
     it('Can execute the the full flow properly', () => {
       const machine = interpret(createIdDocMachine({ ...argsRegular }));
       machine.start();
@@ -73,6 +73,12 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'navigatedToPrev',
+        },
+        {
           type: 'receivedImage',
           payload: {
             image: 'image',
@@ -91,6 +97,12 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('backImage');
 
       state = machine.send([
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'navigatedToPrev',
+        },
         {
           type: 'receivedImage',
           payload: {
@@ -142,6 +154,73 @@ describe('Id Doc Machine Tests', () => {
   });
 
   describe('Additional tests', () => {
+    it('Can take front image using inline camera and upload', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'USA',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
+    });
+
+    it('Can take back image using inline camera and upload', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'USA',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
+    });
+
     it('Can retry image upload when processing fails and update errors', () => {
       const machine = interpret(createIdDocMachine({ ...argsRegular }));
       machine.start();
@@ -242,6 +321,65 @@ describe('Id Doc Machine Tests', () => {
         },
       ]);
       expect(state.value).toEqual('complete');
+    });
+
+    it('Goes back to front image if camera errored', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'USA',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'cameraErrored',
+        },
+      ]);
+      expect(state.value).toEqual('frontImage');
+    });
+
+    it('Goes back to back image if camera errored', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'USA',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+        {
+          type: 'consentReceived',
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'cameraErrored',
+        },
+      ]);
+      expect(state.value).toEqual('backImage');
     });
 
     it('Goes back to selfie prompt if camera errored', () => {
