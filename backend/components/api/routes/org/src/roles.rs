@@ -56,7 +56,6 @@ async fn get(
 
     let results = results
         .into_iter()
-        .map(|(r, num_active_users)| (r, Some(num_active_users)))
         .map(api_wire_types::OrganizationRole::from_db)
         .collect();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))

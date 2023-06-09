@@ -10,10 +10,17 @@ use chrono::{DateTime, Utc};
 use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{Locked, TenantId, TenantRoleId, TenantScope};
+use newtypes::{ApiKeyStatus, Locked, TenantId, TenantRoleId, TenantScope};
 
 pub type IsImmutable = bool;
 pub type NumActiveUsers = i64;
+pub type NumActiveApiKeys = i64;
+
+pub struct TenantRoleInfo {
+    pub role: TenantRole,
+    pub num_active_users: NumActiveUsers,
+    pub num_active_api_keys: NumActiveApiKeys,
+}
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_role)]
@@ -248,8 +255,8 @@ impl TenantRole {
         conn: &mut PgConn,
         filters: &TenantRoleListFilters,
         pagination: OffsetPagination,
-    ) -> DbResult<(Vec<(Self, NumActiveUsers)>, NextPage)> {
-        use crate::schema::tenant_rolebinding;
+    ) -> DbResult<(Vec<TenantRoleInfo>, NextPage)> {
+        use crate::schema::{tenant_api_key, tenant_rolebinding};
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
             .limit(pagination.limit());
@@ -259,21 +266,32 @@ impl TenantRole {
         }
         let results: Vec<Self> = query.get_results(conn)?;
 
-        // For each role, fetch the number of active users
+        // For each role, fetch the number of active users and api keys
         let role_ids = results.iter().map(|r| r.id.clone()).collect_vec();
         let num_active_users_per_role: Vec<(TenantRoleId, NumActiveUsers)> = tenant_rolebinding::table
-            .filter(tenant_rolebinding::tenant_role_id.eq_any(role_ids))
+            .filter(tenant_rolebinding::tenant_role_id.eq_any(&role_ids))
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .group_by(tenant_rolebinding::tenant_role_id)
             .select((tenant_rolebinding::tenant_role_id, count_star()))
             .get_results(conn)?;
 
+        let num_active_keys_per_role: Vec<(TenantRoleId, NumActiveApiKeys)> = tenant_api_key::table
+            .filter(tenant_api_key::role_id.eq_any(&role_ids))
+            .filter(tenant_api_key::status.eq(ApiKeyStatus::Enabled))
+            .group_by(tenant_api_key::role_id)
+            .select((tenant_api_key::role_id, count_star()))
+            .get_results(conn)?;
+
         // Zip results together
         let mut num_active_users_per_role: HashMap<_, _> = num_active_users_per_role.into_iter().collect();
+        let mut num_active_keys_per_role: HashMap<_, _> = num_active_keys_per_role.into_iter().collect();
         let results = results
             .into_iter()
-            .map(|r| (num_active_users_per_role.remove(&r.id).unwrap_or_default(), r))
-            .map(|(r, count)| (count, r))
+            .map(|r| TenantRoleInfo {
+                num_active_users: num_active_users_per_role.remove(&r.id).unwrap_or_default(),
+                num_active_api_keys: num_active_keys_per_role.remove(&r.id).unwrap_or_default(),
+                role: r,
+            })
             .collect();
         let results = pagination.results(results);
         Ok(results)

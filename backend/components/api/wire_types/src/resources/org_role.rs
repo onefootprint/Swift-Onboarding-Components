@@ -12,5 +12,7 @@ pub struct OrganizationRole {
     pub created_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub num_active_users: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub num_active_api_keys: Option<i64>,
 }
 export_schema!(OrganizationRole);

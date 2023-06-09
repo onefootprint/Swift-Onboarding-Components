@@ -222,6 +222,7 @@ def test_get_roles(
         )
         expected_num_users = len(body["data"])
         assert limited_role["num_active_users"] == expected_num_users
+        assert limited_role["num_active_api_keys"] != None
 
 
 def test_update_roles(sandbox_tenant, limited_role, admin_role):
