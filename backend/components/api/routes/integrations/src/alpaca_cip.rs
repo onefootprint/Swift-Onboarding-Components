@@ -215,9 +215,9 @@ async fn kyc(
                 Id(Dob),
                 Id(AddressLine1),
                 Id(AddressLine2),
+                Id(Nationality),
                 Id(Zip),
                 Id(Country),
-                // todo: make latest
                 Document(PassportNumber),
                 Document(IdCardNumber),
                 Document(DriversLicenseNumber),
@@ -252,7 +252,7 @@ async fn kyc(
         id: scoped_vault.fp_id.clone(),
         applicant_name: format_pii!("{} {}", vd.rm(FirstName)?, vd.rm(LastName)?),
         email_address: vd.rm(Email)?,
-        nationality: alpaca::Nationality::American, // TODO: (FP-4186) we need to collect this FP-4186
+        nationality: vd.rm(Nationality)?,
         date_of_birth: vd.rm(Dob)?,
         address: if let Ok(address2) = vd.rm(AddressLine2) {
             format_pii!("{} {}", vd.rm(AddressLine1)?, address2)

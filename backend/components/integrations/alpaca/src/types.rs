@@ -37,7 +37,7 @@ pub struct Kyc {
 
     pub applicant_name: PiiString,
     pub email_address: PiiString,
-    pub nationality: Nationality,
+    pub nationality: PiiString,
 
     /// Government issued ID number of applicant
     pub id_number: Option<PiiString>,
@@ -61,13 +61,6 @@ pub struct Kyc {
     /// The time that your system approved the account
     /// Potentially "now", i.e. when this request is made
     pub approved_at: chrono::DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-#[serde(rename_all = "snake_case")]
-pub enum Nationality {
-    #[default]
-    American,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
@@ -289,7 +282,7 @@ pub mod fixtures {
                     id: fp_id_test(),
                     applicant_name: pii!("Carl Cassanova"),
                     email_address: pii!("carl.casanova@gmail.com"),
-                    nationality: Nationality::American,
+                    nationality: pii!("american"),
                     id_number: None,
                     date_of_birth: pii!("1992-02-02"),
                     address: pii!("1 Penguin Place, Philadelphia PA"),
