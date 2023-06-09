@@ -46,8 +46,12 @@ pub enum DbError {
     TenantRoleDeactivated,
     #[error("Role with this name already exists")]
     TenantRoleAlreadyExists,
-    #[error("Cannot deactivate a role while users are using it. There are {0} active users with this role.")]
+    #[error(
+        "Cannot deactivate a role while active users inherit it. There are {0} active users with this role."
+    )]
     TenantRoleHasUsers(i64),
+    #[error("Cannot deactivate a role while active API keys inherit it. There are {0} active API keys with this role.")]
+    TenantRoleHasActiveApiKeys(i64),
     #[error("User and role belong to different tenants.")]
     TenantRoleMismatch,
     #[error("Scoped user is_live doesn't match UserVault is_live")]

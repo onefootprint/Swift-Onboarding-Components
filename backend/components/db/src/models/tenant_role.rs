@@ -158,7 +158,7 @@ impl TenantRole {
 
     #[tracing::instrument(skip_all)]
     pub fn deactivate(conn: &mut TxnPgConn, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
-        use crate::schema::tenant_rolebinding;
+        use crate::schema::{tenant_api_key, tenant_rolebinding};
         let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
@@ -169,8 +169,16 @@ impl TenantRole {
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .count()
             .get_result(conn.conn())?;
+        let num_active_keys: i64 = tenant_api_key::table
+            .filter(tenant_api_key::role_id.eq(&role.id))
+            .filter(tenant_api_key::status.eq(ApiKeyStatus::Enabled))
+            .count()
+            .get_result(conn.conn())?;
         if num_active_users > 0 {
             return Err(DbError::TenantRoleHasUsers(num_active_users));
+        }
+        if num_active_keys > 0 {
+            return Err(DbError::TenantRoleHasActiveApiKeys(num_active_keys));
         }
         let update = TenantRoleUpdate {
             deactivated_at: Some(Some(Utc::now())),

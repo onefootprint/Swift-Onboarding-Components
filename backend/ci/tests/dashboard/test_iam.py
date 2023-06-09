@@ -7,6 +7,20 @@ from tests.utils import (
 )
 
 
+@pytest.fixture(scope="session")
+def limited_role(sandbox_tenant):
+    # Don't want to share this with test_api_keys since we will deactivate it here
+    suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test limited role {suffix}",
+        scopes=["read", "onboarding_configuration"],
+    )
+    body = post("org/roles", role_data, sandbox_tenant.auth_token)
+    assert body["name"] == role_data["name"]
+    assert set(i for i in body["scopes"]) == set(i for i in role_data["scopes"])
+    return body
+
+
 def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
     # Since we reuse this tenant across integration test runs, an incomplete previous integration
     # test run may leave active users that cause conflict. Deactivate any old integration test

@@ -174,6 +174,7 @@ impl TenantApiKey {
         let role_id = if let Some(role_id) = role_id {
             // Make sure the role we are using belongs to the tenant, otherwise could make api key
             // for another tenant's role
+            // And, lock the role so it isn't deactivated while we are making the key
             TenantRole::lock_active(conn, &role_id, &tenant_id)?
                 .into_inner()
                 .id

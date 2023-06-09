@@ -5,7 +5,19 @@ from tests.utils import (
     get,
     post,
     patch,
+    _gen_random_n_digit_number,
 )
+
+
+@pytest.fixture(scope="session")
+def limited_role(sandbox_tenant):
+    # Don't want to share this with test_iam since we will deactivate it here
+    suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test limited role {suffix}",
+        scopes=["read", "onboarding_configuration"],
+    )
+    return post("org/roles", role_data, sandbox_tenant.auth_token)
 
 
 @pytest.fixture(scope="session")
@@ -15,24 +27,20 @@ def secret_key(sandbox_tenant, admin_role):
     return SecretApiKey.from_response(body)
 
 
-@pytest.fixture(scope="session")
-def limited_secret_key(sandbox_tenant, limited_role):
-    data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post(
-        "org/api_keys", data, sandbox_tenant.auth_token, DashboardAuthIsLive("false")
-    )
-    return (body, SecretApiKey.from_response(body))
-
-
 def test_api_key_limited_role(
-    limited_secret_key,
     sandbox_tenant,
     admin_role,
     must_collect_data,
     can_access_data,
     sandbox_user,
+    limited_role,
 ):
-    key = limited_secret_key[1].key
+    data = dict(name="Test secret key", role_id=limited_role["id"])
+    body = post(
+        "org/api_keys", data, sandbox_tenant.auth_token, DashboardAuthIsLive("false")
+    )
+    key_id = body["id"]
+    key = SecretApiKey.from_response(body).key
 
     # Can do ob config operations with limited role
     data = {
@@ -49,7 +57,6 @@ def test_api_key_limited_role(
 
     # Now, change the key's role
     data = dict(role_id=admin_role["id"])
-    key_id = limited_secret_key[0]["id"]
     patch(
         f"org/api_keys/{key_id}",
         data,
@@ -59,6 +66,39 @@ def test_api_key_limited_role(
 
     # And now can do other actions with admin permissions
     post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key)
+
+
+def test_deactivate_api_key_role(limited_role, sandbox_tenant):
+    data = dict(name="Test secret key", role_id=limited_role["id"])
+    body = post(
+        "org/api_keys", data, sandbox_tenant.auth_token, DashboardAuthIsLive("false")
+    )
+    key_id = body["id"]
+
+    # Can't deactivate role with active API keys
+    role_id = limited_role["id"]
+    post(
+        f"org/roles/{role_id}/deactivate",
+        None,
+        sandbox_tenant.auth_token,
+        status_code=400,
+    )
+
+    # Deactivate the API key
+    data = dict(status="disabled")
+    patch(
+        f"org/api_keys/{key_id}",
+        data,
+        sandbox_tenant.auth_token,
+        DashboardAuthIsLive("false"),
+    )
+
+    # Now we can deactivate the role
+    post(
+        f"org/roles/{role_id}/deactivate",
+        None,
+        sandbox_tenant.auth_token,
+    )
 
 
 def test_api_key_list(secret_key):
