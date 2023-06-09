@@ -4,7 +4,6 @@ use api_core::{
     errors::{business::BusinessError, ApiResult},
     State,
 };
-use api_wire_types::hosted::onboarding_requirement::{AuthorizeFields, OnboardingRequirement};
 use db::{
     models::{
         document_request::{DocRequestIdentifier, DocumentRequest},
@@ -20,6 +19,7 @@ use db::{
 use either::Either;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
+use newtypes::{AuthorizeFields, OnboardingRequirement};
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,

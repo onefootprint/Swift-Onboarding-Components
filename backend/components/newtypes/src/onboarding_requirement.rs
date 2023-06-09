@@ -1,10 +1,10 @@
-use newtypes::{CollectedDataOption, DocumentRequestId, IdDocKind, ModernIdDocKind};
+use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, ModernIdDocKind};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants, JsonSchema)]
-#[strum_discriminants(name(OnboardingRequirementDiscriminant))]
+#[strum_discriminants(name(OnboardingRequirementKind))]
 #[strum_discriminants(derive(strum_macros::Display))]
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]

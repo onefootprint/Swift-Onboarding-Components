@@ -58,6 +58,9 @@ pub use uuid::Uuid;
 pub mod proxy_token;
 pub use self::proxy_token::*;
 
+pub mod onboarding_requirement;
+pub use onboarding_requirement::*;
+
 pub mod fingerprinter;
 pub use self::fingerprinter::Fingerprinter;
 

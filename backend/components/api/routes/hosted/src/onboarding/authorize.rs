@@ -16,12 +16,12 @@ use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
-use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
 use decision::state::Authorize;
 use itertools::Itertools;
+use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(

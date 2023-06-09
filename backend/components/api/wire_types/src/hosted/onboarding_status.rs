@@ -1,6 +1,6 @@
 use crate::*;
 
-use super::onboarding_requirement::OnboardingRequirement;
+use newtypes::OnboardingRequirement;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, JsonSchema)]
 pub struct OnboardingStatusResponse {

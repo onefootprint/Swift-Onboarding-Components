@@ -16,9 +16,9 @@ use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::workflow::WorkflowError;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
-use api_wire_types::hosted::onboarding_requirement::OnboardingRequirement;
 use decision::state::Authorize;
 use itertools::Itertools;
+use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(

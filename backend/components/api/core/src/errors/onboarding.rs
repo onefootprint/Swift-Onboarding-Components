@@ -1,4 +1,4 @@
-use api_wire_types::hosted::onboarding_requirement::OnboardingRequirementDiscriminant;
+use newtypes::OnboardingRequirementKind;
 use newtypes::{output::Csv, CollectedDataOption, OnboardingId};
 use thiserror::Error;
 
@@ -21,7 +21,7 @@ pub enum OnboardingError {
     #[error("Tenant does not match")]
     TenantMismatch,
     #[error("Unmet onboarding requirements: {0}")]
-    UnmetRequirements(Csv<OnboardingRequirementDiscriminant>),
+    UnmetRequirements(Csv<OnboardingRequirementKind>),
     #[error("Required attributes are not set: {0}")]
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
