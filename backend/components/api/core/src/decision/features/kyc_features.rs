@@ -256,8 +256,8 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 impl FeatureVector for KycFeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // The set of rules that determine if a user passes onboarding
-        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![rule_sets::kyc::idology_base_rule_set()];
-        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![rule_sets::kyc::experian_rules()];
+        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![rule_sets::kyc::idology_rule_set()];
+        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![rule_sets::kyc::experian_rule_set()];
 
         // Evaluate rules
         let idology_rule_result = self

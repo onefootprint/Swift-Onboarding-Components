@@ -8,8 +8,8 @@ use crate::decision::{
 
 use newtypes::{FootprintReasonCode, RuleSetName};
 
-pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
-    let rules = vec![
+pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
+    vec![
         // If we don't have a located identity, we should fail
         Rule {
             rule: {
@@ -108,56 +108,33 @@ pub fn idology_base_rule_set() -> RuleSet<IDologyFeatures> {
             name: RuleName::SsnIssuedPriorToDob,
             action: Action::Fail,
         },
-        // This is an IDology recommended "always fail" rule
-        Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes.iter().any(|rc| {
-                        vec![
-                            FootprintReasonCode::WatchlistHitOfac,
-                            FootprintReasonCode::WatchlistHitNonSdn,
-                            FootprintReasonCode::WatchlistHitPep,
-                        ]
-                        .contains(rc)
-                    })
-                }
-            },
-            name: RuleName::WatchlistHit,
-            action: Action::Fail,
-        },
-    ];
+    ]
+}
+
+pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
+    let mut rules = idology_base_rules();
+    rules.push(super::common::watchlist_hit_rule());
 
     RuleSet {
         rules,
-        name: RuleSetName::IdologyBaseRules,
+        name: RuleSetName::IdologyRules,
     }
 }
 
-pub fn experian_rules() -> RuleSet<ExperianFeatures> {
-    let rules = vec![
-        Rule {
-            rule: |f: &ExperianFeatures| {
-                f.footprint_reason_codes
-                    .contains(&FootprintReasonCode::IdNotLocated)
-            },
-            name: RuleName::IdNotLocated,
-            action: Action::Fail,
+pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
+    vec![Rule {
+        rule: |f: &ExperianFeatures| {
+            f.footprint_reason_codes
+                .contains(&FootprintReasonCode::IdNotLocated)
         },
-        Rule {
-            rule: |f: &ExperianFeatures| {
-                f.footprint_reason_codes.iter().any(|rc| {
-                    vec![
-                        FootprintReasonCode::WatchlistHitOfac,
-                        FootprintReasonCode::WatchlistHitNonSdn,
-                        FootprintReasonCode::WatchlistHitPep,
-                    ]
-                    .contains(rc)
-                })
-            },
-            name: RuleName::WatchlistHit,
-            action: Action::Fail,
-        },
-    ];
+        name: RuleName::IdNotLocated,
+        action: Action::Fail,
+    }]
+}
+
+pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
+    let mut rules = experian_base_rules();
+    rules.push(super::common::watchlist_hit_rule());
 
     RuleSet {
         rules,
@@ -169,8 +146,26 @@ pub fn experian_rules() -> RuleSet<ExperianFeatures> {
 mod tests {
     use std::collections::HashSet;
 
-    use super::idology_base_rule_set;
+    use super::{experian_base_rules, idology_base_rules, idology_rule_set};
     use crate::decision::rule::RuleName;
+    use itertools::Itertools;
+
+    #[test]
+    fn test_base_rules_do_not_have_watchlist() {
+        assert!(
+            !(idology_base_rules()
+                .iter()
+                .map(|r| &r.name)
+                .contains(&RuleName::WatchlistHit))
+        );
+
+        assert!(
+            !(experian_base_rules()
+                .iter()
+                .map(|r| &r.name)
+                .contains(&RuleName::WatchlistHit))
+        );
+    }
 
     #[test]
     fn test_onboarding_rules_has_minimum() {
@@ -188,7 +183,7 @@ mod tests {
             .into_iter(),
         );
 
-        let rules = HashSet::from_iter(idology_base_rule_set().rules.into_iter().map(|r| r.name));
+        let rules = HashSet::from_iter(idology_rule_set().rules.into_iter().map(|r| r.name));
 
         assert!(expected_rules.is_subset(&rules))
     }

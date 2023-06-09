@@ -55,8 +55,8 @@ pub struct KycRuleGroup {
 }
 impl KycRuleGroup {
     pub fn default_rules() -> Self {
-        let idology_rules = rule_sets::kyc::idology_base_rule_set();
-        let experian_rules = rule_sets::kyc::experian_rules();
+        let idology_rules = rule_sets::kyc::idology_rule_set();
+        let experian_rules = rule_sets::kyc::experian_rule_set();
         Self {
             idology_rules,
             experian_rules,

@@ -13,7 +13,7 @@ fn create_onboarding_rules_decision_output(
     expected_should_commit: bool,
     expected_triggered_rules: Vec<RuleName>,
 ) -> OnboardingRulesDecisionOutput {
-    let base = rule_sets::kyc::idology_base_rule_set()
+    let base = rule_sets::kyc::idology_rule_set()
         .rules
         .into_iter()
         .map(|r| r.name);
