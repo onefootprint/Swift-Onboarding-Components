@@ -2,7 +2,10 @@ use std::{collections::HashMap, sync::Arc};
 
 use super::{
     features::kyc_features::KycFeatureVector,
-    onboarding::{DecisionReasonCodes, FeatureVector, OnboardingRulesDecisionOutput},
+    onboarding::{
+        calculate_kyc_rules_output_with_waterfall, DecisionReasonCodes, FeatureVector, KycRuleGroup,
+        OnboardingRulesDecisionOutput,
+    },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
@@ -349,6 +352,7 @@ pub async fn make_vendor_requests(
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
+    rule_group: KycRuleGroup,
 ) -> ApiResult<(
     OnboardingRulesDecisionOutput,
     DecisionReasonCodes,
@@ -356,7 +360,7 @@ pub fn calculate_decision(
 )> {
     // From our results, create a FeatureVector for the final decision output
     let fv = features::kyc_features::create_features(vendor_results);
-    let (decision, reason_codes) = fv.evaluate()?;
+    let (decision, reason_codes) = calculate_kyc_rules_output_with_waterfall(&fv, rule_group)?;
 
     Ok((decision, reason_codes, fv))
 }

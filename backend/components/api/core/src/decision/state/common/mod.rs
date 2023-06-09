@@ -22,7 +22,7 @@ use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 use crate::{
     decision::{
         self, engine,
-        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput},
         utils::FixtureDecision,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
@@ -206,7 +206,8 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ky
 }
 
 pub fn get_kyc_decision(conn: &mut TxnPgConn, vendor_results: Vec<VendorResult>) -> ApiResult<KycDecision> {
-    let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results)?;
+    let rule_group = KycRuleGroup::default_rules();
+    let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results, rule_group)?;
     Ok((rules_output, reason_codes))
 }
 

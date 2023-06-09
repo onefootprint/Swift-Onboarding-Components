@@ -6,7 +6,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::decision::features;
-use api_core::decision::onboarding::{Decision, OnboardingRulesDecisionOutput};
+use api_core::decision::onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
 use chrono::Utc;
@@ -129,8 +129,9 @@ async fn make_vendor_calls(
         &ob.id,
     )
     .await?;
-
-    let (rules_output, _, _) = crate::decision::engine::calculate_decision(vendor_results.clone())?;
+    let rule_group = KycRuleGroup::default_rules();
+    let (rules_output, _, _) =
+        crate::decision::engine::calculate_decision(vendor_results.clone(), rule_group)?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()
@@ -307,8 +308,8 @@ async fn shadow_run(
             verification_request_id: req.id,
         })
         .collect();
-
-    let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results)?;
+    let rule_group = KycRuleGroup::default_rules();
+    let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results, rule_group)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision.decision_status,

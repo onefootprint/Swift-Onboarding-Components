@@ -128,12 +128,12 @@ impl KycFeatureVector {
     /// For now, we have very simple logic to decide when to commit which is just "if the only thing that failed this user is a watchlist hit, commit"
     ///
     /// More thoughts: https://www.notion.so/onefootprint/Design-Doc-Portabilization-Decision-71f1cfb945234c58b74e97f005211917?pvs=4
-    fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
+    pub fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
         rules_triggered.is_empty()
             || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
     }
 
-    fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+    pub fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
         let all_codes = vendor_apis
             .iter()
             .flat_map(|v| {

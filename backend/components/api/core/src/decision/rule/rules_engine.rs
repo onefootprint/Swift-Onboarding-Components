@@ -7,6 +7,24 @@ use super::{
     *,
 };
 
+pub fn evaluate_onboarding_rule_set<T>(ruleset: RuleSet<T>, rule_input: &T) -> OnboardingEvaluationResult
+where
+    T: FeatureSet + Clone,
+{
+    let evaluated_ruleset = ruleset.evaluate(rule_input);
+    let triggered_action = evaluated_ruleset.action.clone();
+
+    // Log evaluation of a single rule set
+    log_ruleset_evaluation(&evaluated_ruleset);
+
+    OnboardingEvaluationResult {
+        rules_triggered: evaluated_ruleset.triggered_rule_names(),
+        rules_not_triggered: evaluated_ruleset.not_triggered_rule_names(),
+        triggered_action,
+        vendor_api: rule_input.vendor_api(),
+    }
+}
+
 /// Evaluate a list of rulesets for a given input type T
 pub fn evaluate_onboarding_rules<T>(rulesets: Vec<RuleSet<T>>, rule_input: &T) -> OnboardingEvaluationResult
 where
@@ -19,14 +37,7 @@ where
             let evaluated_ruleset = rs.evaluate(rule_input);
 
             // Log evaluation of a single rule set
-            tracing::info!(
-                rule_set_name=%evaluated_ruleset.ruleset_name,
-                action=?evaluated_ruleset.action,
-                rules_triggered_fail=%super::rules_to_string(&evaluated_ruleset.rules_triggered.iter().filter_map(|r| (r.action == Action::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
-                rules_triggered_steup=%super::rules_to_string(&evaluated_ruleset.rules_triggered.iter().filter_map(|r| (r.action == Action::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
-                rules_not_triggered=%super::rules_to_string(&evaluated_ruleset.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),
-                RULE_LOG_LINE
-            );
+            log_ruleset_evaluation(&evaluated_ruleset);
 
             evaluated_ruleset
         })
@@ -52,6 +63,16 @@ where
         triggered_action,
         vendor_api: rule_input.vendor_api(),
     }
+}
+
+fn log_ruleset_evaluation(rule_set_result: &RuleSetResult) {
+    tracing::info!(
+        action=?rule_set_result.action,
+        rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
+        rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
+        rules_not_triggered=%super::rules_to_string(&rule_set_result.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),
+        RULE_LOG_LINE
+    )
 }
 
 /// Struct to represent the result of evaluating a set of RuleSets
