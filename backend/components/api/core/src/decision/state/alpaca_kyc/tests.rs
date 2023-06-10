@@ -64,18 +64,13 @@ use std::sync::Arc;
 ///
 
 #[test_state_case(UserKind::Demo)]
-#[test_state_case(UserKind::Sandbox)]
+#[test_state_case(UserKind::Sandbox("pass"))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn pass(state: &mut State, user_kind: UserKind) {
     /// DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(
-        state,
-        user_kind,
-        Some(CipKind::Alpaca),
-        matches!(user_kind, UserKind::Sandbox).then(|| "pass".to_owned()),
-    )
-    .await;
+    let (wf, tenant, obc, _tu) =
+        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -92,7 +87,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -168,7 +163,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none());
 
     match user_kind {
-        UserKind::Demo | UserKind::Sandbox => {
+        UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
                 vec![
                     FootprintReasonCode::AddressMatches,
@@ -207,8 +202,8 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
 #[test_state_case(UserKind::Live, TerminalDecisionStatus::Pass)]
 #[test_state_case(UserKind::Live, TerminalDecisionStatus::Fail)]
-#[test_state_case(UserKind::Sandbox, TerminalDecisionStatus::Pass)]
-#[test_state_case(UserKind::Sandbox, TerminalDecisionStatus::Fail)]
+#[test_state_case(UserKind::Sandbox("manualreview"), TerminalDecisionStatus::Pass)]
+#[test_state_case(UserKind::Sandbox("manualreview"), TerminalDecisionStatus::Fail)]
 #[tokio::test]
 async fn pass_then_watchlist_hit(
     state: &mut State,
@@ -216,13 +211,8 @@ async fn pass_then_watchlist_hit(
     review_decision: TerminalDecisionStatus,
 ) {
     /// DATA SETUP
-    let (wf, tenant, obc, tu) = setup_data(
-        state,
-        user_kind,
-        Some(CipKind::Alpaca),
-        matches!(user_kind, UserKind::Sandbox).then(|| "manualreview".to_owned()),
-    )
-    .await;
+    let (wf, tenant, obc, tu) =
+        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -240,7 +230,7 @@ async fn pass_then_watchlist_hit(
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -313,7 +303,7 @@ async fn pass_then_watchlist_hit(
     assert!(mr.is_some());
 
     match user_kind {
-        UserKind::Demo | UserKind::Sandbox => {
+        UserKind::Demo | UserKind::Sandbox(_) => {
             // TODO: In Demo + Sandbox, we are currently making real Incode watchlist calls (which is wrong). But when we respect the fixtures, we'll probably
             // check for the presence of any random watchlist reason code here
             assert!(rs
@@ -377,7 +367,7 @@ async fn pass_then_watchlist_hit(
             // Test Redo as well
             match user_kind {
                 // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
-                UserKind::Demo | UserKind::Sandbox => {}
+                UserKind::Demo | UserKind::Sandbox(_) => {}
                 UserKind::Live => {
                     redo_and_pass(state, user_kind, &ob, &obd.unwrap(), &tenant.id, &obc.key).await;
                 }
@@ -388,12 +378,12 @@ async fn pass_then_watchlist_hit(
 
 // TODO: currently can only stepup in Sandbox through fixture because we don't have Alpaca rules configured yet to do real stepups
 // #[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox)]
+#[test_state_case(UserKind::Sandbox("stepup"))]
 #[tokio::test]
 async fn step_up(state: &mut State, user_kind: UserKind) {
     /// DATA SETUP
     let (wf, tenant, obc, tu) =
-        setup_data(state, user_kind, Some(CipKind::Alpaca), Some("stepup".to_owned())).await;
+        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -410,7 +400,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             todo!();
@@ -485,18 +475,13 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
 }
 
-#[test_state_case(UserKind::Sandbox)]
+#[test_state_case(UserKind::Sandbox("fail"))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn fail(state: &mut State, user_kind: UserKind) {
     /// DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(
-        state,
-        user_kind,
-        Some(CipKind::Alpaca),
-        matches!(user_kind, UserKind::Sandbox).then(|| "fail".to_owned()),
-    )
-    .await;
+    let (wf, tenant, obc, _tu) =
+        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -514,7 +499,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -555,6 +540,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .unwrap();
 
     // Expect Webhook
+    let expect_review = match user_kind {
+        UserKind::Demo | UserKind::Sandbox(_) => false,
+        UserKind::Live => {
+            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
+            true
+        }
+    };
     mock_webhook(
         state,
         ExpectedStatus(OnboardingStatus::Fail),
@@ -577,7 +569,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none());
 
     match user_kind {
-        UserKind::Demo | UserKind::Sandbox => {
+        UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
                 vec![FootprintReasonCode::SsnDoesNotMatch],
                 rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
@@ -610,7 +602,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     // Test Redo as well
     match user_kind {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
             redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key).await;
         }
@@ -651,7 +643,7 @@ async fn redo_and_pass(
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = ob_config_key.clone();

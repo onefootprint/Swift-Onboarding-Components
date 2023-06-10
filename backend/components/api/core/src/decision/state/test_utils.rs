@@ -35,8 +35,17 @@ use webhooks::MockWebhookClient;
 #[derive(Clone, Copy)]
 pub enum UserKind {
     Demo,
-    Sandbox,
+    Sandbox(&'static str),
     Live,
+}
+impl UserKind {
+    pub fn phone_suffix(&self) -> Option<String> {
+        match self {
+            UserKind::Demo => None,
+            UserKind::Sandbox(s) => Some(s.to_string()),
+            UserKind::Live => None,
+        }
+    }
 }
 
 pub async fn setup_data(
