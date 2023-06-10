@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { DocumentDI, isVaultDataDecrypted } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
@@ -11,11 +12,12 @@ import DocumentField from './components/document-field';
 type DocumentFieldsProps = WithEntityProps;
 
 const DocumentFields = ({ entity }: DocumentFieldsProps) => {
+  const { t } = useTranslation('di');
   const { data } = useEntityVault(entity.id, entity);
   const fields = [
     {
       main: DocumentDI.latestIdCardFront,
-      label: 'Id card',
+      label: t('document.id_card.front'),
       dis: [
         DocumentDI.latestIdCardFront,
         DocumentDI.latestIdCardBack,
@@ -24,7 +26,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     },
     {
       main: DocumentDI.latestDriversLicenseFront,
-      label: 'Drivers license',
+      label: t('document.drivers_license.front'),
       dis: [
         DocumentDI.latestDriversLicenseFront,
         DocumentDI.latestDriversLicenseBack,
@@ -33,7 +35,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     },
     {
       main: DocumentDI.latestPassport,
-      label: 'Passport',
+      label: t('document.passport'),
       dis: [DocumentDI.latestPassport, DocumentDI.latestPassportSelfie],
     },
   ];

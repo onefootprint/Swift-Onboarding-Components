@@ -1040,6 +1040,7 @@
           "cancel": "Cancel"
         },
         "table": {
+          "aria-label": "Secret API keys table",
           "loading": {
             "aria-label": "Loading api keys..."
           },
@@ -1486,6 +1487,7 @@
             "email": "Email",
             "phone_number": "Phone number",
             "documents": "Documents",
+            "document_and_selfie": "Document and selfie",
             "custom": "Custom attributes",
             "investor_profile": "Broker questions (Investor profile)"
           }

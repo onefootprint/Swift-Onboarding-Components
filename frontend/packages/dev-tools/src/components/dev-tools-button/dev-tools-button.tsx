@@ -43,6 +43,7 @@ const Button = styled.button`
       position: fixed;
       top: 50%;
       transform: rotate(-90deg);
+      z-index: ${theme.zIndex.overlay};
 
       @media (hover: hover) {
         &:hover {
