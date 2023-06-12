@@ -298,27 +298,35 @@ fn identity(
             .map(|fv| fv.match_level),
         Some(MatchLevel::Exact) | Some(MatchLevel::Partial)
     );
+    let matched_address_result = CipResult::clear(matched_address);
 
-    let date_of_birth = field_validations
+    let dob = field_validations
         .remove(&SignalScope::Dob)
         .map(|fv| fv.match_level)
         == Some(MatchLevel::Exact);
+    let dob_result = CipResult::clear(dob);
 
     let tax_id = field_validations
         .remove(&SignalScope::Ssn)
         .map(|fv| fv.match_level)
         == Some(MatchLevel::Exact);
+    let tax_id_result = CipResult::clear(tax_id);
+
+    let any_consider = vec![matched_address_result, dob_result, tax_id_result]
+        .iter()
+        .any(|r| matches!(r, CipResult::Consider));
+    let overall_result = CipResult::clear(!any_consider);
 
     alpaca::Identity {
         id: scoped_vault.fp_id.clone(),
-        result: CipResult::Clear,
+        result: overall_result,
         status: alpaca::CipStatus::Complete,
         created_at: onboarding.decision_made_at.unwrap_or(chrono::Utc::now()),
-        matched_address: CipResult::clear(matched_address),
+        matched_address: matched_address_result,
         matched_addresses: vendors.clone(),
-        date_of_birth: CipResult::clear(date_of_birth),
+        date_of_birth: dob_result,
         date_of_birth_breakdown: vendors.clone(),
-        tax_id: CipResult::clear(tax_id),
+        tax_id: tax_id_result,
         tax_id_breakdown: vendors,
     }
 }
@@ -333,18 +341,27 @@ fn watchlist(
     let pep: bool = risk_signals
         .iter()
         .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitPep);
+    let pep_result = CipResult::clear(!pep);
 
     let ofac: bool = risk_signals
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitOfac);
+    let ofac_result = CipResult::clear(!ofac);
 
     let sanctions: bool = risk_signals
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitNonSdn);
+    let sanctions_result = CipResult::clear(!sanctions);
 
     let adverse_media: bool = risk_signals
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::AdverseMediaHit);
+    let adverse_media_result = CipResult::clear(!adverse_media);
+
+    let any_consider = vec![pep_result, ofac_result, sanctions_result, adverse_media_result]
+        .iter()
+        .any(|r| matches!(r, CipResult::Consider));
+    let overall_result = CipResult::clear(!any_consider);
 
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
     // so we pull them from the Vres on the fly here
@@ -369,13 +386,13 @@ fn watchlist(
 
     Ok(alpaca::Watchlist {
         id: scoped_vault.fp_id.clone(),
-        result: CipResult::Clear,
+        result: overall_result,
         status: alpaca::CipStatus::Complete,
         created_at: onboarding.decision_made_at.unwrap_or(chrono::Utc::now()),
-        politically_exposed_person: CipResult::clear(!pep),
-        monitored_lists: CipResult::clear(!ofac),
-        sanction: CipResult::clear(!sanctions),
-        adverse_media: CipResult::clear(!adverse_media),
+        politically_exposed_person: pep_result,
+        monitored_lists: ofac_result,
+        sanction: sanctions_result,
+        adverse_media: adverse_media_result,
         records: records_json,
     })
 }

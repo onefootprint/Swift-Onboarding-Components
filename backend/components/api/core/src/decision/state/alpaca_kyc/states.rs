@@ -407,7 +407,11 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             Either::Right(fixture_decision) => match fixture_decision.0 {
                 // For Alpaca sandbox fixtures, we treat "#fail" as meaning there was a watchlist hit. If we stepup (or pass), we don't simulate watchlist hits
                 DecisionStatus::StepUp | DecisionStatus::Pass => vec![],
-                DecisionStatus::Fail => vec![(FootprintReasonCode::WatchlistHitOfac, vec![Vendor::Incode])],
+                DecisionStatus::Fail => vec![
+                    // TODO: probably does make sense to just parse these instead from the dummy vres
+                    (FootprintReasonCode::WatchlistHitOfac, vec![Vendor::Incode]),
+                    (FootprintReasonCode::AdverseMediaHit, vec![Vendor::Incode]),
+                ],
             },
         };
 

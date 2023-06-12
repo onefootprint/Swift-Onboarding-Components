@@ -70,7 +70,7 @@ pub enum ApprovalStatus {
     Approved,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum CipResult {
     #[default]
