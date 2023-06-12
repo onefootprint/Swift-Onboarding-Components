@@ -121,7 +121,8 @@
     "socure": "Socure",
     "lexis_nexis": "LexisNexis",
     "experian": "Experian",
-    "twilio": "Twilio"
+    "twilio": "Twilio",
+    "incode": "Incode"
   },
   "signal-attributes": {
     "name": "Full name",
