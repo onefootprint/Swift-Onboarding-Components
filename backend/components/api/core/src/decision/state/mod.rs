@@ -16,7 +16,7 @@ pub mod document;
 pub mod kyc;
 #[cfg(test)]
 pub mod test_utils;
-mod traits;
+pub mod traits;
 
 use traits::{DoAction, OnAction, Workflow, WorkflowState};
 
@@ -32,6 +32,8 @@ pub enum StateError {
     ConcurrentStateChange(newtypes::WorkflowState, newtypes::WorkflowState),
     #[error("Error initializing state {0}: {1}")]
     StateInitError(String, String),
+    #[error("Cannot materialize {0} into WorkflowActions")]
+    WorkflowActionsConversionError(WorkflowActionsKind),
 }
 
 use alpaca_kyc::AlpacaKycState;

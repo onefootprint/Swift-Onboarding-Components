@@ -2,6 +2,12 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_core::auth::tenant::GetFirmEmployee;
+use api_core::auth::tenant::TenantRbAuthContext;
+use api_core::auth::Either;
+use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::traits::Workflow as TWorkflow;
+use api_core::decision::state::{WorkflowActionsKind, WorkflowWrapper};
 use chrono::Utc;
 use db::models::workflow::{NewWorkflow, Workflow};
 use db::DbError;
@@ -54,5 +60,55 @@ async fn create_workflow(
 
     Ok(Json(ResponseData::ok(CreateWorkflowResponse {
         workflow_id: wf.id,
+    })))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct ProceedRequest {
+    pub wf_id: WorkflowId,
+    pub wf_action_kind: Option<WorkflowActionsKind>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct ProceedResponse {
+    pub new_workflow_state: WorkflowState,
+}
+
+#[api_v2_operation(description = "Runs Workflow with its current default action", tags(Private))]
+#[post("/private/protected/workflow/proceed")]
+async fn proceed(
+    state: web::Data<State>,
+    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
+    request: Json<ProceedRequest>,
+) -> actix_web::Result<Json<ResponseData<ProceedResponse>>, ApiError> {
+    if let Either::Left(tenant_rb) = auth {
+        // Make sure only firm employees can hit this endpoint
+        tenant_rb.firm_employee_user()?;
+    }
+
+    let ProceedRequest {
+        wf_id,
+        wf_action_kind,
+    } = request.into_inner();
+
+    let wf = state
+        .db_pool
+        .db_query(move |conn| Workflow::get(conn, &wf_id))
+        .await??;
+
+    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+
+    let action = if let Some(wf_action_kind) = wf_action_kind {
+        WorkflowActions::try_from(wf_action_kind)?
+    } else {
+        ww.state.default_action().ok_or(ApiError::AssertionError(
+            "Current state has no default action".to_string(),
+        ))?
+    };
+
+    let ww = ww.run(&state, action).await?;
+
+    Ok(Json(ResponseData::ok(ProceedResponse {
+        new_workflow_state: newtypes::WorkflowState::from(ww.state),
     })))
 }

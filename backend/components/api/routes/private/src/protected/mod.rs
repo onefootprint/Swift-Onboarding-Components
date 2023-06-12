@@ -20,7 +20,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(task::create_task)
         .service(token_reveal::post)
         .service(task::create_overdue_watchlist_check_tasks)
-        .service(workflow::create_workflow);
+        .service(workflow::create_workflow)
+        .service(workflow::proceed);
 }
 
 #[api_v2_operation(tags(Private, Protected))]
