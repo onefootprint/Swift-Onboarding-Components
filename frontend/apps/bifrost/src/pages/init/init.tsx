@@ -18,9 +18,12 @@ const Init = () => {
   const tenantPk = useTenantPublicKey();
   const [, send] = useBifrostMachine();
   const observeCollector = useObserveCollector();
+  const obConfigAuth = tenantPk
+    ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk }
+    : undefined;
 
   useGetOnboardingConfig(
-    { obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk } },
+    { obConfigAuth },
     {
       onSuccess: (config: OnboardingConfig) => {
         observeCollector.setAppContext({
