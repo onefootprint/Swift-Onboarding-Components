@@ -423,7 +423,6 @@ impl OnboardingAndConfig {
     /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
     /// to decrypt.
     pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
-        // TODO fix decryption permissions for id docs collected progressively
         let Self(ob, obc) = &self;
         if ob.authorized_at.is_none() {
             // Only authorized onboardings give permission to decrypt data

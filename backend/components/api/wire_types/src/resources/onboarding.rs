@@ -14,8 +14,6 @@ pub struct Onboarding {
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
     pub insight_event: InsightEvent,
-    /// Represents the permissions that this approved onboarding gives to tenant users.
-    pub can_access_permissions: Vec<TenantScope>,
 }
 
 export_schema!(Onboarding);

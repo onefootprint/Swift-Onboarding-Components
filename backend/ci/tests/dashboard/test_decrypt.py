@@ -79,7 +79,6 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
     }
     # confirm they didn't auth identity_document
     body = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
-    assert not "decrypt.dob" in body["onboarding"]["can_access_permissions"]
     assert not "id.dob" in body["decryptable_attributes"]
 
     post(
