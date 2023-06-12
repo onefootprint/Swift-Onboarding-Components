@@ -213,10 +213,10 @@
   },
   "pages": {
     "home": {
-      "html-title": "Onboard users and vault their data with one click",
+      "html-title": "Footprint - Onboard customers and vault their data with one click",
       "hero": {
-        "title": "Onboard users and vault their data with one click",
-        "subtitle": "Frictionless identity verification & PII vaulting wrapped in the same platform and one API. \n KYC your users without worrying about storing their sensitive data afterwards.",
+        "title": "Onboard customers and vault their data with one click",
+        "subtitle": "Embedding KYC, KYB, and PII + Card Vaulting with 5 lines of code, we empower companies to own their onboarding experience and customer data.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
         "primary-button": "Get started",
@@ -224,108 +224,92 @@
         "tertiary-button": "Watch demo",
         "demo-video-close": "Close"
       },
-      "new-approach-section": {
-        "title": "A new approach to KYC & PII storage",
-        "subtitle": "With a security-first approach, we remove the toggle between friction and accuracy.",
-        "features": {
-          "feature-1": {
-            "title": "Increased conversion",
-            "body": "Our one-click flow increases conversion by dramatically reducing time to account creation."
-          },
-          "feature-2": {
-            "title": "Decreased cost",
-            "body": "Say goodbye to separate KYC and tokenization tools. We do both in one, and pass along the savings."
-          },
-          "feature-3": {
-            "title": "Enhanced dev experience",
-            "body": "With a few lines of code, you'll have KYC and PII vaulting running in less than a day. It's that simple."
-          },
-          "feature-4": {
-            "title": "Designed to the last pixel",
-            "body": "Our polished interface and intuitive user experience make KYC and PII storage a breeze."
-          },
-          "alt": "image of a phone with confirmation screen"
+      "new-approach": {
+        "title": "A new approach to unify verification for onboarding",
+        "subtitle": "A security-first approach utilizing novel biometrics to remove the toggle between fraud and friction.",
+        "kyc": {
+          "title": "Know Your Customer (KYC)",
+          "subtitle": "Verify real people, not typed information.",
+          "alt-image": "A phone with an authorization screen and face id validation",
+          "cta": "See documentation"
+        },
+        "kyb": {
+          "title": "Know Your Business (KYB)",
+          "subtitle": "Verify businesses, and the people behind the business.",
+          "alt-image": "A phone with details about a business",
+          "cta": "See documentation"
+        },
+        "passkeys": {
+          "title": "Passkeys.",
+          "subtitle": " We are on the cutting edge of using passkeys to bind a strong cryptographic credential to verified PII info protected by biometrics."
+        },
+        "increased-conversion": {
+          "title": "Increased conversion.",
+          "subtitle": "Millions of users are being verified in Footprint. Imagine your conversion if people didn't need to complete a form?"
+        },
+        "dev-experience": {
+          "title": "Enhanced dev experience.",
+          "subtitle": "With a few lines of code, you'll be onboarding customers within hours. We sell results, not complexity."
+        },
+        "last-pixel": {
+          "title": "Designed to the last pixel.",
+          "subtitle": "Our polished interface and intuitive user experience make KYC, KYB and vaulting a breeze."
         }
       },
-      "customizable-section": {
+      "customizable": {
         "title": "Beautiful, modern, customizable",
         "subtitle": "Customize the look and feel of your onboarding flow to perfectly match your brand.",
-        "features": {
-          "feature-1": {
-            "title": "Make it your own",
-            "body": "Match your brand's font-family, colors, border radius, and more."
-          },
-          "feature-2": {
-            "title": "Easy & flexible",
-            "body": "We offer 80+ variables that can be customized as you'd like."
-          },
-          "feature-3": {
-            "title": "Fine-tune component styles",
-            "body": "Need to go a step further? Missing something? You can use CSS to arbitrarily style individual components."
-          },
-          "feature-4": {
-            "title": "Well-documented",
-            "body": "Everything you need to customize your onboarding flow can be found in <a>our docs</a>. Still need help? No problem! We're here for you."
-          }
+        "cta": "See documentation",
+        "your-own": {
+          "title": "Make it your own",
+          "subtitle": "Match your brand's font-family, colors, border radius, and more, across all platforms."
+        },
+        "easy-flexible": {
+          "title": "Easy & flexible",
+          "subtitle": "We offer 80+ variables that can be customized as you'd like at speed of light."
+        },
+        "fine-tune": {
+          "title": "Fine-tune component styles",
+          "subtitle": "Need to go a step further? Missing something? You can use CSS-in-JS to arbitrarily style individual components."
+        },
+        "world-class": {
+          "title": "World-class developer experience",
+          "subtitle": "Beautiful docs, SDKs, and APIs that make integrating it a breeze (in 5 lines of code)."
         }
       },
-      "accurate-section": {
-        "title": "Accurate, portable, and secure user verification",
-        "subtitle": "Footprint's goal is to label good actors and enrich their identity over time, resulting in a more aligned business model that gets more actors in at a lower cost.",
-        "features": {
-          "feature-1": {
-            "title": "Best-in-class security",
-            "body": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Utilize our PII vault which uses secure enclaves to store data instead of building your own."
-          },
-          "feature-2": {
-            "title": "Unprecedented accuracy",
-            "body": "Footprint's ecosystem creates a feedback loop to increase accuracy through peer-to-peer verification. Our liveness checks use cutting edge biometrics to ensure only real people make accounts."
-          },
-          "feature-3": {
-            "title": "More functionality, fewer dollars",
-            "body": "By condensing multiple tools into one, our solution is up to 2x cheaper than traditional methods to verify and store PII."
-          },
-          "alt": "image of footprint's audit trail visualization"
-        }
-      },
-      "own-data-section": {
-        "title": "Own the data, disown the risk",
-        "subtitle": "Footprint gives companies 24/7 permissioned access to data, but adds zero trust security to mitigate risk of breach.",
-        "features": {
-          "feature-1": {
-            "title": "Private & secure",
-            "body": "Our advanced PII vaults are built on top of secure nitro enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
-          },
-          "feature-2": {
-            "title": "Zero-trust by design",
-            "body": "Our permissioned API ensures only the right parties can access the data they're allowed to see. PII data is never stored in plaintext."
-          },
-          "feature-3": {
-            "title": "Granular data access",
-            "body": "Limit the exposure, and only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults."
-          },
-          "feature-4": {
-            "title": "Secure enclave backed",
-            "body": "Our system guarantees that all PII data is always encrypted to our network-gapped, storage-, CPU-, and memory-isolated nitro enclaves."
-          },
-          "alt": "image of footprint's process for decrypting data"
+      "vault-pii": {
+        "title": "Vault PII, PCI, and custom data",
+        "subtitle": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
+        "cta": "See documentation",
+        "identity-data": {
+          "title": "Identity data (PII)",
+          "subtitle": "Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable."
+        },
+        "card-data": {
+          "title": "Payment card data (PCI)",
+          "subtitle": "In many financial applications, it's required to collect or store payment card, so we provide a PCI-compliant vaulting solution for payment card holder data such as card number, expiration date and security code (CVV)."
+        },
+        "custom-data": {
+          "title": "Custom data",
+          "subtitle": "We support custom key-value attributes that are provided by you and are not validated. You can use custom data to securely vault any associated sensitive user or business in the vault using a unified vaulting API."
         }
       },
       "vault-proxy": {
-        "title": "Vault Proxy",
-        "subtitle": "Send PII and card data from Footprint to third parties without decrypting it",
+        "title": "Next-gen vault proxy",
+        "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself.",
+        "cta": "See documentation",
         "features": {
-          "feature-1": {
+          "enhanced-security": {
             "title": "Enhanced security",
-            "body": "By using Footprint's single API for vaulting both PII data and custom data, you simplify your data management and minimize the amount of sensitive data stored on your systems, reducing the risk of data breaches and other security incidents."
+            "subtitle": "Simplify your data management and minimize the amount of sensitive data stored on your systems, reducing the risk of data breaches and other security incidents."
           },
-          "feature-2": {
+          "reduced-liability": {
             "title": "Reduced liability",
-            "body": "By offloading the responsibility of securely storing and managing sensitive data to us, you minimize your exposure to security risks and demonstrate compliance with data privacy regulations."
+            "subtitle": "Offload the responsibility of securely storing and managing sensitive data to us, you minimize your exposure to security risks and demonstrate compliance with data privacy regulations."
           },
-          "feature-3": {
+          "less-money": {
             "title": "Less money and time",
-            "body": "Protect your sensitive data with our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
+            "subtitle": "Protect your sensitive data with our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
           }
         },
         "illustration": {
@@ -333,56 +317,39 @@
           "your-app": "Your application"
         }
       },
-      "identity-wallet": {
-        "title": "An identity wallet built for transparency",
-        "subtitle": "One third of people admit to aborting sign-up due to worry over how their data will be stored. Footprint reduces this by giving people peace of mind over how their data will be handled.",
-        "features": {
-          "feature-1": {
-            "title": "Decrease drop-off",
-            "body": "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment."
-          },
-          "feature-2": {
-            "title": "Real-time information",
-            "body": "People have the ability to update information such as their address in Footprint, helping to more accurately maintain records on a population that increasingly moves cities resulting in false negative KYC fails."
-          },
-          "feature-3": {
-            "title": "Trust as a competitive advantage",
-            "body": "Become a more trusted brand by putting your users in control of their data. Not only does this help conversion and offload your own risk, but it is a way to do right by your consumers."
-          }
-        }
-      },
-      "everything-you-need-section": {
+      "more-than-expect": {
         "title": "Everything you need. More than you expect.",
         "subtitle": "One tool to unify account creation, continuous auth and monitoring, and company security.",
-        "features": {
-          "feature-1": {
-            "title": "Fraud & Risk",
-            "body": "By tying security, fraud, and KYC together, we can create a bar to enter the digital ecosystem. It only takes one second to prove your identity and create accounts with certainty.",
-            "alt-1": "Risk insights screen"
-          },
-          "feature-2": {
-            "title": "Security logs",
-            "body": "Each time data is accessed in the enclave, it automatically gets appended in our security logs - which are always accessible via API.",
-            "alt": "Image showing security logs in the product"
-          },
-          "feature-3": {
-            "title": "ID Scan + Selfie",
-            "body": "Combining identity document and selfie collection with smartphone biometric authentication methods like FaceID or TouchID, we create an incredible onboarding experience with the most accurate attestation of liveness.",
-            "alt-1": "Scan ID screen",
-            "alt-2": "Submitting drivers license screen"
-          },
-          "feature-4": {
-            "title": "Auth & IAM",
-            "body": "Identity should not be limited to onboarding. Footprint helps you bridge the identity gap from onboarding to auth to IAM.",
-            "alt-1": "Create role screen",
-            "alt-2": "Background table view"
-          }
+        "appclip": {
+          "title": "App Clip",
+          "subtitle": "App Clip allows your users to quickly verify their identity without needing to download any app. Web to mobile, seamlessly."
+        },
+        "fraud-risk": {
+          "title": "Fraud & risk",
+          "subtitle": "By tying security to fraud to KYC, we can create a bar to enter the digital ecosystem, and once cleared in a second let people create accounts with certainty."
+        },
+        "security-logs": {
+          "title": "Security logs",
+          "subtitle": "Each time data is accessed in the enclave, it automatically gets appended in our security logs, which are always accessible via API."
+        },
+        "id-scan": {
+          "title": "ID Scan + Selfie",
+          "subtitle": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness."
+        },
+        "auth": {
+          "title": "Auth & IAM",
+          "subtitle": "Identity should not be limited to onboarding. Footprint helps you bridge the identity gap from onboarding to auth to IAM."
+        },
+        "manual-review": {
+          "title": "Manual review",
+          "subtitle": "In the event we can't automatically verify a user, you can easily review them yourself and make a pass/fail decision."
         }
       },
-      "banner": {
-        "title": "The last identity form you'll ever fill out",
+      "penguin-banner": {
+        "title": "Onboard more customers and enjoy peace of mind. Today.",
         "cta": "Get started",
-        "alt": "Our penguin mascot"
+        "book-demo": "Book a demo",
+        "alt-img": "Penguin floating on a block of ice"
       }
     },
     "company": {

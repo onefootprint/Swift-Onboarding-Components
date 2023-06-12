@@ -150,7 +150,7 @@ const Inner = styled.div`
     gap: ${theme.spacing[9]};
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[9]} 0 ${theme.spacing[9]} 0;
+      padding: ${theme.spacing[10]} 0 ${theme.spacing[10]} 0;
       flex-direction: row;
     `};
   `}
@@ -164,7 +164,6 @@ const SectionColumn = styled.div`
     gap: ${theme.spacing[2]};
     min-width: 160px;
     gap: ${theme.spacing[6]};
-    margin-top: ${theme.spacing[6]};
   `}
 `;
 
@@ -184,20 +183,17 @@ const LinksContainer = styled.nav`
 `;
 
 const LeftContainer = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: ${theme.spacing[8]};
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 
-    ${media.greaterThan('lg')`
+  ${media.greaterThan('lg')`
       width: 300px;
       flex-direction: column;
       align-items: flex-start;
     `};
-  `}
 `;
 
 const TopLeftLinks = styled.div`

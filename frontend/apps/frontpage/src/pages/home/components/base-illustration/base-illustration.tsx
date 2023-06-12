@@ -1,24 +1,26 @@
-import { media } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
+import React from 'react';
+import styled from 'styled-components';
 
-const BaseIllustration = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    width: 100%;
-    grid-area: image;
-    height: 400px;
-    overflow: hidden;
-    border-radius: ${theme.borderRadius.default};
-    margin-left: 0;
-    z-index: 0;
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: ${theme.elevation[3]};
-    border: 0.1px solid transparent;
+type BaseIllustrationProps = {
+  className?: string;
+  children?: React.ReactNode;
+};
 
-    ${media.greaterThan('lg')`
-      height: 553px;
-    `};
-  `}
+const BaseIllustration = ({
+  className = 'base-illustration',
+  children,
+}: BaseIllustrationProps) => (
+  <Container className={className}>{children}</Container>
+);
+
+const Container = styled.div<{ invertedGradient?: boolean; className: string }>`
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  mask: linear-gradient(180deg, #fff 85%, transparent 100%);
+  mask-mode: alpha;
+  pointer-events: none;
+  user-select: none;
 `;
 
 export default BaseIllustration;

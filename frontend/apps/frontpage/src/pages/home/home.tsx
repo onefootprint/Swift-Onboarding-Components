@@ -1,62 +1,44 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import SEO from '../../components/seo';
-import Accurate from './sections/accurate';
-import Customizable from './sections/customizable';
-import EverythingYouNeed from './sections/everything-you-need';
-import Hero from './sections/hero';
-import NewApproach from './sections/new-approach';
-import OwnData from './sections/own-data';
-import PenguinBanner from './sections/penguin-banner';
-import VaultProxy from './sections/vault-proxy';
+import Customizable from './components/sections/customizable';
+import Hero from './components/sections/hero';
+import MoreThanExpect from './components/sections/more-than-expect/more-than-expect';
+import NewApproach from './components/sections/new-approach';
+import PenguinBanner from './components/sections/penguin-banner/penguin-banner';
+import VaultPii from './components/sections/vault-pii';
+import VaultProxy from './components/sections/vault-proxy';
 
-const NewHome = () => {
+const Home = () => {
   const { t } = useTranslation('pages.home');
   return (
     <>
-      <SEO title={t('html-title')} slug="/" />
+      <SEO title={t('html-title')} slug="/hero" />
       <Hero />
-      <SectionSpacer data-type="big" />
+      <SectionSpacer />
       <NewApproach />
-
-      <SectionSpacer />
-      <Accurate />
-      <SectionSpacer />
-      <OwnData />
-      <SectionSpacer />
-      <VaultProxy />
       <SectionSpacer />
       <Customizable />
       <SectionSpacer />
-      <EverythingYouNeed />
+      <VaultPii />
+      <VaultProxy />
+      <SectionSpacer />
+      <MoreThanExpect />
+      <SectionSpacer />
       <PenguinBanner />
     </>
   );
 };
 
 const SectionSpacer = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[10]} 0;
+  height: 80px;
 
-    &[data-type='big'] {
-      padding: ${theme.spacing[8]} 0;
-    }
-
-    ${media.greaterThan('sm')`
-      padding: ${theme.spacing[11]} 0;
-    `}
-
-    ${media.greaterThan('md')`  
-      padding: ${theme.spacing[12]} 0;
-
-        &[data-type='big'] {
-          padding: ${theme.spacing[13]} 0;
-        }
-    `}
+  ${media.greaterThan('lg')`
+    height: 156px;
   `}
 `;
 
-export default NewHome;
+export default Home;
