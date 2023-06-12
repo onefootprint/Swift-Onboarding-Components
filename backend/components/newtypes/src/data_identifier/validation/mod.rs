@@ -1,4 +1,6 @@
-use crate::{NtResult, PiiString, ValidateArgs};
+use std::collections::HashMap;
+
+use crate::{DataIdentifier, NtResult, PiiString, ValidateArgs};
 
 mod business;
 mod card;
@@ -10,9 +12,11 @@ pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
 pub use card::{CardIssuer, Expiration as CardExpiration};
 pub use investor_profile::Declaration;
 
+pub type AllData = HashMap<DataIdentifier, PiiString>;
+
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
-    fn validate(&self, value: PiiString, args: ValidateArgs) -> NtResult<PiiString>;
+    fn validate(&self, value: PiiString, args: ValidateArgs, all_data: &AllData) -> NtResult<PiiString>;
 }
 
 #[derive(Debug, thiserror::Error)]

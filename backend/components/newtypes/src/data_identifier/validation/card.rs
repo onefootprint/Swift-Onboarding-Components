@@ -1,5 +1,5 @@
 use super::{utils, Error, VResult};
-use crate::{CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
+use crate::{AliasId, AllData, CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
@@ -7,11 +7,11 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 
 impl Validate for CI {
-    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
-        let Self { alias: _, kind } = self;
+    fn validate(&self, value: PiiString, _: ValidateArgs, all_data: &AllData) -> NtResult<PiiString> {
+        let Self { alias, kind } = self;
         let result = match kind {
             CDK::Number => validate_card_number(value)?,
-            CDK::Cvc => validate_cc_cvc(value)?,
+            CDK::Cvc => validate_cc_cvc(value, alias, all_data)?,
             CDK::Expiration => Expiration::validate(&value)?.into(),
             CDK::ExpMonth => Expiration::validate_month(value.leak())?,
             CDK::ExpYear => Expiration::validate_year(value.leak())?,
@@ -177,19 +177,38 @@ impl From<Expiration> for PiiString {
     }
 }
 
-fn validate_cc_cvc(value: PiiString) -> VResult<PiiString> {
+fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VResult<PiiString> {
     if value.leak().chars().any(|c| !c.is_numeric()) {
         return Err(Error::NonDigitCharacter);
     }
-    // TODO this is a slightly new paradigm - the length we expect depends on the card number
     if value.leak().len() < 3 || value.leak().len() > 4 {
         return Err(Error::InvalidLength);
+    }
+
+    // Then try to validate the CVC length as a function of the card issuer
+    let number_di = CI {
+        alias: alias.clone(),
+        kind: CDK::Number,
+    };
+    let validated_card_number = all_data
+        .get(&number_di.into())
+        .and_then(|v| CardValidate::from(v.leak()).ok());
+    if let Some(card_number) = validated_card_number {
+        let expected_length = match CardIssuer::from(card_number.card_type) {
+            CardIssuer::Amex => 4,
+            _ => 3,
+        };
+        if value.leak().len() != expected_length {
+            return Err(Error::InvalidLength);
+        }
     }
     Ok(value)
 }
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
+
     use super::CDK::*;
     use super::{CDK, CI};
     use crate::{AliasId, Validate};
@@ -213,9 +232,34 @@ mod test {
             ..ValidateArgs::for_tests()
         };
         CI { alias, kind }
-            .validate(PiiString::new(pii.to_owned()), args)
+            .validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
             .ok()
             .map(|pii| pii.leak_to_string())
+    }
+
+    // Visa
+    #[test_case("4428680502681658", "123" => true)]
+    #[test_case("4428680502681658", "1234" => false)]
+    // Amex
+    #[test_case("346501315038265", "123" => false)]
+    #[test_case("346501315038265", "1234" => true)]
+    fn test_validate_cvc(card_number: &str, cvc: &str) -> bool {
+        let alias = AliasId::from("flerp".to_owned());
+        let args = ValidateArgs::for_tests();
+        let number_di = CI {
+            alias: alias.clone(),
+            kind: CDK::Number,
+        };
+        let other_data = [(number_di.into(), PiiString::new(card_number.into()))]
+            .into_iter()
+            .collect();
+        let cvc_di = CI {
+            alias,
+            kind: CDK::Cvc,
+        };
+        cvc_di
+            .validate(PiiString::new(cvc.into()), args, &other_data)
+            .is_ok()
     }
 
     #[test_case("12/24" => Some("12/2024".into()))]

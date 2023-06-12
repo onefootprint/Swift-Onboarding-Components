@@ -1,6 +1,6 @@
 use crate::{
-    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, StorageType,
-    Validate, ValidateArgs,
+    AllData, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, NtResult,
+    PiiString, StorageType, Validate, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -101,7 +101,7 @@ impl TryFrom<DataIdentifier> for DocumentKind {
 impl Validate for DocumentKind {
     // TODO this isn't used for DocumentKind since the input isn't a PiiString, but we have to implement
     // it in order to implement IsDataIdentifierDiscriminant. Maybe in the future we can split this functionality out
-    fn validate(&self, value: crate::PiiString, _args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
+    fn validate(&self, value: PiiString, _: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
         Ok(value)
     }
 }

@@ -144,14 +144,19 @@ impl DataIdentifier {
 }
 
 impl Validate for DataIdentifier {
-    fn validate(&self, value: crate::PiiString, args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
+    fn validate(
+        &self,
+        value: crate::PiiString,
+        args: ValidateArgs,
+        all_data: &AllData,
+    ) -> crate::NtResult<crate::PiiString> {
         match self {
-            Self::Id(s) => s.validate(value, args),
-            Self::Custom(s) => s.validate(value, args),
-            Self::Business(s) => s.validate(value, args),
-            Self::InvestorProfile(s) => s.validate(value, args),
-            Self::Document(s) => s.validate(value, args),
-            Self::Card(s) => s.validate(value, args),
+            Self::Id(s) => s.validate(value, args, all_data),
+            Self::Custom(s) => s.validate(value, args, all_data),
+            Self::Business(s) => s.validate(value, args, all_data),
+            Self::InvestorProfile(s) => s.validate(value, args, all_data),
+            Self::Document(s) => s.validate(value, args, all_data),
+            Self::Card(s) => s.validate(value, args, all_data),
         }
     }
 }

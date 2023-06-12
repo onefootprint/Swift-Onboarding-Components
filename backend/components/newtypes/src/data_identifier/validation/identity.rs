@@ -1,12 +1,12 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
-use crate::{IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs};
+use crate::{AllData, IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs};
 use chrono::{Datelike, NaiveDate, Utc};
 use std::str::FromStr;
 
 impl Validate for IDK {
-    fn validate(&self, value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, args: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
         // Generally don't want anything to be empty
         let value = utils::validate_not_empty(value)?;
         let result = match self {
@@ -113,6 +113,8 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
+
     use super::IDK::*;
     use crate::IdentityDataKind as IDK;
     use crate::PiiString;
@@ -155,6 +157,7 @@ mod test {
         idk.validate(
             PiiString::new(pii.to_owned()),
             ValidateArgs::for_non_portable(true),
+            &HashMap::new(),
         )
         .ok()
         .map(|pii| pii.leak_to_string())
@@ -168,6 +171,7 @@ mod test {
         idk.validate(
             PiiString::new(pii.to_owned()),
             ValidateArgs::for_non_portable(false),
+            &HashMap::new(),
         )
         .ok()
         .map(|pii| pii.leak_to_string())
@@ -189,7 +193,7 @@ mod test {
             for_bifrost: true,
             ..ValidateArgs::for_tests()
         };
-        idk.validate(PiiString::new(pii.to_owned()), args)
+        idk.validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
             .ok()
             .map(|pii| pii.leak_to_string())
     }

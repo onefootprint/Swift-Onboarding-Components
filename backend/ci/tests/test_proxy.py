@@ -46,8 +46,10 @@ class ProxyIngressContentType(BaseAuth):
 class ProxyTokenAssignment(BaseAuth):
     HEADER_NAME = "x-fp-proxy-footprint-token"
 
+
 class ProxyPathAndQuery(BaseAuth):
     HEADER_NAME = "x-fp-path-and-query"
+
 
 def read_file(name):
     import os
@@ -408,7 +410,7 @@ class TestVaultProxy:
             "data": {
                 "date_of_birth": "1950-01-01",
                 "card_number": "42424242424242",
-                "card_cvc": 4242,
+                "card_cvc": 424,
             }
         }
 
@@ -449,7 +451,7 @@ class TestVaultProxy:
         assert response["id.ssn9"] == "121121212"
         assert response["id.dob"] == "1950-01-01"
         assert response["card.primary.number"] == "42424242424242"
-        assert response["card.primary.cvc"] == "4242"
+        assert response["card.primary.cvc"] == "424"
 
     def test_ingress_document(self, sandbox_tenant):
         # create the vault

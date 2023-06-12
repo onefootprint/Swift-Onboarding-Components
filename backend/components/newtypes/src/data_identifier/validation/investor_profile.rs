@@ -1,5 +1,6 @@
 use super::utils;
 use super::Error;
+use crate::AllData;
 use crate::NtResult;
 use crate::Validate;
 use crate::ValidateArgs;
@@ -8,7 +9,7 @@ use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
 impl Validate for IPK {
-    fn validate(&self, value: PiiString, _args: ValidateArgs) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, _: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
         // Don't want anything to be empty
         let value = utils::validate_not_empty(value)?;
         let value = match self {

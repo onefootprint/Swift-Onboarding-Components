@@ -1,7 +1,10 @@
-use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, Validate, ValidateArgs};
+use crate::{
+    AllData, CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiString,
+    Validate, ValidateArgs,
+};
 
 impl Validate for KvDataKey {
-    fn validate(&self, value: crate::PiiString, _args: ValidateArgs) -> crate::NtResult<crate::PiiString> {
+    fn validate(&self, value: crate::PiiString, _: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
         Ok(value)
     }
 }

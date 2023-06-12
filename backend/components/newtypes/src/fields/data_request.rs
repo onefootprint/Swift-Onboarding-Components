@@ -11,7 +11,7 @@ use std::clone::Clone;
 use std::collections::{HashMap, HashSet};
 use strum::IntoEnumIterator;
 
-type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
+pub type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FingerprintRequest {
@@ -160,8 +160,8 @@ impl DataRequest<()> {
 
         // Only take the data that fits in the Vd table
         // TODO should we make the DataRequest a VdKind -> PiiString
-        let (data, err_data): (HashMap<_, _>, HashMap<_, _>) =
-            map.into_iter()
+        let (data, err_data): (HashMap<_, _>, HashMap<_, _>) = map.into_iter()
+                // TODO don't allow putting derived keys like expiration.month and expiration.year
                 .partition_map(|(k, v)| match VdKind::try_from(k.clone()) {
                     Ok(_) => Left((k, v)),
                     Err(_) => Right((k, v)),
@@ -180,9 +180,10 @@ impl DataRequest<()> {
         }
 
         // Clean and validate each individual piece of data
+        let all_data = data.clone();
         let (cleaned_data, errors): (HashMap<_, _>, HashMap<_, _>) =
             data.into_iter()
-                .partition_map(|(k, v)| match k.validate(v, args) {
+                .partition_map(|(k, v)| match k.validate(v, args, &all_data) {
                     Ok(v) => Left((k, v)),
                     Err(v) => Right((k, v)),
                 });
