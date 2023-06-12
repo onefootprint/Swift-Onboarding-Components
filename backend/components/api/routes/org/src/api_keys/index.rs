@@ -139,11 +139,7 @@ pub async fn patch(
     } = request.into_inner();
     let (api_key, role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let api_key = TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id)?;
-            let role = TenantRole::get(conn, &api_key.role_id)?;
-            Ok((api_key, role))
-        })
+        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id))
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((

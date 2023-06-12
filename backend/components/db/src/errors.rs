@@ -52,6 +52,8 @@ pub enum DbError {
     TenantRoleHasUsers(i64),
     #[error("Cannot deactivate a role while active API keys inherit it. There are {0} active API keys with this role.")]
     TenantRoleHasActiveApiKeys(i64),
+    #[error("Role is deactivated - please choose an active role.")]
+    TenantRoleAlreadyDeactivated,
     #[error("User and role belong to different tenants.")]
     TenantRoleMismatch,
     #[error("Scoped user is_live doesn't match UserVault is_live")]

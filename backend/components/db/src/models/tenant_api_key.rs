@@ -207,22 +207,22 @@ impl TenantApiKey {
         name: Option<String>,
         status: Option<ApiKeyStatus>,
         role_id: Option<TenantRoleId>,
-    ) -> DbResult<Self> {
+    ) -> DbResult<(Self, TenantRole)> {
         let update = TenantApiKeyUpdate {
             name,
             status,
             role_id,
         };
-        // TODO also lock the role if we change the status?
-        if let Some(role_id) = update.role_id.as_ref() {
-            // Lock the role to make sure we don't deactivate it before we update this rolebinding.
-            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            TenantRole::lock_active(conn, role_id, &tenant_id)?;
+        let key = Self::get(conn, (&id, &tenant_id, is_live))?.0;
+        let role_id_to_lock = update.role_id.as_ref().unwrap_or(&key.role_id);
+        // Lock the role to make sure we don't deactivate it before we update this rolebinding.
+        // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
+        let new_role = TenantRole::lock_active(conn, role_id_to_lock, &tenant_id)?;
+        if new_role.deactivated_at.is_some() {
+            return Err(DbError::TenantRoleAlreadyDeactivated);
         }
         let results: Vec<Self> = diesel::update(tenant_api_key::table)
-            .filter(tenant_api_key::id.eq(id))
-            .filter(tenant_api_key::tenant_id.eq(tenant_id))
-            .filter(tenant_api_key::is_live.eq(is_live))
+            .filter(tenant_api_key::id.eq(key.id))
             .set(update)
             .load(conn.conn())?;
 
@@ -230,6 +230,6 @@ impl TenantApiKey {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
-        Ok(result)
+        Ok((result, new_role.into_inner()))
     }
 }

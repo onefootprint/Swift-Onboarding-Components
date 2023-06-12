@@ -183,7 +183,10 @@ impl TenantRolebinding {
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Lock the role to make sure we don't deactivate it before we update this rolebinding.
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            TenantRole::lock_active(conn, tenant_role_id, &tenant.id)?;
+            let role = TenantRole::lock_active(conn, tenant_role_id, &tenant.id)?;
+            if role.deactivated_at.is_some() {
+                return Err(DbError::TenantRoleAlreadyDeactivated);
+            }
         }
         let results: Vec<Self> = diesel::update(tenant_rolebinding::table)
             .filter(tenant_rolebinding::deactivated_at.is_null())
