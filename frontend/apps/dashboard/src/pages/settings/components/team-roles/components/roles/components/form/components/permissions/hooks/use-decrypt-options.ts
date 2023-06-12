@@ -68,6 +68,10 @@ const useDecryptOptions = () => {
           value: RoleScope.decryptInvestorProfile,
           label: t('decrypt.investor_profile'),
         },
+        {
+          value: RoleScope.decryptCard,
+          label: t('decrypt.card'),
+        },
       ],
     },
   ];
