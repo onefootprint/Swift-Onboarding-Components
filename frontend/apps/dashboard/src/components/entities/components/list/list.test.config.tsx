@@ -5,7 +5,6 @@ import {
   EntityKind,
   EntityStatus,
   OnboardingStatus,
-  RoleScope,
 } from '@onefootprint/types';
 
 export const entitiesFixture: Entity[] = [
@@ -14,6 +13,17 @@ export const entitiesFixture: Entity[] = [
     isPortable: true,
     kind: EntityKind.business,
     attributes: [
+      BusinessDI.city,
+      BusinessDI.name,
+      BusinessDI.website,
+      BusinessDI.addressLine1,
+      BusinessDI.phoneNumber,
+      BusinessDI.zip,
+      BusinessDI.country,
+      BusinessDI.state,
+      BusinessDI.tin,
+    ],
+    decryptableAttributes: [
       BusinessDI.city,
       BusinessDI.name,
       BusinessDI.website,
@@ -48,19 +58,6 @@ export const entitiesFixture: Entity[] = [
         userAgent:
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
       },
-      canAccessPermissions: [
-        RoleScope.decryptName,
-        RoleScope.decryptDob,
-        RoleScope.decryptSsn9,
-        RoleScope.decryptFullAddress,
-        RoleScope.decryptEmail,
-        RoleScope.decryptPhoneNumber,
-        RoleScope.decryptBusinessName,
-        RoleScope.decryptBusinessTin,
-        RoleScope.decryptBusinessAddress,
-        RoleScope.decryptBusinessPhoneNumber,
-        RoleScope.decryptBusinessWebsite,
-      ],
     },
     requiresManualReview: false,
     status: EntityStatus.pass,

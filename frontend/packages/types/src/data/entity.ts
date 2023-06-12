@@ -20,6 +20,7 @@ export enum EntityStatus {
 
 export type Entity = {
   attributes: DataIdentifier[];
+  decryptableAttributes: DataIdentifier[];
   id: string;
   isPortable: boolean;
   kind: EntityKind;

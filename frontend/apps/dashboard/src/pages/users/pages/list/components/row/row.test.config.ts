@@ -12,6 +12,7 @@ export const entityPassed: Entity = {
   isPortable: true,
   kind: EntityKind.person,
   attributes: [],
+  decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   onboarding: {
     id: 'ob_Y3gPIFuPyhqK4f9w2f8QF7',
@@ -36,7 +37,6 @@ export const entityPassed: Entity = {
       userAgent:
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
     },
-    canAccessPermissions: [],
   },
   requiresManualReview: false,
   status: EntityStatus.pass,

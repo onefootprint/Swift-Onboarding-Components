@@ -7,7 +7,6 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_SELECTOR, VAULT_FORM_ID } from '@/entity/constants';
 
 import ReasonDialog from './components/reason-dialog';
-import useCanDecrypt from './hooks/use-can-decrypt';
 import useDecryptControls from './hooks/use-decrypt-controls';
 
 type DecryptControlsProps = WithEntityProps;
@@ -15,7 +14,7 @@ type DecryptControlsProps = WithEntityProps;
 const DecryptControls = ({ entity }: DecryptControlsProps) => {
   const { allT, t } = useTranslation('pages.entity.decrypt');
   const controls = useDecryptControls();
-  const canDecrypt = useCanDecrypt(entity);
+  const canDecrypt = !!entity.decryptableAttributes.length;
   const entityVault = useEntityVault(entity.id, entity);
 
   const handleSubmit = () => {
