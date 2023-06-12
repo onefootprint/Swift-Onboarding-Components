@@ -2,8 +2,7 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::auth::tenant::GetFirmEmployee;
-use api_core::auth::tenant::TenantRbAuthContext;
+use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard};
 use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::traits::Workflow as TWorkflow;
@@ -78,12 +77,12 @@ pub struct ProceedResponse {
 #[post("/private/protected/workflow/proceed")]
 async fn proceed(
     state: web::Data<State>,
-    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
+    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAuthContext>,
     request: Json<ProceedRequest>,
 ) -> actix_web::Result<Json<ResponseData<ProceedResponse>>, ApiError> {
-    if let Either::Left(tenant_rb) = auth {
-        // Make sure only firm employees can hit this endpoint
-        tenant_rb.firm_employee_user()?;
+    if let Either::Right(auth) = auth {
+        // Basically, make sure only "Risk ops" employees can hit this API
+        auth.check_guard(TenantGuard::ManualReview)?;
     }
 
     let ProceedRequest {
