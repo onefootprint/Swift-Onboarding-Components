@@ -23,6 +23,6 @@ pub fn watchlist_hit_rule<T: FeatureSet + Clone>() -> Rule<T> {
             }
         },
         name: RuleName::WatchlistHit,
-        action: Action::Fail,
+        action: Action::ManualReview,
     }
 }
