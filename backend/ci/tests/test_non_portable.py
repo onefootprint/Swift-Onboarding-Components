@@ -34,6 +34,11 @@ from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DA
             "4026123412341233",
             "Invalid checksum. Please verify that the number is correct",
         ),
+        (
+            "card.flerp.expiration.month",
+            "12",
+            "Cannot specify this piece of data. It will automatically be derived.",
+        ),
     ],
 )
 def test_data_validation(tenant, key, value, expected_error):

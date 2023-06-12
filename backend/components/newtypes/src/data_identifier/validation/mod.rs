@@ -68,8 +68,10 @@ pub enum Error {
     SandboxDataInLiveMode,
     #[error("Must provide sandbox data in sandbox mode. To allow reusing phone numbers and emails, they have a \"sandbox suffix\", like `#test1`. Please add a sandbox suffix to your phone and email")]
     LiveDataInSandboxMode,
-    #[error("Cannot set card last4, expiration month/year (must be derived from number or expiration)")]
-    CardEntriesMustBeDerivedOnly,
+    #[error("Cannot specify this piece of data. It will automatically be derived.")]
+    CannotSpecifyDerivedEntry,
+    #[error("Cannot vault this piece of data.")]
+    CannotVault,
 }
 
 pub type VResult<T> = Result<T, Error>;

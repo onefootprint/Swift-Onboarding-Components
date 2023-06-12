@@ -100,6 +100,7 @@ pub trait IsDataIdentifierDiscriminant:
 impl DataIdentifier {
     /// When true, will not be required in order to satisfy the parent CD/CDO
     fn is_optional(&self) -> bool {
+        // TODO is more a function of the CDO
         match self {
             Self::Id(s) => s.is_optional(),
             Self::Custom(s) => s.is_optional(),
@@ -136,6 +137,18 @@ impl DataIdentifier {
                     kind: CardDataKind::Issuer
                 })
         )
+    }
+
+    /// True if the given DI can only be derived and should not be allowed to be vaulted directly
+    /// via API
+    pub fn is_derived(&self) -> bool {
+        match self {
+            Self::Card(CardInfo { alias: _, kind }) => matches!(
+                kind,
+                CardDataKind::Issuer | CardDataKind::ExpMonth | CardDataKind::ExpYear | CardDataKind::Last4
+            ),
+            _ => false,
+        }
     }
 
     pub fn globally_unique(&self) -> bool {

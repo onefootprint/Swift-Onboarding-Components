@@ -1,3 +1,4 @@
+use crate::data_identifier::ValidationError;
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
     CardDataKind as CDK, CardInfo, CardIssuer, CollectedDataOption, DataIdentifier, Error, Fingerprint,
@@ -153,22 +154,27 @@ impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
     pub fn clean_and_validate(map: DataIdentifierRequest, args: ValidateArgs) -> NtResult<Self> {
-        let derived_entries = map.iter().flat_map(|(di, v)| derived_entry(di, v));
+        let unallowed_derived_dis: HashMap<_, _> = map
+            .keys()
+            .filter_map(|di| {
+                let err = if di.is_derived() {
+                    Some(ValidationError::CannotSpecifyDerivedEntry.into())
+                } else if VdKind::try_from(di.clone()).is_err() {
+                    Some(ValidationError::CannotVault.into())
+                } else {
+                    None
+                };
+                err.map(|e| (di.clone(), e))
+            })
+            .collect();
+        if !unallowed_derived_dis.is_empty() {
+            return Err(DataValidationError::FieldValidationError(unallowed_derived_dis).into());
+        }
+
         // Purposefully overlay derived entries on top of existing entries in order to overwrite
         // an ssn4 that's provided and might not match the given ssn9
-        let map: DataIdentifierRequest = map.clone().into_iter().chain(derived_entries).collect();
-
-        // Only take the data that fits in the Vd table
-        // TODO should we make the DataRequest a VdKind -> PiiString
-        let (data, err_data): (HashMap<_, _>, HashMap<_, _>) = map.into_iter()
-                // TODO don't allow putting derived keys like expiration.month and expiration.year
-                .partition_map(|(k, v)| match VdKind::try_from(k.clone()) {
-                    Ok(_) => Left((k, v)),
-                    Err(_) => Right((k, v)),
-                });
-        if let Some(k) = err_data.into_iter().next() {
-            return Err(Error::Custom(format!("Cannot put key {}", k.0)));
-        }
+        let derived_entries = map.iter().flat_map(|(di, v)| derived_entry(di, v));
+        let data: DataIdentifierRequest = map.clone().into_iter().chain(derived_entries).collect();
 
         // Then, validate that there are no "dangling" extra keys in this request.
         // For example, don't allow updating only AddressLine1 - need the whoel address

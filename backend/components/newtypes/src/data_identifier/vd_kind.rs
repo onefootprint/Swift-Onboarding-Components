@@ -29,6 +29,7 @@ use crate::{
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+// TODO remove VdKind, just have runtime validation of the data kind
 /// A subset of DataIdentifier whose values are stored in the VaultData table
 pub enum VdKind {
     Id(IDK),
