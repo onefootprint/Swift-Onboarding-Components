@@ -18,9 +18,12 @@ use api_wire_types::TriggerKind;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use newtypes::AlpacaKycConfig;
+use newtypes::CipKind;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
@@ -50,6 +53,12 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let cip_kind = if let Some(obc_id) = sv.ob_configuration_id {
+                let (obc, _) = ObConfiguration::get(conn, &obc_id)?;
+                obc.cip_kind
+            } else {
+                None
+            };
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
             let vault = Vault::get(conn, &sv.vault_id)?;
@@ -62,7 +71,14 @@ pub async fn post(
             }
 
             let wf = match kind {
-                TriggerKind::RedoKyc => Workflow::create(conn, &sv.id, KycConfig { is_redo: true }.into())?,
+                TriggerKind::RedoKyc => {
+                    let config = if matches!(cip_kind, Some(CipKind::Alpaca)) {
+                        AlpacaKycConfig { is_redo: true }.into()
+                    } else {
+                        KycConfig { is_redo: true }.into()
+                    };
+                    Workflow::create(conn, &sv.id, config)?
+                }
                 TriggerKind::IdDocument => {
                     let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into())?;
                     // TODO how do we determine if we should collect selfie? Should we ask to provide?
