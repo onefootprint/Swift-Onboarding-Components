@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
-import { Overlay, Typography } from '@onefootprint/ui';
+import { media, Overlay, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
@@ -44,8 +44,9 @@ const ModalContainer = styled.div`
     z-index: 100;
     top: ${theme.spacing[10]};
     left: 5%;
-    width: 90%; /* Leave some space at the edges of the modal */
-    padding-top: 50.625%; /* Preserves 16:9 Aspect Ratio */
+    width: 90%;
+    padding-top: 50.625%;
+    /* Preserves 16:9 Aspect Ratio */
   `}
 `;
 
@@ -72,12 +73,18 @@ const CloseContainer = styled.div`
 
 const StyledIFrame = styled.iframe`
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
-  bottom: 0;
-  right: 0;
   width: 100%;
   height: 100%;
+
+  ${media.greaterThan('xl')`
+     transform: translate(-50%, -50%);
+      width: 50%;
+      height: 50%;
+      top: 50%;
+      left: 50%;
+  `}
 `;
 
 export default DemoVideo;
