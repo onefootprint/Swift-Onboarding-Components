@@ -1,12 +1,6 @@
-import pytest
-from tests.auth import FpAuth
-from tests.conftest import generate_real_phone_number
-from tests.utils import _gen_random_n_digit_number, post
-from tests.utils import (
-    get,
-    try_until_success,
-)
+from tests.utils import get, patch
 from tests.bifrost_client import BifrostClient
+
 
 def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     # User one-clicks onto same ob config
@@ -16,9 +10,8 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
         override_inherit_phone=sandbox_user.client.data["id.phone_number"],
     )
     bifrost.run()
-    # TODO: later assert that data cannot be edited (since we aren't in a redo workflow)
-    body = post("hosted/onboarding/authorize", None, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"] == "Workflow does not exist"
+    body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=400)
+    assert body["error"]["message"] == "Workflow state does not allow add_data"
     assert len(bifrost.handled_requirements) == 0
 
     # no new KYC checks should be run, we should still only 1 OBD
@@ -29,4 +22,3 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
-

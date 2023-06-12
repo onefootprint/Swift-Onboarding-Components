@@ -25,6 +25,7 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
+use db::models::workflow::Workflow;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -85,7 +86,6 @@ pub async fn post(
             };
 
             let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true)?;
-
             if let IsNew::Yes(ref wf) = is_new_ob {
                 if obc.must_collect(DataIdentifierDiscriminant::Document) {
                     // Create a `DocumentRequest` if specified in the ob config.
@@ -98,12 +98,14 @@ pub async fn post(
 
             let mut new_scopes = vec![];
 
-            let wf = match is_new_ob {
-                IsNew::Yes(Some(wf)) => Some(wf),
-                _ => None,
-            };
-            if let Some(ref wf) = wf {
-                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
+            // TODO: one day we should just have the client not hit this endpoint for redo flows
+            let wf_id = user_auth.workflow_id().or_else(|| ob.workflow_id.clone());
+            let wf = wf_id.map(|wf_id| Workflow::get(conn, &wf_id)).transpose()?;
+            if let Some(wf) = wf.as_ref() {
+                if user_auth.workflow_id().is_none() {
+                    // No need to add the workflow scope if we already have one from a redo flow
+                    new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
+                }
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
