@@ -6,7 +6,6 @@ use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
@@ -25,7 +24,6 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
-use db::models::workflow::Workflow;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -73,7 +71,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let (ob, sb, wf) = state
+    state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let user_vault = Vault::lock(conn, user_auth.user_vault_id())?;
@@ -98,18 +96,16 @@ pub async fn post(
 
             let mut new_scopes = vec![];
 
-            // TODO: one day we should just have the client not hit this endpoint for redo flows
-            let wf_id = user_auth.workflow_id().or_else(|| ob.workflow_id.clone());
-            let wf = wf_id.map(|wf_id| Workflow::get(conn, &wf_id)).transpose()?;
-            if let Some(wf) = wf.as_ref() {
-                if user_auth.workflow_id().is_none() {
-                    // No need to add the workflow scope if we already have one from a redo flow
-                    new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
+            if user_auth.workflow_id().is_none() {
+                // No need to add the workflow scope if we already have one from a redo flow
+                // TODO: one day we should just have the client not hit this endpoint for redo flows
+                if let Some(wf_id) = ob.workflow_id {
+                    new_scopes.push(UserAuthScope::Workflow { wf_id });
                 }
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            let sb = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
+            if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
                 let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
                 let sb = if let Some(existing) = existing_businesses.into_iter().next() {
                     // If the user has already started onboarding their business onto this exact
@@ -142,36 +138,18 @@ pub async fn post(
                     sb
                 };
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                new_scopes.push(UserAuthScope::Business(sb.id.clone()));
-                Some(sb)
-            } else {
-                None
-            };
+                new_scopes.push(UserAuthScope::Business(sb.id));
+            }
 
             let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;
 
-            Ok((ob, sb, wf))
+            Ok(())
         })
         .await?;
 
-    let already_authorized = if ob.authorized_at.is_some() {
-        // If the onboarding is authorized, double check that we don't have any remaining
-        // requirements before telling the frontend to skip processing requirements
-        let args = GetRequirementsArgs {
-            ob_config: ob_config.clone(),
-            onboarding: ob,
-            workflow: wf,
-            sb_id: sb.map(|sb| sb.id),
-        };
-        let reqs = crate::onboarding::get_requirements(&state, args).await?;
-        reqs.into_iter().all(|r| r.is_met())
-    } else {
-        false
-    };
     let onboarding_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
     ResponseData::ok(OnboardingResponse {
-        already_authorized,
         // Omit appearance serialization here
         onboarding_config,
     })
