@@ -36,6 +36,7 @@ pub enum CollectedData {
     BusinessCorporationType,
 
     InvestorProfile,
+    Card,
 }
 
 impl CollectedData {
@@ -62,6 +63,7 @@ impl CollectedData {
             Self::BusinessBeneficialOwners => vec![BusinessBeneficialOwners, BusinessKycedBeneficialOwners],
             Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
+            Self::Card => vec![Card],
         }
     }
 
@@ -83,6 +85,7 @@ impl CollectedData {
             | Self::Nationality => DataIdentifierDiscriminant::Id,
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
+            Self::Card => DataIdentifierDiscriminant::Card,
         }
     }
 }
@@ -140,6 +143,8 @@ pub enum CollectedDataOption {
     BusinessCorporationType,
 
     InvestorProfile,
+
+    Card,
 }
 
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
@@ -165,6 +170,7 @@ impl CollectedDataOption {
             Self::BusinessKycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
+            Self::Card => CollectedData::Card,
         }
     }
 
@@ -213,6 +219,9 @@ impl CollectedDataOption {
 
             Self::Document => None,
             Self::DocumentAndSelfie => None,
+
+            // TODO we should associate this with types of data
+            Self::Card => None,
         }
     }
 

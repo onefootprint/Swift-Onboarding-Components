@@ -53,6 +53,8 @@ pub enum TenantScope {
     Decrypt(CollectedDataOption),
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
+    /// Allows decrypting all data
+    DecryptAll,
 
     /// Allows decrypting relevant identity data for forwarding to a CIP integration
     CipIntegration,
@@ -107,6 +109,7 @@ impl FromStr for TenantScope {
             TenantScopeDiscriminants::ManualReview => Self::ManualReview,
             TenantScopeDiscriminants::VaultProxy => Self::VaultProxy,
             TenantScopeDiscriminants::CipIntegration => Self::CipIntegration,
+            TenantScopeDiscriminants::DecryptAll => Self::DecryptAll,
         };
         Ok(result)
     }

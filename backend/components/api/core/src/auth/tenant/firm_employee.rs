@@ -18,17 +18,8 @@ use db::{
     PgConn,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{CollectedDataOption, TenantScope};
+use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
-use strum::IntoEnumIterator;
-
-/// Risk ops users can perform manual review and decrypt info
-fn risk_ops_permissions() -> Vec<TenantScope> {
-    CollectedDataOption::iter()
-        .map(TenantScope::Decrypt)
-        .chain([TenantScope::ManualReview, TenantScope::DecryptCustom])
-        .collect()
-}
 
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
@@ -116,7 +107,7 @@ impl FirmEmployeeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
         let extra_permissions_for_user = if self.is_risk_ops {
-            risk_ops_permissions()
+            vec![TenantScope::DecryptAll, TenantScope::ManualReview]
         } else {
             vec![]
         };
@@ -193,28 +184,8 @@ mod test {
     #[db_test_case(false => vec![TenantScope::Read])]
     #[db_test_case(true => vec![
         TenantScope::Read,
-        TenantScope::Decrypt(CollectedDataOption::Name),
-        TenantScope::Decrypt(CollectedDataOption::Dob),
-        TenantScope::Decrypt(CollectedDataOption::Ssn4),
-        TenantScope::Decrypt(CollectedDataOption::Ssn9),
-        TenantScope::Decrypt(CollectedDataOption::FullAddress),
-        TenantScope::Decrypt(CollectedDataOption::PartialAddress),
-        TenantScope::Decrypt(CollectedDataOption::Email),
-        TenantScope::Decrypt(CollectedDataOption::PhoneNumber),
-        TenantScope::Decrypt(CollectedDataOption::Nationality),
-        TenantScope::Decrypt(CollectedDataOption::Document),
-        TenantScope::Decrypt(CollectedDataOption::DocumentAndSelfie),
-        TenantScope::Decrypt(CollectedDataOption::BusinessName),
-        TenantScope::Decrypt(CollectedDataOption::BusinessTin),
-        TenantScope::Decrypt(CollectedDataOption::BusinessAddress),
-        TenantScope::Decrypt(CollectedDataOption::BusinessPhoneNumber),
-        TenantScope::Decrypt(CollectedDataOption::BusinessWebsite),
-        TenantScope::Decrypt(CollectedDataOption::BusinessBeneficialOwners),
-        TenantScope::Decrypt(CollectedDataOption::BusinessKycedBeneficialOwners),
-        TenantScope::Decrypt(CollectedDataOption::BusinessCorporationType),
-        TenantScope::Decrypt(CollectedDataOption::InvestorProfile),
+        TenantScope::DecryptAll,
         TenantScope::ManualReview,
-        TenantScope::DecryptCustom,
     ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);

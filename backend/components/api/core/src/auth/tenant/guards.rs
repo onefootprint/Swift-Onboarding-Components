@@ -46,6 +46,14 @@ impl IsGuardMet<TenantScope> for TenantGuard {
 
 impl IsGuardMet<TenantScope> for CanDecrypt {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        if token_scopes.contains(&TenantScope::DecryptAll) {
+            return true;
+        }
+
+        // Otherwise, check fine-grained decryption permissions.
+        // We have these two codepaths below separated with partition_map to support some CDOs that
+        // are difficult to map directly to DIs for now. For the CDOs that do map cleanly to DIs,
+        // the check is very simple
         let (identifiers, other): (Vec<_>, Vec<_>) = self.0.into_iter().partition_map(|di| match di {
             // Id and Business data permissions are handled with CDOs
             DataIdentifier::Id(_) | DataIdentifier::Business(_) | DataIdentifier::InvestorProfile(_) => {
@@ -81,8 +89,7 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             | DataIdentifier::Document(newtypes::DocumentKind::DriversLicenseSelfie) => {
                 Right(token_scopes.contains(&TenantScope::Decrypt(CDO::DocumentAndSelfie)))
             }
-            // Don't allow decrypting credit card info yet since we don't have a corresponding CDO permission
-            DataIdentifier::Card(_) => Right(false),
+            DataIdentifier::Card(_) => Right(token_scopes.contains(&TenantScope::Decrypt(CDO::Card))),
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different
