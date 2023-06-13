@@ -122,25 +122,6 @@ const Hero = () => {
   );
 };
 
-const Title = styled(motion.h1)`
-  ${({ theme }) => css`
-    ${createFontStyles('display-2')}
-    color: ${theme.color.primary};
-
-    ${media.greaterThan('md')`
-      ${createFontStyles('display-1')}
-    `}
-  `}
-`;
-
-const Subtitle = styled(motion.h2)`
-  ${({ theme }) => css`
-    ${createFontStyles('display-4')}
-    color: ${theme.color.primary};
-    max-width: 760px;
-  `}
-`;
-
 const Blob = styled.span<{
   color?: string;
   top?: string;
@@ -183,7 +164,7 @@ const GradientsContainer = styled.div`
 
 const TextContainer = styled(motion.div)`
   ${({ theme }) => css`
-    max-width: 872px;
+    max-width: 1092px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -191,6 +172,25 @@ const TextContainer = styled(motion.div)`
     gap: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[9]};
     text-align: center;
+  `}
+`;
+
+const Title = styled(motion.h1)`
+  ${({ theme }) => css`
+    ${createFontStyles('display-2')}
+    color: ${theme.color.primary};
+
+    ${media.greaterThan('md')`
+      ${createFontStyles('display-1')}
+    `}
+  `}
+`;
+
+const Subtitle = styled(motion.h2)`
+  ${({ theme }) => css`
+    ${createFontStyles('display-4')}
+    color: ${theme.color.primary};
+    max-width: 800px;
   `}
 `;
 

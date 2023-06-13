@@ -29,7 +29,7 @@ const LinkingButton = styled(Link)<LinkingButtonProps>`
         user-select: none;
 
         @media (hover: hover) {
-          &:hover:enabled {
+          &:hover {
             background-color: ${button.variant.primary.hover.bg};
             border-color: ${button.variant.primary.hover.borderColor};
             color: ${button.variant.primary.hover.color};
