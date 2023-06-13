@@ -126,7 +126,6 @@ type Group = {
 
 const Template: Story<MultiSelectProps<Option, Group>> = ({
   autoFocus,
-  defaultValue,
   disabled,
   emptyStateText,
   id,
@@ -142,29 +141,37 @@ const Template: Story<MultiSelectProps<Option, Group>> = ({
   hasError,
   hint,
   size,
-  value,
-}: MultiSelectProps<Option, Group>) => (
-  <MultiSelect
-    autoFocus={autoFocus}
-    defaultValue={defaultValue}
-    disabled={disabled}
-    emptyStateText={emptyStateText}
-    id={id}
-    label={label}
-    name={name}
-    onBlur={onBlur}
-    onChange={onChange}
-    onFocus={onFocus}
-    onInputChange={onInputChange}
-    options={options}
-    placeholder={placeholder}
-    required={required}
-    hasError={hasError}
-    hint={hint}
-    size={size}
-    value={value}
-  />
-);
+}: MultiSelectProps<Option, Group>) => {
+  const [value, setValue] = React.useState<readonly Option[]>([]);
+  return (
+    <MultiSelect
+      autoFocus={autoFocus}
+      disabled={disabled}
+      emptyStateText={emptyStateText}
+      id={id}
+      label={label}
+      name={name}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      onInputChange={onInputChange}
+      options={options}
+      placeholder={placeholder}
+      required={required}
+      hasError={hasError}
+      hint={hint}
+      size={size}
+      value={value}
+      onChange={(newOptions: readonly Option[], meta) => {
+        setValue(newOptions);
+        onChange?.(newOptions, meta);
+      }}
+      allOption={{
+        label: 'Everything',
+        value: 'all',
+      }}
+    />
+  );
+};
 
 export const Base = Template.bind({});
 Base.args = {
@@ -185,5 +192,4 @@ Base.args = {
   hasError: false,
   hint: '',
   size: 'default',
-  value: undefined,
 };

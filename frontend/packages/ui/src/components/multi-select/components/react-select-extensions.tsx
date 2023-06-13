@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { IcoChevronDown16, IcoCloseSmall16 } from '@onefootprint/icons';
+import noop from 'lodash/noop';
 import React from 'react';
 import {
   ClearIndicatorProps,
@@ -8,7 +9,11 @@ import {
   GroupBase,
   IndicatorSeparatorProps,
   MultiValueRemoveProps,
+  OptionProps,
 } from 'react-select';
+import styled, { css } from 'styled-components';
+
+import Checkbox from '../../checkbox';
 
 export const ClearIndicator = <
   Option,
@@ -56,3 +61,81 @@ export const MultiValueRemove = <
     {children || <IcoCloseSmall16 color="tertiary" />}
   </div>
 );
+
+export const Option = <
+  Option,
+  IsMulti extends boolean,
+  Group extends GroupBase<Option>,
+>(
+  props: OptionProps<Option, IsMulti, Group>,
+) => {
+  const {
+    children,
+    isDisabled,
+    isFocused,
+    isSelected,
+    innerRef,
+    selectProps,
+    innerProps,
+  } = props;
+  // TODO: https://linear.app/footprint/issue/FP-4512/fix-ts-on-multi-select
+  // @ts-ignore
+  const { value, allOption } = selectProps;
+  const isAllChecked =
+    // @ts-ignore
+    allOption && value?.some(option => option.value === allOption.value);
+
+  return (
+    <CustomOption
+      aria-disabled={isDisabled}
+      aria-selected={isSelected}
+      data-focused={isFocused}
+      // @ts-ignore
+      ref={innerRef}
+      role="option"
+      {...innerProps}
+    >
+      <Checkbox
+        checked={isSelected || isAllChecked}
+        disabled={isDisabled}
+        id={innerProps.id}
+        onChange={noop}
+      />
+      {children}
+    </CustomOption>
+  );
+};
+
+const CustomOption = styled.div`
+  ${({ theme }) => {
+    const {
+      components: { dropdown },
+    } = theme;
+
+    return css`
+      align-items: center;
+      color: ${dropdown.colorPrimary};
+      cursor: pointer;
+      display: flex;
+      font: ${theme.typography['body-3']};
+      height: 36px;
+      padding: 0 ${theme.spacing[5]};
+      user-select: none;
+      width: 100%;
+      gap: ${theme.spacing[4]};
+
+      input[type='checkbox'] {
+        position: relative;
+        top: calc(-1 * ${theme.spacing[1]});
+      }
+
+      &:hover {
+        background: ${dropdown.hover.bg};
+      }
+
+      &[data-focused='true'] {
+        background: ${dropdown.hover.bg};
+      }
+    `;
+  }}
+`;

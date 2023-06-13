@@ -16,9 +16,16 @@ import {
   DropdownIndicator,
   IndicatorSeparator,
   MultiValueRemove,
+  Option,
 } from './components';
+import prependAllOption from './multi-select.utils';
 
-export type MultiSelectProps<Option, Group extends GroupBase<Option>> = {
+type OptionType = { value: string; label: string };
+
+export type MultiSelectProps<
+  Option extends OptionType,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+> = {
   autoFocus?: boolean;
   defaultValue?: PropsValue<Option>;
   disabled?: boolean;
@@ -33,18 +40,19 @@ export type MultiSelectProps<Option, Group extends GroupBase<Option>> = {
   ) => void;
   onFocus?: React.FocusEventHandler<HTMLInputElement>;
   onInputChange?: (newValue: string, actionMeta: InputActionMeta) => void;
+  allOption?: Option;
   options: OptionsOrGroups<Option, Group> | undefined;
   placeholder?: string;
   required?: boolean;
   hasError?: boolean;
   hint?: string;
   size?: 'default' | 'compact';
-  value?: PropsValue<Option>;
+  value?: readonly Option[];
 };
 
 const MultiSelect = <
-  Option,
-  Group extends GroupBase<Option> = GroupBase<Option>,
+  Option extends OptionType,
+  Group extends GroupBase<Option>,
 >({
   autoFocus,
   defaultValue,
@@ -57,20 +65,58 @@ const MultiSelect = <
   onChange,
   onFocus,
   onInputChange,
-  options,
+  options: initialOptions = [],
   placeholder = 'Search...',
   required,
   hasError = false,
   hint,
   size,
   value,
+  allOption,
 }: MultiSelectProps<Option, Group>) => {
   const internalId = useId();
   const id = baseId || internalId;
   const theme = useTheme();
+  const options =
+    (prependAllOption(initialOptions, allOption) as OptionsOrGroups<
+      Option,
+      Group
+    >) || [];
   const { dropdown, input } = theme.components;
   const inputSize =
     size === 'compact' ? input.size.compact : input.size.default;
+
+  const handleChange = (
+    selectedOptions: readonly Option[],
+    meta: ActionMeta<Option>,
+  ) => {
+    if (!allOption) {
+      if (onChange) {
+        onChange(selectedOptions, meta);
+      }
+    } else {
+      const optionAll = allOption.value;
+      const isAllSelected = selectedOptions.some(
+        option => option.value === optionAll,
+      );
+      const wasAllSelected = value?.some(option => option.value === optionAll);
+      let newOptions = selectedOptions;
+
+      if (isAllSelected && !wasAllSelected) {
+        newOptions = [allOption];
+      }
+      if (isAllSelected && wasAllSelected) {
+        if (selectedOptions.length > 1) {
+          newOptions = selectedOptions.filter(
+            option => option.value !== optionAll,
+          );
+        }
+      }
+      if (onChange) {
+        onChange(newOptions, meta);
+      }
+    }
+  };
 
   return (
     <Box>
@@ -80,6 +126,8 @@ const MultiSelect = <
         </Label>
       )}
       <Select<Option, true, Group>
+        // @ts-ignore
+        allOption={allOption}
         autoFocus={autoFocus}
         escapeClearsValue={false}
         closeMenuOnSelect={false}
@@ -88,16 +136,18 @@ const MultiSelect = <
           DropdownIndicator,
           IndicatorSeparator,
           MultiValueRemove,
+          Option,
         }}
-        menuPlacement="auto"
         defaultValue={defaultValue}
+        hideSelectedOptions={false}
         inputId={id}
         isDisabled={disabled}
         isMulti
+        menuPlacement="auto"
         name={name}
         noOptionsMessage={() => emptyStateText}
         onBlur={onBlur}
-        onChange={onChange}
+        onChange={handleChange}
         onFocus={onFocus}
         onInputChange={onInputChange}
         openMenuOnFocus
@@ -160,24 +210,6 @@ const MultiSelect = <
               marginBottom: theme.spacing[4],
             },
           }),
-          option: (base, { isFocused }) => ({
-            alignItems: 'center',
-            background: dropdown.bg,
-            color: dropdown.colorPrimary,
-            cursor: 'pointer',
-            display: 'flex',
-            font: theme.typography['body-3'],
-            height: '36px',
-            padding: `0 ${theme.spacing[5]}`,
-            userSelect: 'none',
-            width: '100%',
-            ':hover': {
-              background: dropdown.hover.bg,
-            },
-            ...(isFocused && {
-              background: dropdown.hover.bg,
-            }),
-          }),
           indicatorSeparator: base => ({
             ...base,
             backgroundColor: theme.borderColor.tertiary,
@@ -190,7 +222,6 @@ const MultiSelect = <
             gap: theme.spacing[3],
             justifyContent: 'center',
             margin: `${theme.spacing[0]} ${theme.spacing[5]}`,
-
             svg: {
               display: 'flex',
             },
@@ -201,6 +232,10 @@ const MultiSelect = <
             marginBottom: theme.spacing[2],
             padding: `${theme.spacing[3]} ${theme.spacing[5]} ${theme.spacing[2]}`,
             textTransform: 'uppercase',
+            ':empty': {
+              height: theme.spacing[1],
+              padding: 'unset',
+            },
           }),
           input: (base, { hasValue }) => ({
             ...base,
