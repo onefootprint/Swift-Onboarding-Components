@@ -213,7 +213,7 @@
   },
   "pages": {
     "home": {
-      "html-title": "Footprint - Onboard customers and vault their data with one click",
+      "html-title": "Footprint - One tool to unify onboarding, identity verification, and data security",
       "hero": {
         "title": "One tool to unify onboarding, identity verification, and data security",
         "subtitle": "Embedding KYC, KYB, and PII + Card Vaulting with 5 lines of code, we empower companies to own their onboarding experience and customer data with one-click.",

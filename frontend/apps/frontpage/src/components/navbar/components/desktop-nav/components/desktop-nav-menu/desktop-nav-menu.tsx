@@ -39,7 +39,6 @@ const StyledTrigger = styled(NavigationMenu.Trigger)`
     all: unset;
     display: flex;
     cursor: pointer;
-    transition: opacity 0.2s ease-in;
     padding: ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]}
       ${theme.spacing[4]};
 
@@ -62,7 +61,6 @@ const IconContainer = styled.div`
     align-items: center;
 
     svg {
-      transition: all 0.2s linear;
       margin-left: ${theme.spacing[2]};
     }
   `}

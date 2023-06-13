@@ -20,7 +20,7 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('components.navbar');
 
   return (
-    <Container>
+    <Container delayDuration={0}>
       <MainNav>
         <LogoLink />
         {entries.map(entry => {
@@ -88,7 +88,7 @@ const ViewportPosition = styled.div`
     justify-content: center;
     width: 100%;
     top: 100%;
-    margin-top: ${theme.spacing[2]};
+    margin-top: calc(-1 * ${theme.spacing[3]});
     left: 0;
   `}
 `;
@@ -105,13 +105,13 @@ const Viewport = styled(NavigationMenu.Viewport)`
 
     &[data-state='open'] {
       animation-name: ${slideIn};
-      animation-duration: 0.2s;
+      animation-duration: 0.08s;
       animation-timing-function: ease-out;
     }
 
     &[data-state='closed'] {
       animation-name: ${slideOut};
-      animation-duration: 0.1s;
+      animation-duration: 0.08s;
       animation-timing-function: ease-in;
     }
   `}
