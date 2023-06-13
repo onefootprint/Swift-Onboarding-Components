@@ -1,17 +1,8 @@
 //! This module contains all of the different ways that we identify data stored inside of a UserVault.
-//! It is a little complex, so we describe all of them here:
 //!
 //! `DataIdentifier`: the top level identitfier of a piece of data. Given a UVW and a `DataIdentifier`,
 //! we should be able to locate the underlying piece of data that is requested. `DataIdentifier`s are
 //! also used in access events to designate which pieces of data were decrypted.
-//! - `IdentityDataKind`: A subset of DataIdentifier that refers to what we colloquially have been calling
-//!   "identity data." This is the set of data that shows up on your virtual, Footprint ID card. It is the
-//!   set of data that we send to be verified by our KYC data vendors.
-//!    - TODO need to update this
-//!    - Identity data is stored inside of a handful of different tables. `VdKind` is a subset of
-//!      `IdentityDataKind` that represents data that is stored only in the `UserVaultData` table.
-//! - `KvDataKey`: A subset of DataIdentifier that refers to custom, key-value data. A KvDataKey is just
-//!    a wrapper around a free-form string.
 //!
 //! `CollectedData` and `CollectedDataOption` are also tangential - they are used in onboarding
 //! configurations to specify the set of dentity data that needs to be collected, and in permissions
@@ -33,12 +24,10 @@ mod identity_data_kind;
 mod investor_profile_kind;
 mod kv_data_key;
 mod validation;
-mod vd_kind;
 
 pub use self::{
     business_data_kind::*, card_data_kind::*, collected_data::*, document_kind::*, id_doc_kind::*,
     identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
-    vd_kind::*,
 };
 use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, ValidateArgs, VaultKind,
@@ -359,13 +348,13 @@ impl DataIdentifier {
 }
 
 /// Defines variants for how encrypted bytes are actually stored
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StorageType {
     /// in the database as 'vault_data'
     VaultData,
     /// larger data stored in the `document_data` table with content bytes `s3`
     DocumentData,
-    /// document metadata
+    /// stored in the `document_data` table alongside the document itself
     DocumentMetadata,
 }
 

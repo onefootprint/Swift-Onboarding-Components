@@ -6,8 +6,8 @@ use db::models::vault_data::VaultData;
 use db::HasLifetime;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
 use newtypes::DocumentKind;
-use newtypes::{DataLifetimeId, VdKind};
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
@@ -44,7 +44,10 @@ impl<Type> VwData<Type> {
         let (portable_documents, speculative_documents) = partition(documents, &speculative_lifetime_ids);
 
         // TODO some runtime checks that business vaults don't have id data and vice versa
-        if portable_vd.iter().any(|vd| matches!(vd.kind, VdKind::Custom(_))) {
+        if portable_vd
+            .iter()
+            .any(|vd| matches!(vd.kind, DataIdentifier::Custom(_)))
+        {
             // We don't commit custom data yet because we don't want it to be portable. Error if we
             // find any
             return Err(AssertionError("Found portable custom data").into());
@@ -79,7 +82,7 @@ impl<Type> VwData<Type> {
     }
 
     pub fn populated_dis(&self) -> Vec<DataIdentifier> {
-        let vds = self.vd.iter().map(|vd| vd.kind.clone().into()).collect_vec();
+        let vds = self.vd.iter().map(|vd| vd.kind.clone()).collect_vec();
         let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
         [vds, docs].into_iter().flatten().unique().collect()
     }
@@ -87,13 +90,12 @@ impl<Type> VwData<Type> {
     /// Dispatch queries for a piece of data with a given identifier to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub fn get<T>(&self, id: T) -> Option<&VaultData>
+    pub fn get<T>(&self, di: T) -> Option<&VaultData>
     where
         T: Into<DataIdentifier>,
     {
-        let di = id.into();
-        let vdk = di.try_into().ok()?;
-        self.vd.iter().find(|d| d.kind == vdk)
+        let di = di.into();
+        self.vd.iter().find(|d| d.kind == di)
     }
 
     fn get_lifetime<T>(&self, id: T) -> Option<&DataLifetime>

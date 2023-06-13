@@ -113,9 +113,7 @@ async fn migrate_chunk<'a>(
     let futs = vaults
         .iter()
         .flat_map(|sv_id| map.remove(sv_id))
-        .map(|(v, tenant_id, vds)| async move {
-            create_new_fingerprints(state, &tenant_id, &v, vds).await
-        })
+        .map(|(v, tenant_id, vds)| async move { create_new_fingerprints(state, &tenant_id, &v, vds).await })
         .collect_vec();
 
     let fingerprints = try_join_all(futs).await?.concat();
@@ -133,11 +131,7 @@ async fn create_new_fingerprints(
         .into_iter()
         .map(|vd| {
             // override to save them properly later
-            (
-                DataIdentifier::from(vd.kind.clone()),
-                vd,
-                FingerprintScopeKind::Tenant,
-            )
+            (vd.kind.clone(), vd, FingerprintScopeKind::Tenant)
         })
         .collect_vec();
 
@@ -147,7 +141,7 @@ async fn create_new_fingerprints(
         // this should not have been possible, but it's possible the scope has changed since this code-enforced
         // not DB-enforced
         .filter_map(| vd| {
-            let gfp = GlobalFingerprintKind::try_from(DataIdentifier::from(vd.kind.clone())).ok()?;
+            let gfp = GlobalFingerprintKind::try_from(vd.kind.clone()).ok()?;
             Some((gfp, vd, FingerprintScopeKind::Global))
         })
         .collect_vec();

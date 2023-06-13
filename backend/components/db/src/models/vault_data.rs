@@ -11,8 +11,8 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
+use newtypes::StorageType;
 use newtypes::VaultId;
-use newtypes::VdKind;
 use newtypes::{DataLifetimeId, VdId};
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +25,7 @@ pub struct VaultData {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
-    pub kind: VdKind,
+    pub kind: DataIdentifier,
     /// Encrypted pii data
     pub e_data: SealedVaultBytes,
     /// Plaintext data, only stored for certain data types
@@ -33,7 +33,7 @@ pub struct VaultData {
 }
 
 pub struct NewVaultData {
-    pub kind: VdKind,
+    pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,
     pub p_data: Option<PiiString>,
 }
@@ -42,7 +42,7 @@ pub struct NewVaultData {
 #[diesel(table_name = vault_data)]
 pub struct NewUserVaultDataRow {
     pub lifetime_id: DataLifetimeId,
-    pub kind: VdKind,
+    pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,
     pub p_data: Option<PiiString>,
 }
@@ -59,10 +59,20 @@ impl VaultData {
         // One more sanity check that we don't store plaintext data where not desired
         if let Some(d) = data
             .iter()
-            .find(|d| DataIdentifier::from(d.kind.clone()).store_plaintext() != d.p_data.is_some())
+            .find(|d| d.kind.store_plaintext() != d.p_data.is_some())
         {
             return Err(DbError::ValidationError(format!(
-                "Cannot store {} in plaintext",
+                "Invalid {} in plaintext",
+                d.kind
+            )));
+        }
+        // And a sanity check that all the data we are storing should be in the vault data table
+        if let Some(d) = data
+            .iter()
+            .find(|d| d.kind.storage_type() != StorageType::VaultData)
+        {
+            return Err(DbError::ValidationError(format!(
+                "Cannot store {} as VaultData",
                 d.kind
             )));
         }
@@ -71,9 +81,7 @@ impl VaultData {
             conn,
             user_vault_id,
             scoped_user_id,
-            data.iter()
-                .map(|d| DataIdentifier::from(d.kind.clone()))
-                .collect(),
+            data.iter().map(|d| d.kind.clone()).collect(),
             seqno,
         )?;
         let new_rows: Vec<_> = data

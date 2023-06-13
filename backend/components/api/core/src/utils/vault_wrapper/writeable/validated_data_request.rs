@@ -68,7 +68,6 @@ impl<Type> VaultWrapper<Type> {
         let data = data.into_iter().map(|(kind, pii)| {
             let e_data = self.vault().public_key.seal_pii(&pii)?;
             let p_data = kind.store_plaintext().then_some(pii);
-            let kind = kind.try_into().map_err(newtypes::Error::from)?;
             Ok(NewVaultData { kind, e_data, p_data })
         }).collect::<ApiResult<Vec<_>>>()?;
 
@@ -89,7 +88,7 @@ impl ValidatedDataRequest {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
         let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.parent().options()).flat_map(|cdo| cdo.data_identifiers().unwrap_or_default());
-        let added_kinds = self.data.iter().map(|nvd| DataIdentifier::from(nvd.kind.clone()));
+        let added_kinds = self.data.iter().map(|nvd| nvd.kind.clone());
         let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
             // fields in the CDO. For example, address line 2
@@ -107,9 +106,9 @@ impl ValidatedDataRequest {
             .into_iter()
             .map(|FingerprintRequest { kind, fingerprint, scope }| -> ApiResult<_> {
                 let vd = vds
-                        .iter()
-                        .find(|vd| DataIdentifier::from(vd.kind.clone()) == kind)
-                        .ok_or(AssertionError("No lifetime id found"))?;
+                    .iter()
+                    .find(|vd| vd.kind == kind)
+                    .ok_or(AssertionError("No lifetime id found"))?;
 
                 Ok(NewFingerprint {
                     kind: kind.clone(),

@@ -86,8 +86,6 @@ pub enum Error {
     ValidationError(#[from] DataValidationError),
     #[error("{0}")]
     Custom(String),
-    #[error("{0}")]
-    VdKindConversionError(#[from] ConversionError),
     #[error("Cannot add to this type of vault")]
     IncompatibleDataIdentifier,
     #[error("{0}")]

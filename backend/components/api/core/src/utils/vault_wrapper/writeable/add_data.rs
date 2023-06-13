@@ -16,7 +16,7 @@ use newtypes::BusinessDataKind as BDK;
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
     DocumentKind, DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData,
-    PiiString, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey, VdKind,
+    PiiString, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -73,7 +73,12 @@ impl<Type> WriteableVw<Type> {
         // Create ContactInfo rows for new phone numbers/emails
         let new_contact_info = new_vds
             .iter()
-            .filter(|vd| matches!(vd.kind, VdKind::Id(IDK::PhoneNumber) | VdKind::Id(IDK::Email)))
+            .filter(|vd| {
+                matches!(
+                    vd.kind,
+                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
+                )
+            })
             .map(|vd| NewContactInfoArgs {
                 is_verified: false,
                 priority: ContactInfoPriority::Primary,
@@ -88,7 +93,7 @@ impl<Type> WriteableVw<Type> {
                 let di = new_vds
                     .iter()
                     .find(|vd| vd.lifetime_id == ci.lifetime_id)
-                    .map(|vd| DataIdentifier::from(vd.kind.clone()))
+                    .map(|vd| vd.kind.clone())
                     .ok_or(AssertionError("No lifetime ID"))?;
                 Ok((di, ci))
             })

@@ -2,7 +2,7 @@ use crate::data_identifier::ValidationError;
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
     CardDataKind as CDK, CardInfo, CardIssuer, CollectedDataOption, DataIdentifier, Error, Fingerprint,
-    FingerprintScopeKind, IdentityDataKind as IDK, PiiString, TenantId, Validate, VaultKind, VdKind,
+    FingerprintScopeKind, IdentityDataKind as IDK, PiiString, StorageType, TenantId, Validate, VaultKind,
 };
 use crate::{DataValidationError, NtResult};
 use card_validate::Validate as CardValidate;
@@ -159,7 +159,7 @@ impl DataRequest<()> {
             .filter_map(|di| {
                 let err = if di.is_derived() {
                     Some(ValidationError::CannotSpecifyDerivedEntry.into())
-                } else if VdKind::try_from(di.clone()).is_err() {
+                } else if di.storage_type() != StorageType::VaultData {
                     Some(ValidationError::CannotVault.into())
                 } else {
                     None
