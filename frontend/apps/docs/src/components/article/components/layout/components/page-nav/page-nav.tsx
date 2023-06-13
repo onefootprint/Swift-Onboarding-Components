@@ -87,6 +87,7 @@ const NavContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[9]};
+    overflow: auto;
   `}
 `;
 

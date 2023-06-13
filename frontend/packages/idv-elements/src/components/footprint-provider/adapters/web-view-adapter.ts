@@ -19,7 +19,9 @@ class WebView implements FootprintClient {
 
   load(): void {}
 
-  close(): void {}
+  close(): void {
+    this.setLocation({ canceled: true });
+  }
 
   cancel(): void {
     this.setLocation({ canceled: true });
