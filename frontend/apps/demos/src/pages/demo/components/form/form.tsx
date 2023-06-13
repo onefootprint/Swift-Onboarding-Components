@@ -15,7 +15,7 @@ import {
 } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
 import React, { useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import validateUserData from './utils/validate-user-data';
@@ -34,7 +34,7 @@ type FormProps = {
 };
 
 const Form = ({ html, onSuccess }: FormProps) => {
-  const { register, getValues } = useForm<FormData>();
+  const { control, register, getValues } = useForm<FormData>();
 
   const handleFootprintCompleted = (validationToken: string) => {
     console.log('on completed', validationToken); // eslint-disable-line no-console
@@ -113,15 +113,32 @@ const Form = ({ html, onSuccess }: FormProps) => {
               onChange: debouncedHandleChange,
             })}
           />
-          <PhoneInput
-            label="Phone number"
-            {...register('phoneNumber', {
+          <Controller
+            control={control}
+            name="phoneNumber"
+            rules={{
               pattern: {
                 value: PhoneInputRegex,
                 message: 'Phone number format is incorrect',
               },
-              onChange: debouncedHandleChange,
-            })}
+            }}
+            render={({
+              field: { onChange, onBlur, value, name },
+              fieldState: { error },
+            }) => (
+              <PhoneInput
+                name={name}
+                onBlur={onBlur}
+                value={value}
+                hasError={!!error}
+                hint={error?.message}
+                label="Phone number"
+                onChange={event => {
+                  onChange(event);
+                  debouncedHandleChange();
+                }}
+              />
+            )}
           />
         </InputsContainer>
         <Button fullWidth variant="secondary" onClick={showFootprint}>
