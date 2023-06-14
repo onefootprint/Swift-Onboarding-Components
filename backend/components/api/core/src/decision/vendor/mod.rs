@@ -16,6 +16,7 @@ pub mod incode_watchlist;
 pub mod make_request;
 pub mod middesk;
 pub mod tenant_vendor_control;
+pub mod vendor_api;
 pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;

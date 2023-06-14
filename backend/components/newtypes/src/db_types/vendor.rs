@@ -1,3 +1,4 @@
+use crate::util::impl_enum_str_diesel;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -5,8 +6,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumString};
-
-use crate::util::impl_enum_str_diesel;
 
 #[derive(
     Debug,

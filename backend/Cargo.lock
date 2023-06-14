@@ -531,6 +531,7 @@ dependencies = [
  "enclave",
  "enclave_proxy",
  "enum_dispatch",
+ "enum_variant_type",
  "env_logger 0.9.0",
  "envconfig",
  "feature_flag",
@@ -575,6 +576,7 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "twilio",
+ "typedmap",
  "url",
  "urlencoding 2.1.2",
  "webauthn-rs-core",
@@ -3016,9 +3018,9 @@ checksum = "1435fa1053d8b2fbbe9be7e97eca7f33d37b28409959813daefc1446a14247f1"
 
 [[package]]
 name = "dyn-clone"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f94fa09c2aeea5b8839e414b7b841bf429fd25b9c522116ac97ee87856d88b2"
+checksum = "68b0cf012f1230e43cd00ebb729c6bb58707ecfa8ad08b52ef3a4ccd2697fc30"
 
 [[package]]
 name = "ecdsa"
@@ -3140,6 +3142,18 @@ checksum = "11f36e95862220b211a6e2aa5eca09b4fa391b13cd52ceb8035a24bf65a79de2"
 dependencies = [
  "once_cell",
  "proc-macro2 1.0.55",
+ "quote 1.0.26",
+ "syn 1.0.98",
+]
+
+[[package]]
+name = "enum_variant_type"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7b4d0447be46f06039b1e13c5c77df8d9f9f37fa5fab578a1827b8f136aab64"
+dependencies = [
+ "proc-macro2 1.0.55",
+ "proc_macro_roids",
  "quote 1.0.26",
  "syn 1.0.98",
 ]
@@ -5475,6 +5489,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc_macro_roids"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06675fa2c577f52bcf77fbb511123927547d154faa08097cc012c66ec3c9611a"
+dependencies = [
+ "proc-macro2 1.0.55",
+ "quote 1.0.26",
+ "syn 1.0.98",
+]
+
+[[package]]
 name = "prometheus"
 version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7306,6 +7331,15 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-retry",
+]
+
+[[package]]
+name = "typedmap"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e18bf0186768d6eeb1381ae480152f51160bf7c3ae8eaeecd01cff1fb2e5009"
+dependencies = [
+ "dyn-clone",
 ]
 
 [[package]]
