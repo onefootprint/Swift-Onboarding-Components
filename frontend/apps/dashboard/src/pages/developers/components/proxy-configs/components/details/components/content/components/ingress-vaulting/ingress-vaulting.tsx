@@ -9,11 +9,16 @@ type IngressVaultingProps = {
 
 const IngressVaulting = ({ proxyConfig }: IngressVaultingProps) => {
   const { t } = useTranslation('pages.proxy-configs.details.ingress-vaulting');
+  const contentType = proxyConfig.ingressContentType?.toUpperCase();
+  const contentTypeFallback = contentType ?? t('content-type.empty');
 
   return (
     <>
-      <Field label={t('content-type')}>
-        {proxyConfig.ingressContentType.toUpperCase()}
+      <Field
+        label={t('content-type.label')}
+        childrenSx={contentType ? undefined : { color: 'tertiary' }}
+      >
+        {contentType ?? contentTypeFallback}
       </Field>
       {proxyConfig.ingressRules.map(({ token, target }) => (
         <Fragment key={token}>

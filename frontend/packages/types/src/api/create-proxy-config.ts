@@ -13,7 +13,7 @@ export type CreateProxyConfigRequest = {
   };
   headers: ProxyConfigHeader[];
   ingressSettings: {
-    contentType: 'json';
+    contentType: 'json' | null;
     rules: ProxyConfigIngressRule[];
   };
   method: ProxyConfigMethod;

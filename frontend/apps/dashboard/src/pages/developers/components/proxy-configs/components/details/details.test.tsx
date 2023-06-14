@@ -137,10 +137,10 @@ describe.skip('<Details />', () => {
       const contentTypeRow = screen.getByRole('row', {
         name: 'Content type',
       });
-      const contentTypeValue = within(contentTypeRow).getByText(
-        proxyConfigDetailsFixture.ingressContentType,
-        { exact: false },
-      );
+      const contentType = proxyConfigDetailsFixture.ingressContentType ?? '';
+      const contentTypeValue = within(contentTypeRow).getByText(contentType, {
+        exact: false,
+      });
       expect(contentTypeValue).toBeInTheDocument();
 
       proxyConfigDetailsFixture.ingressRules.forEach(rule => {

@@ -12,7 +12,10 @@ export type FormData = {
     secret: boolean;
     disabled?: boolean;
   }[];
-  ingressSettings: { contentType: 'json'; rules: ProxyConfigIngressRule[] };
+  ingressSettings: {
+    contentType: 'json' | null;
+    rules: ProxyConfigIngressRule[];
+  };
   method: ProxyConfigMethod;
   name: string;
   pinnedServerCertificates: { certificate: string }[];

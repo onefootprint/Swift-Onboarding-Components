@@ -1,12 +1,13 @@
-import { Typography } from '@onefootprint/ui';
+import { SXStyleProps, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldProps = {
   label: string;
   children: React.ReactNode;
+  childrenSx?: SXStyleProps;
 };
 
-const Field = ({ label, children }: FieldProps) => (
+const Field = ({ label, children, childrenSx }: FieldProps) => (
   <div role="row" aria-label={label}>
     <Typography
       variant="label-3"
@@ -16,7 +17,7 @@ const Field = ({ label, children }: FieldProps) => (
     >
       {label}
     </Typography>
-    <Typography variant="body-3" as="div">
+    <Typography variant="body-3" as="div" sx={childrenSx}>
       {children}
     </Typography>
   </div>

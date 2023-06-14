@@ -1583,7 +1583,10 @@
         },
         "ingress-vaulting": {
           "title": "Ingress vaulting",
-          "content-type": "Content type",
+          "content-type": {
+            "label": "Content type",
+            "empty": "Not available"
+          },
           "target": "Target",
           "token": "Token"
         }

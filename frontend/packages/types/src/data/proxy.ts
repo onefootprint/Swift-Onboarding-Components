@@ -32,7 +32,7 @@ export type ProxyConfigDetails = ProxyConfig & {
   clientCertificate: string | null;
   accessReason: string;
   headers: ProxyConfigHeader[];
-  ingressContentType: 'json';
+  ingressContentType: 'json' | null;
   ingressRules: ProxyConfigIngressRule[];
   pinnedServerCertificates: string[];
   secretHeaders: ProxyConfigSecretHeader[];
