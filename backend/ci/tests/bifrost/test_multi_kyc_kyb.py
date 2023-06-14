@@ -1,4 +1,5 @@
 import json
+import time
 import pytest
 from tests.auth import BusinessOwnerAuth
 from tests.utils import (
@@ -126,12 +127,13 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
         twilio,
         override_inherit_phone=primary_bo.client.data["id.phone_number"],
     )
+    # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
+    # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
+    # succeeds
     try:
+        time.sleep(5)
         primary_bo = bifrost.run()
     except:
-        # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
-        # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
-        # succeeds
         try_until_success(bifrost.handle_authorize, 20, 5)
         primary_bo = bifrost.run()
     assert primary_bo.fp_id
