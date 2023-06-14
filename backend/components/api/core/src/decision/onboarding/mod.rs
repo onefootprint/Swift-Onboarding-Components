@@ -80,20 +80,31 @@ pub enum RuleGroup {
     Kyc(KycRuleGroup),
 }
 
+impl RuleGroup {
+    pub fn evaluate(
+        &self,
+        vendor_response_map: &VendorAPIResponseMap,
+    ) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+        match self {
+            RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map),
+        }
+    }
+}
+
 pub struct KycRuleGroup {
     pub idology_rules: RuleSet<IDologyFeatures>,
     pub experian_rules: RuleSet<ExperianFeatures>,
 }
-impl KycRuleGroup {
-    pub fn default_rules() -> Self {
-        let idology_rules = rule_sets::kyc::idology_rule_set();
-        let experian_rules = rule_sets::kyc::experian_rule_set();
+
+impl Default for KycRuleGroup {
+    fn default() -> Self {
         Self {
-            idology_rules,
-            experian_rules,
+            idology_rules: rule_sets::alpaca::idology_rule_set(),
+            experian_rules: rule_sets::alpaca::experian_rule_set(),
         }
     }
-
+}
+impl KycRuleGroup {
     pub fn evaluate_kyc_rules_with_waterfall(
         &self,
         vendor_response_map: &VendorAPIResponseMap,

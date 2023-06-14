@@ -35,7 +35,7 @@ use crate::{
     ApiError, State,
 };
 
-use super::StateError;
+use super::{traits::HasRuleGroup, StateError};
 
 pub async fn get_onboarding_for_workflow(
     db_pool: &DbPool,
@@ -209,11 +209,13 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ky
     (rules_output, reason_codes)
 }
 
-pub fn get_kyc_decision(conn: &mut TxnPgConn, vendor_results: Vec<VendorResult>) -> ApiResult<KycDecision> {
-    let rule_group = KycRuleGroup::default_rules();
-    let vendor_response_map = build_vendor_response_map_from_vendor_results(&vendor_results)?;
-
-    let (rules_output, reason_codes) = rule_group.evaluate_kyc_rules_with_waterfall(&vendor_response_map)?;
+pub fn get_decision(
+    rule_group: &impl HasRuleGroup,
+    conn: &mut TxnPgConn,
+    vendor_results: &[VendorResult],
+) -> ApiResult<KycDecision> {
+    let vendor_response_map = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let (rules_output, reason_codes) = rule_group.rule_group().evaluate(&vendor_response_map)?;
     Ok((rules_output, reason_codes))
 }
 

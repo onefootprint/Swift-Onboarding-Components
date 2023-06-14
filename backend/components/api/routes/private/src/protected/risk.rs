@@ -129,7 +129,7 @@ async fn make_vendor_calls(
         &ob.id,
     )
     .await?;
-    let rule_group = KycRuleGroup::default_rules();
+    let rule_group = KycRuleGroup::default();
     let (rules_output, _, _) =
         crate::decision::engine::calculate_decision(vendor_results.clone(), rule_group)?;
 
@@ -308,7 +308,7 @@ async fn shadow_run(
             verification_request_id: req.id,
         })
         .collect();
-    let rule_group = KycRuleGroup::default_rules();
+    let rule_group = KycRuleGroup::default();
     let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results, rule_group)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {

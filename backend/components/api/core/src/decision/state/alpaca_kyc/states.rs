@@ -216,7 +216,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let kyc_decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)
         } else {
-            common::get_kyc_decision(conn, self.vendor_results.clone())?
+            common::get_decision(&self, conn, &self.vendor_results)?
         };
 
         match kyc_decision.0.decision.decision_status {
@@ -422,7 +422,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let (kyc_decision, kyc_reason_codes) = if let Some(fixture_decision) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)
         } else {
-            common::get_kyc_decision(conn, kyc_vendor_results)?
+            common::get_decision(&self, conn, &kyc_vendor_results)?
         };
 
         // If we collected a doc, we go to review and fail OBD even if no hits

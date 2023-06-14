@@ -4,10 +4,18 @@ pub mod states;
 mod tests;
 
 use super::{
-    actions::MakeDecision, DoAction, MakeVendorCalls, MakeWatchlistCheckCall, StateError, Workflow,
-    WorkflowActions, WorkflowKind, WorkflowState,
+    actions::MakeDecision, traits::HasRuleGroup, DoAction, MakeVendorCalls, MakeWatchlistCheckCall,
+    StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
-use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
+use crate::{
+    decision::{
+        onboarding::{KycRuleGroup, RuleGroup},
+        rule::rule_sets,
+        vendor::vendor_result::VendorResult,
+    },
+    errors::ApiResult,
+    State,
+};
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
@@ -44,6 +52,15 @@ pub struct AlpacaKycDecisioning {
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
 }
+
+impl HasRuleGroup for AlpacaKycDecisioning {
+    fn rule_group(&self) -> RuleGroup {
+        RuleGroup::Kyc(KycRuleGroup {
+            idology_rules: rule_sets::alpaca::idology_rule_set(),
+            experian_rules: rule_sets::alpaca::experian_rule_set(),
+        })
+    }
+}
 #[derive(Clone)]
 pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
@@ -52,6 +69,16 @@ pub struct AlpacaKycWatchlistCheck {
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
+
+impl HasRuleGroup for AlpacaKycWatchlistCheck {
+    fn rule_group(&self) -> RuleGroup {
+        RuleGroup::Kyc(KycRuleGroup {
+            idology_rules: rule_sets::alpaca::idology_rule_set(),
+            experian_rules: rule_sets::alpaca::experian_rule_set(),
+        })
+    }
+}
+
 #[derive(Clone)]
 pub struct AlpacaKycPendingReview {
     wf_id: WorkflowId,

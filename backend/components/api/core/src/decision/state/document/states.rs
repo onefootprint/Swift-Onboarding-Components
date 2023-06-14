@@ -14,10 +14,13 @@ use webhooks::WebhookClient;
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::{
-    onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
+    onboarding::{FeatureVector, KycRuleGroup, OnboardingRulesDecisionOutput, RuleGroup},
+    rule::rule_sets,
     state::{
         actions::{DocCollected, WorkflowActions},
-        common, WorkflowState,
+        common,
+        traits::HasRuleGroup,
+        WorkflowState,
     },
     utils::FixtureDecision,
 };
@@ -50,6 +53,16 @@ pub struct DocumentDecisioning {
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
+}
+
+impl HasRuleGroup for DocumentDecisioning {
+    // TODO: change this to document rules
+    fn rule_group(&self) -> RuleGroup {
+        RuleGroup::Kyc(KycRuleGroup {
+            idology_rules: rule_sets::kyc::idology_rule_set(),
+            experian_rules: rule_sets::kyc::experian_rule_set(),
+        })
+    }
 }
 
 #[derive(Clone)]
@@ -163,7 +176,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)
         } else {
-            common::get_kyc_decision(conn, vendor_results.clone())?
+            common::get_decision(&self, conn, &vendor_results)?
         };
 
         // TODO: doc wf shouldn't really be calling this

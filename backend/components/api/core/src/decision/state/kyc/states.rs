@@ -207,7 +207,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)
         } else {
-            common::get_kyc_decision(conn, self.vendor_results.clone())?
+            common::get_decision(&self, conn, &self.vendor_results)?
         };
 
         let su = ScopedVault::get(conn, &self.sv_id)?;

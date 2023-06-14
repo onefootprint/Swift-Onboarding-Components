@@ -5,9 +5,18 @@ mod tests;
 
 use super::{
     actions::{MakeDecision, MakeVendorCalls},
+    traits::HasRuleGroup,
     DoAction, OnAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
-use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
+use crate::{
+    decision::{
+        onboarding::{KycRuleGroup, RuleGroup},
+        rule::rule_sets,
+        vendor::vendor_result::VendorResult,
+    },
+    errors::ApiResult,
+    State,
+};
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
@@ -43,6 +52,15 @@ pub struct KycDecisioning {
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
+}
+
+impl HasRuleGroup for KycDecisioning {
+    fn rule_group(&self) -> RuleGroup {
+        RuleGroup::Kyc(KycRuleGroup {
+            idology_rules: rule_sets::kyc::idology_rule_set(),
+            experian_rules: rule_sets::kyc::experian_rule_set(),
+        })
+    }
 }
 
 #[derive(Clone)]
