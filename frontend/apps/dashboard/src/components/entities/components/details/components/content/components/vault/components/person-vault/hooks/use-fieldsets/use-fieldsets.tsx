@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoBuilding24,
+  IcoCreditcard24,
   IcoDollar24,
   IcoFileText224,
   IcoUsers24,
@@ -74,6 +75,11 @@ const useFieldsets = (): Fieldset => {
         { di: DocumentDI.latestIdCardFront },
         { di: DocumentDI.latestPassport },
       ],
+    },
+    paymentCardData: {
+      title: t('payment-card-data.title'),
+      iconComponent: IcoCreditcard24,
+      fields: [],
     },
   };
 };

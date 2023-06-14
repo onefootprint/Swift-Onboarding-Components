@@ -10,8 +10,8 @@ describe('getCards', () => {
         ...entityFixture,
         attributes: [
           'card.hayes.issuer',
-          'card.hayes.expiration.month',
-          'card.hayes.expiration.year',
+          'card.hayes.expiration_month',
+          'card.hayes.expiration_year',
           'card.nopa.name',
           'card.nopa.issuer',
         ],
@@ -22,7 +22,8 @@ describe('getCards', () => {
         {
           alias: 'hayes',
           issuer: null,
-          expiration: { month: null, year: null },
+          expiration_month: null,
+          expiration_year: null,
         },
         { alias: 'nopa', issuer: null, name: null },
       ]);
@@ -33,8 +34,8 @@ describe('getCards', () => {
         ...entityFixture,
         attributes: [
           'card.hayes.issuer',
-          'card.hayes.expiration.month',
-          'card.hayes.expiration.year',
+          'card.hayes.expiration_month',
+          'card.hayes.expiration_year',
           'card.nopa.name',
           'card.nopa.issuer',
           'card.nopa.number',
@@ -50,7 +51,8 @@ describe('getCards', () => {
         {
           alias: 'hayes',
           issuer: 'visa',
-          expiration: { month: null, year: null },
+          expiration_month: null,
+          expiration_year: null,
         },
         {
           alias: 'nopa',
@@ -79,25 +81,24 @@ describe('getCards', () => {
   });
 
   describe('with nested attributes', () => {
-    it('should return the correct shape and nest attributes properly', () => {
+    it('should return the correct shape, no longer nesting attributes', () => {
       const entity: Entity = {
         ...entityFixture,
         decryptedAttributes: {
           'card.hayes.issuer': 'visa',
-          'card.hayes.number.last4': '4242',
+          'card.hayes.number_last4': '4242',
           'card.nopa.issuer': 'mastercard',
-          'card.hayes.expiration.month': '05',
-          'card.hayes.expiration.year': '2025',
+          'card.hayes.expiration_month': '05',
+          'card.hayes.expiration_year': '2025',
         },
       };
       expect(getCardFromEntity(entity)).toEqual([
         {
           alias: 'hayes',
           issuer: 'visa',
-          number: {
-            last4: '4242',
-          },
-          expiration: { month: '05', year: '2025' },
+          number_last4: '4242',
+          expiration_month: '05',
+          expiration_year: '2025',
         },
         { alias: 'nopa', issuer: 'mastercard' },
       ]);

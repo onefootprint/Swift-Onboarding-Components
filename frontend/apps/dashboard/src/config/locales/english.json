@@ -91,7 +91,15 @@
     "business.city": "City",
     "business.state": "State",
     "business.country": "Country",
-    "business.zip": "Zip code"
+    "business.zip": "Zip code",
+    "card.name": "Name",
+    "card.number": "Number",
+    "card.number_last4": "Number (last 4)",
+    "card.cvc": "CVC",
+    "card.issuer": "Issuer",
+    "card.expiration": "Expiration",
+    "card.expiration_month": "Expiration month",
+    "card.expiration_year": "Expiration year"
   },
   "cdo": {
     "name": "Full name",
@@ -484,7 +492,9 @@
       },
       "fieldset": {
         "select-all": "Select all",
-        "deselect-all": "Deselect all"
+        "deselect-all": "Deselect all",
+        "card": "card",
+        "cards": "cards"
       },
       "decrypt": {
         "start": "Decrypt data",
@@ -873,6 +883,9 @@
         },
         "documents": {
           "title": "ID documents & Selfie"
+        },
+        "payment-card-data": {
+          "title": "Payment card data"
         },
         "investor-profile": {
           "title": "Investor profile data",

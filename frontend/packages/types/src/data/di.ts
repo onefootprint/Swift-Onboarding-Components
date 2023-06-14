@@ -67,11 +67,11 @@ export type CardDI<T extends string = string> =
   | `card.${T}.name`
   | `card.${T}.issuer`
   | `card.${T}.number`
-  | `card.${T}.number.last4`
+  | `card.${T}.number_last4`
   | `card.${T}.cvc`
   | `card.${T}.expiration`
-  | `card.${T}.expiration.month`
-  | `card.${T}.expiration.year`;
+  | `card.${T}.expiration_month`
+  | `card.${T}.expiration_year`;
 
 export const DataIdentifierKeys = [
   ...Object.values(BusinessDI),

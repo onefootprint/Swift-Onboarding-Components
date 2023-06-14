@@ -1,11 +1,13 @@
 import {
   Entity,
+  hasEntityCards,
   hasEntityDocuments,
   hasEntityInvestorProfile,
 } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import CardFieldset from '../card-fieldset';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
 import DocumentsFields from './components/document-fields';
@@ -17,11 +19,17 @@ type PersonVaultProps = {
 };
 
 const PersonVault = ({ entity }: PersonVaultProps) => {
-  const { basic, address, identity, investorProfile, documents } =
-    useFieldsets();
+  const {
+    basic,
+    address,
+    identity,
+    investorProfile,
+    documents,
+    paymentCardData,
+  } = useFieldsets();
 
   return (
-    <Grid>
+    <Grid hasCard={hasEntityCards(entity)}>
       <Basic>
         <Fieldset
           fields={basic.fields}
@@ -46,6 +54,14 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           footer={<RiskSignalsOverview type="address" />}
         />
       </Address>
+      {hasEntityCards(entity) ? (
+        <PaymentCardData>
+          <CardFieldset
+            title={paymentCardData.title}
+            iconComponent={paymentCardData.iconComponent}
+          />
+        </PaymentCardData>
+      ) : null}
       {hasEntityDocuments(entity) ? (
         <Documents>
           <Fieldset
@@ -73,14 +89,14 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   );
 };
 
-const Grid = styled.div`
-  ${({ theme }) => css`
+const Grid = styled.div<{ hasCard: boolean }>`
+  ${({ theme, hasCard }) => css`
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
       'basic address'
-      'identity address'
+      'identity ${hasCard ? 'payment' : 'address'}'
       'documents documents'
       'investor-profile investor-profile';
   `}
@@ -104,6 +120,10 @@ const Documents = styled.div`
 
 const InvestorProfile = styled.div`
   grid-area: investor-profile;
+`;
+
+const PaymentCardData = styled.div`
+  grid-area: payment;
 `;
 
 export default PersonVault;
