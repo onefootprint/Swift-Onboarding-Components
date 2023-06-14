@@ -12,6 +12,9 @@ use test_case::test_case;
 fn test_collected_data_options() {
     // The Options for each CollectedData must be sorted in order of
     for cd in CD::iter() {
+        if cd == CD::Document {
+            continue;
+        }
         let options = cd.options();
         assert!(options.len() <= 2, "More than 2 options for CollectedData {}", cd);
         assert!(!options.is_empty(), "No option for CollectedData {}", cd);

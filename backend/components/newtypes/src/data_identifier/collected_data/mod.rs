@@ -45,7 +45,6 @@ impl CollectedData {
             Self::Ssn => vec![Ssn4, Ssn9],
             Self::Address => vec![PartialAddress, FullAddress],
             Self::Nationality => vec![Nationality],
-            Self::Document => vec![Document, DocumentAndSelfie],
             Self::BusinessName => vec![BusinessName],
             Self::BusinessTin => vec![BusinessTin],
             Self::BusinessAddress => vec![BusinessAddress],
@@ -55,6 +54,8 @@ impl CollectedData {
             Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
             Self::Card => vec![Card],
+            // TODO it would be great if we didn't have to specify this here. could likely wipe this list
+            Self::Document => vec![],
         }
     }
 
@@ -81,7 +82,9 @@ impl CollectedData {
     }
 }
 
+mod document;
 mod options;
+pub use document::*;
 pub use options::*;
 
 #[cfg(test)]

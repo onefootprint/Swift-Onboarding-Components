@@ -429,7 +429,7 @@ impl OnboardingAndConfig {
             vec![]
         } else {
             let cdos = obc.can_access_data.clone();
-            cdos.into_iter().map(TenantScope::Decrypt).collect()
+            cdos.into_iter().map(|cdo| cdo.permission()).collect()
         }
     }
 
@@ -451,6 +451,6 @@ impl OnboardingAndConfig {
                 .filter(|cdo| !obc.can_access_data.contains(cdo))
                 .collect()
         };
-        cdos.into_iter().map(TenantScope::Decrypt).collect()
+        cdos.into_iter().map(|cdo| cdo.permission()).collect()
     }
 }

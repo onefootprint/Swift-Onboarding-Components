@@ -1,34 +1,33 @@
 use crate::{
-    BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentKind as DK, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
+    BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentCdoInfo, DocumentKind as DK,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK,
 };
+use crate::{Selfie, TenantScope};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashSet;
+use strum::EnumDiscriminants;
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, Display, EnumString};
+use strum_macros::{Display, EnumString};
 
 #[derive(
     Debug,
     Eq,
     PartialEq,
     Hash,
-    Display,
     Clone,
     DeserializeFromStr,
     SerializeDisplay,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
+    EnumDiscriminants,
 )]
-#[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
+#[strum_discriminants(name(CollectedDataOptionKind))]
+#[strum_discriminants(derive(Display, EnumString))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[diesel(sql_type = Text)]
 /// Represent the options of allowed CollectedData.
 /// Some CollectedData variants only have a single allowable CollectedDataOption.
@@ -45,9 +44,7 @@ pub enum CollectedDataOption {
     PhoneNumber,
     Nationality,
 
-    // these correspond to Identity documents + selfie
-    Document,
-    DocumentAndSelfie,
+    Document(DocumentCdoInfo),
 
     // TODO: maybe nest these
     BusinessName,
@@ -64,7 +61,82 @@ pub enum CollectedDataOption {
     Card,
 }
 
-crate::util::impl_enum_str_diesel!(CollectedDataOption);
+crate::util::impl_enum_string_diesel!(CollectedDataOption);
+
+impl schemars::JsonSchema for CollectedDataOption {
+    fn schema_name() -> String {
+        "CollectedDataOption".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        schemars::_private::apply_metadata(
+            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
+                instance_type: Some(schemars::schema::InstanceType::String.into()),
+                // TODO enumerate enum values when we have this in a public-facing API
+                // enum_values: Some(Self::api_examples()),
+                ..Default::default()
+            }),
+            schemars::schema::Metadata {
+                description: Some("Represents a bundle of data that is collected together.".to_owned()),
+                examples: vec![serde_json::Value::String(Self::FullAddress.to_string())],
+                ..Default::default()
+            },
+        )
+    }
+}
+
+impl std::fmt::Display for CollectedDataOption {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        match self {
+            CollectedDataOption::Document(doc_info) => write!(f, "{}", doc_info),
+            _ => write!(f, "{}", CollectedDataOptionKind::from(self)),
+        }
+    }
+}
+
+#[allow(clippy::use_self)]
+impl std::str::FromStr for CollectedDataOption {
+    type Err = strum::ParseError;
+    fn from_str(s: &str) -> Result<CollectedDataOption, Self::Err> {
+        let res = match CollectedDataOptionKind::from_str(s) {
+            Err(_) | Ok(CollectedDataOptionKind::Document) => Self::Document(DocumentCdoInfo::from_str(s)?),
+            Ok(cdo_kind) => Self::try_from(cdo_kind).map_err(|_| strum::ParseError::VariantNotFound)?,
+        };
+        Ok(res)
+    }
+}
+
+// Boiling plate
+impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
+    type Error = crate::Error;
+    fn try_from(value: CollectedDataOptionKind) -> Result<Self, Self::Error> {
+        let v = match value {
+            CollectedDataOptionKind::Name => Self::Name,
+            CollectedDataOptionKind::Dob => Self::Dob,
+            CollectedDataOptionKind::Ssn4 => Self::Ssn4,
+            CollectedDataOptionKind::Ssn9 => Self::Ssn9,
+            CollectedDataOptionKind::FullAddress => Self::FullAddress,
+            CollectedDataOptionKind::PartialAddress => Self::PartialAddress,
+            CollectedDataOptionKind::Email => Self::Email,
+            CollectedDataOptionKind::PhoneNumber => Self::PhoneNumber,
+            CollectedDataOptionKind::Nationality => Self::Nationality,
+            CollectedDataOptionKind::BusinessName => Self::BusinessName,
+            CollectedDataOptionKind::BusinessTin => Self::BusinessTin,
+            CollectedDataOptionKind::BusinessAddress => Self::BusinessAddress,
+            CollectedDataOptionKind::BusinessPhoneNumber => Self::BusinessPhoneNumber,
+            CollectedDataOptionKind::BusinessWebsite => Self::BusinessWebsite,
+            CollectedDataOptionKind::BusinessBeneficialOwners => Self::BusinessBeneficialOwners,
+            CollectedDataOptionKind::BusinessKycedBeneficialOwners => Self::BusinessKycedBeneficialOwners,
+            CollectedDataOptionKind::BusinessCorporationType => Self::BusinessCorporationType,
+            CollectedDataOptionKind::InvestorProfile => Self::InvestorProfile,
+            CollectedDataOptionKind::Card => Self::Card,
+            CollectedDataOptionKind::Document => {
+                return Err(crate::Error::Custom("Cannot convert".to_owned()))
+            }
+        };
+        Ok(v)
+    }
+}
 
 impl CollectedDataOption {
     pub fn parent(&self) -> CollectedData {
@@ -76,8 +148,7 @@ impl CollectedDataOption {
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
             Self::Nationality => CollectedData::Nationality,
-            Self::Document => CollectedData::Document,
-            Self::DocumentAndSelfie => CollectedData::Document,
+            Self::Document(_) => CollectedData::Document,
             Self::BusinessName => CollectedData::BusinessName,
             Self::BusinessTin => CollectedData::BusinessTin,
             Self::BusinessAddress => CollectedData::BusinessAddress,
@@ -134,8 +205,7 @@ impl CollectedDataOption {
                     .collect(),
             ),
 
-            Self::Document => None,
-            Self::DocumentAndSelfie => None,
+            Self::Document(_) => None,
 
             // TODO we should associate this with types of data
             Self::Card => None,
@@ -200,9 +270,21 @@ impl CollectedDataOption {
         match self {
             Self::Ssn4 => Some(Self::Ssn9),
             Self::PartialAddress => Some(Self::FullAddress),
-            Self::Document => Some(Self::DocumentAndSelfie),
             Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
             _ => None,
+        }
+    }
+
+    pub fn permission(self) -> TenantScope {
+        match self {
+            Self::Document(doc_info) => {
+                if doc_info.2 == Selfie::RequireSelfie {
+                    TenantScope::DecryptDocumentAndSelfie
+                } else {
+                    TenantScope::DecryptDocument
+                }
+            }
+            cdo => TenantScope::Decrypt(cdo),
         }
     }
 }

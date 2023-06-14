@@ -66,10 +66,21 @@ impl CreateOnboardingConfigurationRequest {
                 // The fun case - if we have a collect and an access CDO for the same CD, make sure
                 // the collect CDO is "more complete" than the access CDO
                 (Some(collect), Some(access)) => {
-                    // The options for each CD are ordered in ascending "completeness"
-                    let collect_idx = cd.options().iter().position(|cdo| cdo == collect);
-                    let access_idx = cd.options().iter().position(|cdo| cdo == access);
-                    collect_idx >= access_idx
+                    match cd {
+                        CD::Document => {
+                            // TODO document permissions are a little different since we don't
+                            // represent the options. Here, we only allow decrypting either what's
+                            // collected or nothing at all
+                            collect == access
+                        }
+                        _ => {
+                            // The options for each CD are ordered in ascending "completeness"
+                            let collect_idx = cd.options().iter().position(|cdo| cdo == collect);
+                            let access_idx = cd.options().iter().position(|cdo| cdo == access);
+                            // maybe enforce doc permissions are all or npthingj
+                            collect_idx >= access_idx
+                        }
+                    }
                 }
                 // No problems if we want to collect more than we want to decrypt
                 (Some(_), None) | (None, None) => true,
@@ -172,18 +183,20 @@ fn validate_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), Tena
 #[cfg(test)]
 mod test {
     use super::*;
-    use newtypes::CollectedDataOption as CDO;
+    use newtypes::{
+        CollectedDataOption as CDO, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie,
+    };
     use test_case::test_case;
 
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::DocumentAndSelfie], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::DocumentAndSelfie] => true)]
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::DocumentAndSelfie], vec![CDO::Name, CDO::Ssn4, CDO::PartialAddress, CDO::Document] => true)]
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::DocumentAndSelfie], vec![] => true)]
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Name, CDO::Ssn4, CDO::PartialAddress, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![] => true)]
     #[test_case(vec![CDO::Ssn4, CDO::Ssn9], vec![] => false)]
     #[test_case(vec![CDO::PartialAddress, CDO::FullAddress], vec![] => false)]
-    #[test_case(vec![CDO::Document, CDO::DocumentAndSelfie], vec![] => false)]
-    #[test_case(vec![CDO::DocumentAndSelfie], vec![CDO::DocumentAndSelfie] => true)]
-    #[test_case(vec![CDO::DocumentAndSelfie], vec![CDO::Document] => true)]
-    #[test_case(vec![CDO::Document], vec![CDO::DocumentAndSelfie] => false)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None)), CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![] => false)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => false)]
     #[test_case(vec![CDO::Ssn4], vec![CDO::Ssn9] => false)]
     #[test_case(vec![CDO::PartialAddress], vec![CDO::FullAddress] => false)]
     fn test(must_collect_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {

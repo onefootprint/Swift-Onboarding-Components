@@ -13,8 +13,9 @@ use idv::incode::{doc::response::FetchScoresResponse, IncodeAPIResult};
 use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    CollectedDataOption, DocVData, DocumentRequestStatus, DocumentSide, IdDocKind, IncodeConfigurationId,
-    IncodeFailureReason, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, VendorAPI,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo,
+    DocumentRequestStatus, DocumentSide, IdDocKind, IncodeConfigurationId, IncodeFailureReason,
+    IncodeVerificationSessionState, PiiString, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -35,7 +36,12 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     // Set up
     //
     let must_collect_data = if is_selfie {
-        Some(vec![CollectedDataOption::DocumentAndSelfie])
+        let doc_info = DocumentCdoInfo(
+            DocTypeRestriction::None,
+            CountryRestriction::None,
+            Selfie::RequireSelfie,
+        );
+        Some(vec![CollectedDataOption::Document(doc_info)])
     } else {
         None
     };
@@ -239,7 +245,12 @@ async fn test_fail(state: &State, is_selfie: bool) {
     // Set up
     //
     let must_collect_data = if is_selfie {
-        Some(vec![CollectedDataOption::DocumentAndSelfie])
+        let doc_info = DocumentCdoInfo(
+            DocTypeRestriction::None,
+            CountryRestriction::None,
+            Selfie::RequireSelfie,
+        );
+        Some(vec![CollectedDataOption::Document(doc_info)])
     } else {
         None
     };

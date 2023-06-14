@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, ScopedVaultId};
+use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DocumentCdoInfo, ScopedVaultId, Selfie};
 use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
@@ -240,16 +240,15 @@ impl ObConfiguration {
 
 impl ObConfiguration {
     pub fn must_collect_selfie(&self) -> bool {
-        self.must_collect_data.contains(&CDO::DocumentAndSelfie)
+        self.must_collect_data
+            .iter()
+            .any(|cdo| matches!(cdo, CDO::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))))
     }
 
     pub fn can_access_document(&self) -> bool {
-        self.can_access_data.contains(&CDO::Document)
-            || self.can_access_data.contains(&CDO::DocumentAndSelfie)
-    }
-
-    pub fn can_access_selfie(&self) -> bool {
-        self.can_access_data.contains(&CDO::DocumentAndSelfie)
+        self.can_access_data
+            .iter()
+            .any(|cdo| matches!(cdo, CDO::Document(_)))
     }
 
     /// Returns true if this ob config requires collecting any CDO with the provided DataIdentifier kind
