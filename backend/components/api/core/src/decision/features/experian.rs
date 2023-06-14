@@ -1,6 +1,6 @@
 use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
 use itertools::Itertools;
-use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
+use newtypes::{FootprintReasonCode, VendorAPI};
 
 use crate::decision::onboarding::FeatureSet;
 
@@ -10,14 +10,12 @@ const SCORE_THRESHOLD: i32 = 580;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExperianFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
-    pub verification_result_id: VerificationResultId,
 }
 
 impl ExperianFeatures {
-    pub fn from(resp: CrossCoreAPIResponse, verification_result_id: VerificationResultId) -> Self {
+    pub fn from(resp: CrossCoreAPIResponse) -> Self {
         Self {
             footprint_reason_codes: footprint_reason_codes(resp),
-            verification_result_id,
         }
     }
 }
@@ -28,9 +26,6 @@ impl FeatureSet for ExperianFeatures {
     }
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::ExperianPreciseID
-    }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result_id
     }
 }
 

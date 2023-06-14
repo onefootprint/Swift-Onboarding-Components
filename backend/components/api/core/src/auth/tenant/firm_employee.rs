@@ -179,7 +179,7 @@ mod test {
     use crate::auth::{session::AuthSessionData, SessionContext};
     use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{CollectedDataOption, TenantScope};
+    use newtypes::TenantScope;
 
     #[db_test_case(false => vec![TenantScope::Read])]
     #[db_test_case(true => vec![

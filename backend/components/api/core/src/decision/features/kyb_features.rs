@@ -1,6 +1,6 @@
 use db::models::onboarding_decision::OnboardingDecision;
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
 
 use crate::{
     decision::{
@@ -20,16 +20,14 @@ use super::middesk;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MiddeskFeatures {
-    pub verification_result_id: VerificationResultId,
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
 }
 
 impl MiddeskFeatures {
-    pub fn new(business_response: &BusinessResponse, verification_result_id: &VerificationResultId) -> Self {
+    pub fn new(business_response: &BusinessResponse) -> Self {
         let footprint_reason_codes = middesk::reason_codes(business_response);
 
         Self {
-            verification_result_id: verification_result_id.clone(),
             footprint_reason_codes,
         }
     }
@@ -42,9 +40,6 @@ impl FeatureSet for KybFeatureVector {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::MiddeskBusinessUpdateWebhook
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.middesk_features.verification_result_id
-    }
 }
 
 #[derive(Clone, Debug)]
@@ -56,11 +51,10 @@ pub struct KybFeatureVector {
 impl KybFeatureVector {
     pub fn new(
         middesk_business_response: &BusinessResponse,
-        verification_result_id: &VerificationResultId,
         bo_obds: Vec<OnboardingDecision>,
     ) -> KybFeatureVector {
         Self {
-            middesk_features: MiddeskFeatures::new(middesk_business_response, verification_result_id),
+            middesk_features: MiddeskFeatures::new(middesk_business_response),
             bo_obds,
         }
     }
@@ -107,9 +101,5 @@ impl FeatureVector for KybFeatureVector {
 
         let reason_codes = self.reason_codes();
         Ok((output, reason_codes))
-    }
-
-    fn verification_results(&self) -> Vec<newtypes::VerificationResultId> {
-        vec![self.middesk_features.verification_result_id.clone()]
     }
 }

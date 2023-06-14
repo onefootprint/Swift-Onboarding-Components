@@ -102,24 +102,33 @@ pub async fn run(
         return Ok(());
     }
 
-    let all_vendor_results = vendor_requests
+    let all_vendor_results: Vec<VendorResult> = vendor_requests
         .completed_requests
         .into_iter()
         .chain(completed_oustanding_vendor_responses.into_iter())
         .collect();
 
+    let vres_ids = all_vendor_results
+        .iter()
+        .map(|vr| vr.verification_result_id.clone())
+        .collect();
+
     let fv = features::kyc_features::create_features(all_vendor_results);
-    make_onboarding_decision(&ob, fv, db_pool).await
+
+    make_onboarding_decision(&ob, fv, db_pool, vres_ids).await
 }
 
-pub async fn make_onboarding_decision<T>(ob: &Onboarding, fv: T, db_pool: &DbPool) -> ApiResult<()>
+pub async fn make_onboarding_decision<T>(
+    ob: &Onboarding,
+    fv: T,
+    db_pool: &DbPool,
+    verification_result_ids: Vec<VerificationResultId>,
+) -> ApiResult<()>
 where
     T: FeatureVector + Send + Sync,
 {
     // Calculate output from rules + features
     let (rules_output, reason_codes) = fv.evaluate()?;
-
-    let verification_result_ids = fv.verification_results();
 
     let ob = ob.clone();
     db_pool

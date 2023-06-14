@@ -197,7 +197,7 @@ async fn make_decision(
         return Err(AssertionError("No completed vendor requests found").into());
     }
 
-    let vendor_result_ids = vendor_requests
+    let vendor_result_ids: Vec<VerificationResultId> = vendor_requests
         .completed_requests
         .as_slice()
         .iter()
@@ -205,7 +205,7 @@ async fn make_decision(
         .collect();
 
     let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
-    decision::engine::make_onboarding_decision(&ob, fv, &state.db_pool).await?;
+    decision::engine::make_onboarding_decision(&ob, fv, &state.db_pool, vendor_result_ids.clone()).await?;
 
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }

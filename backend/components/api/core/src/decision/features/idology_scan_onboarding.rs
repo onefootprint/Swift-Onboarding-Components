@@ -1,14 +1,13 @@
 use idv::idology::scan_onboarding::response::ScanOnboardingAPIResponse;
-use newtypes::{idology::IdologyScanOnboardingCaptureResult, DecisionStatus, VerificationResultId};
+use newtypes::{idology::IdologyScanOnboardingCaptureResult, DecisionStatus};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyScanOnboardingFeatures {
     pub status: DecisionStatus,
-    pub verification_result: VerificationResultId,
 }
 
 impl IDologyScanOnboardingFeatures {
-    pub fn from(response: &ScanOnboardingAPIResponse, verification_result_id: VerificationResultId) -> Self {
+    pub fn from(response: &ScanOnboardingAPIResponse) -> Self {
         let status = response
             .response
             .capture_result()
@@ -21,9 +20,6 @@ impl IDologyScanOnboardingFeatures {
             })
             .unwrap_or(DecisionStatus::Fail);
 
-        Self {
-            status,
-            verification_result: verification_result_id,
-        }
+        Self { status }
     }
 }

@@ -3,8 +3,7 @@ use crate::decision::{
     features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
     onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName,
 };
-use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
-use std::str::FromStr;
+use newtypes::{DecisionStatus, FootprintReasonCode};
 use test_case::test_case;
 
 fn create_onboarding_rules_decision_output(
@@ -46,7 +45,6 @@ fn test_evaluate_onboarding_rules(
     // Set up a feature vector
     let idology_features = IDologyFeatures {
         footprint_reason_codes: fp_reason_codes,
-        verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     };
 
     let feature_vector = KycFeatureVector {

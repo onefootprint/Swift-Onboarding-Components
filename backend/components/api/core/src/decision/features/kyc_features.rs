@@ -11,7 +11,7 @@ use crate::decision::{
     Error, RuleError,
 };
 use itertools::Itertools;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -31,9 +31,7 @@ use super::{
 
 // TODO!
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct TwilioFeatures {
-    pub verification_result: VerificationResultId,
-}
+pub struct TwilioFeatures {}
 
 #[derive(Clone, Default, Debug)]
 pub struct KycFeatureVector {
@@ -171,7 +169,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
         let verification_result_id = result.verification_result_id;
         match response.response {
             ParsedResponse::IDologyExpectID(resp) => Ok(Self {
-                idology_features: Some(IDologyFeatures::from(resp, verification_result_id)),
+                idology_features: Some(IDologyFeatures::from(resp)),
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
@@ -181,9 +179,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
             ParsedResponse::TwilioLookupV2(_) => Ok(Self {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
-                twilio_features: Some(TwilioFeatures {
-                    verification_result: verification_result_id,
-                }),
+                twilio_features: Some(TwilioFeatures {}),
                 socure_features: None,
                 experian_features: None,
             }),
@@ -191,7 +187,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
-                socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
+                socure_features: Some(SocureFeatures::from(idplus_response)),
                 experian_features: None,
             }),
             // TODO
@@ -221,10 +217,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
             // results to that. I'll keep this around since it's useful to save to PG (when we do that)
             ParsedResponse::IDologyScanOnboarding(ref scan_ob_resp) => Ok(Self {
                 idology_features: None,
-                idology_scan_onboarding_features: Some(IDologyScanOnboardingFeatures::from(
-                    scan_ob_resp,
-                    verification_result_id,
-                )),
+                idology_scan_onboarding_features: Some(IDologyScanOnboardingFeatures::from(scan_ob_resp)),
                 twilio_features: None,
                 socure_features: None,
                 experian_features: None,
@@ -234,7 +227,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
-                experian_features: Some(ExperianFeatures::from(resp, verification_result_id)),
+                experian_features: Some(ExperianFeatures::from(resp)),
             }),
             _ => Err(Error::KycFeatureVectorConversionError(verification_result_id)),
         }
@@ -315,40 +308,6 @@ impl FeatureVector for KycFeatureVector {
         };
         Ok((output, reason_codes))
     }
-
-    fn verification_results(&self) -> Vec<newtypes::VerificationResultId> {
-        let idology_verification_result = self
-            .idology_features
-            .as_ref()
-            .map(|i| i.verification_result.clone());
-        let idology_scan_onboarding_verification_result = self
-            .idology_scan_onboarding_features
-            .as_ref()
-            .map(|i| i.verification_result.clone());
-        let twilio_verification_result = self
-            .twilio_features
-            .as_ref()
-            .map(|i| i.verification_result.clone());
-        let socure_verification_result = self
-            .socure_features
-            .as_ref()
-            .map(|i| i.verification_result.clone());
-        let experian_verification_result = self
-            .experian_features
-            .as_ref()
-            .map(|i| i.verification_result_id.clone());
-
-        vec![
-            idology_verification_result,
-            idology_scan_onboarding_verification_result,
-            twilio_verification_result,
-            socure_verification_result,
-            experian_verification_result,
-        ]
-        .into_iter()
-        .flatten()
-        .collect()
-    }
 }
 
 #[allow(clippy::expect_used)]
@@ -367,7 +326,7 @@ mod tests {
         socure::response::SocureIDPlusResponse,
         ParsedResponse, VendorResponse,
     };
-    use newtypes::{DecisionStatus, Vendor, VerificationRequestId};
+    use newtypes::{DecisionStatus, Vendor, VerificationRequestId, VerificationResultId};
     use serde_json::json;
     // Feature tests
     // TODO: add in twilio
@@ -376,7 +335,7 @@ mod tests {
     #[test]
     fn test_features() -> Result<(), IdologyError> {
         let idology_result = create_idology_vendor_result("id.success")?;
-        let vendor_results = vec![idology_result.clone()];
+        let vendor_results = vec![idology_result];
 
         let feature_vector = create_features(vendor_results);
         let expected_idology_features = IDologyFeatures {
@@ -389,7 +348,6 @@ mod tests {
                 FootprintReasonCode::SsnMatches,
                 FootprintReasonCode::NameMatches,
             ],
-            verification_result: idology_result.verification_result_id,
         };
         let expected_feature_vector = KycFeatureVector {
             idology_features: Some(expected_idology_features),
@@ -478,7 +436,6 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IdNotLocated,
                 ],
-                verification_result: VerificationResultId::from("123".to_owned()),
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,
@@ -490,7 +447,6 @@ mod tests {
                 baseline_id_plus_logic_v6_result: SocureBaselineIdPlusLogicV6Result::Accept,
                 decision_status: DecisionStatus::Pass,
                 create_manual_review: false,
-                verification_result: VerificationResultId::from("456".to_owned()),
                 reason_codes: vec![],
                 footprint_reason_codes: vec![
                     FootprintReasonCode::SsnIssuedPriorToDob,
@@ -536,7 +492,6 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IpStateDoesNotMatch,
                 ],
-                verification_result: VerificationResultId::from("123".to_owned()),
             }),
             ..Default::default()
         };

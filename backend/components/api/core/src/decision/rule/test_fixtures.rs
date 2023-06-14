@@ -22,10 +22,6 @@ impl FeatureSet for TestFeatures {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         newtypes::VendorAPI::TwilioLookupV2
     }
-
-    fn verification_result_id(&self) -> &newtypes::VerificationResultId {
-        &self.vres
-    }
 }
 impl TestFeatures {
     pub fn new(s: &str) -> Self {

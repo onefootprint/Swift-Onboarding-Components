@@ -4,7 +4,6 @@ use crate::models::annotation::{Annotation, AnnotationInfo};
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
-use crate::PgConn;
 use crate::TxnPgConn;
 
 use newtypes::{

@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use newtypes::{FootprintReasonCode, VerificationResultId};
+use newtypes::FootprintReasonCode;
 
 use crate::decision::{
     features::idology_expectid::IDologyFeatures,
@@ -11,7 +9,6 @@ use test_case::test_case;
 fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeatures {
     IDologyFeatures {
         footprint_reason_codes: fp_reason_codes,
-        verification_result: VerificationResultId::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap(),
     }
 }
 

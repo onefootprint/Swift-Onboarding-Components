@@ -92,18 +92,12 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
 mod tests {
     use super::*;
     use crate::decision::{features::kyb_features::MiddeskFeatures, rule::rules_engine};
-    use newtypes::VerificationResultId;
-    use std::str::FromStr;
     use test_case::test_case;
 
     fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> KybFeatureVector {
         KybFeatureVector {
             middesk_features: MiddeskFeatures {
                 footprint_reason_codes: fp_reason_codes,
-                verification_result_id: VerificationResultId::from_str(
-                    "a5971b52-1b44-4c3a-a83f-a96796f8774d",
-                )
-                .unwrap(),
             },
             bo_obds: vec![],
         }

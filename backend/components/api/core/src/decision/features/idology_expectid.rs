@@ -5,9 +5,7 @@ use idv::idology::{
     expectid::response::{ExpectIDResponse, PaWatchlistHit},
 };
 use itertools::Itertools;
-use newtypes::{
-    idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI, VerificationResultId,
-};
+use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI};
 use strum::IntoEnumIterator;
 
 use crate::decision::onboarding::FeatureSet;
@@ -16,7 +14,6 @@ use crate::decision::onboarding::FeatureSet;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
-    pub verification_result: VerificationResultId,
 }
 
 impl FeatureSet for IDologyFeatures {
@@ -26,17 +23,13 @@ impl FeatureSet for IDologyFeatures {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IdologyExpectID
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result
-    }
 }
 
 impl IDologyFeatures {
-    pub fn from(resp: ExpectIDResponse, verification_result_id: VerificationResultId) -> Self {
+    pub fn from(resp: ExpectIDResponse) -> Self {
         let footprint_reason_codes: Vec<FootprintReasonCode> = Self::footprint_reason_codes(resp);
 
         Self {
-            verification_result: verification_result_id,
             footprint_reason_codes,
         }
     }
