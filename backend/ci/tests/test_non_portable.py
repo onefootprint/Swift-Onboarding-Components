@@ -35,7 +35,7 @@ from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DA
             "Invalid checksum. Please verify that the number is correct",
         ),
         (
-            "card.flerp.expiration.month",
+            "card.flerp.expiration_month",
             "12",
             "Cannot specify this piece of data. It will automatically be derived.",
         ),
@@ -90,7 +90,7 @@ def test_invalid_dis(key, tenant):
                 "card.hayes_valley.number": "4428680502681658",
             },
             {
-                "card.hayes_valley.number.last4": "1658",
+                "card.hayes_valley.number_last4": "1658",
                 "card.hayes_valley.issuer": "visa",
             },
         ),
@@ -146,9 +146,9 @@ def test_vault_create_write_decrypt(tenant):
         "id.zip",
         "custom.ach_account_number",
         "custom.cc4",
-        "card.hayes.expiration.month",
-        "card.hayes.expiration.year",
-        "card.hayes.number.last4",
+        "card.hayes.expiration_month",
+        "card.hayes.expiration_year",
+        "card.hayes.number_last4",
         "card.valley.cvc",
     ]
     data = dict(
@@ -160,9 +160,9 @@ def test_vault_create_write_decrypt(tenant):
 
     all_data = {
         **all_data,
-        "card.hayes.expiration.month": all_data["card.hayes.expiration"].split("/")[0],
-        "card.hayes.expiration.year": all_data["card.hayes.expiration"].split("/")[1],
-        "card.hayes.number.last4": all_data["card.hayes.number"][-4:],
+        "card.hayes.expiration_month": all_data["card.hayes.expiration"].split("/")[0],
+        "card.hayes.expiration_year": all_data["card.hayes.expiration"].split("/")[1],
+        "card.hayes.number_last4": all_data["card.hayes.number"][-4:],
     }
     for f in fields_to_check:
         assert data[f] == all_data[f]

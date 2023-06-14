@@ -66,8 +66,8 @@ def test_checkout_flow(sandbox_tenant):
     data = {
         "type": "card",
         "number": "{{ card.test.number }}",
-        "expiry_month": "{{ card.test.expiration.month }}",
-        "expiry_year": "{{ card.test.expiration.year }}",
+        "expiry_month": "{{ card.test.expiration_month }}",
+        "expiry_year": "{{ card.test.expiration_year }}",
         "name": "{{ card.test.name }}",
         "cvv": "{{ card.test.cvc }}",
         "billing_address": {"zip": "{{ card.test.billing_address.zip }}"},

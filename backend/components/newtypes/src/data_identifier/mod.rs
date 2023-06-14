@@ -387,7 +387,7 @@ mod tests {
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
-    #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration.month")]
+    #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration_month")]
     #[test_case(DataIdentifier::Document(DocumentKind::DriversLicenseNumber) => "document.drivers_license.number")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
@@ -400,7 +400,7 @@ mod tests {
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
-    #[test_case("card.hayesvalley.expiration.month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
+    #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()

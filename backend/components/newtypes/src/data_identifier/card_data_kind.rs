@@ -14,11 +14,11 @@ pub enum CardDataKind {
     BillingZip,
 
     // Derived entries
-    #[strum(to_string = "expiration.month")]
+    #[strum(to_string = "expiration_month")]
     ExpMonth,
-    #[strum(to_string = "expiration.year")]
+    #[strum(to_string = "expiration_year")]
     ExpYear,
-    #[strum(to_string = "number.last4")]
+    #[strum(to_string = "number_last4")]
     Last4,
     Issuer,
 }
