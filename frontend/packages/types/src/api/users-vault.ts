@@ -1,8 +1,7 @@
-import { CardDI } from '../data';
+import { CardDI } from '../data/di';
 
 export type UsersVaultRequest = {
   authToken: string;
-  cardName: string;
   data: Partial<Record<CardDI, string>>;
 };
 

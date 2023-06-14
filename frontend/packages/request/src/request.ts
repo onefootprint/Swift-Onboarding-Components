@@ -82,7 +82,8 @@ const getRequestOptions = (
 
 // Disable transformation when the string matched or satisfied the condition.
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
-const preservedKeys = [...DataIdentifierKeys];
+const preservedKeys = (input: any) =>
+  [...DataIdentifierKeys].includes(input) || input.startsWith('card');
 
 const request = <Response = any>(
   requestConfig: AxiosRequestConfig = {},

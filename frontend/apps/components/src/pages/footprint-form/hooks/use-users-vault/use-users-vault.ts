@@ -4,21 +4,11 @@ import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from 'src/config/constants';
 
 const usersVaultRequest = async (payload: UsersVaultRequest) => {
-  const { authToken, cardName, data } = payload;
-  // Replace the * in data keys to embed the cardName in the key
-  const editedData = Object.entries(data).reduce((acc, entry) => {
-    const [key, value] = entry;
-    const newKey = key.replace('*', cardName);
-    return {
-      ...acc,
-      [newKey]: value,
-    };
-  }, {});
-
+  const { authToken, data } = payload;
   const response = await requestWithoutCaseConverter<UsersVaultResponse>({
     method: 'PATCH',
     url: 'users/vault',
-    data: editedData,
+    data,
     headers: {
       [AUTH_HEADER]: authToken,
     },

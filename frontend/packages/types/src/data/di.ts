@@ -63,12 +63,15 @@ export enum DocumentDI {
   latestIdCardSelfie = 'document.id_card.selfie.latest_upload',
 }
 
-export enum CardDI {
-  number = 'card.*.number',
-  cvc = 'card.*.cvc',
-  expiration = 'card.*.expiration',
-  name = 'card.*.name',
-}
+export type CardDI<T extends string = string> =
+  | `card.${T}.name`
+  | `card.${T}.issuer`
+  | `card.${T}.number`
+  | `card.${T}.number.last4`
+  | `card.${T}.cvc`
+  | `card.${T}.expiration`
+  | `card.${T}.expiration.month`
+  | `card.${T}.expiration.year`;
 
 export const DataIdentifierKeys = [
   ...Object.values(BusinessDI),
@@ -77,4 +80,9 @@ export const DataIdentifierKeys = [
   ...Object.values(DocumentDI),
 ];
 
-export type DataIdentifier = InvestorProfileDI | IdDI | BusinessDI | DocumentDI;
+export type DataIdentifier =
+  | InvestorProfileDI
+  | IdDI
+  | BusinessDI
+  | DocumentDI
+  | CardDI;

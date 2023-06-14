@@ -55,7 +55,7 @@ const useDecryptKycData = ({
     });
 
     // Add the decrypted values if available
-    Object.entries(decryptedData).forEach(([di, value]) => {
+    Object.entries(decryptedData).forEach(([di, value = '']) => {
       data[di as IdDI] = {
         value,
         decrypted: true,

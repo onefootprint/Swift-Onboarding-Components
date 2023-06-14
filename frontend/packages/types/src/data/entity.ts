@@ -1,9 +1,12 @@
 import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
+import { EntityCard } from './entity-cards';
 import { Onboarding } from './onboarding';
 import { WatchlistCheckEventData } from './timeline';
 import { VaultValue } from './vault';
 
-export type EntityVault = Partial<Record<DataIdentifier, VaultValue>>;
+export type EntityVault = Partial<Record<DataIdentifier, VaultValue>> & {
+  cards?: EntityCard[];
+};
 
 export enum EntityKind {
   business = 'business',
@@ -38,6 +41,9 @@ export const hasEntityInvestorProfile = (entity: Entity) => {
     entity.attributes.some(attribute => attribute === investorProfileDi),
   );
 };
+
+export const hasEntityCards = (entity: Entity) =>
+  entity.attributes.some(attr => attr.startsWith('card'));
 
 export const hasEntityDocuments = (entity: Entity) => {
   const values = Object.values(DocumentDI);

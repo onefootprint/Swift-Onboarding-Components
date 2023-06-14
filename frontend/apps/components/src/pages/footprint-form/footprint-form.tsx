@@ -34,19 +34,17 @@ const FootprintForm = ({
 
   const handleSave = (formData: SecureFormData) => {
     // For now, we don't support saving address data
-    const data: Partial<Record<CardDI, string>> = {
-      [CardDI.number]: formData.number.split(' ').join(''),
-      [CardDI.expiration]: formData.expiry,
-      [CardDI.cvc]: formData.cvc,
-    };
+    const data: Partial<Record<CardDI, string>> = {};
+    data[`card.${cardName}.number`] = formData.number.split(' ').join('');
+    data[`card.${cardName}.expiration`] = formData.expiry;
+    data[`card.${cardName}.cvc`] = formData.cvc;
     if ('name' in formData) {
-      data[CardDI.name] = formData.name;
+      data[`card.${cardName}.name`] = formData.name;
     }
 
     usersVaultMutation.mutate(
       {
         authToken,
-        cardName,
         data,
       },
       {
