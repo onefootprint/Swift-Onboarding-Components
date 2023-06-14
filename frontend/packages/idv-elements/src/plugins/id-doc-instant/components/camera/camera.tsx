@@ -126,6 +126,7 @@ const Camera = ({
             hidden={!isVideoPlaying}
             onCanPlay={handleCanPlay}
             maxHeight={maxVideoHeight}
+            data-camera-kind={cameraKind}
             autoPlay
             playsInline
             muted
@@ -204,8 +205,13 @@ const Video = styled.video<{ maxHeight: number }>`
   ${({ maxHeight }) => css`
     max-height: ${maxHeight}px;
     width: 100%;
-    transform: scaleX(-1);
     object-fit: cover; // Should be "cover" for the math to work
+
+    &[data-camera-kind='front'] {
+      transform: scaleX(
+        -1
+      ); // Mirror the image only if we are using the front camera
+    }
 
     &::-webkit-media-controls-play-button {
       display: none !important;

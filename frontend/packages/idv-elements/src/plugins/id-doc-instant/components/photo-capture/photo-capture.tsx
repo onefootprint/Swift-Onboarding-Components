@@ -77,6 +77,7 @@ const PhotoCapture = ({
       onRetake={handleRetake}
       onConfirm={handleConfirm}
       isLoading={isLoading}
+      cameraKind={cameraKind}
     />
   ) : (
     <Camera

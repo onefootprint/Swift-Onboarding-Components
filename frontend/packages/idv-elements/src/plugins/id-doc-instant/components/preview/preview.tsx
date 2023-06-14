@@ -3,11 +3,14 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { CameraKind } from '../camera/camera';
+
 type PreviewProps = {
   imageSrc: string;
   onRetake: () => void;
   onConfirm: () => void;
   isLoading: boolean;
+  cameraKind: CameraKind;
 };
 
 const Preview = ({
@@ -15,13 +18,14 @@ const Preview = ({
   onRetake,
   onConfirm,
   isLoading,
+  cameraKind,
 }: PreviewProps) => {
   const { t } = useTranslation('components.preview');
 
   return (
     <Container>
       <PreviewContainer>
-        <ImagePreview src={imageSrc} />
+        <ImagePreview src={imageSrc} data-camera-kind={cameraKind} />
       </PreviewContainer>
       <ButtonsContainer>
         <Button
@@ -84,7 +88,12 @@ const ImagePreview = styled.img`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.large};
     width: 100%;
-    transform: scaleX(-1); // Mirror images feel more natural to the user
+
+    &[data-camera-kind='front'] {
+      transform: scaleX(
+        -1
+      ); // Mirror the image only if we are used the front camera to take the picture
+    }
   `}
 `;
 
