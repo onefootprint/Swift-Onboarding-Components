@@ -18,6 +18,7 @@ pub struct Rule<T> {
 }
 
 /// A set of rules
+#[derive(Clone)]
 pub struct RuleSet<T: Clone> {
     pub name: RuleSetName,
     pub rules: Vec<Rule<T>>,

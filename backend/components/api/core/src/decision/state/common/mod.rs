@@ -24,7 +24,11 @@ use crate::{
         self, engine,
         onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput},
         utils::FixtureDecision,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+        vendor::{
+            tenant_vendor_control::TenantVendorControl,
+            vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
+            vendor_result::VendorResult,
+        },
     },
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::{Any, Person, TenantVw, VaultWrapper, VwArgs},
@@ -207,7 +211,9 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ky
 
 pub fn get_kyc_decision(conn: &mut TxnPgConn, vendor_results: Vec<VendorResult>) -> ApiResult<KycDecision> {
     let rule_group = KycRuleGroup::default_rules();
-    let (rules_output, reason_codes, fv) = decision::engine::calculate_decision(vendor_results, rule_group)?;
+    let vendor_response_map = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+
+    let (rules_output, reason_codes) = rule_group.evaluate_kyc_rules_with_waterfall(&vendor_response_map)?;
     Ok((rules_output, reason_codes))
 }
 

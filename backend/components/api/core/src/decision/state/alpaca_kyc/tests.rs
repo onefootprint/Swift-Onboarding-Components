@@ -179,20 +179,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
             assert_have_same_elements(
                 vec![
                     FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::AddressZipCodeMatches,
-                    FootprintReasonCode::AddressStreetNameMatches,
-                    FootprintReasonCode::AddressStreetNumberMatches,
-                    FootprintReasonCode::AddressStateMatches,
-                    FootprintReasonCode::DobYobMatches,
-                    FootprintReasonCode::DobMobMatches,
                     FootprintReasonCode::SsnMatches,
-                    FootprintReasonCode::NameLastMatches,
                     FootprintReasonCode::NameMatches,
                     FootprintReasonCode::DobMatches,
-                    FootprintReasonCode::IpStateMatches,
-                    FootprintReasonCode::PhoneNumberMatches,
-                    FootprintReasonCode::InputPhoneNumberMatchesInputState,
-                    FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
                 ],
                 rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
             );
@@ -315,20 +304,9 @@ async fn pass_then_watchlist_hit(
                 vec![
                     FootprintReasonCode::WatchlistHitOfac, // has watchlist reason code
                     FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::AddressZipCodeMatches,
-                    FootprintReasonCode::AddressStreetNameMatches,
-                    FootprintReasonCode::AddressStreetNumberMatches,
-                    FootprintReasonCode::AddressStateMatches,
-                    FootprintReasonCode::DobYobMatches,
-                    FootprintReasonCode::DobMobMatches,
-                    FootprintReasonCode::DobMatches,
-                    FootprintReasonCode::NameMatches,
                     FootprintReasonCode::SsnMatches,
-                    FootprintReasonCode::NameLastMatches,
-                    FootprintReasonCode::IpStateMatches,
-                    FootprintReasonCode::PhoneNumberMatches,
-                    FootprintReasonCode::InputPhoneNumberMatchesInputState,
-                    FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
+                    FootprintReasonCode::NameMatches,
+                    FootprintReasonCode::DobMatches,
                 ],
                 rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
             );
@@ -579,20 +557,9 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             assert_have_same_elements(
                 vec![
                     FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::AddressZipCodeMatches,
-                    FootprintReasonCode::AddressStreetNameMatches,
-                    FootprintReasonCode::AddressStreetNumberMatches,
-                    FootprintReasonCode::AddressStateMatches,
-                    FootprintReasonCode::DobYobMatches,
-                    FootprintReasonCode::DobMobMatches,
                     FootprintReasonCode::DobMatches,
                     FootprintReasonCode::SsnDoesNotMatch, // does not match
-                    FootprintReasonCode::NameLastMatches,
                     FootprintReasonCode::NameMatches,
-                    FootprintReasonCode::IpStateMatches,
-                    FootprintReasonCode::PhoneNumberMatches,
-                    FootprintReasonCode::InputPhoneNumberMatchesInputState,
-                    FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
                 ],
                 rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
             );

@@ -2,7 +2,13 @@ use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::resp
 use itertools::Itertools;
 use newtypes::{FootprintReasonCode, VendorAPI};
 
-use crate::decision::onboarding::FeatureSet;
+use crate::decision::{
+    onboarding::FeatureSet,
+    vendor::vendor_api::{
+        vendor_api_response::VendorAPIResponseMap,
+        vendor_api_struct::{ExperianPreciseID, WrappedVendorAPI},
+    },
+};
 
 const SCORE_THRESHOLD: i32 = 580;
 
@@ -122,6 +128,21 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     };
 
     reason_codes
+}
+
+impl TryFrom<&VendorAPIResponseMap> for ExperianFeatures {
+    type Error = crate::decision::Error;
+
+    fn try_from(value: &VendorAPIResponseMap) -> Result<Self, Self::Error> {
+        let v = ExperianPreciseID;
+        let f = value
+            .get(&v)
+            .ok_or(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::from(WrappedVendorAPI::from(v)),
+            ))?;
+
+        Ok(ExperianFeatures::from(f.clone()))
+    }
 }
 
 #[cfg(test)]

@@ -8,7 +8,13 @@ use itertools::Itertools;
 use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI};
 use strum::IntoEnumIterator;
 
-use crate::decision::onboarding::FeatureSet;
+use crate::decision::{
+    onboarding::FeatureSet,
+    vendor::vendor_api::{
+        vendor_api_response::VendorAPIResponseMap,
+        vendor_api_struct::{IdologyExpectID, WrappedVendorAPI},
+    },
+};
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -191,6 +197,21 @@ impl IDologyFeatures {
         });
 
         reason_codes
+    }
+}
+
+impl TryFrom<&VendorAPIResponseMap> for IDologyFeatures {
+    type Error = crate::decision::Error;
+
+    fn try_from(value: &VendorAPIResponseMap) -> Result<Self, Self::Error> {
+        let v = IdologyExpectID;
+        let f = value
+            .get(&v)
+            .ok_or(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::from(WrappedVendorAPI::from(v)),
+            ))?;
+
+        Ok(IDologyFeatures::from(f.clone()))
     }
 }
 

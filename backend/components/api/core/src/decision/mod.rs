@@ -28,6 +28,8 @@ pub enum Error {
     IncodeDocumentTypeNotSupported(IncodeDocumentType),
     #[error("Cannot build KycFeatureVector from vres: {0}")]
     KycFeatureVectorConversionError(VerificationResultId),
+    #[error("Cannot build features for: {0}")]
+    FeatureVectorConversionError(VendorAPI),
 }
 
 #[derive(thiserror::Error, Debug)]
