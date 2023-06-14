@@ -2,7 +2,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::DocumentSide;
 
@@ -23,7 +23,6 @@ use crate::DocumentSide;
     FromSqlRow,
     EnumString,
     EnumIter,
-    AsRefStr,
     JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -34,6 +33,8 @@ pub enum IdDocKind {
     DriverLicense,
     Passport,
 }
+
+crate::util::impl_enum_string_diesel!(IdDocKind);
 
 // TODO replace IdDocKind with ModernIdDocKind
 /// This is horrible. In some internal facing APIs and the DB, we serialize driver_license instead
@@ -60,6 +61,8 @@ pub enum ModernIdDocKind {
     DriversLicense,
     Passport,
 }
+
+crate::util::impl_enum_string_diesel!(ModernIdDocKind);
 
 impl From<ModernIdDocKind> for IdDocKind {
     fn from(value: ModernIdDocKind) -> Self {
@@ -98,8 +101,6 @@ impl IdDocKind {
         <ModernIdDocKind as std::str::FromStr>::from_str(v).map(|x| x.into())
     }
 }
-
-crate::util::impl_enum_str_diesel!(IdDocKind);
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]

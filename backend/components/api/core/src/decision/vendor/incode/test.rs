@@ -1,9 +1,12 @@
 use chrono::Utc;
 use db::{
     models::{
-        document_request::DocumentRequest, document_upload::DocumentUpload,
-        identity_document::IdentityDocument, incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent, user_consent::UserConsent,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
+        document_upload::DocumentUpload,
+        identity_document::IdentityDocument,
+        incode_verification_session::IncodeVerificationSession,
+        incode_verification_session_event::IncodeVerificationSessionEvent,
+        user_consent::UserConsent,
         verification_request::VerificationRequest,
     },
     test_helpers::assert_have_same_elements,
@@ -60,7 +63,15 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), su_id, None, false, None).unwrap();
+            let args = NewDocumentRequestArgs {
+                scoped_vault_id: su_id,
+                ref_id: None,
+                workflow_id: None,
+                should_collect_selfie: false,
+                only_us: false,
+                doc_type_restriction: None,
+            };
+            let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;
@@ -263,13 +274,21 @@ async fn test_fail(state: &State, is_selfie: bool) {
         None,
     )
     .await;
-    let suid = su.id.clone();
 
     // Needed for db constraints
+    let suid = su.id.clone();
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let doc_request = DocumentRequest::create(conn.conn(), suid, None, false, None).unwrap();
+            let args = NewDocumentRequestArgs {
+                scoped_vault_id: suid,
+                ref_id: None,
+                workflow_id: None,
+                should_collect_selfie: false,
+                only_us: false,
+                doc_type_restriction: None,
+            };
+            let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note)?;

@@ -18,6 +18,7 @@ use api_wire_types::TriggerKind;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -81,9 +82,17 @@ pub async fn post(
                 }
                 TriggerKind::IdDocument => {
                     let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into())?;
-                    // TODO how do we determine if we should collect selfie? Should we ask to provide?
-                    let collect_selfie = false;
-                    DocumentRequest::create(conn, sv.id.clone(), None, collect_selfie, Some(wf.id.clone()))?;
+                    let args = NewDocumentRequestArgs {
+                        scoped_vault_id: sv.id.clone(),
+                        ref_id: None,
+                        workflow_id: Some(wf.id.clone()),
+                        // TODO how do we determine if we should collect selfie? Should we ask to provide?
+                        // Or maybe all of these should come from the last doc request
+                        should_collect_selfie: false,
+                        only_us: false,
+                        doc_type_restriction: None,
+                    };
+                    DocumentRequest::create(conn, args)?;
                     wf
                 }
             };

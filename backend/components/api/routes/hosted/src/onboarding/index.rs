@@ -16,6 +16,7 @@ use api_core::utils::db2api::DbToApi;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::IsNew;
@@ -24,7 +25,11 @@ use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
+use newtypes::CollectedDataOption;
+use newtypes::CountryRestriction;
 use newtypes::DataIdentifierDiscriminant;
+use newtypes::DocTypeRestriction;
+use newtypes::Selfie;
 use newtypes::VaultKind;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -85,12 +90,33 @@ pub async fn post(
 
             let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true)?;
             if let IsNew::Yes(ref wf) = is_new_ob {
-                if obc.must_collect(DataIdentifierDiscriminant::Document) {
+                if let Some(doc_info) = obc
+                    .must_collect_data
+                    .iter()
+                    .filter_map(|cdo| match cdo {
+                        CollectedDataOption::Document(doc_info) => Some(doc_info),
+                        _ => None,
+                    })
+                    .next()
+                {
                     // Create a `DocumentRequest` if specified in the ob config.
                     // To prevent duplicate document requests, only create a doc request if the onboarding is new
-                    let collect_selfie = obc.must_collect_selfie();
                     let wf_id = wf.as_ref().map(|wf| wf.id.clone());
-                    DocumentRequest::create(conn, ob.scoped_vault_id.clone(), None, collect_selfie, wf_id)?;
+                    let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone()
+                    {
+                        Some(types)
+                    } else {
+                        None
+                    };
+                    let args = NewDocumentRequestArgs {
+                        scoped_vault_id: ob.scoped_vault_id.clone(),
+                        ref_id: None,
+                        workflow_id: wf_id,
+                        should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
+                        only_us: doc_info.1 == CountryRestriction::UsOnly,
+                        doc_type_restriction,
+                    };
+                    DocumentRequest::create(conn, args)?;
                 }
             }
 

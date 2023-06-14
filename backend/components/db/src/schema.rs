@@ -170,6 +170,8 @@ table! {
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
         workflow_id -> Nullable<Text>,
+        only_us -> Bool,
+        doc_type_restriction -> Nullable<Array<Text>>,
     }
 }
 

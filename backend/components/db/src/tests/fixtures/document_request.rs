@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        document_request::{DocumentRequest, DocumentRequestUpdate},
+        document_request::{DocumentRequest, DocumentRequestUpdate, NewDocumentRequestArgs},
         identity_document::{IdentityDocument, NewIdentityDocumentArgs},
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
@@ -60,14 +60,16 @@ pub fn create(
         panic!("Need to set id_doc_collected=true if you want a verification result")
     }
 
-    let doc_request = DocumentRequest::create(
-        conn.conn(),
-        opts.scoped_user_id.clone(),
-        None,
-        opts.should_collect_selfie,
-        None,
-    )
-    .unwrap();
+    let args = NewDocumentRequestArgs {
+        scoped_vault_id: opts.scoped_user_id.clone(),
+        ref_id: None,
+        workflow_id: None,
+        // TODO: should come from a config
+        should_collect_selfie: opts.should_collect_selfie,
+        only_us: false,
+        doc_type_restriction: None,
+    };
+    let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
     let mut verification_info = None;
 
     // If we want to simulate having collected an id document

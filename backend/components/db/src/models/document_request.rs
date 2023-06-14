@@ -4,13 +4,13 @@ use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::ModernIdDocKind;
 use newtypes::WorkflowId;
 use newtypes::{DocumentRequestId, DocumentRequestStatus, Locked, ScopedVaultId};
-use serde::{Deserialize, Serialize};
 
 pub type DocRefId = String;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
@@ -22,7 +22,10 @@ pub struct DocumentRequest {
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
     pub workflow_id: Option<WorkflowId>,
+    pub only_us: bool,
+    pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
 }
+
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequestUpdate {
@@ -45,20 +48,24 @@ pub struct DocRequestIdentifier<'a> {
 
 impl DocumentRequest {
     #[tracing::instrument(skip_all)]
-    pub fn create(
-        conn: &mut PgConn,
-        scoped_vault_id: ScopedVaultId,
-        ref_id: Option<String>,
-        should_collect_selfie: bool,
-        workflow_id: Option<WorkflowId>,
-    ) -> DbResult<Self> {
-        let new = NewDocumentRequest {
+    pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
+        let NewDocumentRequestArgs {
+            scoped_vault_id,
+            ref_id,
+            workflow_id,
+            should_collect_selfie,
+            only_us,
+            doc_type_restriction,
+        } = args;
+        let new = NewDocumentRequestRow {
             scoped_vault_id,
             ref_id,
             status: DocumentRequestStatus::Pending,
             created_at: Utc::now(),
             should_collect_selfie,
             workflow_id,
+            only_us,
+            doc_type_restriction,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -164,13 +171,25 @@ impl DocumentRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = document_request)]
-pub struct NewDocumentRequest {
+#[derive(Debug, Clone)]
+pub struct NewDocumentRequestArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<String>,
-    pub status: DocumentRequestStatus,
-    pub created_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
     pub workflow_id: Option<WorkflowId>,
+    pub only_us: bool,
+    pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
+}
+
+#[derive(Debug, Clone, Queryable, Insertable)]
+#[diesel(table_name = document_request)]
+struct NewDocumentRequestRow {
+    scoped_vault_id: ScopedVaultId,
+    ref_id: Option<String>,
+    status: DocumentRequestStatus,
+    created_at: DateTime<Utc>,
+    should_collect_selfie: bool,
+    workflow_id: Option<WorkflowId>,
+    only_us: bool,
+    doc_type_restriction: Option<Vec<ModernIdDocKind>>,
 }

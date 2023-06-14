@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        document_request::DocumentRequest,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
         manual_review::ManualReview,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::OnboardingDecision,
@@ -260,13 +260,16 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     &self.ob_id,
                     OnboardingUpdate::set_status(OnboardingStatus::Incomplete),
                 )?;
-                let doc_req = DocumentRequest::create(
-                    conn,
-                    self.sv_id.clone(),
-                    None,
-                    true, // TODO: maybe should_collect_selfie should come from a config
-                    Some(self.wf_id.clone()),
-                )?;
+                let args = NewDocumentRequestArgs {
+                    scoped_vault_id: self.sv_id.clone(),
+                    ref_id: None,
+                    workflow_id: Some(self.wf_id.clone()),
+                    // TODO: should come from a config
+                    should_collect_selfie: true,
+                    only_us: true,
+                    doc_type_restriction: None,
+                };
+                let doc_req = DocumentRequest::create(conn, args)?;
                 Ok(AlpacaKycState::from(AlpacaKycDocCollection {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,

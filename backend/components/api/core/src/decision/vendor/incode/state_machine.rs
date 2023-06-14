@@ -4,8 +4,8 @@ use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::{ApiResult, AssertionError};
 use crate::{ApiError, State};
+use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::DbPool;
 use idv::footprint_http_client::FootprintVendorHttpClient;
@@ -77,15 +77,14 @@ impl IncodeStateMachine {
         tenant_id: TenantId,
         configuration_id: IncodeConfigurationId,
         ctx: IncodeContext,
-    ) -> Result<Self, ApiError> {
+    ) -> ApiResult<Self> {
         // get incode credentials from TVC
         let tenant_vendor_control =
             TenantVendorControl::new(tenant_id, &state.db_pool, &state.enclave_client, &state.config).await?;
 
         // Load our existing state
-        let sv_id = ctx.sv_id.clone();
-        let id_doc_id = ctx.id_doc_id.clone();
         let config_id = configuration_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
         let session = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
@@ -94,8 +93,8 @@ impl IncodeStateMachine {
                     existing
                 } else {
                     // Create a brand new session
-                    let obc = ObConfiguration::get_by_scoped_vault_id(conn, &sv_id)?;
-                    let session_kind = if obc.must_collect_selfie() {
+                    let (_, doc_request) = IdentityDocument::get(conn, &id_doc_id)?;
+                    let session_kind = if doc_request.should_collect_selfie {
                         IncodeVerificationSessionKind::Selfie
                     } else {
                         IncodeVerificationSessionKind::IdDocument

@@ -248,27 +248,26 @@ fn get_requirement_inner(
                 .then_some(OnboardingRequirement::Liveness)
         }
         OnboardingRequirementKind::CollectDocument => {
-            // Document requirements are determined by the presence of DocumentRequest database objects.
-            // In various places in the codebase, we will determine if a DocumentRequest should be created
-            //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
-            //      we will create a DocumentRequest row.
             let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
             let identifier = DocRequestIdentifier {
                 sv_id: &args.onboarding.scoped_vault_id,
                 wf_id: args.workflow.as_ref().map(|wf| &wf.id),
             };
             let doc_request = DocumentRequest::get_active(conn, identifier)?;
-            let supported_document_types = if only_us_dl {
-                vec![ModernIdDocKind::DriversLicense]
-            } else {
-                ModernIdDocKind::iter().collect()
-            };
             doc_request.map(|dr| OnboardingRequirement::CollectDocument {
                 document_request_id: dr.id,
                 should_collect_selfie: dr.should_collect_selfie,
                 should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
-                only_us_supported: only_us_dl,
-                supported_document_types,
+                // TODO remove only_us_dl feature flag when all of flexcar is migrated.
+                // For now, regardless of what's on the DR for flexcar, restrict to US
+                only_us_supported: dr.only_us || only_us_dl,
+                supported_document_types: if let Some(doc_types) = dr.doc_type_restriction {
+                    doc_types
+                } else if only_us_dl {
+                    vec![ModernIdDocKind::DriversLicense]
+                } else {
+                    ModernIdDocKind::iter().collect()
+                },
             })
         }
         OnboardingRequirementKind::Authorize => {
