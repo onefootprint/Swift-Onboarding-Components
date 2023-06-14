@@ -9,7 +9,6 @@ use schemars::JsonSchema;
 /// POST request body for sending Footprint identity document images
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct DocumentRequest {
-    //TODO: rename to IdentityDocumentRequest
     /// base64 standard encoded image bytes
     pub front_image: Option<PiiString>,
     /// base64 standard encoded image bytes!)
@@ -18,7 +17,7 @@ pub struct DocumentRequest {
     /// type of document
     pub document_type: IdDocKind,
     /// country of document
-    pub country_code: String,
+    pub country_code: String, // TODO this should be an enum
 }
 
 /// Status of identity document collection
@@ -101,6 +100,8 @@ pub enum DocumentImageError {
     SelfieGlare,
     SelfieHasLenses,
     SelfieHasFaceMask,
+    UnknownCountryCode,
+    CountryCodeMismatch,
     UnknownError,
 }
 export_schema!(DocumentImageError);
@@ -139,6 +140,8 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::SelfieGlare => Self::SelfieGlare,
             IncodeFailureReason::SelfieHasLenses => Self::SelfieHasLenses,
             IncodeFailureReason::SelfieHasFaceMask => Self::SelfieHasFaceMask,
+            IncodeFailureReason::UnknownCountryCode => Self::UnknownCountryCode,
+            IncodeFailureReason::CountryCodeMismatch => Self::CountryCodeMismatch,
             IncodeFailureReason::Other(_) => Self::UnknownError,
         }
     }

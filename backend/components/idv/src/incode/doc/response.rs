@@ -238,6 +238,7 @@ pub struct FetchOCRResponse {
     pub additional_timestamps: Option<serde_json::Value>,
     // year of issue
     pub issue_date: Option<i32>,
+    // Three-digit ISO, it seems
     pub issuing_country: Option<ScrubbedPiiString>,
     pub issuing_state: Option<ScrubbedPiiString>,
     pub issuing_authority: Option<ScrubbedPiiString>,

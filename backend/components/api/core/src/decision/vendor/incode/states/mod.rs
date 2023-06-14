@@ -52,7 +52,8 @@ use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, IdDocKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, VendorAPI,
+    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, ScrubbedPiiString,
+    VendorAPI,
 };
 
 #[derive(Clone)]
@@ -219,7 +220,10 @@ pub async fn save_fixture_ocr(
 fn parse_type_of_id(
     ctx: &IncodeContext,
     type_of_id: Option<&IncodeDocumentType>,
+    country_code: Option<&ScrubbedPiiString>,
 ) -> ApiResult<Result<IdDocKind, IncodeFailureReason>> {
+    // Validate the doc type matches what the client told us (and what we validated against the
+    // doc request)
     let expected_doc_type = ctx
         .docv_data
         .document_type
@@ -229,12 +233,33 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnknownDocumentType));
     };
     let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
-        println!("UNSUPPORTED DOC TYPE {}", type_of_id);
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type {
-        Ok(Err(IncodeFailureReason::DocTypeMismatch))
-    } else {
-        Ok(Ok(id_doc_kind))
+        return Ok(Err(IncodeFailureReason::DocTypeMismatch));
     }
+
+    // Validate the country code what the client told us (and what we validated against the
+    // doc request)
+    // TODO this is horrible - the country codes we get from the client are two-letter ISO
+    // while incode gives us three-letter ISO.
+    // Until we have fully-fledged enum mappings from the two-letter to three-letter, just hardcode
+    // the check that if the client told us it's US, we have a US document here.
+    // Realistically, the only time we care about a document's country is when the tenant restricts
+    // to only US
+    let expected_country_is_us = ctx
+        .docv_data
+        .country_code
+        .clone()
+        .ok_or(AssertionError("Docv data has no country_code"))?
+        .leak()
+        == "US";
+    let Some(country_code) = country_code else {
+        return Ok(Err(IncodeFailureReason::UnknownCountryCode));
+    };
+    let country_is_us = country_code.leak() == "USA";
+    if country_is_us != expected_country_is_us {
+        return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
+    }
+    Ok(Ok(id_doc_kind))
 }

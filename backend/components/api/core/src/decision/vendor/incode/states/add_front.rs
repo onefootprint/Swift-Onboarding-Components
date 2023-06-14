@@ -70,8 +70,10 @@ impl IncodeStateTransition for AddFront {
         ctx: &IncodeContext,
         _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        // If there's failure, we move to retry upload
-        let mismatch_reason = super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())?.err();
+        // Ensure we've gotten a doc we can support
+        let type_of_id = self.response.type_of_id.as_ref();
+        let country_code = self.response.country_code.as_ref();
+        let mismatch_reason = super::parse_type_of_id(ctx, type_of_id, country_code)?.err();
         let failure_reason = self.response.failure_reason();
         if let Some(reason) = mismatch_reason.or(failure_reason) {
             return Ok(StateResult::Retry {
@@ -81,8 +83,6 @@ impl IncodeStateTransition for AddFront {
             });
         }
 
-        // Ensure we've gotten a doc type we can support
-        // TODO: support checking against acceptable doc types and countries from OBC
         let next_state = should_collect_back_or_process_id(&ctx.docv_data)?;
         Ok(next_state.into())
     }

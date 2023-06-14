@@ -51,7 +51,9 @@ impl IncodeStateTransition for FetchOCR {
         ctx: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        match super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())? {
+        let type_of_id = self.response.type_of_id.as_ref();
+        let country_code = self.response.issuing_country.as_ref();
+        match super::parse_type_of_id(ctx, type_of_id, country_code)? {
             Ok(dk) => {
                 // TODO could represent enter inside the state transition
                 Complete::enter(conn, &ctx.vault, &ctx.sv_id, &ctx.id_doc_id, dk, self.response)?;

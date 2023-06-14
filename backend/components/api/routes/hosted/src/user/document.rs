@@ -28,6 +28,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::DbError;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{DataIdentifierDiscriminant, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
@@ -74,6 +75,14 @@ pub async fn post(
         }
         if user_consent.is_none() {
             return Err(OnboardingError::UserConsentNotFound.into());
+        }
+    }
+    if doc_request.only_us && request.country_code != "US" {
+        return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
+    }
+    if let Some(doc_types) = doc_request.doc_type_restriction.clone() {
+        if !doc_types.contains(&request.document_type.into()) {
+            return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
         }
     }
 

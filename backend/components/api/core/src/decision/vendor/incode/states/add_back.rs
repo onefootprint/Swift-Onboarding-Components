@@ -63,7 +63,15 @@ impl IncodeStateTransition for AddBack {
         ctx: &IncodeContext,
         _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        let mismatch_reason = super::parse_type_of_id(ctx, self.response.type_of_id.as_ref())?.err();
+        // Ensure we've gotten a doc type we can support
+        //
+        // Theoretically if we progressed to back fine, and are _now_ getting this error, it
+        // means the user switched document types halfway through or incode is bugging out. One option is
+        // to require them to go back to AddFront, but we'll assume that having a front and back from different documents will
+        // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
+        let type_of_id = self.response.type_of_id.as_ref();
+        let country_code = self.response.country_code.as_ref();
+        let mismatch_reason = super::parse_type_of_id(ctx, type_of_id, country_code)?.err();
         let failure_reason = self.response.failure_reason();
         if let Some(reason) = mismatch_reason.or(failure_reason) {
             return Ok(StateResult::Retry {
@@ -72,14 +80,6 @@ impl IncodeStateTransition for AddBack {
                 clear_sides: vec![DocumentSide::Back],
             });
         }
-        // Ensure we've gotten a doc type we can support
-        //
-        // Theoretically if we progressed to back fine, and are _now_ getting this error, it
-        // means the user switched document types halfway through or incode is bugging out. One option is
-        // to require them to go back to AddFront, but we'll assume that having a front and back from different documents will
-        // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
-        //
-        // TODO: support checking against acceptable doc types and countries from OBC
         Ok(ProcessId::new().into())
     }
 }

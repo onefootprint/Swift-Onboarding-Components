@@ -1,5 +1,5 @@
-use newtypes::OnboardingRequirementKind;
 use newtypes::{output::Csv, CollectedDataOption, OnboardingId};
+use newtypes::{ModernIdDocKind, OnboardingRequirementKind};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -44,4 +44,8 @@ pub enum OnboardingError {
     MissingObPkAuth,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
+    #[error("Non-US documents are not supported")]
+    UnsupportedNonUSDocumentCountry,
+    #[error("Unsupported document type. Supported document types: {0}")]
+    UnsupportedDocumentType(Csv<ModernIdDocKind>),
 }

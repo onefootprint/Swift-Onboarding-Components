@@ -211,7 +211,7 @@ class BifrostClient:
 
         common_data = {
             "document_type": "driver_license",
-            "country_code": "USA",
+            "country_code": "US",
         }
         sides = [
             "front",
