@@ -16,6 +16,7 @@ mod fingerprint_meta;
 mod footprint_reason_code;
 mod incode;
 mod liveness_source;
+mod manual_review;
 mod middesk_request_state;
 mod ob_config;
 mod onboarding_status;
@@ -39,8 +40,8 @@ pub use self::{
     compliance_status::*, contact_info_priority::*, d2p_session_status::*, d2p_session_status::*,
     data_priority::*, decision_intent_kind::*, decision_status::*, document_request_status::*,
     document_side::*, fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, incode::*,
-    liveness_source::*, middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*,
-    proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*, task_status::*,
-    tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
+    liveness_source::*, manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*,
+    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*,
+    task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
     verification_status::*, watchlist_check::*, workflow::*,
 };

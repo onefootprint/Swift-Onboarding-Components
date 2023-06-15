@@ -367,6 +367,7 @@ table! {
         completed_at -> Nullable<Timestamptz>,
         completed_by_decision_id -> Nullable<Text>,
         completed_by_actor -> Nullable<Jsonb>,
+        review_reasons -> Array<Text>,
     }
 }
 

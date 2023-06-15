@@ -6,7 +6,7 @@ use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId};
+use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, ReviewReason};
 use serde::{Deserialize, Serialize};
 
 use super::onboarding_decision::OnboardingDecision;
@@ -26,6 +26,7 @@ pub struct ManualReview {
     pub completed_by_decision_id: Option<OnboardingDecisionId>,
     /// If the ManualReview was completed by a tenant dashboard user, linked here
     pub completed_by_actor: Option<DbActor>,
+    pub review_reasons: Vec<ReviewReason>,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
@@ -33,6 +34,7 @@ pub struct ManualReview {
 struct NewManualReview {
     timestamp: DateTime<Utc>,
     onboarding_id: OnboardingId,
+    review_reasons: Vec<ReviewReason>,
 }
 
 #[derive(Debug, AsChangeset, Default, Serialize, Deserialize)]
@@ -51,6 +53,7 @@ impl ManualReview {
         let new = NewManualReview {
             timestamp: Utc::now(),
             onboarding_id,
+            review_reasons: Vec::new(),
         };
         let result = diesel::insert_into(manual_review::table)
             .values(new)
