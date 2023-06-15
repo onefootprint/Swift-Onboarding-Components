@@ -68,6 +68,16 @@ const Permissions = () => {
           {...register('scopes')}
         />
         <Checkbox
+          label={t('scopes.vault_proxy')}
+          value="vault_proxy"
+          {...register('scopes')}
+        />
+        <Checkbox
+          label={t('scopes.cip_integration')}
+          value="cip_integration"
+          {...register('scopes')}
+        />
+        <Checkbox
           label={t('form.decrypt.label')}
           {...register('showDecrypt')}
         />

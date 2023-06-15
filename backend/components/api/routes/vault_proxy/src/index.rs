@@ -89,7 +89,7 @@ async fn invoke_vault_proxy(
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
     // Will eventually require the permission to decrypt attributes
-    let auth = auth.check_guard(TenantGuard::Admin)?; // TODO auth for secret key
+    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
     let _is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();
