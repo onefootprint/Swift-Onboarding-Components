@@ -4,7 +4,7 @@ use diesel::{
     sql_query,
     sql_types::{BigInt, Text, Timestamptz},
 };
-use newtypes::{Locked, TaskData, TaskId, TaskStatus};
+use newtypes::{Locked, TaskData, TaskId, TaskKind, TaskStatus};
 use serde::{Deserialize, Serialize};
 
 use crate::{schema::task, DbError, DbResult, PgConn, TxnPgConn};
@@ -82,22 +82,24 @@ impl Task {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn poll(conn: &mut TxnPgConn, limit: i64) -> DbResult<Vec<Self>> {
+    pub fn poll(conn: &mut TxnPgConn, limit: i64, kind: Option<TaskKind>) -> DbResult<Vec<Self>> {
         // TODO: cannot for the life of me get this to compile in diesel
-        let results = sql_query(
+        let results = sql_query(format!(
             "
             UPDATE task
             SET status = $1, num_attempts = num_attempts + 1
             WHERE id IN (
                 SELECT id FROM task
-                WHERE status = $2 AND scheduled_for < $3
+                WHERE status = $2 AND scheduled_for < $3{}
                 ORDER BY scheduled_for ASC
                 FOR UPDATE SKIP LOCKED
                 LIMIT $4
             )
             RETURNING *;
         ",
-        )
+            kind.map(|k| format!(" AND task_data->>'kind' = '{}'", k))
+                .unwrap_or("".to_string()),
+        ))
         .bind::<Text, _>(TaskStatus::Running)
         .bind::<Text, _>(TaskStatus::Pending)
         .bind::<Timestamptz, _>(Utc::now())
@@ -145,10 +147,13 @@ impl Task {
 #[allow(unused_must_use)]
 mod tests {
     use super::*;
+    use crate::test_helpers::assert_have_same_elements;
     use crate::test_helpers::have_same_elements;
     use crate::tests::prelude::*;
     use macros::db_test;
     use newtypes::LogMessageTaskArgs;
+    use newtypes::LogNumTenantApiKeysArgs;
+    use std::str::FromStr;
 
     fn task_data() -> TaskData {
         TaskData::LogMessage(LogMessageTaskArgs {
@@ -163,7 +168,7 @@ mod tests {
         let _task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
         let _task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
 
-        let tasks = Task::poll(conn, 2).unwrap();
+        let tasks = Task::poll(conn, 2, None).unwrap();
         // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
         assert!(have_same_elements(
             vec![
@@ -184,8 +189,41 @@ mod tests {
         Task::update(conn, &task3.id, TaskStatus::Failed);
         let task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
 
-        let tasks = Task::poll(conn, 4).unwrap();
+        let tasks = Task::poll(conn, 4, None).unwrap();
         assert_eq!(1, tasks.len());
         assert_eq!(tasks[0].id, task4.id);
+    }
+
+    #[db_test]
+    fn filter_to_kind(conn: &mut TestPgConn) {
+        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
+        let _task2 = Task::create(
+            conn,
+            Utc::now(),
+            TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
+                tenant_id: newtypes::TenantId::from_str("t123").unwrap(),
+                is_live: true,
+            }),
+        )
+        .unwrap();
+        let task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
+        let _task4 = Task::create(
+            conn,
+            Utc::now(),
+            TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
+                tenant_id: newtypes::TenantId::from_str("t456").unwrap(),
+                is_live: true,
+            }),
+        )
+        .unwrap();
+
+        let tasks = Task::poll(conn, 2, Some(TaskKind::LogMessage)).unwrap();
+        assert_have_same_elements(
+            vec![
+                (&task1.id, TaskStatus::Running, 1),
+                (&task3.id, TaskStatus::Running, 1),
+            ],
+            tasks.iter().map(|t| (&t.id, t.status, t.num_attempts)).collect(),
+        );
     }
 }

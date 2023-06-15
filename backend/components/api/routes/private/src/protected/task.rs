@@ -32,7 +32,7 @@ async fn execute_tasks(
 ) -> actix_web::Result<Json<ResponseData<ExecuteTasksResponse>>, ApiError> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
 
-    let executed_tasks = task::poll_and_execute_tasks(&state, num_tasks).await?;
+    let executed_tasks = task::poll_and_execute_tasks(&state, num_tasks, None).await?;
 
     Ok(Json(ResponseData::ok(ExecuteTasksResponse {
         num_executed_tasks: executed_tasks.len(),

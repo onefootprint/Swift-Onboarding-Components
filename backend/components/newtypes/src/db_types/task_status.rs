@@ -5,6 +5,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use strum::EnumDiscriminants;
 use strum_macros::{AsRefStr, EnumString};
 
 use crate::{FpId, OnboardingStatus, ScopedVaultId, TenantId, WatchlistCheckError, WatchlistCheckStatusKind};
@@ -40,13 +41,20 @@ pub enum TaskStatus {
 }
 
 crate::util::impl_enum_str_diesel!(TaskStatus);
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
+#[strum_discriminants(
+    name(TaskKind),
+    vis(pub),
+    derive(strum_macros::Display, Serialize),
+    strum(serialize_all = "snake_case")
+)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum TaskData {
     LogMessage(LogMessageTaskArgs),
     LogNumTenantApiKeys(LogNumTenantApiKeysArgs), // proof of concept non-trivial task that does DB stuffs, can remove in future
     WatchlistCheck(WatchlistCheckArgs),
+    FireWebhook(FireWebhookArgs),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,13 +1,13 @@
 use async_trait::async_trait;
 use db::{models::task::Task, DbError, DbPool};
-use newtypes::{TaskId, TaskStatus};
+use newtypes::{TaskId, TaskKind, TaskStatus};
 use thiserror::Error;
 
 use crate::{errors::ApiError, State};
 
 use self::tasks::{
-    log_message_task::LogMessageTask, log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
-    watchlist_check_task::WatchlistCheckTask,
+    fire_webhook_task::FireWebhookTask, log_message_task::LogMessageTask,
+    log_num_tenant_api_keys_task::LogNumTenantApiKeysTask, watchlist_check_task::WatchlistCheckTask,
 };
 
 mod tasks;
@@ -32,12 +32,15 @@ pub enum TaskError {
     WebhookError(#[from] webhooks::Error),
 }
 
-#[allow(unused)]
-pub async fn poll_and_execute_tasks(state: &State, limit: i64) -> Result<Vec<Task>, DbError> {
+pub async fn poll_and_execute_tasks(
+    state: &State,
+    limit: i64,
+    kind: Option<TaskKind>,
+) -> Result<Vec<Task>, DbError> {
     let tasks = state
         .db_pool
         .db_transaction(move |conn| -> Result<Vec<Task>, DbError> {
-            let tasks = Task::poll(conn, limit)?;
+            let tasks = Task::poll(conn, limit, kind)?;
             Ok(tasks)
         })
         .await?;
@@ -64,7 +67,6 @@ pub async fn poll_and_execute_tasks(state: &State, limit: i64) -> Result<Vec<Tas
         .collect::<Result<Vec<Task>, DbError>>()
 }
 
-#[allow(unused)]
 async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
     match &task.task_data {
         newtypes::TaskData::LogMessage(args) => LogMessageTask {}.execute(args).await,
@@ -84,6 +86,11 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
             )
             .execute(args)
             .await
+        }
+        newtypes::TaskData::FireWebhook(args) => {
+            FireWebhookTask::new(state.db_pool.clone(), state.webhook_client.clone())
+                .execute(args)
+                .await
         }
     }
 }
@@ -170,7 +177,7 @@ mod task_tests {
             .unwrap();
 
         // Test
-        let executed_tasks = poll_and_execute_tasks(state, 2).await.unwrap();
+        let executed_tasks = poll_and_execute_tasks(state, 2, None).await.unwrap();
         // TODO: would be nice to actually assert the tasks did what they were supposed to do. Some dumb ideas: have a task which writes a Task to PG with a
         // particular nonce as an arg and then confirm that was written. Or a task that writes to a tmp file and then we read and confirm
         assert!(have_same_elements(
