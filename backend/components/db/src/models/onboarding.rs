@@ -352,19 +352,12 @@ impl Onboarding {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn update(self, conn: &mut PgConn, update: OnboardingUpdate) -> DbResult<Self> {
-        // Intentionally consume the value so the stale version is not used
-        let result = Self::update_by_id(conn, &self.id, update)?;
-        Ok(result)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn update_by_id(conn: &mut PgConn, id: &OnboardingId, update: OnboardingUpdate) -> DbResult<Self> {
+    pub fn update(ob: Locked<Onboarding>, conn: &mut TxnPgConn, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = diesel::update(onboarding::table)
-            .filter(onboarding::id.eq(id))
+            .filter(onboarding::id.eq(&ob.id))
             .set(update)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
         Ok(result)
     }
 

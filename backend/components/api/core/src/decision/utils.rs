@@ -175,7 +175,8 @@ pub async fn setup_kyc_test_fixtures(
             };
             let decision = OnboardingDecision::create(conn, new_decision)?;
 
-            ob.into_inner().update(
+            Onboarding::update(
+                ob,
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;
@@ -215,7 +216,8 @@ pub async fn setup_kyb_test_fixtures(
             };
             let biz_obd = OnboardingDecision::create(conn, new_decision)?;
 
-            biz_ob.into_inner().update(
+            Onboarding::update(
+                biz_ob,
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;

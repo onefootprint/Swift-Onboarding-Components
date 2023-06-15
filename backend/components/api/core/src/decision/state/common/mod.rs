@@ -64,8 +64,8 @@ pub fn setup_kyc_onboarding_vreqs(
         if ob.idv_reqs_initiated_at.is_some() {
             return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
         }
-        ob.into_inner()
-            .update(conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
+
+        Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
     }
     // TODO: create new DI if is_redo
     let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;

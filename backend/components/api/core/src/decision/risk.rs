@@ -70,16 +70,17 @@ pub fn save_final_decision(
     };
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
-    let ob = ob.into_inner();
     // Make a billable event here
     // If this is the first time setting a decision, then write decision_made_at
     if is_first_decision_for_onboarding {
-        ob.update(
+        Onboarding::update(
+            ob,
             conn,
             OnboardingUpdate::set_decision_and_decision_made_at(decision.decision.decision_status),
         )?;
     } else {
-        ob.update(
+        Onboarding::update(
+            ob,
             conn,
             OnboardingUpdate::set_decision(decision.decision.decision_status),
         )?;

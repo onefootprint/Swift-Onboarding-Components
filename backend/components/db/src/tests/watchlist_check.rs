@@ -1,3 +1,4 @@
+use crate::models::onboarding::Onboarding;
 use crate::models::onboarding::OnboardingUpdate;
 use crate::models::task::NewTask;
 use crate::models::task::Task;
@@ -103,16 +104,17 @@ fn make_vault(
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
             let onboarding = fixtures::onboarding::create(conn, svid, ob_config.id);
-            onboarding
-                .update(
-                    conn,
-                    OnboardingUpdate {
-                        decision_made_at: Some(Some(ob_decision_made_at)),
-                        status: Some(OnboardingStatus::Pass),
-                        ..Default::default()
-                    },
-                )
-                .unwrap();
+            let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
+            Onboarding::update(
+                ob,
+                conn,
+                OnboardingUpdate {
+                    decision_made_at: Some(Some(ob_decision_made_at)),
+                    status: Some(OnboardingStatus::Pass),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
         }
         sv
     } else {

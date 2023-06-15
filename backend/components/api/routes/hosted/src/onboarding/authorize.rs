@@ -70,7 +70,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
             let set_biz_is_authorized = if ob.authorized_at.is_none() {
-                ob.into_inner().update(c, OnboardingUpdate::is_authorized())?;
+                Onboarding::update(ob, c, OnboardingUpdate::is_authorized())?;
                 true
             } else {
                 false
@@ -79,10 +79,11 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             let biz_ob = user_auth.business_onboarding(c)?;
             let bizob = biz_ob
                 .map(|b| {
+                    let b = Onboarding::lock(c, &b.id)?;
                     if b.authorized_at.is_none() {
-                        b.update(c, OnboardingUpdate::is_authorized())
+                        Onboarding::update(b, c, OnboardingUpdate::is_authorized())
                     } else {
-                        Ok(b)
+                        Ok(b.into_inner())
                     }
                 })
                 .transpose()?;

@@ -544,8 +544,7 @@ pub async fn init_middesk_request(
             if ob.idv_reqs_initiated_at.is_some() {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            ob.into_inner()
-                .update(conn, OnboardingUpdate::idv_reqs_initiated())?;
+            Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
 
             let decision_intent = DecisionIntent::get_or_create_onboarding_kyb(conn, &sv_id)?;
             let vreq = VerificationRequest::create(

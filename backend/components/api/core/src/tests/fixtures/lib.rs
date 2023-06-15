@@ -86,15 +86,16 @@ pub fn create_user_and_onboarding(
 
     let suid = su.id.clone();
     let onboarding = fixtures::onboarding::create(conn, suid, ob_config_id);
-    let onboarding = onboarding
-        .update(
-            conn,
-            OnboardingUpdate {
-                status: Some(onboarding_status),
-                ..Default::default()
-            },
-        )
-        .unwrap();
+    let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
+    let onboarding = Onboarding::update(
+        ob,
+        conn,
+        OnboardingUpdate {
+            status: Some(onboarding_status),
+            ..Default::default()
+        },
+    )
+    .unwrap();
 
     (tenant, onboarding, uv, su)
 }
