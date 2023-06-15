@@ -196,13 +196,13 @@ impl UserTimeline {
                         SaturatedTimelineEvent::DataCollected(e.clone())
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
-                        let (obd, ob_config, mut verification_requests, actor) =
+                        let (obd, ob_config, mut verification_requests, actor, mr) =
                             decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?;
                         // filter out socure, if applicable
                         verification_requests.retain(|v| vendor_apis_to_include.contains(&v.vendor_api));
 
                         let decision: SaturatedOnboardingDecisionInfo =
-                            (obd, ob_config, verification_requests, actor);
+                            (obd, ob_config, verification_requests, actor, mr);
 
                         SaturatedTimelineEvent::OnboardingDecision(
                             decision,
