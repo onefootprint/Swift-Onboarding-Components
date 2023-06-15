@@ -233,7 +233,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     };
 
     tracing::info!("did not match workos login, creating new tenant");
-    let tenant = create_tenant(state, new_tenant_name, Some(org_id.to_string()), true).await?;
+    let tenant = create_tenant(state, new_tenant_name, Some(org_id.to_string())).await?;
     Ok((tenant, true))
 }
 
@@ -241,7 +241,6 @@ async fn create_tenant(
     state: &State,
     tenant_name: String,
     workos_org_id: Option<String>,
-    sandbox_restricted: bool,
 ) -> Result<Tenant, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
@@ -251,7 +250,8 @@ async fn create_tenant(
         public_key: ec_pk_uncompressed,
         workos_id: workos_org_id,
         logo_url: None,
-        sandbox_restricted,
+        sandbox_restricted: true,
+        is_prod_ob_config_restricted: true,
     };
     let result = state
         .db_pool

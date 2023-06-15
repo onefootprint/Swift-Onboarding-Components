@@ -12,6 +12,7 @@ pub fn create(conn: &mut PgConn) -> Tenant {
         workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
+        is_prod_ob_config_restricted: false,
     };
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
 }
@@ -28,6 +29,7 @@ pub fn create_with_keys(
         workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
+        is_prod_ob_config_restricted: false,
     };
 
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
