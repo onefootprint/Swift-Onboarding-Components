@@ -61,7 +61,10 @@ pub fn watchlist_result_response_with_hit() -> IncodeResponse<WatchlistResultRes
                         media: None,
                         name: None,
                         sources: None,
-                        types: Some(vec!["sanction".to_owned()]),
+                        types: Some(vec![
+                            "sanction".to_owned(),
+                            "adverse-media-v2-terrorism".to_owned(),
+                        ]),
                     }),
                 }]),
                 searcher_id: None,

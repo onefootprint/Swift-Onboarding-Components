@@ -125,7 +125,7 @@ pub async fn setup_kyc_test_fixtures(
 
             // Create ManualReview row if requested
             if create_manual_review {
-                ManualReview::create(conn, ob.id.clone())?;
+                ManualReview::create(conn, ob.id.clone(), vec![])?;
             }
 
             let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &ob.scoped_vault_id)?;

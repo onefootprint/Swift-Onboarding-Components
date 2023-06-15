@@ -48,7 +48,8 @@ use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
 use macros::{test_db_pool, test_state_case};
 use newtypes::{
-    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, SealedVaultBytes,
+    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
+    SealedVaultBytes,
 };
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use newtypes::{FootprintReasonCode, TenantUserId};
@@ -289,20 +290,29 @@ async fn pass_then_watchlist_hit(
     let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
-    assert!(mr.is_some());
+    // manual_review should exist and have correct review_reasons
+    let mr = mr.unwrap();
+    assert_eq!(
+        vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit],
+        mr.review_reasons
+    );
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             // TODO: In Demo + Sandbox, we are currently making real Incode watchlist calls (which is wrong). But when we respect the fixtures, we'll probably
             // check for the presence of any random watchlist reason code here
             assert!(rs
-                .into_iter()
+                .iter()
                 .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitOfac));
+            assert!(rs
+                .iter()
+                .any(|rs| rs.reason_code == FootprintReasonCode::AdverseMediaHit));
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
                     FootprintReasonCode::WatchlistHitOfac, // has watchlist reason code
+                    FootprintReasonCode::AdverseMediaHit,
                     FootprintReasonCode::AddressMatches,
                     FootprintReasonCode::SsnMatches,
                     FootprintReasonCode::NameMatches,
@@ -424,7 +434,9 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
-    assert!(mr.is_some());
+    // manual_review should exist and have correct review_reasons
+    let mr = mr.unwrap();
+    assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
 
     // TODO: maybe assert risk signals here
 

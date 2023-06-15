@@ -193,6 +193,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             &(decision, reason_codes),
             true,
             fixture_decision.is_some(),
+            vec![],
         )?;
         Ok(DocumentState::from(DocumentComplete))
     }

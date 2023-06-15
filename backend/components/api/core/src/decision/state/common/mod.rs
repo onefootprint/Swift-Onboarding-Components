@@ -14,8 +14,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ScopedVaultId, TenantId, VaultKind,
-    Vendor, VerificationResultId, WorkflowId, WorkflowKind,
+    DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ReviewReason, ScopedVaultId,
+    TenantId, VaultKind, Vendor, VerificationResultId, WorkflowId, WorkflowKind,
 };
 use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 
@@ -230,6 +230,7 @@ pub fn save_kyc_decision(
     decision: &KycDecision,
     is_redo: bool,
     is_sandbox: bool,
+    review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let (rules_output, reason_codes) = decision;
 
@@ -243,6 +244,7 @@ pub fn save_kyc_decision(
         !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,
         Some(workflow_id.clone()),
+        review_reasons,
     )?;
 
     if !is_redo {

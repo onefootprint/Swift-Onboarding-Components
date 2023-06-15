@@ -226,6 +226,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             &(decision, reason_codes),
             self.is_redo,
             fixture_decision.is_some(),
+            vec![],
         )?;
         Ok(KycState::from(KycComplete))
     }

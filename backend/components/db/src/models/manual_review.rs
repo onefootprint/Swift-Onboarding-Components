@@ -47,13 +47,17 @@ struct ManualReviewUpdate {
 
 impl ManualReview {
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut PgConn, onboarding_id: OnboardingId) -> DbResult<Self> {
+    pub fn create(
+        conn: &mut PgConn,
+        onboarding_id: OnboardingId,
+        review_reasons: Vec<ReviewReason>,
+    ) -> DbResult<Self> {
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
         // ManualReview rows for one onboarding.
         let new = NewManualReview {
             timestamp: Utc::now(),
             onboarding_id,
-            review_reasons: Vec::new(),
+            review_reasons,
         };
         let result = diesel::insert_into(manual_review::table)
             .values(new)

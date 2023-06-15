@@ -1,4 +1,6 @@
-use newtypes::{DbActor, FootprintReasonCode, OnboardingId, Vendor, VerificationResultId, WorkflowId};
+use newtypes::{
+    DbActor, FootprintReasonCode, OnboardingId, ReviewReason, Vendor, VerificationResultId, WorkflowId,
+};
 
 use db::{
     models::{
@@ -21,6 +23,7 @@ use crate::{
 /// assert_is_first_decision_for_onboarding determines if an error should be thrown if the onboarding already has a decision made
 ///     we set this true to perform this check during the initial decisioning we make at the end of Bifrost.
 ///     we also can make decisions post-Bifrost, when we manually trigger a running of decisioning and in those cases we would set this false
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(conn))]
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
@@ -30,6 +33,7 @@ pub fn save_final_decision(
     decision: &OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,
     workflow_id: Option<WorkflowId>,
+    review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<OnboardingDecision> {
     // TODO: Create our risk signals!
     // Save status
@@ -85,7 +89,7 @@ pub fn save_final_decision(
     if decision.decision.create_manual_review {
         let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
         if existing_review.is_none() {
-            ManualReview::create(conn, ob_id)?;
+            ManualReview::create(conn, ob_id, review_reasons)?;
         }
     }
 

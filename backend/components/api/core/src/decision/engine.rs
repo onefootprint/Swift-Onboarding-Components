@@ -40,7 +40,8 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
+    FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId,
+    VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 ///
@@ -143,6 +144,7 @@ where
                 true,
                 false,
                 None,
+                vec![],
             )
         })
         .await
@@ -385,6 +387,7 @@ pub fn save_onboarding_decision(
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,
     workflow_id: Option<WorkflowId>,
+    review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
@@ -395,6 +398,7 @@ pub fn save_onboarding_decision(
         &rules_output,
         assert_is_first_decision_for_onboarding,
         workflow_id,
+        review_reasons,
     )?;
 
     let status = onboarding_decision.status.to_string();

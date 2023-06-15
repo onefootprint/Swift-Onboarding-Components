@@ -26,7 +26,7 @@ use idv::incode::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, AlpacaKycConfig, DecisionStatus, FootprintReasonCode,
-    OnboardingStatus, Vendor, VendorAPI,
+    OnboardingStatus, ReasonCode, ReviewReason, Vendor, VendorAPI,
 };
 use webhooks::WebhookClient;
 
@@ -235,6 +235,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     &kyc_decision,
                     self.is_redo,
                     fixture_decision.is_some(),
+                    vec![],
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycComplete))
             }
@@ -446,6 +447,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 create_manual_review: true,
             }
         };
+        let review_reasons = get_review_reasons(&wc_reason_codes, doc_req.is_some());
 
         let decision = (
             OnboardingRulesDecisionOutput {
@@ -472,6 +474,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             &decision,
             self.is_redo,
             is_sandbox,
+            review_reasons,
         )?;
 
         if final_decision.decision_status == DecisionStatus::Pass {
@@ -615,5 +618,57 @@ impl WorkflowState for AlpacaKycComplete {
 
     fn default_action(&self) -> Option<WorkflowActions> {
         None // terminal state
+    }
+}
+
+fn get_review_reasons(
+    wc_reason_codes: &[(FootprintReasonCode, Vec<Vendor>)],
+    collected_doc: bool,
+) -> Vec<ReviewReason> {
+    let wc_reason_codes = wc_reason_codes.iter().map(|r| r.0.clone()).collect::<Vec<_>>();
+    let adverse_media: bool = wc_reason_codes
+        .iter()
+        .any(|rs| rs == &FootprintReasonCode::AdverseMediaHit);
+
+    let wl_hit = vec![
+        FootprintReasonCode::WatchlistHitOfac,
+        FootprintReasonCode::WatchlistHitNonSdn,
+        FootprintReasonCode::WatchlistHitPep,
+    ]
+    .iter()
+    .any(|r| wc_reason_codes.contains(r));
+
+    let mut reasons = vec![];
+
+    if adverse_media {
+        reasons.push(ReviewReason::AdverseMediaHit);
+    }
+    if wl_hit {
+        reasons.push(ReviewReason::WatchlistHit);
+    }
+    if collected_doc {
+        reasons.push(ReviewReason::Document);
+    }
+
+    reasons
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![])], false => vec![ReviewReason::WatchlistHit])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![])], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![]), (FootprintReasonCode::WatchlistHitPep, vec![])], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![])], false => vec![ReviewReason::AdverseMediaHit])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![])], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![]), (FootprintReasonCode::WatchlistHitNonSdn, vec![])], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
+
+    fn test_get_review_reasons(
+        wc_reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+        collected_doc: bool,
+    ) -> Vec<ReviewReason> {
+        get_review_reasons(&wc_reason_codes, collected_doc)
     }
 }
