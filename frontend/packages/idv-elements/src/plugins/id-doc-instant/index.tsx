@@ -24,7 +24,7 @@ const App = ({ context, onDone }: IdDocProps) => {
     currSide: ImageTypes.front,
     requirement: customData.requirement,
     idDoc: {
-      country: customData.requirement.onlyUsSupported ? 'USA' : undefined,
+      country: customData.requirement.onlyUsSupported ? 'US' : undefined,
       type:
         customData.requirement.supportedDocumentTypes.length === 1
           ? supportedTypeToIdDocType[

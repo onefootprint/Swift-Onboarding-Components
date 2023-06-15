@@ -4,6 +4,7 @@ import { NavigationHeader } from '../../../../components';
 import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
 import { ImageTypes } from '../../constants/image-types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const IdDocBackPhoto = () => {
   const [state, send] = useIdDocMachine();
@@ -11,7 +12,9 @@ const IdDocBackPhoto = () => {
     idDoc: { type, country },
   } = state.context;
 
-  if (!type || !country) {
+  const countryCode3 = getCountryFromCode(country)?.value3;
+
+  if (!type || !countryCode3) {
     return null;
   }
 
@@ -38,7 +41,7 @@ const IdDocBackPhoto = () => {
         imageType={ImageTypes.back}
         type={type}
         onComplete={handleComplete}
-        country={country}
+        country={countryCode3}
       />
     </>
   );

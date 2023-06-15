@@ -52,11 +52,11 @@ describe('Id Doc Machine Tests', () => {
         type: 'receivedCountryAndType',
         payload: {
           type: IdDocType.driversLicense,
-          country: 'USA',
+          country: 'US',
         },
       });
       expect(state.value).toEqual('frontImage');
-      expect(state.context.idDoc.country).toEqual('USA');
+      expect(state.context.idDoc.country).toEqual('US');
 
       expect(state.context.idDoc.type).toEqual('driver_license');
       state = machine.send({
@@ -69,7 +69,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -163,7 +163,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -189,7 +189,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -230,7 +230,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -276,7 +276,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -304,7 +304,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -332,7 +332,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -354,7 +354,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -391,7 +391,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -433,7 +433,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {
@@ -464,7 +464,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedCountryAndType',
           payload: {
             type: IdDocType.driversLicense,
-            country: 'USA',
+            country: 'US',
           },
         },
         {

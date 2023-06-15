@@ -7,7 +7,7 @@ import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { ImageTypes } from '../../constants/image-types';
-import { getCountryFromCode3 } from '../../utils/get-country-from-code';
+import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const SelfieRetryPrompt = () => {
   const [state, send] = useIdDocMachine();
@@ -21,7 +21,7 @@ const SelfieRetryPrompt = () => {
     return null;
   }
 
-  const countryName = getCountryFromCode3(country)?.label;
+  const countryName = getCountryFromCode(country)?.label;
 
   const handleClick = () => {
     send({ type: 'startImageCapture' });

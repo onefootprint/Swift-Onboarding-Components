@@ -27,10 +27,8 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
-import {
-  getCountryFromCode,
-  getCountryFromCode3,
-} from '../../utils/get-country-from-code';
+import { getCountryFromCode } from '../../utils/get-country-from-code';
+import supportedTypeToIdDocType from '../../utils/supported-type-to-doc-type';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
 
 const IdDocCountryAndType = () => {
@@ -38,16 +36,21 @@ const IdDocCountryAndType = () => {
   const [state, send] = useIdDocMachine();
   const { country: defaultCountry, type: defaultType } = state.context.idDoc;
   const [country, setCountry] = useState<CountryRecord>(
-    getCountryFromCode3(defaultCountry) ?? DEFAULT_COUNTRY,
+    getCountryFromCode(defaultCountry) ?? DEFAULT_COUNTRY,
   );
 
-  const types: IdDocType[] = IdDocTypesByCountry[country.value3];
+  const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
+  const supportedIdDocTypes = supportedDocumentTypes.map(
+    supportedDocumentType => supportedTypeToIdDocType[supportedDocumentType],
+  ); // get rid of this line once back end fixes the typo with "drivers license" in id-doc type
+  const types: IdDocType[] = IdDocTypesByCountry[country.value].filter(type =>
+    supportedIdDocTypes.includes(type),
+  );
   const firstTypeFromOptions = types.length ? types[0] : IdDocType.passport;
   const [docType, setDocType] = useState<IdDocType>(
     defaultType ?? firstTypeFromOptions,
   );
 
-  const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
   const countryOptions = onlyUsSupported
     ? [getCountryFromCode('US') as CountryRecord]
     : COUNTRIES;
@@ -57,7 +60,9 @@ const IdDocCountryAndType = () => {
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value3];
+      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value].filter(
+        type => supportedIdDocTypes.includes(type),
+      );
       const nextType = typesForNextCountry.length
         ? typesForNextCountry[0]
         : IdDocType.passport;
@@ -75,7 +80,7 @@ const IdDocCountryAndType = () => {
       payload: {
         type: docType,
         country:
-          getCountryFromCode3(country.value3)?.value3 ?? DEFAULT_COUNTRY.value3,
+          getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value,
       },
     });
   };
