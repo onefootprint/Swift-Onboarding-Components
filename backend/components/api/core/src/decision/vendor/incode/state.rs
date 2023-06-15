@@ -5,7 +5,7 @@ use super::{
     },
     IncodeContext,
 };
-use crate::errors::ApiResult;
+use crate::{errors::ApiResult, vendor_clients::IncodeClients};
 use async_trait::async_trait;
 use db::{
     models::{
@@ -15,7 +15,6 @@ use db::{
     DbPool, TxnPgConn,
 };
 use enum_dispatch::enum_dispatch;
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{DocumentSide, IncodeFailureReason};
 use std::marker::PhantomData;
 
@@ -57,7 +56,7 @@ pub trait IncodeStateTransition: Sized {
     /// If None is returned, the state is not ready to run
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>>;
@@ -88,7 +87,7 @@ pub trait RunTransition {
     async fn step(
         self,
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: IncodeContext,
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)>;
@@ -115,12 +114,12 @@ where
     async fn step(
         self,
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: IncodeContext,
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
         let starting_state = self.into();
-        let init_state = T::run(db_pool, http_client, &ctx, &session).await?;
+        let init_state = T::run(db_pool, clients, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
             // AddBack but haven't yet collected the back image

@@ -4,12 +4,11 @@ use super::{
 };
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::{ApiResult, AssertionError};
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::models::user_consent::UserConsent;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
 use newtypes::VendorAPI;
 
@@ -20,7 +19,7 @@ pub struct AddConsent {}
 impl IncodeStateTransition for AddConsent {
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -46,8 +45,11 @@ impl IncodeStateTransition for AddConsent {
         };
 
         // Make requests to incode
-        let privacy_res = http_client.make_request(privacy_request).await;
-        let ml_res = http_client.make_request(ml_request).await;
+        let privacy_res = clients
+            .incode_add_privacy_consent
+            .make_request(privacy_request)
+            .await;
+        let ml_res = clients.incode_add_ml_consent.make_request(ml_request).await;
 
         // Save our result
         let privacy_args =

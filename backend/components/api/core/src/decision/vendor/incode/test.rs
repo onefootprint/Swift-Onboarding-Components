@@ -12,7 +12,10 @@ use db::{
     test_helpers::assert_have_same_elements,
     DbError, DbResult,
 };
-use idv::incode::{doc::response::FetchScoresResponse, IncodeAPIResult};
+use idv::{
+    footprint_http_client::FootprintVendorHttpClient,
+    incode::{doc::response::FetchScoresResponse, IncodeAPIResult},
+};
 use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
@@ -35,6 +38,10 @@ use crate::{
 #[test_state_case(false)]
 #[tokio::test]
 async fn test_run_machine(state: &State, is_selfie: bool) {
+    // These tests are actually testing that our integration with incode works.
+    // But in other cases, we'll mock responses so we don't actually make requests
+    let fp_client = FootprintVendorHttpClient::new().expect("client failed");
+    state.set_incode_to_real_calls(fp_client);
     //
     // Set up
     //
@@ -67,7 +74,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 scoped_vault_id: su_id,
                 ref_id: None,
                 workflow_id: None,
-                should_collect_selfie: false,
+                should_collect_selfie: is_selfie,
                 only_us: false,
                 doc_type_restriction: None,
             };
@@ -95,6 +102,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         document_type: Some(IdDocKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
+        country_code: Some(PiiString::from("USA")),
         ..Default::default()
     };
     let ctx = IncodeContext {
@@ -109,7 +117,10 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    let (machine, failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+    let (machine, failure_reasons) = machine
+        .run(&state.db_pool, &state.vendor_clients.incode)
+        .await
+        .unwrap();
 
     // Assert machine stops at AddBack until we add the back
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
@@ -139,7 +150,10 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
 
-    let (mut machine, mut failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+    let (mut machine, mut failure_reasons) = machine
+        .run(&state.db_pool, &state.vendor_clients.incode)
+        .await
+        .unwrap();
 
     // If we are uploading a selfie, the machine will have stopped to wait for an upload
     if is_selfie {
@@ -151,7 +165,10 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             .await
             .unwrap();
         assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddConsent);
-        (machine, failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+        (machine, failure_reasons) = machine
+            .run(&state.db_pool, &state.vendor_clients.incode)
+            .await
+            .unwrap();
     }
 
     assert!(failure_reasons.is_empty());
@@ -252,6 +269,10 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
 #[test_state_case(false)]
 #[tokio::test]
 async fn test_fail(state: &State, is_selfie: bool) {
+    // These tests are actually testing that our integration with incode works.
+    // But in other cases, we'll mock responses so we don't actually make requests
+    let fp_client = FootprintVendorHttpClient::new().expect("client failed");
+    state.set_incode_to_real_calls(fp_client);
     //
     // Set up
     //
@@ -284,7 +305,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 scoped_vault_id: suid,
                 ref_id: None,
                 workflow_id: None,
-                should_collect_selfie: false,
+                should_collect_selfie: is_selfie,
                 only_us: false,
                 doc_type_restriction: None,
             };
@@ -311,6 +332,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         document_type: Some(IdDocKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
+        country_code: Some(PiiString::from("USA")),
         ..Default::default()
     };
     let ctx = IncodeContext {
@@ -325,7 +347,10 @@ async fn test_fail(state: &State, is_selfie: bool) {
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
-    let (machine, failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+    let (machine, failure_reasons) = machine
+        .run(&state.db_pool, &state.vendor_clients.incode)
+        .await
+        .unwrap();
 
     // Assert machine is in the correct state
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
@@ -373,7 +398,10 @@ async fn test_fail(state: &State, is_selfie: bool) {
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
 
-    let (machine, failure_reasons) = machine.run(&state.db_pool, &state.fp_client).await.unwrap();
+    let (machine, failure_reasons) = machine
+        .run(&state.db_pool, &state.vendor_clients.incode)
+        .await
+        .unwrap();
     assert!(failure_reasons.is_empty());
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::Complete);
 

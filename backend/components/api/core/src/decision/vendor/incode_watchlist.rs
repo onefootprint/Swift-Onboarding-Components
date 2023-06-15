@@ -72,6 +72,7 @@ async fn call_start_onboarding(
     };
     let res = state
         .vendor_clients
+        .incode
         .incode_start_onboarding
         .make_request(request)
         .await
@@ -124,6 +125,7 @@ async fn call_watchlist_result(
 
     let res = state
         .vendor_clients
+        .incode
         .incode_watchlist_check
         .make_request(req)
         .await

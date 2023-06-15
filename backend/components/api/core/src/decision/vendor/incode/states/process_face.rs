@@ -3,11 +3,10 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeProcessFaceRequest;
 use newtypes::VendorAPI;
 
@@ -17,7 +16,7 @@ pub struct ProcessFace {}
 impl IncodeStateTransition for ProcessFace {
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -25,7 +24,7 @@ impl IncodeStateTransition for ProcessFace {
         let request = IncodeProcessFaceRequest {
             credentials: session.credentials.clone(),
         };
-        let res = http_client.make_request(request).await;
+        let res = clients.incode_process_face.make_request(request).await;
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessFace, ctx);

@@ -4,12 +4,11 @@ use super::{
 };
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::AddSideResponse;
 use idv::incode::doc::IncodeAddFrontRequest;
 use newtypes::{DocVData, DocumentSide, VendorAPI};
@@ -25,7 +24,7 @@ impl IncodeStateTransition for AddFront {
     /// If None is returned, the state is not ready to run
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -45,7 +44,7 @@ impl IncodeStateTransition for AddFront {
             credentials: session.credentials.clone(),
             docv_data,
         };
-        let res = http_client.make_request(request).await;
+        let res = clients.incode_add_front.make_request(request).await;
 
         // Save our result
 

@@ -4,6 +4,7 @@ use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::vendor_clients::IncodeClients;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequestUpdate;
@@ -13,7 +14,6 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::DbPool;
 use db::TxnPgConn;
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -120,7 +120,7 @@ impl Complete {
 impl IncodeStateTransition for Complete {
     async fn run(
         _: &DbPool,
-        _: &FootprintVendorHttpClient,
+        _: &IncodeClients,
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<Option<Self>> {

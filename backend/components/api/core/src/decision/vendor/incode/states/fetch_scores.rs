@@ -3,11 +3,10 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeFetchScoresRequest;
 use newtypes::VendorAPI;
 
@@ -17,7 +16,7 @@ pub struct FetchScores {}
 impl IncodeStateTransition for FetchScores {
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -25,7 +24,7 @@ impl IncodeStateTransition for FetchScores {
         let request = IncodeFetchScoresRequest {
             credentials: session.credentials.clone(),
         };
-        let res = http_client.make_request(request).await;
+        let res = clients.incode_fetch_scores.make_request(request).await;
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeFetchScores, ctx);

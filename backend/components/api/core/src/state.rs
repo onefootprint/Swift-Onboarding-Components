@@ -31,11 +31,12 @@ use idv::{
         doc::{
             response::{
                 AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
-                FetchScoresResponse, ProcessIdResponse,
+                FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
             },
             IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
             IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
-            IncodeFetchScoresRequest, IncodeProcessIdRequest,
+            IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
+            IncodeProcessIdRequest,
         },
         response::OnboardingStartResponse,
         watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
@@ -69,7 +70,6 @@ pub struct State {
     pub billing_client: billing::BillingClient,
     pub fingerprintjs_client: FingerprintJSClient,
     pub vendor_clients: VendorClients,
-    pub fp_client: FootprintVendorHttpClient, // hack for now until Incode state machine removes dependency from this
 }
 impl State {
     /// initialize global state in test context
@@ -205,7 +205,7 @@ impl State {
         let vendor_clients = VendorClients::new(
             socure_production_client,
             twilio_client.clone(),
-            footprint_vendor_http_client.clone(),
+            footprint_vendor_http_client,
             middesk_client,
         );
 
@@ -227,7 +227,6 @@ impl State {
             billing_client,
             fingerprintjs_client,
             vendor_clients,
-            fp_client: footprint_vendor_http_client,
         }
     }
 
@@ -325,7 +324,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_start_onboarding = incode_start_onboarding;
+        self.vendor_clients.incode.incode_start_onboarding = incode_start_onboarding;
     }
 
     #[cfg(test)]
@@ -337,7 +336,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_add_front = incode_add_front;
+        self.vendor_clients.incode.incode_add_front = incode_add_front;
     }
 
     #[cfg(test)]
@@ -349,7 +348,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_add_back = incode_add_back;
+        self.vendor_clients.incode.incode_add_back = incode_add_back;
     }
 
     #[cfg(test)]
@@ -361,7 +360,31 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_process_id = incode_process_id;
+        self.vendor_clients.incode.incode_process_id = incode_process_id;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_process_face(
+        &mut self,
+        incode_process_face: VendorClient<
+            IncodeProcessFaceRequest,
+            IncodeResponse<ProcessFaceResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode.incode_process_face = incode_process_face;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_get_onboarding_status(
+        &mut self,
+        incode_get_onboarding_status: VendorClient<
+            IncodeGetOnboardingStatusRequest,
+            IncodeResponse<GetOnboardingStatusResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode.incode_get_onboarding_status = incode_get_onboarding_status;
     }
 
     #[cfg(test)]
@@ -373,7 +396,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_fetch_scores = incode_fetch_scores;
+        self.vendor_clients.incode.incode_fetch_scores = incode_fetch_scores;
     }
 
     #[cfg(test)]
@@ -385,7 +408,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_add_privacy_consent = incode_add_privacy_consent;
+        self.vendor_clients.incode.incode_add_privacy_consent = incode_add_privacy_consent;
     }
 
     #[cfg(test)]
@@ -397,7 +420,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_add_ml_consent = incode_add_ml_consent;
+        self.vendor_clients.incode.incode_add_ml_consent = incode_add_ml_consent;
     }
 
     #[cfg(test)]
@@ -409,7 +432,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_fetch_ocr = incode_fetch_ocr;
+        self.vendor_clients.incode.incode_fetch_ocr = incode_fetch_ocr;
     }
 
     #[cfg(test)]
@@ -421,7 +444,7 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_add_selfie = incode_add_selfie;
+        self.vendor_clients.incode.incode_add_selfie = incode_add_selfie;
     }
 
     #[cfg(test)]
@@ -433,7 +456,14 @@ impl State {
             idv::incode::error::Error,
         >,
     ) {
-        self.vendor_clients.incode_watchlist_check = incode_watchlist_check;
+        self.vendor_clients.incode.incode_watchlist_check = incode_watchlist_check;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_to_real_calls(&mut self, fp_client: FootprintVendorHttpClient) {
+        use crate::vendor_clients::IncodeClients;
+
+        self.vendor_clients.incode = IncodeClients::new(Arc::new(fp_client));
     }
 }
 

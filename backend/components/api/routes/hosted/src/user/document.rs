@@ -304,7 +304,7 @@ async fn handle_incode_request(
     .await?; // TODO: handle this with better requirement checking
 
     let (machine, retry_reasons) = machine
-        .run(&state.db_pool, &state.fp_client)
+        .run(&state.db_pool, &state.vendor_clients.incode)
         .await
         .map_err(|e| e.error)?;
 

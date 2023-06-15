@@ -3,6 +3,7 @@ use super::VerificationSession;
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use crate::ApiError;
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequestUpdate;
@@ -10,7 +11,6 @@ use db::models::identity_document::IdentityDocument;
 use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::DocumentRequestStatus;
 
 // TODO this is more like the other workflow state transitions where it has behavior that must be
@@ -39,7 +39,7 @@ impl Fail {
 impl IncodeStateTransition for Fail {
     async fn run(
         _: &DbPool,
-        _: &FootprintVendorHttpClient,
+        _: &IncodeClients,
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<Option<Self>> {

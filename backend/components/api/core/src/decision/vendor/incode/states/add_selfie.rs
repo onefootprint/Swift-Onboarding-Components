@@ -4,11 +4,10 @@ use super::{
 };
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::IncodeAddSelfieRequest;
 use newtypes::{DocVData, VendorAPI};
 use newtypes::{DocumentSide, IncodeFailureReason};
@@ -21,7 +20,7 @@ pub struct AddSelfie {
 impl IncodeStateTransition for AddSelfie {
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -40,7 +39,7 @@ impl IncodeStateTransition for AddSelfie {
             credentials: session.credentials.clone(),
             docv_data,
         };
-        let request_result = http_client.make_request(request).await;
+        let request_result = clients.incode_add_selfie.make_request(request).await;
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&request_result, VendorAPI::IncodeAddSelfie, ctx);

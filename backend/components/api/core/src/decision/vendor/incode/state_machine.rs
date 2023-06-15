@@ -3,12 +3,12 @@ use super::states::*;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::{ApiResult, AssertionError};
+use crate::vendor_clients::IncodeClients;
 use crate::{ApiError, State};
 use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::vault::Vault;
 use db::DbPool;
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
@@ -162,14 +162,14 @@ impl IncodeStateMachine {
     pub async fn run(
         self,
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
     ) -> Result<(Self, Vec<IncodeFailureReason>), IncodeMachineError> {
         let mut machine = self;
         let failure_reasons = loop {
             let Self { state, ctx, session } = machine;
             let state_name = state.name();
             let (state, result, ctx, session) = state
-                .step(db_pool, http_client, ctx, session)
+                .step(db_pool, clients, ctx, session)
                 .await
                 .map_err(|e| IncodeMachineError { state_name, error: e })?;
             machine = Self { state, ctx, session };

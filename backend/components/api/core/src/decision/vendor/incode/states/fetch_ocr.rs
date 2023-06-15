@@ -3,11 +3,10 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
-use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::IncodeFetchOCRRequest;
 use newtypes::{DocumentSide, VendorAPI};
@@ -21,7 +20,7 @@ pub struct FetchOCR {
 impl IncodeStateTransition for FetchOCR {
     async fn run(
         db_pool: &DbPool,
-        http_client: &FootprintVendorHttpClient,
+        clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
@@ -29,7 +28,7 @@ impl IncodeStateTransition for FetchOCR {
         let request = IncodeFetchOCRRequest {
             credentials: session.credentials.clone(),
         };
-        let res = http_client.make_request(request).await;
+        let res = clients.incode_fetch_ocr.make_request(request).await;
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeFetchOCR, ctx);
