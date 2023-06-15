@@ -441,7 +441,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         } else {
             Decision {
                 decision_status: DecisionStatus::Fail,
-                should_commit: false,
+                should_commit: true,
                 create_manual_review: true,
             }
         };
