@@ -11,7 +11,7 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::{DocCollected, WorkflowWrapper};
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::{save_fixture_ocr, Complete};
-use api_core::decision::vendor::incode::{IncodeContext, IncodeStateMachine};
+use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_wire_types::document_request::DocumentRequest;
@@ -32,7 +32,7 @@ use newtypes::output::Csv;
 use newtypes::{DataIdentifierDiscriminant, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
-    IncodeConfigurationId, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
+    IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -298,7 +298,7 @@ async fn handle_incode_request(
         state,
         tenant_id,
         // TODO: upstream this somewhere based on OBC
-        IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string()),
+        get_config_id(doc_request.should_collect_selfie),
         ctx,
     )
     .await?; // TODO: handle this with better requirement checking

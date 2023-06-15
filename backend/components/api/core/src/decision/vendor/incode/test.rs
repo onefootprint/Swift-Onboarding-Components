@@ -20,20 +20,20 @@ use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo,
-    DocumentRequestStatus, DocumentSide, IdDocKind, IncodeConfigurationId, IncodeFailureReason,
-    IncodeVerificationSessionState, PiiString, SealedVaultDataKey, Selfie, VendorAPI,
+    DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason, IncodeVerificationSessionState,
+    PiiString, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
 use crate::{
     decision::{
         tests::test_helpers::create_user_and_onboarding,
-        vendor::incode::{images::*, IncodeStateMachine},
+        vendor::incode::{get_config_id, images::*, IncodeStateMachine},
     },
     State,
 };
 
-#[ignore]
+// #[ignore]
 #[test_state_case(true)]
 #[test_state_case(false)]
 #[tokio::test]
@@ -113,7 +113,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         docv_data,
         doc_request_id: id_doc.request_id,
     };
-    let config_id = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
+    let config_id = get_config_id(is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
@@ -343,7 +343,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         docv_data,
         doc_request_id: id_doc.request_id.clone(),
     };
-    let config_id = IncodeConfigurationId::from("643450886f6f92d20b27599b".to_string());
+    let config_id = get_config_id(is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();

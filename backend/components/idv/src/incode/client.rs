@@ -20,7 +20,9 @@ use tokio_retry::strategy::FixedInterval;
 use tokio_retry::RetryIf;
 
 #[allow(unused)]
-const INCODE_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
+// TODO: put these into State
+pub const INCODE_SANDBOX_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
+pub const INCODE_SANDBOX_DOCUMENT_FLOW_ID: &str = "643450886f6f92d20b27599b";
 
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
@@ -463,7 +465,7 @@ mod tests {
         tests::fixtures::images::load_image_and_encode_as_b64,
     };
 
-    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter, INCODE_SELFIE_FLOW_ID};
+    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter, INCODE_SANDBOX_SELFIE_FLOW_ID};
 
     pub fn load_client() -> IncodeClientAdapter {
         let creds = IncodeCredentials {
@@ -478,7 +480,7 @@ mod tests {
         let client = load_client();
         let fp_client = FootprintVendorHttpClient::new().unwrap();
         // Start the session
-        let config = IncodeConfigurationId::from(INCODE_SELFIE_FLOW_ID.to_string());
+        let config = IncodeConfigurationId::from(INCODE_SANDBOX_SELFIE_FLOW_ID.to_string());
         let res = client
             .onboarding_start(&fp_client, Some(config), None, None)
             .await
