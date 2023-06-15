@@ -18,18 +18,17 @@ use chrono::Utc;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        annotation::Annotation, insight_event::InsightEvent, manual_review::ManualReview,
-        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
-        verification_result::VerificationResult,
+        insight_event::InsightEvent, manual_review::ManualReview, onboarding::Onboarding,
+        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
+        verification_request::VerificationRequest, verification_result::VerificationResult,
     },
     DbError,
 };
 use idv::ParsedResponse;
 use newtypes::{
     format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, EncryptedVaultPrivateKey,
-    FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, SignalScope,
-    TenantId, Vendor, VendorAPI,
+    FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, PiiJsonValue, PiiString,
+    ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use strum::IntoEnumIterator;
@@ -88,27 +87,27 @@ async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<CipRequest> {
-    let (uvw, onboarding, decision, scoped_vault, actor, annotations, risk_signals, insight, vres) = state
+    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let obd = OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
 
-            let (risk_signals, fp_obd, manual_obd) = match obd {
+            let (risk_signals, fp_obd, mr, manual_obd) = match obd {
                 Some(obd) => {
                     let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?;
 
                     match obd.status {
-                        DecisionStatus::Pass => (risk_signals, obd, None),
+                        DecisionStatus::Pass => (risk_signals, obd, None, None),
                         DecisionStatus::Fail | DecisionStatus::StepUp => {
                             // footprint decided as fail, see if a manual decision override exists
-                            let (_, obd_manual) = ManualReview::find_completed(conn, &obd.onboarding_id)?
+                            let (mr, obd_manual) = ManualReview::find_completed(conn, &obd.onboarding_id)?
                                 .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
                             if obd_manual.status != DecisionStatus::Pass {
                                 return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                             }
 
-                            (risk_signals, obd, Some(obd_manual))
+                            (risk_signals, obd, Some(mr), Some(obd_manual))
                         }
                     }
                 }
@@ -118,11 +117,6 @@ async fn create_cip_request(
             let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
-
-            let annotations = Annotation::list(conn, fp_id, tenant_id, is_live, None)?
-                .into_iter()
-                .map(|(a, _)| a)
-                .collect::<Vec<_>>();
 
             let decision = manual_obd.unwrap_or(fp_obd);
 
@@ -136,17 +130,7 @@ async fn create_cip_request(
                 sv.id.clone(),
             )?;
 
-            Ok((
-                uvw,
-                ob,
-                decision,
-                sv,
-                actor,
-                annotations,
-                risk_signals,
-                insight,
-                vres,
-            ))
+            Ok((uvw, ob, decision, sv, actor, mr, risk_signals, insight, vres))
         })
         .await??;
 
@@ -168,12 +152,19 @@ async fn create_cip_request(
         insight,
         actor,
         default_approver,
-        annotations,
+        mr.as_ref(),
     )
     .await?;
-    let watchlist = watchlist(&scoped_vault, &onboarding, &risk_signals, &vendor_results)?;
+    let watchlist = watchlist(
+        &scoped_vault,
+        &onboarding,
+        &risk_signals,
+        &vendor_results,
+        mr.as_ref(),
+    )?;
     let identity = identity(&scoped_vault, &onboarding, risk_signals);
-    let (document, photo) = document_and_photo(state, scoped_vault.clone(), &user_vault_private_key).await?;
+    let (document, photo) =
+        document_and_photo(state, scoped_vault.clone(), &user_vault_private_key, mr.as_ref()).await?;
 
     let cip = CipRequest {
         provider_name: vec![alpaca::Provider::Footprint],
@@ -198,7 +189,7 @@ async fn kyc(
     insight: InsightEvent,
     actor: Option<SaturatedActor>,
     default_approver: PiiString,
-    annotations: Vec<Annotation>,
+    mr: Option<&ManualReview>,
 ) -> ApiResult<alpaca::Kyc> {
     use DataIdentifier::*;
     use DocumentKind::*;
@@ -237,11 +228,18 @@ async fn kyc(
 
     // build the approved reason from the latest annotation if it exists
     // TODO: FP-3990 there should be a better way to signfiy a manual review annotation
-    let approved_reason = annotations
-        .iter()
-        .max_by(|a, b| a.timestamp.cmp(&b.timestamp))
-        .map(|annotation| format!("{} ({})", annotation.note, annotation.timestamp));
 
+    let approved_reason = if let Some(mr) = mr {
+        let mut review_reason_crs = mr
+            .review_reasons
+            .iter()
+            .map(|rr| rr.canned_response().to_owned())
+            .collect::<Vec<_>>();
+        review_reason_crs.sort();
+        Some(review_reason_crs.join(". "))
+    } else {
+        None
+    };
     // find a gov't id number if we have one
     let id_number = vec![PassportNumber, IdCardNumber, DriversLicenseDob]
         .into_iter()
@@ -337,6 +335,7 @@ fn watchlist(
     onboarding: &Onboarding,
     risk_signals: &[RiskSignal],
     vres: &[VendorResult],
+    mr: Option<&ManualReview>,
 ) -> ApiResult<alpaca::Watchlist> {
     let pep: bool = risk_signals
         .iter()
@@ -362,6 +361,24 @@ fn watchlist(
         .iter()
         .any(|r| matches!(r, CipResult::Consider));
     let overall_result = CipResult::clear(!any_consider);
+
+    // Validate wrt to mr.review_reasons
+    if adverse_media
+        && !mr
+            .map(|r| r.review_reasons.contains(&ReviewReason::AdverseMediaHit))
+            .unwrap_or(false)
+    {
+        Err(CipError::ExpectedReviewReasonNotFound(
+            ReviewReason::AdverseMediaHit,
+        ))?
+    }
+    if (pep | ofac | sanctions)
+        && !mr
+            .map(|r| r.review_reasons.contains(&ReviewReason::WatchlistHit))
+            .unwrap_or(false)
+    {
+        Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::WatchlistHit))?
+    }
 
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
     // so we pull them from the Vres on the fly here
@@ -401,6 +418,7 @@ async fn document_and_photo(
     state: &State,
     scoped_vault: ScopedVault,
     user_vault_private_key: &EncryptedVaultPrivateKey,
+    mr: Option<&ManualReview>,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let su_id = scoped_vault.id.clone();
     let incode_doc_apis: Vec<VendorAPI> = VendorAPI::iter().filter(|v| v.is_incode_doc_flow_api()).collect();
@@ -419,6 +437,14 @@ async fn document_and_photo(
     if incode_results.is_empty() {
         // nothing to do here if we haven't collected a doc
         return Ok((None, None));
+    }
+
+    // Validate wrt to mr.review_reasons
+    if !mr
+        .map(|r| r.review_reasons.contains(&ReviewReason::Document))
+        .unwrap_or(false)
+    {
+        Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::Document))?
     }
 
     // pick a reasonable timestamp

@@ -32,4 +32,15 @@ pub enum ReviewReason {
     WatchlistHit,
 }
 
+impl ReviewReason {
+    // currently Follow/Alpaca oriented
+    pub fn canned_response(&self) -> &str {
+        match self {
+            ReviewReason::Document => "Document identity verification was manually conducted and approved",
+            ReviewReason::AdverseMediaHit => "Adverse media hit deemed non-detrimental",
+            ReviewReason::WatchlistHit => "Watchlist hit deemed low risk or false-positive",
+        }
+    }
+}
+
 crate::util::impl_enum_str_diesel!(ReviewReason);

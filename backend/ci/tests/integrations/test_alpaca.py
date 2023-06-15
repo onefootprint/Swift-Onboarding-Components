@@ -48,10 +48,8 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
     d = user.client.data
     
     review_annotation = None
-    if sandbox_suffix == "stepup":
-        review_annotation = "Documentary identity verification was manually conducted and approved"
-    elif sandbox_suffix == "manualreview":
-        review_annotation = "Watchlist deemed false-positive"
+    if sandbox_suffix == "stepup" or sandbox_suffix == "manualreview":
+        review_annotation = "Piip is very trustworthy" # extra annotation should not be included in the CIP response
 
     if review_annotation:
         post(
@@ -158,8 +156,21 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
             body["alpaca_response"]["kyc"]["applicant_name"]
             == f"{d['id.first_name']} {d['id.last_name']}"
         )
+
+        expected_approved_reason = None
+        if sandbox_suffix == "stepup":
+            expected_approved_reason = "Document identity verification was manually conducted and approved"
+        elif sandbox_suffix == "manualreview":
+            expected_approved_reason = "Adverse media hit deemed non-detrimental. Watchlist hit deemed low risk or false-positive"
+        
+        if expected_approved_reason:
+            assert body["alpaca_response"]["kyc"]["approved_reason"] == expected_approved_reason
+            # extra check that we aren't sending the internal/non-CR annotations in the CIP
+            assert review_annotation not in str(body["alpaca_response"])
+
         # sanity check that we aren't accidently scrubbing PII in the alpaca CIP
         assert "SCRUBBED" not in str(body["alpaca_response"])
+
 
 
 # TODO: Test scenarios to add

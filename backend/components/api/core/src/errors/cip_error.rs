@@ -1,3 +1,4 @@
+use newtypes::ReviewReason;
 use reqwest::StatusCode;
 
 #[derive(Debug, thiserror::Error)]
@@ -16,6 +17,9 @@ pub enum CipError {
 
     #[error("Watchlist results not found")]
     WatchlistResultsNotFoundError,
+
+    #[error("Expected ReviewReason but not found: {0}")]
+    ExpectedReviewReasonNotFound(ReviewReason),
 }
 
 impl CipError {
@@ -24,9 +28,9 @@ impl CipError {
             CipError::EntityDecisionManualReviewStatusNotPass
             | CipError::EntityDecisionDoesNotExist
             | CipError::EntityDecisionStatusNotPass => StatusCode::BAD_REQUEST,
-            CipError::AlpacaError(_) | CipError::WatchlistResultsNotFoundError => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            CipError::AlpacaError(_)
+            | CipError::WatchlistResultsNotFoundError
+            | CipError::ExpectedReviewReasonNotFound(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
