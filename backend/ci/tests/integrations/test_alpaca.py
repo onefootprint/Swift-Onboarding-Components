@@ -4,7 +4,7 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number, create_sandbox_user
-from tests.utils import post
+from tests.utils import post, get
 import uuid
 from alpaca.broker.client import BrokerClient
 from alpaca.broker.requests import (
@@ -52,6 +52,14 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
         review_annotation = "Piip is very trustworthy" # extra annotation should not be included in the CIP response
 
     if review_annotation:
+        # Check that the review_reasons are correctly populated in /entities for showing in the review UI
+        entities_body = get(
+            f"entities/{user.fp_id}",
+            None,
+            sandbox_tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
+        # Complete review
         post(
             f"entities/{user.fp_id}/decisions",
             dict(
@@ -61,6 +69,29 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
             sandbox_tenant.auth_token,
             DashboardAuthIsLive("false"),
         )
+        # Check that the timeline event for the completed review has correct review_reasons as well
+        timeline = get(
+            f"entities/{user.fp_id}/timeline",
+            None,
+            sandbox_tenant.auth_token,
+            DashboardAuthIsLive("false"),
+        )
+        if sandbox_suffix == "stepup":
+            expected_review_reasons = [{
+                    "review_reason": "document",
+                    "canned_response": "Document identity verification was manually conducted and approved"
+                }]
+        else:
+            expected_review_reasons = [{
+                    "review_reason": "adverse_media_hit",
+                    "canned_response": "Adverse media hit deemed non-detrimental"
+                },
+                {
+                    "review_reason": "watchlist_hit",
+                    "canned_response": "Watchlist hit deemed low risk or false-positive"
+                }]
+        assert entities_body["onboarding"]["manual_review"]["review_reasons"] == expected_review_reasons
+        assert timeline[-1]["event"]["data"]["decision"]["manual_review"]["review_reasons"] == expected_review_reasons
 
     # create a new alpaca account
     broker_client = BrokerClient(ALPACA_SANDBOX_API_KEY, ALPACA_SANDBOX_API_SECRET)

@@ -11,6 +11,7 @@ pub struct Onboarding {
     pub config_id: ObConfigurationId,
     // incomplete onboardings will show as null here. There is no codepath that does this today
     pub requires_manual_review: bool,
+    pub manual_review: Option<ManualReview>,
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
     pub insight_event: InsightEvent,

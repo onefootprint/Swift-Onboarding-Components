@@ -22,6 +22,7 @@ impl DbToApi<SerializableOnboarding> for api_wire_types::Onboarding {
             name,
             config_id,
             requires_manual_review: manual_review.is_some(),
+            manual_review: manual_review.map(api_wire_types::ManualReview::from_db),
             status,
             timestamp: start_timestamp,
             insight_event: api_wire_types::InsightEvent::from_db(insight),
