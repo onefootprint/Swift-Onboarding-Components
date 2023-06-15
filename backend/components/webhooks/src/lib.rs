@@ -80,15 +80,39 @@ impl WebhookServiceClient {
         let id = WebhookServiceId::from(app.id);
         Ok(id)
     }
+}
+
+#[async_trait]
+impl WebhookClient for WebhookServiceClient {
+    /// Send a webhook event to tenant if it's been configured
+    /// Note this spawns a task so it wont block
+    #[tracing::instrument(skip(self))]
+    fn send_event_to_tenant_non_blocking(
+        &self,
+        tenant: WebhookApp,
+        event: WebhookEvent,
+        idempotency_key: Option<String>,
+    ) {
+        let client = self.clone();
+        tokio::spawn(async move {
+            // TODO: we may want to support some retry here in the future
+            let _ = client
+                .send_event_to_tenant(tenant, event, idempotency_key)
+                .await
+                .map_err(|err| {
+                    tracing::error!(error=?err, "failed to send webhook event");
+                });
+        });
+    }
 
     /// Send a webhook event to tenant if it's been configured
     async fn send_event_to_tenant(
         &self,
-        tenant: &WebhookApp,
+        tenant: WebhookApp,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     ) -> Result<(), Error> {
-        let webhook_id = self.get_or_create_for_tenant(tenant).await?;
+        let webhook_id = self.get_or_create_for_tenant(&tenant).await?;
 
         let client = self.client();
         client
@@ -107,30 +131,6 @@ impl WebhookServiceClient {
             )
             .await?;
         Ok(())
-    }
-}
-
-#[async_trait]
-impl WebhookClient for WebhookServiceClient {
-    /// Send a webhook event to tenant if it's been configured
-    /// Note this spawns a task so it wont block
-    #[tracing::instrument(skip(self))]
-    fn send_event_to_tenant_non_blocking(
-        &self,
-        tenant: WebhookApp,
-        event: WebhookEvent,
-        idempotency_key: Option<String>,
-    ) {
-        let client = self.clone();
-        tokio::spawn(async move {
-            // TODO: we may want to support some retry here in the future
-            let _ = client
-                .send_event_to_tenant(&tenant, event, idempotency_key)
-                .await
-                .map_err(|err| {
-                    tracing::error!(error=?err, "failed to send webhook event");
-                });
-        });
     }
 
     /// Get the portal URL to edit webhooks
@@ -171,6 +171,13 @@ pub trait WebhookClient: Send + Sync {
         event: WebhookEvent,
         idempotency_key: Option<String>,
     );
+
+    async fn send_event_to_tenant(
+        &self,
+        tenant: WebhookApp,
+        event: WebhookEvent,
+        idempotency_key: Option<String>,
+    ) -> Result<(), Error>;
 
     async fn portal_url_for_tenant(&self, tenant: WebhookApp) -> Result<PortalResponse, Error>;
 }

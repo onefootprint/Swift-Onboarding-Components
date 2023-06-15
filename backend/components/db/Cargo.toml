@@ -14,6 +14,7 @@ testing = []
 crypto = { path = "../enclave/crypto" }
 newtypes = { path = "../newtypes" }
 macros = { path = "../macros" }
+webhooks = {path = "../webhooks" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }

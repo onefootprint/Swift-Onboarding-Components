@@ -28,6 +28,8 @@ pub enum TaskError {
     IdologyError(#[from] idv::idology::error::Error),
     #[error("{0}")]
     IdvError(#[from] idv::Error),
+    #[error("{0}")]
+    WebhookError(#[from] webhooks::Error),
 }
 
 #[allow(unused)]

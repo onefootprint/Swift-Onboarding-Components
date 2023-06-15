@@ -2,7 +2,11 @@ pub use self::payloads::{
     OnboardingCompletedPayload, OnboardingStatusChangedPayload, WatchlistCheckCompletedPayload,
 };
 use chrono::{DateTime, Utc};
-use newtypes::{FpId, OnboardingStatus};
+use newtypes::{
+    FpId, OnboardingCompletedPayload as NTOnboardingCompletedPayload, OnboardingStatus,
+    OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload,
+    WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload, WebhookEvent as NTWebhookEvent,
+};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, EnumMessage};
@@ -118,5 +122,50 @@ mod examples {
 impl WebhookEvent {
     pub fn event_type(&self) -> String {
         self.to_string()
+    }
+}
+
+impl From<NTWebhookEvent> for WebhookEvent {
+    fn from(value: newtypes::WebhookEvent) -> Self {
+        match value {
+            NTWebhookEvent::OnboardingCompleted(v) => WebhookEvent::OnboardingCompleted(v.into()),
+            NTWebhookEvent::OnboardingStatusChanged(v) => WebhookEvent::OnboardingStatusChanged(v.into()),
+            NTWebhookEvent::WatchlistCheckCompleted(v) => WebhookEvent::WatchlistCheckCompleted(v.into()),
+        }
+    }
+}
+
+impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
+    fn from(value: NTOnboardingCompletedPayload) -> Self {
+        Self {
+            fp_id: value.fp_id,
+            footprint_user_id: value.footprint_user_id,
+            timestamp: value.timestamp,
+            status: value.status,
+            requires_manual_review: value.requires_manual_review,
+        }
+    }
+}
+
+impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
+    fn from(value: NTOnboardingStatusChangedPayload) -> Self {
+        Self {
+            fp_id: value.fp_id,
+            footprint_user_id: value.footprint_user_id,
+            timestamp: value.timestamp,
+            new_status: value.new_status,
+        }
+    }
+}
+
+impl From<NTWatchlistCheckCompletedPayload> for WatchlistCheckCompletedPayload {
+    fn from(value: NTWatchlistCheckCompletedPayload) -> Self {
+        Self {
+            fp_id: value.fp_id,
+            footprint_user_id: value.footprint_user_id,
+            timestamp: value.timestamp,
+            status: value.status,
+            error: value.error,
+        }
     }
 }
