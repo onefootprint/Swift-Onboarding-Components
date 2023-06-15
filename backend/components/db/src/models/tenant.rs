@@ -38,6 +38,8 @@ pub struct Tenant {
     /// may be using an older version. These are only set manually through the DB shell.
     /// Be careful when using this.
     pub pinned_api_version: Option<i32>,
+    // When true, don't allow creating ob configs in prod
+    pub is_prod_ob_config_restricted: bool,
 }
 
 impl Tenant {

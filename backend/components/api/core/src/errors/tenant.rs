@@ -31,4 +31,7 @@ pub enum TenantError {
 
     #[error("Cannot provide an HTTP body alongside an idempotency ID - behavior would be undefined if the user already exists.")]
     CannotProvideBodyAndIdempotencyId,
+
+    #[error("You are not configured to create production onboarding configurations. Feel free to continue in sandbox, or contact us to enable.")]
+    CannotCreateProdObConfigs,
 }

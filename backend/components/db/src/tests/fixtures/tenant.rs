@@ -50,5 +50,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         stripe_customer_id: None,
         is_demo_tenant: false,
         pinned_api_version: None,
+        is_prod_ob_config_restricted: false,
     }
 }

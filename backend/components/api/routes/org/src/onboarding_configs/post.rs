@@ -139,6 +139,9 @@ pub async fn post(
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
+    if is_live && tenant.is_prod_ob_config_restricted {
+        return Err(TenantError::CannotCreateProdObConfigs.into());
+    }
     let is_alpaca_tenant = state
         .feature_flag_client
         .flag(BoolFlag::IsAlpacaTenant(&tenant_id));
