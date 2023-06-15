@@ -1,14 +1,16 @@
-import { DataIdentifier, DataIdentifierKeys } from '@onefootprint/types';
+import { DataIdentifier } from '@onefootprint/types';
+import flat from 'flat';
 import get from 'lodash/get';
 
 const getDiFields = (
   fields: Partial<Record<DataIdentifier, boolean | null | undefined>>,
 ) => {
   const result: DataIdentifier[] = [];
-  DataIdentifierKeys.forEach(value => {
+  const flatFieldsArray = Object.keys(flat(fields));
+  flatFieldsArray.forEach(value => {
     const checked = get(fields, value);
     if (checked) {
-      result.push(value);
+      result.push(value as DataIdentifier);
     }
   });
 

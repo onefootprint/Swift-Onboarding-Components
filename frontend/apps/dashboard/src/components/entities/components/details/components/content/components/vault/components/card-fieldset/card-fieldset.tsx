@@ -52,16 +52,14 @@ const Fieldset = ({
 
   const renderField = (field: DiField) => {
     const { di } = field;
+    const tKeyWithoutAlias = `di.${di.replace(`${selectedCard.alias}.`, '')}`;
+
     return (
       <Field
         key={di}
         di={di}
         entity={entity}
-        renderLabel={() => (
-          <Typography variant="body-3" color="tertiary" as="label">
-            {allT(`di.${di.replace(`${selectedCard.alias}.`, '')}`)}
-          </Typography>
-        )}
+        renderLabel={() => allT(tKeyWithoutAlias)}
       />
     );
   };

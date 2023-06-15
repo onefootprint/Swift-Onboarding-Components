@@ -330,6 +330,98 @@ describe('<Details />', () => {
         });
       });
 
+      describe('card data section', () => {
+        it('should display the encrypted data', async () => {
+          await renderDetailsAndWaitData();
+          const container = screen.getByRole('group', {
+            name: 'Payment card data',
+          });
+
+          const number = getTextByRow({
+            name: 'Number',
+            value: '•••••••••',
+            container,
+          });
+          expect(number).toBeInTheDocument();
+
+          const numberLast4 = getTextByRow({
+            name: 'Number (Last 4)',
+            value: '•••••••••',
+            container,
+          });
+          expect(numberLast4).toBeInTheDocument();
+
+          const expiration = getTextByRow({
+            name: 'Expiration',
+            value: '•••••••••',
+            container,
+          });
+          expect(expiration).toBeInTheDocument();
+
+          const cvc = getTextByRow({
+            name: 'CVC',
+            value: '•••••••••',
+            container,
+          });
+          expect(cvc).toBeInTheDocument();
+
+          const issuer = getTextByRow({
+            name: 'Issuer',
+            value: '•••••••••',
+            container,
+          });
+          expect(issuer).toBeInTheDocument();
+        });
+      });
+
+      describe('when clicking on the decrypt button', () => {
+        beforeEach(() => {
+          withDecrypt(entityFixture.id, {
+            'card.primary.issuer': 'visa',
+            'card.primary.number': '4916975755030283',
+            'card.primary.expiration': '02/25',
+            'card.primary.cvc': '123',
+            'card.primary.number_last4': '0283',
+            'card.primary.name': 'John Doe',
+          });
+        });
+
+        it('should allow to decrypt the data', async () => {
+          await renderDetailsAndWaitData();
+          await decryptFields(['Issuer', 'Number (Last 4)', 'CVC']);
+          const container = screen.getByRole('group', {
+            name: 'Payment card data',
+          });
+
+          await waitFor(() => {
+            const issuer = getTextByRow({
+              name: 'Issuer',
+              value: 'visa',
+              container,
+            });
+            expect(issuer).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const numberLast4 = getTextByRow({
+              name: 'Number (Last 4)',
+              value: '0283',
+              container,
+            });
+            expect(numberLast4).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            const CVC = getTextByRow({
+              name: 'CVC',
+              value: '123',
+              container,
+            });
+            expect(CVC).toBeInTheDocument();
+          });
+        });
+      });
+
       describe('identity data section', () => {
         it('should display the encrypted data', async () => {
           await renderDetailsAndWaitData();

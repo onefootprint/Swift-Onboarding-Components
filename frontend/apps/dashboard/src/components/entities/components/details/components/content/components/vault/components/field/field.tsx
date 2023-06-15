@@ -27,26 +27,23 @@ export type FieldProps = {
 const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
   const { t } = useTranslation('pages.entity.decrypt');
   const { register } = useFormContext();
-  const field = useField(entity);
-  const {
-    canDecrypt,
-    disabled,
-    isDecrypted,
-    label,
-    name,
-    showCheckbox,
-    value,
-  } = field(di);
+  const field = useField(entity)(di);
+  const customLabel = renderLabel ? renderLabel() : undefined;
+  const label = typeof customLabel === 'string' ? customLabel : field.label;
 
   return (
     <Container role="row" aria-label={label}>
-      {showCheckbox ? (
-        <Tooltip disabled={canDecrypt} position="right" text={t('not-allowed')}>
+      {field.showCheckbox ? (
+        <Tooltip
+          disabled={field.canDecrypt}
+          position="right"
+          text={t('not-allowed')}
+        >
           <Box>
             <Checkbox
-              checked={isDecrypted || undefined}
-              {...register(name)}
-              disabled={disabled}
+              checked={field.isDecrypted || undefined}
+              {...register(field.name)}
+              disabled={field.disabled}
               label={label}
               hint={hint}
             />
@@ -54,8 +51,8 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
         </Tooltip>
       ) : (
         <LabelContainer>
-          {renderLabel ? (
-            renderLabel()
+          {customLabel && React.isValidElement(customLabel) ? (
+            customLabel
           ) : (
             <Typography variant="body-3" color="tertiary" as="label">
               {label}
@@ -69,9 +66,9 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
         </LabelContainer>
       )}
       {renderValue ? (
-        renderValue(value, isVaultDataDecrypted(value))
+        renderValue(field.value, isVaultDataDecrypted(field.value))
       ) : (
-        <FieldOrPlaceholder data={value} />
+        <FieldOrPlaceholder data={field.value} />
       )}
     </Container>
   );

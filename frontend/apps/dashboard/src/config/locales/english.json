@@ -94,7 +94,7 @@
     "business.zip": "Zip code",
     "card.name": "Name",
     "card.number": "Number",
-    "card.number_last4": "Number (last 4)",
+    "card.number_last4": "Number (Last 4)",
     "card.cvc": "CVC",
     "card.issuer": "Issuer",
     "card.expiration": "Expiration",
