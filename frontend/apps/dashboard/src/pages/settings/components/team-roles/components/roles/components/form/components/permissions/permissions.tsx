@@ -97,6 +97,10 @@ const Permissions = () => {
                   <MultiSelect
                     label={t('form.decrypt-attributes.label')}
                     options={decryptOptions}
+                    allOption={{
+                      value: RoleScope.decryptAll,
+                      label: t('scopes.decrypt_all'),
+                    }}
                     size="compact"
                     onBlur={field.onBlur}
                     onChange={field.onChange}
