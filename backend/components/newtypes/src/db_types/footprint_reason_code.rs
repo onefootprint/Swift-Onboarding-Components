@@ -544,12 +544,32 @@ footprint_reason_code_enum! {
         DocumentNotVerified,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document OCR not successful", severity = SignalSeverity::High,  description = "The OCR for the front of the document failed."]
+        #[note = "Document verified", severity = SignalSeverity::Info,  description = "Document provided was verified"]
+        DocumentVerified,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document OCR not successful", severity = SignalSeverity::High,  description = "The OCR for the document failed."]
         DocumentOcrNotSuccessful,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document OCR was successful", severity = SignalSeverity::Info,  description = "The OCR for the the document was successful."]
+        DocumentOcrSuccessful,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document barcode illegible", severity = SignalSeverity::High,  description = "The reading and extracting of the barcode on the back of the document failed."]
         DocumentBarcodeCouldNotBeRead,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document barcode was read", severity = SignalSeverity::Info,  description = "The reading and extracting of the barcode on the back of the document succeeded."]
+        DocumentBarcodeCouldBeRead,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document barcode content matches OCR data", severity = SignalSeverity::Info,  description = "Data extracted from the barcode matches. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
+        DocumentBarcodeContentMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document barcode content does not match OCR data", severity = SignalSeverity::High,  description = "Data extracted from the barcode does not match. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
+        DocumentBarcodeContentDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document requires review", severity = SignalSeverity::Medium,  description = "Indicates that further review of the document is required."]
@@ -558,6 +578,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document expired", severity = SignalSeverity::Medium,  description = "The document is expired."]
         DocumentExpired,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document not expired", severity = SignalSeverity::Info,  description = "The document is not expired."]
+        DocumentNotExpired,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document from restricted country", severity = SignalSeverity::High,  description = "The document is from a high-risk country."]
@@ -571,6 +595,7 @@ footprint_reason_code_enum! {
         #[note = "Document type not allowed", severity = SignalSeverity::High,  description = "The document type provided is not allowed."]
         DocumentTypeNotAllowed,
 
+        // Crosschecks
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document crosscheck failed", severity = SignalSeverity::High,  description = "A field crosscheck (comparing data on the front of the document to the back) failed during the document authentication."]
         DocumentFieldCrosscheckFailed,
@@ -584,8 +609,44 @@ footprint_reason_code_enum! {
         DocumentInvalidTemplateLayout,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image possible tampering", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being manipulated or tampered."]
+        #[note = "Document image possible tampering", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being physically manipulated or tampered."]
         DocumentPossibleImageTampering,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document has no signs of physical tampering", severity = SignalSeverity::Info,  description = "The image of the document has no sign of being physically manipulated or tampered."]
+        DocumentNoImageTampering,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document image possible fake", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]
+        DocumentPossibleFakeImage,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document image is not fake", severity = SignalSeverity::Info,  description = "The image of the document has no evidence or appearances of being a fake document."]
+        DocumentNotFakeImage,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document image is an image of a screen", severity = SignalSeverity::High,  description = "The image of the document is picture of a document on a screen"]
+        DocumentPhotoIsScreenCapture,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document image is not an image of a screen", severity = SignalSeverity::Info,  description = "The image of the document is not a picture of a document on a screen"]
+        DocumentPhotoIsNotScreenCapture,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document is printed on paper", severity = SignalSeverity::High,  description = "The image of the document is printed on paper"]
+        DocumentPhotoIsPaperCapture,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document is not printed on paper", severity = SignalSeverity::Info,  description = "The image of the document is not printed on paper"]
+        DocumentPhotoIsNotPaperCapture,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document visible photo features are not verified", severity = SignalSeverity::Medium,  description = "The visible photo features of the document were not verified"]
+        DocumentVisiblePhotoFeaturesNotVerified,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document visible photo features are verified", severity = SignalSeverity::Info,  description = "The visible photo features of the document were verified"]
+        DocumentVisiblePhotoFeaturesVerified,
 
         #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = None]
         #[note = "Document low match with selfie", severity = SignalSeverity::High,  description = "The match score between the customer's captured selfie image and captured document was low."]

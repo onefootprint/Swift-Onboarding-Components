@@ -1,6 +1,6 @@
 use newtypes::{
-    idology::IdologyScanOnboardingCaptureResult, ExperianAddressAndNameMatchReasonCodes,
-    ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
+    idology::IdologyScanOnboardingCaptureResult, incode::IncodeStatus,
+    ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
 };
 
 pub fn test_idology_expectid_response() -> serde_json::Value {
@@ -3607,6 +3607,153 @@ pub fn middesk_business_update_webhook_response() -> serde_json::Value {
     })
 }
 
+pub struct DocTestOpts {
+    pub screen: IncodeStatus,
+    pub paper: IncodeStatus,
+    pub expiration: IncodeStatus,
+    pub overall: IncodeStatus,
+    pub tamper: IncodeStatus,
+    pub visible_photo_features: IncodeStatus,
+    pub barcode: IncodeStatus,
+    pub barcode_content: IncodeStatus,
+    pub fake: IncodeStatus,
+    pub ocr_confidence: IncodeStatus,
+}
+impl Default for DocTestOpts {
+    fn default() -> Self {
+        Self {
+            screen: IncodeStatus::Ok,
+            paper: IncodeStatus::Ok,
+            expiration: IncodeStatus::Ok,
+            overall: IncodeStatus::Ok,
+            tamper: IncodeStatus::Ok,
+            visible_photo_features: IncodeStatus::Ok,
+            barcode: IncodeStatus::Ok,
+            barcode_content: IncodeStatus::Ok,
+            fake: IncodeStatus::Ok,
+            ocr_confidence: IncodeStatus::Ok,
+        }
+    }
+}
+
+pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
+    serde_json::json!({
+      "idValidation": {
+        "photoSecurityAndQuality": [
+          {
+            "value": "PASSED",
+            "status": opts.tamper.to_string(),
+            "key": "tamperCheck"
+          },
+          {
+            "value": "PASSED",
+            "status": "OK",
+            "key": "postitCheck"
+          },
+          {
+            "value": "PASSED",
+            "status": "OK",
+            "key": "alignment"
+          },
+          {
+            "value": "OK",
+            "status": opts.screen.to_string(),
+            "key": "screenIdLiveness"
+          },
+          {
+            "value": "OK",
+            "status": opts.paper.to_string(),
+            "key": "paperIdLiveness"
+          },
+          {
+            "value": "PASSED",
+            "status": "OK",
+            "key": "idAlreadyUsedCheck"
+          },
+          {
+            "value": "96",
+            "status": "OK",
+            "key": "balancedLightFront"
+          },
+          {
+            "value": "99",
+            "status": "OK",
+            "key": "sharpnessFront"
+          }
+        ],
+        "idSpecific": [
+          {
+            "value": "100",
+            "status": "WARN",
+            "key": "documentClassification"
+          },
+          {
+            "value": "100",
+            "status": "OK",
+            "key": "birthDateValidity"
+          },
+          {
+            "value": "100",
+            "status": opts.visible_photo_features.to_string(),
+            "key": "visiblePhotoFeatures"
+          },
+          {
+            "value": "100",
+            "status": "FAIL",
+            "key": "expirationDateValidity"
+          },
+          {
+            "value": "20",
+            "status": opts.expiration.to_string(),
+            "key": "documentExpired"
+          },
+          {
+            "value": "20",
+            "status": opts.barcode_content.to_string(),
+            "key": "2DBarcodeContent"
+          },
+          {
+            "value": "20",
+            "status": opts.barcode.to_string(),
+            "key": "barcode2DDetected"
+          },
+          {
+            "value": "20",
+            "status": opts.fake.to_string(),
+            "key": "fakeCheck"
+          }
+
+        ],
+        "customFields": [
+          {
+            "value": "firstNameMatch",
+            "status": "FAIL",
+            "key": "firstNameMatch"
+          },
+          {
+            "value": "lastNameMatch",
+            "status": "FAIL",
+            "key": "lastNameMatch"
+          }
+        ],
+        "appliedRule": null
+      },
+      "liveness": null,
+      "faceRecognition": null,
+      "idOcrConfidence": {
+        "overallConfidence": {
+          "value": "99.0",
+          "status": opts.ocr_confidence.to_string(),
+          "key": null
+        }
+      },
+      "overall": {
+        "value": "100.0",
+        "status": opts.overall.to_string(),
+        "key": null
+      }
+    })
+}
 pub fn incode_watchlist_result_response_large() -> serde_json::Value {
     let s = r#"
     {

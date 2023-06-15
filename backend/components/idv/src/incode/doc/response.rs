@@ -122,6 +122,15 @@ impl FetchScoresResponse {
             })
             .collect()
     }
+
+    pub fn id_ocr_confidence(&self) -> Result<IncodeStatus, IncodeError> {
+        self.id_ocr_confidence
+            .as_ref()
+            .and_then(|i| i.overall_confidence.as_ref())
+            .and_then(|o| o.status.as_ref())
+            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
+            .ok_or(IncodeError::AssertionError("missing id confidence status".into()))
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -418,15 +427,19 @@ mod tests {
         IncodeFailureReason,
     };
 
-    use crate::incode::doc::response::AddSelfieResponse;
+    use crate::{
+        incode::doc::response::AddSelfieResponse,
+        test_fixtures::{self, DocTestOpts},
+    };
 
     use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse};
 
     #[test]
     pub fn test_parse_fetch_scores() {
-        let raw_response = serde_json::json!({"idValidation":{"photoSecurityAndQuality":[{"value":"PASSED","status":"OK","key":"tamperCheck"},{"value":"PASSED","status":"OK","key":"postitCheck"}, {"value":"PASSED","status":"OK","key":"alignment"},{"value":"OK","status":"OK","key":"screenIdLiveness"},{"value":"OK","status":"OK","key":"paperIdLiveness"},{"value":"PASSED","status":"OK","key":"idAlreadyUsedCheck"},{"value":"96","status":"OK","key":"balancedLightFront"},{"value":"99","status":"OK","key":"sharpnessFront"}],"idSpecific":[{"value":"100","status":"WARN","key":"documentClassification"},{"value":"100","status":"OK","key":"birthDateValidity"},{"value":"100","status":"OK","key":"visiblePhotoFeatures"},{"value":"100","status":"FAIL","key":"expirationDateValidity"},{"value":"100","status":"OK","key":"documentExpired"}],"customFields":[{"value":"firstNameMatch","status":"FAIL","key":"firstNameMatch"},{"value":"lastNameMatch","status":"FAIL","key":"lastNameMatch"}],"appliedRule":null},"liveness":null,"faceRecognition":null,"idOcrConfidence":{"overallConfidence":{"value":"99.0","status":"OK","key":null}},"overall":{"value":"100.0","status":"OK","key":null}});
+        let raw_response = test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
 
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        assert_eq!(parsed.id_ocr_confidence().unwrap(), IncodeStatus::Ok);
         let parsed_tests = parsed.get_id_tests();
 
         // Check a few tests

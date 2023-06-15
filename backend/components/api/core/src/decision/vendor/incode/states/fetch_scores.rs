@@ -31,10 +31,14 @@ impl IncodeStateTransition for FetchScores {
         save_incode_verification_result(db_pool, args).await?;
 
         // Now ensure we don't have an error
-        res.map_err(map_to_api_err)?
+        let parsed_result = res
+            .map_err(map_to_api_err)?
             .result
             .into_success()
             .map_err(map_to_api_err)?;
+        // we need an overall score or else we should fail
+        let _ = parsed_result.overall_score().map_err(map_to_api_err)?;
+
         Ok(Some(Self {}))
     }
 
