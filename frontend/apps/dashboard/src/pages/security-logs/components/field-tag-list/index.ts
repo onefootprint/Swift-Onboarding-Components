@@ -1,1 +1,1 @@
-export { default } from './field-tag-list';
+export { type FieldTagListProps, default } from './field-tag-list';

@@ -92,12 +92,21 @@
     "business.state": "State",
     "business.country": "Country",
     "business.zip": "Zip code",
-    "card.issuer": "Issuer",
-    "card.name": "Name on card",
-    "card.number": "Card number",
-    "card.number_last4": "Number (Last 4)",
-    "card.expiration": "Expiration",
-    "card.cvc": "Security code (CVC)"
+    "card": {
+      "issuer": "Issuer",
+      "name": "Name on card",
+      "number": "Card number",
+      "number_last4": "Number (Last 4)",
+      "expiration": "Expiration",
+      "cvc": "Security code (CVC)",
+      "verbose": {
+        "name": "Name on card",
+        "number": "Card number",
+        "expiration": "Card expiration",
+        "cvc": "Card security code (CVC)",
+        "number_last4": "Card number (last 4)"
+      }
+    }
   },
   "cdo": {
     "name": "Full name",
