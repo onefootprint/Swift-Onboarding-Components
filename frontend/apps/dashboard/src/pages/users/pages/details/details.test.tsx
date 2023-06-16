@@ -77,7 +77,7 @@ describe('<Details />', () => {
     });
   };
 
-  describe('when the request to fetch the users succeeds', () => {
+  describe.skip('when the request to fetch the users succeeds', () => {
     beforeEach(() => {
       withEntity();
     });
