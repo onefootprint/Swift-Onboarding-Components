@@ -108,7 +108,16 @@ const mobile: Option = {
   links: [
     {
       name: 'React Native',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-native',
+      href: 'https://github.com/onefootprint/examples/tree/master/mobile-react-native',
+      img: {
+        src: '/examples/react.png',
+        height: 32,
+        width: 32,
+      },
+    },
+    {
+      name: 'Expo + React Native',
+      href: 'https://github.com/onefootprint/examples/tree/master/mobile-expo',
       img: {
         src: '/examples/react.png',
         height: 32,
