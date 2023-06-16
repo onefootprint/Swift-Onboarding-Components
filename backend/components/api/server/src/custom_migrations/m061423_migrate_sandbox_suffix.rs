@@ -225,13 +225,20 @@ async fn compute_single(
     let (pii, new_vd) = match &vd.kind {
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
-            // assert!(!phone_number.is_live());
-            if phone_number.is_live() {
+            // assert!(!phone_number.is_live() || !vault.is_portable);
+            // We should only expect to see some legacy non-portable vaults with live emails in sandbox
+            if phone_number.is_live() && vault.is_portable {
                 tracing::info!("Non-live phone number for {}, {}", vault.id, vd.id);
             }
+            let sandbox_id = if !phone_number.is_live() {
+                phone_number.sandbox_suffix.clone()
+            } else {
+                // Autofill sandbox id for the few non-portable sandbox vaults that had numbers without a suffix
+                crypto::random::gen_random_alphanumeric_code(10)
+            };
             let vault_update = VaultUpdate {
                 id: vault.id,
-                sandbox_id: phone_number.sandbox_suffix.clone(),
+                sandbox_id,
             };
             (phone_number.e164(), Some(vault_update))
         }
@@ -239,8 +246,9 @@ async fn compute_single(
             // TODO do the same truncating email, but i don't think we should actually save the email's
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
-            // assert!(!email.is_live());
-            if email.is_live() {
+            // assert!(!email.is_live() || !vault.is_portable);
+            // We should only expect to see some legacy non-portable vaults with live emails in sandbox
+            if email.is_live() && vault.is_portable {
                 tracing::info!("Non-live email for {}, {}", vault.id, vd.id);
             }
             (email.email, None)
