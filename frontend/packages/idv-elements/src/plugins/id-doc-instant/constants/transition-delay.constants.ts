@@ -1,3 +1,2 @@
-const TRANSITION_DELAY = 3000;
-
-export default TRANSITION_DELAY;
+export const TRANSITION_DELAY_LONG = 3000;
+export const TRANSITION_DELAY_DEFAULT = 1500;

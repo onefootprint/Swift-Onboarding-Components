@@ -9,7 +9,7 @@ import NavigationHeader from '../../../../../../components/layout/components/nav
 import FadeInContainer from '../../../../components/fade-in-container';
 import FeedbackIcon from '../../../../components/feedback-icon';
 import { useIdDocMachine } from '../../../../components/machine-provider';
-import TRANSITION_DELAY from '../../../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_LONG } from '../../../../constants/transition-delay.constants';
 
 const RetryLimitExceeded = () => {
   const { t } = useTranslation('pages.retry-limit-exceeded');
@@ -20,7 +20,7 @@ const RetryLimitExceeded = () => {
     send({
       type: 'retryLimitExceeded',
     });
-  }, TRANSITION_DELAY);
+  }, TRANSITION_DELAY_LONG);
 
   return (
     <FadeInContainer>

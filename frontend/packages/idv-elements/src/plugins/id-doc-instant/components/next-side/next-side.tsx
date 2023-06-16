@@ -5,7 +5,7 @@ import React from 'react';
 import { useTimeout } from 'usehooks-ts';
 
 import { imageIcons, ImageTypes } from '../../constants/image-types';
-import TRANSITION_DELAY from '../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 
 type NextSideProps = {
   docType: IdDocType;
@@ -23,7 +23,7 @@ const NextSide = ({
 
   useTimeout(() => {
     onComplete();
-  }, TRANSITION_DELAY);
+  }, TRANSITION_DELAY_DEFAULT);
 
   const side =
     nextSideImageType === (docType === IdDocType.passport && ImageTypes.front)

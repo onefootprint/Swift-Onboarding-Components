@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import TRANSITION_DELAY from '../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 
 type IdDocAnimationProps = {
   mode: 'loading' | 'success';
@@ -58,7 +58,7 @@ const IdDocAnimation = ({
       setTimeout(() => {
         setIsShowingSuccess(false);
         if (hasNextSide) setIsShowingNextSide(true);
-      }, TRANSITION_DELAY);
+      }, TRANSITION_DELAY_DEFAULT);
     }
   }, [mode, hasNextSide]);
 

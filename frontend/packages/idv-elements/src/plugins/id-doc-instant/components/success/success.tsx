@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { imageIcons, ImageTypes } from '../../constants/image-types';
-import TRANSITION_DELAY from '../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
@@ -21,7 +21,7 @@ const Success = ({ imageType, onComplete, docType }: SuccessProps) => {
   useEffect(() => {
     // This conditional should satisfy only when we are done with the flow
     if (onComplete) {
-      setTimeout(onComplete, TRANSITION_DELAY);
+      setTimeout(onComplete, TRANSITION_DELAY_DEFAULT);
     }
   }, [onComplete]);
 
