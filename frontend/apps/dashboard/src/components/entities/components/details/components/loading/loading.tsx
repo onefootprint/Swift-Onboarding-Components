@@ -90,19 +90,17 @@ const Header = () => (
 
 const Vault = () => (
   <Box sx={{ display: 'grid', gap: 5, gridTemplateColumns: 'repeat(2, 1fr)' }}>
-    <Box id="basic-data">
-      <Shimmer sx={{ height: '172px', width: '632px' }} />
+    <Box>
+      <Shimmer sx={{ height: '317px', width: '632px' }} />
     </Box>
-    <Box id="identity-data">
-      <Shimmer sx={{ height: '216px', width: '632px' }} />
+    <Box>
+      <Shimmer sx={{ height: '317px', width: '632px' }} />
     </Box>
-    <Box
-      id="address-data"
-      sx={{
-        gridArea: '1 / 2 / span 2 / 2',
-      }}
-    >
-      <Shimmer sx={{ height: '404px', width: '632px' }} />
+    <Box>
+      <Shimmer sx={{ height: '235px', width: '632px' }} />
+    </Box>
+    <Box>
+      <Shimmer sx={{ height: '235px', width: '632px' }} />
     </Box>
   </Box>
 );

@@ -1,7 +1,7 @@
 import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
 import { EntityCard } from '@onefootprint/types';
 import { Dropdown, media, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import CardIcon from '../card-icon';
@@ -16,64 +16,88 @@ export const CardHeader = ({
   cards,
   selectedCard,
   onChange,
-}: CardHeaderProps) => (
-  <MiniCardDisplay>
-    <CardIcon issuer={selectedCard?.issuer || ''} />
-    <CardLine>
-      <Typography variant="body-4">
-        {selectedCard?.number_last4
-          ? `••••${selectedCard.number_last4}`
-          : `••••••••`}
-      </Typography>
-      <Typography variant="body-4">({selectedCard.alias})</Typography>
-    </CardLine>
-    <Dropdown.Root>
-      <Dropdown.Trigger aria-label="Card header dropdown trigger">
-        <IcoChevronDown24 />
-      </Dropdown.Trigger>
-      <Dropdown.Content align="end" sideOffset={4}>
-        <CardDropdownDisplay>
-          {cards.map(card => (
-            <CardDropdownElement
-              key={`${card?.number_last4}-${card.alias}`}
-              onClick={() => onChange(card)}
-            >
-              <CardAndNumber>
-                <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
-                <Typography variant="body-4">
-                  {card?.number_last4 ? `••••${card.number_last4}` : `••••••••`}
-                </Typography>
-              </CardAndNumber>
-              <AliasAndCheckmark>
-                <Typography variant="body-4" color="tertiary">
-                  {card.alias}
-                </Typography>
-                {card.alias === selectedCard.alias ? (
-                  <IcoCheck24 />
-                ) : (
-                  <BlankIcon />
-                )}
-              </AliasAndCheckmark>
-            </CardDropdownElement>
-          ))}
-        </CardDropdownDisplay>
-      </Dropdown.Content>
-    </Dropdown.Root>
-  </MiniCardDisplay>
-);
+}: CardHeaderProps) => {
+  const [showDropdown, setShowDropdown] = useState(false);
 
-const MiniCardDisplay = styled.div`
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const changeCard = (card: EntityCard) => {
+    onChange(card);
+    setShowDropdown(false);
+  };
+
+  return (
+    <CardHeaderContainer>
+      <Dropdown.Root open={showDropdown} onOpenChange={toggleDropdown}>
+        <CustomDropdownTrigger aria-label="Open card options">
+          <CardIcon issuer={selectedCard?.issuer || ''} />
+          <CardLine>
+            <Typography variant="body-4">
+              {selectedCard?.number_last4
+                ? `••••${selectedCard.number_last4}`
+                : `••••`}
+            </Typography>
+            <Typography variant="body-4">({selectedCard.alias})</Typography>
+          </CardLine>
+          <IcoChevronDown24 />
+        </CustomDropdownTrigger>
+        <Dropdown.Content
+          align="end"
+          sideOffset={4}
+          style={{
+            padding: '0',
+          }}
+        >
+          <DropdownInner>
+            {cards.map(card => (
+              <CardDropdownElement
+                key={`${card?.number_last4}-${card.alias}`}
+                onClick={() => changeCard(card)}
+              >
+                <CardAndNumber>
+                  <CardIcon
+                    key={card.issuer || ''}
+                    issuer={card.issuer || ''}
+                  />
+                  <Typography variant="body-4">
+                    {card?.number_last4 ? `••••${card.number_last4}` : `••••`}
+                  </Typography>
+                </CardAndNumber>
+                <AliasAndCheckmark>
+                  <Typography variant="body-4" color="tertiary">
+                    {card.alias}
+                  </Typography>
+                  {card.alias === selectedCard.alias ? (
+                    <IcoCheck24 />
+                  ) : (
+                    <BlankIcon />
+                  )}
+                </AliasAndCheckmark>
+              </CardDropdownElement>
+            ))}
+          </DropdownInner>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    </CardHeaderContainer>
+  );
+};
+
+const CardHeaderContainer = styled.div`
+  ${media.lessThan('md')`
+    display: none;
+  `}
+`;
+
+const CustomDropdownTrigger = styled(Dropdown.Trigger)`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: ${theme.spacing[3]};
-    white-space: nowrap;
+    padding-left: ${theme.spacing[3]};
+    width: unset;
 
-    ${media.lessThan('md')`
-      display: none;
-    `}
+    &[data-state='open'] {
+      background: unset;
+    }
   `};
 `;
 
@@ -84,16 +108,32 @@ const BlankIcon = styled.div`
   `};
 `;
 
+const DropdownInner = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.primary};
+    display: flex;
+    flex-direction: column;
+    padding: ${theme.spacing[3]} 0px;
+    user-select: none;
+    width: 280px;
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
+  `};
+`;
+
 const CardDropdownElement = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[2]} ${theme.spacing[5]};
     cursor: pointer;
     flex-wrap: nowrap;
     overflow: hidden;
+    :hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
   `};
 `;
 
@@ -102,6 +142,7 @@ const CardLine = styled.div`
     display: flex;
     flex-direction: row;
     gap: ${theme.spacing[4]};
+    margin-left: ${theme.spacing[3]};
     white-space: nowrap;
   `};
 `;
@@ -123,17 +164,6 @@ const AliasAndCheckmark = styled.div`
     flex-direction: row;
     align-items: center;
     gap: ${theme.spacing[3]};
-  `};
-`;
-
-const CardDropdownDisplay = styled.div`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    user-select: none;
   `};
 `;
 

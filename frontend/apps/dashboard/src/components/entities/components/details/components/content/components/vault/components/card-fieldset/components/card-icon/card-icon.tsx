@@ -30,14 +30,7 @@ const cardIcons: Record<string, JSX.Element> = {
 
 const CardIcon = ({ issuer }: CardIconProps) =>
   issuer ? (
-    <IconContainer
-      animate={{ opacity: 1, y: 0 }}
-      aria-label={issuer}
-      initial={{ opacity: 0, y: 10 }}
-      key={issuer}
-      role="img"
-      transition={{ duration: 0.2 }}
-    >
+    <IconContainer aria-label={issuer} key={issuer} role="img">
       {cardIcons[issuer] && cardIcons[issuer]}
     </IconContainer>
   ) : (

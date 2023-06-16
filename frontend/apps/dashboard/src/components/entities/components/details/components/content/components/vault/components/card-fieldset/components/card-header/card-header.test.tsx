@@ -54,7 +54,7 @@ describe('<CardHeader />', () => {
       expect(screen.getByText('••••1234')).toBeInTheDocument();
     });
 
-    it('should display extra dots if no last 4 provided for selected card', () => {
+    it('should display just for dots if no 4 provided for selected card', () => {
       const currentCard = {
         ...defaultCard,
         alias: 'Hayes',
@@ -68,7 +68,7 @@ describe('<CardHeader />', () => {
         onChange: () => {},
       });
 
-      expect(screen.getByText('••••••••')).toBeInTheDocument();
+      expect(screen.getByText('••••')).toBeInTheDocument();
     });
   });
 
@@ -86,9 +86,7 @@ describe('<CardHeader />', () => {
         onChange: () => {},
       });
 
-      const dropdownTrigger = screen.getByLabelText(
-        'Card header dropdown trigger',
-      );
+      const dropdownTrigger = screen.getByLabelText('Open card options');
       await userEvent.click(dropdownTrigger);
 
       await waitFor(() => {
@@ -128,9 +126,7 @@ describe('<CardHeader />', () => {
         onChange: () => {},
       });
 
-      const dropdownTrigger = screen.getByLabelText(
-        'Card header dropdown trigger',
-      );
+      const dropdownTrigger = screen.getByLabelText('Open card options');
       await userEvent.click(dropdownTrigger);
 
       await waitFor(() => {

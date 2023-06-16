@@ -22,6 +22,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
         display: flex;
         height: 32px;
         padding: 0 ${theme.spacing[2]};
+        user-select: none;
 
         &:hover:enabled {
           background-color: ${button.variant.secondary.hover.bg};

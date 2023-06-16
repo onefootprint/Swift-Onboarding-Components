@@ -14,7 +14,7 @@ const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
   const createInitialData = () => {
     const vault: EntityVault = {};
     entity.attributes.forEach(attribute => {
-      vault[attribute] = null;
+      vault[attribute] = entity.decryptedAttributes[attribute] ?? null;
     });
     vault.cards = getCards(entity);
     return vault;

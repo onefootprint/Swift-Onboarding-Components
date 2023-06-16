@@ -1,0 +1,38 @@
+import { DataIdentifier } from '@onefootprint/types';
+
+const order: Record<string, number> = {
+  issuer: 1,
+  name: 2,
+  number: 3,
+  expiration: 4,
+  cvc: 5,
+};
+
+const filter = (attributes: DataIdentifier[], search: any) => {
+  const hiddenAttributes = [
+    'expiration_month',
+    'expiration_year',
+    'number_last4',
+  ];
+  return attributes.filter(
+    attr =>
+      attr.includes(`card.${search}`) &&
+      !hiddenAttributes.some(hiddenAttr => attr.includes(hiddenAttr)),
+  );
+};
+
+const sort = (attributes: DataIdentifier[]) =>
+  attributes.sort((a, b) => {
+    const aKey = a.split('.')[2];
+    const bKey = b.split('.')[2];
+
+    return order[aKey] - order[bKey];
+  });
+
+const getDis = (attributes: DataIdentifier[], search: any) => {
+  const filtered = filter(attributes, search);
+  const sorted = sort(filtered);
+  return sorted;
+};
+
+export default getDis;

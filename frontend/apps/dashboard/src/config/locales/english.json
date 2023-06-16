@@ -92,14 +92,12 @@
     "business.state": "State",
     "business.country": "Country",
     "business.zip": "Zip code",
-    "card.name": "Name",
-    "card.number": "Number",
-    "card.number_last4": "Number (Last 4)",
-    "card.cvc": "CVC",
     "card.issuer": "Issuer",
+    "card.name": "Name on card",
+    "card.number": "Card number",
+    "card.number_last4": "Number (Last 4)",
     "card.expiration": "Expiration",
-    "card.expiration_month": "Expiration month",
-    "card.expiration_year": "Expiration year"
+    "card.cvc": "Security code (CVC)"
   },
   "cdo": {
     "name": "Full name",
@@ -493,7 +491,6 @@
       "fieldset": {
         "select-all": "Select all",
         "deselect-all": "Deselect all",
-        "card": "card",
         "cards": "cards"
       },
       "decrypt": {

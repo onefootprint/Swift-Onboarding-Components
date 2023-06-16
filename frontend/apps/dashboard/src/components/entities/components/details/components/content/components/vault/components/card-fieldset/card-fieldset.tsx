@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { type Icon } from '@onefootprint/icons';
-import { DataIdentifier, EntityCard } from '@onefootprint/types';
+import { EntityCard } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
@@ -14,6 +14,7 @@ import { DiField } from '../../vault.types';
 import { useDecryptControls } from '../decrypt-controls';
 import Field from '../field';
 import CardHeader from './components/card-header';
+import getDis from './utils/get-dis';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;
@@ -31,7 +32,7 @@ const Fieldset = ({
   const { data } = useEntityVault(entity.id, entity);
   const cards: EntityCard[] = data?.cards ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
-  const dis = getCardDis(entity.attributes, selectedCard.alias);
+  const dis = getDis(entity.attributes, selectedCard.alias);
   const fields = dis.map(di => ({ di }));
 
   const getFieldProps = useField(entity);
@@ -40,7 +41,7 @@ const Fieldset = ({
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const getCardTitle = (length: number) =>
-    `${title} • ${length} ${length > 1 ? t('cards') : t('card')}`;
+    `${title} ${length > 1 ? `(${length} ${t('cards')})` : ''}`;
 
   const handleSelectAll = () => {
     form.set(selectableFields, true);
@@ -74,11 +75,13 @@ const Fieldset = ({
               {getCardTitle(cards.length)}
             </Typography>
           </Title>
-          <CardHeader
-            cards={cards}
-            selectedCard={selectedCard}
-            onChange={setSelectedCard}
-          />
+          {!decrypt.inProgress && cards.length > 1 && (
+            <CardHeader
+              cards={cards}
+              selectedCard={selectedCard}
+              onChange={setSelectedCard}
+            />
+          )}
           {shouldShowSelectAll && (
             <LinkButton
               onClick={allSelected ? handleDeselectAll : handleSelectAll}
@@ -93,15 +96,6 @@ const Fieldset = ({
     </Container>
   );
 };
-
-const getCardDis = (attributes: DataIdentifier[], search: any) =>
-  attributes.filter(
-    attr =>
-      attr.includes(`card.${search}`) &&
-      // exclude expiration_month, expiration_year; only show expiration
-      !attr.includes(`expiration_month`) &&
-      !attr.includes(`expiration_year`),
-  );
 
 const Container = styled.fieldset`
   ${({ theme }) => css`
