@@ -148,6 +148,7 @@ pub async fn post(
                         is_portable: true,
                         kind: VaultKind::Business,
                         is_fixture: false,
+                        sandbox_id: user_vault.sandbox_id.clone(), // Use the same sandbox ID for business vault
                     };
                     let business_vault = Vault::create(conn, args)?;
                     BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;

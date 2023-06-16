@@ -21,32 +21,30 @@ impl Validate for IDK {
             IDK::State => value, // maybe we'll want to validate state based on country some day
             IDK::Zip => utils::clean_and_validate_zip(value)?,
             IDK::Country => utils::clean_and_validate_country(value)?,
-            IDK::Email => clean_and_validate_email(value, args)?,
-            IDK::PhoneNumber => clean_and_validate_phone(value, args)?,
+            IDK::Email => clean_and_validate_email(value)?,
+            IDK::PhoneNumber => clean_and_validate_phone(value)?,
             IDK::Nationality => utils::clean_and_validate_country(value)?,
         };
         Ok(result)
     }
 }
 
-fn clean_and_validate_email(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
+fn clean_and_validate_email(value: PiiString) -> NtResult<PiiString> {
     let email = Email::from_str(value.leak())?;
-    if email.is_live() && !args.is_live {
-        return Err(Error::LiveDataInSandboxMode.into());
-    }
-    if !email.is_live() && args.is_live {
-        return Err(Error::SandboxDataInLiveMode.into());
+    if email.is_live() {
+        return Err(crate::Error::Custom(
+            "Unexpected: got to validation without stripping sandbox suffix".into(),
+        ));
     }
     Ok(email.to_piistring())
 }
 
-fn clean_and_validate_phone(value: PiiString, args: ValidateArgs) -> NtResult<PiiString> {
+fn clean_and_validate_phone(value: PiiString) -> NtResult<PiiString> {
     let phone = PhoneNumber::parse(value)?;
-    if phone.is_live() && !args.is_live {
-        return Err(Error::LiveDataInSandboxMode.into());
-    }
-    if !phone.is_live() && args.is_live {
-        return Err(Error::SandboxDataInLiveMode.into());
+    if phone.is_live() {
+        return Err(crate::Error::Custom(
+            "Unexpected: got to validation without stripping sandbox suffix".into(),
+        ));
     }
     Ok(phone.e164_with_suffix())
 }

@@ -40,7 +40,7 @@ pub struct NewVaultData {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = vault_data)]
-pub struct NewUserVaultDataRow {
+pub struct NewVaultDataRow {
     pub lifetime_id: DataLifetimeId,
     pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,
@@ -87,7 +87,7 @@ impl VaultData {
         let new_rows: Vec<_> = data
             .into_iter()
             .zip(lifetimes.into_iter())
-            .map(|(new_vd, lifetime)| NewUserVaultDataRow {
+            .map(|(new_vd, lifetime)| NewVaultDataRow {
                 lifetime_id: lifetime.id,
                 kind: new_vd.kind,
                 e_data: new_vd.e_data,

@@ -4,10 +4,12 @@
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
 use api_core::{errors::ApiResult, State};
-mod m042323_migrate_fingerprints;
 use byteorder::{BigEndian, ReadBytesExt};
 use db::{DbError, DbResult, TxnPgConn};
 use diesel::{sql_query, sql_types::BigInt, RunQueryDsl};
+
+mod m042323_migrate_fingerprints;
+mod m061423_migrate_sandbox_suffix;
 
 trait CustomMigration {
     type MigrationState;
@@ -25,6 +27,7 @@ trait CustomMigration {
 /// runs any active migrations that need to be run
 pub async fn run(state: &State) -> ApiResult<()> {
     run_migration(state, m042323_migrate_fingerprints::Migration).await?;
+    run_migration(state, m061423_migrate_sandbox_suffix::Migration).await?;
     Ok(())
 }
 

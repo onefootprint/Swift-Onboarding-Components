@@ -40,23 +40,22 @@ impl TryFrom<DataIdentifier> for IdentityDataKind {
 
 impl IsDataIdentifierDiscriminant for IdentityDataKind {
     fn parent(&self) -> Option<CollectedData> {
-        let result = match self {
-            Self::FirstName => CollectedData::Name,
-            Self::LastName => CollectedData::Name,
-            Self::Dob => CollectedData::Dob,
-            Self::Ssn4 => CollectedData::Ssn,
-            Self::Ssn9 => CollectedData::Ssn,
-            Self::AddressLine1 => CollectedData::Address,
-            Self::AddressLine2 => CollectedData::Address,
-            Self::City => CollectedData::Address,
-            Self::State => CollectedData::Address,
-            Self::Zip => CollectedData::Address,
-            Self::Country => CollectedData::Address,
-            Self::Email => CollectedData::Email,
-            Self::PhoneNumber => CollectedData::PhoneNumber,
-            Self::Nationality => CollectedData::Nationality,
-        };
-        Some(result)
+        match self {
+            Self::FirstName => Some(CollectedData::Name),
+            Self::LastName => Some(CollectedData::Name),
+            Self::Dob => Some(CollectedData::Dob),
+            Self::Ssn4 => Some(CollectedData::Ssn),
+            Self::Ssn9 => Some(CollectedData::Ssn),
+            Self::AddressLine1 => Some(CollectedData::Address),
+            Self::AddressLine2 => Some(CollectedData::Address),
+            Self::City => Some(CollectedData::Address),
+            Self::State => Some(CollectedData::Address),
+            Self::Zip => Some(CollectedData::Address),
+            Self::Country => Some(CollectedData::Address),
+            Self::Email => Some(CollectedData::Email),
+            Self::PhoneNumber => Some(CollectedData::PhoneNumber),
+            Self::Nationality => Some(CollectedData::Nationality),
+        }
     }
 
     fn is_optional(&self) -> bool {

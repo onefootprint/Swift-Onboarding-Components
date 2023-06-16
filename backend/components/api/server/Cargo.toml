@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 api_core = { path = "../core" }
 db = { path = "../../db" }
+enclave = { path = "../../enclave/enclave" }
 newtypes = { path = "../../newtypes" }
 crypto = { path = "../../enclave/crypto" }
 api_routes_root = { path = "../routes/_root" }
@@ -17,6 +18,7 @@ futures = { workspace = true }
 tokio = { workspace = true }
 actix-cors = "0.6"
 
+chrono = { workspace = true }
 sentry = { workspace = true }
 sentry-actix = { workspace = true }
 sentry-tracing = { workspace = true }

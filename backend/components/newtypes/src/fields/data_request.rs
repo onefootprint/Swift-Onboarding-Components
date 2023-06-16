@@ -250,10 +250,27 @@ impl<T> DataRequest<T> {
             })
             .collect();
 
-        let request = DataRequest {
-            data: self.data,
-            fingerprints,
-        };
+        // TODO for now, while we still accept sandbox suffix in email, strip it here.
+        // In the future, fingerprint the email with the sandbox suffix?
+
+        // todo don't allow changing sandbox id once it's set
+        // todo do we want the phone fingerprint to also include the suffix or just check in identify
+        // the sandbox fingerprint matches too? probably latter
+        let data = self
+            .data
+            .into_iter()
+            .map(|(di, pii)| {
+                let pii = match di {
+                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
+                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
+                    }
+                    _ => pii,
+                };
+                (di, pii)
+            })
+            .collect();
+
+        let request = DataRequest { data, fingerprints };
         Ok(request)
     }
 
@@ -285,10 +302,23 @@ impl<T> DataRequest<T> {
             })
             .collect();
 
-        let request = DataRequest {
-            data: self.data,
-            fingerprints,
-        };
+        // TODO for now, while we still accept sandbox suffix in email, strip it here
+        // In the future, fingerprint the email with the sandbox suffix?
+        let data = self
+            .data
+            .into_iter()
+            .map(|(di, pii)| {
+                let pii = match di {
+                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
+                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
+                    }
+                    _ => pii,
+                };
+                (di, pii)
+            })
+            .collect();
+
+        let request = DataRequest { data, fingerprints };
         Ok(request)
     }
 

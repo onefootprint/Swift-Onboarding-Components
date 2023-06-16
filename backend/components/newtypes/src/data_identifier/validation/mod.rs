@@ -64,10 +64,8 @@ pub enum Error {
     InvalidExpiration,
     #[error("{0}")]
     CannotParseInt(#[from] std::num::ParseIntError),
-    #[error("Cannot provide sandbox data in live mode. Please remove the sandbox suffix (the # and after)")]
+    #[error("Cannot provide sandbox ID in live mode. Please remove the sandbox ID.")]
     SandboxDataInLiveMode,
-    #[error("Must provide sandbox data in sandbox mode. To allow reusing phone numbers and emails, they have a \"sandbox suffix\", like `#test1`. Please add a sandbox suffix to your phone and email")]
-    LiveDataInSandboxMode,
     #[error("Cannot specify this piece of data. It will automatically be derived.")]
     CannotSpecifyDerivedEntry,
     #[error("Cannot vault this piece of data.")]

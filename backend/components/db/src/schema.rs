@@ -798,6 +798,7 @@ table! {
         kind -> Text,
         is_fixture -> Bool,
         idempotency_id -> Nullable<Text>,
+        sandbox_id -> Nullable<Text>,
     }
 }
 

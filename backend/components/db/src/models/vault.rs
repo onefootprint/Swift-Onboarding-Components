@@ -26,6 +26,7 @@ pub struct Vault {
     pub public_key: VaultPublicKey,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    // TODO can probably deprecate this and just check the sandbox_id
     pub is_live: IsLive,
     pub is_portable: bool,
     pub kind: VaultKind,
@@ -34,6 +35,10 @@ pub struct Vault {
     /// global fingerprints so they can not be identified outside of the tenant that created them
     pub is_fixture: IsFixture,
     pub idempotency_id: Option<IdempotencyId>,
+    /// The sandbox identifier for this vault. Must be provided for vaults where is_live = false.
+    /// The sandbox identifier helps to differentiate multiple sandbox vaults made with the same
+    /// phone number / email.
+    pub sandbox_id: Option<String>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -179,6 +184,7 @@ impl Vault {
             is_portable,
             kind,
             is_fixture,
+            sandbox_id,
         } = new_user;
         let new_user = NewVaultRow {
             id: VaultId::generate(kind),
@@ -189,6 +195,7 @@ impl Vault {
             kind,
             is_fixture,
             idempotency_id,
+            sandbox_id,
         };
         let vault = diesel::insert_into(vault::table)
             .values(new_user)
@@ -242,6 +249,7 @@ struct NewVaultRow {
     kind: VaultKind,
     is_fixture: IsFixture,
     idempotency_id: Option<IdempotencyId>,
+    sandbox_id: Option<String>,
 }
 
 pub struct NewVaultArgs {
@@ -251,4 +259,5 @@ pub struct NewVaultArgs {
     pub is_portable: bool,
     pub kind: VaultKind,
     pub is_fixture: IsFixture,
+    pub sandbox_id: Option<String>,
 }

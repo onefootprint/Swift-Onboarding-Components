@@ -1,17 +1,25 @@
 use std::collections::HashSet;
 
+pub(crate) fn validate_sandbox_suffix(s: &str) -> Result<(), crate::Error> {
+    // "sandbox suffix" must match [a-zA-Z0-9_]+
+    let allowed_characters = HashSet::<char>::from_iter(['_']);
+    if s.is_empty()
+        || !s
+            .chars()
+            .all(|x| x.is_alphanumeric() || allowed_characters.contains(&x))
+    {
+        return Err(crate::Error::InvalidSandboxSuffix);
+    }
+    Ok(())
+}
+
 pub(crate) fn split_sandbox_parts(s: &str) -> Result<(&str, &str), crate::Error> {
     let res = if s.contains('#') {
         let split = s.split('#').collect::<Vec<&str>>();
-        let allowed_characters = HashSet::<char>::from_iter(['_']);
-
-        if split.len() != 2
-            || split[1].is_empty()
-            // "sandbox suffix" must match [a-zA-Z0-9_]+
-            || !split[1].chars().all(|x| x.is_alphanumeric() || allowed_characters.contains(&x))
-        {
+        if split.len() != 2 {
             return Err(crate::Error::InvalidSandboxSuffix);
         }
+        validate_sandbox_suffix(split[1])?;
         (split[0], split[1])
     } else {
         (s, "")

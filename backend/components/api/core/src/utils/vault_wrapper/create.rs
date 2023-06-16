@@ -34,7 +34,7 @@ impl VaultWrapper<Person> {
         tenant_sh_phone_number: Fingerprint,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
         // Verify that the ob config is_live matches the user vault
-        let phone_number_parsed = PhoneNumber::parse(phone_number.clone())?;
+        let phone_number_parsed = PhoneNumber::parse(phone_number)?;
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {
@@ -44,6 +44,8 @@ impl VaultWrapper<Person> {
             is_portable: true,
             kind: VaultKind::Person,
             is_fixture: phone_number_parsed.is_fixture_phone_number(),
+            sandbox_id: (!phone_number_parsed.is_live())
+                .then_some(phone_number_parsed.sandbox_suffix.clone()),
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
@@ -53,7 +55,7 @@ impl VaultWrapper<Person> {
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number to the vault since it was used to create it
-        let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number)].into_iter());
+        let data = HashMap::from_iter([(IDK::PhoneNumber.into(), phone_number_parsed.e164())].into_iter());
         let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
         let request = request.manual_fingerprints(HashSet::from_iter(
             [

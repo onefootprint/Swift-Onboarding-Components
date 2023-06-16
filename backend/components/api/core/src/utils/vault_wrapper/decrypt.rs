@@ -2,7 +2,7 @@ use super::{Business, VaultWrapper};
 use crate::enclave_client::EnclaveClient;
 use crate::errors::business::BusinessError;
 use crate::errors::user::UserError;
-use crate::errors::{ApiError, ApiResult};
+use crate::errors::{ApiError, ApiResult, AssertionError};
 use crate::State;
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
@@ -103,6 +103,29 @@ impl<Type> VaultWrapper<Type> {
             .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key, DataTransform::Identity)
             .await?;
 
+        // TODO during our migration while we are moving sandbox_id to its own DI, re-add the suffix
+        // back into the phone and email
+        let text = if !self.vault.is_live {
+            let sandbox_id = self
+                .vault
+                .sandbox_id
+                .as_ref()
+                .ok_or(AssertionError("Sandbox vault without sandbox id"))?;
+            text.into_iter()
+                .map(|(di, pii)| {
+                    let pii = match di {
+                        DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
+                            PiiString::new(format!("{}#{}", pii.leak(), sandbox_id))
+                        }
+                        _ => pii,
+                    };
+                    (di, pii)
+                })
+                .collect()
+        } else {
+            text
+        };
+
         // Don't make access events for the DIs that are already in plaintext
         let decrypted_dis = ids
             .iter()
@@ -119,6 +142,7 @@ impl<Type> VaultWrapper<Type> {
             results,
             decrypted_dis,
         };
+        // TODO add sandbox suffix to phone/email here
         Ok(result)
     }
 

@@ -56,6 +56,8 @@ pub async fn post(
         is_portable: false,
         kind: VaultKind::Person,
         is_fixture: false,
+        // TODO allow providing sandbox ID in a header
+        sandbox_id: (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10)),
     };
 
     // Parse optional request
