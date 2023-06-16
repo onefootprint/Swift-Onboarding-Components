@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig(options => ({
   entryPoints: {
-    'footprint-expo': 'src/index.ts',
+    'footprint-react-native': 'src/index.ts',
   },
   clean: true,
   treeshake: true,
@@ -10,5 +10,5 @@ export default defineConfig(options => ({
   format: ['cjs', 'esm'],
   watch: options.watch,
   minify: !options.watch,
-  external: ['react', 'react-native', 'expo'],
+  external: ['react', 'react-native'],
 }));
