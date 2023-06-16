@@ -100,7 +100,8 @@ impl CustomMigration for Migration {
             let migrate_fut = migrate_chunk(&state, conn, chunk);
             futures::executor::block_on(migrate_fut)?;
         }
-        Ok(())
+        panic!("REVERT");
+        // Ok(())
     }
 }
 
@@ -173,9 +174,8 @@ async fn migrate_chunk<'a>(
         .values(fps)
         .execute(conn.conn())
         .map_err(DbError::from)?;
-    panic!("REVERT");
 
-    // Ok(())
+    Ok(())
 }
 
 table! {
