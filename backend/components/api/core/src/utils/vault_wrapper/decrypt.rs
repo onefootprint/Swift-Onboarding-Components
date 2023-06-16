@@ -48,6 +48,14 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ids: &[DataIdentifier],
     ) -> ApiResult<DecryptUncheckedResult> {
+        if ids.is_empty() {
+            // Short-circuit so no network requests
+            return Ok(DecryptUncheckedResult {
+                results: HashMap::new(),
+                decrypted_dis: vec![],
+            });
+        }
+
         // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
         let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| match di {
             DataIdentifier::Document(kind) if matches!(kind.storage_type(), StorageType::DocumentData) => {

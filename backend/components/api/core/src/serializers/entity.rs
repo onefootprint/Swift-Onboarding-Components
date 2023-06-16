@@ -12,12 +12,26 @@ use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
     vault::Vault,
 };
+use newtypes::{DataIdentifier, PiiString};
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>, &'a Box<dyn TenantAuth>);
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth): EntityDetail) -> Self {
+        api_wire_types::Entity::from_db((entity, vw, auth, HashMap::new()))
+    }
+}
+
+pub type EntityDetailMore<'a> = (
+    SerializableEntity,
+    &'a TenantVw<Any>,
+    &'a Box<dyn TenantAuth>,
+    HashMap<DataIdentifier, PiiString>,
+);
+
+impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
+    fn from_db((entity, vw, auth, decrypted_attrs): EntityDetailMore) -> Self {
         let (sv, watchlist_check, onboarding_info) = entity;
         let attributes = vw.get_visible_populated_fields();
 
@@ -36,6 +50,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .into_iter()
             .filter(|di| di.store_plaintext())
             .flat_map(|di| vw.get_p_data(di.clone()).map(|p_data| (di, p_data.clone())))
+            .chain(decrypted_attrs.into_iter())
             .collect();
 
         let Vault {

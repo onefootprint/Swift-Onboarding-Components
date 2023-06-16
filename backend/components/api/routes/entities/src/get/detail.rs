@@ -13,6 +13,10 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use itertools::Itertools;
+use newtypes::CardDataKind;
+use newtypes::CardInfo;
+use newtypes::DataIdentifier;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
@@ -56,6 +60,28 @@ pub async fn get(
             Ok((entity, vw))
         })
         .await??;
-    let result = api_wire_types::Entity::from_db((entity, &vw, &auth));
+
+    // Always decrypt card last4.
+    // TODO it's strange we don't make an access event here, but we would if you requested to
+    // decrypt it
+    let additional_visible_dis = vw
+        .populated_dis()
+        .into_iter()
+        .filter(|di| {
+            matches!(
+                di,
+                DataIdentifier::Card(CardInfo {
+                    alias: _,
+                    kind: CardDataKind::Last4,
+                })
+            )
+        })
+        .collect_vec();
+    let additional_visible_attrs = vw
+        .decrypt_unchecked(&state.enclave_client, &additional_visible_dis)
+        .await?
+        .results;
+
+    let result = api_wire_types::Entity::from_db((entity, &vw, &auth, additional_visible_attrs));
     ResponseData::ok(result).json()
 }
