@@ -100,8 +100,7 @@ impl CustomMigration for Migration {
             let migrate_fut = migrate_chunk(&state, conn, chunk);
             futures::executor::block_on(migrate_fut)?;
         }
-        panic!("REVERT");
-        // Ok(())
+        Ok(())
     }
 }
 
@@ -225,10 +224,9 @@ async fn compute_single(
     let (pii, new_vd) = match &vd.kind {
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
-            // assert!(!phone_number.is_live() || !vault.is_portable);
             // We should only expect to see some legacy non-portable vaults with live emails in sandbox
             if phone_number.is_live() && vault.is_portable {
-                tracing::info!("Non-live phone number for {}, {}", vault.id, vd.id);
+                panic!("Non-live phone number for {}, {}", vault.id, vd.id);
             }
             let sandbox_id = if !phone_number.is_live() {
                 phone_number.sandbox_suffix.clone()
@@ -246,10 +244,9 @@ async fn compute_single(
             // TODO do the same truncating email, but i don't think we should actually save the email's
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
-            // assert!(!email.is_live() || !vault.is_portable);
             // We should only expect to see some legacy non-portable vaults with live emails in sandbox
             if email.is_live() && vault.is_portable {
-                tracing::info!("Non-live email for {}, {}", vault.id, vd.id);
+                panic!("Non-live email for {}, {}", vault.id, vd.id);
             }
             (email.email, None)
         }
