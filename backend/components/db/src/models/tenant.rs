@@ -89,6 +89,7 @@ pub struct NewIntegrationTestTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub sandbox_restricted: bool,
     pub is_demo_tenant: bool,
+    pub is_prod_ob_config_restricted: bool,
 }
 
 impl Tenant {

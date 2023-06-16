@@ -83,6 +83,7 @@ async fn post(
                         public_key: ec_pk_uncompressed,
                         sandbox_restricted: false,
                         is_demo_tenant: true,
+                        is_prod_ob_config_restricted: false,
                     };
                     Tenant::create(conn, new_tenant)?
                 }
