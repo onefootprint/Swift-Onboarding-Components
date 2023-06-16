@@ -5,7 +5,7 @@ use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_state;
-use newtypes::{DecisionStatus, OnboardingStatus, PhoneNumber};
+use newtypes::{DecisionStatus, OnboardingStatus};
 use std::sync::Arc;
 use test_case::test_case;
 
@@ -15,12 +15,12 @@ async fn test_handle_setup(state: &mut State) {
     // PROD
     //
     // create a live UV and ob_config
-    let (tenant, vault, sv) = state
+    let (tenant, vault) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (tenant, _, vault, sv) =
+            let (tenant, _, vault, _) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
-            Ok((tenant, vault, sv))
+            Ok((tenant, vault))
         })
         .await
         .unwrap();
@@ -36,9 +36,8 @@ async fn test_handle_setup(state: &mut State) {
         .return_once(|_| false);
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    let res = utils::get_fixture_data_decision(state, state.feature_flag_client.clone(), &sv.id, &tenant.id)
-        .await
-        .unwrap();
+    let res =
+        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &tenant.id).unwrap();
     assert!(res.is_none()); // No fixture decision
 
     //
@@ -47,12 +46,12 @@ async fn test_handle_setup(state: &mut State) {
 
     // create a live UV and ob_config
     // TODO: do we even need to make a new user here?
-    let (tenant, vault, sv) = state
+    let (tenant, vault) = state
         .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
-            let (tenant, _, vault, sv) =
+            let (tenant, _, vault, _) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
-            Ok((tenant, vault, sv))
+            Ok((tenant, vault))
         })
         .await
         .unwrap();
@@ -67,9 +66,8 @@ async fn test_handle_setup(state: &mut State) {
         .return_once(|_| true);
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    let res = utils::get_fixture_data_decision(state, state.feature_flag_client.clone(), &sv.id, &tenant.id)
-        .await
-        .unwrap();
+    let res =
+        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &tenant.id).unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
 }
 
@@ -80,6 +78,5 @@ async fn test_handle_setup(state: &mut State) {
 #[test_case("passmeplease" => (DecisionStatus::Pass, false))]
 #[test_case("idv" => (DecisionStatus::Pass, false))]
 fn test_decision_status_from_sandbox_suffix(suffix: &str) -> (DecisionStatus, bool) {
-    let phone_number = PhoneNumber::parse(format!("+1 123 456 7890#{}", suffix).into()).unwrap();
-    utils::decision_status_from_sandbox_suffix(phone_number)
+    utils::decision_status_from_sandbox_id(suffix)
 }

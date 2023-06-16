@@ -117,16 +117,14 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     };
 
-    let sv_id = user_auth.scoped_user.id.clone();
-    let tenant = user_auth.tenant()?;
-
     // Run KYB
+    let tenant = user_auth.tenant()?;
     if let Some(biz_ob) = biz_ob {
         let should_run_kyb = should_run_kyb(&state, &biz_ob, tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
-            let kyb_res =
-                decision::vendor::middesk::run_kyb(&state, biz_ob.id, sv_id.clone(), tenant.id.clone()).await;
+            let uv = user_auth.user();
+            let kyb_res = decision::vendor::middesk::run_kyb(&state, biz_ob.id, uv, &tenant.id).await;
             if let Err(e) = kyb_res {
                 tracing::error!(error=%e, "Error kicking off KYB")
             }

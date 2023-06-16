@@ -7,6 +7,7 @@ use db::models::{
     onboarding::{Onboarding, OnboardingUpdate},
     scoped_vault::ScopedVault,
     tenant::Tenant,
+    vault::Vault,
     workflow::Workflow as DbWorkflow,
 };
 
@@ -176,33 +177,19 @@ impl KycDecisioning {
 type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = (
-        Option<FixtureDecision>,
-        Arc<dyn FeatureFlagClient>,
-        Arc<dyn WebhookClient>,
-    );
+    type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
 
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state,
-            state.feature_flag_client.clone(),
-            &self.sv_id,
-            &self.t_id,
-        )
-        .await?;
-
-        Ok((
-            fixture_decision,
-            state.feature_flag_client.clone(),
-            state.webhook_client.clone(),
-        ))
+        Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
     }
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        let (fixture_decision, ff_client, webhook_client) = async_res;
+        let (ff_client, webhook_client) = async_res;
+        let vault = Vault::get(conn, &self.sv_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)

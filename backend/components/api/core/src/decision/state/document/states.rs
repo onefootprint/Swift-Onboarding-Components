@@ -5,6 +5,7 @@ use db::models::{
     decision_intent::DecisionIntent,
     onboarding::{Onboarding, OnboardingUpdate},
     scoped_vault::ScopedVault,
+    vault::Vault,
     workflow::Workflow as DbWorkflow,
 };
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
@@ -140,7 +141,6 @@ type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     type AsyncRes = (
-        Option<FixtureDecision>,
         Arc<dyn FeatureFlagClient>,
         Vec<VendorResult>,
         Arc<dyn WebhookClient>,
@@ -151,27 +151,20 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state,
-            state.feature_flag_client.clone(),
-            &self.sv_id,
-            &self.t_id,
-        )
-        .await?;
-
         // TODO
         let vendor_results =
             common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
 
         Ok((
-            fixture_decision,
             state.feature_flag_client.clone(),
             vendor_results,
             state.webhook_client.clone(),
         ))
     }
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
-        let (fixture_decision, ff_client, vendor_results, webhook_client) = async_res;
+        let (ff_client, vendor_results, webhook_client) = async_res;
+        let vault = Vault::get(conn, &self.sv_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)

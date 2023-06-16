@@ -503,16 +503,14 @@ impl MiddeskState<Complete> {
 pub async fn run_kyb(
     state: &State,
     biz_ob_id: OnboardingId,
-    person_sv_id: ScopedVaultId,
-    tenant_id: TenantId,
+    person_vault: &Vault,
+    tenant_id: &TenantId,
 ) -> Result<(), ApiError> {
     let fixture_decision = decision::utils::get_fixture_data_decision(
-        state,
         state.feature_flag_client.clone(),
-        &person_sv_id,
-        &tenant_id,
-    )
-    .await?;
+        person_vault,
+        tenant_id,
+    )?;
 
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod middesk requests and instead just create fixture data for this business

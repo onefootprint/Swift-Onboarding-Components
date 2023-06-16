@@ -96,12 +96,10 @@ pub async fn post(
 
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
-        &state,
         state.feature_flag_client.clone(),
-        &user_auth.scoped_user.id,
+        &vault,
         &user_auth.scoped_user.tenant_id,
-    )
-    .await?
+    )?
     .is_none();
 
     //

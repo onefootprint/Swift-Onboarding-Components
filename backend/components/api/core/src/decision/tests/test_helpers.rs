@@ -6,7 +6,7 @@ use db::{
     tests::fixtures,
     DbError, DbPool, TxnPgConn,
 };
-use newtypes::{CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString};
+use newtypes::{CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString, VaultKind};
 
 use crate::{
     enclave_client::EnclaveClient,
@@ -60,19 +60,15 @@ pub async fn create_user_and_onboarding(
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
-    phone_suffix: Option<String>,
+    sandbox_id: Option<String>,
 ) -> (Vault, ScopedVault) {
-    let uv = fixtures::vault::create_person(conn, ob_config.is_live);
+    let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let update = vec![
         (
             IdentityDataKind::PhoneNumber.into(),
-            PiiString::new(format!(
-                "{}{}",
-                random_phone_number(),
-                phone_suffix.map(|s| format!("#{}", s)).unwrap_or_default()
-            )),
+            PiiString::new(random_phone_number()),
         ),
         (
             IdentityDataKind::FirstName.into(),

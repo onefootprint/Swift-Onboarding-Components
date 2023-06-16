@@ -8,6 +8,7 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         tenant::Tenant,
+        vault::Vault,
         workflow::Workflow,
     },
     DbError, DbPool, DbResult, TxnPgConn,
@@ -88,9 +89,13 @@ pub async fn make_outstanding_kyc_vendor_calls(
     ob_id: &OnboardingId,
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
+    let svid = sv_id.clone();
+    let vault = state
+        .db_pool
+        .db_query(move |conn| Vault::get(conn, &svid))
+        .await??;
     let fixture_decision =
-        decision::utils::get_fixture_data_decision(state, state.feature_flag_client.clone(), sv_id, t_id)
-            .await?;
+        decision::utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, t_id)?;
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
         ob_id,

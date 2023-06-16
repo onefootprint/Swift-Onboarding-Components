@@ -161,20 +161,6 @@ mod test {
         .map(|pii| pii.leak_to_string())
     }
 
-    #[test_case(Email, "flerp@derp.com" => None)]
-    #[test_case(Email, "flerp@derp.com#sandbox" => Some("flerp@derp.com#sandbox".to_owned()))] // Sandbox email
-    #[test_case(PhoneNumber, "+1-555-555-5555" => None)]
-    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
-    fn test_clean_and_validate_sandbox(idk: IDK, pii: &str) -> Option<String> {
-        idk.validate(
-            PiiString::new(pii.to_owned()),
-            ValidateArgs::for_non_portable(false),
-            &HashMap::new(),
-        )
-        .ok()
-        .map(|pii| pii.leak_to_string())
-    }
-
     #[test_case(Dob, "1876-12-25" => None)]
     // too young
     #[test_case(Dob, "2015-01-01" => None)]

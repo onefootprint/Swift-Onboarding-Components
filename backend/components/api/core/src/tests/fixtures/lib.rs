@@ -34,26 +34,20 @@ pub fn create_user_and_populate_vault(
     ob_config: Option<ObConfiguration>,
     idks: Vec<IDK>,
 ) -> (Vault, ScopedVault) {
+    let sandbox_id = (!is_live).then_some("#pass".to_string());
     let (uv, su) = if let Some(ob_config) = ob_config {
-        let uv = fixtures::vault::create_person(conn, is_live).into_inner();
+        let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true).into_inner();
         let uvid = uv.id.clone();
         (uv, fixtures::scoped_vault::create(conn, &uvid, &ob_config.id))
     } else {
-        let args = fixtures::vault::new_vault_args(VaultKind::Person, is_live, false);
+        let args = fixtures::vault::new_vault_args(VaultKind::Person, sandbox_id, false);
         let (su, uv) = fixtures::scoped_vault::create_non_portable(conn, args, &tenant_id);
         (uv, su)
     };
 
     let idks = idks.into_iter().map(DataIdentifier::from).collect_vec();
     let update: Vec<(DataIdentifier, PiiString)> = vec![
-        (
-            IDK::PhoneNumber.into(),
-            PiiString::new(format!(
-                "{}{}",
-                random_phone_number(),
-                (!is_live).then(|| "#pass".to_string()).unwrap_or_default()
-            )),
-        ),
+        (IDK::PhoneNumber.into(), PiiString::new(random_phone_number())),
         (IDK::FirstName.into(), PiiString::new("Bob".to_owned())),
         (IDK::LastName.into(), PiiString::new("Boberto".to_owned())),
         (IDK::AddressLine1.into(), PiiString::new("123 Main st".to_owned())),

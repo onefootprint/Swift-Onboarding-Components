@@ -118,7 +118,8 @@ fn make_vault(
         }
         sv
     } else {
-        let args = fixtures::vault::new_vault_args(VaultKind::Person, is_live, false);
+        let sandbox_id = (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10));
+        let args = fixtures::vault::new_vault_args(VaultKind::Person, sandbox_id, false);
         fixtures::scoped_vault::create_non_portable(conn, args, tenant_id).0
     };
 

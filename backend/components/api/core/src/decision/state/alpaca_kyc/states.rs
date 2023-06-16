@@ -190,29 +190,22 @@ impl AlpacaKycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
-    type AsyncRes = (Option<FixtureDecision>, Arc<dyn WebhookClient>);
+    type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
 
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state,
-            state.feature_flag_client.clone(),
-            &self.sv_id,
-            &self.t_id,
-        )
-        .await?;
-
-        Ok((fixture_decision, state.webhook_client.clone()))
+        Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
     }
 
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        let (fixture_decision, webhook_client) = async_res;
-
+        let (ff_client, webhook_client) = async_res;
         // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
+        let vault = Vault::get(conn, &self.sv_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
         let kyc_decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)
         } else {
@@ -327,7 +320,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     ) -> ApiResult<Self::AsyncRes> {
         // TODO: query for already complete (Vreq/Vres) for edge case where server crashes after `make_watchlist_result_call` but before `on_commit` commits
         let sv_id = self.sv_id.clone();
-        let (di, vault) = state
+        let (di, uv) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id)?;
@@ -343,13 +336,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         )
         .await?;
 
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state,
-            state.feature_flag_client.clone(),
-            &self.sv_id,
-            &self.t_id,
-        )
-        .await?;
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(state.feature_flag_client.clone(), &uv, &self.t_id)?;
 
         let watchlist_res = if let Some(fixture_decision) = fixture_decision {
             // TODO: since we are now saving a mock incode response, we could make the sandbox reason_code logic in `on_commit` just operate on the mocked vres instead of synthetically deriving from fixture_decision
@@ -358,7 +346,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 fixture_decision,
                 &di.id,
                 &self.sv_id,
-                &vault.public_key,
+                &uv.public_key,
             )
             .await?;
 
@@ -370,7 +358,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                     &tvc,
                     &self.sv_id,
                     &di.id,
-                    &vault.public_key,
+                    &uv.public_key,
                 )
                 .await?,
             )

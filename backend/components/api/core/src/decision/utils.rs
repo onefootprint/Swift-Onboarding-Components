@@ -7,20 +7,21 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
+        vault::Vault,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, PhoneNumber, ScopedVaultId,
-    TenantId, VaultKind, VendorAPI,
+    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, ScopedVaultId, TenantId,
+    VaultKind, VendorAPI,
 };
 
 use super::{sandbox, vendor};
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
+    utils::vault_wrapper::VaultWrapper,
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -32,25 +33,15 @@ pub type FixtureDecision = (DecisionStatus, CreateManualReview);
 /// Determines whether production IDV requests should be made.
 /// Returns None if we should make production IDV reqs, otherwise returns Some with the desired
 /// fixture status
-pub async fn get_fixture_data_decision(
-    state: &State,
+pub fn get_fixture_data_decision(
     ff_client: Arc<dyn FeatureFlagClient>, // Pass in ff_client directly to make it easier to test
-    scoped_vault_id: &ScopedVaultId,
+    vault: &Vault,
     tenant_id: &TenantId,
 ) -> ApiResult<Option<FixtureDecision>> {
     let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
-
-    let svid = scoped_vault_id.clone();
-    let uvw: VaultWrapper<Person> = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build(conn, VwArgs::Tenant(&svid)))
-        .await??;
-
-    let is_sandbox = !uvw.vault.is_live;
-    if is_sandbox {
+    if let Some(sandbox_id) = vault.sandbox_id.as_ref() {
         // Sandbox users have the final KYC state encoded in their phone number's sandbox suffix
-        let phone_number = uvw.get_decrypted_primary_phone(state).await?;
-        let fixture_decision = decision_status_from_sandbox_suffix(phone_number);
+        let fixture_decision = decision_status_from_sandbox_id(sandbox_id);
         return Ok(Some(fixture_decision));
     }
 
@@ -95,12 +86,12 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
     !matches!(vendor_api, VendorAPI::SocureIDPlus)
 }
 
-pub fn decision_status_from_sandbox_suffix(phone_number: PhoneNumber) -> FixtureDecision {
-    if phone_number.sandbox_suffix.starts_with("fail") {
+pub fn decision_status_from_sandbox_id(sandbox_id: &str) -> FixtureDecision {
+    if sandbox_id.starts_with("fail") {
         (DecisionStatus::Fail, false)
-    } else if phone_number.sandbox_suffix.starts_with("manualreview") {
+    } else if sandbox_id.starts_with("manualreview") {
         (DecisionStatus::Fail, true)
-    } else if phone_number.sandbox_suffix.starts_with("stepup") {
+    } else if sandbox_id.starts_with("stepup") {
         (DecisionStatus::StepUp, false)
     } else {
         (DecisionStatus::Pass, false)
