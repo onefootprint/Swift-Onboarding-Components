@@ -175,7 +175,7 @@ async fn migrate_chunk<'a>(
         .map_err(DbError::from)?;
     panic!("REVERT");
 
-    Ok(())
+    // Ok(())
 }
 
 table! {
@@ -226,7 +226,7 @@ async fn compute_single(
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
             // assert!(!phone_number.is_live());
-            if (!phone_number.is_live()) {
+            if phone_number.is_live() {
                 tracing::info!("Non-live phone number for {}, {}", vault.id, vd.id);
             }
             let vault_update = VaultUpdate {
@@ -240,7 +240,7 @@ async fn compute_single(
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
             // assert!(!email.is_live());
-            if (!email.is_live()) {
+            if email.is_live() {
                 tracing::info!("Non-live email for {}, {}", vault.id, vd.id);
             }
             (email.email, None)
