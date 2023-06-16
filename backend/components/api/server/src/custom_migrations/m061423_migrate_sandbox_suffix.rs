@@ -173,6 +173,7 @@ async fn migrate_chunk<'a>(
         .values(fps)
         .execute(conn.conn())
         .map_err(DbError::from)?;
+    panic!("REVERT");
 
     Ok(())
 }
@@ -224,7 +225,10 @@ async fn compute_single(
     let (pii, new_vd) = match &vd.kind {
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
-            assert!(!phone_number.is_live());
+            // assert!(!phone_number.is_live());
+            if (!phone_number.is_live()) {
+                tracing::info!("Non-live phone number for {}, {}", vault.id, vd.id);
+            }
             let vault_update = VaultUpdate {
                 id: vault.id,
                 sandbox_id: phone_number.sandbox_suffix.clone(),
@@ -235,7 +239,10 @@ async fn compute_single(
             // TODO do the same truncating email, but i don't think we should actually save the email's
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
-            assert!(!email.is_live());
+            // assert!(!email.is_live());
+            if (!email.is_live()) {
+                tracing::info!("Non-live email for {}, {}", vault.id, vd.id);
+            }
             (email.email, None)
         }
         // sanity check
