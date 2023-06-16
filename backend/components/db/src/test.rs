@@ -110,6 +110,7 @@ mod test {
             is_portable: true,
             kind: VaultKind::Person,
             is_fixture: false,
+            sandbox_id: Some("12345".into()),
         };
         pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();

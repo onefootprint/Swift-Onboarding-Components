@@ -1,11 +1,17 @@
 //! Migrates our old phone and email format that had the sandbox suffix encrypted inline to instead have sandbox suffix elsewhere.
 
 use api_core::{enclave_client::EnclaveClient, errors::ApiResult, State};
-use db::schema::{data_lifetime, scoped_vault, vault, vault_data};
+use db::{
+    models::fingerprint::NewFingerprint,
+    schema::{data_lifetime, fingerprint, scoped_vault, vault, vault_data},
+};
 use enclave::DataTransform;
 use futures::StreamExt;
 use itertools::Itertools;
-use newtypes::{VaultId, VdId};
+use newtypes::{
+    fingerprinter::GlobalFingerprintKind, DataLifetimeId, Fingerprint, FingerprintScopeKind,
+    FingerprintVersion, TenantId, VaultId, VdId,
+};
 use std::str::FromStr;
 use tokio::runtime::Handle;
 
@@ -66,14 +72,18 @@ impl CustomMigration for Migration {
         .map_err(db::DbError::from)?;
 
         // 1. first get the vaults and vault data to migrate
-        let results: Vec<(Vault, VaultData)> = vault::table
+        let results: Vec<(Vault, TenantId, VaultData)> = vault::table
             .inner_join(scoped_vault::table.inner_join(data_lifetime::table.inner_join(vault_data::table)))
             .filter(vault::is_live.eq(false))
             .filter(vault_data::kind.eq_any([
                 DataIdentifier::from(IdentityDataKind::PhoneNumber),
                 DataIdentifier::from(IdentityDataKind::Email),
             ]))
-            .select((vault::all_columns, vault_data::all_columns))
+            .select((
+                vault::all_columns,
+                scoped_vault::tenant_id,
+                vault_data::all_columns,
+            ))
             .get_results(conn.conn())
             .map_err(DbError::from)?;
 
@@ -83,7 +93,7 @@ impl CustomMigration for Migration {
         let handle = Handle::current();
         let _guard = handle.enter();
 
-        // do in chunks of 100 vaults
+        // do in chunks of 1000 vaults
         for chunk in results.chunks(1000) {
             tracing::info!("migrating {} rows", chunk.len());
 
@@ -98,24 +108,23 @@ impl CustomMigration for Migration {
 async fn migrate_chunk<'a>(
     state: &MigrationState,
     conn: &mut TxnPgConn<'a>,
-    data: &[(Vault, VaultData)],
+    data: &[(Vault, TenantId, VaultData)],
 ) -> ApiResult<()> {
     // compute new and updated VDs
     let futs = data
         .iter()
-        .map(|(v, vd)| async move { compute_single(state, v.clone(), vd.clone()).await })
+        .map(|(v, t_id, vd)| async move { compute_single(state, v.clone(), t_id.clone(), vd.clone()).await })
         .collect_vec();
     // Only execute 10 futures at the same time - the enclave client poops out otherwise
     let stream = futures::stream::iter(futs).buffer_unordered(10);
-    let (vd_updates, v_updates): (Vec<_>, Vec<_>) = stream
+    let updates = stream
         .collect::<Vec<_>>()
         .await
         .into_iter()
-        .collect::<ApiResult<Vec<_>>>()?
-        .into_iter()
-        .unzip();
-
-    let v_updates = v_updates.into_iter().flatten().collect_vec();
+        .collect::<ApiResult<Vec<_>>>()?;
+    let vd_updates = updates.iter().map(|u| u.0.clone()).collect_vec();
+    let new_fps = updates.iter().flat_map(|u| u.1.clone()).collect_vec();
+    let v_updates = updates.into_iter().filter_map(|u| u.2).collect_vec();
 
     // Save a backup of the old rows we are changing in case we need to restore
     diesel::insert_into(backfill_vault_data_update::table)
@@ -146,6 +155,25 @@ async fn migrate_chunk<'a>(
             .map_err(DbError::from)?;
     }
 
+    // Add the new fingerprints of the data that doesn't include the sandbox suffix
+    // TODO should we delete the old fingerprints that included the sandbox id? we don't really need to
+    let fps = new_fps
+        .into_iter()
+        .map(|fp| NewFingerprint {
+            sh_data: fp.sh_data,
+            kind: fp.kind,
+            lifetime_id: fp.lifetime_id,
+            is_unique: false, // We used to make phone number fingerprints unique, but we can't anymore since there could be multiple sandbox users with the same phone
+            version: FingerprintVersion::V2,
+            scope: fp.scope,
+        })
+        .collect_vec();
+
+    diesel::insert_into(fingerprint::table)
+        .values(fps)
+        .execute(conn.conn())
+        .map_err(DbError::from)?;
+
     Ok(())
 }
 
@@ -160,7 +188,7 @@ table! {
     }
 }
 
-#[derive(diesel::Insertable)]
+#[derive(Clone, diesel::Insertable)]
 #[diesel(table_name = backfill_vault_data_update)]
 struct VaultDataUpdate {
     id: VdId,
@@ -168,48 +196,96 @@ struct VaultDataUpdate {
     new_e_data: SealedVaultBytes,
 }
 
+#[derive(Clone)]
 struct VaultUpdate {
     id: VaultId,
     sandbox_id: String,
 }
 
+#[derive(Clone)]
+struct NewFingerprintArgs {
+    lifetime_id: DataLifetimeId,
+    sh_data: Fingerprint,
+    kind: DataIdentifier,
+    scope: FingerprintScopeKind,
+}
+
+#[allow(clippy::unwrap_used)]
 async fn compute_single(
     state: &MigrationState,
     vault: Vault,
+    tenant_id: TenantId,
     vd: VaultData,
-) -> ApiResult<(VaultDataUpdate, Option<VaultUpdate>)> {
+) -> ApiResult<(VaultDataUpdate, Vec<NewFingerprintArgs>, Option<VaultUpdate>)> {
     let decrypted = state
         .enclave_client
         .decrypt_to_piistring(&vd.e_data, &vault.e_private_key, DataTransform::Identity)
         .await?;
-    let (new_e_data, new_vd) = match vd.kind {
+    let (pii, new_vd) = match &vd.kind {
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
             assert!(!phone_number.is_live());
-            let e_pii_without_suffix = vault.public_key.seal_pii(&phone_number.e164())?;
             let vault_update = VaultUpdate {
                 id: vault.id,
-                sandbox_id: phone_number.sandbox_suffix,
+                sandbox_id: phone_number.sandbox_suffix.clone(),
             };
-            (e_pii_without_suffix, Some(vault_update))
+            (phone_number.e164(), Some(vault_update))
         }
         DataIdentifier::Id(IdentityDataKind::Email) => {
             // TODO do the same truncating email, but i don't think we should actually save the email's
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
             assert!(!email.is_live());
-            let e_pii_without_suffix = vault.public_key.seal_pii(&email.email)?;
-            (e_pii_without_suffix, None)
+            (email.email, None)
         }
         // sanity check
         _ => panic!("Got non-phone non-email DI!"),
     };
+
+    // Create new fingerprints that don't include the suffix
+    let global_fp = if !vault.is_fixture {
+        let fp = state
+            .enclave_client
+            .batch_fingerprint(&[(GlobalFingerprintKind::try_from(vd.kind.clone())?, &pii)])
+            .await?
+            .into_iter()
+            .next()
+            .unwrap();
+
+        Some(NewFingerprintArgs {
+            lifetime_id: vd.lifetime_id.clone(),
+            sh_data: fp,
+            kind: vd.kind.clone(),
+            scope: FingerprintScopeKind::Global,
+        })
+    } else {
+        None
+    };
+    // Normally, we only make tenant-scoped fingerprints for emails after the onboarding is authorized.
+    // Does not matter much to me for these backfilled sandbox accounts, though
+    let tenant_scoped_sh_data = state
+        .enclave_client
+        .batch_fingerprint(&[((&vd.kind, &tenant_id), &pii)])
+        .await?
+        .into_iter()
+        .next()
+        .unwrap();
+    let tenant_fp = NewFingerprintArgs {
+        lifetime_id: vd.lifetime_id.clone(),
+        sh_data: tenant_scoped_sh_data,
+        kind: vd.kind.clone(),
+        scope: FingerprintScopeKind::Tenant,
+    };
+    let fps = [global_fp, Some(tenant_fp)].into_iter().flatten().collect();
+
+    // Create vd update
+    let new_e_data = vault.public_key.seal_pii(&pii)?;
     let vd_update = VaultDataUpdate {
         id: vd.id,
         old_e_data: vd.e_data,
         new_e_data,
     };
-    Ok((vd_update, new_vd))
+    Ok((vd_update, fps, new_vd))
 }
 
 /*
@@ -224,6 +300,9 @@ UPDATE vault_data
     SET e_data = backfill_vault_data_update.old_e_data
     FROM backfill_vault_data_update
     WHERE vault_data.id = backfill_vault_data_update.id AND vault_data.e_data = backfill_vault_data_update.new_e_data;
+
+-- Don't run this if we've already started creating new data, we'd delete some real v2 fingerprints
+DELETE FROM fingerprint WHERE version = 'v2';
 
 DELETE FROM custom_migration WHERE version = '061423';
 

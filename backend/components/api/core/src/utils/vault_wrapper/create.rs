@@ -1,5 +1,6 @@
 use super::{Any, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
+use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -33,8 +34,12 @@ impl VaultWrapper<Person> {
         global_sh_phone_number: Fingerprint,
         tenant_sh_phone_number: Fingerprint,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
-        // Verify that the ob config is_live matches the user vault
         let phone_number_parsed = PhoneNumber::parse(phone_number)?;
+        // Verify that the ob config is_live matches the user vault
+        if ob_config.is_live != phone_number_parsed.is_live() {
+            return Err(UserError::SandboxMismatch.into());
+        }
+
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {

@@ -104,7 +104,7 @@ impl State {
         let existing_user = match identifier {
             VaultIdentifier::IdentifyId(id) => {
                 // Search via fingerprint
-                let (scopes, data) = match id {
+                let (scopes, data, sandbox_id) = match id {
                     IdentifyId::PhoneNumber(phone_number) => (
                         vec![
                             Some(GlobalFingerprintKind::PhoneNumber.scope()),
@@ -112,14 +112,16 @@ impl State {
                                 FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)
                             }),
                         ],
-                        phone_number.e164_with_suffix(),
+                        phone_number.e164(),
+                        (!phone_number.is_live()).then_some(phone_number.sandbox_suffix),
                     ),
                     IdentifyId::Email(email) => (
                         vec![
                             Some(GlobalFingerprintKind::Email.scope()),
                             t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
                         ],
-                        PiiString::from(email),
+                        email.email.clone(),
+                        (!email.is_live()).then_some(email.suffix),
                     ),
                 };
                 let fps: Vec<_> = scopes
@@ -129,7 +131,7 @@ impl State {
                     .collect();
                 let sh_datas = self.compute_fingerprints(&fps).await?;
                 self.db_pool
-                    .db_query(move |conn| Vault::find_portable(conn, &sh_datas))
+                    .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id))
                     .await??
             }
             VaultIdentifier::AuthenticatedId(id) => {

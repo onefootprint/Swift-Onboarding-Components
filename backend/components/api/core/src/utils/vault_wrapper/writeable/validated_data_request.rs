@@ -114,7 +114,9 @@ impl ValidatedDataRequest {
                     kind: kind.clone(),
                     sh_data: fingerprint,
                     lifetime_id: vd.lifetime_id.clone(),
-                    is_unique: scope == FingerprintScopeKind::Global && kind.globally_unique(),
+                    // Don't make sandbox fingerprints unique since one phone number can be used
+                    // to make multiple sandbox vaults.
+                    is_unique: user_vault.is_live && scope == FingerprintScopeKind::Global && kind.globally_unique(),
                     scope,
                     version: newtypes::FingerprintVersion::current()
                 })

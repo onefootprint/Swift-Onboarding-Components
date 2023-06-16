@@ -91,7 +91,6 @@ async fn patch_inner(
     let targets = request.keys().cloned().collect_vec();
     let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let request = request.build_tenant_fingerprints(state, &tenant_id).await?;
-    // TODO strip suffix from email
 
     state
         .db_pool

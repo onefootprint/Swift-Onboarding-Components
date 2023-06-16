@@ -2,7 +2,7 @@ use super::fixtures;
 use crate::models::{data_lifetime::DataLifetime, vault::Vault};
 use crate::tests::prelude::*;
 use macros::db_test_case;
-use newtypes::{Fingerprint, IdentityDataKind as IDK, FingerprintScopeKind};
+use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK};
 
 #[db_test_case(false, false => false; "cant-find-speculative")]
 #[db_test_case(true, false => true; "can-find-portablized-active")]
@@ -26,8 +26,26 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
         is_deactivated.then_some(seqno),
         IDK::PhoneNumber,
     );
-    fixtures::fingerprint::create(conn, lifetime.id, fingerprint.clone(), IDK::PhoneNumber.into(), FingerprintScopeKind::Global);
+    fixtures::fingerprint::create(
+        conn,
+        lifetime.id,
+        fingerprint.clone(),
+        IDK::PhoneNumber.into(),
+        FingerprintScopeKind::Global,
+    );
 
-    let u = Vault::find_portable(conn, &[fingerprint]).unwrap();
+    // Should never be able to find with wrong sandbox id
+    let inverse_sandbox_id = if uv.sandbox_id.is_some() {
+        None
+    } else {
+        Some("FLERP".to_owned())
+    };
+    assert!(
+        Vault::find_portable(conn, &[fingerprint.clone()], inverse_sandbox_id)
+            .unwrap()
+            .is_none()
+    );
+
+    let u = Vault::find_portable(conn, &[fingerprint], uv.sandbox_id).unwrap();
     u.is_some()
 }

@@ -23,7 +23,7 @@ def sandbox_user2(sandbox_tenant, twilio):
 def incomplete_user(sandbox_tenant, twilio):
     bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
 
-    phone_number = bifrost.data["id.phone_number"].replace(" ", "")
+    phone_number = bifrost.data["id.phone_number"].replace(" ", "").split("#")[0]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
     body = get("entities", dict(search=phone_number), sandbox_tenant.sk.key)
     return body["data"][0]["id"]

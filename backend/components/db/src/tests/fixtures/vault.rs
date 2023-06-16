@@ -23,7 +23,7 @@ pub fn new_vault_args(kind: VaultKind, is_live: bool, is_portable: bool) -> NewV
         is_portable,
         kind,
         is_fixture: false,
-        sandbox_id: Some(crypto::random::gen_random_alphanumeric_code(10)),
+        sandbox_id: (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10)),
     }
 }
 

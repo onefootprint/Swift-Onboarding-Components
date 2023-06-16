@@ -53,13 +53,16 @@ pub enum FingerprintScopeKind {
 #[diesel(sql_type = Text)]
 pub enum FingerprintVersion {
     V0,
+    /// Maybe: we introduced tenant-scoped fingerprints?
     V1,
+    /// Here, we stopped including the sandbox suffix in fingerprints
+    V2,
 }
 
 impl FingerprintVersion {
     /// the current version we're creating fingerprints for
     pub fn current() -> Self {
-        FingerprintVersion::V1
+        FingerprintVersion::V2
     }
 }
 

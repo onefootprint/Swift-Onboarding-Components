@@ -205,18 +205,29 @@ impl Vault {
 
     /// Look for the portable user vault with a matching fingerprint
     #[tracing::instrument(skip(conn))]
-    pub fn find_portable(conn: &mut PgConn, sh_data: &[Fingerprint]) -> DbResult<Option<Vault>> {
+    pub fn find_portable(
+        conn: &mut PgConn,
+        sh_data: &[Fingerprint],
+        sandbox_id: Option<String>,
+    ) -> DbResult<Option<Vault>> {
         use crate::schema::{data_lifetime, fingerprint};
 
-        let results = vault::table
+        let mut query = vault::table
             .inner_join(data_lifetime::table.inner_join(fingerprint::table))
             .filter(fingerprint::sh_data.eq_any(sh_data))
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             .filter(data_lifetime::deactivated_seqno.is_null())
             // Never allow finding a vault-only, non-portable user vault created via API
             .filter(vault::is_portable.eq(true))
-            .select(vault::all_columns)
-            .get_results::<Vault>(conn)?;
+            .into_boxed();
+
+        query = if let Some(sandbox_id) = sandbox_id {
+            query.filter(vault::sandbox_id.eq(sandbox_id))
+        } else {
+            query.filter(vault::sandbox_id.is_null())
+        };
+
+        let results = query.select(vault::all_columns).get_results::<Vault>(conn)?;
 
         tracing::info!("searched portable vaults, found: {}", results.len());
 

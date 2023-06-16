@@ -17,4 +17,8 @@ pub enum UserError {
     PhoneNumberNotVerified,
     #[error("Document type not provided")]
     NoDocumentType,
+
+    // TODO rm
+    #[error("Cannot provide sandbox data in live mode or live data in sandbox mode.")]
+    SandboxMismatch,
 }

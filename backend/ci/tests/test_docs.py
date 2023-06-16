@@ -11,7 +11,7 @@ def test_get_users(sandbox_user, sandbox_tenant):
     body = get("/users", None, sandbox_tenant.sk.key)
     assert body["data"][0]["id"]
 
-    email = sandbox_user.client.data["id.email"]
+    email = sandbox_user.client.data["id.email"].split("#")[0]
     body = get("/users", dict(search=email), sandbox_tenant.sk.key)
     assert any(i["id"] == sandbox_user.fp_id for i in body["data"])
 

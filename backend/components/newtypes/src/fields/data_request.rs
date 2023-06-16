@@ -154,6 +154,20 @@ impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
     pub fn clean_and_validate(map: DataIdentifierRequest, args: ValidateArgs) -> NtResult<Self> {
+        // TODO for now, while we still accept sandbox suffix in email, strip it here
+        let map: DataIdentifierRequest = map
+            .into_iter()
+            .map(|(di, pii)| {
+                let pii = match di {
+                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
+                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
+                    }
+                    _ => pii,
+                };
+                (di, pii)
+            })
+            .collect();
+
         let unallowed_derived_dis: HashMap<_, _> = map
             .keys()
             .filter_map(|di| {
@@ -250,27 +264,10 @@ impl<T> DataRequest<T> {
             })
             .collect();
 
-        // TODO for now, while we still accept sandbox suffix in email, strip it here.
-        // In the future, fingerprint the email with the sandbox suffix?
-
-        // todo don't allow changing sandbox id once it's set
-        // todo do we want the phone fingerprint to also include the suffix or just check in identify
-        // the sandbox fingerprint matches too? probably latter
-        let data = self
-            .data
-            .into_iter()
-            .map(|(di, pii)| {
-                let pii = match di {
-                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
-                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
-                    }
-                    _ => pii,
-                };
-                (di, pii)
-            })
-            .collect();
-
-        let request = DataRequest { data, fingerprints };
+        let request = DataRequest {
+            data: self.data,
+            fingerprints,
+        };
         Ok(request)
     }
 
@@ -302,23 +299,10 @@ impl<T> DataRequest<T> {
             })
             .collect();
 
-        // TODO for now, while we still accept sandbox suffix in email, strip it here
-        // In the future, fingerprint the email with the sandbox suffix?
-        let data = self
-            .data
-            .into_iter()
-            .map(|(di, pii)| {
-                let pii = match di {
-                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
-                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
-                    }
-                    _ => pii,
-                };
-                (di, pii)
-            })
-            .collect();
-
-        let request = DataRequest { data, fingerprints };
+        let request = DataRequest {
+            data: self.data,
+            fingerprints,
+        };
         Ok(request)
     }
 
