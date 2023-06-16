@@ -1136,6 +1136,7 @@ dependencies = [
  "futures-util",
  "hmac",
  "idv",
+ "newtypes",
  "paperclip",
  "serde",
  "serde_json",

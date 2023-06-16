@@ -192,25 +192,50 @@ pub fn mock_twilio(state: &mut State) {
     state.set_twilio_lookup_v2(Arc::new(mock_twilio_lookup_v2));
 }
 
+#[derive(Clone)]
 pub struct ExpectedStatus(pub OnboardingStatus);
+#[derive(Clone)]
 pub struct ExpectedRequiresManualReview(pub bool);
-pub fn mock_webhook(
+pub struct OnboardingCompleted(pub ExpectedStatus, pub ExpectedRequiresManualReview);
+pub struct OnboardingStatusChanged(pub ExpectedStatus);
+
+// TODO: I think since we are executing the webhook Task's spawned threads, it could be possible these expectations panic but don't necessarily fail the test
+// need to check what CI would do that in situation. Possible fixes could be: wrap tests in a runtime we create with unhandled_panic OR wrap mock webhook client in a Mutex and call .checkpoint throughout test
+pub fn mock_webhooks(
     state: &mut State,
-    expected_status: ExpectedStatus,
-    expected_requires_manual_review: ExpectedRequiresManualReview,
+    expected_ob_status_changed: Vec<OnboardingStatusChanged>,
+    expected_ob_completed: Vec<OnboardingCompleted>,
 ) {
     let mut mock_webhook_client = MockWebhookClient::new();
-    mock_webhook_client
-        .expect_send_event_to_tenant_non_blocking()
-        .withf(move |_, w, _| match w {
-            WebhookEvent::OnboardingCompleted(obc) => {
-                obc.status == expected_status.0
-                    && obc.requires_manual_review == expected_requires_manual_review.0
-            }
-            _ => false,
-        })
-        .times(1)
-        .return_const(());
+
+    for e in expected_ob_status_changed.iter() {
+        let expected_status = e.0.clone();
+
+        mock_webhook_client
+            .expect_send_event_to_tenant()
+            .withf(move |_, w, _| match w {
+                WebhookEvent::OnboardingStatusChanged(osc) => osc.new_status == expected_status.0,
+                _ => false,
+            })
+            .times(1)
+            .return_once(|_, _, _| Ok(()));
+    }
+
+    for e in expected_ob_completed.iter() {
+        let expected_status = e.0.clone();
+        let expected_requires_manual_review = e.1.clone();
+        mock_webhook_client
+            .expect_send_event_to_tenant()
+            .withf(move |_, w, _| match w {
+                WebhookEvent::OnboardingCompleted(obc) => {
+                    obc.status == expected_status.0
+                        && obc.requires_manual_review == expected_requires_manual_review.0
+                }
+                _ => false,
+            })
+            .times(1)
+            .return_once(|_, _, _| Ok(()));
+    }
 
     state.set_webhook_client(Arc::new(mock_webhook_client));
 }

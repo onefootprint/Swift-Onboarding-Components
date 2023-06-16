@@ -32,6 +32,20 @@ pub enum TaskError {
     WebhookError(#[from] webhooks::Error),
 }
 
+pub fn execute_webhook_tasks(state: State) {
+    poll_and_execute_tasks_non_blocking(state, 10, TaskKind::FireWebhook)
+}
+
+pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: TaskKind) {
+    tokio::spawn(async move {
+        let _ = poll_and_execute_tasks(&state, limit, Some(kind))
+            .await
+            .map_err(|err| {
+                tracing::error!(error=?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
+            });
+    });
+}
+
 pub async fn poll_and_execute_tasks(
     state: &State,
     limit: i64,
@@ -88,7 +102,7 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
             .await
         }
         newtypes::TaskData::FireWebhook(args) => {
-            FireWebhookTask::new(state.db_pool.clone(), state.webhook_client.clone())
+            FireWebhookTask::new(state.webhook_client.clone())
                 .execute(args)
                 .await
         }

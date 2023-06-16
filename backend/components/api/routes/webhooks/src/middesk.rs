@@ -1,7 +1,7 @@
 use actix_web::{web, FromRequest};
 use api_core::auth::AuthError;
 use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::{decision, State};
+use api_core::{decision, task, State};
 use crypto::hex;
 use futures_util::Future;
 use paperclip::actix::Apiv2Header;
@@ -21,6 +21,8 @@ async fn handle_webhook(
         webhook_signature.request,
     )
     .await?;
+    // temporary until we migrate to a KYB workflow
+    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
     EmptyResponse::ok().json()
 }
 

@@ -76,6 +76,8 @@ pub struct WatchlistCheckArgs {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FireWebhookArgs {
     pub scoped_vault_id: ScopedVaultId,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
     pub webhook_event: WebhookEvent,
 }
 

@@ -10,7 +10,7 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::ReviewCompleted;
 use api_core::decision::state::StateError;
 use api_core::decision::state::WorkflowWrapper;
-use api_core::utils::webhook_app::IntoWebhookApp;
+use api_core::task;
 use api_core::ApiError;
 use api_wire_types::DecisionRequest;
 use db::models::scoped_vault::ScopedVault;
@@ -18,7 +18,6 @@ use db::models::workflow::Workflow;
 use db::DbResult;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
-use webhooks::events::WebhookEvent;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
@@ -37,7 +36,6 @@ pub async fn post(
     let actor = auth.actor();
     let fp_id = fp_id.into_inner();
     let request = request.into_inner();
-    let status = request.status;
 
     let fpid = fp_id.clone();
     let tid = tenant_id.clone();
@@ -75,28 +73,15 @@ pub async fn post(
     }
 
     let fpid = fp_id.clone();
-    let decision = state
+    let _decision = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let fpid = fpid.clone();
             decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, None)
         })
         .await?;
-
-    // TODO: move this webhook into Onboarding::update call itself
-    // notify any webhook listeners of the change
-    if let Some((decision, scoped_vault)) = decision {
-        state.webhook_client.send_event_to_tenant_non_blocking(
-            scoped_vault.webhook_app(),
-            WebhookEvent::OnboardingStatusChanged(webhooks::events::OnboardingStatusChangedPayload {
-                fp_id: fp_id.clone(),
-                footprint_user_id: auth.tenant().uses_legacy_serialization().then_some(fp_id),
-                timestamp: decision.created_at,
-                new_status: status.into(),
-            }),
-            None,
-        );
-    }
+    // Since we may have updated users onboarding status
+    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     EmptyResponse::ok().json()
 }

@@ -70,6 +70,14 @@ pub fn save_final_decision(
     };
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
+    // Create ManualReview row if requested and an active one does not already exist
+    if decision.decision.create_manual_review {
+        let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
+        if existing_review.is_none() {
+            ManualReview::create(conn, ob_id, review_reasons)?;
+        }
+    }
+
     // Make a billable event here
     // If this is the first time setting a decision, then write decision_made_at
     if is_first_decision_for_onboarding {
@@ -84,14 +92,6 @@ pub fn save_final_decision(
             conn,
             OnboardingUpdate::set_decision(decision.decision.decision_status),
         )?;
-    }
-
-    // Create ManualReview row if requested and an active one does not already exist
-    if decision.decision.create_manual_review {
-        let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
-        if existing_review.is_none() {
-            ManualReview::create(conn, ob_id, review_reasons)?;
-        }
     }
 
     RiskSignal::bulk_create(conn, obd.id.clone(), reason_codes)?;

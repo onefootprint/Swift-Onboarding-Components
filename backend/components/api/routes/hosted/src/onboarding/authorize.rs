@@ -12,6 +12,7 @@ use api_core::auth::user::UserObAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::common;
 use api_core::decision::state::WorkflowWrapper;
+use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Business;
@@ -69,7 +70,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
-            let set_biz_is_authorized = if ob.authorized_at.is_none() {
+            if ob.authorized_at.is_none() {
                 Onboarding::update(ob, c, OnboardingUpdate::is_authorized())?;
                 true
             } else {
@@ -77,16 +78,21 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             };
 
             let biz_ob = user_auth.business_onboarding(c)?;
-            let bizob = biz_ob
-                .map(|b| {
-                    let b = Onboarding::lock(c, &b.id)?;
-                    if b.authorized_at.is_none() {
-                        Onboarding::update(b, c, OnboardingUpdate::is_authorized())
-                    } else {
-                        Ok(b.into_inner())
-                    }
-                })
-                .transpose()?;
+            let (set_biz_is_authorized, bizob) = if let Some(biz_ob) = biz_ob {
+                let b = Onboarding::lock(c, &biz_ob.id)?;
+                let (set_biz_is_authorized, bizob) = if b.authorized_at.is_none() {
+                    (
+                        true,
+                        Onboarding::update(b, c, OnboardingUpdate::is_authorized_and_status_pending())?,
+                    )
+                } else {
+                    (false, b.into_inner())
+                };
+                (set_biz_is_authorized, Some(bizob))
+            } else {
+                (false, biz_ob)
+            };
+
             Ok((bizob, user_auth, set_biz_is_authorized))
         })
         .await?;
@@ -127,6 +133,8 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         }
     }
 
+    // temporary until we migrate to a KYB workflow
+    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
     ResponseData::ok(EmptyResponse {}).json()
 }
 

@@ -2,43 +2,30 @@ use std::sync::Arc;
 
 use crate::task::{ExecuteTask, TaskError};
 use async_trait::async_trait;
-use db::{models::scoped_vault::ScopedVault, DbPool, DbResult};
 use newtypes::FireWebhookArgs;
 use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 
 pub(crate) struct FireWebhookTask {
-    db_pool: DbPool,
     webhook_client: Arc<dyn WebhookClient>,
 }
 
 impl FireWebhookTask {
     #[allow(unused)]
-    pub fn new(db_pool: DbPool, webhook_client: Arc<dyn WebhookClient>) -> Self {
-        Self {
-            db_pool,
-            webhook_client,
-        }
+    pub fn new(webhook_client: Arc<dyn WebhookClient>) -> Self {
+        Self { webhook_client }
     }
 }
 
 #[async_trait]
 impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
     async fn execute(&self, args: &FireWebhookArgs) -> Result<(), TaskError> {
-        let svid = args.scoped_vault_id.clone();
-        let (t_id, is_live) = self
-            .db_pool
-            .db_query(move |conn| -> DbResult<_> {
-                let su = ScopedVault::get(conn, &svid)?;
-                Ok((su.tenant_id, su.is_live))
-            })
-            .await??;
-
+        let t_id = args.tenant_id.clone();
+        let is_live = args.is_live;
         let event = WebhookEvent::from(args.webhook_event.clone());
         let _ = self
             .webhook_client
             .send_event_to_tenant(WebhookApp { id: t_id, is_live }, event, None)
             .await?;
-
         Ok(())
     }
 }
@@ -50,6 +37,7 @@ mod tests {
     use macros::test_db_pool;
 
     use db::tests::fixtures;
+    use db::DbResult;
     use newtypes::{
         OnboardingCompletedPayload as NTOnboardingCompletedPayload, OnboardingStatus,
         WebhookEvent as NTWebhookEvent,
@@ -71,6 +59,8 @@ mod tests {
 
         let args = FireWebhookArgs {
             scoped_vault_id: sv.id,
+            tenant_id: sv.tenant_id,
+            is_live: sv.is_live,
             webhook_event: NTWebhookEvent::OnboardingCompleted(NTOnboardingCompletedPayload {
                 fp_id: sv.fp_id.clone(),
                 footprint_user_id: None,
@@ -95,7 +85,7 @@ mod tests {
             .return_once(|_, _, _| Ok(()));
 
         // Run task
-        let task = FireWebhookTask::new((*db_pool).clone(), Arc::new(mock_webhook_client));
+        let task = FireWebhookTask::new(Arc::new(mock_webhook_client));
         task.execute(&args).await.unwrap();
     }
 }

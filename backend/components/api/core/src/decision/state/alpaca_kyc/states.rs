@@ -241,8 +241,10 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             }
             DecisionStatus::Pass => {
                 // we update ob.status = Pending but cannot write an OBD yet (need to do watchlist checks next)
-                let ob = Onboarding::lock(conn, &self.ob_id)?;
-                Onboarding::update(ob, conn, OnboardingUpdate::set_status(OnboardingStatus::Pending))?;
+                if !self.is_redo {
+                    let ob = Onboarding::lock(conn, &self.ob_id)?;
+                    Onboarding::update(ob, conn, OnboardingUpdate::set_status(OnboardingStatus::Pending))?;
+                }
                 Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,
@@ -253,12 +255,14 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             }
             DecisionStatus::StepUp => {
                 // we set ob.status = incomplete (should be a no-op) but don't write an OBD yet
-                let ob = Onboarding::lock(conn, &self.ob_id)?;
-                Onboarding::update(
-                    ob,
-                    conn,
-                    OnboardingUpdate::set_status(OnboardingStatus::Incomplete),
-                )?;
+                if !self.is_redo {
+                    let ob = Onboarding::lock(conn, &self.ob_id)?;
+                    Onboarding::update(
+                        ob,
+                        conn,
+                        OnboardingUpdate::set_status(OnboardingStatus::Incomplete),
+                    )?;
+                }
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: self.sv_id.clone(),
                     ref_id: None,

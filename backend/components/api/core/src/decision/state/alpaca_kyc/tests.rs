@@ -1,8 +1,9 @@
 use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_incode, mock_twilio, mock_webhook, query_data, setup_data,
-    ExpectedRequiresManualReview, ExpectedStatus, UserKind, WithHit, WithQualifier,
+    mock_idology, mock_incode, mock_twilio, mock_webhooks, query_data, setup_data,
+    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
+    WithHit, WithQualifier,
 };
 use crate::decision::state::DocCollected;
 use crate::decision::state::ReviewCompleted;
@@ -108,6 +109,12 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     /// TESTS
     ///
     /// Authorize
+    // Expect webhook
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![],
+    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -139,14 +146,16 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
-    // Expect Webhook
-    mock_webhook(
-        state,
-        ExpectedStatus(OnboardingStatus::Pass),
-        ExpectedRequiresManualReview(false),
-    );
-
     /// MakeWatchlistCheckCall
+    // Expect Webhooks
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
+    );
     let (ww, _) = ww
         .action(
             state,
@@ -240,6 +249,12 @@ async fn pass_then_watchlist_hit(
     /// TESTS
     ///
     /// Authorize
+    // Expect Webhooks
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![],
+    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -271,11 +286,14 @@ async fn pass_then_watchlist_hit(
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
-    // Expect Webhook
-    mock_webhook(
+    // Expect Webhooks
+    mock_webhooks(
         state,
-        ExpectedStatus(OnboardingStatus::Fail),
-        ExpectedRequiresManualReview(true),
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(true),
+        )],
     );
 
     /// MakeWatchlistCheckCall
@@ -324,6 +342,19 @@ async fn pass_then_watchlist_hit(
     };
 
     // ReviewCompleted
+    // Expect Webhooks
+    match review_decision {
+        TerminalDecisionStatus::Pass => {
+            mock_webhooks(
+                state,
+                vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+                vec![],
+            );
+        }
+        // users status isn't changing, so no webhook
+        TerminalDecisionStatus::Fail => {}
+    }
+
     let (ww, _) = ww
         .action(
             state,
@@ -399,6 +430,15 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     /// TESTS
     ///
     /// Authorize
+    // Expect Webhook
+    mock_webhooks(
+        state,
+        vec![
+            OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending)),
+            OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Incomplete)),
+        ],
+        vec![],
+    );
     let ww: WorkflowWrapper = ww
         .run(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -415,11 +455,14 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none());
     assert!(!fps.is_empty()); //fingerprints were written
 
-    // Expect Webhook
-    mock_webhook(
+    // Expect Webhooks
+    mock_webhooks(
         state,
-        ExpectedStatus(OnboardingStatus::Fail),
-        ExpectedRequiresManualReview(true),
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(true),
+        )],
     );
 
     /// DocCollected
@@ -441,6 +484,11 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     // TODO: maybe assert risk signals here
 
     // ReviewCompleted
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![],
+    );
     let (ww, _) = ww
         .action(
             state,
@@ -511,6 +559,12 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     /// TESTS
     ///
     /// Authorize
+    // Expect Webhooks
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![],
+    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -537,10 +591,15 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             true
         }
     };
-    mock_webhook(
+
+    // Expect Webhooks
+    mock_webhooks(
         state,
-        ExpectedStatus(OnboardingStatus::Fail),
-        ExpectedRequiresManualReview(false),
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(false),
+        )],
     );
 
     /// MakeDecision
@@ -641,6 +700,13 @@ async fn redo_and_pass(
     // webhook is specifically not mocked as we should not fire the OnboardingComplete webhook in redo
 
     // run Authorize
+    // Expect Webhooks
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![],
+    );
+
     let ww: WorkflowWrapper = ww
         .run(state, WorkflowActions::Authorize(Authorize {}))
         .await

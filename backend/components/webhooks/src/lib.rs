@@ -86,6 +86,7 @@ impl WebhookServiceClient {
 impl WebhookClient for WebhookServiceClient {
     /// Send a webhook event to tenant if it's been configured
     /// Note this spawns a task so it wont block
+    /// TODO: can probably remove this
     #[tracing::instrument(skip(self))]
     fn send_event_to_tenant_non_blocking(
         &self,

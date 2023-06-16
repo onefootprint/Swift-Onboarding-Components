@@ -2,6 +2,7 @@ use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
+use super::task::Task;
 use super::tenant::Tenant;
 use super::vault::Vault;
 use super::workflow::Workflow;
@@ -14,8 +15,9 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    AlpacaKycConfig, CipKind, DecisionStatus, FpId, InsightEventId, KycConfig, Locked, ObConfigurationId,
-    OnboardingId, ScopedVaultId, TenantId, TenantScope, VaultId, WorkflowId,
+    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, FpId, InsightEventId, KycConfig, Locked,
+    ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
+    ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -71,6 +73,13 @@ pub struct OnboardingCreateArgs {
 
 impl OnboardingUpdate {
     pub fn is_authorized() -> Self {
+        Self {
+            authorized_at: Some(Some(Utc::now())),
+            ..Self::default()
+        }
+    }
+
+    pub fn is_authorized_and_status_pending() -> Self {
         Self {
             authorized_at: Some(Some(Utc::now())),
             status: Some(OnboardingStatus::Pending),
@@ -354,6 +363,56 @@ impl Onboarding {
     #[tracing::instrument(skip_all)]
     pub fn update(ob: Locked<Onboarding>, conn: &mut TxnPgConn, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
+
+        let sv = ScopedVault::get(conn, &ob.id)?;
+        let tenant = Tenant::get(conn, &sv.tenant_id)?;
+        // !! it's important that code in the same txn that is going to write a review does it before this update call
+        let mr = ManualReview::get_active_for_onboarding(conn, &ob.id)?;
+
+        if let Some(new_status) = update.status {
+            if ob.status != new_status {
+                // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
+                // decision for the first time or in a redo flow
+                if !ob.status.has_decision() && new_status.has_decision() {
+                    let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
+                        fp_id: sv.fp_id.clone(),
+                        footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                        timestamp: Utc::now(),
+                        status: new_status,
+                        requires_manual_review: mr.is_some(),
+                    });
+                    Task::create(
+                        conn,
+                        Utc::now(),
+                        TaskData::FireWebhook(FireWebhookArgs {
+                            scoped_vault_id: ob.scoped_vault_id.clone(),
+                            tenant_id: tenant.id.clone(),
+                            is_live: sv.is_live,
+                            webhook_event,
+                        }),
+                    )?;
+                };
+
+                // fire a OnboardingStatusChanged webhook no matter what
+                let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
+                    fp_id: sv.fp_id.clone(),
+                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                    timestamp: Utc::now(),
+                    new_status,
+                });
+                Task::create(
+                    conn,
+                    Utc::now(),
+                    TaskData::FireWebhook(FireWebhookArgs {
+                        scoped_vault_id: ob.scoped_vault_id.clone(),
+                        tenant_id: tenant.id,
+                        is_live: sv.is_live,
+                        webhook_event,
+                    }),
+                )?;
+            }
+        }
+
         let result = diesel::update(onboarding::table)
             .filter(onboarding::id.eq(&ob.id))
             .set(update)

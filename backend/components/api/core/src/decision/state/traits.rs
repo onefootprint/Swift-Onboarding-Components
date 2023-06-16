@@ -2,10 +2,12 @@ use super::actions::WorkflowActions;
 use super::StateError;
 use super::WorkflowKind;
 use crate::decision::onboarding::RuleGroup;
+use crate::task;
 use crate::{errors::ApiResult, ApiError, State};
 use async_trait::async_trait;
 use db::{models::workflow::Workflow as DbWorkflow, TxnPgConn};
 use enum_dispatch::enum_dispatch;
+use newtypes::TaskKind;
 use newtypes::WorkflowId;
 use thiserror::Error;
 
@@ -81,6 +83,9 @@ where
                 Ok(new_state)
             })
             .await?;
+        // Various workflows can do Onboarding::update which creates Task's for webhooks
+        // Until we get comfortable with a proper daemon/worker machines executing these Tasks continually, we need to manually prompt execution
+        task::execute_webhook_tasks(state.clone());
         Ok(result)
     }
 }

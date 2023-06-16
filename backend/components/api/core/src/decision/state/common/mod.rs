@@ -246,45 +246,7 @@ pub fn save_kyc_decision(
         Some(workflow_id.clone()),
         review_reasons,
     )?;
-
-    if !is_redo {
-        let su = ScopedVault::get(conn, sv_id)?;
-        let tenant = Tenant::get(conn, &su.tenant_id)?;
-
-        fire_onboarding_completed_webhook(
-            webhook_client,
-            &su,
-            &tenant,
-            decision.0.decision.decision_status.into(),
-            decision.0.decision.create_manual_review,
-        );
-    }
     Ok(())
-}
-
-fn fire_onboarding_completed_webhook(
-    webhook_client: Arc<dyn WebhookClient>,
-    su: &ScopedVault,
-    tenant: &Tenant,
-    status: OnboardingStatus,
-    requires_manual_review: bool,
-) {
-    let wh_event = WebhookEvent::OnboardingCompleted(webhooks::events::OnboardingCompletedPayload {
-        fp_id: su.fp_id.clone(),
-        footprint_user_id: tenant.uses_legacy_serialization().then(|| su.fp_id.clone()),
-        timestamp: Utc::now(),
-        status,
-        requires_manual_review,
-    });
-
-    webhook_client.send_event_to_tenant_non_blocking(
-        WebhookApp {
-            id: su.tenant_id.clone(),
-            is_live: su.is_live,
-        },
-        wh_event,
-        None,
-    );
 }
 
 pub async fn write_authorized_fingerprints(state: &State, sv_id: &ScopedVaultId) -> ApiResult<()> {

@@ -9,6 +9,7 @@ use api_core::decision::features;
 use api_core::decision::onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
+use api_core::task;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -206,6 +207,8 @@ async fn make_decision(
 
     let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
     decision::engine::make_onboarding_decision(&ob, fv, &state.db_pool, vendor_result_ids.clone()).await?;
+
+    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }
