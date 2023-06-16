@@ -20,7 +20,6 @@ const SheetManager = () => {
 
   return sheet ? (
     <MissingPermissionsSheet
-      permissionName={sheet.permissionName}
       open={sheet.open}
       onClose={handleClose(sheet.onClose)}
     />

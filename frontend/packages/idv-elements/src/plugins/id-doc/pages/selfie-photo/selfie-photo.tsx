@@ -1,79 +1,56 @@
-import React, { useState } from 'react';
+import { useTranslation } from '@onefootprint/hooks';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-import { NavigationHeader } from '../../../../components';
+import { HeaderTitle } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
+import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import useProcessImage from '../../hooks/use-process-image';
-import Camera from './components/camera';
-import Preview from './components/preview';
+
+const MAX_VIDEO_HEIGHT = 390;
+const FACE_OUTLINE_TO_HEIGHT_RATIO = 0.7;
 
 const SelfiePhoto = () => {
+  const { t } = useTranslation('pages.selfie-photo');
   const [, send] = useIdDocMachine();
-  const [image, setImage] = useState<string | null>(null);
-  const { processImageUrl, convertImageFileToStrippedBase64 } =
-    useProcessImage();
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRetake = () => {
-    setImage(null);
-  };
-
-  const handleConfirm = async () => {
-    if (!image) {
-      return;
-    }
-
-    setIsLoading(true);
-    const processedImageFile = await processImageUrl(image);
-    if (!processedImageFile) {
-      // An error occurred, directly prompt user to re-take the image
-      setIsLoading(false);
-      handleRetake();
-      return;
-    }
-
-    const imageString = await convertImageFileToStrippedBase64(
-      processedImageFile,
-    );
-    if (!imageString) {
-      setIsLoading(false);
-      handleRetake();
-      return;
-    }
-
-    setIsLoading(false);
+  const onComplete = (imageString: string) =>
     send({
-      type: 'receivedSelfieImage',
+      type: 'receivedImage',
       payload: {
         image: imageString,
       },
     });
-  };
 
-  const handleError = () => {
+  const handleClickBack = () => {
     send({
-      type: 'cameraErrored',
+      type: 'navigatedToPrev',
     });
-  };
-
-  const handleCapture = async (newImage: string) => {
-    setImage(newImage);
   };
 
   return (
     <>
-      <NavigationHeader />
-      {image ? (
-        <Preview
-          imageSrc={image}
-          onRetake={handleRetake}
-          onConfirm={handleConfirm}
-          isLoading={isLoading}
-        />
-      ) : (
-        <Camera onCapture={handleCapture} onError={handleError} />
-      )}
+      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <TitleContainer>
+        <HeaderTitle title={t('title')} />
+      </TitleContainer>
+      <PhotoCapture
+        maxVideoHeight={MAX_VIDEO_HEIGHT}
+        outlineHeightRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
+        outlineWidthRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
+        cameraKind="front"
+        outlineKind="corner"
+        onComplete={onComplete}
+      />
     </>
   );
 };
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    margin-top: calc(-1 * ${theme.spacing[5]});
+    margin-bottom: ${theme.spacing[5]};
+  `}
+`;
 
 export default SelfiePhoto;

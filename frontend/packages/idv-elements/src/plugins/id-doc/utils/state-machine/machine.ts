@@ -1,9 +1,9 @@
 import { assign, createMachine } from 'xstate';
 
-import ImagesRequiredByIdDocType from '../../constants/images-required-by-id-doc-type';
+import NextSideTargets from './machine.utils';
 import { MachineContext, MachineEvents } from './types';
 
-const createIdDocMachine = () =>
+const createIdDocMachine = (args: MachineContext) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -13,111 +13,158 @@ const createIdDocMachine = () =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'init',
-      context: {
-        idDoc: {},
-        selfie: {},
-      },
+      initial: 'initState',
+      context: { ...args },
       states: {
-        init: {
-          on: {
-            receivedContext: [
-              {
-                target: 'idDocCountryAndType',
-                actions: 'assignContext',
-                cond: (context, event) => !!event.payload.idDocRequired,
-              },
-              {
-                target: 'selfiePrompt',
-                actions: 'assignContext',
-                cond: (context, event) => !!event.payload.selfieRequired,
-              },
-              {
-                target: 'success',
-              },
-            ],
-          },
+        initState: {
+          always: [
+            {
+              target: 'incompatibleDevice',
+              cond: context => context.device.type !== 'mobile',
+            },
+            {
+              target: 'frontImage',
+              cond: context =>
+                !!context.requirement.onlyUsSupported &&
+                context.requirement.supportedDocumentTypes?.length === 1,
+            },
+            {
+              target: 'countryAndType',
+            },
+          ],
         },
-        idDocCountryAndType: {
+        countryAndType: {
           on: {
-            idDocCountryAndTypeSelected: {
-              target: 'idDocFrontImage',
-              actions: 'assignIdDocCountryAndType',
+            receivedCountryAndType: {
+              target: 'frontImage',
+              actions: 'assignCountryAndType',
             },
           },
         },
-        idDocFrontImage: {
+        frontImage: {
           on: {
             navigatedToPrev: {
-              target: 'idDocCountryAndType',
+              target: 'countryAndType',
             },
-            receivedIdDocFrontImage: [
-              {
-                target: 'idDocBackImage',
-                actions: 'assignIdDocFrontImage',
-                cond: context => {
-                  const {
-                    idDoc: { type },
-                  } = context;
-                  return type ? !!ImagesRequiredByIdDocType[type].back : false;
-                },
-              },
-              {
-                target: 'selfiePrompt',
-                cond: context => !!context.selfie.required,
-                actions: 'assignIdDocFrontImage',
-              },
-              {
-                target: 'processingDocuments',
-                actions: 'assignIdDocFrontImage',
-              },
-            ],
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+            startImageCapture: {
+              target: 'frontImageCapture',
+            },
           },
         },
-        idDocBackImage: {
+        frontImageCapture: {
           on: {
-            receivedIdDocBackImage: [
-              {
-                target: 'selfiePrompt',
-                cond: context => !!context.selfie.required,
-                actions: 'assignIdDocBackImage',
-              },
-              {
-                target: 'processingDocuments',
-                actions: 'assignIdDocBackImage',
-              },
-            ],
+            navigatedToPrev: {
+              target: 'frontImage',
+            },
+            cameraErrored: {
+              target: 'frontImage',
+            },
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        frontImageRetry: {
+          on: {
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+            startImageCapture: {
+              target: 'frontImageCapture',
+            },
+          },
+        },
+        backImage: {
+          on: {
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+            startImageCapture: {
+              target: 'backImageCapture',
+            },
+          },
+        },
+        backImageCapture: {
+          on: {
+            navigatedToPrev: {
+              target: 'backImage',
+            },
+            cameraErrored: {
+              target: 'backImage',
+            },
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+          },
+        },
+        backImageRetry: {
+          on: {
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
+            },
+            startImageCapture: {
+              target: 'backImageCapture',
+            },
           },
         },
         selfiePrompt: {
           on: {
             consentReceived: {
-              actions: ['assignConsent'],
+              actions: 'assignConsent',
             },
-            startSelfieCapture: {
+            startImageCapture: {
               target: 'selfieImage',
+              cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },
         selfieImage: {
           on: {
+            navigatedToPrev: {
+              target: 'selfiePrompt',
+            },
             cameraErrored: {
               target: 'selfiePrompt',
             },
-            receivedSelfieImage: {
-              target: 'processingDocuments',
-              actions: 'assignSelfie',
+            receivedImage: {
+              target: 'processing',
+              actions: 'assignImage',
             },
           },
         },
-        processingDocuments: {
+        selfieImageRetry: {
           on: {
-            succeeded: {
-              target: 'success',
+            startImageCapture: {
+              target: 'selfieImage',
             },
-            errored: [
+          },
+        },
+        processing: {
+          on: {
+            processingSucceeded: NextSideTargets,
+            processingErrored: [
               {
-                target: 'error',
+                target: 'frontImageRetry',
+                cond: context => context.currSide === 'front',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'backImageRetry',
+                cond: context => context.currSide === 'back',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'selfieImageRetry',
+                cond: context => context.currSide === 'selfie',
                 actions: 'assignIdDocImageErrors',
               },
             ],
@@ -126,63 +173,37 @@ const createIdDocMachine = () =>
             },
           },
         },
-        error: {
-          on: {
-            resubmitIdDocImages: {
-              target: 'idDocFrontImage',
-            },
-          },
-        },
-        success: {
+        complete: {
           type: 'final',
         },
         failure: {
+          type: 'final',
+        },
+        incompatibleDevice: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        assignContext: assign((context, event) => {
-          const {
-            authToken,
-            device,
-            idDocRequired,
-            selfieRequired,
-            consentRequired,
-          } = event.payload;
-          context.authToken = authToken;
-          context.device = { ...device };
-          context.idDoc.required = idDocRequired;
-          context.selfie.required = selfieRequired;
-          context.selfie.consentRequired = consentRequired;
+        assignCountryAndType: assign((context, event) => {
+          context.idDoc = {
+            type: event.payload.type,
+            country: event.payload.country,
+          };
           return context;
         }),
-        assignIdDocCountryAndType: assign((context, event) => {
-          context.idDoc.type = event.payload.type;
-          context.idDoc.country = event.payload.country;
-          return context;
-        }),
-        assignIdDocFrontImage: assign((context, event) => {
-          context.idDoc.frontImage = event.payload.image;
-          return context;
-        }),
-        assignIdDocBackImage: assign((context, event) => {
-          context.idDoc.backImage = event.payload.image;
-          return context;
-        }),
-        assignConsent: assign(context => {
-          context.selfie.consentRequired = false;
-          return context;
-        }),
-        assignSelfie: assign((context, event) => {
-          context.selfie.image = event.payload.image;
+        assignImage: assign((context, event) => {
+          context.image = event.payload.image;
           return context;
         }),
         assignIdDocImageErrors: assign((context, event) => {
-          context.idDoc.errors = event.payload.errors;
-          context.idDoc.frontImage = undefined;
-          context.idDoc.backImage = undefined;
+          context.errors = event.payload.errors;
+          context.image = undefined;
+          return context;
+        }),
+        assignConsent: assign(context => {
+          context.requirement.shouldCollectConsent = false;
           return context;
         }),
       },

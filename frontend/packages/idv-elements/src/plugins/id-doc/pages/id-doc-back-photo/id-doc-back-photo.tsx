@@ -1,38 +1,47 @@
-import { IcoIdBack40 } from '@onefootprint/icons';
 import React from 'react';
 
 import { NavigationHeader } from '../../../../components';
 import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
+import { ImageTypes } from '../../constants/image-types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const IdDocBackPhoto = () => {
   const [state, send] = useIdDocMachine();
   const {
-    idDoc: { type },
+    idDoc: { type, country },
   } = state.context;
 
-  if (!type) {
+  const countryCode3 = getCountryFromCode(country)?.value3;
+
+  if (!type || !countryCode3) {
     return null;
   }
 
   const handleComplete = (image: string) => {
     send({
-      type: 'receivedIdDocBackImage',
+      type: 'receivedImage',
       payload: {
         image,
       },
     });
   };
 
+  const handleClickBack = () => {
+    send({
+      type: 'navigatedToPrev',
+    });
+  };
+
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
       <IdDocPhotoPrompt
-        iconComponent={IcoIdBack40}
         showGuidelines
-        side="back"
+        imageType={ImageTypes.back}
         type={type}
         onComplete={handleComplete}
+        country={countryCode3}
       />
     </>
   );

@@ -1,31 +1,26 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  IcoEmojiHappy24,
   IcoSelfie40,
   IcoSmartphone24,
-  IcoSquareFrame24,
   IcoSun24,
 } from '@onefootprint/icons';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import IdAnimation from '../../../../components/animations/id-animation';
 import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import SelfieConsent from '../../components/selfie-consent';
+import FadeInContainer from '../../components/fade-in-container';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import SelfieConsent from './components/selfie-consent/selfie-consent';
 
 const SelfiePrompt = () => {
   const [state, send] = useIdDocMachine();
   const { t } = useTranslation('pages.selfie-photo-prompt');
-  const {
-    selfie: { consentRequired },
-  } = state.context;
+  const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);
-  const {
-    idDoc: { type },
-  } = state.context;
 
   const handleClose = () => {
     setConsentVisible(false);
@@ -34,67 +29,54 @@ const SelfiePrompt = () => {
   const handleConsent = () => {
     send({ type: 'consentReceived' });
     setConsentVisible(false);
-    send({ type: 'startSelfieCapture' });
+    send({ type: 'startImageCapture' });
   };
 
   const handleClick = () => {
     if (consentRequired) {
       setConsentVisible(true);
     } else {
-      send({ type: 'startSelfieCapture' });
+      send({ type: 'startImageCapture' });
     }
   };
 
   return (
-    <Container>
-      <NavigationHeader />
-      {type === 'passport' ? (
-        <IdAnimation
-          firstText={t('animation-selfie-from-passport.first-text')}
-          secondText={t('animation-selfie-from-passport.second-text')}
-          src="/selfie-animation/selfie-animation.riv"
+    <FadeInContainer>
+      <PromptContainer>
+        <NavigationHeader />
+        <IcoSelfie40 />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <InfoBox
+          items={[
+            {
+              title: t('guidelines.check-lighting.title'),
+              description: t('guidelines.check-lighting.description'),
+              Icon: IcoSun24,
+            },
+            {
+              title: t('guidelines.whole-face.title'),
+              Icon: IcoEmojiHappy24,
+            },
+            {
+              title: t('guidelines.device-steady.title'),
+              Icon: IcoSmartphone24,
+            },
+          ]}
         />
-      ) : (
-        <IdAnimation
-          firstText={t('animation-selfie.first-text')}
-          secondText={t('animation-selfie.second-text')}
-          src="/selfie-animation/selfie-animation.riv"
+        <Button fullWidth onClick={handleClick}>
+          {t('cta')}
+        </Button>
+        <SelfieConsent
+          open={consentVisible}
+          onClose={handleClose}
+          onConsent={handleConsent}
         />
-      )}
-      <IcoSelfie40 />
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <InfoBox
-        items={[
-          {
-            title: t('guidelines.check-lighting.title'),
-            description: t('guidelines.check-lighting.description'),
-            Icon: IcoSun24,
-          },
-          {
-            title: t('guidelines.device-steady.title'),
-            description: t('guidelines.device-steady.description'),
-            Icon: IcoSmartphone24,
-          },
-          {
-            title: t('guidelines.whole-face.title'),
-            description: t('guidelines.whole-face.description'),
-            Icon: IcoSquareFrame24,
-          },
-        ]}
-      />
-      <Button fullWidth onClick={handleClick}>
-        {t('cta')}
-      </Button>
-      <SelfieConsent
-        open={consentVisible}
-        onClose={handleClose}
-        onConsent={handleConsent}
-      />
-    </Container>
+      </PromptContainer>
+    </FadeInContainer>
   );
 };
 
-const Container = styled.div`
+const PromptContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

@@ -1,86 +1,72 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CountryCode3,
-  IdDocBadImageError,
+  CountryCode,
+  IdDocImageError,
+  IdDocRequirement,
   IdDocType,
 } from '@onefootprint/types';
 
+import { ImageTypes } from '../../constants/image-types';
+
 export type MachineContext = {
-  authToken?: string;
-  device?: DeviceInfo;
+  authToken: string;
+  device: DeviceInfo;
+  requirement: IdDocRequirement;
+  image?: string;
+  currSide?: ImageTypes;
   idDoc: {
-    required?: boolean;
     type?: IdDocType;
-    country?: CountryCode3;
-    frontImage?: string; // Base64 encoded
-    backImage?: string; // Base64 encoded
-    errors?: IdDocBadImageError[];
+    country?: CountryCode;
   };
-  selfie: {
-    consentRequired?: boolean;
-    required?: boolean;
-    image?: string; // Base64 encoded
+  errors?: IdDocImageError[];
+};
+
+export type ProccessingSucceededEvent = {
+  type: 'processingSucceeded';
+  payload: {
+    nextSideToCollect?: string;
   };
 };
 
 export type MachineEvents =
   | {
-      type: 'receivedContext';
+      type: 'receivedCountryAndType';
       payload: {
-        authToken: string;
-        device: DeviceInfo;
-        selfieRequired?: boolean;
-        idDocRequired?: boolean;
-        consentRequired?: boolean;
+        type?: IdDocType;
+        country?: CountryCode;
       };
     }
   | {
-      type: 'idDocCountryAndTypeSelected';
-      payload: {
-        type: IdDocType;
-        country: CountryCode3;
-      };
-    }
-  | {
-      type: 'navigatedToPrev';
-    }
-  | {
-      type: 'cameraErrored';
-    }
-  | {
-      type: 'receivedIdDocFrontImage';
+      type: 'receivedImage';
       payload: {
         image: string;
       };
     }
   | {
-      type: 'receivedIdDocBackImage';
+      type: 'nextSide';
       payload: {
-        image: string;
+        nextSideToCollect: string;
+      };
+    }
+  | {
+      type: 'processingErrored';
+      payload: {
+        errors: IdDocImageError[];
       };
     }
   | {
       type: 'consentReceived';
     }
   | {
-      type: 'startSelfieCapture';
+      type: 'startImageCapture';
     }
   | {
-      type: 'receivedSelfieImage';
-      payload: {
-        image: string;
-      };
+      type: 'cameraErrored';
     }
   | {
-      type: 'succeeded';
-    }
-  | { type: 'retryLimitExceeded' }
-  | {
-      type: 'errored';
-      payload: {
-        errors: IdDocBadImageError[];
-      };
+      type: 'navigatedToPrev';
     }
   | {
-      type: 'resubmitIdDocImages';
-    };
+      type: 'retryLimitExceeded';
+    }
+  | ProccessingSucceededEvent;

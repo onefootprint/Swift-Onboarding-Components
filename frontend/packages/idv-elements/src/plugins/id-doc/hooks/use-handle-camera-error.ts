@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { useToast } from '@onefootprint/ui';
 
-import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet/missing-permissions-sheet-provider';
+import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet';
 
 const useHandleCameraError = () => {
   const toast = useToast();
@@ -41,9 +41,7 @@ const useHandleCameraError = () => {
       error.name === 'PermissionDeniedError'
     ) {
       // permission denied in browser
-      missingPermissionsSheet.show({
-        permissionName: t('camera-permissions'),
-      });
+      missingPermissionsSheet.show({});
     } else if (error.name === 'TypeError' || error.name === 'TypeError') {
       // empty constraints object
       showErrorToast(t('other-error'));

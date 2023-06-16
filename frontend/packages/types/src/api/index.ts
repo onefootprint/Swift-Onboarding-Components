@@ -14,7 +14,6 @@ export * from './get-access-events';
 export * from './get-auth-roles';
 export * from './get-business-owners';
 export * from './get-d2p-status';
-export * from './get-doc-status';
 export * from './get-entities';
 export * from './get-entity';
 export * from './get-entity-match-signals';

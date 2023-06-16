@@ -10,7 +10,8 @@ import {
   IcoIdGeneric40,
   IcoPassport24,
 } from '@onefootprint/icons';
-import { CountryCode, CountryCode3, IdDocType } from '@onefootprint/types';
+import { IdDocType } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
   CountrySelect,
@@ -18,6 +19,7 @@ import {
   Divider,
   RadioSelect,
   RadioSelectOptionFields,
+  Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -25,38 +27,42 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
+import { getCountryFromCode } from '../../utils/get-country-from-code';
+import supportedTypeToIdDocType from '../../utils/supported-type-to-doc-type';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
-
-const getCountryFromCode = (countryCode?: CountryCode) => {
-  const match = COUNTRIES.find(country => country.value === countryCode);
-  return match;
-};
-
-const getCountryFromCode3 = (countryCode?: CountryCode3) => {
-  const match = COUNTRIES.find(country => country.value3 === countryCode);
-  return match;
-};
 
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state, send] = useIdDocMachine();
   const { country: defaultCountry, type: defaultType } = state.context.idDoc;
   const [country, setCountry] = useState<CountryRecord>(
-    getCountryFromCode3(defaultCountry) ?? DEFAULT_COUNTRY,
+    getCountryFromCode(defaultCountry) ?? DEFAULT_COUNTRY,
   );
 
-  const types: IdDocType[] = IdDocTypesByCountry[country.value3];
+  const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
+  const supportedIdDocTypes = supportedDocumentTypes.map(
+    supportedDocumentType => supportedTypeToIdDocType[supportedDocumentType],
+  ); // get rid of this line once back end fixes the typo with "drivers license" in id-doc type
+  const types: IdDocType[] = IdDocTypesByCountry[country.value].filter(type =>
+    supportedIdDocTypes.includes(type),
+  );
   const firstTypeFromOptions = types.length ? types[0] : IdDocType.passport;
   const [docType, setDocType] = useState<IdDocType>(
     defaultType ?? firstTypeFromOptions,
   );
+
+  const countryOptions = onlyUsSupported
+    ? [getCountryFromCode('US') as CountryRecord]
+    : COUNTRIES;
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value3];
+      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value].filter(
+        type => supportedIdDocTypes.includes(type),
+      );
       const nextType = typesForNextCountry.length
         ? typesForNextCountry[0]
         : IdDocType.passport;
@@ -65,43 +71,50 @@ const IdDocCountryAndType = () => {
   };
 
   const handleDocTypeChange = (value: string) => {
-    setDocType(IdDocType[value as keyof typeof IdDocType]);
+    setDocType(value as IdDocType);
   };
 
   const handleSubmit = () => {
     send({
-      type: 'idDocCountryAndTypeSelected',
+      type: 'receivedCountryAndType',
       payload: {
         type: docType,
         country:
-          getCountryFromCode(country.value)?.value3 ?? DEFAULT_COUNTRY.value3,
+          getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value,
       },
     });
   };
 
-  const optionByDocType: Record<IdDocType, RadioSelectOptionFields> = {
-    [IdDocType.passport]: {
+  const optionByDocType: { [key in IdDocType]?: RadioSelectOptionFields } = {};
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passport)) {
+    optionByDocType[IdDocType.passport] = {
       title: t('form.type.passport.title'),
       description: t('form.type.passport.description'),
       IconComponent: IcoPassport24,
-      value: t('form.type.passport.value'),
-    },
-    [IdDocType.driversLicense]: {
+      value: IdDocType.passport,
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.driversLicense)) {
+    optionByDocType[IdDocType.driversLicense] = {
       title: t('form.type.driversLicense.title'),
       description: t('form.type.driversLicense.description'),
       IconComponent: IcoCar24,
-      value: t('form.type.driversLicense.value'),
-    },
-    [IdDocType.idCard]: {
+      value: IdDocType.driversLicense,
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.idCard)) {
+    optionByDocType[IdDocType.idCard] = {
       title: t('form.type.idCard.title'),
       description: t('form.type.idCard.description'),
       IconComponent: IcoIdCard24,
-      value: t('form.type.idCard.value'),
-    },
-  };
-  const options: RadioSelectOptionFields[] = types.map(
-    type => optionByDocType[type],
-  );
+      value: IdDocType.idCard,
+    };
+  }
+
+  // We only show the doc types supported by both the country and onboarding config
+  const options: RadioSelectOptionFields[] = types
+    .map(type => optionByDocType[type])
+    .filter((option): option is RadioSelectOptionFields => !!option);
 
   return (
     <Container>
@@ -113,18 +126,30 @@ const IdDocCountryAndType = () => {
           data-private
           label={t('form.country')}
           onChange={handleCountryChange}
+          options={countryOptions}
           value={country}
         />
         <Divider />
-        <RadioSelect
-          value={optionByDocType[docType].value}
-          options={options}
-          onChange={handleDocTypeChange}
-        />
+        {options.length > 0 ? (
+          <RadioSelect
+            value={optionByDocType[docType]?.value}
+            options={options}
+            onChange={handleDocTypeChange}
+          />
+        ) : (
+          <Typography
+            variant="body-4"
+            sx={{ textAlign: 'center', marginLeft: 5, marginRight: 5 }}
+          >
+            {t('form.not-supported')}
+          </Typography>
+        )}
       </InputsContainer>
-      <Button fullWidth onClick={handleSubmit}>
-        {t('form.cta')}
-      </Button>
+      {options.length > 0 && (
+        <Button fullWidth onClick={handleSubmit}>
+          {t('form.cta')}
+        </Button>
+      )}
     </Container>
   );
 };

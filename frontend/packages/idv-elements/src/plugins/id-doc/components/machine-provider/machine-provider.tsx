@@ -1,9 +1,13 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import idDocMachine from '../../utils/state-machine/machine';
+import { createIdDocMachine, MachineContext } from '../../utils/state-machine';
 
-const useLocalIdDocMachine = () => useMachine(idDocMachine);
+type IdDocMachineArgs = {
+  args: MachineContext;
+};
+const useLocalIdDocMachine = ({ args }: IdDocMachineArgs) =>
+  useMachine(() => createIdDocMachine(args));
 
 export const [MachineProvider, useIdDocMachine] =
   constate(useLocalIdDocMachine);

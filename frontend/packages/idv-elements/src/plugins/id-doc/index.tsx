@@ -1,55 +1,50 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { useEffectOnce } from 'usehooks-ts';
 
-import {
-  MachineProvider,
-  useIdDocMachine,
-} from './components/machine-provider';
-import MissingPermissionsSheetProvider from './components/missing-permissions-sheet/missing-permissions-sheet-provider';
+import { MachineProvider } from './components/machine-provider';
+import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
-import { IdDocProps } from './id-doc.types';
+import { ImageTypes } from './constants/image-types';
 import Router from './pages/router';
+import { IdDocProps } from './types';
+import { MachineContext } from './utils/state-machine';
+import supportedTypeToIdDocType from './utils/supported-type-to-doc-type';
 
 const App = ({ context, onDone }: IdDocProps) => {
-  const [, send] = useIdDocMachine();
   const { authToken, device, customData } = context;
+  if (!customData) {
+    return null;
+  }
 
-  useEffectOnce(() => {
-    if (!customData) {
-      return;
-    }
-    const { shouldCollectSelfie, shouldCollectConsent } =
-      customData.requirement;
-    send({
-      type: 'receivedContext',
-      payload: {
-        authToken,
-        device,
-        idDocRequired: true,
-        selfieRequired: !!shouldCollectSelfie,
-        consentRequired: !!shouldCollectConsent,
-      },
-    });
-  });
+  const initialContext: MachineContext = {
+    authToken,
+    device,
+    currSide: ImageTypes.front,
+    requirement: customData.requirement,
+    idDoc: {
+      country: customData.requirement.onlyUsSupported ? 'US' : undefined,
+      type:
+        customData.requirement.supportedDocumentTypes.length === 1
+          ? supportedTypeToIdDocType[
+              customData.requirement.supportedDocumentTypes[0]
+            ]
+          : undefined,
+    },
+  };
 
   return (
-    <I18nextProvider i18n={configureI18next()}>
-      <QueryClientProvider client={queryClient}>
-        <MissingPermissionsSheetProvider>
-          <Router onDone={onDone} />
-        </MissingPermissionsSheetProvider>
-      </QueryClientProvider>
-    </I18nextProvider>
+    <MachineProvider args={initialContext}>
+      <I18nextProvider i18n={configureI18next()}>
+        <QueryClientProvider client={queryClient}>
+          <MissingPermissionsSheetProvider>
+            <Router onDone={onDone} />
+          </MissingPermissionsSheetProvider>
+        </QueryClientProvider>
+      </I18nextProvider>
+    </MachineProvider>
   );
 };
 
-const AppWithMachine = ({ context, onDone }: IdDocProps) => (
-  <MachineProvider>
-    <App context={context} onDone={onDone} />
-  </MachineProvider>
-);
-
-export default AppWithMachine;
+export default App;

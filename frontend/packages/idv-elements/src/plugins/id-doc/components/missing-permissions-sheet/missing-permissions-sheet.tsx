@@ -6,25 +6,20 @@ import styled, { css } from 'styled-components';
 import { HeaderTitle } from '../../../../components';
 
 export type MissingPermissionsSheetProps = {
-  permissionName: string;
   open: boolean;
   onClose?: () => void;
 };
 
 const MissingPermissionsSheet = ({
-  permissionName,
   open,
   onClose,
 }: MissingPermissionsSheetProps) => {
   const { t } = useTranslation('components.missing-permissions');
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="">
+    <BottomSheet open={open} onClose={onClose}>
       <Container>
-        <HeaderTitle
-          title={t('title', { permissionName })}
-          subtitle={t('subtitle')}
-        />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Typography variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
           {t('cta')}
         </Typography>

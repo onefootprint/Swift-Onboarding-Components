@@ -14,26 +14,28 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignConsent: 'consentReceived';
-    assignContext: 'receivedContext';
-    assignIdDocBackImage: 'receivedIdDocBackImage';
-    assignIdDocCountryAndType: 'idDocCountryAndTypeSelected';
-    assignIdDocFrontImage: 'receivedIdDocFrontImage';
-    assignIdDocImageErrors: 'errored';
-    assignSelfie: 'receivedSelfieImage';
+    assignCountryAndType: 'receivedCountryAndType';
+    assignIdDocImageErrors: 'processingErrored';
+    assignImage: 'receivedImage';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'error'
+    | 'backImage'
+    | 'backImageCapture'
+    | 'backImageRetry'
+    | 'complete'
+    | 'countryAndType'
     | 'failure'
-    | 'idDocBackImage'
-    | 'idDocCountryAndType'
-    | 'idDocFrontImage'
-    | 'init'
-    | 'processingDocuments'
+    | 'frontImage'
+    | 'frontImageCapture'
+    | 'frontImageRetry'
+    | 'incompatibleDevice'
+    | 'initState'
+    | 'processing'
     | 'selfieImage'
-    | 'selfiePrompt'
-    | 'success';
+    | 'selfieImageRetry'
+    | 'selfiePrompt';
   tags: never;
 }

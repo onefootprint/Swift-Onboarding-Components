@@ -28,7 +28,6 @@ export * from './di';
 export * from './entity';
 export * from './entity-cards';
 export * from './id-di-data';
-export { default as IdDocBadImageError } from './id-doc-bad-image-error';
 export { default as IdDocImageError } from './id-doc-image-error-incode';
 export * from './id-doc-info';
 export * from './id-doc-type';

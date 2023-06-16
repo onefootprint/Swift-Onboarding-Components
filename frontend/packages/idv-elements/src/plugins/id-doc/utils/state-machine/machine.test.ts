@@ -1,354 +1,483 @@
-import { IdDocBadImageError, IdDocType } from '@onefootprint/types';
+import { IdDocType } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
+import {
+  argsNonMobile,
+  argsRegular,
+  argsUsOnlySingleDocType,
+  processingErrors,
+  requirement,
+} from './machine.test.config';
 
 describe('Id Doc Machine Tests', () => {
-  const createMachine = () => createIdDocMachine();
-  it('collects id doc only', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
-    expect(state.context).toEqual({
-      idDoc: {},
-      selfie: {},
-    });
-
-    state = machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'token',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
+  describe('Auto transition to the correct state after initState', () => {
+    it('If the device in not mobile, it should transition to incompatible device final state', () => {
+      const machine = interpret(createIdDocMachine(argsNonMobile)).onTransition(
+        state => {
+          expect(state.value).toEqual('incompatibleDevice');
         },
-        idDocRequired: true,
-        selfieRequired: false,
-      },
+      );
+      machine.start();
+      machine.stop();
     });
-    expect(state.context).toEqual({
-      authToken: 'token',
-      device: {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      },
-      idDoc: {
-        required: true,
-      },
-      selfie: {
-        required: false,
-      },
-    });
-    expect(state.value).toEqual('idDocCountryAndType');
 
-    state = machine.send({
-      type: 'idDocCountryAndTypeSelected',
-      payload: {
-        type: IdDocType.idCard,
-        country: 'USA',
-      },
+    it('If the doc requirement is US only with a only one accepted doc type, it should transition to front image state', () => {
+      const machine = interpret(
+        createIdDocMachine(argsUsOnlySingleDocType),
+      ).onTransition(state => {
+        expect(state.value).toEqual('frontImage');
+      });
+      machine.start();
+      machine.stop();
     });
-    expect(state.context.idDoc).toEqual({
-      type: IdDocType.idCard,
-      required: true,
-      country: 'USA',
-    });
-    expect(state.value).toEqual('idDocFrontImage');
 
-    state = machine.send({
-      type: 'receivedIdDocFrontImage',
-      payload: {
-        image: 'front',
-      },
+    it('Otherwise, in regular case, it should transition to country and doc type select state', () => {
+      const machine = interpret(createIdDocMachine(argsRegular)).onTransition(
+        state => {
+          expect(state.value).toEqual('countryAndType');
+        },
+      );
+      machine.start();
+      machine.stop();
     });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual('idDocBackImage');
-
-    state = machine.send({
-      type: 'receivedIdDocBackImage',
-      payload: {
-        image: 'back',
-      },
-    });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual('processingDocuments');
-
-    state = machine.send({
-      type: 'succeeded',
-    });
-    expect(state.value).toEqual('success');
   });
 
-  it('collects selfie only', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
+  describe('Full flow test with image upload and navigate back', () => {
+    it('Can execute the the full flow properly', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
 
-    state = machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'token',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
+      let state = machine.send({
+        type: 'receivedCountryAndType',
+        payload: {
+          type: IdDocType.driversLicense,
+          country: 'US',
         },
-        idDocRequired: false,
-        selfieRequired: true,
-        consentRequired: true,
-      },
-    });
-    expect(state.context).toEqual({
-      authToken: 'token',
-      device: {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      },
-      idDoc: {
-        required: false,
-      },
-      selfie: {
-        required: true,
-        consentRequired: true,
-      },
-    });
-    expect(state.value).toEqual('selfiePrompt');
+      });
+      expect(state.value).toEqual('frontImage');
+      expect(state.context.idDoc.country).toEqual('US');
 
-    state = machine.send({
-      type: 'consentReceived',
-    });
-    expect(state.value).toEqual('selfiePrompt');
+      expect(state.context.idDoc.type).toEqual('driver_license');
+      state = machine.send({
+        type: 'navigatedToPrev',
+      });
+      expect(state.value).toEqual('countryAndType');
 
-    state = machine.send({
-      type: 'startSelfieCapture',
-    });
-    expect(state.value).toEqual('selfieImage');
+      state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'navigatedToPrev',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
 
-    state = machine.send({
-      type: 'receivedSelfieImage',
-      payload: {
-        image: 'selfie',
-      },
-    });
-    expect(state.context.selfie.image).toEqual('selfie');
-    expect(state.value).toEqual('processingDocuments');
+      state = machine.send({
+        type: 'processingSucceeded',
+        payload: {
+          nextSideToCollect: 'back',
+        },
+      });
+      expect(state.value).toEqual('backImage');
 
-    state = machine.send({
-      type: 'succeeded',
+      state = machine.send([
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'navigatedToPrev',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
+
+      state = machine.send({
+        type: 'processingSucceeded',
+        payload: {
+          nextSideToCollect: 'selfie',
+        },
+      });
+      expect(state.value).toEqual('selfiePrompt');
+
+      state = machine.send({
+        type: 'consentReceived',
+      });
+      expect(state.value).toEqual('selfiePrompt');
+      expect(state.context.requirement.shouldCollectConsent).toEqual(false);
+
+      state = machine.send({
+        type: 'startImageCapture',
+      });
+      expect(state.value).toEqual('selfieImage');
+
+      state = machine.send([
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
+
+      state = machine.send({
+        type: 'processingSucceeded',
+        payload: {
+          nextSideToCollect: undefined,
+        },
+      });
+      expect(state.value).toEqual('complete');
     });
-    expect(state.value).toEqual('success');
   });
 
-  it('collects id doc + selfie', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
-    state = machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'token',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
+  describe('Additional tests', () => {
+    it('Can take front image using inline camera and upload', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
         },
-        idDocRequired: true,
-        selfieRequired: true,
-      },
-    });
-    expect(state.context).toEqual({
-      authToken: 'token',
-      device: {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      },
-      idDoc: {
-        required: true,
-      },
-      selfie: {
-        required: true,
-      },
-    });
-    expect(state.value).toEqual('idDocCountryAndType');
-
-    state = machine.send({
-      type: 'idDocCountryAndTypeSelected',
-      payload: {
-        type: IdDocType.idCard,
-        country: 'USA',
-      },
-    });
-    expect(state.value).toEqual('idDocFrontImage');
-
-    state = machine.send({
-      type: 'receivedIdDocFrontImage',
-      payload: {
-        image: 'front',
-      },
-    });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual('idDocBackImage');
-
-    state = machine.send({
-      type: 'receivedIdDocBackImage',
-      payload: {
-        image: 'back',
-      },
-    });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual('selfiePrompt');
-
-    state = machine.send({
-      type: 'startSelfieCapture',
-    });
-    expect(state.value).toEqual('selfieImage');
-
-    state = machine.send({
-      type: 'receivedSelfieImage',
-      payload: {
-        image: 'selfie',
-      },
-    });
-    expect(state.context.selfie.image).toEqual('selfie');
-    expect(state.value).toEqual('processingDocuments');
-
-    state = machine.send({
-      type: 'succeeded',
-    });
-    expect(state.value).toEqual('success');
-  });
-
-  it('retries id doc images on error', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'token',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
+        {
+          type: 'startImageCapture',
         },
-        idDocRequired: true,
-        selfieRequired: false,
-      },
-    });
-    expect(state.value).toEqual('idDocCountryAndType');
-
-    state = machine.send({
-      type: 'idDocCountryAndTypeSelected',
-      payload: {
-        type: IdDocType.idCard,
-        country: 'USA',
-      },
-    });
-    expect(state.value).toEqual('idDocFrontImage');
-
-    state = machine.send({
-      type: 'receivedIdDocFrontImage',
-      payload: {
-        image: 'front',
-      },
-    });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.value).toEqual('idDocBackImage');
-
-    state = machine.send({
-      type: 'receivedIdDocBackImage',
-      payload: {
-        image: 'back',
-      },
-    });
-    expect(state.context.idDoc.frontImage).toEqual('front');
-    expect(state.context.idDoc.backImage).toEqual('back');
-    expect(state.value).toEqual('processingDocuments');
-
-    state = machine.send({
-      type: 'errored',
-      payload: {
-        errors: [
-          IdDocBadImageError.barcodeNotDetected,
-          IdDocBadImageError.documentBorderTooSmall,
-        ],
-      },
-    });
-    expect(state.value).toEqual('error');
-    expect(state.context.idDoc.errors).toEqual([
-      IdDocBadImageError.barcodeNotDetected,
-      IdDocBadImageError.documentBorderTooSmall,
-    ]);
-
-    state = machine.send({
-      type: 'resubmitIdDocImages',
-    });
-    expect(state.context.idDoc.frontImage).toEqual(undefined);
-    expect(state.context.idDoc.backImage).toEqual(undefined);
-    expect(state.value).toBe('idDocFrontImage');
-  });
-
-  it('can return to id doc country and type selection', () => {
-    const machine = interpret(createMachine());
-    machine.start();
-    let { state } = machine;
-    expect(state.value).toBe('init');
-    state = machine.send({
-      type: 'receivedContext',
-      payload: {
-        authToken: 'token',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: true,
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
         },
-        idDocRequired: true,
-        selfieRequired: true,
-      },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
     });
-    expect(state.context).toEqual({
-      authToken: 'token',
-      device: {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      },
-      idDoc: {
-        required: true,
-      },
-      selfie: {
-        required: true,
-      },
-    });
-    expect(state.value).toEqual('idDocCountryAndType');
 
-    state = machine.send({
-      type: 'idDocCountryAndTypeSelected',
-      payload: {
-        type: IdDocType.idCard,
-        country: 'USA',
-      },
-    });
-    expect(state.value).toEqual('idDocFrontImage');
-    expect(state.context.idDoc.type).toEqual(IdDocType.idCard);
-    expect(state.context.idDoc.country).toEqual('USA');
+    it('Can take back image using inline camera and upload', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
 
-    state = machine.send({
-      type: 'navigatedToPrev',
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('processing');
+      expect(state.context.image).toEqual('image');
     });
-    expect(state.value).toEqual('idDocCountryAndType');
 
-    state = machine.send({
-      type: 'idDocCountryAndTypeSelected',
-      payload: {
-        type: IdDocType.driversLicense,
-        country: 'AFG',
-      },
+    it('Can retry image upload when processing fails and update errors', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingErrored',
+          payload: {
+            errors: processingErrors,
+          },
+        },
+      ]);
+      expect(state.value).toEqual('frontImageRetry');
+      expect(state.context.errors).toEqual(processingErrors);
+
+      state = machine.send([
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('backImage');
+      expect(state.context.errors).toEqual([]);
     });
-    expect(state.value).toEqual('idDocFrontImage');
-    expect(state.context.idDoc.type).toEqual(IdDocType.driversLicense);
-    expect(state.context.idDoc.country).toEqual('AFG');
+
+    it('Allows uploading any side/selfie based nextSideToCollect out of order', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'selfie',
+          },
+        },
+      ]);
+      expect(state.value).toEqual('selfiePrompt');
+    });
+
+    it('Can terminate the flow after any side upload', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: undefined,
+          },
+        },
+      ]);
+      expect(state.value).toEqual('complete');
+    });
+
+    it('Goes back to front image if camera errored', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'cameraErrored',
+        },
+      ]);
+      expect(state.value).toEqual('frontImage');
+    });
+
+    it('Goes back to back image if camera errored', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+        {
+          type: 'consentReceived',
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'cameraErrored',
+        },
+      ]);
+      expect(state.value).toEqual('backImage');
+    });
+
+    it('Goes back to selfie prompt if camera errored', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'selfie',
+          },
+        },
+        {
+          type: 'consentReceived',
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'cameraErrored',
+        },
+      ]);
+      expect(state.value).toEqual('selfiePrompt');
+    });
+
+    it('Does not start selfie capture if consent was not provided', () => {
+      const machine = interpret(
+        createIdDocMachine({
+          ...argsRegular,
+          requirement: { ...requirement, shouldCollectConsent: true },
+        }),
+      );
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'selfie',
+          },
+        },
+        {
+          type: 'startImageCapture',
+        },
+      ]);
+      expect(state.value).toEqual('selfiePrompt');
+    });
+
+    it('Terminate the flow when retry limit exceeds', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegular }));
+      machine.start();
+
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: IdDocType.driversLicense,
+            country: 'US',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            image: 'image',
+          },
+        },
+        {
+          type: 'retryLimitExceeded',
+        },
+      ]);
+      expect(state.value).toEqual('failure');
+    });
   });
 });

@@ -7,52 +7,100 @@
       "not-found": "We couldn't find a camera on your device. Please use another device.",
       "already-in-use": "Another application is using your camera, please close the other application and try again.",
       "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
-      "camera-permissions": "camera",
       "other-error": "There was an error accessing your camera. Please try again."
     },
     "missing-permissions": {
-      "title": "Allow access to your {{permissionName}}",
-      "subtitle": "This lets you submit photos of your documents, and we can use them to verify your identity.",
+      "title": "Allow access to your camera",
+      "subtitle": "We will need you to take photos of your document to properly verify your identity.",
       "cta": "Open settings to give camera permissions"
     },
     "id-doc-photo-prompt": {
-      "title": "Submit your {{type}} ({{side}})",
-      "subtitle": "Upload or take a photo of the {{side}} of your {{type}}.",
+      "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
-      "animation-back-side": {
-        "first": "Front image captured",
-        "second": "Now the back side"
-      },
-      "take-photo": {
-        "title": "Take photo",
-        "take": "Take photo",
-        "retake": "Take another photo"
-      },
-      "upload-photo": {
-        "title": "Upload photo",
-        "reupload": "Upload another photo"
-      },
       "guidelines": {
         "check-lighting": {
           "title": "Check your lighting",
           "description": "It can't be too bright or too dark."
         },
         "device-steady": {
-          "title": "Hold your device steady",
-          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+          "title": "Hold your device steady"
         },
-        "whole-document": {
-          "title": "Get the whole document in the photo",
-          "description": "We recommend that you place your document on a flat surface."
+        "position-document": {
+          "title": "Position your {{document}} in the frame",
+          "description": "Make sure it's the {{side}}."
         }
       }
     },
+    "loading": {
+      "processing-front": "Processing image...",
+      "processing-back": "Processing image...",
+      "processing-one-side": "Processing image...",
+      "processing-selfie": "Processing your selfie..."
+    },
+    "error": {
+      "title-front": "We couldn't process your image",
+      "title-back": "We couldn't process your image",
+      "title-selfie": "We couldn't process your selfie",
+      "description": {
+        "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
+        "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
+        "unsupported_document_type": "Unfortunately the uploaded document type is not supported. Please upload your {{documentType}} from {{countryName}}.",
+        "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
+        "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "document_not_readable": "Your document could not be read. Please try again.",
+        "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
+        "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",
+        "country_code_mismatch": "The {{documentType}} issuer country didn't match. Please upload your {{documentType}} from {{countryName}}.",
+        "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
+        "selfie_low_confidence": "We could not verify your selfie. Please try again.",
+        "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
+        "selfie_glare": "Your selfie had image glare. Please adjust the lighting and try again.",
+        "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
+        "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
+        "unknown_error": "An error occurred. Please try again."
+      }
+    },
+    "success": {
+      "front-upload": "Front side image uploaded",
+      "back-upload": "Back side image uploaded",
+      "one-side-upload": "Image uploaded",
+      "selfie-upload": "Selfie uploaded"
+    },
     "selfie-consent": {
-      "title": "Footprint needs to collect and use your biometric data",
-      "subtitle": "By clicking \"Agree\", you agree that Footprint will collect biometric data from your selfie and identity document.",
+      "title": "We need a selfie to verify your identity",
+      "subtitle": "By continuing, you're agreeing to Footprint collecting and processing your biometric data from your selfie and identity document.",
       "cta": "Agree",
-      "footer": "Please refer to our <a>Privacy Policy</a> for more details about how we handle and retain your biometric data."
+      "continue": "Continue",
+      "third-party-consent": "Optional: Allow Footprint's third-party providers to improve their products with this data. <a>Privacy Policy</a>.",
+      "third-party-consent-text": "Allow Footprint's third-party providers to improve their products with this data."
+    },
+    "id-doc-photo-upload-buttons": {
+      "take-photo": {
+        "title": "Take photo",
+        "take": "Take photo"
+      },
+      "upload-photo": {
+        "title": "Upload photo"
+      }
+    },
+    "next-side": {
+      "front": "Now the front side",
+      "back": "Now the back side",
+      "selfie": "Now we need a selfie",
+      "one-side": "Now the photo page of your passport"
+    },
+    "camera": {
+      "instructions": {
+        "position": "Position your face within the frame",
+        "readiness": "Take the photo when you're ready"
+      },
+      "take": "Take photo"
+    },
+    "preview": {
+      "retake": "Retake",
+      "confirm": "Confirm"
     }
   },
   "pages": {
@@ -60,26 +108,40 @@
       "title": "Scan or upload your ID",
       "subtitle": "We need some more information about your identity.",
       "form": {
-        "country": "Issuing country",
+        "country": "Country",
         "type": {
           "passport": {
             "title": "Passport",
-            "description": "Photo page",
-            "value": "passport"
+            "description": "Photo page"
           },
           "idCard": {
             "title": "Identity card",
-            "description": "Front & Back",
-            "value": "idCard"
+            "description": "Front & Back"
           },
           "driversLicense": {
             "title": "Driver's license",
-            "description": "Front & Back",
-            "value": "driversLicense"
+            "description": "Front & Back"
           }
         },
+        "not-supported": "Sorry, we don't support IDs for your country yet.",
         "cta": "Continue"
       }
+    },
+    "front-photo-capture": {
+      "title": {
+        "driversLicense": "Driver's license",
+        "idCard": "ID card",
+        "passport": "Passport"
+      },
+      "subtitle": "Front side"
+    },
+    "back-photo-capture": {
+      "title": {
+        "driversLicense": "Driver's license",
+        "idCard": "ID card",
+        "passport": "Passport"
+      },
+      "subtitle": "Back side"
     },
     "selfie-photo-prompt": {
       "title": "Take a selfie",
@@ -101,41 +163,28 @@
           "description": "It can't be too bright or too dark."
         },
         "device-steady": {
-          "title": "Hold your device steady",
-          "description": "Make sure you're holding your device steady to get a clear photo without any blur or glare."
+          "title": "Hold your device steady"
         },
         "whole-face": {
-          "title": "Make sure your face is clearly visible and centered",
-          "description": "You should face the camera directly and capture your whole head."
+          "title": "Position your face within the frame"
         }
       }
     },
+    "selfie-retry-prompt": {
+      "cta": "Take photo"
+    },
     "selfie-photo": {
-      "camera": {
-        "instructions": "Center your face in the area",
-        "take": "Take photo"
-      },
-      "preview": {
-        "retake": "Retake",
-        "confirm": "Use photo"
-      }
+      "title": "Selfie photo"
     },
-    "processing-documents": {
-      "title": "Processing your documents",
-      "subtitle": "This should only take a few seconds.",
-      "loading": "Analyzing...",
-      "success": "Document successfully collected!",
-      "error": "An error occurred."
+    "processing": {
+      "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
     },
-    "error": {
-      "title": "We couldn't process your images",
-      "description": "Please submit new images.",
-      "description-with-errors": "Please submit new images considering:",
-      "cta": "Resubmit images"
+    "retry-limit-exceeded": {
+      "title": "Too many attempts",
+      "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
     },
-    "failure": {
-      "title": "Document couldn't be verified",
-      "subtitle": "We'll review your identity and reach out to you shortly."
+    "device-warning": {
+      "warning": "This action can only be performed on a mobile phone. Please go back to the previous screen/tab and click the \"Cancel\" button to generate a new QR code with a new URL link. Open the new link on your phone."
     }
   }
 }

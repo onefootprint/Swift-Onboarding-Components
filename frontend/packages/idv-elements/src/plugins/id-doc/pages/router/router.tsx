@@ -2,14 +2,18 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import Error from '../error';
-import Failure from '../failure';
+import BackPhotoCapture from '../back-photo-capture';
+import DeviceWarning from '../device-warning';
+import FrontPhotoCapture from '../front-photo-capture';
 import IdDocBackPhoto from '../id-doc-back-photo';
+import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
 import IdDocFrontPhoto from '../id-doc-front-photo';
-import ProcessingDocuments from '../processing-documents';
+import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
+import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
 import SelfiePrompt from '../selfie-prompt';
+import SelfieRetryPrompt from '../selfie-retry-prompt';
 
 type RouterProps = {
   onDone: () => void;
@@ -17,7 +21,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdDocMachine();
-  const isDone = state.matches('success') || state.matches('failure');
+  const isDone = state.matches('complete') || state.matches('failure');
   useLogStateMachine('id-doc', state);
 
   useEffect(() => {
@@ -26,29 +30,52 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches('idDocCountryAndType')) {
+  if (state.matches('countryAndType')) {
     return <IdDocCountryAndType />;
   }
-  if (state.matches('idDocFrontImage')) {
+
+  if (state.matches('frontImage')) {
     return <IdDocFrontPhoto />;
   }
-  if (state.matches('idDocBackImage')) {
+
+  if (state.matches('frontImageCapture')) {
+    return <FrontPhotoCapture />;
+  }
+
+  if (state.matches('frontImageRetry')) {
+    return <IdDocFrontPhotoRetry />;
+  }
+
+  if (state.matches('backImage')) {
     return <IdDocBackPhoto />;
   }
+
+  if (state.matches('backImageCapture')) {
+    return <BackPhotoCapture />;
+  }
+
+  if (state.matches('backImageRetry')) {
+    return <IdDocBackPhotoRetry />;
+  }
+
   if (state.matches('selfiePrompt')) {
     return <SelfiePrompt />;
   }
+
   if (state.matches('selfieImage')) {
     return <SelfiePhoto />;
   }
-  if (state.matches('processingDocuments')) {
-    return <ProcessingDocuments />;
+
+  if (state.matches('selfieImageRetry')) {
+    return <SelfieRetryPrompt />;
   }
-  if (state.matches('error')) {
-    return <Error />;
+
+  if (state.matches('processing')) {
+    return <Processing />;
   }
-  if (state.matches('failure')) {
-    return <Failure />;
+
+  if (state.matches('incompatibleDevice')) {
+    return <DeviceWarning />;
   }
 
   return null;
