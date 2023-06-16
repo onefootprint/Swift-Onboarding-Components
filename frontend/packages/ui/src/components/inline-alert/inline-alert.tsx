@@ -45,7 +45,7 @@ const InlineAlertContainer = styled.div<{
   sx: SXStyles;
 }>`
   ${({ theme, variant }) => css`
-    ${createFontStyles('body-2')};
+    ${createFontStyles('body-3')};
     ${createVariantStyles(variant)};
     border-radius: ${theme.borderRadius.default};
     display: flex;
@@ -54,7 +54,7 @@ const InlineAlertContainer = styled.div<{
 
     a,
     button {
-      ${createFontStyles('label-2')};
+      ${createFontStyles('label-3')};
       color: currentColor;
       background: unset;
       border: unset;
