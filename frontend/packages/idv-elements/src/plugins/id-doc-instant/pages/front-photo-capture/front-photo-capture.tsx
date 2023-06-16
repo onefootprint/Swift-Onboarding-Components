@@ -9,13 +9,9 @@ import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const ID_VIDEO_HEIGHT = 280;
-const PASSPORT_VIDEO_HEIGHT = 450;
 
 const ID_OUTLINE_WIDTH_RATIO = 1.1;
 const ID_OUTLINE_HEIGHT_RATIO = 0.7;
-
-const PASSPORT_OUTLINE_WIDTH_RATIO = 0.7;
-const PASSPORT_OUTLINE_HEIGHT_RATIO = 0.9;
 
 const translationIndex: { [key in IdDocType]: string } = {
   [IdDocType.driversLicense]: 'driversLicense',
@@ -57,21 +53,9 @@ const FrontPhotoCapture = () => {
         />
       </TitleContainer>
       <PhotoCapture
-        maxVideoHeight={
-          doctType === IdDocType.passport
-            ? PASSPORT_VIDEO_HEIGHT
-            : ID_VIDEO_HEIGHT
-        }
-        outlineHeightRatio={
-          doctType === IdDocType.passport
-            ? PASSPORT_OUTLINE_HEIGHT_RATIO
-            : ID_OUTLINE_HEIGHT_RATIO
-        }
-        outlineWidthRatio={
-          doctType === IdDocType.passport
-            ? PASSPORT_OUTLINE_WIDTH_RATIO
-            : ID_OUTLINE_WIDTH_RATIO
-        }
+        maxVideoHeight={ID_VIDEO_HEIGHT}
+        outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
+        outlineWidthRatio={ID_OUTLINE_WIDTH_RATIO}
         cameraKind="back"
         outlineKind="full-frame"
         onComplete={onComplete}
