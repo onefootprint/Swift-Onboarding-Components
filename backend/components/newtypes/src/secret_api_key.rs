@@ -57,6 +57,11 @@ impl SecretApiKey {
     pub async fn fingerprint<F: ApiKeyFingerprinter>(&self, f: &F) -> Result<Fingerprint, F::Error> {
         f.sign_raw_data(self.0.as_bytes()).await
     }
+
+    /// Determines if an ob config public key may have been accidentally provided as the secret key
+    pub fn is_maybe_ob_config_key(&self) -> bool {
+        &self.0[..3] == "ob_"
+    }
 }
 
 impl Debug for SecretApiKey {

@@ -43,6 +43,7 @@ impl FromRequest for PublicOnboardingContext {
         Box::pin(async move {
             let key = newtypes::ObConfigurationKey::try_from(config_key?)
                 .map_err(|_| AuthError::InvalidHeader(HEADER_NAME.to_owned()))?;
+            let key2 = key.clone();
             let (ob_config, tenant) = state
                 .db_pool
                 .db_query(move |conn| ObConfiguration::get_enabled(conn, &key))
@@ -50,7 +51,11 @@ impl FromRequest for PublicOnboardingContext {
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {
                         // Slightly more informative error message when we can't find an ObConfig with this key
-                        AuthError::ApiKeyNotFound.into()
+                        if &key2[..3] == "sk_" {
+                            AuthError::ApiKeyUsedForObConfig.into()
+                        } else {
+                            AuthError::ObConfigNotFound.into()
+                        }
                     } else {
                         e.into()
                     }

@@ -17,8 +17,18 @@ pub use guard::*;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("Key not found")]
+    #[error("Secret API key with this value not found.")]
     ApiKeyNotFound,
+    #[error(
+        "It looks like you may have provided an onboarding publishable key. Please use a secret API key instead."
+    )]
+    ObConfigKeyUsedForApiKey,
+    #[error("Onboarding publishable key with this value not found.")]
+    ObConfigNotFound,
+    #[error(
+        "It looks like you may have provide a secret API key. Please use an onboarding publishable key instead, and keep your secret API keys safe on your backend!"
+    )]
+    ApiKeyUsedForObConfig,
     #[error("Missing {0}")]
     MissingHeader(String),
     #[error("Invalid {0}")]

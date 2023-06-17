@@ -6,7 +6,7 @@ use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
-use db::models::tenant_role::{TenantRole};
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
@@ -51,7 +51,8 @@ impl FromRequest for SecretTenantAuthContext {
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {
-            let sh_api_key = tenant_sk_input?.fingerprint(state.as_ref()).await?;
+            let sk = tenant_sk_input?;
+            let sh_api_key = sk.fingerprint(state.as_ref()).await?;
 
             let (api_key, tenant, role) = state
                 .db_pool
@@ -59,7 +60,11 @@ impl FromRequest for SecretTenantAuthContext {
                 .await?
                 .map_err(|e| {
                     if e.is_not_found() {
-                        ApiError::from(AuthError::ApiKeyNotFound)
+                        if sk.is_maybe_ob_config_key() {
+                            ApiError::from(AuthError::ObConfigKeyUsedForApiKey)
+                        } else {
+                            ApiError::from(AuthError::ApiKeyNotFound)
+                        }
                     } else {
                         e.into()
                     }
