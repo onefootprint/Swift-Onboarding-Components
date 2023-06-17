@@ -4,8 +4,6 @@ import {
   Box,
   FormControl,
   FormLabel,
-  InputAddon,
-  InputGroup,
   LinkButton,
   NativeSelect,
   TextInput,
@@ -24,14 +22,18 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
   const { t } = useTranslation(
     'pages.proxy-configs.create.form.ingress-vaulting',
   );
-  const { handleSubmit, control, register } = useForm<FormData>({
+  const { handleSubmit, control, register, watch } = useForm<FormData>({
     defaultValues: {
       ingressSettings: {
-        contentType: 'json',
-        rules: values.ingressSettings.rules,
+        contentType: 'none',
+        // Always default to having at least one rule
+        rules: values.ingressSettings.rules.length
+          ? values.ingressSettings.rules
+          : [defaultRule],
       },
     },
   });
+  const ingressContentType = watch('ingressSettings.contentType');
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'ingressSettings.rules',
@@ -54,77 +56,78 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
         <FormControl>
           <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
           <NativeSelect
-            disabled
             id="method"
             placeholder={t('content-type.placeholder')}
             {...register('ingressSettings.contentType')}
           >
+            <option value="none">None</option>
             <option value="json">JSON</option>
           </NativeSelect>
         </FormControl>
       </Box>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
-        {t('vaulting-rules.title')}
-      </Typography>
-      <FormGrid>
-        {fields.map((field, index) => (
-          <Box key={field.id}>
-            <Box sx={{ display: 'grid', gap: 5, marginBottom: 3 }}>
-              <FormControl>
-                <FormLabel htmlFor={`token-${index}`}>
-                  {t('vaulting-rules.token.label')}
-                </FormLabel>
-                <InputGroup>
-                  <InputAddon>custom.</InputAddon>
-                  <TextInput
-                    autoFocus
-                    id={`token-${index}`}
-                    placeholder={t('vaulting-rules.token.placeholder')}
-                    {...register(`ingressSettings.rules.${index}.token`, {
-                      ...createValidationOptions(
-                        index,
-                        t('vaulting-rules.token.errors.required'),
-                      ),
-                    })}
-                  />
-                </InputGroup>
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor={`target-${index}`}>
-                  {t('vaulting-rules.target.label')}
-                </FormLabel>
-                <TextInput
-                  id={`target-${index}`}
-                  placeholder={t('vaulting-rules.target.placeholder')}
-                  {...register(`ingressSettings.rules.${index}.target`, {
-                    ...createValidationOptions(
-                      index,
-                      t('vaulting-rules.target.errors.required'),
-                    ),
-                  })}
-                />
-              </FormControl>
-            </Box>
-            {fields.length >= 2 && (
-              <LinkButton
-                onClick={handleRemove(index)}
-                size="compact"
-                variant="destructive"
-              >
-                Remove
-              </LinkButton>
-            )}
-          </Box>
-        ))}
-      </FormGrid>
-      <LinkButton
-        iconComponent={IcoPlusSmall16}
-        iconPosition="left"
-        onClick={handleAdd}
-        size="compact"
-      >
-        {t('add-more')}
-      </LinkButton>
+      {ingressContentType !== 'none' && (
+        <>
+          <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+            {t('vaulting-rules.title')}
+          </Typography>
+          <FormGrid>
+            {fields.map((field, index) => (
+              <Box key={field.id}>
+                <Box sx={{ display: 'grid', gap: 5, marginBottom: 3 }}>
+                  <FormControl>
+                    <FormLabel htmlFor={`token-${index}`}>
+                      {t('vaulting-rules.token.label')}
+                    </FormLabel>
+                    <TextInput
+                      autoFocus
+                      id={`token-${index}`}
+                      placeholder={t('vaulting-rules.token.placeholder')}
+                      {...register(`ingressSettings.rules.${index}.token`, {
+                        ...createValidationOptions(
+                          index,
+                          t('vaulting-rules.token.errors.required'),
+                        ),
+                      })}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor={`target-${index}`}>
+                      {t('vaulting-rules.target.label')}
+                    </FormLabel>
+                    <TextInput
+                      id={`target-${index}`}
+                      placeholder={t('vaulting-rules.target.placeholder')}
+                      {...register(`ingressSettings.rules.${index}.target`, {
+                        ...createValidationOptions(
+                          index,
+                          t('vaulting-rules.target.errors.required'),
+                        ),
+                      })}
+                    />
+                  </FormControl>
+                </Box>
+                {fields.length >= 2 && (
+                  <LinkButton
+                    onClick={handleRemove(index)}
+                    size="compact"
+                    variant="destructive"
+                  >
+                    Remove
+                  </LinkButton>
+                )}
+              </Box>
+            ))}
+          </FormGrid>
+          <LinkButton
+            iconComponent={IcoPlusSmall16}
+            iconPosition="left"
+            onClick={handleAdd}
+            size="compact"
+          >
+            {t('add-more')}
+          </LinkButton>
+        </>
+      )}
     </form>
   );
 };

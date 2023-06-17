@@ -28,7 +28,7 @@ const Edit = ({ proxyConfig, children, title, Form }: EditProps) => {
     const payload = createPayload(proxyConfig.id, formData);
     proxyConfigMutation.mutate(payload, {
       onError: showErrorToast,
-      onSettled: () => setShow(false),
+      onSuccess: () => setShow(false),
     });
   };
 
@@ -61,10 +61,13 @@ const Edit = ({ proxyConfig, children, title, Form }: EditProps) => {
   ) : (
     <Fieldset
       title={title}
-      cta={{
-        label: allT('edit'),
-        onClick: () => setShow(true),
-      }}
+      // TODO: editing of vault proxy configs is pretty broken right now, and we're not convinced
+      // we need it. For now, let's stop allowing editing at all - will revisit in the future as
+      // more customers start using it
+      // cta={{
+      //   label: allT('edit'),
+      //   onClick: () => setShow(true),
+      // }}
     >
       {children}
     </Fieldset>

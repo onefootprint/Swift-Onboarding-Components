@@ -13,7 +13,7 @@ export type FormData = {
     disabled?: boolean;
   }[];
   ingressSettings: {
-    contentType: 'json' | null;
+    contentType: 'json' | 'none';
     rules: ProxyConfigIngressRule[];
   };
   method: ProxyConfigMethod;

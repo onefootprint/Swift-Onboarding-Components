@@ -28,13 +28,13 @@ const getDataInExpectedMode = (data: FormData) => {
     headers: filteredHeaders
       .filter(header => !header.secret)
       .map(header => ({ name: header.name, value: header.value })),
-    ingressSettings: {
-      ...ingressSettings,
-      rules: ingressSettings.rules.map(rule => ({
-        token: `custom.${rule.token}`,
-        target: rule.target,
-      })),
-    },
+    ingressSettings:
+      ingressSettings.contentType !== 'none'
+        ? {
+            contentType: ingressSettings.contentType,
+            rules: ingressSettings.rules,
+          }
+        : undefined,
     pinnedServerCertificates: pinnedServerCertificates
       .filter(({ certificate }) => certificate)
       .map(({ certificate }) => certificate),

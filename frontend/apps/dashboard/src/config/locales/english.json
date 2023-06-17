@@ -1616,12 +1616,12 @@
         },
         "ingress-vaulting": {
           "title": "Ingress vaulting",
+          "empty": "None",
           "content-type": {
-            "label": "Content type",
-            "empty": "Not available"
+            "label": "Content type"
           },
-          "target": "Target",
-          "token": "Token"
+          "target": "Source",
+          "token": "Vault token"
         }
       },
       "create": {
@@ -1702,14 +1702,14 @@
               "label": "Content type"
             },
             "vaulting-rules": {
-              "title": "Vaulting rules  (Optional)",
+              "title": "Vaulting rules",
               "token": {
-                "label": "Token",
-                "placeholder": "card_number"
+                "label": "Vault token",
+                "placeholder": "custom.bank_account_number"
               },
               "target": {
-                "label": "Target",
-                "placeholder": "card_number"
+                "label": "Source",
+                "placeholder": "bank.account_number"
               }
             },
             "add-more": "Add another"

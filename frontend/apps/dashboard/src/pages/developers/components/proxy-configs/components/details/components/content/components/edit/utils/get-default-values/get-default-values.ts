@@ -25,7 +25,7 @@ const getDefaultValues = (proxyConfig: ProxyConfigDetails): FormData => ({
     certificate => ({ certificate }),
   ),
   ingressSettings: {
-    contentType: proxyConfig.ingressContentType,
+    contentType: proxyConfig.ingressContentType || 'none',
     rules: proxyConfig.ingressRules,
   },
   clientIdentity: {

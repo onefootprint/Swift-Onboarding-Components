@@ -98,7 +98,7 @@ export const filloutForm = async () => {
 
   // Step 4: Pinned server certificates
   await waitFor(() => {
-    const title = screen.getByText('Client certificate authentication (mTLS)');
+    const title = screen.getByText('Pinned server certificates');
     expect(title).toBeInTheDocument();
   });
 
@@ -112,12 +112,6 @@ export const filloutForm = async () => {
     const title = screen.getByText('Ingress vaulting');
     expect(title).toBeInTheDocument();
   });
-
-  const tokenField = screen.getByLabelText('Token');
-  await userEvent.type(tokenField, 'card_number');
-
-  const targetField = screen.getByLabelText('Target');
-  await userEvent.type(targetField, '$.data.card_number');
 
   const submitButton = screen.getByRole('button', { name: 'Save' });
   await userEvent.click(submitButton);
