@@ -52,9 +52,11 @@ struct TenantApiKeyUpdate {
 }
 
 #[derive(Debug, Clone)]
-pub struct ApiKeyListQuery {
+pub struct ApiKeyListFilters {
     pub tenant_id: TenantId,
     pub is_live: IsLive,
+    pub role_ids: Option<Vec<TenantRoleId>>,
+    pub status: Option<ApiKeyStatus>,
 }
 
 pub enum TenantApiKeyIdentifier<'a> {
@@ -76,21 +78,31 @@ impl<'a> From<(&'a str, &'a TenantId, IsLive)> for TenantApiKeyIdentifier<'a> {
 }
 
 impl TenantApiKey {
-    fn list_query(query: &ApiKeyListQuery) -> BoxedQuery<Pg> {
-        tenant_api_key::table
-            .filter(tenant_api_key::tenant_id.eq(&query.tenant_id))
-            .filter(tenant_api_key::is_live.eq(query.is_live))
-            .into_boxed()
+    fn list_query(filters: &ApiKeyListFilters) -> BoxedQuery<Pg> {
+        let mut query = tenant_api_key::table
+            .filter(tenant_api_key::tenant_id.eq(&filters.tenant_id))
+            .filter(tenant_api_key::is_live.eq(filters.is_live))
+            .into_boxed();
+
+        if let Some(role_ids) = filters.role_ids.as_ref() {
+            query = query.filter(tenant_api_key::role_id.eq_any(role_ids));
+        }
+
+        if let Some(status) = filters.status.as_ref() {
+            query = query.filter(tenant_api_key::status.eq(status));
+        }
+
+        query
     }
 
     #[tracing::instrument(skip_all)]
     pub fn list(
         conn: &mut PgConn,
-        query: &ApiKeyListQuery,
+        filters: &ApiKeyListFilters,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
     ) -> DbResult<Vec<(TenantApiKey, TenantRole)>> {
-        let mut query = Self::list_query(query)
+        let mut query = Self::list_query(filters)
             .inner_join(tenant_role::table)
             .select((tenant_api_key::all_columns, tenant_role::all_columns))
             .order_by(tenant_api_key::created_at.desc())
@@ -105,8 +117,8 @@ impl TenantApiKey {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn count(conn: &mut PgConn, query: &ApiKeyListQuery) -> DbResult<i64> {
-        let count = Self::list_query(query).count().get_result(conn)?;
+    pub fn count(conn: &mut PgConn, filters: &ApiKeyListFilters) -> DbResult<i64> {
+        let count = Self::list_query(filters).count().get_result(conn)?;
         Ok(count)
     }
 

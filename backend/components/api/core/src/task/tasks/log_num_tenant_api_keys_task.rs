@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use db::{
     models::{
         tenant::Tenant,
-        tenant_api_key::{ApiKeyListQuery, TenantApiKey},
+        tenant_api_key::{ApiKeyListFilters, TenantApiKey},
     },
     DbError, DbPool,
 };
@@ -29,7 +29,13 @@ impl ExecuteTask<LogNumTenantApiKeysArgs> for LogNumTenantApiKeysTask {
             .db_query(move |conn| -> Result<i64, DbError> {
                 Tenant::get(conn, &tenant_id)?; // assert tenant exists
 
-                let count = TenantApiKey::count(conn, &ApiKeyListQuery { tenant_id, is_live })?;
+                let filters = ApiKeyListFilters {
+                    tenant_id,
+                    is_live,
+                    role_ids: None,
+                    status: None,
+                };
+                let count = TenantApiKey::count(conn, &filters)?;
                 Ok(count)
             })
             .await??;

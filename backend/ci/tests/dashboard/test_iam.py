@@ -1,10 +1,54 @@
 import pytest
+from tests.auth import DashboardAuthIsLive
 from tests.utils import (
     get,
     post,
     patch,
     _gen_random_n_digit_number,
 )
+
+
+@pytest.fixture(autouse=True, scope="session")
+def test_deactivate_roles(sandbox_tenant, limited_role):
+    """
+    Deactivate roles at this tenant that were created by previous integration testing runs.
+    Otherwise, the users you want to see end up on the second page...
+    """
+    body = get(f"org/roles", None, sandbox_tenant.auth_token)
+    roles_to_deactivate = (
+        i
+        for i in body["data"]
+        if not i["is_immutable"] and i["id"] != limited_role["id"]
+    )
+
+    for r in roles_to_deactivate:
+        # Deactivate members using this role
+        r_id = r["id"]
+        print("ROLE")
+        print(r)
+        members = get(f"org/members", dict(role_ids=r_id), sandbox_tenant.auth_token)
+        for m in members["data"]:
+            m_id = m["id"]
+            post(
+                f"org/members/{m_id}/deactivate",
+                None,
+                sandbox_tenant.auth_token,
+            )
+        # Deactivate api keys using this role
+        data = dict(role_ids=r_id, status="enabled")
+        for is_live in ["true", "false"]:
+            is_live = DashboardAuthIsLive(is_live)
+            api_keys = get("org/api_keys", data, sandbox_tenant.auth_token, is_live)
+            for k in api_keys["data"]:
+                k_id = k["id"]
+                patch(
+                    f"org/api_keys/{k_id}",
+                    dict(status="disabled"),
+                    sandbox_tenant.auth_token,
+                    is_live,
+                )
+        # Deactivate the role
+        post(f"org/roles/{r_id}/deactivate", None, sandbox_tenant.auth_token)
 
 
 @pytest.fixture(scope="session")

@@ -8,8 +8,9 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::AuthActor;
 use api_core::errors::tenant::TenantError;
+use api_wire_types::ApiKeyFilters;
 use chrono::{DateTime, Utc};
-use db::models::tenant_api_key::{ApiKeyListQuery, TenantApiKey};
+use db::models::tenant_api_key::{ApiKeyListFilters, TenantApiKey};
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
@@ -27,17 +28,23 @@ type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretAp
 #[actix::get("/org/api_keys")]
 pub async fn get(
     state: web::Data<State>,
+    filters: web::Query<ApiKeyFilters>,
     pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let page_size = pagination.page_size(&state);
     let cursor = pagination.cursor;
+    let ApiKeyFilters { role_ids, status } = filters.into_inner();
+    let role_ids = role_ids.map(|r_ids| r_ids.0);
 
-    let query = ApiKeyListQuery {
+    let query = ApiKeyListFilters {
         tenant_id: auth.tenant().id.clone(),
         is_live: auth.is_live()?,
+        role_ids,
+        status,
     };
+    println!("FILTERING {:?}", query);
     let (keys, id_to_last_used, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
