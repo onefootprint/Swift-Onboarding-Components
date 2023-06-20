@@ -37,9 +37,9 @@ const BodyContent = styled.span`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    height: 100%;
     box-sizing: content-box;
     padding: ${theme.spacing[5]};
+
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[7]} ${theme.spacing[8]}; 
     `}
