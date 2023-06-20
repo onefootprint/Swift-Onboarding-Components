@@ -1,7 +1,7 @@
 export type NextToast = {
   closeAriaLabel?: string;
   cta?: { label: string; onClick?: () => void };
-  description: string;
+  description: string | React.ReactNode;
   onClose?: () => void;
   testID?: string;
   title: string;
