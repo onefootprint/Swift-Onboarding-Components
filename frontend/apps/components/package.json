@@ -12,69 +12,33 @@
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "set:dot-env": "sh ../../scripts/set-dot-env.sh",
-    "dev:storybook": "start-storybook -p 3011",
-    "build:storybook": "build-storybook"
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
-    "@onefootprint/design-tokens": "*",
+    "@onefootprint/components": "*",
     "@onefootprint/dev-tools": "*",
-    "@onefootprint/global-constants": "*",
-    "@onefootprint/hooks": "*",
-    "@onefootprint/icons": "*",
-    "@onefootprint/idv-elements": "*",
-    "@onefootprint/request": "*",
-    "@onefootprint/test-utils": "*",
-    "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
+    "@onefootprint/design-tokens": "*",
     "@sentry/nextjs": "^7.28.1",
-    "axios": "^1.2.1",
-    "axios-case-converter": "^0.9.0",
-    "creditcardutils": "^1.0.0",
-    "date-fns": "^2.30.0",
-    "framer-motion": "^10.12.16",
-    "i18next": "^22.5.0",
-    "i18next-browser-languagedetector": "^7.0.1",
-    "i18next-http-backend": "^2.2.1",
-    "react-i18next": "^12.3.1",
-    "use-places-autocomplete": "^4.0.0",
-    "usehooks-ts": "^2.9.1"
+    "@tanstack/react-query": "^4.29.5"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.3.4",
     "@onefootprint/jest-presets": "*",
-    "@storybook/addon-actions": "^6.5.15",
-    "@storybook/addon-essentials": "^6.5.15",
-    "@storybook/addon-interactions": "^6.5.15",
-    "@storybook/addon-links": "^6.5.15",
-    "@storybook/builder-webpack5": "^6.5.15",
-    "@storybook/manager-webpack5": "^6.5.15",
-    "@storybook/react": "^6.5.15",
-    "@storybook/testing-library": "^0.0.11",
-    "@tanstack/react-query": "^4.29.5",
     "@types/lodash": "^4.14.191",
     "@types/node": "^17.0.31",
     "@types/react-dom": "^18.0.10",
-    "@types/styled-components": "^5.1.26",
-    "constate": "^3.3.2",
     "eslint-config-footprint": "*",
-    "i18next": "^22.5.0",
+    "styled-components": "^5.3.8",
     "lodash": "^4.17.21",
     "next": "13.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-error-boundary": "^3.1.4",
-    "react-hook-form": "^7.43.9",
-    "react-i18next": "^12.3.1",
-    "storybook-react-i18next": "^2.0.1",
-    "styled-components": "^5.3.8",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/react-i18next-test.ts"
-    ]
+    "setupFiles": []
   }
 }

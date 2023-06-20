@@ -1,1 +1,1 @@
-export { default } from './secure-render';
+export * from './secure-render';

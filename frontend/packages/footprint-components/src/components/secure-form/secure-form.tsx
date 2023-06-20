@@ -1,5 +1,5 @@
 import React from 'react';
 
-const SecureForm = () => <div>TODO</div>;
-
-export default SecureForm;
+export const SecureFormChild = () => <div>TODO</div>;
+export const SecureFormParent = () => <div>DevToolsDialog</div>;
+export const initSecureFormChild = () => {};

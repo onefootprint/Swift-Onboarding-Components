@@ -2,48 +2,34 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
-import { AppErrorBoundary } from '@onefootprint/idv-elements';
-import { DesignSystemProvider, media } from '@onefootprint/ui';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
+import Script from 'next/script';
 import React from 'react';
-import { createGlobalStyle, css } from 'styled-components';
 
-import configureReactI18next from '../config/initializers/react-i18next';
+import { GOOGLE_MAPS_KEY } from '../config/constants';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
 
 configureSentry();
-configureReactI18next();
 
+// TODO: add error boundary
+// https://linear.app/footprint/issue/FP-4515/add-nice-error-boundaryfallback-to-embedded-components
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <ObserveCollectorProvider appName="components">
-      <DesignSystemProvider theme={themes.light}>
-        <AppErrorBoundary>
-          <GlobalStyle />
+  <>
+    <QueryClientProvider client={queryClient}>
+      <ObserveCollectorProvider appName="components">
+        <DesignSystemProvider theme={themes.light}>
           <Component {...pageProps} />
-        </AppErrorBoundary>
-      </DesignSystemProvider>
-    </ObserveCollectorProvider>
-  </QueryClientProvider>
+        </DesignSystemProvider>
+      </ObserveCollectorProvider>
+    </QueryClientProvider>
+    <Script
+      src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}
+      strategy="lazyOnload"
+    />
+  </>
 );
-
-const GlobalStyle = createGlobalStyle`
-  html {
-    --navigation-header-height: 65px;
-    --loading-container-min-height: 188px;
-    
-    ${media.greaterThan('md')`
-       --navigation-header-height: 57px;
-    `}
-  }
-
-  ${({ theme }) => css`
-    body {
-      background-color: ${theme.backgroundColor.primary};
-      overflow: hidden;
-    }
-  `}`;
 
 export default App;

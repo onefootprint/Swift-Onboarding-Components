@@ -1,5 +1,5 @@
 import React from 'react';
 
-const SecureRender = () => <div>TODO</div>;
-
-export default SecureRender;
+export const SecureRenderChild = () => <div>TODO</div>;
+export const SecureRenderParent = () => <div>DevToolsDialog</div>;
+export const initSecureRenderChild = () => {};
