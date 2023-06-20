@@ -5,11 +5,11 @@
     "build": "turbo run build",
     "clean": "turbo run clean && rm -rf node_modules",
     "dev": "turbo run dev --concurrency 30 --continue",
+    "dev:packages": "turbo run dev --filter=./packages/* dev --concurrency 30 --continue",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "dev:packages": "turbo run dev --filter=./packages/*"
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
