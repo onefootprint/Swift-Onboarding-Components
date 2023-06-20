@@ -1,4 +1,9 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Table, { TableProps } from './table';
@@ -103,6 +108,31 @@ describe('<Table />', () => {
 
         const row = screen.getByRole('row', { name: 'John Doe' });
         expect(row).toBeInTheDocument();
+      });
+    });
+
+    describe('when has tooltip', () => {
+      it('should properly display tooltip text when clicking', async () => {
+        renderTable({
+          columns: [
+            { text: 'Name', width: '50%' },
+            {
+              text: 'Age',
+              width: '50%',
+              tooltipText: 'Age is how old you are',
+            },
+          ],
+        });
+
+        const icon = screen.getByLabelText('Age is how old you are');
+        await userEvent.hover(icon);
+
+        await waitFor(() => {
+          const tooltip = screen.getByRole('tooltip', {
+            name: 'Age is how old you are',
+          });
+          expect(tooltip).toBeInTheDocument();
+        });
       });
     });
   });

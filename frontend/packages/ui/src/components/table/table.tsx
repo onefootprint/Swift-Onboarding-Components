@@ -1,3 +1,4 @@
+import { IcoInfo16 } from '@onefootprint/icons';
 import { Property } from 'csstype';
 import times from 'lodash/times';
 import React from 'react';
@@ -5,6 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
 import Shimmer from '../shimmer';
+import Tooltip from '../tooltip';
 import Typography from '../typography';
 import TableFilters from './components/table-filters';
 
@@ -15,7 +17,12 @@ export type TableRow<T> = {
 
 export type TableProps<T> = {
   'aria-label': string;
-  columns: { id?: string; text: string; width?: Property.Width }[];
+  columns: {
+    id?: string;
+    text: string;
+    width?: Property.Width;
+    tooltipText?: string;
+  }[];
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
   getAriaLabelForRow?: (item: T) => string;
@@ -79,7 +86,22 @@ const Table = <T,>({
           <thead>
             <tr>
               {columns.map(column => (
-                <th key={column.id || column.text}>{column.text}</th>
+                <th key={column.id || column.text}>
+                  <TooltipContainer>
+                    {column.text}
+                    {column?.tooltipText && (
+                      <Tooltip
+                        text={column.tooltipText}
+                        alignment="center"
+                        position="bottom"
+                      >
+                        <InfoButton aria-label={column.tooltipText}>
+                          <IcoInfo16 />
+                        </InfoButton>
+                      </Tooltip>
+                    )}
+                  </TooltipContainer>
+                </th>
               ))}
             </tr>
           </thead>
@@ -223,10 +245,27 @@ const Tr = styled.tr`
   `}
 `;
 
+const InfoButton = styled.button`
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  display: inherit;
+`;
+
 const EmptyTr = styled.tr`
   td {
     text-align: left;
   }
 `;
 
+const TooltipContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: ${theme.spacing[3]};
+  `}
+`;
 export default Table;
