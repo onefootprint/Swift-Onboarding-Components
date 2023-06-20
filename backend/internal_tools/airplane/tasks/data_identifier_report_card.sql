@@ -1,4 +1,9 @@
-SELECT kind, COUNT(DISTINCT data_lifetime.vault_id)
+SELECT
+  CASE
+    WHEN data_lifetime.kind ilike 'card.%.%' THEN REGEXP_REPLACE(data_lifetime.kind, 'card\.(.*)\.(.*)', 'card.*.\2')
+    ELSE data_lifetime.kind
+  END,
+  COUNT(DISTINCT data_lifetime.vault_id)
 FROM data_lifetime
 INNER JOIN scoped_vault
   ON scoped_vault.id = data_lifetime.scoped_vault_id

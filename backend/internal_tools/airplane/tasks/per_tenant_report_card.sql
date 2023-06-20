@@ -7,7 +7,10 @@ WITH live_tenant AS (
 identifiers_per_tenant AS (
   SELECT
     live_tenant.id as tenant_id,
-    array_agg(distinct data_lifetime.kind) as all_keys
+    array_agg(DISTINCT CASE
+      WHEN data_lifetime.kind ilike 'card.%.%' THEN REGEXP_REPLACE(data_lifetime.kind, 'card\.(.*)\.(.*)', 'card.*.\2')
+      ELSE data_lifetime.kind
+    END) as all_keys
   FROM live_tenant
   INNER JOIN scoped_vault
     ON scoped_vault.tenant_id = live_tenant.id AND scoped_vault.is_live = 't'
