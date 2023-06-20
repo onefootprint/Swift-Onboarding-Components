@@ -1,6 +1,7 @@
+import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { LogoFpdocsDefault } from '@onefootprint/icons';
-import { LinkButton, media } from '@onefootprint/ui';
+import { LogoFpCompact } from '@onefootprint/icons';
+import { createFontStyles, LinkButton, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -17,9 +18,15 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
   return (
     <Container>
       <Nav>
-        <LogoLink href="/" aria-label={t('nav.home')}>
-          <LogoFpdocsDefault />
-        </LogoLink>
+        <MainLinks>
+          <LogoLink href={FRONTPAGE_BASE_URL} aria-label={t('nav.home')}>
+            <LogoFpCompact />
+          </LogoLink>
+          <Divider />
+          <DocumentationLink href="/">
+            {t('nav.documentation')}
+          </DocumentationLink>
+        </MainLinks>
         <>
           {links.map(({ href, Icon, text }) => (
             <LinkButton
@@ -38,23 +45,48 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
   );
 };
 
+const DocumentationLink = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    color: ${theme.color.tertiary};
+    text-decoration: none;
+  `}
+`;
+
 const Container = styled.div`
   ${({ theme }) => css`
-    align-items: center;
     display: none;
-    height: var(--header-height);
-    justify-content: space-between;
-    padding: ${theme.spacing[4]} calc(${theme.spacing[7]} + ${theme.spacing[2]});
-    width: 100%;
 
     ${media.greaterThan('sm')`
       display: flex;
+      height: var(--header-height);
+      padding: ${theme.spacing[4]} calc(${theme.spacing[7]} + ${theme.spacing[2]});
+      width: 100%;
     `}
   `};
 `;
 
 const LogoLink = styled(Link)`
   display: flex;
+`;
+
+const Divider = styled.div`
+  ${({ theme }) => css`
+    height: 100%;
+    width: 1px;
+    background-color: ${theme.borderColor.tertiary};
+    max-height: 20px;
+  `}
+`;
+
+const MainLinks = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[4]};
+    position: relative;
+    height: 100%;
+  `};
 `;
 
 const Nav = styled.nav`

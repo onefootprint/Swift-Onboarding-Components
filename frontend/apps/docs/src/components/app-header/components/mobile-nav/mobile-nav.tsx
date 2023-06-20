@@ -1,7 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
-import { Box, LinkButton, media } from '@onefootprint/ui';
+import { IcoClose24, IcoMenu24, LogoFpCompact } from '@onefootprint/icons';
+import { Box, createFontStyles, LinkButton, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
@@ -48,9 +49,15 @@ const MobileNav = ({ navigation, links }: MobileNavProps) => {
               {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
             </NavTrigger>
           )}
-          <Link href="/" aria-label={t('nav.home')}>
-            <LogoFpdocsDefault />
-          </Link>
+          <MainLinks>
+            <LogoLink href={FRONTPAGE_BASE_URL} aria-label={t('nav.home')}>
+              <LogoFpCompact />
+            </LogoLink>
+            <Divider />
+            <DocumentationLink href="/">
+              {t('nav.documentation')}
+            </DocumentationLink>
+          </MainLinks>
         </NavTriggerContainer>
         {links.length &&
           links.map(({ href, text, Icon }) => (
@@ -123,6 +130,40 @@ const NavMenu = styled.div`
     height: calc(100vh - var(--header-height));
     overflow: auto;
   `};
+`;
+
+const Divider = styled.div`
+  ${({ theme }) => css`
+    height: 100%;
+    width: 1px;
+    background-color: ${theme.borderColor.tertiary};
+    height: 20px;
+  `}
+`;
+
+const DocumentationLink = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    color: ${theme.color.tertiary};
+    text-decoration: none;
+  `}
+`;
+
+const MainLinks = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: ${theme.spacing[3]};
+    position: relative;
+    height: 100%;
+  `};
+`;
+
+const LogoLink = styled(Link)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default MobileNav;

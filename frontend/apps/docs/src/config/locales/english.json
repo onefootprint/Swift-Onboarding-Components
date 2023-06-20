@@ -12,6 +12,7 @@
       "request-early-access": "Request Early Access",
       "nav": {
         "home": "Go to the home page",
+        "documentation": "Documentation",
         "docs": {
           "mobile": "API",
           "desktop": "API Reference"

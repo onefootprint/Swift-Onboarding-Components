@@ -53,7 +53,7 @@ const GlobalStyle = createGlobalStyle`
       --page-aside-nav-width: 270px;
 
       ${media.greaterThan('sm')`
-        --header-height: 52px;
+        --header-height: 56px;
       `}
 
       scroll-padding-top: calc(var(--header-height) + ${theme.spacing[5]});
