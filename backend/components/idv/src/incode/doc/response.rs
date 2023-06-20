@@ -564,60 +564,7 @@ mod tests {
 
     #[test]
     fn test_parse_ocr() {
-        let raw_response = serde_json::json!({
-          "name": {
-            "fullName": "ALEX GINMAN",
-            "firstName": "ALEX",
-            "givenName": "ALEX",
-            "paternalLastName": "GINMAN"
-          },
-          "address": "76 PARKER HILL AVE 1\nBOSTON, MA 02120",
-          "addressFields": {
-            "state": "MA"
-          },
-          "checkedAddress": "76 Parker Hill Ave, Boston, MA 02120, United States",
-          "checkedAddressBean": {
-            "street": "76 Parker Hill Ave",
-            "postalCode": "02120",
-            "city": "Boston",
-            "state": "MA",
-            "label": "76 Parker Hill Ave, Boston, MA 02120, United States",
-            "zipColonyOptions": []
-          },
-          "typeOfId": "DriversLicense",
-          "documentFrontSubtype": "DRIVERS_LICENSE",
-          "documentBackSubtype": "DRIVERS_LICENSE",
-          "birthDate": 5298048, // serde_json overflows, so this is artificially truncated
-          "gender": "M",
-          "documentNumber": "S3441243",
-          "refNumber": "06/13/2015 Rev 02/22/2016",
-          "issuedAt": "1560384000000",
-          "expireAt": "1728950400000",
-          "expirationDate": 2024,
-          "issueDate": 2019,
-          "additionalTimestamps": [],
-          "issuingCountry": "USA",
-          "issuingState": "MASSACHUSETTS",
-          "height": "5 '  11",
-          "restrictions": "NONE",
-          "ocrDataConfidence": {
-            "birthDateConfidence": 0.9975609,
-            "nameConfidence": 0.98470485,
-            "givenNameConfidence": 0.98787415,
-            "firstNameConfidence": 0.98787415,
-            "fathersSurnameConfidence": 0.98153555,
-            "addressConfidence": 0.91200954,
-            "genderConfidence": 0.9834226,
-            "issueDateConfidence": 0.99,
-            "expirationDateConfidence": 0.99,
-            "issuedAtConfidence": 0.99948984,
-            "expireAtConfidence": 0.9990068,
-            "documentNumberConfidence": 0.9766761,
-            "heightConfidence": 0.9645301,
-            "refNumberConfidence": 0.9727157,
-            "restrictionsConfidence": 0.92769164
-          }
-        });
+        let raw_response = test_fixtures::incode_fetch_ocr_response(None);
 
         let mut parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
         // serde_json doens't like i32, so add in the bday
@@ -625,5 +572,9 @@ mod tests {
 
         assert_eq!(parsed.expiration_date().unwrap().leak(), "2024-10-15");
         assert_eq!(parsed.dob().unwrap().leak(), "1986-10-16");
+
+        // check negatives
+        parsed.birth_date = Some(-631152000000);
+        assert_eq!(parsed.dob().unwrap().leak(), "1950-01-01");
     }
 }

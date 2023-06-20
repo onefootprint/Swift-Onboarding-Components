@@ -1,11 +1,17 @@
-use idv::incode::doc::response::{FetchScoresResponse};
+use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    FootprintReasonCode, VendorAPI,
+    FootprintReasonCode, VendorAPI, PiiString,
 };
 
 use crate::decision::onboarding::FeatureSet;
 
+// This 
+pub struct IncodeOcrComparisonDataFields {
+    pub first_name: PiiString,
+    pub last_name: PiiString,
+    pub dob: PiiString,
+}
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,14 +32,14 @@ impl FeatureSet for IncodeDocumentFeatures {
 
 // Once we move RiskSignals to being computed at the time are handling the VRes, we can use this method.
 pub fn footprint_reason_codes(
-    // _ocr: FetchOCRResponse,
+    ocr: FetchOCRResponse,
     scores: FetchScoresResponse,
-    // _vault_data: IncodeOcrComparisonDataFields, // TODO
+    vault_data: IncodeOcrComparisonDataFields, 
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
-    
-    // TODO Compare OCR to vault_data
+    let score_reason_codes = reason_codes_from_score_response(scores)?;
+    let ocr_reason_codes = reason_codes_from_ocr_response(ocr, vault_data)?;
 
-    reason_codes_from_score_response(scores)
+    Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
 
 fn reason_codes_from_score_response( scores: FetchScoresResponse,) -> Result<Vec<FootprintReasonCode>, idv::Error> {
@@ -77,6 +83,69 @@ fn reason_codes_from_score_response( scores: FetchScoresResponse,) -> Result<Vec
     Ok(reason_codes)
 }
 
+fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
+        let first_name_ocr: PiiString = ocr.name.as_ref().and_then(|n| n.first_name.clone().map(|f| f.into())).ok_or(idv::Error::from(idv::incode::error::Error::OcrError("missing first name".into())))?;
+        let paternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.paternal_last_name.clone().map(|f| f.into()));
+        let maternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.maternal_last_name.clone().map(|f| f.into()));
+        // TODO: 
+        //   switch MM-DD and DD-MM
+        let dob_ocr: PiiString = ocr.dob()?;        
+
+        // matches, eventually should do levinstein or something else to determine "partial" matches
+        let first_name_matches = pii_strings_match(&first_name_ocr, &vault_data.first_name);
+        // incode doesn't give us a single last name field, except from the MRZ. But we don't always get the MRZ if the barcode was too blurry to 
+        // be decoded. ¯\_(ツ)_/¯
+        let pat_ln_matches = paternal_last_name_ocr.map(|p_ln| pii_strings_match(&p_ln, &vault_data.last_name)).unwrap_or(false);
+        let mat_ln_matches = maternal_last_name_ocr.map(|m_ln| pii_strings_match(&m_ln, &vault_data.last_name)).unwrap_or(false);
+        let last_name_matches = pat_ln_matches || mat_ln_matches;
+        
+        let name_matches = first_name_matches && last_name_matches;
+
+        let dob_matches = pii_strings_match(&dob_ocr, &vault_data.dob);
+        // TODO: address w/ CDOs are a little harder here. also incode OCR includes a bunch of \n and random crap so will do this in followup
+        // incode also theoretically provides `addressFields` which is address broken out, but it hasn't been filled in for any of the test 
+        // requests i've done. ex. `test_fixtures::incode_fetch_ocr_response()` 
+        // So maybe we just default the alpaca cip stuff to `consider` for now
+
+
+        let mut reason_codes = vec![];
+        if first_name_matches {
+            reason_codes.push(FootprintReasonCode::DocumentOcrFirstNameMatches)
+        } else {
+            reason_codes.push(FootprintReasonCode::DocumentOcrFirstNameDoesNotMatch)
+        };
+
+        if last_name_matches {
+            reason_codes.push(FootprintReasonCode::DocumentOcrLastNameMatches)
+        } else {
+            reason_codes.push(FootprintReasonCode::DocumentOcrLastNameDoesNotMatch)
+        };
+
+        if name_matches {
+            reason_codes.push(FootprintReasonCode::DocumentOcrNameMatches)
+        } else {
+            reason_codes.push(FootprintReasonCode::DocumentOcrNameDoesNotMatch)
+        };
+
+        if dob_matches {
+            reason_codes.push(FootprintReasonCode::DocumentOcrDobMatches)
+        } else {
+            reason_codes.push(FootprintReasonCode::DocumentOcrDobDoesNotMatch)
+        };
+
+        Ok(reason_codes)
+    }
+
+fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
+    let normalized_p1 = normalize_pii(p1);
+    let normalized_p2 = normalize_pii(p2);
+    (normalized_p1.leak() == normalized_p2.leak()) && !(normalized_p1.leak().is_empty() || normalized_p2.leak().is_empty())
+}
+
+fn normalize_pii(p: &PiiString) -> PiiString {
+    p.leak().trim().to_lowercase().into()
+}
+
 fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<FootprintReasonCode> {
     let (t, s) = value;
     let frc_helper: Option<IncodeRCH> = t.into();
@@ -92,12 +161,81 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<FootprintRea
 #[cfg(test)]
 mod tests {
     use db::test_helpers::assert_have_same_elements;
-    use idv::{incode::doc::response::FetchScoresResponse, test_fixtures::DocTestOpts};
+    use idv::{incode::doc::response::FetchScoresResponse, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
     use newtypes::{
         incode::IncodeStatus::*,
         FootprintReasonCode::{self, *},
     };
     use test_case::test_case;
+    use super::*;
+    
+    #[test_case(OcrTestOpts {
+        first_name: "Rob".into(),
+        paternal_last_name: "Roberto".into(),
+        dob: "1990-01-01".into(),
+    },
+    IncodeOcrComparisonDataFields {
+        first_name: "Rob".into(),
+        last_name: "Roberto".into(),
+        dob: "1990-01-01".into(),
+    },
+    vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]
+; "name and dob match")]
+    #[test_case(OcrTestOpts {
+        first_name: "ROB".into(),
+        paternal_last_name: "    roBERTo".into(),
+        dob: "1990-01-01".into(),
+    },
+    IncodeOcrComparisonDataFields {
+        first_name: "rob".into(),
+        last_name: "roberto".into(),
+        dob: "       1990-01-01".into(),
+    },
+    vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]
+    ; "whitespace/mixed case matches name")]
+    #[test_case(OcrTestOpts {
+        first_name: "Robby".into(),
+        paternal_last_name: "Roberto".into(),
+        dob: "1990-01-01".into(),
+    },
+    IncodeOcrComparisonDataFields {
+        first_name: "Bob".into(),
+        last_name: "Roberto".into(),
+        dob: "1980-01-01".into(),
+    },
+    vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch]; "first name doesn't match and DOBs don't match"
+    )]
+    #[test_case(OcrTestOpts {
+        first_name: "Bob".into(),
+        paternal_last_name: "Roberti".into(),
+        dob: "1990-01-01".into(),
+    },
+    IncodeOcrComparisonDataFields {
+        first_name: "Bob".into(),
+        last_name: "Roberto".into(),
+        dob: "  1980-01-01".into(),
+    },
+    vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch]; "last name doesn't match and DOBs don't match"
+    )]
+    #[test_case(OcrTestOpts {
+        first_name: "Bob".into(),
+        paternal_last_name: "Roberto".into(),
+        dob: "1990-01-01".into(),
+    },
+    IncodeOcrComparisonDataFields {
+        first_name: "Crob".into(),
+        last_name: "Croberto".into(),
+        dob: "1980-01-01".into(),
+    },
+    vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch]; "all doesn't match"
+    )]
+    
+    fn test_reason_codes_from_ocr_response(ocr_opts: OcrTestOpts, vault_data: IncodeOcrComparisonDataFields, expected: Vec<FootprintReasonCode>) {
+        let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
+        let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
+
+        assert_have_same_elements(reason_codes_from_ocr_response(parsed, vault_data).unwrap(), expected)
+    }
 
     #[test_case(
         DocTestOpts {
@@ -180,4 +318,6 @@ mod tests {
 
         assert_have_same_elements(super::reason_codes_from_score_response(parsed).unwrap(), expected)
     }
+
+    
 }

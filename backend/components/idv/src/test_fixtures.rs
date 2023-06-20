@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use newtypes::{
     idology::IdologyScanOnboardingCaptureResult, incode::IncodeStatus,
     ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
@@ -3751,6 +3752,75 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
         "value": "100.0",
         "status": opts.overall.to_string(),
         "key": null
+      }
+    })
+}
+
+pub struct OcrTestOpts {
+    pub first_name: String,
+    pub paternal_last_name: String,
+    pub dob: String,
+}
+fn dob_to_incode_timestamp(dob: &str) -> i64 {
+    NaiveDate::parse_from_str(dob, "%Y-%m-%d")
+        .unwrap()
+        .and_hms_milli_opt(0, 0, 0, 0)
+        .map(|d| d.timestamp_millis())
+        .unwrap()
+}
+pub fn incode_fetch_ocr_response(opts: Option<OcrTestOpts>) -> serde_json::Value {
+    serde_json::json!({
+      "name": {
+        "fullName": "ALEX GINMAN",
+        "firstName": opts.as_ref().map(|o| o.first_name.clone()).unwrap_or("ALEX".into()),
+        "givenName": "ALEX",
+        "paternalLastName": opts.as_ref().map(|o| o.paternal_last_name.clone()).unwrap_or("GINMAN".into()),
+      },
+      "address": "76 PARKER HILL AVE 1\nBOSTON, MA 02120",
+      "addressFields": {
+        "state": "MA"
+      },
+      "checkedAddress": "76 Parker Hill Ave, Boston, MA 02120, United States",
+      "checkedAddressBean": {
+        "street": "76 Parker Hill Ave",
+        "postalCode": "02120",
+        "city": "Boston",
+        "state": "MA",
+        "label": "76 Parker Hill Ave, Boston, MA 02120, United States",
+        "zipColonyOptions": []
+      },
+      "typeOfId": "DriversLicense",
+      "documentFrontSubtype": "DRIVERS_LICENSE",
+      "documentBackSubtype": "DRIVERS_LICENSE",
+      "birthDate": opts.as_ref().map(|o| dob_to_incode_timestamp(&o.dob)).unwrap_or(534267), // serde_json overflows, so this is artificially truncated
+      "gender": "M",
+      "documentNumber": "S3441243",
+      "refNumber": "06/13/2015 Rev 02/22/2016",
+      "issuedAt": "1560384000000",
+      "expireAt": "1728950400000",
+      "expirationDate": 2024,
+      "issueDate": 2019,
+      "additionalTimestamps": [],
+      "issuingCountry": "USA",
+      "issuingState": "MASSACHUSETTS",
+      "height": "5 '  11",
+      "restrictions": "NONE",
+      "ocrDataConfidence": {
+        "birthDateConfidence": 0.9975609,
+        "nameConfidence": 0.98470485,
+        "givenNameConfidence": 0.98787415,
+        "firstNameConfidence": 0.98787415,
+        "fathersSurnameConfidence": 0.98153555,
+        "addressConfidence": 0.91200954,
+        "genderConfidence": 0.9834226,
+        "issueDateConfidence": 0.99,
+        "expirationDateConfidence": 0.99,
+        "issuedAtConfidence": 0.99948984,
+        "expireAtConfidence": 0.9990068,
+        "documentNumberConfidence": 0.9766761,
+        "heightConfidence": 0.9645301,
+        "refNumberConfidence": 0.9727157,
+        "restrictionsConfidence": 0.92769164
       }
     })
 }
