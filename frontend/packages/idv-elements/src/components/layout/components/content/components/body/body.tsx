@@ -27,7 +27,7 @@ const Body = ({ children }: BodyProps) => {
 };
 
 const Container = styled(motion.div)`
-  flex: 1 0 auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -37,6 +37,7 @@ const BodyContent = styled.span`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
+    height: 100%;
     box-sizing: content-box;
     padding: ${theme.spacing[5]};
     ${media.greaterThan('md')`

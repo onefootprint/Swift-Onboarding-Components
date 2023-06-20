@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/idv-elements';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import React from 'react';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
@@ -37,16 +38,25 @@ const Complete = () => {
   return (
     <>
       <NavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={
-          shouldShowCounter
-            ? t('subtitle.with-countdown', { seconds: countdown })
-            : t('subtitle.without-countdown')
-        }
-      />
+      <Aligner>
+        <HeaderTitle
+          title={t('title')}
+          subtitle={
+            shouldShowCounter
+              ? t('subtitle.with-countdown', { seconds: countdown })
+              : t('subtitle.without-countdown')
+          }
+        />
+      </Aligner>
     </>
   );
 };
+
+const Aligner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 64px);
+`;
 
 export default Complete;

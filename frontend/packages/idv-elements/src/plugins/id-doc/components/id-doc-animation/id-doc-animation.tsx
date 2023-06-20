@@ -63,7 +63,7 @@ const IdDocAnimation = ({
   }, [mode, hasNextSide]);
 
   return (
-    <>
+    <Aligner>
       <AnimatePresence>
         {mode === 'loading' && (
           <motion.div exit={{ opacity: 0 }}>{loadingComponent}</motion.div>
@@ -94,7 +94,7 @@ const IdDocAnimation = ({
           </NextSideContainer>
         )}
       </AnimatePresence>
-    </>
+    </Aligner>
   );
 };
 
@@ -108,6 +108,14 @@ const NextSideContainer = styled(motion.div)`
   position: absolute;
   left: 0;
   right: 0;
+`;
+
+const Aligner = styled.div`
+  position: relative;
+  height: calc(100% - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default IdDocAnimation;
