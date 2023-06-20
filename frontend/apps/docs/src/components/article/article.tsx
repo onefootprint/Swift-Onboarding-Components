@@ -6,6 +6,8 @@ import styled, { css } from 'styled-components';
 
 import type { Article } from '../../types/article';
 import type { Page } from '../../types/page';
+import Banner from '../introduction/banner';
+import SectionCards from '../introduction/section-cards';
 import ArticleHeader from './components/article-header';
 import Layout from './components/layout';
 import A from './components/markdown-components/a';
@@ -54,6 +56,12 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   examples: {
     component: Examples,
+  },
+  sectioncards: {
+    component: SectionCards,
+  },
+  banner: {
+    component: Banner,
   },
 };
 

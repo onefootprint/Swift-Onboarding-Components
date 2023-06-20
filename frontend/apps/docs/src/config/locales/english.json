@@ -74,6 +74,80 @@
     }
   },
   "pages": {
+    "home": {
+      "title": "Introduction to Footprint 👋",
+      "subtitle": "Footprint offers frictionless identity verification & PII vaulting wrapped in the same platform and one API. Onboard your customers without worrying about storing their sensitive data afterwards.",
+      "quickstart": {
+        "title": "Quickstart",
+        "subtitle": "Learn how to get Footprint up and running in your project. Quick and easy.",
+        "kyc": {
+          "title": "Know Your Customer (KYC)",
+          "description": "Verify your customers' identities with Footprint KYC."
+        },
+        "kyb": {
+          "title": "Know Your Business (KYB)",
+          "description": "Verify your customers' businesses with Footprint KYB."
+        },
+        "vaulting": {
+          "title": "Vaulting",
+          "description": "Store your customers' sensitive data in Footprint's secure vault."
+        },
+        "vault-proxy": {
+          "title": "Vault Proxy",
+          "description": "Use Footprint's Vault Proxy to securely access your customers' data."
+        }
+      },
+      "banner": {
+        "title": "Need help?",
+        "subtitle": "If you're looking to onboard customers quickly and securely store their sensitive data, we'd love to help. Schedule a call, reach out by email or stay up to date with the latest updates by following us on Twitter.",
+        "pii-alt": "Our mascot, pii, resting on an ice-cube",
+        "get-started": "Get started",
+        "schedule-call": "Schedule a call",
+        "contact-us": "Contact us",
+        "contact-us-dialog": {
+          "title": "Contact us",
+          "description": "Let us know where to get back to you and we'll find some options to chat.",
+          "send-button": "Send",
+          "cancel-button": "Cancel",
+          "submit-success": {
+            "title": "Message sent",
+            "description": "We'll get back to you as soon as possible."
+          },
+          "submit-error": {
+            "title": "Oops, something went wrong. Please try again.",
+            "description": "Please try again."
+          },
+          "name": {
+            "label": "Full name",
+            "placeholder": "Jane Doe",
+            "errors": {
+              "required": "Name is required"
+            }
+          },
+          "email": {
+            "label": "Business email address",
+            "placeholder": "janedoe@company.com",
+            "errors": {
+              "required": "Email is required"
+            }
+          },
+          "company": {
+            "label": "Company",
+            "placeholder": "Company name",
+            "errors": {
+              "required": "Company name is required"
+            }
+          },
+          "message": {
+            "label": "Anything else?",
+            "placeholder": "I'm interested in a Footprint demo for...",
+            "errors": {
+              "required": "Message is required"
+            }
+          }
+        }
+      }
+    },
     "404": {
       "title": "Oops! Page couldn't be found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",

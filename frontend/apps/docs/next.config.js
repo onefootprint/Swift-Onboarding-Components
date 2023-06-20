@@ -77,7 +77,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/kyc/getting-started',
+        destination: '/getting-started/introduction',
         permanent: true,
       },
     ];
