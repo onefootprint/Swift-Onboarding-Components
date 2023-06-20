@@ -32,6 +32,7 @@ def test_decrypt(sandbox_user, attrs_to_decrypt):
     expected_data = {
         **sandbox_user.client.data,
         "id.ssn4": sandbox_user.client.data["id.ssn9"][-4:],
+        "id.email": sandbox_user.client.data["id.email"].split("#")[0],
     }
 
     # Generate the token that can only be used to decrypt this info

@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use crate::{
-    errors::{challenge::ChallengeError, ApiError, ApiResult},
+    errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
     State,
 };
 use actix_web::http::StatusCode;
@@ -120,6 +120,9 @@ impl TwilioClient {
         tenant_name: Option<String>,
         destination: &PhoneNumber,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
+        if destination.is_fixture_phone_number() && destination.is_live() {
+            return Err(UserError::FixtureNumberInLive.into());
+        }
         let code = if destination.is_fixture_phone_number() {
             // For our one fixture number in sandbox mode, we want the 2fac code to be fixed
             // to make it easy to test

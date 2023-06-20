@@ -32,7 +32,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     // clean phone number
     let SignupChallengeRequest { phone_number } = request.into_inner();
-    let tenant_name = ob_context.map(|obc| obc.tenant().name.clone());
+    let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
     let (challenge_state_data, time_before_retry_s) = state
         .twilio_client
         .send_challenge(&state, tenant_name, &phone_number)

@@ -39,6 +39,9 @@ impl VaultWrapper<Person> {
         if ob_config.is_live != phone_number_parsed.is_live() {
             return Err(UserError::SandboxMismatch.into());
         }
+        if ob_config.is_live && phone_number_parsed.is_fixture_phone_number() {
+            return Err(UserError::FixtureNumberInLive.into());
+        }
 
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;

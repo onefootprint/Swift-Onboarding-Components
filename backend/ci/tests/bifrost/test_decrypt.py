@@ -58,11 +58,6 @@ def test_decrypt_biometric(
         biometric_sandbox_user_auth,
         status_code=expected_status,
     )
-    expected_data = {
-        **sandbox_user.client.data,
-        # TODO annoying that phone number has spaces
-        "id.phone_number": sandbox_user.client.data["id.phone_number"].replace(" ", ""),
-    }
     if expected_success:
         for k in fields_to_decrypt:
-            assert body[k] == expected_data.get(k)
+            assert body[k] == sandbox_user.client.decrypted_data.get(k)

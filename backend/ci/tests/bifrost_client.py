@@ -114,6 +114,18 @@ class BifrostClient:
         # Initialize the onboarding
         self.initialize_onboarding()
 
+    @property
+    def decrypted_data(self):
+        return {
+            **self.data,
+            "id.ssn4": self.data["id.ssn9"][-4:],
+            "id.email": self.data["id.email"].split("#")[0],
+            "id.phone_number": self.data["id.phone_number"]
+            .replace(" ", "")
+            .split("#")[0],
+            # Could add other derived entries here
+        }
+
     def initialize_onboarding(self):
         return post("hosted/onboarding", None, self.auth_token)
 

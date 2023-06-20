@@ -70,13 +70,5 @@ def test_decrypt_sensitive(sandbox_user_real_phone, auth_token):
     fields = BASIC_FIELDS + SENSITIVE_FIELDS
     data = dict(fields=fields)
     body = post("/hosted/user/vault/decrypt", data, auth_token)
-    verified_data = {
-        **sandbox_user_real_phone.client.data,
-        # Grrr, phone number spaces strike again
-        "id.ssn4": sandbox_user_real_phone.client.data["id.ssn9"][-4:],
-        "id.phone_number": sandbox_user_real_phone.client.data[
-            "id.phone_number"
-        ].replace(" ", ""),
-    }
     for k in fields:
-        assert body[k] == verified_data[k]
+        assert body[k] == sandbox_user_real_phone.client.decrypted_data[k]

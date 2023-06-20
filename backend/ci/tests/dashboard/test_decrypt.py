@@ -40,10 +40,7 @@ def test_tenant_decrypt(sandbox_user):
         )
         attributes = body
         for di, value in attributes.items():
-            if di == "id.ssn4":
-                assert sandbox_user.client.data["id.ssn9"][-4:] == value
-            else:
-                assert sandbox_user.client.data[di] == value
+            assert sandbox_user.client.decrypted_data[di] == value
 
         access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
         assert set(access_event["targets"]) == set(attributes)

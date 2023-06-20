@@ -47,7 +47,7 @@ impl PhoneNumber {
 
     /// Returns true for the SINGLE fake, fixture phone number we provide
     pub fn is_fixture_phone_number(&self) -> bool {
-        !self.is_live() && self.e164().leak() == Self::FIXTURE_PHONE_NUMBER
+        self.e164().leak() == Self::FIXTURE_PHONE_NUMBER
     }
 
     // Maybe make two versions of e164: one with sandbox and one without
@@ -157,10 +157,8 @@ mod tests {
         assert!(!phone_number.is_live());
         assert!(phone_number.is_fixture_phone_number());
 
-        // Same number non-sandbox should not be considered the fixture phone number - we don't
-        // want to allow using this phone number in prod
         let phone_number = PhoneNumber::parse("+1-555-555-0100".into()).unwrap();
         assert!(phone_number.is_live());
-        assert!(!phone_number.is_fixture_phone_number());
+        assert!(phone_number.is_fixture_phone_number());
     }
 }
