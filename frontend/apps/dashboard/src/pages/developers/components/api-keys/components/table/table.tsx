@@ -15,9 +15,10 @@ const ApiKeysTable = () => {
   const columns = [
     { text: t('table.header.name'), width: '15%' },
     { text: t('table.header.token'), width: '25%' },
-    { text: t('table.header.last-used'), width: '17.5%' },
-    { text: t('table.header.created'), width: '17.5%' },
-    { text: t('table.header.status'), width: '15%' },
+    { text: t('table.header.last-used'), width: '15%' },
+    { text: t('table.header.created'), width: '15%' },
+    { text: t('table.header.status'), width: '12.5%' },
+    { text: t('table.header.access-control.title'), width: '12.5%' },
     { text: '', width: '10%' },
   ];
 

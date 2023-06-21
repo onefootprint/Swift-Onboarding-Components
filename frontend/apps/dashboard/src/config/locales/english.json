@@ -1083,12 +1083,19 @@
           "loading": {
             "aria-label": "Loading api keys..."
           },
+          "edit-role": {
+            "aria-label": "Edit role"
+          },
           "header": {
             "name": "Name",
             "token": "Token",
             "last-used": "Last used",
             "created": "Created",
-            "status": "Status"
+            "status": "Status",
+            "access-control": {
+              "title": "Access control",
+              "tooltip": "You can restrict access to this secret key to specific IP addresses."
+            }
           },
           "manage": {
             "aria-label": "Manage secret key",

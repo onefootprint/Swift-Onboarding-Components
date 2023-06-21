@@ -1,3 +1,5 @@
+import {Role} from './role';
+
 export type ApiKey = {
   createdAt: string;
   id: string;
@@ -6,4 +8,5 @@ export type ApiKey = {
   lastUsedAt: string | null;
   name: string;
   status: 'enabled' | 'disabled';
+  role: Role;
 };

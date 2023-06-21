@@ -1,15 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
+import { RoleScope } from '@onefootprint/types';
 import { Badge, Box, Dropdown } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate, { Scope } from 'src/components/permission-gate';
+import usePermissions from 'src/hooks/use-permissions';
 
+import EditRole from './components/edit-role';
 import KeyCell from './components/key-cell';
 import useReveal from './hooks/use-reveal-key';
 import useUpdateStatus from './hooks/use-update-status';
 
-type RowProps = {
+export type RowProps = {
   apiKey: ApiKey;
 };
 
@@ -18,6 +21,7 @@ const Row = ({ apiKey }: RowProps) => {
   const reveal = useReveal(apiKey);
   const status = useUpdateStatus(apiKey);
   const isEnabled = apiKey.status === 'enabled';
+  const { hasPermission } = usePermissions();
 
   return (
     <>
@@ -29,6 +33,13 @@ const Row = ({ apiKey }: RowProps) => {
       <td>{apiKey.createdAt}</td>
       <td>
         <Badge variant={isEnabled ? 'success' : 'error'}>{apiKey.status}</Badge>
+      </td>
+      <td>
+        {hasPermission(RoleScope.orgSettings) ? (
+          <EditRole apiKey={apiKey} />
+        ) : (
+          apiKey.name
+        )}
       </td>
       <td>
         <Box
