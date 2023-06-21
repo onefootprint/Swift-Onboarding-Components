@@ -1,6 +1,6 @@
 use crate::schema::vault::{self, BoxedQuery};
 use crate::schema::{onboarding, scoped_vault};
-use crate::PgConn;
+use crate::{DbError, PgConn};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
@@ -153,29 +153,32 @@ impl Vault {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn create(conn: &mut PgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
+    pub fn create(conn: &mut TxnPgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
         let (uv, _) = Self::insert(conn, new_user, None)?;
         Ok(uv)
     }
 
+    fn lock_by_idempotency_id(conn: &mut TxnPgConn, i_id: &IdempotencyId) -> DbResult<Option<Locked<Vault>>> {
+        let vault = vault::table
+            .filter(vault::idempotency_id.eq(i_id))
+            .for_no_key_update()
+            .first(conn.conn())
+            .optional()?;
+        Ok(vault.map(Locked::new))
+    }
+
     pub(super) fn insert(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         new_user: NewVaultArgs,
         idempotency_id: Option<IdempotencyId>,
     ) -> DbResult<(Locked<Vault>, IsNew)> {
         let existing_vault = idempotency_id
             .as_ref()
-            .map(|i_id| {
-                vault::table
-                    .filter(vault::idempotency_id.eq(i_id))
-                    .for_no_key_update()
-                    .first(conn)
-                    .optional()
-            })
+            .map(|i_id| Self::lock_by_idempotency_id(conn, i_id))
             .transpose()?
             .flatten();
         if let Some(existing_vault) = existing_vault {
-            return Ok((Locked::new(existing_vault), false));
+            return Ok((existing_vault, false));
         }
         let NewVaultArgs {
             e_private_key,
@@ -194,13 +197,35 @@ impl Vault {
             is_portable,
             kind,
             is_fixture,
-            idempotency_id,
+            idempotency_id: idempotency_id.clone(),
             sandbox_id,
         };
-        let vault = diesel::insert_into(vault::table)
+        let vault_res = diesel::insert_into(vault::table)
             .values(new_user)
-            .get_result::<Vault>(conn)?;
-        Ok((Locked::new(vault), true))
+            .get_result::<Vault>(conn.conn());
+
+        // Since two requests in very rapid succession with the same idempotency ID can both
+        // reach the INSERT statement above, catch constraint violation by checking if there's
+        // a vault with this idempotency ID
+        match vault_res {
+            Ok(vault) => Ok((Locked::new(vault), true)),
+            Err(e) => {
+                let e = DbError::from(e);
+                if e.is_unique_constraint_violation() {
+                    let existing_vault = idempotency_id
+                        .map(|i_id| Self::lock_by_idempotency_id(conn, &i_id))
+                        .transpose()?
+                        .flatten();
+                    if let Some(vault) = existing_vault {
+                        Ok((vault, false))
+                    } else {
+                        Err(e)
+                    }
+                } else {
+                    Err(e)
+                }
+            }
+        }
     }
 
     /// Look for the portable user vault with a matching fingerprint
