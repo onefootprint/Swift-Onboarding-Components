@@ -1,8 +1,8 @@
 import { useQueryState, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Tab, Tabs } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import ApiKeys from './components/api-keys';
 import Header from './components/header';

@@ -1,8 +1,8 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import StatusBadge from 'src/components/status-badge';
-import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';

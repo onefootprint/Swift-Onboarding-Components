@@ -1,3 +1,4 @@
+import styled, { css } from '@onefootprint/styled';
 import {
   Entity,
   hasEntityCards,
@@ -5,7 +6,6 @@ import {
   hasEntityInvestorProfile,
 } from '@onefootprint/types';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import CardFieldset from '../card-fieldset';
 import Fieldset from '../fieldset';

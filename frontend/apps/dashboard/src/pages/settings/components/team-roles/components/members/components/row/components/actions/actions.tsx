@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import { Member, RoleScope } from '@onefootprint/types';
 import {
   Box,
@@ -11,7 +12,6 @@ import {
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import styled from 'styled-components';
 
 import useRemoveMember from './hooks/use-remove-org-member';
 

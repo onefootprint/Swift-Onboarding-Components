@@ -1,11 +1,11 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoArrowTopRight24 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import { OnboardingConfig } from '@onefootprint/types';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled from 'styled-components';
 
 import isKybOnboardingConfig from '../../../../utils/is-kyb-onboarding-config';
 import Actions from './components/actions';

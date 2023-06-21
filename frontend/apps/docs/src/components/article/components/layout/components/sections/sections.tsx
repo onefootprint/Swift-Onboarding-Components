@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import type { ArticleSection } from 'src/types/article';
-import styled, { css } from 'styled-components';
 
 import scrollSpy from './utils/scroll-spy';
 

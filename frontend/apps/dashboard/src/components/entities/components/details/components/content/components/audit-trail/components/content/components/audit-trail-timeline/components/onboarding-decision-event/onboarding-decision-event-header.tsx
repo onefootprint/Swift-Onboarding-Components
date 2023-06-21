@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   ActorKind,
   DecisionStatus,
@@ -6,7 +7,6 @@ import {
 } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import FieldValidationDetails from './components/field-validation-details';
 

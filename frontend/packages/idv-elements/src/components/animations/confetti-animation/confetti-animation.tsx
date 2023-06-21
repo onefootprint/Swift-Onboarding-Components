@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import Confetti from 'react-confetti';
-import styled, { css } from 'styled-components';
 
 type ConfettiAnimationProps = {
   onComplete: () => void;

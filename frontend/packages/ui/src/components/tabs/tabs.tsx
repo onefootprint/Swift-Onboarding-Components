@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React, { useId, useMemo } from 'react';
-import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import TabContext from './components/context';

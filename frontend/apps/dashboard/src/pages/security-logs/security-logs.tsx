@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { AccessEvent } from '@onefootprint/types';
 import { SearchInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
-import styled, { css } from 'styled-components';
 
 import Dot from './components/dot';
 import SecurityLogBody from './components/security-log-body';

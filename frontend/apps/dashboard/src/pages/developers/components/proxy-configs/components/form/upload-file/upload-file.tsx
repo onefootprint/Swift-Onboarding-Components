@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Icon, IcoTrash16 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import {
   Box,
   Button,
@@ -10,7 +11,6 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
-import styled from 'styled-components';
 
 export type UploadFileProps = {
   accept: string;

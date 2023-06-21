@@ -3,7 +3,7 @@ import {
   FontVariant,
   Overlay,
 } from '@onefootprint/design-tokens';
-import { css } from 'styled-components';
+import { css } from '@onefootprint/styled';
 
 export const createFontStyles = (variant: FontVariant) => css`
   ${({ theme }) => css`

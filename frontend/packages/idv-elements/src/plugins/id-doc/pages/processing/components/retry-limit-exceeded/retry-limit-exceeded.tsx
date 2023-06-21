@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoRepeat40, IcoWarning16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';

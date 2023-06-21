@@ -1,6 +1,7 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCirclePlay24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import {
   Button,
   Container,
@@ -12,7 +13,6 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import ContactDialog from 'src/components/contact-dialog';
 import LinkingButton from 'src/components/linking-button';
-import styled, { css } from 'styled-components';
 
 import DemoVideo from '../../demo-video';
 import DesktopIllustration from './components/desktop-illustration';

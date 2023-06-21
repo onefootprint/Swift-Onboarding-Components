@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
-import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 

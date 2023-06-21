@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   Dialog,
   TextArea,
@@ -8,7 +9,6 @@ import {
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import useSupportForm from '../../hooks/use-support-form';
 import { FormField, SupportFormData } from '../../support-list.types';

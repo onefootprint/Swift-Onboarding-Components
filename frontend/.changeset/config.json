@@ -21,6 +21,7 @@
     "docs",
     "@onefootprint/global-constants",
     "@onefootprint/ui",
+    "@onefootprint/styled",
     "@onefootprint/icons",
     "@onefootprint/hooks",
     "@onefootprint/request",

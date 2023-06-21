@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   DocumentDI,
   InvestorProfileDI,
@@ -8,7 +9,6 @@ import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import createStringList from 'src/utils/create-string-list';
-import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 

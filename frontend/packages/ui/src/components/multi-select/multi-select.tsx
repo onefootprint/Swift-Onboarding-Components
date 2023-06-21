@@ -1,3 +1,4 @@
+import { useTheme } from '@onefootprint/styled';
 import React, { useId } from 'react';
 import Select, {
   ActionMeta,
@@ -6,7 +7,6 @@ import Select, {
   OptionsOrGroups,
   PropsValue,
 } from 'react-select';
-import { useTheme } from 'styled-components';
 
 import Box from '../box';
 import Hint from '../internal/hint';

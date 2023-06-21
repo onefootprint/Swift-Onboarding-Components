@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeft24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { IconButton } from '@onefootprint/ui';
 import { LayoutGroup, motion } from 'framer-motion';
 import times from 'lodash/times';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 export type ProgressBarProps = {
   value: number;

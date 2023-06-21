@@ -1,10 +1,10 @@
+import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 
 type PageNavProps = {
   navigation: PageNavigation;

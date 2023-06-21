@@ -1,11 +1,11 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css, keyframes } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import React from 'react';
 import LinkButton from 'src/components/linking-button';
-import styled, { css, keyframes } from 'styled-components';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
 import LogoLink from '../logo-link';

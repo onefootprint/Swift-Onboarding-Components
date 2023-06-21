@@ -1,8 +1,8 @@
 import { IcoMinusSmall24, IcoPlusSmall24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { createCheckedStyled, createPseudoStyles } from './row.utils';
 

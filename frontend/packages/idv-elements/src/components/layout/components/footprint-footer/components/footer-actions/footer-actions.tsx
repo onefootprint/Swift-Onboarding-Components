@@ -1,11 +1,11 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import {
   createOverlayBackground,
   Dropdown,
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 export type Link = { label: string; href: string };
 

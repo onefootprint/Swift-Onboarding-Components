@@ -1,8 +1,8 @@
+import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
 import React from 'react';
 import SEO from 'src/components/seo';
-import styled, { css } from 'styled-components';
 
 import type { Article } from '../../types/article';
 import type { Page } from '../../types/page';

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16, LogoFpCompact } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, LinkButton } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 export type BlankLayoutProps = {
   children: React.ReactNode;

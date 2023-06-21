@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import {
   PreviousWatchlistChecksEventData,
   WatchlistCheckEventData,
@@ -6,7 +7,6 @@ import {
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
-import styled from 'styled-components';
 
 import WatchlistCheckEventBody from '../../../../watchlist-check-event-body';
 import WatchlistCheckEventIcon from '../../../../watchlist-check-event-icon';

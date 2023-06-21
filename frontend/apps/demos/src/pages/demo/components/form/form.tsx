@@ -3,6 +3,7 @@ import footprint, {
   identifyUser,
 } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/footprint-react';
+import styled, { css } from '@onefootprint/styled';
 import {
   Button,
   Container,
@@ -16,7 +17,6 @@ import {
 import debounce from 'lodash/debounce';
 import React, { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import validateUserData from './utils/validate-user-data';
 

@@ -3,7 +3,7 @@ const template = (
   { tpl },
 ) => tpl`
 import React from 'react';
-import { useTheme } from 'styled-components';
+import { useTheme } from '@onefootprint/styled';
 
 import type { IconProps } from '../types';
 

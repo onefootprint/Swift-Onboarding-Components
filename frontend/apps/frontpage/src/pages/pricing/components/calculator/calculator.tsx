@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import Banner from '../banner';
 import Row from './components/row';

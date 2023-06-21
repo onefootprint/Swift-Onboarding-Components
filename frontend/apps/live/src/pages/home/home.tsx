@@ -1,12 +1,12 @@
 import { FootprintButton } from '@onefootprint/footprint-react';
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import Footer from './components/footer';

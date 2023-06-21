@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from '@onefootprint/idv-elements';
+import styled, { css } from '@onefootprint/styled';
 import { Avatar } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import useIsKyb from 'src/pages/intro/utils/is-kyb';
-import styled, { css } from 'styled-components';
 
 const Header = () => {
   const { t } = useTranslation('pages.intro.header');

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Rive from '@rive-app/react-canvas';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import Sparkles from '../sparkles';

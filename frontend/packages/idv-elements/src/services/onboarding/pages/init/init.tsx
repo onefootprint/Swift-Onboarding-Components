@@ -1,10 +1,10 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import { DeviceInfo, useDeviceInfo, useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { CollectedDataOptionLabels } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useOnboardingMachine } from '../../components/machine-provider';

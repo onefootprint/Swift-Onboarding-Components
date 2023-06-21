@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Banner, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import ContactForm from 'src/components/contact-form';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled, { css } from 'styled-components';
 
 const SandboxBanner = () => {
   const { t } = useTranslation('components.sandbox-banner');

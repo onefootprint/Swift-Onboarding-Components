@@ -1,5 +1,5 @@
+import styled, { css } from '@onefootprint/styled';
 import React, { useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from '../../../../constants';
 import NavigationHeaderContainer from '../../../navigation-header/components/navigation-header-container';

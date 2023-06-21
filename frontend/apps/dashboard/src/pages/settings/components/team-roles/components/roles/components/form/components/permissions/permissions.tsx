@@ -1,5 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { RoleScope } from '@onefootprint/types';
 import {
   Box,
@@ -10,7 +11,6 @@ import {
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import useDecryptOptions from './hooks/use-decrypt-options';
 

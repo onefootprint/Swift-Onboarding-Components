@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React, { forwardRef, HTMLAttributes } from 'react';
-import styled, { css } from 'styled-components';
 
 import use100vh from './hooks/use-100vh';
 

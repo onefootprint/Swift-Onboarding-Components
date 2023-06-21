@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from '@onefootprint/styled';
 
 import media from '../../utils/media';
 

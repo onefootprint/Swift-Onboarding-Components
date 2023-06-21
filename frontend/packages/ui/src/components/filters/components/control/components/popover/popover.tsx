@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useId, useRef } from 'react';
-import styled, { css } from 'styled-components';
 import {
   useEventListener,
   useLockedBody,

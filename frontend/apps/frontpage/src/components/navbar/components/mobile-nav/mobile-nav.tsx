@@ -1,13 +1,13 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpDefault } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import LinkButton from 'src/components/linking-button';
-import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';

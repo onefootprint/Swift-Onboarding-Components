@@ -1,5 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   BeneficialOwner,
   BeneficialOwnerDataAttribute,
@@ -7,7 +8,6 @@ import {
 import { Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import AddButton from './components/add-button';

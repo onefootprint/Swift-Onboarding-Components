@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { Drawer, LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 
 import ValidationItems from './components/validation-items';
 

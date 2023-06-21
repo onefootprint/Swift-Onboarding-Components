@@ -1,9 +1,9 @@
 import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { MatchLevel } from '@onefootprint/types/src/data/match-signal';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 type ValidationTimelineItemHeaderProps = {
   attribute: string;

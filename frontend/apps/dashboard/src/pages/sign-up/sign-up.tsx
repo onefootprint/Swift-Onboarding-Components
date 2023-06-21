@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Button, GoogleButton, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import TermsAndConditions from 'src/components/terms-and-conditions';
-import styled, { css } from 'styled-components';
 
 const Login = () => {
   const { t } = useTranslation('pages.sign-up');

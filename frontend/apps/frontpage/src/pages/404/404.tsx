@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { Container, EmptyState } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
-import styled from 'styled-components';
 
 import SEO from '../../components/seo';
 

@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { NAVIGATION_HEADER_PORTAL_ID } from '../../constants';
 import useContainerHasScroll from '../../hooks/use-container-has-scroll';

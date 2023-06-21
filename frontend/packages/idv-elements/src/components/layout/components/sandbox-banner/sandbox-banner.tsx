@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { Banner, media } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import styled, { css } from 'styled-components';
 
 export type SandboxBannerHandler = {
   getHeight: () => number;

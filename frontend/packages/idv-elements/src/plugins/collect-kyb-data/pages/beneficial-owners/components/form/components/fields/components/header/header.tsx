@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 type HeaderProps = {
   shouldShowRemove?: boolean;

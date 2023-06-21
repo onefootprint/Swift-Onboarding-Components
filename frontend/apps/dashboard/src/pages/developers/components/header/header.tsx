@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled, { css } from 'styled-components';
 
 const Header = () => {
   const { t } = useTranslation('pages.developers');

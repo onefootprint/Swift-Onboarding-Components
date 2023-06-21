@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpCompact } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 type LogoLinkProps = {
   onClick?: () => void;

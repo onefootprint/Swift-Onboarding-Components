@@ -2,11 +2,11 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { createGlobalStyle, css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import React from 'react';
-import { createGlobalStyle, css } from 'styled-components';
 
 import MachineProvider from '../components/machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut24, IcoUser24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
 
 const NavDropdown = () => {
   const { t } = useTranslation('components.private-layout.nav');

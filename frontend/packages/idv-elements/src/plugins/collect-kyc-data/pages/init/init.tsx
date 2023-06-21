@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import { KycData } from '../../utils';

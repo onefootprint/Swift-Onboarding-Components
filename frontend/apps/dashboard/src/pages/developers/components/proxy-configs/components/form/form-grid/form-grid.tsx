@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from '@onefootprint/styled';
 
 const FormGrid = styled.div`
   ${({ theme }) => css`

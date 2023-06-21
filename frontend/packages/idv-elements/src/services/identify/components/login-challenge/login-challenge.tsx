@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import { getCanChallengeBiometrics } from '../../utils/biometrics';

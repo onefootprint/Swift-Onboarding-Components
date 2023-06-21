@@ -1,8 +1,8 @@
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import type { Article } from 'src/types/article';
 import type { Page } from 'src/types/page';
-import styled, { css } from 'styled-components';
 
 import PageNav from './components/page-nav';
 import Sections from './components/sections';

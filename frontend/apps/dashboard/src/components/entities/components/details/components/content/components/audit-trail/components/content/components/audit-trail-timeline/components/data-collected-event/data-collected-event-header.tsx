@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { CollectedDataEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
-import styled, { css } from 'styled-components';
 
 type DataCollectedEventHeaderProps = {
   data: CollectedDataEventData;

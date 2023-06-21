@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { isMobile, isTablet } from 'react-device-detect';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
-import styled from 'styled-components';
 
 const KybIllustration = () => {
   const { t } = useTranslation('home.new-approach.kyb');

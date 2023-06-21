@@ -1,7 +1,7 @@
+import styled, { css } from '@onefootprint/styled';
 import { Box, Shimmer } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Container data-testid="business-owners-loading">

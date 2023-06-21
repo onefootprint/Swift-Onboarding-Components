@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 const Verifying = () => {
   const { t } = useTranslation('components.sms-challenge-verification');

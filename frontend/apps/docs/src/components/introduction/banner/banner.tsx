@@ -1,12 +1,12 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoHelp24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Button, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import ContactDialog from 'src/components/contact-dialog';
-import styled, { css } from 'styled-components';
 
 const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';

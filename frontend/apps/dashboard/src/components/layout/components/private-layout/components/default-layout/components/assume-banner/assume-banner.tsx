@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Banner } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
 
 const AssumeBanner = () => {
   const { t } = useTranslation('components.private-layout.assume-banner');

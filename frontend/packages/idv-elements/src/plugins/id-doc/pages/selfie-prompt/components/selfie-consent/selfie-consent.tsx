@@ -1,9 +1,9 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { BottomSheet, Button, Checkbox, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../../../components';
 import useIdDocMachine from '../../../../hooks/use-id-doc-machine';

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 export type LoginWithDifferentAccountProps = {
   showMissingPhoneLabel?: boolean;

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from '@onefootprint/styled';
 
 const GridRow = styled.div`
   display: flex;

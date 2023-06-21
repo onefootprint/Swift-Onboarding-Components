@@ -15,8 +15,8 @@
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
+    "@onefootprint/styled": "*",
     "@types/react-dom": "^18.0.10",
-    "@types/styled-components": "^5.1.26",
     "@types/uuid": "^9.0.0",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
@@ -32,7 +32,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
-    "styled-components": "^5.3.8",
     "ua-parser-js": "^1.0.33",
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.0",

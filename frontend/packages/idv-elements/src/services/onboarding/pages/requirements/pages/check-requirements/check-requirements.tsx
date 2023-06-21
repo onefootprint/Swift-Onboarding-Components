@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useGetOnboardingStatus from '../authorize/hooks/use-get-onboarding-status';

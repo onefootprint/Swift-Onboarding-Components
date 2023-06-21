@@ -1,7 +1,7 @@
 import { FontVariant } from '@onefootprint/design-tokens';
+import styled, { css } from '@onefootprint/styled';
 import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
-import styled, { css } from 'styled-components';
 
 import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import Label from '../../label';

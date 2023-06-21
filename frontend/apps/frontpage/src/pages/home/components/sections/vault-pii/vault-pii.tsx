@@ -4,9 +4,9 @@ import {
   IcoFileText16,
   IcoUserCircle16,
 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import SectionTitle from '../../section-title/section-title';
 import CircularBeam from './components/circular-beam/circular-beam';

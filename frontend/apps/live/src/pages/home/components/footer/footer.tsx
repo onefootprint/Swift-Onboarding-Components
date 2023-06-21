@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 const Footer = () => {
   const { t } = useTranslation('home.legal-documents');

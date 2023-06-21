@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import Calculator from './components/calculator';

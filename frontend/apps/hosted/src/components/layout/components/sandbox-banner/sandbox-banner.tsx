@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Banner, media } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import styled, { css } from 'styled-components';
 
 const SandboxBanner = () => {
   const { t } = useTranslation('components.layout.sandbox-banner');

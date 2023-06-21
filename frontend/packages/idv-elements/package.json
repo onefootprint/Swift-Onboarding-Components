@@ -23,6 +23,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
+    "@onefootprint/styled": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
@@ -62,7 +63,6 @@
     "eslint-config-footprint": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "styled-components": "^5.3.8",
     "tsconfig": "*",
     "typescript": "4.9.5",
     "webpack": "*"
@@ -70,8 +70,7 @@
   "peerDependencies": {
     "next": "13.x",
     "react": "18.x",
-    "react-dom": "18.x",
-    "styled-components": "5.x"
+    "react-dom": "18.x"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",

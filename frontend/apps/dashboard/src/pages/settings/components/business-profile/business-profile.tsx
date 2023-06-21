@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import styled, { css } from '@onefootprint/styled';
 import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
 import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';
-import styled, { css } from 'styled-components';
 
 import Data from './components/data';
 import Error from './components/error';

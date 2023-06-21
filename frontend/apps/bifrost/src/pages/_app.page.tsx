@@ -6,13 +6,13 @@ import {
   configureFootprint,
   FootprintProvider,
 } from '@onefootprint/idv-elements';
+import { createGlobalStyle } from '@onefootprint/styled';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
-import { createGlobalStyle } from 'styled-components';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';

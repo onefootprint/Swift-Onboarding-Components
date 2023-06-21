@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import FeatureRow from '../components/feature-row';
 import TableHeader from '../components/table-header';

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { SignalShortInfoType } from '../../hooks/use-entity-match-signals/utils/transform-response';
 

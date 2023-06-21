@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import styled from '@onefootprint/styled';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 import Content from './components/content';
 import Error from './components/error';

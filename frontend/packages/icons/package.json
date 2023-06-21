@@ -19,6 +19,7 @@
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "@onefootprint/design-tokens": "*",
+    "@onefootprint/styled": "*",
     "@svgr/core": "^6.2.1",
     "@svgr/plugin-jsx": "^6.2.1",
     "@svgr/plugin-prettier": "^6.1.2",
@@ -32,7 +33,6 @@
     "lodash": "^4.17.21",
     "react-dom": "18.2.0",
     "react": "18.2.0",
-    "styled-components": "^5.3.8",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },

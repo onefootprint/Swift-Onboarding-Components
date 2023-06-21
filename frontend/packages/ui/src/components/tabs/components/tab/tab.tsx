@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React, { forwardRef, useContext } from 'react';
-import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils';
 import TabContext from '../context';

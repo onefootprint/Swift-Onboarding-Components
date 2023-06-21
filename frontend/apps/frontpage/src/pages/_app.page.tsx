@@ -2,13 +2,13 @@ import '@onefootprint/design-tokens/src/output/theme.css';
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import themes from '@onefootprint/design-tokens';
+import { createGlobalStyle, css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
-import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';

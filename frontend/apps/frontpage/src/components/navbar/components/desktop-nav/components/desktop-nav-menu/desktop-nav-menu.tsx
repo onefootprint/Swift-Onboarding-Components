@@ -1,8 +1,8 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { NavMenu } from '../../../../types';
 import DesktopNavMenuItem from '../desktop-nav-menu-item';

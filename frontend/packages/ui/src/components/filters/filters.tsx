@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import noop from 'lodash/noop';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import LinkButton from '../link-button';
 import Typography from '../typography';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button, PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 type FormData = {
   phoneNumber: string;

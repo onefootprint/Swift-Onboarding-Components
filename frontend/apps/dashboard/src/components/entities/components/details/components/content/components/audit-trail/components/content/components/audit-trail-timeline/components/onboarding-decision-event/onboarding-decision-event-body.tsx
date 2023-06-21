@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   ActorKind,
   CollectedDataOption,
@@ -10,7 +11,6 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
 import createStringList from 'src/utils/create-string-list';
-import styled, { css } from 'styled-components';
 
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';

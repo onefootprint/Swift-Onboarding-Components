@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import useOrg from 'src/hooks/use-org';
-import styled, { css } from 'styled-components';
 
 import Header from '../header';
 import Content from './components/content';

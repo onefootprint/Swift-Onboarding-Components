@@ -21,6 +21,7 @@
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
+    "@onefootprint/styled": "*",
     "@onefootprint/jest-presets": "*",
     "@popperjs/core": "^2.11.5",
     "@radix-ui/react-dropdown-menu": "^1.0.0",
@@ -75,15 +76,13 @@
     "eslint-config-footprint": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "styled-components": "^5.3.8",
     "tsconfig": "*",
     "typescript": "4.9.5",
     "webpack": "*"
   },
   "peerDependencies": {
     "react": "18.x",
-    "react-dom": "18.x",
-    "styled-components": "5.x"
+    "react-dom": "18.x"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

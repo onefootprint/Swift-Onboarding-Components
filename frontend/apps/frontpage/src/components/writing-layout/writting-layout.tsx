@@ -1,6 +1,6 @@
+import styled, { createGlobalStyle, css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { createGlobalStyle, css } from 'styled-components';
 
 import SubscribeToNewsletter from './components/subscribe-to-newsletter';
 

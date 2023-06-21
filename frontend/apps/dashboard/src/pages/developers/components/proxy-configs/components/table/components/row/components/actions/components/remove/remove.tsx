@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
-import styled from 'styled-components';
 
 import useRemoveProxyConfig from './hooks/use-remove-proxy-config';
 

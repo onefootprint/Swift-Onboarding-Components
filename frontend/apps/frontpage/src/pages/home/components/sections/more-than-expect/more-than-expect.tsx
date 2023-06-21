@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import FeatureCard from '../../feature-card';
 import SectionTitle from '../../section-title';

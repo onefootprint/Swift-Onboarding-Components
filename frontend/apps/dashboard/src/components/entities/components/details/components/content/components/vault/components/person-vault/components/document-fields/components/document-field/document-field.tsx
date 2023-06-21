@@ -1,4 +1,5 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   DocumentDI,
   Entity,
@@ -13,7 +14,6 @@ import {
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 

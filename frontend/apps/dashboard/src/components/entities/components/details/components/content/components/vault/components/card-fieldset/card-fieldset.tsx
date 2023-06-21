@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { type Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
-import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 

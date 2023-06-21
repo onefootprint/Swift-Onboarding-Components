@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Annotation } from '@onefootprint/types';
 import { Toggle } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
 import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';

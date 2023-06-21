@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button, LoadingIndicator } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import Flash from './components/flash';
 import Overlay from './components/overlay';

@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { LinkButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 const JoinUs = () => {
   const { t } = useTranslation('pages.company.join-us');

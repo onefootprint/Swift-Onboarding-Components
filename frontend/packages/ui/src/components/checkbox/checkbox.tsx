@@ -1,5 +1,5 @@
+import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef, ReactNode, useId } from 'react';
-import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';

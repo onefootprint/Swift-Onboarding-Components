@@ -1,6 +1,6 @@
+import styled, { css, useTheme } from '@onefootprint/styled';
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import CopyButton from '../copy-button';

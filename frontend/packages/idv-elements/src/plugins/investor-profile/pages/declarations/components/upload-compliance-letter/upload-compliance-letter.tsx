@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoWarning16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import UploadFiles from './components/upload-files';
 

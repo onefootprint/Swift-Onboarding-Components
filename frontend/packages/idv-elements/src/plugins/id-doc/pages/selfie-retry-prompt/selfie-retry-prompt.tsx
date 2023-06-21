@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { IdDocType } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 import { imageIcons, ImageTypes } from '../../constants/image-types';
 import FeedbackIcon from '../feedback-icon';

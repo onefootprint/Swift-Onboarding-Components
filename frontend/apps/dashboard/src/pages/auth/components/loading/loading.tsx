@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import RiveComponent from '@rive-app/react-canvas';
 import React from 'react';
-import styled from 'styled-components';
 
 const Loading = () => (
   <Container>

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDataOption,
   CollectedDocumentDataOption,
@@ -10,7 +11,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
 import CdoTagList from 'src/components/cdo-tag-list';
-import styled, { css } from 'styled-components';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import { useOnboardingConfigMachine } from '../machine-provider';

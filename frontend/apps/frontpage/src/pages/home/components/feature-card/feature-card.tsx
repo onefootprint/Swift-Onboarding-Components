@@ -1,4 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import {
   createFontStyles,
   LinkButton,
@@ -7,7 +8,6 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { isMobile, isTablet } from 'react-device-detect';
-import styled, { css } from 'styled-components';
 
 type FeatureCardProps = {
   title: string;

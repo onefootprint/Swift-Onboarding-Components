@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { TextArea, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import { ContactDialogData, FormField } from '../../contact-dialog.types';
 

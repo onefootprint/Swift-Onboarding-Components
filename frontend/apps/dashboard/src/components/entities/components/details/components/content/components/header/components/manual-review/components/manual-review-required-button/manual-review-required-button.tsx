@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 

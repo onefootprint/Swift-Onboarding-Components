@@ -48,6 +48,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
+    "@onefootprint/styled": "*",
     "@onefootprint/request": "*",
     "@onefootprint/test-utils": "*",
     "@onefootprint/types": "*",
@@ -91,8 +92,7 @@
     "@types/react-dom": "^18.0.10",
     "@types/styled-components": "^5.1.26",
     "@xstate/react": "^3.2.1",
-    "constate": "^3.3.2",
-    "styled-components": "^5.3.8"
+    "constate": "^3.3.2"
   },
   "publishConfig": {
     "access": "public"

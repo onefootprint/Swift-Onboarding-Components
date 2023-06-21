@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40, IcoFaceid24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 export type VerificationProps = {
   isWaiting?: boolean;

@@ -1,8 +1,8 @@
 import { useHasScroll, useToggle, useTranslation } from '@onefootprint/hooks';
 import { IcoBook24, IcoMegaphone24, IcoWriting24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';

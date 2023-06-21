@@ -1,6 +1,6 @@
 import type { UIState } from '@onefootprint/design-tokens';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 

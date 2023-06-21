@@ -1,10 +1,10 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { media, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { defaultOption, options } from './examples.constants';
 

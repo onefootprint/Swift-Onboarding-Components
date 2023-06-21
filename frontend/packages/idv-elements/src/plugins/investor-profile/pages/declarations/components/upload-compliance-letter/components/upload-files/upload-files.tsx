@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box, Button, Divider } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import FileEntry from '../file-entry';
 

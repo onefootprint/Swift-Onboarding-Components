@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { IcoChevronDown16, IcoCloseSmall16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import noop from 'lodash/noop';
 import React from 'react';
 import {
@@ -11,7 +12,6 @@ import {
   MultiValueRemoveProps,
   OptionProps,
 } from 'react-select';
-import styled, { css } from 'styled-components';
 
 import Checkbox from '../../checkbox';
 

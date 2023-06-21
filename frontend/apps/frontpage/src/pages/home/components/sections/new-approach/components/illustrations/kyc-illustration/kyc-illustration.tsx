@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
-import styled, { css } from 'styled-components';
 
 const KycIllustration = () => {
   const { t } = useTranslation('home.new-approach.kyc');

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from '@onefootprint/styled';
 
 const strong = styled.strong`
   font-weight: bold;

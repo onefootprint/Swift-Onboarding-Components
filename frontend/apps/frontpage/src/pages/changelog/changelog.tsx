@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import {
   Button,
   Container,
@@ -11,7 +12,6 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
 import { PostDetails } from 'src/utils/ghost/types';
-import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 import Card from './components/card';

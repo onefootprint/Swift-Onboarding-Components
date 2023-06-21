@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { Portal } from '@onefootprint/ui';
 import React, { useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from '../../constants';
 import { HEADER_TITLE_DEFAULT_ID } from '../header-title';

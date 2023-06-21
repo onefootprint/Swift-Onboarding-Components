@@ -1,7 +1,7 @@
+import styled, { useTheme } from '@onefootprint/styled';
 import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
 import ReactSelect, { OptionProps } from 'react-select';
-import styled, { useTheme } from 'styled-components';
 
 import Label from '../../label';
 import Hint from '../hint';

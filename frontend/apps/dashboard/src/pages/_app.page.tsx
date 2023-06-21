@@ -4,12 +4,12 @@ import themes from '@onefootprint/design-tokens';
 import FootprintDevTools, {
   ObserveCollectorProvider,
 } from '@onefootprint/dev-tools';
+import { createGlobalStyle, css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import { createGlobalStyle, css } from 'styled-components';
 
 import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import { EmptyState } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 type ErrorProps = {
   message: string;

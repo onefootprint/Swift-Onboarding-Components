@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar16, IcoEye16, IcoShield16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
 import SectionTitle from '../../section-title/section-title';

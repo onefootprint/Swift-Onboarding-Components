@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
 import { Box, Dialog, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import WaveAnimation from 'src/components/wave-animation';
-import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import useOnboardingConfigs from '../../../../../../hooks/use-onboarding-configs';

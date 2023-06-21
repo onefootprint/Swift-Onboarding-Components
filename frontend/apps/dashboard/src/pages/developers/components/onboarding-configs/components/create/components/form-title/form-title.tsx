@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 type FormTitleProps = {
   title: string;

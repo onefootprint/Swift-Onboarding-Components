@@ -1,10 +1,10 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
+import styled from '@onefootprint/styled';
 import { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import styled from 'styled-components';
 
 import useGetBusiness from './hooks/use-get-business';
 import useParseUrl from './hooks/use-url-params';

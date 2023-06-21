@@ -1,9 +1,9 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { OnboardingConfig } from '@onefootprint/types';
 import { Button, useToast } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
 import useUpdateOnboardingConfigs from 'src/pages/developers/components/onboarding-configs/hooks/use-update-onboarding-configs';
-import styled, { css } from 'styled-components';
 
 import { FormData } from '../form-data.types';
 import Fieldset from './components/fieldset';

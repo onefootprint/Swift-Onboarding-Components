@@ -1,6 +1,6 @@
+import styled, { css } from '@onefootprint/styled';
 import { Dialog, Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import EnvVariables from './components/env-variables';
 

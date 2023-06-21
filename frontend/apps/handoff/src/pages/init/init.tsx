@@ -6,11 +6,11 @@ import {
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
+import styled from '@onefootprint/styled';
 import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
-import styled from 'styled-components';
 
 const Init = () => {
   const [state, send] = useHandoffMachine();

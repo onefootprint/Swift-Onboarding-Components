@@ -1,6 +1,6 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import React, { useRef } from 'react';
-import styled, { css } from 'styled-components';
 
 import Box from '../box';
 import ButtonPicker, { ButtonPickerRef } from './components/button-picker';

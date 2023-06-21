@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button, Grid, Portal, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useUserSession from 'src/hooks/use-user-session';
-import styled, { css } from 'styled-components';
 
 import Header from '../header';
 

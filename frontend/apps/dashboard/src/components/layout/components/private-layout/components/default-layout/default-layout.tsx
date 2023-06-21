@@ -7,13 +7,13 @@ import {
   IcoUsers16,
   LogoFpCompact,
 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled, { css } from 'styled-components';
 
 import AssumeBanner from './components/assume-banner';
 import ManualReviewNavigator from './components/manual-review-navigator';

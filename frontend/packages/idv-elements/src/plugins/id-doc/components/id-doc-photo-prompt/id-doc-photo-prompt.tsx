@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24, IcoSmartphone24, IcoSun24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { CountryCode3, IdDocType } from '@onefootprint/types';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';

@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import { IdDocType } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
 
 import { imageIcons, ImageTypes } from '../../constants/image-types';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';

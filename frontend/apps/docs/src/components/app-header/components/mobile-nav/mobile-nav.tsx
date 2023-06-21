@@ -2,11 +2,11 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpCompact } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, LinkButton, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { LinkItem } from '../../app-header.types';

@@ -1,6 +1,6 @@
 import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
 import { IcoInfo24, IcoWarning24 } from '@onefootprint/icons';
-import { css } from 'styled-components';
+import { css } from '@onefootprint/styled';
 
 import type { InlineAlertVariant } from './inline-alert.types';
 

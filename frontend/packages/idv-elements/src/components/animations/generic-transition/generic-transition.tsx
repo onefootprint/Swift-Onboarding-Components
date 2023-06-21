@@ -1,8 +1,8 @@
 import { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
-import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import CustomCheckIcon from './custom-check-icon';

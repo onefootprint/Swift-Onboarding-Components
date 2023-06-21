@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import useProcessImage from '../../hooks/use-process-image';
 import { useIdDocMachine } from '../machine-provider';

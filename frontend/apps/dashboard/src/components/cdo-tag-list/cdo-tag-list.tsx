@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDataOption,
   CollectedDocumentDataOption,
@@ -8,7 +9,6 @@ import {
 } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 type CdoTagListProps = {
   testID?: string;

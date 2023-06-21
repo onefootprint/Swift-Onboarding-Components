@@ -1,11 +1,11 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { OnboardingConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 import useUpdateOnboardingConfigs from 'src/pages/developers/components/onboarding-configs/hooks/use-update-onboarding-configs';
-import styled from 'styled-components';
 
 export type StatusHandler = {
   toggle: () => void;

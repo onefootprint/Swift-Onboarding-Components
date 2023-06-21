@@ -1,12 +1,12 @@
+import type { Theme } from '@onefootprint/design-tokens';
+import { createGlobalStyle, ThemeProvider } from '@onefootprint/styled';
 import React from 'react';
-import type { DefaultTheme } from 'styled-components';
-import { createGlobalStyle, ThemeProvider } from 'styled-components';
 
 import media from '../media';
 
 export type BootstrapProps = {
   children: React.ReactNode;
-  theme: DefaultTheme;
+  theme: Theme;
 };
 
 const GlobalStyle = createGlobalStyle`

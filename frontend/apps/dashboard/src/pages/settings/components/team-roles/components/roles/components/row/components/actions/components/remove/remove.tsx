@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { Role } from '@onefootprint/types';
 import { createFontStyles, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
-import styled from 'styled-components';
 
 import ConfirmationDialog from './components/confirmation-dialog';
 import useRemoveRole from './hooks/use-remove-role';

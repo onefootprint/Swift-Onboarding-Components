@@ -1,5 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { BusinessDI, CountryCode } from '@onefootprint/types';
 import {
   AddressInput,
@@ -10,7 +11,6 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { BusinessAddressData } from '../../../../utils/state-machine/types';

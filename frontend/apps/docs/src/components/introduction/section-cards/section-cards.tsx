@@ -5,9 +5,9 @@ import {
   IcoLayer0124,
   IcoStore24,
 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import SectionCard from './section-card/section-card';
 

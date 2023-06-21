@@ -1,7 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
+import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import Flag from '../flag';
 import BaseSelect, {

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { Member, RoleScope } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 import useUserSession from 'src/hooks/use-user-session';
-import styled from 'styled-components';
 
 import Actions from './components/actions';
 import EditRole from './components/edit-role';

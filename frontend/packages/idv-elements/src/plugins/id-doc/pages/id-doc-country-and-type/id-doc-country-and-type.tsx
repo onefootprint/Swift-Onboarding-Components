@@ -10,6 +10,7 @@ import {
   IcoIdGeneric40,
   IcoPassport24,
 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { IdDocType } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
@@ -22,7 +23,6 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';

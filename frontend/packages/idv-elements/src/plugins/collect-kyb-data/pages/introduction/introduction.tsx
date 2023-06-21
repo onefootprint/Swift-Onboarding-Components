@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoStore24, IcoUser24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';

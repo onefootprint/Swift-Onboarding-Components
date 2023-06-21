@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 
 import GenericTransition from '../../../../components/animations/generic-transition';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';

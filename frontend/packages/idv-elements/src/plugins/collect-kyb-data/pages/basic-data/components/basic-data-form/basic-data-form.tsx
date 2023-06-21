@@ -1,9 +1,9 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { BusinessDI } from '@onefootprint/types';
 import { PhoneInput, PhoneInputRegex, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { BasicData } from '../../../../utils/state-machine/types';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';

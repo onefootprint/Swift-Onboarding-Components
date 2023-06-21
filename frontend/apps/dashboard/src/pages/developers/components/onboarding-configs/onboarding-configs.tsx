@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import SectionHeader from 'src/components/section-header';
 import WaveAnimation from 'src/components/wave-animation';
-import styled, { css } from 'styled-components';
 
 import Create from './components/create';
 import Details from './components/details';

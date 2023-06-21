@@ -1,12 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { OrgAuthMagicLinkRequest } from '@onefootprint/types';
 import { Box, Button, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import BackButton from '../../components/back-button';
 import useLoginEmail from './hooks/use-login-email';

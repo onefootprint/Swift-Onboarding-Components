@@ -1,4 +1,5 @@
 // import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   createFontStyles,
@@ -11,7 +12,6 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 // import { useDarkMode } from 'usehooks-ts';
 
 type PageNavProps = {

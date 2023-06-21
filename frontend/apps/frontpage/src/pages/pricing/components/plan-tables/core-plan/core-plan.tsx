@@ -2,10 +2,10 @@ import '@typeform/embed/build/css/popup.css';
 
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Box, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import LinkButton from 'src/components/linking-button';
-import styled, { css } from 'styled-components';
 
 import Banner from '../../banner';
 import InfoDialog from '../../info-dialog';

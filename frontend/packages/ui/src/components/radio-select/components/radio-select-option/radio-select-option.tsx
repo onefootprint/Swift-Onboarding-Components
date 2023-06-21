@@ -1,6 +1,6 @@
 import { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import React, { useRef } from 'react';
-import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import Typography from '../../../typography';

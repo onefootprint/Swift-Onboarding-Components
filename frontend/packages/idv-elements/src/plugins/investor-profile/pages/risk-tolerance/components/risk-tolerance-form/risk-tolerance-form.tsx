@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   InvestorProfileData,
   InvestorProfileDI,
@@ -7,7 +8,6 @@ import {
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import CustomForm from '../../../../components/custom-form';
 import { RiskToleranceData } from '../../../../utils/state-machine/types';

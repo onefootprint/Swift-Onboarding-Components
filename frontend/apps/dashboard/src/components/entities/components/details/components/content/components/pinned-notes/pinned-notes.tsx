@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPin24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { ActorKind } from '@onefootprint/types';
 import { Divider, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
-import styled, { css } from 'styled-components';
 
 import useCurrentEntityAnnotations from '@/entity/hooks/use-current-entity-annotations';
 

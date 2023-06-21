@@ -78,6 +78,7 @@ module.exports = withPlugins([withMDX], {
   },
   transpilePackages: [
     '@onefootprint/ui',
+    '@onefootprint/styled',
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
     '@onefootprint/global-constants',

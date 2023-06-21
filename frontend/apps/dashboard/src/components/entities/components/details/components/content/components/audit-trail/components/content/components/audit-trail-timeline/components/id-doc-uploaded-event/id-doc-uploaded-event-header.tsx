@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { IdDocUploadedEventData } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 type IdDocUploadedEventHeaderProps = {
   data: IdDocUploadedEventData;

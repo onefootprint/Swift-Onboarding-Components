@@ -1,11 +1,11 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { SecuredByFootprint } from '@onefootprint/idv-elements';
+import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import styled, { css } from 'styled-components';
 
 type Link = { label: string; href: string };
 

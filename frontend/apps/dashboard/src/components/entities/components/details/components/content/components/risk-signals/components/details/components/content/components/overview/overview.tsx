@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import createStringList from 'src/utils/create-string-list';
-import styled, { css } from 'styled-components';
 
 import SeverityBadge from '../../../../../severity-badge';
 import Field from './components/field';

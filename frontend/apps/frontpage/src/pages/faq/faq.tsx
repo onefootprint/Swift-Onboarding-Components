@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Button, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Accordion from 'src/components/accordion';
-import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 

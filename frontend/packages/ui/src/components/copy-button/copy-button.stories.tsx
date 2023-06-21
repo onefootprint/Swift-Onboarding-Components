@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
-import styled from 'styled-components';
 
 import CopyButton, { CopyButtonProps } from './copy-button';
 

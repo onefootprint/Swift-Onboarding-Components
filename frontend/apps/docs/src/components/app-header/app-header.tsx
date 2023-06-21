@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';

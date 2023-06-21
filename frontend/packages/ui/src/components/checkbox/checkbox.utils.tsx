@@ -3,7 +3,7 @@ import type {
   Color,
   Overlay,
 } from '@onefootprint/design-tokens';
-import { css } from 'styled-components';
+import { css } from '@onefootprint/styled';
 
 import { createOverlayBackground } from '../../utils/mixins';
 

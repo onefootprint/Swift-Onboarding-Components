@@ -4,9 +4,9 @@ import {
   NavigationHeader,
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
+import styled from '@onefootprint/styled';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import React from 'react';
-import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';

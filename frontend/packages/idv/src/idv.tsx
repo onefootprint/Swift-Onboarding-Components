@@ -1,8 +1,8 @@
+import { createGlobalStyle } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import Script from 'next/script';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { createGlobalStyle } from 'styled-components';
 
 import { MachineProvider } from './components/machine-provider';
 import { GOOGLE_MAPS_KEY } from './config/constants';

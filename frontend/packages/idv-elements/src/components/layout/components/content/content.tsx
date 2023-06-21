@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 
 import hasCustomHeightInAppearance from '../../utils/has-custom-height-in-appearance';
 import FootprintFooter from '../footprint-footer';

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, Divider, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import FooterLink from './components/footer-link';
 

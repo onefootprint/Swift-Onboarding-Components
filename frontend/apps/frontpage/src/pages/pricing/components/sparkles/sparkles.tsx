@@ -1,6 +1,6 @@
+import styled from '@onefootprint/styled';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useInterval } from 'usehooks-ts';
 
 import range from './components/range';

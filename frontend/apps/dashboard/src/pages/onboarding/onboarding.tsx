@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
-import styled from 'styled-components';
 
 import Form from './components/form';
 import LoggedUser from './components/logged-user';

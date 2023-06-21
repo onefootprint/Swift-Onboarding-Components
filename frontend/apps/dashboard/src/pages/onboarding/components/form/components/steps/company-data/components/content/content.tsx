@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Organization, OrganizationSize } from '@onefootprint/types';
 import {
   Button,
@@ -10,7 +11,6 @@ import {
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useUpdateOrg from 'src/hooks/use-update-org';
-import styled, { css } from 'styled-components';
 
 import SIZE_OPTIONS from './content.constants';
 

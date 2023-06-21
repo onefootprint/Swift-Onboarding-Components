@@ -1,6 +1,6 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import React from 'react';
-import styled from 'styled-components';
 
 import Pill, { PillProps } from '../pill';
 

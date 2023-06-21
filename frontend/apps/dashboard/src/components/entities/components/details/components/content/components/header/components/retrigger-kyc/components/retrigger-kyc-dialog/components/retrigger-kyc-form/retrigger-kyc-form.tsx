@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { TriggerKind } from '@onefootprint/types';
 import {
   Checkbox,
@@ -10,7 +11,6 @@ import {
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
-import styled, { css } from 'styled-components';
 
 export type RetriggerKYCFormData = {
   kind: TriggerKind;

@@ -1,8 +1,8 @@
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import useMeasure from 'react-use-measure';
-import styled, { css } from 'styled-components';
 
 const SHIMMER_HEIGHT = '296px';
 

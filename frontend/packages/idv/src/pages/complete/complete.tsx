@@ -6,9 +6,9 @@ import {
   NavigationHeader,
 } from '@onefootprint/idv-elements';
 import { LAYOUT_CONTAINER_ID } from '@onefootprint/idv-elements/src/components/layout/constants';
+import styled from '@onefootprint/styled';
 import { Box, LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import useIdvMachine from '../../hooks/use-idv-machine';

@@ -1,6 +1,6 @@
 import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
+import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
-import styled, { css, keyframes } from 'styled-components';
 
 import Box from '../box';
 import LinkButton from '../link-button';

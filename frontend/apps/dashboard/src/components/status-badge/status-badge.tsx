@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { EntityStatus } from '@onefootprint/types';
 import { Badge, Box, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import getBadgeVariantByStatus from '../entities/utils';
 

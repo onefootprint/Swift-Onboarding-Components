@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle16, IcoClose16, IcoForbid40 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
-import styled, { css } from 'styled-components';
 
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 

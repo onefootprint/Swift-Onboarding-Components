@@ -1,4 +1,5 @@
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import styled, { css } from '@onefootprint/styled';
 import {
   CountryCode,
   DataIdentifier,
@@ -9,7 +10,6 @@ import {
 import { Flag, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
-import styled, { css } from 'styled-components';
 
 import Field from '../../../../../field';
 

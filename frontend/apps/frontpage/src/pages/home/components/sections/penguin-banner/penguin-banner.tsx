@@ -1,5 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Button,
@@ -11,7 +12,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import ContactDialog from 'src/components/contact-dialog';
-import styled, { css } from 'styled-components';
 
 const PenguinBanner = () => {
   const { t } = useTranslation('pages.home.penguin-banner');

@@ -7,10 +7,10 @@ import {
   IcoLock24,
   IcoShield40,
 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Container, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import FeatureCard from './components/feature-card';
 import PartnersLogos from './components/partners-logos';

@@ -1,12 +1,12 @@
 import '@onefootprint/design-tokens/src/output/theme.css';
 
 import themes from '@onefootprint/design-tokens';
+import { createGlobalStyle, css } from '@onefootprint/styled';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
-import { createGlobalStyle, css } from 'styled-components';
 
 import AppHeader from '../components/app-header';
 import configureReactI18next from '../config/initializers/react-i18next';
