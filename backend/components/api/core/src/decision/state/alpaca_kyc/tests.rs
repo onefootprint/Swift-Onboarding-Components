@@ -395,8 +395,7 @@ async fn pass_then_watchlist_hit(
     }
 }
 
-// TODO: currently can only stepup in Sandbox through fixture because we don't have Alpaca rules configured yet to do real stepups
-// #[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Live)]
 #[test_state_case(UserKind::Sandbox("stepup"))]
 #[tokio::test]
 async fn step_up(state: &mut State, user_kind: UserKind) {
@@ -422,7 +421,19 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
-            todo!();
+            let ob_config_key = obc.key.clone();
+            // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
+            mock_ff_client
+                .expect_flag()
+                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                .return_once(move |_| true);
+
+            mock_idology(
+                state,
+                WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
+            );
+            mock_twilio(state);
+            mock_incode(state, WithHit(false));
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
