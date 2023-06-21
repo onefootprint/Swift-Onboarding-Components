@@ -132,14 +132,6 @@ const Container = styled.aside`
         }
       }
 
-      &[data-level='3'] {
-        padding-left: ${theme.spacing[6]};
-
-        a {
-          ${createFontStyles('caption-2')};
-        }
-      }
-
       &[data-active='true'] {
         a {
           color: ${theme.color.primary};
@@ -149,6 +141,21 @@ const Container = styled.aside`
       &.active {
         a {
           color: ${theme.color.primary};
+        }
+      }
+
+      /* this is only for the case of Introduction to Footprint in which there's 1 of each level kind */
+      &[data-level='3'] {
+        padding-left: ${theme.spacing[6]};
+
+        &:nth-child(3):last-of-type {
+          a {
+            ${createFontStyles('body-4')};
+          }
+        }
+
+        a {
+          ${createFontStyles('caption-2')};
         }
       }
     }

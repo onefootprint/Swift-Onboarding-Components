@@ -50,6 +50,13 @@ const DocumentationLink = styled(Link)`
     ${createFontStyles('body-3')}
     color: ${theme.color.tertiary};
     text-decoration: none;
+    transition: opacity 0.2s ease-in-out;
+
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   `}
 `;
 
@@ -68,6 +75,13 @@ const Container = styled.div`
 
 const LogoLink = styled(Link)`
   display: flex;
+  transition: opacity 0.2s ease-in-out;
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 `;
 
 const Divider = styled.div`
