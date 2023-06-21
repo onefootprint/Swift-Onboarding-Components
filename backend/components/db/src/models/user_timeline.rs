@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::actor::saturate_actors;
+use crate::actor::SaturatedActor;
 use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_vault::ScopedVault;
@@ -9,6 +11,7 @@ use crate::{schema::user_timeline, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::DocumentDataId;
 use newtypes::VendorAPI;
@@ -60,6 +63,7 @@ pub enum SaturatedTimelineEvent {
     Annotation(AnnotationInfo),
     DocumentUploaded(DocumentData),
     WatchlistCheck(WatchlistCheck),
+    VaultCreated(SaturatedActor),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -169,23 +173,23 @@ impl UserTimeline {
             _ => None,
         });
 
-        let mut decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
-        let mut annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
-        let mut liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
-        let mut identity_documents_and_requests =
+        let db_actors = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::VaultCreated(ref e) => Some(e.actor.clone()),
+            _ => None,
+        });
+
+        let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
+        let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
+        let liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
+        let identity_documents_and_requests =
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
-        let mut vendor_apis_to_include: Vec<VendorAPI> = VendorAPI::iter()
-            .filter(|v| !matches!(v, &VendorAPI::SocureIDPlus))
-            .collect();
-
-        let mut documents: HashMap<DocumentDataId, DocumentData> =
+        let vendor_apis_to_include = VendorAPI::iter()
+            .filter(|v| (!matches!(v, &VendorAPI::SocureIDPlus)) || tenant_can_view_socure_risk_signal)
+            .collect_vec();
+        let documents: HashMap<DocumentDataId, DocumentData> =
             DocumentData::get_bulk(conn, document_ids.collect())?;
-
-        let mut watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
-
-        if tenant_can_view_socure_risk_signal {
-            vendor_apis_to_include.push(VendorAPI::SocureIDPlus)
-        }
+        let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
+        let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -196,8 +200,10 @@ impl UserTimeline {
                         SaturatedTimelineEvent::DataCollected(e.clone())
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
-                        let (obd, ob_config, mut verification_requests, actor, mr) =
-                            decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?;
+                        let (obd, ob_config, mut verification_requests, actor, mr) = decisions
+                            .get(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
                         // filter out socure, if applicable
                         verification_requests.retain(|v| vendor_apis_to_include.contains(&v.vendor_api));
 
@@ -208,37 +214,51 @@ impl UserTimeline {
                             decision,
                             e.annotation_id
                                 .as_ref()
-                                .map(|a_id| annotations.remove(a_id).ok_or(DbError::RelatedObjectNotFound)) // TODO: annotations.remove here and in a below match is sketch, could replace with .get.clone
-                                .transpose()?,
+                                .map(|a_id| annotations.get(a_id).ok_or(DbError::RelatedObjectNotFound))
+                                .transpose()?
+                                .cloned(),
                         )
                     }
                     DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => {
                         SaturatedTimelineEvent::IdentityDocumentUploaded(
                             identity_documents_and_requests
-                                .remove(&e.id)
-                                .ok_or(DbError::RelatedObjectNotFound)?,
+                                .get(&e.id)
+                                .ok_or(DbError::RelatedObjectNotFound)?
+                                .clone(),
                         )
                     }
                     DbUserTimelineEvent::Liveness(ref e) => {
                         let (liveness, insight) = liveness_events
-                            .remove(&e.id)
-                            .ok_or(DbError::RelatedObjectNotFound)?;
+                            .get(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
 
                         SaturatedTimelineEvent::Liveness(liveness, insight)
                     }
                     DbUserTimelineEvent::Annotation(ref e) => {
                         let annotation = annotations
-                            .remove(&e.annotation_id)
-                            .ok_or(DbError::RelatedObjectNotFound)?;
+                            .get(&e.annotation_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
                         SaturatedTimelineEvent::Annotation(annotation)
                     }
                     DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
-                        documents.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
+                        documents
+                            .get(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone(),
                     ),
                     DbUserTimelineEvent::WatchlistCheck(ref e) => SaturatedTimelineEvent::WatchlistCheck(
                         watchlist_checks
-                            .remove(&e.id)
-                            .ok_or(DbError::RelatedObjectNotFound)?,
+                            .get(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone(),
+                    ),
+                    DbUserTimelineEvent::VaultCreated(ref e) => SaturatedTimelineEvent::VaultCreated(
+                        actors
+                            .get(&e.actor)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone(),
                     ),
                 };
                 // This will actually display that events from different ob configs at the same

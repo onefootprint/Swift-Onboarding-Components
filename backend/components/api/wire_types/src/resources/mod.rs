@@ -87,3 +87,6 @@ pub use authorized_org::*;
 
 pub mod manual_review;
 pub use self::manual_review::*;
+
+mod vault_created;
+pub use self::vault_created::*;

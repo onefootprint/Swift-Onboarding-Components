@@ -1,3 +1,4 @@
+use crate::DbActor;
 use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId,
     LivenessEventId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
@@ -35,6 +36,7 @@ pub enum DbUserTimelineEvent {
     Annotation(AnnotationInfo),
     DocumentUploaded(DocumentUploadedInfo),
     WatchlistCheck(WatchlistCheckInfo),
+    VaultCreated(VaultCreatedInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -81,6 +83,12 @@ impl From<WatchlistCheckInfo> for DbUserTimelineEvent {
     }
 }
 
+impl From<VaultCreatedInfo> for DbUserTimelineEvent {
+    fn from(s: VaultCreatedInfo) -> Self {
+        Self::VaultCreated(s)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
@@ -120,4 +128,9 @@ pub struct DocumentUploadedInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WatchlistCheckInfo {
     pub id: WatchlistCheckId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VaultCreatedInfo {
+    pub actor: DbActor,
 }

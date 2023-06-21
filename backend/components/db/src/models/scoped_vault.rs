@@ -4,6 +4,7 @@ use super::insight_event::InsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
 use super::onboarding::Onboarding;
+use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
 use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
@@ -15,7 +16,8 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId, VaultId,
+    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId,
+    VaultCreatedInfo, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -158,6 +160,7 @@ impl ScopedVault {
         new_user: NewVaultArgs,
         tenant_id: TenantId,
         idempotency_id: Option<String>,
+        actor: DbActor,
     ) -> DbResult<(Self, Vault)> {
         // Since the idempotency id is stored on the vault, concatenate it with the tenant ID to
         // make sure they are scoped per tenant
@@ -176,9 +179,12 @@ impl ScopedVault {
                 vault_id: uv.id.clone(),
                 ob_configuration_id: None,
             };
-            diesel::insert_into(scoped_vault::table)
+            let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
-                .get_result(conn.conn())?
+                .get_result(conn.conn())?;
+            let event = VaultCreatedInfo { actor };
+            UserTimeline::create(conn, event, uv.id.clone(), sv.id.clone())?;
+            sv
         } else {
             scoped_vault::table
                 .filter(scoped_vault::vault_id.eq(&uv.id))

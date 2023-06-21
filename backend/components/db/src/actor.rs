@@ -42,6 +42,12 @@ impl HasActor for AccessEvent {
     }
 }
 
+impl HasActor for DbActor {
+    fn actor(&self) -> DbActor {
+        self.clone()
+    }
+}
+
 pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> DbResult<Vec<(T, SaturatedActor)>>
 where
     T: HasActor,
@@ -90,12 +96,11 @@ where
                         .clone(),
                 ),
                 DbActor::Footprint => SaturatedActor::Footprint,
-                DbActor::FirmEmployee{id} => SaturatedActor::FirmEmployee(
+                DbActor::FirmEmployee { id } => SaturatedActor::FirmEmployee(
                     tenant_users_map
                         .get(&id)
                         .ok_or(DbError::RelatedObjectNotFound)?
                         .clone(),
-
                 ),
             };
             Ok((ha, saturated_actor))

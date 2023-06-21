@@ -53,6 +53,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::WatchlistCheck(wc) => {
                 Self::WatchlistCheck(api_wire_types::WatchlistCheck::from_db(wc))
             }
+            SaturatedTimelineEvent::VaultCreated(actor) => Self::VaultCreated(api_wire_types::VaultCreated {
+                actor: api_wire_types::Actor::from_db(actor),
+            }),
         }
     }
 }

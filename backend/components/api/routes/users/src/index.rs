@@ -80,11 +80,12 @@ pub async fn post(
         return Err(TenantError::CannotProvideBodyAndIdempotencyId.into());
     }
 
+    let actor = auth.actor().into();
     let scoped_user = state
         .db_pool
         .db_transaction(|conn| -> ApiResult<_> {
             let (su, _) =
-                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0)?;
+                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0, actor)?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{TenantApiKeyId, TenantUserId};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq, Hash)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum DbActor {
