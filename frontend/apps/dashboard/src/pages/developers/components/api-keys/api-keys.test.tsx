@@ -1,6 +1,7 @@
 import {
   customRender,
   screen,
+  selectEvents,
   userEvent,
   waitFor,
   waitForElementToBeRemoved,
@@ -17,12 +18,17 @@ import {
   withApiKeysError,
   withCreateApiKeys,
   withCreateApiKeysError,
+  withRoles,
 } from './api-keys.test.config';
 
 describe('<ApiKeys />', () => {
   const renderDevelopers = () => {
     customRender(<ApiKeys />);
   };
+
+  beforeEach(() => {
+    withRoles();
+  });
 
   beforeAll(() => {
     asAdminUser();
@@ -131,6 +137,15 @@ describe('<ApiKeys />', () => {
         const input = screen.getByLabelText('Secret key name');
         await userEvent.type(input, keyName);
 
+        await waitFor(() => {
+          expect(
+            screen.queryByTestId('members-roles-loading'),
+          ).not.toBeInTheDocument();
+        });
+
+        const roleSelect = screen.getByRole('button', { name: 'Select role' });
+        await selectEvents.select(roleSelect, 'Admin');
+
         const submitButton = screen.getByRole('button', { name: 'Create' });
         await userEvent.click(submitButton);
 
@@ -165,6 +180,15 @@ describe('<ApiKeys />', () => {
 
         const input = screen.getByLabelText('Secret key name');
         await userEvent.type(input, keyName);
+
+        await waitFor(() => {
+          expect(
+            screen.queryByTestId('members-roles-loading'),
+          ).not.toBeInTheDocument();
+        });
+
+        const roleSelect = screen.getByRole('button', { name: 'Select role' });
+        await selectEvents.select(roleSelect, 'Admin');
 
         const submitButton = screen.getByRole('button', { name: 'Create' });
         await userEvent.click(submitButton);
