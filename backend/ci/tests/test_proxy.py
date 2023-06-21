@@ -1,6 +1,6 @@
 from tests.cert_fixtures import GOOGLE_CERT
 from tests.utils import _make_request
-from tests.auth import BaseAuth
+from tests.headers import BaseAuth
 from tests.utils import post, get, patch
 from tests.constants import ID_DATA
 import requests

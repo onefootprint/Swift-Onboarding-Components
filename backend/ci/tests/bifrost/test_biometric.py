@@ -3,7 +3,7 @@ import json
 from tests.constants import (
     TEST_URL,
 )
-from tests.auth import FpAuth, OnboardingSessionToken
+from tests.headers import FpAuth, OnboardingSessionToken
 from tests.bifrost_client import BifrostClient
 from tests.utils import (
     override_webauthn_attestation,

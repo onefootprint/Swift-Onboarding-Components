@@ -1,7 +1,11 @@
 import json
 import os
-from .auth import CustodianAuth
-from .image_fixtures import test_image_dl_front, test_image_dl_back, test_image_dl_selfie
+from .headers import CustodianAuth
+from .image_fixtures import (
+    test_image_dl_front,
+    test_image_dl_back,
+    test_image_dl_selfie,
+)
 from dotenv import load_dotenv
 
 load_dotenv()

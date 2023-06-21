@@ -7,7 +7,7 @@ from tests.utils import (
     create_basic_sandbox_user,
     create_ob_config,
 )
-from tests.auth import (
+from tests.headers import (
     PublishableOnboardingKey,
 )
 

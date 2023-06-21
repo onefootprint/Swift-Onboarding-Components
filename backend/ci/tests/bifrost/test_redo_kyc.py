@@ -1,5 +1,5 @@
 import pytest
-from tests.auth import FpAuth
+from tests.headers import FpAuth
 from tests.conftest import generate_real_phone_number
 from tests.utils import _gen_random_n_digit_number, post
 from tests.utils import (

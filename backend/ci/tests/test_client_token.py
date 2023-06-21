@@ -2,7 +2,7 @@ import pytest
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import post, patch
 from tests.dashboard.utils import latest_access_event_for
-from tests.auth import ClientTokenAuth
+from tests.headers import ClientTokenAuth
 
 
 def client_token_with_scopes(user, fields, scopes):

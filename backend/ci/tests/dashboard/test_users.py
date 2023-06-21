@@ -8,8 +8,8 @@ from tests.utils import (
     post,
     create_sandbox_user,
 )
-from tests.auth import (
-    DashboardAuthIsLive,
+from tests.headers import (
+    IsLive,
 )
 
 
@@ -260,7 +260,7 @@ def test_override_onboarding_decision(sandbox_user):
         f"entities/{sandbox_user.fp_id}/decisions",
         decision_data,
         tenant.auth_token,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
 
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
@@ -295,15 +295,15 @@ def test_get_annotations(sandbox_user):
         ),
         sandbox_user.tenant.sk.key,
         # `sandbox_user` creates a scoped sandbox_user that is is_live=false but the auths (tenant.sk.key, tenant.auth_token, workos_sandbox_tentnat.auth_token)
-        # all are auth.is_live() = true, so I think I need to pass this DashboardAuthIsLive struct on every request? seems weird
-        DashboardAuthIsLive("false"),
+        # all are auth.is_live() = true, so I think I need to pass this IsLive struct on every request? seems weird
+        IsLive("false"),
     )
 
     annotations = get(
         f"/entities/{sandbox_user.fp_id}/annotations",
         None,
         sandbox_user.tenant.sk.key,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
     annotations.sort(key=lambda x: x["timestamp"])
 
@@ -321,14 +321,14 @@ def test_get_annotations(sandbox_user):
             is_pinned=True,
         ),
         sandbox_user.tenant.auth_token,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
 
     annotations = get(
         f"/entities/{sandbox_user.fp_id}/annotations",
         None,
         sandbox_user.tenant.auth_token,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
     annotations.sort(key=lambda x: x["timestamp"])
 

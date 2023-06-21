@@ -1,7 +1,7 @@
 import json
 import time
 import pytest
-from tests.auth import BusinessOwnerAuth
+from tests.headers import BusinessOwnerAuth
 from tests.utils import (
     get,
     create_ob_config,

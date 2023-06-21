@@ -8,7 +8,7 @@ import time
 import os
 
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
-from tests.auth import DashboardAuth, FpAuth
+from tests.headers import DashboardAuth, FpAuth
 from tests.constants import (
     CUSTODIAN_AUTH,
     TEST_URL,

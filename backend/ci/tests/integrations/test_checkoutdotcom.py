@@ -1,4 +1,4 @@
-from tests.auth import ClientTokenAuth
+from tests.headers import ClientTokenAuth
 from tests.test_proxy import ProxyTokenAssignment, ProxyPathAndQuery
 from tests.utils import post, patch
 

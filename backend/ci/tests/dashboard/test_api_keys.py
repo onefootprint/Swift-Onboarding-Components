@@ -1,6 +1,6 @@
 import pytest
 from tests.types import SecretApiKey
-from tests.auth import DashboardAuthIsLive
+from tests.headers import IsLive
 from tests.utils import (
     get,
     post,
@@ -36,9 +36,7 @@ def test_api_key_limited_role(
     limited_role,
 ):
     data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post(
-        "org/api_keys", data, sandbox_tenant.auth_token, DashboardAuthIsLive("false")
-    )
+    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
     key_id = body["id"]
     key = SecretApiKey.from_response(body).key
 
@@ -61,7 +59,7 @@ def test_api_key_limited_role(
         f"org/api_keys/{key_id}",
         data,
         sandbox_tenant.auth_token,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
 
     # And now can do other actions with admin permissions
@@ -70,9 +68,7 @@ def test_api_key_limited_role(
 
 def test_deactivate_api_key_role(limited_role, sandbox_tenant):
     data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post(
-        "org/api_keys", data, sandbox_tenant.auth_token, DashboardAuthIsLive("false")
-    )
+    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
     key_id = body["id"]
 
     # Can't deactivate role with active API keys
@@ -90,7 +86,7 @@ def test_deactivate_api_key_role(limited_role, sandbox_tenant):
         f"org/api_keys/{key_id}",
         data,
         sandbox_tenant.auth_token,
-        DashboardAuthIsLive("false"),
+        IsLive("false"),
     )
 
     # Now we can deactivate the role

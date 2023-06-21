@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 from pyparsing import Any
-from tests.auth import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
+from tests.headers import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
 
 
 class SecretApiKey(NamedTuple):

@@ -1,5 +1,5 @@
 import pytest
-from tests.auth import DashboardAuthIsLive
+from tests.headers import IsLive
 from tests.utils import (
     get,
     post,
@@ -37,7 +37,7 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
         # Deactivate api keys using this role
         data = dict(role_ids=r_id, status="enabled")
         for is_live in ["true", "false"]:
-            is_live = DashboardAuthIsLive(is_live)
+            is_live = IsLive(is_live)
             api_keys = get("org/api_keys", data, sandbox_tenant.auth_token, is_live)
             for k in api_keys["data"]:
                 k_id = k["id"]

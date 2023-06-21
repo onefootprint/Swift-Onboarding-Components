@@ -1,5 +1,5 @@
 import pytest
-from tests.auth import DashboardAuthIsLive
+from tests.headers import IsLive
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 from tests.constants import FIXTURE_PHONE_NUMBER
@@ -13,7 +13,7 @@ from alpaca.broker.requests import (
     Identity,
     Disclosures,
     Agreement,
-    AccountDocument
+    AccountDocument,
 )
 from alpaca.broker.enums import AgreementType
 import datetime
@@ -25,12 +25,9 @@ ALPACA_SANDBOX_API_SECRET = "WBJf7VgZmE0oFBdFFCItK49p41jwpdLX9tcg9gsV"
 @pytest.fixture(scope="session")
 def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     return create_ob_config(
-        sandbox_tenant,
-        "Alpaca",
-        must_collect_data,
-        can_access_data,
-        "alpaca"
+        sandbox_tenant, "Alpaca", must_collect_data, can_access_data, "alpaca"
     )
+
 
 @pytest.mark.parametrize(
     "sandbox_suffix,expected_error",
@@ -38,18 +35,20 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
         ("pass", None),
         ("manualreview", None),
         ("stepup", None),
-        ("fail", "The entity must have an approved decision status")
+        ("fail", "The entity must have an approved decision status"),
     ],
 )
-def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error):
+def test_alpaca_cip(
+    sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error
+):
     # create a new user that has onboarded
     bifrost = BifrostClient(alpaca_kyc_ob_config, twilio, sandbox_suffix=sandbox_suffix)
     user = bifrost.run()
     d = user.client.data
-    
+
     review_annotation = None
     if sandbox_suffix == "stepup" or sandbox_suffix == "manualreview":
-        review_annotation = "Piip is very trustworthy" # extra annotation should not be included in the CIP response
+        review_annotation = "Piip is very trustworthy"  # extra annotation should not be included in the CIP response
 
     if review_annotation:
         # Check that the review_reasons are correctly populated in /entities for showing in the review UI
@@ -57,7 +56,7 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
             f"entities/{user.fp_id}",
             None,
             sandbox_tenant.auth_token,
-            DashboardAuthIsLive("false"),
+            IsLive("false"),
         )
         # Complete review
         post(
@@ -67,31 +66,41 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
                 status="pass",
             ),
             sandbox_tenant.auth_token,
-            DashboardAuthIsLive("false"),
+            IsLive("false"),
         )
         # Check that the timeline event for the completed review has correct review_reasons as well
         timeline = get(
             f"entities/{user.fp_id}/timeline",
             None,
             sandbox_tenant.auth_token,
-            DashboardAuthIsLive("false"),
+            IsLive("false"),
         )
         if sandbox_suffix == "stepup":
-            expected_review_reasons = [{
+            expected_review_reasons = [
+                {
                     "review_reason": "document",
-                    "canned_response": "Document identity verification was manually conducted and approved"
-                }]
+                    "canned_response": "Document identity verification was manually conducted and approved",
+                }
+            ]
         else:
-            expected_review_reasons = [{
+            expected_review_reasons = [
+                {
                     "review_reason": "adverse_media_hit",
-                    "canned_response": "Adverse media hit deemed non-detrimental"
+                    "canned_response": "Adverse media hit deemed non-detrimental",
                 },
                 {
                     "review_reason": "watchlist_hit",
-                    "canned_response": "Watchlist hit deemed low risk or false-positive"
-                }]
-        assert entities_body["onboarding"]["manual_review"]["review_reasons"] == expected_review_reasons
-        assert timeline[-1]["event"]["data"]["decision"]["manual_review"]["review_reasons"] == expected_review_reasons
+                    "canned_response": "Watchlist hit deemed low risk or false-positive",
+                },
+            ]
+        assert (
+            entities_body["onboarding"]["manual_review"]["review_reasons"]
+            == expected_review_reasons
+        )
+        assert (
+            timeline[-1]["event"]["data"]["decision"]["manual_review"]["review_reasons"]
+            == expected_review_reasons
+        )
 
     # create a new alpaca account
     broker_client = BrokerClient(ALPACA_SANDBOX_API_KEY, ALPACA_SANDBOX_API_SECRET)
@@ -103,14 +112,16 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
     if sandbox_suffix == "stepup":
         documents = []
         for side in ["front", "back", "selfie"]:
-         documents.append(AccountDocument(
-            id=uuid.uuid4(), # this shouldn't really be necessary but this python client doesn't list `id` as optional
-            document_type="identity_verification",
-            document_sub_type="drivers_license",
-            content=d[f"document.drivers_license.{side}"],
-            mime_type="image/png"
-        ))
-    
+            documents.append(
+                AccountDocument(
+                    id=uuid.uuid4(),  # this shouldn't really be necessary but this python client doesn't list `id` as optional
+                    document_type="identity_verification",
+                    document_sub_type="drivers_license",
+                    content=d[f"document.drivers_license.{side}"],
+                    mime_type="image/png",
+                )
+            )
+
     account = broker_client.create_account(
         CreateAccountRequest(
             contact=Contact(
@@ -171,9 +182,14 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
         "account_id": f"{account.id}",
         "default_approver": "bob@boberto.com",
     }
-    
+
     # send cip
-    body = post("integrations/alpaca/cip", alpaca_data, sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
+    body = post(
+        "integrations/alpaca/cip",
+        alpaca_data,
+        sandbox_tenant.sk.key,
+        status_code=200 if expected_error is None else 400,
+    )
     if expected_error:
         assert body["error"]["message"] == expected_error
     else:
@@ -190,18 +206,22 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
 
         expected_approved_reason = None
         if sandbox_suffix == "stepup":
-            expected_approved_reason = "Document identity verification was manually conducted and approved"
+            expected_approved_reason = (
+                "Document identity verification was manually conducted and approved"
+            )
         elif sandbox_suffix == "manualreview":
             expected_approved_reason = "Adverse media hit deemed non-detrimental. Watchlist hit deemed low risk or false-positive"
-        
+
         if expected_approved_reason:
-            assert body["alpaca_response"]["kyc"]["approved_reason"] == expected_approved_reason
+            assert (
+                body["alpaca_response"]["kyc"]["approved_reason"]
+                == expected_approved_reason
+            )
             # extra check that we aren't sending the internal/non-CR annotations in the CIP
             assert review_annotation not in str(body["alpaca_response"])
 
         # sanity check that we aren't accidently scrubbing PII in the alpaca CIP
         assert "SCRUBBED" not in str(body["alpaca_response"])
-
 
 
 # TODO: Test scenarios to add

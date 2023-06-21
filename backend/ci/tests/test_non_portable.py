@@ -1,6 +1,6 @@
 import pytest
 from tests.utils import post, get, patch, delete
-from tests.auth import IdempotencyId
+from tests.headers import IdempotencyId
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 
 
