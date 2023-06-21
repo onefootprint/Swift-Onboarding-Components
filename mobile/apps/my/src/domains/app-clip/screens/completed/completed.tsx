@@ -2,7 +2,6 @@ import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import { Container, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
-import { displayOverlay } from 'react-native-app-clip';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -13,7 +12,6 @@ const Completed = ({ authToken }) => {
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   useEffect(() => {
-    displayOverlay();
     updateD2PStatusMutation.mutate({
       authToken,
       status: D2PStatusUpdate.completed,
