@@ -1,5 +1,5 @@
 {
-  "name": "@onefootprint/idv",
+  "name": "@onefootprint/idv-elements",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,6 +12,9 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/ui": "*",
+    "@onefootprint/types": "*",
     "@onefootprint/test-utils": "*",
     "@types/lodash": "^4.14.194",
     "@types/react": "^18.0.37",
@@ -25,9 +28,7 @@
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
-    "@onefootprint/idv-elements": "*",
     "@onefootprint/styled": "*",
-    "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "lodash": "^4.17.21",
     "react-native-safe-area-context": "^4.5.1",

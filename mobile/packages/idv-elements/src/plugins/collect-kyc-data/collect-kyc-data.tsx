@@ -1,0 +1,17 @@
+import themes from '@onefootprint/design-tokens';
+import { Box, DesignSystemProvider, Typography } from '@onefootprint/ui';
+import React from 'react';
+
+const CollectKycData = () => {
+  return (
+    <DesignSystemProvider theme={themes.light}>
+      <Box center flex={1}>
+        <Typography variant="body-2">
+          Hello world from the CollectKycData!!
+        </Typography>
+      </Box>
+    </DesignSystemProvider>
+  );
+};
+
+export default CollectKycData;
