@@ -106,14 +106,18 @@ describe('<Idv />', () => {
     );
 
   describe('When onboarding with an existing user vault', () => {
+    const config = getKycOnboardingConfig(true);
+    const validationToken = 'validation-token';
+    const closeDelay = 6000;
+
+    beforeEach(() => {
+      withOnboarding(config);
+      withOnboardingConfig(config);
+      withOnboardingValidate(validationToken);
+    });
+
     describe('When onboarding to same config', () => {
       it('can one-click when given an auth token', async () => {
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
-        withOnboardingValidate(validationToken);
         withRequirements([], []);
 
         const onComplete = jest.fn();
@@ -135,17 +139,10 @@ describe('<Idv />', () => {
       });
 
       it('can onboard directly after identify if already authorized', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
-
         const onComplete = jest.fn();
         const onClose = jest.fn();
 
         withRequirements([], []);
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
 
         renderIdv({
           onComplete,
@@ -159,9 +156,6 @@ describe('<Idv />', () => {
       });
 
       it('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
         withUserToken();
         withIdentify(true);
         withRequirements(
@@ -185,9 +179,6 @@ describe('<Idv />', () => {
           [IdDI.ssn9]: '123-45-6789',
         });
         withUserVault();
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
         withAuthorize();
 
         const onComplete = jest.fn();
@@ -230,11 +221,14 @@ describe('<Idv />', () => {
     });
 
     describe('When onboarding to a new config', () => {
-      it('skips identify flow when provided an auth token', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
+      beforeEach(() => {
         withUserToken();
+        withUserVaultValidate();
+        withUserVault();
+        withAuthorize();
+      });
+
+      it('skips identify flow when provided an auth token', async () => {
         withIdentify();
         withRequirements();
 
@@ -248,9 +242,6 @@ describe('<Idv />', () => {
       });
 
       it('can onboard after identify, confirm and authorize', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
         withRequirements(
           [TestAuthorizeRequirement],
           [
@@ -265,18 +256,13 @@ describe('<Idv />', () => {
             },
           ],
         );
-        withUserToken();
+
         withDecrypt({
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
           [IdDI.dob]: '05/23/1996',
           [IdDI.ssn9]: '123-45-6789',
         });
-        withUserVault();
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
-        withAuthorize();
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -317,9 +303,6 @@ describe('<Idv />', () => {
       });
 
       it('can onboard after filling remaining missing attributes', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
         withRequirements(
           [
             {
@@ -334,17 +317,11 @@ describe('<Idv />', () => {
           ],
           [],
         );
-        withUserToken();
+
         withDecrypt({
           [IdDI.dob]: '05/23/1996',
           [IdDI.ssn9]: '123-45-6789',
         });
-        withUserVaultValidate();
-        withUserVault();
-        const validationToken = 'validation-token';
-        const closeDelay = 6000;
-        withOnboardingValidate(validationToken);
-        withAuthorize();
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -424,11 +401,13 @@ describe('<Idv />', () => {
 
   describe('When onboarding with a new user', () => {
     describe('When in sandbox onboarding config', () => {
-      it('starts flow on sandbox outcome page', async () => {
+      beforeEach(() => {
         const sandboxConfig = getKycOnboardingConfig();
         withOnboarding(sandboxConfig);
         withOnboardingConfig(sandboxConfig);
+      });
 
+      it('starts flow on sandbox outcome page', async () => {
         renderIdv({});
 
         await waitFor(() => {
@@ -440,10 +419,13 @@ describe('<Idv />', () => {
 
   describe('When there is bootstrap data', () => {
     describe('When there is partial bootstrap KYC data', () => {
-      it('collects missing data before confirm', async () => {
+      beforeEach(() => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
+      });
+
+      it('collects missing data before confirm', async () => {
         withRequirements(
           [
             {
@@ -490,10 +472,14 @@ describe('<Idv />', () => {
     });
 
     describe('When there is bootstrap and decrypted data', () => {
-      it('bootstrap data takes precendence over decryption', async () => {
+      beforeEach(() => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
+        withUserToken();
+        withIdentify(true);
+        withUserVaultValidate();
+        withUserVault();
         withRequirements(
           [
             {
@@ -508,13 +494,13 @@ describe('<Idv />', () => {
           ],
           [],
         );
-        withUserToken();
-        withIdentify(true);
+      });
+
+      it('bootstrap data takes precendence over decryption', async () => {
         withDecrypt({
           [IdDI.firstName]: 'SomeName',
           [IdDI.lastName]: 'OtherName',
         });
-        withUserVault();
 
         renderIdv({
           authToken: 'token',
@@ -530,31 +516,10 @@ describe('<Idv />', () => {
       });
 
       it('skips pages with bootstrap or decrypted data', async () => {
-        const config = getKycOnboardingConfig(true);
-        withOnboarding(config);
-        withOnboardingConfig(config);
-        withRequirements(
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              missingAttributes: [
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-              populatedAttributes: [CollectedKycDataOption.name],
-            },
-            TestAuthorizeRequirement,
-          ],
-          [],
-        );
-        withUserToken();
-        withIdentify(true);
         withDecrypt({
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
         });
-        withUserVaultValidate();
-        withUserVault();
 
         renderIdv({
           authToken: 'token',
@@ -582,16 +547,19 @@ describe('<Idv />', () => {
   });
 
   describe('When there is a step up', () => {
-    it('shows the id doc step up after authorize', async () => {
+    beforeEach(() => {
       const config = getKycOnboardingConfig(true);
       withOnboarding(config);
       withOnboardingConfig(config);
       withUserToken();
       withIdentify(true);
       withRequirements([TestAuthorizeRequirement], []);
+      withD2PGenerate();
       withOnboardingValidate('validation-token');
       withAuthorize();
+    });
 
+    it('shows the id doc step up after authorize', async () => {
       const onComplete = jest.fn();
       const onClose = jest.fn();
 
@@ -629,10 +597,15 @@ describe('<Idv />', () => {
   });
 
   describe('When on desktop', () => {
-    it('transfers when there is a liveness requirement', async () => {
+    beforeEach(() => {
       const config = getKycOnboardingConfig(true);
       withOnboarding(config);
       withOnboardingConfig(config);
+      withD2PGenerate();
+      withD2PStatus(D2PStatus.waiting);
+    });
+
+    it('transfers when there is a liveness requirement', async () => {
       withRequirements(
         [
           {
@@ -641,8 +614,6 @@ describe('<Idv />', () => {
         ],
         [],
       );
-      withD2PGenerate();
-      withD2PStatus(D2PStatus.inProgress);
 
       renderIdv({
         authToken: 'token',
@@ -654,9 +625,6 @@ describe('<Idv />', () => {
     });
 
     it('transfers when there is an id doc requirement', async () => {
-      const config = getKycOnboardingConfig(true);
-      withOnboarding(config);
-      withOnboardingConfig(config);
       withRequirements(
         [
           {
@@ -669,8 +637,6 @@ describe('<Idv />', () => {
         ],
         [],
       );
-      withD2PGenerate();
-      withD2PStatus(D2PStatus.waiting);
 
       renderIdv({
         authToken: 'token',
