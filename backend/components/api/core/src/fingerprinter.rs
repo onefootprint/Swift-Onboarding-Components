@@ -82,14 +82,8 @@ impl Fingerprinter for State {
 
 #[derive(Debug)]
 pub enum VaultIdentifier {
-    IdentifyId(IdentifyId),
+    IdentifyId(IdentifyId, Option<String>),
     AuthenticatedId(VaultId),
-}
-
-impl From<IdentifyId> for VaultIdentifier {
-    fn from(value: IdentifyId) -> Self {
-        Self::IdentifyId(value)
-    }
 }
 
 impl State {
@@ -102,7 +96,7 @@ impl State {
         t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
         let existing_user = match identifier {
-            VaultIdentifier::IdentifyId(id) => {
+            VaultIdentifier::IdentifyId(id, sandbox_id_from_header) => {
                 // Search via fingerprint
                 let (scopes, data, sandbox_id) = match id {
                     IdentifyId::PhoneNumber(phone_number) => (
@@ -124,6 +118,9 @@ impl State {
                         (!email.is_live()).then_some(email.suffix),
                     ),
                 };
+                // For now, default to the sandbox id provided inline in the phone or email,
+                // otherwise, default to the one provided via a header
+                let sandbox_id = sandbox_id.or(sandbox_id_from_header);
                 let fps: Vec<_> = scopes
                     .into_iter()
                     .flatten()

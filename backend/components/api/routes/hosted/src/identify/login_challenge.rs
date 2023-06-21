@@ -13,6 +13,7 @@ use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
+use api_core::utils::headers::SandboxId;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
@@ -45,6 +46,8 @@ pub async fn post(
     request: Json<AuthChallengeRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
+    // When provided, identifies only sandbox users with the suffix
+    sandbox_id: SandboxId,
     // When provided, is used to identify the currently authed user. Will generate a challenge
     // for the authed user
     user_auth: Option<UserAuthContext>,
@@ -63,7 +66,7 @@ pub async fn post(
             let user_auth = user_auth.check_guard(Any)?;
             VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
         }
-        (None, Some(id)) => id.into(),
+        (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
         (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
     };
 

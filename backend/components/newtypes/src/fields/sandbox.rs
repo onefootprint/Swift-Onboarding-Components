@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-pub(crate) fn validate_sandbox_suffix(s: &str) -> Result<(), crate::Error> {
+pub fn validate_sandbox_suffix(s: &str) -> Result<(), crate::Error> {
     // "sandbox suffix" must match [a-zA-Z0-9_]+
     let allowed_characters = HashSet::<char>::from_iter(['_']);
     if s.is_empty()

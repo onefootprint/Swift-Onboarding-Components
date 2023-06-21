@@ -5,7 +5,8 @@ use crate::utils::challenge::Challenge;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
-use newtypes::PhoneNumber;
+use api_core::utils::headers::SandboxId;
+use newtypes::{PhoneNumber, PiiString};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -29,10 +30,18 @@ pub async fn post(
     request: Json<SignupChallengeRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
+    // When provided, creates a sandbox user with the given suffix
+    sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
-    // clean phone number
     let SignupChallengeRequest { phone_number } = request.into_inner();
     let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
+    // TODO clean up when when sandbox_id no longer in phone number
+    let phone_number = if let Some(sandbox_id) = sandbox_id.0 {
+        let number = PiiString::new(format!("{}#{}", phone_number.e164().leak(), sandbox_id));
+        PhoneNumber::parse(number)?
+    } else {
+        phone_number
+    };
     let (challenge_state_data, time_before_retry_s) = state
         .twilio_client
         .send_challenge(&state, tenant_name, &phone_number)

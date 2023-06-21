@@ -12,6 +12,7 @@ use api_core::{
     },
     errors::challenge::ChallengeError,
     fingerprinter::VaultIdentifier,
+    utils::headers::SandboxId,
 };
 use api_wire_types::IdentifyRequest;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -36,6 +37,8 @@ pub async fn post(
     request: Json<IdentifyRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
+    // When provided, identifies only sandbox users with the suffix
+    sandbox_id: SandboxId,
     // When provided, is used to identify the currently authed user. Will generate a challenge
     // for the authed user
     user_auth: Option<UserAuthContext>,
@@ -48,7 +51,7 @@ pub async fn post(
             let user_auth = user_auth.check_guard(Any)?;
             VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
         }
-        (None, Some(id)) => id.into(),
+        (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
         (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
     };
 

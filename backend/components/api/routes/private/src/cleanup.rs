@@ -3,6 +3,8 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
 use api_core::errors::AssertionError;
+use api_core::fingerprinter::VaultIdentifier;
+use api_core::utils::headers::SandboxId;
 use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -31,6 +33,8 @@ async fn post(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,
     request: web::Json<Request>,
+    // When provided, identifies only sandbox users with the suffix
+    sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
     let Request { phone_number } = request.into_inner();
 
@@ -47,7 +51,8 @@ async fn post(
 
     // Use e164 with suffix to compute fingerprint
     let id = IdentifyId::PhoneNumber(phone_number);
-    let uv = state.find_vault(id.into(), None).await?;
+    let id = VaultIdentifier::IdentifyId(id, sandbox_id.0);
+    let uv = state.find_vault(id, None).await?;
 
     let user_vault_id = if let Some(uv) = uv {
         uv.id
