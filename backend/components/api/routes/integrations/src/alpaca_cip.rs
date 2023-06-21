@@ -97,7 +97,7 @@ async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<CipRequest> {
-    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres, document_collected) =
+    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres, collected_document) =
         state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
@@ -128,7 +128,7 @@ async fn create_cip_request(
                 };
 
                 let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-                let document_collected = DocumentRequest::get(conn, &sv.id)?.is_some();
+                let collected_document = DocumentRequest::get(conn, &sv.id)?.map(|d| d.should_collect_selfie);
                 let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 
@@ -154,7 +154,7 @@ async fn create_cip_request(
                     risk_signals,
                     insight,
                     vres,
-                    document_collected,
+                    collected_document,
                 ))
             })
             .await??;
@@ -212,13 +212,14 @@ async fn create_cip_request(
         mr.as_ref(),
     )?;
     let identity = identity(&scoped_vault, &onboarding, risk_signals);
-    let (document, photo) = if document_collected {
+    let (document, photo) = if let Some(collected_selfie) = collected_document {
         document_and_photo(
             scoped_vault.clone(),
             mr.as_ref(),
             &vendor_results,
             &vd,
             document_check_created_at,
+            collected_selfie,
         )?
     } else {
         (None, None)
@@ -456,6 +457,7 @@ fn document_and_photo(
     vendor_results: &[VendorResult],
     decrypted_data: &DecryptUncheckedResult,
     check_started_at: DateTime<Utc>,
+    expect_selfie: bool,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     // Validate wrt to mr.review_reasons
     if !mr
@@ -500,6 +502,7 @@ fn document_and_photo(
         ocr_response.clone(),
         score_response.clone(),
         incode_vault_data,
+        expect_selfie,
     )?;
 
     let document_result_helper = DocumentCipResultHelper::new(&frcs);

@@ -3619,6 +3619,7 @@ pub struct DocTestOpts {
     pub barcode_content: IncodeStatus,
     pub fake: IncodeStatus,
     pub ocr_confidence: IncodeStatus,
+    pub selfie_match: IncodeStatus,
 }
 impl Default for DocTestOpts {
     fn default() -> Self {
@@ -3633,6 +3634,7 @@ impl Default for DocTestOpts {
             barcode_content: IncodeStatus::Ok,
             fake: IncodeStatus::Ok,
             ocr_confidence: IncodeStatus::Ok,
+            selfie_match: IncodeStatus::Ok,
         }
     }
 }
@@ -3740,7 +3742,23 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
         "appliedRule": null
       },
       "liveness": null,
-      "faceRecognition": null,
+      "faceRecognition": {
+        "maskCheck": {
+          "value": "0.0",
+          "status": "OK"
+        },
+        "lensesCheck": {
+          "status": "OK"
+        },
+        "faceBrightness": {
+          "value": "128.6",
+          "status": "OK"
+        },
+        "overall": {
+          "value": "100.0",
+          "status": opts.selfie_match.to_string(),
+        }
+      },
       "idOcrConfidence": {
         "overallConfidence": {
           "value": "99.0",

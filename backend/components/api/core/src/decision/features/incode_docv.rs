@@ -34,15 +34,17 @@ impl FeatureSet for IncodeDocumentFeatures {
 pub fn footprint_reason_codes(
     ocr: FetchOCRResponse,
     scores: FetchScoresResponse,
-    vault_data: IncodeOcrComparisonDataFields, 
+    vault_data: IncodeOcrComparisonDataFields,
+    // not all documents collect will have selfie
+    expect_selfie: bool
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
-    let score_reason_codes = reason_codes_from_score_response(scores)?;
+    let score_reason_codes = reason_codes_from_score_response(scores, expect_selfie)?;
     let ocr_reason_codes = reason_codes_from_ocr_response(ocr, vault_data)?;
 
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
 
-fn reason_codes_from_score_response( scores: FetchScoresResponse,) -> Result<Vec<FootprintReasonCode>, idv::Error> {
+fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: bool) -> Result<Vec<FootprintReasonCode>, idv::Error> {
     let mut reason_codes = vec![];
     // Overall score
     // 
@@ -66,12 +68,26 @@ fn reason_codes_from_score_response( scores: FetchScoresResponse,) -> Result<Vec
         .id_ocr_confidence()
         .ok()
         .map(|s| s == IncodeStatus::Fail)
-        .unwrap_or(false)
+        .unwrap_or(false) 
     {
         reason_codes.push(FootprintReasonCode::DocumentOcrNotSuccessful);
     } else {
         reason_codes.push(FootprintReasonCode::DocumentOcrSuccessful);
     };
+    
+    // only populate reason code if we collected a selfie
+    if expect_selfie {
+        if scores.selfie_match()
+        .ok()
+        .map(|s| s == IncodeStatus::Fail)
+        .unwrap_or(false)
+        {
+            reason_codes.push(FootprintReasonCode::DocumentSelfieDoesNotMatch);
+        } else {
+            reason_codes.push(FootprintReasonCode::DocumentSelfieMatches);
+        }
+    }
+    
 
     scores
         .get_id_tests()
@@ -249,6 +265,7 @@ mod tests {
             barcode_content: Ok,
             fake: Ok,
             ocr_confidence: Ok,
+            selfie_match: Ok
         }, 
         vec![
             DocumentPhotoIsNotScreenCapture,
@@ -261,7 +278,8 @@ mod tests {
             DocumentBarcodeCouldBeRead,
             DocumentNotFakeImage,
             DocumentOcrSuccessful,
-        ]; "everything passes")]
+            DocumentSelfieMatches
+        ], true; "everything passes")]
         #[test_case(
             DocTestOpts {
                 screen: Fail,
@@ -274,6 +292,7 @@ mod tests {
                 barcode_content: Fail,
                 fake: Fail,
                 ocr_confidence: Fail,
+                selfie_match: Fail
             }, 
             vec![
                 DocumentPhotoIsScreenCapture,
@@ -285,8 +304,9 @@ mod tests {
                 DocumentBarcodeContentDoesNotMatch,
                 DocumentBarcodeCouldNotBeRead,
                 DocumentPossibleFakeImage,
-                DocumentOcrNotSuccessful
-            ]; "everything fails")]
+                DocumentOcrNotSuccessful,
+                DocumentSelfieDoesNotMatch
+            ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
                 screen: Ok,
@@ -299,6 +319,7 @@ mod tests {
                 barcode_content: Fail,
                 fake: Ok,
                 ocr_confidence: Ok,
+                selfie_match: Fail,
             }, 
             vec![
                 DocumentPhotoIsNotScreenCapture,
@@ -310,13 +331,41 @@ mod tests {
                 DocumentBarcodeContentDoesNotMatch,
                 DocumentBarcodeCouldNotBeRead,
                 DocumentNotFakeImage,
-                DocumentOcrSuccessful
-            ]; "mix of things")]
-    fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>) {
+                DocumentOcrSuccessful,
+                DocumentSelfieDoesNotMatch
+            ], true; "mix of things")]
+            #[test_case(
+                DocTestOpts {
+                    screen: Ok,
+                    paper: Ok,
+                    expiration: Ok,
+                    overall: Ok,
+                    tamper: Ok,
+                    visible_photo_features: Ok,
+                    barcode: Ok,
+                    barcode_content: Ok,
+                    fake: Ok,
+                    ocr_confidence: Ok,
+                    selfie_match: Ok
+                }, 
+                vec![
+                    DocumentPhotoIsNotScreenCapture,
+                    DocumentVisiblePhotoFeaturesVerified,
+                    DocumentPhotoIsNotPaperCapture,
+                    DocumentNoImageTampering,
+                    DocumentNotExpired,
+                    DocumentVerified,
+                    DocumentBarcodeContentMatches,
+                    DocumentBarcodeCouldBeRead,
+                    DocumentNotFakeImage,
+                    DocumentOcrSuccessful,
+                    // no selfie code
+                ], false; "everything passes, but selfie isn't collected")]  
+    fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(doc_opts);
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
 
-        assert_have_same_elements(super::reason_codes_from_score_response(parsed).unwrap(), expected)
+        assert_have_same_elements(super::reason_codes_from_score_response(parsed, expect_selfie).unwrap(), expected)
     }
 
     

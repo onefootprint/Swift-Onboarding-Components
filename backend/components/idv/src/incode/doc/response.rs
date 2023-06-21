@@ -66,7 +66,7 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 pub struct FetchScoresResponse {
     pub id_validation: Option<IdValidation>,
     pub liveness: Option<serde_json::Value>,
-    pub face_recognition: Option<serde_json::Value>,
+    pub face_recognition: Option<FaceRecognition>,
     pub id_ocr_confidence: Option<IdOcrConfidence>,
     pub overall: Option<IdTest>,
 
@@ -131,6 +131,17 @@ impl FetchScoresResponse {
             .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
             .ok_or(IncodeError::AssertionError("missing id confidence status".into()))
     }
+
+    pub fn selfie_match(&self) -> Result<IncodeStatus, IncodeError> {
+        self.face_recognition
+            .as_ref()
+            .and_then(|i| i.overall.as_ref())
+            .and_then(|o| o.status.as_ref())
+            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
+            .ok_or(IncodeError::AssertionError(
+                "missing face recognition status".into(),
+            ))
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -146,6 +157,26 @@ pub struct IdValidation {
 #[serde(rename_all = "camelCase")]
 pub struct IdOcrConfidence {
     pub overall_confidence: Option<IdTest>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FaceRecognition {
+    pub existing_user: Option<bool>,
+    // Session ID, in case the user, is approved in another session.,
+    pub existing_interview_id: Option<String>,
+    // External ID, in case the user, is approved in another session.,
+    pub existing_external_id: Option<String>,
+    // Shows info if the user was wearing a mask during selfie capture,
+    pub mask_check: Option<IdTest>,
+    pub face_brightness: Option<IdTest>,
+    pub lenses_check: Option<IdTest>,
+    // Shows if the name matches the previously used (only in case the user is already approved in another session),
+    pub name_match: Option<IdTest>,
+    // Specific rule from rule engine for faceValidation:,
+    pub applied_rule: Option<serde_json::Value>,
+    // Shows how much face from ID matches the selfie,
+    pub overall: Option<IdTest>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -449,6 +480,7 @@ mod tests {
 
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         assert_eq!(parsed.id_ocr_confidence().unwrap(), IncodeStatus::Ok);
+        assert_eq!(parsed.selfie_match().unwrap(), IncodeStatus::Ok);
         let parsed_tests = parsed.get_id_tests();
 
         // Check a few tests

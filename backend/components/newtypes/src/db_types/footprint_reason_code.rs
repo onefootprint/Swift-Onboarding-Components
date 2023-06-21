@@ -652,6 +652,14 @@ footprint_reason_code_enum! {
         #[note = "Document low match with selfie", severity = SignalSeverity::High,  description = "The match score between the customer's captured selfie image and captured document was low."]
         DocumentLowMatchScoreWithSelfie,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = Some(MatchLevel::Exact)]
+        #[note = "Document image matches selfie", severity = SignalSeverity::High,  description = "The image on the document matches the captured selfie."]
+        DocumentSelfieMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Document image does not match selfie", severity = SignalSeverity::High,  description = "The image on the document does not match the captured selfie."]
+        DocumentSelfieDoesNotMatch,
+
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document OCR name does not match input", severity = SignalSeverity::Medium,  description = "The OCR name does not match the name that was input."]
