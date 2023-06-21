@@ -1,8 +1,9 @@
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
 use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
+use idv::test_fixtures::DocTestOpts;
 use newtypes::incode::IncodeDocumentType;
 pub use start_onboarding::*;
 
@@ -46,7 +47,7 @@ use crate::decision::vendor::verification_result::encrypt_verification_result_re
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
 use crate::{ApiError, State};
-use db::models::verification_result::VerificationResult;
+use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
@@ -147,10 +148,7 @@ fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
 }
 
-pub async fn save_fixture_ocr(
-    state: &State,
-    scoped_vault_id: &ScopedVaultId,
-) -> ApiResult<serde_json::Value> {
+pub async fn save_incode_fixtures(state: &State, scoped_vault_id: &ScopedVaultId) -> ApiResult<()> {
     let suid = scoped_vault_id.clone();
     let suid2 = scoped_vault_id.clone();
     let (decision_intent, uvw): (DecisionIntent, TenantVw) = state
@@ -174,6 +172,7 @@ pub async fn save_fixture_ocr(
             ],
         )
         .await?;
+    let uv_public_key = uvw.vault.public_key.clone();
     let first_name = vd.rm(IdentityDataKind::FirstName)?;
     let last_name = vd.rm(IdentityDataKind::LastName)?;
     let dob = vd.rm(IdentityDataKind::Dob)?;
@@ -182,38 +181,64 @@ pub async fn save_fixture_ocr(
         .and_hms_milli_opt(0, 0, 0, 0)
         .map(|d| d.timestamp_millis());
 
-    let ocr = state
+    state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let request = VerificationRequest::bulk_create(
+            let requests = VerificationRequest::bulk_create(
                 conn,
                 suid2.clone(),
-                vec![VendorAPI::IncodeFetchOCR],
+                vec![VendorAPI::IncodeFetchOCR, VendorAPI::IncodeFetchScores],
                 &decision_intent.id,
-            )?
-            .pop()
-            .ok_or(ApiError::ResourceNotFound)?;
-            let raw_response = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
+            )?;
+
+            // Save OCR
+            let raw_ocr_response = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
                 Some(first_name),
                 Some(last_name),
                 date_of_birth_timestamp,
             );
-
-            // Verification result response is encrypted
-            let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
-            let e_response = vendor::verification_result::encrypt_verification_result_response(
-                &raw_response.clone().into(),
-                &uv.public_key,
+            let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
+                &raw_ocr_response.clone().into(),
+                &uv_public_key,
             )?;
 
-            let _result =
-                VerificationResult::create(conn, request.id, raw_response.clone().into(), e_response, false)?;
+            // save scores
+            let raw_score_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
+            let e_score_response = vendor::verification_result::encrypt_verification_result_response(
+                &raw_score_response.clone().into(),
+                &uv_public_key,
+            )?;
 
-            Ok(raw_response)
+            let new_vres = requests
+                .into_iter()
+                .map(move |r| {
+                    if r.vendor_api == VendorAPI::IncodeFetchOCR {
+                        NewVerificationResult {
+                            request_id: r.id,
+                            response: raw_ocr_response.clone().into(),
+                            timestamp: Utc::now(),
+                            e_response: Some(e_ocr_response.clone()),
+                            is_error: false,
+                        }
+                    } else {
+                        NewVerificationResult {
+                            request_id: r.id,
+                            response: raw_score_response.clone().into(),
+                            timestamp: Utc::now(),
+                            e_response: Some(e_score_response.clone()),
+                            is_error: false,
+                        }
+                    }
+                })
+                .collect();
+
+            let _result = VerificationResult::bulk_create(conn, new_vres)?;
+
+            Ok(())
         })
         .await?;
 
-    Ok(ocr)
+    Ok(())
 }
 
 /// Parses the IdDocKind from the response. Returns an Err IncodeFailureReason if we can't parse

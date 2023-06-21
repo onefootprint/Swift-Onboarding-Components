@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError};
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
     IncodeFailureReason, IncodeVerificationSessionKind, PiiString, ScrubbedPiiString,
@@ -289,6 +289,15 @@ impl FetchOCRResponse {
         ))?;
 
         Ok(PiiString::from(naive.format("%Y-%m-%d")))
+    }
+
+    pub fn age(&self) -> Result<i64, IncodeError> {
+        let dob = NaiveDate::parse_from_str(self.dob()?.leak(), "%Y-%m-%d")
+            .map_err(|_| IncodeError::OcrError("error parsing dob".into()))?;
+
+        let today = Utc::now().naive_utc().date();
+
+        Ok((today - dob).num_days() / 365)
     }
 
     #[allow(non_snake_case)]

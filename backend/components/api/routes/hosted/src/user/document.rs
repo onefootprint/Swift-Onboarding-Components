@@ -10,7 +10,7 @@ use api_core::auth::SessionContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::{DocCollected, WorkflowWrapper};
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use api_core::decision::vendor::incode::states::{save_fixture_ocr, Complete};
+use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
@@ -209,7 +209,7 @@ pub async fn post(
             .find(|s| missing_sides.contains(s));
         if next_side_to_collect.is_none() {
             // Save fixture VRes
-            save_fixture_ocr(&state, &user_auth.scoped_user.id.clone()).await?;
+            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone()).await?;
             advance_workflow_if_needed(&state, &user_auth).await?;
         }
         DocumentResponse {

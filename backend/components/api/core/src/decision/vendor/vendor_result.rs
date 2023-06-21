@@ -60,6 +60,12 @@ impl VendorResult {
             )
             .collect()
     }
+
+    pub fn vendor_api(&self) -> VendorAPI {
+        let parsed = &self.response.response;
+
+        parsed.into()
+    }
 }
 
 /// Not all

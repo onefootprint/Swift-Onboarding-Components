@@ -6,7 +6,7 @@ use newtypes::{
 
 use crate::decision::onboarding::FeatureSet;
 
-// This 
+
 pub struct IncodeOcrComparisonDataFields {
     pub first_name: PiiString,
     pub last_name: PiiString,

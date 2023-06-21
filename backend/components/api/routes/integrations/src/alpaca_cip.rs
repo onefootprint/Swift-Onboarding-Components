@@ -6,32 +6,42 @@ use alpaca::{
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     decision::{
-        self, field_validations::create_field_validation_results, vendor::vendor_result::VendorResult,
+        self,
+        features::{self, incode_docv::IncodeOcrComparisonDataFields},
+        field_validations::create_field_validation_results,
+        vendor::{
+            vendor_api::{
+                vendor_api_response::build_vendor_response_map_from_vendor_results,
+                vendor_api_struct::{vendor_api_enum_from_struct, IncodeFetchOCR, IncodeFetchScores},
+            },
+            vendor_result::VendorResult,
+        },
     },
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{TenantVw, VaultWrapper},
+    utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
     ApiError, State,
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse};
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        insight_event::InsightEvent, manual_review::ManualReview, onboarding::Onboarding,
-        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
-        verification_request::VerificationRequest, verification_result::VerificationResult,
+        document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
+        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest,
     },
-    DbError,
 };
 use idv::ParsedResponse;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, EncryptedVaultPrivateKey,
-    FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, PiiJsonValue, PiiString,
-    ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId, IdDocKind,
+    IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor,
+    VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
-use strum::IntoEnumIterator;
+use DataIdentifier::*;
+use DocumentKind::*;
+use IdentityDataKind::*;
 
 #[api_v2_operation(
     description = "Forward CIP information to Alpaca",
@@ -87,115 +97,82 @@ async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<CipRequest> {
-    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let obd = OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
+    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres, document_collected) =
+        state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let obd =
+                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
 
-            let (risk_signals, fp_obd, mr, manual_obd) = match obd {
-                Some(obd) => {
-                    let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?;
+                let (risk_signals, fp_obd, mr, manual_obd) = match obd {
+                    Some(obd) => {
+                        let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?;
 
-                    match obd.status {
-                        DecisionStatus::Pass => (risk_signals, obd, None, None),
-                        DecisionStatus::Fail | DecisionStatus::StepUp => {
-                            // footprint decided as fail, see if a manual decision override exists
-                            let (mr, obd_manual) = ManualReview::find_completed(conn, &obd.onboarding_id)?
-                                .ok_or(CipError::EntityDecisionStatusNotPass)?;
+                        match obd.status {
+                            DecisionStatus::Pass => (risk_signals, obd, None, None),
+                            DecisionStatus::Fail | DecisionStatus::StepUp => {
+                                // footprint decided as fail, see if a manual decision override exists
+                                let (mr, obd_manual) =
+                                    ManualReview::find_completed(conn, &obd.onboarding_id)?
+                                        .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
-                            if obd_manual.status != DecisionStatus::Pass {
-                                return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
+                                if obd_manual.status != DecisionStatus::Pass {
+                                    return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
+                                }
+
+                                (risk_signals, obd, Some(mr), Some(obd_manual))
                             }
-
-                            (risk_signals, obd, Some(mr), Some(obd_manual))
                         }
                     }
-                }
-                None => return Err(CipError::EntityDecisionDoesNotExist)?,
-            };
+                    None => return Err(CipError::EntityDecisionDoesNotExist)?,
+                };
 
-            let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
+                let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
+                let document_collected = DocumentRequest::get(conn, &sv.id)?.is_some();
+                let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+                let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 
-            let decision = manual_obd.unwrap_or(fp_obd);
+                let decision = manual_obd.unwrap_or(fp_obd);
 
-            // find the actor either via Manaul OBD or the FP OBD.
-            let actor = saturate_actors(conn, vec![decision.clone()])?
-                .pop()
-                .map(|(_, actor)| actor);
+                // find the actor either via Manaul OBD or the FP OBD.
+                let actor = saturate_actors(conn, vec![decision.clone()])?
+                    .pop()
+                    .map(|(_, actor)| actor);
 
-            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
-                conn,
-                sv.id.clone(),
-            )?;
+                let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
+                    conn,
+                    sv.id.clone(),
+                )?;
 
-            Ok((uvw, ob, decision, sv, actor, mr, risk_signals, insight, vres))
-        })
-        .await??;
+                Ok((
+                    uvw,
+                    ob,
+                    decision,
+                    sv,
+                    actor,
+                    mr,
+                    risk_signals,
+                    insight,
+                    vres,
+                    document_collected,
+                ))
+            })
+            .await??;
 
     let user_vault_private_key = uvw.vault.e_private_key.clone();
+    let document_check_created_at = vres
+        .iter()
+        .find(|(r, _)| r.vendor_api == VendorAPI::IncodeFetchScores)
+        .map(|(r, _)| r._created_at)
+        .unwrap_or(Utc::now());
+
     let vendor_results = VendorResult::from_verification_results_for_onboarding(
         vres,
         &state.enclave_client,
         &user_vault_private_key,
     )
     .await?;
-
-    // build the cip object components
-    let kyc = kyc(
-        state,
-        &scoped_vault,
-        uvw,
-        &onboarding,
-        decision,
-        insight,
-        actor,
-        default_approver,
-        mr.as_ref(),
-    )
-    .await?;
-    let watchlist = watchlist(
-        &scoped_vault,
-        &onboarding,
-        &risk_signals,
-        &vendor_results,
-        mr.as_ref(),
-    )?;
-    let identity = identity(&scoped_vault, &onboarding, risk_signals);
-    let (document, photo) =
-        document_and_photo(state, scoped_vault.clone(), &user_vault_private_key, mr.as_ref()).await?;
-
-    let cip = CipRequest {
-        provider_name: vec![alpaca::Provider::Footprint],
-        kyc,
-        watchlist,
-        identity,
-        document,
-        photo,
-    };
-
-    Ok(cip)
-}
-
-/// helper for building the kyc data
-#[allow(clippy::too_many_arguments)]
-async fn kyc(
-    state: &State,
-    scoped_vault: &ScopedVault,
-    uvw: TenantVw,
-    onboarding: &Onboarding,
-    decision: OnboardingDecision,
-    insight: InsightEvent,
-    actor: Option<SaturatedActor>,
-    default_approver: PiiString,
-    mr: Option<&ManualReview>,
-) -> ApiResult<alpaca::Kyc> {
-    use DataIdentifier::*;
-    use DocumentKind::*;
-    use IdentityDataKind::*;
-
-    let mut vd = uvw
+    let vd = uvw
         .decrypt_unchecked(
             &state.enclave_client,
             &[
@@ -216,6 +193,61 @@ async fn kyc(
         )
         .await?;
 
+    // build the cip object components
+    let kyc = kyc(
+        &scoped_vault,
+        &onboarding,
+        decision,
+        insight,
+        actor,
+        default_approver,
+        mr.as_ref(),
+        &vd,
+    )?;
+    let watchlist = watchlist(
+        &scoped_vault,
+        &onboarding,
+        &risk_signals,
+        &vendor_results,
+        mr.as_ref(),
+    )?;
+    let identity = identity(&scoped_vault, &onboarding, risk_signals);
+    let (document, photo) = if document_collected {
+        document_and_photo(
+            scoped_vault.clone(),
+            mr.as_ref(),
+            &vendor_results,
+            &vd,
+            document_check_created_at,
+        )?
+    } else {
+        (None, None)
+    };
+
+    let cip = CipRequest {
+        provider_name: vec![alpaca::Provider::Footprint],
+        kyc,
+        watchlist,
+        identity,
+        document,
+        photo,
+    };
+
+    Ok(cip)
+}
+
+/// helper for building the kyc data
+#[allow(clippy::too_many_arguments)]
+fn kyc(
+    scoped_vault: &ScopedVault,
+    onboarding: &Onboarding,
+    decision: OnboardingDecision,
+    insight: InsightEvent,
+    actor: Option<SaturatedActor>,
+    default_approver: PiiString,
+    mr: Option<&ManualReview>,
+    decrypted_data: &DecryptUncheckedResult,
+) -> ApiResult<alpaca::Kyc> {
     // find the right approver
     let approved_by = actor
         .and_then(|a| match a {
@@ -243,22 +275,26 @@ async fn kyc(
     // find a gov't id number if we have one
     let id_number = vec![PassportNumber, IdCardNumber, DriversLicenseDob]
         .into_iter()
-        .flat_map(|id| vd.rm(id).ok())
+        .flat_map(|id| decrypted_data.get(id).ok())
         .next();
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
-        applicant_name: format_pii!("{} {}", vd.rm(FirstName)?, vd.rm(LastName)?),
-        email_address: vd.rm(Email)?,
-        nationality: vd.rm(Nationality)?,
-        date_of_birth: vd.rm(Dob)?,
-        address: if let Ok(address2) = vd.rm(AddressLine2) {
-            format_pii!("{} {}", vd.rm(AddressLine1)?, address2)
+        applicant_name: format_pii!(
+            "{} {}",
+            decrypted_data.get(FirstName)?,
+            decrypted_data.get(LastName)?
+        ),
+        email_address: decrypted_data.get(Email)?,
+        nationality: decrypted_data.get(Nationality)?,
+        date_of_birth: decrypted_data.get(Dob)?,
+        address: if let Ok(address2) = decrypted_data.get(AddressLine2) {
+            format_pii!("{} {}", decrypted_data.get(AddressLine1)?, address2)
         } else {
-            vd.rm(AddressLine1)?
+            decrypted_data.get(AddressLine1)?
         },
-        postal_code: vd.rm(Zip)?,
-        country_of_residency: vd.rm(Country)?,
+        postal_code: decrypted_data.get(Zip)?,
+        country_of_residency: decrypted_data.get(Country)?,
         kyc_completed_at: onboarding.decision_made_at,
         ip_address: pii!(insight.ip_address.unwrap_or("0.0.0.0".into())),
         check_initiated_at: onboarding.authorized_at,
@@ -414,31 +450,13 @@ fn watchlist(
     })
 }
 
-async fn document_and_photo(
-    state: &State,
+fn document_and_photo(
     scoped_vault: ScopedVault,
-    user_vault_private_key: &EncryptedVaultPrivateKey,
     mr: Option<&ManualReview>,
+    vendor_results: &[VendorResult],
+    decrypted_data: &DecryptUncheckedResult,
+    check_started_at: DateTime<Utc>,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
-    let su_id = scoped_vault.id.clone();
-    let incode_doc_apis: Vec<VendorAPI> = VendorAPI::iter().filter(|v| v.is_incode_doc_flow_api()).collect();
-    let incode_results: Vec<(VerificationRequest, Option<VerificationResult>)> = state
-        .db_pool
-        .db_query(
-            move |conn| -> Result<Vec<(VerificationRequest, Option<VerificationResult>)>, DbError> {
-                VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, su_id)
-            },
-        )
-        .await??
-        .into_iter()
-        .filter(|(req, _)| incode_doc_apis.contains(&req.vendor_api))
-        .collect();
-
-    if incode_results.is_empty() {
-        // nothing to do here if we haven't collected a doc
-        return Ok((None, None));
-    }
-
     // Validate wrt to mr.review_reasons
     if !mr
         .map(|r| r.review_reasons.contains(&ReviewReason::Document))
@@ -447,43 +465,52 @@ async fn document_and_photo(
         Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::Document))?
     }
 
-    // pick a reasonable timestamp
-    let score_request_created_at = incode_results
-        .iter()
-        .find(|(r, _)| r.vendor_api == VendorAPI::IncodeFetchScores)
-        .map(|(r, _)| r._created_at)
-        .unwrap_or(Utc::now());
+    let vendor_map = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let ocr_api = IncodeFetchOCR;
+    let scores_api = IncodeFetchScores;
+    let ocr_response = vendor_map
+        .get(&ocr_api)
+        .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+            ocr_api,
+        )))?;
+    let score_response = vendor_map
+        .get(&scores_api)
+        .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+            scores_api,
+        )))?;
 
-    let incode_results =
-        crate::decision::vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
-            incode_results,
-            &state.enclave_client,
-            user_vault_private_key,
-        )
-        .await?;
-
-    let ParsedResponse::IncodeFetchOCR(ocr) = incode_results
-        .iter()
-        .find(|pr| matches!(pr.response.response, ParsedResponse::IncodeFetchOCR(_)))
-        .ok_or(DbError::ObjectNotFound)?
-        .response
-        .response
-        .to_owned() else {
-            return Err(ApiError::AssertionError("ocr not found".into()))
-        };
-
-    let ocr_name = ok_or(ocr.name.as_ref(), "missing ocr name".into())?;
-    let type_of_id = ocr.type_of_id.as_ref().ok_or_else(|| {
+    let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
+    let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
         idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
     })?;
     let document_type = IdDocKind::try_from(type_of_id)?.into();
-    let dob = ocr.dob().map_err(|e| ApiError::from(idv::Error::from(e)))?;
+    let dob = ocr_response
+        .dob()
+        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+    let over_18_check = ocr_response.age().map_err(idv::Error::from)? >= 18;
+
+    // Construct all of the breakdown fields
+    // TODO: load these once FRC<>VRes migration is done
+    let incode_vault_data = IncodeOcrComparisonDataFields {
+        first_name: decrypted_data.get(FirstName)?,
+        last_name: decrypted_data.get(LastName)?,
+        dob: decrypted_data.get(Dob)?,
+    };
+    let frcs = features::incode_docv::footprint_reason_codes(
+        ocr_response.clone(),
+        score_response.clone(),
+        incode_vault_data,
+    )?;
+
+    let document_result_helper = DocumentCipResultHelper::new(&frcs);
+    let (data_comparison_overall, data_comparison_breakdown) = document_result_helper.data_comparison();
+    let (image_integrity_overall, image_integrity_breakdown) = document_result_helper.image_integrity();
 
     let document_photo_id = alpaca::DocumentPhotoId {
         id: scoped_vault.fp_id.clone(),
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
-        created_at: score_request_created_at,
+        created_at: check_started_at,
         first_name: ok_or(
             ocr_name.first_name.as_ref().map(|p| PiiString::from(p.clone())),
             "first name missing".into(),
@@ -493,53 +520,35 @@ async fn document_and_photo(
             "last name missing".into(),
         )?,
         gender: ok_or(
-            ocr.gender.as_ref().map(|p| (**p).clone()),
+            ocr_response.gender.as_ref().map(|p| (**p).clone()),
             "missing gender".into(),
         )?,
         date_of_birth: dob,
-        date_of_expiry: ocr
+        date_of_expiry: ocr_response
             .expiration_date()
             .map_err(|e| ApiError::from(idv::Error::from(e)))?,
         issuing_country: ok_or(
-            ocr.issuing_country.map(|p| (*p).clone()),
+            ocr_response.issuing_country.as_ref().map(|p| (*p).clone().into()),
             "missing issuing_country".into(),
         )?,
         document_numbers: vec![ok_or(
-            ocr.document_number.map(|p| (*p).clone()),
+            ocr_response.document_number.as_ref().map(|p| (*p).clone().into()),
             "missing document_number".into(),
         )?],
         document_type,
-        // TODO: FP-4427 these should all be computed from actual response
-        age_validation: CipResult::Clear,
-        data_comparison: CipResult::Clear,
-        data_comparison_breakdown: DataComparsionBreakDown {
-            first_name: CipResult::Clear,
-            last_name: CipResult::Clear,
-            date_of_birth: CipResult::Clear,
-            address: Some(CipResult::Clear),
-        },
-        image_integrity: CipResult::Clear,
-        image_integrity_breakdown: ImageIntegrityBreakdown {
-            image_quality: CipResult::Clear,
-            supported_document: CipResult::Clear,
-            colour_picture: None,
-            conclusive_document_quality: None,
-        },
-        visual_authenticity: VisualAuthenticity {
-            digital_tampering: CipResult::Clear,
-            face_detection: CipResult::Clear,
-            fonts: CipResult::Clear,
-            picture_face_integrity: CipResult::Clear,
-            security_features: CipResult::Clear,
-            template: CipResult::Clear,
-        },
+        age_validation: CipResult::clear(over_18_check),
+        data_comparison: data_comparison_overall,
+        data_comparison_breakdown,
+        image_integrity: image_integrity_overall,
+        image_integrity_breakdown,
+        visual_authenticity: document_result_helper.visual_authenticity(),
     };
-
+    // TODO (FP-4620)
     let photo_selfie = alpaca::PhotoSelfie {
-        id: scoped_vault.fp_id.clone(),
+        id: scoped_vault.fp_id,
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
-        created_at: score_request_created_at,
+        created_at: check_started_at,
         face_comparison: CipResult::Clear,
         image_integrity: CipResult::Clear,
         visual_authenticity: CipResult::Clear,
@@ -552,4 +561,88 @@ fn ok_or<T>(o: Option<T>, assert_msg: String) -> ApiResult<T> {
     let unwrapped = o.ok_or(ApiError::AssertionError(assert_msg))?;
 
     Ok(unwrapped)
+}
+
+struct DocumentCipResultHelper<'a> {
+    frcs: &'a [FootprintReasonCode],
+}
+
+impl<'a> DocumentCipResultHelper<'a> {
+    fn new(frcs: &'a [FootprintReasonCode]) -> Self {
+        Self { frcs }
+    }
+
+    fn data_comparison(&self) -> (CipResult, DataComparsionBreakDown) {
+        let first = CipResult::clear(
+            self.frcs
+                .contains(&FootprintReasonCode::DocumentOcrFirstNameMatches),
+        );
+
+        let last = CipResult::clear(
+            self.frcs
+                .contains(&FootprintReasonCode::DocumentOcrLastNameMatches),
+        );
+
+        let dob = CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentOcrDobMatches));
+
+        let any_consider = vec![first, last, dob]
+            .iter()
+            .any(|r| matches!(r, CipResult::Consider));
+        let overall_result = CipResult::clear(!any_consider);
+        (
+            overall_result,
+            DataComparsionBreakDown {
+                first_name: first,
+                last_name: last,
+                date_of_birth: dob,
+                // TODO (FP-4619)
+                address: Some(CipResult::Consider),
+            },
+        )
+    }
+
+    fn image_integrity(&self) -> (CipResult, ImageIntegrityBreakdown) {
+        // TODO: this isn't quite right, but prob need to parse a few of the id tests to get this exactly
+        let image_quality = CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified));
+        // we error upstream if not
+        let supported_document = CipResult::Clear;
+
+        let any_consider = vec![image_quality, supported_document]
+            .iter()
+            .any(|r| matches!(r, CipResult::Consider));
+
+        let overall_result = CipResult::clear(!any_consider);
+
+        (
+            overall_result,
+            ImageIntegrityBreakdown {
+                image_quality,
+                supported_document,
+                // Incode doesn't have a test for this directly
+                colour_picture: None,
+                // redundant to image quality
+                conclusive_document_quality: Some(image_quality),
+            },
+        )
+    }
+
+    fn visual_authenticity(&self) -> VisualAuthenticity {
+        VisualAuthenticity {
+            // postitcheck is actually what we want but /shrug
+            digital_tampering: CipResult::clear(
+                self.frcs.contains(&FootprintReasonCode::DocumentNotFakeImage),
+            ),
+            face_detection: CipResult::clear(
+                self.frcs
+                    .contains(&FootprintReasonCode::DocumentVisiblePhotoFeaturesVerified),
+            ),
+            // Incode doesn't have a test for these directly, all bundled into the score
+            fonts: CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified)),
+            picture_face_integrity: CipResult::clear(
+                self.frcs.contains(&FootprintReasonCode::DocumentVerified),
+            ),
+            security_features: CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified)),
+            template: CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified)),
+        }
+    }
 }

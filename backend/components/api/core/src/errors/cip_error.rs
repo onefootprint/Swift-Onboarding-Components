@@ -1,4 +1,4 @@
-use newtypes::ReviewReason;
+use newtypes::{ReviewReason, VendorAPI};
 use reqwest::StatusCode;
 
 #[derive(Debug, thiserror::Error)]
@@ -20,6 +20,8 @@ pub enum CipError {
 
     #[error("Expected ReviewReason but not found: {0}")]
     ExpectedReviewReasonNotFound(ReviewReason),
+    #[error("Expected VerificationResult not found for: {0}")]
+    VerificationResultNotFound(VendorAPI),
 }
 
 impl CipError {
@@ -30,7 +32,8 @@ impl CipError {
             | CipError::EntityDecisionStatusNotPass => StatusCode::BAD_REQUEST,
             CipError::AlpacaError(_)
             | CipError::WatchlistResultsNotFoundError
-            | CipError::ExpectedReviewReasonNotFound(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | CipError::ExpectedReviewReasonNotFound(_)
+            | CipError::VerificationResultNotFound(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

@@ -292,10 +292,10 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeAddBack {
     type Value = AddSideResponse;
 }
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeProcessId {
-    type Value = FetchScoresResponse;
+    type Value = ProcessIdResponse;
 }
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeFetchScores {
-    type Value = ProcessIdResponse;
+    type Value = FetchScoresResponse;
 }
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeAddPrivacyConsent {
     type Value = AddConsentResponse;

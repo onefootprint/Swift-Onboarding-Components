@@ -97,4 +97,9 @@ impl From<WrappedVendorAPI> for VendorAPI {
     }
 }
 
+pub fn vendor_api_enum_from_struct(s: impl Into<WrappedVendorAPI>) -> VendorAPI {
+    let w: WrappedVendorAPI = s.into();
+    w.into()
+}
+
 pub use vendor_api_struct::*;

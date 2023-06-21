@@ -12,6 +12,7 @@ mod build;
 mod create;
 #[allow(dead_code)]
 mod decrypt;
+pub use decrypt::DecryptUncheckedResult;
 mod tenant;
 mod vw_data;
 mod writeable;

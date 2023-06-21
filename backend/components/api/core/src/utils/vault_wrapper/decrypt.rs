@@ -34,6 +34,14 @@ impl DecryptUncheckedResult {
             .remove(&di)
             .ok_or(ApiError::MissingRequiredEntityData(di))
     }
+
+    pub fn get<D: Into<DataIdentifier>>(&self, di: D) -> ApiResult<PiiString> {
+        let di = di.into();
+        self.results
+            .get(&di)
+            .cloned()
+            .ok_or(ApiError::MissingRequiredEntityData(di))
+    }
 }
 
 impl<Type> VaultWrapper<Type> {
