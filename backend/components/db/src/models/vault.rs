@@ -9,8 +9,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, OnboardingId, ScopedVaultId,
-    TenantId, VaultId, VaultKind, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, OnboardingId, SandboxId,
+    ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -38,7 +38,7 @@ pub struct Vault {
     /// The sandbox identifier for this vault. Must be provided for vaults where is_live = false.
     /// The sandbox identifier helps to differentiate multiple sandbox vaults made with the same
     /// phone number / email.
-    pub sandbox_id: Option<String>,
+    pub sandbox_id: Option<SandboxId>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -233,7 +233,7 @@ impl Vault {
     pub fn find_portable(
         conn: &mut PgConn,
         sh_data: &[Fingerprint],
-        sandbox_id: Option<String>,
+        sandbox_id: Option<SandboxId>,
     ) -> DbResult<Option<Vault>> {
         use crate::schema::{data_lifetime, fingerprint};
 
@@ -285,7 +285,7 @@ struct NewVaultRow {
     kind: VaultKind,
     is_fixture: IsFixture,
     idempotency_id: Option<IdempotencyId>,
-    sandbox_id: Option<String>,
+    sandbox_id: Option<SandboxId>,
 }
 
 pub struct NewVaultArgs {
@@ -295,5 +295,5 @@ pub struct NewVaultArgs {
     pub is_portable: bool,
     pub kind: VaultKind,
     pub is_fixture: IsFixture,
-    pub sandbox_id: Option<String>,
+    pub sandbox_id: Option<SandboxId>,
 }

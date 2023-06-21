@@ -29,7 +29,7 @@ use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
-    PhoneNumber, SessionAuthToken, VaultId, VaultPublicKey,
+    PhoneNumber, SandboxId, SessionAuthToken, VaultId, VaultPublicKey,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -264,7 +264,8 @@ fn validate_sms_challenge(
     .into_iter()
     .flatten()
     .collect_vec();
-    let sandbox_id = (!context.phone_number.is_live()).then_some(context.phone_number.sandbox_suffix);
+    let sandbox_id =
+        (!context.phone_number.is_live()).then_some(SandboxId::from(context.phone_number.sandbox_suffix));
     let existing_user = Vault::find_portable(conn, &fps_to_search, sandbox_id)?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),

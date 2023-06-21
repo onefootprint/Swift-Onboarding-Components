@@ -2,7 +2,7 @@ use super::fixtures;
 use crate::models::{data_lifetime::DataLifetime, vault::Vault};
 use crate::tests::prelude::*;
 use macros::db_test_case;
-use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK};
+use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, SandboxId};
 
 #[db_test_case(false, false => false; "cant-find-speculative")]
 #[db_test_case(true, false => true; "can-find-portablized-active")]
@@ -38,7 +38,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     let inverse_sandbox_id = if uv.sandbox_id.is_some() {
         None
     } else {
-        Some("FLERP".to_owned())
+        Some(SandboxId::from("FLERP".to_owned()))
     };
     assert!(
         Vault::find_portable(conn, &[fingerprint.clone()], inverse_sandbox_id)

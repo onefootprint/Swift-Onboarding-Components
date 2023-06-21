@@ -11,7 +11,7 @@ use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::{
     DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, PhoneNumber,
-    SealedVaultBytes,
+    SandboxId, SealedVaultBytes,
 };
 use newtypes::{IdentityDataKind as IDK, PiiString, VaultKind};
 use newtypes::{Locked, ValidateArgs};
@@ -53,7 +53,7 @@ impl VaultWrapper<Person> {
             kind: VaultKind::Person,
             is_fixture: phone_number_parsed.is_fixture_phone_number(),
             sandbox_id: (!phone_number_parsed.is_live())
-                .then_some(phone_number_parsed.sandbox_suffix.clone()),
+                .then_some(SandboxId::from(phone_number_parsed.sandbox_suffix.clone())),
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;

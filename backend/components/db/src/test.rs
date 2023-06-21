@@ -78,7 +78,7 @@ mod test {
     use crate::{test_helpers, DbResult};
     use diesel::sql_types::Text;
     use diesel::{sql_query, RunQueryDsl};
-    use newtypes::{EncryptedVaultPrivateKey, VaultKind, VaultPublicKey};
+    use newtypes::{EncryptedVaultPrivateKey, SandboxId, VaultKind, VaultPublicKey};
 
     #[actix_rt::test]
     async fn test_db() {
@@ -110,7 +110,7 @@ mod test {
             is_portable: true,
             kind: VaultKind::Person,
             is_fixture: false,
-            sandbox_id: Some("12345".into()),
+            sandbox_id: Some(SandboxId::new()),
         };
         pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();

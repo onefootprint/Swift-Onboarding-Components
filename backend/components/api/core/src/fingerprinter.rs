@@ -10,6 +10,7 @@ use newtypes::{
 };
 
 use crate::{errors::kms::KmsSignError, ApiError, State};
+use newtypes::SandboxId;
 
 /// Deprecated: old signed hash method using KMS directly
 /// replaced by hmac signing in the enclave
@@ -82,7 +83,7 @@ impl Fingerprinter for State {
 
 #[derive(Debug)]
 pub enum VaultIdentifier {
-    IdentifyId(IdentifyId, Option<String>),
+    IdentifyId(IdentifyId, Option<SandboxId>),
     AuthenticatedId(VaultId),
 }
 
@@ -107,7 +108,7 @@ impl State {
                             }),
                         ],
                         phone_number.e164(),
-                        (!phone_number.is_live()).then_some(phone_number.sandbox_suffix),
+                        (!phone_number.is_live()).then_some(SandboxId::from(phone_number.sandbox_suffix)),
                     ),
                     IdentifyId::Email(email) => (
                         vec![
@@ -115,7 +116,7 @@ impl State {
                             t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
                         ],
                         email.email.clone(),
-                        (!email.is_live()).then_some(email.suffix),
+                        (!email.is_live()).then_some(SandboxId::from(email.suffix)),
                     ),
                 };
                 // For now, default to the sandbox id provided inline in the phone or email,

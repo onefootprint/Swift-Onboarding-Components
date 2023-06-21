@@ -1,4 +1,4 @@
-use newtypes::{EncryptedVaultPrivateKey, Locked, VaultKind, VaultPublicKey};
+use newtypes::{EncryptedVaultPrivateKey, Locked, SandboxId, VaultKind, VaultPublicKey};
 
 use crate::{
     models::vault::{NewVaultArgs, Vault},
@@ -21,7 +21,7 @@ pub fn new_vault_args(kind: VaultKind, sandbox_id: Option<String>, is_portable: 
         e_private_key: EncryptedVaultPrivateKey(e_private_key_bytes),
         public_key: VaultPublicKey::from_raw_uncompressed(&public_key_bytes).unwrap(),
         is_live: sandbox_id.is_none(),
-        sandbox_id,
+        sandbox_id: sandbox_id.map(SandboxId::from),
         is_portable,
         kind,
         is_fixture: false,

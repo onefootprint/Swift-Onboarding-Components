@@ -27,6 +27,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
+use newtypes::SandboxId;
 use newtypes::ValidateArgs;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
@@ -57,7 +58,7 @@ pub async fn post(
         kind: VaultKind::Person,
         is_fixture: false,
         // TODO allow providing sandbox ID in a header
-        sandbox_id: (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10)),
+        sandbox_id: (!is_live).then(SandboxId::new),
     };
 
     // Parse optional request

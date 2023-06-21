@@ -1,16 +1,24 @@
 use std::collections::HashSet;
 
-pub fn validate_sandbox_suffix(s: &str) -> Result<(), crate::Error> {
-    // "sandbox suffix" must match [a-zA-Z0-9_]+
-    let allowed_characters = HashSet::<char>::from_iter(['_']);
-    if s.is_empty()
-        || !s
-            .chars()
-            .all(|x| x.is_alphanumeric() || allowed_characters.contains(&x))
-    {
-        return Err(crate::Error::InvalidSandboxSuffix);
+use crate::SandboxId;
+
+impl SandboxId {
+    pub fn new() -> Self {
+        Self::from(crypto::random::gen_random_alphanumeric_code(10))
     }
-    Ok(())
+
+    pub fn parse(s: &str) -> Result<Self, crate::Error> {
+        // "sandbox suffix" must match [a-zA-Z0-9_]+
+        let allowed_characters = HashSet::<char>::from_iter(['_']);
+        if s.is_empty()
+            || !s
+                .chars()
+                .all(|x| x.is_alphanumeric() || allowed_characters.contains(&x))
+        {
+            return Err(crate::Error::InvalidSandboxSuffix);
+        }
+        Ok(SandboxId::from(s.to_string()))
+    }
 }
 
 pub(crate) fn split_sandbox_parts(s: &str) -> Result<(&str, &str), crate::Error> {
@@ -19,7 +27,7 @@ pub(crate) fn split_sandbox_parts(s: &str) -> Result<(&str, &str), crate::Error>
         if split.len() != 2 {
             return Err(crate::Error::InvalidSandboxSuffix);
         }
-        validate_sandbox_suffix(split[1])?;
+        SandboxId::parse(split[1])?;
         (split[0], split[1])
     } else {
         (s, "")

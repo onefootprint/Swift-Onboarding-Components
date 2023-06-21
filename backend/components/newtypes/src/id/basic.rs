@@ -20,6 +20,7 @@ define_newtype_id!(
     "Identifier for an org api key access log"
 );
 define_newtype_id!(VaultId, String, "Identifier for a User Vault");
+define_newtype_id!(SandboxId, String, "User-defined sandbox ID for a vault");
 define_newtype_id!(BoId, String, "Identifier for a business owner");
 define_newtype_id!(
     BoLinkId,

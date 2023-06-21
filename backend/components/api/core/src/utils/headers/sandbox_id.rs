@@ -3,7 +3,6 @@ use crate::errors::ApiResult;
 use actix_web::{http::header::HeaderMap, FromRequest};
 use derive_more::Deref;
 use futures_util::Future;
-use newtypes::sandbox::validate_sandbox_suffix;
 use paperclip::v2::{
     models::{DefaultSchemaRaw, Parameter},
     schema::Apiv2Schema,
@@ -13,7 +12,7 @@ use std::pin::Pin;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
 /// When provided, locates only sandbox users with the provided sandbox id
-pub struct SandboxId(pub Option<String>);
+pub struct SandboxId(pub Option<newtypes::SandboxId>);
 
 impl Apiv2Schema for SandboxId {
     fn required() -> bool {
@@ -41,7 +40,7 @@ impl SandboxId {
 
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResult<Self> {
         let sandbox_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
-            validate_sandbox_suffix(&id)?;
+            let id = newtypes::SandboxId::parse(&id)?;
             Some(id)
         } else {
             None
