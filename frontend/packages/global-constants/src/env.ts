@@ -64,3 +64,9 @@ export const FRONTPAGE_BASE_URL = createGetProjectUrl({
   previewAlias: 'frontpage',
   prodAlias: 'frontpage',
 })(env, branchName);
+
+export const EMBEDDED_COMPONENTS_BASE_URL = createGetProjectUrl({
+  port: '3010',
+  previewAlias: 'components',
+  prodAlias: 'components',
+})(env, branchName);
