@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:my.xcodeproj">
+      location = "group:/Users/rafaelmichelsmotta/Documents/footprint/monorepo/mobile/apps/demo/ios/demo.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
