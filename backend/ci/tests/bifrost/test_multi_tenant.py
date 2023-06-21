@@ -47,7 +47,7 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
         sandbox_user_real_phone.client.data["id.phone_number"],
         foo_sandbox_tenant.default_ob_config.key,
     )
-    foo_bifrost = BifrostClient(foo_sandbox_tenant.default_ob_config, twilio)
+    foo_bifrost = BifrostClient.new(foo_sandbox_tenant.default_ob_config, twilio)
     # Manually initialize the onboarding and overwrite the auth token on the BifrostClient.
     # The behavior of BifrostClient is still a little undefined in this case, though - don't do
     # this unless you know what you're doing

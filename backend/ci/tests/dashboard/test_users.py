@@ -6,7 +6,6 @@ from tests.utils import (
     get,
     patch,
     post,
-    create_sandbox_user,
 )
 from tests.headers import (
     IsLive,
@@ -16,12 +15,13 @@ from tests.headers import (
 @pytest.fixture(scope="module")
 def sandbox_user2(sandbox_tenant, twilio):
     # Another sandbox user for endpoints that need multiple
-    return create_sandbox_user(sandbox_tenant, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    return bifrost.run()
 
 
 @pytest.fixture(scope="module")
 def incomplete_user(sandbox_tenant, twilio):
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
 
     phone_number = bifrost.decrypted_data["id.phone_number"]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
@@ -131,7 +131,7 @@ def test_get_users_detail_doc(
     doc_request_sandbox_ob_config,
 ):
     tenant = sandbox_user.tenant
-    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
 
     res = get(f"entities/{user.fp_id}", None, tenant.sk.key)

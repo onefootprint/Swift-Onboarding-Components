@@ -14,10 +14,8 @@ from tests.constants import (
 from tests.utils import (
     EXPECTED_SERVER_VERSION_GIT_HASH,
     IncorrectServerVersion,
-    create_sandbox_user,
     _make_request,
     create_tenant,
-    create_basic_sandbox_user,
     create_ob_config,
     _gen_random_n_digit_number,
 )
@@ -171,20 +169,14 @@ def twilio():
 
 
 @pytest.fixture(scope="module")
-def basic_sandbox_user(twilio):
-    """
-    Create a sandbox user with no data other than phone.
-    The user will not be onboarded onto any tenants.
-    """
-    return create_basic_sandbox_user(twilio)
-
-
-@pytest.fixture(scope="module")
 def sandbox_user(sandbox_tenant, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant.
     """
-    return create_sandbox_user(sandbox_tenant, twilio)
+    from tests.bifrost_client import BifrostClient
+
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    return bifrost.run()
 
 
 @pytest.fixture(scope="module")
@@ -195,8 +187,8 @@ def sandbox_user_real_phone(sandbox_tenant, twilio):
     from tests.bifrost_client import BifrostClient
 
     phone_number = generate_real_phone_number()
-    bifrost = BifrostClient(
-        sandbox_tenant.default_ob_config, twilio, override_create_phone=phone_number
+    bifrost = BifrostClient.create(
+        sandbox_tenant.default_ob_config, twilio, phone_number
     )
     return bifrost.run()
 

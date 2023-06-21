@@ -10,7 +10,7 @@ from tests.constants import FIXTURE_PHONE_NUMBER
 
 @pytest.fixture(scope="session")
 def incomplete_bifrost(kyb_sandbox_ob_config, twilio, kyb_cdos):
-    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
     requirements = bifrost.get_status()["requirements"]
     business_requirement = get_requirement_from_requirements(
         "collect_business_data", requirements
@@ -118,20 +118,18 @@ def test_put_business_vault(incomplete_bifrost, business_data, expected_status_c
 
 
 def test_put_business_vault_not_authorized(sandbox_tenant, twilio):
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
     auth_token = bifrost.auth_token
     # Can't hit PATCH /hosted/business/vault without a business vault
     patch("hosted/business/vault", {}, auth_token, status_code=401)
 
 
 def test_one_click_kyb(kyb_sandbox_ob_config, twilio):
-    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
     user = bifrost.run()
 
     phone_number = bifrost.data["id.phone_number"]
-    bifrost2 = BifrostClient(
-        kyb_sandbox_ob_config, twilio, override_inherit_phone=phone_number
-    )
+    bifrost2 = BifrostClient.inherit(kyb_sandbox_ob_config, twilio, phone_number)
     user2 = bifrost2.run()
     assert user.fp_id == user2.fp_id
     assert user.fp_bid

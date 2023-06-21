@@ -308,15 +308,6 @@ def identify_verify(
     return try_until_success(inner, 5)
 
 
-def create_basic_sandbox_user(twilio, ob_config_auth=None, suffix=None) -> BasicUser:
-    sandbox_phone_number = _random_sandbox_phone(suffix)
-    auth_token = create_user(twilio, sandbox_phone_number, ob_config_auth)
-    return BasicUser(
-        auth_token=auth_token,
-        phone_number=sandbox_phone_number,
-    )
-
-
 def create_user(twilio, phone_number, ob_config_auth=None) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
@@ -332,13 +323,6 @@ def create_user(twilio, phone_number, ob_config_auth=None) -> str:
     return identify_verify(
         twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
     )
-
-
-def create_sandbox_user(sandbox_tenant, twilio):
-    from tests.bifrost_client import BifrostClient
-
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
-    return bifrost.run()
 
 
 def create_tenant(org_data, ob_conf_data):

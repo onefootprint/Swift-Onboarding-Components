@@ -21,8 +21,8 @@ def bifrost(twilio, tenant):
     """
     Bifrost client for a non-sandbox user
     """
-    bifrost_client = BifrostClient(
-        tenant.default_ob_config, twilio, override_create_phone=LIVE_PHONE_NUMBER
+    bifrost_client = BifrostClient.create(
+        tenant.default_ob_config, twilio, LIVE_PHONE_NUMBER
     )
     return bifrost_client
 

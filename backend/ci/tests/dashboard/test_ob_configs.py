@@ -1,11 +1,11 @@
 import pytest
-from tests.types import ObConfiguration
 from tests.utils import (
     get,
     post,
     patch,
-    create_basic_sandbox_user,
+    create_user,
     create_ob_config,
+    _random_sandbox_phone,
 )
 from tests.headers import (
     PublishableOnboardingKey,
@@ -54,8 +54,9 @@ def test_config_create(sandbox_tenant, twilio):
     ob_config = body
     ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
-    sandbox_user = create_basic_sandbox_user(twilio, ob_config_key)
-    post("hosted/onboarding", None, ob_config_key, sandbox_user.auth_token)
+    phone_number = _random_sandbox_phone()
+    auth_token = create_user(twilio, phone_number, ob_config_key)
+    post("hosted/onboarding", None, ob_config_key, auth_token)
 
 
 @pytest.mark.parametrize(

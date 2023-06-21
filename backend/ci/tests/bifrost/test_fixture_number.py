@@ -24,7 +24,7 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     body = post("hosted/identify", identify_data, ob_config.key)
     assert not body["user_found"]
 
-    bifrost = BifrostClient(ob_config, twilio, override_create_phone=phone_number)
+    bifrost = BifrostClient.create(ob_config, twilio, phone_number)
     bifrost.run()
     assert bifrost.handled_requirements
 
@@ -42,7 +42,7 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     body = post("hosted/identify", data, ob_config.key)
     assert body["user_found"]
 
-    bifrost2 = BifrostClient(ob_config2, twilio, override_inherit_phone=phone_number)
+    bifrost2 = BifrostClient.inherit(ob_config2, twilio, phone_number)
     bifrost2.run()
     assert set(i["kind"] for i in bifrost2.handled_requirements) == {
         "authorize",

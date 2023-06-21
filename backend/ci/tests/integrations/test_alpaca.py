@@ -1,9 +1,10 @@
 import pytest
+from tests.utils import _random_sandbox_phone
 from tests.headers import IsLive
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 from tests.constants import FIXTURE_PHONE_NUMBER
-from tests.utils import _gen_random_n_digit_number, create_sandbox_user
+from tests.utils import _gen_random_n_digit_number
 from tests.utils import post, get
 import uuid
 from alpaca.broker.client import BrokerClient
@@ -42,7 +43,8 @@ def test_alpaca_cip(
     sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error
 ):
     # create a new user that has onboarded
-    bifrost = BifrostClient(alpaca_kyc_ob_config, twilio, sandbox_suffix=sandbox_suffix)
+    sandbox_phone_number = _random_sandbox_phone(sandbox_suffix)
+    bifrost = BifrostClient.create(alpaca_kyc_ob_config, twilio, sandbox_phone_number)
     user = bifrost.run()
     d = user.client.data
 

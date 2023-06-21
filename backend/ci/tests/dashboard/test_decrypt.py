@@ -15,7 +15,7 @@ def user_with_documents(doc_request_sandbox_ob_config, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
     doc_requirement = next(
         r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
@@ -151,7 +151,7 @@ def test_tenant_selfie_decrypt(
         test_image_dl_selfie,
     )
 
-    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
 
     data = {

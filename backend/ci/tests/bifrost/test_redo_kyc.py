@@ -25,10 +25,8 @@ def extract_trigger_sms(twilio, phone_number, id):
 
 def test_redo_kyc(sandbox_tenant, twilio):
     phone_number = generate_real_phone_number()
-    bifrost = BifrostClient(
-        sandbox_tenant.default_ob_config,
-        twilio,
-        override_create_phone=phone_number,
+    bifrost = BifrostClient.create(
+        sandbox_tenant.default_ob_config, twilio, phone_number
     )
     sandbox_user = bifrost.run()
 
@@ -53,11 +51,10 @@ def test_redo_kyc(sandbox_tenant, twilio):
     auth_token = FpAuth(token)
 
     # re-run Bifrost with the token from the link we sent to user
-    bifrost = BifrostClient(
+    bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config,
-        twilio,
-        override_inherit_phone=sandbox_user.client.data["id.phone_number"],
-        override_auth=auth_token,
+        auth_token,
+        sandbox_user.client.data["id.phone_number"],
     )
     # Edit some data
     data = {"id.ssn9": "999-99-9999"}

@@ -34,7 +34,7 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config, twilio):
-    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
     user = bifrost.run()
     assert user.fp_id
     assert user.fp_bid
@@ -64,7 +64,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     assert body["invited"]["phone_number"] == bos[1]["phone_number"].replace(" ", "")
 
     # Send the secondary BO through KYC
-    bifrost = BifrostClient(
+    bifrost = BifrostClient.new(
         kyb_sandbox_ob_config, twilio, override_ob_config_auth=secondary_bo_token
     )
     secondary_bo = bifrost.run()
@@ -111,21 +111,19 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
 
 def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     # Create two users onboarded onto the default OB config
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
     primary_bo = bifrost.run()
     assert primary_bo.fp_id
     assert not primary_bo.fp_bid
 
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
     secondary_bo = bifrost.run()
     assert secondary_bo.fp_id
     assert not secondary_bo.fp_bid
 
     # Onboard the primary_bo onto the KYB sandbox config
-    bifrost = BifrostClient(
-        kyb_sandbox_ob_config,
-        twilio,
-        override_inherit_phone=primary_bo.client.data["id.phone_number"],
+    bifrost = BifrostClient.inherit(
+        kyb_sandbox_ob_config, twilio, primary_bo.client.data["id.phone_number"]
     )
     # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
     # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
@@ -157,11 +155,11 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     secondary_bo_token = BusinessOwnerAuth(token)
 
     # Then, onboard the secondary_bo as a BO of primary_bo's business
-    bifrost = BifrostClient(
+    bifrost = BifrostClient.inherit(
         kyb_sandbox_ob_config,
         twilio,
+        secondary_bo.client.data["id.phone_number"],
         override_ob_config_auth=secondary_bo_token,
-        override_inherit_phone=secondary_bo.client.data["id.phone_number"],
     )
     secondary_bo = bifrost.run()
     assert secondary_bo.fp_id

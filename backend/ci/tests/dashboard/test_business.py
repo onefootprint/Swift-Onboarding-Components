@@ -17,7 +17,7 @@ def populated_business_data(kyb_cdos):
 
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config, twilio):
-    bifrost = BifrostClient(kyb_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
     return bifrost.run()
 
 

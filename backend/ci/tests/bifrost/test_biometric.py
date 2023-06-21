@@ -20,7 +20,7 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 def test_skip_liveness(twilio, sandbox_tenant):
     # Create user with requirements handled except liveness
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
 
     # Liveness requirement exists
     body = bifrost.get_status()
@@ -35,7 +35,7 @@ def test_skip_liveness(twilio, sandbox_tenant):
 
 def test_d2p_biometric(twilio, sandbox_tenant):
     # Create user with requirements handled except liveness
-    bifrost = BifrostClient(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
     bifrost.handle_requirements(kind="collect_data")
 
     # Try generating tokens with no metadata for backwards compatibility

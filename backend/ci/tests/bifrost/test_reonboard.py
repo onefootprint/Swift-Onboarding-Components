@@ -4,10 +4,9 @@ from tests.bifrost_client import BifrostClient
 
 def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     # User one-clicks onto same ob config
-    bifrost = BifrostClient(
-        sandbox_tenant.default_ob_config,
-        twilio,
-        override_inherit_phone=sandbox_user.client.data["id.phone_number"],
+    phone_number = sandbox_user.client.data["id.phone_number"]
+    bifrost = BifrostClient.inherit(
+        sandbox_tenant.default_ob_config, twilio, phone_number
     )
     bifrost.run()
     body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=400)

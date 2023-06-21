@@ -15,14 +15,14 @@ def restricted_doc_ob_config(sandbox_tenant, must_collect_data, can_access_data)
 
 def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     # TODO need to make this with non-sandbox in order to actually test workflow
-    bifrost = BifrostClient(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     bifrost.run()
 
     assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
 
 
 def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config, twilio):
-    bifrost = BifrostClient(restricted_doc_ob_config, twilio)
+    bifrost = BifrostClient.new(restricted_doc_ob_config, twilio)
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}

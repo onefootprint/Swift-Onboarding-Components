@@ -12,10 +12,10 @@ from tests.constants import (
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
+    _random_sandbox_phone,
     multipart_file,
     _gen_random_ssn,
     inherit_user,
-    create_basic_sandbox_user,
     get,
     create_user,
     post,
@@ -30,60 +30,57 @@ class BifrostClient:
     BifrostClient simulates Footprint hosted frontend's requests to the backend APIs.
     """
 
+    def raw_auth(ob_config, auth_token, phone_number):
+        """
+        Create an instance of BifrostClient that uses the provided auth token.
+        """
+        return BifrostClient(ob_config, auth_token, phone_number, True)
+
+    def inherit(ob_config, twilio, phone_number, override_ob_config_auth=None):
+        """
+        Create an instance of BifrostClient that inherits the user with the provided phone number.
+        """
+        ob_config_auth = override_ob_config_auth or ob_config.key
+        auth = inherit_user(twilio, phone_number, ob_config_auth)
+        return BifrostClient(ob_config, auth, phone_number, True)
+
+    def create(ob_config, twilio, phone_number, override_ob_config_auth=None):
+        """
+        Create an instance of BifrostClient that creates a new user with the provided phone number.
+        """
+        ob_config_auth = override_ob_config_auth or ob_config.key
+        auth_token = create_user(twilio, phone_number, ob_config_auth)
+        return BifrostClient(ob_config, auth_token, phone_number, False)
+
+    def new(ob_config, twilio, override_ob_config_auth=None):
+        """
+        Create an instance of BifrostClient that creates a new user with a new, sandbox phone number
+        """
+        ob_config_auth = override_ob_config_auth or ob_config.key
+        phone_number = _random_sandbox_phone()
+        auth_token = create_user(twilio, phone_number, ob_config_auth)
+        return BifrostClient(ob_config, auth_token, phone_number, False)
+
     def __init__(
         self,
         ob_config,
-        twilio,
-        sandbox_suffix=None,
-        override_ob_config_auth=None,
-        override_inherit_phone=None,
-        override_create_phone=None,
-        override_auth=None,
+        auth_token,
+        phone_number,
+        is_inherited,
     ):
-        """
-        Creates a BifrostClient associated with a specific ob config and a specific user with
-        default data populated.
-
-        Can override any data with BifrostClient.data.
-
-        Can also override the auth method we use in the identify flow.
-        """
         self.ob_config = ob_config
-        # Generate all default data up front. Pluck from it to satisfy requirements
-        # Now, we do the old init_for_onboarding in the constructor
-
-        ob_config_auth = override_ob_config_auth or self.ob_config.key
-        if override_auth:
-            self.auth_token = override_auth
-            phone_number = override_inherit_phone
-            pass
-        elif override_inherit_phone:
-            # Inherit the sandbox/prod user
-            auth = inherit_user(twilio, override_inherit_phone, ob_config_auth)
-            self.auth_token = auth
-            phone_number = override_inherit_phone
-        elif override_create_phone:
-            # Create a user with the given phone number
-            self.auth_token = create_user(twilio, override_create_phone, ob_config_auth)
-            phone_number = override_create_phone
-        else:
-            # Create a sandbox user
-            user = create_basic_sandbox_user(
-                twilio,
-                ob_config_auth=ob_config_auth,
-                suffix=sandbox_suffix,
-            )
-            self.auth_token = user.auth_token
-            phone_number = user.phone_number
+        self.auth_token = auth_token
 
         is_sandbox = "#" in phone_number
         if is_sandbox:
+            # Edit the email and business name to have the same suffix as the phone number
             suffix = phone_number.split("#")[-1]
             business_name = f'{BUSINESS_DATA["business.name"]} {suffix}'
             email = f"{EMAIL}#{suffix}"
         else:
             business_name = BUSINESS_DATA["business.name"]
             email = EMAIL
+
         self.data = {
             **ID_DATA,
             **BUSINESS_DATA,
@@ -106,7 +103,7 @@ class BifrostClient:
 
         # Add email data before even initializing the onboarding, which we do on the client side.
         # Inherited users will already have an email
-        if not override_inherit_phone:
+        if not is_inherited:
             email_data = {"id.email": self.data["id.email"]}
             post("/hosted/user/vault/validate", email_data, self.auth_token)
             patch("/hosted/user/vault", email_data, self.auth_token)

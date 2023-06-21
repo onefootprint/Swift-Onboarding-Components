@@ -7,7 +7,7 @@ from tests.constants import IP_DATA
 
 @pytest.fixture(scope="session")
 def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config, twilio):
-    bifrost = BifrostClient(investor_profile_ob_config, twilio)
+    bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
     user = bifrost.run()
     body = get("entities", dict(kind="person"), sandbox_tenant.sk.key)
     entity = body["data"][0]
