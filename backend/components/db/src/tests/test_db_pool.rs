@@ -75,7 +75,7 @@ impl TestDbPool {
         ))
         .execute(&mut conn)
         .expect("failed to terminate proccesses using test db");
-        diesel::sql_query(format!("DROP DATABASE {}", test_db_name))
+        diesel::sql_query(format!("DROP DATABASE {} WITH (FORCE)", test_db_name))
             .execute(&mut conn)
             .expect("failed to drop test db");
     }
