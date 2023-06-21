@@ -54,7 +54,10 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             .collect();
 
         let Vault {
-            is_portable, kind, ..
+            is_portable,
+            kind,
+            sandbox_id,
+            ..
         } = vw.vault.clone();
 
         let ScopedVault {
@@ -66,6 +69,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
 
         api_wire_types::Entity {
             id: fp_id,
+            sandbox_id,
             is_portable,
             kind,
             attributes,

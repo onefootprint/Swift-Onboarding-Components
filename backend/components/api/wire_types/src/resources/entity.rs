@@ -7,6 +7,7 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 pub struct Entity {
     pub id: FpId,
+    pub sandbox_id: Option<SandboxId>,
     pub is_portable: bool,
     /// The kind of entity: Person or Business
     pub kind: VaultKind,
