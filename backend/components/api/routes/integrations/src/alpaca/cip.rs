@@ -47,7 +47,7 @@ use IdentityDataKind::*;
     description = "Forward CIP information to Alpaca",
     tags(Integrations, Alpaca, Preview)
 )]
-#[actix::post("/integrations/alpaca_cip")]
+#[actix::post("/integrations/alpaca/cip")]
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,

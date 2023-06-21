@@ -173,7 +173,7 @@ def test_alpaca_cip(sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix
     }
     
     # send cip
-    body = post("integrations/alpaca_cip", alpaca_data, sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
+    body = post("integrations/alpaca/cip", alpaca_data, sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
     if expected_error:
         assert body["error"]["message"] == expected_error
     else:
