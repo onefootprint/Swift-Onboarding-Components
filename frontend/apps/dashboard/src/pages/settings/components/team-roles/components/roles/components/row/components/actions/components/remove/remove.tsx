@@ -17,7 +17,7 @@ export type RemoveProps = {
 };
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
-  const { id, numActiveUsers, name } = role;
+  const { id, numActiveUsers, name, numActiveApiKeys } = role;
   const { t } = useTranslation('pages.settings.roles.remove');
   const [open, setOpen] = useState(false);
   const removeRoleMutation = useRemoveRole(name);
@@ -38,9 +38,7 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
   };
 
   const handleRemove = () => {
-    if (numActiveUsers === 0) {
-      showConfirmation();
-    } else {
+    if (numActiveUsers > 0) {
       toast.show({
         title: t('errors.num-active-users.title'),
         description: t('errors.num-active-users.description', {
@@ -48,6 +46,16 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
         }),
         variant: 'error',
       });
+    } else if (numActiveApiKeys > 0) {
+      toast.show({
+        title: t('errors.num-active-api-keys.title'),
+        description: t('errors.num-active-api-keys.description', {
+          count: numActiveApiKeys,
+        }),
+        variant: 'error',
+      });
+    } else {
+      showConfirmation();
     }
   };
 

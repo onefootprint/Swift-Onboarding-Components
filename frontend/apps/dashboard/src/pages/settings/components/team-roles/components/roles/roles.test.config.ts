@@ -9,6 +9,7 @@ export const RolesFixture: Role[] = [
     isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
     numActiveUsers: 0,
+    numActiveApiKeys: 0,
   },
   {
     id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -16,7 +17,8 @@ export const RolesFixture: Role[] = [
     scopes: [RoleScope.admin],
     isImmutable: true,
     createdAt: '2023-01-25T21:47:22.679708Z',
-    numActiveUsers: 1,
+    numActiveUsers: 2,
+    numActiveApiKeys: 3,
   },
   {
     id: 'Role_erflKNWEF13143EWRWELJN',
@@ -24,7 +26,8 @@ export const RolesFixture: Role[] = [
     isImmutable: true,
     scopes: [RoleScope.read],
     createdAt: '2023-01-06T04:33:34.272399Z',
-    numActiveUsers: 3,
+    numActiveUsers: 4,
+    numActiveApiKeys: 5,
   },
 ];
 

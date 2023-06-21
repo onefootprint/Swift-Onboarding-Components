@@ -9,12 +9,20 @@ export type RowProps = {
 };
 
 const Row = ({ role }: RowProps) => {
-  const { name, scopes, isImmutable, createdAt, numActiveUsers } = role;
+  const {
+    name,
+    scopes,
+    isImmutable,
+    createdAt,
+    numActiveUsers,
+    numActiveApiKeys,
+  } = role;
 
   return (
     <>
       <td>{name}</td>
       <td>{numActiveUsers}</td>
+      <td>{numActiveApiKeys}</td>
       <td>
         <Scopes scopes={scopes} />
       </td>

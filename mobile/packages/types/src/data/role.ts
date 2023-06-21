@@ -32,5 +32,6 @@ export type Role = {
   isImmutable: boolean;
   name: string;
   numActiveUsers: number;
+  numActiveApiKeys: number;
   scopes: RoleScope[];
 };

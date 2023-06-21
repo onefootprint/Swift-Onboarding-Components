@@ -90,14 +90,18 @@ describe('<Roles />', () => {
       withRoles();
     });
 
-    it('should role name, number of active users, created at and permissions', async () => {
+    it('should show role name, number of active users, number of active api keys, created at, and permissions', async () => {
       await renderRolesAndWaitData();
       RolesFixture.forEach((role, index) => {
         const name = screen.getByText(role.name);
         expect(name).toBeInTheDocument();
 
-        const numActiveUsers = screen.getByText(role.numActiveUsers);
-        expect(numActiveUsers).toBeInTheDocument();
+        // using getAll and indexing in the case that we have 0 active users and 0 active api keys
+        const numActiveUsers = screen.getAllByText(role.numActiveUsers);
+        expect(numActiveUsers[0]).toBeInTheDocument();
+
+        const numActiveApiKeys = screen.getAllByText(role.numActiveApiKeys);
+        expect(numActiveApiKeys[0]).toBeInTheDocument();
 
         role.scopes.forEach((scope, scopeIndex) => {
           const scopeText = RolesScopesFixture[scopeIndex];
@@ -166,6 +170,7 @@ describe('<Roles />', () => {
             isImmutable: false,
             createdAt: '2022-09-19T16:24:35.367322Z',
             numActiveUsers: 0,
+            numActiveApiKeys: 0,
           });
         });
 
@@ -179,6 +184,7 @@ describe('<Roles />', () => {
               isImmutable: false,
               createdAt: '2022-09-19T16:24:35.367322Z',
               numActiveUsers: 0,
+              numActiveApiKeys: 0,
             },
           ]);
           await renderRolesAndWaitData();
@@ -299,7 +305,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const editButton = screen.getByText('Edit');
+          const editButton = screen.getByText('Edit role');
           await userEvent.click(editButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -347,7 +353,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const editButton = screen.getByText('Edit');
+          const editButton = screen.getByText('Edit role');
           await userEvent.click(editButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
@@ -390,16 +396,16 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove');
-          await userEvent.click(removeButton);
+          const deleteButton = screen.getByText('Delete role');
+          await userEvent.click(deleteButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
-              name: 'Remove role',
+              name: 'Delete role',
             });
           });
 
           const confirmationDialog = screen.getByRole('dialog', {
-            name: 'Remove role',
+            name: 'Delete role',
           });
 
           const submitButton = within(confirmationDialog).getByRole('button', {
@@ -409,7 +415,7 @@ describe('<Roles />', () => {
           await waitForElementToBeRemoved(confirmationDialog);
 
           await waitFor(() => {
-            const confirmationMessage = screen.getByText('Role removed');
+            const confirmationMessage = screen.getByText('Role deleted');
             expect(confirmationMessage).toBeInTheDocument();
           });
 
@@ -431,16 +437,16 @@ describe('<Roles />', () => {
           });
           await userEvent.click(actionButton);
 
-          const removeButton = screen.getByText('Remove');
-          await userEvent.click(removeButton);
+          const deleteButton = screen.getByText('Delete role');
+          await userEvent.click(deleteButton);
           await waitFor(() => {
             screen.getByRole('dialog', {
-              name: 'Remove role',
+              name: 'Delete role',
             });
           });
 
           const confirmationDialog = screen.getByRole('dialog', {
-            name: 'Remove role',
+            name: 'Delete role',
           });
 
           const submitButton = within(confirmationDialog).getByRole('button', {

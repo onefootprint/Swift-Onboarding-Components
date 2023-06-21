@@ -32,6 +32,11 @@ describe('<Row />', () => {
     );
   };
 
+  it('should render the active API users', () => {
+    renderRow({ role: { ...roleFixture, numActiveApiKeys: 1234 } });
+    expect(screen.getByText('1234')).toBeInTheDocument();
+  });
+
   it('should render the name', () => {
     renderRow({ role: { ...roleFixture, name: 'Admin' } });
     expect(screen.getByText('Admin')).toBeInTheDocument();
@@ -83,7 +88,7 @@ describe('<Row />', () => {
   });
 
   describe('when the role is assigned to at least one user', () => {
-    it('should show an error message when trying to remove it', async () => {
+    it('should show an error message when trying to delete it', async () => {
       renderRow({
         role: { ...roleFixture, numActiveUsers: 1, name: 'Customer Support' },
       });
@@ -93,11 +98,11 @@ describe('<Row />', () => {
       });
       await userEvent.click(actionButton);
 
-      const removeButton = screen.getByText('Remove');
-      await userEvent.click(removeButton);
+      const deleteButton = screen.getByText('Delete role');
+      await userEvent.click(deleteButton);
 
       await waitFor(() => {
-        const errorMessage = screen.getByText("Role can't be removed");
+        const errorMessage = screen.getByText("Role can't be deleted");
         expect(errorMessage).toBeInTheDocument();
       });
     });

@@ -265,6 +265,7 @@ describe('<Members />', () => {
                 isImmutable: true,
                 name: 'Admin',
                 numActiveUsers: 1,
+                numActiveApiKeys: 0,
                 scopes: [RoleScope.admin],
               },
               rolebinding: {

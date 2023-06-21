@@ -7,6 +7,7 @@ const roleFixture: Role = {
   isImmutable: false,
   createdAt: '2022-11-18T00:04:11.368107Z',
   numActiveUsers: 4,
+  numActiveApiKeys: 0,
 };
 
 export default roleFixture;

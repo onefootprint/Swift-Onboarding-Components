@@ -1425,6 +1425,7 @@
           "header": {
             "role": "Role",
             "active-users": "Active users",
+            "active-api-users": "Active API users",
             "created": "Created at",
             "permissions": "Permissions"
           },
@@ -1432,8 +1433,8 @@
           "actions": {
             "aria-label": "Open actions for role {{name}}",
             "not-allowed": "You are not allowed to manage roles",
-            "remove": "Remove",
-            "edit": "Edit"
+            "remove": "Delete role",
+            "edit": "Edit role"
           }
         },
         "create": {
@@ -1463,20 +1464,25 @@
         },
         "remove": {
           "confirmation": {
-            "title": "Remove role",
-            "description": "You’re about to remove the role <b>{{name}}</b>. Are you sure?"
+            "title": "Delete role",
+            "description": "You’re about to delete the role <b>{{name}}</b>. Are you sure?"
           },
           "errors": {
             "num-active-users": {
-              "title": "Role can't be removed",
+              "title": "Role can't be deleted",
               "description_one": "One user is assigned to this role. Please assign those users to a different role.",
               "description_others": "{{count}} users are assigned to this role. Please assign those users to a different role."
+            },
+            "num-active-api-keys": {
+              "title": "Role can't be deleted",
+              "description_one": "One API key is active on this role. Please assign a different role to this API key.",
+              "description_others": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
             }
           },
           "feedback": {
             "success": {
-              "title": "Role removed",
-              "description": "{{name}} role has been removed."
+              "title": "Role deleted",
+              "description": "{{name}} role has been deleted."
             },
             "error": {
               "title": "Error removing role"

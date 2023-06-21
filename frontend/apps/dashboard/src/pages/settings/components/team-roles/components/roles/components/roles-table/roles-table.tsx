@@ -16,9 +16,14 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
   const { t } = useTranslation('pages.settings.roles');
   const filters = useRolesFilters();
   const columns = [
-    { id: 'role', text: t('table.header.role'), width: '20%' },
-    { id: 'active-users', text: t('table.header.active-users'), width: '15%' },
-    { id: 'permissions', text: t('table.header.permissions'), width: '50%' },
+    { id: 'role', text: t('table.header.role'), width: '19%' },
+    { id: 'active-users', text: t('table.header.active-users'), width: '12%' },
+    {
+      id: 'active-api-keys',
+      text: t('table.header.active-api-users'),
+      width: '12%',
+    },
+    { id: 'permissions', text: t('table.header.permissions'), width: '37%' },
     { id: 'created', text: t('table.header.created'), width: '15%' },
     { id: 'actions', text: '', width: '5%' },
   ];
