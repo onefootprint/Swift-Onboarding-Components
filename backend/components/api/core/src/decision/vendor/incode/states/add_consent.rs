@@ -38,10 +38,10 @@ impl IncodeStateTransition for AddConsent {
             title: "Service Consent".into(),
             content: consent.consent_language_text,
         };
-        // TODO this should be separated out from privacy in bifrost
+
         let ml_request = IncodeAddMLConsentRequest {
             credentials: session.credentials.clone(),
-            status: true,
+            status: consent.ml_consent,
         };
 
         // Make requests to incode

@@ -20,6 +20,7 @@ pub struct UserConsent {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub onboarding_id: OnboardingId,
+    pub ml_consent: bool,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
@@ -29,6 +30,7 @@ pub struct NewUserConsent {
     pub insight_event_id: InsightEventId,
     pub consent_language_text: String,
     pub onboarding_id: OnboardingId,
+    pub ml_consent: bool,
 }
 
 impl UserConsent {
@@ -39,12 +41,14 @@ impl UserConsent {
         onboarding_id: OnboardingId,
         insight_event_id: InsightEventId,
         consent_language_text: String,
+        ml_consent: bool,
     ) -> Result<UserConsent, crate::DbError> {
         let new_user_consent = NewUserConsent {
             timestamp,
             insight_event_id,
             consent_language_text,
             onboarding_id,
+            ml_consent,
         };
 
         let new_user_consent = diesel::insert_into(crate::schema::user_consent::table)

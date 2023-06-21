@@ -27,6 +27,7 @@ pub async fn post(
 
     let ConsentRequest {
         consent_language_text,
+        ml_consent,
     } = request.into_inner();
 
     state
@@ -34,8 +35,15 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
-            let _user_consent =
-                UserConsent::create(conn, Utc::now(), ob_id, insight_event.id, consent_language_text)?;
+            let ml_consent = ml_consent.unwrap_or(false);
+            let _user_consent = UserConsent::create(
+                conn,
+                Utc::now(),
+                ob_id,
+                insight_event.id,
+                consent_language_text,
+                ml_consent,
+            )?;
 
             Ok(())
         })

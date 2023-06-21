@@ -1,0 +1,1 @@
+ALTER TABLE user_consent DROP COLUMN ml_consent;

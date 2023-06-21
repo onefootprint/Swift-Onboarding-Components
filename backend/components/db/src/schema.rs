@@ -763,6 +763,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         onboarding_id -> Text,
+        ml_consent -> Bool,
     }
 }
 
