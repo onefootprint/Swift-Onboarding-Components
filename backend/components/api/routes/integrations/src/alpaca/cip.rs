@@ -546,15 +546,16 @@ fn document_and_photo(
         image_integrity_breakdown,
         visual_authenticity: document_result_helper.visual_authenticity(),
     };
-    // TODO (FP-4620)
+
+    let selfie_result = document_result_helper.selfie_result();
     let photo_selfie = alpaca::PhotoSelfie {
         id: scoped_vault.fp_id,
-        result: CipResult::Clear,
+        result: selfie_result,
         status: alpaca::CipStatus::Complete,
         created_at: check_started_at,
-        face_comparison: CipResult::Clear,
-        image_integrity: CipResult::Clear,
-        visual_authenticity: CipResult::Clear,
+        face_comparison: selfie_result,
+        image_integrity: selfie_result,
+        visual_authenticity: selfie_result,
     };
 
     Ok((Some(document_photo_id), Some(photo_selfie)))
@@ -647,5 +648,9 @@ impl<'a> DocumentCipResultHelper<'a> {
             security_features: CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified)),
             template: CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentVerified)),
         }
+    }
+
+    fn selfie_result(&self) -> CipResult {
+        CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentSelfieMatches))
     }
 }
