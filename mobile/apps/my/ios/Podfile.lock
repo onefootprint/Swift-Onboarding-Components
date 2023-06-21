@@ -495,6 +495,8 @@ PODS:
     - React-RCTImage
   - RNSVG (13.9.0):
     - React-Core
+  - vision-camera-plugin-document (0.2.0):
+    - React-Core
   - VisionCamera (2.15.4):
     - React
     - React-callinvoker
@@ -562,6 +564,7 @@ DEPENDENCIES:
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
+  - vision-camera-plugin-document (from `../../../node_modules/vision-camera-plugin-document`)
   - VisionCamera (from `../../../node_modules/react-native-vision-camera`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
@@ -687,6 +690,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-screens"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
+  vision-camera-plugin-document:
+    :path: "../../../node_modules/vision-camera-plugin-document"
   VisionCamera:
     :path: "../../../node_modules/react-native-vision-camera"
   Yoga:
@@ -753,9 +758,10 @@ SPEC CHECKSUMS:
   RNReanimated: addc4900bf47882118d0a1b21747fa6705fa8cff
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
+  vision-camera-plugin-document: 9fb81cb97cf9c54c9c637c72abe5621048b7d09c
   VisionCamera: c6356b309f7b8e185b7be2e703ec67bb35acf345
   Yoga: d56980c8914db0b51692f55533409e844b66133c
 
 PODFILE CHECKSUM: f10f54319364ba8044f3d96d749cef0f48305b6d
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

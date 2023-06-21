@@ -15,16 +15,14 @@
 		27CCBF5E8F304ED1BA117BF6 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B7493E88A62E45E5B4677E8E /* AppDelegate.mm */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		466FB29480ED45F29313B597 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D70DCF0218B413A89B9CE9C /* main.m */; };
+		5666E5B62A437AD8005BA1BD /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
 		5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
 		5EC2A3E9A3B0479AB1760D27 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8F3F1A47D53746429E58E364 /* Expo.plist */; };
-		686C765137C1736E1C62DAFD /* DocumentProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3099F848BD6EA880836883D /* DocumentProcessor.swift */; };
 		7A7369C3766E46B1BBE0DDA2 /* My App Clip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 5EB82C7A0D6D44B0B1406AE4 /* My App Clip.app */; };
 		91B1B46AC6184BA0B75A5C48 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 87F4B5E7EE654F87A3F34AEF /* Images.xcassets */; };
 		96905EF65AED1B983A6B3ABC /* libPods-my.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-my.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		BCB266A337BA6F7C38C9F372 /* DocumentProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DF965AA1D4354C694E918D5 /* DocumentProcessor.m */; };
-		C519FEB5E8D5C39026FA1F69 /* my-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C5AACFD5A74DA8DE264B177 /* my-Bridging-Header.h */; };
 		D89EDE490A2BB8FFFC5149D7 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98E42AC46CF9C5970BF38C1 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
-		0C5AACFD5A74DA8DE264B177 /* my-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "my-Bridging-Header.h"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* my.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = my.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = my/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = my/AppDelegate.mm; sourceTree = "<group>"; };
@@ -121,7 +118,6 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */,
-				0C5AACFD5A74DA8DE264B177 /* my-Bridging-Header.h */,
 			);
 			name = my;
 			sourceTree = "<group>";
@@ -246,7 +242,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C519FEB5E8D5C39026FA1F69 /* my-Bridging-Header.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5666E5BB2A437B5E005BA1BD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +286,7 @@
 			buildPhases = (
 				DABF40818886C3C36C69A7BC /* [CP] Check Pods Manifest.lock */,
 				0A1A10DA613146F38D5DB622 /* Start Packager */,
+				5666E5BB2A437B5E005BA1BD /* Headers */,
 				A01825E1217B4426A0498B14 /* Sources */,
 				9D643F47B6C4422A85481A83 /* Frameworks */,
 				03767D9C516140C6998A3D91 /* Resources */,
@@ -563,8 +566,6 @@
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
 				5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */,
-				BCB266A337BA6F7C38C9F372 /* DocumentProcessor.m in Sources */,
-				686C765137C1736E1C62DAFD /* DocumentProcessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,6 +576,7 @@
 				27CCBF5E8F304ED1BA117BF6 /* AppDelegate.mm in Sources */,
 				466FB29480ED45F29313B597 /* main.m in Sources */,
 				D89EDE490A2BB8FFFC5149D7 /* ExpoModulesProvider.swift in Sources */,
+				5666E5B62A437AD8005BA1BD /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

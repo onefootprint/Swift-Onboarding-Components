@@ -6,7 +6,7 @@ module.exports = function (api) {
       [
         'react-native-reanimated/plugin',
         {
-          globals: ['__processDocument'],
+          globals: ['__documentProcessor'],
         },
       ],
       ['module:react-native-dotenv'],

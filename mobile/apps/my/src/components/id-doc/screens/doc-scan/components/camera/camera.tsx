@@ -23,12 +23,12 @@ import {
   useCameraDevices,
   useFrameProcessor,
 } from 'react-native-vision-camera';
+import { documentProcessor } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
 import Instructions from '../instructions';
 import type { CameraSize, CameraType } from './camera.types';
-import processDocument from './frame-processors/process-document';
 import useCanTakePhotoManually from './hooks/use-can-take-photo-manually';
 import encodeImagePath from './utils/encode-image-path';
 
@@ -93,7 +93,7 @@ const Camera = ({
       const options = {
         frame: { x: 16, y: 30, width: windowWidth - 32, height: 220 },
       };
-      const result = processDocument(frame, options);
+      const result = documentProcessor(frame, options);
       detector.value = result.is_document;
       if (detector.value !== result.is_document) {
         detector.value = !!result.is_document;

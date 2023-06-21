@@ -16602,6 +16602,11 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
+vision-camera-plugin-document@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.2.0.tgz#02174e62ed2652a4edbd1d2c51acc9036f6d1004"
+  integrity sha512-xuQX2H4eT73TwXuch5VejuLa7j9BB3ZpvHfhVtlhVmVFR2ELKyu1KdFD5qyadtyty3yr5P8BEHPa767J3uowPg==
+
 vlq@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/vlq/-/vlq-1.0.1.tgz"
