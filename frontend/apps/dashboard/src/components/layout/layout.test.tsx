@@ -8,6 +8,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';
 import Layout, { LayoutProps } from './layout';
+import { withEntities } from './layout.test.config';
 
 const originalState = useStore.getState();
 
@@ -16,6 +17,10 @@ const useRouterSpy = createUseRouterSpy();
 describe('<Layout />', () => {
   const renderLayout = ({ children = 'Foo', name }: Partial<LayoutProps>) =>
     customRender(<Layout name={name}>{children}</Layout>);
+
+  beforeAll(() => {
+    withEntities();
+  });
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
