@@ -5,11 +5,12 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 mod newtype_exports;
 
-pub mod resources;
 pub(crate) use newtypes::*;
+
+mod resources;
 pub use resources::*;
 pub mod hosted;
-pub mod requests;
+mod requests;
 pub use self::requests::*;
 
 #[macro_use]
