@@ -77,7 +77,8 @@
     "@storybook/manager-webpack5": "^6.5.15",
     "@storybook/react": "^6.5.15",
     "@storybook/testing-library": "^0.0.11",
-    "storybook-react-i18next": "^2.0.1"
+    "storybook-react-i18next": "^2.0.1",
+    "zoid": "^9.0.86"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
