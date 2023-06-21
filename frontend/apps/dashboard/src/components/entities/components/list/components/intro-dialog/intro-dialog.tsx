@@ -1,10 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { EntityKind } from '@onefootprint/types';
 import { Box, Dialog, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
+import useEntities from '../../hooks/use-entities/use-entities';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
 const TIME_TO_SHOW_DIALOG = 1000;
@@ -12,9 +14,11 @@ const TIME_TO_SHOW_DIALOG = 1000;
 const IntroDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { t } = useTranslation('pages.entities.intro');
-  const { data } = useOnboardingConfigs();
+  const { data: onboardings } = useOnboardingConfigs();
+  const { data: entities } = useEntities(EntityKind.person);
   const router = useRouter();
-  const shouldShowDialog = data?.length === 0;
+  const shouldShowDialog =
+    onboardings?.length === 0 && entities?.data?.length === 0;
 
   useTimeout(() => {
     if (shouldShowDialog) {

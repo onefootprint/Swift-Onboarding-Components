@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCursorPagination } from 'src/hooks/use-pagination';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-import useFilters from '../../../hooks/use-filters';
+import useFilters from '../../../../hooks/use-filters';
 
 const getEntities = async (
   authHeaders: AuthHeaders,
