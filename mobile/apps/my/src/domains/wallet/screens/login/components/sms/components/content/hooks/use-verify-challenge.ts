@@ -8,11 +8,21 @@ import { useMutation } from '@tanstack/react-query';
 
 import useTranslation from '@/hooks/use-translation';
 
-const identifyVerify = async (payload: IdentifyVerifyRequest) => {
+const identifyVerify = async (
+  payload: IdentifyVerifyRequest & { isApple: boolean },
+) => {
+  const { isApple, ...data } = payload;
+  if (isApple) {
+    return {
+      kind: 'user_inherited',
+      authToken: 'tok_apple',
+    };
+  }
+
   const response = await request<IdentifyVerifyResponse>({
     method: 'POST',
     url: '/hosted/identify/verify',
-    data: payload,
+    data,
   });
   return response.data;
 };

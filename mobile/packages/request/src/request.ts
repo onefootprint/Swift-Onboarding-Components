@@ -62,7 +62,7 @@ export const getErrorMessage = (error?: unknown | Error): string => {
 
 const getRequestOptions = (requestConfig: RequestConfig) => {
   return {
-    baseURL: process.env.API_BASE_URL,
+    baseURL: process.env.API_BASE_URL ?? 'https://api.onefootprint.com',
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,

@@ -7,15 +7,18 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useCallback } from 'react';
 import { isClip } from 'react-native-app-clip';
 
+import Debug from './components/debug';
 import queryClient from './config/initializers/react-query';
 // import configureLogger from './config/logger';
 import AppClip from './domains/app-clip';
 import Wallet from './domains/wallet';
+import useIsDebug from './hooks/use-is-debug';
 
 SplashScreen.preventAutoHideAsync();
 // configureLogger();
 
 const App = () => {
+  const isDebug = useIsDebug();
   const [fontsLoaded] = useFonts({
     DMSans_400Regular: require('../assets/fonts/DMSans-Regular.otf'),
     DMSans_500Medium: require('../assets/fonts/DMSans-Medium.otf'),
@@ -30,7 +33,9 @@ const App = () => {
 
   return fontsLoaded ? (
     <QueryClientProvider client={queryClient}>
-      {isClip() ? (
+      {isDebug ? (
+        <Debug onLoad={handleLoad} />
+      ) : isClip() ? (
         <AppClip onLoad={handleLoad} />
       ) : (
         <Wallet onLoad={handleLoad} />

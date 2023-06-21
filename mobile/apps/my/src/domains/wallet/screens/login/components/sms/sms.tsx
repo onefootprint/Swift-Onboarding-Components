@@ -6,11 +6,12 @@ import Loading from './components/loading';
 import useLoginChallenge from './hooks/use-login-challenge';
 
 type SmsProps = {
+  isApple: boolean;
   identifier: Identifier;
   onSuccess: (authToken) => void;
 };
 
-const Sms = ({ identifier, onSuccess }: SmsProps) => {
+const Sms = ({ isApple, identifier, onSuccess }: SmsProps) => {
   const { isLoading, data, mutate } = useLoginChallenge();
 
   const createChallenge = () => {
@@ -23,6 +24,7 @@ const Sms = ({ identifier, onSuccess }: SmsProps) => {
       {isLoading && <Loading />}
       {data && (
         <Content
+          isApple={isApple}
           challengeToken={data.challengeData.challengeToken}
           onSuccess={onSuccess}
           phoneNumber={data.challengeData.scrubbedPhoneNumber}

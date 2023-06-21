@@ -18,10 +18,11 @@ const Login = ({ route, navigation }: LoginProps) => {
   const shouldShowTabs = canUseBiometric;
   const [tab, setTab] = useState(canUseBiometric ? 'passkey' : 'sms');
   const session = useSession();
+  const isApple = identifier.email === 'apple@onefootprint.com';
 
   const handleSuccess =
     (challengeKind: ChallengeKind) => (authToken: string) => {
-      session.logIn(challengeKind, authToken);
+      session.logIn(challengeKind, authToken, isApple);
       navigation.navigate('MainTabs');
     };
 
@@ -54,6 +55,7 @@ const Login = ({ route, navigation }: LoginProps) => {
       </Box>
       {tab === 'sms' ? (
         <Sms
+          isApple={isApple}
           identifier={identifier}
           onSuccess={handleSuccess(ChallengeKind.sms)}
         />

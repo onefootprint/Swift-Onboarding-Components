@@ -21,7 +21,11 @@ const Settings = ({ navigation }) => {
               {
                 'aria-label': 'Logout',
                 onPress: handleLogout,
-                content: <LinkButton variant="destructive">Logout</LinkButton>,
+                content: (
+                  <LinkButton variant="destructive" onPress={handleLogout}>
+                    Logout
+                  </LinkButton>
+                ),
               },
             ],
           },

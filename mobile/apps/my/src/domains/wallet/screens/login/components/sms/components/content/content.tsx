@@ -14,12 +14,18 @@ import Verifying from './components/verifying';
 import useVerifyChallenge from './hooks/use-verify-challenge';
 
 type ContentProps = {
+  isApple: boolean;
   challengeToken: string;
   onSuccess: (authToken) => void;
   phoneNumber: string;
 };
 
-const Content = ({ challengeToken, onSuccess, phoneNumber }: ContentProps) => {
+const Content = ({
+  isApple,
+  challengeToken,
+  onSuccess,
+  phoneNumber,
+}: ContentProps) => {
   const { t } = useTranslation('screens.login.sms');
   const { isLoading, isSuccess, mutate } = useVerifyChallenge();
 
@@ -28,6 +34,7 @@ const Content = ({ challengeToken, onSuccess, phoneNumber }: ContentProps) => {
   const handleComplete = (pin: string) => {
     mutate(
       {
+        isApple,
         challengeResponse: pin,
         challengeToken,
       },

@@ -9,7 +9,11 @@ export type AuthHeaders = {
   'x-fp-authorization': string;
 };
 
-export type SessionData = { authToken: string; challengeKind: ChallengeKind };
+export type SessionData = {
+  isApple: boolean;
+  authToken: string;
+  challengeKind: ChallengeKind;
+};
 
 export type Session = {
   data?: SessionData;
@@ -48,8 +52,12 @@ const useSession = () => {
   const isLoggedIn = !!data;
   const authHeaders = { [AUTH_HEADER]: data?.authToken };
 
-  const logIn = async (challengeKind: ChallengeKind, authToken: string) => {
-    update({ challengeKind, authToken });
+  const logIn = async (
+    challengeKind: ChallengeKind,
+    authToken: string,
+    isApple: boolean,
+  ) => {
+    update({ challengeKind, authToken, isApple });
   };
 
   const logOut = () => {

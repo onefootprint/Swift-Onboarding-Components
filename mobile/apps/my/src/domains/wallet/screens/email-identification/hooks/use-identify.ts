@@ -7,6 +7,13 @@ import * as Linking from 'expo-linking';
 import useTranslation from '@/hooks/use-translation';
 
 const identify = async (data: IdentifyRequest) => {
+  if (data.identifier.email === 'apple@onefootprint.com') {
+    return {
+      userFound: true,
+      availableChallengeKinds: ['sms'],
+      hasSyncablePassKey: false,
+    };
+  }
   const response = await request<IdentifyResponse>({
     method: 'POST',
     url: '/hosted/identify',

@@ -9,7 +9,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "predev": "yarn install && yarn build:packages",
+    "build:packages": "turbo run build --filter=./packages/*"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
