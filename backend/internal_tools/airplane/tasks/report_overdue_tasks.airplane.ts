@@ -13,9 +13,9 @@ export default airplane.task(
     schedules:
       process.env.AIRPLANE_ENV_SLUG === 'prod'
         ? {
-            every_four_hours: {
-              cron: '0 */3 * * *',
-              description: 'Runs every 3 hours',
+            every_two_minutes: {
+              cron: '*/2 * * * *',
+              description: 'Runs every 2 minutes',
             },
           }
         : {},
@@ -27,7 +27,10 @@ export default airplane.task(
         *
       from task
       where 
-        scheduled_for + interval '5 hour' < now()
+        (
+          (task_data->>'kind' = 'watchlist_check' and scheduled_for + interval '5 hour' < now())
+          OR (task_data->>'kind' != 'watchlist_check' and scheduled_for + interval '2 minute' < now())
+        )
         and task.status not in ('failed', 'completed')
     `;
 
