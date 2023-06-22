@@ -6,6 +6,15 @@ const useIntl = (locale = 'en-US') => {
       year: 'numeric',
     }).format(date);
 
+  const formatUtcDate = (date: Date, options?: Record<string, any>) =>
+    date.toLocaleString(locale, {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+      timeZone: 'utc',
+      ...options,
+    });
+
   const formatDateWithTime = (date: Date, options?: Record<string, any>) =>
     date.toLocaleString(locale, {
       month: 'numeric',
@@ -48,6 +57,7 @@ const useIntl = (locale = 'en-US') => {
   return {
     formatDateWithLongMonth,
     formatDateWithTime,
+    formatUtcDate,
     formatRelativeDate,
   };
 };
