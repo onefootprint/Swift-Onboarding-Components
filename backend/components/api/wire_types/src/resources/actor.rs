@@ -7,7 +7,7 @@ pub enum Actor {
     Footprint,
     FirmEmployee,
     Organization { member: String },
-    ApiKey { name: String },
+    ApiKey { id: TenantApiKeyId, name: String },
 }
 
 export_schema!(Actor);

@@ -20,7 +20,10 @@ impl DbToApi<SaturatedActor> for Actor {
                 };
                 Actor::Organization { member }
             }
-            SaturatedActor::TenantApiKey(tak) => Actor::ApiKey { name: tak.name },
+            SaturatedActor::TenantApiKey(tak) => Actor::ApiKey {
+                id: tak.id,
+                name: tak.name,
+            },
             SaturatedActor::Footprint => Actor::Footprint,
             // Don't serialize any information on which firm employee performed the action. Maybe
             // one day we will show this when authed as a firm employee
