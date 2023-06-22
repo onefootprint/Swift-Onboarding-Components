@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDataOption,
   CollectedDocumentDataOption,
@@ -9,7 +10,6 @@ import { Box, Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import CdoTagList from 'src/components/cdo-tag-list';
-import styled, { css } from 'styled-components';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import AnimatedContainer from '../animated-container';
