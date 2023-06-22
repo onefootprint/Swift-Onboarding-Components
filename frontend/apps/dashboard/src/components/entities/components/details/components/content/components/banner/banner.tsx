@@ -16,7 +16,7 @@ const Banner = ({ entity }: BannerProps) => {
     auditTrail?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  if (entity.requiresManualReview && entity.status !== EntityStatus.vaultOnly) {
+  if (entity.requiresManualReview && entity.status !== EntityStatus.none) {
     return (
       <InlineAlert
         variant={entity.status === EntityStatus.failed ? 'error' : 'warning'}

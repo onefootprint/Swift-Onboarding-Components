@@ -53,7 +53,6 @@ export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export * from './role';
 export * from './rolebinding';
 export * from './timeline';
-export { default as UserStatus } from './user-status';
 export * from './vault';
 export { default as Vendor } from './vendor';
 export { default as VerificationStatus } from './verification-status';

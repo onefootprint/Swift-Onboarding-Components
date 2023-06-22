@@ -13,12 +13,15 @@ export enum EntityKind {
   person = 'person',
 }
 
+/// This type doesn't actually exist on the backend - it is a frontend-only representation of the
+/// status of an entity.
+/// Realistically, all but the `none` status exist on the backend as OnboardingStatuses
 export enum EntityStatus {
   failed = 'fail',
   incomplete = 'incomplete',
   pending = 'pending',
   pass = 'pass',
-  vaultOnly = 'vault_only',
+  none = 'none', // Onboarding hasn't started for this vault
 }
 
 export type Entity = {
@@ -66,9 +69,12 @@ export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
 
 const getEntityStatus = (entity: Entity): EntityStatus => {
   if (!entity.isPortable) {
-    return EntityStatus.vaultOnly;
+    return EntityStatus.none;
   }
-  return (entity.onboarding?.status ||
+  if (!entity.onboarding) {
+    return EntityStatus.none;
+  }
+  return (entity.onboarding.status ||
     EntityStatus.incomplete) as unknown as EntityStatus;
 };
 

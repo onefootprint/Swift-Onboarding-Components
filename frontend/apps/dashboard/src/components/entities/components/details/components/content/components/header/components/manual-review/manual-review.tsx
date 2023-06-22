@@ -13,7 +13,7 @@ const ManualReview = () => {
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
   const shouldRender =
     data &&
-    data.status !== EntityStatus.vaultOnly &&
+    data.status !== EntityStatus.none &&
     data.status !== EntityStatus.incomplete;
 
   const handleOpenDialog = (dialogStatus: ReviewStatus) => {

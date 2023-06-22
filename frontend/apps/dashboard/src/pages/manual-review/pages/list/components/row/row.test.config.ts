@@ -61,7 +61,7 @@ export const entityIncomplete: Entity = {
 
 export const entityVaultOnly: Entity = {
   ...entityPassed,
-  status: EntityStatus.vaultOnly,
+  status: EntityStatus.none,
 };
 
 export const entityOnWatchlist: Entity = {

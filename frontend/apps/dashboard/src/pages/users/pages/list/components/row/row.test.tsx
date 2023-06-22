@@ -40,9 +40,9 @@ describe('User table row <Row />', () => {
     expect(screen.getByText('Failed')).toBeInTheDocument();
   });
 
-  it('should show Vault when the user is vault only', () => {
+  it('should show None when the user has no KYC status', () => {
     renderRow(entityVaultOnly);
-    expect(screen.getByText('Vault')).toBeInTheDocument();
+    expect(screen.getByText('None')).toBeInTheDocument();
   });
 
   it('should show Incomplete when the user status is incomplete', () => {

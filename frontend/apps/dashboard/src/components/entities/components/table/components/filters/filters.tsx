@@ -40,8 +40,8 @@ const Filters = () => {
               label: t('status.options.incomplete'),
             },
             {
-              value: EntityStatus.vaultOnly,
-              label: t('status.options.vaultOnly'),
+              value: EntityStatus.none,
+              label: t('status.options.none'),
             },
           ],
           selectedOptions: filters.values.status,

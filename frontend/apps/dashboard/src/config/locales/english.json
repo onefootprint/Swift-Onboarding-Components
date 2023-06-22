@@ -28,7 +28,7 @@
   "entity-statuses": {
     "pass": "Verified",
     "fail": "Failed",
-    "vault_only": "Vault",
+    "none": "None",
     "incomplete": "Incomplete",
     "pending": "Pending"
   },
@@ -443,7 +443,7 @@
             "verified": "Verified",
             "failed": "Failed",
             "incomplete": "Incomplete",
-            "vaultOnly": "Vault"
+            "none": "None"
           }
         },
         "date-range": {
@@ -814,7 +814,7 @@
         "not_verified": "Not verified",
         "vault-only": {
           "title": "No device insights available",
-          "message": "This is a \"Vault only\" user, so we don't have any device insights available."
+          "message": "This user was created via API, so we don't have any device insights available."
         }
       },
       "truncated-text": {

@@ -77,7 +77,7 @@ describe('<FloatingBox/>', () => {
       renderFloatingBox(propsWithoutInsights);
 
       const bodyText = screen.getByText(
-        'This is a "Vault only" user, so we don\'t have any device insights available.',
+        "This user was created via API, so we don't have any device insights available.",
       );
       expect(bodyText).toBeInTheDocument();
     });
