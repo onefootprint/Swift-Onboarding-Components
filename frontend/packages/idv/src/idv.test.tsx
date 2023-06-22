@@ -175,7 +175,7 @@ describe('<Idv />', () => {
         withDecrypt({
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
-          [IdDI.dob]: '05/23/1996',
+          [IdDI.dob]: '1996-05-23',
           [IdDI.ssn9]: '123-45-6789',
         });
         withUserVault();
