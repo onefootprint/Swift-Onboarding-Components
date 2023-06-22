@@ -24,7 +24,7 @@ const EditableFormButtonContainer = ({
           variant="secondary"
           type="button"
           onClick={onCancel}
-          loading={isLoading}
+          disabled={isLoading}
         >
           {t('cta.cancel')}
         </Button>
