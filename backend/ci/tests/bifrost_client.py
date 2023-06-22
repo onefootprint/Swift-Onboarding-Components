@@ -34,7 +34,7 @@ class BifrostClient:
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
-        return BifrostClient(ob_config, auth_token, phone_number, True)
+        return BifrostClient(ob_config, auth_token, phone_number, True, None)
 
     def inherit(ob_config, twilio, phone_number, override_ob_config_auth=None):
         """
@@ -42,15 +42,15 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         auth = inherit_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth, phone_number, True)
+        return BifrostClient(ob_config, auth, phone_number, True, None)
 
-    def create(ob_config, twilio, phone_number, override_ob_config_auth=None):
+    def create(ob_config, twilio, phone_number, override_ob_config_auth=None, override_email=None):
         """
         Create an instance of BifrostClient that creates a new user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         auth_token = create_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth_token, phone_number, False)
+        return BifrostClient(ob_config, auth_token, phone_number, False, override_email)
 
     def new(ob_config, twilio, override_ob_config_auth=None):
         """
@@ -59,7 +59,7 @@ class BifrostClient:
         ob_config_auth = override_ob_config_auth or ob_config.key
         phone_number = _random_sandbox_phone()
         auth_token = create_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth_token, phone_number, False)
+        return BifrostClient(ob_config, auth_token, phone_number, False, None)
 
     def __init__(
         self,
@@ -67,19 +67,25 @@ class BifrostClient:
         auth_token,
         phone_number,
         is_inherited,
+        override_email=None,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
+
+        if override_email:
+            email = override_email
+        else:
+            email = EMAIL
 
         is_sandbox = "#" in phone_number
         if is_sandbox:
             # Edit the email and business name to have the same suffix as the phone number
             suffix = phone_number.split("#")[-1]
             business_name = f'{BUSINESS_DATA["business.name"]} {suffix}'
-            email = f"{EMAIL}#{suffix}"
+            email = f"{email}#{suffix}"
         else:
             business_name = BUSINESS_DATA["business.name"]
-            email = EMAIL
+
 
         self.data = {
             **ID_DATA,

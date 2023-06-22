@@ -1,12 +1,16 @@
+use crate::schema::identity_document;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{schema::document_request, DbResult};
 use chrono::{DateTime, Utc};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::ModernIdDocKind;
 use newtypes::WorkflowId;
 use newtypes::{DocumentRequestId, DocumentRequestStatus, Locked, ScopedVaultId};
+
+use super::identity_document::IdentityDocument;
 
 pub type DocRefId = String;
 
@@ -162,6 +166,21 @@ impl DocumentRequest {
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_latest_complete(
+        conn: &mut PgConn,
+        sv_id: ScopedVaultId,
+    ) -> DbResult<Option<(DocumentRequest, IdentityDocument)>> {
+        let res = document_request::table
+            .inner_join(identity_document::table)
+            .filter(not(document_request::status.eq(DocumentRequestStatus::Pending)))
+            .filter(document_request::scoped_vault_id.eq(sv_id))
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
     }
 }
 

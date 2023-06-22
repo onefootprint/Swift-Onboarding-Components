@@ -102,7 +102,7 @@ impl IdDocKind {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum AlpacaDocumentType {
     DriversLicense,

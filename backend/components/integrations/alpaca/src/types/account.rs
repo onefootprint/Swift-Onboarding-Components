@@ -116,8 +116,8 @@ pub struct Agreement {
     pub agreement: Agreements,
     /// string (timestamp)
     pub signed_at: DateTime<Utc>, //"2020-09-11T18:13:44Z",
-    pub ip_address: PiiString, //"185.13.21.99"
-    pub revision: String,      //"19.2022.02"
+    pub ip_address: PiiString,    //"185.13.21.99"
+    pub revision: Option<String>, //"19.2022.02"
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

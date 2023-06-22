@@ -1,30 +1,192 @@
+use alpaca::{
+    types::account::{Contact, CreateAccountRequest, Document, DocumentType, Identity, TaxIdType},
+    AlpacaCip,
+};
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
     State,
 };
 use api_wire_types::{AlpacaCreateAccountRequest, AlpacaCreateAccountResponse};
+use std::str::FromStr;
 
-use newtypes::PiiJsonValue;
+use db::models::{document_request::DocumentRequest, scoped_vault::ScopedVault};
+use newtypes::{
+    email::Email, DataIdentifier as DI, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK, PhoneNumber,
+    PiiJsonValue, PiiString, TenantId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Create an Alpaca account", tags(Integrations, Alpaca, Preview))]
 #[actix::post("/integrations/alpaca/account")]
 pub async fn post(
-    _state: web::Data<State>,
+    state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCreateAccountRequest>,
 ) -> JsonApiResponse<AlpacaCreateAccountResponse> {
-    let _request = request.into_inner();
+    // TODO: do we also want to validate here that the user is `Pass` like we do in the CIP endpoint?
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
-    let _is_live = auth.is_live()?;
-    let _tenant_id = auth.tenant().id.clone();
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
 
-    let alpaca_response = PiiJsonValue::new(serde_json::json!({}));
-    let status_code = 200;
+    // make the client
+    let alpaca_client = alpaca::AlpacaCipClient::new(
+        request.api_key.clone(),
+        request.api_secret.clone(),
+        &request.hostname,
+    )
+    .map_err(CipError::from)?;
+
+    let request: CreateAccountRequest =
+        create_create_account_request(&state, tenant_id, is_live, request.into_inner()).await?;
+    let response = alpaca_client
+        .create_account(request)
+        .await
+        .map_err(CipError::from)?;
+
+    // parse the response as json and grab it's response code
+    let status_code = response.status().as_u16();
+    let alpaca_response: PiiJsonValue = response.json().await?;
+
     ResponseData::ok(AlpacaCreateAccountResponse {
         status_code,
         alpaca_response,
     })
     .json()
+}
+
+async fn create_create_account_request(
+    state: &State,
+    tenant_id: TenantId,
+    is_live: bool,
+    req: AlpacaCreateAccountRequest,
+) -> ApiResult<CreateAccountRequest> {
+    let (uvw, doc) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<(TenantVw<Person>, _)> {
+            let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
+            let doc = DocumentRequest::get_latest_complete(conn, sv.id.clone())?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            Ok((uvw, doc))
+        })
+        .await??;
+
+    let doc_info = doc.map(|(_, id)| {
+        let di_pairs = id
+            .document_type
+            .sides()
+            .into_iter()
+            .map(|s| {
+                (
+                    DI::from(DK::LatestUpload(id.document_type, s)),
+                    DI::from(DK::MimeType(id.document_type, s)),
+                )
+            })
+            .collect::<Vec<_>>();
+        DocInfo {
+            id_doc_kind: id.document_type,
+            di_pairs,
+        }
+    });
+
+    let mut decrypted = uvw
+        .decrypt_unchecked(
+            &state.enclave_client,
+            vec![
+                DI::Id(IDK::FirstName),
+                DI::Id(IDK::LastName),
+                DI::Id(IDK::Email),
+                DI::Id(IDK::PhoneNumber),
+                DI::Id(IDK::Dob),
+                DI::Id(IDK::AddressLine1),
+                DI::Id(IDK::AddressLine2),
+                DI::Id(IDK::Zip),
+                DI::Id(IDK::Country),
+                DI::Id(IDK::State),
+                DI::Id(IDK::City),
+                DI::Id(IDK::Ssn9),
+            ]
+            .into_iter()
+            .chain(doc_info.as_ref().map(|d| d.all_dis()).unwrap_or(vec![]))
+            .collect::<Vec<_>>()
+            .as_slice(),
+        )
+        .await?;
+
+    let documents = if let Some(doc_info) = doc_info {
+        let documents = doc_info
+            .di_pairs
+            .into_iter()
+            .map(|(latest_doc_di, mime_di)| -> ApiResult<Document> {
+                let content = decrypted.rm(latest_doc_di)?;
+                let mime_type = decrypted.rm(mime_di)?;
+                Ok(Document {
+                    document_type: DocumentType::IdentityVerification,
+                    document_sub_type: Some(doc_info.id_doc_kind.to_string()),
+                    content,
+                    mime_type: mime_type.leak_to_string(),
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        Some(documents)
+    } else {
+        None
+    };
+
+    Ok(CreateAccountRequest {
+        enabled_assets: req.enabled_assets,
+        contact: Contact {
+            email_address: Email::from_str(decrypted.rm(IDK::Email)?.leak())?.email,
+            phone_number: PhoneNumber::parse(decrypted.rm(IDK::PhoneNumber)?)?.e164(),
+            street_address: vec![decrypted.rm(IDK::AddressLine1)?],
+            unit: decrypted.rm(IDK::AddressLine2).ok(),
+            city: decrypted.rm(IDK::City)?,
+            state: Some(decrypted.rm(IDK::State)?), // required if country_of_tax_residence is USA which currently our users are
+            postal_code: decrypted.rm(IDK::Zip)?,
+            country: decrypted.rm(IDK::Country)?,
+        },
+        identity: Identity {
+            given_name: decrypted.rm(IDK::FirstName)?,
+            middle_name: None,
+            family_name: decrypted.rm(IDK::LastName)?,
+            date_of_birth: decrypted.rm(IDK::Dob)?,
+            tax_id: Some(decrypted.rm(IDK::Ssn9)?),
+            tax_id_type: Some(TaxIdType::USA_SSN),
+            country_of_citizenship: None,
+            country_of_birth: None,
+            country_of_tax_residence: PiiString::from("USA"), // hardcoded for now
+            visa_type: None,
+            visa_expiration_date: None,
+            date_of_departure_from_usa: None,
+            permanent_resident: None,
+            funding_source: vec![],
+            annual_income_min: None,
+            annual_income_max: None,
+            liquid_net_worth_min: None,
+            liquid_net_worth_max: None,
+            total_net_worth_min: None,
+            total_net_worth_max: None,
+            extra: None,
+        },
+        disclosures: req.disclosures, // TODO: get from broker questions
+        agreements: req.agreements,
+        documents,
+        trusted_contact: req.trusted_contact,
+    })
+}
+
+struct DocInfo {
+    id_doc_kind: IdDocKind,
+    di_pairs: Vec<(DI, DI)>, // (LatestUpload, MimeType)
+}
+
+impl DocInfo {
+    fn all_dis(&self) -> Vec<DI> {
+        self.di_pairs
+            .iter()
+            .flat_map(|(di1, di2)| vec![di1.clone(), di2.clone()])
+            .collect::<Vec<_>>()
+    }
 }

@@ -8,6 +8,7 @@ use reqwest::Method;
 use serde::Serialize;
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;
+use types::account::CreateAccountRequest;
 mod error;
 pub mod types;
 
@@ -87,12 +88,22 @@ pub trait AlpacaCip {
     /// POST /v1/accounts/{account_id}/cip
     /// Returns the direct response from alpaca
     async fn send_cip(&self, account_id: String, request: CipRequest) -> AlpacaResult<reqwest::Response>;
+
+    /// POST /v1/accounts
+    /// Returns the direct response from alpaca
+    async fn create_account(&self, request: CreateAccountRequest) -> AlpacaResult<reqwest::Response>;
 }
 
 #[async_trait]
 impl AlpacaCip for AlpacaCipClient {
     async fn send_cip(&self, account_id: String, request: CipRequest) -> AlpacaResult<reqwest::Response> {
         let path = format!("/v1/accounts/{account_id}/cip");
+        let response = self.make_request_with_retry(Method::POST, path, &request).await?;
+        Ok(response)
+    }
+
+    async fn create_account(&self, request: CreateAccountRequest) -> AlpacaResult<reqwest::Response> {
+        let path = "/v1/accounts";
         let response = self.make_request_with_retry(Method::POST, path, &request).await?;
         Ok(response)
     }

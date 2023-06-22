@@ -3,20 +3,9 @@ from tests.utils import _random_sandbox_phone
 from tests.headers import IsLive
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
-from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number
 from tests.utils import post, get
-import uuid
 from alpaca.broker.client import BrokerClient
-from alpaca.broker.requests import (
-    CreateAccountRequest,
-    Contact,
-    Identity,
-    Disclosures,
-    Agreement,
-    AccountDocument,
-)
-from alpaca.broker.enums import AgreementType
 import datetime
 
 ALPACA_SANDBOX_API_KEY = "CK9ANXZG595Q7CHXAXX3"
@@ -43,8 +32,9 @@ def test_alpaca_cip(
     sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error
 ):
     # create a new user that has onboarded
-    sandbox_phone_number = _random_sandbox_phone(sandbox_suffix)
-    bifrost = BifrostClient.create(alpaca_kyc_ob_config, twilio, sandbox_phone_number)
+    # Alpaca doesn't allow duplicate emails, so we create a nonce'd one 
+    email = f"footprint.user.dev.{_gen_random_n_digit_number(10)}@gmail.com"
+    bifrost = BifrostClient.create(alpaca_kyc_ob_config, twilio, _random_sandbox_phone(sandbox_suffix), override_email=email)
     user = bifrost.run()
     d = user.client.data
 
@@ -104,75 +94,50 @@ def test_alpaca_cip(
             == expected_review_reasons
         )
 
-    # create a new alpaca account
-    broker_client = BrokerClient(ALPACA_SANDBOX_API_KEY, ALPACA_SANDBOX_API_SECRET)
 
-    alpaca_account_email_num = _gen_random_n_digit_number(10)
+    # Create Alpaca Account    
+    create_account_data = {
+        "fp_user_id": user.fp_id,
+        "api_key": ALPACA_SANDBOX_API_KEY,
+        "api_secret": ALPACA_SANDBOX_API_SECRET,
+        "hostname": "broker-api.sandbox.alpaca.markets",
+        "enabled_assets": [
+            "us_equity"
+        ],
+        "disclosures": {
+            "immediate_family_exposed": False,
+            "is_politically_exposed": False,
+            "is_control_person": False,
+            "is_affiliated_exchange_or_finra": False,
+        },
+        "agreements": [
+            {
+            "agreement": "customer_agreement",
+            "signed_at": datetime.datetime.now(
+                tz=datetime.timezone.utc
+            ).isoformat(),
+            "ip_address": "127.0.0.1",
+            },
+            {
+            "agreement": "crypto_agreement",
+            "signed_at": datetime.datetime.now(
+                tz=datetime.timezone.utc
+            ).isoformat(),
+            "ip_address": "127.0.0.1",
+            }
+        ],
+    }
+        
+    create_account_res = post("integrations/alpaca/account", create_account_data, sandbox_tenant.sk.key)
+    assert create_account_res["status_code"] == 200
+    alpaca_response = create_account_res["alpaca_response"]
+    assert alpaca_response["contact"]["email_address"] == d["id.email"].split("#")[0]
+    assert alpaca_response["contact"]["phone_number"] == d["id.phone_number"].split("#")[0]
+    assert alpaca_response["identity"]["given_name"] == d["id.first_name"]
+    assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
+    assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
 
-    documents = None
-    # If we colleted doc, then we will send that in the create Alpaca account request too
-    if sandbox_suffix == "stepup":
-        documents = []
-        for side in ["front", "back", "selfie"]:
-            documents.append(
-                AccountDocument(
-                    id=uuid.uuid4(),  # this shouldn't really be necessary but this python client doesn't list `id` as optional
-                    document_type="identity_verification",
-                    document_sub_type="drivers_license",
-                    content=d[f"document.drivers_license.{side}"],
-                    mime_type="image/png",
-                )
-            )
-
-    account = broker_client.create_account(
-        CreateAccountRequest(
-            contact=Contact(
-                email_address=f"footprint.user.dev+{alpaca_account_email_num}@gmail.com",
-                phone_number=FIXTURE_PHONE_NUMBER,
-                city=d["id.city"],
-                country=d["id.country"],
-                postal_code=d["id.zip"],
-                state=d["id.state"],
-                street_address=[d["id.address_line1"]],
-            ),
-            identity=Identity(
-                given_name=d["id.first_name"],
-                family_name=d["id.last_name"],
-                date_of_birth=d["id.dob"],
-                country_of_tax_residence="USA",
-            ),
-            documents=documents,
-            disclosures=Disclosures(
-                immediate_family_exposed=False,
-                is_politically_exposed=False,
-                is_control_person=False,
-                is_affiliated_exchange_or_finra=False,
-            ),
-            agreements=[
-                Agreement(
-                    agreement=AgreementType.ACCOUNT,
-                    signed_at=datetime.datetime.now(
-                        tz=datetime.timezone.utc
-                    ).isoformat(),
-                    ip_address="127.0.0.1",
-                ),
-                Agreement(
-                    agreement=AgreementType.CUSTOMER,
-                    signed_at=datetime.datetime.now(
-                        tz=datetime.timezone.utc
-                    ).isoformat(),
-                    ip_address="127.0.0.1",
-                ),
-                Agreement(
-                    agreement=AgreementType.MARGIN,
-                    signed_at=datetime.datetime.now(
-                        tz=datetime.timezone.utc
-                    ).isoformat(),
-                    ip_address="127.0.0.1",
-                ),
-            ],
-        )
-    )
+    account_id = alpaca_response['id']
 
     # alpaca request
     alpaca_data = {
@@ -181,7 +146,7 @@ def test_alpaca_cip(
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
         # taken from our sandbox account
-        "account_id": f"{account.id}",
+        "account_id": f"{account_id}",
         "default_approver": "bob@boberto.com",
     }
 
@@ -197,8 +162,9 @@ def test_alpaca_cip(
     else:
         assert body["alpaca_response"]
 
-        # retrieve cip from alpaca
-        broker_client.get_cip_data_for_account_by_id(account_id=account.id)
+        # retrieve cip from alpaca - not really sure what this is for, just an extra level of validation i guess?
+        broker_client = BrokerClient(ALPACA_SANDBOX_API_KEY, ALPACA_SANDBOX_API_SECRET)
+        broker_client.get_cip_data_for_account_by_id(account_id=account_id)
 
         assert body["alpaca_response"]["id"]
         assert (
