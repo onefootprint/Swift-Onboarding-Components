@@ -1465,7 +1465,7 @@
           "header": {
             "role": "Role",
             "active-users": "Active users",
-            "active-api-users": "Active API users",
+            "active-api-keys": "Active API keys",
             "created": "Created at",
             "permissions": "Permissions"
           },
@@ -1511,12 +1511,12 @@
             "num-active-users": {
               "title": "Role can't be deleted",
               "description_one": "One user is assigned to this role. Please assign those users to a different role.",
-              "description_others": "{{count}} users are assigned to this role. Please assign those users to a different role."
+              "description_other": "{{count}} users are assigned to this role. Please assign those users to a different role."
             },
             "num-active-api-keys": {
               "title": "Role can't be deleted",
               "description_one": "One API key is active on this role. Please assign a different role to this API key.",
-              "description_others": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
+              "description_other": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
             }
           },
           "feedback": {

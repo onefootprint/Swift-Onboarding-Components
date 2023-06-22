@@ -20,7 +20,7 @@ const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
     { id: 'active-users', text: t('table.header.active-users'), width: '12%' },
     {
       id: 'active-api-keys',
-      text: t('table.header.active-api-users'),
+      text: t('table.header.active-api-keys'),
       width: '12%',
     },
     { id: 'permissions', text: t('table.header.permissions'), width: '37%' },
