@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import {
   ActorKind,
   DecisionStatus,
