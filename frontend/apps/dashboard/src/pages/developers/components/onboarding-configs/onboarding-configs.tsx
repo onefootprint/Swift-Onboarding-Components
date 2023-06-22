@@ -7,6 +7,8 @@ import SectionHeader from 'src/components/section-header';
 import WaveAnimation from 'src/components/wave-animation';
 
 import Create from './components/create';
+// TODO: clodoan uncomment when testing
+// import Create from './components/create-new';
 import Details from './components/details';
 import Table from './components/table';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
