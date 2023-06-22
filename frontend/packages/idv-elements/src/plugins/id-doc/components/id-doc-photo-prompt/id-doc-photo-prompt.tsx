@@ -54,7 +54,7 @@ const IdDocPhotoPrompt = ({
               },
               {
                 title: t('guidelines.position-document.title', {
-                  document: type === IdDocType.passport ? 'passport' : 'id',
+                  document: type === IdDocType.passport ? 'passport' : 'ID',
                 }),
                 description: t('guidelines.position-document.description', {
                   side,

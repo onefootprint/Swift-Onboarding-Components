@@ -98,14 +98,14 @@
         "front": {
           "subtitle": "Front side",
           "instructions": {
-            "title": "Position the your id in the frame",
+            "title": "Position your ID in the frame",
             "description": "Make sure it's the front side."
           }
         },
         "back": {
           "subtitle": "Back side",
           "instructions": {
-            "title": "Position the your id in the frame",
+            "title": "Position your ID in the frame",
             "description": "Make sure it's the back side."
           }
         }
@@ -115,14 +115,14 @@
         "front": {
           "subtitle": "Front side",
           "instructions": {
-            "title": "Position the your id in the frame",
+            "title": "Position your ID in the frame",
             "description": "Make sure it's the front side."
           }
         },
         "back": {
           "subtitle": "Back side",
           "instructions": {
-            "title": "Position the your id in the frame",
+            "title": "Position your ID in the frame",
             "description": "Make sure it's the back side."
           }
         }
@@ -131,7 +131,7 @@
         "title": "Passport",
         "subtitle": "Photo page",
         "instructions": {
-          "title": "Position the your passport in the frame",
+          "title": "Position your passport in the frame",
           "description": "Make sure it's open in the photo page"
         }
       },
