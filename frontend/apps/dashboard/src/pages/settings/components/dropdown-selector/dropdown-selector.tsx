@@ -72,7 +72,7 @@ const Trigger = styled(Select.Trigger)`
 
 const ItemText = styled.div`
   ${({ theme }) => css`
-    width: 'calc(100% - ${theme.spacing[7]}';
+    width: calc(100% - ${theme.spacing[7]});
   `}
 `;
 
@@ -80,7 +80,7 @@ const Value = styled.span`
   ${({ theme }) => css`
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 'calc(100% - ${theme.spacing[5]})';
+    width: calc(100% - ${theme.spacing[5]});
     white-space: nowrap;
   `}
 `;
@@ -97,6 +97,7 @@ const Content = styled(Select.Content)`
       max-height: 380px;
       overflow: hidden;
       width: 360px;
+      z-index: ${theme.zIndex.dropdown};
     `;
   }}
 `;
