@@ -4,7 +4,7 @@ use paperclip::actix::web;
 
 mod business;
 mod identify;
-mod onboarding;
+pub mod onboarding;
 mod user;
 
 use api_core::*;

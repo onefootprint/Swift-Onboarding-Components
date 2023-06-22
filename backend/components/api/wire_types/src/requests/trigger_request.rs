@@ -11,3 +11,11 @@ pub struct TriggerRequest {
 }
 
 export_schema!(TriggerRequest);
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct TriggerKycRequest {
+    pub onboarding_config_key: ObConfigurationKey,
+}
+
+export_schema!(TriggerKycRequest);

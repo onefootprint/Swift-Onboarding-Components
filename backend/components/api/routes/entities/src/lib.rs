@@ -6,6 +6,7 @@ mod client_token;
 mod decisions;
 mod field_validations;
 mod get;
+mod kyc;
 mod liveness;
 mod risk_signals;
 mod timeline;
@@ -29,6 +30,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::get)
         .service(field_validations::get)
         .service(trigger::post)
+        .service(kyc::post)
         .service(client_token::post)
         .service(risk_signals::get_detail);
 }

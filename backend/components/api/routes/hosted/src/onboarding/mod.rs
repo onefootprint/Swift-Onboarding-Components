@@ -31,6 +31,7 @@ mod authorize;
 mod d2p;
 mod fingerprint_visit;
 mod index;
+pub use index::get_or_start_onboarding;
 mod pat;
 mod process;
 mod skip_liveness;

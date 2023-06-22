@@ -1,4 +1,5 @@
 import pytest
+from tests.utils import _gen_random_ssn, create_ob_config
 from tests.utils import post, get, patch, delete
 from tests.headers import IdempotencyId
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
@@ -228,3 +229,59 @@ def test_idempotency_id(tenant, sandbox_tenant):
 
     invalid_idempotency_id = IdempotencyId("1234567890000!")
     post("users/", None, sandbox_tenant.sk.key, invalid_idempotency_id, status_code=400)
+
+
+
+@pytest.mark.parametrize(
+    "missing_can_access_data,missing_vault_data,expected_error",
+    [
+        ([],[], None),
+        (["dob"], [], "Invalid onboarding configuration for Vault"),
+        ([], ["id.ssn9"], "Unmet onboarding requirements: CollectData"),
+    ],
+)
+def test_kyc(sandbox_tenant, must_collect_data, missing_can_access_data, missing_vault_data, expected_error):
+    obc = create_ob_config(sandbox_tenant, **{
+        "name": "Acme Bank Card",
+        "must_collect_data": must_collect_data,
+        "can_access_data": list(set(must_collect_data)-set(missing_can_access_data)),
+    })
+
+    # create NPV
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    [vault_data.pop(d) for d in missing_vault_data]
+
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    # run KYC
+    body = post(f"entities/{fp_id}/kyc", dict(onboarding_config_key=obc.key.value), sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
+    if expected_error:
+        assert expected_error in body["error"]["message"]
+        return 
+
+    # confirm OBD timeline event created
+    timeline = get(
+        f"entities/{fp_id}/timeline",
+        None,
+        sandbox_tenant.sk.key,
+    )
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 1
+
+    # confirm we can still decrypt all fields
+    post(
+        f"entities/{fp_id}/vault/decrypt",
+        {
+            "fields": list(vault_data.keys()),
+            "reason": "i wanna",
+        },
+        sandbox_tenant.sk.key,
+    )
+
+    
