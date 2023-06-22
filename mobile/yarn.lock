@@ -16607,6 +16607,11 @@ vision-camera-plugin-document@^0.2.0:
   resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.2.0.tgz#02174e62ed2652a4edbd1d2c51acc9036f6d1004"
   integrity sha512-xuQX2H4eT73TwXuch5VejuLa7j9BB3ZpvHfhVtlhVmVFR2ELKyu1KdFD5qyadtyty3yr5P8BEHPa767J3uowPg==
 
+vision-camera-plugin-face-detection@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.3.0.tgz#2bad84936b78f32096065b1a0d199f425d7dc10f"
+  integrity sha512-wF4yUfscKmsvnuOuSVF2GnRs4YXBYTFGaBlcDMU+wkOXMQ9zMsD4ycqqSyfB07aQqVKoig606gEYiES/zfY4/g==
+
 vlq@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/vlq/-/vlq-1.0.1.tgz"

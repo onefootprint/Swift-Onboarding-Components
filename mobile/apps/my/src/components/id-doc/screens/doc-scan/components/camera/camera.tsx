@@ -9,35 +9,29 @@ import {
   Image,
   Typography,
 } from '@onefootprint/ui';
-import React, { useCallback, useRef, useState } from 'react';
-import { Dimensions, ViewStyle } from 'react-native';
-import {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions } from 'react-native';
 import {
   Camera as VisionCamera,
   PhotoFile,
   useCameraDevices,
-  useFrameProcessor,
 } from 'react-native-vision-camera';
-import { documentProcessor } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
 import Instructions from '../instructions';
 import type { CameraSize, CameraType } from './camera.types';
-import useCanTakePhotoManually from './hooks/use-can-take-photo-manually';
 import encodeImagePath from './utils/encode-image-path';
 
 let timerId: NodeJS.Timeout | null = null;
 
 type CameraProps = {
+  detector: any;
   disabled?: boolean;
-  Frame?: ({ style }: { style: ViewStyle }) => JSX.Element;
+  Frame?: ({ detector }: { detector: any }) => JSX.Element;
+  frameProcessor?: any;
   instructions: { description?: string; IconComponent: Icon; title: string };
+  isObjectDetected?: boolean;
   loading?: boolean;
   onSubmit: (encodedImage: string) => void;
   size?: CameraSize;
@@ -48,66 +42,42 @@ type CameraProps = {
 };
 
 const Camera = ({
+  detector,
   disabled = false,
   Frame,
+  frameProcessor,
   instructions,
+  isObjectDetected,
   loading,
   onSubmit,
   size = 'default',
   subtitle,
+  success,
   title,
   type = 'back',
-  success,
 }: CameraProps) => {
   const { t } = useTranslation('components.scan.camera');
   const camera = useRef<VisionCamera>(null);
   const devices = useCameraDevices();
   const device = devices[type];
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
-  const detector = useSharedValue(false);
-  const frameStyles = useAnimatedStyle(
-    () => ({
-      borderWidth: withTiming(detector.value ? 6 : 2.5, { duration: 200 }),
-    }),
-    [detector],
-  );
-  const [canTakePhotoManually, resetCanTakePhotoManually] =
-    useCanTakePhotoManually();
+
   const showActionButtons = photo;
-  const showTakePhotoManuallyButton =
-    !showActionButtons && canTakePhotoManually;
+  const showTakePhotoManuallyButton = !showActionButtons;
   const showInstructions = !photo;
   const showCamera = !photo && device;
 
-  const handleDetectorChange = useCallback((value: boolean) => {
-    resetAutoCapture();
-    if (value) {
-      timerId = setTimeout(takePhoto, 1000);
+  useEffect(() => {
+    if (isObjectDetected) {
+      timerId = setTimeout(takePhoto, 1250);
+      return () => clearTimeout(timerId);
     }
-  }, []);
-
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
-
-      const options = {
-        frame: { x: 16, y: 30, width: windowWidth - 32, height: 220 },
-      };
-      const result = documentProcessor(frame, options);
-      detector.value = result.is_document;
-      if (detector.value !== result.is_document) {
-        detector.value = !!result.is_document;
-        runOnJS(handleDetectorChange)(result.is_document);
-      }
-    },
-    [detector],
-  );
+  }, [isObjectDetected]);
 
   const takePhoto = async () => {
-    resetCanTakePhotoManually();
-    const newPhoto = await camera.current.takePhoto({
-      flash: 'auto',
-    });
+    if (!camera.current) return;
+    resetAutoCapture();
+    const newPhoto = await camera.current.takePhoto();
     setPhoto(newPhoto);
   };
 
@@ -119,7 +89,6 @@ const Camera = ({
   };
 
   const handleTakePhotoManually = () => {
-    resetAutoCapture();
     takePhoto();
   };
 
@@ -151,7 +120,7 @@ const Camera = ({
             )}
             {showCamera && (
               <CameraContainer size={size}>
-                {Frame && <Frame style={frameStyles} />}
+                {Frame && <Frame detector={detector} />}
                 <StyledCamera
                   device={device}
                   frameProcessor={frameProcessor}
