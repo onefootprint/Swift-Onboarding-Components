@@ -1,6 +1,6 @@
-use crate::{export_schema, Apiv2Schema, Deserialize, JsonSchema, Serialize, TriggerKind};
+use crate::{export_schema, Apiv2Schema, JsonSchema, Serialize, TriggerKind};
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
 pub struct Workflow {
     pub kind: TriggerKind,
 }

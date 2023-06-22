@@ -1,13 +1,13 @@
 use newtypes::CollectedDataOption;
 
 use crate::{
-    export_schema, Actor, Annotation, Apiv2Schema, DateTime, Deserialize, DocumentUploadedTimelineEvent,
+    export_schema, Actor, Annotation, Apiv2Schema, DateTime, DocumentUploadedTimelineEvent,
     IdentityDocumentTimelineEvent, JsonSchema, LivenessEvent, OnboardingDecision, Serialize, Utc,
     VaultCreated, WatchlistCheck, Workflow,
 };
 
 /// Describes a liveness event that took place
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct UserTimeline {
@@ -18,7 +18,7 @@ pub struct UserTimeline {
 
 export_schema!(UserTimeline);
 
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 #[allow(clippy::large_enum_variant)]
@@ -38,14 +38,14 @@ pub enum UserTimelineEvent {
 }
 export_schema!(UserTimelineEvent);
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
 }
 
 export_schema!(DataCollectedInfo);
 
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, JsonSchema)]
 pub struct WorkflowTriggered {
     pub workflow: Workflow,
     pub actor: Actor,

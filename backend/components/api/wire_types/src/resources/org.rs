@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Organization
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct Organization {

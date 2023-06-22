@@ -5,7 +5,7 @@ fn is_false(b: &bool) -> bool {
 }
 
 /// Member of an organization
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct OrganizationMember {
@@ -22,7 +22,7 @@ pub struct OrganizationMember {
 export_schema!(OrganizationMember);
 
 /// Member of an organization
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 /// Info on the currently authed user
 pub struct AuthOrgMember {

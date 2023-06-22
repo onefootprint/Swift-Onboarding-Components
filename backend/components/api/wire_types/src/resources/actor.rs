@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum Actor {
