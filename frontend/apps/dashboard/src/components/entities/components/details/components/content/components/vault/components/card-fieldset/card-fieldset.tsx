@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { type Icon } from '@onefootprint/icons';
-import { EntityCard } from '@onefootprint/types';
+import { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
+import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import styled, { css } from 'styled-components';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
@@ -40,8 +41,8 @@ const Fieldset = ({
   const allSelected = selectableFields.every(form.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
-  const getCardTitle = (length: number) =>
-    `${title} ${length > 1 ? `(${length} ${t('cards')})` : ''}`;
+  const getCardTitle = (count: number) =>
+    `${title} ${t('cards.title', { count })}`;
 
   const handleSelectAll = () => {
     form.set(selectableFields, true);
@@ -51,10 +52,26 @@ const Fieldset = ({
     form.set(selectableFields, false);
   };
 
+  const renderCardIssuer = (value: VaultValue) => {
+    const changedValue = t(`cards.card-brands.${value}`);
+    return <FieldOrPlaceholder data={changedValue} />;
+  };
+
   const renderField = (field: DiField) => {
     const { di } = field;
     const tKeyWithoutAlias = `di.${di.replace(`${selectedCard.alias}.`, '')}`;
 
+    if (di.endsWith('issuer')) {
+      return (
+        <Field
+          renderValue={renderCardIssuer}
+          key={di}
+          di={di}
+          entity={entity}
+          renderLabel={() => allT(tKeyWithoutAlias)}
+        />
+      );
+    }
     return (
       <Field
         key={di}

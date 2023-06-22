@@ -1,12 +1,12 @@
 export type CardBrands =
   | 'amex'
-  | 'dinersclub'
+  | 'diners_club'
   | 'discover'
   | 'jcb'
   | 'maestro'
-  | 'mastercard'
+  | 'master_card'
   | 'unionpay'
   | 'visa'
-  | 'visaelectron'
+  | 'visa_electron'
   | 'forbrugsforeningen'
   | 'dankort';

@@ -111,6 +111,9 @@
       "number_last4": "Number (Last 4)",
       "expiration": "Expiration",
       "cvc": "Security code (CVC)",
+      "billing_address": {
+        "zip": "Billing address (Zip code)"
+      },
       "verbose": {
         "name": "Name on card",
         "number": "Card number",
@@ -512,7 +515,25 @@
       "fieldset": {
         "select-all": "Select all",
         "deselect-all": "Deselect all",
-        "cards": "cards"
+        "cards": {
+          "title_other": "({{count}} cards)",
+          "title_one": "",
+          "card-brands": {
+            "visa": "Visa",
+            "mir": "Mir",
+            "master_card": "MasterCard",
+            "amex": "American Express",
+            "diners_club": "Diners Club",
+            "discover": "Discover",
+            "union_pay": "UnionPay",
+            "jcb": "JCB",
+            "visa_electron": "Visa Electron",
+            "maestro": "Maestro",
+            "forbrugsforeningen": "Forbrugsforeningen",
+            "dankort": "Dankort",
+            "unknown": "Unknown"
+          }
+        }
       },
       "decrypt": {
         "start": "Decrypt data",
