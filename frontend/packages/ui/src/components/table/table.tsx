@@ -1,3 +1,4 @@
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Property } from 'csstype';
 import times from 'lodash/times';
@@ -34,6 +35,7 @@ export type TableProps<T> = {
   onRowClick?: (item: T) => void;
   renderActions?: () => React.ReactNode;
   renderTr: (row: TableRow<T>) => JSX.Element;
+  hasRowEmphasis?: (item: T) => boolean;
   searchPlaceholder?: string;
 };
 
@@ -51,12 +53,14 @@ const Table = <T,>({
   onRowClick,
   renderActions,
   renderTr,
+  hasRowEmphasis,
   searchPlaceholder = 'Search...',
 }: TableProps<T>) => {
   const shouldRenderFilters = onChangeSearchText || renderActions;
   const shouldShowEmptyState = !isLoading && !items?.length;
   const shouldShowData = !isLoading && !!items;
   const columnsCount = columns.length;
+  const [animate] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <>
@@ -140,9 +144,11 @@ const Table = <T,>({
                   }
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
+                  ref={animate}
                   onClick={() => {
                     onRowClick?.(item);
                   }}
+                  color={hasRowEmphasis?.(item) ? 'warning' : undefined}
                 >
                   {renderTr({ index, item })}
                 </Tr>

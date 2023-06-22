@@ -1,13 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { TriggerKind } from '@onefootprint/types';
-import { Divider, Radio, TextArea, Typography } from '@onefootprint/ui';
+import {
+  Checkbox,
+  Divider,
+  Radio,
+  TextArea,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import AnimatedContainer from 'src/components/animated-container';
 import styled, { css } from 'styled-components';
 
 export type RetriggerKYCFormData = {
   kind: TriggerKind;
-  note?: string | undefined;
+  collectSelfie: boolean;
+  note?: string;
 };
 
 type RetriggerKYCFormProps = {
@@ -21,7 +29,9 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RetriggerKYCFormData>();
+  const triggerKind = watch('kind');
 
   const handleBeforeSubmit = (data: RetriggerKYCFormData) => {
     onSubmit({
@@ -32,12 +42,23 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   return (
     <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Typography variant="label-3">{t('prompt')}</Typography>
-      <Radio
-        value={TriggerKind.IdDocument}
-        label={t('form.id-photo.title')}
-        hint={t('form.id-photo.description')}
-        {...register('kind', { required: true })}
-      />
+      <div>
+        <Radio
+          value={TriggerKind.IdDocument}
+          label={t('form.id-photo.title')}
+          hint={t('form.id-photo.description')}
+          {...register('kind', { required: true })}
+        />
+        <AnimatedContainer
+          isExpanded={triggerKind === TriggerKind.IdDocument}
+          sx={{ marginLeft: 8, marginTop: 4 }}
+        >
+          <Checkbox
+            label={t('form.id-photo.collect-selfie')}
+            {...register('collectSelfie', { required: false })}
+          />
+        </AnimatedContainer>
+      </div>
       <Radio
         value={TriggerKind.RedoKyc}
         label={t('form.revise-kyc.title')}

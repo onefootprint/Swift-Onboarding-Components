@@ -8,11 +8,11 @@ import {
 import { Box, Checkbox, Divider, Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import AnimatedContainer from 'src/components/animated-container';
 import CdoTagList from 'src/components/cdo-tag-list';
 import styled, { css } from 'styled-components';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
-import AnimatedContainer from '../animated-container';
 import { useOnboardingConfigMachine } from '../machine-provider';
 import IdDocDescription from './components/id-doc-description';
 import InvestorProfileQuestions from './components/investor-profile-questions';
@@ -146,7 +146,10 @@ const KycCollectForm = ({ showInvestorProfile }: KycCollectFormProps) => {
               })}
             />
 
-            <AnimatedContainer isExpanded={idDoc}>
+            <AnimatedContainer
+              isExpanded={idDoc}
+              sx={{ marginLeft: 5, marginTop: 3 }}
+            >
               <Checkbox
                 label={allT('cdo.selfie')}
                 {...register(CollectedDocumentDataOption.documentAndSelfie)}

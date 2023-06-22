@@ -7,9 +7,9 @@ import {
 import { Box, Checkbox, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import AnimatedContainer from 'src/components/animated-container';
 import styled, { css } from 'styled-components';
 
-import AnimatedContainer from '../../components/animated-container';
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getDefaultKycAccess from '../../utils/get-default-kyc-access';
@@ -128,6 +128,7 @@ const KybAccess = () => {
                     CollectedDocumentDataOption.documentAndSelfie
                   ] && !!idDocAccess
                 }
+                sx={{ marginLeft: 5, marginTop: 3 }}
               >
                 <Checkbox
                   label={allT('cdo.selfie')}

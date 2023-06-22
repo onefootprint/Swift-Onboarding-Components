@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { TriggerKind } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -23,12 +24,20 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
   const entityId = useEntityId();
 
   const handleSubmit = (data: RetriggerKYCFormData) => {
-    const { kind, note } = data;
+    const { kind, collectSelfie, note } = data;
+    let trigger;
+    if (kind === TriggerKind.IdDocument) {
+      trigger = { kind, data: { collectSelfie } };
+    } else if (kind === TriggerKind.RedoKyc) {
+      trigger = { kind };
+    } else {
+      return;
+    }
     submitRetriggerKYCMutation.mutate(
       {
         entityId,
-        kind,
-        note,
+        trigger,
+        note: note || undefined,
       },
       {
         onSuccess: () => {

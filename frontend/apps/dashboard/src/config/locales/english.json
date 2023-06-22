@@ -607,7 +607,8 @@
           "form": {
             "id-photo": {
               "title": "Re-upload ID photo",
-              "description": "Data will be updated with this new information."
+              "description": "Data will be updated with this new information.",
+              "collect-selfie": "Collect selfie"
             },
             "revise-kyc": {
               "title": "Revise KYC data",

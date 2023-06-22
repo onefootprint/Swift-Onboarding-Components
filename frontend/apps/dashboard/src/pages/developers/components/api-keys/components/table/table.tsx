@@ -32,6 +32,7 @@ const ApiKeysTable = () => {
       isLoading={isLoading}
       items={data}
       renderTr={renderTr}
+      hasRowEmphasis={() => true}
     />
   );
 };
