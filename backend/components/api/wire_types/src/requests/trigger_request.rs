@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TriggerKind {
     /// Allow editing data, re-verify data, and then re-trigger decision engine

@@ -56,6 +56,12 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::VaultCreated(actor) => Self::VaultCreated(api_wire_types::VaultCreated {
                 actor: api_wire_types::Actor::from_db(actor),
             }),
+            SaturatedTimelineEvent::WorkflowTriggered((workflow, actor)) => {
+                Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
+                    workflow: api_wire_types::Workflow::from_db(workflow),
+                    actor: api_wire_types::Actor::from_db(actor),
+                })
+            }
         }
     }
 }

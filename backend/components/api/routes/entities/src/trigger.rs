@@ -21,6 +21,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::AlpacaKycConfig;
@@ -29,6 +30,7 @@ use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
 use newtypes::VaultKind;
+use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -48,6 +50,7 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
+    let actor = auth.actor().into();
 
     // Generate an auth token for the user and send to their phone number on file
     let (vw, auth_token) = state
@@ -96,15 +99,21 @@ pub async fn post(
                     wf
                 }
             };
+            // Create a timeline event logging that the workflow was triggered
+            let event = WorkflowTriggeredInfo {
+                workflow_id: wf.id.clone(),
+                actor,
+            };
+            UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
+            // Create an auth token for this workflow that we will send to the user
             let scopes = vec![
                 UserAuthScope::SignUp,
                 // NOTE: when we remove this OrgOnboarding scope, make sure we're able to
                 // look up the ob_config and tenant on UserObAuth via the Workflow scope
-                UserAuthScope::OrgOnboarding { id: sv.id },
+                UserAuthScope::OrgOnboarding { id: sv.id.clone() },
                 UserAuthScope::Workflow { wf_id: wf.id },
             ];
             let duration = Duration::days(1);
-            // TODO make a timeline event?
             let data = UserSession::make(sv.vault_id, scopes);
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))

@@ -1,8 +1,8 @@
-use crate::DbActor;
 use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId,
     LivenessEventId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
 };
+use crate::{DbActor, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -37,6 +37,7 @@ pub enum DbUserTimelineEvent {
     DocumentUploaded(DocumentUploadedInfo),
     WatchlistCheck(WatchlistCheckInfo),
     VaultCreated(VaultCreatedInfo),
+    WorkflowTriggered(WorkflowTriggeredInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -89,6 +90,12 @@ impl From<VaultCreatedInfo> for DbUserTimelineEvent {
     }
 }
 
+impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
+    fn from(s: WorkflowTriggeredInfo) -> Self {
+        Self::WorkflowTriggered(s)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
@@ -132,5 +139,11 @@ pub struct WatchlistCheckInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VaultCreatedInfo {
+    pub actor: DbActor,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkflowTriggeredInfo {
+    pub workflow_id: WorkflowId,
     pub actor: DbActor,
 }

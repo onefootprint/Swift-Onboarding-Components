@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{AlpacaKycState, DocumentState};
@@ -65,6 +67,18 @@ impl Workflow {
         let res = workflow::table
             .filter(workflow::id.eq(workflow_id))
             .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<WorkflowId>) -> DbResult<HashMap<WorkflowId, Self>> {
+        let res = workflow::table
+            .filter(workflow::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|w| (w.id.clone(), w))
+            .collect();
 
         Ok(res)
     }
