@@ -8,7 +8,6 @@ import {
 } from '@onefootprint/test-utils';
 import { Entity, EntityKind, EntityStatus } from '@onefootprint/types';
 import React from 'react';
-import { useStore } from 'src/hooks/use-session';
 
 import RetriggerKYC from './retrigger-kyc';
 import { withTrigger, withTriggerError } from './retrigger-kyc.test.config';
@@ -31,29 +30,12 @@ const entityFixture: Entity = {
   watchlistCheck: null,
 };
 
-const originalState = useStore.getState();
 describe('<RetriggerKYC />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: `/entities/${entityFixture.id}/trigger`,
       query: {
         id: entityFixture.id,
-      },
-    });
-
-    useStore.setState({
-      ...originalState,
-      data: {
-        user: {
-          isFirmEmployee: true,
-          id: entityFixture.id,
-          firstName: 'Lucas',
-          lastName: 'Gelfond',
-          email: 'lucas@onefootprint.com',
-          scopes: [],
-          isAssumedSession: true,
-        },
-        meta: { ...originalState.data.meta },
       },
     });
   });

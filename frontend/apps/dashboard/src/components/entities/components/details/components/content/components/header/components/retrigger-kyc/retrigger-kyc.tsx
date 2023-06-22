@@ -3,16 +3,12 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useSession from 'src/hooks/use-session';
 
 import { WithEntityProps } from '../../../../../with-entity';
 import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
 
 const RetriggerKYC = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('pages.entity.retrigger-kyc');
-  const {
-    data: { user },
-  } = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleCloseDialog = () => {
@@ -24,9 +20,7 @@ const RetriggerKYC = ({ entity }: WithEntityProps) => {
   };
 
   const shouldShowActionsDropdown =
-    user?.isFirmEmployee &&
-    entity?.isPortable &&
-    entity.kind === EntityKind.person;
+    entity?.isPortable && entity.kind === EntityKind.person;
   return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
