@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
-import createStringList from 'src/utils/create-string-list';
+import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import SeverityBadge from '../../../../../severity-badge';
 import Field from './components/field';
@@ -36,7 +36,9 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
             </Field>
           </Grid.Column>
           <Grid.Column col={6}>
-            <Field label={t('scopes')}>{createStringList(scopesList)}</Field>
+            <Field label={t('scopes')}>
+              {createCapitalStringList(scopesList)}
+            </Field>
           </Grid.Column>
         </Grid.Row>
         <Field label={t('description')}>{description}</Field>

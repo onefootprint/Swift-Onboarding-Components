@@ -27,7 +27,10 @@ const createStringList = (
       }
     });
 
-  return capitalize(list.join(''));
+  return list.join('');
 };
+
+export const createCapitalStringList = (items: string[]) =>
+  capitalize(createStringList(items));
 
 export default createStringList;

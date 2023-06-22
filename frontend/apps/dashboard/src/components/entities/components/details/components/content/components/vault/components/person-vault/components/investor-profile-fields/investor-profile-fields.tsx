@@ -8,7 +8,7 @@ import {
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
-import createStringList from 'src/utils/create-string-list';
+import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
@@ -72,7 +72,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               if (Array.isArray(value)) {
                 return (
                   <FieldOrPlaceholder
-                    data={createStringList(
+                    data={createCapitalStringList(
                       value.map(option =>
                         t(`investment-goals.options.${option}`),
                       ),
@@ -107,7 +107,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               if (Array.isArray(value)) {
                 return (
                   <FieldOrPlaceholder
-                    data={createStringList(
+                    data={createCapitalStringList(
                       value.map(option => t(`declarations.options.${option}`)),
                     )}
                   />

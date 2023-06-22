@@ -3,7 +3,7 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import { RiskSignal } from '@onefootprint/types';
 import { Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
-import createStringList from 'src/utils/create-string-list';
+import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import SeverityBadge from '../severity-badge';
 
@@ -24,7 +24,7 @@ const Row = ({ riskSignal }: RowProps) => {
       <td>
         <SeverityBadge severity={riskSignal.severity} />
       </td>
-      <td>{createStringList(scopesList)}</td>
+      <td>{createCapitalStringList(scopesList)}</td>
       <td>
         {shouldShowTooltip ? (
           <Tooltip text={riskSignal.description}>
