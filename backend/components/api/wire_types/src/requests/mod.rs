@@ -45,3 +45,6 @@ pub use alpaca_cip_request::*;
 
 mod api_key;
 pub use api_key::*;
+
+mod alpaca_create_account;
+pub use alpaca_create_account::*;

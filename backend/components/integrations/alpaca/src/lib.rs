@@ -9,10 +9,10 @@ use serde::Serialize;
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;
 mod error;
-mod types;
+pub mod types;
 
 pub use self::error::Error;
-pub use self::types::*;
+pub use self::types::cip::*;
 
 pub type AlpacaResult<T> = Result<T, error::Error>;
 

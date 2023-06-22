@@ -21,5 +21,6 @@ thiserror = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
 derive_more = { workspace = true }
+alpaca = { path = "../../integrations/alpaca" }
 
 paste = "1.0"
