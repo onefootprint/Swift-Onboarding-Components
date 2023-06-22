@@ -6,6 +6,7 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
+import { Entity, EntityKind, EntityStatus } from '@onefootprint/types';
 import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
@@ -14,18 +15,29 @@ import { withTrigger, withTriggerError } from './retrigger-kyc.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
-const renderRetriggerKYC = async () => customRender(<RetriggerKYC />);
+const renderRetriggerKYC = async () =>
+  customRender(<RetriggerKYC entity={entityFixture} />);
+
+const entityFixture: Entity = {
+  id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+  isPortable: true,
+  kind: EntityKind.person,
+  attributes: [],
+  decryptableAttributes: [],
+  startTimestamp: '2023-03-27T14:43:47.444716Z',
+  requiresManualReview: false,
+  status: EntityStatus.pass,
+  decryptedAttributes: {},
+  watchlistCheck: null,
+};
 
 const originalState = useStore.getState();
-
 describe('<RetriggerKYC />', () => {
-  const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
-
   beforeEach(() => {
     useRouterSpy({
-      pathname: `/entities/${entityId}/trigger`,
+      pathname: `/entities/${entityFixture.id}/trigger`,
       query: {
-        id: entityId,
+        id: entityFixture.id,
       },
     });
 
@@ -34,7 +46,7 @@ describe('<RetriggerKYC />', () => {
       data: {
         user: {
           isFirmEmployee: true,
-          id: entityId,
+          id: entityFixture.id,
           firstName: 'Lucas',
           lastName: 'Gelfond',
           email: 'lucas@onefootprint.com',
@@ -48,7 +60,7 @@ describe('<RetriggerKYC />', () => {
 
   describe('when the request to trigger request succeeds', () => {
     beforeEach(() => {
-      withTrigger(entityId);
+      withTrigger(entityFixture.id);
     });
 
     it('should close the dialog and show a confirmation message', async () => {
@@ -93,7 +105,7 @@ describe('<RetriggerKYC />', () => {
 
   describe('when the request to trigger request fails', () => {
     beforeEach(() => {
-      withTriggerError(entityId);
+      withTriggerError(entityFixture.id);
     });
 
     it('should show an error message', async () => {

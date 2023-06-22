@@ -1,12 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import { EntityKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useSession from 'src/hooks/use-session';
 
+import { WithEntityProps } from '../../../../../with-entity';
 import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
 
-const RetriggerKYC = () => {
+const RetriggerKYC = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('pages.entity.retrigger-kyc');
   const {
     data: { user },
@@ -21,7 +23,11 @@ const RetriggerKYC = () => {
     setDialogOpen(true);
   };
 
-  return user?.isFirmEmployee ? (
+  const shouldShowActionsDropdown =
+    user?.isFirmEmployee &&
+    entity?.isPortable &&
+    entity.kind === EntityKind.person;
+  return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
         <Dropdown.Trigger $asButton aria-label={t('cta')}>
