@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
-import { Badge } from '@onefootprint/ui';
+import { Badge, CodeInline } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { Field } from 'src/components';
 
@@ -17,7 +17,9 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
     <>
       {proxyConfig.secretHeaders.map(({ name }) => (
         <Fragment key={name}>
-          <Field label={t('name')}>{name}</Field>
+          <Field label={t('name')}>
+            <CodeInline>{name}</CodeInline>
+          </Field>
           <Field label={t('value')}>
             <Badge variant="info">{t('secret')}</Badge>
           </Field>
@@ -25,7 +27,9 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
       ))}
       {proxyConfig.headers.map(({ name, value }) => (
         <Fragment key={value}>
-          <Field label={t('name')}>{name}</Field>
+          <Field label={t('name')}>
+            <CodeInline>{name}</CodeInline>
+          </Field>
           <Field label={t('value')}>{value}</Field>
         </Fragment>
       ))}
