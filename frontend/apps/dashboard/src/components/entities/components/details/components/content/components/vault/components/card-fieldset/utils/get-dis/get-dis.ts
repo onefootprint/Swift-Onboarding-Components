@@ -6,6 +6,7 @@ const order: Record<string, number> = {
   number: 3,
   expiration: 4,
   cvc: 5,
+  billing_address: 6,
 };
 
 const filter = (attributes: DataIdentifier[], search: any) => {
