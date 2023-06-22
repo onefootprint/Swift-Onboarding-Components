@@ -15,7 +15,10 @@ use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::utils::headers::InsightHeaders;
-use api_route_hosted::onboarding::get_requirements;
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_route_hosted::onboarding::get_requirements_inner;
 use api_route_hosted::onboarding::GetRequirementsArgs;
 use api_wire_types::TriggerKycRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -25,10 +28,10 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::DbError;
 use itertools::Itertools;
+use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::FpId;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
@@ -52,16 +55,17 @@ pub async fn post(
     } = request.into_inner();
 
     let insight_event = CreateInsightEvent::from(insights);
-
-    let (ob, obc, wf, sb) = state
+    let ff_client = state.feature_flag_client.clone();
+    let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vault = Vault::lock(conn, &sv.vault_id)?;
-            if vault.kind != VaultKind::Person {
+            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id))?;
+
+            if uvw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForKyc.into());
             }
-            if vault.is_portable {
+            if uvw.vault.is_portable {
                 return Err(TenantError::CannotRunKycForPortable.into());
             }
             let (obc, tenant) = ObConfiguration::get_enabled(conn, &onboarding_config_key)
@@ -107,31 +111,37 @@ pub async fn post(
             }
             .insert(conn)?;
 
-            Ok((ob, obc, wf, sb))
+            if obc.must_collect(DID::InvestorProfile) {
+                return Err(
+                    TenantError::UnsupportedObcForNpv("Investor Profile not allowed".to_owned()).into(),
+                );
+            }
+            let reqs = get_requirements_inner(
+                conn,
+                uvw,
+                GetRequirementsArgs {
+                    ob_config: obc.clone(),
+                    onboarding: ob,
+                    workflow: Some(wf.clone()),
+                    sb_id: sb.map(|s| s.id),
+                },
+                None, // /kyc endpoint currently does not properly handle IPK doc requirements!
+                ff_client,
+            )?;
+            // TODO: consolidate with /authorize code
+            let unmet_reqs = reqs
+                .into_iter()
+                .filter(|r| !r.is_met())
+                .filter(|r| !matches!(r, OnboardingRequirement::Process))
+                .collect_vec();
+            if !unmet_reqs.is_empty() {
+                let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
+                return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+            }
+
+            Ok(wf)
         })
         .await?;
-
-    // TODO: move inside txn once we remove async enclave dependency
-    let reqs = get_requirements(
-        &state,
-        GetRequirementsArgs {
-            ob_config: obc,
-            onboarding: ob,
-            workflow: Some(wf.clone()),
-            sb_id: sb.map(|s| s.id),
-        },
-    )
-    .await?;
-    // TODO: consolidate with /authorize code
-    let unmet_reqs = reqs
-        .into_iter()
-        .filter(|r| !r.is_met())
-        .filter(|r| !matches!(r, OnboardingRequirement::Process))
-        .collect_vec();
-    if !unmet_reqs.is_empty() {
-        let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
-        return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
-    }
 
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
     let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;

@@ -41,4 +41,7 @@ pub enum TenantError {
 
     #[error("Invalid onboarding configuration for Vault. The following fields need to be authorized for read access: {0}")]
     MissingCanAccessCdos(Csv<CollectedDataOption>),
+
+    #[error("Invalid onboarding configuration for Vault. {0}")]
+    UnsupportedObcForNpv(String),
 }

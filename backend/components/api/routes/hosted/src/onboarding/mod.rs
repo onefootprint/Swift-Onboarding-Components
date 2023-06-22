@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
     auth::user::CheckedUserObAuthContext,
@@ -17,7 +19,7 @@ use db::{
     PgConn,
 };
 use either::Either;
-use feature_flag::BoolFlag;
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{AuthorizeFields, OnboardingRequirement, OnboardingRequirementKind};
 use newtypes::{
@@ -94,14 +96,11 @@ pub async fn get_requirements(
         .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
         .await?;
 
-    let only_us_dl = state
-        .feature_flag_client
-        .flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
-
+    let ff_client = state.feature_flag_client.clone();
     let requirements = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let requirements = get_requirements_inner(conn, uvw, args, declarations, only_us_dl)?;
+            let requirements = get_requirements_inner(conn, uvw, args, declarations, ff_client)?;
             Ok(requirements)
         })
         .await??;
@@ -140,13 +139,15 @@ fn get_progress<Type>(
 }
 
 #[tracing::instrument(skip_all)]
-fn get_requirements_inner(
+pub fn get_requirements_inner(
     conn: &mut PgConn,
     uvw: VaultWrapper<Person>,
     args: GetRequirementsArgs,
     declarations: Option<PiiString>,
-    only_us_dl: bool,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
+    let only_us_dl = ff_client.flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
+
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = args
         .workflow
