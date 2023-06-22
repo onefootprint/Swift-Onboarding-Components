@@ -1,12 +1,30 @@
 import styled, { css } from '@onefootprint/styled';
+import React from 'react';
 import { Dimensions } from 'react-native';
-import Reanimated from 'react-native-reanimated';
+import Reanimated, {
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
+
+type FrameProps = {
+  detector: any;
+};
+
+const Frame = ({ detector }: FrameProps) => {
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      borderWidth: withTiming(detector.value ? 6 : 3, { duration: 200 }),
+    };
+  });
+
+  return <StyledFrame style={animatedStyles} />;
+};
 
 const windowWidth = Dimensions.get('window').width;
 
-const Frame = styled(Reanimated.View)`
+const StyledFrame = styled(Reanimated.View)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.large};
+  border-radius: ${theme.borderRadius.large};
     border: ${theme.borderWidth[2]} solid #FFF  
     height: 220px;
     position: absolute;

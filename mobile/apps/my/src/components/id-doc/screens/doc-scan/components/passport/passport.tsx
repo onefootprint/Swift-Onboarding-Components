@@ -8,7 +8,7 @@ import { documentProcessor } from 'vision-camera-plugin-document';
 import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../camera';
-import Frame from './components/frame';
+import Frame from '../default-frame';
 
 export type PassportProps = {
   success?: boolean;
