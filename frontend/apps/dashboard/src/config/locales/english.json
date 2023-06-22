@@ -680,10 +680,9 @@
             "title-from-other-org": "Collected (from other companies) "
           },
           "onboarding-decision-event": {
-            "verified-by-footprint": "Verified by Footprint",
-            "not-verified-by-footprint": "Could not be verified by Footprint",
-            "verified-by-firm-employee": "Verified by Footprint Risk Ops",
-            "not-verified-by-firm-employee": "Could not be verified by Footprint Risk Ops",
+            "verified-by": "Verified by",
+            "not-verified-by": "Verified by",
+            "could-not-be-verified-by": "Could not be verified by",
             "verified": "Verified",
             "not-verified": "Failed",
             "decision-status": {
@@ -693,7 +692,7 @@
             },
             "with": " with ",
             "org-overwrite": {
-              "title": "Marked as {{decision}} by {{user}}",
+              "title": "Marked as {{decision}} by",
               "see-details": "See details",
               "drawer": {
                 "title": "Review details",

@@ -1,24 +1,13 @@
-import {
-  ActorApiKey,
-  ActorFirmEmployee,
-  ActorFootprint,
-  ActorOrganization,
-} from './actor';
+import { Actor } from './actor';
 import { CollectedDataOption } from './collected-data-option';
 import DecisionStatus from './decision-status';
 import Vendor from './vendor';
-
-export type DecisionSource =
-  | ActorFootprint
-  | ActorOrganization
-  | ActorFirmEmployee
-  | ActorApiKey;
 
 export type OnboardingDecision = {
   id: string;
   status: DecisionStatus;
   timestamp: Date;
-  source: DecisionSource;
+  source: Actor;
   obConfiguration: {
     mustCollectData: CollectedDataOption[];
     mustCollectIdentityDocument: boolean;

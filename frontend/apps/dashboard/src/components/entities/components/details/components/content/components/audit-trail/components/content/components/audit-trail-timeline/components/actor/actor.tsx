@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Actor as TActor, ActorKind } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 type ActorProps = {
   actor: TActor;
@@ -10,20 +11,20 @@ type ActorProps = {
 const Actor = ({ actor }: ActorProps) => {
   const { t } = useTranslation('pages.entity.actor');
 
-  if (actor.kind === ActorKind.footprint) {
-    return <Typography variant="label-3">{t('footprint')}</Typography>;
-  }
-  if (actor.kind === ActorKind.firmEmployee) {
-    return <Typography variant="label-3">{t('firm-employee')}</Typography>;
-  }
-  // TODO actually deeplink to these resources
-  if (actor.kind === ActorKind.organization) {
-    return <Typography variant="label-3">{actor.member}</Typography>;
-  }
-  if (actor.kind === ActorKind.apiKey) {
-    return <Typography variant="label-3">{actor.name}</Typography>;
-  }
-  return null;
+  return (
+    <Container>
+      {actor.kind === ActorKind.footprint && t('footprint')}
+      {actor.kind === ActorKind.firmEmployee && t('firm-employee')}
+      {/* TODO deeplink these one day */}
+      {actor.kind === ActorKind.organization && actor.member}
+      {actor.kind === ActorKind.apiKey && actor.name}
+    </Container>
+  );
 };
+
+const Container = styled.span`
+  ${createFontStyles('label-3')};
+  color: currentColor;
+`;
 
 export default Actor;

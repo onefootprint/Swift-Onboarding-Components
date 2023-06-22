@@ -55,8 +55,9 @@ describe('<AuditTrailTimeline />', () => {
 
       const header = headers[1];
       expect(
-        within(header).getByText('Could not be verified by Footprint'),
+        within(header).getByText('Could not be verified by'),
       ).toBeInTheDocument();
+      expect(within(header).getByText('Footprint')).toBeInTheDocument();
 
       const bodies = screen.getAllByTestId('onboarding-decision-event-body');
       expect(bodies.length).toEqual(2);
@@ -71,9 +72,8 @@ describe('<AuditTrailTimeline />', () => {
       expect(headers.length).toEqual(2);
 
       const header = headers[0];
-      expect(
-        within(header).getByText('Verified by Footprint'),
-      ).toBeInTheDocument();
+      expect(within(header).getByText('Verified by')).toBeInTheDocument();
+      expect(within(header).getByText('Footprint')).toBeInTheDocument();
 
       const bodies = screen.getAllByTestId('onboarding-decision-event-body');
       expect(bodies.length).toEqual(2);

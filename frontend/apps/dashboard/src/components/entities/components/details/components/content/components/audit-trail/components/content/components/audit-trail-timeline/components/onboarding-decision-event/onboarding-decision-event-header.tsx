@@ -8,6 +8,7 @@ import {
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import Actor from '../actor';
 import FieldValidationDetails from './components/field-validation-details';
 
 type OnboardingDecisionEventHeaderProps = {
@@ -26,60 +27,35 @@ const OnboardingDecisionEventHeader = ({
   const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
 
-  if (source.kind === ActorKind.footprint) {
-    return (
-      <Box sx={{ gap: 2 }}>
-        <Typography
-          variant="label-3"
-          color={color}
-          testID="onboarding-decision-event-header"
-        >
-          {isVerified
-            ? t('verified-by-footprint')
-            : t('not-verified-by-footprint')}
-        </Typography>
-        {!isVerified && <FieldValidationDetails />}
-      </Box>
-    );
-  }
-
-  if (source.kind === ActorKind.firmEmployee) {
-    return (
-      <OrgDecisionContainer>
-        <Typography
-          variant="label-3"
-          color={color}
-          testID="onboarding-decision-event-header"
-        >
-          {isVerified
-            ? t('verified-by-firm-employee')
-            : t('not-verified-by-firm-employee')}
-        </Typography>
-      </OrgDecisionContainer>
-    );
-  }
-
-  if (source.kind === ActorKind.organization) {
+  // Text differs slightly based on whether Footprint or the tenant made the decision
+  const isFootprintActor =
+    source.kind === ActorKind.firmEmployee ||
+    source.kind === ActorKind.footprint;
+  let text;
+  if (isFootprintActor) {
+    text = isVerified ? t('verified-by') : t('could-not-be-verified-by');
+  } else {
     const decision = t(`decision-status.${status}`);
-
-    return (
-      <OrgDecisionContainer data-test-id="onboarding-decision-event-header">
-        <Typography variant="label-3" color={color}>
-          {t('org-overwrite.title', { decision, user: source.member })}
-        </Typography>
-      </OrgDecisionContainer>
-    );
+    text = t('org-overwrite.title', { decision });
   }
 
-  return null;
-};
+  const showFieldValidationDetails =
+    !isVerified && source.kind === ActorKind.footprint;
 
-const OrgDecisionContainer = styled.span`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-  `}
-`;
+  return (
+    <Box sx={{ gap: 2 }}>
+      <Typography
+        variant="label-3"
+        color={color}
+        testID="onboarding-decision-event-header"
+      >
+        {text}
+        &nbsp;
+        <Actor actor={source} />
+      </Typography>
+      {showFieldValidationDetails && <FieldValidationDetails />}
+    </Box>
+  );
+};
 
 export default OnboardingDecisionEventHeader;
