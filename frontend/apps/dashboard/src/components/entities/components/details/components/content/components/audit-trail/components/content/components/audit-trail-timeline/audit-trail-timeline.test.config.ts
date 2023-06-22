@@ -6,6 +6,7 @@ import {
   LivenessSource,
   Timeline,
   TimelineEventKind,
+  TriggerKind,
   Vendor,
 } from '@onefootprint/types';
 
@@ -109,6 +110,34 @@ const TimelineFixture: Timeline = [
           vendors: [Vendor.idology],
         },
         annotation: null,
+      },
+    },
+    timestamp: '2022-11-08T20:21:53.771495Z',
+  },
+  {
+    event: {
+      kind: TimelineEventKind.vaultCreated,
+      data: {
+        actor: {
+          kind: ActorKind.apiKey,
+          id: 'api_key_1234',
+          name: 'Production key',
+        },
+      },
+    },
+    timestamp: '2022-11-08T20:21:53.771495Z',
+  },
+  {
+    event: {
+      kind: TimelineEventKind.workflowTriggered,
+      data: {
+        workflow: {
+          kind: TriggerKind.IdDocument,
+        },
+        actor: {
+          kind: ActorKind.organization,
+          member: 'Piip Penguin (piip@onefootprint.com)',
+        },
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',

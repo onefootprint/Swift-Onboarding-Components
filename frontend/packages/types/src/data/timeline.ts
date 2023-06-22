@@ -1,3 +1,5 @@
+import { TriggerKind } from '../api/trigger';
+import { Actor } from './actor';
 import { Annotation } from './annotation';
 import {
   CollectedInvestorProfileDataOption,
@@ -18,6 +20,8 @@ export enum TimelineEventKind {
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
   combinedWatchlistChecks = 'combined_watchlist_checks',
+  vaultCreated = 'vault_created',
+  workflowTriggered = 'workflow_triggered',
 }
 
 export type CollectedDataEvent = {
@@ -77,6 +81,27 @@ export type WatchlistCheckEvent = {
   data: WatchlistCheckEventData;
 };
 
+export type VaultCreatedEventData = {
+  actor: Actor;
+};
+
+export type VaultCreatedEvent = {
+  kind: TimelineEventKind.vaultCreated;
+  data: VaultCreatedEventData;
+};
+
+export type WorkflowTriggeredEventData = {
+  workflow: {
+    kind: TriggerKind;
+  };
+  actor: Actor;
+};
+
+export type WorkflowTriggeredEvent = {
+  kind: TimelineEventKind.workflowTriggered;
+  data: WorkflowTriggeredEventData;
+};
+
 export enum WatchlistCheckReasonCode {
   watchlistHitOfac = 'watchlist_hit_ofac',
   watchlistHitPep = 'watchlist_hit_pep',
@@ -114,7 +139,9 @@ export type TimelineEvent = {
     | OnboardingDecisionEvent
     | WatchlistCheckEvent
     | FreeFormNoteEvent
-    | CombinedWatchlistChecksEvent;
+    | CombinedWatchlistChecksEvent
+    | VaultCreatedEvent
+    | WorkflowTriggeredEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };

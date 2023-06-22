@@ -658,6 +658,10 @@
           "description": "Select a risk signal"
         }
       },
+      "actor": {
+        "footprint": "Footprint",
+        "firm-employee": "Footprint Risk Ops"
+      },
       "audit-trail": {
         "title": "Audit trail",
         "empty": "No entries",
@@ -760,11 +764,16 @@
                 "placeholder": "Type your note..."
               }
             },
-            "note-added-by": "Note added by",
-            "note-added-by-source": {
-              "firm_employee": "Footprint Risk Ops",
-              "footprint": "Footprint",
-              "api_key": "API key"
+            "note-added-by": "Note added by"
+          },
+          "vault-created-event": {
+            "user-created-by": "User created by "
+          },
+          "workflow-triggered-event": {
+            "requested-user-to": "requested user to {{action}}",
+            "actions": {
+              "id_document": "upload ID photo",
+              "redo_kyc": "revise KYC data"
             }
           }
         }

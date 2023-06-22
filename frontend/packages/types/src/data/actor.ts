@@ -20,5 +20,12 @@ export type ActorOrganization = {
 
 export type ActorApiKey = {
   kind: ActorKind.apiKey;
+  id: string;
   name: string;
 };
+
+export type Actor =
+  | ActorFootprint
+  | ActorFirmEmployee
+  | ActorOrganization
+  | ActorApiKey;

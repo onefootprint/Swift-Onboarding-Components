@@ -1,7 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoFileText16, IcoWarning16 } from '@onefootprint/icons';
 import {
-  ActorKind,
+  IcoDownload16,
+  IcoFileText16,
+  IcoWarning16,
+  IcoWriting16,
+} from '@onefootprint/icons';
+import {
   Annotation,
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
@@ -13,7 +17,9 @@ import {
   PreviousWatchlistChecksEventData,
   Timeline as EntityTimeline,
   TimelineEventKind,
+  VaultCreatedEventData,
   WatchlistCheckEventData,
+  WorkflowTriggeredEventData,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -23,6 +29,7 @@ import {
   AbandonedEventBody,
   AbandonedEventHeader,
 } from './components/abandoned-event';
+import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import {
   DataCollectedEventHeader,
@@ -129,17 +136,51 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         iconComponent: <IcoFileText16 />,
         headerComponent: (
-          <Typography variant="label-3">{`${t(
-            'timeline.free-form-note-event.note-added-by',
-          )} ${
-            eventData.source.kind === ActorKind.organization
-              ? eventData.source.member
-              : t(
-                  `timeline.free-form-note-event.note-added-by-source.${eventData.source.kind}`,
-                )
-          }`}</Typography>
+          <>
+            <Typography variant="label-3">
+              {t('timeline.free-form-note-event.note-added-by')}
+            </Typography>
+            &nbsp;
+            <Actor actor={eventData.source} />
+          </>
         ),
         bodyComponent: <AnnotationNote annotation={eventData} />,
+      });
+    } else if (kind === TimelineEventKind.vaultCreated) {
+      const eventData = data as VaultCreatedEventData;
+      items.push({
+        time,
+        iconComponent: <IcoDownload16 />,
+        headerComponent: (
+          <>
+            <Typography variant="body-3">
+              {t('timeline.vault-created-event.user-created-by')}
+            </Typography>
+            &nbsp;
+            <Actor actor={eventData.actor} />
+          </>
+        ),
+      });
+    } else if (kind === TimelineEventKind.workflowTriggered) {
+      const eventData = data as WorkflowTriggeredEventData;
+      const workflowKind = eventData.workflow.kind;
+      const action = t(
+        `timeline.workflow-triggered-event.actions.${workflowKind}`,
+      );
+      items.push({
+        time,
+        iconComponent: <IcoWriting16 />,
+        headerComponent: (
+          <>
+            <Actor actor={eventData.actor} />
+            &nbsp;
+            <Typography variant="body-3">
+              {t('timeline.workflow-triggered-event.requested-user-to', {
+                action,
+              })}
+            </Typography>
+          </>
+        ),
       });
     }
   });
@@ -153,6 +194,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
     });
   }
 
+  // TODO only for users with permissions
   items.push({
     iconComponent: <FreeFormNoteAddIcon />,
     headerComponent: <FreeFormNoteAddHeader />,
