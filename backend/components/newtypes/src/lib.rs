@@ -64,6 +64,9 @@ pub use onboarding_requirement::*;
 pub mod fingerprinter;
 pub use self::fingerprinter::Fingerprinter;
 
+mod trigger;
+pub use trigger::*;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Invalid email address")]

@@ -1,5 +1,5 @@
-use api_wire_types::TriggerKind;
 use db::models::workflow::Workflow;
+use newtypes::TriggerKind;
 use newtypes::WorkflowKind;
 
 use crate::utils::db2api::DbToApi;

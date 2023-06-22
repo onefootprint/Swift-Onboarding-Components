@@ -14,7 +14,6 @@ use api_core::types::EmptyResponse;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::TriggerKind;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
@@ -29,6 +28,7 @@ use newtypes::CipKind;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
+use newtypes::TriggerInfo;
 use newtypes::VaultKind;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -45,7 +45,7 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
-    let TriggerRequest { kind, note } = request.into_inner();
+    let TriggerRequest { trigger, note } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -53,6 +53,7 @@ pub async fn post(
     let actor = auth.actor().into();
 
     // Generate an auth token for the user and send to their phone number on file
+    let trigger_kind = trigger.into();
     let (vw, auth_token) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -74,8 +75,8 @@ pub async fn post(
                 return Err(TenantError::CannotTriggerKycForNonPortable.into());
             }
 
-            let wf = match kind {
-                TriggerKind::RedoKyc => {
+            let wf = match trigger {
+                TriggerInfo::RedoKyc => {
                     let config = if matches!(cip_kind, Some(CipKind::Alpaca)) {
                         AlpacaKycConfig { is_redo: true }.into()
                     } else {
@@ -83,15 +84,14 @@ pub async fn post(
                     };
                     Workflow::create(conn, &sv.id, config)?
                 }
-                TriggerKind::IdDocument => {
+                TriggerInfo::IdDocument { collect_selfie } => {
                     let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into())?;
                     let args = NewDocumentRequestArgs {
                         scoped_vault_id: sv.id.clone(),
                         ref_id: None,
                         workflow_id: Some(wf.id.clone()),
-                        // TODO how do we determine if we should collect selfie? Should we ask to provide?
-                        // Or maybe all of these should come from the last doc request
-                        should_collect_selfie: false,
+                        should_collect_selfie: collect_selfie,
+                        // TODO should these come from the last doc request? or be tenant-specific? or from workflow?
                         only_us: false,
                         doc_type_restriction: None,
                     };
@@ -128,7 +128,7 @@ pub async fn post(
     let org_name = auth.tenant().name.clone();
     state
         .twilio_client
-        .send_trigger(&state, &phone_number, note, org_name, kind, url)
+        .send_trigger(&state, &phone_number, note, org_name, trigger_kind, url)
         .await?;
 
     ResponseData::ok(EmptyResponse {}).json()

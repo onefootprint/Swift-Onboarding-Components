@@ -5,9 +5,9 @@ use crate::{
     State,
 };
 use actix_web::http::StatusCode;
-use api_wire_types::TriggerKind;
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use newtypes::TriggerKind;
 use newtypes::{PhoneNumber, PiiString};
 use thiserror::Error;
 

@@ -41,9 +41,10 @@ def test_redo_kyc(sandbox_tenant, twilio):
 
     # trigger RedoKYC
     id = _gen_random_n_digit_number(10)
+    trigger = dict(kind="redo_kyc")
     post(
         f"entities/{sandbox_user.fp_id}/trigger",
-        dict(kind="redo_kyc", note=id),
+        dict(trigger=trigger, note=id),
         sandbox_tenant.sk.key,
     )
     # find link we sent to user via Twilio
