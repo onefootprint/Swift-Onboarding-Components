@@ -5,9 +5,11 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
+use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::ClientTenantScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::utils::session::AuthSession;
 use api_wire_types::ClientTokenRequest;
 use api_wire_types::ClientTokenResponse;
@@ -36,9 +38,12 @@ pub async fn post(
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ClientTokenResponse> {
-    let tenant_api_key_id = auth.api_key().id.clone();
     // Safeguard so when API keys have less than admin permissions we don't allow making tokens
     let auth = auth.check_guard(TenantGuard::Admin)?;
+    let tenant_api_key_id = match auth.actor() {
+        AuthActor::TenantApiKey(id) => id,
+        _ => return Err(AssertionError("Non-api key actor in client_token").into()),
+    };
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();

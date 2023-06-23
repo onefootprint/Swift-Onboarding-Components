@@ -14,6 +14,13 @@ use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
+#[derive(Debug, Clone)]
+pub struct CheckedSecretTenantAuth {
+    tenant: Tenant,
+    api_key: TenantApiKey,
+    role: TenantRole,
+}
+
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -24,18 +31,7 @@ use std::pin::Pin;
 )]
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Footprint-Secret-Key header
 /// which authenticates the client as a tenant.
-pub struct SecretTenantAuthContext {
-    tenant: Tenant,
-    api_key: TenantApiKey,
-    role: TenantRole,
-}
-
-impl SecretTenantAuthContext {
-    /// get the tenant's api key id
-    pub fn api_key(&self) -> &TenantApiKey {
-        &self.api_key
-    }
-}
+pub struct SecretTenantAuthContext(CheckedSecretTenantAuth);
 
 pub const HEADER_NAME: &str = "X-Footprint-Secret-Key";
 
@@ -72,11 +68,11 @@ impl FromRequest for SecretTenantAuthContext {
 
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
 
-            Ok(SecretTenantAuthContext {
+            Ok(SecretTenantAuthContext(CheckedSecretTenantAuth {
                 tenant,
                 api_key,
                 role,
-            })
+            }))
         })
     }
 }
@@ -98,8 +94,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
     Ok(tenant_sk_input)
 }
 
-// TODO we shouldn't allow accessing this until the auth is checked
-impl TenantAuth for SecretTenantAuthContext {
+impl TenantAuth for CheckedSecretTenantAuth {
     fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -117,7 +112,7 @@ impl TenantAuth for SecretTenantAuthContext {
     }
 
     fn actor(&self) -> AuthActor {
-        AuthActor::TenantApiKey(self.api_key().id.clone())
+        AuthActor::TenantApiKey(self.api_key.id.clone())
     }
 
     fn scopes(&self) -> Vec<TenantScope> {
@@ -127,7 +122,7 @@ impl TenantAuth for SecretTenantAuthContext {
 
 impl CanCheckTenantGuard for SecretTenantAuthContext {
     fn role(&self) -> &TenantRole {
-        &self.role
+        &self.0.role
     }
 
     fn token_scopes(&self) -> Vec<TenantScope> {
@@ -135,6 +130,6 @@ impl CanCheckTenantGuard for SecretTenantAuthContext {
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
-        Box::new(self)
+        Box::new(self.0)
     }
 }

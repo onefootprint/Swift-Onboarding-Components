@@ -44,7 +44,6 @@ pub async fn get(
         role_ids,
         status,
     };
-    println!("FILTERING {:?}", query);
     let (keys, id_to_last_used, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
