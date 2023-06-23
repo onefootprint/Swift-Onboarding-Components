@@ -6,6 +6,7 @@ export enum RoleScope {
   vaultProxy = 'vault_proxy',
   orgSettings = 'org_settings',
   manualReview = 'manual_review',
+  writeEntities = 'write_entities',
   decryptAll = 'decrypt_all',
   decryptName = 'decrypt.name',
   decryptDob = 'decrypt.dob',

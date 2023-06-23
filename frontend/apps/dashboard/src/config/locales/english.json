@@ -1555,6 +1555,7 @@
           "cip_integration": "Make CIP proxy requests",
           "org_settings": "Modify organization settings",
           "manual_review": "Perform manual review",
+          "write_entities": "Create and update users",
           "decrypt_all": "Everything",
           "decrypt_custom": "Custom attributes",
           "decrypt_documents": "Documents",
