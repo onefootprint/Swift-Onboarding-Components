@@ -16,7 +16,7 @@ const Root = () => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
-  const { bootstrapData } = state.context;
+  const { bootstrapData, showCompletionPage } = state.context;
   useLogStateMachine('bifrost', state);
   const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
@@ -43,7 +43,7 @@ const Root = () => {
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
             onClose={footprint.close}
-            showCompletionPage // TODO: remove later and pass the one from state machine
+            showCompletionPage={showCompletionPage}
           />
         )}
       </Layout>

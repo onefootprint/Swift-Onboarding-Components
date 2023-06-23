@@ -6,7 +6,7 @@ import { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 import { useEffect, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useArgsFromUrl from './hooks/use-args-from-url';
+import useArgsFromUrl, { UrlArgs } from './hooks/use-args-from-url';
 import parseBootstrapData from './utils/parse-bootstrap-data';
 
 // Wait for a bit for post message to arrive before giving up
@@ -21,10 +21,22 @@ type FootprintProviderArgs = {
 const useFootprintProviderArgs = (
   onSuccess: (args: FootprintProviderArgs) => void,
 ) => {
-  const urlArgs = useArgsFromUrl();
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>();
   const [isLoaded, setIsLoaded] = useState(false);
   const footprintProvider = useFootprintProvider();
+
+  // Will be set to undefined if haven't completed parsing url
+  // Will be set to {} if not provided in url
+  const [urlOptions, setUrlOptions] = useState<IdvOptions | undefined>();
+  const [urlBootstrapData, setUrlBootstrapData] = useState<
+    IdvBootstrapData | undefined
+  >();
+  useArgsFromUrl((args: UrlArgs) => {
+    if (!urlOptions && !urlBootstrapData) {
+      setUrlOptions(args.options);
+      setUrlBootstrapData(args.bootstrapData);
+    }
+  });
 
   // Will be set to undefined if still waiting on provider
   // Will be set to {} if not provided
@@ -34,11 +46,6 @@ const useFootprintProviderArgs = (
   const [providerOptions, setProviderOptions] = useState<
     IdvOptions | undefined
   >();
-
-  // Will be set to undefined if haven't completed parsing url
-  // Will be set to {} if not provided in url
-  const { options: urlOptions, bootstrapData: urlBootstrapData } =
-    urlArgs || {};
 
   const unsubscribeBootstrap = footprintProvider.on(
     FootprintInternalEvent.bootstrapDataReceived,
@@ -55,31 +62,31 @@ const useFootprintProviderArgs = (
     },
   );
 
-  // If we have bootstrap data from footprint provider, use that
+  // If we have bootstrap data from url, use that
   const getEffectiveBootstrapData = () => {
-    const hasProviderData =
-      providerBootstrapData && Object.values(providerBootstrapData).length > 0;
-    if (hasProviderData) {
-      return providerBootstrapData;
-    }
     const hasUrlData =
       urlBootstrapData && Object.values(urlBootstrapData).length > 0;
     if (hasUrlData) {
       return urlBootstrapData;
     }
+    const hasProviderData =
+      providerBootstrapData && Object.values(providerBootstrapData).length > 0;
+    if (hasProviderData) {
+      return providerBootstrapData;
+    }
     return {};
   };
 
-  // If we have options from footprint provider, use that
+  // If we have options from url, use that
   const getEffectiveOptions = () => {
+    const hasUrlOptions = urlOptions && Object.values(urlOptions).length > 0;
+    if (hasUrlOptions) {
+      return urlOptions;
+    }
     const hasProviderOptions =
       providerOptions && Object.values(providerOptions).length > 0;
     if (hasProviderOptions) {
       return providerOptions;
-    }
-    const hasUrlOptions = urlOptions && Object.values(urlOptions).length > 0;
-    if (hasUrlOptions) {
-      return urlOptions;
     }
     return {};
   };
@@ -107,10 +114,6 @@ const useFootprintProviderArgs = (
   });
 
   useEffect(() => {
-    // Don't time out on footprint provider events if it hasn't even loaded yet
-    if (!isLoaded) {
-      return clearTimer;
-    }
     // Wait at least for the router to be ready before timing out
     if (!urlBootstrapData || !urlOptions) {
       return clearTimer;

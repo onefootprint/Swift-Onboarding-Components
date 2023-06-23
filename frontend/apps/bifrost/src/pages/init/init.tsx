@@ -12,7 +12,7 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import useTenantPublicKey from '../../hooks/use-tenant-public-key';
-import useBootstrapData from './hooks/use-bootstrap-data';
+import useFootprintProviderArgs from './hooks/use-footprint-provider-args/use-footprint-provider-args';
 
 const Init = () => {
   const tenantPk = useTenantPublicKey();
@@ -52,7 +52,11 @@ const Init = () => {
     },
   );
 
-  useBootstrapData(bootstrapData => {
+  useFootprintProviderArgs(args => {
+    const {
+      bootstrapData,
+      options: { showCompletionPage },
+    } = args;
     observeCollector.setAppContext({
       bootstrapData,
     });
@@ -60,6 +64,7 @@ const Init = () => {
       type: 'initContextUpdated',
       payload: {
         bootstrapData,
+        showCompletionPage,
       },
     });
   });
