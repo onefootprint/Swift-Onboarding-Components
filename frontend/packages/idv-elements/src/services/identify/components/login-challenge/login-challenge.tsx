@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-import styled, { css } from '@onefootprint/styled';
-=======
 import styled from '@onefootprint/styled';
->>>>>>> Stashed changes
 import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 
