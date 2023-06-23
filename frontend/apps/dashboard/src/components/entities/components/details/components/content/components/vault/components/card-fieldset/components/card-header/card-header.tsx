@@ -117,7 +117,6 @@ const DropdownInner = styled.div`
     user-select: none;
     width: 280px;
     border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
   `};
 `;
 
