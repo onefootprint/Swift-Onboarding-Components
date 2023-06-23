@@ -65,7 +65,7 @@ pub async fn delete(
     let fp_id = path.into_inner();
     let DeleteFieldsParams { fields } = request.into_inner();
 
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let actor = auth.actor();
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

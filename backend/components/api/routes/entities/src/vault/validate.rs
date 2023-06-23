@@ -36,7 +36,7 @@ pub async fn post(
     request: Json<RawDataRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let result = post_inner(&state, path.into_inner(), request.into_inner(), auth).await?;
     Ok(result)

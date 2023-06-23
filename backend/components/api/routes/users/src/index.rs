@@ -1,5 +1,4 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantAuth;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
@@ -44,6 +43,7 @@ pub async fn post(
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let principal = auth.actor().into();
     let insight = CreateInsightEvent::from(insight);

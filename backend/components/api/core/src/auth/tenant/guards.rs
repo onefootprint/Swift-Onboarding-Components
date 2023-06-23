@@ -14,6 +14,7 @@ use strum::Display;
 pub enum TenantGuard {
     Admin,
     Read,
+    WriteEntities,
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
@@ -28,6 +29,7 @@ impl TenantGuard {
         match self {
             Self::Admin => TenantScope::Admin,
             Self::Read => TenantScope::Read,
+            Self::WriteEntities => TenantScope::WriteEntities,
             Self::OnboardingConfiguration => TenantScope::OnboardingConfiguration,
             Self::ApiKeys => TenantScope::ApiKeys,
             Self::OrgSettings => TenantScope::OrgSettings,

@@ -98,6 +98,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
     Ok(tenant_sk_input)
 }
 
+// TODO we shouldn't allow accessing this until the auth is checked
 impl TenantAuth for SecretTenantAuthContext {
     fn tenant(&self) -> &Tenant {
         &self.tenant

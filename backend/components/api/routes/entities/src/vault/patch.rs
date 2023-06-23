@@ -41,8 +41,7 @@ pub async fn patch(
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    // TODO what permissions do we need to add data to vault? Any API key will be able to right now
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let result = patch_inner(&state, path.into_inner(), request.into_inner(), auth, insight).await?;
     Ok(result)

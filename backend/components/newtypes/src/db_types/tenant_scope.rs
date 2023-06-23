@@ -48,6 +48,8 @@ pub enum TenantScope {
     VaultProxy,
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
+    /// Allows creating new users and updating existing entities' data
+    WriteEntities,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
     /// TODO: Should probably also add a DecryptAll here
@@ -123,6 +125,7 @@ impl TryFrom<TenantScopeDiscriminants> for TenantScope {
         let v = match value {
             TenantScopeDiscriminants::Read => Self::Read,
             TenantScopeDiscriminants::Admin => Self::Admin,
+            TenantScopeDiscriminants::WriteEntities => Self::WriteEntities,
             TenantScopeDiscriminants::OnboardingConfiguration => Self::OnboardingConfiguration,
             TenantScopeDiscriminants::ApiKeys => Self::ApiKeys,
             TenantScopeDiscriminants::OrgSettings => Self::OrgSettings,
