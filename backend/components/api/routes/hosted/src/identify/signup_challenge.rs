@@ -62,7 +62,7 @@ pub async fn post(
             challenge_data: UserChallengeData {
                 challenge_kind: ChallengeKind::Sms,
                 challenge_token,
-                scrubbed_phone_number: phone_number.leak_formatted_last_two(),
+                scrubbed_phone_number: phone_number.last_two(),
                 biometric_challenge_json: None,
                 time_before_retry_s: time_before_retry_s.num_seconds(),
             },

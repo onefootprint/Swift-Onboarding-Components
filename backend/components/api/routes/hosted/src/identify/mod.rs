@@ -5,6 +5,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::PiiString;
 use newtypes::TenantId;
 use strum::EnumDiscriminants;
 pub mod signup_challenge;
@@ -37,7 +38,7 @@ pub(crate) enum ChallengeKind {
 pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
-    scrubbed_phone_number: String,
+    scrubbed_phone_number: PiiString,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
 }

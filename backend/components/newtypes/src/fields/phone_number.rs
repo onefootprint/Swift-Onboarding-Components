@@ -67,7 +67,7 @@ impl PhoneNumber {
     }
 
     /// Formats the PhoneNumber with all digits except the country code and last two scrubbed
-    pub fn leak_formatted_last_two(&self) -> String {
+    pub fn last_two(&self) -> PiiString {
         // Use the phonenumber library to format the number as a national number.
         // This includes nice formatting, aside from the country code
         let national = format!("{}", self.number.format().mode(phonenumber::Mode::National));
@@ -86,7 +86,7 @@ impl PhoneNumber {
             })
             .collect();
         // Prepend the country code to the scrubbed, formatted national
-        format!("+{} {}", self.number.country().code(), national)
+        PiiString::new(format!("+{} {}", self.number.country().code(), national))
     }
 }
 
@@ -137,7 +137,7 @@ mod tests {
     fn test_leak_formatted_last_two(number: &str) -> String {
         let phone_number = PhoneNumber::parse(number.into()).unwrap();
         assert!(!phone_number.is_fixture_phone_number());
-        phone_number.leak_formatted_last_two()
+        phone_number.last_two().leak_to_string()
     }
 
     #[test]
