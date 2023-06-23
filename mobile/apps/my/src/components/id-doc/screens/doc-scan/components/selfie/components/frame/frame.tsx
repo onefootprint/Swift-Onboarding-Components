@@ -24,7 +24,7 @@ const Frame = ({ detector }: FrameProps) => {
     <FrameContainer>
       <Box position="relative" width="100%" height="100%">
         {cornerKinds.map(corner => (
-          <Corner kind={corner} key={corner} detector={detector} />
+          <Corner detector={detector} key={corner} kind={corner} />
         ))}
       </Box>
     </FrameContainer>
@@ -72,12 +72,14 @@ const FrameContainer = styled.View`
   `}
 `;
 
-const StyledCorner = styled(Reanimated.View)<{ kind: CornerKind }>`
+const StyledCorner = styled(Reanimated.View)<{
+  kind: CornerKind;
+}>`
   ${({ theme, kind }) => css`
+    border-color: #fff;
     height: 50px;
     position: absolute;
     width: 50px;
-    border-color: #fff;
 
     ${kind.includes('TopLeft') &&
     css`

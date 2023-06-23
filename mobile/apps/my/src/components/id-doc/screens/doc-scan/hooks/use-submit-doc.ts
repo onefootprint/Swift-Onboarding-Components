@@ -31,6 +31,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
   return response.data;
 };
 
-const useSubmitDoc = () => useMutation(submitDoc);
+const useSubmitDoc = ({ onError }: { onError: (error: unknown) => void }) =>
+  useMutation(submitDoc, { onError });
 
 export default useSubmitDoc;

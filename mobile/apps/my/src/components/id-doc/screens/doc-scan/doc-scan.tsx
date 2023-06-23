@@ -1,19 +1,24 @@
+import { getErrorMessage } from '@onefootprint/request';
 import {
   CountryCode,
   IdDocType,
   SubmitDocumentSide,
 } from '@onefootprint/types';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+
+import useTranslation from '@/hooks/use-translation';
 
 import DriversLicense from './components/drivers-license';
 import IdCard from './components/id-card';
 import Passport from './components/passport';
+import Context from './components/scan-context';
 import Selfie from './components/selfie';
 import useSubmitDoc from './hooks/use-submit-doc';
 
 export type DocScanProps = {
   authToken: string;
   countryCode: CountryCode;
+  countryName: string;
   onDone: (nextSideToCollect: SubmitDocumentSide) => void;
   side: SubmitDocumentSide;
   type: IdDocType;
@@ -22,14 +27,25 @@ export type DocScanProps = {
 const DocScan = ({
   authToken,
   countryCode,
+  countryName,
   onDone,
   side,
   type,
 }: DocScanProps) => {
-  const submitDocMutation = useSubmitDoc();
+  const { t, allT } = useTranslation('components.scan.camera.errors');
+  const [errors, setErrors] = useState([]);
+  const mutation = useSubmitDoc({
+    onError: error => {
+      setErrors([getErrorMessage(error)]);
+    },
+  });
+
+  const handleResetErrors = () => {
+    setErrors([]);
+  };
 
   const handleSubmit = (image: string) => {
-    submitDocMutation.mutate(
+    mutation.mutate(
       {
         authToken,
         countryCode,
@@ -40,50 +56,43 @@ const DocScan = ({
       },
       {
         onSuccess: response => {
-          setTimeout(() => {
-            onDone(response.nextSideToCollect);
-          }, 1500);
+          if (response.errors.length > 0) {
+            const documentType = allT(`document-type.${type}`);
+            setErrors(
+              response.errors.map(error =>
+                t(error, { documentType, countryName }),
+              ),
+            );
+          } else {
+            setTimeout(() => {
+              onDone(response.nextSideToCollect);
+            }, 1500);
+          }
         },
       },
     );
   };
 
-  if (side === SubmitDocumentSide.Selfie) {
-    return (
-      <Selfie
-        success={submitDocMutation.isSuccess}
-        authToken={authToken}
-        loading={submitDocMutation.isLoading}
-        onSubmit={handleSubmit}
-      />
-    );
-  }
-  if (type === IdDocType.driversLicense) {
-    return (
-      <DriversLicense
-        success={submitDocMutation.isSuccess}
-        loading={submitDocMutation.isLoading}
-        onSubmit={handleSubmit}
-        side={side}
-      />
-    );
-  }
-  if (type === IdDocType.idCard) {
-    return (
-      <IdCard
-        success={submitDocMutation.isSuccess}
-        loading={submitDocMutation.isLoading}
-        onSubmit={handleSubmit}
-        side={side}
-      />
-    );
-  }
+  const contextValues = useMemo(
+    () => ({
+      authToken,
+      errors,
+      isError: errors.length > 0,
+      isLoading: mutation.isLoading,
+      isSuccess: mutation.isSuccess && mutation.data.errors.length === 0,
+      onSubmit: handleSubmit,
+      onResetErrors: handleResetErrors,
+    }),
+    [authToken, errors, mutation],
+  );
+
   return (
-    <Passport
-      success={submitDocMutation.isSuccess}
-      loading={submitDocMutation.isLoading}
-      onSubmit={handleSubmit}
-    />
+    <Context.Provider value={contextValues}>
+      {side === SubmitDocumentSide.Selfie && <Selfie authToken={authToken} />}
+      {type === IdDocType.driversLicense && <DriversLicense side={side} />}
+      {type === IdDocType.idCard && <IdCard side={side} />}
+      {type === IdDocType.passport && <Passport />}
+    </Context.Provider>
   );
 };
 

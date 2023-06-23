@@ -9,7 +9,7 @@ import {
   Image,
   Typography,
 } from '@onefootprint/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Dimensions } from 'react-native';
 import {
   Camera as VisionCamera,
@@ -20,7 +20,9 @@ import {
 import useTranslation from '@/hooks/use-translation';
 
 import Instructions from '../instructions';
+import ScanContext from '../scan-context';
 import type { CameraSize, CameraType } from './camera.types';
+import Errors from './components/errors';
 import encodeImagePath from './utils/encode-image-path';
 
 let timerId: NodeJS.Timeout | null = null;
@@ -32,11 +34,8 @@ type CameraProps = {
   frameProcessor?: any;
   instructions: { description?: string; IconComponent: Icon; title: string };
   isObjectDetected?: boolean;
-  loading?: boolean;
-  onSubmit: (encodedImage: string) => void;
   size?: CameraSize;
   subtitle?: string;
-  success?: boolean;
   title: string;
   type?: CameraType;
 };
@@ -48,23 +47,22 @@ const Camera = ({
   frameProcessor,
   instructions,
   isObjectDetected,
-  loading,
-  onSubmit,
   size = 'default',
   subtitle,
-  success,
   title,
   type = 'back',
 }: CameraProps) => {
   const { t } = useTranslation('components.scan.camera');
+  const { isLoading, isError, isSuccess, onSubmit, errors, onResetErrors } =
+    useContext(ScanContext);
   const camera = useRef<VisionCamera>(null);
   const devices = useCameraDevices();
   const device = devices[type];
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
-
-  const showActionButtons = photo;
-  const showTakePhotoManuallyButton = !showActionButtons;
-  const showInstructions = !photo;
+  const hasFeedback = isError || isSuccess;
+  const showActionButtons = !hasFeedback && photo;
+  const showTakePhotoManuallyButton = !hasFeedback && !showActionButtons;
+  const showInstructions = !photo && !hasFeedback && !isError;
   const showCamera = !photo && device;
 
   useEffect(() => {
@@ -92,8 +90,13 @@ const Camera = ({
     takePhoto();
   };
 
-  const handleReset = () => {
+  const handleRetake = () => {
     setPhoto(null);
+  };
+
+  const handleRetakeAfterError = () => {
+    handleRetake();
+    onResetErrors();
   };
 
   const handleSubmit = async () => {
@@ -113,9 +116,10 @@ const Camera = ({
           <Box marginBottom={7}>
             {photo && (
               <Preview
+                hasError={isError}
+                resizeMode="cover"
                 size={size}
                 source={{ uri: photo.path }}
-                resizeMode="cover"
               />
             )}
             {showCamera && (
@@ -130,6 +134,7 @@ const Camera = ({
                 />
               </CameraContainer>
             )}
+            {isError && <Errors errors={errors} />}
           </Box>
           {showInstructions && (
             <Instructions
@@ -144,41 +149,45 @@ const Camera = ({
             />
           )}
         </Box>
-        {success ? (
-          <Box gap={4}>
-            <FeedbackButton>{t('cta-success')}</FeedbackButton>
-            <Button disabled variant="secondary">
+        <Box gap={4}>
+          {isSuccess && (
+            <>
+              <FeedbackButton>{t('cta-success')}</FeedbackButton>
+              <Button disabled variant="secondary">
+                {t('retake')}
+              </Button>
+            </>
+          )}
+          {isError && (
+            <Button disabled={isLoading} onPress={handleRetakeAfterError}>
               {t('retake')}
             </Button>
-          </Box>
-        ) : (
-          <>
-            {showActionButtons && (
-              <Box gap={4}>
-                <Button
-                  loading={loading}
-                  loadingLabel={t('cta-loading')}
-                  onPress={handleSubmit}
-                >
-                  {t('cta')}
-                </Button>
-                <Button
-                  disabled={loading}
-                  onPress={handleReset}
-                  variant="secondary"
-                >
-                  {t('retake')}
-                </Button>
-              </Box>
-            )}
-            {showTakePhotoManuallyButton && (
-              <FadeIn>
-                <Button onPress={handleTakePhotoManually}>
-                  {t('take-manually')}
-                </Button>
-              </FadeIn>
-            )}
-          </>
+          )}
+          {showActionButtons && (
+            <>
+              <Button
+                loading={isLoading}
+                loadingLabel={t('cta-loading')}
+                onPress={handleSubmit}
+              >
+                {t('cta')}
+              </Button>
+              <Button
+                disabled={isLoading}
+                onPress={handleRetake}
+                variant="secondary"
+              >
+                {t('retake')}
+              </Button>
+            </>
+          )}
+        </Box>
+        {showTakePhotoManuallyButton && (
+          <FadeIn>
+            <Button onPress={handleTakePhotoManually}>
+              {t('take-manually')}
+            </Button>
+          </FadeIn>
         )}
       </Box>
     </Container>
@@ -204,12 +213,18 @@ const StyledCamera = styled(VisionCamera)`
   width: 100%;
 `;
 
-const Preview = styled(Image)<{ size: CameraSize }>`
-  ${({ theme, size }) => css`
+const Preview = styled(Image)<{ size: CameraSize; hasError: boolean }>`
+  ${({ theme, size, hasError }) => css`
     border-radius: ${theme.borderRadius.large};
     height: ${size === 'default' ? 260 : 390}px;
     margin-top: ${theme.spacing[7]};
     width: 100%;
+
+    ${hasError &&
+    css`
+      border-width: ${theme.borderWidth[3]};
+      border-color: ${theme.borderColor.error};
+    `}
   `}
 `;
 

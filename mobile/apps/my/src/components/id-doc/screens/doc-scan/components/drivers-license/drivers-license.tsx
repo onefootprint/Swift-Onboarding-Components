@@ -12,18 +12,10 @@ import Camera from '../camera';
 import Frame from '../default-frame';
 
 export type DriversLicenseProps = {
-  loading?: boolean;
-  onSubmit: (image: string) => void;
   side: SubmitDocumentSide;
-  success?: boolean;
 };
 
-const DriversLicense = ({
-  loading,
-  onSubmit,
-  side,
-  success,
-}: DriversLicenseProps) => {
+const DriversLicense = ({ side }: DriversLicenseProps) => {
   const { t } = useTranslation('components.scan.drivers-license');
   const { t: sideT } = useTranslation(
     `components.scan.drivers-license.${side}`,
@@ -51,19 +43,16 @@ const DriversLicense = ({
 
   return (
     <Camera
+      detector={detector}
       Frame={Frame}
       instructions={{
         description: sideT('instructions.description'),
         IconComponent: IcoIdCard24,
         title: sideT('instructions.title'),
       }}
-      detector={detector}
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      loading={loading}
-      onSubmit={onSubmit}
       subtitle={sideT('subtitle')}
-      success={success}
       title={t('title')}
     />
   );

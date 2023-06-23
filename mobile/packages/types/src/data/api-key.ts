@@ -1,4 +1,4 @@
-import {Role} from './role';
+import { Role } from './role';
 
 export type ApiKey = {
   createdAt: string;

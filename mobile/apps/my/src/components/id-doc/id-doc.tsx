@@ -1,3 +1,7 @@
+import {
+  DEFAULT_COUNTRY,
+  getCountryFromCode,
+} from '@onefootprint/global-constants';
 import { IdDocRequirement } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -38,11 +42,16 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     state.matches('selfie')
   ) {
     const { currentSide, collectingDocumentMeta } = state.context;
+    const countryName =
+      getCountryFromCode(collectingDocumentMeta.countryCode).label ||
+      DEFAULT_COUNTRY.label;
+
     return (
       <DocScan
         key={currentSide}
         authToken={authToken}
         countryCode={collectingDocumentMeta.countryCode}
+        countryName={countryName}
         onDone={nextSideToCollect => {
           send('imageSubmitted', {
             payload: { nextSideToCollect },

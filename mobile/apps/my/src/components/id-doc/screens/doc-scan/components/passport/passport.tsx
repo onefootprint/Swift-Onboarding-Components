@@ -10,13 +10,7 @@ import useTranslation from '@/hooks/use-translation';
 import Camera from '../camera';
 import Frame from '../default-frame';
 
-export type PassportProps = {
-  success?: boolean;
-  loading?: boolean;
-  onSubmit: (image: string) => void;
-};
-
-const Passport = ({ success, loading, onSubmit }: PassportProps) => {
+const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -41,19 +35,16 @@ const Passport = ({ success, loading, onSubmit }: PassportProps) => {
 
   return (
     <Camera
+      detector={detector}
       Frame={Frame}
+      frameProcessor={frameProcessor}
       instructions={{
         description: t('instructions.description'),
         IconComponent: IcoPassport24,
         title: t('instructions.title'),
       }}
-      detector={detector}
-      frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      loading={loading}
-      onSubmit={onSubmit}
       subtitle={t('subtitle')}
-      success={success}
       title={t('title')}
     />
   );

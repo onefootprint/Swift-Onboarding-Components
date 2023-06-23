@@ -12,13 +12,10 @@ import Camera from '../camera';
 import Frame from '../default-frame';
 
 export type IdCardProps = {
-  loading?: boolean;
-  onSubmit: (image: string) => void;
   side: SubmitDocumentSide;
-  success?: boolean;
 };
 
-const IdCard = ({ loading, onSubmit, side, success }: IdCardProps) => {
+const IdCard = ({ side }: IdCardProps) => {
   const { t } = useTranslation('components.scan.id-card');
   const { t: sideT } = useTranslation(`components.scan.id-card.${side}`);
   const [objectedDetected, setObjectDetected] = useState(false);
@@ -44,19 +41,16 @@ const IdCard = ({ loading, onSubmit, side, success }: IdCardProps) => {
 
   return (
     <Camera
+      detector={detector}
       Frame={Frame}
       instructions={{
         description: sideT('instructions.description'),
         IconComponent: IcoIdCard24,
         title: sideT('instructions.title'),
       }}
-      detector={detector}
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      loading={loading}
-      onSubmit={onSubmit}
       subtitle={sideT('subtitle')}
-      success={success}
       title={t('title')}
     />
   );

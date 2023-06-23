@@ -24,7 +24,8 @@ const windowWidth = Dimensions.get('window').width;
 
 const StyledFrame = styled(Reanimated.View)`
   ${({ theme }) => css`
-  border-radius: ${theme.borderRadius.large};
+    border-color: #FFF;
+    border-radius: ${theme.borderRadius.large};
     border: ${theme.borderWidth[2]} solid #FFF  
     height: 220px;
     position: absolute;

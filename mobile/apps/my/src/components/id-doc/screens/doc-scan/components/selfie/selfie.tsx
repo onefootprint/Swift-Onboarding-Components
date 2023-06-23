@@ -13,12 +13,9 @@ import Frame from './components/frame';
 
 export type SelfieProps = {
   authToken: string;
-  loading: boolean;
-  onSubmit: (image: string) => void;
-  success?: boolean;
 };
 
-const Selfie = ({ authToken, loading, onSubmit, success }: SelfieProps) => {
+const Selfie = ({ authToken }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
   const [isCameraDisabled, setIsCameraDisable] = useState(true);
   const [objectedDetected, setObjectDetected] = useState(false);
@@ -46,19 +43,16 @@ const Selfie = ({ authToken, loading, onSubmit, success }: SelfieProps) => {
   return (
     <>
       <Camera
+        detector={detector}
         disabled={isCameraDisabled}
+        Frame={Frame}
+        frameProcessor={frameProcessor}
         instructions={{
           IconComponent: IcoEmojiHappy24,
           title: t('instructions.title'),
         }}
-        detector={detector}
-        Frame={Frame}
-        frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
-        loading={loading}
-        onSubmit={onSubmit}
         size="large"
-        success={success}
         title={t('title')}
         type="front"
       />
