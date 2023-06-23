@@ -106,7 +106,11 @@ pub fn list_authorized_for_tenant_query<'a>(
     // Filter on onboarding status: pass/fail/incomplete/vault only
     if !params.statuses.is_empty() {
         // Filter on non-portable users
-        let q_vault_only = if params.statuses.contains(&OnboardingStatusFilter::VaultOnly) {
+        let q_none_status = if params.statuses.contains(&OnboardingStatusFilter::None) {
+            // TODO this is technically true now where non-portable users have a None status.
+            // We'll need to fix this when we start running KYC for non-portable vaults.
+            // Instead, we'll want to filter on scoped vaults that have no onboarding here.
+            // But diesel makes it hard to do joins here...
             let uv_ids = vault::table
                 .filter(vault::is_portable.eq(false))
                 .select(vault::id);
@@ -133,7 +137,7 @@ pub fn list_authorized_for_tenant_query<'a>(
         // This is tricky... If any filtering status is provided, we only want to return results
         // that match the filters. But, the filters are determined through a handful of different
         // queries.
-        match (q_vault_only, q_onboarding_status) {
+        match (q_none_status, q_onboarding_status) {
             (Some(q1), Some(q2)) => query = query.filter(q1.or(q2)),
             (Some(q1), None) => query = query.filter(q1),
             (None, Some(q1)) => query = query.filter(q1),

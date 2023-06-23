@@ -74,11 +74,11 @@ def test_get_users_by_fp_id_query(sandbox_user):
     [
         (dict(statuses="pass"), [0, 1]),
         (dict(statuses="fail"), []),
-        (dict(statuses="vault_only"), [2]),
+        (dict(statuses="none"), [2]),
         (dict(statuses="incomplete"), [3]),
-        (dict(statuses="pass,vault_only"), [0, 1, 2]),
+        (dict(statuses="pass,none"), [0, 1, 2]),
         (dict(statuses="pass,incomplete"), [0, 1, 3]),
-        (dict(statuses="pass,incomplete,vault_only"), [0, 1, 2, 3]),
+        (dict(statuses="pass,incomplete,none"), [0, 1, 2, 3]),
     ],
 )
 def test_get_users_filter(

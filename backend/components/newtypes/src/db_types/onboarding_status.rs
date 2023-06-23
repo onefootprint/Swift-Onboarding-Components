@@ -71,7 +71,7 @@ pub enum OnboardingStatusFilter {
     Fail,
     Incomplete,
     Pending,
-    VaultOnly,
+    None,
 }
 
 impl OnboardingStatus {
@@ -81,7 +81,7 @@ impl OnboardingStatus {
             OnboardingStatusFilter::Fail => Some(Self::Fail),
             OnboardingStatusFilter::Incomplete => Some(Self::Incomplete),
             OnboardingStatusFilter::Pending => Some(Self::Pending),
-            OnboardingStatusFilter::VaultOnly => None,
+            OnboardingStatusFilter::None => None,
         }
     }
 }
