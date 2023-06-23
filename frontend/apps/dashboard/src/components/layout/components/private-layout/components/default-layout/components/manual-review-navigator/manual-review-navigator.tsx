@@ -28,7 +28,7 @@ const ManualReviewNavigator = () => {
         icon={manualReviewRoute.Icon}
       >
         {manualReviewRoute.text}
-        {response && response.data?.length > 0 && ` • ${response.data.length}`}
+        {response && response.data?.length >= 0 && ` (${response.data.length})`}
       </Tab>
     </Tabs>
   );

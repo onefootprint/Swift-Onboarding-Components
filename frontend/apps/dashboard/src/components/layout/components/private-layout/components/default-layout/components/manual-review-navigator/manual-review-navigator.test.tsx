@@ -17,7 +17,7 @@ describe('<ManualReviewNavigator />', () => {
   describe('Functions as expected', () => {
     useRouterSpy({ pathname: '/entities' });
 
-    it('Show just Manual review when endpt has not loaded', () => {
+    it('Should show just Manual review when endpt has not loaded', async () => {
       renderAssumeBanner();
       mockRequest({
         method: 'get',
@@ -25,11 +25,12 @@ describe('<ManualReviewNavigator />', () => {
         response: { data: [] },
       });
 
-      expect(screen.queryByText('Manual review • 0')).not.toBeInTheDocument();
-      expect(screen.getByText('Manual review')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Manual review (0)')).toBeInTheDocument();
+      });
     });
 
-    it('Show Manual Review w/ number when entities/requires_manual_review returns non-empty list', async () => {
+    it('Should show Manual Review w/ number when entities/requires_manual_review returns non-empty list', async () => {
       renderAssumeBanner();
       mockRequest({
         method: 'get',
@@ -40,11 +41,11 @@ describe('<ManualReviewNavigator />', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Manual review • 2')).toBeInTheDocument();
+        expect(screen.getByText('Manual review (2)')).toBeInTheDocument();
       });
     });
 
-    it('Shows /manual-review href', () => {
+    it('Should show /manual-review href', () => {
       renderAssumeBanner();
       mockRequest({
         method: 'get',

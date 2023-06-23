@@ -34,11 +34,12 @@ const useEntities = (
   kind: EntityKind,
   defaultFilters?: Record<string, any>,
 ) => {
-  const { authHeaders } = useSession();
+  const { authHeaders, isLive } = useSession();
   const filters = useFilters();
   const { requestParams } = filters;
+
   const query = useQuery(
-    ['entities', kind, requestParams, authHeaders],
+    ['entities', kind, requestParams, authHeaders, defaultFilters, isLive],
     () =>
       getEntities(authHeaders, {
         ...requestParams,

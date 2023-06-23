@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
 import { getDI } from 'src/components/entities/utils/get-dis';
-import styled, { css } from 'styled-components';
 
 export type FieldTagListProps = {
   targets: string[];
