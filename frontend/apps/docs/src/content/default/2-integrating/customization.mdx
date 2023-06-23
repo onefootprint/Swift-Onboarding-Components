@@ -313,3 +313,24 @@ footprint.open({ publicKey, appearance });
 | `link`          | The link                        |
 | `link:hover`    | The link, when it's hovered     |
 | `link:active`   | The link, when it's activated   |
+
+## Customizing the user flow
+
+Footprint also lets you customize some other options that influence the UI flow.
+
+If you want to render a pre-built completion page at the end of the onboarding flow, you can pass an `options` object into your integration, as in below:
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const options = {
+  showCompletionPage: true,
+};
+
+footprint.open({ publicKey, options });
+```
+
+If the `showCompletionPage` is not provided, the bifrost modal will automatically close when the user onboarding is complete. The completion page looks like the following.
+
+<complete-page-preview></complete-page-preview>
