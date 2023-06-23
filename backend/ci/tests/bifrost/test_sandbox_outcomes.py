@@ -1,6 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.utils import _gen_random_n_digit_number
 
 
 @pytest.mark.parametrize(
@@ -18,6 +19,8 @@ def test_deterministic_onboarding(
     expected_status,
     expected_requires_manual_review,
 ):
+    seed = _gen_random_n_digit_number(10)
+    sandbox_id = f"{sandbox_id}{seed}"
     bifrost = BifrostClient.create(
         sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
