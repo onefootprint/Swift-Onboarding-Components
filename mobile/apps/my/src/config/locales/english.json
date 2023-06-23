@@ -165,6 +165,11 @@
         "instructions": {
           "title": "Position your face within the frame"
         },
+        "warnings": {
+          "no-face": "Unable to detect a face",
+          "not-centralized": "Center your face",
+          "not-straight": "Straighten your face"
+        },
         "consent": {
           "title": "We need a selfie to verify your identity",
           "description": "By continuing, you're agreeing to Footprint collecting and processing your biometric data from your selfie and identity document.",

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
-import { hasFace } from 'vision-camera-plugin-face-detection';
+import { detectFace } from 'vision-camera-plugin-face-detection';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -17,6 +17,7 @@ export type SelfieProps = {
 
 const Selfie = ({ authToken }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
+  const [warning, setWarning] = useState('');
   const [isCameraDisabled, setIsCameraDisable] = useState(true);
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -29,12 +30,28 @@ const Selfie = ({ authToken }: SelfieProps) => {
         width: windowWidth - 32,
         height: 220,
       };
-      const result = hasFace(frame, options);
-      detector.value = result.has_face;
-      if (result.has_face) {
-        runOnJS(setObjectDetected)(true);
+      const result = detectFace(frame, options);
+
+      if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
+        runOnJS(setWarning)('');
+        detector.value = result.hasFace;
+        if (result.hasFace) {
+          runOnJS(setObjectDetected)(true);
+        } else {
+          runOnJS(setObjectDetected)(false);
+        }
       } else {
-        runOnJS(setObjectDetected)(false);
+        if (!result.hasFace) {
+          runOnJS(setWarning)('Unable to detect a face');
+          return;
+        }
+        if (!result.isFaceInCenter) {
+          runOnJS(setWarning)('Center your face');
+          return;
+        }
+        if (!result.isFaceStraight) {
+          runOnJS(setWarning)('Straighten your face');
+        }
       }
     },
     [detector],
@@ -55,6 +72,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
         size="large"
         title={t('title')}
         type="front"
+        warning={warning}
       />
       <ConsentDialog
         authToken={authToken}

@@ -88,10 +88,15 @@ const DocScan = ({
 
   return (
     <Context.Provider value={contextValues}>
-      {side === SubmitDocumentSide.Selfie && <Selfie authToken={authToken} />}
-      {type === IdDocType.driversLicense && <DriversLicense side={side} />}
-      {type === IdDocType.idCard && <IdCard side={side} />}
-      {type === IdDocType.passport && <Passport />}
+      {side === SubmitDocumentSide.Selfie ? (
+        <Selfie authToken={authToken} />
+      ) : (
+        <>
+          {type === IdDocType.driversLicense && <DriversLicense side={side} />}
+          {type === IdDocType.idCard && <IdCard side={side} />}
+          {type === IdDocType.passport && <Passport />}
+        </>
+      )}
     </Context.Provider>
   );
 };
