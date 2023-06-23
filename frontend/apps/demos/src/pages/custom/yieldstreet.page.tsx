@@ -9,6 +9,9 @@ const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 const handleOpen = () => {
   footprint.open({
     publicKey,
+    options: {
+      showCompletionPage: true,
+    },
     appearance: {
       fontSrc:
         'https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap',

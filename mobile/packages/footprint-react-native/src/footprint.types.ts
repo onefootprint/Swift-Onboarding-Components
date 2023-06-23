@@ -150,6 +150,7 @@ export type OpenFootprint = {
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
   userData?: FootprintUserData;
+  options?: FootprintOptions;
 };
 
 export type Footprint = {
@@ -195,3 +196,7 @@ export type FootprintUserData = Partial<{
   'id.ssn4': string;
   'id.nationality': string; // 2 letter country code
 }>;
+
+export type FootprintOptions = {
+  showCompletionPage?: boolean;
+};

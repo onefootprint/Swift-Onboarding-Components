@@ -150,6 +150,7 @@ export type OpenFootprint = {
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
   userData?: FootprintUserData;
+  options?: FootprintOptions;
 };
 
 export type Footprint = {
@@ -203,4 +204,8 @@ export type FootprintUserData = Partial<{
 
 export type IdentifyRequest = {
   identifier: { email: string } | { phone_number: string };
+};
+
+export type FootprintOptions = {
+  showCompletionPage?: boolean;
 };

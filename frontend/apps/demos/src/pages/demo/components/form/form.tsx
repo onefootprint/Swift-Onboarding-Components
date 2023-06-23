@@ -68,6 +68,9 @@ const Form = ({ html, onSuccess }: FormProps) => {
       publicKey,
       onCanceled: handleFootprintCanceled,
       onCompleted: handleFootprintCompleted,
+      options: {
+        showCompletionPage: true,
+      },
     });
   };
 
