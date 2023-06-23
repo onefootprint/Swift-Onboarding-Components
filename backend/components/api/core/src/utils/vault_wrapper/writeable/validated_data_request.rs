@@ -30,7 +30,12 @@ impl<Type> VaultWrapper<Type> {
     /// These invariants are also a function of the data in the vault at the time
     pub fn validate_request(&self, request: DataRequest<Fingerprints>) -> ApiResult<ValidatedDataRequest> {
         // Don't allow replacing some pieces of info
-        let irreplaceable_dis = vec![(IDK::PhoneNumber.into(), true), (IDK::Email.into(), false), (BDK::KycedBeneficialOwners.into(), true)];
+        let irreplaceable_dis = if self.vault.is_portable {
+            // TODO really just want to avoid replacing verified phone and email
+             vec![(IDK::PhoneNumber.into(), true), (IDK::Email.into(), false), (BDK::KycedBeneficialOwners.into(), true)]
+        } else {
+            vec![(BDK::KycedBeneficialOwners.into(), true)]
+        };
         for (di, check_portable_and_speculative) in irreplaceable_dis {
             let update_has_di = request.keys().any(|x| x == &di);
             let vault_already_has_di = if check_portable_and_speculative {
