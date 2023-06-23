@@ -1,6 +1,6 @@
 import { DataIdentifier } from '@onefootprint/types';
 
-import getDis from './get-dis';
+import getDis, { getDI } from './get-dis';
 
 describe('getDis', () => {
   it('should filter, sort attributes and return in correct order', () => {
@@ -46,5 +46,28 @@ describe('getDis', () => {
     const input: DataIdentifier[] = [];
     const result = getDis(input, 'flerp');
     expect(result).toEqual([]);
+  });
+});
+
+describe('getDI', () => {
+  it('should return verbose di for card attributes', () => {
+    const input = 'card.flerp.name';
+    const result = getDI(input);
+    const expected = 'di.card.verbose.name';
+    expect(result).toEqual(expected);
+  });
+
+  it('should return custom di for custom attributes', () => {
+    const input = 'custom.environment';
+    const result = getDI(input);
+    const expected = 'custom.environment';
+    expect(result).toEqual(expected);
+  });
+
+  it('should remove latest upload from DI', () => {
+    const input = 'document.id_card.front.latest_upload';
+    const result = getDI(input);
+    const expected = 'di.document.id_card.front';
+    expect(result).toEqual(expected);
   });
 });

@@ -22,6 +22,20 @@ const filter = (attributes: DataIdentifier[], search: any) => {
   );
 };
 
+export const getDI = (target: string) => {
+  if (target.startsWith('card')) {
+    const cardAlias = target.split('.')[1];
+    return `di.${target.replace(`${cardAlias}.`, 'verbose.')}`;
+  }
+  if (target.startsWith('custom')) {
+    return target;
+  }
+  if (target.includes('.latest_upload')) {
+    return `di.${target.replace(`.latest_upload`, '')}`;
+  }
+  return `di.${target}`;
+};
+
 const sort = (attributes: DataIdentifier[]) =>
   attributes.sort((a, b) => {
     const aKey = a.split('.')[2];

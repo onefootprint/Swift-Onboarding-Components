@@ -9,13 +9,13 @@ import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
+import getDis from '../../../../../../../../utils/get-dis';
 import useField from '../../hooks/use-field';
 import useForm from '../../hooks/use-form';
 import { DiField } from '../../vault.types';
 import { useDecryptControls } from '../decrypt-controls';
 import Field from '../field';
 import CardHeader from './components/card-header';
-import getDis from './utils/get-dis';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;

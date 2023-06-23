@@ -75,18 +75,12 @@
       "id_card": {
         "front": "ID card",
         "back": "ID card back",
-        "selfie": "Selfie",
-        "front.latest_upload": "ID card",
-        "back.latest_upload": "ID card back",
-        "selfie.latest_upload": "Selfie"
+        "selfie": "Selfie"
       },
       "drivers_license": {
         "front": "Driver's license",
         "back": "Driver's license back",
-        "selfie": "Selfie",
-        "front.latest_upload": "Driver's license",
-        "back.latest_upload": "Driver's license back",
-        "selfie.latest_upload": "Selfie"
+        "selfie": "Selfie"
       }
     },
     "business": {
@@ -119,8 +113,8 @@
         "number": "Card number",
         "expiration": "Card expiration",
         "expiration_month": "Card expiration (Month)",
-        "expiration_year": "Card expiration (Year",
-        "billing_address.zip": "Billing address (Zip code)",
+        "expiration_year": "Card expiration (Year)",
+        "billing_address.zip": "Card billing address (Zip code)",
         "cvc": "Card security code (CVC)",
         "number_last4": "Card number (last 4)"
       }
