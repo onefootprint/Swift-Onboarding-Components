@@ -6,24 +6,42 @@ from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DA
 
 
 @pytest.mark.parametrize(
+    "key, value",
+    [
+        ("id.first_name", "Hi"),
+        ("id.last_name", "Bye"),
+        ("id.dob", "2023-12-25"),
+        ("id.ssn9", "123-12-1234"),
+        ("id.zip", "12345"),
+        ("id.zip", "12345-1234"),
+        ("id.address_line1", "1 Footprint Way"),
+        ("id.phone_number", "+14444444444"),
+        ("id.email", "piip@onefootprint.com"),
+    ],
+)
+def test_data_vaulting(tenant, key, value):
+    # Should be able to initialize a vault with the data
+    data = {key: value}
+    post("users/", data, tenant.sk.key)
+
+    # And should be able to add it to an existing vault
+    body = post("users/", None, tenant.sk.key)
+    fp_id = body["id"]
+    patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
+    post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key)
+
+
+@pytest.mark.parametrize(
     "key, value, expected_error",
     [
         ("id.ssn9", "12345678", "Invalid length"),
         ("id.ssn4", "123456789", "Invalid length"),
         ("id.ssn4", "123", "Invalid length"),
         ("id.ssn4", "123a", "Invalid character: can only provide ascii digits"),
-        ("id.first_name", "Hi", "Cannot vault without other Name data"),
-        ("id.last_name", "Bye", "Cannot vault without other Name data"),
         (
             "id.dob",
             "2023-13-25",
             "Invalid date: must provide a valid date in ISO 8601 format, YYYY-MM-DD",
-        ),
-        ("id.zip", "12345", "Cannot vault without other Address data"),
-        (
-            "id.address_line1",
-            "1 Footprint Way",
-            "Cannot vault without other Address data",
         ),
         (
             "business.tin",
@@ -231,21 +249,31 @@ def test_idempotency_id(tenant, sandbox_tenant):
     post("users/", None, sandbox_tenant.sk.key, invalid_idempotency_id, status_code=400)
 
 
-
 @pytest.mark.parametrize(
     "missing_can_access_data,missing_vault_data,expected_error",
     [
-        ([],[], None),
+        ([], [], None),
         (["dob"], [], "Invalid onboarding configuration for Vault"),
         ([], ["id.ssn9"], "Unmet onboarding requirements: CollectData"),
     ],
 )
-def test_kyc(sandbox_tenant, must_collect_data, missing_can_access_data, missing_vault_data, expected_error):
-    obc = create_ob_config(sandbox_tenant, **{
-        "name": "Acme Bank Card",
-        "must_collect_data": must_collect_data,
-        "can_access_data": list(set(must_collect_data)-set(missing_can_access_data)),
-    })
+def test_kyc(
+    sandbox_tenant,
+    must_collect_data,
+    missing_can_access_data,
+    missing_vault_data,
+    expected_error,
+):
+    obc = create_ob_config(
+        sandbox_tenant,
+        **{
+            "name": "Acme Bank Card",
+            "must_collect_data": must_collect_data,
+            "can_access_data": list(
+                set(must_collect_data) - set(missing_can_access_data)
+            ),
+        },
+    )
 
     # create NPV
     vault_data = {
@@ -260,10 +288,15 @@ def test_kyc(sandbox_tenant, must_collect_data, missing_can_access_data, missing
     fp_id = body["id"]
 
     # run KYC
-    body = post(f"entities/{fp_id}/kyc", dict(onboarding_config_key=obc.key.value), sandbox_tenant.sk.key, status_code=200 if expected_error is None else 400)
+    body = post(
+        f"entities/{fp_id}/kyc",
+        dict(onboarding_config_key=obc.key.value),
+        sandbox_tenant.sk.key,
+        status_code=200 if expected_error is None else 400,
+    )
     if expected_error:
         assert expected_error in body["error"]["message"]
-        return 
+        return
 
     # confirm OBD timeline event created
     timeline = get(
@@ -283,5 +316,3 @@ def test_kyc(sandbox_tenant, must_collect_data, missing_can_access_data, missing
         },
         sandbox_tenant.sk.key,
     )
-
-    

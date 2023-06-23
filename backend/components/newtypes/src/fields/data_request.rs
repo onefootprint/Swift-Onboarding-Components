@@ -68,7 +68,7 @@ impl ValidateArgs {
     pub fn for_non_portable(is_live: bool) -> Self {
         Self {
             for_bifrost: false,
-            allow_dangling_keys: false,
+            allow_dangling_keys: true,
             is_live,
         }
     }
