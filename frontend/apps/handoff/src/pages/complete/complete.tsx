@@ -4,7 +4,6 @@ import {
   NavigationHeader,
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
-import styled from '@onefootprint/styled';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -38,25 +37,16 @@ const Complete = () => {
   return (
     <>
       <NavigationHeader />
-      <Aligner>
-        <HeaderTitle
-          title={t('title')}
-          subtitle={
-            shouldShowCounter
-              ? t('subtitle.with-countdown', { seconds: countdown })
-              : t('subtitle.without-countdown')
-          }
-        />
-      </Aligner>
+      <HeaderTitle
+        title={t('title')}
+        subtitle={
+          shouldShowCounter
+            ? t('subtitle.with-countdown', { seconds: countdown })
+            : t('subtitle.without-countdown')
+        }
+      />
     </>
   );
 };
-
-const Aligner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100% - 64px);
-`;
 
 export default Complete;
