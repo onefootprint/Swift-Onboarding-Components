@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "postinstall": "cd ../.. && yarn build:packages",
-    "android": "expo run:android",
+    "android": "npx expo run:android",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "expo start --dev-client --clear",
-    "ios": "expo run:ios",
+    "dev": "npx expo start --dev-client --clear",
+    "ios": "npx expo run:ios",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch --detectOpenHandles",
     "test": "jest --ci --bail --detectOpenHandles",
