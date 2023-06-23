@@ -24,7 +24,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(authorized_orgs::get)
         .service(biometric::init_post)
         .service(biometric::complete_post)
-        .service(document::get)
         .service(document::post)
         .service(liveness::get)
         .service(token::get)

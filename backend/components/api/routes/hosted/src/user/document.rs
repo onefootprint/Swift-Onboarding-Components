@@ -15,18 +15,16 @@ use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeSta
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{DocumentImageError, DocumentResponse, LegacyDocumentResponse};
+use api_wire_types::{DocumentImageError, DocumentResponse};
 use crypto::aead::AeadSealedBytes;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocRequestIdentifier, DocumentRequest as DbDocumentRequest};
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
-use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
-use db::DbError;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{DataIdentifierDiscriminant, WorkflowGuard};
@@ -234,41 +232,6 @@ async fn upload_image(
     let path = IdentityDocument::s3_path_for_document_image(side, req_id, uv_id);
     let s3_url = state.s3_client.put_object(bucket, path, e_data.0, None).await?;
     Ok((side, s3_url))
-}
-
-// TODO deprecate this
-#[api_v2_operation(description = "GET a document request status", tags(Hosted))]
-#[actix::get("/hosted/user/document/status")]
-pub async fn get(
-    state: web::Data<State>,
-    user_auth: UserObAuthContext,
-) -> JsonApiResponse<LegacyDocumentResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-
-    let (doc_request, session) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let su_id = &user_auth.scoped_user.id;
-            let doc_request = DbDocumentRequest::get(conn, su_id)?.ok_or(DbError::ObjectNotFound)?;
-            // TODO this will break with workflows. Should deprecate this API before then
-            let id_doc = IdentityDocument::list(conn, su_id)?
-                .into_iter()
-                .next()
-                .ok_or(ApiError::ResourceNotFound)?;
-            let session = IncodeVerificationSession::get(conn, &id_doc.id)?;
-            Ok((doc_request, session))
-        })
-        .await??;
-
-    let status = doc_request.status.into();
-    let errors = session
-        .map(|s| s.latest_failure_reasons)
-        .unwrap_or_default()
-        .into_iter()
-        .map(DocumentImageError::from)
-        .collect();
-
-    ResponseData::ok(LegacyDocumentResponse { status, errors }).json()
 }
 
 #[allow(clippy::too_many_arguments)]

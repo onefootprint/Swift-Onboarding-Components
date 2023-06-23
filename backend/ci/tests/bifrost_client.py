@@ -44,7 +44,13 @@ class BifrostClient:
         auth = inherit_user(twilio, phone_number, ob_config_auth)
         return BifrostClient(ob_config, auth, phone_number, True, None)
 
-    def create(ob_config, twilio, phone_number, override_ob_config_auth=None, override_email=None):
+    def create(
+        ob_config,
+        twilio,
+        phone_number,
+        override_ob_config_auth=None,
+        override_email=None,
+    ):
         """
         Create an instance of BifrostClient that creates a new user with the provided phone number.
         """
@@ -85,7 +91,6 @@ class BifrostClient:
             email = f"{email}#{suffix}"
         else:
             business_name = BUSINESS_DATA["business.name"]
-
 
         self.data = {
             **ID_DATA,
@@ -243,11 +248,6 @@ class BifrostClient:
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
             assert not body["errors"]
-
-        # Check the status of uploading the doc
-        body = get(f"hosted/user/document/status", None, self.auth_token)
-        assert body["status"]["kind"] == "complete"
-        assert not body["errors"]
 
     def handle_liveness(self):
         """Register the biometric credential"""
