@@ -166,8 +166,11 @@ export enum FootprintPublicEvent {
 
 export enum FootprintInternalEvent {
   bootstrapDataReceived = 'bootstrapDataReceived',
+  optionsReceived = 'optionsReceived',
   started = 'started',
 }
+
+export const FOOTPRINT_OPTIONS_KEYS = ['showCompletionPage'];
 
 export const FOOTPRINT_USER_DATA_KEYS = [
   'id.email',

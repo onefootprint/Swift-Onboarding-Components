@@ -28,6 +28,7 @@ const footprint = () => {
     onCompleted,
     publicKey,
     userData,
+    options,
   }: OpenFootprint) => {
     if (hasIframeOpened) {
       return;
@@ -36,7 +37,7 @@ const footprint = () => {
 
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
-    await iframeManager.open(url, userData);
+    await iframeManager.open(url, userData, options);
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }

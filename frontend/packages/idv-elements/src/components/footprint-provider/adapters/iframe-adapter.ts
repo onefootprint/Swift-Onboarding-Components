@@ -1,5 +1,6 @@
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
+import { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import {
   CompletePayload,
@@ -15,11 +16,16 @@ class IframeAdapter implements FootprintClient {
 
   async load() {
     const postmate = await new Postmate.Model({
-      [FootprintInternalEvent.bootstrapDataReceived]: (data?: any) => {
+      [FootprintInternalEvent.bootstrapDataReceived]: (
+        data?: IdvBootstrapData,
+      ) => {
         this.eventEmitter.emit(
           FootprintInternalEvent.bootstrapDataReceived,
           data,
         );
+      },
+      [FootprintInternalEvent.optionsReceived]: (data?: IdvOptions) => {
+        this.eventEmitter.emit(FootprintInternalEvent.optionsReceived, data);
       },
     });
     this.postmate = postmate;

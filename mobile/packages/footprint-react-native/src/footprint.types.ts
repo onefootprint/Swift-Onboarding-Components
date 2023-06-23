@@ -164,6 +164,8 @@ export enum FootprintPublicEvent {
   canceled = 'canceled',
 }
 
+export const FOOTPRINT_OPTIONS_KEYS = ['showCompletionPage'];
+
 export const FOOTPRINT_USER_DATA_KEYS = [
   'id.email',
   'id.phone_number',

@@ -3,6 +3,9 @@ import { IdDI } from './di';
 
 // TODO: expand in the future with KybBootstrapData and InvestorProfileBootstrapData
 export type IdvBootstrapData = KycBootstrapData;
+export type IdvOptions = {
+  showCompletionPage?: boolean;
+};
 
 export type KycBootstrapData = Partial<{
   [IdDI.firstName]: string;

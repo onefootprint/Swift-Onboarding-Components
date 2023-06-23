@@ -8,6 +8,8 @@ import { useEffect } from 'react';
 
 const WAITING_USER_DATA_TIME = 500;
 
+// TODO: delete next
+
 // There are two possible ways of getting the bootstrap data:
 // (1) The bootstrap data is passed in the URL fragment
 // (2) The bootstrap data is passed via post message

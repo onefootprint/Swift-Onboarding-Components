@@ -1,6 +1,8 @@
 import type { Footprint } from '../footprint-js.types';
 import {
+  FOOTPRINT_OPTIONS_KEYS,
   FOOTPRINT_USER_DATA_KEYS,
+  FootprintOptions,
   FootprintUserData,
 } from '../footprint-js.types';
 import { createButton } from './footprint-ui';
@@ -32,7 +34,15 @@ const startVanillaIntegration = (footprint: Footprint) => {
   const handleButtonClicked = (publicKey: string, container: HTMLElement) => {
     const userData: FootprintUserData = {};
     FOOTPRINT_USER_DATA_KEYS.forEach(key => {
-      const val = container.getAttribute(`data-user-${key}`);
+      const val = container.getAttribute(`footprint-user-data-${key}`);
+      if (val) {
+        userData[key as keyof FootprintUserData] = val;
+      }
+    });
+
+    const options: FootprintOptions = {};
+    FOOTPRINT_OPTIONS_KEYS.forEach(key => {
+      const val = container.getAttribute(`footprint-option-${key}`);
       if (val) {
         userData[key as keyof FootprintUserData] = val;
       }
@@ -52,6 +62,7 @@ const startVanillaIntegration = (footprint: Footprint) => {
         }
       },
       userData,
+      options,
     });
   };
 

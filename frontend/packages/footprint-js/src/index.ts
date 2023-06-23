@@ -10,6 +10,7 @@ export type {
   FootprintAppearanceRules,
   FootprintAppearanceTheme,
   FootprintAppearanceVariables,
+  FootprintOptions,
   FootprintShowParams,
   FootprintUserData,
   OpenFootprint,

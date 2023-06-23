@@ -1,5 +1,6 @@
 import footprint, {
   FootprintAppearance,
+  FootprintOptions,
   FootprintUserData,
 } from '@onefootprint/footprint-js';
 import React from 'react';
@@ -13,6 +14,7 @@ export type FootprintButtonProps = {
   publicKey?: string;
   testID?: string;
   userData?: FootprintUserData;
+  options?: FootprintOptions;
 };
 
 const FootprintButton = ({
@@ -24,6 +26,7 @@ const FootprintButton = ({
   publicKey,
   testID,
   userData,
+  options,
 }: FootprintButtonProps) => {
   const openFootprint = () => {
     footprint.open({
@@ -32,6 +35,7 @@ const FootprintButton = ({
       onCompleted,
       publicKey,
       userData,
+      options,
     });
   };
 

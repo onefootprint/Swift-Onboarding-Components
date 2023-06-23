@@ -24,9 +24,7 @@ const useFootprintProvider = ({ client }: UseFootprintProvider) => {
   const on = (name: FootprintInternalEvent, callback: (data?: any) => void) =>
     client.on(name, callback);
 
-  const load = () => {
-    client.load();
-  };
+  const load = () => client.load();
 
   return {
     cancel,

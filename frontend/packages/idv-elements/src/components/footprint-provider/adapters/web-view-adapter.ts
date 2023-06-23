@@ -17,7 +17,9 @@ class WebView implements FootprintClient {
     window.location.href = `${this.redirectUrl}?${params.toString()}`;
   };
 
-  load(): void {}
+  load(): Promise<void> {
+    return Promise.resolve();
+  }
 
   close(): void {
     this.setLocation({ canceled: true });
