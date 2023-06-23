@@ -198,6 +198,7 @@ export type FootprintUserData = Partial<{
   'id.zip': string;
   'id.ssn9': string;
   'id.ssn4': string;
+  'id.nationality': string; // 2 letter country code
 }>;
 
 export type IdentifyRequest = {
