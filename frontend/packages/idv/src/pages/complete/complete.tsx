@@ -1,48 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import {
-  ConfettiAnimation,
-  HeaderTitle,
-  NavigationHeader,
-} from '@onefootprint/idv-elements';
-import { LAYOUT_CONTAINER_ID } from '@onefootprint/idv-elements/src/components/layout/constants';
+import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import styled from '@onefootprint/styled';
 import { Box, LinkButton, LoadingIndicator } from '@onefootprint/ui';
-import React, { useState } from 'react';
-import { useEffectOnce, useTimeout } from 'usehooks-ts';
+import React from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
 import useIsKyb from './hooks/use-is-kyb';
 
 const CLOSE_DELAY = 6000;
-const CONFETTI_DELAY = 600;
 
 const Complete = () => {
   const { t } = useTranslation('pages.complete');
   const [state] = useIdvMachine();
   const { isLoading, isKyb } = useIsKyb();
-  const { validationToken, onClose, onComplete, hideConfetti } = state.context;
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiDimensions, setConfettiDimensions] = useState({
-    width: 0,
-    height: 0,
-    left: 0,
-    top: 0,
-  });
-
-  useTimeout(() => {
-    const container = document.getElementById(LAYOUT_CONTAINER_ID);
-    if (container) {
-      container.getBoundingClientRect();
-      setConfettiDimensions({
-        width: container.offsetWidth,
-        height: container.offsetHeight,
-        left: container.offsetLeft,
-        top: container.offsetTop,
-      });
-      if (!hideConfetti) setShowConfetti(true);
-    }
-  }, CONFETTI_DELAY);
+  const { validationToken, onClose, onComplete } = state.context;
 
   useEffectOnce(() => {
     if (validationToken) {
@@ -53,10 +26,6 @@ const Complete = () => {
   if (isLoading) {
     return <LoadingIndicator />;
   }
-
-  const handleCompleteAnimation = () => {
-    setShowConfetti(false);
-  };
 
   return (
     <>
@@ -74,15 +43,6 @@ const Complete = () => {
           <LinkButton sx={{ marginTop: 7 }} onClick={onClose}>
             {t('cta')}
           </LinkButton>
-        )}
-        {showConfetti && (
-          <ConfettiAnimation
-            onComplete={handleCompleteAnimation}
-            height={confettiDimensions.height}
-            width={confettiDimensions.width}
-            left={confettiDimensions.left}
-            top={confettiDimensions.top}
-          />
         )}
       </Container>
     </>

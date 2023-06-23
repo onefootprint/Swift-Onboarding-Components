@@ -8,7 +8,6 @@ export type IdvMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  hideConfetti?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
 };

@@ -13,7 +13,6 @@ export type MachineContext = {
   obConfigAuth?: ObConfigAuth;
   onClose?: () => void;
   onComplete?: (validationToken: string, delay?: number) => void;
-  hideConfetti?: boolean;
   // Generated
   validationToken?: string;
   sandboxSuffix?: string;

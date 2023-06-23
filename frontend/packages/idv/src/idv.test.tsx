@@ -95,7 +95,6 @@ describe('<Idv />', () => {
                     bootstrapData={bootstrapData}
                     onComplete={onComplete}
                     onClose={onClose}
-                    hideConfetti
                   />
                 </Layout>
               </ToastProvider>
