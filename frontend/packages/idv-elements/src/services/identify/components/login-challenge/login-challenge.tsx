@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import styled, { css } from '@onefootprint/styled';
+=======
+import styled from '@onefootprint/styled';
+>>>>>>> Stashed changes
 import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 
@@ -12,7 +16,7 @@ const LoginChallenge = () => {
   const [state] = useIdentifyMachine();
   const { device, challenge } = state.context;
   const [selectedChallengeKind, setSelectedChallengeKind] =
-    useState<ChallengeKind>(ChallengeKind.sms);
+    useState<ChallengeKind>(ChallengeKind.biometric);
   const canChallengeBiometrics = getCanChallengeBiometrics(challenge, device);
 
   if (!canChallengeBiometrics) {
@@ -25,28 +29,23 @@ const LoginChallenge = () => {
 
   return (
     <>
-      {canChallengeBiometrics && (
-        <LoginChallengeSegmentedControl onChange={handleChangeChallengeKind} />
-      )}
-      <ChallengeContainer visible={selectedChallengeKind === ChallengeKind.sms}>
-        <LoginSmsChallenge />
-      </ChallengeContainer>
-      <ChallengeContainer
-        visible={selectedChallengeKind === ChallengeKind.biometric}
-      >
-        <LoginBiometricChallenge />
+      <LoginChallengeSegmentedControl onChange={handleChangeChallengeKind} />
+      <ChallengeContainer>
+        {selectedChallengeKind === ChallengeKind.sms ? (
+          <LoginSmsChallenge />
+        ) : (
+          <LoginBiometricChallenge />
+        )}
       </ChallengeContainer>
     </>
   );
 };
 
-const ChallengeContainer = styled.div<{ visible: boolean }>`
-  ${({ visible }) => css`
-    display: ${visible ? 'flex' : 'none'};
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-  `}
+const ChallengeContainer = styled.div`
+  display: 'flex';
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default LoginChallenge;

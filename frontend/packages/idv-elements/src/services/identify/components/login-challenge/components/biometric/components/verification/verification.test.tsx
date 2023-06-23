@@ -20,23 +20,19 @@ describe('<BiometricChallengeVerification />', () => {
 
   it('renders default state correctly', () => {
     renderVerification({});
-    const button = screen.getByRole('button', { name: 'Launch biometrics' });
+    const button = screen.getByRole('button', { name: 'Launch passkey' });
     expect(button).toBeInTheDocument();
   });
 
   it('renders loading correctly', () => {
     renderVerification({ isWaiting: true });
-    expect(
-      screen.queryByRole('button', { name: 'Launch biometrics' }),
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Launch passkey' })).toBeNull();
     expect(screen.getByText('Waiting...')).toBeInTheDocument();
   });
 
   it('renders success correctly', () => {
     renderVerification({ isSuccess: true });
-    expect(
-      screen.queryByRole('button', { name: 'Launch biometrics' }),
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Launch passkey' })).toBeNull();
     expect(screen.getByText('Success!')).toBeInTheDocument();
   });
 
@@ -44,7 +40,7 @@ describe('<BiometricChallengeVerification />', () => {
     const onComplete = jest.fn();
     renderVerification({ onComplete });
     expect(onComplete).not.toHaveBeenCalled();
-    const button = screen.getByRole('button', { name: 'Launch biometrics' });
+    const button = screen.getByRole('button', { name: 'Launch passkey' });
     expect(button).toBeInTheDocument();
     await userEvent.click(button);
     expect(onComplete).toHaveBeenCalled();

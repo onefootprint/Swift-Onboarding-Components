@@ -22,13 +22,13 @@
         "verification": {
           "loading": "Waiting...",
           "success": "Success!",
-          "cta": "Launch biometrics",
-          "cta-retry": "Retry biometrics"
+          "cta": "Launch passkey",
+          "cta-retry": "Retry passkey"
         }
       },
       "challenge-picker": {
         "sms": "SMS",
-        "biometric": "Biometric",
+        "biometric": "Passkey",
         "aria-label": "Select a login challenge type."
       }
     },

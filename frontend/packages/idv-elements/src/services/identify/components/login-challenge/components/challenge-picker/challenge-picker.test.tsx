@@ -14,15 +14,16 @@ describe('<ChallengePicker />', () => {
       <ChallengePicker defaultValue={defaultValue} onChange={onChange} />,
     );
 
-  it('should render successfully, with SMS selected by default', () => {
+  it('should render successfully, with passkey selected by default', () => {
     renderControl({});
+
+    const biometricSegment = screen.getByRole('button', { name: 'Passkey' });
+    expect(biometricSegment).toBeInTheDocument();
+    expect(biometricSegment.getAttribute('data-selected')).toBe('true');
+
     const smsSegment = screen.getByRole('button', { name: 'SMS' });
     expect(smsSegment).toBeInTheDocument();
-    expect(smsSegment.getAttribute('data-selected')).toBe('true');
-
-    const biometricSegment = screen.getByRole('button', { name: 'Biometric' });
-    expect(biometricSegment).toBeInTheDocument();
-    expect(biometricSegment.getAttribute('data-selected')).toBe('false');
+    expect(smsSegment.getAttribute('data-selected')).toBe('false');
   });
 
   it('should render with a default value provided', () => {
@@ -30,7 +31,7 @@ describe('<ChallengePicker />', () => {
     const smsSegment = screen.getByRole('button', { name: 'SMS' });
     expect(smsSegment.getAttribute('data-selected')).toBe('false');
 
-    const biometricSegment = screen.getByRole('button', { name: 'Biometric' });
+    const biometricSegment = screen.getByRole('button', { name: 'Passkey' });
     expect(biometricSegment.getAttribute('data-selected')).toBe('true');
   });
 
@@ -40,16 +41,11 @@ describe('<ChallengePicker />', () => {
 
     const smsSegment = screen.getByRole('button', { name: 'SMS' });
     const biometricSegment = screen.getByRole('button', {
-      name: 'Biometric',
+      name: 'Passkey',
     });
 
-    await userEvent.click(smsSegment);
-    expect(onChange).not.toHaveBeenCalled();
-    expect(smsSegment.getAttribute('data-selected')).toBe('true');
-    expect(biometricSegment.getAttribute('data-selected')).toBe('false');
-
     await userEvent.click(biometricSegment);
-    expect(onChange).toHaveBeenCalledWith(ChallengeKind.biometric);
+    expect(onChange).not.toHaveBeenCalled();
     expect(smsSegment.getAttribute('data-selected')).toBe('false');
     expect(biometricSegment.getAttribute('data-selected')).toBe('true');
 

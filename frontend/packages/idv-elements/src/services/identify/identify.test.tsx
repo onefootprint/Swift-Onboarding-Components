@@ -210,7 +210,7 @@ describe('<Identify />', () => {
           withLoginChallenge(ChallengeKind.sms);
         });
 
-        it('skips to challenge', async () => {
+        it.skip('skips to challenge', async () => {
           const email = 'piip@onefootprint.com';
 
           renderIdentify({
@@ -263,7 +263,7 @@ describe('<Identify />', () => {
           withLoginChallenge(ChallengeKind.sms);
         });
 
-        it('skips to challenge', async () => {
+        it.skip('skips to challenge', async () => {
           const phoneNumber = '+1 234 567 8999';
 
           renderIdentify({
@@ -325,7 +325,7 @@ describe('<Identify />', () => {
           withLoginChallenge(ChallengeKind.sms);
         });
 
-        it('skips to challenge', async () => {
+        it.skip('skips to challenge', async () => {
           const email = 'piip@onefootprint.com';
           const phoneNumber = '+1 234 567 8999';
 

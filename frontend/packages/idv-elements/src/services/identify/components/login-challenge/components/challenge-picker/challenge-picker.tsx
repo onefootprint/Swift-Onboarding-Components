@@ -13,15 +13,15 @@ const ChallengePicker = ({ defaultValue, onChange }: ChallengePickerProps) => {
   const { t } = useTranslation('components.login-challenge.challenge-picker');
 
   const options = [
-    { label: t('sms'), value: ChallengeKind.sms, IconComponent: IcoPhone24 },
     {
       label: t('biometric'),
       value: ChallengeKind.biometric,
       IconComponent: IcoFaceid24,
     },
+    { label: t('sms'), value: ChallengeKind.sms, IconComponent: IcoPhone24 },
   ];
   const [segment, setSegment] = useState<ChallengeKind>(
-    defaultValue ?? ChallengeKind.sms,
+    defaultValue ?? ChallengeKind.biometric,
   );
 
   const handleChangeSegment = (value: string) => {
