@@ -11,7 +11,7 @@ export type OnboardingMachineArgs = {
   userFound?: boolean;
   isTransfer?: boolean;
   onClose?: () => void;
-  onComplete?: (validationToken: string, delay?: number) => void;
+  onComplete?: (validationToken?: string, delay?: number) => void;
 };
 
 const createOnboardingMachine = ({

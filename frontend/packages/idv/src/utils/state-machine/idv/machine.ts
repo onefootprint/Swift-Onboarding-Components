@@ -8,8 +8,9 @@ export type IdvMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
+  showCompletionPage?: boolean;
   onClose?: () => void;
-  onComplete?: (validationToken: string, delay?: number) => void;
+  onComplete?: (validationToken?: string, delay?: number) => void;
 };
 
 const createIdvMachine = (args: IdvMachineArgs) =>

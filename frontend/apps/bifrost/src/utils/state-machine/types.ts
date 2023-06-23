@@ -5,6 +5,7 @@ export type MachineContext = {
   config?: OnboardingConfig;
   validationToken?: string;
   bootstrapData?: IdvBootstrapData;
+  showCompletionPage?: boolean;
 };
 
 export type MachineEvents =
@@ -13,6 +14,7 @@ export type MachineEvents =
       payload: {
         config?: OnboardingConfig;
         bootstrapData?: IdvBootstrapData;
+        showCompletionPage?: boolean;
       };
     }
   | {

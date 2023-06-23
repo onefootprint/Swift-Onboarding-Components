@@ -35,6 +35,7 @@ const Root = () => {
             }}
             authToken={authToken}
             obConfigAuth={obConfigAuth}
+            showCompletionPage
           />
         )}
       </Layout>

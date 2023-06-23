@@ -5,7 +5,11 @@ import createIdvMachine, {
   IdvMachineArgs,
 } from '../../utils/state-machine/idv/machine';
 
-const useLocalIdvMachine = (args: IdvMachineArgs) =>
+type IdvMachineProviderArgs = {
+  args: IdvMachineArgs;
+};
+
+const useLocalIdvMachine = ({ args }: IdvMachineProviderArgs) =>
   useMachine(() => createIdvMachine(args));
 
 export const [MachineProvider, useIdvMachine] = constate(useLocalIdvMachine);

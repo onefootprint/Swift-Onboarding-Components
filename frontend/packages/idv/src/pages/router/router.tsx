@@ -10,11 +10,9 @@ import useIdvMachine from '../../hooks/use-idv-machine';
 import Complete from '../complete';
 import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
-type RouterProps = {
-  onDone?: (validationToken?: string) => void;
-};
+const AUTO_CLOSE_DELAY = 6000;
 
-const Router = ({ onDone }: RouterProps) => {
+const Router = () => {
   const [state, send] = useIdvMachine();
   const {
     bootstrapData,
@@ -22,6 +20,7 @@ const Router = ({ onDone }: RouterProps) => {
     authToken,
     userFound,
     isTransfer,
+    showCompletionPage,
     validationToken,
     obConfigAuth,
     onClose,
@@ -30,13 +29,27 @@ const Router = ({ onDone }: RouterProps) => {
   useLogStateMachine('idv', state);
   const isDone = state.matches('complete');
   const identifyBootstrapData = getIdentifyBootstrapData(bootstrapData);
+  const shouldShowComplete =
+    state.matches('complete') && !isTransfer && showCompletionPage;
 
   useEffect(() => {
-    if (isDone) {
-      onDone?.(validationToken);
+    if (!isDone) {
+      return;
     }
+
+    if (isTransfer) {
+      onComplete?.();
+      return;
+    }
+
+    if (showCompletionPage) {
+      onComplete?.(validationToken, AUTO_CLOSE_DELAY);
+      return;
+    }
+
+    onComplete?.(validationToken);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDone, onDone]);
+  }, [isDone]);
 
   return (
     <AppErrorBoundary
@@ -67,7 +80,7 @@ const Router = ({ onDone }: RouterProps) => {
           }}
         />
       )}
-      {state.matches('complete') && !isTransfer && <Complete />}
+      {shouldShowComplete && <Complete />}
     </AppErrorBoundary>
   );
 };

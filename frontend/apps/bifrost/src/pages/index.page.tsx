@@ -12,8 +12,6 @@ import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 
 import Init from './init';
 
-const CLOSE_DELAY = 6000;
-
 const Root = () => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
@@ -22,11 +20,11 @@ const Root = () => {
   useLogStateMachine('bifrost', state);
   const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
-  const handleComplete = (validationToken?: string) => {
+  const handleComplete = (validationToken?: string, delay?: number) => {
     if (validationToken) {
       footprint.complete({
         validationToken,
-        closeDelay: CLOSE_DELAY,
+        closeDelay: delay,
       });
     }
   };
@@ -45,6 +43,7 @@ const Root = () => {
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
             onClose={footprint.close}
+            showCompletionPage // TODO: remove later and pass the one from state machine
           />
         )}
       </Layout>

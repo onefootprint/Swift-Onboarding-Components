@@ -1,10 +1,3 @@
-import { IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import { IdvMachineArgs } from './utils/state-machine/idv/machine';
 
-export type IdvProps = {
-  obConfigAuth?: ObConfigAuth;
-  authToken?: string; // If provided, will skip identify step
-  bootstrapData?: IdvBootstrapData; // If provided, will bootstrap identify and pre-fill fields on onboarding
-  isTransfer?: boolean;
-  onClose?: () => void;
-  onComplete?: (validationToken?: string, delay?: number) => void;
-};
+export type IdvProps = IdvMachineArgs;

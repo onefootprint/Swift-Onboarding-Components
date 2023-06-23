@@ -80,6 +80,7 @@ describe('<Idv />', () => {
     onComplete = jest.fn(),
     onClose = jest.fn(),
     authToken,
+    showCompletionPage,
   }: Partial<IdvProps>) =>
     render(
       <React.StrictMode>
@@ -95,6 +96,7 @@ describe('<Idv />', () => {
                     bootstrapData={bootstrapData}
                     onComplete={onComplete}
                     onClose={onClose}
+                    showCompletionPage={showCompletionPage}
                   />
                 </Layout>
               </ToastProvider>
@@ -124,12 +126,15 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
           onComplete,
           onClose,
         });
 
         await checkComplete();
-        expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        });
 
         const linkButton = screen.getByText('Return to site');
         expect(linkButton).toBeInTheDocument();
@@ -144,6 +149,7 @@ describe('<Idv />', () => {
         withRequirements([], []);
 
         renderIdv({
+          showCompletionPage: true,
           onComplete,
           onClose,
         });
@@ -151,7 +157,31 @@ describe('<Idv />', () => {
         await identifyUserByPhone();
 
         await checkComplete();
-        expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        });
+      });
+
+      it('skips completion page', async () => {
+        const onComplete = jest.fn();
+        const onClose = jest.fn();
+
+        withRequirements([], []);
+
+        renderIdv({
+          onComplete,
+          onClose,
+        });
+
+        await identifyUserByPhone();
+
+        await waitFor(() => {
+          expect(screen.getByRole('progressbar')).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken);
+        });
       });
 
       it('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
@@ -185,6 +215,7 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
           onComplete,
           onClose,
         });
@@ -215,7 +246,9 @@ describe('<Idv />', () => {
 
         await authorizeData();
         await checkComplete();
-        expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        });
       });
     });
 
@@ -233,6 +266,7 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
         });
 
         await waitFor(() => {
@@ -267,6 +301,7 @@ describe('<Idv />', () => {
         const onClose = jest.fn();
 
         renderIdv({
+          showCompletionPage: true,
           onComplete,
           onClose,
         });
@@ -298,7 +333,39 @@ describe('<Idv />', () => {
 
         await authorizeData();
         await checkComplete();
-        expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        });
+      });
+
+      it('skips completion page', async () => {
+        withRequirements([TestAuthorizeRequirement], []);
+
+        const onComplete = jest.fn();
+        const onClose = jest.fn();
+
+        renderIdv({
+          onComplete,
+          onClose,
+        });
+
+        await identifyUserByPhone();
+
+        await waitFor(() => {
+          expect(screen.getByRole('progressbar')).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+          expect(screen.getByText('Authorize access')).toBeInTheDocument();
+        });
+
+        // Update the mock response after we entered the authorize page
+        withRequirements([], []);
+
+        await authorizeData();
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken);
+        });
       });
 
       it('can onboard after filling remaining missing attributes', async () => {
@@ -326,6 +393,7 @@ describe('<Idv />', () => {
         const onClose = jest.fn();
 
         renderIdv({
+          showCompletionPage: true,
           onComplete,
           onClose,
         });
@@ -393,7 +461,9 @@ describe('<Idv />', () => {
 
         await authorizeData();
         await checkComplete();
-        expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        await waitFor(() => {
+          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        });
       });
     });
   });
@@ -407,7 +477,9 @@ describe('<Idv />', () => {
       });
 
       it('starts flow on sandbox outcome page', async () => {
-        renderIdv({});
+        renderIdv({
+          showCompletionPage: true,
+        });
 
         await waitFor(() => {
           expect(screen.getByText('Select test outcome')).toBeInTheDocument();
@@ -447,6 +519,7 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
           bootstrapData: {
             [IdDI.firstName]: 'Piip',
             [IdDI.lastName]: 'Foot',
@@ -503,6 +576,7 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
           bootstrapData: {
             [IdDI.firstName]: 'Piip',
             [IdDI.lastName]: 'Foot',
@@ -522,9 +596,14 @@ describe('<Idv />', () => {
 
         renderIdv({
           authToken: 'token',
+          showCompletionPage: true,
           bootstrapData: {
             [IdDI.dob]: '05/23/1996',
           },
+        });
+
+        await waitFor(() => {
+          expect(screen.getByRole('progressbar')).toBeInTheDocument();
         });
 
         await waitFor(() => {
@@ -564,6 +643,7 @@ describe('<Idv />', () => {
 
       renderIdv({
         authToken: 'token',
+        showCompletionPage: true,
         onComplete,
         onClose,
       });
@@ -616,6 +696,7 @@ describe('<Idv />', () => {
 
       renderIdv({
         authToken: 'token',
+        showCompletionPage: true,
       });
 
       await waitFor(() => {
@@ -639,6 +720,7 @@ describe('<Idv />', () => {
 
       renderIdv({
         authToken: 'token',
+        showCompletionPage: true,
       });
 
       await waitFor(() => {

@@ -11,7 +11,7 @@ export type MachineContext = {
   isTransfer?: boolean;
   validationToken?: string;
   onClose?: () => void;
-  onComplete?: (validationToken: string, delay?: number) => void;
+  onComplete?: (validationToken?: string, delay?: number) => void;
 };
 
 export type MachineEvents =

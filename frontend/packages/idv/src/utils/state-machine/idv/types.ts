@@ -12,11 +12,11 @@ export type MachineContext = {
   isTransfer?: boolean;
   obConfigAuth?: ObConfigAuth;
   onClose?: () => void;
-  onComplete?: (validationToken: string, delay?: number) => void;
-  // Generated
+  onComplete?: (validationToken?: string, delay?: number) => void; // Generated
   validationToken?: string;
   sandboxSuffix?: string;
   userFound?: boolean;
+  showCompletionPage?: boolean;
 };
 
 export type MachineEvents =
