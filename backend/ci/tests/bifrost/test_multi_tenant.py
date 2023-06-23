@@ -8,6 +8,7 @@ from tests.utils import (
     inherit_user,
 )
 from tests.bifrost_client import BifrostClient
+from tests.headers import SandboxId
 from tests.constants import TENANT_ID3
 
 
@@ -42,10 +43,13 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     #
     # Then onboard them onto foo_sandbox_tenant
     #
+    phone_number = sandbox_user_real_phone.client.data["id.phone_number"]
+    sandbox_id = sandbox_user_real_phone.client.sandbox_id
     inherited_auth_token = inherit_user(
         twilio,
-        sandbox_user_real_phone.client.data["id.phone_number"],
+        phone_number,
         foo_sandbox_tenant.default_ob_config.key,
+        SandboxId(sandbox_id),
     )
     foo_bifrost = BifrostClient.new(foo_sandbox_tenant.default_ob_config, twilio)
     # Manually initialize the onboarding and overwrite the auth token on the BifrostClient.

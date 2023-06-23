@@ -53,6 +53,7 @@ class Tenant(NamedTuple):
 class BasicUser(NamedTuple):
     auth_token: str
     phone_number: str
+    sandbox_id: str
 
 
 class User(NamedTuple):

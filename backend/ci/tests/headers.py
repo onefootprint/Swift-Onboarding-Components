@@ -48,3 +48,7 @@ class IsLive(BaseAuth):
 
 class IdempotencyId(BaseAuth):
     HEADER_NAME = "x-idempotency-id"
+
+
+class SandboxId(BaseAuth):
+    HEADER_NAME = "x-sandbox-id"

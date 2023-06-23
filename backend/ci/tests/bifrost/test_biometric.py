@@ -1,9 +1,6 @@
 import json
-
-from tests.constants import (
-    TEST_URL,
-)
-from tests.headers import FpAuth, OnboardingSessionToken
+from tests.constants import TEST_URL
+from tests.headers import FpAuth, SandboxId
 from tests.bifrost_client import BifrostClient
 from tests.utils import (
     override_webauthn_attestation,
@@ -100,10 +97,16 @@ def test_d2p_biometric(twilio, sandbox_tenant):
 def test_identify_login_repeat_customer_biometric(sandbox_user):
     # Identify the user by email, should have ability to auth via biometric
     identifier = {"email": sandbox_user.client.data["id.email"]}
+    sandbox_id = sandbox_user.client.sandbox_id
     data = dict(
         identifier=identifier,
     )
-    body = post("hosted/identify", data, sandbox_user.client.ob_config.key)
+    body = post(
+        "hosted/identify",
+        data,
+        sandbox_user.client.ob_config.key,
+        SandboxId(sandbox_id),
+    )
     assert body["user_found"]
     assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 

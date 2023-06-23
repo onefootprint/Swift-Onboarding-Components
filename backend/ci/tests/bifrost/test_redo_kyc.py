@@ -1,12 +1,12 @@
-import pytest
 from tests.headers import FpAuth
-from tests.conftest import generate_real_phone_number
-from tests.utils import _gen_random_n_digit_number, post
+from tests.utils import _gen_random_sandbox_id, post
 from tests.utils import (
     get,
     patch,
     try_until_success,
+    _gen_random_n_digit_number,
 )
+from tests.constants import LIVE_PHONE_NUMBER
 from tests.bifrost_client import BifrostClient
 
 
@@ -24,9 +24,12 @@ def extract_trigger_sms(twilio, phone_number, id):
 
 
 def test_redo_kyc(sandbox_tenant, twilio):
-    phone_number = generate_real_phone_number()
+    sandbox_id = _gen_random_sandbox_id()
     bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, phone_number
+        sandbox_tenant.default_ob_config,
+        twilio,
+        LIVE_PHONE_NUMBER,  # Have to make with the live phone number in order to receive SMSes
+        sandbox_id,
     )
     sandbox_user = bifrost.run()
 
@@ -40,15 +43,17 @@ def test_redo_kyc(sandbox_tenant, twilio):
     assert len(obds) == 1
 
     # trigger RedoKYC
-    id = _gen_random_n_digit_number(10)
+    note = _gen_random_n_digit_number(10)
     trigger = dict(kind="redo_kyc")
     post(
         f"entities/{sandbox_user.fp_id}/trigger",
-        dict(trigger=trigger, note=id),
+        dict(trigger=trigger, note=note),
         sandbox_tenant.sk.key,
     )
     # find link we sent to user via Twilio
-    token = extract_trigger_sms(twilio, sandbox_user.client.data["id.phone_number"], id)
+    token = extract_trigger_sms(
+        twilio, sandbox_user.client.data["id.phone_number"], note
+    )
     auth_token = FpAuth(token)
 
     # re-run Bifrost with the token from the link we sent to user
@@ -56,6 +61,7 @@ def test_redo_kyc(sandbox_tenant, twilio):
         sandbox_tenant.default_ob_config,
         auth_token,
         sandbox_user.client.data["id.phone_number"],
+        sandbox_user.client.sandbox_id,
     )
     # Edit some data
     data = {"id.ssn9": "999-99-9999"}

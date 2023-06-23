@@ -129,7 +129,10 @@ def test_one_click_kyb(kyb_sandbox_ob_config, twilio):
     user = bifrost.run()
 
     phone_number = bifrost.data["id.phone_number"]
-    bifrost2 = BifrostClient.inherit(kyb_sandbox_ob_config, twilio, phone_number)
+    sandbox_id = bifrost.sandbox_id
+    bifrost2 = BifrostClient.inherit(
+        kyb_sandbox_ob_config, twilio, phone_number, sandbox_id
+    )
     user2 = bifrost2.run()
     assert user.fp_id == user2.fp_id
     assert user.fp_bid

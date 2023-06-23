@@ -1,10 +1,10 @@
 import pytest
-from tests.utils import _random_sandbox_phone
 from tests.bifrost_client import BifrostClient
+from tests.constants import FIXTURE_PHONE_NUMBER
 
 
 @pytest.mark.parametrize(
-    "suffix,expected_status,expected_requires_manual_review",
+    "sandbox_id,expected_status,expected_requires_manual_review",
     [
         ("fail", "fail", False),
         ("blah_123", "pass", False),
@@ -14,13 +14,12 @@ from tests.bifrost_client import BifrostClient
 def test_deterministic_onboarding(
     twilio,
     sandbox_tenant,
-    suffix,
+    sandbox_id,
     expected_status,
     expected_requires_manual_review,
 ):
-    sandbox_phone_number = _random_sandbox_phone(suffix)
     bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, sandbox_phone_number
+        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
     bifrost.run()
 

@@ -6,7 +6,7 @@ import random
 import arrow
 import time
 import os
-
+from tests.headers import SandboxId
 from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from tests.headers import DashboardAuth, FpAuth
 from tests.constants import (
@@ -142,29 +142,34 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def inherit_user(twilio, phone_number, ob_config_auth=None):
-    body = identify_user(phone_number, ob_config_auth)
+def inherit_user(twilio, phone_number, *headers):
+    body = identify_user(phone_number, *headers)
     assert "sms" in body["available_challenge_kinds"]
-    challenge_data = challenge_user(phone_number, ob_config_auth, "sms")
+    challenge_data = challenge_user(phone_number, "sms", *headers)
 
     # Log in as the user
     return identify_verify(
         twilio,
         phone_number,
         challenge_data["challenge_token"],
-        ob_config_auth=ob_config_auth,
         expected_kind="user_inherited",
+        *headers,
     )
 
 
 def inherit_user_biometric(user):
     phone_number = user.client.data["id.phone_number"]
-    body = identify_user(phone_number, user.client.ob_config.key)
+    sandbox_id = user.client.sandbox_id
+    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
+
+    body = identify_user(phone_number, user.client.ob_config.key, *sandbox_id_h)
     assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
-        phone_number, user.client.ob_config.key, "biometric"
+        phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h
     )
-    body = biometric_challenge_response(challenge_data, user, user.client.ob_config.key)
+    body = biometric_challenge_response(
+        challenge_data, user, user.client.ob_config.key, *sandbox_id_h
+    )
     assert body["kind"] == "user_inherited"
     return FpAuth(body["auth_token"])
 
@@ -172,13 +177,17 @@ def inherit_user_biometric(user):
 def step_up_user_biometric(auth_token, user):
     # Don't technically need to pass in the phone number to step up, but the util takes it in
     phone_number = user.client.data["id.phone_number"]
-    challenge_data = challenge_user(phone_number, auth_token, "biometric")
-    body = biometric_challenge_response(challenge_data, user, auth_token)
+    sandbox_id = user.client.sandbox_id
+    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
+    challenge_data = challenge_user(
+        phone_number, "biometric", auth_token, *sandbox_id_h
+    )
+    body = biometric_challenge_response(challenge_data, user, auth_token, *sandbox_id_h)
     assert body["kind"] == "user_inherited"
     assert body["auth_token"] == auth_token.value
 
 
-def biometric_challenge_response(challenge_data, user, *auths):
+def biometric_challenge_response(challenge_data, user, *headers):
     # do webauthn
     chal = json.loads(challenge_data["biometric_challenge_json"])
     chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
@@ -205,19 +214,18 @@ def biometric_challenge_response(challenge_data, user, *auths):
         "challenge_kind": "biometric",
         "challenge_token": challenge_data["challenge_token"],
     }
-    body = post("hosted/identify/verify", data, *auths)
+    body = post("hosted/identify/verify", data, *headers)
     return body
 
 
-def identify_user(phone_number, auth=None):
+def identify_user(phone_number, *headers):
     identifier = dict(phone_number=phone_number)
-    auth_args = [auth] if auth else []
 
     def identify():
         data = dict(
             identifier=identifier,
         )
-        body = post("hosted/identify", data, *auth_args)
+        body = post("hosted/identify", data, *headers)
         assert body["user_found"]
         assert body["available_challenge_kinds"]
         return body
@@ -225,11 +233,10 @@ def identify_user(phone_number, auth=None):
     return try_until_success(identify, 5)
 
 
-def challenge_user(phone_number, auth=None, challenge_kind="sms"):
+def challenge_user(phone_number, challenge_kind, *headers):
     identifier = dict(phone_number=phone_number)
     # Support sandbox phone numbers being passed in
     real_phone_number = phone_number.split("#")[0]
-    auth_args = [auth] if auth else []
 
     def challenge():
         data = dict(
@@ -237,11 +244,11 @@ def challenge_user(phone_number, auth=None, challenge_kind="sms"):
             preferred_challenge_kind=challenge_kind,
         )
 
-        if isinstance(auth, FpAuth):
+        if any(isinstance(h, FpAuth) for h in headers):
             # Hacky - if we are challenging for step up, don't provide an identifier
             data.pop("identifier")
 
-        body = post("hosted/identify/login_challenge", data, *auth_args)
+        body = post("hosted/identify/login_challenge", data, *headers)
         last_two = real_phone_number[-2:]
         assert (
             body["challenge_data"]["scrubbed_phone_number"]
@@ -257,7 +264,7 @@ def identify_verify(
     twilio,
     phone_number,
     challenge_token,
-    ob_config_auth=None,
+    *headers,
     expected_kind="user_created",
     expected_error=None,
 ):
@@ -267,8 +274,7 @@ def identify_verify(
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
         }
-        args = [ob_config_auth] if ob_config_auth else []
-        body = post("hosted/identify/verify", data, *args)
+        body = post("hosted/identify/verify", data, *headers)
         assert body["kind"] == expected_kind
         return FpAuth(body["auth_token"])
 
@@ -308,11 +314,11 @@ def identify_verify(
     return try_until_success(inner, 5)
 
 
-def create_user(twilio, phone_number, ob_config_auth=None) -> str:
+def create_user(twilio, phone_number, *headers) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = dict(phone_number=phone_number)
-        body = post("hosted/identify/signup_challenge", data, ob_config_auth)
+        body = post("hosted/identify/signup_challenge", data, *headers)
         return body["challenge_data"]["challenge_token"]
 
     challenge_token = try_until_success(
@@ -320,9 +326,7 @@ def create_user(twilio, phone_number, ob_config_auth=None) -> str:
     )  # Rate limiting may take a while
 
     # Respond to the challenge and create the user
-    return identify_verify(
-        twilio, phone_number, challenge_token, ob_config_auth=ob_config_auth
-    )
+    return identify_verify(twilio, phone_number, challenge_token, *headers)
 
 
 def create_tenant(org_data, ob_conf_data):
@@ -384,14 +388,9 @@ def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
 
-def _random_sandbox_phone(suffix=None):
-    """
-    Generates a random sandbox phone number that uses our FIXTURE phone number.
-    No SMS messages will be sent to this number, and its PIN code in identify is always 000000
-    """
-    suffix = suffix or "sandbox"
+def _gen_random_sandbox_id():
     seed = _gen_random_n_digit_number(10)
-    return f"{FIXTURE_PHONE_NUMBER}#{suffix}{seed}"
+    return f"sandbox{seed}"
 
 
 def _gen_random_ssn():

@@ -1,7 +1,7 @@
 import json
 import time
 import pytest
-from tests.headers import BusinessOwnerAuth
+from tests.headers import BusinessOwnerAuth, SandboxId
 from tests.utils import (
     get,
     create_ob_config,
@@ -92,20 +92,23 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     assert body[1]["ownership_stake"] == 30
 
     # Should be able to use the BO token in identify flow for same user
-    inherit_user(
-        twilio, secondary_bo.client.data["id.phone_number"], secondary_bo_token
-    )
+    phone_number = secondary_bo.client.data["id.phone_number"]
+    sandbox_id = secondary_bo.client.sandbox_id
+    inherit_user(twilio, phone_number, secondary_bo_token, SandboxId(sandbox_id))
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
-    identify_user(phone_number, kyb_sandbox_ob_config.key)
-    challenge_data = challenge_user(phone_number, kyb_sandbox_ob_config.key, "sms")
+    sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
+    identify_user(phone_number, kyb_sandbox_ob_config.key, sandbox_id_h)
+    challenge_data = challenge_user(
+        phone_number, "sms", kyb_sandbox_ob_config.key, sandbox_id_h
+    )
     identify_verify(
         twilio,
         phone_number,
         challenge_data["challenge_token"],
-        ob_config_auth=secondary_bo_token,
         expected_error="This business owner has already started KYC",
+        *[secondary_bo_token, sandbox_id_h],
     )
 
 
@@ -122,8 +125,10 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     assert not secondary_bo.fp_bid
 
     # Onboard the primary_bo onto the KYB sandbox config
+    phone_number = primary_bo.client.data["id.phone_number"]
+    sandbox_id = primary_bo.client.sandbox_id
     bifrost = BifrostClient.inherit(
-        kyb_sandbox_ob_config, twilio, primary_bo.client.data["id.phone_number"]
+        kyb_sandbox_ob_config, twilio, phone_number, sandbox_id
     )
     # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
     # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
@@ -155,10 +160,13 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     secondary_bo_token = BusinessOwnerAuth(token)
 
     # Then, onboard the secondary_bo as a BO of primary_bo's business
+    phone_number = secondary_bo.client.data["id.phone_number"]
+    sandbox_id = secondary_bo.client.sandbox_id
     bifrost = BifrostClient.inherit(
         kyb_sandbox_ob_config,
         twilio,
-        secondary_bo.client.data["id.phone_number"],
+        phone_number,
+        sandbox_id,
         override_ob_config_auth=secondary_bo_token,
     )
     secondary_bo = bifrost.run()

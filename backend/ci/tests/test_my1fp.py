@@ -5,6 +5,7 @@ from tests.utils import (
     post,
     step_up_user_biometric,
 )
+from tests.headers import SandboxId
 
 
 @pytest.fixture(scope="module")
@@ -13,8 +14,9 @@ def auth_token(sandbox_user_real_phone, twilio):
     My1fp-specific auth token
     """
     phone_number = sandbox_user_real_phone.client.data["id.phone_number"]
+    sandbox_id = sandbox_user_real_phone.client.sandbox_id
     # Specifically inherit the user through the identify flow without providing any ob public key auth
-    auth_token = inherit_user(twilio, phone_number)
+    auth_token = inherit_user(twilio, phone_number, SandboxId(sandbox_id))
     body = get("/hosted/user/token", None, auth_token)
     assert body["scopes"] == ["basic_profile"]
     return auth_token

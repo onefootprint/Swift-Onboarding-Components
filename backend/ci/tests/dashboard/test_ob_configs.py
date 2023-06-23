@@ -5,10 +5,12 @@ from tests.utils import (
     patch,
     create_user,
     create_ob_config,
-    _random_sandbox_phone,
+    _gen_random_sandbox_id,
 )
+from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.headers import (
     PublishableOnboardingKey,
+    SandboxId,
 )
 
 
@@ -54,8 +56,10 @@ def test_config_create(sandbox_tenant, twilio):
     ob_config = body
     ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
-    phone_number = _random_sandbox_phone()
-    auth_token = create_user(twilio, phone_number, ob_config_key)
+    sandbox_id = _gen_random_sandbox_id()
+    auth_token = create_user(
+        twilio, FIXTURE_PHONE_NUMBER, ob_config_key, SandboxId(sandbox_id)
+    )
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
 

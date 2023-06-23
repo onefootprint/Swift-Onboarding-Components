@@ -1,5 +1,6 @@
 import json
 from typing import NamedTuple, Optional
+from tests.headers import SandboxId
 from tests.types import Tenant
 from tests.constants import (
     TEST_URL,
@@ -9,10 +10,11 @@ from tests.constants import (
     CDO_TO_DIS,
     EMAIL,
     DOCUMENT_DATA,
+    FIXTURE_PHONE_NUMBER,
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
-    _random_sandbox_phone,
+    _gen_random_sandbox_id,
     multipart_file,
     _gen_random_ssn,
     inherit_user,
@@ -30,24 +32,28 @@ class BifrostClient:
     BifrostClient simulates Footprint hosted frontend's requests to the backend APIs.
     """
 
-    def raw_auth(ob_config, auth_token, phone_number):
+    def raw_auth(ob_config, auth_token, phone_number, sandbox_id):
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
-        return BifrostClient(ob_config, auth_token, phone_number, True, None)
+        return BifrostClient(ob_config, auth_token, phone_number, sandbox_id, True)
 
-    def inherit(ob_config, twilio, phone_number, override_ob_config_auth=None):
+    def inherit(
+        ob_config, twilio, phone_number, sandbox_id, override_ob_config_auth=None
+    ):
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        auth = inherit_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth, phone_number, True, None)
+        sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
+        auth = inherit_user(twilio, phone_number, ob_config_auth, *sandbox_id_header)
+        return BifrostClient(ob_config, auth, phone_number, sandbox_id, True)
 
     def create(
         ob_config,
         twilio,
         phone_number,
+        sandbox_id,
         override_ob_config_auth=None,
         override_email=None,
     ):
@@ -55,40 +61,44 @@ class BifrostClient:
         Create an instance of BifrostClient that creates a new user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        auth_token = create_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth_token, phone_number, False, override_email)
+        sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
+        auth_token = create_user(
+            twilio, phone_number, ob_config_auth, *sandbox_id_header
+        )
+        return BifrostClient(
+            ob_config, auth_token, phone_number, sandbox_id, False, override_email
+        )
 
     def new(ob_config, twilio, override_ob_config_auth=None):
         """
-        Create an instance of BifrostClient that creates a new user with a new, sandbox phone number
+        Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        phone_number = _random_sandbox_phone()
-        auth_token = create_user(twilio, phone_number, ob_config_auth)
-        return BifrostClient(ob_config, auth_token, phone_number, False, None)
+        sandbox_id = _gen_random_sandbox_id()
+        auth_token = create_user(
+            twilio, FIXTURE_PHONE_NUMBER, ob_config_auth, SandboxId(sandbox_id)
+        )
+        return BifrostClient(
+            ob_config, auth_token, FIXTURE_PHONE_NUMBER, sandbox_id, False
+        )
 
     def __init__(
         self,
         ob_config,
         auth_token,
         phone_number,
+        sandbox_id,
         is_inherited,
         override_email=None,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
+        self.sandbox_id = sandbox_id
 
-        if override_email:
-            email = override_email
-        else:
-            email = EMAIL
-
-        is_sandbox = "#" in phone_number
-        if is_sandbox:
-            # Edit the email and business name to have the same suffix as the phone number
-            suffix = phone_number.split("#")[-1]
-            business_name = f'{BUSINESS_DATA["business.name"]} {suffix}'
-            email = f"{email}#{suffix}"
+        email = override_email or EMAIL
+        if sandbox_id:
+            # Edit the business name to have the same suffix as the phone number for more visibility
+            business_name = f'{BUSINESS_DATA["business.name"]} {sandbox_id}'
         else:
             business_name = BUSINESS_DATA["business.name"]
 

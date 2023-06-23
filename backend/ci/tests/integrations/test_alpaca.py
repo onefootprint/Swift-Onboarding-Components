@@ -1,10 +1,10 @@
 import pytest
-from tests.utils import _random_sandbox_phone
 from tests.headers import IsLive
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 from tests.utils import _gen_random_n_digit_number
 from tests.utils import post, get
+from tests.constants import FIXTURE_PHONE_NUMBER
 from alpaca.broker.client import BrokerClient
 import datetime
 
@@ -20,7 +20,7 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 
 
 @pytest.mark.parametrize(
-    "sandbox_suffix,expected_error",
+    "sandbox_outcome,expected_error",
     [
         ("pass", None),
         ("manualreview", None),
@@ -29,17 +29,25 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     ],
 )
 def test_alpaca_cip(
-    sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_suffix, expected_error
+    sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_outcome, expected_error
 ):
     # create a new user that has onboarded
-    # Alpaca doesn't allow duplicate emails, so we create a nonce'd one 
+    # Alpaca doesn't allow duplicate emails, so we create a nonce'd one
+    seed = _gen_random_n_digit_number(10)
+    sandbox_id = f"{sandbox_outcome}{seed}"
     email = f"footprint.user.dev.{_gen_random_n_digit_number(10)}@gmail.com"
-    bifrost = BifrostClient.create(alpaca_kyc_ob_config, twilio, _random_sandbox_phone(sandbox_suffix), override_email=email)
+    bifrost = BifrostClient.create(
+        alpaca_kyc_ob_config,
+        twilio,
+        FIXTURE_PHONE_NUMBER,
+        sandbox_id,
+        override_email=email,
+    )
     user = bifrost.run()
     d = user.client.data
 
     review_annotation = None
-    if sandbox_suffix == "stepup" or sandbox_suffix == "manualreview":
+    if sandbox_outcome == "stepup" or sandbox_outcome == "manualreview":
         review_annotation = "Piip is very trustworthy"  # extra annotation should not be included in the CIP response
 
     if review_annotation:
@@ -67,7 +75,7 @@ def test_alpaca_cip(
             sandbox_tenant.auth_token,
             IsLive("false"),
         )
-        if sandbox_suffix == "stepup":
+        if sandbox_outcome == "stepup":
             expected_review_reasons = [
                 {
                     "review_reason": "document",
@@ -94,16 +102,13 @@ def test_alpaca_cip(
             == expected_review_reasons
         )
 
-
-    # Create Alpaca Account    
+    # Create Alpaca Account
     create_account_data = {
         "fp_user_id": user.fp_id,
         "api_key": ALPACA_SANDBOX_API_KEY,
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
-        "enabled_assets": [
-            "us_equity"
-        ],
+        "enabled_assets": ["us_equity"],
         "disclosures": {
             "immediate_family_exposed": False,
             "is_politically_exposed": False,
@@ -112,32 +117,36 @@ def test_alpaca_cip(
         },
         "agreements": [
             {
-            "agreement": "customer_agreement",
-            "signed_at": datetime.datetime.now(
-                tz=datetime.timezone.utc
-            ).isoformat(),
-            "ip_address": "127.0.0.1",
+                "agreement": "customer_agreement",
+                "signed_at": datetime.datetime.now(
+                    tz=datetime.timezone.utc
+                ).isoformat(),
+                "ip_address": "127.0.0.1",
             },
             {
-            "agreement": "crypto_agreement",
-            "signed_at": datetime.datetime.now(
-                tz=datetime.timezone.utc
-            ).isoformat(),
-            "ip_address": "127.0.0.1",
-            }
+                "agreement": "crypto_agreement",
+                "signed_at": datetime.datetime.now(
+                    tz=datetime.timezone.utc
+                ).isoformat(),
+                "ip_address": "127.0.0.1",
+            },
         ],
     }
-        
-    create_account_res = post("integrations/alpaca/account", create_account_data, sandbox_tenant.sk.key)
+
+    create_account_res = post(
+        "integrations/alpaca/account", create_account_data, sandbox_tenant.sk.key
+    )
     assert create_account_res["status_code"] == 200
     alpaca_response = create_account_res["alpaca_response"]
     assert alpaca_response["contact"]["email_address"] == d["id.email"].split("#")[0]
-    assert alpaca_response["contact"]["phone_number"] == d["id.phone_number"].split("#")[0]
+    assert (
+        alpaca_response["contact"]["phone_number"] == d["id.phone_number"].split("#")[0]
+    )
     assert alpaca_response["identity"]["given_name"] == d["id.first_name"]
     assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
     assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
 
-    account_id = alpaca_response['id']
+    account_id = alpaca_response["id"]
 
     # alpaca request
     alpaca_data = {
@@ -173,11 +182,11 @@ def test_alpaca_cip(
         )
 
         expected_approved_reason = None
-        if sandbox_suffix == "stepup":
+        if sandbox_outcome == "stepup":
             expected_approved_reason = (
                 "Document identity verification was manually conducted and approved"
             )
-        elif sandbox_suffix == "manualreview":
+        elif sandbox_outcome == "manualreview":
             expected_approved_reason = "Adverse media hit deemed non-detrimental. Watchlist hit deemed low risk or false-positive"
 
         if expected_approved_reason:

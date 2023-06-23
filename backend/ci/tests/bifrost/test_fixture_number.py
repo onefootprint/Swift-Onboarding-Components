@@ -1,5 +1,6 @@
 import pytest
-from tests.utils import _gen_random_n_digit_number, post, create_ob_config
+from tests.utils import _gen_random_sandbox_id, post, create_ob_config
+from tests.headers import SandboxId
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER
 
@@ -16,15 +17,15 @@ def ob_config2(sandbox_tenant, must_collect_data, can_access_data):
 
 @pytest.mark.parametrize("use_phone", [True, False])
 def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
-    seed = _gen_random_n_digit_number(10)
-    phone_number = f"{FIXTURE_PHONE_NUMBER}#sandbox{seed}"
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
     ob_config = sandbox_tenant.default_ob_config
 
-    identify_data = dict(identifier=dict(phone_number=phone_number))
-    body = post("hosted/identify", identify_data, ob_config.key)
+    identify_data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER))
+    body = post("hosted/identify", identify_data, ob_config.key, sandbox_id_h)
     assert not body["user_found"]
 
-    bifrost = BifrostClient.create(ob_config, twilio, phone_number)
+    bifrost = BifrostClient.create(ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
     bifrost.run()
     assert bifrost.handled_requirements
 
@@ -33,16 +34,18 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
         identifier = dict(phone_number=bifrost.data["id.phone_number"])
     else:
         identifier = dict(email=bifrost.data["id.email"])
-    print(identifier)
+
     data = dict(identifier=identifier)
-    body = post("hosted/identify", data)
+    body = post("hosted/identify", data, sandbox_id_h)
     assert not body["user_found"]
-    body = post("hosted/identify", data, tenant.default_ob_config.key)
+    body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
     assert not body["user_found"]
-    body = post("hosted/identify", data, ob_config.key)
+    body = post("hosted/identify", data, ob_config.key, sandbox_id_h)
     assert body["user_found"]
 
-    bifrost2 = BifrostClient.inherit(ob_config2, twilio, phone_number)
+    bifrost2 = BifrostClient.inherit(
+        ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
+    )
     bifrost2.run()
     assert set(i["kind"] for i in bifrost2.handled_requirements) == {
         "authorize",
@@ -52,6 +55,15 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
 
 
 def test_identify_fixture_phone_number_non_sandbox(sandbox_tenant):
+    # Should work with sandbox id
+    sandbox_id = _gen_random_sandbox_id()
+    post(
+        "hosted/identify/signup_challenge",
+        dict(phone_number=FIXTURE_PHONE_NUMBER),
+        sandbox_tenant.default_ob_config.key,
+        SandboxId(sandbox_id),
+    )
+
     # Fixture number shouldn't even work in prod
     post(
         "hosted/identify/signup_challenge",
