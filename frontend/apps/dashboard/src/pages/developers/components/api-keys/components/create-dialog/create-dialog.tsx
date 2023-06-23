@@ -34,10 +34,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
-    const fetchedRole = rolesQuery.data?.find(
-      r => r.id === formData.role.value,
-    );
-    const data = { name: formData.name, role: fetchedRole };
+    const data = { name: formData.name, roleId: formData.role.value };
     createApiKeyMutation.mutate(data, {
       onSuccess: () => {
         toast.show({
