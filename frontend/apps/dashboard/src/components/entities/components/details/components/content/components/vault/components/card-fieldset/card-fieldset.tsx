@@ -4,7 +4,6 @@ import styled, { css } from '@onefootprint/styled';
 import { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
@@ -16,6 +15,7 @@ import { DiField } from '../../vault.types';
 import { useDecryptControls } from '../decrypt-controls';
 import Field from '../field';
 import CardHeader from './components/card-header';
+import getCards from './utils/get-cards';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;
@@ -30,8 +30,8 @@ const Fieldset = ({
   const { t, allT } = useTranslation('pages.entity.fieldset');
   const decrypt = useDecryptControls();
   const form = useForm();
-  const { data } = useEntityVault(entity.id, entity);
-  const cards: EntityCard[] = data?.cards ?? [];
+
+  const cards: EntityCard[] = getCards(entity) ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
   const dis = getDis(entity.attributes, selectedCard.alias);
   const fields = dis.map(di => ({ di }));
