@@ -94,12 +94,12 @@ fn validate_card_number_last4(value: PiiString) -> VResult<PiiString> {
     Ok(value)
 }
 
-/// TODO: there are probably more rules but couldn't find a definitive source here
 fn validate_card_name(value: PiiString) -> VResult<PiiString> {
-    if value.len() >= 200 || value.leak().chars().any(|c| !c.is_ascii()) {
-        return Err(Error::CardError(
-            "card name too long or contains invalid non-ascii characters".into(),
-        ));
+    if value.leak().is_empty() {
+        return Err(Error::CardError("Cannot be empty".into()));
+    }
+    if value.len() >= 200 {
+        return Err(Error::CardError("Too long".into()));
     }
 
     Ok(value)
