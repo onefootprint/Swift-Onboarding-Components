@@ -9,7 +9,7 @@ import React, { useCallback } from 'react';
 import Debug from './components/debug';
 import queryClient from './config/initializers/react-query';
 // import configureLogger from './config/logger';
-import AppClip from './domains/app-clip';
+import Idv from './domains/idv';
 import Wallet from './domains/wallet';
 import useIsDebug from './hooks/use-is-debug';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
@@ -18,7 +18,7 @@ SplashScreen.preventAutoHideAsync();
 // configureLogger();
 
 const App = () => {
-  const shouldOpenIdv = useShouldOpenIdv();
+  const { linkingUrl, shouldOpen } = useShouldOpenIdv();
   const isDebug = useIsDebug();
   const [fontsLoaded] = useFonts({
     DMSans_400Regular: require('../assets/fonts/DMSans-Regular.otf'),
@@ -36,8 +36,8 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       {isDebug ? (
         <Debug onLoad={handleLoad} />
-      ) : shouldOpenIdv ? (
-        <AppClip onLoad={handleLoad} />
+      ) : shouldOpen ? (
+        <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
       ) : (
         <Wallet onLoad={handleLoad} />
       )}

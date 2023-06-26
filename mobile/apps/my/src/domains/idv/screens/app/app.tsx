@@ -9,11 +9,12 @@ import ThemeProvider from './components/theme-provider';
 import useParseHandoffUrl from './hooks/use-parse-handoff-url';
 
 type AppProps = {
+  linkingUrl?: string;
   onLoad: () => void;
 };
 
-const App = ({ onLoad }: AppProps) => {
-  const { isError, data } = useParseHandoffUrl();
+const App = ({ linkingUrl, onLoad }: AppProps) => {
+  const { isError, data } = useParseHandoffUrl(linkingUrl);
 
   if (isError) {
     return (

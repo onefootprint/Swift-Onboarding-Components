@@ -26,9 +26,9 @@ module.exports = function (api) {
           ],
           alias: {
             '@': './src',
-            '@/app-clip': './src/domains/app-clip',
+            '@/idv': './src/domains/idv',
             '@/wallet': './src/domains/wallet',
-            '@/scan': './src/domains/app-clip/components/scan',
+            '@/scan': './src/domains/idv/components/scan',
           },
         },
       ],

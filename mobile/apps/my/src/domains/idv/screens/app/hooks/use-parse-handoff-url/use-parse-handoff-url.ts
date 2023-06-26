@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import * as Linking from 'expo-linking';
 
-import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/app-clip/config/constants';
+import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/idv/config/constants';
 
 const getToken = (url?: string) => {
   if (!url) {
@@ -15,11 +14,13 @@ const getToken = (url?: string) => {
   return { authToken: decodeURI(authToken) };
 };
 
-const useParseHandoffUrl = () => {
-  const linkingUrl = Linking.useURL();
+const useParseHandoffUrl = (deepLinkUrl = '') => {
   const debugUrl = IS_DEV ? DEBUG_HANDOFF_URL : undefined;
-  const url = debugUrl || linkingUrl;
-  return useQuery(['token', url], () => getToken(url));
+  const url = debugUrl || deepLinkUrl;
+  return useQuery({
+    queryKey: ['token', url],
+    queryFn: () => getToken(url),
+  });
 };
 
 export default useParseHandoffUrl;

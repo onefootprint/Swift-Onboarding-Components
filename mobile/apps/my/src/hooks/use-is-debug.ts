@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking';
 
-import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/app-clip/config/constants';
+import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/idv/config/constants';
 
 const useIsDebug = () => {
   const linkingUrl = Linking.useURL();

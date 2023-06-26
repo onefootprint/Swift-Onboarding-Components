@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/app-clip/*": ["./src/domains/app-clip/*"],
+      "@/idv/*": ["src/domains/idv/*"],
       "@/wallet/*": ["./src/domains/wallet/*"],
       "@/scan/*": ["src/components/id-doc/*"],
     },
