@@ -48,7 +48,6 @@ mime = "0.3.16"
 chrono = { workspace = true }
 strum_macros = { workspace = true }
 actix-web-httpauth = "0.8.0"
-actix-web-prom = "0.6.0"
 prometheus = "0.13.3"
 
 webauthn-rs-core = { workspace = true }

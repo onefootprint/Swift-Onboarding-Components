@@ -254,8 +254,6 @@ dependencies = [
 [[package]]
 name = "actix-web-prom"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9df3127d20a5d01c9fc9aceb969a38d31a6767e1b48a54d55a8f56c769a84923"
 dependencies = [
  "actix-web",
  "futures-core",
@@ -609,7 +607,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_route_hosted",
  "api_wire_types",
@@ -673,7 +670,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "app-attest",
@@ -738,7 +734,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "aws-config 0.49.0",
@@ -824,7 +819,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "aws-config 0.49.0",
@@ -886,7 +880,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "aws-config 0.49.0",
@@ -948,7 +941,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "aws-config 0.49.0",
@@ -1010,7 +1002,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_route_entities",
  "api_wire_types",
@@ -1073,7 +1064,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-httpauth",
- "actix-web-prom",
  "api_core",
  "api_wire_types",
  "aws-config 0.49.0",
