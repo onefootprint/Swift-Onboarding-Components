@@ -103,7 +103,13 @@ pub async fn decrypt_verification_result_response(
         .collect::<Result<_, _>>()?;
 
     enclave_client
-        .batch_decrypt_to_piibytes(sealed_data, sealed_key, DataTransform::Identity)
+        .batch_decrypt_to_piibytes(
+            sealed_data
+                .into_iter()
+                .map(|sealed| (sealed, DataTransform::Identity))
+                .collect(),
+            sealed_key,
+        )
         .await?
         .into_iter()
         .map(|b| PiiJsonValue::try_from(b).map_err(ApiError::from))

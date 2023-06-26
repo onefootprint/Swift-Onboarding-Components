@@ -34,7 +34,7 @@ pub struct EnclaveClient {
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
 
-pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String);
+pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String, &'a DataTransform);
 
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
@@ -146,9 +146,15 @@ impl EnclaveClient {
         let sealed_data = sealed_data_keys
             .iter()
             .map(|key| EciesP256Sha256AesGcmSealed::from_bytes(&key.0))
-            .collect::<Result<_, _>>()?;
+            .collect::<Result<Vec<_>, _>>()?;
         let decrypted_keys = self
-            .batch_decrypt_to_piibytes(sealed_data, sealed_key, DataTransform::Identity)
+            .batch_decrypt_to_piibytes(
+                sealed_data
+                    .into_iter()
+                    .map(|sealed| (sealed, DataTransform::Identity))
+                    .collect(),
+                sealed_key,
+            )
             .await?;
         let response = decrypted_keys
             .into_iter()
@@ -165,7 +171,7 @@ impl EnclaveClient {
         transform: DataTransform,
     ) -> Result<PiiString, EnclaveError> {
         let result = self
-            .batch_decrypt_to_piistring(vec![((), sealed_data)], sealed_key, transform)
+            .batch_decrypt_to_piistring(vec![((), sealed_data, transform)], sealed_key)
             .await?
             .into_iter()
             .next()
@@ -176,17 +182,19 @@ impl EnclaveClient {
     /// Decrypts the provided list of SealedVaultBytes into PiiStrings
     pub async fn batch_decrypt_to_piistring<T: Eq + Hash>(
         &self,
-        data: Vec<(T, &SealedVaultBytes)>,
+        data: Vec<(T, &SealedVaultBytes, DataTransform)>,
         sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
     ) -> Result<HashMap<T, PiiString>, EnclaveError> {
-        let (ids, sealed_data): (Vec<_>, Vec<_>) = data.into_iter().unzip();
+        let (ids, sealed_data): (Vec<_>, Vec<_>) = data
+            .into_iter()
+            .map(|(t, sealed, transform)| (t, (sealed, transform)))
+            .unzip();
         let sealed_data: Vec<_> = sealed_data
-            .iter()
-            .map(|b| EciesP256Sha256AesGcmSealed::from_bytes(b.as_ref()))
-            .collect::<Result<_, _>>()?;
+            .into_iter()
+            .map(|(b, transform)| Ok((EciesP256Sha256AesGcmSealed::from_bytes(b.as_ref())?, transform)))
+            .collect::<Result<_, crypto::Error>>()?;
         let results = self
-            .batch_decrypt_to_piibytes(sealed_data, sealed_key, transform)
+            .batch_decrypt_to_piibytes(sealed_data, sealed_key)
             .await?
             .into_iter()
             .map(PiiString::try_from)
@@ -203,7 +211,7 @@ impl EnclaveClient {
         transform: DataTransform,
     ) -> Result<PiiBytes, EnclaveError> {
         let sealed = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
-        self.batch_decrypt_to_piibytes(vec![sealed], sealed_key, transform)
+        self.batch_decrypt_to_piibytes(vec![(sealed, transform)], sealed_key)
             .await?
             .into_iter()
             .next()
@@ -215,13 +223,12 @@ impl EnclaveClient {
     #[tracing::instrument(skip_all)]
     pub async fn batch_decrypt_to_piibytes(
         &self,
-        sealed_data: Vec<EciesP256Sha256AesGcmSealed>,
+        sealed_data: Vec<(EciesP256Sha256AesGcmSealed, DataTransform)>,
         sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
     ) -> Result<Vec<PiiBytes>, EnclaveError> {
         let requests = sealed_data
             .into_iter()
-            .map(|sealed_data| DecryptRequest {
+            .map(|(sealed_data, transform)| DecryptRequest {
                 sealed_data,
                 transform,
             })
@@ -343,22 +350,29 @@ impl EnclaveClient {
         e_private_key: &EncryptedVaultPrivateKey,
         documents: Vec<EncryptedDocumentData<'a>>,
     ) -> Result<Vec<PiiBytes>, ApiError> {
-        let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
+        let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents
+            .into_iter()
+            .map(|(k, url, transform)| ((k, transform), url))
+            .unzip();
         let get_futures = s3_urls.into_iter().map(|s3_url| {
             self.s3_client
                 .get_object_from_s3_url(s3_url)
                 .map_err(ApiError::from)
         });
-
         let document_bytes = futures::future::try_join_all(get_futures).await?;
+
+        let (sealed_keys, transforms): (Vec<_>, Vec<_>) = sealed_keys.into_iter().unzip();
         let sealing_keys = self
             .decrypt_sealed_vault_data_key(sealed_keys, e_private_key)
             .await?;
         let decrypted_document_bytes = document_bytes
             .into_iter()
             .zip(sealing_keys)
-            .map(|(bytes, key)| {
+            .zip(transforms)
+            .map(|((bytes, key), transform)| {
                 key.unseal_bytes(AeadSealedBytes(bytes.to_vec()))
+                    .map_err(ApiError::from)
+                    .and_then(|data| transform.apply(data).map_err(ApiError::from))
                     .map(PiiBytes::new)
             })
             .collect::<Result<Vec<_>, _>>()?;

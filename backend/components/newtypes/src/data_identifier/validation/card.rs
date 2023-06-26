@@ -99,7 +99,7 @@ fn validate_card_name(value: PiiString) -> VResult<PiiString> {
         return Err(Error::CardError("Cannot be empty".into()));
     }
     if value.len() >= 200 {
-        return Err(Error::CardError("Too long".into()));
+        return Err(Error::CardError("Cardholder name too long".into()));
     }
 
     Ok(value)

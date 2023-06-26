@@ -67,6 +67,9 @@ pub enum Error {
 
     #[error("Crypto Error {0}")]
     CryptoError(#[from] crypto::Error),
+
+    #[error("Transform error: {0}")]
+    TransformError(#[from] rpc::TransformError),
 }
 
 #[cfg(feature = "nitro")]
@@ -160,15 +163,18 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecr
     let data_private_key = ikek.key.unseal_bytes(sealed_key)?;
 
     let results: Vec<FnDecryptionSingle> = requests
-        .iter()
+        .into_iter()
         .map(|r| {
             let result = crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
                 &data_private_key,
                 r.sealed_data.clone(),
             )?;
+
             Ok(FnDecryptionSingle {
-                data: result.0,
-                transform: r.transform,
+                data: r.transform.apply(result.0)?,
+                // TODO: remove this once new enclave RPC lands.
+                // we don't use this. We keep this for back compat.
+                transform: Default::default(),
             })
         })
         .collect::<Result<Vec<FnDecryptionSingle>, Error>>()?;

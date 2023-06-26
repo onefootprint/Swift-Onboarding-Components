@@ -61,6 +61,9 @@ pub use self::proxy_token::*;
 pub mod onboarding_requirement;
 pub use onboarding_requirement::*;
 
+pub mod integrity_signing_key;
+pub use integrity_signing_key::*;
+
 pub mod fingerprinter;
 pub use self::fingerprinter::Fingerprinter;
 
@@ -93,6 +96,8 @@ pub enum Error {
     IncompatibleDataIdentifier,
     #[error("{0}")]
     EnumDotNotationError(#[from] EnumDotNotationError),
+    #[error("invalid hex string")]
+    InvalidHex(#[from] crypto::hex::FromHexError),
 }
 
 use std::collections::HashMap;

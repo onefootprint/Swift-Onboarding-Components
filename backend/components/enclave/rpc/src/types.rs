@@ -20,10 +20,22 @@ impl Debug for KmsCredentials {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "type")]
 pub enum DataTransform {
+    #[default]
     /// no transform, just the plain data
     Identity,
+    /// HMAC-SHA256
+    HmacSha256 { key: Vec<u8> },
+}
+
+impl std::fmt::Debug for DataTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Identity => write!(f, "Identity"),
+            Self::HmacSha256 { .. } => write!(f, "HmacSha256"),
+        }
+    }
 }

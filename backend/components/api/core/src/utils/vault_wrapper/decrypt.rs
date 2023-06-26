@@ -25,6 +25,7 @@ pub struct DecryptUncheckedResult {
     #[deref_mut]
     pub results: HashMap<DataIdentifier, PiiString>,
     pub decrypted_dis: Vec<DataIdentifier>,
+    //TODO: record transforms here
 }
 
 impl DecryptUncheckedResult {
@@ -45,16 +46,29 @@ impl DecryptUncheckedResult {
 }
 
 impl<Type> VaultWrapper<Type> {
-    /// Util to decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
+    /// Like `fn_decrypt_unchecked` but with no transform
+    pub async fn decrypt_unchecked(
+        &self,
+        enclave_client: &EnclaveClient,
+        ids: &[DataIdentifier],
+    ) -> ApiResult<DecryptUncheckedResult> {
+        let ids: Vec<_> = ids
+            .iter()
+            .map(|di| (di.clone(), DataTransform::Identity))
+            .collect();
+        self.fn_decrypt_unchecked(enclave_client, ids.as_slice()).await
+    }
+
+    /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
     /// event.
     ///
     /// Returns a hashmap of identifiers to their decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
     /// doesn't exist in the UVW.
-    pub async fn decrypt_unchecked(
+    pub async fn fn_decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
-        ids: &[DataIdentifier],
+        ids: &[(DataIdentifier, DataTransform)],
     ) -> ApiResult<DecryptUncheckedResult> {
         if ids.is_empty() {
             // Short-circuit so no network requests
@@ -65,31 +79,41 @@ impl<Type> VaultWrapper<Type> {
         }
 
         // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
-        let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) = ids.iter().partition_map(|di| match di {
-            DataIdentifier::Document(kind) if matches!(kind.storage_type(), StorageType::DocumentData) => {
-                either::Either::Left(kind)
-            }
-            DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) => {
-                let doc_di = DocumentKind::from_id_doc_kind(*doc_kind, *side);
-                let mime_type = self
-                    .get_document(doc_di)
-                    .map(|data| PiiString::from(&data.mime_type))
-                    .map(|mt| Either::Right((di.clone(), mt)));
-                either::Either::Right(mime_type)
-            }
-            _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
-                VaultedData::Sealed(e_data) => Either::Left((di.clone(), e_data)),
-                VaultedData::NonPrivate(p_data) => Either::Right((di.clone(), p_data.clone())),
-            })),
-        });
+        let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) =
+            ids.iter().partition_map(|(di, transform)| match di {
+                DataIdentifier::Document(kind)
+                    if matches!(kind.storage_type(), StorageType::DocumentData) =>
+                {
+                    either::Either::Left((kind, transform))
+                }
+                DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) => {
+                    let doc_di = DocumentKind::from_id_doc_kind(*doc_kind, *side);
+                    let mime_type = self
+                        .get_document(doc_di)
+                        .map(|data| transform.apply_str::<PiiString>(&data.mime_type))
+                        .map(|mt| Either::Right((di.clone(), mt)));
+                    either::Either::Right(mime_type)
+                }
+                _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
+                    VaultedData::Sealed(e_data) => Either::Left((di.clone(), e_data, transform.clone())),
+                    VaultedData::NonPrivate(p_data) => {
+                        Either::Right((di.clone(), transform.apply_str(p_data.leak())))
+                    }
+                })),
+            });
         let (e_data, p_data): (_, Vec<_>) = remaining_dis.into_iter().flatten().partition_map(|x| x);
+
+        let p_data = p_data
+            .into_iter()
+            .map(|(di, p_data_res)| p_data_res.map(|p| (di, p)))
+            .collect::<Result<Vec<_>, _>>()?;
 
         // special case decrypt documents
         let documents: HashMap<DataIdentifier, PiiString> = {
             let (document_kinds, document_datas): (Vec<_>, _) = documents_kinds
                 .into_iter()
-                .filter_map(|kind| self.get_document(kind))
-                .map(|doc| (doc.kind, (&doc.e_data_key, &doc.s3_url)))
+                .filter_map(|(kind, transform)| self.get_document(*kind).map(|d| (d, transform)))
+                .map(|(doc, transform)| (doc.kind, (&doc.e_data_key, &doc.s3_url, transform)))
                 .unzip();
 
             let decrypted_documents: Vec<PiiString> = enclave_client
@@ -108,12 +132,13 @@ impl<Type> VaultWrapper<Type> {
 
         // decrypt remaining e_data
         let text = enclave_client
-            .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key, DataTransform::Identity)
+            .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key)
             .await?;
 
         // Don't make access events for the DIs that are already in plaintext
         let decrypted_dis = ids
             .iter()
+            .map(|(di, _)| di)
             .filter(|di| !p_data.iter().any(|(d, _)| &d == di))
             .cloned()
             .collect();

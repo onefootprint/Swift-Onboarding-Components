@@ -12,7 +12,7 @@ pub use rpc::{
     EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest, FnDecryption,
     GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
-    SignRequest, Signing,
+    SignRequest, Signing, TransformError,
 };
 
 use pool::{Stream, StreamConnection};

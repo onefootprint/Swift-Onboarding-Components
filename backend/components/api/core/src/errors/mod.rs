@@ -137,6 +137,8 @@ pub enum ApiError {
     CipIntegrationError(#[from] cip_error::CipError),
     #[error("Required entity data is missing data: {0}")]
     MissingRequiredEntityData(DataIdentifier),
+    #[error("Enclave transform error: {0}")]
+    EnclaveDataTransformError(#[from] enclave_proxy::TransformError),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -200,7 +202,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::EnclaveDataTransformError(_) | ApiError::EnclaveError(_) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken

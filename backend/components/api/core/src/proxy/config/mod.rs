@@ -307,15 +307,17 @@ impl ProxyConfig {
             .chain({
                 let secret_header_values = secret_headers
                     .iter()
-                    .map(|sh| (sh.name.clone(), &sh.e_data))
+                    .map(|sh| {
+                        (
+                            sh.name.clone(),
+                            &sh.e_data,
+                            enclave_proxy::DataTransform::Identity,
+                        )
+                    })
                     .collect();
                 state
                     .enclave_client
-                    .batch_decrypt_to_piistring(
-                        secret_header_values,
-                        &auth.tenant().e_private_key,
-                        enclave_proxy::DataTransform::Identity,
-                    )
+                    .batch_decrypt_to_piistring(secret_header_values, &auth.tenant().e_private_key)
                     .await?
                     .into_iter()
             });

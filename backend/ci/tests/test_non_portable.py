@@ -3,6 +3,8 @@ from tests.utils import _gen_random_ssn, create_ob_config
 from tests.utils import post, get, patch, delete
 from tests.headers import IdempotencyId
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
+import hmac
+import hashlib
 
 
 @pytest.mark.parametrize(
@@ -247,6 +249,39 @@ def test_idempotency_id(tenant, sandbox_tenant):
 
     invalid_idempotency_id = IdempotencyId("1234567890000!")
     post("users/", None, sandbox_tenant.sk.key, invalid_idempotency_id, status_code=400)
+
+
+# validates integrity checks
+def test_data_integrity_check(sandbox_tenant):
+    body = post("users/", None, sandbox_tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    data = {
+        "id.first_name": "billy",
+        "id.last_name": "bob",
+        "id.ssn9": "121212121",
+        "card.primary.number": "4242424242424242",
+    }
+    body = patch(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+    signing_key = "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
+
+    # should be able to validate the integrity
+    resp = post(
+        f"users/{fp_id}/vault/integrity",
+        dict(fields=list(data.keys()), signing_key=signing_key),
+        sandbox_tenant.sk.key,
+    )
+
+    for key, value in data.items():
+        expected = hmac.new(
+            bytes.fromhex(signing_key),
+            msg=bytes(value, "utf-8"),
+            digestmod=hashlib.sha256,
+        ).hexdigest()
+        assert resp[key] == expected
 
 
 @pytest.mark.parametrize(
