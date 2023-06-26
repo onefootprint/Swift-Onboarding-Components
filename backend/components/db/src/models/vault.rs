@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use diesel::upsert::on_constraint;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
@@ -200,30 +201,26 @@ impl Vault {
             idempotency_id: idempotency_id.clone(),
             sandbox_id,
         };
-        let vault_res = diesel::insert_into(vault::table)
+
+        let vault = diesel::insert_into(vault::table)
             .values(new_user)
-            .get_result::<Vault>(conn.conn());
+            .on_conflict(on_constraint("vault_idempotency_id_key"))
+            .do_nothing()
+            .get_result::<Vault>(conn.conn())
+            .optional()?;
 
         // Since two requests in very rapid succession with the same idempotency ID can both
         // reach the INSERT statement above, catch constraint violation by checking if there's
         // a vault with this idempotency ID
-        match vault_res {
-            Ok(vault) => Ok((Locked::new(vault), true)),
-            Err(e) => {
-                let e = DbError::from(e);
-                if e.is_unique_constraint_violation() {
-                    let existing_vault = idempotency_id
-                        .map(|i_id| Self::lock_by_idempotency_id(conn, &i_id))
-                        .transpose()?
-                        .flatten();
-                    if let Some(vault) = existing_vault {
-                        Ok((vault, false))
-                    } else {
-                        Err(e)
-                    }
-                } else {
-                    Err(e)
-                }
+        match vault {
+            Some(vault) => Ok((Locked::new(vault), true)),
+            None => {
+                let vault = idempotency_id
+                    .map(|i_id| Self::lock_by_idempotency_id(conn, &i_id))
+                    .transpose()?
+                    .flatten()
+                    .ok_or(DbError::ObjectNotFound)?;
+                Ok((vault, false))
             }
         }
     }
