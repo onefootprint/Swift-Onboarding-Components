@@ -69,7 +69,11 @@ export default async function main() {
   );
 
   // setup our enclave/hmac keys
-  const enclaveKeyConfig = await enclaveKey.Initialize(stackMetadata, constants, otherRegions);
+  const enclaveKeyConfig = await enclaveKey.Initialize(
+    stackMetadata,
+    constants,
+    otherRegions,
+  );
   const hmacSigningKeyConfig = await hmacSigningKey.Initialize(
     constants,
     otherRegions,
