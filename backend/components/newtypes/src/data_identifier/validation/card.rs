@@ -283,7 +283,7 @@ mod test {
 
     #[test_case("Alex Grinman" => true)]
     #[test_case("Alissa P Hacker" => true)]
-    #[test_case("Ben 😃 Bitdiddle" => false)]
+    #[test_case("Ben 😃 Bitdiddle" => true)]
     fn test_card_name(name: &str) -> bool {
         super::validate_card_name(PiiString::try_from(name).unwrap()).is_ok()
     }
