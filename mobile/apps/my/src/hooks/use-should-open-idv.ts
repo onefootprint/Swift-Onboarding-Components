@@ -4,7 +4,7 @@ import { isClip } from 'react-native-app-clip';
 const useShouldOpenIdv = () => {
   const linkingUrl = Linking.useURL();
   const isAppClip = isClip();
-  const shouldOpen = isAppClip || !!linkingUrl;
+  const shouldOpen = isAppClip || linkingUrl?.includes('http://handoff');
   return { shouldOpen, linkingUrl };
 };
 

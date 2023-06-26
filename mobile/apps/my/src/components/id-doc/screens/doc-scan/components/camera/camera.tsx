@@ -78,7 +78,7 @@ const Camera = ({
   const takePhoto = async () => {
     if (!camera.current) return;
     resetAutoCapture();
-    const newPhoto = await camera.current.takePhoto();
+    const newPhoto = await camera.current.takePhoto({});
     setPhoto(newPhoto);
   };
 
@@ -204,7 +204,7 @@ const CameraContainer = styled.View<{ size: CameraSize }>`
   ${({ theme, size }) => css`
     align-items: center;
     background: ${theme.backgroundColor.senary};
-    height: ${size === 'default' ? 280 : 390}px;
+    height: ${size === 'default' ? 300 : 390}px;
     justify-content: center;
     margin-left: -${theme.spacing[5]};
     position: relative;

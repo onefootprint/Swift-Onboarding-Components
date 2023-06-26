@@ -31,6 +31,7 @@ const StyledFrame = styled(Reanimated.View)`
     position: absolute;
     width: ${windowWidth - 32}px;
     z-index: 1;
+    top: 50px;
   `}
 `;
 

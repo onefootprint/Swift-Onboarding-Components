@@ -12,6 +12,7 @@ import Frame from '../default-frame';
 
 const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
+  const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
 
@@ -20,13 +21,16 @@ const Passport = () => {
       'worklet';
 
       const options = {
-        frame: { x: 16, y: 30, width: windowWidth - 32, height: 220 },
+        frame: { x: 16, y: 50, width: windowWidth - 32, height: 220 },
       };
       const result = documentProcessor(frame, options);
-      detector.value = result.is_document;
       if (result.is_document) {
+        detector.value = true;
         runOnJS(setObjectDetected)(true);
+        runOnJS(setFeedback)('Hold still...');
       } else {
+        detector.value = false;
+        runOnJS(setFeedback)('Detecting...');
         runOnJS(setObjectDetected)(false);
       }
     },
@@ -36,6 +40,7 @@ const Passport = () => {
   return (
     <Camera
       detector={detector}
+      feedback={feedback}
       Frame={Frame}
       frameProcessor={frameProcessor}
       instructions={{

@@ -41,7 +41,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
         runOnJS(setObjectDetected)(false);
 
         if (!result.hasFace) {
-          runOnJS(setFeedback)('Unable to detect a face');
+          runOnJS(setFeedback)('Detecting...');
           return;
         }
         if (!result.isFaceInCenter) {
