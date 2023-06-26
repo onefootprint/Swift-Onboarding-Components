@@ -186,3 +186,33 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 ```
 
 For listing, decrypting, and updating -- all the APIs above are identical for standalone user vaults.
+
+## Validation rules for vault data
+
+Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the validation rules enforced by vaults.
+
+| Data Identifier              | Class    | Rules                                                                                                                                                                                        |
+| ---------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id.phone_number`            | Identity | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                               |
+| `id.email_address`           | Identity | Email address `(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)`                                                                                                                           |
+| `id.first_name`              | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.last_name`               | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.ssn9`                    | Identity | `9` digit string (note hyphens will be ignored and stripped out)                                                                                                                             |
+| `id.ssn4`                    | Identity | `4` digit string                                                                                                                                                                             |
+| `id.dob`                     | Identity | Date of birth formatted as `%Y-%m-%d`                                                                                                                                                        |
+| `id.address_line1`           | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.address_line2`           | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.city`                    | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.state`                   | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
+| `id.zip`                     | Identity | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                            |
+| `id.country`                 | Identity | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                              |
+| `id.nationality`             | Identity | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                              |
+| `card.*.name`                | PCI      | Any UTF-8 String <200B                                                                                                                                                                       |
+| `card.*.number`              | PCI      | Valid credit or debit card number (length and Luhn check). Supports: Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
+| `card.*.cvc`                 | PCI      | Valid `3` or `4` digit string card security code relative to the number if provided (Amex is 4 digits, others are 3)                                                                         |
+| `card.*.expiration`          | PCI      | Any valid expiration date `MM/YYYY`,`MM/YY`, `MM-YY`, or `MM-YYYY`. Note: always stored as`MM/YYYY`.                                                                                         |
+| `card.*.number_last4`        | PCI      | `4` digit string                                                                                                                                                                             |
+| `card.*.number_last4`        | PCI      | `4` digit string                                                                                                                                                                             |
+| `card.*.billing_address.zip` | PCI      | Same as `id.zip`                                                                                                                                                                             |
+| `card.*.issuer`              | PCI      | Automatically populated when a recognized number is supplied. See `card.*.number` for supported issuers.                                                                                     |
+| `custom.*`                   | Custom   | Any UTF-8 String                                                                                                                                                                             |
