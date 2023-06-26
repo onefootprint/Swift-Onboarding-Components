@@ -2,9 +2,7 @@ use std::{collections::BTreeMap, pin::Pin};
 
 use actix_web::FromRequest;
 use async_trait::async_trait;
-use db::models::{tenant::Tenant, tenant_rolebinding::TenantRolebinding};
 use futures_util::Future;
-use newtypes::TenantScope;
 use paperclip::{
     actix::OperationModifier,
     v2::{
@@ -19,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    tenant::{GetFirmEmployee, InvalidateAuth, TenantAuth},
+    tenant::{GetFirmEmployee, InvalidateAuth},
     AuthError,
 };
 
@@ -115,47 +113,6 @@ impl<A: OperationModifier, B: OperationModifier> OperationModifier for Either<A,
     fn update_security_definitions(map: &mut BTreeMap<String, SecurityScheme>) {
         A::update_security_definitions(map);
         B::update_security_definitions(map);
-    }
-}
-
-impl<A, B> TenantAuth for Either<A, B>
-where
-    A: TenantAuth,
-    B: TenantAuth,
-{
-    fn tenant(&self) -> &Tenant {
-        match self {
-            Either::Left(s) => s.tenant(),
-            Either::Right(s) => s.tenant(),
-        }
-    }
-
-    fn rolebinding(&self) -> Option<&TenantRolebinding> {
-        match self {
-            Either::Left(s) => s.rolebinding(),
-            Either::Right(s) => s.rolebinding(),
-        }
-    }
-
-    fn is_live(&self) -> Result<bool, ApiError> {
-        match self {
-            Either::Left(l) => l.is_live(),
-            Either::Right(r) => r.is_live(),
-        }
-    }
-
-    fn actor(&self) -> super::tenant::AuthActor {
-        match self {
-            Either::Left(l) => l.actor(),
-            Either::Right(r) => r.actor(),
-        }
-    }
-
-    fn scopes(&self) -> Vec<TenantScope> {
-        match self {
-            Either::Left(l) => l.scopes(),
-            Either::Right(r) => r.scopes(),
-        }
     }
 }
 

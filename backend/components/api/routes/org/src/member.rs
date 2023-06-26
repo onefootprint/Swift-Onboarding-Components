@@ -9,6 +9,7 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::Either;
 use db::models::tenant_user::TenantUser;
 use db::models::tenant_user::TenantUserUpdate;
 use paperclip::actix::Apiv2Schema;
@@ -20,11 +21,14 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
+    let rb = match &auth {
+        Either::Left(a) => a.rolebinding().cloned(),
+        Either::Right(_) => None,
+    };
     // Fetch the scopes from the auth token, which may have some additional dynamic permissions for
     // firm employee users
     let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
-    let rb = auth.rolebinding().cloned();
     let tenant = auth.tenant().clone();
     let user_id = match auth.actor() {
         AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
@@ -55,8 +59,8 @@ async fn patch(
     auth: TenantRbAuthContext,
 ) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
     let scopes = auth.token_scopes();
-    let auth = auth.check_guard(Any)?;
     let rb = auth.rolebinding().cloned();
+    let auth = auth.check_guard(Any)?;
     let tenant = auth.tenant().clone();
 
     let UpdateTenantUserRequest {

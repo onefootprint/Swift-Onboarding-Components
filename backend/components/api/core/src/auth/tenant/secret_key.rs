@@ -7,7 +7,6 @@ use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
-use db::models::tenant_rolebinding::TenantRolebinding;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantScope;
@@ -107,10 +106,6 @@ impl TenantAuth for CheckedSecretTenantAuth {
         Ok(self.api_key.is_live)
     }
 
-    fn rolebinding(&self) -> Option<&TenantRolebinding> {
-        None
-    }
-
     fn actor(&self) -> AuthActor {
         AuthActor::TenantApiKey(self.api_key.id.clone())
     }
@@ -121,12 +116,8 @@ impl TenantAuth for CheckedSecretTenantAuth {
 }
 
 impl CanCheckTenantGuard for SecretTenantAuthContext {
-    fn role(&self) -> &TenantRole {
-        &self.0.role
-    }
-
     fn token_scopes(&self) -> Vec<TenantScope> {
-        CanCheckTenantGuard::role(self).scopes.clone()
+        self.0.role.scopes.clone()
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {

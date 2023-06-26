@@ -82,6 +82,12 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
     }
 }
 
+impl SessionContext<ParsedTenantRbAuth> {
+    pub fn rolebinding(&self) -> Option<&TenantRolebinding> {
+        Some(&self.0.tenant_rolebinding)
+    }
+}
+
 impl TenantRbAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
@@ -92,12 +98,8 @@ impl TenantRbAuth {
 pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
 impl CanCheckTenantGuard for TenantRbAuthContext {
-    fn role(&self) -> &TenantRole {
-        &self.0.tenant_role
-    }
-
     fn token_scopes(&self) -> Vec<TenantScope> {
-        CanCheckTenantGuard::role(self).scopes.clone()
+        self.0.tenant_role.scopes.clone()
     }
 
     fn tenant_auth(self) -> Box<dyn TenantAuth> {
@@ -126,10 +128,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 
     fn tenant(&self) -> &Tenant {
         self.data.tenant()
-    }
-
-    fn rolebinding(&self) -> Option<&TenantRolebinding> {
-        Some(&self.tenant_rolebinding)
     }
 
     fn actor(&self) -> AuthActor {

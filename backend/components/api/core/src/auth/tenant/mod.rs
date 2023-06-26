@@ -4,8 +4,6 @@ mod workos;
 pub use self::workos::*;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
-use db::models::tenant_role::TenantRole;
-use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 
 mod secret_key;
@@ -57,9 +55,6 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
-    /// The rolebinding that ties the authed principal to the role. Will be None for firm employee
-    /// auth and API key auth
-    fn rolebinding(&self) -> Option<&TenantRolebinding>;
     fn scopes(&self) -> Vec<TenantScope>;
 }
 
@@ -111,9 +106,6 @@ impl From<AuthActor> for DbActor {
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
 trait CanCheckTenantGuard: Sized {
-    /// The tenant role that the authed principal has
-    fn role(&self) -> &TenantRole;
-
     /// The list of TenantPermissions scopes that are allowed by this auth token
     /// Though the impl is usually the same, don't provide a default since using Either will
     /// overwrite any custom impl

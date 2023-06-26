@@ -86,10 +86,6 @@ impl TenantAuth for SessionContext<ClientTenantData> {
         AuthActor::TenantApiKey(self.tenant_api_key_id.clone())
     }
 
-    fn rolebinding(&self) -> Option<&db::models::tenant_rolebinding::TenantRolebinding> {
-        None
-    }
-
     fn scopes(&self) -> Vec<newtypes::TenantScope> {
         // This is false in some cases. Maybe ClientTenantAuth shouldn't implement TenantAuth
         vec![]

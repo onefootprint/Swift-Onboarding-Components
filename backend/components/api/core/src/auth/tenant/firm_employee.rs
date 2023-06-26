@@ -12,7 +12,6 @@ use db::{
     models::{
         tenant::Tenant,
         tenant_role::{ImmutableRoleKind, TenantRole},
-        tenant_rolebinding::TenantRolebinding,
         tenant_user::TenantUser,
     },
     PgConn,
@@ -121,10 +120,6 @@ impl FirmEmployeeAuth {
 }
 
 impl CanCheckTenantGuard for FirmEmployeeAuthContext {
-    fn role(&self) -> &TenantRole {
-        &self.0.role
-    }
-
     fn token_scopes(&self) -> Vec<TenantScope> {
         self.0.token_scopes()
     }
@@ -156,10 +151,6 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
 
     fn tenant(&self) -> &Tenant {
         &self.tenant
-    }
-
-    fn rolebinding(&self) -> Option<&TenantRolebinding> {
-        None
     }
 
     fn actor(&self) -> AuthActor {
