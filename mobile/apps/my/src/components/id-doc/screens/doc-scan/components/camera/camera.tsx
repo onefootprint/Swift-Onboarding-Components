@@ -23,7 +23,7 @@ import Instructions from '../instructions';
 import ScanContext from '../scan-context';
 import type { CameraSize, CameraType } from './camera.types';
 import Errors from './components/errors';
-import Warning from './components/warning';
+import Feedback from './components/feedback';
 import encodeImagePath from './utils/encode-image-path';
 
 let timerId: NodeJS.Timeout | null = null;
@@ -39,7 +39,7 @@ type CameraProps = {
   subtitle?: string;
   title: string;
   type?: CameraType;
-  warning?: string;
+  feedback?: string;
 };
 
 const Camera = ({
@@ -53,7 +53,7 @@ const Camera = ({
   subtitle,
   title,
   type = 'back',
-  warning,
+  feedback,
 }: CameraProps) => {
   const { t } = useTranslation('components.scan.camera');
   const { isLoading, isError, isSuccess, onSubmit, errors, onResetErrors } =
@@ -127,7 +127,7 @@ const Camera = ({
             )}
             {showCamera && (
               <CameraContainer size={size}>
-                {warning && <Warning>{warning}</Warning>}
+                {feedback && <Feedback>{feedback}</Feedback>}
                 {Frame && <Frame detector={detector} />}
                 <StyledCamera
                   device={device}

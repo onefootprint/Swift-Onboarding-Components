@@ -2,11 +2,11 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-type WarningProps = {
+type FeedbackProps = {
   children: string;
 };
 
-const Warning = ({ children }: WarningProps) => {
+const Feedback = ({ children }: FeedbackProps) => {
   return (
     <Container>
       <Typography variant="caption-3" color="quinary">
@@ -27,4 +27,4 @@ const Container = styled.View`
   `}
 `;
 
-export default Warning;
+export default Feedback;

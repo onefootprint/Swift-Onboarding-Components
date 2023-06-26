@@ -17,7 +17,7 @@ export type SelfieProps = {
 
 const Selfie = ({ authToken }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
-  const [warning, setWarning] = useState('');
+  const [feedback, setFeedback] = useState('');
   const [isCameraDisabled, setIsCameraDisable] = useState(true);
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -35,21 +35,21 @@ const Selfie = ({ authToken }: SelfieProps) => {
       if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
-        runOnJS(setWarning)('Hold still');
+        runOnJS(setFeedback)('Hold still...');
       } else {
         detector.value = false;
         runOnJS(setObjectDetected)(false);
 
         if (!result.hasFace) {
-          runOnJS(setWarning)('Unable to detect a face');
+          runOnJS(setFeedback)('Unable to detect a face');
           return;
         }
         if (!result.isFaceInCenter) {
-          runOnJS(setWarning)('Center your face');
+          runOnJS(setFeedback)('Face is outside the frame outline');
           return;
         }
         if (!result.isFaceStraight) {
-          runOnJS(setWarning)('Straighten your face');
+          runOnJS(setFeedback)('Face is tilted or looking other way');
         }
       }
     },
@@ -71,7 +71,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
         size="large"
         title={t('title')}
         type="front"
-        warning={warning}
+        feedback={feedback}
       />
       <ConsentDialog
         authToken={authToken}
