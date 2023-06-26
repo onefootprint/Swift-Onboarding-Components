@@ -28,26 +28,25 @@ Footprint's vault supports several types of structured data: identity data, card
 ```bash
 curl https://api.onefootprint.com/users \
 	-X POST \
-    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:\
 	-d '{
 		    "id.first_name": "Jane",
 		    "id.last_name": "Doe",
 		    "id.dob": "1988-12-30",
 			"id.ssn9": "12-121-1212",
-            "id.address_line_1": "1 Penguin Pond",
+            "id.address_line1": "1 Penguin Pond",
             "id.city": "Polar Plunge",
             "id.state": "New York",
             "id.zip": "10014",
-            "id.country": "USA",
+            "id.country": "US",
             "id.phone_number":"+155555500",
-            "card.primary.number":"4242224242424242",
-            "card.primary.cvc": "4242",
-            "card.primary.exp_month": "12",
-            "card.primary.exp_year": "24",
+            "card.primary.number":"4242424242424242",
+            "card.primary.cvc": "424",
+            "card.primary.expiration": "12/24",
             "document.drivers_license.front": "S94x6silUu0rpHq16aFIo8lo6C/GCRYqX4mDddUbD/4...",
             "document.drivers_license.back": "pTy0Xa5yAQ3aTFUw/qDUIcqYKgdmnij31UPgktrXYvo...",
             "custom.account_number": "42421212312",
-            "custom.routing_number": "12121212121",
+            "custom.routing_number": "12121212121"
 		}'
 ```
 
@@ -68,10 +67,37 @@ Otherwise, an error will return with the data field that is improperly formatted
 
 Take special note of the `fp_id_...` value above -- this is the stable identifier for this user vault, this is the only identifier you'll need to store in your database or users table for this user vault. All vault data can be referenced with just this one identifier.
 
+## Data integrity (optional)
+
+For big migration jobs, it can be useful to validate that the data you have migrated to footprint vaults actually byte-for-byte matches what you have in your database. To that end, Footprint vaults support an `integrity` endpoint for computing signed hashes (using `HMAC-SHA256`) of the underlying data so you can check that the data you've pushed matches what you expect.
+
+To compute integrity signatures, provide a HEX-encoded `signing_key` and a list data identifiers in `fields`. For each provided data identifier `key` in `fields` a resulting `hmac-sha256(signing_key, vault[key])` is computed.
+
+### Example
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/vault/integrity \
+  -X POST \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+  -d '{
+          "fields": ["id.first_name", "id.last_name", "id.ssn9", "card.my_alias.number"],
+          "signing_key": "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
+      }'
+```
+
+```json
+{
+  "id.first_name": "6e9b8af84ffc8829f03911f73c997d27c62a4c2078d90320ebcb7dbbce0e39a5",
+  "id.last_name": "55c6c9c45dc54391fdd2f98d719095479ca3022f8583d1a6442d4c66889f8bb9",
+  "id.ssn9": "18568e3cd81f27a50e56750317d3446a3080f3aba4a726af3b848b51eb37071f",
+  "card.my_alias.number": "4f8a7abfbf11912991b364fd429f2a59cea4c859619692e712b628752cb83ecf"
+}
+```
+
 ## More guides and resources
 
 Please find additional docs and guides for using Footprint vaults:
 
 1. [API Reference for Vault](https://api-docs.onefootprint.com/docs/footprint-public-docs/80d7cb29758b2-create-a-user)
 2. [PII Vault docs](/vault/apis)
-3. [Vault Proxy Ingress](/vault/proxy#ingress-vaulting)
+3. [Vault Proxy Ingress](/vault/proxy)
