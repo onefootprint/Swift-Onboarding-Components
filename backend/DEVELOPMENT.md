@@ -158,9 +158,19 @@ To add a secret to pulumi, do the following:
 
 ```sh
 $ cd infra/
-$ pulumi --stack footprint/dev config set --secret <SECRET_NAME> <SECRET_VALUE?
-$ pulumi --stack footprint/prod config set --secret <SECRET_NAME> <SECRET_VALUE?
+$ pulumi --stack footprint/dev config set --secret --path <SECRET_NAME> <SECRET_VALUE?
+$ pulumi --stack footprint/prod config set --secret --path <SECRET_NAME> <SECRET_VALUE?
 ```
+
+For example
+ ```sh
+ $ AWS_PROFILE=dev pulumi --stack footprint/dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
+ ```
+
+ You can similarly read existing secret values with
+ ```
+ $ AWS_PROFILE=dev pulumi --stack footprint/dev config get --path constants.grafana.apiKey
+ ```
 
 - To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.
 

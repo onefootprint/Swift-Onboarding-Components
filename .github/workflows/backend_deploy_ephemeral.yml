@@ -5,6 +5,8 @@ on:
 
 concurrency:
   group: 'ephem-stack-group-${{ github.head_ref }}'
+  # We want a new push on a branch
+  cancel-in-progress: true
 
 jobs:
   ephemeral_stack:
