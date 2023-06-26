@@ -14,7 +14,7 @@ const useCreateHandoffUrl = (authToken?: string) => {
     // For now, generate at most 3 digits to randomize the url. Chance of a
     // user generating the same url twice is 0.001^2.
     const randomSeed = Math.floor(Math.random() * 1000);
-    const newUrl = `${HANDOFF_BASE_URL}?r=${randomSeed}#${encodeURI(
+    const newUrl = `${HANDOFF_BASE_URL}/verify?r=${randomSeed}#${encodeURI(
       authToken,
     )}`;
     setUrl(newUrl);
