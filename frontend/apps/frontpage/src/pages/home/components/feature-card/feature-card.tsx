@@ -70,7 +70,12 @@ const FeatureCard = ({
           {subtitle}
         </Typography>
         {cta && (
-          <LinkButton iconComponent={IcoArrowRightSmall16}>{cta}</LinkButton>
+          <LinkButton
+            iconComponent={IcoArrowRightSmall16}
+            href="https://docs.onefootprint.com/"
+          >
+            {cta}
+          </LinkButton>
         )}
       </TextContainer>
     </Container>
