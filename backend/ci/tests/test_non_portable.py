@@ -333,6 +333,10 @@ def test_kyc(
         assert expected_error in body["error"]["message"]
         return
 
+    assert body["requires_manual_review"] == False
+    assert body["status"] == "pass"
+
+
     # confirm OBD timeline event created
     timeline = get(
         f"entities/{fp_id}/timeline",

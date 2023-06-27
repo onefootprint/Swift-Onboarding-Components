@@ -13,13 +13,14 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::task;
-use api_core::types::EmptyResponse;
+use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_route_hosted::onboarding::get_requirements_inner;
 use api_route_hosted::onboarding::GetRequirementsArgs;
+use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKycRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::insight_event::InsightEvent;
@@ -45,7 +46,7 @@ pub async fn post(
     request: web::Json<TriggerKycRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?; // TODO: this aint it
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -56,7 +57,7 @@ pub async fn post(
 
     let insight_event = CreateInsightEvent::from(insights);
     let ff_client = state.feature_flag_client.clone();
-    let wf = state
+    let (ob_id, wf) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -91,7 +92,7 @@ pub async fn post(
                 insight_event,
                 None, // currently dont support KYB for NPV
             )?;
-
+            let ob_id = ob.id.clone();
             let wf_id = ob.workflow_id.ok_or(OnboardingError::NoWorkflow)?;
             let wf = Workflow::get(conn, &wf_id)?;
 
@@ -139,7 +140,7 @@ pub async fn post(
                 return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
             }
 
-            Ok(wf)
+            Ok((ob_id, wf))
         })
         .await?;
 
@@ -148,6 +149,10 @@ pub async fn post(
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    // TODO: probs return EntityValidateResponse here
-    ResponseData::ok(EmptyResponse {}).json()
+    let ob_info = state
+        .db_pool
+        .db_query(move |conn| Onboarding::get(conn, &ob_id))
+        .await??;
+
+    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db(ob_info)).json()
 }
