@@ -31,6 +31,7 @@ export interface StaticSecrets {
   fractionalIdologyUsername: aws.ssm.Parameter;
   fractionalIdologyPassword: aws.ssm.Parameter;
   grafanaPrometheusPushAuth: aws.ssm.Parameter;
+  honeycombApiKey: aws.ssm.Parameter;
   airplaneApiToken: pulumi.Output<string>;
   socureSandboxApiKey: aws.ssm.Parameter;
   socureProductionApiKey: aws.ssm.Parameter;
@@ -61,6 +62,7 @@ interface SecretConstants {
   sendgrid: Sendgrid;
   idology: IDology;
   grafana: Grafana;
+  honeycomb: Honeycomb;
   airplane: Airplane;
   socure: Socure;
   launchDarkly: LaunchDarkly;
@@ -104,6 +106,10 @@ interface Socure {
 
 interface Grafana {
   prometheusPushAuth: string;
+}
+
+interface Honeycomb {
+  apiKey: string;
 }
 
 interface Airplane {
@@ -284,6 +290,10 @@ export async function LoadSecrets(
     grafanaPrometheusPushAuth: createSecretParameter(
       `grafanaPrometheusPushAuth-${stack}`,
       secretConstants.grafana.prometheusPushAuth,
+    ),
+    honeycombApiKey: createSecretParameter(
+      `honeycombApiKey-${stack}`,
+      secretConstants.honeycomb.apiKey,
     ),
     airplaneApiToken: pulumi.secret(secretConstants.airplane.apiToken),
     socureSandboxApiKey: createSecretParameter(

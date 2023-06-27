@@ -29,11 +29,11 @@ export abstract class ServiceContainers {
     metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
   ): Promise<pulumi.Output<string>> {
-    const traceOtelCollecterContainerName = 'otelcollect-trace';
+    const otelCollectorContainerName = 'otelcollector';
     const serverContainerName = 'fpc';
 
     const traceOtelCollector = ServiceContainers.createTraceOtelCollector(
-      traceOtelCollecterContainerName,
+      otelCollectorContainerName,
       secretsStore,
       constants,
       region,
@@ -50,7 +50,7 @@ export abstract class ServiceContainers {
 
     const apiServer = await ServiceContainers.createApiServer(
       serverContainerName,
-      traceOtelCollecterContainerName,
+      otelCollectorContainerName,
       appPort,
       constants,
       secretsStore,
@@ -480,8 +480,9 @@ export abstract class ServiceContainers {
         secrets.traceOtelConfig.arn,
         secrets.elasticApmAgentKey.arn,
         secrets.grafanaPrometheusPushAuth.arn,
+        secrets.honeycombApiKey.arn,
       ])
-      .apply(([config, apiKey, grafanaPrometheusPushAuth]) => [
+      .apply(([config, apiKey, grafanaPrometheusPushAuth, honeycombApiKey]) => [
         {
           name: 'AOT_CONFIG_CONTENT',
           valueFrom: config,
@@ -493,6 +494,10 @@ export abstract class ServiceContainers {
         {
           name: 'GRAFANA_PROMETHEUS_PUSH_AUTH',
           valueFrom: grafanaPrometheusPushAuth,
+        },
+        {
+          name: 'HONEYCOMB_API_KEY',
+          valueFrom: honeycombApiKey,
         },
       ])
       .apply(secrets => {
