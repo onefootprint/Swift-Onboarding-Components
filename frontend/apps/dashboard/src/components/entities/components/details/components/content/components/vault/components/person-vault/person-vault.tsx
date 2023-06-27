@@ -2,17 +2,20 @@ import styled, { css } from '@onefootprint/styled';
 import {
   Entity,
   hasEntityCards,
+  hasEntityCustomData,
   hasEntityDocuments,
   hasEntityInvestorProfile,
 } from '@onefootprint/types';
 import React from 'react';
 
-import CardFieldset from '../card-fieldset';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
+import CardFieldset from './components/card-fieldset';
+import CustomDataFields from './components/custom-data-fields';
 import DocumentsFields from './components/document-fields';
 import InvestorProfileFields from './components/investor-profile-fields';
 import useFieldsets from './hooks/use-fieldsets';
+import generateGridTemplateAreas from './utils/generate-grid-template-areas';
 
 type PersonVaultProps = {
   entity: Entity;
@@ -25,45 +28,51 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
     identity,
     investorProfile,
     documents,
-    paymentCardData,
+    cards,
+    custom,
   } = useFieldsets();
+  const hasCards = hasEntityCards(entity);
+  const hasDocuments = hasEntityDocuments(entity);
+  const hasInvestorProfile = hasEntityInvestorProfile(entity);
+  const hasCustomData = hasEntityCustomData(entity);
+  const gridTemplateAreas = generateGridTemplateAreas(entity);
 
   return (
-    <Grid hasCard={hasEntityCards(entity)}>
-      <Basic>
+    <Grid gridTemplateAreas={gridTemplateAreas}>
+      <GridArea name="basic">
         <Fieldset
           fields={basic.fields}
           iconComponent={basic.iconComponent}
           title={basic.title}
           footer={<RiskSignalsOverview type="basic" />}
         />
-      </Basic>
-      <Identity>
+      </GridArea>
+      <GridArea name="identity">
         <Fieldset
           fields={identity.fields}
           iconComponent={identity.iconComponent}
           title={identity.title}
           footer={<RiskSignalsOverview type="identity" />}
         />
-      </Identity>
-      <Address>
+      </GridArea>
+      <GridArea name="address">
         <Fieldset
           fields={address.fields}
           iconComponent={address.iconComponent}
           title={address.title}
           footer={<RiskSignalsOverview type="address" />}
         />
-      </Address>
-      {hasEntityCards(entity) ? (
-        <PaymentCardData>
+      </GridArea>
+      {hasCards ? (
+        <GridArea name="payment">
           <CardFieldset
-            title={paymentCardData.title}
-            iconComponent={paymentCardData.iconComponent}
+            title={cards.title}
+            iconComponent={cards.iconComponent}
           />
-        </PaymentCardData>
+        </GridArea>
       ) : null}
-      {hasEntityDocuments(entity) ? (
-        <Documents>
+      {hasDocuments ? (
+        <GridArea name="documents">
           <Fieldset
             fields={documents.fields}
             iconComponent={documents.iconComponent}
@@ -72,10 +81,10 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           >
             <DocumentsFields />
           </Fieldset>
-        </Documents>
+        </GridArea>
       ) : null}
-      {hasEntityInvestorProfile(entity) ? (
-        <InvestorProfile>
+      {hasInvestorProfile ? (
+        <GridArea name="investor-profile">
           <Fieldset
             fields={investorProfile.fields}
             iconComponent={investorProfile.iconComponent}
@@ -83,47 +92,34 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           >
             <InvestorProfileFields />
           </Fieldset>
-        </InvestorProfile>
+        </GridArea>
+      ) : null}
+      {hasCustomData ? (
+        <GridArea name="custom">
+          <CustomDataFields
+            entity={entity}
+            title={custom.title}
+            iconComponent={custom.iconComponent}
+          />
+        </GridArea>
       ) : null}
     </Grid>
   );
 };
 
-const Grid = styled.div<{ hasCard: boolean }>`
-  ${({ theme, hasCard }) => css`
+const Grid = styled.div<{
+  gridTemplateAreas: string;
+}>`
+  ${({ theme, gridTemplateAreas }) => css`
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-      'basic address'
-      'identity ${hasCard ? 'payment' : 'address'}'
-      'documents documents'
-      'investor-profile investor-profile';
+    grid-template-areas: ${gridTemplateAreas};
   `}
 `;
 
-const Basic = styled.div`
-  grid-area: basic;
-`;
-
-const Address = styled.div`
-  grid-area: address;
-`;
-
-const Identity = styled.div`
-  grid-area: identity;
-`;
-
-const Documents = styled.div`
-  grid-area: documents;
-`;
-
-const InvestorProfile = styled.div`
-  grid-area: investor-profile;
-`;
-
-const PaymentCardData = styled.div`
-  grid-area: payment;
+const GridArea = styled.div<{ name: string }>`
+  grid-area: ${({ name }) => name};
 `;
 
 export default PersonVault;

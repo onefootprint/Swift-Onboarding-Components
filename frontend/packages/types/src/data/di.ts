@@ -65,6 +65,8 @@ export type CardDI<T extends string = string> =
   | `card.${T}.expiration_month`
   | `card.${T}.expiration_year`;
 
+export type CustomDI<T extends string = string> = `custom.${T}`;
+
 export const DataIdentifierKeys = [
   ...Object.values(BusinessDI),
   ...Object.values(InvestorProfileDI),
@@ -77,4 +79,5 @@ export type DataIdentifier =
   | IdDI
   | BusinessDI
   | DocumentDI
-  | CardDI;
+  | CardDI
+  | CustomDI;

@@ -3,6 +3,7 @@ import {
   IcoBuilding24,
   IcoCreditcard24,
   IcoDollar24,
+  IcoFileText24,
   IcoFileText224,
   IcoUsers24,
 } from '@onefootprint/icons';
@@ -76,9 +77,14 @@ const useFieldsets = (): Fieldset => {
         { di: DocumentDI.latestPassport },
       ],
     },
-    paymentCardData: {
-      title: t('payment-card-data.title'),
+    cards: {
+      title: t('cards.title'),
       iconComponent: IcoCreditcard24,
+      fields: [],
+    },
+    custom: {
+      title: t('custom.title'),
+      iconComponent: IcoFileText24,
       fields: [],
     },
   };

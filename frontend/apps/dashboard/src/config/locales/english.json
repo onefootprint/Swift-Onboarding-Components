@@ -970,8 +970,11 @@
         "documents": {
           "title": "ID documents & Selfie"
         },
-        "payment-card-data": {
+        "cards": {
           "title": "Payment card data"
+        },
+        "custom": {
+          "title": "Custom data"
         },
         "investor-profile": {
           "title": "Investor profile data",

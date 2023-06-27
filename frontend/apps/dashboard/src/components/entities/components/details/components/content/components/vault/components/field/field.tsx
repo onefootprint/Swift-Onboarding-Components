@@ -29,10 +29,11 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
   const { register } = useFormContext();
   const field = useField(entity)(di);
   const customLabel = renderLabel ? renderLabel() : undefined;
-  const label = typeof customLabel === 'string' ? customLabel : field.label;
+  const label = customLabel ?? field.label;
+  const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
 
   return (
-    <Container role="row" aria-label={label}>
+    <Container role="row" aria-label={ariaLabel}>
       {field.showCheckbox ? (
         <Tooltip
           disabled={field.canDecrypt}

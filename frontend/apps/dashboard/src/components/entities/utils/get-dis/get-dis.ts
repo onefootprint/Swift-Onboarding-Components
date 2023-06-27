@@ -1,4 +1,4 @@
-import { DataIdentifier } from '@onefootprint/types';
+import { DataIdentifier, EntityVault } from '@onefootprint/types';
 
 const order: Record<string, number> = {
   issuer: 1,
@@ -40,6 +40,12 @@ const sort = (attributes: DataIdentifier[]) =>
 
     return order[aKey] - order[bKey];
   });
+
+export const getCustomDIs = (data: EntityVault) => {
+  const attributes = Object.keys(data);
+  const filtered = attributes.filter(attr => attr.startsWith('custom'));
+  return filtered as DataIdentifier[];
+};
 
 const getDis = (attributes: DataIdentifier[], search: any) => {
   const filtered = filter(attributes, search);

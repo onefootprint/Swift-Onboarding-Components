@@ -8,14 +8,14 @@ import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
-import getDis from '../../../../../../../../utils/get-dis';
-import useField from '../../hooks/use-field';
-import useForm from '../../hooks/use-form';
-import { DiField } from '../../vault.types';
-import { useDecryptControls } from '../decrypt-controls';
-import Field from '../field';
+import getDis from '../../../../../../../../../../utils/get-dis';
+import useField from '../../../../hooks/use-field';
+import useForm from '../../../../hooks/use-form';
+import { DiField } from '../../../../vault.types';
+import getCards from '../../../card-fieldset/utils/get-cards';
+import { useDecryptControls } from '../../../decrypt-controls';
+import Field from '../../../field';
 import CardHeader from './components/card-header';
-import getCards from './utils/get-cards';
 
 export type FieldsetProps = WithEntityProps & {
   iconComponent: Icon;
