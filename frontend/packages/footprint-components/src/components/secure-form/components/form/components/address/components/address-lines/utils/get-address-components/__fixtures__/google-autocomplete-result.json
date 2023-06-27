@@ -1,0 +1,70 @@
+{
+  "address_components": [
+    {
+      "long_name": "14",
+      "short_name": "14",
+      "types": ["street_number"]
+    },
+    {
+      "long_name": "Linda Street",
+      "short_name": "Linda St",
+      "types": ["route"]
+    },
+    {
+      "long_name": "Mission Dolores",
+      "short_name": "Mission Dolores",
+      "types": ["neighborhood", "political"]
+    },
+    {
+      "long_name": "San Francisco",
+      "short_name": "SF",
+      "types": ["locality", "political"]
+    },
+    {
+      "long_name": "San Francisco County",
+      "short_name": "San Francisco County",
+      "types": ["administrative_area_level_2", "political"]
+    },
+    {
+      "long_name": "California",
+      "short_name": "CA",
+      "types": ["administrative_area_level_1", "political"]
+    },
+    {
+      "long_name": "United States",
+      "short_name": "US",
+      "types": ["country", "political"]
+    },
+    {
+      "long_name": "94110",
+      "short_name": "94110",
+      "types": ["postal_code"]
+    }
+  ],
+  "adr_address": "<span class=\"street-address\">14 Linda St</span>, <span class=\"locality\">San Francisco</span>, <span class=\"region\">CA</span> <span class=\"postal-code\">94110</span>, <span class=\"country-name\">USA</span>",
+  "formatted_address": "14 Linda St, San Francisco, CA 94110, USA",
+  "geometry": {
+    "location": {
+      "lat": 37.7612446,
+      "lng": -122.4230783
+    },
+    "viewport": {
+      "south": 37.75989121970851,
+      "west": -122.4243608302915,
+      "north": 37.76258918029151,
+      "east": -122.4216628697085
+    }
+  },
+  "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+  "icon_background_color": "#7B9EB0",
+  "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+  "name": "14 Linda St",
+  "place_id": "EikxNCBMaW5kYSBTdCwgU2FuIEZyYW5jaXNjbywgQ0EgOTQxMTAsIFVTQSIwEi4KFAoSCefrakY9fo-AEYB3qq0S2xW-EA4qFAoSCcVqXWo9fo-AEf_vyyuP2Khp",
+  "reference": "EikxNCBMaW5kYSBTdCwgU2FuIEZyYW5jaXNjbywgQ0EgOTQxMTAsIFVTQSIwEi4KFAoSCefrakY9fo-AEYB3qq0S2xW-EA4qFAoSCcVqXWo9fo-AEf_vyyuP2Khp",
+  "types": ["street_address"],
+  "url": "https://maps.google.com/?q=14+Linda+St,+San+Francisco,+CA+94110,+USA&ftid=0x808f7e3d466aebe7:0x4aa412cd666925d0",
+  "utc_offset": -420,
+  "vicinity": "San Francisco",
+  "html_attributions": [],
+  "utc_offset_minutes": -420
+}

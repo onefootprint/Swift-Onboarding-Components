@@ -97,6 +97,9 @@
     "access": "public"
   },
   "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
+    "preset": "@onefootprint/jest-presets/jest/web",
+    "setupFiles": [
+      "<rootDir>/src/config/initializers/react-i18next-test.ts"
+    ]
   }
 }
