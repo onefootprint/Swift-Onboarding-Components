@@ -1,4 +1,3 @@
-
 use futures_util::Stream;
 use futures_util::StreamExt;
 use opentelemetry::global;
@@ -28,7 +27,7 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     // don't setup the exporter
     if config.disable_otel.is_some() {
         let sub = Registry::default()
-            .with(env_filter)            
+            .with(env_filter)
             .with(tracing_subscriber::fmt::layer().with_ansi(true).pretty());
 
         tracing::subscriber::set_global_default(sub)?;
@@ -48,19 +47,19 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
         .with_exporter(exporter)
         .install_simple()?;
 
-    // sentry layer 
+    // sentry layer
     let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
         tracing::Level::ERROR => sentry_tracing::EventFilter::Exception,
-        tracing::Level::INFO | tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,         
+        tracing::Level::INFO | tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,
         _ => sentry_tracing::EventFilter::Ignore,
     });
-    
+
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging
     let sub = Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
         .with(tracing_subscriber::fmt::layer().with_ansi(false).pretty())
-        .with(tracing_opentelemetry::layer().with_tracer(tracer))        
+        .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .with(sentry_layer);
 
     tracing::subscriber::set_global_default(sub)?;
@@ -96,13 +95,13 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             ip_address,
             city,
             country,
-            region_name,
+            region_name: _,
             latitude,
             longitude,
             postal_code,
-            time_zone,
+            time_zone: _,
             user_agent,
-            timestamp,
+            timestamp: _,
             region: _,
             metro_code: _,
             is_android_user: _,
@@ -112,15 +111,13 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             is_smarttv_viewer: _,
             is_tablet_viewer: _,
             asn: _,
-            country_code,
+            country_code: _,
             forwarded_proto: _,
             http_version: _,
             tls: _,
         } = InsightHeaders::parse_from_request(request.headers());
 
-        let TelemetryHeaders {
-            session_id,
-        } = TelemetryHeaders::parse_from_request(request.headers());
+        let TelemetryHeaders { session_id } = TelemetryHeaders::parse_from_request(request.headers());
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
@@ -128,21 +125,23 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         // have to remove some if you add more.
         let span = root_span!(
             request,
-            route, 
+            tenant_id = tracing::field::Empty,
+            api_key_id = tracing::field::Empty,
+            fp_id = tracing::field::Empty,
+            tenant_user_id = tracing::field::Empty,
+            vault_id = tracing::field::Empty,
+            route,
             ip_address,
             latitude,
             longitude,
             city,
             country,
-            region_name,
             postal_code,
-            time_zone,
             user_agent,
             session_id,
-            timestamp=%timestamp,
             server_git_hash,
-            country_code,
-            "Root span");
+            "Root span"
+        );
         span
     }
 

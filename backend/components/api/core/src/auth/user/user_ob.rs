@@ -112,6 +112,11 @@ impl ExtractableAuthSession for ParsedUserObSession {
         };
         Ok(ParsedUserObSession(onboarding_session))
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("tenant_id", &self.0.tenant.as_ref().map(|t| t.id.to_string()));
+        root_span.record("vault_id", &self.0.user_vault_id().to_string());
+    }
 }
 
 /// A shorthand for the commonly used ParsedUserSession context.

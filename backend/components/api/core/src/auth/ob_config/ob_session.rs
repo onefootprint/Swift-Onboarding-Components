@@ -52,4 +52,8 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
 
         Ok(ParsedOnboardingSession { ob_config, tenant })
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("tenant_id", &self.tenant.id.to_string());
+    }
 }

@@ -11,6 +11,7 @@ use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
+use tracing_actix_web::RootSpan;
 use std::pin::Pin;
 
 #[derive(Debug, Clone)]
@@ -38,14 +39,19 @@ impl FromRequest for SecretTenantAuthContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         // get the tenant header
         let tenant_sk_input = parse_auth_key(req);
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
+        
+        let root_span = RootSpan::from_request(req, payload);
 
         Box::pin(async move {
+            #[allow(clippy::unwrap_used)]
+            let root_span = root_span.await.unwrap();
+
             let sk = tenant_sk_input?;
             let sh_api_key = sk.fingerprint(state.as_ref()).await?;
 
@@ -66,6 +72,10 @@ impl FromRequest for SecretTenantAuthContext {
                 })?;
 
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
+            
+            root_span.record("tenant_id", &tenant.id.to_string());
+            root_span.record("api_key_id", &api_key.id.to_string());
+            root_span.record("role.id", &role.id.to_string());
 
             Ok(SecretTenantAuthContext(CheckedSecretTenantAuth {
                 tenant,

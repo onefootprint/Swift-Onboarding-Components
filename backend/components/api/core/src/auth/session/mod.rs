@@ -5,6 +5,7 @@ pub use context::*;
 mod data;
 pub use data::*;
 mod update;
+use tracing_actix_web::RootSpan;
 pub use update::*;
 
 use db::PgConn;
@@ -22,4 +23,6 @@ pub trait ExtractableAuthSession: Apiv2Schema + Sized + Send + Sync + 'static {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
     ) -> Result<Self, ApiError>;
+
+    fn log_authed_principal(&self, root_span: RootSpan);
 }

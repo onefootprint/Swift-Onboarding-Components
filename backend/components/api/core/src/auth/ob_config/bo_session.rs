@@ -63,4 +63,8 @@ impl ExtractableAuthSession for ParsedBoSession {
             bo,
         })
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("tenant_id", &self.tenant.id.to_string());
+    }
 }

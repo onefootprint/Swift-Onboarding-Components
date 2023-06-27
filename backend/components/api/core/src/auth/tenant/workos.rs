@@ -47,6 +47,10 @@ impl ExtractableAuthSession for WorkOsSessionData {
         };
         Ok(data)
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("tenant_user_id", &self.tenant_user_id.to_string());
+    }
 }
 
 impl AllowSessionUpdate for WorkOsSessionData {}

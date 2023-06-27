@@ -85,6 +85,11 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             is_risk_ops,
         }))
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("tenant_id", &self.0.tenant.id.to_string());
+        root_span.record("tenant_user_id", &self.0.tenant_user.id.to_string());
+    }
 }
 
 impl GetFirmEmployee for FirmEmployeeAuthContext {

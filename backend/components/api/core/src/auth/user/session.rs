@@ -111,6 +111,10 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }
+
+    fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
+        root_span.record("vault_id", &self.0.user.id.to_string());
+    }
 }
 
 /// A shorthand for the commonly used ParsedUserSessionContext context

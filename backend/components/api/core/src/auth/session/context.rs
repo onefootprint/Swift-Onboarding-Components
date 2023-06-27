@@ -14,6 +14,7 @@ use paperclip::actix::OperationModifier;
 use paperclip::v2::models::{DefaultSchemaRaw, Parameter, SecurityScheme};
 use paperclip::v2::schema::Apiv2Schema;
 use std::{marker::PhantomData, pin::Pin};
+use tracing_actix_web::RootSpan;
 
 /// Abstract Session Context Type
 #[derive(Debug, Clone, Deref)]
@@ -91,9 +92,10 @@ where
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
+        let root_span = RootSpan::from_request(req, payload);
 
         let allowed_headers = T::header_names().join(", "); // Temporary
         let auth_token = T::header_names()
@@ -105,6 +107,9 @@ where
         let headers = req.headers().clone();
 
         Box::pin(async move {
+            #[allow(clippy::unwrap_used)]
+            let root_span = root_span.await.unwrap();
+
             let auth_token = SessionAuthToken::from(auth_token?);
 
             let session = AuthSession::get(&state, &auth_token)
@@ -126,6 +131,8 @@ where
                         .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, format!("{:?}", e)))
                 })
                 .await??;
+            parsed_session_data.log_authed_principal(root_span);
+            
             Ok(Self {
                 data: parsed_session_data,
                 auth_token,
