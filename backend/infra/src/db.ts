@@ -133,14 +133,42 @@ export async function CreateDB(
     backupRetentionPeriod: 7,
   });
 
+  const enhancedMonitoringRoleName = `${clusterIdentifier}-rds-monitoring-role`;
+  const enhancedMonitoringRole = new aws.iam.Role(enhancedMonitoringRoleName, {
+    name: enhancedMonitoringRoleName,
+    assumeRolePolicy: {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: '',
+          Effect: 'Allow',
+          Principal: {
+            Service: 'monitoring.rds.amazonaws.com',
+          },
+          Action: 'sts:AssumeRole',
+        },
+      ],
+    },
+  });
+  new aws.iam.RolePolicyAttachment(
+    `${enhancedMonitoringRoleName}-policy-attachment`,
+    {
+      role: enhancedMonitoringRole.name,
+      policyArn:
+        'arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole',
+    },
+  );
+
   const _dbInstance = new aws.rds.ClusterInstance(`${clusterIdentifier}-1`, {
     clusterIdentifier: db.id,
     instanceClass: 'db.serverless',
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
-    performanceInsightsEnabled: true,
     dbParameterGroupName: instanceParameterGroupName,
     autoMinorVersionUpgrade: false,
+    performanceInsightsEnabled: true,
+    monitoringInterval: 60,
+    monitoringRoleArn: enhancedMonitoringRole.arn,
   });
 
   const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
@@ -148,9 +176,11 @@ export async function CreateDB(
     instanceClass: 'db.serverless',
     engine: EngineType.AuroraPostgresql,
     engineVersion: db.engineVersion,
-    performanceInsightsEnabled: true,
     dbParameterGroupName: instanceParameterGroupName,
     autoMinorVersionUpgrade: false,
+    performanceInsightsEnabled: true,
+    monitoringInterval: 60,
+    monitoringRoleArn: enhancedMonitoringRole.arn,
   });
 
   const {
