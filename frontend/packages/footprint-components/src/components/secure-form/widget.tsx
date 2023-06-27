@@ -1,6 +1,6 @@
 import { EMBEDDED_COMPONENTS_BASE_URL } from '@onefootprint/global-constants';
+import styled from '@onefootprint/styled';
 import React from 'react';
-import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import createWidget from '../../utils/create-widget';
