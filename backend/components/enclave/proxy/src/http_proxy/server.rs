@@ -24,7 +24,7 @@ impl From<crate::Error> for EnclaveProxyError {
 
 impl ResponseError for EnclaveProxyError {}
 
-pub async fn build_server(config: Config) -> std::io::Result<Server> {
+pub async fn build_server(config: Config) -> std::io::Result<(Server, u16)> {
     let manager = StreamManager {
         config: config.clone(),
     };
@@ -50,14 +50,16 @@ pub async fn build_server(config: Config) -> std::io::Result<Server> {
             .service(health)
             .service(proxy)
     })
-    .bind(("0.0.0.0", port))?
-    .run();
+    .bind(("0.0.0.0", port))?;
 
-    Ok(server)
+    let port = server.addrs()[0].port();
+    let server = server.run();
+    Ok((server, port))
 }
 
 pub async fn run(config: Config) -> Result<(), std::io::Error> {
-    build_server(config).await?.await?;
+    let (server, _) = build_server(config).await?;
+    server.await?;
     Ok(())
 }
 

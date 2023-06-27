@@ -21,57 +21,93 @@ use tokio::{
 #[cfg(feature = "nitro")]
 use tokio_vsock::VsockListener;
 
-pub async fn run(config: Config) -> std::io::Result<()> {
-    init_enclave_sdk();
-
-    // for local development, use a local tcp socket instead of AF_VSOCK
+pub struct Enclave {
+    pub port: u16,
     #[cfg(not(feature = "nitro"))]
-    {
-        listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-    }
-
+    listener: TcpListener,
     #[cfg(feature = "nitro")]
-    {
-        if config.use_local.is_some() {
-            listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-        } else {
+    listener: VsockListener,
+}
+
+impl Enclave {
+    pub async fn bind(config: Config) -> std::io::Result<Self> {
+        #[cfg(not(feature = "nitro"))]
+        {
+            let listener = bind_tcp(&format!("127.0.0.1:{}", config.port)).await?;
+            Ok(Self {
+                port: listener.local_addr()?.port(),
+                listener,
+            })
+        }
+
+        #[cfg(feature = "nitro")]
+        {
             // spawn our loop to start seeding entropy via the NSM
             crate::enclave::spawn_seed_entropy_loop();
 
-            listen_vsock(config.port as u32).await
+            let listener = bind_vsock(config.port as u32).await?;
+            Ok(Self {
+                port: config.port,
+                listener,
+            })
         }
+    }
+
+    pub async fn run(self) -> std::io::Result<()> {
+        init_enclave_sdk();
+
+        // for local development, use a local tcp socket instead of AF_VSOCK
+        #[cfg(not(feature = "nitro"))]
+        {
+            self.listen_tcp().await
+        }
+
+        #[cfg(feature = "nitro")]
+        {
+            self.listen_vsock().await
+        }
+    }
+
+    #[allow(unused_mut)]
+    async fn listen_tcp(mut self) -> std::io::Result<()> {
+        log::info!(
+            "Listening for TCP connections at path: {}",
+            self.listener.local_addr()?
+        );
+
+        while let Ok((stream, _)) = self.listener.accept().await {
+            stream_listen(stream)
+        }
+
+        Ok(())
+    }
+
+    #[cfg(feature = "nitro")]
+    async fn listen_vsock(self) -> std::io::Result<()> {
+        log::info!("Listening for VSOCK connections on port: {}", self.port);
+
+        let mut incoming = self.listener.incoming();
+        while let Some(result) = incoming.next().await {
+            match result {
+                Ok(stream) => stream_listen(stream),
+                Err(e) => {
+                    log::info!("Got error accepting connection: {:?}", e);
+                    return Err(e);
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 
-async fn listen_tcp(address: &str) -> std::io::Result<()> {
-    let listener = TcpListener::bind(address).await?;
-    log::info!("Listening for TCP connections at path: {address}");
-
-    while let Ok((stream, _)) = listener.accept().await {
-        stream_listen(stream)
-    }
-
-    Ok(())
+async fn bind_tcp(address: &str) -> std::io::Result<TcpListener> {
+    TcpListener::bind(address).await
 }
 
 #[cfg(feature = "nitro")]
-async fn listen_vsock(port: u32) -> std::io::Result<()> {
-    let listener = VsockListener::bind(libc::VMADDR_CID_ANY, port)?;
-
-    log::info!("Listening for VSOCK connections on port: {}", port);
-
-    let mut incoming = listener.incoming();
-    while let Some(result) = incoming.next().await {
-        match result {
-            Ok(stream) => stream_listen(stream),
-            Err(e) => {
-                log::info!("Got error accepting connection: {:?}", e);
-                return Err(e);
-            }
-        }
-    }
-
-    Ok(())
+async fn bind_vsock(port: u32) -> std::io::Result<VsockListener> {
+    VsockListener::bind(libc::VMADDR_CID_ANY, port)
 }
 
 fn stream_listen<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(stream: S) {

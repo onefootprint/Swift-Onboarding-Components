@@ -1,8 +1,7 @@
 use crate::State;
 use actix_web::dev::ServerHandle;
 use envconfig::Envconfig;
-use once_cell::sync::Lazy;
-use std::{collections::HashMap, sync::Mutex, time::Duration};
+use std::{collections::HashMap, time::Duration};
 use tokio::task::JoinHandle;
 
 #[allow(unused)]
@@ -22,33 +21,23 @@ impl Drop for MockEnclave {
     }
 }
 
-static PP_LOCK: Lazy<Mutex<()>> = Lazy::new(Mutex::default);
-
 impl MockEnclave {
-    fn unused_ports() -> (u16, u16) {
-        let _g = PP_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-        (
-            portpicker::pick_unused_port().expect("no free ports"),
-            portpicker::pick_unused_port().expect("no free ports"),
-        )
-    }
-
     /// initializes a new enclave proxy on random port
     pub async fn init() -> MockEnclave {
-        let (enclave_port, port) = Self::unused_ports();
-        let h1 = tokio::spawn(async move {
-            let enclave_config = enclave::Config {
-                port: enclave_port,
-                use_local: None,
-            };
-            enclave::run(enclave_config).await.expect("enclave crashed");
-        });
+        let enclave_config = enclave::Config {
+            port: 0, // let OS assign unused port
+        };
+        let enclave = enclave::Enclave::bind(enclave_config)
+            .await
+            .expect("enclave crashed");
+        let enclave_port = enclave.port;
+        let h1 = tokio::spawn(async move { enclave.run().await.expect("enclave crashed") });
 
         let mut config = enclave_proxy::Config::init_from_hashmap(&HashMap::new()).unwrap();
-        config.port = port;
+        config.port = 0; // let OS assign unused port
         config.enclave_port = enclave_port;
 
-        let server = enclave_proxy::http_proxy::server::build_server(config)
+        let (server, server_port) = enclave_proxy::http_proxy::server::build_server(config)
             .await
             .expect("failed to build enclave proxy server");
         let handle = server.handle();
@@ -60,7 +49,7 @@ impl MockEnclave {
         tokio::time::sleep(Duration::from_secs(2)).await;
 
         MockEnclave {
-            port,
+            port: server_port,
             h1,
             h2,
             server: handle,
