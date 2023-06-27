@@ -44,14 +44,6 @@ export enum IdDI {
 
 export enum DocumentDI {
   finraComplianceLetter = 'document.finra_compliance_letter',
-  passport = 'document.passport',
-  passportSelfie = 'document.passport.selfie',
-  driversLicenseFront = 'document.drivers_license.front',
-  driversLicenseBack = 'document.drivers_license.back',
-  driversLicenseSelfie = 'document.drivers_license.selfie',
-  idCardFront = 'document.id_card.front',
-  idCardBack = 'document.id_card.back',
-  idCardSelfie = 'document.id_card.selfie',
 
   latestPassport = 'document.passport.front.latest_upload',
   latestPassportSelfie = 'document.passport.selfie.latest_upload',

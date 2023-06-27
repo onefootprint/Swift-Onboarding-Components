@@ -10,12 +10,6 @@ const getDocDis = (
   vaultData?: Partial<Record<DataIdentifier, VaultValue>>,
 ) => {
   const extraFieldsToDecrypt: Partial<Record<DocumentDI, DocumentDI[]>> = {
-    [DocumentDI.idCardFront]: [DocumentDI.idCardBack, DocumentDI.idCardSelfie],
-    [DocumentDI.driversLicenseFront]: [
-      DocumentDI.driversLicenseBack,
-      DocumentDI.driversLicenseSelfie,
-    ],
-    [DocumentDI.passport]: [DocumentDI.passportSelfie],
     [DocumentDI.latestIdCardFront]: [
       DocumentDI.latestIdCardBack,
       DocumentDI.latestIdCardSelfie,

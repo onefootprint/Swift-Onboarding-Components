@@ -12,14 +12,6 @@ type Output = Partial<Record<DocumentDI, VaultDocumentData | VaultImageData>>;
 
 const pdfs = [DocumentDI.finraComplianceLetter];
 const images = [
-  DocumentDI.driversLicenseBack,
-  DocumentDI.driversLicenseFront,
-  DocumentDI.driversLicenseSelfie,
-  DocumentDI.idCardBack,
-  DocumentDI.idCardFront,
-  DocumentDI.idCardSelfie,
-  DocumentDI.passport,
-  DocumentDI.passportSelfie,
   DocumentDI.latestDriversLicenseBack,
   DocumentDI.latestDriversLicenseFront,
   DocumentDI.latestDriversLicenseSelfie,

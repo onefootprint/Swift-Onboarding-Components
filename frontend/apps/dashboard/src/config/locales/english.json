@@ -68,19 +68,60 @@
     },
     "document": {
       "finra_compliance_letter": "Finra compliance letter",
-      "passport": "Passport",
-      "passport.selfie": "Selfie",
-      "passport.selfie.latest_upload": "Selfie",
-      "passport.front.latest_upload": "Passport",
+      "passport": {
+        "front": {
+          "image": "Passport",
+          "latest_upload": "Passport",
+          "mime_type": "Passport MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Passport number",
+        "expiration": "Passport expiration",
+        "dob": "Passport DOB"
+      },
       "id_card": {
-        "front": "ID card",
-        "back": "ID card back",
-        "selfie": "Selfie"
+        "front": {
+          "image": "ID card",
+          "latest_upload": "ID card",
+          "mime_type": "ID card MIME type"
+        },
+        "back": {
+          "image": "ID card back",
+          "latest_upload": "ID card back",
+          "mime_type": "ID card back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "ID card number",
+        "expiration": "ID card expiration"
       },
       "drivers_license": {
-        "front": "Driver's license",
-        "back": "Driver's license back",
-        "selfie": "Selfie"
+        "front": {
+          "image": "Drivers license",
+          "latest_upload": "Drivers license",
+          "mime_type": "Drivers license MIME type"
+        },
+        "back": {
+          "image": "Drivers license back",
+          "latest_upload": "Drivers license back",
+          "mime_type": "Drivers license back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Drivers license number",
+        "expiration": "Drivers license expiration",
+        "dob": "Drivers license DOB",
+        "issuing_state": "Drivers license issuing state"
       }
     },
     "business": {
