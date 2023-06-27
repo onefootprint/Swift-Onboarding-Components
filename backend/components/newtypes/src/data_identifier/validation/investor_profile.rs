@@ -71,7 +71,7 @@ enum RiskTolerance {
     Aggressive,
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]
 pub enum Declaration {
     AffiliatedWithUsBroker,

@@ -5,6 +5,7 @@ from tests.utils import create_ob_config
 from tests.utils import _gen_random_n_digit_number
 from tests.utils import post, get
 from tests.constants import FIXTURE_PHONE_NUMBER
+import json
 from alpaca.broker.client import BrokerClient
 import datetime
 
@@ -15,7 +16,11 @@ ALPACA_SANDBOX_API_SECRET = "WBJf7VgZmE0oFBdFFCItK49p41jwpdLX9tcg9gsV"
 @pytest.fixture(scope="session")
 def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     return create_ob_config(
-        sandbox_tenant, "Alpaca", must_collect_data, can_access_data, "alpaca"
+        sandbox_tenant,
+        "Alpaca",
+        must_collect_data + ["investor_profile"],
+        can_access_data + ["investor_profile"],
+        "alpaca"
     )
 
 
@@ -108,13 +113,9 @@ def test_alpaca_cip(
         "api_key": ALPACA_SANDBOX_API_KEY,
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
-        "enabled_assets": ["us_equity"],
-        "disclosures": {
-            "immediate_family_exposed": False,
-            "is_politically_exposed": False,
-            "is_control_person": False,
-            "is_affiliated_exchange_or_finra": False,
-        },
+        "enabled_assets": [
+            "us_equity"
+        ],
         "agreements": [
             {
                 "agreement": "customer_agreement",
@@ -145,6 +146,14 @@ def test_alpaca_cip(
     assert alpaca_response["identity"]["given_name"] == d["id.first_name"]
     assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
     assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
+    declarations = json.loads(d['investor_profile.declarations'])
+    assert alpaca_response["disclosures"] == {
+        "is_control_person": 'senior_executive' in declarations,
+        "is_affiliated_exchange_or_finra": 'affiliated_with_us_broker' in declarations,
+        "is_politically_exposed": 'senior_political_figure' in declarations,
+        "immediate_family_exposed": 'family_of_political_figure' in declarations,
+        "is_discretionary": False
+    }
 
     account_id = alpaca_response["id"]
 

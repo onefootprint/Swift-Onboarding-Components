@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{PiiJsonValue, PiiString};
+use newtypes::{Declaration, PiiJsonValue, PiiString};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 
@@ -86,6 +86,22 @@ pub struct Disclosures {
     pub employer_name: Option<PiiString>,
     pub employer_address: Option<PiiString>,
     pub employment_position: Option<PiiString>,
+}
+
+impl Disclosures {
+    pub fn from_declarations(declarations: &[Declaration]) -> Disclosures {
+        Disclosures {
+            is_control_person: declarations.contains(&Declaration::SeniorExecutive),
+            is_affiliated_exchange_or_finra: declarations.contains(&Declaration::AffiliatedWithUsBroker),
+            is_politically_exposed: declarations.contains(&Declaration::SeniorPoliticalFigure),
+            immediate_family_exposed: declarations.contains(&Declaration::FamilyOfPoliticalFigure),
+            context: None,
+            employment_status: None,
+            employer_name: None,
+            employer_address: None,
+            employment_position: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]

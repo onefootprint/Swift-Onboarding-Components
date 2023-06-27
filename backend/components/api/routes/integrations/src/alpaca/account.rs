@@ -1,5 +1,7 @@
 use alpaca::{
-    types::account::{Contact, CreateAccountRequest, Document, DocumentType, Identity, TaxIdType},
+    types::account::{
+        Contact, CreateAccountRequest, Disclosures, Document, DocumentType, Identity, TaxIdType,
+    },
     AlpacaCip,
 };
 use api_core::{
@@ -14,8 +16,8 @@ use std::str::FromStr;
 
 use db::models::{document_request::DocumentRequest, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK, PhoneNumber,
-    PiiJsonValue, PiiString, TenantId,
+    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
+    InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -107,6 +109,7 @@ async fn create_create_account_request(
                 DI::Id(IDK::State),
                 DI::Id(IDK::City),
                 DI::Id(IDK::Ssn9),
+                DI::InvestorProfile(IPK::Declarations),
             ]
             .into_iter()
             .chain(doc_info.as_ref().map(|d| d.all_dis()).unwrap_or(vec![]))
@@ -114,6 +117,13 @@ async fn create_create_account_request(
             .as_slice(),
         )
         .await?;
+
+    let disclosures = if let Some(disclosures) = req.disclosures {
+        disclosures
+    } else {
+        let declarations: Vec<Declaration> = decrypted.rm(IPK::Declarations)?.deserialize()?;
+        Disclosures::from_declarations(&declarations)
+    };
 
     let documents = if let Some(doc_info) = doc_info {
         let documents = doc_info
@@ -170,7 +180,7 @@ async fn create_create_account_request(
             total_net_worth_max: None,
             extra: None,
         },
-        disclosures: req.disclosures, // TODO: get from broker questions
+        disclosures,
         agreements: req.agreements,
         documents,
         trusted_contact: req.trusted_contact,

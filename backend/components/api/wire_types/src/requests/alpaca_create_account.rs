@@ -18,7 +18,7 @@ pub struct AlpacaCreateAccountRequest {
     pub hostname: String,
 
     pub enabled_assets: Option<Vec<AssetClass>>,
-    pub disclosures: Disclosures,
+    pub disclosures: Option<Disclosures>,
     pub agreements: Option<Vec<Agreement>>,
     pub trusted_contact: Option<TrustedContact>,
 }
