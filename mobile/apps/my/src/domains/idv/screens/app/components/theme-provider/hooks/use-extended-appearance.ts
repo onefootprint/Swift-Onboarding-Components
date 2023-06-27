@@ -2,7 +2,7 @@ import request from '@onefootprint/request';
 import { GetD2PResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER } from '@/config/constants';
 
 import createTheme from './theme-factory/create-theme';
 

@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 import { Passkey } from 'react-native-passkey';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER } from '@/config/constants';
 
 const passkey = new Passkey('onefootprint.com', 'Footprint');
 

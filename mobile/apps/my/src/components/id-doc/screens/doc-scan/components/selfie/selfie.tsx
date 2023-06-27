@@ -5,6 +5,7 @@ import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
 import { detectFace } from 'vision-camera-plugin-face-detection';
 
+import { REVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../camera';
@@ -17,8 +18,9 @@ export type SelfieProps = {
 
 const Selfie = ({ authToken }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
+  const shouldShowContent = authToken !== REVIEW_AUTH_TOKEN;
   const [feedback, setFeedback] = useState('');
-  const [isCameraDisabled, setIsCameraDisable] = useState(true);
+  const [isCameraDisabled, setIsCameraDisable] = useState(shouldShowContent);
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
 
@@ -73,12 +75,14 @@ const Selfie = ({ authToken }: SelfieProps) => {
         type="front"
         feedback={feedback}
       />
-      <ConsentDialog
-        authToken={authToken}
-        onSubmit={() => {
-          setIsCameraDisable(false);
-        }}
-      />
+      {shouldShowContent && (
+        <ConsentDialog
+          authToken={authToken}
+          onSubmit={() => {
+            setIsCameraDisable(false);
+          }}
+        />
+      )}
     </>
   );
 };

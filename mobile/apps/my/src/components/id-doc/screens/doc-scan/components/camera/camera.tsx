@@ -67,6 +67,7 @@ const Camera = ({
   const showTakePhotoManuallyButton = !hasFeedback && !showActionButtons;
   const showInstructions = !photo && !hasFeedback && !isError;
   const showCamera = !photo && device;
+  const zoom = device?.neutralZoom;
 
   useEffect(() => {
     if (isObjectDetected) {
@@ -135,6 +136,7 @@ const Camera = ({
                   isActive={!disabled}
                   photo
                   ref={camera}
+                  zoom={zoom}
                 />
               </CameraContainer>
             )}

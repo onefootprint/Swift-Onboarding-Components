@@ -17,6 +17,6 @@ export type SubmitDocRequest = {
 
 export type SubmitDocResponse = {
   errors: IdDocImageError[];
-  nextSideToCollect: SubmitDocumentSide;
+  nextSideToCollect: SubmitDocumentSide | null;
   isRetryLimitExceeded: boolean;
 };

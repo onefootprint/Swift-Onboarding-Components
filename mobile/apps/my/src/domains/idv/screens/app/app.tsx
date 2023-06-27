@@ -3,6 +3,9 @@ import styled, { css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React from 'react';
 
+import { REVIEW_AUTH_TOKEN } from '@/config/constants';
+
+import AppStoreReview from '../app-store-review';
 import Error from '../error';
 import Router from '../router';
 import ThemeProvider from './components/theme-provider';
@@ -29,7 +32,11 @@ const App = ({ linkingUrl, onLoad }: AppProps) => {
     return (
       <ThemeProvider authToken={data.authToken}>
         <Container onLayout={onLoad}>
-          <Router authToken={data.authToken} />
+          {data.authToken === REVIEW_AUTH_TOKEN ? (
+            <AppStoreReview authToken={data.authToken} />
+          ) : (
+            <Router authToken={data.authToken} />
+          )}
         </Container>
       </ThemeProvider>
     );

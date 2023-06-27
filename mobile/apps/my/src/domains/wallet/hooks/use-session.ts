@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER } from '@/config/constants';
 
 export type AuthHeaders = {
   'x-fp-authorization': string;

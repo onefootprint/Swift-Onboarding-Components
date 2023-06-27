@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER } from '@/config/constants';
 
 const getOnboardingStatus = async (payload: OnboardingStatusRequest) => {
   const response = await request<OnboardingStatusResponse>({

@@ -3,7 +3,7 @@ import { ConsentRequest, ConsentResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 
 const consent = async ({ consentLanguageText, authToken }: ConsentRequest) => {

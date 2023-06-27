@@ -1,8 +1,13 @@
 import request from '@onefootprint/request';
-import { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
+import {
+  IdDocType,
+  SubmitDocRequest,
+  SubmitDocResponse,
+  SubmitDocumentSide,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import AUTH_HEADER from '@/config/constants';
+import { AUTH_HEADER, REVIEW_AUTH_TOKEN } from '@/config/constants';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
   const {
@@ -13,6 +18,33 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     documentType,
     countryCode,
   } = payload;
+  if (authToken === REVIEW_AUTH_TOKEN) {
+    if (frontImage) {
+      return {
+        errors: [],
+        nextSideToCollect:
+          documentType === IdDocType.passport
+            ? SubmitDocumentSide.Selfie
+            : SubmitDocumentSide.Back,
+        isRetryLimitExceeded: false,
+      };
+    }
+    if (backImage) {
+      return {
+        errors: [],
+        nextSideToCollect: SubmitDocumentSide.Selfie,
+        isRetryLimitExceeded: false,
+      };
+    }
+    if (selfieImage) {
+      return {
+        errors: [],
+        nextSideToCollect: null,
+        isRetryLimitExceeded: false,
+      };
+    }
+  }
+
   const response = await request<SubmitDocResponse>({
     method: 'POST',
     url: '/hosted/user/document',
