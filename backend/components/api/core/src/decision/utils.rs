@@ -2,14 +2,11 @@ use std::sync::Arc;
 
 use db::{
     models::{
-        decision_intent::DecisionIntent,
-        manual_review::ManualReview,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
         vault::Vault,
         verification_request::VerificationRequest,
-        verification_result::VerificationResult,
     },
     PgConn,
 };
@@ -18,10 +15,9 @@ use newtypes::{
     VaultKind, VendorAPI,
 };
 
-use super::{sandbox, vendor};
+use super::sandbox;
 use crate::{
-    errors::{onboarding::OnboardingError, ApiError, ApiResult},
-    utils::vault_wrapper::VaultWrapper,
+    errors::{ApiError, ApiResult},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -96,88 +92,6 @@ pub fn decision_status_from_sandbox_id(sandbox_id: &str) -> FixtureDecision {
     } else {
         (DecisionStatus::Pass, false)
     }
-}
-
-#[tracing::instrument(skip_all)]
-pub async fn setup_kyc_test_fixtures(
-    state: &State,
-    ob_id: OnboardingId,
-    fixture_decision: FixtureDecision,
-) -> ApiResult<()> {
-    let (decision_status, create_manual_review) = fixture_decision;
-    state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let ob = Onboarding::lock(conn, &ob_id)?;
-            let (_, su, _, _) = Onboarding::get(conn, &ob.id)?;
-            if ob.idv_reqs_initiated_at.is_some() {
-                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-            }
-
-            // Create ManualReview row if requested
-            if create_manual_review {
-                ManualReview::create(conn, ob.id.clone(), vec![])?;
-            }
-
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &ob.scoped_vault_id)?;
-            // Create some mock verification request and results
-            let request = VerificationRequest::bulk_create(
-                conn,
-                ob.scoped_vault_id.clone(),
-                vec![VendorAPI::IdologyExpectID],
-                &decision_intent.id,
-            )?
-            .pop()
-            .ok_or(ApiError::ResourceNotFound)?;
-            let raw_response = idv::test_fixtures::idology_fake_data_expectid_response();
-
-            // Verification result response is encrypted
-            let uv = VerificationRequest::get_user_vault(conn.conn(), request.id.clone())?;
-            let e_response = vendor::verification_result::encrypt_verification_result_response(
-                &raw_response.clone().into(),
-                &uv.public_key,
-            )?;
-
-            // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
-            let result =
-                VerificationResult::create(conn, request.id, raw_response.into(), e_response, false)?;
-            // If the decision is a pass, mark all data as verified for the onboarding
-            let seqno = if decision_status == DecisionStatus::Pass {
-                let uvw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                let seqno = uvw.portablize_identity_data(conn)?;
-                Some(seqno)
-            } else {
-                None
-            };
-
-            // Create the decision itself
-            // TODO should we move the creation of the decision onto the locked UVW since we also
-            // commit the data there? Would dedupe this logic between tests + prod
-            let new_decision = OnboardingDecisionCreateArgs {
-                vault_id: su.vault_id.clone(),
-                onboarding: &ob,
-                logic_git_hash: crate::GIT_HASH.to_string(),
-                status: decision_status,
-                result_ids: vec![result.id],
-                annotation_id: None,
-                actor: DbActor::Footprint,
-                seqno,
-                workflow_id: None,
-            };
-            let decision = OnboardingDecision::create(conn, new_decision)?;
-
-            Onboarding::update(
-                ob,
-                conn,
-                OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
-            )?;
-            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-            RiskSignal::bulk_create(conn, decision.id, signals)?;
-            Ok(())
-        })
-        .await?;
-
-    Ok(())
 }
 
 #[tracing::instrument(skip_all)]

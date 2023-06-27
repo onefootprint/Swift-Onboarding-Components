@@ -414,47 +414,6 @@ pub async fn make_idv_request(
     Ok(vendor_response)
 }
 
-/// Make our requests to a vendor, building data from the cached VerificationRequest
-///
-/// A note on usage: Doc verification is different from other vendor requests in that we run the request synchronously in bifrost
-/// in order to communicate potential issues with the uploaded image back to the customer. Because of this,
-/// we have VerificationResults _before_ the decision engine would run
-#[tracing::instrument(skip(state))]
-pub async fn make_docv_request(
-    state: &State,
-    request: VerificationRequest,
-    onboarding_id: &OnboardingId,
-) -> Result<vendor_result::VendorResult, ApiError> {
-    let request_id = request.id.clone();
-    let requestid = request.id.clone();
-
-    let data = build_request::build_docv_data_for_submission_from_verification_request(
-        &state.db_pool,
-        &state.enclave_client,
-        request.clone(),
-    )
-    .await?;
-
-    let vendor_response = send_docv_request(state, request.clone(), onboarding_id, data).await?;
-
-    let vr = (request.clone(), vendor_response.clone());
-    let verification_result = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let uv = VerificationRequest::get_user_vault(conn, requestid)?;
-            verification_result::save_verification_result(conn, &vr, &uv.public_key)
-        })
-        .await??;
-
-    let result = vendor_result::VendorResult {
-        response: vendor_response,
-        verification_result_id: verification_result.id,
-        verification_request_id: request_id,
-    };
-
-    Ok(result)
-}
-
 pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
 

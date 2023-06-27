@@ -7,11 +7,6 @@ mod vendor_result;
 mod risk;
 
 #[allow(clippy::unwrap_used)]
-#[allow(clippy::expect_used)]
-#[cfg(test)]
-mod engine;
-
-#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod utils;
 
