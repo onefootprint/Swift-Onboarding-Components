@@ -6,7 +6,7 @@ import Form, { FormData } from './components/form';
 import useUsersVault from './hooks/use-users-vault';
 import { SecureFormProps } from './types';
 
-export const SecureForm = () => {
+const SecureForm = () => {
   const usersVaultMutation = useUsersVault();
 
   const props = useProps<SecureFormProps>();

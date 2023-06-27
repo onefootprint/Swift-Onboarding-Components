@@ -23,7 +23,7 @@ const Demo = ({ page }: DemoProps) => {
     setConfirmation(true);
   };
 
-  return (
+  return page ? (
     <>
       <Head>
         <title>{page.meta_title || 'Footprint Demo'}</title>
@@ -41,7 +41,7 @@ const Demo = ({ page }: DemoProps) => {
         </Typography>
       </Container>
     </>
-  );
+  ) : null;
 };
 
 const Container = styled.div`
