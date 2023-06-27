@@ -59,8 +59,9 @@ pub fn get_bifrost(
     } else {
         None
     };
+    let ff_client = state.feature_flag_client.clone();
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, appearance)),
+        api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, appearance, ff_client)),
     )))
 }
 
@@ -96,10 +97,13 @@ async fn get_list(
         .await??;
 
     let cursor = pagination.cursor_item(&state, &configs).map(|x| x.created_at);
+    let ff_client = state.feature_flag_client.clone();
     let configs = configs
         .into_iter()
         .take(page_size)
-        .map(|obc| api_wire_types::OnboardingConfiguration::from_db((obc, tenant.clone(), None)))
+        .map(|obc| {
+            api_wire_types::OnboardingConfiguration::from_db((obc, tenant.clone(), None, ff_client.clone()))
+        })
         .collect::<Vec<api_wire_types::OnboardingConfiguration>>();
     Ok(Json(CursorPaginatedResponse::ok(configs, cursor, Some(count))))
 }
@@ -124,6 +128,7 @@ async fn get_detail(
         .db_query(move |conn| ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live)))
         .await??;
 
-    let result = api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None));
+    let ff_client = state.feature_flag_client.clone();
+    let result = api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None, ff_client));
     ResponseData::ok(result).json()
 }

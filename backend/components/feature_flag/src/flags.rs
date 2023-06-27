@@ -35,6 +35,8 @@ pub enum BoolFlag<'a> {
     IsAlpacaTenant(&'a TenantId),
     #[strum(to_string = "RestrictToUsDriversLicense")]
     RestrictToUsDriversLicense(&'a TenantId),
+    #[strum(to_string = "IsAppClipEnabled")]
+    IsAppClipEnabled(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -60,6 +62,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateOnboardingWorkflows(k) => Some(k.to_string()),
             Self::IsAlpacaTenant(k) => Some(k.to_string()),
             Self::RestrictToUsDriversLicense(k) => Some(k.to_string()),
+            Self::IsAppClipEnabled(k) => Some(k.to_string()),
         }
     }
 
@@ -81,6 +84,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateOnboardingWorkflows(_) => false,
             Self::IsAlpacaTenant(_) => false,
             Self::RestrictToUsDriversLicense(_) => false,
+            Self::IsAppClipEnabled(_) => false,
         }
     }
 }

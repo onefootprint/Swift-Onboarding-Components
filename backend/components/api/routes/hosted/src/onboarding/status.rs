@@ -20,7 +20,8 @@ pub async fn get(
     let (met_requirements, requirements) = reqs.into_iter().partition(|r| r.is_met());
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant()?.clone();
-    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None));
+    let ff_client = state.feature_flag_client.clone();
+    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, ff_client));
 
     ResponseData::ok(OnboardingStatusResponse {
         requirements,
