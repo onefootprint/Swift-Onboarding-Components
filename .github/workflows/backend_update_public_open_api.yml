@@ -39,4 +39,4 @@ jobs:
       - name: Push files to Stoplight
         working-directory: ./backend/ci/out
         run: |
-          npx @stoplight/cli@5 push --ci-token ${{secrets.STOPLIGHT_TOKEN}}
+          npx @stoplight/cli@6 push --ci-token ${{secrets.STOPLIGHT_TOKEN}}
