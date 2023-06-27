@@ -89,7 +89,7 @@ pub async fn post(
                 &scoped_user.vault_id,
                 &scoped_user.id,
                 &obc,
-                insight_event,
+                Some(insight_event),
                 maybe_new_biz_keypair,
             )?;
 
@@ -129,7 +129,7 @@ pub fn get_or_start_onboarding(
     v_id: &VaultId,
     sv_id: &ScopedVaultId,
     obc: &ObConfiguration,
-    insight_event: CreateInsightEvent,
+    insight_event: Option<CreateInsightEvent>,
     maybe_new_biz_keypair: Option<(VaultPublicKey, EncryptedVaultPrivateKey)>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
 ) -> ApiResult<(Onboarding, Option<ScopedVault>)> {
     let user_vault = Vault::lock(conn, v_id)?;

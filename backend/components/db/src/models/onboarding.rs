@@ -37,7 +37,7 @@ pub struct Onboarding {
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub insight_event_id: InsightEventId,
+    pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
@@ -51,7 +51,7 @@ struct NewOnboarding {
     scoped_vault_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
-    insight_event_id: InsightEventId,
+    insight_event_id: Option<InsightEventId>,
     status: OnboardingStatus,
     workflow_id: Option<WorkflowId>,
 }
@@ -68,7 +68,7 @@ pub struct OnboardingUpdate {
 pub struct OnboardingCreateArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
-    pub insight_event: CreateInsightEvent,
+    pub insight_event: Option<CreateInsightEvent>,
 }
 
 impl OnboardingUpdate {
@@ -344,12 +344,16 @@ impl Onboarding {
         };
 
         // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
-        let insight_event = args.insight_event.insert_with_conn(conn)?;
+        let insight_event_id = if let Some(insight_event) = args.insight_event {
+            Some(insight_event.insert_with_conn(conn)?.id)
+        } else {
+            None
+        };
         let new_ob = NewOnboarding {
             scoped_vault_id: args.scoped_vault_id.clone(),
             ob_configuration_id: args.ob_configuration_id,
             start_timestamp: Utc::now(),
-            insight_event_id: insight_event.id,
+            insight_event_id,
             status: OnboardingStatus::Incomplete,
             workflow_id: wf.as_ref().map(|w| w.id.clone()),
         };

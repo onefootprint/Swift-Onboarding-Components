@@ -36,7 +36,7 @@ pub async fn post(
                 scoped_vault_id: user_auth.data.scoped_user.id,
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
-                insight_event_id: insight_event.id,
+                insight_event_id: Some(insight_event.id),
             }
             .insert(conn)?;
 

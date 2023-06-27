@@ -35,7 +35,7 @@ pub struct LivenessEvent {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub insight_event_id: InsightEventId,
+    pub insight_event_id: Option<InsightEventId>,
 }
 
 impl LivenessEvent {
@@ -43,13 +43,13 @@ impl LivenessEvent {
     pub fn get_by_user_vault_id(
         conn: &mut PgConn,
         vault_id: &VaultId,
-    ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
+    ) -> Result<Vec<(Self, Option<InsightEvent>)>, DbError> {
         use schema::insight_event;
         let results = liveness_event::table
-            .inner_join(insight_event::table)
             .inner_join(scoped_vault::table)
+            .left_join(insight_event::table)
             .filter(scoped_vault::vault_id.eq(vault_id))
-            .select((liveness_event::all_columns, insight_event::all_columns))
+            .select((liveness_event::all_columns, insight_event::all_columns.nullable()))
             .load(conn)?;
         Ok(results)
     }
@@ -60,15 +60,18 @@ impl LivenessEvent {
         fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> Result<Vec<(Self, InsightEvent)>, DbError> {
+    ) -> Result<Vec<(Self, Option<InsightEvent>)>, DbError> {
         use schema::insight_event;
         let results = liveness_event::table
-            .inner_join(insight_event::table)
             .inner_join(scoped_vault::table)
+            .left_join(insight_event::table)
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .select((liveness_event::all_columns, schema::insight_event::all_columns))
+            .select((
+                liveness_event::all_columns,
+                schema::insight_event::all_columns.nullable(),
+            ))
             .load(conn)?;
         Ok(results)
     }
@@ -96,7 +99,7 @@ pub struct NewLivenessEvent {
     pub scoped_vault_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
-    pub insight_event_id: InsightEventId,
+    pub insight_event_id: Option<InsightEventId>,
 }
 
 impl NewLivenessEvent {

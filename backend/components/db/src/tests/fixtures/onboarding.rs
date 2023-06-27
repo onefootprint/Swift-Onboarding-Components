@@ -16,7 +16,7 @@ pub fn create(
     let ob_args = OnboardingCreateArgs {
         scoped_vault_id,
         ob_configuration_id,
-        insight_event: CreateInsightEvent { ..Default::default() },
+        insight_event: Some(CreateInsightEvent { ..Default::default() }),
     };
 
     Onboarding::get_or_create(conn, ob_args, true).unwrap().0

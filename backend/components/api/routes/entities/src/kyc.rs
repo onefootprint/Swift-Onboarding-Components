@@ -89,7 +89,7 @@ pub async fn post(
                 &sv.vault_id,
                 &sv.id,
                 &obc,
-                insight_event,
+                Some(insight_event),
                 None, // currently dont support KYB for NPV
             )?;
             let ob_id = ob.id.clone();
@@ -108,7 +108,7 @@ pub async fn post(
                 scoped_vault_id: sv.id,
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
-                insight_event_id: InsightEvent::get_by_onboarding_id(conn, &ob.id)?.id,
+                insight_event_id: Some(InsightEvent::get_by_onboarding_id(conn, &ob.id)?.id),
             }
             .insert(conn)?;
 

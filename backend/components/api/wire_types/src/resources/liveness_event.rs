@@ -6,7 +6,7 @@ use crate::*;
 pub struct LivenessEvent {
     pub source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
-    pub insight_event: InsightEvent,
+    pub insight_event: Option<InsightEvent>,
 }
 
 export_schema!(LivenessEvent);

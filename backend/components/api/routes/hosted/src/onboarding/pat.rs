@@ -97,7 +97,7 @@ async fn authorize_privacy_pass(
                     ..Default::default()
                 }),
                 liveness_source: newtypes::LivenessSource::PrivacyPass,
-                insight_event_id: insight_event.id,
+                insight_event_id: Some(insight_event.id),
             }
             .insert(conn)?;
 

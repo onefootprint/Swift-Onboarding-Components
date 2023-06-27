@@ -24,7 +24,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 })
             }
             SaturatedTimelineEvent::Liveness(l, i) => {
-                Self::Liveness(api_wire_types::LivenessEvent::from_db((l, i)))
+                Self::Liveness(api_wire_types::LivenessEvent::from_db((l, Some(i))))
             }
             SaturatedTimelineEvent::IdentityDocumentUploaded((id_doc, doc_req)) => {
                 Self::IdentityDocumentUploaded(api_wire_types::IdentityDocumentTimelineEvent::from_db((

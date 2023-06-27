@@ -50,6 +50,17 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    backfill_vault_data_update (id) {
+        id -> Text,
+        old_e_data -> Bytea,
+        new_e_data -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     business_owner (id) {
         id -> Text,
         user_vault_id -> Nullable<Text>,
@@ -350,7 +361,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Text,
+        insight_event_id -> Nullable<Text>,
     }
 }
 
@@ -420,7 +431,7 @@ table! {
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Text,
+        insight_event_id -> Nullable<Text>,
         authorized_at -> Nullable<Timestamptz>,
         idv_reqs_initiated_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
@@ -998,6 +1009,7 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,
+    backfill_vault_data_update,
     business_owner,
     contact_info,
     custom_migration,

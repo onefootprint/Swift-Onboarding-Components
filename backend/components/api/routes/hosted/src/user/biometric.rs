@@ -231,7 +231,7 @@ pub async fn complete_post(
                         scoped_vault_id: su_id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: Some(attributes),
-                        insight_event_id: insight_event.id.clone(),
+                        insight_event_id: Some(insight_event.id.clone()),
                     }
                     .insert(conn)?
                 } else {
@@ -244,7 +244,7 @@ pub async fn complete_post(
                         scoped_vault_id: su_id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: None,
-                        insight_event_id: insight_event.id.clone(),
+                        insight_event_id: Some(insight_event.id.clone()),
                     }
                     .insert(conn)?
                 };

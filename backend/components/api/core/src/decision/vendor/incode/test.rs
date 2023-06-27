@@ -81,7 +81,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
-                UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note, false)?;
+                UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id.unwrap(), note, false)?;
             }
 
             Ok(db::tests::fixtures::identity_document::create(
@@ -312,7 +312,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
             if is_selfie {
                 let note = "I, Bob Boberto, consent to NOTHING".into();
-                UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id, note, false)?;
+                UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id.unwrap(), note, false)?;
             }
             let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
             assert!(!id_doc.images(conn)?.is_empty());
