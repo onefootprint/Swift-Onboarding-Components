@@ -10,7 +10,6 @@ config:
     containers:
       apiVersion: latest
       enclaveVersion: latest
-    deletionProtection: false
     domain:
       assets: i-dev.onefp.net
       base: dev.onefootprint.com
@@ -85,6 +84,10 @@ config:
       maxInstances: 4
       targetCpuUtilization: 70
       targetMemoryUtilization: 70
+    db:
+      deletionProtection: false
+      minAcus: 2
+      maxAcus: 16
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

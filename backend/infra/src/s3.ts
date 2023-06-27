@@ -27,7 +27,7 @@ function createDocumentImagesBucket(
   const bucket = new aws.s3.Bucket(
     bucketName,
     {
-      forceDestroy: !config.deletionProtection,
+      forceDestroy: !config.db.deletionProtection,
       bucket: bucketName,
       arn: `arn:aws:s3:::${bucketName}`,
       acl: 'private',
@@ -68,7 +68,7 @@ function createAssetsBucket(
   const bucket = new aws.s3.Bucket(
     bucketName,
     {
-      forceDestroy: !config.deletionProtection,
+      forceDestroy: !config.db.deletionProtection, // Weird to derive this from deletionProtection
       bucket: bucketName,
       arn: `arn:aws:s3:::${bucketName}`,
       website: {

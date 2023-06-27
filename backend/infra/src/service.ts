@@ -564,7 +564,7 @@ async function createAlbAccessLogsBucket(
   const bucket = new aws.s3.Bucket(
     bucketName,
     {
-      forceDestroy: !g.constants.deletionProtection,
+      forceDestroy: !g.constants.db.deletionProtection, // Weird to derive this from deletionProtection
       bucket: bucketName,
       arn: `arn:aws:s3:::${bucketName}`,
       acl: 'private',

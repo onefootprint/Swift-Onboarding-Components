@@ -7,6 +7,7 @@ import { Config } from './config';
 import { StaticSecrets } from './secrets';
 import { FootprintVpc, Vpc } from './vpc';
 import { EngineType } from '@pulumi/aws/rds';
+import { Database } from './config';
 import * as inputs from '@pulumi/aws/types';
 
 const DEFAULT_PG_PARAMETERS = [
@@ -33,10 +34,6 @@ const DEFAULT_PG_PARAMETERS = [
   },
 ];
 
-export type DbConfig = {
-  protectDeletion: boolean;
-};
-
 export type DatabaseOutput = {
   databaseUrl: pulumi.Output<string>;
   readOnlyDatabaseUrl: pulumi.Output<string>;
@@ -51,7 +48,7 @@ export async function CreateDB(
   provider: aws.Provider,
   clusterIdentifier: string,
   secretsStore: StaticSecrets,
-  dbConfig: DbConfig,
+  dbConfig: Database,
   coreSecurityGroups: CoreSecurityGroups,
   stackMetadata: StackMetadata,
 ): Promise<DatabaseOutput> {
@@ -124,14 +121,14 @@ export async function CreateDB(
     applyImmediately: true,
     snapshotIdentifier: await getSnapshotIdIfNeeded(clusterIdentifier),
     vpcSecurityGroupIds: [databaseSecurityGroup.id],
-    skipFinalSnapshot: !dbConfig.protectDeletion,
-    deletionProtection: dbConfig.protectDeletion,
+    skipFinalSnapshot: !dbConfig.deletionProtection,
+    deletionProtection: dbConfig.deletionProtection,
     restoreToPointInTime: await getRestorePointIfNeeded(),
     dbClusterParameterGroupName: clusterParameterGroupName,
     dbInstanceParameterGroupName: instanceParameterGroupName,
     serverlessv2ScalingConfiguration: {
-      maxCapacity: 16,
-      minCapacity: 2,
+      maxCapacity: dbConfig.maxAcus,
+      minCapacity: dbConfig.minAcus,
     },
     backupRetentionPeriod: 7,
   });

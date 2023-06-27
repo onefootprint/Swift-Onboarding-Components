@@ -1,5 +1,6 @@
 export interface Config {
   resources: Resources;
+  db: Database;
   domain: Domains;
   elastic: Elastic;
   enclave: Enclave;
@@ -10,7 +11,6 @@ export interface Config {
   s3: S3;
   sendgrid: Sendgrid;
   sentryUrl: string;
-  deletionProtection: boolean;
   airplane: Airplane;
 }
 
@@ -28,6 +28,12 @@ export interface Resources {
   maxInstances: number;
   targetCpuUtilization: number;
   targetMemoryUtilization: number;
+}
+
+export interface Database {
+  deletionProtection: boolean;
+  minAcus: number;
+  maxAcus: number;
 }
 
 export interface Elastic {

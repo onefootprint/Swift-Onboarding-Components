@@ -109,9 +109,7 @@ export default async function main() {
       provider,
       `db-${stackMetadata.shortStackName}`,
       secretsStore,
-      {
-        protectDeletion: constants.deletionProtection,
-      },
+      constants.db,
       coreSecurityGroups,
       stackMetadata,
     );
