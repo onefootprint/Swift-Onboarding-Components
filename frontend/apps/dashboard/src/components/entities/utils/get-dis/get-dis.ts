@@ -30,9 +30,6 @@ export const getDI = (target: string) => {
   if (target.startsWith('custom')) {
     return target;
   }
-  if (target.includes('.latest_upload')) {
-    return `di.${target.replace(`.latest_upload`, '')}`;
-  }
   return `di.${target}`;
 };
 

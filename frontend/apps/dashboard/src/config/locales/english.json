@@ -104,24 +104,24 @@
       },
       "drivers_license": {
         "front": {
-          "image": "Drivers license",
-          "latest_upload": "Drivers license",
-          "mime_type": "Drivers license MIME type"
+          "image": "Driver's license",
+          "latest_upload": "Driver's license",
+          "mime_type": "Driver's license MIME type"
         },
         "back": {
-          "image": "Drivers license back",
-          "latest_upload": "Drivers license back",
-          "mime_type": "Drivers license back MIME type"
+          "image": "Driver's license back",
+          "latest_upload": "Driver's license back",
+          "mime_type": "Driver's license back MIME type"
         },
         "selfie": {
           "image": "Selfie",
           "latest_upload": "Selfie",
           "mime_type": "Selfie MIME type"
         },
-        "number": "Drivers license number",
-        "expiration": "Drivers license expiration",
-        "dob": "Drivers license DOB",
-        "issuing_state": "Drivers license issuing state"
+        "number": "Driver's license number",
+        "expiration": "Driver's license expiration",
+        "dob": "Driver's license DOB",
+        "issuing_state": "Driver's license issuing state"
       }
     },
     "business": {

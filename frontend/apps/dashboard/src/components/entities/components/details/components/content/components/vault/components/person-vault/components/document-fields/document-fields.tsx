@@ -17,7 +17,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
   const fields = [
     {
       main: DocumentDI.latestIdCardFront,
-      label: t('document.id_card.front'),
+      label: t(DocumentDI.latestIdCardFront),
       dis: [
         DocumentDI.latestIdCardFront,
         DocumentDI.latestIdCardBack,
@@ -26,7 +26,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     },
     {
       main: DocumentDI.latestDriversLicenseFront,
-      label: t('document.drivers_license.front'),
+      label: t(DocumentDI.latestDriversLicenseFront),
       dis: [
         DocumentDI.latestDriversLicenseFront,
         DocumentDI.latestDriversLicenseBack,
@@ -35,7 +35,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     },
     {
       main: DocumentDI.latestPassport,
-      label: t('document.passport'),
+      label: t(DocumentDI.latestPassport),
       dis: [DocumentDI.latestPassport, DocumentDI.latestPassportSelfie],
     },
   ];
@@ -44,7 +44,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     <Box>
       {fields.map(field =>
         entity.attributes.includes(field.main) ? (
-          <Box key={field.label}>
+          <Box key={field.main}>
             {isVaultDataDecrypted(data?.[field.main]) ? (
               <DocumentField
                 label={field.label}

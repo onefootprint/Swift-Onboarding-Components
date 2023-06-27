@@ -63,11 +63,4 @@ describe('getDI', () => {
     const expected = 'custom.environment';
     expect(result).toEqual(expected);
   });
-
-  it('should remove latest upload from DI', () => {
-    const input = 'document.id_card.front.latest_upload';
-    const result = getDI(input);
-    const expected = 'di.document.id_card.front';
-    expect(result).toEqual(expected);
-  });
 });
