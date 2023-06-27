@@ -60,6 +60,7 @@ struct UpdateWatchlistCheck {
 impl WatchlistCheck {
     /// Deactivate the old completed WatchlistCheck for this user since we are only allowed to have
     /// one active, completed WatchlistCheck at a time
+    #[tracing::instrument("WatchlistCheck::deactivate_old", skip_all)]
     fn deactivate_old(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -74,7 +75,7 @@ impl WatchlistCheck {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WatchlistCheck::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         scoped_vault_id: ScopedVaultId,
@@ -108,7 +109,7 @@ impl WatchlistCheck {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WatchlistCheck::get_by_task_id", skip_all)]
     pub fn get_by_task_id(conn: &mut PgConn, task_id: &TaskId) -> DbResult<Option<Self>> {
         let res = watchlist_check::table
             .filter(watchlist_check::task_id.eq(task_id))
@@ -118,7 +119,7 @@ impl WatchlistCheck {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WatchlistCheck::update", skip_all)]
     pub fn update(
         self,
         conn: &mut TxnPgConn,
@@ -145,7 +146,7 @@ impl WatchlistCheck {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WatchlistCheck::get_billable_count", skip_all)]
     pub fn get_billable_count(
         conn: &mut PgConn,
         tenant_id: &TenantId,
@@ -168,6 +169,7 @@ impl WatchlistCheck {
     }
 
     // #[cfg(test)]
+    #[tracing::instrument("WatchlistCheck::_get_by_svid", skip_all)]
     pub fn _get_by_svid(conn: &mut PgConn, svid: &ScopedVaultId) -> DbResult<Self> {
         let res = watchlist_check::table
             .filter(watchlist_check::scoped_vault_id.eq(svid))
@@ -175,6 +177,7 @@ impl WatchlistCheck {
         Ok(res)
     }
 
+    #[tracing::instrument("WatchlistCheck::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&WatchlistCheckId>,
@@ -189,7 +192,7 @@ impl WatchlistCheck {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WatchlistCheck::get_overdue_scoped_vaults", skip_all)]
     pub fn get_overdue_scoped_vaults(conn: &mut PgConn, tenant_id: TenantId) -> DbResult<Vec<ScopedVaultId>> {
         let thirty_days_ago = Utc::now() - Duration::days(30);
 
@@ -233,6 +236,7 @@ impl WatchlistCheck {
     }
 
     #[cfg(test)]
+    #[tracing::instrument("WatchlistCheck::create_for_test", skip_all)]
     pub fn create_for_test(conn: &mut PgConn, new_watchlist_check: NewWatchlistCheck) -> DbResult<Self> {
         if let Some(completed_at) = new_watchlist_check.completed_at {
             Self::deactivate_old(conn, &new_watchlist_check.scoped_vault_id, completed_at)?;

@@ -36,7 +36,7 @@ pub struct NewFingerprintVisit {
 }
 impl FingerprintVisitEvent {
     #[allow(clippy::too_many_arguments)]
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("FingerprintVisitEvent::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         visitor_id: FingerprintVisitorId,

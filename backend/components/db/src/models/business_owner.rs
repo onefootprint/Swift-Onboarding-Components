@@ -35,7 +35,7 @@ struct NewBusinessOwnerRow {
 pub type UserData = (ScopedVault, Vault, Onboarding);
 
 impl BusinessOwner {
-    #[tracing::instrument(skip(conn))]
+    #[tracing::instrument("BusinessOwner::create_primary", skip_all)]
     pub fn create_primary(
         conn: &mut TxnPgConn,
         user_vault_id: VaultId,
@@ -53,6 +53,7 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    #[tracing::instrument("BusinessOwner::bulk_create_secondary", skip_all)]
     pub fn bulk_create_secondary(
         conn: &mut TxnPgConn,
         link_ids: Vec<BoLinkId>,
@@ -73,6 +74,7 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    #[tracing::instrument("BusinessOwner::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         bv_id: &VaultId,
@@ -96,6 +98,7 @@ impl BusinessOwner {
     }
 
     /// List the set of businesses belonging to this user onboarded onto the provided ob config
+    #[tracing::instrument("BusinessOwner::list_businesses", skip_all)]
     pub fn list_businesses(
         conn: &mut PgConn,
         uv_id: &VaultId,
@@ -116,6 +119,7 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    #[tracing::instrument("BusinessOwner::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &BoId) -> DbResult<Self> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))
@@ -123,6 +127,7 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    #[tracing::instrument("BusinessOwner::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &BoId) -> DbResult<Locked<Self>> {
         let result = business_owner::table
             .filter(business_owner::id.eq(id))
@@ -131,6 +136,7 @@ impl BusinessOwner {
         Ok(Locked::new(result))
     }
 
+    #[tracing::instrument("BusinessOwner::add_user_vault_id", skip_all)]
     pub fn add_user_vault_id(self, conn: &mut PgConn, user_vault_id: &VaultId) -> DbResult<Self> {
         // This should only happen inside of a Locked<Self>
         if self.user_vault_id.is_some() {

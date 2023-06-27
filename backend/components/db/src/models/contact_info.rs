@@ -28,6 +28,7 @@ pub struct NewContactInfoArgs {
 }
 
 impl ContactInfo {
+    #[tracing::instrument("ContactInfo::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut PgConn, new_rows: Vec<NewContactInfoArgs>) -> DbResult<Vec<Self>> {
         let results = diesel::insert_into(contact_info::table)
             .values(new_rows)
@@ -35,7 +36,7 @@ impl ContactInfo {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ContactInfo::mark_verified", skip_all)]
     pub fn mark_verified(conn: &mut PgConn, id: &ContactInfoId) -> DbResult<()> {
         diesel::update(contact_info::table)
             .filter(contact_info::id.eq(id))
@@ -44,7 +45,7 @@ impl ContactInfo {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ContactInfo::get", skip_all)]
     pub fn get(conn: &mut PgConn, lifetime_id: &DataLifetimeId) -> DbResult<Self> {
         let result = contact_info::table
             .filter(contact_info::lifetime_id.eq(lifetime_id))

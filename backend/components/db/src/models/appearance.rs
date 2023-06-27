@@ -19,6 +19,7 @@ pub struct Appearance {
 // We don't yet have codepaths to add appearances - we will just do it manually in the DB
 
 impl Appearance {
+    #[tracing::instrument("Appearance::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &AppearanceId, t_id: &TenantId) -> DbResult<Self> {
         let result = appearance::table
             .filter(appearance::id.eq(id))

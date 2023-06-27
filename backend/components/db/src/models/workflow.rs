@@ -34,7 +34,7 @@ pub struct NewWorkflow {
 }
 
 impl Workflow {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::insert", skip_all)]
     pub fn insert(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
         let res = diesel::insert_into(workflow::table)
             .values(new_workflow)
@@ -43,7 +43,7 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::create", skip_all)]
     pub fn create(conn: &mut PgConn, sv_id: &ScopedVaultId, config: WorkflowConfig) -> DbResult<Self> {
         let kind = config.kind();
         let initial_state = match kind {
@@ -62,7 +62,7 @@ impl Workflow {
         Self::insert(conn, new_workflow)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::get", skip_all)]
     pub fn get(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Self> {
         let res = workflow::table
             .filter(workflow::id.eq(workflow_id))
@@ -71,7 +71,7 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::get_bulk", skip_all)]
     pub fn get_bulk(conn: &mut PgConn, ids: Vec<WorkflowId>) -> DbResult<HashMap<WorkflowId, Self>> {
         let res = workflow::table
             .filter(workflow::id.eq_any(ids))
@@ -83,7 +83,7 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<Locked<Self>> {
         let result = workflow::table
             .filter(workflow::id.eq(id))
@@ -92,7 +92,7 @@ impl Workflow {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::update_state", skip_all)]
     pub fn update_state(
         conn: &mut TxnPgConn,
         workflow: Locked<Self>,
@@ -112,7 +112,7 @@ impl Workflow {
     }
 
     // TODO: maybe in future we have a concept of only 1 active workflow at a time and this queries for that instead
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Workflow::latest", skip_all)]
     pub fn latest(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))

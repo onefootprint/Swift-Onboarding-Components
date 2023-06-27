@@ -48,7 +48,7 @@ pub struct NewVaultDataRow {
 }
 
 impl VaultData {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VaultData::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
@@ -100,7 +100,7 @@ impl VaultData {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VaultData::bulk_get_by_id", skip_all)]
     pub fn bulk_get_by_id(conn: &mut PgConn, ids: &[VdId]) -> DbResult<Vec<Self>> {
         Ok(vault_data::table
             .filter(vault_data::id.eq_any(ids))
@@ -113,6 +113,7 @@ impl HasLifetime for VaultData {
         &self.lifetime_id
     }
 
+    #[tracing::instrument("VaultData::get_for", skip_all)]
     fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,

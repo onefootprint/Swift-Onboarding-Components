@@ -37,7 +37,7 @@ pub struct NewVerificationResult {
 }
 
 impl VerificationResult {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationResult::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         request_id: VerificationRequestId,
@@ -59,6 +59,7 @@ impl VerificationResult {
         Ok(result)
     }
 
+    #[tracing::instrument("VerificationResult::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut PgConn,
         new_verification_results: Vec<NewVerificationResult>,
@@ -69,7 +70,7 @@ impl VerificationResult {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationResult::get_successful_by_response_id", skip_all)]
     pub fn get_successful_by_response_id(
         conn: &mut PgConn,
         vendor_api: VendorAPI,

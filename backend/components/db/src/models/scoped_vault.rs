@@ -114,7 +114,7 @@ pub type SerializableEntity = (
 
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ScopedVault::get_or_create", skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
@@ -154,7 +154,7 @@ impl ScopedVault {
     }
 
     /// Used to create a ScopedUser for a non-portable vault
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ScopedVault::get_or_create_non_portable", skip_all)]
     pub fn get_or_create_non_portable(
         conn: &mut TxnPgConn,
         new_user: NewVaultArgs,
@@ -194,7 +194,7 @@ impl ScopedVault {
         Ok((su, uv.into_inner()))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ScopedVault::get", skip_all)]
     pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
         let mut query = scoped_vault::table.into_boxed();
 
@@ -228,7 +228,7 @@ impl ScopedVault {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ScopedVault::bulk_get_serializable_info", skip_all)]
     pub fn bulk_get_serializable_info(
         conn: &mut PgConn,
         ids: Vec<&ScopedVaultId>,

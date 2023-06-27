@@ -88,7 +88,7 @@ pub type SaturatedOnboardingDecisionInfo = (
 );
 
 impl OnboardingDecision {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("OnboardingDecision::create", skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
@@ -134,7 +134,7 @@ impl OnboardingDecision {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("OnboardingDecision::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
@@ -187,7 +187,7 @@ impl OnboardingDecision {
         Ok(result_map)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("OnboardingDecision::bulk_get_active", skip_all)]
     pub fn bulk_get_active(conn: &mut PgConn, onboarding_ids: &[OnboardingId]) -> DbResult<Vec<Self>> {
         let res = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq_any(onboarding_ids))
@@ -196,7 +196,7 @@ impl OnboardingDecision {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("OnboardingDecision::list_by_onboarding_id", skip_all)]
     pub fn list_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Vec<Self>> {
         let result = onboarding_decision::table
             .filter(onboarding_decision::onboarding_id.eq(onboarding_id))
@@ -205,7 +205,7 @@ impl OnboardingDecision {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("OnboardingDecision::latest_footprint_actor_decision", skip_all)]
     pub fn latest_footprint_actor_decision(
         conn: &mut PgConn,
         fp_id: &FpId,

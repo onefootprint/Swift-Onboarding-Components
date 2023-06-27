@@ -27,7 +27,7 @@ pub struct UpdateSession {
 }
 
 impl Session {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Session::get", skip_all)]
     pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<Session>, crate::DbError> {
         let session = session::table
             .filter(session::key.eq(key))
@@ -43,7 +43,7 @@ impl Session {
         Ok(session)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Session::update_or_create", skip_all)]
     pub fn update_or_create(
         conn: &mut PgConn,
         key: AuthTokenHash,
@@ -70,6 +70,7 @@ impl Session {
         Ok(session)
     }
 
+    #[tracing::instrument("Session::invalidate", skip_all)]
     pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> Result<(), crate::DbError> {
         let now = Utc::now();
         diesel::update(session::table)

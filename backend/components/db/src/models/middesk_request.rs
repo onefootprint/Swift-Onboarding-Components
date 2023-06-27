@@ -55,7 +55,7 @@ impl UpdateMiddeskRequest {
 }
 
 impl MiddeskRequest {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("MiddeskRequest::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         onboarding_id: OnboardingId,
@@ -76,7 +76,7 @@ impl MiddeskRequest {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("MiddeskRequest::update", skip_all)]
     pub fn update(conn: &mut PgConn, id: MiddeskRequestId, update: UpdateMiddeskRequest) -> DbResult<Self> {
         let res = diesel::update(middesk_request::table)
             .filter(middesk_request::id.eq(&id))
@@ -86,7 +86,7 @@ impl MiddeskRequest {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("MiddeskRequest::get_by_business_id", skip_all)]
     pub fn get_by_business_id(conn: &mut PgConn, business_id: String) -> DbResult<Self> {
         let res: MiddeskRequest = middesk_request::table
             .filter(middesk_request::business_id.eq(business_id))

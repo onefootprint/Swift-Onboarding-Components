@@ -64,7 +64,7 @@ impl TenantRole {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::get_immutable", skip_all)]
     pub fn get_immutable(conn: &mut PgConn, tenant_id: &TenantId, kind: ImmutableRoleKind) -> DbResult<Self> {
         let (name, scopes) = kind.props();
         let role = tenant_role::table
@@ -77,7 +77,7 @@ impl TenantRole {
     }
 
     /// Every tenant is created with an admin/read only role - this gets or creates that role
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::get_or_create_immutable", skip_all)]
     pub fn get_or_create_immutable(
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
@@ -100,7 +100,7 @@ impl TenantRole {
         Ok(role)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &TenantRoleId) -> DbResult<Self> {
         let role = tenant_role::table
             .filter(tenant_role::id.eq(id))
@@ -108,7 +108,7 @@ impl TenantRole {
         Ok(role)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         tenant_id: TenantId,
@@ -139,7 +139,7 @@ impl TenantRole {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::lock_active", skip_all)]
     pub fn lock_active(
         conn: &mut TxnPgConn,
         id: &TenantRoleId,
@@ -156,7 +156,7 @@ impl TenantRole {
         Ok(Locked::new(role))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::deactivate", skip_all)]
     pub fn deactivate(conn: &mut TxnPgConn, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
         use crate::schema::{tenant_api_key, tenant_rolebinding};
         let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
@@ -199,7 +199,7 @@ impl TenantRole {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
@@ -258,7 +258,7 @@ impl TenantRole {
         query
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::list_active", skip_all)]
     pub fn list_active(
         conn: &mut PgConn,
         filters: &TenantRoleListFilters,
@@ -305,7 +305,7 @@ impl TenantRole {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRole::count_active", skip_all)]
     pub fn count_active(conn: &mut PgConn, filters: &TenantRoleListFilters) -> DbResult<i64> {
         let query = Self::list_active_query(filters);
         let count = query.count().get_result(conn)?;

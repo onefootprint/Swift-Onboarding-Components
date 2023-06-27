@@ -40,7 +40,7 @@ impl DocumentUpload {
     /// Max number attempts to upload a given side before we fail the document request
     pub const MAX_ATTEMPTS_PER_SIDE: i64 = 5;
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentUpload::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         document_id: IdentityDocumentId,
@@ -65,6 +65,7 @@ impl DocumentUpload {
         Ok(result)
     }
 
+    #[tracing::instrument("DocumentUpload::deactivate", skip_all)]
     pub fn deactivate(
         conn: &mut TxnPgConn,
         document_id: &IdentityDocumentId,
@@ -80,6 +81,7 @@ impl DocumentUpload {
 
     /// Count how many deactivated (= failed) attempts there were to upload each side of the
     /// provided document
+    #[tracing::instrument("DocumentUpload::count_failed_attempts", skip_all)]
     pub fn count_failed_attempts(
         conn: &mut PgConn,
         document_id: &IdentityDocumentId,

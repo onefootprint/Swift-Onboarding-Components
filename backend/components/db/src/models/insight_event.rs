@@ -67,7 +67,7 @@ pub struct CreateInsightEvent {
 }
 
 impl CreateInsightEvent {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("CreateInsightEvent::insert_with_conn", skip_all)]
     pub fn insert_with_conn(self, conn: &mut PgConn) -> Result<InsightEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::insight_event::table)
             .values(self)
@@ -77,7 +77,7 @@ impl CreateInsightEvent {
 }
 
 impl InsightEvent {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("InsightEvent::get_by_onboarding_id", skip_all)]
     pub fn get_by_onboarding_id(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,

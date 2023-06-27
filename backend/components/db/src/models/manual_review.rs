@@ -46,7 +46,7 @@ struct ManualReviewUpdate {
 }
 
 impl ManualReview {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ManualReview::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         onboarding_id: OnboardingId,
@@ -66,7 +66,7 @@ impl ManualReview {
     }
 
     /// Used to mark the manual review as complete
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ManualReview::complete", skip_all)]
     pub fn complete<T>(
         self,
         conn: &mut TxnPgConn,
@@ -92,7 +92,7 @@ impl ManualReview {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ManualReview::find_completed", skip_all)]
     pub fn find_completed(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,
@@ -108,6 +108,7 @@ impl ManualReview {
         Ok(res)
     }
 
+    #[tracing::instrument("ManualReview::get_active_for_onboarding", skip_all)]
     pub fn get_active_for_onboarding(conn: &mut PgConn, ob_id: &OnboardingId) -> DbResult<Option<Self>> {
         let result = manual_review::table
             .filter(manual_review::onboarding_id.eq(ob_id))

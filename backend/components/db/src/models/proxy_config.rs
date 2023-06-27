@@ -180,7 +180,7 @@ pub type DbProxyConfigAll = (
 
 impl ProxyConfig {
     /// create a new proxy config along with other config tables
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ProxyConfig::create_new", skip_all)]
     pub fn create_new(conn: &mut TxnPgConn, args: NewProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
         let NewProxyConfigArgs {
             tenant_id,
@@ -277,7 +277,7 @@ impl ProxyConfig {
     }
 
     /// updates an existing proxy configuration
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ProxyConfig::update", skip_all)]
     pub fn update(conn: &mut TxnPgConn, args: UpdateProxyConfigArgs) -> DbResult<DbProxyConfigAll> {
         let UpdateProxyConfigArgs {
             tenant_id,
@@ -413,7 +413,7 @@ impl ProxyConfig {
         Ok((proxy_config, headers, secret_headers, server_certs, ingress_rules))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ProxyConfig::list", skip_all)]
     pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
         let result = proxy_config::table
             .filter(proxy_config::tenant_id.eq(tenant_id))
@@ -425,7 +425,7 @@ impl ProxyConfig {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ProxyConfig::find", skip_all)]
     pub fn find(
         conn: &mut PgConn,
         tenant_id: &TenantId,
@@ -456,7 +456,7 @@ impl ProxyConfig {
     }
 
     /// updates an existing proxy configuration
-    #[tracing::instrument(skip(conn))]
+    #[tracing::instrument("ProxyConfig::deactivate", skip_all)]
     pub fn deactivate(
         conn: &mut TxnPgConn,
         proxy_config_id: ProxyConfigId,

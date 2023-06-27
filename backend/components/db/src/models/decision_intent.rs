@@ -25,7 +25,7 @@ struct NewDecisionIntent {
 }
 
 impl DecisionIntent {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DecisionIntent::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         kind: DecisionIntentKind,
@@ -42,7 +42,7 @@ impl DecisionIntent {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DecisionIntent::get_or_create_for_kind", skip_all)]
     fn get_or_create_for_kind(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -71,7 +71,7 @@ impl DecisionIntent {
         Ok(new_di)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyc", skip_all)]
     pub fn get_or_create_onboarding_kyc(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -79,7 +79,7 @@ impl DecisionIntent {
         Self::get_or_create_for_kind(conn, scoped_vault_id, DecisionIntentKind::OnboardingKyc)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyb", skip_all)]
     pub fn get_or_create_onboarding_kyb(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,

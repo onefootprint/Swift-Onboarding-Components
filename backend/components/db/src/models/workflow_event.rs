@@ -27,7 +27,7 @@ pub struct NewWorkflowEvent {
 }
 
 impl WorkflowEvent {
-    #[tracing::instrument(skip(conn))]
+    #[tracing::instrument("WorkflowEvent::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         workflow_id: WorkflowId,
@@ -48,7 +48,7 @@ impl WorkflowEvent {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("WorkflowEvent::list_for_workflow", skip_all)]
     pub fn list_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Vec<Self>> {
         let results = workflow_event::table
             .filter(workflow_event::workflow_id.eq(workflow_id))

@@ -34,7 +34,7 @@ pub struct NewUserConsent {
 }
 
 impl UserConsent {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserConsent::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         timestamp: DateTime<Utc>,
@@ -58,7 +58,7 @@ impl UserConsent {
         Ok(new_user_consent)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserConsent::latest_for_onboarding", skip_all)]
     pub fn latest_for_onboarding(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,

@@ -27,7 +27,7 @@ struct NewTenantApiKeyAccessLog {
 }
 
 impl TenantApiKeyAccessLog {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKeyAccessLog::create", skip_all)]
     pub fn create(conn: &mut PgConn, tenant_api_key_id: TenantApiKeyId) -> Result<(), DbError> {
         let access_log = NewTenantApiKeyAccessLog {
             tenant_api_key_id,
@@ -39,7 +39,7 @@ impl TenantApiKeyAccessLog {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKeyAccessLog::get", skip_all)]
     pub fn get(
         conn: &mut PgConn,
         tenant_api_key_ids: Vec<&TenantApiKeyId>,

@@ -104,7 +104,7 @@ impl Tenant {
             }
         }
     }
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table
             .for_no_key_update()
@@ -113,7 +113,7 @@ impl Tenant {
         Ok(tenant)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::get", skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<TenantIdentifier<'a>>,
@@ -122,7 +122,7 @@ impl Tenant {
         Ok(tenant)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::list_live", skip_all)]
     pub fn list_live(conn: &mut PgConn) -> DbResult<Vec<Self>> {
         let results = tenant::table
             .filter(tenant::sandbox_restricted.eq(false))
@@ -132,7 +132,7 @@ impl Tenant {
 
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::create", skip_all)]
     pub fn create<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
@@ -144,7 +144,7 @@ impl Tenant {
         Ok(tenant)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::update", skip_all)]
     pub fn update(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
@@ -154,7 +154,7 @@ impl Tenant {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Tenant::list_by_user_vault_id", skip_all)]
     pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(vault_id))

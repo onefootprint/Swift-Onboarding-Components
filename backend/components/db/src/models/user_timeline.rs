@@ -76,7 +76,7 @@ pub struct UserTimelineInfo(
 );
 
 impl UserTimeline {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserTimeline::create", skip_all)]
     pub fn create<T>(
         conn: &mut PgConn,
         event: T,
@@ -102,7 +102,7 @@ impl UserTimeline {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserTimeline::bulk_portablize", skip_all)]
     pub fn bulk_portablize(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -116,7 +116,7 @@ impl UserTimeline {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserTimeline::list", skip_all)]
     pub fn list<'a, T>(
         conn: &mut PgConn,
         scoped_vault_id: T,
@@ -286,7 +286,7 @@ impl UserTimeline {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("UserTimeline::get_by_event_data_id", skip_all)]
     pub fn get_by_event_data_id(conn: &mut PgConn, id: String) -> DbResult<Option<Self>> {
         let res = user_timeline::table
             .filter(

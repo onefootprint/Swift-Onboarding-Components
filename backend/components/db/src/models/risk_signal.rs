@@ -33,7 +33,7 @@ pub struct NewRiskSignal {
 }
 
 impl RiskSignal {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut PgConn,
         onboarding_decision_id: OnboardingDecisionId,
@@ -76,7 +76,7 @@ impl RiskSignal {
             .into_boxed()
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("RiskSignal::get", skip_all)]
     pub fn get(
         conn: &mut PgConn,
         id: &RiskSignalId,
@@ -108,7 +108,7 @@ impl RiskSignal {
         Ok((signal, vrs))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("RiskSignal::list_by_onboarding_decision_id", skip_all)]
     pub fn list_by_onboarding_decision_id(
         conn: &mut PgConn,
         onboarding_decision_id: &OnboardingDecisionId,

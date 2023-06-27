@@ -47,7 +47,7 @@ pub struct NewDocumentData {
 }
 
 impl DocumentData {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentData::create", skip_all)]
     #[allow(clippy::too_many_arguments)]
     pub fn create(
         conn: &mut TxnPgConn,
@@ -78,24 +78,7 @@ impl DocumentData {
         Ok(res)
     }
 
-    // TODO: query by DLId's and call from vdbuilder
-    #[tracing::instrument(skip_all)]
-    pub fn latest_for_scoped_vault(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Option<Self>> {
-        let res = document_data::table
-            .inner_join(data_lifetime::table)
-            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
-            .order_by(document_data::_created_at.desc())
-            .select(document_data::all_columns)
-            .first(conn)
-            .optional()?;
-
-        Ok(res)
-    }
-
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentData::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&DocumentDataId>,
@@ -110,7 +93,7 @@ impl DocumentData {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentData::bulk_get_by_lifetime_ids", skip_all)]
     pub fn bulk_get_by_lifetime_ids(
         conn: &mut PgConn,
         ids: Vec<&DataLifetimeId>,
@@ -138,6 +121,7 @@ impl HasLifetime for DocumentData {
         &self.lifetime_id
     }
 
+    #[tracing::instrument("DocumentData::get_for", skip_all)]
     fn get_for(conn: &mut PgConn, lifetime_ids: &[DataLifetimeId]) -> DbResult<Vec<Self>>
     where
         Self: Sized,

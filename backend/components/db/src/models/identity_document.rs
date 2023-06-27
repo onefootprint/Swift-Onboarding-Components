@@ -60,7 +60,7 @@ pub struct IdentityDocumentUpdate {
 }
 
 impl IdentityDocument {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IdentityDocument::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
         let existing_doc = identity_document::table
             .filter(identity_document::request_id.eq(&args.request_id))
@@ -89,7 +89,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IdentityDocument::update", skip_all)]
     pub fn update(
         conn: &mut PgConn,
         id: &IdentityDocumentId,
@@ -104,7 +104,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IdentityDocument::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
         let res = identity_document::table
             .filter(identity_document::id.eq(id))
@@ -115,7 +115,7 @@ impl IdentityDocument {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IdentityDocument::get_bulk_with_requests", skip_all)]
     pub fn get_bulk_with_requests(
         conn: &mut PgConn,
         ids: Vec<&IdentityDocumentId>,
@@ -132,7 +132,7 @@ impl IdentityDocument {
     }
 
     /// Get all the documents collected for a given onboarding
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IdentityDocument::list", skip_all)]
     pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(document_request::table)
@@ -143,6 +143,7 @@ impl IdentityDocument {
         Ok(results)
     }
 
+    #[tracing::instrument("IdentityDocument::images", skip_all)]
     pub fn images(&self, conn: &mut PgConn) -> DbResult<Vec<DocumentUpload>> {
         let results = document_upload::table
             .filter(document_upload::document_id.eq(&self.id))

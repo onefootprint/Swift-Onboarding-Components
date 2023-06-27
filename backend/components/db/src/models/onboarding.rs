@@ -188,7 +188,7 @@ pub type BasicOnboardingInfo<ObT = Onboarding> =
     (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
 
 impl Onboarding {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::get", skip_all)]
     pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo>
     where
         T: Into<OnboardingIdentifier<'a>>,
@@ -251,7 +251,7 @@ impl Onboarding {
 
     // Generally we need to query by scoped vault AND user vault in authed endpoints,
     // to prove ownership, so this is broken out
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::get_by_scoped_vault_internal_lookup_only", skip_all)]
     pub fn get_by_scoped_vault_internal_lookup_only(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -263,7 +263,7 @@ impl Onboarding {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::lock_for_tenant", skip_all)]
     pub fn lock_for_tenant(
         conn: &mut TxnPgConn,
         fp_id: &FpId,
@@ -286,7 +286,7 @@ impl Onboarding {
         Ok((Locked::new(result.0), result.1, result.2, result.3))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &OnboardingId) -> DbResult<Locked<Self>> {
         let result = onboarding::table
             .filter(onboarding::id.eq(id))
@@ -295,7 +295,7 @@ impl Onboarding {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::bulk_get_for_users", skip_all)]
     pub fn bulk_get_for_users(
         conn: &mut PgConn,
         scoped_vault_ids: Vec<&ScopedVaultId>,
@@ -313,7 +313,7 @@ impl Onboarding {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::get_or_create", skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         args: OnboardingCreateArgs,
@@ -364,7 +364,7 @@ impl Onboarding {
         Ok((ob, IsNew::Yes(wf)))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::update", skip_all)]
     pub fn update(ob: Locked<Onboarding>, conn: &mut TxnPgConn, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
 
@@ -424,7 +424,7 @@ impl Onboarding {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Onboarding::get_billable_count", skip_all)]
     pub fn get_billable_count(
         conn: &mut PgConn,
         tenant_id: &TenantId,

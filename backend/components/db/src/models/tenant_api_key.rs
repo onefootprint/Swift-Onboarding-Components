@@ -95,7 +95,7 @@ impl TenantApiKey {
         query
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         filters: &ApiKeyListFilters,
@@ -116,13 +116,13 @@ impl TenantApiKey {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::count", skip_all)]
     pub fn count(conn: &mut PgConn, filters: &ApiKeyListFilters) -> DbResult<i64> {
         let count = Self::list_query(filters).count().get_result(conn)?;
         Ok(count)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::get", skip_all)]
     pub fn get<'a, T: Into<TenantApiKeyIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,
@@ -146,7 +146,7 @@ impl TenantApiKey {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::get_enabled", skip_all)]
     pub fn get_enabled(
         conn: &mut PgConn,
         sh_api_key: Fingerprint,
@@ -170,7 +170,7 @@ impl TenantApiKey {
         Ok((api_key, tenant, role))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         name: String,
@@ -210,7 +210,7 @@ impl TenantApiKey {
         Ok(tenant_api_key)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantApiKey::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         id: TenantApiKeyId,

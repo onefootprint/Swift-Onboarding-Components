@@ -49,7 +49,7 @@ pub struct NewFingerprint {
 pub type IsUnique = bool;
 pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
 impl Fingerprint {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Fingerprint::create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         fingerprints: Vec<NewFingerprint>,
@@ -71,7 +71,7 @@ impl Fingerprint {
         Ok(duplicates)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Fingerprint::bulk_check_if_exists", skip_all)]
     fn bulk_check_if_exists(
         conn: &mut PgConn,
         sh_datas: Vec<FingerprintData>,
@@ -87,6 +87,7 @@ impl Fingerprint {
     }
 
     // for tests
+    #[tracing::instrument("Fingerprint::_list_for_scoped_vault", skip_all)]
     pub fn _list_for_scoped_vault(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let results = fingerprint::table
             .inner_join(data_lifetime::table)

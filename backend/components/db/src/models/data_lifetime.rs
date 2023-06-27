@@ -115,7 +115,7 @@ impl DataLifetime {
     /// Uniquely, writes made to a sequence are never undone, even if the transaction that made the
     /// write ends up rolling back. Because of this, multiple concurrently running transactions can
     /// fetch the next value from a sequence without creating an observable throughput bottleneck.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::get_next_seqno", skip_all)]
     pub fn get_next_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
@@ -124,7 +124,7 @@ impl DataLifetime {
     /// Gets the current sequence number for the lifetime table without incrementing. Should be used
     /// when taking a snapshot
     /// This DOES NOT give you the latest sequence number used in the current transaction.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::get_current_seqno", skip_all)]
     pub fn get_current_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::sql_query("SELECT last_value FROM data_lifetime_seqno".to_owned())
             .get_result::<PgSequence>(conn)?;
@@ -132,7 +132,7 @@ impl DataLifetime {
     }
 
     /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::bulk_create", skip_all)]
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
@@ -157,7 +157,7 @@ impl DataLifetime {
     }
 
     /// Creates a single new DataLifetime row
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::create", skip_all)]
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
@@ -172,7 +172,7 @@ impl DataLifetime {
         Ok(lifetime)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::portablize", skip_all)]
     pub fn portablize(conn: &mut PgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
@@ -188,7 +188,7 @@ impl DataLifetime {
 
     /// Marks a list of DataLifetimes as portable for a specific (user, tenant). Used to commit
     /// speculative data and make it portable after it is verified by an approved onboarding
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::bulk_portablize_for_tenant", skip_all)]
     pub fn bulk_portablize_for_tenant(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
@@ -212,7 +212,7 @@ impl DataLifetime {
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
     /// NOTE: this may deactivate portablized data. When deactivating portablized data, should
     /// generally only do when replacing with other portablized data
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
     pub fn bulk_deactivate(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
@@ -233,7 +233,7 @@ impl DataLifetime {
 
     /// Deactivates the speculative DataLifetimes with the provided kinds associated with this (user, tenant).
     /// This should only be used when replacing speculative, un-committed user data with new speculative user data
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::bulk_deactivate_speculativbe", skip_all)]
     pub fn bulk_deactivate_speculative(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -261,7 +261,7 @@ impl DataLifetime {
     /// A piece of user data is visible if it is (1) portable and (2) not deactivated.
     /// A piece of user data is also visible _to a specific tenant_ if the tenant added the data,
     /// whether or not the data is portable.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::get_active", skip_all)]
     pub fn get_active(
         conn: &mut PgConn,
         vault_id: &VaultId,
@@ -290,7 +290,7 @@ impl DataLifetime {
 
     /// Get the list of currently active DataLifetimeIds for the provided tenant_id and list
     /// of vault_ids.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::get_active_for_tenant", skip_all)]
     pub fn get_bulk_active_for_tenant(
         conn: &mut PgConn,
         vault_ids: Vec<&VaultId>,
@@ -346,7 +346,7 @@ impl DataLifetime {
 
     /// Get the list of currently active DataLifetimeIds for the provided (vault_id, scoped_vault_id)
     /// at a given seqno. This allows reconstructing a snapshot of what a user vault looked like at a time.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DataLifetime::get_active_at", skip_all)]
     pub fn get_active_at(
         conn: &mut PgConn,
         vault_id: &VaultId,

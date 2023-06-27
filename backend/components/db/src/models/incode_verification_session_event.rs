@@ -35,7 +35,7 @@ pub struct NewIncodeVerificationSessionEvent {
 }
 
 impl IncodeVerificationSessionEvent {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IncodeVerificationSessionEvent::get", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         incode_verification_session_id: IncodeVerificationSessionId,
@@ -60,7 +60,7 @@ impl IncodeVerificationSessionEvent {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IncodeVerificationSessionEvent::get_for_session_id", skip_all)]
     pub fn get_for_session_id(
         conn: &mut PgConn,
         session_id: &IncodeVerificationSessionId,

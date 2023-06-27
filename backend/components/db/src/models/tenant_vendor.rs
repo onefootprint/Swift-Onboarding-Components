@@ -36,7 +36,7 @@ struct NewTenantVendorControl {
 }
 
 impl TenantVendorControl {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantVendorControl::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         tenant_id: TenantId,
@@ -62,7 +62,7 @@ impl TenantVendorControl {
         Ok(tvc)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantVendorControl::get", skip_all)]
     pub fn get(conn: &mut PgConn, tenant_id: TenantId) -> Result<Option<Self>, crate::DbError> {
         let control: Option<Self> = tenant_vendor_control::table
             .filter(tenant_vendor_control::tenant_id.eq(tenant_id))

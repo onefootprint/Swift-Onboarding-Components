@@ -44,9 +44,11 @@ struct NewVerificationRequestRow {
     scoped_vault_id: ScopedVaultId,
     decision_intent_id: Option<DecisionIntentId>,
 }
+
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
+
 impl VerificationRequest {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationRequest::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
@@ -72,7 +74,7 @@ impl VerificationRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationRequest::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -89,6 +91,7 @@ impl VerificationRequest {
         .ok_or(crate::DbError::ObjectNotFound)
     }
 
+    #[tracing::instrument("VerificationRequest::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Self> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
@@ -98,7 +101,10 @@ impl VerificationRequest {
     }
 
     /// Based on VerificationRequests for the onboarding, get VerificationResults
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument(
+        "VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user",
+        skip_all
+    )]
     pub fn get_latest_requests_and_successful_results_for_scoped_user(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
@@ -122,7 +128,7 @@ impl VerificationRequest {
         Ok(req_and_res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationRequest::create_document_verification_request", skip_all)]
     pub fn create_document_verification_request(
         conn: &mut PgConn,
         vendor_api: VendorAPI,
@@ -146,7 +152,7 @@ impl VerificationRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationRequest::get_user_vault", skip_all)]
     pub fn get_user_vault(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Vault> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
@@ -158,7 +164,7 @@ impl VerificationRequest {
     }
 
     /// Get the list of VReqs for a given DI, including the VRes for each VReq if it exists
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VerificationRequest::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         decision_intent_id: &DecisionIntentId,

@@ -51,7 +51,7 @@ pub struct DocRequestIdentifier<'a> {
 }
 
 impl DocumentRequest {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
         let NewDocumentRequestArgs {
             scoped_vault_id,
@@ -77,7 +77,7 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::lock_active", skip_all)]
     pub fn lock_active(conn: &mut TxnPgConn, id: DocRequestIdentifier) -> DbResult<Locked<Self>> {
         let doc = Self::get_active(conn, id)?.ok_or(crate::DbError::ObjectNotFound)?;
         // Can't use into_boxed with locks
@@ -89,7 +89,7 @@ impl DocumentRequest {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::get_active", skip_all)]
     pub fn get_active(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
         let mut query = document_request::table
             .filter(document_request::status.eq(DocumentRequestStatus::Pending))
@@ -110,7 +110,7 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::get", skip_all)]
     pub fn get(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let result = document_request::table
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
@@ -120,14 +120,14 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::update", skip_all)]
     pub fn update(self, conn: &mut PgConn, update: DocumentRequestUpdate) -> DbResult<Self> {
         // Intentionally consume self so the stale version is not used
         let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::update_by_id", skip_all)]
     pub fn update_by_id(
         conn: &mut PgConn,
         id: &DocumentRequestId,
@@ -140,7 +140,7 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::count_statuses", skip_all)]
     pub fn count_statuses(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -154,7 +154,7 @@ impl DocumentRequest {
         Ok(num_status)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::lock", skip_all)]
     pub fn lock(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -168,7 +168,7 @@ impl DocumentRequest {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("DocumentRequest::get_latest_complete", skip_all)]
     pub fn get_latest_complete(
         conn: &mut PgConn,
         sv_id: ScopedVaultId,

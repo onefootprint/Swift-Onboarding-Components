@@ -44,7 +44,7 @@ pub struct TaskUpdate {
 }
 
 impl Task {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Task::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         scheduled_for: DateTime<Utc>,
@@ -63,7 +63,7 @@ impl Task {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Task::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut PgConn, args: Vec<TaskCreateArgs>) -> DbResult<Vec<Self>> {
         let new_tasks: Vec<NewTask> = args
             .into_iter()
@@ -81,7 +81,7 @@ impl Task {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Task::poll", skip_all)]
     pub fn poll(conn: &mut TxnPgConn, limit: i64, kind: Option<TaskKind>) -> DbResult<Vec<Self>> {
         // TODO: cannot for the life of me get this to compile in diesel
         let results = sql_query(format!(
@@ -109,7 +109,7 @@ impl Task {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Task::update", skip_all)]
     pub fn update(conn: &mut PgConn, id: &TaskId, status: TaskStatus) -> DbResult<Self> {
         let task_update = TaskUpdate { status };
         let result = diesel::update(task::table)
@@ -119,7 +119,7 @@ impl Task {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Task::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, task_id: &TaskId) -> DbResult<Locked<Self>> {
         let result = task::table
             .filter(task::id.eq(task_id))
@@ -129,6 +129,7 @@ impl Task {
     }
 
     // Currently only used for Tests! pretend there is #[cfg(test)] here!!
+    #[tracing::instrument("Task::_bulk_delete_for_tests", skip_all)]
     pub fn _bulk_delete_for_tests(conn: &mut PgConn, ids: Vec<&TaskId>) -> DbResult<usize> {
         let cnt = diesel::delete(task::table.filter(task::id.eq_any(ids))).execute(conn)?;
         Ok(cnt)

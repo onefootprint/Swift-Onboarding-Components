@@ -51,7 +51,7 @@ impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<
 impl TenantRolebinding {
     /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
     /// associate the TenantUser with the provided role
-    #[tracing::instrument(skip(conn))]
+    #[tracing::instrument("TenantRolebinding::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
@@ -89,7 +89,7 @@ impl TenantRolebinding {
 
     /// Get the list of active TenantRolebindingIds for the provided user.
     /// Could be multiple if a user has been invited to multiple tenants.
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::list_by_user", skip_all)]
     pub fn list_by_user(
         conn: &mut PgConn,
         user_id: &TenantUserId,
@@ -106,7 +106,7 @@ impl TenantRolebinding {
 
     /// Fetches TenantUserInfo when logging them in via a workos auth token, and
     /// validates invariants for the TenantUser
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::get", skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<TenantUserInfo>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
@@ -156,7 +156,7 @@ impl TenantRolebinding {
     }
 
     /// Log into a given TenantRolebinding
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::login", skip_all)]
     pub fn login<'a, T>(conn: &mut TxnPgConn, id: T) -> DbResult<(TenantUserInfo, IsFirstLogin)>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
@@ -173,7 +173,7 @@ impl TenantRolebinding {
         Ok(((user, rb, role, tenant), is_first_login))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::update", skip_all)]
     pub fn update<'a, T>(conn: &mut TxnPgConn, id: T, update: TenantRolebindingUpdate) -> DbResult<Self>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
@@ -201,7 +201,7 @@ impl TenantRolebinding {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::count", skip_all)]
     pub fn count(conn: &mut PgConn, filters: &TenantRolebindingFilters) -> DbResult<i64> {
         // Apply filters. TODO share these with list
         let mut query = tenant_user::table
@@ -235,7 +235,7 @@ impl TenantRolebinding {
         Ok(count)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("TenantRolebinding::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         filters: &TenantRolebindingFilters,

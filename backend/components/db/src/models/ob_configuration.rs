@@ -101,7 +101,7 @@ impl ObConfiguration {
             .into_boxed()
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         query: &ObConfigurationQuery,
@@ -119,13 +119,13 @@ impl ObConfiguration {
         Ok(results)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::count", skip_all)]
     pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::get", skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
@@ -151,7 +151,7 @@ impl ObConfiguration {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where
         T: Into<ObConfigIdentifier<'a>>,
@@ -164,7 +164,7 @@ impl ObConfiguration {
     }
 
     #[allow(clippy::too_many_arguments)]
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
         name: String,
@@ -191,7 +191,7 @@ impl ObConfiguration {
         Ok(obc)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         id: &ObConfigurationId,
@@ -215,7 +215,7 @@ impl ObConfiguration {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::get_by_onboarding_id", skip_all)]
     pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Self> {
         let ob_config: ObConfiguration = onboarding::table
             .inner_join(ob_configuration::table)
@@ -226,7 +226,7 @@ impl ObConfiguration {
         Ok(ob_config)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("ObConfiguration::get_by_scoped_vault_id", skip_all)]
     pub fn get_by_scoped_vault_id(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
         let ob_config: ObConfiguration = scoped_vault::table
             .filter(scoped_vault::id.eq(scoped_vault_id))

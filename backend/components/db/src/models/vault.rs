@@ -114,7 +114,7 @@ impl Vault {
         }
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Vault::get", skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Self>
     where
         T: Into<VaultIdentifier<'a>>,
@@ -123,7 +123,7 @@ impl Vault {
         Ok(user)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Vault::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<Locked<Self>> {
         let user = vault::table
             .filter(vault::id.eq(id))
@@ -132,7 +132,7 @@ impl Vault {
         Ok(Locked::new(user))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Vault::lock_by_scoped_user", skip_all)]
     pub fn lock_by_scoped_user(conn: &mut TxnPgConn, su_id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let uv_ids = scoped_vault::table
             .filter(scoped_vault::id.eq(su_id))
@@ -144,7 +144,7 @@ impl Vault {
         Ok(Locked::new(user))
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Vault::multi_get", skip_all)]
     pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedVaultId>) -> DbResult<Vec<Self>> {
         let uv_ids = scoped_vault::table
             .filter(scoped_vault::id.eq_any(ids))
@@ -153,12 +153,13 @@ impl Vault {
         Ok(users)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Vault::create", skip_all)]
     pub fn create(conn: &mut TxnPgConn, new_user: NewVaultArgs) -> DbResult<Locked<Vault>> {
         let (uv, _) = Self::insert(conn, new_user, None)?;
         Ok(uv)
     }
 
+    #[tracing::instrument("Vault::lock_by_idempotency_id", skip_all)]
     fn lock_by_idempotency_id(conn: &mut TxnPgConn, i_id: &IdempotencyId) -> DbResult<Option<Locked<Vault>>> {
         let vault = vault::table
             .filter(vault::idempotency_id.eq(i_id))
@@ -168,6 +169,7 @@ impl Vault {
         Ok(vault.map(Locked::new))
     }
 
+    #[tracing::instrument("Vault::insert", skip_all)]
     pub(super) fn insert(
         conn: &mut TxnPgConn,
         new_user: NewVaultArgs,
@@ -226,7 +228,7 @@ impl Vault {
     }
 
     /// Look for the portable user vault with a matching fingerprint
-    #[tracing::instrument(skip(conn))]
+    #[tracing::instrument("Vault::find_portable", skip_all)]
     pub fn find_portable(
         conn: &mut PgConn,
         sh_data: &[Fingerprint],

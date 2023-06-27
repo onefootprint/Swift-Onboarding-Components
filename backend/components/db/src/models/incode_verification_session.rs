@@ -93,7 +93,7 @@ impl UpdateIncodeVerificationSession {
 }
 
 impl IncodeVerificationSession {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IncodeVerificationSession::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         identity_document_id: IdentityDocumentId,
@@ -125,7 +125,7 @@ impl IncodeVerificationSession {
         Ok(res)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IncodeVerificationSession::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
         id: &IncodeVerificationSessionId,
@@ -159,7 +159,7 @@ impl IncodeVerificationSession {
         }
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("IncodeVerificationSession::get", skip_all)]
     pub fn get<'a, T>(conn: &mut PgConn, id: T) -> DbResult<Option<Self>>
     where
         T: Into<IncodeSessionIdentifier<'a>>,

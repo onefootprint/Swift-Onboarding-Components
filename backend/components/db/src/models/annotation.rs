@@ -46,7 +46,7 @@ struct AnnotationUpdate {
 }
 
 impl Annotation {
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Annotation::create", skip_all)]
     pub fn create<T>(
         conn: &mut PgConn,
         note: String,
@@ -77,7 +77,7 @@ impl Annotation {
         Ok(annotation_info)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Annotation::update", skip_all)]
     pub fn update(
         conn: &mut PgConn,
         id: AnnotationId,
@@ -102,7 +102,7 @@ impl Annotation {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Annotation::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,
         ids: Vec<&AnnotationId>,
@@ -121,7 +121,7 @@ impl Annotation {
         Ok(annotation_map)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("Annotation::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         fp_id: FpId,
