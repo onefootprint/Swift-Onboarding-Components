@@ -487,7 +487,7 @@ class TestVaultProxy:
                 ProxyAccessReason("test reason"),
                 ProxyTokenAssignment(fp_id),
                 ProxyIngressRule(
-                    "document.drivers_license.front=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
+                    "document.drivers_license.front.image=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
                 ),
                 ProxyIngressContentType("json"),
             ],
@@ -495,7 +495,9 @@ class TestVaultProxy:
         )
 
         result = response.json()
-        assert result["data"]["id_card"] == f"{fp_id}.document.drivers_license.front"
+        assert (
+            result["data"]["id_card"] == f"{fp_id}.document.drivers_license.front.image"
+        )
         assert (
             result["data"]["type"]
             == f"{fp_id}.document.drivers_license.front.mime_type"
@@ -504,12 +506,12 @@ class TestVaultProxy:
         data = dict(
             reason="test",
             fields=[
-                "document.drivers_license.front",
+                "document.drivers_license.front.image",
                 "document.drivers_license.front.mime_type",
             ],
         )
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
-        assert response["document.drivers_license.front"] == test_image
+        assert response["document.drivers_license.front.image"] == test_image
         assert response["document.drivers_license.front.mime_type"] == "image/jpeg"
 
 

@@ -171,7 +171,7 @@ CDO_TO_DIS = {
 }
 
 DOCUMENT_DATA = {
-    "document.drivers_license.front": test_image_dl_front,
-    "document.drivers_license.back": test_image_dl_back,
-    "document.drivers_license.selfie": test_image_dl_selfie,
+    "document.drivers_license.front.image": test_image_dl_front,
+    "document.drivers_license.back.image": test_image_dl_back,
+    "document.drivers_license.selfie.image": test_image_dl_selfie,
 }

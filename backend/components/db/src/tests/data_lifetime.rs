@@ -3,7 +3,8 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, DocumentKind, IdentityDataKind, ScopedVaultId, TenantId, VaultId,
+    DataLifetimeId, DataLifetimeSeqno, DocumentKind, DocumentSide, IdDocKind, IdentityDataKind,
+    ScopedVaultId, TenantId, VaultId,
 };
 use std::collections::HashSet;
 
@@ -106,7 +107,7 @@ impl TestData {
             seqno1,
             None,
             None,
-            DocumentKind::Passport,
+            DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front),
         );
         let lifetime6 = fixtures::data_lifetime::build(
             conn,

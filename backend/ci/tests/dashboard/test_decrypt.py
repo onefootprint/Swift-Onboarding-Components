@@ -95,8 +95,8 @@ def test_tenant_document_get_decrypt(user_with_documents):
         tenant.sk.key,
         status_code=200,
     )
-    assert resp["document.drivers_license.front"]
-    assert resp["document.drivers_license.selfie"]
+    assert resp["document.drivers_license.front.image"]
+    assert resp["document.drivers_license.selfie.image"]
     assert resp["document.drivers_license.number"]
     assert resp["document.drivers_license.issuing_state"]
     assert resp["document.drivers_license.expiration"]
@@ -110,7 +110,7 @@ def test_tenant_document_decrypt(user_with_documents):
     tenant = user_with_documents.tenant
     fields = [
         "document.drivers_license.front.latest_upload",
-        "document.drivers_license.front",
+        "document.drivers_license.front.image",
         "document.drivers_license.number",
         "document.drivers_license.issuing_state",
         "document.drivers_license.expiration",
@@ -129,7 +129,7 @@ def test_tenant_document_decrypt(user_with_documents):
     )
 
     assert resp["document.drivers_license.front.latest_upload"] == test_image_dl_front
-    assert resp["document.drivers_license.front"] == test_image_dl_front
+    assert resp["document.drivers_license.front.image"] == test_image_dl_front
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "MA"
@@ -156,9 +156,9 @@ def test_tenant_selfie_decrypt(
 
     data = {
         "fields": [
-            "document.drivers_license.front",
-            "document.drivers_license.back",
-            "document.drivers_license.selfie",
+            "document.drivers_license.front.image",
+            "document.drivers_license.back.image",
+            "document.drivers_license.selfie.image",
             "document.drivers_license.front.mime_type",
         ],
         "reason": "Responding to a customer request",
@@ -170,14 +170,14 @@ def test_tenant_selfie_decrypt(
         sandbox_tenant.sk.key,
     )
 
-    assert resp["document.drivers_license.front"] == test_image_dl_front
-    assert resp["document.drivers_license.back"] == test_image_dl_back
-    assert resp["document.drivers_license.selfie"] == test_image_dl_selfie
+    assert resp["document.drivers_license.front.image"] == test_image_dl_front
+    assert resp["document.drivers_license.back.image"] == test_image_dl_back
+    assert resp["document.drivers_license.selfie.image"] == test_image_dl_selfie
     assert resp["document.drivers_license.front.mime_type"] == "image/png"
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
     assert set(access_event["targets"]) == {
-        "document.drivers_license.front",
-        "document.drivers_license.back",
-        "document.drivers_license.selfie",
+        "document.drivers_license.front.image",
+        "document.drivers_license.back.image",
+        "document.drivers_license.selfie.image",
     }

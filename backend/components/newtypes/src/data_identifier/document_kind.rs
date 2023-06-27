@@ -26,25 +26,23 @@ use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString};
 #[strum_discriminants(name(DocumentKindDiscriminant))]
 #[strum_discriminants(derive(EnumString, AsRefStr, Display, EnumIter))]
 #[diesel(sql_type = Text)]
+// TODO backfill
+// passport -> passport.front.image
+// passport.back -> passport.back.image, etc
 pub enum DocumentKind {
-    #[strum_discriminants(strum(to_string = "passport"))]
-    Passport,
-    #[strum_discriminants(strum(to_string = "passport.selfie"))]
-    PassportSelfie,
+    /// represents the verified image for a document
+    /// document.[doc_kind].[side].image
+    #[strum_discriminants(strum(to_string = "image"))]
+    Image(IdDocKind, DocumentSide),
+    /// represents the mime type of a document
+    /// document.[doc_kind].[side].mime_type
+    #[strum_discriminants(strum(to_string = "mime_type"))]
+    MimeType(IdDocKind, DocumentSide),
 
-    #[strum_discriminants(strum(to_string = "drivers_license.front"))]
-    DriversLicenseFront,
-    #[strum_discriminants(strum(to_string = "drivers_license.back"))]
-    DriversLicenseBack,
-    #[strum_discriminants(strum(to_string = "drivers_license.selfie"))]
-    DriversLicenseSelfie,
-
-    #[strum_discriminants(strum(to_string = "id_card.front"))]
-    IdCardFront,
-    #[strum_discriminants(strum(to_string = "id_card.back"))]
-    IdCardBack,
-    #[strum_discriminants(strum(to_string = "id_card.selfie"))]
-    IdCardSelfie,
+    /// represents the latest upload of a document
+    /// document.[doc_kind].[side].latest_upload - TODO one day latest_upload_mime_type?
+    #[strum_discriminants(strum(to_string = "latest_upload"))]
+    LatestUpload(IdDocKind, DocumentSide),
 
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
@@ -68,16 +66,6 @@ pub enum DocumentKind {
     IdCardNumber,
     #[strum_discriminants(strum(to_string = "id_card.expiration"))]
     IdCardExpiration,
-
-    /// represents the latest upload of a document
-    /// document.[doc_kind].[side].latest_upload
-    #[strum_discriminants(strum(to_string = "latest_upload"))]
-    LatestUpload(IdDocKind, DocumentSide),
-
-    /// represents the mime type of a document
-    /// document.[doc_kind].[side].mime_type
-    #[strum_discriminants(strum(to_string = "mime_type"))]
-    MimeType(IdDocKind, DocumentSide),
 }
 
 crate::util::impl_enum_string_diesel!(DocumentKind);
@@ -110,14 +98,6 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
     fn is_optional(&self) -> bool {
         match self {
             DocumentKind::FinraComplianceLetter
-            | DocumentKind::Passport
-            | DocumentKind::PassportSelfie
-            | DocumentKind::IdCardFront
-            | DocumentKind::IdCardBack
-            | DocumentKind::IdCardSelfie
-            | DocumentKind::DriversLicenseFront
-            | DocumentKind::DriversLicenseBack
-            | DocumentKind::DriversLicenseSelfie
             | DocumentKind::PassportNumber
             | DocumentKind::PassportExpiration
             | DocumentKind::PassportDob
@@ -127,21 +107,15 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             | DocumentKind::DriversLicenseIssuingState
             | DocumentKind::IdCardNumber
             | DocumentKind::IdCardExpiration
-            | DocumentKind::MimeType(_, _) => true,
-            DocumentKind::LatestUpload(_, _) => true,
+            | DocumentKind::Image(_, _)
+            | DocumentKind::MimeType(_, _)
+            | DocumentKind::LatestUpload(_, _) => true,
         }
     }
 
     fn parent(&self) -> Option<CollectedData> {
         match self {
-            DocumentKind::Passport
-            | DocumentKind::IdCardFront
-            | DocumentKind::IdCardBack
-            | DocumentKind::DriversLicenseFront
-            | DocumentKind::DriversLicenseBack
-            | DocumentKind::DriversLicenseSelfie
-            | DocumentKind::IdCardSelfie
-            | DocumentKind::PassportSelfie => Some(CollectedData::Document),
+            DocumentKind::Image(_, _) => Some(CollectedData::Document),
             // allow storing this data independently
             DocumentKind::PassportNumber
             | DocumentKind::PassportExpiration
@@ -162,16 +136,12 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
 impl DocumentKind {
     pub fn accepted_mime_types(&self) -> Vec<Mime> {
         match self {
-            DocumentKind::Passport
-            | DocumentKind::IdCardFront
-            | DocumentKind::IdCardBack
-            | DocumentKind::DriversLicenseFront
-            | DocumentKind::DriversLicenseBack => {
-                vec![mime::APPLICATION_PDF, mime::IMAGE_JPEG, mime::IMAGE_PNG]
-            }
-            DocumentKind::DriversLicenseSelfie
-            | DocumentKind::IdCardSelfie
-            | DocumentKind::PassportSelfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
+            DocumentKind::Image(_, side) => match side {
+                DocumentSide::Front | DocumentSide::Back => {
+                    vec![mime::APPLICATION_PDF, mime::IMAGE_JPEG, mime::IMAGE_PNG]
+                }
+                DocumentSide::Selfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
+            },
             DocumentKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
             DocumentKind::PassportNumber
             | DocumentKind::PassportExpiration
@@ -188,17 +158,7 @@ impl DocumentKind {
     }
 
     pub fn from_id_doc_kind(kind: IdDocKind, side: DocumentSide) -> Self {
-        match (kind, side) {
-            (IdDocKind::IdCard, DocumentSide::Front) => Self::IdCardFront,
-            (IdDocKind::IdCard, DocumentSide::Back) => Self::IdCardBack,
-            (IdDocKind::IdCard, DocumentSide::Selfie) => Self::IdCardSelfie,
-            (IdDocKind::DriverLicense, DocumentSide::Front) => Self::DriversLicenseFront,
-            (IdDocKind::DriverLicense, DocumentSide::Back) => Self::DriversLicenseBack,
-            (IdDocKind::DriverLicense, DocumentSide::Selfie) => Self::DriversLicenseSelfie,
-            (IdDocKind::Passport, DocumentSide::Front) => Self::Passport,
-            (IdDocKind::Passport, DocumentSide::Back) => Self::Passport,
-            (IdDocKind::Passport, DocumentSide::Selfie) => Self::PassportSelfie,
-        }
+        Self::Image(kind, side)
     }
 }
 
@@ -206,14 +166,7 @@ impl DocumentKind {
     /// defines how the encrypted bytes of the data identifier is stored
     pub fn storage_type(&self) -> StorageType {
         match self {
-            DocumentKind::Passport
-            | DocumentKind::PassportSelfie
-            | DocumentKind::DriversLicenseFront
-            | DocumentKind::DriversLicenseBack
-            | DocumentKind::DriversLicenseSelfie
-            | DocumentKind::IdCardFront
-            | DocumentKind::IdCardBack
-            | DocumentKind::IdCardSelfie
+            DocumentKind::Image(_, _)
             | DocumentKind::FinraComplianceLetter
             | DocumentKind::LatestUpload(_, _) => StorageType::DocumentData,
             DocumentKind::MimeType(_, _) => StorageType::DocumentMetadata,
@@ -245,14 +198,6 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
     fn try_from(value: DocumentKindDiscriminant) -> Result<Self, Self::Error> {
         let v = match value {
             DocumentKindDiscriminant::FinraComplianceLetter => DocumentKind::FinraComplianceLetter,
-            DocumentKindDiscriminant::Passport => DocumentKind::Passport,
-            DocumentKindDiscriminant::PassportSelfie => DocumentKind::PassportSelfie,
-            DocumentKindDiscriminant::IdCardFront => DocumentKind::IdCardFront,
-            DocumentKindDiscriminant::IdCardBack => DocumentKind::IdCardBack,
-            DocumentKindDiscriminant::IdCardSelfie => DocumentKind::IdCardSelfie,
-            DocumentKindDiscriminant::DriversLicenseFront => DocumentKind::DriversLicenseFront,
-            DocumentKindDiscriminant::DriversLicenseBack => DocumentKind::DriversLicenseBack,
-            DocumentKindDiscriminant::DriversLicenseSelfie => DocumentKind::DriversLicenseSelfie,
             DocumentKindDiscriminant::PassportNumber => DocumentKind::PassportNumber,
             DocumentKindDiscriminant::PassportExpiration => DocumentKind::PassportExpiration,
             DocumentKindDiscriminant::PassportDob => DocumentKind::PassportDob,
@@ -262,7 +207,9 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
             DocumentKindDiscriminant::DriversLicenseIssuingState => DocumentKind::DriversLicenseIssuingState,
             DocumentKindDiscriminant::IdCardNumber => DocumentKind::IdCardNumber,
             DocumentKindDiscriminant::IdCardExpiration => DocumentKind::IdCardExpiration,
-            DocumentKindDiscriminant::MimeType | DocumentKindDiscriminant::LatestUpload => {
+            DocumentKindDiscriminant::Image
+            | DocumentKindDiscriminant::MimeType
+            | DocumentKindDiscriminant::LatestUpload => {
                 return Err(crate::Error::Custom("Cannot convert".to_owned()))
             }
         };
@@ -297,6 +244,10 @@ impl std::str::FromStr for DocumentKind {
                 let (prefix, suffix) = get_parts()?;
                 DocumentKind::MimeType(prefix, suffix)
             }
+            Ok(DocumentKindDiscriminant::Image) => {
+                let (prefix, suffix) = get_parts()?;
+                DocumentKind::Image(prefix, suffix)
+            }
             _ => {
                 let variant =
                     DocumentKindDiscriminant::from_str(s).map_err(|_| strum::ParseError::VariantNotFound)?;
@@ -311,7 +262,9 @@ impl std::str::FromStr for DocumentKind {
 impl std::fmt::Display for DocumentKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            DocumentKind::LatestUpload(id_doc_kind, side) | DocumentKind::MimeType(id_doc_kind, side) => {
+            DocumentKind::LatestUpload(id_doc_kind, side)
+            | DocumentKind::MimeType(id_doc_kind, side)
+            | DocumentKind::Image(id_doc_kind, side) => {
                 write!(
                     f,
                     "{}.{}.{}",
