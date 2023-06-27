@@ -16,6 +16,7 @@ const open = async ({
   userData,
   onCanceled,
   onCompleted,
+  options,
 }: OpenFootprint) => {
   const deepLink = getDeepLink();
   const url = getURL({
@@ -23,6 +24,7 @@ const open = async ({
     userData,
     appearance,
     redirectUrl: deepLink,
+    options,
   });
   try {
     const result = await InAppBrowser.openAuth(url, deepLink);

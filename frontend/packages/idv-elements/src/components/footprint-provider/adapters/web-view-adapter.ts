@@ -31,8 +31,6 @@ class WebView implements FootprintClient {
 
   on() {
     return () => {};
-    // TODO: FP-2012
-    // https://linear.app/footprint/issue/FP-2012/allow-to-pass-emailphone-via-webview
   }
 
   complete({ validationToken }: CompletePayload): void {
