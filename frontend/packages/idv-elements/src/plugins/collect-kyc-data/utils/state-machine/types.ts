@@ -12,7 +12,6 @@ export type MachineContext = {
   device: DeviceInfo;
   config: OnboardingConfig;
   userFound: boolean;
-  sandboxSuffix?: string; // only if in sandbox mode
   requirement: CollectKycDataRequirement;
   // Machine-generated
   data: KycData; // combines bootstrapData, disabledFields and fieldsToDecrypt after decrypting the values

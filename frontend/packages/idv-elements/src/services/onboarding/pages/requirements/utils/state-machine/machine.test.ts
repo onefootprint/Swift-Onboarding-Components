@@ -65,7 +65,6 @@ describe('Onboarding Requirements Machine Tests', () => {
           bootstrapData: {
             [IdDI.email]: 'piip@onefootprint.com',
           },
-          sandboxSuffix: 'sandboxTest',
         }),
       );
 
@@ -87,7 +86,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         bootstrapData: {
           [IdDI.email]: 'piip@onefootprint.com',
         },
-        sandboxSuffix: 'sandboxTest',
       });
 
       state = machine.send({

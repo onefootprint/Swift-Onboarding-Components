@@ -8,7 +8,6 @@ import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-i
 import useSignupChallenge from '../../../../../../hooks/api/hosted/identify/use-signup-challenge';
 import useUserEmail from '../../../../../../hooks/api/hosted/user/use-user-email';
 import SmsChallengeVerification from '../../../../components/sms-challenge-verification';
-import useIdentifierSuffix from '../../../../hooks/use-identifier-suffix';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
 
@@ -18,7 +17,7 @@ const SignupChallenge = () => {
   const { t } = useTranslation('pages.challenge.signup-challenge');
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { successfulIdentifier, email, phoneNumber },
+    identify: { successfulIdentifier, email, phoneNumber, sandboxId },
     obConfigAuth,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
@@ -30,10 +29,6 @@ const SignupChallenge = () => {
   const userEmailMutation = useUserEmail();
   const [isSuccess, setSuccess] = useState(false);
   const [isResend, setResend] = useState(false);
-
-  const idSuffix = useIdentifierSuffix();
-  const emailWithSuffix = idSuffix.append(email);
-  const phoneNumberWithSuffix = idSuffix.append(phoneNumber);
 
   // Either scrub the phone number collected from the previous steps, or use the
   // challenge data scrubbed number
@@ -53,7 +48,7 @@ const SignupChallenge = () => {
 
     setSuccess(true);
     userEmailMutation.mutate(
-      { data: { email: emailWithSuffix }, authToken },
+      { data: { email }, authToken },
       {
         onError: (error: unknown) => {
           console.error('Failed email verification request: ', error);
@@ -83,6 +78,7 @@ const SignupChallenge = () => {
         challengeResponse: pin,
         challengeToken,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -102,8 +98,9 @@ const SignupChallenge = () => {
     setResend(true);
     signupChallengeMutation.mutate(
       {
-        phoneNumber: phoneNumberWithSuffix,
+        phoneNumber,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {
@@ -128,8 +125,9 @@ const SignupChallenge = () => {
 
     signupChallengeMutation.mutate(
       {
-        phoneNumber: phoneNumberWithSuffix,
+        phoneNumber,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: ({ challengeData: newChallengeData }) => {

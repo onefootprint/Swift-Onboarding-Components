@@ -28,7 +28,6 @@ describe('Collect KYC Data Machine Tests', () => {
   const createMachine = (
     missingAttributes: CollectedKycDataOption[],
     data: KycData = {},
-    sandboxSuffix?: string,
     deviceType?: string,
   ) => {
     const initialContext: MachineContext = {
@@ -46,7 +45,6 @@ describe('Collect KYC Data Machine Tests', () => {
       config: { ...TestOnboardingConfig },
       data,
       initialData: {},
-      sandboxSuffix,
     };
     const machine = interpret(createCollectKycDataMachine(initialContext));
     machine.start();
@@ -76,7 +74,6 @@ describe('Collect KYC Data Machine Tests', () => {
         value: 'piip@onefootprint.com',
         bootstrap: true,
       });
-      expect(context.sandboxSuffix).toEqual('sandboxTest');
       expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
@@ -357,7 +354,6 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.data[IdDI.email]).toBeUndefined();
-      expect(context.sandboxSuffix).toEqual(undefined);
       expect(state.value).toEqual('email');
 
       state = machine.send({

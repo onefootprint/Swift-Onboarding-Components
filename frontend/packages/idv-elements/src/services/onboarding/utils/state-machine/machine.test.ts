@@ -36,14 +36,12 @@ describe('Onboarding Machine Tests', () => {
     userFound = true,
     authToken = 'token',
     bootstrapData = defaultBootstrapData,
-    sandboxSuffix,
   }: Partial<OnboardingMachineArgs>) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
         bootstrapData,
         authToken,
-        sandboxSuffix,
       }),
     );
     machine.start();

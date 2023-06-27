@@ -14,7 +14,6 @@ export type MachineContext = {
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void; // Generated
   validationToken?: string;
-  sandboxSuffix?: string;
   userFound?: boolean;
   showCompletionPage?: boolean;
 };
@@ -37,7 +36,6 @@ export type MachineEvents =
         userFound: boolean;
         email?: string;
         phoneNumber?: string;
-        sandboxSuffix?: string;
       };
     }
   | {

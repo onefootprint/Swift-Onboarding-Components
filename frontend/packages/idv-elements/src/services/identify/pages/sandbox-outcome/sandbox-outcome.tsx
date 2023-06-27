@@ -43,7 +43,7 @@ const SandboxOutcome = () => {
     send({
       type: 'sandboxOutcomeSubmitted',
       payload: {
-        sandboxSuffix: `#${formData.outcome}${formData.testID}`,
+        sandboxId: `${formData.outcome}${formData.testID}`,
       },
     });
   };

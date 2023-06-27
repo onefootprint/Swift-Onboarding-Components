@@ -21,7 +21,7 @@ export type MachineIdentifyContext = {
   email?: string;
   userFound?: boolean;
   successfulIdentifier?: Identifier;
-  sandboxSuffix?: string;
+  sandboxId?: string;
 };
 
 export type MachineChallengeContext = {
@@ -44,7 +44,7 @@ export type MachineEvents =
   | {
       type: 'sandboxOutcomeSubmitted';
       payload: {
-        sandboxSuffix: string;
+        sandboxId: string;
       };
     }
   | {

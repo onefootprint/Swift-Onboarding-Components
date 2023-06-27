@@ -6,13 +6,13 @@ import React from 'react';
 import parseSuffix from './utils/parse-suffix';
 
 type SandboxOutcomeFooterProps = {
-  sandboxSuffix?: string;
+  sandboxId?: string;
 };
 
-const SandboxOutcomeFooter = ({ sandboxSuffix }: SandboxOutcomeFooterProps) => {
+const SandboxOutcomeFooter = ({ sandboxId }: SandboxOutcomeFooterProps) => {
   const { t } = useTranslation('components.sandbox-outcome-footer');
 
-  return sandboxSuffix ? (
+  return sandboxId ? (
     <Container>
       <Inner>
         <Column>
@@ -20,7 +20,7 @@ const SandboxOutcomeFooter = ({ sandboxSuffix }: SandboxOutcomeFooterProps) => {
             {t('outcome')}
           </Typography>
           <Typography variant="label-4" color="secondary">
-            {parseSuffix(sandboxSuffix).outcome}
+            {parseSuffix(sandboxId).outcome}
           </Typography>
         </Column>
         <Column>
@@ -28,7 +28,7 @@ const SandboxOutcomeFooter = ({ sandboxSuffix }: SandboxOutcomeFooterProps) => {
             {t('testID')}
           </Typography>
           <Typography variant="label-4" color="secondary">
-            {parseSuffix(sandboxSuffix).testID}
+            {parseSuffix(sandboxId).testID}
           </Typography>
         </Column>
       </Inner>

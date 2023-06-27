@@ -14,7 +14,6 @@ const Requirements = ({
   authToken,
   config,
   bootstrapData,
-  sandboxSuffix,
   isTransfer,
   onDone,
 }: RequirementsProps) => {
@@ -29,7 +28,6 @@ const Requirements = ({
       authToken={authToken}
       config={config}
       bootstrapData={bootstrapData}
-      sandboxSuffix={sandboxSuffix}
       isTransfer={isTransfer}
     >
       <Router onDone={onDone} />

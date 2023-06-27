@@ -5,7 +5,6 @@ import React from 'react';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
-import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import EmailPreview from './components/email-preview';
 import Form from './components/form';
 import Header from './components/header';
@@ -17,22 +16,21 @@ type FormData = {
 const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { phoneNumber, email, sandboxSuffix: identifierSuffix },
+    identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
   const showRequestErrorToast = useRequestErrorToast();
-  const idSuffix = useIdentifierSuffix();
 
   const handleSubmit = (formData: FormData) => {
     const phoneFromForm = formData.phoneNumber;
-    const phoneNumberWithSuffix = idSuffix.append(phoneFromForm);
     // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(
       {
-        identifier: { phoneNumber: phoneNumberWithSuffix },
+        identifier: { phoneNumber: phoneFromForm },
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: ({
@@ -45,7 +43,7 @@ const PhoneIdentification = () => {
             payload: {
               phoneNumber: phoneFromForm,
               userFound,
-              successfulIdentifier: { phoneNumber: phoneNumberWithSuffix },
+              successfulIdentifier: { phoneNumber: phoneFromForm },
               availableChallengeKinds,
               hasSyncablePassKey,
             },
@@ -72,7 +70,7 @@ const PhoneIdentification = () => {
         isLoading={isLoading}
         defaultPhone={phoneNumber}
       />
-      <SandboxOutcomeFooter sandboxSuffix={identifierSuffix} />
+      <SandboxOutcomeFooter sandboxId={sandboxId} />
     </>
   );
 };

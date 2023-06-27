@@ -482,12 +482,12 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'sandboxOutcomeSubmitted',
         payload: {
-          sandboxSuffix: 'suffix',
+          sandboxId: 'suffix',
         },
       });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.identify).toEqual({
-        sandboxSuffix: 'suffix',
+        sandboxId: 'suffix',
       });
     });
 
@@ -510,7 +510,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'sandboxOutcomeSubmitted',
         payload: {
-          sandboxSuffix: 'suffix',
+          sandboxId: 'suffix',
         },
       });
 
@@ -519,14 +519,14 @@ describe('Identify Machine Tests', () => {
         email: 'piip@onefootprint.com',
       });
       expect(state.context.identify).toEqual({
-        sandboxSuffix: 'suffix',
+        sandboxId: 'suffix',
       });
 
       state = machine.send({
         type: 'identifyReset',
       });
       expect(state.context.identify).toEqual({
-        sandboxSuffix: 'suffix',
+        sandboxId: 'suffix',
       });
     });
   });

@@ -206,7 +206,7 @@ const createIdentifyMachine = ({
           return context;
         }),
         assignSandboxOutcome: assign((context, event) => {
-          context.identify.sandboxSuffix = event.payload.sandboxSuffix;
+          context.identify.sandboxId = event.payload.sandboxId;
           return context;
         }),
         assignEmail: assign((context, event) => {
@@ -255,7 +255,7 @@ const createIdentifyMachine = ({
         reset: assign(context => {
           // Don't allow resetting the identifier suffix
           context.identify = {
-            sandboxSuffix: context.identify.sandboxSuffix,
+            sandboxId: context.identify.sandboxId,
           };
           context.challenge = {};
           return context;

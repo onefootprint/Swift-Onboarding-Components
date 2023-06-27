@@ -23,7 +23,6 @@ const Router = ({ onDone }: RouterProps) => {
     config,
     authToken,
     bootstrapData,
-    sandboxSuffix,
     isTransfer,
     validationToken,
   } = state.context;
@@ -49,7 +48,6 @@ const Router = ({ onDone }: RouterProps) => {
           config={config}
           authToken={authToken}
           bootstrapData={bootstrapData}
-          sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
           onDone={() => {
             send({

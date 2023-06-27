@@ -22,7 +22,7 @@ const Sms = () => {
   const { t } = useTranslation('components.login-challenge.sms');
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { phoneNumber, successfulIdentifier },
+    identify: { phoneNumber, successfulIdentifier, sandboxId },
     obConfigAuth,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
@@ -92,6 +92,7 @@ const Sms = () => {
         challengeResponse: pin,
         challengeToken,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -114,6 +115,7 @@ const Sms = () => {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: payload => {
@@ -146,6 +148,7 @@ const Sms = () => {
         identifier: successfulIdentifier,
         preferredChallengeKind: ChallengeKind.sms,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: handleRequestChallengeSuccess,

@@ -21,7 +21,6 @@ const BeneficialOwnerKyc = () => {
     device,
     config,
     userFound,
-    sandboxSuffix,
   } = state.context;
   if (!authToken || !device || !config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
@@ -60,7 +59,6 @@ const BeneficialOwnerKyc = () => {
           requirement: kycRequirement,
           userFound: !!userFound,
           config,
-          sandboxSuffix,
         },
       }}
       onDone={handleDone}

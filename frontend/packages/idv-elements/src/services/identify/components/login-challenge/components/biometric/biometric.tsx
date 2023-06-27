@@ -13,7 +13,7 @@ const SUCCESS_EVENT_DELAY_MS = 1500;
 const Biometric = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { successfulIdentifier },
+    identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
   } = state.context;
   const showRequestErrorToast = useRequestErrorToast();
@@ -40,6 +40,7 @@ const Biometric = () => {
           identifier: successfulIdentifier,
           preferredChallengeKind: ChallengeKind.biometric,
           obConfigAuth,
+          sandboxId,
         },
         {
           onSuccess: handleRequestChallengeSuccess,
@@ -87,6 +88,7 @@ const Biometric = () => {
         challengeResponse,
         challengeToken,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: ({ authToken }) => {

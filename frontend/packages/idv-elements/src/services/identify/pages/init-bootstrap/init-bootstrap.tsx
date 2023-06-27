@@ -3,24 +3,27 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import InitShimmer from '../../../../components/init-shimmer';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
-import useIdentifierSuffix from '../../hooks/use-identifier-suffix';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import validateBootstrapData from './utils/validate-bootstrap-data';
 
 const InitBootstrap = () => {
   const [state, send] = useIdentifyMachine();
-  const { bootstrapData, obConfigAuth } = state.context;
+  const {
+    bootstrapData,
+    obConfigAuth,
+    identify: { sandboxId },
+  } = state.context;
   const identifyMutation = useIdentify();
-  const idSuffix = useIdentifierSuffix();
 
   const identify = async (email?: string, phoneNumber?: string) => {
     // If both email and phone identified successfully, we will give preference to phone
     try {
       if (phoneNumber) {
-        const identifier = { phoneNumber: idSuffix.append(phoneNumber) };
+        const identifier = { phoneNumber };
         const phoneIdentify = await identifyMutation.mutateAsync({
           identifier,
           obConfigAuth,
+          sandboxId,
         });
 
         if (phoneIdentify.userFound) {
@@ -38,10 +41,11 @@ const InitBootstrap = () => {
 
     try {
       if (email) {
-        const identifier = { email: idSuffix.append(email) };
+        const identifier = { email };
         const emailIdentify = await identifyMutation.mutateAsync({
           identifier,
           obConfigAuth,
+          sandboxId,
         });
 
         if (emailIdentify.userFound) {

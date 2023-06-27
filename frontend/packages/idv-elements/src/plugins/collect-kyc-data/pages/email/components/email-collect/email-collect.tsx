@@ -31,11 +31,10 @@ const EmailCollect = ({
   ctaLabel,
 }: EmailCollectProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data, sandboxSuffix, config } = state.context;
+  const { data } = state.context;
   const { t } = useTranslation('pages.email');
   const showRequestErrorToast = useRequestErrorToast();
   const { mutation, syncEmail } = useSyncEmail();
-  const isSandbox = !config.isLive;
   const {
     register,
     handleSubmit,
@@ -49,15 +48,9 @@ const EmailCollect = ({
 
   const onSubmitForm = (formData: FormData) => {
     const { email } = formData;
-    if (isSandbox && !sandboxSuffix) {
-      console.error(
-        'Found empty sandbox suffix in collect-kyc-data email-collect form while in sandbox mode.',
-      );
-    }
 
     syncEmail({
       email,
-      sandboxSuffix,
       authToken,
       speculative: true,
       onSuccess: () => {

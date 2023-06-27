@@ -16,7 +16,6 @@ const Router = () => {
   const [state, send] = useIdvMachine();
   const {
     bootstrapData,
-    sandboxSuffix,
     authToken,
     userFound,
     isTransfer,
@@ -71,7 +70,6 @@ const Router = () => {
           authToken={authToken}
           userFound={userFound}
           bootstrapData={bootstrapData}
-          sandboxSuffix={sandboxSuffix}
           isTransfer={isTransfer}
           onClose={onClose}
           onComplete={onComplete}

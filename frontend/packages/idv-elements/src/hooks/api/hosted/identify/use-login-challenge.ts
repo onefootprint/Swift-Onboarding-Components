@@ -2,6 +2,7 @@ import request from '@onefootprint/request';
 import {
   LoginChallengeRequest,
   LoginChallengeResponse,
+  SANDBOX_ID_HEADER,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -10,7 +11,12 @@ import getRetryDisabledUntil from './utils/get-retry-disabled-until';
 const QUERY_CACHE_LIMIT = 1000 * 60 * 5; // challenges expire after 5 mins
 
 const loginChallenge = async (payload: LoginChallengeRequest) => {
-  const { obConfigAuth, identifier, preferredChallengeKind } = payload;
+  const { obConfigAuth, identifier, preferredChallengeKind, sandboxId } =
+    payload;
+  const headers: Record<string, string> = { ...obConfigAuth };
+  if (sandboxId) {
+    headers[SANDBOX_ID_HEADER] = sandboxId;
+  }
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
@@ -18,7 +24,7 @@ const loginChallenge = async (payload: LoginChallengeRequest) => {
       identifier,
       preferredChallengeKind,
     },
-    headers: obConfigAuth,
+    headers,
   });
   const { challengeData } = { ...response.data };
   challengeData.retryDisabledUntil = getRetryDisabledUntil(

@@ -55,7 +55,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
                   'assignUserFound',
                   'assignEmail',
                   'assignPhoneNumber',
-                  'assignSandboxOutcome',
                 ],
               },
             ],
@@ -87,10 +86,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           obConfigAuth: context.obConfigAuth,
           onClose: context.onClose,
           onComplete: context.onComplete,
-        })),
-        assignSandboxOutcome: assign((context, event) => ({
-          ...context,
-          sandboxSuffix: event.payload.sandboxSuffix,
         })),
         assignUserFound: assign((context, event) => ({
           ...context,

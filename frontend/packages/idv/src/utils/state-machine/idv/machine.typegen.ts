@@ -16,7 +16,6 @@ export interface Typegen0 {
     assignAuthToken: 'identifyCompleted';
     assignEmail: 'identifyCompleted';
     assignPhoneNumber: 'identifyCompleted';
-    assignSandboxOutcome: 'identifyCompleted';
     assignUserFound: 'identifyCompleted';
     assignValidationToken: 'onboardingCompleted';
     resetContext: 'reset';

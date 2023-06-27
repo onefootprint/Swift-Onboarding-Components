@@ -24,14 +24,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: {
-      authToken,
-      userFound,
-      sandboxSuffix,
-      bootstrapData,
-      config,
-      device,
-    },
+    onboardingContext: { authToken, userFound, bootstrapData, config, device },
     collectedKycData,
     requirements: { kyb, kyc, liveness, idDoc },
   } = state.context;
@@ -73,7 +66,6 @@ const Router = ({ onDone }: RouterProps) => {
               kycRequirement: kyc,
               kycBootstrapData,
               userFound,
-              sandboxSuffix,
               config,
             },
           }}
@@ -93,7 +85,6 @@ const Router = ({ onDone }: RouterProps) => {
               requirement: kyc,
               bootstrapData: kycBootstrapData,
               userFound,
-              sandboxSuffix,
               config,
             },
           }}

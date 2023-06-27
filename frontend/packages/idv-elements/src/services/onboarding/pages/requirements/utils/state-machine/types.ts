@@ -28,7 +28,6 @@ export type MachineContext = {
     config: OnboardingConfig;
     device: DeviceInfo;
     authToken: string;
-    sandboxSuffix?: string; // only if in sandbox mode
     isTransfer?: boolean;
     bootstrapData?: IdvBootstrapData;
   };

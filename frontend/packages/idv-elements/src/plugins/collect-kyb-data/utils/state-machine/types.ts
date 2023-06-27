@@ -41,7 +41,6 @@ export type MachineContext = {
   authToken?: string;
   config?: OnboardingConfig;
   userFound?: boolean;
-  sandboxSuffix?: string;
   // Machine generated
   data: BusinessDIData;
 };

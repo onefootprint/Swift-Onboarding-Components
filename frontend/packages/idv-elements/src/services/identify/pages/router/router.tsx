@@ -16,7 +16,6 @@ export type DonePayload = {
   userFound: boolean;
   email?: string;
   phoneNumber?: string;
-  sandboxSuffix?: string;
 };
 
 type RouterProps = {
@@ -28,7 +27,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('success');
   const {
     challenge: { authToken },
-    identify: { userFound, email, phoneNumber, sandboxSuffix },
+    identify: { userFound, email, phoneNumber },
   } = state.context;
   useLogStateMachine('identify', state);
 
@@ -43,7 +42,6 @@ const Router = ({ onDone }: RouterProps) => {
         userFound: !!userFound,
         email,
         phoneNumber,
-        sandboxSuffix,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

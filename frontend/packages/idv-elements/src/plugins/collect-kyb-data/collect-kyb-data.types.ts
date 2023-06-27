@@ -13,7 +13,6 @@ export type CollectKybDataContext = {
   kycRequirement?: CollectKycDataRequirement;
   kycBootstrapData?: KycBootstrapData;
   userFound: boolean;
-  sandboxSuffix?: string;
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

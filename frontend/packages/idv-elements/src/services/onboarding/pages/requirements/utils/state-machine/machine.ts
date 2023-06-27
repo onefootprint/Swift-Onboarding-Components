@@ -11,7 +11,6 @@ export type OnboardingRequirementsMachineArgs = {
   config: OnboardingConfig;
   authToken: string;
   bootstrapData?: IdvBootstrapData;
-  sandboxSuffix?: string; // only if in sandbox mode
   isTransfer?: boolean;
 };
 
@@ -23,7 +22,6 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   config,
   bootstrapData,
-  sandboxSuffix,
   isTransfer,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
@@ -43,7 +41,6 @@ const createOnboardingRequirementsMachine = ({
           authToken,
           config,
           bootstrapData,
-          sandboxSuffix,
           isTransfer,
         },
         requirements: { ...defaultRequirements },

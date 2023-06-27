@@ -17,10 +17,8 @@ const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
 
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, config, sandboxSuffix, requirement, initialData } =
-    state.context;
+  const { authToken, data, requirement, initialData } = state.context;
   const { missingAttributes } = requirement;
-  const isSandbox = !config.isLive;
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
@@ -53,16 +51,9 @@ const Confirm = () => {
       return;
     }
 
-    if (isSandbox && !sandboxSuffix) {
-      console.error(
-        'Found empty sandbox suffix in collect-kyc-data email-collect form while in sandbox mode.',
-      );
-    }
-
     syncEmail({
       authToken,
       email: data[IdDI.email]?.value,
-      sandboxSuffix,
       speculative: false,
       onSuccess: handleSyncData,
     });

@@ -112,7 +112,6 @@ describe('<CollectKycData />', () => {
         [IdDI.email]: 'piip@onefootprint.com',
       },
       userFound: true,
-      sandboxSuffix: 'sandbox',
       config: getOnboardingConfig(attributes, attributes),
     },
     device: {
