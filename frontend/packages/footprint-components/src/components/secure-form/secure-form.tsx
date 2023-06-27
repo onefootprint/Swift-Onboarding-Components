@@ -1,4 +1,4 @@
-import { CardDI } from '@onefootprint/types';
+import { CardDIField } from '@onefootprint/types';
 import React from 'react';
 
 import useProps from '../../hooks/use-props';
@@ -11,7 +11,7 @@ const SecureForm = () => {
 
   const props = useProps<SecureFormProps>();
   if (!props) {
-    return null;
+    throw new Error('SecureForm received empty props');
   }
 
   const {
@@ -27,13 +27,19 @@ const SecureForm = () => {
 
   const handleSave = (formData: FormData) => {
     // For now, we don't support saving address data
-    const data: Partial<Record<CardDI, string>> = {};
-    data[`card.${cardAlias}.number`] = formData.number.split(' ').join('');
-    data[`card.${cardAlias}.expiration`] = formData.expiry;
-    data[`card.${cardAlias}.cvc`] = formData.cvc;
+    const values: Record<string, string> = {
+      [CardDIField.number]: formData.number.split(' ').join(''),
+      [CardDIField.expiration]: formData.expiry,
+      [CardDIField.cvc]: formData.cvc,
+    };
     if ('name' in formData) {
-      data[`card.${cardAlias}.name`] = formData.name;
+      values[CardDIField.name] = formData.name;
     }
+    const valueMap = Object.entries(values).map(([key, value]) => [
+      `card.${cardAlias}.${key}`,
+      value,
+    ]);
+    const data = Object.fromEntries(valueMap);
 
     usersVaultMutation.mutate(
       {

@@ -55,15 +55,26 @@ export enum DocumentDI {
   latestIdCardSelfie = 'document.id_card.selfie.latest_upload',
 }
 
+export enum CardDIField {
+  name = 'name',
+  issuer = 'issuer',
+  number = 'number',
+  numberLast4 = 'number_last4',
+  cvc = 'cvc',
+  expiration = 'expiration',
+  expirationMonth = 'expiration_month',
+  expirationYear = 'expiration_year',
+}
+
 export type CardDI<T extends string = string> =
-  | `card.${T}.name`
-  | `card.${T}.issuer`
-  | `card.${T}.number`
-  | `card.${T}.number_last4`
-  | `card.${T}.cvc`
-  | `card.${T}.expiration`
-  | `card.${T}.expiration_month`
-  | `card.${T}.expiration_year`;
+  | `card.${T}.${CardDIField.name}`
+  | `card.${T}.${CardDIField.issuer}`
+  | `card.${T}.${CardDIField.number}`
+  | `card.${T}.${CardDIField.numberLast4}`
+  | `card.${T}.${CardDIField.cvc}`
+  | `card.${T}.${CardDIField.expiration}`
+  | `card.${T}.${CardDIField.expirationMonth}`
+  | `card.${T}.${CardDIField.expirationYear}`;
 
 export type CustomDI<T extends string = string> = `custom.${T}`;
 

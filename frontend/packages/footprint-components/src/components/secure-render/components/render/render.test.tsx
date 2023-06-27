@@ -24,16 +24,18 @@ describe('<Render />', () => {
     isHidden = false,
     label,
     mask = 'creditCard',
-    onShow,
+    onToggleHidden,
     value = '4242424242424242',
+    canCopy = false,
   }: Partial<RenderProps>) =>
     customRender(
       <Render
         isHidden={isHidden}
         label={label}
         mask={mask}
-        onShow={onShow}
+        onToggleHidden={onToggleHidden}
         value={value}
+        canCopy={canCopy}
       />,
     );
 
@@ -109,11 +111,12 @@ describe('<Render />', () => {
     expect(hiddenValue).toBeInTheDocument();
   });
 
-  it('should render the copy button when isHidden is false', () => {
+  it('should render the copy button', () => {
     renderRender({
       isHidden: false,
       mask: 'creditCard',
       value: CARD_VALUE,
+      canCopy: true,
     });
     const copyButton = screen.getByRole('button');
     expect(copyButton).toBeInTheDocument();

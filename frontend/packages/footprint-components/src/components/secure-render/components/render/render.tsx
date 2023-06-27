@@ -1,23 +1,30 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { IcoEye16, IcoEyeCrossed16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CopyButton, LinkButton, Typography } from '@onefootprint/ui';
+import { CopyButton, IconButton, Typography } from '@onefootprint/ui';
 import { formatCardExpiry, formatCardNumber } from 'creditcardutils';
 import React, { useEffect, useState } from 'react';
+
+export type RenderMask = 'creditCard' | 'cvc' | 'date';
 
 export type RenderProps = {
   isHidden?: boolean;
   label?: string;
-  mask?: 'creditCard' | 'cvc' | 'date';
-  onShow?: () => void;
+  mask?: RenderMask;
+  onToggleHidden?: () => void;
   value: string;
+  canCopy?: boolean;
 };
 
 const Render = ({
-  isHidden = false,
+  isHidden,
   label,
   mask,
-  onShow,
+  onToggleHidden,
   value,
+  canCopy,
 }: RenderProps) => {
+  const { t } = useTranslation('components.secure-render');
   const [values, setValues] = useState({
     showValue: '',
     hiddenValue: '',
@@ -61,13 +68,22 @@ const Render = ({
           </Typography>
         )}
         <ValueContainer>
-          <Value isHidden={isHidden} variant="body-3">
+          <Value isHidden={!!isHidden} variant="body-3">
             {isHidden ? values.hiddenValue : values.showValue}
           </Value>
-          {!isHidden && <CopyButton contentToCopy={values.showValue} />}
+          {canCopy && <CopyButton contentToCopy={values.showValue} />}
         </ValueContainer>
       </FieldContainer>
-      {isHidden && <LinkButton onClick={onShow}>Show</LinkButton>}
+      {isHidden && (
+        <IconButton
+          onClick={onToggleHidden}
+          aria-label={
+            isHidden ? t('toggle.show-aria-label') : t('toggle.hide-aria-label')
+          }
+        >
+          {isHidden ? <IcoEye16 /> : <IcoEyeCrossed16 />}
+        </IconButton>
+      )}
     </Container>
   );
 };

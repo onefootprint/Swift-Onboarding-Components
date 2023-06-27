@@ -9,6 +9,7 @@ export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt';
 export * from './decrypt-user';
+export * from './entities-vault-decrypt';
 export * from './ger-roles';
 export * from './get-access-events';
 export * from './get-auth-roles';

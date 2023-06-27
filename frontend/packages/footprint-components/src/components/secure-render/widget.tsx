@@ -5,8 +5,35 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import createWidget from '../../utils/create-widget';
 import { SecureRenderProps } from './types';
+import isValidDI from './utils/is-valid-di';
 
-const props = {}; // TODO: implement secure render props
+const props = {
+  authToken: {
+    type: 'string',
+    required: true,
+  },
+  id: {
+    type: 'string',
+    required: true,
+    validate: ({ value }: { value?: string }) => {
+      if (!isValidDI(value)) {
+        throw new TypeError('Expected the id to be a valid data identifier');
+      }
+    },
+  },
+  label: {
+    type: 'string',
+    required: false,
+  },
+  canCopy: {
+    type: 'boolean',
+    required: false,
+  },
+  isHidden: {
+    type: 'boolean',
+    required: false,
+  },
+};
 
 export const initSecureRenderChild = () =>
   createWidget({

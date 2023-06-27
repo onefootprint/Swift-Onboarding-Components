@@ -7,5 +7,4 @@ export type SecureRenderProps = {
   label?: string; // defaults to a nice string chosen for that data identifier
   canCopy?: boolean;
   isHidden?: boolean; // If provided, will show a button to hide/show data
-  onShow?: () => void;
 };
