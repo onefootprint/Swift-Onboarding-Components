@@ -197,7 +197,10 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
     {
       cpuUnits: g.constants.resources.cpuUnits,
       memoryMB: g.constants.resources.memoryMB,
-      instanceCount: g.constants.resources.instances,
+      minTasks: g.constants.resources.minInstances,
+      maxTasks: g.constants.resources.maxInstances,
+      targetCpuUtilization: g.constants.resources.targetCpuUtilization,
+      targetMemoryUtilization: g.constants.resources.targetMemoryUtilization,
     },
     cert,
     nitroServiceOutput,

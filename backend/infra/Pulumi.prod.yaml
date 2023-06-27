@@ -78,8 +78,11 @@ config:
         secure: v1:JwLRbuAPf0pSaGKC:UXrgvZZ1LmLXmmeJcWGekg40tnmEvCkKhj/cYVcVu4jRmHDxppMyTpZArO/D3Picu1rEGh2UgiAMTKZfSFzBTZo=
     resources:
       cpuUnits: 2048
-      instances: 6
       memoryMB: 16384
+      minInstances: 6
+      maxInstances: 50
+      targetCpuUtilization: 70
+      targetMemoryUtilization: 70
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

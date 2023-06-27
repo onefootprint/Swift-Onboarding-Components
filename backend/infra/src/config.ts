@@ -22,9 +22,12 @@ export interface Domains {
 }
 
 export interface Resources {
-  instances: number;
   memoryMB: number;
   cpuUnits: number;
+  minInstances: number;
+  maxInstances: number;
+  targetCpuUtilization: number;
+  targetMemoryUtilization: number;
 }
 
 export interface Elastic {

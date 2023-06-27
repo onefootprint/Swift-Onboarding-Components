@@ -24,9 +24,12 @@ export type ServiceLoadBalancer = {
 };
 
 export type ServiceConfig = {
-  instanceCount: number;
   memoryMB: number;
   cpuUnits: number;
+  minTasks: number;
+  maxTasks: number;
+  targetCpuUtilization: number;
+  targetMemoryUtilization: number;
 };
 
 export type AWSPolicyConfig = {
@@ -67,10 +70,11 @@ export async function CreateApiService(
   );
 
   // init our cluster
+  const clusterName = `cluster-${stackMetadata.shortStackName}`;
   const cluster = new awsx.ecs.Cluster(
-    `cluster-${stackMetadata.shortStackName}`,
+    clusterName,
     {
-      name: `cluster-${stackMetadata.shortStackName}`,
+      name: clusterName,
       vpc,
       settings: [
         {
@@ -141,12 +145,14 @@ export async function CreateApiService(
     serviceDependsOn.push(g.database.db);
   }
 
+  const serviceName = `svc-${stackMetadata.shortStackName}`;
   const service = new aws.ecs.Service(
-    `svc-${stackMetadata.shortStackName}`,
+    serviceName,
     {
+      name: serviceName,
       cluster: cluster.cluster.arn,
       launchType: 'FARGATE',
-      desiredCount: serviceConfig.instanceCount,
+      desiredCount: serviceConfig.minTasks,
       taskDefinition: taskDefinition.arn,
       deploymentController: {
         type: 'ECS',
@@ -173,6 +179,51 @@ export async function CreateApiService(
     {
       provider,
       dependsOn: serviceDependsOn,
+    },
+  );
+
+  const resourceId = `service/${clusterName}/${serviceName}`;
+  const ecsTarget = new aws.appautoscaling.Target(
+    `ecs-scaling-target-${stackMetadata.shortStackName}`,
+    {
+      maxCapacity: serviceConfig.maxTasks,
+      minCapacity: serviceConfig.minTasks,
+      resourceId,
+      scalableDimension: 'ecs:service:DesiredCount',
+      serviceNamespace: 'ecs',
+    },
+    { dependsOn: [cluster, service] },
+  );
+  const cpuScalingPolicy = new aws.appautoscaling.Policy(
+    `ecs-cpu-scaling-policy-${stackMetadata.shortStackName}`,
+    {
+      policyType: 'TargetTrackingScaling',
+      resourceId: ecsTarget.resourceId,
+      scalableDimension: ecsTarget.scalableDimension,
+      serviceNamespace: ecsTarget.serviceNamespace,
+      targetTrackingScalingPolicyConfiguration: {
+        predefinedMetricSpecification: {
+          predefinedMetricType: 'ECSServiceAverageCPUUtilization',
+        },
+        targetValue: serviceConfig.targetCpuUtilization,
+        disableScaleIn: false,
+      },
+    },
+  );
+  const ramScalingPolicy = new aws.appautoscaling.Policy(
+    `ecs-ram-scaling-policy-${stackMetadata.shortStackName}`,
+    {
+      policyType: 'TargetTrackingScaling',
+      resourceId: ecsTarget.resourceId,
+      scalableDimension: ecsTarget.scalableDimension,
+      serviceNamespace: ecsTarget.serviceNamespace,
+      targetTrackingScalingPolicyConfiguration: {
+        predefinedMetricSpecification: {
+          predefinedMetricType: 'ECSServiceAverageMemoryUtilization',
+        },
+        targetValue: serviceConfig.targetMemoryUtilization,
+        disableScaleIn: false,
+      },
     },
   );
 
@@ -342,7 +393,7 @@ async function createCdnFrontedLoadBalancer(
     domain: g.dnsConfig.apiDomain,
     origin: albDomainName,
     hostedZoneId: g.dnsConfig.hostedZone.id,
-    stack: g.stackMetadata
+    stack: g.stackMetadata,
   });
 
   return {
