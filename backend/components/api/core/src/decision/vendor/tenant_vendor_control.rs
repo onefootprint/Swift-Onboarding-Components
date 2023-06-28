@@ -24,6 +24,8 @@ pub struct TenantVendorControl {
     experian_credentials: ExperianCredentials,
     incode_credentials: IncodeCredentials,
     enabled_vendor_apis: Vec<VendorAPI>,
+    tenant_id: TenantId,
+    tenant_name: String,
 }
 
 impl TenantVendorControl {
@@ -42,7 +44,7 @@ impl TenantVendorControl {
             })
             .await??;
 
-        Self::new_internal(vendor_control, config, enclave_client, &tenant.e_private_key).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant).await
     }
 
     // Accessors
@@ -67,6 +69,7 @@ impl TenantVendorControl {
         IdologyExpectIDRequest {
             idv_data,
             credentials: self.idology_credentials(),
+            tenant_identifier: self.tenant_identifier(),
         }
     }
     pub fn build_experian_request(&self, idv_data: IdvData) -> ExperianCrossCoreRequest {
@@ -80,6 +83,7 @@ impl TenantVendorControl {
         IdologyPaRequest {
             idv_data,
             credentials: self.idology_credentials(),
+            tenant_identifier: self.tenant_identifier(),
         }
     }
 }
@@ -89,12 +93,12 @@ impl TenantVendorControl {
         vendor_control: Option<DbTenantVendorControl>,
         config: &Config,
         enclave_client: &EnclaveClient,
-        tenant_e_private_key: &EncryptedVaultPrivateKey,
+        tenant: Tenant,
     ) -> ApiResult<Self> {
         // Check if this tenant has specific IDology credentials, if not, fall back to default creds from state
         // In the future we'll error here
         let db_idology_creds =
-            Self::get_tenant_idology_credentials(&vendor_control, enclave_client, tenant_e_private_key)
+            Self::get_tenant_idology_credentials(&vendor_control, enclave_client, &tenant.e_private_key)
                 .await
                 .map_err(crate::decision::Error::from);
 
@@ -139,6 +143,8 @@ impl TenantVendorControl {
             experian_credentials,
             enabled_vendor_apis,
             incode_credentials,
+            tenant_name: tenant.name,
+            tenant_id: tenant.id,
         };
 
         Ok(control)
@@ -217,6 +223,10 @@ impl TenantVendorControl {
 
         apis
     }
+
+    fn tenant_identifier(&self) -> String {
+        format!("{}:{}", self.tenant_id, self.tenant_name)
+    }
 }
 
 impl TenantVendorControl {
@@ -225,9 +235,9 @@ impl TenantVendorControl {
         config: &Config,
         vendor_control: Option<DbTenantVendorControl>,
         enclave_client: &EnclaveClient,
-        tenant_e_private_key: &EncryptedVaultPrivateKey,
+        tenant: Tenant,
     ) -> ApiResult<Self> {
-        Self::new_internal(vendor_control, config, enclave_client, tenant_e_private_key).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant).await
     }
 }
 

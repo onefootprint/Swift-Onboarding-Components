@@ -30,6 +30,7 @@ use self::scan_verify::response::ScanVerifySubmissionAPIResponse;
 pub struct IdologyExpectIDRequest {
     pub idv_data: IdvData,
     pub credentials: IdologyCredentials,
+    pub tenant_identifier: String,
 }
 
 #[derive(Clone)]
@@ -46,7 +47,7 @@ pub async fn verify_expectid(
     request: IdologyExpectIDRequest,
 ) -> Result<serde_json::Value, IdologyError::Error> {
     let url = "https://web.idologylive.com/api/idiq.svc";
-    let req_data = expectid::request::RequestData::try_from(request.idv_data)?;
+    let req_data = expectid::request::RequestData::try_from(request.idv_data, request.tenant_identifier)?;
     let req_list = Request::new(
         request.credentials.username.clone(),
         request.credentials.password.clone(),
@@ -126,10 +127,11 @@ pub async fn standalone_pa(
     let IdologyPaRequest {
         idv_data,
         credentials,
+        tenant_identifier,
     } = request;
 
     let url = "https://web.idologylive.com/api/pa-standalone.svc";
-    let req_data = pa::request::RequestData::try_from(idv_data)?;
+    let req_data = pa::request::RequestData::try_from(idv_data, tenant_identifier)?;
     let req_list = Request::new(
         credentials.username,
         credentials.password,
@@ -221,6 +223,7 @@ mod test {
             IdologyExpectIDRequest {
                 idv_data,
                 credentials,
+                tenant_identifier: "org_1234".into(),
             },
         )
         .await

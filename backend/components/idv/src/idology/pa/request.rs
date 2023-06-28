@@ -14,12 +14,12 @@ pub(crate) struct RequestData {
     city: Option<PiiString>,
     state: Option<PiiString>,
     zip: Option<PiiString>,
+    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology side
+    invoice: Option<String>,
 }
 
-impl TryFrom<IdvData> for RequestData {
-    type Error = IdologyError::ConversionError;
-
-    fn try_from(d: IdvData) -> Result<Self, Self::Error> {
+impl RequestData {
+    pub fn try_from(d: IdvData, tenant_identifier: String) -> Result<Self, IdologyError::ConversionError> {
         let IdvData {
             first_name,
             last_name,
@@ -61,6 +61,7 @@ impl TryFrom<IdvData> for RequestData {
             city,
             state,
             zip,
+            invoice: Some(tenant_identifier),
         };
         Ok(request)
     }

@@ -8,6 +8,7 @@ pub mod response;
 pub struct IdologyPaRequest {
     pub idv_data: IdvData,
     pub credentials: IdologyCredentials,
+    pub tenant_identifier: String,
 }
 
 #[derive(Clone)]
@@ -51,6 +52,7 @@ mod test {
             IdologyPaRequest {
                 idv_data,
                 credentials,
+                tenant_identifier: "org1234".into(),
             },
         )
         .await

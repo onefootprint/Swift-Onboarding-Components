@@ -23,12 +23,12 @@ pub(crate) struct RequestData {
     email: Option<PiiString>,
     /// this must be 10 digits
     telephone: Option<PiiString>,
+    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology side
+    invoice: Option<String>,
 }
 
-impl TryFrom<IdvData> for RequestData {
-    type Error = IdologyError::ConversionError;
-
-    fn try_from(d: IdvData) -> Result<Self, Self::Error> {
+impl RequestData {
+    pub fn try_from(d: IdvData, tenant_identifier: String) -> Result<Self, IdologyError::ConversionError> {
         let IdvData {
             first_name,
             last_name,
@@ -75,6 +75,7 @@ impl TryFrom<IdvData> for RequestData {
             email,
             // TODO remove country code
             telephone: phone_number,
+            invoice: Some(tenant_identifier),
         };
         Ok(request)
     }
@@ -108,6 +109,7 @@ mod tests {
                 dob_day: None,
                 email: None,
                 telephone: None,
+                invoice: Some("tenant_id:org_1234".into()),
             }),
         };
 
@@ -130,6 +132,7 @@ mod tests {
               "dobDay": null,
               "email": null,
               "telephone": null,
+              "invoice": "tenant_id:org_1234",
               "output": "json"
             }),
             json_val

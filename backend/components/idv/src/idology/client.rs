@@ -27,9 +27,13 @@ impl IdologyClient {
     /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
     /// scopes that were sent to IDology's ExpectID
     #[tracing::instrument(skip_all)]
-    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, IdologyError::Error> {
+    pub async fn verify_expectid(
+        &self,
+        idv_data: IdvData,
+        tenant_identifier: String,
+    ) -> Result<serde_json::Value, IdologyError::Error> {
         let url = "https://web.idologylive.com/api/idiq.svc";
-        let req_data = expectid::request::RequestData::try_from(idv_data)?;
+        let req_data = expectid::request::RequestData::try_from(idv_data, tenant_identifier)?;
         let req_list = Request::new(
             self.username.clone(),
             self.password.clone(),

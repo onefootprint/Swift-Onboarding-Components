@@ -205,23 +205,17 @@ async fn test_update_credentials(state: &mut State) {
 }
 
 pub mod fixtures {
-    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
-    use newtypes::EncryptedVaultPrivateKey;
+    use db::models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl};
 
     use crate::{decision::vendor::tenant_vendor_control::TenantVendorControl, State};
 
     pub async fn create(
         state: &State,
         vendor_control: Option<DbTenantVendorControl>,
-        tenant_e_private_key: EncryptedVaultPrivateKey,
+        tenant: Tenant,
     ) -> TenantVendorControl {
-        TenantVendorControl::new_for_test(
-            &state.config,
-            vendor_control,
-            &state.enclave_client,
-            &tenant_e_private_key,
-        )
-        .await
-        .expect("couldn't create tenant vendor control")
+        TenantVendorControl::new_for_test(&state.config, vendor_control, &state.enclave_client, tenant)
+            .await
+            .expect("couldn't create tenant vendor control")
     }
 }

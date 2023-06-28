@@ -33,7 +33,7 @@ async fn create_tvc_for_requirements(
         };
 
         fixtures::tenant_vendor_control::create_in_memory(
-            tenant.id,
+            tenant.id.clone(),
             idology_enabled,
             idology_username,
             idology_e_password,
@@ -42,12 +42,8 @@ async fn create_tvc_for_requirements(
         )
     });
 
-    crate::decision::tests::tenant_vendor_control::fixtures::create(
-        state,
-        db_tenant_vendor_control,
-        tenant.e_private_key,
-    )
-    .await
+    crate::decision::tests::tenant_vendor_control::fixtures::create(state, db_tenant_vendor_control, tenant)
+        .await
 }
 
 #[test_case(vec![
