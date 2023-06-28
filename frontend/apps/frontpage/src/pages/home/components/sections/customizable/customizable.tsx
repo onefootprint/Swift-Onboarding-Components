@@ -50,6 +50,7 @@ const Customizable = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         icon="/home/icons/customizable.png"
+        href="https://docs.onefootprint.com"
       />
       <Grid>
         <Card

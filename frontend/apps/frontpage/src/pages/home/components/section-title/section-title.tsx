@@ -41,7 +41,11 @@ const SectionTitle = ({
         <Subtitle darkTheme={darkTheme}>{subtitle}</Subtitle>
       </TextContainer>
       {cta && (
-        <LinkButton iconComponent={IcoArrowRightSmall16} href={href}>
+        <LinkButton
+          iconComponent={IcoArrowRightSmall16}
+          href={href}
+          target="_blank"
+        >
           {cta}
         </LinkButton>
       )}

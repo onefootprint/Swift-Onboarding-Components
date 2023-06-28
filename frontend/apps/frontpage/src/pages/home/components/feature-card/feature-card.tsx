@@ -73,6 +73,7 @@ const FeatureCard = ({
           <LinkButton
             iconComponent={IcoArrowRightSmall16}
             href="https://docs.onefootprint.com/"
+            target="_blank"
           >
             {cta}
           </LinkButton>
