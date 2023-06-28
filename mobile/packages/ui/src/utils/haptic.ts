@@ -1,13 +1,8 @@
-import * as Haptics from 'expo-haptics';
-
-const { NotificationFeedbackType: notification, ImpactFeedbackStyle: impact } =
-  Haptics;
-
 const haptic = {
-  impact: () => Haptics.impactAsync(impact.Medium),
-  error: () => Haptics.notificationAsync(notification.Error),
-  warning: () => Haptics.notificationAsync(notification.Warning),
-  success: () => Haptics.notificationAsync(notification.Success),
+  impact: () => {},
+  error: () => {},
+  warning: () => {},
+  success: () => {},
 };
 
 export default haptic;

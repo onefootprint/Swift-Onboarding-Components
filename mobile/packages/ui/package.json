@@ -28,7 +28,6 @@
     "@onefootprint/icons": "*",
     "@onefootprint/styled": "*",
     "@shopify/flash-list": "1.4.0",
-    "expo-haptics": "^12.2.1",
     "lodash": "^4.17.21",
     "react-merge-refs": "^1.1.0",
     "react-native-flash-message": "^0.4.1",
