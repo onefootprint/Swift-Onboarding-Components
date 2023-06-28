@@ -47,6 +47,7 @@ const TableFilter = ({
 const TableFilterContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
+    flex-direction: column;
     margin-bottom: ${theme.spacing[4]};
     gap: ${theme.spacing[5]};
   `}

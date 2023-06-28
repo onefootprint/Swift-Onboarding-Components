@@ -79,6 +79,7 @@ const SecurityLogs = () => {
 const FiltersContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
+    flex-direction: column;
     gap: ${theme.spacing[5]};
     padding-bottom: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[7]};

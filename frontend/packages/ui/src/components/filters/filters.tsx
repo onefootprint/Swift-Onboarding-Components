@@ -3,7 +3,6 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 import LinkButton from '../link-button';
-import Typography from '../typography';
 import Control from './components/control';
 import type { FilterControl, FilterSelectedOption } from './filters.types';
 
@@ -27,27 +26,37 @@ const Filters = ({
 
   return (
     <FilterContainer>
-      <Typography color="tertiary" variant="label-4" as="label">
-        Filter by
-      </Typography>
       <Controls>
         {controls.map(control => (
           <Control control={control} key={control.query} onChange={onChange} />
         ))}
       </Controls>
       {hasSelectedOptions && (
-        <LinkButton onClick={onClear} size="compact">
-          Clear filters
-        </LinkButton>
+        <ClearFiltersContainer>
+          <LinkButton onClick={onClear} size="compact">
+            Clear filters
+          </LinkButton>
+        </ClearFiltersContainer>
       )}
     </FilterContainer>
   );
 };
 
+const ClearFiltersContainer = styled.div`
+  ${({ theme }) => css`
+    height: ${theme.spacing[8]};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    white-space: nowrap;
+  `}
+`;
+
 const FilterContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     display: flex;
     gap: ${theme.spacing[4]};
   `}
@@ -57,8 +66,9 @@ const Controls = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
     gap: ${theme.spacing[3]};
-    justify-content: center;
+    justify-content: flex-start;
   `}
 `;
 
