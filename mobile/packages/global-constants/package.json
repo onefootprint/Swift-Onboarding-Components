@@ -8,8 +8,8 @@
   "scripts": {
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "build": "tsup src/index.ts --format esm,cjs",
+    "dev": "tsup src/index.ts --format esm,cjs --watch",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "devDependencies": {

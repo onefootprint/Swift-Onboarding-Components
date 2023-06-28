@@ -1,9 +1,8 @@
 {
-    "extends": "tsconfig/react-native-library",
-    "include": ["."],
-    "exclude": ["dist", "build", "node_modules"],
-    "compilerOptions": {
-      "strict": true,
-      "types": ["styled-components-react-native"]
-    }
+  "extends": "../../tsconfig",
+  "include": ["src"],
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx"
   }
+}

@@ -4,9 +4,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "build": "tsup src/index.ts --format esm,cjs --external react",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --external react",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch",
     "typecheck": "yarn tsc --noEmit"
@@ -14,7 +14,7 @@
   "devDependencies": {
     "@onefootprint/test-utils": "*",
     "@types/lodash": "^4.14.194",
-    "@types/react": "^18.0.37",
+    "@types/react": "^18.2.8",
     "@types/styled-components": "^5.1.26",
     "jest-expo": "^48.0.2",
     "tsconfig": "*",
@@ -31,7 +31,7 @@
     "@onefootprint/ui": "*",
     "lodash": "^4.17.21",
     "react-native-safe-area-context": "^4.5.1",
-    "react-native": "^0.71.6",
+    "react-native": "^0.71.7",
     "react": "^18.2.0",
     "usehooks-ts": "^2.9.1"
   },

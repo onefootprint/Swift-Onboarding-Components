@@ -5,12 +5,12 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "typecheck": "yarn tsc --noEmit",
-    "build": "tsup src/index.tsx --format esm,cjs --dts --external react react-native",
-    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react react-native",
+    "build": "tsup src/index.tsx --format esm,cjs --external react react-native",
+    "dev": "tsup src/index.tsx --format esm,cjs --watch --external react react-native",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "devDependencies": {
-    "@types/react": "^18.0.37",
+    "@types/react": "^18.2.8",
     "@types/styled-components": "^5.1.26",
     "@types/styled-components-react-native": "^5.2.1",
     "tsconfig": "*",
@@ -20,7 +20,7 @@
   "dependencies": {
     "@onefootprint/design-tokens": "*",
     "react": "^18.2.0",
-    "react-native": "^0.71.6",
+    "react-native": "^0.71.7",
     "styled-components": "^5.3.8"
   }
 }
