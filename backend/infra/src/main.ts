@@ -22,6 +22,7 @@ import * as dns from './dns';
 import * as airplane from './airplane';
 import * as assets from './asset_cdn';
 import { DatabaseOutput } from './db';
+import { ConfigureAlerts } from './alerts';
 
 /**
  * Convenient type to pass shared global resources
@@ -145,6 +146,8 @@ export default async function main() {
   const airplaneOutput = airplane.CreateAirplaneAgentStack(globalState);
 
   const service = await createCoreService(globalState);
+
+  ConfigureAlerts(stackMetadata);
 
   return {
     service,

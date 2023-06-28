@@ -10,6 +10,10 @@ config:
     containers:
       apiVersion: latest
       enclaveVersion: latest
+    db:
+      deletionProtection: false
+      maxAcus: 16
+      minAcus: 2
     domain:
       assets: i-dev.onefp.net
       base: dev.onefootprint.com
@@ -79,15 +83,11 @@ config:
         secure: v1:pEdCWHncA7z7jfpm:Y/925Y6RiRhHoHPHx+SQDmCmyCHR67OWPQQEn0qcAfS6LHxBUXisSvn7Wfmdl7wtcpOBcpV3I1Gkng==
     resources:
       cpuUnits: 256
+      maxInstances: 4
       memoryMB: 512
       minInstances: 2
-      maxInstances: 4
       targetCpuUtilization: 70
       targetMemoryUtilization: 70
-    db:
-      deletionProtection: false
-      minAcus: 2
-      maxAcus: 16
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents
@@ -123,6 +123,9 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
+  infra:honeycomb:
+    apiKey:
+      secure: v1:OvsQ2EQpwZgDtXX2:gnCIfaNIoMI6yGAeDyc0qBFzp9f3WgptY1RBtOtR9mZBEAsf2bo=
   infra:neon:
     apiKey:
       secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=
