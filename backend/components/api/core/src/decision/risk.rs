@@ -50,8 +50,12 @@ pub fn save_final_decision(
     // If we should commit, portablize all data for the onboarding
     let seqno = if decision.decision.should_commit {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
-        let seqno = uvw.portablize_identity_data(conn)?;
-        Some(seqno)
+        if uvw.vault.is_portable {
+            let seqno = uvw.portablize_identity_data(conn)?;
+            Some(seqno)
+        } else {
+            None
+        }
     } else {
         None
     };
