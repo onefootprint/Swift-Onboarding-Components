@@ -1600,6 +1600,7 @@
           "org_settings": "Modify organization settings",
           "manual_review": "Perform manual review",
           "write_entities": "Create and update users",
+          "trigger_kyc": "Manually initiate KYC",
           "decrypt_all": "Everything",
           "decrypt_custom": "Custom attributes",
           "decrypt_documents": "Documents",

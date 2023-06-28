@@ -69,6 +69,9 @@ pub enum TenantScope {
 
     /// Allows decrypting relevant identity data for forwarding to a CIP integration
     CipIntegration,
+
+    /// Allows manually triggering KYC for a user via API
+    TriggerKyc,
 }
 
 impl_enum_string_diesel!(TenantScope);
@@ -139,6 +142,7 @@ impl TryFrom<TenantScopeDiscriminants> for TenantScope {
             TenantScopeDiscriminants::Decrypt => {
                 return Err(crate::Error::Custom("Cannot convert TenantScope".to_owned()))
             }
+            TenantScopeDiscriminants::TriggerKyc => Self::TriggerKyc,
         };
         Ok(v)
     }

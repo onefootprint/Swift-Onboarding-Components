@@ -20,6 +20,7 @@ pub enum TenantGuard {
     ManualReview,
     VaultProxy,
     CipIntegration,
+    TriggerKyc,
 }
 
 impl TenantGuard {
@@ -35,6 +36,7 @@ impl TenantGuard {
             Self::ManualReview => TenantScope::ManualReview,
             Self::VaultProxy => TenantScope::VaultProxy,
             Self::CipIntegration => TenantScope::CipIntegration,
+            Self::TriggerKyc => TenantScope::TriggerKyc,
         }
     }
 }

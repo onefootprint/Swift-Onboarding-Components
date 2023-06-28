@@ -78,6 +78,11 @@ const Permissions = () => {
           {...register('scopes')}
         />
         <Checkbox
+          label={t('scopes.trigger_kyc')}
+          value="trigger_kyc"
+          {...register('scopes')}
+        />
+        <Checkbox
           label={t('form.decrypt.label')}
           {...register('showDecrypt')}
         />

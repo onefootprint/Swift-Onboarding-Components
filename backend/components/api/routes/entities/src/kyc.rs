@@ -47,7 +47,7 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EntityValidateResponse> {
-    let auth = auth.check_guard(TenantGuard::ManualReview)?; // TODO: this aint it
+    let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
