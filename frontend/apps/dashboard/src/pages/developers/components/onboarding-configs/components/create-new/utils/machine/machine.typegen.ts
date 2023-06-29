@@ -14,9 +14,12 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignKybAccess: 'kybAccessSubmitted';
+    assignKybBoStepUp: 'kybBoStepUpSubmitted';
     assignKybCollect: 'kybCollectSubmitted';
     assignKycAccess: 'kycAccessSubmitted';
     assignKycCollect: 'kycCollectSubmitted';
+    assignKycInvestorProfile: 'kycInvestorProfileSubmitted';
+    assignKycStepUp: 'kycStepUpSubmitted';
     assignName: 'nameSubmitted';
     assignType: 'typeSubmitted';
   };
@@ -27,9 +30,12 @@ export interface Typegen0 {
     | 'complete'
     | 'kybAccess'
     | 'kybBoCollect'
+    | 'kybBoStepUp'
     | 'kybCollect'
     | 'kycAccess'
     | 'kycCollect'
+    | 'kycInvestorProfile'
+    | 'kycStepUp'
     | 'name'
     | 'type';
   tags: never;

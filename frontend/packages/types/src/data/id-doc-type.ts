@@ -9,3 +9,8 @@ export enum SupportedIdDocTypes {
   driversLicense = 'drivers_license',
   passport = 'passport',
 }
+
+export enum IdDocRegionality {
+  international = 'international',
+  usOnly = 'us_only',
+}

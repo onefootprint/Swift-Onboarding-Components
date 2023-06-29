@@ -8,8 +8,8 @@ import {
 import { Box, Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import AnimatedContainer from 'src/components/animated-container';
 
-import AnimatedContainer from '../../components/animated-container';
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getDefaultKycAccess from '../../utils/get-default-kyc-access';
@@ -24,13 +24,16 @@ type FormData = Record<
 
 const KycAccess = () => {
   const [state, send] = useOnboardingConfigMachine();
-  const { kycCollect, kycAccess } = state.context;
+  const { kycCollect, kycInvestorProfile } = state.context;
+  const hasCollectedDoc = !!kycCollect && kycCollect?.idDoc.types.length > 0;
+  const hasCollectedSelfie =
+    hasCollectedDoc && !!kycCollect && kycCollect?.idDoc.selfieRequired;
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create.kyc-access-form',
   );
 
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
-    defaultValues: getDefaultKycAccess(kycCollect, kycAccess),
+    defaultValues: getDefaultKycAccess(state.context),
   });
   const idDocAccess = watch(CollectedDocumentDataOption.document);
 
@@ -96,7 +99,7 @@ const KycAccess = () => {
               {...register(CollectedKycDataOption.nationality)}
             />
           )}
-          {kycCollect?.[CollectedDocumentDataOption.document] && (
+          {hasCollectedDoc && (
             <Box>
               <Checkbox
                 label={allT('cdo.document')}
@@ -106,9 +109,7 @@ const KycAccess = () => {
               />
               <AnimatedContainer
                 isExpanded={
-                  !!kycCollect?.[
-                    CollectedDocumentDataOption.documentAndSelfie
-                  ] && !!idDocAccess
+                  hasCollectedDoc && hasCollectedSelfie && !!idDocAccess
                 }
               >
                 <Checkbox
@@ -118,7 +119,9 @@ const KycAccess = () => {
               </AnimatedContainer>
             </Box>
           )}
-          {kycCollect?.[CollectedInvestorProfileDataOption.investorProfile] && (
+          {kycInvestorProfile?.[
+            CollectedInvestorProfileDataOption.investorProfile
+          ] && (
             <Checkbox
               label={allT('cdo.investor_profile')}
               {...register(CollectedInvestorProfileDataOption.investorProfile)}

@@ -5,7 +5,6 @@ import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
 import Dialog from './components/dialog';
-import OnboardingConfigMachineProvider from './components/machine-provider';
 
 type CreateProps = {
   onCreate: () => void;
@@ -26,13 +25,11 @@ const Create = ({ onCreate }: CreateProps) => {
           {t('cta')}
         </Button>
       </PermissionGate>
-      <OnboardingConfigMachineProvider>
-        <Dialog
-          open={isCreateDialogOpen}
-          onClose={closeCreateDialog}
-          onCreate={onCreate}
-        />
-      </OnboardingConfigMachineProvider>
+      <Dialog
+        open={isCreateDialogOpen}
+        onClose={closeCreateDialog}
+        onCreate={onCreate}
+      />
     </>
   );
 };

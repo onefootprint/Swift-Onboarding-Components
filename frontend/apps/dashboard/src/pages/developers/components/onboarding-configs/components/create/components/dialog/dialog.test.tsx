@@ -12,8 +12,6 @@ import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
 import withCreateOnboardingConfig from './dialog.test.config';
 
-// TODO: Add KYB Access form tests
-
 describe('<CreateConfig />', () => {
   const defaultOptions = {
     open: true,

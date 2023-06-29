@@ -44,11 +44,33 @@ export const createOnboardingConfigMachine = () =>
         kycCollect: {
           on: {
             kycCollectSubmitted: {
-              target: 'kycAccess',
+              target: 'kycStepUp',
               actions: ['assignKycCollect'],
             },
             prevClicked: {
               target: 'name',
+            },
+          },
+        },
+        kycStepUp: {
+          on: {
+            kycStepUpSubmitted: {
+              target: 'kycInvestorProfile',
+              actions: ['assignKycStepUp'],
+            },
+            prevClicked: {
+              target: 'kycCollect',
+            },
+          },
+        },
+        kycInvestorProfile: {
+          on: {
+            kycInvestorProfileSubmitted: {
+              target: 'kycAccess',
+              actions: ['assignKycInvestorProfile'],
+            },
+            prevClicked: {
+              target: 'kycStepUp',
             },
           },
         },
@@ -59,7 +81,7 @@ export const createOnboardingConfigMachine = () =>
               actions: ['assignKycAccess'],
             },
             prevClicked: {
-              target: 'kycCollect',
+              target: 'kycInvestorProfile',
             },
           },
         },
@@ -77,11 +99,22 @@ export const createOnboardingConfigMachine = () =>
         kybBoCollect: {
           on: {
             kycCollectSubmitted: {
-              target: 'kybAccess',
+              target: 'kybBoStepUp',
               actions: ['assignKycCollect'],
             },
             prevClicked: {
               target: 'kybCollect',
+            },
+          },
+        },
+        kybBoStepUp: {
+          on: {
+            kybBoStepUpSubmitted: {
+              target: 'kybAccess',
+              actions: ['assignKybBoStepUp'],
+            },
+            prevClicked: {
+              target: 'kybBoCollect',
             },
           },
         },
@@ -92,7 +125,7 @@ export const createOnboardingConfigMachine = () =>
               actions: ['assignKybAccess'],
             },
             prevClicked: {
-              target: 'kybBoCollect',
+              target: 'kybBoStepUp',
             },
           },
         },
@@ -115,6 +148,14 @@ export const createOnboardingConfigMachine = () =>
           ...context,
           kycCollect: event.payload,
         })),
+        assignKycStepUp: assign((context, event) => ({
+          ...context,
+          kycStepUp: event.payload,
+        })),
+        assignKycInvestorProfile: assign((context, event) => ({
+          ...context,
+          kycInvestorProfile: event.payload,
+        })),
         assignKycAccess: assign((context, event) => ({
           ...context,
           kycAccess: event.payload,
@@ -123,12 +164,13 @@ export const createOnboardingConfigMachine = () =>
           ...context,
           kybCollect: event.payload,
         })),
+        assignKybBoStepUp: assign((context, event) => ({
+          ...context,
+          kybBoStepUp: event.payload,
+        })),
         assignKybAccess: assign((context, event) => ({
           ...context,
-          kycAccess: event.payload.kycAccess,
-          kybAccess: {
-            allKybData: event.payload.allKybData,
-          },
+          kybAccess: event.payload,
         })),
       },
     },

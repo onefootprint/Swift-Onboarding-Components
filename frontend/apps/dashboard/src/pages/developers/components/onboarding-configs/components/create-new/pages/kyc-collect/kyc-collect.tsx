@@ -12,7 +12,7 @@ const KycCollect = () => {
   return (
     <>
       <FormTitle title={t('title')} description={t('description')} />
-      <KycCollectForm showInvestorProfile />
+      <KycCollectForm />
     </>
   );
 };

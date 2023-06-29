@@ -33,6 +33,7 @@ export enum CollectedKycDataOption {
   nationality = 'nationality',
 }
 
+// TODO: update this
 export enum CollectedDocumentDataOption {
   document = 'document',
   documentAndSelfie = 'document_and_selfie',

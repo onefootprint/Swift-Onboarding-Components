@@ -6,10 +6,9 @@ import {
 
 import { MachineContext } from '../machine/types';
 
-const getDefaultKycAccess = (
-  kycCollect: MachineContext['kycCollect'],
-  kycAccess: MachineContext['kycAccess'],
-) => {
+const getDefaultKycAccess = (context: MachineContext) => {
+  const { kycCollect, kycInvestorProfile, kycAccess } = context;
+
   const defaultValues: Partial<
     Record<
       | CollectedKycDataOption
@@ -30,18 +29,23 @@ const getDefaultKycAccess = (
     [CollectedKycDataOption.nationality]:
       !!kycCollect?.[CollectedKycDataOption.nationality],
     [CollectedDocumentDataOption.document]:
-      !!kycCollect?.[CollectedDocumentDataOption.document],
+      !!kycCollect && kycCollect?.idDoc.types.length > 0,
     [CollectedDocumentDataOption.documentAndSelfie]:
-      !!kycCollect?.[CollectedDocumentDataOption.documentAndSelfie],
+      !!kycCollect &&
+      kycCollect?.idDoc.types.length > 0 &&
+      kycCollect.idDoc.selfieRequired,
     [CollectedInvestorProfileDataOption.investorProfile]:
-      !!kycCollect?.[CollectedInvestorProfileDataOption.investorProfile],
+      !!kycInvestorProfile?.[
+        CollectedInvestorProfileDataOption.investorProfile
+      ],
   };
 
   if (kycAccess) {
     Object.entries(kycAccess).forEach(entry => {
       const key = entry[0] as
         | CollectedKycDataOption
-        | CollectedDocumentDataOption;
+        | CollectedDocumentDataOption
+        | CollectedInvestorProfileDataOption;
       const value = entry[1] as boolean;
       defaultValues[key] = value;
     });

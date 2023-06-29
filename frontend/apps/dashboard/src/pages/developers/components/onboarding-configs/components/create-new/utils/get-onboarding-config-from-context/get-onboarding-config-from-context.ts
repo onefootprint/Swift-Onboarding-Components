@@ -8,6 +8,8 @@ import {
 
 import { MachineContext } from '../machine/types';
 
+// TODO: (clodoan/belce) edit the util methods in this file at the end to compose the new id doc cdos
+
 const getKybOnboardingConfigFromContext = (
   context: MachineContext,
 ): {
@@ -60,9 +62,12 @@ const getKybOnboardingConfigFromContext = (
   if (kycCollect?.[CollectedKycDataOption.nationality]) {
     mustCollectKycData.push(CollectedKycDataOption.nationality);
   }
-  if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
+  const hasCollectedIdDoc = !!kycCollect && kycCollect?.idDoc.types?.length > 0;
+  const hasCollectedSelfie =
+    hasCollectedIdDoc && kycCollect?.idDoc.selfieRequired;
+  if (hasCollectedSelfie) {
     mustCollectKycData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
+  } else if (hasCollectedIdDoc) {
     mustCollectKycData.push(CollectedDocumentDataOption.document);
   }
 
@@ -110,7 +115,7 @@ const getKycOnboardingConfigFromContext = (
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
 } => {
-  const { kycCollect, kycAccess } = context;
+  const { kycCollect, kycAccess, kycInvestorProfile } = context;
 
   const mustCollectData: (
     | CollectedKycDataOption
@@ -132,12 +137,18 @@ const getKycOnboardingConfigFromContext = (
   if (kycCollect?.[CollectedKycDataOption.nationality]) {
     mustCollectData.push(CollectedKycDataOption.nationality);
   }
-  if (kycCollect?.[CollectedDocumentDataOption.documentAndSelfie]) {
+  const hasCollectedIdDoc = !!kycCollect && kycCollect?.idDoc.types?.length > 0;
+  const hasCollectedSelfie =
+    hasCollectedIdDoc && kycCollect?.idDoc.selfieRequired;
+  if (hasCollectedSelfie) {
     mustCollectData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (kycCollect?.[CollectedDocumentDataOption.document]) {
+  } else if (hasCollectedIdDoc) {
     mustCollectData.push(CollectedDocumentDataOption.document);
   }
-  if (kycCollect?.[CollectedInvestorProfileDataOption.investorProfile]) {
+
+  if (
+    kycInvestorProfile?.[CollectedInvestorProfileDataOption.investorProfile]
+  ) {
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
