@@ -1,10 +1,8 @@
 //! Migrates our old phone and email format that had the sandbox suffix encrypted inline to instead have sandbox suffix elsewhere.
 
 use api_core::{enclave_client::EnclaveClient, errors::ApiResult, State};
-use db::{
-    models::fingerprint::NewFingerprint,
-    schema::{data_lifetime, fingerprint, scoped_vault, vault, vault_data},
-};
+use db::models::fingerprint::NewFingerprint;
+use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault, vault_data};
 use enclave::DataTransform;
 use futures::StreamExt;
 use itertools::Itertools;

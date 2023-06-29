@@ -13,7 +13,7 @@ crypto = { path = "../../../enclave/crypto" }
 enclave_proxy = { path = "../../../enclave/proxy" }
 newtypes = { path = "../../../newtypes" }
 app-attest = { path = "../../../app_attest" }
-db = { path = "../../../db" }
+db = { path = "../../../db/core" }
 twilio = { path = "../../../twilio"}
 idv = { path = "../../../idv" }
 privacy_pass = { path = "../../../privacy_pass" }

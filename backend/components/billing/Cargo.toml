@@ -9,7 +9,7 @@ doctest = false
 
 [dependencies]
 async-stripe = { version = "0.18.2", default-features = false, features = ["checkout","billing","runtime-tokio-hyper"] }
-db = { path = "../db" }
+db = { path = "../db/core" }
 newtypes = { path = "../newtypes" }
 feature_flag = { path = "../feature_flag" }
 thiserror = { workspace = true }

@@ -223,7 +223,7 @@ jobs:
         run: cargo install diesel_cli --version 1.4.1 --no-default-features --features postgres
 
       - name: Check valid db migrations
-        working-directory: ./backend/components/db
+        working-directory: ./backend/components/db/schema
         run: |
           NUM_FILES=`ls migrations | wc -l`
           NUM_TO_REVERT=$(( $NUM_FILES < 1 ? $NUM_FILES : 1 ))

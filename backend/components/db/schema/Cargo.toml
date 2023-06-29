@@ -1,0 +1,16 @@
+[package]
+name = "db_schema"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+doctest = true
+
+[features]
+testing = []
+
+[dependencies]
+# i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
+diesel = { workspace = true, features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes" ] }
+diesel_migrations = { workspace = true }

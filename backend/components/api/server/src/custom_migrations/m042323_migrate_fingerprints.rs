@@ -8,9 +8,9 @@ use tokio::runtime::Handle;
 
 use db::{
     models::{fingerprint::NewFingerprint, vault::Vault, vault_data::VaultData},
-    schema::{data_lifetime, fingerprint, scoped_vault, tenant, vault, vault_data},
     DbError, TxnPgConn,
 };
+use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, tenant, vault, vault_data};
 use diesel::{dsl::not, prelude::*};
 use newtypes::{
     fingerprinter::GlobalFingerprintKind, DataIdentifier, FingerprintScopeKind, ScopedVaultId, TenantId,
