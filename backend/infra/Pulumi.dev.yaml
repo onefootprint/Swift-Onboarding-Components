@@ -34,7 +34,7 @@ config:
       resources:
         instance: c5a.xlarge
         cpus: 2
-        memory: 6144
+        memory: 512
         cid: 16
     experian:
       authClientId:
