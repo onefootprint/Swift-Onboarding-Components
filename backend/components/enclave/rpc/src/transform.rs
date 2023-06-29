@@ -11,6 +11,9 @@ pub enum TransformError {
 
     #[error("invalid utf-8 string")]
     TransformExpectedString(#[from] Utf8Error),
+
+    #[error("invalid date or date format")]
+    DateFormat(#[from] chrono::ParseError),
 }
 
 pub trait DataTransformer {
@@ -30,7 +33,9 @@ impl DataTransformer for DataTransform {
             | DataTransform::Suffix { .. }
             | DataTransform::ToLowercase
             | DataTransform::ToUppercase
-            | DataTransform::ToAscii => {
+            | DataTransform::ToAscii
+            | DataTransform::Replace { .. }
+            | DataTransform::DateFormat { .. } => {
                 let str = std::str::from_utf8(&data)?;
                 let out = self.apply_str::<String>(str)?;
                 out.as_bytes().to_vec()
@@ -49,7 +54,7 @@ impl DataTransformer for DataTransform {
             }
             DataTransform::ToLowercase => data.to_lowercase(),
             DataTransform::ToUppercase => data.to_uppercase(),
-            DataTransform::ToAscii => data.chars().filter(|c| c.is_ascii()).collect(),
+            DataTransform::ToAscii => deunicode::deunicode(data),
             DataTransform::Prefix { count } => data.chars().take(*count).collect(),
             DataTransform::Suffix { count } => {
                 if *count < data.len() {
@@ -57,6 +62,14 @@ impl DataTransformer for DataTransform {
                 } else {
                     data.to_string()
                 }
+            }
+            DataTransform::Replace { from, to } => data.replace(from.as_str(), to.as_str()),
+            DataTransform::DateFormat {
+                from_format,
+                to_format,
+            } => {
+                let datetime = chrono::NaiveDate::parse_from_str(data, from_format.as_str())?;
+                datetime.format(to_format).to_string()
             }
         };
         Ok(T::from(string))
@@ -92,15 +105,18 @@ mod tests {
     #[test_case(vec![Identity], "Hi Hello 🎉" => "Hi Hello 🎉".to_string())]
     #[test_case(vec![ToLowercase], "HeLLo WORld" => "hello world".to_string())]
     #[test_case(vec![ToUppercase], "HeLLo WORld" => "HELLO WORLD".to_string())]
-    #[test_case(vec![ToAscii], "Hi Hello 🎉" => "Hi Hello ".to_string())]
+    #[test_case(vec![ToAscii], "Hi Álex Hello 🎉" => "Hi Alex Hello tada".to_string())]
     #[test_case(vec![Prefix { count: 3}], "Hello World" => "Hel".to_string())]
     #[test_case(vec![Suffix { count: 3}], "Hello World" => "rld".to_string())]
     #[test_case(vec![Prefix { count: 15}], "Hello World" => "Hello World".to_string())]
     #[test_case(vec![Suffix { count: 43}], "Hello World" => "Hello World".to_string())]
     #[test_case(vec![HmacSha256 { key: vec![0,1,2,3]}], "Hello World" => "a1616b32521caae43a9479cca28904bc5f6b9e3056fadef332129116d50523eb".to_string())]
-    #[test_case(vec![ToAscii, ToLowercase], "Hi Hello 🎉" => "hi hello ".to_string())]
+    #[test_case(vec![ToAscii, ToUppercase], "Hi Hello 🎉" => "HI HELLO TADA".to_string())]
     #[test_case(vec![ToUppercase, Suffix { count: 4 }, Prefix { count: 2 } ], "Hello flerp derp" => "DE".to_string())]
     #[test_case(vec![ToUppercase, Prefix { count: 4 }, ToLowercase ], "Hello flerp derp" => "hell".to_string())]
+    #[test_case(vec![ToUppercase, Replace { from: "FLERP".into(), to: "".into() }, ToLowercase ], "Hello flerp derp" => "hello  derp".to_string())]
+    #[test_case(vec![DateFormat { from_format: "%Y-%m-%d".into(), to_format: "%m/%y".into()}], "1984-09-24" => "09/84".to_string())]
+    #[test_case(vec![DateFormat { from_format: "%Y-%m-%d".into(), to_format: "%A in %B".into()}], "1984-09-24" => "Monday in September".to_string())]
     fn test_apply_data_tranform(transforms: Vec<DataTransform>, input: &str) -> String {
         DataTransforms(transforms)
             .apply_str(input)

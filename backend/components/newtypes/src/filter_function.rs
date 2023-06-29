@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use std::str::FromStr;
+use std::vec::IntoIter;
 use strum_macros::EnumDiscriminants;
 use strum_macros::EnumString;
 
@@ -16,6 +17,8 @@ pub enum FilterFunction {
     ToAscii,
     Prefix { count: usize },
     Suffix { count: usize },
+    Replace { from: String, to: String },
+    DateFormat { from_format: String, to_format: String },
 }
 
 #[derive(thiserror::Error, Debug, PartialEq)]
@@ -34,6 +37,12 @@ pub enum FilterFunctionParsingError {
 
     #[error("unknown function")]
     UnknownFunctionName,
+
+    #[error("invalid args separtor ','")]
+    InvalidArgsSeparator,
+
+    #[error("string argument {0} must use single or double quotes")]
+    StringArgumentMustUseQuotes(&'static str),
 }
 
 impl FilterFunction {
@@ -46,6 +55,7 @@ impl FilterFunction {
         match self {
             FilterFunction::ToLowercase | FilterFunction::ToUppercase | FilterFunction::ToAscii => 0,
             FilterFunction::Prefix { .. } | FilterFunction::Suffix { .. } => 1,
+            FilterFunction::DateFormat { .. } | FilterFunction::Replace { .. } => 2,
         }
     }
 
@@ -54,7 +64,7 @@ impl FilterFunction {
         let raw = raw.trim();
 
         // functions can either have arguments or none
-        let (name, args) = match (raw.find('('), raw.find(')')) {
+        let (name, mut args) = match (raw.find('('), find_unescaped(raw, ')')) {
             (Some(open), Some(close)) if open < close => {
                 // check nothing after close paren
                 if close + 1 != raw.len() {
@@ -62,52 +72,135 @@ impl FilterFunction {
                 }
 
                 let name = &raw[0..open];
-                let args = raw[open + 1..close]
-                    .split(',')
-                    .map(|s| s.trim())
-                    .filter(|s| !s.is_empty())
-                    .collect_vec();
+                let args = &raw[open + 1..close];
+
+                let args = ArgParser::new(args);
                 (name, args)
             }
-            (None, None) => (raw, vec![]),
+            (None, None) => (raw, ArgParser::empty()),
             _ => return Err(FilterFunctionParsingError::InvalidParens)?,
         };
 
         let ff_name = FilterFunctionName::from_str(name)
             .map_err(|_| FilterFunctionParsingError::UnknownFunctionName)?;
 
-        let num_args_found = args.len();
-
         let func = match ff_name {
             FilterFunctionName::ToLowercase => FilterFunction::ToLowercase,
             FilterFunctionName::ToUppercase => FilterFunction::ToUppercase,
             FilterFunctionName::ToAscii => FilterFunction::ToAscii,
             FilterFunctionName::Prefix => FilterFunction::Prefix {
-                count: args
-                    .into_iter()
-                    .next()
-                    .ok_or(FilterFunctionParsingError::MissingArgument("count"))?
-                    .parse()
-                    .map_err(FilterFunctionParsingError::from)?,
+                count: args.parse_integer("count")?,
             },
             FilterFunctionName::Suffix => FilterFunction::Suffix {
-                count: args
-                    .into_iter()
-                    .next()
-                    .ok_or(FilterFunctionParsingError::MissingArgument("count"))?
-                    .parse()
-                    .map_err(FilterFunctionParsingError::from)?,
+                count: args.parse_integer("count")?,
+            },
+            FilterFunctionName::Replace => FilterFunction::Replace {
+                from: args.parse_string("from")?,
+                to: args.parse_string("to")?,
+            },
+            FilterFunctionName::DateFormat => FilterFunction::DateFormat {
+                from_format: args.parse_string("from_format")?,
+                to_format: args.parse_string("to_format")?,
             },
         };
 
-        if num_args_found != func.num_args() {
+        if args.count != func.num_args() {
             return Err(FilterFunctionParsingError::UnexpectedArguments {
                 expected: func.num_args(),
-                found: num_args_found,
+                found: args.count,
             })?;
         }
 
         Ok(func)
+    }
+}
+
+/// helper function to find an unescaped char (i.e. `c` but NOT `\c`)
+fn find_unescaped(raw: &str, c: char) -> Option<usize> {
+    let mut pos = 0;
+    while let Some(loc) = raw[pos..].find(c) {
+        if raw.get(loc - 1..loc) == Some("\\") {
+            pos = loc + 1;
+            continue;
+        }
+        return Some(pos + loc);
+    }
+    None
+}
+
+/// Args are comma-separated values.
+/// Support parsing Integers and Strings
+/// Escape special characters like `(`, `)`, `,` with the escape character `\`.
+/// Strings must be in double or single quotes
+/// We do this so that we can support escaped strings and separators.
+struct ArgParser {
+    count: usize,
+    args: IntoIter<String>,
+}
+
+impl ArgParser {
+    fn empty() -> Self {
+        Self {
+            count: 0,
+            args: vec![].into_iter(),
+        }
+    }
+    fn new(args: &str) -> Self {
+        let mut args_list = vec![];
+
+        let mut pos = 0;
+        while let Some(sep) = find_unescaped(&args[pos..], ',') {
+            args_list.push(&args[pos..pos + sep]);
+            pos += sep + 1;
+        }
+
+        // add the last arg
+        let last = &args[pos..];
+        if !last.is_empty() {
+            args_list.push(last);
+        }
+
+        // trim args and remove the escape literals
+        let args_list = args_list
+            .into_iter()
+            .map(|arg| {
+                arg.trim()
+                    .replace("\\(", "(")
+                    .replace("\\)", ")")
+                    .replace("\\,", ",")
+            })
+            .collect_vec();
+        let count = args_list.len();
+        let args = args_list.into_iter();
+        ArgParser { count, args }
+    }
+
+    fn parse_integer(&mut self, name: &'static str) -> Result<usize, FilterFunctionParsingError> {
+        self.args
+            .next()
+            .ok_or(FilterFunctionParsingError::MissingArgument(name))?
+            .parse()
+            .map_err(FilterFunctionParsingError::from)
+    }
+
+    /// must be in single or double quotes `'`
+    fn parse_string(&mut self, name: &'static str) -> Result<String, FilterFunctionParsingError> {
+        let arg = self
+            .args
+            .next()
+            .ok_or(FilterFunctionParsingError::MissingArgument(name))?;
+
+        if let Some(rem) = arg.strip_prefix('\"') {
+            if let Some(rem) = rem.strip_suffix('\"') {
+                return Ok(rem.to_string());
+            }
+        } else if let Some(rem) = arg.strip_prefix('\'') {
+            if let Some(rem) = rem.strip_suffix('\'') {
+                return Ok(rem.to_string());
+            }
+        }
+
+        Err(FilterFunctionParsingError::StringArgumentMustUseQuotes(name))
     }
 }
 
@@ -125,7 +218,28 @@ mod tests {
     #[test_case("to_lowercase()" => Ok(FF::ToLowercase))]
     #[test_case("to_ascii(1)" => Err(UnexpectedArguments { expected: 0, found: 1 }))]
     #[test_case(" to_uppercase " => Ok(FF::ToUppercase))]
+    #[test_case("replace('a','b')" => Ok(FF::Replace { from: "a".into(), to: "b".into() }))]
+    #[test_case("replace(c,d)" => Err(StringArgumentMustUseQuotes("from")))]
+    #[test_case("replace('\"hi','flerp')" => Ok(FF::Replace { from: "\"hi".into(), to: "flerp".into() }))]
+    #[test_case("replace(\"my\\,flerp\",\" derp \")" => Ok(FF::Replace { from: "my,flerp".into(), to: " derp ".into() }))]
+    #[test_case("replace('\\(my','paren\\)')" => Ok(FF::Replace { from: "(my".into(), to: "paren)".into() }))]
     fn test_filter_function_parsing(input: &str) -> Result<FilterFunction, FilterFunctionParsingError> {
         FilterFunction::parse(input)
+    }
+
+    #[test_case("hello my name, is", ',' => Some(13))]
+    #[test_case("hello\\, world", ',' => None)]
+    #[test_case("hello\\, world1,", ',' => Some(14))]
+    fn test_unescaped(raw: &str, c: char) -> Option<usize> {
+        find_unescaped(raw, c)
+    }
+
+    #[test_case("hello,world" => 2)]
+    #[test_case("hello" => 1)]
+    #[test_case("" => 0)]
+    #[test_case("hello,world,today," => 3)]
+    #[test_case("hello , world , hi" => 3)]
+    fn test_arg_parser(args: &str) -> usize {
+        ArgParser::new(args).count
     }
 }

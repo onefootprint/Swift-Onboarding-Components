@@ -46,6 +46,14 @@ pub enum DataTransform {
     Suffix {
         count: usize,
     },
+    Replace {
+        from: String,
+        to: String,
+    },
+    DateFormat {
+        from_format: String,
+        to_format: String,
+    },
 }
 
 impl std::fmt::Debug for DataTransform {
