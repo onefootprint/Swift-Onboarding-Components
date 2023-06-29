@@ -15,7 +15,7 @@ export const preferences: Partial<
     mask: {
       numericOnly: true,
       delimiters: ['(', ') ', '-'],
-      blocks: [0, 3, 3, Infinity],
+      blocks: [0, 3, 3, 4],
     },
   },
   CA: {
@@ -23,7 +23,7 @@ export const preferences: Partial<
     mask: {
       numericOnly: true,
       delimiters: ['(', ') ', '-'],
-      blocks: [0, 3, 3, Infinity],
+      blocks: [0, 3, 3, 4],
     },
   },
 };
