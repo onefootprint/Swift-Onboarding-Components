@@ -2,18 +2,26 @@ import { StackMetadata } from './stack_metadata';
 import * as aws from '@pulumi/aws';
 import { Config } from './config';
 import { AWSPolicyConfig } from './service';
+import { GlobalState } from './main';
 
 /**
  * Configure document Images bucket
  */
-export function CreateServiceBuckets(
+export async function CreateServiceBuckets(
   provider: aws.Provider,
   config: Config,
   stackMetadata: StackMetadata,
-): ServiceS3Buckets {
+  region: string,
+): Promise<ServiceS3Buckets> {
   return {
     documentImages: createDocumentImagesBucket(stackMetadata, config, provider),
     assetsBucket: createAssetsBucket(stackMetadata, config, provider),
+    accessLogBucketName: await createAlbAccessLogsBucket(
+      provider,
+      config,
+      stackMetadata,
+      region,
+    ),
     // More buckets would go here in the future...
   };
 }
@@ -121,4 +129,50 @@ export interface S3BucketConfig {
 export interface ServiceS3Buckets {
   documentImages: S3BucketConfig;
   assetsBucket: S3BucketConfig;
+  accessLogBucketName: string;
+}
+
+async function createAlbAccessLogsBucket(
+  provider: aws.Provider,
+  config: Config,
+  stackMetadata: StackMetadata,
+  region: string,
+): Promise<string> {
+  const bucketName = `1fp-alb-access-logs-${stackMetadata.shortStackName}`;
+  const elbAccountArn = await (await aws.elb.getServiceAccount({ region })).arn;
+  const bucket = new aws.s3.Bucket(
+    bucketName,
+    {
+      forceDestroy: !config.db.deletionProtection, // Weird to derive this from deletionProtection
+      bucket: bucketName,
+      arn: `arn:aws:s3:::${bucketName}`,
+      acl: 'private',
+      serverSideEncryptionConfiguration: {
+        rule: {
+          applyServerSideEncryptionByDefault: {
+            sseAlgorithm: 'aws:kms',
+          },
+          bucketKeyEnabled: true,
+        },
+      },
+      policy: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: ['s3:PutObject'],
+            Principal: {
+              AWS: elbAccountArn,
+            },
+            Resource: `arn:aws:s3:::${bucketName}/*/AWSLogs/*`,
+          },
+        ],
+      },
+    },
+    {
+      provider,
+    },
+  );
+
+  return bucketName;
 }

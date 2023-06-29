@@ -200,9 +200,13 @@ async function createLoadBalancer(
       // this lets the LB communicate to our nitro instances
       securityGroups: [securityGroup],
       external: false,
-
       // private subnets as this is an internal service
       subnets: g.vpc.privateSubnetIds,
+      accessLogs: {
+        bucket: g.buckets.accessLogBucketName,
+        enabled: true,
+        prefix: 'fpc-ns',
+      },
     },
     { provider },
   );

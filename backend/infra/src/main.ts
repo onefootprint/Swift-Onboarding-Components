@@ -117,7 +117,12 @@ export default async function main() {
   }
 
   // Create our s3 buckets
-  const s3Buckets = s3.CreateServiceBuckets(provider, constants, stackMetadata);
+  const s3Buckets = await s3.CreateServiceBuckets(
+    provider,
+    constants,
+    stackMetadata,
+    region,
+  );
 
   // Create our asset CDN
   const assetCdn = await assets.CreateAssetCdn(

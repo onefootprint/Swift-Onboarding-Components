@@ -254,7 +254,7 @@ async function createCdnFrontedLoadBalancer(
       securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer],
       subnets: vpc.publicSubnetIds,
       accessLogs: {
-        bucket: await createAlbAccessLogsBucket(g, stackMetadata),
+        bucket: g.buckets.accessLogBucketName,
         enabled: true,
         prefix: 'fpc-svc',
       },
@@ -550,50 +550,4 @@ function createTaskContainerRole(
     });
 
   return role;
-}
-
-async function createAlbAccessLogsBucket(
-  g: GlobalState,
-  stackMetadata: StackMetadata,
-): Promise<string> {
-  const provider = g.provider;
-  const bucketName = `1fp-alb-access-logs-${stackMetadata.shortStackName}`;
-  const elbAccountArn = await (
-    await aws.elb.getServiceAccount({ region: g.region })
-  ).arn;
-  const bucket = new aws.s3.Bucket(
-    bucketName,
-    {
-      forceDestroy: !g.constants.db.deletionProtection, // Weird to derive this from deletionProtection
-      bucket: bucketName,
-      arn: `arn:aws:s3:::${bucketName}`,
-      acl: 'private',
-      serverSideEncryptionConfiguration: {
-        rule: {
-          applyServerSideEncryptionByDefault: {
-            sseAlgorithm: 'aws:kms',
-          },
-          bucketKeyEnabled: true,
-        },
-      },
-      policy: {
-        Version: '2012-10-17',
-        Statement: [
-          {
-            Effect: 'Allow',
-            Action: ['s3:PutObject'],
-            Principal: {
-              AWS: elbAccountArn,
-            },
-            Resource: `arn:aws:s3:::${bucketName}/*/AWSLogs/*`,
-          },
-        ],
-      },
-    },
-    {
-      provider,
-    },
-  );
-
-  return bucketName;
 }
