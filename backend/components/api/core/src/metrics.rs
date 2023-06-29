@@ -1,5 +1,6 @@
 #![allow(clippy::expect_used)]
 use lazy_static::lazy_static;
+use opentelemetry::metrics::UpDownCounter;
 use prometheus::{
     opts, register_histogram, register_int_counter, Histogram, IntCounter, IntCounterVec, Registry,
 };
@@ -50,4 +51,18 @@ pub fn register_all_metrics(registry: &Registry) -> Result<(), prometheus::Error
     registry.register(Box::new(DECISION_ENGINE_ONBOARDING_DECISION.clone()))?;
 
     Ok(())
+}
+
+#[derive(Debug, Clone)]
+pub struct Metrics {
+    pub get_status_counter: UpDownCounter<i64>,
+}
+
+pub fn init() -> Metrics {
+    let meter = opentelemetry::global::meter("fpc");
+    let get_status_counter = meter
+        .i64_up_down_counter("get_status_counter")
+        .with_description("Dummy counter that counts the number of times GET /status is hit")
+        .init();
+    Metrics { get_status_counter }
 }

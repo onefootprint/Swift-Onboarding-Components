@@ -565,6 +565,7 @@ dependencies = [
  "once_cell",
  "opentelemetry 0.17.0",
  "opentelemetry-otlp",
+ "opentelemetry_api",
  "paperclip",
  "paste",
  "portpicker",

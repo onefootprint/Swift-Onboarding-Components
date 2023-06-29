@@ -5,6 +5,7 @@ use crate::{
     enclave_client::EnclaveClient,
     errors::ApiError,
     fingerprinter::AwsHmacClient,
+    metrics::Metrics,
     s3,
     utils::{email::SendgridClient, twilio::TwilioClient},
     vendor_clients::VendorClients,
@@ -70,6 +71,7 @@ pub struct State {
     pub billing_client: billing::BillingClient,
     pub fingerprintjs_client: FingerprintJSClient,
     pub vendor_clients: VendorClients,
+    pub metrics: Metrics,
 }
 impl State {
     /// initialize global state in test context
@@ -209,6 +211,8 @@ impl State {
             middesk_client,
         );
 
+        let metrics = crate::metrics::init();
+
         State {
             config,
             enclave_client,
@@ -227,6 +231,7 @@ impl State {
             billing_client,
             fingerprintjs_client,
             vendor_clients,
+            metrics,
         }
     }
 

@@ -110,3 +110,5 @@ portpicker = "0.1.1"
 
 tokio-test = "0.4.2"
 mockall = { workspace = true }
+
+opentelemetry_api = { workspace = true }

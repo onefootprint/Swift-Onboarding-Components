@@ -25,6 +25,7 @@ async fn handler() -> StringResponse {
 #[get("/status")]
 async fn status(state: web::Data<State>) -> StringResponse {
     metrics::GET_STATUS_COUNTER.inc();
+    state.metrics.get_status_counter.add(1, &[]);
 
     let before_enclave = chrono::Utc::now().timestamp_millis();
     state.enclave_client.pong().await?;
