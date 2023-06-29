@@ -1378,10 +1378,8 @@
             }
           },
           "kyc-step-up": {
-            "id-doc": {
-              "title": "Step-up document request",
-              "description": "When users cannot be identified with their submitted data, automatically requesting additional documentation can improve your onboarding process conversion. This has an additional cost per step-up request."
-            }
+            "title": "Step-up document request",
+            "description": "When users cannot be identified with their submitted data, automatically requesting additional documentation can improve your onboarding process conversion. This has an additional cost per step-up request."
           },
           "kyc-investor-profile": {
             "label": "Broker questions (Investor profile)",

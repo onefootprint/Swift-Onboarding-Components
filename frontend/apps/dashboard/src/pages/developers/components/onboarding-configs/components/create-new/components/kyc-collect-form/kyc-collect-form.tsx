@@ -33,9 +33,11 @@ const KycCollectForm = () => {
       ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn9,
       [CollectedKycDataOption.nationality]:
         kycCollect?.[CollectedKycDataOption.nationality],
-      idDocType: [],
-      regionality: IdDocRegionality.international,
-      selfieRequired: false,
+      idDocType: kycCollect?.idDoc?.types || [],
+      regionality: kycCollect
+        ? kycCollect?.idDoc.regionality
+        : IdDocRegionality.international,
+      selfieRequired: kycCollect?.idDoc.selfieRequired || false,
     },
   });
   const { register, handleSubmit, watch } = methods;
