@@ -54,7 +54,7 @@ impl<Type> TenantVw<Type> {
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let _ = db::models::fingerprint::Fingerprint::bulk_create(conn, fingerprints)?;
+                db::models::fingerprint::Fingerprint::bulk_create(conn, fingerprints)?;
                 Ok(())
             })
             .await?;

@@ -4,7 +4,6 @@ use crate::schema::data_lifetime;
 use crate::schema::fingerprint;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
-use diesel::dsl::count_distinct;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::FingerprintScopeKind;
@@ -50,40 +49,11 @@ pub type IsUnique = bool;
 pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::create", skip_all)]
-    pub fn bulk_create(
-        conn: &mut TxnPgConn,
-        fingerprints: Vec<NewFingerprint>,
-    ) -> DbResult<DuplicateExistingFingerprintsByDLK> {
-        // Alert if we see multiple user vaults with the same information
-        let new_sh_data = fingerprints.iter().map(|f| f.sh_data.clone()).collect();
-        let existing_fingerprints_result = Self::bulk_check_if_exists(conn.conn(), new_sh_data);
-        let duplicates = match existing_fingerprints_result {
-            Ok(existing_fingerprints) => HashMap::from_iter(existing_fingerprints.into_iter()),
-            Err(e) => {
-                tracing::warn!(e=%e, "query for duplicate fingerprints failed");
-                HashMap::new()
-            }
-        };
-
+    pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
         diesel::insert_into(fingerprint::table)
             .values(fingerprints)
             .execute(conn.conn())?;
-        Ok(duplicates)
-    }
-
-    #[tracing::instrument("Fingerprint::bulk_check_if_exists", skip_all)]
-    fn bulk_check_if_exists(
-        conn: &mut PgConn,
-        sh_datas: Vec<FingerprintData>,
-    ) -> DbResult<Vec<(DataIdentifier, i64)>> {
-        let res: Vec<(DataIdentifier, i64)> = fingerprint::table
-            .filter(fingerprint::sh_data.eq_any(sh_datas))
-            .inner_join(data_lifetime::table)
-            .group_by(fingerprint::kind)
-            .select((fingerprint::kind, count_distinct(data_lifetime::vault_id)))
-            .get_results(conn)?;
-
-        Ok(res)
+        Ok(())
     }
 
     // for tests

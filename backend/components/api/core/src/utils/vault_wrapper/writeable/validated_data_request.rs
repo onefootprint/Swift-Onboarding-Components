@@ -2,27 +2,28 @@ use std::collections::HashSet;
 
 use crate::{
     errors::{user::UserError, ApiResult, AssertionError},
-    utils::{vault_wrapper::VaultWrapper},
+    utils::vault_wrapper::VaultWrapper,
 };
 use db::{
     models::{
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
-        vault_data::{NewVaultData, VaultData}, tenant::Tenant, vault::Vault
+        vault::Vault,
+        vault_data::{NewVaultData, VaultData},
     },
     TxnPgConn,
 };
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption, DataIdentifier, ScopedVaultId, IdentityDataKind as IDK, DataRequest,
-    Fingerprints, FingerprintScopeKind, FingerprintRequest, BusinessDataKind as BDK
+    BusinessDataKind as BDK, CollectedDataOption, DataRequest, FingerprintRequest, FingerprintScopeKind,
+    Fingerprints, IdentityDataKind as IDK, ScopedVaultId,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
-pub struct ValidatedDataRequest{
+pub struct ValidatedDataRequest {
     data: Vec<NewVaultData>,
     fingerprints: Fingerprints,
-    new_cdos: HashSet<CollectedDataOption>
+    new_cdos: HashSet<CollectedDataOption>,
 }
 
 impl<Type> VaultWrapper<Type> {
@@ -32,7 +33,11 @@ impl<Type> VaultWrapper<Type> {
         // Don't allow replacing some pieces of info
         let irreplaceable_dis = if self.vault.is_portable {
             // TODO really just want to avoid replacing verified phone and email
-             vec![(IDK::PhoneNumber.into(), true), (IDK::Email.into(), false), (BDK::KycedBeneficialOwners.into(), true)]
+            vec![
+                (IDK::PhoneNumber.into(), true),
+                (IDK::Email.into(), false),
+                (BDK::KycedBeneficialOwners.into(), true),
+            ]
         } else {
             vec![(BDK::KycedBeneficialOwners.into(), true)]
         };
@@ -70,17 +75,23 @@ impl<Type> VaultWrapper<Type> {
 
         // Transform the request into a Vec<NewVaultData>
         let (data, fingerprints) = request.decompose();
-        let data = data.into_iter().map(|(kind, pii)| {
-            let e_data = self.vault().public_key.seal_pii(&pii)?;
-            let p_data = kind.store_plaintext().then_some(pii);
-            Ok(NewVaultData { kind, e_data, p_data })
-        }).collect::<ApiResult<Vec<_>>>()?;
+        let data = data
+            .into_iter()
+            .map(|(kind, pii)| {
+                let e_data = self.vault().public_key.seal_pii(&pii)?;
+                let p_data = kind.store_plaintext().then_some(pii);
+                Ok(NewVaultData { kind, e_data, p_data })
+            })
+            .collect::<ApiResult<Vec<_>>>()?;
 
-        let req = ValidatedDataRequest{data, fingerprints, new_cdos};
+        let req = ValidatedDataRequest {
+            data,
+            fingerprints,
+            new_cdos,
+        };
         Ok(req)
     }
 }
-
 
 impl ValidatedDataRequest {
     /// Saves the validated updates to the DB
@@ -92,7 +103,11 @@ impl ValidatedDataRequest {
     ) -> ApiResult<Vec<VaultData>> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
-        let overwrite_kinds = self.new_cdos.iter().flat_map(|cdo| cdo.parent().options()).flat_map(|cdo| cdo.data_identifiers().unwrap_or_default());
+        let overwrite_kinds = self
+            .new_cdos
+            .iter()
+            .flat_map(|cdo| cdo.parent().options())
+            .flat_map(|cdo| cdo.data_identifiers().unwrap_or_default());
         let added_kinds = self.data.iter().map(|nvd| nvd.kind.clone());
         let kinds_to_deactivate = added_kinds
             // Even if we're not providing all fields for a CDO, deactivate old versions of all
@@ -107,46 +122,38 @@ impl ValidatedDataRequest {
         let vds = VaultData::bulk_create(conn, &user_vault.id, &scoped_user_id, self.data, seqno)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
-        let fingerprints: Vec<_> = self.fingerprints
+        let fingerprints: Vec<_> = self
+            .fingerprints
             .into_iter()
-            .map(|FingerprintRequest { kind, fingerprint, scope }| -> ApiResult<_> {
-                let vd = vds
-                    .iter()
-                    .find(|vd| vd.kind == kind)
-                    .ok_or(AssertionError("No lifetime id found"))?;
+            .map(
+                |FingerprintRequest {
+                     kind,
+                     fingerprint,
+                     scope,
+                 }|
+                 -> ApiResult<_> {
+                    let vd = vds
+                        .iter()
+                        .find(|vd| vd.kind == kind)
+                        .ok_or(AssertionError("No lifetime id found"))?;
 
-                Ok(NewFingerprint {
-                    kind: kind.clone(),
-                    sh_data: fingerprint,
-                    lifetime_id: vd.lifetime_id.clone(),
-                    // Don't make sandbox fingerprints unique since one phone number can be used
-                    // to make multiple sandbox vaults.
-                    is_unique: user_vault.is_live && scope == FingerprintScopeKind::Global && kind.globally_unique(),
-                    scope,
-                    version: newtypes::FingerprintVersion::current()
-                })
-            })
+                    Ok(NewFingerprint {
+                        kind: kind.clone(),
+                        sh_data: fingerprint,
+                        lifetime_id: vd.lifetime_id.clone(),
+                        // Don't make sandbox fingerprints unique since one phone number can be used
+                        // to make multiple sandbox vaults.
+                        is_unique: user_vault.is_live
+                            && scope == FingerprintScopeKind::Global
+                            && kind.globally_unique(),
+                        scope,
+                        version: newtypes::FingerprintVersion::current(),
+                    })
+                },
+            )
             .collect::<ApiResult<_>>()?;
-        let duplicates = Fingerprint::bulk_create(conn, fingerprints)?;
-        
-        // we don't ? here since if there's errors, we don't need to fail the txn, this is just for logs
-        let tenant = Tenant::get(conn, &scoped_user_id);
-        if let Ok(t) = tenant {
-            duplicates.into_iter().filter(|(kind, count)| {
-                *count > 1 && 
-                // not all DLKs we 1) fingerprint and 2) we expect to be unique
-                    match kind {
-                        DataIdentifier::Id(k) => k.should_have_unique_fingerprint(),
-                        _ => false
-                    }
-                }
-            ).for_each(|(kind, count)| {
-                // don't error if this is a demo tenant or sandbox user
-                if user_vault.is_live && !t.is_demo_tenant {
-                    tracing::error!(kind=%kind, count=%count, "same fingerprints used across distinct UserVaults")
-                }
-            });
-        }         
+
+        Fingerprint::bulk_create(conn, fingerprints)?;
 
         Ok(vds)
     }

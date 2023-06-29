@@ -96,7 +96,7 @@ impl CustomMigration for Migration {
             let new_fingerprints = migrate_chunk(&state, &mut results, chunk);
             let new_fingerprints = futures::executor::block_on(new_fingerprints)?;
 
-            let _ = db::models::fingerprint::Fingerprint::bulk_create(conn, new_fingerprints)?;
+            db::models::fingerprint::Fingerprint::bulk_create(conn, new_fingerprints)?;
         }
         Ok(())
     }
