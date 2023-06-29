@@ -253,6 +253,10 @@ async function createCdnFrontedLoadBalancer(
       external: true,
       securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer],
       subnets: vpc.publicSubnetIds,
+      // Be careful changing this - we have to make sure it is not any higher than the application's
+      // keep-alive timeout
+      // https://linear.app/footprint/issue/FP-3633/diagnose-502s
+      idleTimeout: 60,
       accessLogs: {
         bucket: g.buckets.accessLogBucketName,
         enabled: true,

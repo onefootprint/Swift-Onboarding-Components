@@ -1,6 +1,9 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
+use std::time::Duration;
+
+use actix_web::http::KeepAlive;
 use api_core::{config::Config, *};
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
@@ -118,6 +121,10 @@ async fn run_server() -> std::io::Result<()> {
             .default_service(actix_web::web::to(default_not_found))
             .build()
     })
+    // Our loadbalancer has a keep alive idle timeout of 60s. To make sure that the target doesn't
+    // time out while the loadbalancer is waiting for a response, increase the keep alive timeout
+    // https://linear.app/footprint/issue/FP-3633/diagnose-502s
+    .keep_alive(KeepAlive::Timeout(Duration::from_secs(120)))
     .shutdown_timeout(5)
     .bind(("0.0.0.0", config.port))?
     .run()

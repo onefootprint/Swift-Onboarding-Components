@@ -200,6 +200,10 @@ async function createLoadBalancer(
       // this lets the LB communicate to our nitro instances
       securityGroups: [securityGroup],
       external: false,
+      // Be careful changing this - we have to make sure it is not any higher than the application's
+      // keep-alive timeout
+      // https://linear.app/footprint/issue/FP-3633/diagnose-502s
+      idleTimeout: 60,
       // private subnets as this is an internal service
       subnets: g.vpc.privateSubnetIds,
       accessLogs: {
