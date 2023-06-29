@@ -39,15 +39,19 @@ export type FootprintAppearanceVariables = Partial<{
   inputColor: CSS.Property.Color;
   inputBg: CSS.Property.Background;
   inputBorderColor: CSS.Property.BorderColor;
+  inputElevation: CSS.Property.BoxShadow;
   inputHoverBg: CSS.Property.Background;
   inputHoverBorderColor: CSS.Property.BorderColor;
+  inputHoverElevation: CSS.Property.BoxShadow;
   inputFocusBg: CSS.Property.Background;
   inputFocusBorderColor: CSS.Property.BorderColor;
   inputFocusElevation: CSS.Property.BoxShadow;
   inputErrorBg: CSS.Property.Background;
   inputErrorBorderColor: CSS.Property.BorderColor;
+  inputErrorElevation: CSS.Property.BoxShadow;
   inputErrorHoverBg: CSS.Property.Background;
   inputErrorHoverBorderColor: CSS.Property.BorderColor;
+  inputErrorHoverElevation: CSS.Property.BoxShadow;
   inputErrorFocusBg: CSS.Property.Background;
   inputErrorFocusBorderColor: CSS.Property.BorderColor;
   inputErrorFocusElevation: CSS.Property.BoxShadow;
@@ -112,6 +116,19 @@ export type FootprintAppearanceVariables = Partial<{
   dropdownColorPrimary: CSS.Property.Color;
   dropdownColorSecondary: CSS.Property.Color;
   dropdownFooterBg: CSS.Property.Background;
+
+  // Radio select
+  radioSelectBg: CSS.Property.Background;
+  radioSelectBorderRadius: CSS.Property.BorderRadius;
+  radioSelectBorderWidth: CSS.Property.BorderWidth;
+  radioSelectBorderColor: CSS.Property.BorderColor;
+  radioSelectHoverBg: CSS.Property.Background;
+  radioSelectHoverBorderColor: CSS.Property.BorderColor;
+  radioSelectSelectedBg: CSS.Property.Background;
+  radioSelectSelectedBorderColor: CSS.Property.BorderColor;
+  radioSelectComponentsIconBg: CSS.Property.Background;
+  radioSelectComponentsIconHoverBg: CSS.Property.Background;
+  radioSelectComponentsIconSelectedBg: CSS.Property.Background;
 }>;
 
 export type FootprintAppearanceTheme = 'light' | 'dark';

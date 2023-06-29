@@ -5,6 +5,7 @@ import input from './input';
 import inputHint from './input-hint';
 import inputLabel from './input-label';
 import linkButton from './link-button';
+import radioSelect from './radio-select';
 
 export default {
   dropdown,
@@ -14,4 +15,5 @@ export default {
   inputLabel,
   linkButton,
   bifrost,
+  radioSelect,
 };

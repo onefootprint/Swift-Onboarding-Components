@@ -483,7 +483,9 @@ export const baseInputsTypographyCompactLabel = '500 13px/16px "DM Sans"';
 export const baseInputsTypographyCompactInputContent =
   '400 14px/20px "DM Sans"';
 export const baseInputsTypographyCompactHint = '500 13px/16px "DM Sans"';
-export const baseInputsElevationFocus =
+export const baseInputsInitialElevation = 'none';
+export const baseInputsHoverElevation = 'none';
+export const baseInputsFocusElevation =
   '0px 0px 0px 4px rgba(74, 36, 219, 0.12156862745098039)';
 export const baseInputsElevationFocusError =
   '0px 0px 0px 4px rgba(191, 20, 10, 0.12156862745098039)';
@@ -513,24 +515,3 @@ export const baseDropdownSpacingBodyPaddingsVertical = 8;
 export const baseDropdownSpacingBodyItemsGap = 4;
 export const baseDropdownSpacingBodySectionsGap = 20;
 export const baseDropdownBorderRadius = 6;
-export const tokenSetOrder0 = 'global';
-export const tokenSetOrder1 = 'light';
-export const tokenSetOrder2 = 'dark';
-export const tokenSetOrder3 = 'components/date-range-input';
-export const tokenSetOrder4 = 'components/fp-button';
-export const tokenSetOrder5 = 'components/buttons';
-export const tokenSetOrder6 = 'components/google-button';
-export const tokenSetOrder7 = 'components/link-button';
-export const tokenSetOrder8 = 'components/icon-button';
-export const tokenSetOrder9 = 'components/base-inputs';
-export const tokenSetOrder10 = 'components/phone-inputs';
-export const tokenSetOrder11 = 'components/select';
-export const tokenSetOrder12 = 'components/base-dropdown';
-export const tokenSetOrder13 = 'components/bifrost-dialog';
-export const tokenSetOrder14 = 'components/confirmation-dialog';
-export const tokenSetOrder15 = 'components/dialog';
-export const tokenSetOrder16 = 'customization/ramp/global';
-export const tokenSetOrder17 = 'customization/ramp/light';
-export const tokenSetOrder18 = 'customization/ramp/base-inputs';
-export const tokenSetOrder19 = 'customization/ramp/buttons';
-export const tokenSetOrder20 = 'customization/ramp/bifrost-dialog';

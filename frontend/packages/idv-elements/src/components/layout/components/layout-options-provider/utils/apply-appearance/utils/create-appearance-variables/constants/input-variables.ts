@@ -53,6 +53,13 @@ const inputVariables = new Map<
     },
   ],
   [
+    'inputElevation',
+    {
+      var: '--fp-base-inputs-initial-elevation',
+      assignDefault: ['inputHoverElevation', 'inputFocusElevation'],
+    },
+  ],
+  [
     'inputHoverBg',
     {
       var: '--fp-base-inputs-hover-bg',
@@ -64,6 +71,12 @@ const inputVariables = new Map<
     {
       var: '--fp-base-inputs-hover-border',
       assignDefault: ['inputFocusBorderColor'],
+    },
+  ],
+  [
+    'inputHoverElevation',
+    {
+      var: '--fp-base-inputs-hover-elevation',
     },
   ],
   [
@@ -99,6 +112,13 @@ const inputVariables = new Map<
     },
   ],
   [
+    'inputErrorElevation',
+    {
+      var: '--fp-base-inputs-initial-error-elevation',
+      assignDefault: ['inputErrorHoverElevation', 'inputErrorFocusElevation'],
+    },
+  ],
+  [
     'inputErrorHoverBg',
     {
       var: '--fp-base-inputs-hover-error-bg',
@@ -109,7 +129,12 @@ const inputVariables = new Map<
     'inputErrorHoverBorderColor',
     {
       var: '--fp-base-inputs-hover-error-border',
-      assignDefault: ['inputErrorFocusBorderColor'],
+    },
+  ],
+  [
+    'inputErrorHoverElevation',
+    {
+      var: '--fp-base-inputs-hover-error-elevation',
     },
   ],
   [

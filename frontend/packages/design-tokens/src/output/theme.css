@@ -421,6 +421,7 @@
   --fp-base-inputs-initial-hint: #707070;
   --fp-base-inputs-initial-error-bg: #ffffff;
   --fp-base-inputs-initial-error-border: #bf140a;
+  --fp-base-inputs-initial-error-elevation: none;
   --fp-base-inputs-initial-error-placeholder: #8d8d8d;
   --fp-base-inputs-initial-error-label: #000000;
   --fp-base-inputs-initial-error-hint: #991008;
@@ -431,6 +432,7 @@
   --fp-base-inputs-hover-hint: #707070;
   --fp-base-inputs-hover-error-bg: #ffffff;
   --fp-base-inputs-hover-error-border: #730c06;
+  --fp-base-inputs-hover-error-elevation: none;
   --fp-base-inputs-hover-error-placeholder: #8d8d8d;
   --fp-base-inputs-hover-error-label: #000000;
   --fp-base-inputs-hover-error-hint: #991008;
@@ -487,6 +489,8 @@
   --fp-base-inputs-typography-compact-label: 500 13px/16px 'DM Sans';
   --fp-base-inputs-typography-compact-input-content: 400 14px/20px 'DM Sans';
   --fp-base-inputs-typography-compact-hint: 400 13px/16px 'DM Sans';
+  --fp-base-inputs-initial-elevation: none;
+  --fp-base-inputs-hover-elevation: none;
   --fp-base-inputs-elevation-focus: 0px 0px 0px 4px
     rgba(74, 36, 219, 0.12156862745098039);
   --fp-base-inputs-elevation-focus-error: 0px 0px 0px 4px
@@ -517,25 +521,17 @@
   --fp-base-dropdown-spacing-body-items-gap: 4px;
   --fp-base-dropdown-spacing-body-sections-gap: 20px;
   --fp-base-dropdown-border-radius: 6px;
-  --fp-token-set-order-0: global;
-  --fp-token-set-order-1: light;
-  --fp-token-set-order-2: dark;
-  --fp-token-set-order-3: components/date-range-input;
-  --fp-token-set-order-4: components/fp-button;
-  --fp-token-set-order-5: components/buttons;
-  --fp-token-set-order-6: components/google-button;
-  --fp-token-set-order-7: components/link-button;
-  --fp-token-set-order-8: components/icon-button;
-  --fp-token-set-order-9: components/base-inputs;
-  --fp-token-set-order-10: components/phone-inputs;
-  --fp-token-set-order-11: components/select;
-  --fp-token-set-order-12: components/base-dropdown;
-  --fp-token-set-order-13: components/bifrost-dialog;
-  --fp-token-set-order-14: components/confirmation-dialog;
-  --fp-token-set-order-15: components/dialog;
-  --fp-token-set-order-16: customization/ramp/global;
-  --fp-token-set-order-17: customization/ramp/light;
-  --fp-token-set-order-18: customization/ramp/base-inputs;
-  --fp-token-set-order-19: customization/ramp/buttons;
-  --fp-token-set-order-20: customization/ramp/bifrost-dialog;
+
+  --fp-base-radio-select-bg: none;
+  --fp-base-radio-select-border-radius: 6px;
+  --fp-base-radio-select-border-width: 1px;
+  --fp-base-radio-select-border-color: #e2e2e2;
+  --fp-base-radio-select-color: #4a24db;
+  --fp-base-radio-select-hover-bg: #f7f7f7;
+  --fp-base-radio-select-hover-border-color: #d4d4d4;
+  --fp-base-radio-select-selected-bg: rgba(74, 36, 219, 0.08);
+  --fp-base-radio-select-selected-border-color: #4a24db;
+  --fp-base-radio-select-components-icon-bg: #f7f7f7;
+  --fp-base-radio-select-components-icon-hover-bg: #e2e2e2;
+  --fp-base-radio-select-components-icon-selected-bg: #4a24db;
 }

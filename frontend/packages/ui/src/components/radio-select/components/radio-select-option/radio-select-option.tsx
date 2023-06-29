@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import React, { useRef } from 'react';
 import { useHover } from 'usehooks-ts';
 
+import { createFontStyles } from '../../../../utils';
 import Typography from '../../../typography';
 
 export type RadioSelectOptionFields = {
@@ -48,9 +49,7 @@ const RadioSelectOption = ({
         <IconComponent color={selected ? 'quinary' : undefined} />
       </IconContainer>
       <OptionLabel>
-        <Typography variant="label-2" color={selected ? 'accent' : 'primary'}>
-          {title}
-        </Typography>
+        <Title selected={selected}>{title}</Title>
         <Typography variant="body-4" color="secondary">
           {description}
         </Typography>
@@ -60,62 +59,94 @@ const RadioSelectOption = ({
 };
 
 const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
-  ${({ theme, selected, hovered }) => css`
-    background: none;
-    text-align: left;
-    cursor: pointer;
-    margin: 0;
-    border: 1px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[5]};
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    align-items: flex-start;
-    border-radius: ${theme.borderRadius.default};
-    gap: ${theme.spacing[4]};
-    transition: all 0.2s ease-out;
+  ${({ theme, selected, hovered }) => {
+    const {
+      components: { radioSelect },
+    } = theme;
 
-    ${selected &&
-    css`
-      z-index: 1;
-      background-color: #4a24db14;
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
-    `}
+    return css`
+      align-items: flex-start;
+      background: none;
+      border-color: ${radioSelect.borderColor};
+      border-radius: ${radioSelect.borderRadius};
+      border-style: solid;
+      border-width: ${radioSelect.borderWidth};
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      gap: ${theme.spacing[4]};
+      justify-content: left;
+      margin: 0;
+      padding: ${theme.spacing[5]};
+      text-align: left;
+      transition: all 0.2s ease-out;
 
-    ${hovered &&
-    !selected &&
-    css`
-      background-color: ${theme.backgroundColor.secondary};
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    `}
-  `}
+      ${selected &&
+      css`
+        z-index: 1;
+        background-color: ${radioSelect.selected.bg};
+        border-color: ${radioSelect.selected.borderColor};
+      `}
+
+      ${hovered &&
+      !selected &&
+      css`
+        background-color: ${radioSelect.hover.bg};
+        border-color: ${radioSelect.hover.borderColor};
+      `}
+    `;
+  }}
+`;
+
+const Title = styled.h2<{ selected?: boolean }>`
+  ${({ theme, selected }) => {
+    const {
+      components: { radioSelect },
+    } = theme;
+
+    return css`
+      ${createFontStyles('label-2')}
+      color: ${theme.color.primary};
+
+      ${selected &&
+      css`
+        color: ${radioSelect.color};
+      `};
+    `;
+  }}
 `;
 
 const IconContainer = styled.div<{ selected?: boolean; hovered?: boolean }>`
-  ${({ theme, selected, hovered }) => css`
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: ${theme.borderRadius.full};
-    background-color: ${theme.backgroundColor.secondary};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.2s ease-out;
-    margin-top: ${theme.spacing[1]};
+  ${({ theme, selected, hovered }) => {
+    const {
+      components: { radioSelect },
+    } = theme;
 
-    ${selected &&
-    css`
-      border: 0;
-      background-color: ${theme.backgroundColor.accent};
-    `}
+    return css`
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: ${theme.borderRadius.full};
+      background-color: ${radioSelect.components.icon.bg};
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease-out;
+      margin-top: ${theme.spacing[1]};
 
-    ${hovered &&
-    !selected &&
-    css`
-      background-color: ${theme.backgroundColor.senary};
-    `}
-  `}
+      ${selected &&
+      css`
+        border: 0;
+        background-color: ${radioSelect.components.icon.selected.bg};
+      `}
+
+      ${hovered &&
+      !selected &&
+      css`
+        background-color: ${radioSelect.components.icon.hover.bg};
+      `}
+    `;
+  }}
 `;
 
 const OptionLabel = styled.div`

@@ -1,55 +1,61 @@
+import * as CSS from 'csstype';
+
 import type { Typography } from './typography';
 
 export type Input = {
   global: {
-    borderRadius: string;
-    borderWidth: string;
-    color: string;
-    placeholderColor: string;
+    borderRadius: CSS.Property.BorderRadius;
+    borderWidth: CSS.Property.BorderWidth;
+    color: CSS.Property.Color;
+    placeholderColor: CSS.Property.Color;
   };
   state: {
     default: {
       initial: {
-        bg: string;
-        border: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
       hover: {
-        bg: string;
-        border: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
       focus: {
-        bg: string;
-        border: string;
-        elevation: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
     };
     error: {
       initial: {
-        bg: string;
-        border: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
       hover: {
-        bg: string;
-        border: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
       focus: {
-        bg: string;
-        border: string;
-        elevation: string;
+        bg: CSS.Property.Background;
+        border: CSS.Property.BorderColor;
+        elevation: CSS.Property.BoxShadow;
       };
     };
     disabled: {
-      bg: string;
-      border: string;
+      bg: CSS.Property.Background;
+      border: CSS.Property.BorderColor;
     };
   };
   size: {
     default: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
     compact: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
   };

@@ -12,10 +12,12 @@ const input: Input = {
       initial: {
         bg: 'var(--fp-base-inputs-initial-bg)',
         border: 'var(--fp-base-inputs-initial-border)',
+        elevation: 'var(--fp-base-inputs-initial-elevation)',
       },
       hover: {
         bg: 'var(--fp-base-inputs-hover-bg)',
         border: 'var(--fp-base-inputs-hover-border)',
+        elevation: 'var(--fp-base-inputs-hover-elevation)',
       },
       focus: {
         bg: 'var(--fp-base-inputs-focus-bg)',
@@ -27,10 +29,12 @@ const input: Input = {
       initial: {
         bg: 'var(--fp-base-inputs-initial-error-bg)',
         border: 'var(--fp-base-inputs-initial-error-border)',
+        elevation: 'var(--fp-base-inputs-initial-error-elevation)',
       },
       hover: {
         bg: 'var(--fp-base-inputs-hover-error-bg)',
         border: 'var(--fp-base-inputs-hover-error-border)',
+        elevation: 'var(--fp-base-inputs-hover-error-elevation)',
       },
       focus: {
         bg: 'var(--fp-base-inputs-focus-error-bg)',

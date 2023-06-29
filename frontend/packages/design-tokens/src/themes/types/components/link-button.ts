@@ -1,3 +1,5 @@
+import * as CSS from 'csstype';
+
 import type { Typography } from './typography';
 
 export type LinkButton = {
@@ -5,55 +7,55 @@ export type LinkButton = {
     default: {
       color: {
         text: {
-          initial: string;
-          active: string;
-          hover: string;
-          disabled: string;
+          initial: CSS.Property.Color;
+          active: CSS.Property.Color;
+          hover: CSS.Property.Color;
+          disabled: CSS.Property.Color;
         };
         icon: {
-          initial: string;
-          active: string;
-          hover: string;
-          disabled: string;
+          initial: CSS.Property.Color;
+          active: CSS.Property.Color;
+          hover: CSS.Property.Color;
+          disabled: CSS.Property.Color;
         };
       };
     };
     destructive: {
       color: {
         text: {
-          initial: string;
-          active: string;
-          hover: string;
-          disabled: string;
+          initial: CSS.Property.Color;
+          active: CSS.Property.Color;
+          hover: CSS.Property.Color;
+          disabled: CSS.Property.Color;
         };
         icon: {
-          initial: string;
-          active: string;
-          hover: string;
-          disabled: string;
+          initial: CSS.Property.Color;
+          active: CSS.Property.Color;
+          hover: CSS.Property.Color;
+          disabled: CSS.Property.Color;
         };
       };
     };
   };
   size: {
     default: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
     compact: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
     tiny: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
     xTiny: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
     xxTiny: {
-      height: string;
+      height: CSS.Property.Height;
       typography: Typography;
     };
   };

@@ -8,6 +8,7 @@ import type {
   InputHint,
   InputLabel,
   LinkButton,
+  RadioSelect,
 } from './components';
 
 export type UIStates = {
@@ -233,6 +234,7 @@ export type Theme = {
     inputHint: InputHint;
     inputLabel: InputLabel;
     linkButton: LinkButton;
+    radioSelect: RadioSelect;
   };
 };
 

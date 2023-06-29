@@ -1,12 +1,14 @@
+import * as CSS from 'csstype';
+
 import type { Typography } from './typography';
 
 export type InputHint = {
   states: {
     default: {
-      color: string;
+      color: CSS.Property.Color;
     };
     error: {
-      color: string;
+      color: CSS.Property.Color;
     };
   };
   size: {

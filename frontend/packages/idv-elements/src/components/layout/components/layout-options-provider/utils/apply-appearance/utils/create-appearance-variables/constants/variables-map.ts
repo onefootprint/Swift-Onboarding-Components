@@ -4,6 +4,7 @@ import hintVariables from './hint-variables';
 import inputVariables from './input-variables';
 import labelVariables from './label-variables';
 import linkButtonVariables from './link-button';
+import radioSelectVariables from './radio-select-variables';
 import typographyVariables from './typography-variables';
 
 const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
@@ -17,6 +18,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
           'dialogBorderRadius',
           'inputBorderRadius',
           'dropdownBorderRadius',
+          'radioSelectBorderRadius',
         ],
       },
     ],
@@ -54,6 +56,9 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
           'linkButtonColor',
           'linkButtonHoverColor',
           'linkButtonActiveColor',
+          'radioSelectColor',
+          'radioSelectSelectedBorderColor',
+          'radioSelectComponentsIconSelectedBg',
         ],
       },
     ],
@@ -96,6 +101,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
     ...hintVariables,
     ...typographyVariables,
     ...dropdownVariables,
+    ...radioSelectVariables,
   ],
 );
 

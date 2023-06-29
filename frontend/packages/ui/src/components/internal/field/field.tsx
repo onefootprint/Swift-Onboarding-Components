@@ -34,6 +34,7 @@ const Field = styled(Cleave)<FieldInternalProps>`
       color: ${input.global.color};
       outline: none;
       width: 100%;
+      box-shadow: ${input.state.default.initial.elevation};
 
       &[data-size='default'] {
         font: ${input.size.default.typography};
@@ -60,6 +61,7 @@ const Field = styled(Cleave)<FieldInternalProps>`
         &:enabled:hover {
           background: ${input.state.default.hover.bg};
           border-color: ${input.state.default.hover.border};
+          box-shadow: ${input.state.default.hover.elevation};
         }
 
         &[data-has-focus='true'],
@@ -73,10 +75,12 @@ const Field = styled(Cleave)<FieldInternalProps>`
       &[data-has-error='true'] {
         background: ${input.state.error.initial.bg};
         border-color: ${input.state.error.initial.border};
+        box-shadow: ${input.state.error.initial.elevation};
 
         &:enabled:hover {
           background: ${input.state.error.hover.bg};
           border-color: ${input.state.error.hover.border};
+          box-shadow: ${input.state.error.hover.elevation};
         }
 
         &:enabled:focus {
