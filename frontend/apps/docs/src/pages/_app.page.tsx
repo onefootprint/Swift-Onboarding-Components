@@ -7,6 +7,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
+import Cmd from 'src/components/cmd';
 
 import AppHeader from '../components/app-header';
 import configureReactI18next from '../config/initializers/react-i18next';
@@ -41,6 +42,7 @@ const App = ({ Component, pageProps }: AppProps) => (
         <GlobalStyle />
         <AppHeader navigation={pageProps.page?.navigation} />
         <Component {...pageProps} />
+        <Cmd navigation={pageProps.page?.navigation} />
       </DesignSystemProvider>
     </QueryClientProvider>
   </>

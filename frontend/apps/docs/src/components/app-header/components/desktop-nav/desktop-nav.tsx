@@ -27,6 +27,7 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
             {t('nav.documentation')}
           </DocumentationLink>
         </MainLinks>
+
         <>
           {links.map(({ href, Icon, text }) => (
             <LinkButton

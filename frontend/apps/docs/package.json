@@ -25,6 +25,7 @@
     "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.29.5",
     "@vercel/og": "^0.0.27",
+    "cmdk": "^0.2.0",
     "framer-motion": "^10.11.2",
     "lodash": "^4.17.21",
     "markdown-to-jsx": "^7.1.8",
