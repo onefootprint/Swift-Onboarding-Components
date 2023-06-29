@@ -40,7 +40,7 @@ impl ProxyToken {
     /// Supports `| filter_fn1 | filter_fn2| ..`
     pub fn parse_global(raw: &str, global_fp_id: Option<FpId>) -> Result<Self, crate::Error> {
         let raw = raw.trim();
-        let components = raw.split('|').map(|s| s.trim()).collect::<Vec<_>>();
+        let components: Vec<&str> = raw.split('|').map(|s| s.trim()).collect::<Vec<_>>();
 
         // parse the token and zero or more FFs
         let (token, filter_functions) = if components.len() > 1 {

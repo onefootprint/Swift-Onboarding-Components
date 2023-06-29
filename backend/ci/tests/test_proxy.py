@@ -549,7 +549,7 @@ class TestVaultProxy:
                 ProxyAccessReason("test reason"),
                 ProxyTokenAssignment(fp_id),
                 ProxyIngressRule(
-                    "custom.message | prefix(16) | to_uppercase = $.data.message"
+                    "custom.message = $.data.message | prefix(16) | to_uppercase"
                 ),
                 ProxyIngressContentType("json"),
             ],
