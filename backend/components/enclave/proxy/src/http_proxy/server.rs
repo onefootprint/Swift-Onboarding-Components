@@ -1,6 +1,11 @@
+use std::time::Duration;
+
 use super::client::*;
 use crate::{config::Config, pool, StreamManager};
-use actix_web::{dev::Server, get, middleware::Logger, post, web, App, HttpServer, Responder, ResponseError};
+use actix_web::{
+    dev::Server, get, http::KeepAlive, middleware::Logger, post, web, App, HttpServer, Responder,
+    ResponseError,
+};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 use futures::TryFutureExt;
@@ -50,6 +55,10 @@ pub async fn build_server(config: Config) -> std::io::Result<(Server, u16)> {
             .service(health)
             .service(proxy)
     })
+    // Our loadbalancer has a keep alive idle timeout of 60s. To make sure that the target doesn't
+    // time out while the loadbalancer is waiting for a response, increase the keep alive timeout
+    // https://linear.app/footprint/issue/FP-3633/diagnose-502s
+    .keep_alive(KeepAlive::Timeout(Duration::from_secs(120)))
     .bind(("0.0.0.0", port))?;
 
     let port = server.addrs()[0].port();

@@ -89,7 +89,7 @@ export const Alerts: Alert[] = [
     },
     threshold: {
       op: '>',
-      value: 2,
+      value: 0,
     },
   },
   {
