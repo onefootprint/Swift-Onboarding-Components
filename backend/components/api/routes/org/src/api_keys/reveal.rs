@@ -7,7 +7,6 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
-use enclave_proxy::DataTransform;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantApiKeyId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -51,7 +50,7 @@ async fn post(
         .decrypt_to_piistring(
             &key.e_secret_api_key,
             &tenant.e_private_key,
-            DataTransform::Identity,
+            vec![],
         )
         .await?;
 

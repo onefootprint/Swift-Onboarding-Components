@@ -17,6 +17,9 @@ use itertools::Itertools;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
 
+use super::filter_function_to_transform;
+use super::transform_to_filter_function;
+
 /// turns tokens -> PII
 /// TODO: depending on usage this function can be optimized greatly:
 ///     - concurrent async (dispatch concurrent all per-fpid)
@@ -34,7 +37,7 @@ pub async fn detokenize(
     // split tokens by fp_id
     let tokens = tokens
         .into_iter()
-        .map(|tok| (tok.fp_id, tok.identifier))
+        .map(|tok| (tok.fp_id, (tok.identifier, tok.filter_functions)))
         .into_group_map();
 
     for (fp_id, targets) in tokens {
@@ -53,18 +56,33 @@ pub async fn detokenize(
             .await??;
 
         let req = DecryptRequest {
-            reason: reason.clone().unwrap_or_default(),
+            reason: reason
+                .clone()
+                .unwrap_or_else(|| "Vault Proxy Default Reason".to_string()),
             principal: auth.actor().into(),
             insight: CreateInsightEvent::from(insight.clone()),
         };
+        let targets = targets
+            .into_iter()
+            .map(|(di, filters)| {
+                let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
+                (di, transforms)
+            })
+            .collect();
+
         let results = uvw
-            .decrypt(state, &targets, req)
+            .fn_decrypt(state, targets, req)
             .await?
             .into_iter()
-            .map(|(identifier, v)| {
+            .map(|(op, v)| {
                 let token = ProxyToken {
                     fp_id: scoped_user.fp_id.clone(),
-                    identifier,
+                    identifier: op.identifier,
+                    filter_functions: op
+                        .transforms
+                        .into_iter()
+                        .filter_map(transform_to_filter_function)
+                        .collect(),
                 };
                 (token, v)
             });
@@ -73,3 +91,4 @@ pub async fn detokenize(
 
     Ok(out)
 }
+

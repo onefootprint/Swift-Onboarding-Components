@@ -52,7 +52,7 @@ def test_webhook_e2e(sandbox_tenant, twilio):
 
     # 3. fire off a codepath that triggers the webhook (i.e. an onboarding)
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
-    return bifrost.run()
+    user = bifrost.run()
 
     # 4. Retrieve the webhook message and make sure it's correct
     # we expect 3 webhooks, 1 OnboardingStatusChanged from incomplete -> pending. Then an OnboardingCompleted and another OnboardingStatusChanged from pending -> pass

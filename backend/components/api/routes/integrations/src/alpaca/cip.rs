@@ -276,26 +276,26 @@ fn kyc(
     // find a gov't id number if we have one
     let id_number = vec![PassportNumber, IdCardNumber, DriversLicenseDob]
         .into_iter()
-        .flat_map(|id| decrypted_data.get(id).ok())
+        .flat_map(|id| decrypted_data.get_di(id).ok())
         .next();
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
         applicant_name: format_pii!(
             "{} {}",
-            decrypted_data.get(FirstName)?,
-            decrypted_data.get(LastName)?
+            decrypted_data.get_di(FirstName)?,
+            decrypted_data.get_di(LastName)?
         ),
-        email_address: decrypted_data.get(Email)?,
-        nationality: decrypted_data.get(Nationality)?,
-        date_of_birth: decrypted_data.get(Dob)?,
-        address: if let Ok(address2) = decrypted_data.get(AddressLine2) {
-            format_pii!("{} {}", decrypted_data.get(AddressLine1)?, address2)
+        email_address: decrypted_data.get_di(Email)?,
+        nationality: decrypted_data.get_di(Nationality)?,
+        date_of_birth: decrypted_data.get_di(Dob)?,
+        address: if let Ok(address2) = decrypted_data.get_di(AddressLine2) {
+            format_pii!("{} {}", decrypted_data.get_di(AddressLine1)?, address2)
         } else {
-            decrypted_data.get(AddressLine1)?
+            decrypted_data.get_di(AddressLine1)?
         },
-        postal_code: decrypted_data.get(Zip)?,
-        country_of_residency: decrypted_data.get(Country)?,
+        postal_code: decrypted_data.get_di(Zip)?,
+        country_of_residency: decrypted_data.get_di(Country)?,
         kyc_completed_at: onboarding.decision_made_at,
         ip_address: pii!(insight.ip_address.unwrap_or("0.0.0.0".into())),
         check_initiated_at: onboarding.authorized_at,
@@ -494,9 +494,9 @@ fn document_and_photo(
     // Construct all of the breakdown fields
     // TODO: load these once FRC<>VRes migration is done
     let incode_vault_data = IncodeOcrComparisonDataFields {
-        first_name: decrypted_data.get(FirstName)?,
-        last_name: decrypted_data.get(LastName)?,
-        dob: decrypted_data.get(Dob)?,
+        first_name: decrypted_data.get_di(FirstName)?,
+        last_name: decrypted_data.get_di(LastName)?,
+        dob: decrypted_data.get_di(Dob)?,
     };
     let frcs = features::incode_docv::footprint_reason_codes(
         ocr_response.clone(),

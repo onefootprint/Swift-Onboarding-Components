@@ -173,9 +173,9 @@ pub async fn save_incode_fixtures(state: &State, scoped_vault_id: &ScopedVaultId
         )
         .await?;
     let uv_public_key = uvw.vault.public_key.clone();
-    let first_name = vd.rm(IdentityDataKind::FirstName)?;
-    let last_name = vd.rm(IdentityDataKind::LastName)?;
-    let dob = vd.rm(IdentityDataKind::Dob)?;
+    let first_name = vd.rm_di(IdentityDataKind::FirstName)?;
+    let last_name = vd.rm_di(IdentityDataKind::LastName)?;
+    let dob = vd.rm_di(IdentityDataKind::Dob)?;
     let date_of_birth_timestamp = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
         .map_err(|_| ApiError::AssertionError("invalid date in fixture".into()))?
         .and_hms_milli_opt(0, 0, 0, 0)

@@ -163,11 +163,7 @@ impl TenantVendorControl {
             ) {
                 (true, Some(un), Some(pw)) => {
                     let decrypted_pw = enclave_client
-                        .decrypt_to_piistring(
-                            &pw,
-                            tenant_e_private_key,
-                            enclave_proxy::DataTransform::Identity,
-                        )
+                        .decrypt_to_piistring(&pw, tenant_e_private_key, vec![])
                         .await?;
 
                     Ok(Some(IdologyCredentials {

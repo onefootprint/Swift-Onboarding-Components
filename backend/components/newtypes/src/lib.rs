@@ -58,6 +58,9 @@ pub use uuid::Uuid;
 pub mod proxy_token;
 pub use self::proxy_token::*;
 
+pub mod filter_function;
+pub use self::filter_function::*;
+
 pub mod onboarding_requirement;
 pub use onboarding_requirement::*;
 
@@ -98,6 +101,8 @@ pub enum Error {
     EnumDotNotationError(#[from] EnumDotNotationError),
     #[error("invalid hex string")]
     InvalidHex(#[from] crypto::hex::FromHexError),
+    #[error("invalid filter function: {0}")]
+    FilterFunctionParsingError(#[from] crate::filter_function::FilterFunctionParsingError),
 }
 
 use std::collections::HashMap;
@@ -157,7 +162,7 @@ impl std::error::Error for DataValidationError {
 
 pub type NtResult<T> = Result<T, Error>;
 
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error, PartialEq)]
 pub enum EnumDotNotationError {
     #[error("Cannot parse: {0}")]
     CannotParse(String),

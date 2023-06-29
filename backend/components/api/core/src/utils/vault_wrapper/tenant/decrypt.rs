@@ -1,5 +1,6 @@
 use super::{DecryptRequest, TenantVw};
 use crate::auth::AuthError;
+use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, IntegritySigningKey, PiiString};
@@ -27,12 +28,9 @@ impl<Type> TenantVw<Type> {
         state: &State,
         dis: &[DataIdentifier],
         req: DecryptRequest,
-    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
-        let dis: Vec<_> = dis
-            .iter()
-            .map(|di| (di.clone(), enclave_proxy::DataTransform::Identity))
-            .collect();
-        self.fn_decrypt(state, dis.as_slice(), req).await
+    ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
+        let dis: Vec<_> = dis.iter().map(|di| (di.clone(), vec![])).collect();
+        self.fn_decrypt(state, dis, req).await
     }
 
     /// Compute integrity signed hashes with `fn_decrypt` using hmac-sha256 data transform
@@ -42,17 +40,17 @@ impl<Type> TenantVw<Type> {
         dis: &[DataIdentifier],
         key: IntegritySigningKey,
         req: DecryptRequest,
-    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
+    ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
         let dis: Vec<_> = dis
             .iter()
             .map(|di| {
                 (
                     di.clone(),
-                    enclave_proxy::DataTransform::HmacSha256 { key: key.leak() },
+                    vec![enclave_proxy::DataTransform::HmacSha256 { key: key.leak() }],
                 )
             })
             .collect();
-        self.fn_decrypt(state, dis.as_slice(), req).await
+        self.fn_decrypt(state, dis, req).await
     }
 
     /// Util to transform decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
@@ -62,9 +60,9 @@ impl<Type> TenantVw<Type> {
     pub async fn fn_decrypt(
         &self,
         state: &State,
-        dis_and_transforms: &[(DataIdentifier, enclave_proxy::DataTransform)],
+        dis_and_transforms: Vec<(DataIdentifier, Vec<enclave_proxy::DataTransform>)>,
         req: DecryptRequest,
-    ) -> ApiResult<HashMap<DataIdentifier, PiiString>> {
+    ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
         let dis = dis_and_transforms.iter().map(|(di, _)| di.clone()).collect_vec();
         self.check_ob_config_access(dis.as_slice())?;
         let results = self

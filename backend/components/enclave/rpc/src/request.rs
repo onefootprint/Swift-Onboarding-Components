@@ -113,13 +113,13 @@ impl Debug for EnvelopeDecryptRequest {
 #[serde(rename_all = "snake_case")]
 pub struct DecryptRequest {
     pub sealed_data: EciesP256Sha256AesGcmSealed,
-    pub transform: DataTransform,
+    pub transforms: Vec<DataTransform>,
 }
 impl Debug for DecryptRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("DecryptRequest")
             .field("sealed_data", &"<omitted>")
-            .field("transform", &self.transform)
+            .field("transforms", &self.transforms)
             .finish()
     }
 }

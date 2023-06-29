@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use serde::{Deserialize, Serialize};
+use strum_macros::EnumDiscriminants;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct KmsCredentials {
@@ -20,7 +21,11 @@ impl Debug for KmsCredentials {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Default)]
+#[derive(Clone, Serialize, Deserialize, EnumDiscriminants, PartialEq, Hash, Eq, Default)]
+#[strum_discriminants(name(DataTransformName))]
+#[strum_discriminants(derive(strum_macros::Display, strum::EnumString, Hash))]
+#[strum_discriminants(vis(pub))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "type")]
 pub enum DataTransform {
@@ -28,14 +33,29 @@ pub enum DataTransform {
     /// no transform, just the plain data
     Identity,
     /// HMAC-SHA256
-    HmacSha256 { key: Vec<u8> },
+    HmacSha256 {
+        key: Vec<u8>,
+    },
+    ///
+    ToLowercase,
+    ToUppercase,
+    ToAscii,
+    Prefix {
+        count: usize,
+    },
+    Suffix {
+        count: usize,
+    },
 }
 
 impl std::fmt::Debug for DataTransform {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Identity => write!(f, "Identity"),
-            Self::HmacSha256 { .. } => write!(f, "HmacSha256"),
-        }
+        DataTransformName::from(self).fmt(f)
+    }
+}
+
+impl std::fmt::Display for DataTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&DataTransformName::from(self), f)
     }
 }

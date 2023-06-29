@@ -3,7 +3,6 @@
 use api_core::{enclave_client::EnclaveClient, errors::ApiResult, State};
 use db::models::fingerprint::NewFingerprint;
 use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault, vault_data};
-use enclave::DataTransform;
 use futures::StreamExt;
 use itertools::Itertools;
 use newtypes::{
@@ -217,7 +216,7 @@ async fn compute_single(
 ) -> ApiResult<(VaultDataUpdate, Vec<NewFingerprintArgs>, Option<VaultUpdate>)> {
     let decrypted = state
         .enclave_client
-        .decrypt_to_piistring(&vd.e_data, &vault.e_private_key, DataTransform::Identity)
+        .decrypt_to_piistring(&vd.e_data, &vault.e_private_key, vec![])
         .await?;
     let (pii, new_vd) = match &vd.kind {
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {

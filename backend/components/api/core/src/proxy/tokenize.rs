@@ -1,3 +1,4 @@
+use super::FilterFunctions;
 use super::IngressRule;
 use crate::auth::tenant::TenantAuth;
 use crate::errors::ApiResult;
@@ -6,12 +7,14 @@ use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::ApiError;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use either::Either;
+use enclave_proxy::DataTransformer;
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
@@ -19,6 +22,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
 use newtypes::FpId;
+use newtypes::PiiBytes;
 use newtypes::PiiString;
 use newtypes::SealedVaultDataKey;
 use newtypes::StorageType;
@@ -28,7 +32,6 @@ use std::collections::HashMap;
 
 /// Vaults PII values
 /// writes the PII token values to the vault
-/// NOTE: we only limit proxy vaulting custom PII data
 pub async fn vault_pii(
     state: &State,
     auth: &dyn TenantAuth,
@@ -42,7 +45,16 @@ pub async fn vault_pii(
     // split by fp_id
     let values_by_user = values
         .into_iter()
-        .map(|(rule, pii)| (rule.proxy_token.fp_id.clone(), (rule.proxy_token.identifier, pii)))
+        .map(|(rule, pii)| {
+            (
+                rule.proxy_token.fp_id.clone(),
+                (
+                    rule.proxy_token.identifier,
+                    FilterFunctions(rule.proxy_token.filter_functions),
+                    pii,
+                ),
+            )
+        })
         .into_group_map();
 
     for (fp_id, values) in values_by_user {
@@ -54,36 +66,47 @@ pub async fn vault_pii(
         // extract our mime types
         let mime_types = values
             .iter()
-            .filter_map(|(di, pii)| {
+            .filter_map(|(di, filters, pii)| {
                 if let DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = di {
-                    Some((
-                        DocumentKind::from_id_doc_kind(*doc_kind, *side),
-                        pii.leak_to_string(),
-                    ))
+                    // (edge case): apply the filter on the mime_type if it exists
+                    filters
+                        .apply_str::<String>(pii.leak())
+                        .map(|mt| Some((DocumentKind::from_id_doc_kind(*doc_kind, *side), mt)))
+                        .map_err(ApiError::from)
+                        .transpose()
                 } else {
                     None
                 }
             })
+            .collect::<ApiResult<Vec<_>>>()?
+            .into_iter()
             .collect::<HashMap<_, _>>();
 
         // build the update request
         let (data, documents): (Vec<_>, Vec<_>) = values
             .into_iter()
-            .filter_map(|(di, value)| match di {
+            .filter_map(|(di, filters, value)| match di {
                 DataIdentifier::Document(doc_kind) => match doc_kind.storage_type() {
-                    StorageType::VaultData => Some(Either::Left((di, value))),
-                    StorageType::DocumentData => {
-                        Some(Either::Right((doc_kind, (mime_types.get(&doc_kind), value))))
-                    }
+                    StorageType::VaultData => Some(Either::Left((di, filters, value))),
+                    StorageType::DocumentData => Some(Either::Right((
+                        doc_kind,
+                        (mime_types.get(&doc_kind), filters, value),
+                    ))),
                     StorageType::DocumentMetadata => None,
                 },
                 DataIdentifier::InvestorProfile(_)
                 | DataIdentifier::Business(_)
                 | DataIdentifier::Id(_)
                 | DataIdentifier::Custom(_)
-                | DataIdentifier::Card(_) => Some(Either::Left((di, value))),
+                | DataIdentifier::Card(_) => Some(Either::Left((di, filters, value))),
             })
             .partition_map(|r| r);
+
+        // apply filters on the data
+        let data = data
+            .into_iter()
+            .map(|(di, filters, value)| Ok((di, filters.apply_str::<PiiString>(value.leak())?)))
+            .collect::<Result<Vec<_>, ApiError>>()?;
 
         let data: HashMap<_, _> = data.into_iter().collect();
         let documents: HashMap<_, _> = documents.into_iter().collect();
@@ -98,17 +121,22 @@ pub async fn vault_pii(
         let data = data.build_tenant_fingerprints(state, &tenant_id).await?;
 
         // prepare the documents
-        let documents = try_join_all(documents.into_iter().map(|(doc_kind, (mime_type, pii))| {
-            encrypt_document(
-                state,
-                pii,
-                doc_kind,
-                mime_type,
-                fp_id.clone(),
-                tenant_id.clone(),
-                is_live,
-            )
-        }))
+        let documents = try_join_all(
+            documents
+                .into_iter()
+                .map(|(doc_kind, (mime_type, filters, pii))| {
+                    encrypt_document(
+                        state,
+                        pii,
+                        filters,
+                        doc_kind,
+                        mime_type,
+                        fp_id.clone(),
+                        tenant_id.clone(),
+                        is_live,
+                    )
+                }),
+        )
         .await?;
 
         state
@@ -182,11 +210,13 @@ struct EncryptedDocumentToStore {
     mime_type: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 /// helper function to seal document images and push to document store
 /// returns storage information for vault wrapper
 async fn encrypt_document(
     state: &State,
     file_data: PiiString,
+    filters: FilterFunctions,
     doc_kind: DocumentKind,
     mime_type: Option<&String>,
     fp_id: FpId,
@@ -202,8 +232,13 @@ async fn encrypt_document(
         })
         .await??;
 
+    let file_data = file_data.try_decode_base64().map_err(crypto::Error::from)?;
+
+    // apply the filters on the raw file bytes
+    let file_transformed = filters.apply(file_data.into_leak()).map(PiiBytes::new)?;
+
     let file = utils::file_upload::FileUpload::new_simple(
-        file_data.try_decode_base64().map_err(crypto::Error::from)?,
+        file_transformed,
         format!("{}", doc_kind),
         mime_type.as_ref().map(|s| s.as_str()).unwrap_or("image/png"),
     );

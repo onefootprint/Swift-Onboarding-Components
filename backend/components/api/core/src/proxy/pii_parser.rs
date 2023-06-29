@@ -68,7 +68,7 @@ impl IngressTokenizer for JsonPath {
                     _ => Err(VaultProxyError::TargetJsonPathValueNotAStringOrNumber),
                 };
                 values_to_vault.push(pii.map(|p| (rule.clone(), p)));
-                Some(Value::String(rule.proxy_token.to_string()))
+                Some(Value::String(rule.proxy_token.display_for_ingress()))
             });
 
             match result {

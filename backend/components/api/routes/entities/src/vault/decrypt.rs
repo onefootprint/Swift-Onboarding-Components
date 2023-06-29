@@ -121,7 +121,7 @@ async fn post_inner(
     };
     let mut results = uvw.decrypt(state, &fields, req).await?;
     // Is this step necessary? Every key is present in the response if it was in the request?
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di))));
+    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di.into()))));
     let out = DecryptResponse { map: results };
 
     ResponseData::ok(out).json()

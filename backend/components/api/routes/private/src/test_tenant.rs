@@ -152,7 +152,7 @@ async fn post(
         .decrypt_to_piistring(
             &api_key.e_secret_api_key,
             &tenant.e_private_key,
-            enclave_proxy::DataTransform::Identity,
+            vec![],
         )
         .await?;
     let decrypted_api_key = SecretApiKey::from(decrypted_api_key.leak().to_string());

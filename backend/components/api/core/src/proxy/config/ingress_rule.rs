@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use crate::{
     errors::{proxy::VaultProxyError, ApiError},
     utils::headers::get_header,
 };
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
-use newtypes::{DataIdentifier, FpId, ProxyToken, ProxyTokenError};
+use newtypes::{FpId, ProxyToken};
 
 use super::proxy_headers::INGRESS_RULE_HEADER;
 
@@ -35,17 +33,12 @@ impl IngressRule {
             return Ok(vec![]);
         }
 
-        let fp_id = fp_id.ok_or(VaultProxyError::MissingFootprintUserTokenParameter)?;
-
         let rules = rules
             .into_iter()
-            .map(|rule| -> Result<_, VaultProxyError> {
+            .map(|rule| -> Result<_, ApiError> {
+                let proxy_token = ProxyToken::parse_global(&rule.token_path, fp_id.clone())?;
                 Ok(IngressRule {
-                    proxy_token: ProxyToken {
-                        fp_id: fp_id.clone(),
-                        identifier: DataIdentifier::from_str(&rule.token_path)
-                            .map_err(ProxyTokenError::from)?,
-                    },
+                    proxy_token,
                     target: rule.target,
                 })
             })

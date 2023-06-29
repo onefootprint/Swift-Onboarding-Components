@@ -287,6 +287,7 @@ class TestVaultProxy:
             # here we test the token assignment also works for egress
             "msg": "{{ custom.message }}",
             "data": {"card_number": "4242424242424242424"},
+            "msg2": "{{ custom.message | to_uppercase | prefix(5) }}",
         }
 
         response = _make_request(
@@ -314,6 +315,7 @@ class TestVaultProxy:
         last = ID_DATA["id.last_name"]
         assert result["full_name"] == f"{first} {last}"
         assert result["msg"] == "hello world"
+        assert result["msg2"] == "HELLO"
 
         data = dict(reason="test", fields=["custom.card_number"])
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
@@ -513,6 +515,60 @@ class TestVaultProxy:
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["document.drivers_license.front.image"] == test_image
         assert response["document.drivers_license.front.mime_type"] == "image/jpeg"
+
+    def test_ingress_filters(self, sandbox_tenant):
+        # create the vault
+        body = post("users/", None, sandbox_tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
+        # post data to it
+        data = {
+            **ID_DATA,
+        }
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+        # specify the ditto server
+        ditto_url = "https://ditto.footprint.dev"
+
+        # send the proxy request
+        # ditto will simulate this data for the proxy to ingress vault
+
+        data = {"data": {"message": "my really really really long message"}}
+
+        response = _make_request(
+            method=requests.post,
+            path="vault_proxy/jit",
+            data=data,
+            params=None,
+            status_code=200,
+            auths=[
+                sandbox_tenant.sk.key,
+                ProxyDestinationHeader(ditto_url),
+                ProxyAccessReason("test reason"),
+                ProxyTokenAssignment(fp_id),
+                ProxyIngressRule(
+                    "custom.message | prefix(16) | to_uppercase = $.data.message"
+                ),
+                ProxyIngressContentType("json"),
+            ],
+            files=None,
+        )
+
+        result = response.json()
+        assert (
+            result["data"]["message"] == f"{fp_id}.custom.message"
+        )
+
+        data = dict(
+            reason="test",
+            fields=[
+                "custom.message",
+            ],
+        )
+        response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+        assert response["custom.message"] == "MY REALLY REALLY"
 
 
 ### Tests to do ###

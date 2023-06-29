@@ -1,8 +1,8 @@
-use crate::errors::ApiResult;
 use crate::State;
+use crate::{errors::ApiResult, utils::vault_wrapper::decrypt::EnclaveDecryptOperation};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use newtypes::{AccessEventKind, DataIdentifier, DbActor, ScopedVaultId};
+use newtypes::{AccessEventKind, DbActor, ScopedVaultId};
 
 pub struct DecryptRequest {
     pub reason: String,
@@ -15,7 +15,7 @@ impl DecryptRequest {
         self,
         state: &State,
         scoped_user_id: ScopedVaultId,
-        targets: Vec<DataIdentifier>,
+        targets: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<()> {
         let DecryptRequest {
             reason,
@@ -28,7 +28,8 @@ impl DecryptRequest {
             principal,
             insight,
             kind: AccessEventKind::Decrypt,
-            targets,
+            // TODO: also store the transforms!
+            targets: targets.into_iter().map(|t| t.identifier).collect(),
         };
         state.db_pool.db_query(|conn| event.create(conn)).await??;
         Ok(())

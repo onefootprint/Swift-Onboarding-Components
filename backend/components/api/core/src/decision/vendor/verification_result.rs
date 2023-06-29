@@ -10,7 +10,6 @@ use db::{
     },
     DbError, PgConn,
 };
-use enclave_proxy::DataTransform;
 use newtypes::{EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey};
 
 use super::make_request::VerificationRequestWithVendorResponse;
@@ -106,7 +105,7 @@ pub async fn decrypt_verification_result_response(
         .batch_decrypt_to_piibytes(
             sealed_data
                 .into_iter()
-                .map(|sealed| (sealed, DataTransform::Identity))
+                .map(|sealed| (sealed, vec![]))
                 .collect(),
             sealed_key,
         )

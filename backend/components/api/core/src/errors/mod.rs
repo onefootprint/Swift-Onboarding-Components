@@ -4,7 +4,7 @@ use actix_web::{
 };
 
 use db::errors::DbError;
-use newtypes::{DataIdentifier, ErrorMessage, Uuid};
+use newtypes::{output::Csv, DataIdentifier, ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -135,8 +135,8 @@ pub enum ApiError {
     StateError(#[from] crate::decision::state::StateError),
     #[error("{0}")]
     CipIntegrationError(#[from] cip_error::CipError),
-    #[error("Required entity data is missing data: {0}")]
-    MissingRequiredEntityData(DataIdentifier),
+    #[error("Required entity data is missing data: {0} {1}")]
+    MissingRequiredEntityData(DataIdentifier, Csv<enclave_proxy::DataTransform>),
     #[error("Enclave transform error: {0}")]
     EnclaveDataTransformError(#[from] enclave_proxy::TransformError),
 }
@@ -257,7 +257,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::MissingRequiredEntityData(_) => StatusCode::BAD_REQUEST,
+            ApiError::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
             ApiError::CipIntegrationError(c) => c.status_code(),
         }
     }

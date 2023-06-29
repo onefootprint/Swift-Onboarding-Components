@@ -80,7 +80,7 @@ pub async fn get(
     let additional_visible_attrs = vw
         .decrypt_unchecked(&state.enclave_client, &additional_visible_dis)
         .await?
-        .results;
+        .results_by_data_identifier();
 
     let result = api_wire_types::Entity::from_db((entity, &vw, &auth, additional_visible_attrs));
     ResponseData::ok(result).json()

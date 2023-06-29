@@ -121,7 +121,7 @@ async fn create_create_account_request(
     let disclosures = if let Some(disclosures) = req.disclosures {
         disclosures
     } else {
-        let declarations: Vec<Declaration> = decrypted.rm(IPK::Declarations)?.deserialize()?;
+        let declarations: Vec<Declaration> = decrypted.rm_di(IPK::Declarations)?.deserialize()?;
         Disclosures::from_declarations(&declarations)
     };
 
@@ -130,8 +130,8 @@ async fn create_create_account_request(
             .di_pairs
             .into_iter()
             .map(|(latest_doc_di, mime_di)| -> ApiResult<Document> {
-                let content = decrypted.rm(latest_doc_di)?;
-                let mime_type = decrypted.rm(mime_di)?;
+                let content = decrypted.rm_di(latest_doc_di)?;
+                let mime_type = decrypted.rm_di(mime_di)?;
                 Ok(Document {
                     document_type: DocumentType::IdentityVerification,
                     document_sub_type: Some(doc_info.id_doc_kind.to_string()),
@@ -148,21 +148,21 @@ async fn create_create_account_request(
     Ok(CreateAccountRequest {
         enabled_assets: req.enabled_assets,
         contact: Contact {
-            email_address: Email::from_str(decrypted.rm(IDK::Email)?.leak())?.email,
-            phone_number: PhoneNumber::parse(decrypted.rm(IDK::PhoneNumber)?)?.e164(),
-            street_address: vec![decrypted.rm(IDK::AddressLine1)?],
-            unit: decrypted.rm(IDK::AddressLine2).ok(),
-            city: decrypted.rm(IDK::City)?,
-            state: Some(decrypted.rm(IDK::State)?), // required if country_of_tax_residence is USA which currently our users are
-            postal_code: decrypted.rm(IDK::Zip)?,
-            country: decrypted.rm(IDK::Country)?,
+            email_address: Email::from_str(decrypted.rm_di(IDK::Email)?.leak())?.email,
+            phone_number: PhoneNumber::parse(decrypted.rm_di(IDK::PhoneNumber)?)?.e164(),
+            street_address: vec![decrypted.rm_di(IDK::AddressLine1)?],
+            unit: decrypted.rm_di(IDK::AddressLine2).ok(),
+            city: decrypted.rm_di(IDK::City)?,
+            state: Some(decrypted.rm_di(IDK::State)?), // required if country_of_tax_residence is USA which currently our users are
+            postal_code: decrypted.rm_di(IDK::Zip)?,
+            country: decrypted.rm_di(IDK::Country)?,
         },
         identity: Identity {
-            given_name: decrypted.rm(IDK::FirstName)?,
+            given_name: decrypted.rm_di(IDK::FirstName)?,
             middle_name: None,
-            family_name: decrypted.rm(IDK::LastName)?,
-            date_of_birth: decrypted.rm(IDK::Dob)?,
-            tax_id: Some(decrypted.rm(IDK::Ssn9)?),
+            family_name: decrypted.rm_di(IDK::LastName)?,
+            date_of_birth: decrypted.rm_di(IDK::Dob)?,
+            tax_id: Some(decrypted.rm_di(IDK::Ssn9)?),
             tax_id_type: Some(TaxIdType::USA_SSN),
             country_of_citizenship: None,
             country_of_birth: None,

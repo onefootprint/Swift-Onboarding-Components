@@ -56,7 +56,11 @@ pub async fn post(
 
     let mut results = uvw.decrypt_unchecked(&state.enclave_client, &fields).await?;
     // Is this step necessary? Every key is present in the response if it was in the request?
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di))));
+    let results = HashMap::from_iter(
+        fields
+            .into_iter()
+            .map(|di| (di.clone(), results.remove(&di.into()))),
+    );
     let out = DecryptResponse { map: results };
 
     ResponseData::ok(out).json()

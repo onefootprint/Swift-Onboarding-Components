@@ -12,8 +12,8 @@ use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
 
-/// The Proxy Token Parser finds and replaces
-/// instances of ProxyTokens with their
+/// The Proxy Token Parser finds proxy tokens in a body
+/// and stores the string matches for future replacement
 pub struct ProxyTokenParser<'a> {
     /// the original input
     body: &'a str,
@@ -42,7 +42,7 @@ impl<'a> ProxyTokenParser<'a> {
         Self::DELIMITER_START.contains(c) || Self::DELIMITER_END.contains(c)
     }
 
-    /// parses a string into a single Proxy Token
+    /// parses a string into a map of Proxy Tokens
     pub fn parse(raw: &'a str, global_fp_id: Option<FpId>) -> ApiResult<ProxyTokenParser> {
         let mut parsed: Vec<(String, ProxyToken)> = vec![];
         let mut chars = raw.chars().peekable();
@@ -144,18 +144,32 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use newtypes::{DataIdentifier, FpId, IdentityDataKind as IDK, KvDataKey};
+    use newtypes::{DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey};
     use test_case::test_case;
     use DataIdentifier as DI;
+    use FilterFunction::*;
 
     fn custom(raw: &'static str) -> DataIdentifier {
         DI::Custom(KvDataKey::from_str(raw).unwrap())
     }
 
-    fn token(fp_id: &str, data_kind: DataIdentifier) -> ProxyToken {
+    fn tok1(fp_id: &str, data_kind: DataIdentifier) -> ProxyToken {
         ProxyToken {
             fp_id: FpId::from_str(fp_id).unwrap(),
             identifier: data_kind,
+            filter_functions: vec![],
+        }
+    }
+
+    fn tok2<D: Into<DataIdentifier>>(
+        fp_id: &str,
+        identifier: D,
+        filter_functions: Vec<FilterFunction>,
+    ) -> ProxyToken {
+        ProxyToken {
+            fp_id: FpId::from_str(fp_id).unwrap(),
+            identifier: identifier.into(),
+            filter_functions,
         }
     }
 
@@ -164,7 +178,8 @@ mod tests {
     "last_name": "{{   fp_id_abcd.id.last_name }}",
     "credit_card": "{{ fp_id_abcd.custom.credit_card }}",
     "full_name": "{{ fp_id_abcd.id.first_name}} {{fp_id_abcd.id.last_name }}",
-    "dob": "{{ id.dob }}"
+    "dob": "{{ id.dob }}",
+    "name_transform": "{{ fp_id_abcd.id.first_name | to_uppercase }}{{ fp_id_abcd.id.last_name | prefix(2) | to_uppercase }}"
 }"#;
 
     #[derive(serde::Deserialize, PartialEq, Eq, Debug, Clone)]
@@ -173,6 +188,7 @@ mod tests {
         full_name: &'a str,
         credit_card: &'a str,
         last_name: &'a str,
+        name_transform: &'a str,
     }
 
     #[test]
@@ -182,24 +198,34 @@ mod tests {
 
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Id(IDK::Ssn9))));
+            .contains_key(&tok1("fp_id_abcd", DI::Id(IDK::Ssn9))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Id(IDK::LastName))));
+            .contains_key(&tok1("fp_id_abcd", DI::Id(IDK::LastName))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", custom("credit_card"))));
+            .contains_key(&tok1("fp_id_abcd", custom("credit_card"))));
         assert!(result
             .matches
-            .contains_key(&token("fp_id_abcd", DI::Id(IDK::FirstName))));
+            .contains_key(&tok1("fp_id_abcd", DI::Id(IDK::FirstName))));
 
-        assert!(result.matches.contains_key(&token("fp_id_xyz", DI::Id(IDK::Dob))));
+        assert!(result
+            .matches
+            .contains_key(&tok2("fp_id_abcd", IDK::FirstName, vec![ToUppercase])));
+
+        assert!(result.matches.contains_key(&tok2(
+            "fp_id_abcd",
+            IDK::LastName,
+            vec![Prefix { count: 2 }, ToUppercase]
+        )));
+
+        assert!(result.matches.contains_key(&tok1("fp_id_xyz", DI::Id(IDK::Dob))));
 
         // test that we found two matches for this token
         assert_eq!(
             result
                 .matches
-                .get(&token("fp_id_abcd", DI::Id(IDK::LastName)))
+                .get(&tok1("fp_id_abcd", DI::Id(IDK::LastName)))
                 .expect("missing token")
                 .len(),
             2
@@ -214,15 +240,25 @@ mod tests {
             full_name: "Elon Musk",
             credit_card: "4242424242424242",
             last_name: "Musk",
+            name_transform: "ELONMU",
         };
 
         let detokens = HashMap::from_iter(vec![
-            (token("fp_id_abcd", DI::Id(IDK::Ssn9)), test.ssn.into()),
-            (token("fp_id_abcd", DI::Id(IDK::LastName)), test.last_name.into()),
-            (token("fp_id_abcd", DI::Id(IDK::FirstName)), "Elon".into()),
+            (tok1("fp_id_abcd", DI::Id(IDK::Ssn9)), test.ssn.into()),
+            (tok1("fp_id_abcd", DI::Id(IDK::LastName)), test.last_name.into()),
+            (tok1("fp_id_abcd", DI::Id(IDK::FirstName)), "Elon".into()),
+            (tok1("fp_id_abcd", custom("credit_card")), test.credit_card.into()),
             (
-                token("fp_id_abcd", custom("credit_card")),
-                test.credit_card.into(),
+                tok2("fp_id_abcd", IDK::FirstName, vec![ToUppercase]),
+                "ELON".into(),
+            ),
+            (
+                tok2(
+                    "fp_id_abcd",
+                    IDK::LastName,
+                    vec![Prefix { count: 2 }, ToUppercase],
+                ),
+                "MU".into(),
             ),
         ]);
         let detokenized = result.detokenize_body(detokens).expect("detokenize");
@@ -250,6 +286,7 @@ mod tests {
         let expected = ProxyToken {
             fp_id: FpId::from_str(fp_id).unwrap(),
             identifier,
+            filter_functions: vec![],
         };
         let global = global.map(|s| FpId::from(s.to_string()));
 
@@ -268,28 +305,54 @@ mod tests {
     const B_6: &str = r#"{ { {{{ fp_id_1.custom.ach     }}"#;
 
     #[test_case(B_1, Some("fp_id_xyz"), &[
-        (token("fp_id_xyz", DI::Id(IDK::Ssn9)), 1),
-        (token("fp_id_xyz", custom("cc4")), 1)
+        (tok1("fp_id_xyz", DI::Id(IDK::Ssn9)), 1),
+        (tok1("fp_id_xyz", custom("cc4")), 1)
     ])]
     #[test_case(B_2, Some("fp_id_xyz"), &[
-        (token("fp_id_xyz", DI::Id(IDK::Ssn9)), 1),
-        (token("fp_id_xyz", custom("cc4")), 1)
+        (tok1("fp_id_xyz", DI::Id(IDK::Ssn9)), 1),
+        (tok1("fp_id_xyz", custom("cc4")), 1)
     ])]
     #[test_case(B_3, Some("fp_id_xyz"), &[
-        (token("fp_id_xyz", DI::Id(IDK::Dob)), 1),
+        (tok1("fp_id_xyz", DI::Id(IDK::Dob)), 1),
     ])]
     #[test_case(B_4, Some("fp_id_xyz"), &[])]
     #[test_case(B_5, Some("fp_id_xyz"), &[
-        (token("fp_id_x", custom("ach")), 1),
-        (token("fp_id_y", DI::Id(IDK::Ssn9)), 2),
-        (token("fp_id_xyz", custom("ach2")), 1),
+        (tok1("fp_id_x", custom("ach")), 1),
+        (tok1("fp_id_y", DI::Id(IDK::Ssn9)), 2),
+        (tok1("fp_id_xyz", custom("ach2")), 1),
     ])]
     #[test_case(B_6, Some("fp_id_xyz"), &[
-        (token("fp_id_1", custom("ach")), 1),
+        (tok1("fp_id_1", custom("ach")), 1),
     ])]
     fn test_edge_case_parsing(body: &str, global_fp_id: Option<&str>, expected: &[(ProxyToken, usize)]) {
         let global_fp_id = global_fp_id.map(|s| FpId::from(s.to_string()));
         let result = ProxyTokenParser::parse(body, global_fp_id).expect("failed to parse");
+        for (tok, num) in expected {
+            assert!(result.matches.contains_key(tok));
+            assert_eq!(result.matches.get(tok).unwrap().len(), *num);
+        }
+
+        let total_matches: usize = result.matches.values().map(|m| m.len()).sum();
+        let total_expected: usize = expected.iter().map(|(_, n)| *n).sum();
+        assert_eq!(total_matches, total_expected);
+    }
+
+    const B7_FP_ID: &str = "fp_id_1";
+
+    const B_7: &str = r#"{
+        "ssn": "{{ id.ssn9 | suffix(4) }}",
+        "last_name": "{{  id.last_name | prefix(4) | to_uppercase }}",
+        "last_name2": "{{  id.last_name | to_lowercase }}"
+    }"#;
+
+    #[test_case(B_7, &[
+        (tok2(B7_FP_ID, IDK::Ssn9, vec![Suffix { count: 4 }]), 1),
+        (tok2(B7_FP_ID, IDK::LastName, vec![Prefix { count: 4 }, ToUppercase ]), 1),
+        (tok2(B7_FP_ID, IDK::LastName, vec![ToLowercase]), 1),
+    ])]
+    fn test_with_filters(body: &str, expected: &[(ProxyToken, usize)]) {
+        let result =
+            ProxyTokenParser::parse(body, Some(FpId::from(B7_FP_ID.to_string()))).expect("failed to parse");
         for (tok, num) in expected {
             assert!(result.matches.contains_key(tok));
             assert_eq!(result.matches.get(tok).unwrap().len(), *num);

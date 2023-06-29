@@ -3,9 +3,10 @@ use crypto::{
 };
 use once_cell::sync::Lazy;
 use rpc::{
-    DecryptThenSignRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
-    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKey, HmacSignature, HmacSignatureSingle, SealedIkek, SealedIkekId, SignRequest,
+    DataTransformer, DataTransforms, DecryptThenSignRequest, EnvelopeDecryptThenHmacSignRequest,
+    EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, HmacSignatureSingle, SealedIkek,
+    SealedIkekId, SignRequest,
 };
 use std::collections::HashMap;
 use thiserror::Error;
@@ -169,9 +170,9 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecr
                 &data_private_key,
                 r.sealed_data.clone(),
             )?;
-
+            let transforms = DataTransforms(r.transforms);
             Ok(FnDecryptionSingle {
-                data: r.transform.apply(result.0)?,
+                data: transforms.apply(result.0)?,
                 // TODO: remove this once new enclave RPC lands.
                 // we don't use this. We keep this for back compat.
                 transform: Default::default(),

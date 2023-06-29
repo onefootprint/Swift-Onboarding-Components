@@ -10,6 +10,7 @@ use enclave_proxy::{
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
     SignRequest, Signing,
 };
+use enclave_proxy::{DataTransformer, DataTransforms};
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
@@ -34,7 +35,7 @@ pub struct EnclaveClient {
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
 
-pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String, &'a DataTransform);
+pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String, Vec<DataTransform>);
 
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
@@ -149,10 +150,7 @@ impl EnclaveClient {
             .collect::<Result<Vec<_>, _>>()?;
         let decrypted_keys = self
             .batch_decrypt_to_piibytes(
-                sealed_data
-                    .into_iter()
-                    .map(|sealed| (sealed, DataTransform::Identity))
-                    .collect(),
+                sealed_data.into_iter().map(|sealed| (sealed, vec![])).collect(),
                 sealed_key,
             )
             .await?;
@@ -168,10 +166,10 @@ impl EnclaveClient {
         &self,
         sealed_data: &SealedVaultBytes,
         sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
+        transforms: Vec<DataTransform>,
     ) -> Result<PiiString, EnclaveError> {
         let result = self
-            .batch_decrypt_to_piistring(vec![((), sealed_data, transform)], sealed_key)
+            .batch_decrypt_to_piistring(vec![((), sealed_data, transforms)], sealed_key)
             .await?
             .into_iter()
             .next()
@@ -182,7 +180,7 @@ impl EnclaveClient {
     /// Decrypts the provided list of SealedVaultBytes into PiiStrings
     pub async fn batch_decrypt_to_piistring<T: Eq + Hash>(
         &self,
-        data: Vec<(T, &SealedVaultBytes, DataTransform)>,
+        data: Vec<(T, &SealedVaultBytes, Vec<DataTransform>)>,
         sealed_key: &EncryptedVaultPrivateKey,
     ) -> Result<HashMap<T, PiiString>, EnclaveError> {
         let (ids, sealed_data): (Vec<_>, Vec<_>) = data
@@ -208,10 +206,10 @@ impl EnclaveClient {
         &self,
         sealed_data: &SealedVaultBytes,
         sealed_key: &EncryptedVaultPrivateKey,
-        transform: DataTransform,
+        transforms: Vec<DataTransform>,
     ) -> Result<PiiBytes, EnclaveError> {
         let sealed = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
-        self.batch_decrypt_to_piibytes(vec![(sealed, transform)], sealed_key)
+        self.batch_decrypt_to_piibytes(vec![(sealed, transforms)], sealed_key)
             .await?
             .into_iter()
             .next()
@@ -223,14 +221,14 @@ impl EnclaveClient {
     #[tracing::instrument(skip_all)]
     pub async fn batch_decrypt_to_piibytes(
         &self,
-        sealed_data: Vec<(EciesP256Sha256AesGcmSealed, DataTransform)>,
+        sealed_data: Vec<(EciesP256Sha256AesGcmSealed, Vec<DataTransform>)>,
         sealed_key: &EncryptedVaultPrivateKey,
     ) -> Result<Vec<PiiBytes>, EnclaveError> {
         let requests = sealed_data
             .into_iter()
-            .map(|(sealed_data, transform)| DecryptRequest {
+            .map(|(sealed_data, transforms)| DecryptRequest {
                 sealed_data,
-                transform,
+                transforms,
             })
             .collect_vec();
         let num_requests = requests.len();
@@ -372,7 +370,7 @@ impl EnclaveClient {
             .map(|((bytes, key), transform)| {
                 key.unseal_bytes(AeadSealedBytes(bytes.to_vec()))
                     .map_err(ApiError::from)
-                    .and_then(|data| transform.apply(data).map_err(ApiError::from))
+                    .and_then(|data| DataTransforms(transform).apply(data).map_err(ApiError::from))
                     .map(PiiBytes::new)
             })
             .collect::<Result<Vec<_>, _>>()?;

@@ -307,13 +307,7 @@ impl ProxyConfig {
             .chain({
                 let secret_header_values = secret_headers
                     .iter()
-                    .map(|sh| {
-                        (
-                            sh.name.clone(),
-                            &sh.e_data,
-                            enclave_proxy::DataTransform::Identity,
-                        )
-                    })
+                    .map(|sh| (sh.name.clone(), &sh.e_data, vec![]))
                     .collect();
                 state
                     .enclave_client
@@ -328,11 +322,7 @@ impl ProxyConfig {
                 // decrypt the sealed cert
                 let key_der = state
                     .enclave_client
-                    .decrypt_to_pii_bytes(
-                        &e_key,
-                        &auth.tenant().e_private_key,
-                        enclave_proxy::DataTransform::Identity,
-                    )
+                    .decrypt_to_pii_bytes(&e_key, &auth.tenant().e_private_key, vec![])
                     .await?;
 
                 // encode to pem and parse

@@ -15,7 +15,7 @@ use newtypes::{flat_api_object_map_type, DataIdentifier, FpId, IntegritySigningK
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct IntegrityRequest {
@@ -72,14 +72,16 @@ pub async fn post(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
     };
-    let mut results = uvw
+    let results = uvw
         .compute_integrity_signed_hashes(&state, &fields, signing_key, req)
         .await?;
 
-    // Is this step necessary? Every key is present in the response if it was in the request?
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di))));
-
-    let out = IntegrityResponse { map: results };
+    let out = IntegrityResponse {
+        map: results
+            .into_iter()
+            .map(|(op, result)| (op.identifier, Some(result)))
+            .collect(),
+    };
 
     ResponseData::ok(out).json()
 }

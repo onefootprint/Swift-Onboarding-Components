@@ -274,6 +274,7 @@ def test_data_integrity_check(sandbox_tenant):
         dict(fields=list(data.keys()), signing_key=signing_key),
         sandbox_tenant.sk.key,
     )
+    print("response: ", resp)
 
     for key, value in data.items():
         expected = hmac.new(
