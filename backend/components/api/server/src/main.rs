@@ -3,6 +3,7 @@
 
 use api_core::{config::Config, *};
 mod custom_migrations;
+use actix_web_opentelemetry::RequestMetricsBuilder;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -57,6 +58,10 @@ async fn run_server() -> std::io::Result<()> {
 
     log::info!("starting server on port {}", config.port);
 
+    // Export metrics
+    let meter = opentelemetry_api::global::meter("actix_web");
+    let request_metrics = RequestMetricsBuilder::new().build(meter);
+
     // telemetry::shutdown();
     HttpServer::new(move || {
         let cors = actix_cors::Cors::default()
@@ -86,6 +91,8 @@ async fn run_server() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(prom.clone())
+            .wrap(request_metrics.clone()) // Export otel metrics for each API request
+            // TODO also wrap RequestTracing::new()
             .wrap(
                 sentry_actix::Sentry::builder()
                     .capture_server_errors(true)
