@@ -13,12 +13,6 @@ import { StackMetadata, GetStackMetadata } from './stack_metadata';
 import * as certs from './certs';
 import { Certificate } from './certs';
 
-export type NitroConfig = {
-  cpus: number;
-  memory: number;
-  cid: number;
-};
-
 export type NitroServiceOutput = {
   serviceEndpoint: string;
   loadBalancer: awsx.lb.ApplicationLoadBalancer;
@@ -34,7 +28,6 @@ const PROXY_LB_PORT = 3668;
  */
 export async function CreateNitroService(
   g: GlobalState,
-  nitroConfig: NitroConfig,
   cert: Certificate,
 ): Promise<NitroServiceOutput> {
   const stackMetadata = GetStackMetadata();
@@ -109,9 +102,9 @@ export async function CreateNitroService(
     `i-template-${serviceName}`,
     {
       namePrefix: `i-${serviceName}`,
-      instanceType: 'c5a.xlarge',
+      instanceType: g.constants.enclave.resources.instance,
       userData: Buffer.from(
-        await userData(g.constants, nitroConfig, g.secretsStore),
+        await userData(g.constants, g.secretsStore),
       ).toString('base64'),
       enclaveOptions: {
         enabled: true,
@@ -371,7 +364,6 @@ function createInstanceRole(
  */
 async function userData(
   constants: Config,
-  config: NitroConfig,
   secretsStore: StaticSecrets,
 ): Promise<string> {
   const current = await aws.getCallerIdentity({});
@@ -382,6 +374,7 @@ async function userData(
   const pulumiConfig = new pulumi.Config();
   const tailscaleAuthKey = pulumiConfig.getSecret('serverTailscaleKey');
   const hostName = `nitro-server-${pulumi.getStack()}`;
+  const resources = constants.enclave.resources;
 
   // TODO: if enclave unhealthy after restart fail health check on ASG.
   return `
@@ -468,7 +461,7 @@ do
         sleep 1
     else
         echo "restarting enclave"
-        sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${config.cpus} --memory ${config.memory} --enclave-cid ${config.cid}
+        sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${resources.cpus} --memory ${resources.memory} --enclave-cid ${resources.cid}
         sleep 5
     fi	 
 done

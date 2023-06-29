@@ -187,15 +187,7 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
   });
 
   // create the nitro service
-  const nitroServiceOutput = await nitroService.CreateNitroService(
-    g,
-    {
-      cid: 16,
-      memory: 256,
-      cpus: 2,
-    },
-    cert,
-  );
+  const nitroServiceOutput = await nitroService.CreateNitroService(g, cert);
 
   // create our ecs api service
   const service = await svc.CreateApiService(

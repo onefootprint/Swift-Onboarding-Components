@@ -74,4 +74,14 @@ export interface Enclave {
   certPCR8: string;
   encryptionSealedIkek: string;
   signingSealedIkek: string;
+  resources: EnclaveResources;
+}
+
+export interface EnclaveResources {
+  /// The underlying instance on which the enclave will run. The instance type affects how many
+  // CPUs and how much RAM can be reserved for the enclave
+  instance: string;
+  cpus: number;
+  memory: number;
+  cid: number;
 }
