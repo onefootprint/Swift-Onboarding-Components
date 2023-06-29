@@ -6,6 +6,7 @@ import times from 'lodash/times';
 import React from 'react';
 
 import { createFontStyles } from '../../utils';
+import { LabelTooltipProps } from '../label';
 import Shimmer from '../shimmer';
 import Tooltip from '../tooltip';
 import Typography from '../typography';
@@ -22,7 +23,7 @@ export type TableProps<T> = {
     id?: string;
     text: string;
     width?: Property.Width;
-    tooltipText?: string;
+    tooltip?: LabelTooltipProps;
   }[];
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
@@ -93,13 +94,18 @@ const Table = <T,>({
                 <th key={column.id || column.text}>
                   <TooltipContainer>
                     {column.text}
-                    {column?.tooltipText && (
+                    {column?.tooltip && (
                       <Tooltip
-                        text={column.tooltipText}
+                        text={column.tooltip.text}
                         alignment="center"
                         position="bottom"
                       >
-                        <InfoButton aria-label={column.tooltipText}>
+                        <InfoButton
+                          aria-label={
+                            column.tooltip?.triggerAriaLabel ??
+                            column?.tooltip.text
+                          }
+                        >
                           <IcoInfo16 />
                         </InfoButton>
                       </Tooltip>
@@ -269,8 +275,9 @@ const TooltipContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
-    align-items: flex-end;
+    white-space: nowrap;
     gap: ${theme.spacing[3]};
   `}
 `;

@@ -2,6 +2,7 @@ import {
   customRender,
   screen,
   selectEvents,
+  userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
@@ -32,6 +33,7 @@ describe('<Select />', () => {
     options = defaultOptions,
     placeholder = 'Select',
     searchPlaceholder,
+    labelTooltip = undefined,
     value,
     testID = 'select-test-id',
   }: Partial<SelectProps>) =>
@@ -47,6 +49,7 @@ describe('<Select />', () => {
         options={options}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
+        labelTooltip={labelTooltip}
         value={value}
         testID={testID}
       />,
@@ -71,6 +74,21 @@ describe('<Select />', () => {
     const hint = 'This is an important message';
     renderSelect({ hint });
     expect(screen.getByText(hint)).toBeInTheDocument();
+  });
+
+  it('should render label tooltip text', async () => {
+    const labelTooltipText = 'This is an important message';
+    renderSelect({ labelTooltip: { text: labelTooltipText } });
+
+    const tooltipIcon = screen.getByLabelText(labelTooltipText);
+    await userEvent.hover(tooltipIcon);
+
+    await waitFor(() => {
+      const tooltip = screen.getByRole('tooltip', {
+        name: labelTooltipText,
+      });
+      expect(tooltip).toBeInTheDocument();
+    });
   });
 
   describe('when clicking on the trigger', () => {

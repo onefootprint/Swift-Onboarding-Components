@@ -1,1 +1,1 @@
-export { type LabelProps, default } from './label';
+export { type LabelProps, type LabelTooltipProps, default } from './label';

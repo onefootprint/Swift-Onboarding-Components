@@ -1,5 +1,14 @@
+import { IcoInfo16, Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+
+import Tooltip from '../tooltip';
+
+export type LabelTooltipProps = {
+  text: string;
+  triggerAriaLabel?: string;
+  iconComponent?: Icon;
+};
 
 export type LabelProps = {
   children: string;
@@ -7,6 +16,7 @@ export type LabelProps = {
   htmlFor?: string;
   id?: string;
   size?: 'default' | 'compact';
+  tooltip?: LabelTooltipProps;
 };
 
 const Label = ({
@@ -15,6 +25,7 @@ const Label = ({
   htmlFor,
   id,
   size = 'default',
+  tooltip = undefined,
 }: LabelProps) => (
   <LabelContainer>
     <StyledLabel
@@ -26,12 +37,31 @@ const Label = ({
     >
       {children}
     </StyledLabel>
+    {tooltip && (
+      <Tooltip text={tooltip.text} alignment="center" position="bottom">
+        <InfoButton aria-label={tooltip?.triggerAriaLabel ?? tooltip?.text}>
+          {tooltip?.iconComponent ? <tooltip.iconComponent /> : <IcoInfo16 />}
+        </InfoButton>
+      </Tooltip>
+    )}
   </LabelContainer>
 );
+const InfoButton = styled.button`
+  ${({ theme }) => css`
+    background: none;
+    border: none;
+    padding: ${theme.spacing[1]} 0 0 0;
+    margin: 0;
+  `}
+`;
 
 const LabelContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[3]};
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

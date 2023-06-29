@@ -3,7 +3,7 @@ import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
 import ReactSelect, { OptionProps } from 'react-select';
 
-import Label from '../../label';
+import Label, { LabelTooltipProps } from '../../label';
 import Hint from '../hint';
 import type { BaseSelectOption } from './base-select.types';
 import modifiers from './base-select.utils';
@@ -19,6 +19,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   hint?: string;
   id?: string;
   label?: string;
+  labelTooltip?: LabelTooltipProps;
   name?: string;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onChange?: (newOption: Option) => void;
@@ -42,6 +43,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   hint,
   id: baseId,
   label,
+  labelTooltip,
   name,
   onBlur,
   onChange,
@@ -86,7 +88,11 @@ const BaseSelect = <Option extends BaseSelectOption>({
 
   return (
     <Container data-testid={testID} className="fp-dropdown">
-      {label && <Label htmlFor={id}>{label}</Label>}
+      {label && (
+        <Label tooltip={labelTooltip} htmlFor={id}>
+          {label}
+        </Label>
+      )}
       <div ref={setReferenceElement}>
         {renderTrigger?.({
           testID: internalId,

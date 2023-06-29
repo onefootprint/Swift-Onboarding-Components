@@ -1,4 +1,9 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Label, { LabelProps } from './label';
@@ -9,9 +14,15 @@ describe('<Label />', () => {
     htmlFor = 'ipsu',
     hasError = false,
     size = 'default',
+    tooltip = undefined,
   }: Partial<LabelProps>) =>
     customRender(
-      <Label htmlFor={htmlFor} hasError={hasError} size={size}>
+      <Label
+        htmlFor={htmlFor}
+        hasError={hasError}
+        size={size}
+        tooltip={tooltip}
+      >
         {children}
       </Label>,
     );
@@ -25,5 +36,26 @@ describe('<Label />', () => {
     renderLabel({ children: 'Lorem', htmlFor: 'ipsum' });
     const label = screen.getByText('Lorem') as HTMLLabelElement;
     expect(label.getAttribute('for')).toEqual('ipsum');
+  });
+
+  it('should render tooltip', async () => {
+    renderLabel({
+      children: 'Lorem',
+      htmlFor: 'ipsum',
+      tooltip: {
+        text: 'Additional detail',
+        triggerAriaLabel: 'Detail tooltip',
+      },
+    });
+
+    const tooltipIcon = screen.getByLabelText('Detail tooltip');
+    await userEvent.hover(tooltipIcon);
+
+    await waitFor(() => {
+      const tooltip = screen.getByRole('tooltip', {
+        name: 'Additional detail',
+      });
+      expect(tooltip).toBeInTheDocument();
+    });
   });
 });

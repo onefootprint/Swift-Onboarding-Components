@@ -23,6 +23,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   hint,
   id,
   label,
+  labelTooltip,
   name,
   onBlur,
   onChange,
@@ -58,6 +59,7 @@ const Select = <Option extends SelectOption = SelectOption>({
     hint={hint}
     id={id}
     label={label}
+    labelTooltip={labelTooltip}
     name={name}
     onBlur={onBlur}
     onChange={onChange}

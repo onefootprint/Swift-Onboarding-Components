@@ -119,7 +119,35 @@ describe('<Table />', () => {
             {
               text: 'Age',
               width: '50%',
-              tooltipText: 'Age is how old you are',
+              tooltip: {
+                triggerAriaLabel: 'Additional age info',
+                text: 'Age is how old you are',
+              },
+            },
+          ],
+        });
+
+        const icon = screen.getByLabelText('Additional age info');
+        await userEvent.hover(icon);
+
+        await waitFor(() => {
+          const tooltip = screen.getByRole('tooltip', {
+            name: 'Age is how old you are',
+          });
+          expect(tooltip).toBeInTheDocument();
+        });
+      });
+
+      it('should use text as trigger aria label when no aria label provided', async () => {
+        renderTable({
+          columns: [
+            { text: 'Name', width: '50%' },
+            {
+              text: 'Age',
+              width: '50%',
+              tooltip: {
+                text: 'Age is how old you are',
+              },
             },
           ],
         });
