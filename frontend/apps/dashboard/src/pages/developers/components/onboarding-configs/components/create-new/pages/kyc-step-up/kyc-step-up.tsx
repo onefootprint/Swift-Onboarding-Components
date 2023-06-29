@@ -1,12 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDocRegionality, IdDocType } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import IdDocForm from '../../components/id-doc-form';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
+import getFormIdForState from '../../utils/get-form-id-for-state';
 
 type FormData = {
   idDocType: IdDocType[];
@@ -51,25 +51,21 @@ const KycStepUp = () => {
     <FormProvider {...methods}>
       <Form
         data-testid="kyc-step-up-form"
+        id={getFormIdForState(state.value)}
         onSubmit={handleSubmit(handleBeforeSubmit)}
       >
         <Section>
-          <SectionTitle>
-            <Typography variant="label-2">{t('kyc-step-up.title')}</Typography>
-            <Typography variant="body-3">
-              {t('kyc-step-up.description')}
-            </Typography>
-          </SectionTitle>
-
           <IdDocForm
-            title={t('id-doc.title')}
-            description={t('id-doc.description')}
+            title={t('kyc-step-up.title')}
+            description={t('kyc-step-up.description')}
+            isPrimary
           />
         </Section>
       </Form>
     </FormProvider>
   );
 };
+
 const Form = styled.form`
   ${({ theme }) => css`
     display: flex;
@@ -83,14 +79,6 @@ const Section = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-  `}
-`;
-
-const SectionTitle = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
   `}
 `;
 

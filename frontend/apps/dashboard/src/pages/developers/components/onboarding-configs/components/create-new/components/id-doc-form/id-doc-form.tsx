@@ -9,9 +9,10 @@ import AnimatedContainer from 'src/components/animated-container';
 type IdDocFormProps = {
   title: string;
   description: string;
+  isPrimary?: boolean;
 };
 
-const IdDocForm = ({ title, description }: IdDocFormProps) => {
+const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create-new.id-doc-form',
   );
@@ -22,7 +23,9 @@ const IdDocForm = ({ title, description }: IdDocFormProps) => {
   return (
     <Container data-testid="id-doc-form">
       <SectionTitle>
-        <Typography variant="label-3">{title}</Typography>
+        <Typography variant={isPrimary ? 'label-2' : 'label-3'}>
+          {title}
+        </Typography>
         <Typography variant="body-3" color="tertiary">
           {description}
         </Typography>

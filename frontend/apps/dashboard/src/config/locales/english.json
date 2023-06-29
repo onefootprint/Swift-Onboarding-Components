@@ -1309,7 +1309,9 @@
           },
           "kyb-bo-collect-form": {
             "title": "KYC of a Beneficial owner",
-            "description": "To successfully verify a business we also need to verify its beneficial owner's identity."
+            "description": "To successfully verify a business we also need to verify its beneficial owner's identity.",
+            "subtitle": "Documentation",
+            "description-subtitle": "Select types of documents to request."
           },
           "kyb-access-form": {
             "title": "Authorized scopes",
@@ -1382,8 +1384,9 @@
             "description": "When users cannot be identified with their submitted data, automatically requesting additional documentation can improve your onboarding process conversion. This has an additional cost per step-up request."
           },
           "kyc-investor-profile": {
-            "label": "Broker questions (Investor profile)",
-            "description": "Required for all brokerage and investment apps.",
+            "title": "Investor profile questions",
+            "description": "These are required for brokerage and investment apps, and are meant to understand users' risk tolerance and investment preferences.",
+            "label": "Ask investor profile questions",
             "questions": {
               "employment": "What's your employment status and occupation?",
               "brokerage-employment": "Are you employed by a brokerage firm?",

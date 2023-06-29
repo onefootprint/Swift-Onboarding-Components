@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
 
 import FormTitle from '../../components/form-title';
@@ -12,6 +13,12 @@ const KybBoCollect = () => {
   return (
     <>
       <FormTitle title={t('title')} description={t('description')} />
+      <Divider />
+      <Box sx={{ margin: 5 }} />
+      <FormTitle
+        title={t('subtitle')}
+        description={t('description-subtitle')}
+      />
       <KycCollectForm />
     </>
   );

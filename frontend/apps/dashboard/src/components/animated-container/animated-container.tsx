@@ -15,7 +15,10 @@ const AnimatedContainer = ({
 }: AnimatedContainerProps) => {
   const [animate] = useAutoAnimate<HTMLDivElement>();
   return (
-    <Box ref={animate} sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box
+      ref={animate}
+      sx={{ display: isExpanded ? 'flex' : 'none', flexDirection: 'column' }}
+    >
       {isExpanded && <Box sx={sx}>{children}</Box>}
     </Box>
   );
