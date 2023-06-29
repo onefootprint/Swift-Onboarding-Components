@@ -1,3 +1,5 @@
+
+#[macro_export]
 macro_rules! api_headers_schema {
     (
         pub mod $group:ident {
@@ -53,10 +55,6 @@ macro_rules! api_headers_schema {
 
     };
 }
-pub(crate) use api_headers_schema;
-
-
-
 
 #[cfg(test)]
 mod tests {

@@ -1107,6 +1107,7 @@ dependencies = [
  "mockall 0.11.3",
  "newtypes",
  "paperclip",
+ "paste",
  "portpicker",
  "privacy_pass",
  "prometheus",

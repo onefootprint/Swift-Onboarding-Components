@@ -9,6 +9,7 @@ use strum::EnumString;
 use url::Url;
 
 use crate::{
+    api_headers_schema,
     auth::tenant::TenantAuth,
     errors::{proxy::VaultProxyError, ApiError, ApiResult},
     utils::headers::{get_header, get_required_header},
@@ -20,7 +21,6 @@ use self::{
     ingress_rule::IngressRule,
 };
 use self::{fwd_headers::ForwardProxyHeaders, ingress_rule::ParsedIngressRules};
-use crate::utils::paperclip::api_headers_schema;
 
 mod certificates;
 pub use self::certificates::ClientCertificateKey;

@@ -557,9 +557,7 @@ class TestVaultProxy:
         )
 
         result = response.json()
-        assert (
-            result["data"]["message"] == f"{fp_id}.custom.message"
-        )
+        assert result["data"]["message"] == f"{fp_id}.custom.message"
 
         data = dict(
             reason="test",
@@ -569,6 +567,39 @@ class TestVaultProxy:
         )
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
         assert response["custom.message"] == "MY REALLY REALLY"
+
+    def test_proxy_reflect(self, sandbox_tenant):
+        # create the vault
+        body = post("users/", None, sandbox_tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
+        # post data to it
+        data = {
+            "id.first_name": "Piip",
+            "id.last_name": "Penguin",
+            "custom.message": "lorem ipsum dolor FLERP",
+            "card.primary.number": "42424242424242",
+            "card.primary.expiration": "12/2024",
+        }
+
+        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+        data = {
+            "data": {
+                "name": f"{{{{ {fp_id}.id.first_name | to_uppercase }}}} {{{{ {fp_id}.id.last_name | to_uppercase }}}}",
+                "message": f"{{{{ {fp_id}.custom.message }}}}",
+            },
+            "cc_first_3": f"{{{{ {fp_id}.card.primary.number | prefix(3) }}}}",
+            "flerp": f"{{{{ {fp_id}.custom.message | suffix(5) | to_lowercase }}}}",
+        }
+
+        response = post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key)
+        assert response["data"]["name"] == "PIIP PENGUIN"
+        assert response["data"]["message"] == "lorem ipsum dolor FLERP"
+        assert response["cc_first_3"] == "424"
+        assert response["flerp"] == "flerp"
 
 
 ### Tests to do ###
