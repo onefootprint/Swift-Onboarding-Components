@@ -17,7 +17,6 @@
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
-    "@onefootprint/idv-elements": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",

@@ -12,7 +12,6 @@ import ArticleHeader from './components/article-header';
 import Layout from './components/layout';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
-import CompletePagePreview from './components/markdown-components/complete-page-preview';
 import CustomizationPreview from './components/markdown-components/customization-preview';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
 import Examples from './components/markdown-components/examples';
@@ -54,9 +53,6 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   'customization-preview': {
     component: CustomizationPreview,
-  },
-  'complete-page-preview': {
-    component: CompletePagePreview,
   },
   examples: {
     component: Examples,
