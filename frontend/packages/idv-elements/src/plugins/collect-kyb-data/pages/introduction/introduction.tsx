@@ -36,6 +36,7 @@ const Introduction = () => {
             Icon: IcoUser24,
           },
         ]}
+        variant="default"
       />
       <Button fullWidth onClick={handleClick}>
         {allT('pages.cta.continue')}

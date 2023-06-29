@@ -30,19 +30,21 @@ const getSourceDimensions = ({
 
   // We however may cut off the top and bottom parts of the image vertically
   // and only show the middle part of the image that fits the container
-  const sWidth = videoWidth * (desiredImageWidth / scaledWidth);
+  const sWidth = Math.floor(videoWidth * (desiredImageWidth / scaledWidth));
 
   const scaledHeight = (videoHeight / videoWidth) * clientWidth;
-  const sHeight = videoHeight * (desiredImageHeight / scaledHeight);
+  const sHeight = Math.floor(videoHeight * (desiredImageHeight / scaledHeight));
 
   // sx, sy are the coordinates top-left the points on the original video
   // We use the mid-point of the original video, go half the desired image height (scaled) to left
   // and go half the desired image height (scaled) to upward direction
   // and we get our sx, sy
-  const sx =
-    ((scaledWidth - desiredImageWidth) / 2) * (videoWidth / scaledWidth);
-  const sy =
-    ((scaledHeight - desiredImageHeight) / 2) * (videoHeight / scaledHeight);
+  const sx = Math.floor(
+    ((scaledWidth - desiredImageWidth) / 2) * (videoWidth / scaledWidth),
+  );
+  const sy = Math.floor(
+    ((scaledHeight - desiredImageHeight) / 2) * (videoHeight / scaledHeight),
+  );
 
   return {
     sx,

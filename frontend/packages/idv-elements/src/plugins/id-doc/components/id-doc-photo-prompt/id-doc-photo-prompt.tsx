@@ -1,5 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoIdCard24, IcoSmartphone24, IcoSun24 } from '@onefootprint/icons';
+import {
+  IcoLayer0124,
+  IcoSmartphone224,
+  IcoSparkles24,
+  IcoSquareFrame24,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CountryCode3, IdDocType } from '@onefootprint/types';
 import React from 'react';
@@ -48,24 +53,29 @@ const IdDocPhotoPrompt = ({
           <InfoBox
             items={[
               {
-                title: t('guidelines.check-lighting.title'),
-                description: t('guidelines.check-lighting.description'),
-                Icon: IcoSun24,
-              },
-              {
                 title: t('guidelines.position-document.title', {
                   document: type === IdDocType.passport ? 'passport' : 'ID',
                 }),
                 description: t('guidelines.position-document.description', {
                   side,
                 }),
-                Icon: IcoIdCard24,
+                Icon: IcoSquareFrame24,
+              },
+              {
+                title: t('guidelines.background.title'),
+                description: t('guidelines.background.description'),
+                Icon: IcoLayer0124,
               },
               {
                 title: t('guidelines.device-steady.title'),
-                Icon: IcoSmartphone24,
+                Icon: IcoSmartphone224,
+              },
+              {
+                title: t('guidelines.autocapture.title'),
+                Icon: IcoSparkles24,
               },
             ]}
+            variant="default"
           />
         )}
         <IdDocPhotoButtons onComplete={onComplete} />

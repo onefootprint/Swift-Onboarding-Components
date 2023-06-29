@@ -59,6 +59,7 @@ const BackPhotoCapture = () => {
         cameraKind="back"
         outlineKind="full-frame"
         onComplete={onComplete}
+        autocaptureKind="document"
       />
     </>
   );

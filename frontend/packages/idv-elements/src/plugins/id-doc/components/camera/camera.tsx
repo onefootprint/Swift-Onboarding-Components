@@ -1,11 +1,25 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  IcoEmojiHappy24,
+  IcoLayer0124,
+  Icon,
+  IcoSmartphone24,
+  IcoSmartphone224,
+  IcoSparkles24,
+  IcoSquareFrame24,
+  IcoSun24,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Button, LoadingIndicator } from '@onefootprint/ui';
+import { Button, LoadingIndicator, useToast } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
+import { useTimeout } from 'usehooks-ts';
 
+import InfoBox from '../../../../components/info-box';
+import Feedback from './components/feedback/feedback';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
 import { OutlineKind } from './components/overlay/overlay';
+import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
@@ -20,6 +34,7 @@ type CameraProps = {
   outlineWidthRatio: number; // with respect to the video height (not width)
   outlineHeightRatio: number; // with respect to the video height
   outlineKind: OutlineKind;
+  autocaptureKind: AutocaptureKind;
 };
 
 const FRONT_CAMERA_OPTIONS = {
@@ -32,6 +47,8 @@ const BACK_CAMERA_OPTIONS = {
   video: { facingMode: 'environment' },
 };
 
+const MANUAL_CAPTURE_WAIT_TIME = 12000; // if the autocapture isn't successful for 10 seconds, we trigger manual capture
+
 const Camera = ({
   onCapture,
   onError,
@@ -40,6 +57,7 @@ const Camera = ({
   outlineWidthRatio,
   outlineHeightRatio,
   outlineKind,
+  autocaptureKind,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
@@ -48,6 +66,11 @@ const Camera = ({
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
   const [image, setImage] = useState<string | undefined>();
+  const [autocaptureFeedback, setAutocaptureFeedback] = useState<
+    string | undefined
+  >('detecting');
+  const [isManualEnabled, setIsManualEnabled] = useState(false);
+  const toast = useToast();
 
   const mediaStream = useUserMedia(
     cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
@@ -58,6 +81,18 @@ const Camera = ({
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
   }
+
+  useTimeout(
+    () => {
+      setIsManualEnabled(true);
+      toast.show({
+        title: t('manual-enabled-toast.title'),
+        description: t('manual-enabled-toast.description'),
+        variant: 'default',
+      });
+    },
+    isCameraVisible ? MANUAL_CAPTURE_WAIT_TIME : null,
+  );
 
   const handleCanPlay = () => {
     if (!videoRef.current) {
@@ -112,6 +147,62 @@ const Camera = ({
     clearCanvas();
   };
 
+  useAutoCapture({
+    videoRef,
+    canvasRef,
+    outlineWidth: videoSize ? videoSize.height * outlineWidthRatio : 0,
+    outlineHeight: videoSize ? videoSize.height * outlineHeightRatio : 0,
+    onCapture: handleClick,
+    onStatusChange: setAutocaptureFeedback,
+    autocaptureKind,
+  });
+
+  const documentCaptureInstructions: {
+    title: string;
+    description?: string;
+    Icon: Icon;
+  }[] = [
+    {
+      title: t('guidelines.position-document.title'),
+      Icon: IcoSquareFrame24,
+    },
+    {
+      title: t('guidelines.background.title'),
+      Icon: IcoLayer0124,
+    },
+    {
+      title: t('guidelines.device-steady.title'),
+      Icon: IcoSmartphone224,
+    },
+    {
+      title: t('guidelines.autocapture.title'),
+      Icon: IcoSparkles24,
+    },
+  ];
+
+  const selfieCaptureInstructions: {
+    title: string;
+    description?: string;
+    Icon: Icon;
+  }[] = [
+    {
+      title: t('guidelines.whole-face.title'),
+      Icon: IcoEmojiHappy24,
+    },
+    {
+      title: t('guidelines.check-lighting.title'),
+      Icon: IcoSun24,
+    },
+    {
+      title: t('guidelines.device-steady.title'),
+      Icon: IcoSmartphone24,
+    },
+    {
+      title: t('guidelines.autocapture.title'),
+      Icon: IcoSparkles24,
+    },
+  ];
+
   return (
     <>
       {!isCameraVisible && (
@@ -146,10 +237,26 @@ const Camera = ({
             height={videoSize?.height}
           />
           <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
+          {autocaptureFeedback && (
+            <Feedback>
+              {t(`autocapture.feedback.${autocaptureFeedback}`)}
+            </Feedback>
+          )}
         </VideoContainer>
-        <Button fullWidth onClick={handleClick} variant="primary">
-          {t('take')}
-        </Button>
+        {!isManualEnabled ? (
+          <InfoBox
+            items={
+              autocaptureKind === 'document'
+                ? documentCaptureInstructions
+                : selfieCaptureInstructions
+            }
+            variant="compact"
+          />
+        ) : (
+          <Button fullWidth onClick={handleClick} variant="primary">
+            {t('take')}
+          </Button>
+        )}
       </Container>
     </>
   );

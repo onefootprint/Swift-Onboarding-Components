@@ -59,6 +59,7 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
               Icon: IcoFileText24,
             },
           ]}
+          variant="default"
         />
       )}
     </>

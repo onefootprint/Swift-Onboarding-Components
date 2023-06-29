@@ -25,6 +25,12 @@ const getImageStringFromVideo = ({
     desiredImageHeight,
   });
 
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+
+  canvasRef.current.setAttribute('width', `${sourceDimensions.sWidth}`);
+  canvasRef.current.setAttribute('height', `${sourceDimensions.sHeight}`);
+
   context.drawImage(
     videoRef.current,
     sourceDimensions.sx,
@@ -33,8 +39,8 @@ const getImageStringFromVideo = ({
     sourceDimensions.sHeight,
     0,
     0,
-    videoRef.current?.clientWidth,
-    videoRef.current?.clientHeight,
+    canvasRef.current?.clientWidth,
+    canvasRef.current?.clientHeight,
   );
 
   const imageString = canvasRef.current.toDataURL();

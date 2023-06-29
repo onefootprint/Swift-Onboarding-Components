@@ -19,16 +19,19 @@
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
       "guidelines": {
-        "check-lighting": {
-          "title": "Check your lighting",
-          "description": "It can't be too bright or too dark."
-        },
         "device-steady": {
           "title": "Hold your device steady"
         },
         "position-document": {
-          "title": "Position your {{document}} in the frame",
+          "title": "Align your {{document}} with the frame outline",
           "description": "Make sure it's the {{side}}."
+        },
+        "background": {
+          "title": "Find a background with good contrast",
+          "description": "The most different from the id card color as possible."
+        },
+        "autocapture": {
+          "title": "Image will be captured automatically"
         }
       }
     },
@@ -96,7 +99,40 @@
         "position": "Position your face within the frame",
         "readiness": "Take the photo when you're ready"
       },
-      "take": "Take photo"
+      "take": "Take photo",
+      "autocapture": {
+        "feedback": {
+          "ok": "Hold still . . .",
+          "detecting": "Detecting . . .",
+          "face-too-far": "Face is too far from the camera",
+          "face-outside-the-frame": "Face is outside the frame outline",
+          "head-not-straight": "Face is tilted or looking other way"
+        }
+      },
+      "guidelines": {
+        "position-document": {
+          "title": "Align your ID with the frame outline"
+        },
+        "background": {
+          "title": "Find a background with good contrast"
+        },
+        "whole-face": {
+          "title": "Position your face within the frame"
+        },
+        "check-lighting": {
+          "title": "Check your lighting"
+        },
+        "device-steady": {
+          "title": "Hold your device steady"
+        },
+        "autocapture": {
+          "title": "Image will be captured automatically"
+        }
+      },
+      "manual-enabled-toast": {
+        "title": "Manual capture enabled",
+        "description": "We noticed it's taking you a while to trigger the automatic capture, so you can now take the picture manually."
+      }
     },
     "preview": {
       "retake": "Retake",
@@ -158,6 +194,10 @@
         "second-text": "Now we need a selfie"
       },
       "guidelines": {
+        "whole-face": {
+          "title": "Position your face within the frame",
+          "description": "Keep your head straight pointing at the camera"
+        },
         "check-lighting": {
           "title": "Check your lighting",
           "description": "It can't be too bright or too dark."
@@ -165,8 +205,8 @@
         "device-steady": {
           "title": "Hold your device steady"
         },
-        "whole-face": {
-          "title": "Position your face within the frame"
+        "autocapture": {
+          "title": "Image will be captured automatically"
         }
       }
     },

@@ -5,6 +5,7 @@ import useProcessImage from '../../hooks/use-process-image';
 import Camera from '../camera';
 import { CameraKind } from '../camera/camera';
 import { OutlineKind } from '../camera/components/overlay/overlay';
+import { AutocaptureKind } from '../camera/hooks/use-auto-capture';
 import Preview from '../preview';
 
 type PhotoCaptureProps = {
@@ -14,6 +15,7 @@ type PhotoCaptureProps = {
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
   onComplete: (imageString: string) => void;
+  autocaptureKind: AutocaptureKind;
 };
 
 const PhotoCapture = ({
@@ -23,6 +25,7 @@ const PhotoCapture = ({
   outlineHeightRatio,
   cameraKind,
   onComplete,
+  autocaptureKind,
 }: PhotoCaptureProps) => {
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
@@ -88,6 +91,7 @@ const PhotoCapture = ({
       outlineWidthRatio={outlineWidthRatio}
       outlineHeightRatio={outlineHeightRatio}
       outlineKind={outlineKind}
+      autocaptureKind={autocaptureKind}
     />
   );
 };

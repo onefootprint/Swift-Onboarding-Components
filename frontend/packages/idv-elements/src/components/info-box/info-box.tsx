@@ -5,10 +5,11 @@ import React from 'react';
 
 export type InfoBoxProps = {
   items: { title: string; description?: string; Icon: Icon }[];
+  variant: 'default' | 'compact';
 };
 
-const InfoBox = ({ items }: InfoBoxProps) => (
-  <Container>
+const InfoBox = ({ items, variant }: InfoBoxProps) => (
+  <Container data-variant={variant}>
     {items.map(({ title, description, Icon }) => (
       <Item title={title} key={title}>
         <IconContainer>
@@ -17,7 +18,7 @@ const InfoBox = ({ items }: InfoBoxProps) => (
         <Box>
           <Typography
             color="primary"
-            sx={{ marginBottom: 3 }}
+            sx={{ marginBottom: variant === 'default' ? 3 : 2 }}
             variant="label-3"
           >
             {title}
@@ -38,9 +39,17 @@ const Container = styled.ul`
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.default};
     display: grid;
-    gap: ${theme.spacing[7]};
-    padding: ${theme.spacing[5]};
     width: 100%;
+
+    &[data-variant='default'] {
+      gap: ${theme.spacing[7]};
+      padding: ${theme.spacing[5]};
+    }
+
+    &[data-variant='compact'] {
+      gap: ${theme.spacing[4]};
+      padding: ${theme.spacing[4]};
+    }
   `}
 `;
 

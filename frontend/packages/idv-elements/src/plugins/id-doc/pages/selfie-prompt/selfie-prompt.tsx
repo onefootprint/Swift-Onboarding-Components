@@ -3,6 +3,7 @@ import {
   IcoEmojiHappy24,
   IcoSelfie40,
   IcoSmartphone24,
+  IcoSparkles24,
   IcoSun24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -49,19 +50,25 @@ const SelfiePrompt = () => {
         <InfoBox
           items={[
             {
+              title: t('guidelines.whole-face.title'),
+              description: t('guidelines.whole-face.description'),
+              Icon: IcoEmojiHappy24,
+            },
+            {
               title: t('guidelines.check-lighting.title'),
               description: t('guidelines.check-lighting.description'),
               Icon: IcoSun24,
             },
             {
-              title: t('guidelines.whole-face.title'),
-              Icon: IcoEmojiHappy24,
-            },
-            {
               title: t('guidelines.device-steady.title'),
               Icon: IcoSmartphone24,
             },
+            {
+              title: t('guidelines.autocapture.title'),
+              Icon: IcoSparkles24,
+            },
           ]}
+          variant="default"
         />
         <Button fullWidth onClick={handleClick}>
           {t('cta')}
