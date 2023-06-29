@@ -3,7 +3,7 @@ import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const EncryptedCell = () => (
-  <Box sx={{ display: 'flex' }}>
+  <Box sx={{ display: 'flex', alignItems: 'center' }}>
     <Box sx={{ marginRight: 2 }}>
       <IcoLock16 />
     </Box>
