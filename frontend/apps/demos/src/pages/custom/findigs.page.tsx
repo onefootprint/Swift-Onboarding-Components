@@ -3,7 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
 
-const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
+// findigs pk
+const publicKey = 'ob_test_KYA0PU0awxnHKjzh9M849Y';
 
 const handleOpen = () => {
   footprint.open({
