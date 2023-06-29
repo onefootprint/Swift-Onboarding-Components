@@ -3,9 +3,11 @@ import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
 
+const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
+
 const handleOpen = () => {
   footprint.open({
-    publicKey: 'ob_test_zZ1fnphZA7Qfeomdk4iG5u',
+    publicKey,
     options: {
       showCompletionPage: true,
     },
