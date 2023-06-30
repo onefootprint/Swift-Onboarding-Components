@@ -1,6 +1,4 @@
-use crate::{
-    config::Config, decision::TenantVendorControlError, enclave_client::EnclaveClient, errors::ApiResult,
-};
+use crate::{config::Config, errors::ApiResult};
 use db::{
     models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl},
     DbPool, DbResult,
@@ -13,7 +11,7 @@ use newtypes::{
     vendor_credentials::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
     },
-    EncryptedVaultPrivateKey, IdvData, PiiString, TenantId, Vendor, VendorAPI,
+    IdvData, PiiString, TenantId, Vendor, VendorAPI,
 };
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
@@ -32,7 +30,6 @@ impl TenantVendorControl {
     pub async fn new(
         tenant_id: TenantId,
         db_pool: &DbPool,
-        enclave_client: &EnclaveClient,
         config: &Config,
     ) -> ApiResult<TenantVendorControl> {
         let (tenant, vendor_control) = db_pool
@@ -44,7 +41,7 @@ impl TenantVendorControl {
             })
             .await??;
 
-        Self::new_internal(vendor_control, config, enclave_client, tenant).await
+        Self::new_internal(vendor_control, config, tenant).await
     }
 
     // Accessors
@@ -92,31 +89,10 @@ impl TenantVendorControl {
     async fn new_internal(
         vendor_control: Option<DbTenantVendorControl>,
         config: &Config,
-        enclave_client: &EnclaveClient,
         tenant: Tenant,
     ) -> ApiResult<Self> {
-        // Check if this tenant has specific IDology credentials, if not, fall back to default creds from state
-        // In the future we'll error here
-        let db_idology_creds =
-            Self::get_tenant_idology_credentials(&vendor_control, enclave_client, &tenant.e_private_key)
-                .await
-                .map_err(crate::decision::Error::from);
-
-        let idology_credentials = match db_idology_creds {
-            Ok(Some(id_creds)) => id_creds,
-            Ok(None) => {
-                tracing::info!(
-                    msg = "did not find idology creds, falling back to state",
-                    "tenant_vendor_control"
-                );
-                IdologyCredentials::from(config)
-            }
-            Err(e) => {
-                // updating these credentials is a manual process and therefore error prone
-                tracing::error!(msg="error decrypting idology credentials from tenant_vendor_control", err=?e, "tenant_vendor_control",);
-                IdologyCredentials::from(config)
-            }
-        };
+        // As of 2023-06-28 we just use our default idology credentials for all tenants
+        let idology_credentials = IdologyCredentials::from(config);
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
         let experian_credential_builder = ExperianCredentialBuilder::from(config);
@@ -150,38 +126,6 @@ impl TenantVendorControl {
         Ok(control)
     }
 
-    async fn get_tenant_idology_credentials(
-        vendor_control: &Option<DbTenantVendorControl>,
-        enclave_client: &EnclaveClient,
-        tenant_e_private_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Option<IdologyCredentials>, TenantVendorControlError> {
-        if let Some(vc) = vendor_control {
-            match (
-                vc.idology_enabled,
-                vc.idology_username.clone(),
-                vc.idology_e_password.clone(),
-            ) {
-                (true, Some(un), Some(pw)) => {
-                    let decrypted_pw = enclave_client
-                        .decrypt_to_piistring(&pw, tenant_e_private_key, vec![])
-                        .await?;
-
-                    Ok(Some(IdologyCredentials {
-                        username: un.into(),
-                        password: decrypted_pw,
-                    }))
-                }
-                _ => {
-                    tracing::warn!(vendor_control_id=%vc.id, "missing idology credentials for tenant vendor control");
-
-                    Ok(None)
-                }
-            }
-        } else {
-            Ok(None)
-        }
-    }
-
     fn get_experian_subscriber_code(vendor_control: &Option<DbTenantVendorControl>) -> Option<PiiString> {
         if let Some(vc) = vendor_control {
             match (vc.experian_enabled, vc.experian_subscriber_code.clone()) {
@@ -205,7 +149,7 @@ impl TenantVendorControl {
 
         // If we have a vendor control, we defer to that for checking Experian and Idology
         if let Some(tvc) = vendor_control {
-            if tvc.idology_enabled && tvc.idology_e_password.is_some() && tvc.idology_username.is_some() {
+            if tvc.idology_enabled {
                 all_idology_vendor_apis.into_iter().for_each(|a| apis.push(a));
             }
 
@@ -230,10 +174,9 @@ impl TenantVendorControl {
     pub async fn new_for_test(
         config: &Config,
         vendor_control: Option<DbTenantVendorControl>,
-        enclave_client: &EnclaveClient,
         tenant: Tenant,
     ) -> ApiResult<Self> {
-        Self::new_internal(vendor_control, config, enclave_client, tenant).await
+        Self::new_internal(vendor_control, config, tenant).await
     }
 }
 

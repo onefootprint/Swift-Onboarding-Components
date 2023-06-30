@@ -77,8 +77,7 @@ async fn make_vendor_calls(
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
     let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
     let tid = tenant_id.clone();
-    let tenant_vendor_control =
-        TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;
+    let tenant_vendor_control = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
     let (requests, ob) = state
@@ -237,8 +236,7 @@ async fn shadow_run(
     let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
 
     let tid = tenant_id.clone();
-    let tenant_vendor_control =
-        TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;
+    let tenant_vendor_control = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
     let (ob, requests) = state

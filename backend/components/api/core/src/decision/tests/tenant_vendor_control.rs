@@ -1,7 +1,4 @@
-use crate::{
-    config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
-    enclave_client::EnclaveClient, State,
-};
+use crate::{config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl, State};
 use db::tests::test_db_pool::TestDbPool;
 use db::{models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, DbPool};
 use macros::test_state;
@@ -49,9 +46,8 @@ async fn get_tenant_vendor_control(
     tenant_id: TenantId,
     db_pool: &DbPool,
     config: &Config,
-    enclave_client: &EnclaveClient,
 ) -> (DefaultCredentials, TenantVendorControl) {
-    let tvc = TenantVendorControl::new(tenant_id, db_pool, enclave_client, config)
+    let tvc = TenantVendorControl::new(tenant_id, db_pool, config)
         .await
         .unwrap();
 
@@ -80,13 +76,8 @@ async fn test_update_credentials(state: &mut State) {
         .db_query(move |conn| db::tests::fixtures::tenant::create_with_keys(conn, pk2, tenant_e_key2))
         .await
         .unwrap();
-    let (default_creds_from_state, updated) = get_tenant_vendor_control(
-        tenant_with_no_tvc.id,
-        &state.db_pool,
-        &state.config,
-        &state.enclave_client,
-    )
-    .await;
+    let (default_creds_from_state, updated) =
+        get_tenant_vendor_control(tenant_with_no_tvc.id, &state.db_pool, &state.config).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
     assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
 
@@ -107,12 +98,18 @@ async fn test_update_credentials(state: &mut State) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
     assert_eq!(
         updated.experian_credentials().subscriber_code,
         "sub_code123".into()
     );
     assert_ne!(default_creds_from_state.experian, updated.experian_credentials());
+    assert!(updated
+        .enabled_vendor_apis()
+        .into_iter()
+        .map(newtypes::Vendor::from)
+        .collect::<Vec<newtypes::Vendor>>()
+        .contains(&newtypes::Vendor::Experian));
 
     // if experian isn't enabled, we shouldn't change credentials, even if provided
     let t = create_db_vendor_control(
@@ -127,8 +124,15 @@ async fn test_update_credentials(state: &mut State) {
     )
     .await;
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
     assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
+    // if idology is not enabled, we should not see any enabled vendor apis
+    assert!(!updated
+        .enabled_vendor_apis()
+        .into_iter()
+        .map(newtypes::Vendor::from)
+        .collect::<Vec<newtypes::Vendor>>()
+        .contains(&newtypes::Vendor::Experian));
 
     // if experian sub code isn't provided, we shouldn't change credentials,
     let t = create_db_vendor_control(
@@ -143,7 +147,7 @@ async fn test_update_credentials(state: &mut State) {
     )
     .await;
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
     assert_eq!(default_creds_from_state.experian, updated.experian_credentials());
     // -------------------
     // ---- Idology -------
@@ -163,10 +167,15 @@ async fn test_update_credentials(state: &mut State) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
-    assert_ne!(default_creds_from_state.idology, updated.idology_credentials());
-    assert_eq!(updated.idology_credentials().password, "id_password".into());
-    assert_eq!(updated.idology_credentials().username, "id_username".into());
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
+    assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
+    // if idology is not enabled, we should not see any enabled vendor apis
+    assert!(updated
+        .enabled_vendor_apis()
+        .into_iter()
+        .map(newtypes::Vendor::from)
+        .collect::<Vec<newtypes::Vendor>>()
+        .contains(&newtypes::Vendor::Idology));
 
     // if idology not enabled, don't update
     let t = create_db_vendor_control(
@@ -182,8 +191,15 @@ async fn test_update_credentials(state: &mut State) {
     .await;
 
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
+    // if idology is not enabled, we should not see any enabled vendor apis
+    assert!(!updated
+        .enabled_vendor_apis()
+        .into_iter()
+        .map(newtypes::Vendor::from)
+        .collect::<Vec<newtypes::Vendor>>()
+        .contains(&newtypes::Vendor::Idology));
 
     // If only pw provided, don't update
     let t = create_db_vendor_control(
@@ -198,9 +214,9 @@ async fn test_update_credentials(state: &mut State) {
         None,
     )
     .await;
-
+    // TODO: remove this test in next PR
     let (default_creds_from_state, updated) =
-        get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
+        get_tenant_vendor_control(t, &state.db_pool, &state.config).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
 }
 
@@ -214,7 +230,7 @@ pub mod fixtures {
         vendor_control: Option<DbTenantVendorControl>,
         tenant: Tenant,
     ) -> TenantVendorControl {
-        TenantVendorControl::new_for_test(&state.config, vendor_control, &state.enclave_client, tenant)
+        TenantVendorControl::new_for_test(&state.config, vendor_control, tenant)
             .await
             .expect("couldn't create tenant vendor control")
     }

@@ -109,9 +109,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     let vendor_results = if let (Some(fixture_decision)) = fixture_decision {
         decision::sandbox::get_fixture_vendor_results(vendor_requests.outstanding_requests)?
     } else {
-        let tvc =
-            TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.enclave_client, &state.config)
-                .await?;
+        let tvc = TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config).await?;
         // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
         decision::engine::make_vendor_requests(
             &state.db_pool,

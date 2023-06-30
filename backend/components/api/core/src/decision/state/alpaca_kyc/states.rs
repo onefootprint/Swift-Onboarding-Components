@@ -85,7 +85,7 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         // Create TVC for use in writing vreqs in `on_commit`
         let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.enclave_client, &state.config).await?;
+        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
 
         Ok(tvc)
     }
@@ -328,13 +328,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 Ok((di, uv))
             })
             .await?;
-        let tvc = TenantVendorControl::new(
-            self.t_id.clone(),
-            &state.db_pool,
-            &state.enclave_client,
-            &state.config,
-        )
-        .await?;
+        let tvc = TenantVendorControl::new(self.t_id.clone(), &state.db_pool, &state.config).await?;
 
         let fixture_decision =
             decision::utils::get_fixture_data_decision(state.feature_flag_client.clone(), &uv, &self.t_id)?;

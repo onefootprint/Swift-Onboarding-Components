@@ -80,7 +80,7 @@ impl IncodeStateMachine {
     ) -> ApiResult<Self> {
         // get incode credentials from TVC
         let tenant_vendor_control =
-            TenantVendorControl::new(tenant_id, &state.db_pool, &state.enclave_client, &state.config).await?;
+            TenantVendorControl::new(tenant_id, &state.db_pool, &state.config).await?;
 
         // Load our existing state
         let config_id = configuration_id.clone();
