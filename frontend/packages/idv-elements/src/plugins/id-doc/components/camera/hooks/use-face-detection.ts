@@ -4,10 +4,11 @@ import {
   nets,
   resizeResults,
   TinyFaceDetectorOptions,
-} from '@vladmandic/face-api';
+} from 'face-api.js';
 import { useEffect, useState } from 'react';
 
 import {
+  calculateFaceAngle,
   isFaceCloseEnough,
   isFaceInTheFrame,
   isHeadStraight,
@@ -97,8 +98,9 @@ const useFaceDetection = () => {
     )
       return FaceStatus.faceOutsideTheFrame;
 
-    // Third priority: head should be straight pointing to the camera
-    if (!isHeadStraight(result.angle)) return FaceStatus.headNotStraight;
+    // // Third priority: head should be straight pointing to the camera
+    const angle = calculateFaceAngle(result.landmarks);
+    if (!isHeadStraight(angle)) return FaceStatus.headNotStraight;
 
     return FaceStatus.OK;
   };
