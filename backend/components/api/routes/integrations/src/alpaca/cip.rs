@@ -467,7 +467,7 @@ fn document_and_photo(
         Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::Document))?
     }
 
-    let vendor_map = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let (vendor_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let ocr_api = IncodeFetchOCR;
     let scores_api = IncodeFetchScores;
     let ocr_response = vendor_map

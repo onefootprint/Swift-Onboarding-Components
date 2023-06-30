@@ -217,7 +217,7 @@ pub fn get_decision(
     conn: &mut TxnPgConn,
     vendor_results: &[VendorResult],
 ) -> ApiResult<KycDecision> {
-    let vendor_response_map = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let (vendor_response_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let (rules_output, reason_codes) = rule_group.rule_group().evaluate(&vendor_response_map)?;
     Ok((rules_output, reason_codes))
 }

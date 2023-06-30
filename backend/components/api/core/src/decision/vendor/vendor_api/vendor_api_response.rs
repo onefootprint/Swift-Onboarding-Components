@@ -1,15 +1,6 @@
-use std::sync::Arc;
-
-use db::{
-    models::{
-        vault::Vault,
-        verification_request::{RequestAndMaybeResult, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbError, DbPool,
-};
+use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use newtypes::{
-    EncryptedVaultPrivateKey, OnboardingId, ScopedVaultId, SealedVaultBytes, VendorAPI, VerificationResultId,
+    EncryptedVaultPrivateKey, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
 };
 
 use crate::{enclave_client::EnclaveClient, errors::ApiResult};
@@ -47,6 +38,13 @@ use super::vendor_api_struct::*;
 
 // Marker to annotate TypedMaps
 pub struct VendorAPIResponseMarker;
+pub struct VendorAPIResponseIdsMarker;
+
+#[derive(Clone)]
+pub struct VerificationRequestAndResult {
+    pub verification_request_id: VerificationRequestId,
+    pub verification_result_id: VerificationResultId,
+}
 
 // Structure that represents a mapping from VendorAPIStruct -> ResponseStruct (defined in `idv` crate)
 //
@@ -54,6 +52,9 @@ pub struct VendorAPIResponseMarker;
 // though. Hence why it's wrapped in Arc down below
 pub type VendorAPIResponseMap =
     TypedMap<VendorAPIResponseMarker, typedmap::clone::SyncCloneBounds, typedmap::clone::SyncCloneBounds>;
+
+pub type VendorAPIResponseIdentifiersMap =
+    TypedMap<VendorAPIResponseIdsMarker, typedmap::clone::SyncCloneBounds, typedmap::clone::SyncCloneBounds>;
 
 pub fn parse_response<T>(value: serde_json::Value) -> Result<T::Value, serde_json::Error>
 where
@@ -124,25 +125,71 @@ fn build_parsed_vendor_response_map_entry(
     Ok(())
 }
 
+fn build_verification_identifier_map_entry(
+    map: &mut VendorAPIResponseIdentifiersMap,
+    request_and_result: VerificationRequestAndResult,
+    vendor_api: VendorAPI,
+) {
+    match vendor_api {
+        VendorAPI::IdologyExpectID => map.insert(IdologyExpectID, request_and_result),
+        VendorAPI::IdologyScanVerifySubmission => map.insert(IdologyScanVerifySubmission, request_and_result),
+        VendorAPI::IdologyScanVerifyResults => map.insert(IdologyScanVerifyResults, request_and_result),
+        VendorAPI::IdologyScanOnboarding => map.insert(IdologyScanOnboarding, request_and_result),
+        VendorAPI::IdologyPa => map.insert(IdologyPa, request_and_result),
+        VendorAPI::TwilioLookupV2 => map.insert(TwilioLookupV2, request_and_result),
+        VendorAPI::SocureIDPlus => map.insert(SocureIDPlus, request_and_result),
+        VendorAPI::ExperianPreciseID => map.insert(ExperianPreciseID, request_and_result),
+        VendorAPI::MiddeskCreateBusiness => map.insert(MiddeskCreateBusiness, request_and_result),
+        VendorAPI::MiddeskGetBusiness => map.insert(MiddeskGetBusiness, request_and_result),
+        VendorAPI::MiddeskBusinessUpdateWebhook => {
+            map.insert(MiddeskBusinessUpdateWebhook, request_and_result)
+        }
+        VendorAPI::MiddeskTinRetriedWebhook => map.insert(MiddeskTinRetriedWebhook, request_and_result),
+        VendorAPI::IncodeStartOnboarding => map.insert(IncodeStartOnboarding, request_and_result),
+        VendorAPI::IncodeAddFront => map.insert(IncodeAddFront, request_and_result),
+        VendorAPI::IncodeAddBack => map.insert(IncodeAddBack, request_and_result),
+        VendorAPI::IncodeProcessId => map.insert(IncodeProcessId, request_and_result),
+        VendorAPI::IncodeFetchScores => map.insert(IncodeFetchScores, request_and_result),
+        VendorAPI::IncodeAddPrivacyConsent => map.insert(IncodeAddPrivacyConsent, request_and_result),
+        VendorAPI::IncodeAddMLConsent => map.insert(IncodeAddMLConsent, request_and_result),
+        VendorAPI::IncodeFetchOCR => map.insert(IncodeFetchOCR, request_and_result),
+        VendorAPI::IncodeAddSelfie => map.insert(IncodeAddSelfie, request_and_result),
+        VendorAPI::IncodeWatchlistCheck => map.insert(IncodeWatchlistCheck, request_and_result),
+        VendorAPI::IncodeGetOnboardingStatus => map.insert(IncodeGetOnboardingStatus, request_and_result),
+        VendorAPI::IncodeProcessFace => map.insert(IncodeProcessFace, request_and_result),
+    };
+}
+
 // In many cases at the moment, we still have functions that return VendorResults.
 // We also still need some things that VendorResults has that this map doesn't (like VerificationResultId). Eventually
 // will get rid of this, but it's non-trivial
 pub fn build_vendor_response_map_from_vendor_results(
     vendor_results: &[VendorResult],
-) -> ApiResult<VendorAPIResponseMap> {
+) -> ApiResult<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)> {
     let mut out_map: VendorAPIResponseMap = TypedMap::new_with_bounds();
+    let mut out_identifiers_map: VendorAPIResponseIdentifiersMap = TypedMap::new_with_bounds();
 
     vendor_results.iter().try_for_each(|vr| -> Result<(), ApiError> {
+        let vendor_api = VendorAPI::from(&vr.response.response);
+        // Mapping from VendorAPI struct -> deserialized vendor response
         build_parsed_vendor_response_map_entry(
             &mut out_map,
             vr.response.raw_response.clone().into_leak(),
-            VendorAPI::from(&vr.response.response),
+            vendor_api,
         )?;
+
+        // Now build a similarly keyed map, but with the VerificationResult and VerificationRequest IDs
+        let vres_and_result = VerificationRequestAndResult {
+            verification_request_id: vr.verification_request_id.clone(),
+            verification_result_id: vr.verification_result_id.clone(),
+        };
+
+        build_verification_identifier_map_entry(&mut out_identifiers_map, vres_and_result, vendor_api);
 
         Ok(())
     })?;
 
-    Ok(out_map)
+    Ok((out_map, out_identifiers_map))
 }
 
 // Build a vendor response map from completed verification requests
@@ -186,63 +233,6 @@ pub async fn build_parsed_vendor_response_map(
         )?;
 
     Ok(out_map)
-}
-
-#[derive(Clone)]
-pub struct VendorRequests {
-    // parsed requests that have completed
-    pub completed_requests: Arc<VendorAPIResponseMap>,
-    pub completed_verification_result_ids: Vec<VerificationResultId>,
-    // requests that we do not yet have results for
-    pub outstanding_requests: Vec<VerificationRequest>,
-}
-
-// TODO: Eventually used, but included for POC. Pull verification requests/results and produce a structure that is used
-// to drive more vendor requests or proceed to decisioning
-#[allow(unused)]
-pub async fn get_latest_verification_requests_and_results(
-    onboarding_id: &OnboardingId,
-    scoped_user_id: &ScopedVaultId,
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-) -> ApiResult<VendorRequests> {
-    let suid = scoped_user_id.clone();
-    let requests_and_results = db_pool
-        .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
-            // Load our requests and results
-            // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, suid)
-        })
-        .await??;
-
-    let obid = onboarding_id.clone();
-    let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
-    let completed_verification_result_ids = requests_and_results
-        .iter()
-        .filter_map(|(_, vres)| vres.as_ref().map(|v| v.id.clone()))
-        .collect();
-
-    let previous_results =
-        build_parsed_vendor_response_map(requests_and_results.clone(), enclave_client, &uv.e_private_key)
-            .await?;
-
-    let requests: Vec<VerificationRequest> = requests_and_results
-        .into_iter()
-        .filter_map(|(request, result)| {
-            // Only send requests for which we don't already have a result
-            if result.is_none() {
-                Some(request)
-            } else {
-                None
-            }
-        })
-        .collect();
-
-    Ok(VendorRequests {
-        completed_requests: Arc::new(previous_results),
-        outstanding_requests: requests,
-        completed_verification_result_ids,
-    })
 }
 
 /// Typed Map impls
@@ -317,6 +307,80 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeGetOnboardingStatus {
 }
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeProcessFace {
     type Value = ProcessFaceResponse;
+}
+
+/// Verification Request and Result map, used in conjunction with the above map for reason codes
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanVerifySubmission {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanVerifyResults {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanOnboarding {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyPa {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for TwilioLookupV2 {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for SocureIDPlus {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for ExperianPreciseID {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for MiddeskCreateBusiness {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for MiddeskGetBusiness {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for MiddeskBusinessUpdateWebhook {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for MiddeskTinRetriedWebhook {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeStartOnboarding {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddFront {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddBack {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeProcessId {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeFetchScores {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddPrivacyConsent {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddMLConsent {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeFetchOCR {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddSelfie {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeWatchlistCheck {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeGetOnboardingStatus {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeProcessFace {
+    type Value = VerificationRequestAndResult;
 }
 
 #[cfg(test)]
