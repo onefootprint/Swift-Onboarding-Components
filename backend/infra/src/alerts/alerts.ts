@@ -171,4 +171,29 @@ export const Alerts: Alert[] = [
       value: 50,
     },
   },
+  {
+    name: 'Unhealthy Host for Loadbalancer Target',
+    datasetName: 'aws',
+    query: {
+      time_range: 240,
+      breakdowns: ['TargetGroup'],
+      calculations: [
+        {
+          op: 'SUM',
+          column: 'amazonaws.com/AWS/ApplicationELB/UnHealthyHostCount.max',
+        },
+      ],
+      filters: [
+        {
+          column: 'TargetGroup',
+          op: 'exists',
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    threshold: {
+      op: '>',
+      value: 0,
+    },
+  },
 ];
