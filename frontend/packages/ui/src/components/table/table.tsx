@@ -201,10 +201,15 @@ const TableContainer = styled.table`
       height: 46px;
       padding: 0 ${theme.spacing[4]};
       vertical-align: middle;
-
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     tbody tr {
