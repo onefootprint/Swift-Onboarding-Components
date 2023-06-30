@@ -6,7 +6,9 @@ import useEntityVault from '@/entities/hooks/use-entity-vault';
 import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_SELECTOR, VAULT_FORM_ID } from '@/entity/constants';
 
+import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
+import RetriggerKYC from './components/retrigger-kyc';
 import useDecryptControls from './hooks/use-decrypt-controls';
 
 type DecryptControlsProps = WithEntityProps;
@@ -27,7 +29,7 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {controls.isIdle && (
         <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
-          <Box>
+          <Box sx={{ display: 'flex', gap: 3 }}>
             <Button
               disabled={!canDecrypt}
               onClick={controls.start}
@@ -36,6 +38,8 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
             >
               {t('start')}
             </Button>
+            <ManualReview />
+            <RetriggerKYC />
           </Box>
         </Tooltip>
       )}

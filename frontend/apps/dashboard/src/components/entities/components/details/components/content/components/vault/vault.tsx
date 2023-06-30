@@ -4,12 +4,12 @@ import React from 'react';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 import BusinessVault from './components/business-vault';
-import DecryptControls, {
-  useDecryptControls,
-} from './components/decrypt-controls';
 import DecryptProvider from './components/decrypt-machine';
 import Form from './components/form';
 import PersonVault from './components/person-vault';
+import DecryptControls, {
+  useDecryptControls,
+} from './components/vault-actions';
 
 const Vault = () => {
   const context = useEntityContext();

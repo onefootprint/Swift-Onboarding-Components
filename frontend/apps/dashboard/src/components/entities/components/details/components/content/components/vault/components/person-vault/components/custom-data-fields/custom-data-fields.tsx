@@ -11,8 +11,8 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 import useField from '../../../../hooks/use-field';
 import useForm from '../../../../hooks/use-form';
 import { DiField } from '../../../../vault.types';
-import { useDecryptControls } from '../../../decrypt-controls';
 import Field from '../../../field';
+import { useDecryptControls } from '../../../vault-actions';
 
 type CustomDataFieldsProps = WithEntityProps & {
   iconComponent: Icon;

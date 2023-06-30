@@ -8,9 +8,6 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
-import ManualReview from './components/manual-review';
-import RetriggerKYC from './components/retrigger-kyc';
-
 type HeaderProps = WithEntityProps;
 
 const Header = ({ entity }: HeaderProps) => {
@@ -42,8 +39,6 @@ const Header = ({ entity }: HeaderProps) => {
         </Row>
         <Row>
           <div id={HEADER_ACTIONS_ID} />
-          <ManualReview />
-          <RetriggerKYC />
         </Row>
       </SubHeader>
     </HeaderContainer>

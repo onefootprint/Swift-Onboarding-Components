@@ -13,8 +13,8 @@ import useField from '../../../../hooks/use-field';
 import useForm from '../../../../hooks/use-form';
 import { DiField } from '../../../../vault.types';
 import getCards from '../../../card-fieldset/utils/get-cards';
-import { useDecryptControls } from '../../../decrypt-controls';
 import Field from '../../../field';
+import { useDecryptControls } from '../../../vault-actions';
 import CardHeader from './components/card-header';
 
 export type FieldsetProps = WithEntityProps & {

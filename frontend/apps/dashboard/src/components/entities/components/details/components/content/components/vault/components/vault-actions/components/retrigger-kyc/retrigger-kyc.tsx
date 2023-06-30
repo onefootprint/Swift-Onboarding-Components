@@ -4,7 +4,7 @@ import { EntityKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import { WithEntityProps } from '../../../../../with-entity';
+import { WithEntityProps } from '../../../../../../../with-entity';
 import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
 
 const RetriggerKYC = ({ entity }: WithEntityProps) => {

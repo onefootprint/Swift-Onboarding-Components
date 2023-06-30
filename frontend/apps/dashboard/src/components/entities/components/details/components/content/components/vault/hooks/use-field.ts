@@ -8,7 +8,7 @@ import {
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 
-import { useDecryptControls } from '../components/decrypt-controls';
+import { useDecryptControls } from '../components/vault-actions';
 
 const useField = (entity: Entity) => {
   const { t } = useTranslation('di');
