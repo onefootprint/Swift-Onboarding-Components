@@ -34,7 +34,7 @@ impl Email {
 
 lazy_static! {
     pub static ref EMAIL_RE: Regex =
-        Regex::new(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
+        Regex::new(r"(^[a-zA-Z0-9_.+\-!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
 }
 
 impl serde::Serialize for Email {
@@ -99,6 +99,14 @@ mod tests {
     })]
     fn test_email(input: &str) -> Email {
         Email::from_str(input).expect("Could not parse")
+    }
+
+    #[test_case("flerpderpmerp@onefootprint.com" => true)]
+    #[test_case("flerpderpmerp!_sdf@onefootprint.com" => true)]
+    #[test_case("abcABC098_.+-!#$%&'*+-/=?^_`{|}~@onefootprint.com" => true)]
+    #[test_case("abcABC098_ .+-!#$%&'*+-/=?^_`{|}~@onefootprint.com" => false)]
+    fn test_parse(input: &str) -> bool {
+        Email::from_str(input).is_ok()
     }
 
     #[test]
