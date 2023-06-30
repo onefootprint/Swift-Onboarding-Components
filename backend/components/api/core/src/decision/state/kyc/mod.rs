@@ -76,6 +76,7 @@ pub enum KycState {
 }
 
 impl KycState {
+    #[tracing::instrument(skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::Kyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())

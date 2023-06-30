@@ -108,6 +108,6 @@ async fn proceed(
     let ww = ww.run(&state, action).await?;
 
     Ok(Json(ResponseData::ok(ProceedResponse {
-        new_workflow_state: newtypes::WorkflowState::from(ww.state),
+        new_workflow_state: newtypes::WorkflowState::from(&ww.state),
     })))
 }

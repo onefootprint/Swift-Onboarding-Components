@@ -48,8 +48,14 @@ pub enum WorkflowKind {
     Document(DocumentState),
 }
 
-impl From<WorkflowKind> for newtypes::WorkflowState {
-    fn from(value: WorkflowKind) -> Self {
+impl std::fmt::Debug for WorkflowKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        newtypes::WorkflowState::from(self).fmt(f)
+    }
+}
+
+impl From<&WorkflowKind> for newtypes::WorkflowState {
+    fn from(value: &WorkflowKind) -> Self {
         match value {
             WorkflowKind::Kyc(s) => s.name(),
             WorkflowKind::AlpacaKyc(s) => s.name(),
@@ -60,12 +66,14 @@ impl From<WorkflowKind> for newtypes::WorkflowState {
 
 /// Wraps any WorkflowWrapperState to provide util methods to initialize a workflow from its
 /// serialized form in the DB and run the workflow.
+#[derive(Debug)]
 pub struct WorkflowWrapper {
     pub state: WorkflowKind,
     pub workflow_id: WorkflowId,
 }
 
 impl WorkflowWrapper {
+    #[tracing::instrument("WorkflowWrapper::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
@@ -79,6 +87,7 @@ impl WorkflowWrapper {
         })
     }
 
+    #[tracing::instrument("WorkflowWrapper::action", skip(state))]
     pub async fn action(
         self,
         state: &State,
@@ -88,8 +97,10 @@ impl WorkflowWrapper {
             state: wf_state,
             workflow_id,
         } = self;
+        tracing::info!(workflow_id=?workflow_id, wf_state=?wf_state, action=?action, "[WorkflowWrapper::action] Running action on workflow");
         let next_state = wf_state.action(state, action, workflow_id.clone()).await?;
         let next_action = next_state.default_action();
+        tracing::info!(workflow_id=?workflow_id, next_state=?next_state, next_action=?next_action, "[WorkflowWrapper::action] Action ran on workflow");
         let next = Self {
             state: next_state,
             workflow_id,
@@ -97,6 +108,7 @@ impl WorkflowWrapper {
         Ok((next, next_action))
     }
 
+    #[tracing::instrument("WorkflowWrapper::run", skip(state))]
     pub async fn run(self, state: &State, action: WorkflowActions) -> ApiResult<Self> {
         let mut next_action = Some(action);
         let mut ww = self;

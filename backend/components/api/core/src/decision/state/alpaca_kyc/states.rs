@@ -57,6 +57,7 @@ use super::{
 /// DataCollection
 /// ////////////////
 impl AlpacaKycDataCollection {
+    #[tracing::instrument("AlpacaKycDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -74,6 +75,10 @@ impl AlpacaKycDataCollection {
 impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
     type AsyncRes = TenantVendorControl;
 
+    #[tracing::instrument(
+        "OnAction<Authorize, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: Authorize,
@@ -90,6 +95,7 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         Ok(tvc)
     }
 
+    #[tracing::instrument("OnAction<Authorize, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
@@ -117,6 +123,7 @@ impl WorkflowState for AlpacaKycDataCollection {
 /// VendorCalls
 /// ////////////////
 impl AlpacaKycVendorCalls {
+    #[tracing::instrument("AlpacaKycVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -134,6 +141,10 @@ impl AlpacaKycVendorCalls {
 impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
+    #[tracing::instrument(
+        "OnAction<MakeVendorCalls, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeVendorCalls,
@@ -142,6 +153,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
     }
 
+    #[tracing::instrument("OnAction<MakeVendorCalls, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(
         self,
         vendor_results: Vec<VendorResult>,
@@ -172,6 +184,7 @@ impl WorkflowState for AlpacaKycVendorCalls {
 /// Decisioning
 /// ////////////////
 impl AlpacaKycDecisioning {
+    #[tracing::instrument("AlpacaKycDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -192,6 +205,10 @@ impl AlpacaKycDecisioning {
 impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
 
+    #[tracing::instrument(
+        "OnAction<MakeDecision, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeDecision,
@@ -200,6 +217,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
     }
 
+    #[tracing::instrument("OnAction<MakeDecision, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         let (ff_client, webhook_client) = async_res;
         // TODO: pass in/otherwise specify Alpaca Rules
@@ -292,6 +310,7 @@ impl WorkflowState for AlpacaKycDecisioning {
 /// WatchlistCheck
 /// ////////////////
 impl AlpacaKycWatchlistCheck {
+    #[tracing::instrument("AlpacaKycWatchlistCheck::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -313,6 +332,10 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         Arc<dyn WebhookClient>,
     );
 
+    #[tracing::instrument(
+        "OnAction<MakeWatchlistCheckCall, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeWatchlistCheckCall,
@@ -364,6 +387,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         Ok((watchlist_res, vendor_results, state.webhook_client.clone()))
     }
 
+    #[tracing::instrument("OnAction<MakeWatchlistCheckCall, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results, webhook_client) = res;
@@ -486,6 +510,7 @@ impl WorkflowState for AlpacaKycWatchlistCheck {
 /// PendingReview
 /// ////////////////
 impl AlpacaKycPendingReview {
+    #[tracing::instrument("AlpacaKycPendingReview::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
         Ok(AlpacaKycPendingReview {
@@ -499,6 +524,10 @@ impl AlpacaKycPendingReview {
 impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
     type AsyncRes = (DecisionRequest, AuthActor);
 
+    #[tracing::instrument(
+        "OnAction<ReviewCompleted, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: ReviewCompleted,
@@ -510,6 +539,7 @@ impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
         Ok((decision, actor))
     }
 
+    #[tracing::instrument("OnAction<ReviewCompleted, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         let (decision, actor) = async_res;
         let sv = ScopedVault::get(conn, &self.sv_id)?;
@@ -540,6 +570,7 @@ impl WorkflowState for AlpacaKycPendingReview {
 /// DocCollection
 /// ////////////////
 impl AlpacaKycDocCollection {
+    #[tracing::instrument("AlpacaKycDocCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -557,6 +588,10 @@ impl AlpacaKycDocCollection {
 impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
     type AsyncRes = ();
 
+    #[tracing::instrument(
+        "OnAction<DocCollected, AlpacaKycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: DocCollected,
@@ -565,6 +600,7 @@ impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
         Ok(())
     }
 
+    #[tracing::instrument("OnAction<DocCollected, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
             wf_id: self.wf_id,
@@ -590,6 +626,7 @@ impl WorkflowState for AlpacaKycDocCollection {
 /// Complete
 /// ////////////////
 impl AlpacaKycComplete {
+    #[tracing::instrument("AlpacaKycComplete::init", skip_all)]
     pub async fn init(_state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         Ok(AlpacaKycComplete)
     }

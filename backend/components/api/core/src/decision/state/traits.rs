@@ -60,9 +60,13 @@ pub(super) trait DoAction<TAction, TWorkflow> {
 impl<T, TAction, TWorkflow> DoAction<TAction, TWorkflow> for T
 where
     T: OnAction<TAction, TWorkflow>,
-    TAction: std::marker::Send + 'static,
+    TAction: std::marker::Send + 'static + std::fmt::Debug,
     TWorkflow: Workflow + Clone,
 {
+    #[tracing::instrument(
+        "<T, TAction, TWorkflow> DoAction<TAction, TWorkflow>::do_action",
+        skip(self, state)
+    )]
     async fn do_action(
         self,
         state: &State,
@@ -79,7 +83,7 @@ where
                     Err(StateError::ConcurrentStateChange(current_state, wf.state))?
                 }
                 let new_state = self.on_commit(r, conn)?;
-                DbWorkflow::update_state(conn, wf, newtypes::WorkflowState::from(new_state.clone().into()))?;
+                DbWorkflow::update_state(conn, wf, newtypes::WorkflowState::from(&new_state.clone().into()))?;
                 Ok(new_state)
             })
             .await?;

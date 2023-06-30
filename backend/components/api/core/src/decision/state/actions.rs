@@ -7,14 +7,20 @@ use strum_macros::EnumString;
 
 use super::StateError;
 
+#[derive(Debug)]
 pub struct Authorize;
+#[derive(Debug)]
 pub struct MakeVendorCalls;
+#[derive(Debug)]
 pub struct MakeDecision;
+#[derive(Debug)]
 pub struct MakeWatchlistCheckCall; // OFAC, PEP, Adverse Media
+#[derive(Debug)]
 pub struct ReviewCompleted {
     pub decision: DecisionRequest,
     pub actor: AuthActor,
 }
+#[derive(Debug)]
 pub struct DocCollected;
 
 #[derive(EnumDiscriminants)]
@@ -32,6 +38,12 @@ pub enum WorkflowActions {
     MakeWatchlistCheckCall(MakeWatchlistCheckCall),
     ReviewCompleted(ReviewCompleted),
     DocCollected(DocCollected),
+}
+
+impl std::fmt::Debug for WorkflowActions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        WorkflowActionsKind::from(self).fmt(f)
+    }
 }
 
 impl TryFrom<WorkflowActionsKind> for WorkflowActions {

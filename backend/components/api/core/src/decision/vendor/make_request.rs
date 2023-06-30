@@ -287,7 +287,7 @@ pub async fn send_socure_idv_request(
     }
 }
 
-// #[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all)]
 pub async fn send_experian_idv_request(
     request: ExperianCrossCoreRequest,
     is_production: bool,
@@ -365,6 +365,7 @@ pub async fn send_scan_onboarding_docv_request(
 }
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
+#[tracing::instrument(skip_all)]
 pub async fn make_idv_request(
     request: VerificationRequest,
     onboarding_id: &OnboardingId,
@@ -417,7 +418,10 @@ pub async fn make_idv_request(
 pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, 
+    fields(vreqs = ?requests.iter().map(|r| r.id.clone()).collect::<Vec<_>>(), 
+    vendors = ?requests.iter().map(|r| r.vendor).collect::<Vec<_>>()))
+]
 pub async fn make_vendor_requests(
     requests: Vec<VerificationRequest>,
     onboarding_id: &OnboardingId,

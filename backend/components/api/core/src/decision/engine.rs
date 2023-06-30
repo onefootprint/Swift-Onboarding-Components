@@ -123,6 +123,7 @@ pub struct VendorRequests {
     pub outstanding_requests: Vec<VerificationRequest>, // requests that we do not yet have results for
 }
 
+#[tracing::instrument(skip(db_pool, enclave_client))]
 pub async fn get_latest_verification_requests_and_results(
     onboarding_id: &OnboardingId,
     scoped_user_id: &ScopedVaultId,
@@ -246,6 +247,7 @@ fn partition_vendor_errors(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
     db_pool: &DbPool,
     onboarding_id: &OnboardingId,

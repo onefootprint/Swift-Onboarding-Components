@@ -110,10 +110,10 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     // To be consistent with current behavior of the non-WF code, we swallow errors
     match res {
         Ok(ww) => {
-            tracing::info!(new_state = ?newtypes::WorkflowState::from(ww.state), "Ran workflow");
+            tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "[Authorize] Ran workflow");
         }
         Err(e) => {
-            tracing::error!(error=%e, "Error running workflow");
+            tracing::error!(error=%e, "[Authorize] Error running workflow");
         }
     };
 

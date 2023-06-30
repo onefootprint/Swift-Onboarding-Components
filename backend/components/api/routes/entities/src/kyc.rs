@@ -7,7 +7,9 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::kyc::KycState;
 use api_core::decision::state::Authorize;
+use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::tenant::TenantError;
@@ -140,7 +142,11 @@ pub async fn post(
         .await?;
 
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-    let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;
+    if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
+        ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+    } else {
+        tracing::warn!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
+    }
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 

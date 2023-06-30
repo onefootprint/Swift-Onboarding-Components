@@ -69,7 +69,7 @@ pub trait InvalidateAuth {
     async fn invalidate(self, state: &State) -> ApiResult<()>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AuthActor {
     TenantUser(TenantUserId),
     TenantApiKey(TenantApiKeyId),

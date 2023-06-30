@@ -57,6 +57,7 @@ pub async fn build_idv_data_from_verification_request(
     Ok(request)
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn bulk_build_data_from_requests(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,

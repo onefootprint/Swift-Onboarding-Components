@@ -38,6 +38,7 @@ use crate::{
 
 use super::{traits::HasRuleGroup, StateError};
 
+#[tracing::instrument(skip(db_pool))]
 pub async fn get_onboarding_for_workflow(
     db_pool: &DbPool,
     workflow: &Workflow,
@@ -52,6 +53,7 @@ pub async fn get_onboarding_for_workflow(
         .await?
 }
 
+#[tracing::instrument(skip(conn, tvc))]
 pub fn setup_kyc_onboarding_vreqs(
     conn: &mut TxnPgConn,
     tvc: TenantVendorControl,
@@ -83,6 +85,7 @@ pub fn setup_kyc_onboarding_vreqs(
     Ok(())
 }
 
+#[tracing::instrument(skip(state))]
 pub async fn make_outstanding_kyc_vendor_calls(
     state: &State,
     sv_id: &ScopedVaultId,
@@ -153,6 +156,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     Ok(all_vendor_results)
 }
 
+#[tracing::instrument(skip(state))]
 pub async fn assert_kyc_vendor_calls_completed(
     state: &State,
     ob_id: &OnboardingId,
@@ -180,6 +184,7 @@ pub type KycDecision = (
     Vec<(FootprintReasonCode, Vec<Vendor>)>,
 );
 
+#[tracing::instrument]
 pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
     let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
     let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
@@ -187,6 +192,7 @@ pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecisi
     (rules_output, reason_codes)
 }
 
+#[tracing::instrument]
 pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
     let decision_status = match fixture_decision {
         // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
@@ -212,6 +218,7 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ky
     (rules_output, reason_codes)
 }
 
+#[tracing::instrument(skip_all)]
 pub fn get_decision(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
@@ -222,6 +229,7 @@ pub fn get_decision(
     Ok((rules_output, reason_codes))
 }
 
+#[tracing::instrument(skip(conn, webhook_client))]
 #[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
@@ -252,6 +260,7 @@ pub fn save_kyc_decision(
     Ok(())
 }
 
+#[tracing::instrument(skip(state))]
 pub async fn write_authorized_fingerprints(state: &State, sv_id: &ScopedVaultId) -> ApiResult<()> {
     let sv_id = sv_id.clone();
     let (obc, vw) = state

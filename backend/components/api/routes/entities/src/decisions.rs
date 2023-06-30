@@ -66,7 +66,7 @@ pub async fn post(
         match res {
             Ok(_) => return EmptyResponse::ok().json(),
             Err(ApiError::StateError(StateError::UnexpectedActionForState)) => {
-                tracing::error!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
+                tracing::info!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
             }
             Err(e) => Err(e)?,
         }

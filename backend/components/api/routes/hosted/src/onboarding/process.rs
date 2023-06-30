@@ -57,7 +57,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                 ww.run(&state, WorkflowActions::DocCollected(DocCollected {}))
                     .await?;
             }
-            s => return Err(WorkflowError::WorkflowCannotProceed(s.into()).into()),
+            s => return Err(WorkflowError::WorkflowCannotProceed(newtypes::WorkflowState::from(&s)).into()),
         }
     }
     ResponseData::ok(EmptyResponse {}).json()

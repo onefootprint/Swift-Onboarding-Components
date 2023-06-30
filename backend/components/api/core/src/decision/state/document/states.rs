@@ -73,6 +73,7 @@ pub struct DocumentComplete;
 /// DataCollection
 /// ////////////////
 impl DocumentDataCollection {
+    #[tracing::instrument("DocumentDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -89,6 +90,10 @@ impl DocumentDataCollection {
 impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
     type AsyncRes = TenantVendorControl;
 
+    #[tracing::instrument(
+        "OnAction<DocCollected, DocumentState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: DocCollected,
@@ -101,6 +106,7 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
         Ok(tvc)
     }
 
+    #[tracing::instrument("OnAction<DocCollected, DocumentState>::on_commit", skip_all)]
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
         Ok(DocumentState::from(DocumentDecisioning {
             wf_id: self.wf_id,
@@ -125,6 +131,7 @@ impl WorkflowState for DocumentDataCollection {
 /// Decisioning
 /// ////////////////
 impl DocumentDecisioning {
+    #[tracing::instrument("DocumentDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -146,6 +153,10 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         Arc<dyn WebhookClient>,
     );
 
+    #[tracing::instrument(
+        "OnAction<MakeDecision, DocumentState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeDecision,
@@ -161,6 +172,8 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             state.webhook_client.clone(),
         ))
     }
+
+    #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results, webhook_client) = async_res;
         let vault = Vault::get(conn, &self.sv_id)?;
@@ -206,6 +219,7 @@ impl WorkflowState for DocumentDecisioning {
 /// Complete
 /// ////////////////
 impl DocumentComplete {
+    #[tracing::instrument("DocumentComplete::init", skip_all)]
     pub async fn init(_state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
         Ok(DocumentComplete)
     }

@@ -47,6 +47,7 @@ use crate::{
 /// DataCollection
 /// ////////////////
 impl KycDataCollection {
+    #[tracing::instrument("KycDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -64,6 +65,7 @@ impl KycDataCollection {
 impl OnAction<Authorize, KycState> for KycDataCollection {
     type AsyncRes = TenantVendorControl;
 
+    #[tracing::instrument("OnAction<Authorize, KycState>::execute_async_idempotent_actions", skip_all)]
     async fn execute_async_idempotent_actions(
         &self,
         action: Authorize,
@@ -80,6 +82,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         Ok(tvc)
     }
 
+    #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
 
@@ -107,6 +110,7 @@ impl WorkflowState for KycDataCollection {
 /// VendorCalls
 /// ////////////////
 impl KycVendorCalls {
+    #[tracing::instrument("KycVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -124,6 +128,10 @@ impl KycVendorCalls {
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = Vec<VendorResult>;
 
+    #[tracing::instrument(
+        "OnAction<MakeVendorCalls, KycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeVendorCalls,
@@ -132,6 +140,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
     }
 
+    #[tracing::instrument("OnAction<MakeVendorCalls, KycState>::on_commit", skip_all)]
     fn on_commit(self, vendor_results: Vec<VendorResult>, _conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
@@ -158,6 +167,7 @@ impl WorkflowState for KycVendorCalls {
 /// Decisioning
 /// ////////////////
 impl KycDecisioning {
+    #[tracing::instrument("KycDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
@@ -179,6 +189,10 @@ type IsSandbox = bool;
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
     type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
 
+    #[tracing::instrument(
+        "OnAction<MakeDecision, KycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
     async fn execute_async_idempotent_actions(
         &self,
         action: MakeDecision,
@@ -186,6 +200,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     ) -> ApiResult<Self::AsyncRes> {
         Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
     }
+
+    #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (ff_client, webhook_client) = async_res;
         let vault = Vault::get(conn, &self.sv_id)?;
@@ -233,6 +249,7 @@ impl WorkflowState for KycDecisioning {
 /// Complete
 /// ////////////////
 impl KycComplete {
+    #[tracing::instrument("KycComplete::init", skip_all)]
     pub async fn init(_state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         Ok(KycComplete)
     }

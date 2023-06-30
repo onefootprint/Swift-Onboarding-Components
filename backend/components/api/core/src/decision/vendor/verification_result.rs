@@ -91,6 +91,7 @@ pub fn encrypt_verification_result_response(
 }
 
 // Bulk decrypt a Vec of encrypted responses
+#[tracing::instrument(skip_all)]
 pub async fn decrypt_verification_result_response(
     enclave_client: &EnclaveClient,
     sealed_data: Vec<SealedVaultBytes>, // sealed vault bytes
@@ -103,10 +104,7 @@ pub async fn decrypt_verification_result_response(
 
     enclave_client
         .batch_decrypt_to_piibytes(
-            sealed_data
-                .into_iter()
-                .map(|sealed| (sealed, vec![]))
-                .collect(),
+            sealed_data.into_iter().map(|sealed| (sealed, vec![])).collect(),
             sealed_key,
         )
         .await?

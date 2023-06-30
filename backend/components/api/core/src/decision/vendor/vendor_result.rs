@@ -16,6 +16,7 @@ pub struct VendorResult {
 }
 
 impl VendorResult {
+    #[tracing::instrument(skip_all)]
     pub async fn from_verification_results_for_onboarding(
         requests_and_results: Vec<(VerificationRequest, Option<VerificationResult>)>,
         enclave_client: &EnclaveClient,
