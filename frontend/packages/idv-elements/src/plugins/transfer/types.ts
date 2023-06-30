@@ -1,4 +1,8 @@
-import { IdDocRequirement, LivenessRequirement } from '@onefootprint/types';
+import {
+  IdDocRequirement,
+  LivenessRequirement,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
@@ -8,6 +12,7 @@ export type TransferRequirements = {
 };
 
 export type TransferCustomData = {
+  config: OnboardingConfig;
   missingRequirements: TransferRequirements;
 };
 

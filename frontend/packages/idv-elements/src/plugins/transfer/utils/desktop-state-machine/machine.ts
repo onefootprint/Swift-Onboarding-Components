@@ -118,6 +118,7 @@ const createDesktopMachine = () =>
           ...context,
           authToken: event.payload.authToken,
           device: event.payload.device,
+          config: event.payload.config,
           missingRequirements: { ...event.payload.missingRequirements },
         })),
         assignScopedAuthToken: assign((context, event) => ({

@@ -18,6 +18,7 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
+        config: OnboardingConfig;
         missingRequirements: TransferRequirements;
       };
     }

@@ -24,6 +24,7 @@ const DesktopApp = ({ context, onDone }: TransferProps) => {
       payload: {
         authToken,
         device,
+        config: customData.config,
         missingRequirements: { ...customData.missingRequirements },
       },
     });

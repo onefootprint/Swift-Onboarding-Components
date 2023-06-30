@@ -117,6 +117,7 @@ const Router = ({ onDone }: RouterProps) => {
             authToken,
             device,
             customData: {
+              config,
               missingRequirements: {
                 liveness,
                 idDoc,
