@@ -372,13 +372,29 @@ async function userData(
   const enclaveProxyImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${constants.containers.enclaveVersion}`;
 
   const pulumiConfig = new pulumi.Config();
-  const tailscaleAuthKey = pulumiConfig.getSecret('serverTailscaleKey');
+  const tailscaleAuthKeyOut = pulumiConfig.getSecret('serverTailscaleKey');
+  const tailscaleAuthKey = pulumi.interpolate`${tailscaleAuthKeyOut}`;
   const hostName = `nitro-server-${pulumi.getStack()}`;
   const resources = constants.enclave.resources;
 
+  // nitro-cli doesn't let you take all the RAM you ask for from the allocator - I guess it also counts
+  // the size of the binary and other things that the enclave needs against you. So, we subtract
+  // a fixed amount of memory out of what you requested
+  const BUFFER_FOR_ENCLAVE = 256;
+
+  const actualEnclaveMemory = resources.memory - BUFFER_FOR_ENCLAVE;
+  if (actualEnclaveMemory < 256) {
+    throw `${BUFFER_FOR_ENCLAVE} MiB of memory are reserved for the enclave, so your provided enclave memory is too low. Please make sure your requested enclave memory - ${BUFFER_FOR_ENCLAVE} >= 256`;
+  }
+
+  // Took this out because tailscaleAuthKey isn't rendering correctly as a pulumi.Output<string>
+  const tailscaleCommand = `sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --hostname "${hostName}" --accept-dns=false `;
+
   // TODO: if enclave unhealthy after restart fail health check on ASG.
+  // TODO one day we should `set -e` to crash if any of these commands fails
   return `
 #!/bin/bash
+set -x
 
 sudo yum update -y
 sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
@@ -423,6 +439,13 @@ log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/enclave_proxy.log
 initial_position=start_of_file
+
+[/var/log/cloud-init]
+log_group_name=/ec2/nitro_service_ec2_cloud_init_logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/cloud-init*.log
+initial_position=start_of_file
 EOF
 
 # start logging daemon
@@ -432,7 +455,6 @@ sudo systemctl start awslogsd
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --hostname "${hostName}" --accept-dns=false 
 
 # setup enclave
 
@@ -447,8 +469,17 @@ docker run --rm -v $(pwd)/proxy:/shared ${enclaveProxyImage}
 sudo chown $USER:$USER -R eif/
 sudo chown $USER:$USER -R proxy/
 
+# Edit the allocator.yaml to support our desired amount of resources
+sudo cat <<'EOF' > /etc/nitro_enclaves/allocator.yaml
+---
+memory_mib: ${resources.memory}
+cpu_count: ${resources.cpus}
+EOF
+
 sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service
+sudo systemctl status nitro-enclaves-allocator.service
 sudo systemctl start nitro-enclaves-vsock-proxy.service && sudo systemctl enable nitro-enclaves-vsock-proxy.service
+sudo systemctl status nitro-enclaves-vsock-proxy.service
 
 # setup enclave runner
 cat <<'EOF' > enclave_runner.sh
@@ -461,7 +492,7 @@ do
         sleep 1
     else
         echo "restarting enclave"
-        sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${resources.cpus} --memory ${resources.memory} --enclave-cid ${resources.cid}
+        sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${resources.cpus} --memory ${actualEnclaveMemory} --enclave-cid ${resources.cid}
         sleep 5
     fi	 
 done
