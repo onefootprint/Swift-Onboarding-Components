@@ -2,11 +2,13 @@ use dashmap::DashMap;
 use futures::StreamExt;
 use hyper::body::Sender as BodySender;
 use hyper::http::Method;
+use hyper::server::conn::AddrIncoming;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, HeaderMap, Request, Response, Server};
 use log::{error, info};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
+use std::time::Duration;
 use thiserror::Error;
 use tokio::sync::mpsc::error::SendError;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
@@ -52,7 +54,12 @@ pub async fn main() -> Result<(), Error> {
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "5003".to_string());
     let addr = format!("0.0.0.0:{}", port).parse().unwrap();
-    let server = Server::bind(&addr).serve(make_svc);
+
+    let builder = Server::builder(AddrIncoming::bind(&addr)?)
+        .http1_keepalive(true)
+        .http2_keep_alive_interval(Duration::from_secs(10))
+        .http2_keep_alive_timeout(Duration::from_secs(120));
+    let server = builder.serve(make_svc);
 
     info!("Listening on http://{}", addr);
     server.await?;
