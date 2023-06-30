@@ -19,6 +19,7 @@ pub struct ProxyResponse {
     pub headers: HeaderMap,
 }
 
+#[tracing::instrument(skip(state, body, config))]
 pub async fn proxy_request(
     state: &State,
     tenant: &Tenant,

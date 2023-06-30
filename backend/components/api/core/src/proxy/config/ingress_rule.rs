@@ -35,39 +35,13 @@ impl IngressRule {
 
         let rules = rules
             .into_iter()
-            .map(|rule| -> Result<_, ApiError> {
-                let proxy_token = ProxyToken::parse_global(&rule.token_path, fp_id.clone())?;
-                Ok(IngressRule {
-                    proxy_token,
-                    target: rule.target,
-                })
-            })
+            .map(|rule| -> Result<_, ApiError> { Self::parse(fp_id.clone(), &rule.token_path, &rule.target) })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(rules)
     }
-}
 
-impl TryFrom<(&str, Option<FpId>)> for IngressRule {
-    type Error = ApiError;
-
-    /// <proxy_token> + '=' + <target>
-    ///
-    /// Note that the `<target>` also supports filter functions!
-    ///
-    /// Examples:
-    ///     - fp_id_abc.custom.credit_card_number=$.data.card.number
-    ///     - custom.credit_card_number = $.data.card.number
-    ///     - custom.credit_card_number = $.data.card.number | replace('-', '')
-    fn try_from((value, global_fp_id): (&str, Option<FpId>)) -> Result<Self, Self::Error> {
-        let components: Vec<&str> = value.split('=').collect();
-
-        if components.len() != 2 {
-            return Err(VaultProxyError::BadIngressRule("must be one '=' only".into()))?;
-        }
-        let proxy_token = components[0].trim();
-        let target = components[1].trim().to_string();
-
-        let mut proxy_token = ProxyToken::parse_global(proxy_token, global_fp_id)?;
+    fn parse(fp_id: Option<FpId>, token_path: &str, target: &str) -> Result<Self, ApiError> {
+        let mut proxy_token = ProxyToken::parse_global(token_path, fp_id)?;
 
         if !proxy_token.filter_functions.is_empty() {
             return Err(VaultProxyError::BadIngressRule(
@@ -97,6 +71,30 @@ impl TryFrom<(&str, Option<FpId>)> for IngressRule {
         proxy_token.filter_functions = filter_functions;
 
         Ok(Self { proxy_token, target })
+    }
+}
+
+impl TryFrom<(&str, Option<FpId>)> for IngressRule {
+    type Error = ApiError;
+
+    /// <proxy_token> + '=' + <target>
+    ///
+    /// Note that the `<target>` also supports filter functions!
+    ///
+    /// Examples:
+    ///     - fp_id_abc.custom.credit_card_number=$.data.card.number
+    ///     - custom.credit_card_number = $.data.card.number
+    ///     - custom.credit_card_number = $.data.card.number | replace('-', '')
+    fn try_from((value, global_fp_id): (&str, Option<FpId>)) -> Result<Self, Self::Error> {
+        let components: Vec<&str> = value.split('=').collect();
+
+        if components.len() != 2 {
+            return Err(VaultProxyError::BadIngressRule("must be one '=' only".into()))?;
+        }
+        let proxy_token = components[0].trim();
+        let target = components[1].trim().to_string();
+
+        Self::parse(global_fp_id, proxy_token, &target)
     }
 }
 
