@@ -14,7 +14,6 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -22,8 +21,6 @@ use api_route_hosted::onboarding::get_requirements_inner;
 use api_route_hosted::onboarding::GetRequirementsArgs;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKycRequest;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::insight_event::InsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
@@ -45,7 +42,6 @@ pub async fn post(
     fp_id: web::Path<FpId>,
     request: web::Json<TriggerKycRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-    insights: InsightHeaders,
 ) -> JsonApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
     let tenant_id = auth.tenant().id.clone();
@@ -55,7 +51,6 @@ pub async fn post(
         onboarding_config_key,
     } = request.into_inner();
 
-    let insight_event = CreateInsightEvent::from(insights);
     let ff_client = state.feature_flag_client.clone();
     let (ob_id, wf) = state
         .db_pool
@@ -89,7 +84,7 @@ pub async fn post(
                 &sv.vault_id,
                 &sv.id,
                 &obc,
-                Some(insight_event),
+                None,
                 None, // currently dont support KYB for NPV
             )?;
             let ob_id = ob.id.clone();
@@ -108,7 +103,7 @@ pub async fn post(
                 scoped_vault_id: sv.id,
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
-                insight_event_id: Some(InsightEvent::get_by_onboarding_id(conn, &ob.id)?.id),
+                insight_event_id: None,
             }
             .insert(conn)?;
 
