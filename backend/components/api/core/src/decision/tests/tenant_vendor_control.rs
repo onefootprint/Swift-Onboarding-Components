@@ -4,7 +4,7 @@ use db::{models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, Db
 use macros::test_state;
 use newtypes::{
     vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
-    EncryptedVaultPrivateKey, SealedVaultBytes, TenantId, VaultPublicKey,
+    EncryptedVaultPrivateKey, TenantId, VaultPublicKey,
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -13,8 +13,6 @@ async fn create_db_vendor_control(
     public_key: VaultPublicKey,
     e_private_key: EncryptedVaultPrivateKey,
     idology_enabled: bool,
-    idology_username: Option<String>,
-    idology_e_password: Option<SealedVaultBytes>,
     experian_enabled: bool,
     experian_subscriber_code: Option<String>,
 ) -> TenantId {
@@ -25,8 +23,6 @@ async fn create_db_vendor_control(
                 conn,
                 tenant.id.clone(),
                 idology_enabled,
-                idology_username,
-                idology_e_password,
                 experian_enabled,
                 experian_subscriber_code,
             )
@@ -90,8 +86,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         false,
-        None,
-        None,
         true,
         Some("sub_code123".into()),
     )
@@ -117,8 +111,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         false,
-        None,
-        None,
         false,
         Some("sub_code123".into()),
     )
@@ -140,8 +132,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         false,
-        None,
-        None,
         true,
         None,
     )
@@ -158,8 +148,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         true,
-        Some("id_username".into()),
-        Some(pk.seal_pii(&"id_password".into()).unwrap()),
         // false
         false,
         None,
@@ -183,8 +171,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         false,
-        Some("id_username".into()),
-        Some(pk.seal_pii(&"id_password".into()).unwrap()),
         false,
         None,
     )
@@ -207,9 +193,6 @@ async fn test_update_credentials(state: &mut State) {
         pk.clone(),
         tenant_e_key.clone(),
         false,
-        None,
-        Some(pk.seal_pii(&"id_password".into()).unwrap()),
-        // false
         false,
         None,
     )

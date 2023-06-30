@@ -71,16 +71,7 @@ pub async fn setup_data(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // only enable Idology for this dummy test merchant
-            let tvc = TenantVendorControl::create(
-                conn,
-                tid,
-                true,
-                Some("un123".to_owned()),
-                Some(SealedVaultBytes(vec![])),
-                false,
-                None,
-            )
-            .unwrap();
+            let tvc = TenantVendorControl::create(conn, tid, true, false, None).unwrap();
 
             let tu = fixtures::tenant_user::create(conn);
 

@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_vendor_control;
 use diesel::ExpressionMethods;
 use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{SealedVaultBytes, TenantId, TenantVendorControlId};
+use newtypes::{TenantId, TenantVendorControlId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
@@ -17,8 +17,6 @@ pub struct TenantVendorControl {
     pub _updated_at: DateTime<Utc>,
 
     pub idology_enabled: bool,
-    pub idology_username: Option<String>,
-    pub idology_e_password: Option<SealedVaultBytes>,
 
     pub experian_enabled: bool,
     pub experian_subscriber_code: Option<String>,
@@ -29,8 +27,6 @@ pub struct TenantVendorControl {
 struct NewTenantVendorControl {
     tenant_id: TenantId,
     idology_enabled: bool,
-    idology_username: Option<String>,
-    idology_e_password: Option<SealedVaultBytes>,
     experian_enabled: bool,
     experian_subscriber_code: Option<String>,
 }
@@ -41,16 +37,12 @@ impl TenantVendorControl {
         conn: &mut PgConn,
         tenant_id: TenantId,
         idology_enabled: bool,
-        idology_username: Option<String>,
-        idology_e_password: Option<SealedVaultBytes>,
         experian_enabled: bool,
         experian_subscriber_code: Option<String>,
     ) -> DbResult<Self> {
         let new = NewTenantVendorControl {
             tenant_id,
             idology_enabled,
-            idology_username,
-            idology_e_password,
             experian_enabled,
             experian_subscriber_code,
         };

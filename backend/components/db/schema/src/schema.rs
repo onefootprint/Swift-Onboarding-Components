@@ -700,8 +700,6 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         idology_enabled -> Bool,
-        idology_username -> Nullable<Text>,
-        idology_e_password -> Nullable<Bytea>,
         experian_enabled -> Bool,
         experian_subscriber_code -> Nullable<Text>,
     }

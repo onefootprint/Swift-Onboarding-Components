@@ -22,21 +22,11 @@ async fn create_tvc_for_requirements(
             (false, None)
         };
 
-        let (idology_enabled, idology_username, idology_e_password) = if vendors.contains(&Vendor::Idology) {
-            (
-                true,
-                Some("un".into()),
-                Some(tenant.public_key.seal_pii(&"pw".to_string().into()).unwrap()),
-            )
-        } else {
-            (false, None, None)
-        };
+        let idology_enabled = vendors.contains(&Vendor::Idology);
 
         fixtures::tenant_vendor_control::create_in_memory(
             tenant.id.clone(),
             idology_enabled,
-            idology_username,
-            idology_e_password,
             experian_enabled,
             sub_code,
         )
