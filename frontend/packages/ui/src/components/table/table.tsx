@@ -202,11 +202,9 @@ const TableContainer = styled.table`
       padding: 0 ${theme.spacing[4]};
       vertical-align: middle;
 
-      p {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     tbody tr {
