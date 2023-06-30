@@ -22,6 +22,7 @@ describe('isContextReady', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   };
 
   const testBusinessBoKycData: BusinessBoKycData = {

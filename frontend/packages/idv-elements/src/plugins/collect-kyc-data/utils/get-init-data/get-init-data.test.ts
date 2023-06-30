@@ -21,6 +21,7 @@ describe('getInitData', () => {
     status: 'enabled',
     mustCollectData: mustCollectData ?? [],
     canAccessData: mustCollectData ?? [],
+    isAppClipEnabled: false,
   });
 
   it('should return an empty object if no bootstrap data is provided', () => {

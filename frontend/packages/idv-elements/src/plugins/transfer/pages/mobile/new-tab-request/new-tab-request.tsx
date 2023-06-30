@@ -14,7 +14,7 @@ const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
   const { authToken, device, config, scopedAuthToken } = state.context;
-  const url = useCreateHandoffUrl(scopedAuthToken);
+  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
 
   const { mutation } = useGenerateScopedAuthToken({
     authToken,

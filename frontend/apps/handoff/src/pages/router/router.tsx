@@ -11,7 +11,7 @@ import Complete from '../complete';
 import Expired from '../expired';
 import Init from '../init';
 
-const Verify = () => {
+const Router = () => {
   const [state, send] = useHandoffMachine();
   const { authToken, onboardingConfig } = state.context;
   const tenantPk = onboardingConfig?.key;
@@ -70,4 +70,4 @@ const Verify = () => {
   );
 };
 
-export default Verify;
+export default Router;

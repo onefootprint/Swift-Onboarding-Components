@@ -23,6 +23,7 @@ describe('Collect KYC Data Machine Tests', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   };
 
   const createMachine = (

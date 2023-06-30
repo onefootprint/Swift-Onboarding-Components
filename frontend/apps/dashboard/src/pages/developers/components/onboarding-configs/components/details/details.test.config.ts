@@ -17,6 +17,7 @@ export const onboardingConfigDetailsFixture: OnboardingConfig = {
   isLive: true,
   createdAt: '8/10/22, 11:56 AM',
   status: 'disabled',
+  isAppClipEnabled: false,
 };
 
 export const withOnboardingConfigDetails = (

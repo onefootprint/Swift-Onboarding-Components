@@ -83,6 +83,7 @@ describe('<CollectKybData />', () => {
     status: 'enabled',
     mustCollectData: mustCollectData ?? [],
     canAccessData: canAccessData ?? [],
+    isAppClipEnabled: false,
   });
 
   const getContext = (

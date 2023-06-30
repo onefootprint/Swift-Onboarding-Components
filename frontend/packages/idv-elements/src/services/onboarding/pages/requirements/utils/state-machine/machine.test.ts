@@ -49,6 +49,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   };
 
   describe('with an existing user', () => {

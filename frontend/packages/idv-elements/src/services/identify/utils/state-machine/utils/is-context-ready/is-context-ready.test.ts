@@ -20,6 +20,7 @@ describe('isContextReady', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   };
 
   describe('when init context info is complete', () => {

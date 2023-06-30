@@ -18,6 +18,7 @@ describe('useSandboxMode', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   });
 
   describe('when it is using a live key', () => {

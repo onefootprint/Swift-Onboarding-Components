@@ -23,6 +23,7 @@ describe('Identify Machine Tests', () => {
     status: 'enabled',
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    isAppClipEnabled: false,
   });
 
   const getDevice = (): DeviceInfo => ({

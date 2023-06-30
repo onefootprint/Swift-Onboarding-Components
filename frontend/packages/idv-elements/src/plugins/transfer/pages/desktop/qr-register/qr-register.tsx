@@ -19,7 +19,7 @@ const QRRegister = () => {
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
   const { authToken, device, config, scopedAuthToken } = state.context;
-  const url = useCreateHandoffUrl(scopedAuthToken);
+  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
