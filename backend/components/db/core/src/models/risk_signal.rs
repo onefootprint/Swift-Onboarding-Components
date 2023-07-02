@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::risk_signal;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +22,8 @@ pub struct RiskSignal {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub vendors: Vec<Vendor>,
+    pub verification_result_id: Option<VerificationResultId>,
+    pub hidden: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -30,6 +33,8 @@ pub struct NewRiskSignal {
     pub reason_code: FootprintReasonCode,
     pub vendors: Vec<Vendor>,
     pub created_at: DateTime<Utc>,
+    pub verification_result_id: Option<VerificationResultId>,
+    pub hidden: bool,
 }
 
 impl RiskSignal {
@@ -46,6 +51,8 @@ impl RiskSignal {
                 reason_code,
                 vendors,
                 created_at: Utc::now(),
+                verification_result_id: None,
+                hidden: false,
             })
             .collect();
         let result = diesel::insert_into(risk_signal::table)

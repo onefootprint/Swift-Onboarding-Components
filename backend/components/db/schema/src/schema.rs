@@ -529,6 +529,8 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         vendors -> Array<Text>,
+        verification_result_id -> Nullable<Text>,
+        hidden -> Bool,
     }
 }
 
@@ -909,6 +911,7 @@ joinable!(proxy_config_server_cert -> proxy_config (config_id));
 joinable!(proxy_request_log -> proxy_config (config_id));
 joinable!(proxy_request_log -> tenant (tenant_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
+joinable!(risk_signal -> verification_result (verification_result_id));
 joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
