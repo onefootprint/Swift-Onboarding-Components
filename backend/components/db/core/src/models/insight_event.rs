@@ -1,4 +1,5 @@
 use crate::DbError;
+use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::insight_event;
@@ -82,12 +83,13 @@ impl InsightEvent {
     pub fn get_by_onboarding_id(
         conn: &mut PgConn,
         onboarding_id: &OnboardingId,
-    ) -> Result<InsightEvent, DbError> {
-        let insight_event: InsightEvent = onboarding::table
+    ) -> DbResult<Option<InsightEvent>> {
+        let insight_event: Option<InsightEvent> = onboarding::table
             .inner_join(insight_event::table)
             .filter(onboarding::id.eq(onboarding_id))
             .select(insight_event::all_columns)
-            .get_result(conn)?;
+            .get_result(conn)
+            .optional()?;
 
         Ok(insight_event)
     }
