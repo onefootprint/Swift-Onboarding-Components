@@ -1,0 +1,1 @@
+ALTER TABLE risk_signal ALTER COLUMN onboarding_decision_id DROP NOT NULL;

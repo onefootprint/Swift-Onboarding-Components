@@ -351,7 +351,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone()))
+                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone().nullable()))
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(onboarding_decision::table)

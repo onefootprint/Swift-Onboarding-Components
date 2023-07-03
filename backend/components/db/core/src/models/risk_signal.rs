@@ -1,4 +1,3 @@
-use crate::models::verification_request::VerificationRequest;
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
@@ -10,13 +9,11 @@ use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
 use serde::{Deserialize, Serialize};
 
-use super::verification_result::VerificationResult;
-
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = risk_signal)]
 pub struct RiskSignal {
     pub id: RiskSignalId,
-    pub onboarding_decision_id: OnboardingDecisionId,
+    pub onboarding_decision_id: Option<OnboardingDecisionId>,
     pub reason_code: FootprintReasonCode,
     pub created_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>, // Currently unused!
@@ -30,7 +27,7 @@ pub struct RiskSignal {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = risk_signal)]
 pub struct NewRiskSignal {
-    pub onboarding_decision_id: OnboardingDecisionId,
+    pub onboarding_decision_id: Option<OnboardingDecisionId>,
     pub reason_code: FootprintReasonCode,
     pub created_at: DateTime<Utc>,
     pub verification_result_id: Option<VerificationResultId>,
@@ -48,7 +45,7 @@ impl RiskSignal {
         let new: Vec<_> = signals
             .into_iter()
             .map(|(reason_code, vendor_api)| NewRiskSignal {
-                onboarding_decision_id: onboarding_decision_id.clone(),
+                onboarding_decision_id: Some(onboarding_decision_id.clone()),
                 reason_code,
                 created_at: Utc::now(),
                 verification_result_id: None,
@@ -78,7 +75,7 @@ impl RiskSignal {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .select(onboarding_decision::id);
+            .select(onboarding_decision::id.nullable());
         risk_signal::table
             .filter(risk_signal::onboarding_decision_id.eq_any(onboarding_decision_ids))
             .into_boxed()
@@ -91,29 +88,11 @@ impl RiskSignal {
         fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> DbResult<(Self, Vec<(VerificationRequest, VerificationResult)>)> {
-        use db_schema::schema::{
-            onboarding_decision_verification_result_junction, verification_request, verification_result,
-        };
+    ) -> DbResult<Self> {
         let signal = Self::query(fp_id, tenant_id, is_live)
             .filter(risk_signal::id.eq(id))
             .get_result::<Self>(conn)?;
-
-        // Fetch related verification results. We look at the VerificationResults tied to the same decision
-        let vr_ids = onboarding_decision_verification_result_junction::table
-            .filter(
-                onboarding_decision_verification_result_junction::onboarding_decision_id
-                    .eq(&signal.onboarding_decision_id),
-            )
-            .select(onboarding_decision_verification_result_junction::verification_result_id);
-        let vrs = verification_request::table
-            .inner_join(verification_result::table)
-            .filter(verification_result::id.eq_any(vr_ids))
-            // don't include Vres that are errors
-            .filter(verification_result::is_error.eq(false))
-            .filter(verification_request::vendor_api.eq(&signal.vendor_api)) // this is removed altogether later
-            .get_results(conn)?;
-        Ok((signal, vrs))
+        Ok(signal)
     }
 
     #[tracing::instrument("RiskSignal::list_by_onboarding_decision_id", skip_all)]

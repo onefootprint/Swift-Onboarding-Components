@@ -108,11 +108,11 @@ pub async fn get_detail(
     let is_live = auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    let (signal, verification_results) = state
+    let signal = state
         .db_pool
         .db_query(move |conn| RiskSignal::get(conn, &risk_signal_id, &fp_id, &tenant_id, is_live))
         .await??;
-    let signal = api_wire_types::RiskSignal::from_db((signal, Some(verification_results)));
+    let signal = api_wire_types::RiskSignal::from_db(signal);
 
     ResponseData::ok(signal).json()
 }

@@ -522,7 +522,7 @@ table! {
 
     risk_signal (id) {
         id -> Text,
-        onboarding_decision_id -> Text,
+        onboarding_decision_id -> Nullable<Text>,
         reason_code -> Text,
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
