@@ -15,7 +15,7 @@ where
     let triggered_action = evaluated_ruleset.action.clone();
 
     // Log evaluation of a single rule set
-    log_ruleset_evaluation(&evaluated_ruleset);
+    log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_api());
 
     OnboardingEvaluationResult {
         rules_triggered: evaluated_ruleset.triggered_rule_names(),
@@ -37,7 +37,7 @@ where
             let evaluated_ruleset = rs.evaluate(rule_input);
 
             // Log evaluation of a single rule set
-            log_ruleset_evaluation(&evaluated_ruleset);
+            log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_api());
 
             evaluated_ruleset
         })
@@ -65,9 +65,10 @@ where
     }
 }
 
-fn log_ruleset_evaluation(rule_set_result: &RuleSetResult) {
+fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_api: VendorAPI) {
     tracing::info!(
         action=?rule_set_result.action,
+        vendor_api=%vendor_api,
         rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_not_triggered=%super::rules_to_string(&rule_set_result.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),

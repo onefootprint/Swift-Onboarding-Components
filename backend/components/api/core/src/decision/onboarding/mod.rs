@@ -1,3 +1,4 @@
+use derive_more::Deref;
 use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
 
 use crate::errors::ApiResult;
@@ -7,7 +8,6 @@ use super::vendor::vendor_api::vendor_api_response::VendorAPIResponseIdentifiers
 use super::{
     features::{
         experian::ExperianFeatures, idology_expectid::IDologyFeatures, kyc_features::KycFeatureVector,
-        waterfall_logic::get_kyc_rules_result,
     },
     rule::{
         self,
@@ -27,16 +27,24 @@ pub struct OnboardingRulesDecisionOutput {
     pub rules_not_triggered: Vec<RuleName>,
 }
 
+#[derive(PartialEq, Eq, Debug, Clone, Deref)]
+pub struct WaterfallOnboardingRulesDecisionOutput {
+    #[deref]
+    pub output: OnboardingRulesDecisionOutput,
+    pub additional_evaluated: Vec<OnboardingRulesDecisionOutput>,
+}
+
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Decision {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,
     pub create_manual_review: bool,
+    pub vendor_api: VendorAPI,
 }
 
 pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>;
 pub trait FeatureVector {
-    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)>;
+    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)>;
 }
 
 pub trait FeatureSet {
@@ -95,7 +103,7 @@ impl RuleGroup {
         &self,
         vendor_response_map: &VendorAPIResponseMap,
         vendor_ids_map: &VendorAPIResponseIdentifiersMap,
-    ) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         match self {
             RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map, vendor_ids_map),
         }
@@ -110,8 +118,8 @@ pub struct KycRuleGroup {
 impl Default for KycRuleGroup {
     fn default() -> Self {
         Self {
-            idology_rules: rule_sets::alpaca::idology_rule_set(),
-            experian_rules: rule_sets::alpaca::experian_rule_set(),
+            idology_rules: rule_sets::kyc::idology_rule_set(),
+            experian_rules: rule_sets::kyc::experian_rule_set(),
         }
     }
 }
@@ -120,7 +128,7 @@ impl KycRuleGroup {
         &self,
         vendor_response_map: &VendorAPIResponseMap,
         vendor_ids_map: &VendorAPIResponseIdentifiersMap,
-    ) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
         let idology_rule_result = evaluate_rule_set_from_vendor_results(
             self.idology_rules.clone(),
@@ -144,26 +152,21 @@ impl KycRuleGroup {
             Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
         }
 
-        let (rule_result, reason_codes) = rule_results
-            .into_iter()
+        let (result, reason_codes) = rule_results
+            .iter()
             .min_by(|x, y| x.0.triggered_action.cmp(&y.0.triggered_action))
             .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
-            .map_err(crate::decision::Error::from)?;
+            .map_err(crate::decision::Error::from)?
+            .clone();
+        let additional_results = rule_results
+            .into_iter()
+            .filter(|(ober, _)| ober != &result)
+            .map(|(ober, _)| OnboardingRulesDecisionOutput::from(ober))
+            .collect();
 
-        // If we no rules that triggered, we consider that a pass
-        let (decision_status, create_manual_review) = match rule_result.triggered_action.as_ref() {
-            Some(a) => (a.into(), a == &Action::ManualReview),
-            None => (DecisionStatus::Pass, false),
-        };
-
-        let output = OnboardingRulesDecisionOutput {
-            decision: Decision {
-                should_commit: KycFeatureVector::should_commit(&rule_result.rules_triggered),
-                decision_status,
-                create_manual_review,
-            },
-            rules_triggered: rule_result.rules_triggered.to_owned(),
-            rules_not_triggered: rule_result.rules_not_triggered.to_owned(),
+        let output = WaterfallOnboardingRulesDecisionOutput {
+            output: OnboardingRulesDecisionOutput::from(result),
+            additional_evaluated: additional_results,
         };
 
         Ok((output, reason_codes))
@@ -174,46 +177,45 @@ impl KycRuleGroup {
 pub fn calculate_kyc_rules_output_with_waterfall(
     feature_vector: &KycFeatureVector,
     rule_group: KycRuleGroup,
-) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
     // Evaluate rules
     let idology_rule_result = feature_vector
         .idology_features
         .as_ref()
         .map(|f| rule::rules_engine::evaluate_onboarding_rule_set(rule_group.idology_rules, f));
 
-    // TODO: add in experian once we have rules for them
-    feature_vector
+    let experian_result = feature_vector
         .experian_features
         .as_ref()
         .map(|e| rule::rules_engine::evaluate_onboarding_rule_set(rule_group.experian_rules, e));
 
-    // TODO: add experian in here
     // TODO: add Ord so we have a vendor preference
-    let rule_results: Vec<OnboardingEvaluationResult> =
-        vec![idology_rule_result].into_iter().flatten().collect();
+    let rule_results: Vec<OnboardingEvaluationResult> = vec![experian_result, idology_rule_result]
+        .into_iter()
+        .flatten()
+        .collect();
     if rule_results.is_empty() {
         Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
     }
 
-    let result = get_kyc_rules_result(rule_results).map_err(Error::from)?;
+    let result = rule_results
+        .iter()
+        .min_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
+        .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
+        .map_err(Error::from)?
+        .clone();
+    let additional_results = rule_results
+        .into_iter()
+        .filter(|ober| ober != &result)
+        .map(OnboardingRulesDecisionOutput::from)
+        .collect();
 
     // TODO: derive this better
     let reason_codes = feature_vector.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
 
-    // If we no rules that triggered, we consider that a pass
-    let (decision_status, create_manual_review) = match result.triggered_action.as_ref() {
-        Some(a) => (a.into(), a == &Action::ManualReview),
-        None => (DecisionStatus::Pass, false),
-    };
-
-    let output = OnboardingRulesDecisionOutput {
-        decision: Decision {
-            should_commit: KycFeatureVector::should_commit(&result.rules_triggered),
-            decision_status,
-            create_manual_review,
-        },
-        rules_triggered: result.rules_triggered.to_owned(),
-        rules_not_triggered: result.rules_not_triggered.to_owned(),
+    let output = WaterfallOnboardingRulesDecisionOutput {
+        output: OnboardingRulesDecisionOutput::from(result),
+        additional_evaluated: additional_results,
     };
 
     Ok((output, reason_codes))
@@ -225,6 +227,36 @@ impl From<&Action> for DecisionStatus {
             Action::StepUp => DecisionStatus::StepUp,
             Action::ManualReview => DecisionStatus::Fail,
             Action::Fail => DecisionStatus::Fail,
+        }
+    }
+}
+
+impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
+    fn from(result: OnboardingEvaluationResult) -> Self {
+        // If we no rules that triggered, we consider that a pass
+        let (decision_status, create_manual_review) = match result.triggered_action.as_ref() {
+            Some(a) => (a.into(), a == &Action::ManualReview),
+            None => (DecisionStatus::Pass, false),
+        };
+
+        OnboardingRulesDecisionOutput {
+            decision: Decision {
+                should_commit: KycFeatureVector::should_commit(&result.rules_triggered),
+                decision_status,
+                create_manual_review,
+                vendor_api: result.vendor_api,
+            },
+            rules_triggered: result.rules_triggered.to_owned(),
+            rules_not_triggered: result.rules_not_triggered.to_owned(),
+        }
+    }
+}
+
+impl From<OnboardingRulesDecisionOutput> for WaterfallOnboardingRulesDecisionOutput {
+    fn from(value: OnboardingRulesDecisionOutput) -> Self {
+        Self {
+            output: value,
+            additional_evaluated: vec![],
         }
     }
 }

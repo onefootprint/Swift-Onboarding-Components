@@ -23,7 +23,10 @@ use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 use crate::{
     decision::{
         self, engine,
-        onboarding::{Decision, DecisionReasonCodes, KycRuleGroup, OnboardingRulesDecisionOutput},
+        onboarding::{
+            Decision, DecisionReasonCodes, KycRuleGroup, OnboardingRulesDecisionOutput,
+            WaterfallOnboardingRulesDecisionOutput,
+        },
         utils::FixtureDecision,
         vendor::{
             tenant_vendor_control::TenantVendorControl,
@@ -182,7 +185,10 @@ pub async fn assert_kyc_vendor_calls_completed(
     Ok(vendor_requests.completed_requests)
 }
 
-pub type KycDecision = (OnboardingRulesDecisionOutput, DecisionReasonCodes);
+pub type KycDecision = (
+    WaterfallOnboardingRulesDecisionOutput,
+    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+);
 
 // TODO: this is an awful temporary hack but should go away when we refactor things so we pass reason codes directly into rule execution
 // In sandbox/demo, we still make Vres's based on the Tenant's TVC. We should probably just have some dummy TestVendor or something or
@@ -204,7 +210,7 @@ pub fn kyc_decision_from_fixture(
     fixture_decision: FixtureDecision,
     vendor_results: &[VendorResult],
 ) -> ApiResult<KycDecision> {
-    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision).into();
     let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
     let vres_id = get_vres_id_for_fixture(vendor_results)?;
     let reason_codes = reason_codes
@@ -229,14 +235,19 @@ pub fn alpaca_kyc_decision_from_fixture(
         // #stepup
         (newtypes::DecisionStatus::StepUp, _) => DecisionStatus::StepUp,
     };
-    let rules_output = OnboardingRulesDecisionOutput {
-        decision: Decision {
-            decision_status,
-            should_commit: false,
-            create_manual_review: false,
+    let rules_output = WaterfallOnboardingRulesDecisionOutput {
+        output: OnboardingRulesDecisionOutput {
+            decision: Decision {
+                decision_status,
+                should_commit: false,
+                create_manual_review: false,
+                // not used
+                vendor_api: VendorAPI::IdologyExpectID,
+            },
+            rules_triggered: vec![],
+            rules_not_triggered: vec![],
         },
-        rules_triggered: vec![],
-        rules_not_triggered: vec![],
+        additional_evaluated: vec![],
     };
     let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fixture_decision);
     let vres_id = get_vres_id_for_fixture(vendor_results)?;
@@ -253,7 +264,7 @@ pub fn get_decision(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     vendor_results: &[VendorResult],
-) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
     let (vendor_response_map, vendor_ids_map) =
         build_vendor_response_map_from_vendor_results(vendor_results)?;
     let (rules_output, reason_codes) = rule_group

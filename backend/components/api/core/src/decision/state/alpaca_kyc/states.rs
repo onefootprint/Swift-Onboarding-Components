@@ -462,12 +462,16 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 decision_status: DecisionStatus::Pass,
                 should_commit: true,
                 create_manual_review: false,
+                // TODO: fix this when this goes to rules
+                vendor_api: VendorAPI::IncodeWatchlistCheck,
             }
         } else {
             Decision {
                 decision_status: DecisionStatus::Fail,
                 should_commit: true,
                 create_manual_review: true,
+                // TODO: fix this when this goes to rules
+                vendor_api: VendorAPI::IncodeWatchlistCheck,
             }
         };
         let review_reasons = get_review_reasons(
@@ -479,9 +483,10 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             OnboardingRulesDecisionOutput {
                 decision: final_decision.clone(),
                 // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
-                rules_triggered: kyc_decision.rules_triggered,
-                rules_not_triggered: kyc_decision.rules_not_triggered,
-            },
+                rules_triggered: kyc_decision.rules_triggered.clone(),
+                rules_not_triggered: kyc_decision.rules_not_triggered.clone(),
+            }
+            .into(),
             kyc_reason_codes
                 .into_iter()
                 .chain(wc_reason_codes.into_iter())

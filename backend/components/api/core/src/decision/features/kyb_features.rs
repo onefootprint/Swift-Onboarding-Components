@@ -6,6 +6,7 @@ use crate::{
     decision::{
         onboarding::{
             Decision, DecisionReasonCodes, FeatureSet, FeatureVector, OnboardingRulesDecisionOutput,
+            WaterfallOnboardingRulesDecisionOutput,
         },
         rule::{
             self,
@@ -80,7 +81,7 @@ impl KybFeatureVector {
 }
 
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         let middesk_rules: Vec<RuleSet<KybFeatureVector>> = vec![
             rule_sets::kyb::middesk_base_rule_set(),
             rule_sets::kyb::bos_pass_kyc_rule_set(),
@@ -98,14 +99,18 @@ impl FeatureVector for KybFeatureVector {
         };
         let create_manual_review = decision_status == DecisionStatus::Fail;
 
-        let output = OnboardingRulesDecisionOutput {
-            decision: Decision {
-                decision_status,
-                should_commit: false, // never commit business data for now
-                create_manual_review,
+        let output = WaterfallOnboardingRulesDecisionOutput {
+            output: OnboardingRulesDecisionOutput {
+                decision: Decision {
+                    decision_status,
+                    should_commit: false, // never commit business data for now
+                    create_manual_review,
+                    vendor_api: eval_result.vendor_api,
+                },
+                rules_triggered: eval_result.rules_triggered,
+                rules_not_triggered: eval_result.rules_not_triggered,
             },
-            rules_triggered: eval_result.rules_triggered,
-            rules_not_triggered: eval_result.rules_not_triggered,
+            additional_evaluated: vec![],
         };
 
         let reason_codes = self.reason_codes();

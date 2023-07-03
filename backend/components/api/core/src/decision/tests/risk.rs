@@ -25,6 +25,7 @@ fn create_onboarding_rules_decision_output(
             decision_status: expected_decision_status,
             should_commit: expected_should_commit,
             create_manual_review: expected_create_manual_review,
+            vendor_api: newtypes::VendorAPI::IdologyExpectID,
         },
         rules_triggered: expected_triggered_rules,
         rules_not_triggered: all_non_triggering_rules,
@@ -33,13 +34,13 @@ fn create_onboarding_rules_decision_output(
 
 // id located
 #[test_case(vec![] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![]); "id located -> pass")]
-#[test_case(vec![FootprintReasonCode::IdNotLocated] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::IdNotLocated]); "id not located -> fail")]
-// id located, but was a watchlist hit so we commit, but fail onboarding
+#[test_case(vec![FootprintReasonCode::IdNotLocated] => create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::IdNotLocated]); "id not located -> fail")]
+// id located, but was a watchlist hit so we commit, but fail onboarding and raise a review since it's just WL
 #[test_case(vec![FootprintReasonCode::WatchlistHitOfac] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit]); "id located, watchlist hit -> fail but commit")]
-// 2 reasons for failing
-#[test_case(vec![FootprintReasonCode::WatchlistHitNonSdn, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit]); "id located, watchlist hit + other reason -> fail and don't commit")]
-#[test_case(vec![FootprintReasonCode::SubjectDeceased]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased]); "id located but hit a base rule -> fail")]
-#[test_case(vec![FootprintReasonCode::SubjectDeceased, FootprintReasonCode::AddressLocatedIsHighRiskAddress]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, true, false, vec![RuleName::SubjectDeceased]); "id located, but hit a base rule and conservative rule -> fail")]
+// 2 reasons for failing, we don't raise a review in any case if there's a hard fail
+#[test_case(vec![FootprintReasonCode::WatchlistHitNonSdn, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit]); "id located, watchlist hit + other reason -> fail and don't commit")]
+#[test_case(vec![FootprintReasonCode::SubjectDeceased]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased]); "id located but hit a base rule -> fail")]
+#[test_case(vec![FootprintReasonCode::SubjectDeceased, FootprintReasonCode::AddressLocatedIsHighRiskAddress]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased]); "id located, but hit a base rule and conservative rule -> fail")]
 fn test_evaluate_onboarding_rules(
     fp_reason_codes: Vec<FootprintReasonCode>,
 ) -> OnboardingRulesDecisionOutput {
@@ -56,5 +57,5 @@ fn test_evaluate_onboarding_rules(
 
     // function under test
     let (decision, _) = feature_vector.evaluate().unwrap();
-    decision
+    decision.output
 }

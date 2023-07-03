@@ -4,7 +4,7 @@ use super::{
     features::kyc_features::KycFeatureVector,
     onboarding::{
         calculate_kyc_rules_output_with_waterfall, DecisionReasonCodes, FeatureVector, KycRuleGroup,
-        OnboardingRulesDecisionOutput,
+        OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
     },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
@@ -40,7 +40,8 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
+    ObConfigurationId, OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId,
+    VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 
@@ -300,7 +301,7 @@ pub fn calculate_decision(
     let fv = features::kyc_features::create_features(vendor_results);
     let (decision, reason_codes) = calculate_kyc_rules_output_with_waterfall(&fv, rule_group)?;
 
-    Ok((decision, reason_codes, fv))
+    Ok((decision.output, reason_codes, fv))
 }
 
 /// Create and save an onboarding decision
@@ -308,7 +309,7 @@ pub fn calculate_decision(
 pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
-    rules_output: OnboardingRulesDecisionOutput,
+    rules_output: WaterfallOnboardingRulesDecisionOutput,
     reason_codes: DecisionReasonCodes,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
@@ -322,7 +323,7 @@ pub fn save_onboarding_decision(
         ob.id.clone(),
         reason_codes,
         verification_result_ids,
-        &rules_output,
+        &rules_output.output,
         assert_is_first_decision_for_onboarding,
         workflow_id,
         review_reasons,
@@ -336,18 +337,47 @@ pub fn save_onboarding_decision(
     }
 
     if !is_sandbox {
-        tracing::info!(
-           rules_triggered=%rule::rules_to_string(&rules_output.rules_triggered),
-           rules_not_triggered=%rule::rules_to_string(&rules_output.rules_not_triggered),
-           create_manual_review=%rules_output.decision.create_manual_review,
-           decision=%rules_output.decision.decision_status,
-           onboarding_id=%ob.id,
-           scoped_user_id=%ob.scoped_vault_id,
-           ob_configuration_id=%ob.ob_configuration_id,
-           "{}", rule::CANONICAL_ONBOARDING_RULE_LINE,
-           // TODO: differentiate KYB vs KYC here
+        // Log our canonical line
+        log_rule_evaluation(
+            &ob.id,
+            &ob.ob_configuration_id,
+            &ob.scoped_vault_id,
+            &rules_output.output,
+            rule::CANONICAL_ONBOARDING_RULE_LINE,
         );
+
+        // Log any additional decisions
+        rules_output.additional_evaluated.into_iter().for_each(|output| {
+            log_rule_evaluation(
+                &ob.id,
+                &ob.ob_configuration_id,
+                &ob.scoped_vault_id,
+                &output,
+                "additional_decisions_for_onboarding",
+            )
+        });
     }
 
     Ok(())
+}
+
+fn log_rule_evaluation(
+    ob_id: &OnboardingId,
+    obc_id: &ObConfigurationId,
+    sv_id: &ScopedVaultId,
+    rule_output: &OnboardingRulesDecisionOutput,
+    msg: &str,
+) {
+    tracing::info!(
+       rules_triggered=%rule::rules_to_string(&rule_output.rules_triggered),
+       rules_not_triggered=%rule::rules_to_string(&rule_output.rules_not_triggered),
+       create_manual_review=%rule_output.decision.create_manual_review,
+       decision=%rule_output.decision.decision_status,
+       onboarding_id=%ob_id,
+       scoped_user_id=%sv_id,
+       ob_configuration_id=%obc_id,
+       vendor_api=%rule_output.decision.vendor_api,
+       msg
+       // TODO: differentiate KYB vs KYC here
+    );
 }

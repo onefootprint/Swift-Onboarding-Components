@@ -1,31 +1,25 @@
 use crate::decision::{
-    onboarding::{Decision, DecisionReasonCodes},
-    rule::{
-        rule_set::{Action, RuleSet},
-        rules_engine::OnboardingEvaluationResult,
+    onboarding::{
+        calculate_kyc_rules_output_with_waterfall, DecisionReasonCodes, KycRuleGroup,
+        WaterfallOnboardingRulesDecisionOutput,
     },
-    Error, RuleError,
+    Error,
 };
 /// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
 /// we can use to make decisions
 use idv::ParsedResponse;
 use itertools::Itertools;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
+use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
 
 use crate::{
-    decision::{
-        onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        rule::{self, rule_sets, RuleName},
-        vendor::vendor_result::VendorResult,
-    },
+    decision::{onboarding::FeatureVector, rule::RuleName, vendor::vendor_result::VendorResult},
     errors::ApiResult,
 };
 
 use super::{
     experian::ExperianFeatures, idology_expectid::IDologyFeatures,
     idology_scan_onboarding::IDologyScanOnboardingFeatures, socure_idplus::SocureFeatures,
-    waterfall_logic::get_kyc_rules_result,
 };
 
 // TODO!
@@ -241,61 +235,13 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
     })
 }
 
+// TODO: remove KYCFeatureVector
 impl FeatureVector for KycFeatureVector {
-    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
-        // The set of rules that determine if a user passes onboarding
-        let idology_rules: Vec<RuleSet<IDologyFeatures>> = vec![rule_sets::kyc::idology_rule_set()];
-        let experian_rules: Vec<RuleSet<ExperianFeatures>> = vec![rule_sets::kyc::experian_rule_set()];
+    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+        let rule_group = KycRuleGroup::default();
+        let result = calculate_kyc_rules_output_with_waterfall(self, rule_group)?;
 
-        // Evaluate rules
-        let idology_rule_result = self
-            .idology_features
-            .as_ref()
-            .map(|f| rule::rules_engine::evaluate_onboarding_rules(idology_rules, f));
-
-        // TODO: add in experian once we have rules for them
-        self.experian_features
-            .as_ref()
-            .map(|e| rule::rules_engine::evaluate_onboarding_rules(experian_rules, e));
-
-        // TODO: add experian in here
-        // TODO: add Ord so we have a vendor preference
-        let rule_results: Vec<OnboardingEvaluationResult> =
-            vec![idology_rule_result].into_iter().flatten().collect();
-        if rule_results.is_empty() {
-            Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
-        }
-
-        // TODO: move reason code creation and use returned VendorAPI
-
-        let result = get_kyc_rules_result(rule_results).map_err(Error::from)?;
-        // If we no rules that triggered, we consider that a pass
-        let decision_status = match result.triggered_action.as_ref() {
-            Some(a) => match a {
-                Action::StepUp => DecisionStatus::Fail,
-                Action::ManualReview => DecisionStatus::Fail,
-                Action::Fail => DecisionStatus::Fail,
-            },
-            None => DecisionStatus::Pass,
-        };
-
-        // For now, we just queue up failures so we can see until we have a better sense of
-        // what reviews we want to be doing
-        let create_manual_review = decision_status == DecisionStatus::Fail;
-
-        // TODO: derive this better
-        let reason_codes = self.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
-
-        let output = OnboardingRulesDecisionOutput {
-            decision: Decision {
-                should_commit: Self::should_commit(&result.rules_triggered),
-                decision_status,
-                create_manual_review,
-            },
-            rules_triggered: result.rules_triggered.to_owned(),
-            rules_not_triggered: result.rules_not_triggered.to_owned(),
-        };
-        Ok((output, reason_codes))
+        Ok(result)
     }
 }
 
