@@ -1,7 +1,7 @@
 use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    FootprintReasonCode, VendorAPI, PiiString,
+    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId,
 };
 
 use crate::decision::onboarding::FeatureSet;
@@ -17,6 +17,7 @@ pub struct IncodeOcrComparisonDataFields {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IncodeDocumentFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
+    pub verification_result_id: VerificationResultId,
 }
 
 impl FeatureSet for IncodeDocumentFeatures {
@@ -27,6 +28,9 @@ impl FeatureSet for IncodeDocumentFeatures {
         // TODO: Not quite right, but that's fine since this won't be used. 
         // eventually should move this to some sort of vendor api struct
         VendorAPI::IncodeFetchScores
+    }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.verification_result_id
     }
 }
 

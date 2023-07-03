@@ -18,9 +18,11 @@ impl FeatureSet for TestFeatures {
     fn footprint_reason_codes(&self) -> &Vec<newtypes::FootprintReasonCode> {
         &self.frcs
     }
-
     fn vendor_api(&self) -> newtypes::VendorAPI {
         newtypes::VendorAPI::TwilioLookupV2
+    }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.vres
     }
 }
 impl TestFeatures {

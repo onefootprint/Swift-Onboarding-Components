@@ -1,11 +1,11 @@
 use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
 use itertools::Itertools;
-use newtypes::{FootprintReasonCode, VendorAPI};
+use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
 
 use crate::decision::{
     onboarding::FeatureSet,
     vendor::vendor_api::{
-        vendor_api_response::VendorAPIResponseMap,
+        vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
         vendor_api_struct::{ExperianPreciseID, WrappedVendorAPI},
     },
 };
@@ -16,12 +16,14 @@ const SCORE_THRESHOLD: i32 = 580;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExperianFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
+    pub verification_result_id: VerificationResultId,
 }
 
 impl ExperianFeatures {
-    pub fn from(resp: CrossCoreAPIResponse) -> Self {
+    pub fn from(resp: CrossCoreAPIResponse, verification_result_id: VerificationResultId) -> Self {
         Self {
             footprint_reason_codes: footprint_reason_codes(resp),
+            verification_result_id,
         }
     }
 }
@@ -32,6 +34,9 @@ impl FeatureSet for ExperianFeatures {
     }
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::ExperianPreciseID
+    }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.verification_result_id
     }
 }
 
@@ -130,18 +135,29 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     reason_codes
 }
 
-impl TryFrom<&VendorAPIResponseMap> for ExperianFeatures {
+impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for ExperianFeatures {
     type Error = crate::decision::Error;
 
-    fn try_from(value: &VendorAPIResponseMap) -> Result<Self, Self::Error> {
+    fn try_from(
+        maps: (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
+    ) -> Result<Self, Self::Error> {
+        let (response_map, ids_map) = maps;
         let v = ExperianPreciseID;
-        let f = value
+        let f = response_map
+            .get(&v)
+            .ok_or(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::from(WrappedVendorAPI::from(v.clone())),
+            ))?;
+        let ids = ids_map
             .get(&v)
             .ok_or(crate::decision::Error::FeatureVectorConversionError(
                 VendorAPI::from(WrappedVendorAPI::from(v)),
             ))?;
 
-        Ok(ExperianFeatures::from(f.clone()))
+        Ok(ExperianFeatures::from(
+            f.clone(),
+            ids.verification_result_id.clone(),
+        ))
     }
 }
 

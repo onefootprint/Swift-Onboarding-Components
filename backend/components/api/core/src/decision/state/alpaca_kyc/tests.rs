@@ -50,7 +50,7 @@ use itertools::Itertools;
 use macros::{test_db_pool, test_state_case};
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
-    SealedVaultBytes,
+    SealedVaultBytes, VendorAPI,
 };
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use newtypes::{FootprintReasonCode, TenantUserId};
@@ -176,24 +176,27 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
                 vec![
-                    FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::DobMatches,
-                    FootprintReasonCode::SsnMatches,
-                    FootprintReasonCode::NameFirstMatches,
-                    FootprintReasonCode::NameLastMatches,
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
                 ],
-                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
             );
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::SsnMatches,
-                    FootprintReasonCode::NameMatches,
-                    FootprintReasonCode::DobMatches,
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
                 ],
-                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
             );
         }
     };
@@ -315,31 +318,25 @@ async fn pass_then_watchlist_hit(
         mr.review_reasons
     );
 
-    match user_kind {
-        UserKind::Demo | UserKind::Sandbox(_) => {
-            // TODO: In Demo + Sandbox, we are currently making real Incode watchlist calls (which is wrong). But when we respect the fixtures, we'll probably
-            // check for the presence of any random watchlist reason code here
-            assert!(rs
-                .iter()
-                .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitOfac));
-            assert!(rs
-                .iter()
-                .any(|rs| rs.reason_code == FootprintReasonCode::AdverseMediaHit));
-        }
-        UserKind::Live => {
-            assert_have_same_elements(
-                vec![
-                    FootprintReasonCode::WatchlistHitOfac, // has watchlist reason code
-                    FootprintReasonCode::AdverseMediaHit,
-                    FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::SsnMatches,
-                    FootprintReasonCode::NameMatches,
-                    FootprintReasonCode::DobMatches,
-                ],
-                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
-            );
-        }
-    };
+    assert_have_same_elements(
+        vec![
+            (
+                VendorAPI::IncodeWatchlistCheck,
+                FootprintReasonCode::WatchlistHitOfac,
+            ),
+            (
+                VendorAPI::IncodeWatchlistCheck,
+                FootprintReasonCode::AdverseMediaHit,
+            ),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+        ],
+        rs.into_iter()
+            .map(|rs| (rs.vendor_api, rs.reason_code))
+            .collect_vec(),
+    );
 
     // ReviewCompleted
     // Expect Webhooks
@@ -379,6 +376,7 @@ async fn pass_then_watchlist_hit(
         TerminalDecisionStatus::Pass => {
             assert_eq!(OnboardingStatus::Pass, ob.status);
             assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+            assert!(!rs.is_empty()); // sanity check since we made a new OBD
         }
         TerminalDecisionStatus::Fail => {
             assert_eq!(OnboardingStatus::Fail, ob.status);
@@ -488,11 +486,39 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
+    assert!(obd.is_some());
     // manual_review should exist and have correct review_reasons
     let mr = mr.unwrap();
     assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
 
-    // TODO: maybe assert risk signals here
+    match user_kind {
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
+            assert!(rs
+                .iter()
+                .any(|rs| rs.reason_code == FootprintReasonCode::SsnMatches));
+        }
+        UserKind::Live => {
+            assert_have_same_elements(
+                vec![
+                    (
+                        VendorAPI::IdologyExpectID,
+                        FootprintReasonCode::NamePartiallyMatches,
+                    ),
+                    (
+                        VendorAPI::IdologyExpectID,
+                        FootprintReasonCode::NameFirstDoesNotMatch,
+                    ),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                ],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
+        }
+    }
 
     // ReviewCompleted
     mock_webhooks(
@@ -522,6 +548,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+    assert!(!rs.is_empty()); // sanity check since we made a new OBD
 }
 
 #[test_state_case(UserKind::Sandbox("fail"))]
@@ -631,19 +658,23 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
-                vec![FootprintReasonCode::SsnDoesNotMatch],
-                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+                vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch)],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
             );
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    FootprintReasonCode::AddressMatches,
-                    FootprintReasonCode::DobMatches,
-                    FootprintReasonCode::SsnDoesNotMatch, // does not match
-                    FootprintReasonCode::NameMatches,
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch), // does not match
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
                 ],
-                rs.into_iter().map(|rs| rs.reason_code).collect_vec(),
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
             );
         }
     };
@@ -735,4 +766,16 @@ async fn redo_and_pass(
     assert!(prior_ob.authorized_at == ob.authorized_at);
     assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
     assert!(prior_ob.decision_made_at == ob.decision_made_at);
+
+    assert_have_same_elements(
+        vec![
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+        ],
+        rs.into_iter()
+            .map(|rs| (rs.vendor_api, rs.reason_code))
+            .collect_vec(),
+    );
 }

@@ -10,7 +10,7 @@ use crate::decision::{
 /// we can use to make decisions
 use idv::ParsedResponse;
 use itertools::Itertools;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -60,12 +60,17 @@ impl KycFeatureVector {
 }
 
 impl KycFeatureVector {
-    fn reason_codes_for_vendor_api(&self, vendor_api: &VendorAPI) -> Option<Vec<FootprintReasonCode>> {
+    fn reason_codes_for_vendor_api(
+        &self,
+        vendor_api: &VendorAPI,
+    ) -> Option<(VerificationResultId, Vec<FootprintReasonCode>)> {
         match vendor_api {
-            VendorAPI::IdologyExpectID => self
-                .idology_features
-                .as_ref()
-                .map(|i| Self::enrich_idology_reason_codes_with_info_codes(i.footprint_reason_codes.clone())),
+            VendorAPI::IdologyExpectID => self.idology_features.as_ref().map(|i| {
+                (
+                    i.verification_result_id.clone(),
+                    Self::enrich_idology_reason_codes_with_info_codes(i.footprint_reason_codes.clone()),
+                )
+            }),
             VendorAPI::IdologyScanVerifySubmission => None,
             VendorAPI::IdologyScanVerifyResults => None,
             VendorAPI::IdologyScanOnboarding => None,
@@ -73,11 +78,11 @@ impl KycFeatureVector {
             VendorAPI::ExperianPreciseID => self
                 .experian_features
                 .as_ref()
-                .map(|f| f.footprint_reason_codes.clone()),
+                .map(|f| (f.verification_result_id.clone(), f.footprint_reason_codes.clone())),
             VendorAPI::SocureIDPlus => self
                 .socure_features
                 .as_ref()
-                .map(|f| f.footprint_reason_codes.clone()),
+                .map(|f| (f.verification_result_id.clone(), f.footprint_reason_codes.clone())),
             VendorAPI::IdologyPa => None,
             VendorAPI::MiddeskCreateBusiness => None,
             VendorAPI::MiddeskBusinessUpdateWebhook => None,
@@ -130,14 +135,14 @@ impl KycFeatureVector {
             || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
     }
 
-    pub fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, VendorAPI)> {
+    pub fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> DecisionReasonCodes {
         vendor_apis
             .iter()
             .flat_map(|v| {
-                self.reason_codes_for_vendor_api(v).map(|rcs| {
+                self.reason_codes_for_vendor_api(v).map(|(vres_id, rcs)| {
                     rcs.iter()
-                        .map(|rc: &FootprintReasonCode| (rc.to_owned(), v.to_owned()))
-                        .collect::<Vec<(FootprintReasonCode, VendorAPI)>>()
+                        .map(|rc: &FootprintReasonCode| (rc.to_owned(), v.to_owned(), vres_id.clone()))
+                        .collect::<DecisionReasonCodes>()
                 })
             })
             .flatten()
@@ -153,7 +158,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
         let verification_result_id = result.verification_result_id;
         match response.response {
             ParsedResponse::IDologyExpectID(resp) => Ok(Self {
-                idology_features: Some(IDologyFeatures::from(resp)),
+                idology_features: Some(IDologyFeatures::from(resp, verification_result_id)),
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
@@ -171,7 +176,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
                 idology_features: None,
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
-                socure_features: Some(SocureFeatures::from(idplus_response)),
+                socure_features: Some(SocureFeatures::from(idplus_response, verification_result_id)),
                 experian_features: None,
             }),
             // TODO
@@ -211,7 +216,7 @@ impl TryFrom<VendorResult> for KycFeatureVector {
                 idology_scan_onboarding_features: None,
                 twilio_features: None,
                 socure_features: None,
-                experian_features: Some(ExperianFeatures::from(resp)),
+                experian_features: Some(ExperianFeatures::from(resp, verification_result_id)),
             }),
             _ => Err(Error::KycFeatureVectorConversionError(verification_result_id)),
         }
@@ -319,6 +324,7 @@ mod tests {
     #[test]
     fn test_features() -> Result<(), IdologyError> {
         let idology_result = create_idology_vendor_result("id.success")?;
+        let vres_id = idology_result.verification_result_id.clone();
         let vendor_results = vec![idology_result];
 
         let feature_vector = create_features(vendor_results);
@@ -332,6 +338,7 @@ mod tests {
                 FootprintReasonCode::SsnMatches,
                 FootprintReasonCode::NameMatches,
             ],
+            verification_result_id: vres_id,
         };
         let expected_feature_vector = KycFeatureVector {
             idology_features: Some(expected_idology_features),
@@ -411,6 +418,8 @@ mod tests {
 
     #[test]
     fn test_consolidated_reason_codes() {
+        let id_vres_id = VerificationResultId::from_str("vres123").unwrap();
+        let socure_vres_id = VerificationResultId::from_str("vres456").unwrap();
         let feature_vector = KycFeatureVector {
             idology_features: Some(IDologyFeatures {
                 footprint_reason_codes: vec![
@@ -420,6 +429,7 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IdNotLocated,
                 ],
+                verification_result_id: id_vres_id.clone(),
             }),
             idology_scan_onboarding_features: None,
             twilio_features: None,
@@ -437,6 +447,7 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::SsnIssuedPriorToDob,
                 ],
+                verification_result_id: socure_vres_id.clone(),
             }),
             experian_features: None,
         };
@@ -445,12 +456,21 @@ mod tests {
         // only reason codes from specified VendorAPI's are included in output
         assert_have_same_elements(
             vec![
-                (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
+                (
+                    FootprintReasonCode::SubjectDeceased,
+                    VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
+                ),
                 (
                     FootprintReasonCode::NameLastDoesNotMatch,
                     VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
                 ),
-                (FootprintReasonCode::IdNotLocated, VendorAPI::IdologyExpectID),
+                (
+                    FootprintReasonCode::IdNotLocated,
+                    VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
+                ),
             ],
             feature_vector.reason_codes(vec![VendorAPI::IdologyExpectID]),
         );
@@ -459,14 +479,31 @@ mod tests {
         // correctly consolidates by vendor
         assert_have_same_elements(
             vec![
-                (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
-                (FootprintReasonCode::SubjectDeceased, VendorAPI::SocureIDPlus),
+                (
+                    FootprintReasonCode::SubjectDeceased,
+                    VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
+                ),
+                (
+                    FootprintReasonCode::SubjectDeceased,
+                    VendorAPI::SocureIDPlus,
+                    socure_vres_id.clone(),
+                ),
                 (
                     FootprintReasonCode::NameLastDoesNotMatch,
                     VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
                 ),
-                (FootprintReasonCode::SsnIssuedPriorToDob, VendorAPI::SocureIDPlus),
-                (FootprintReasonCode::IdNotLocated, VendorAPI::IdologyExpectID),
+                (
+                    FootprintReasonCode::SsnIssuedPriorToDob,
+                    VendorAPI::SocureIDPlus,
+                    socure_vres_id,
+                ),
+                (
+                    FootprintReasonCode::IdNotLocated,
+                    VendorAPI::IdologyExpectID,
+                    id_vres_id.clone(),
+                ),
             ],
             yo,
         );
@@ -480,6 +517,7 @@ mod tests {
                     FootprintReasonCode::SubjectDeceased,
                     FootprintReasonCode::IpStateDoesNotMatch,
                 ],
+                verification_result_id: id_vres_id.clone(),
             }),
             ..Default::default()
         };
@@ -487,48 +525,77 @@ mod tests {
         let idology_reason_codes_with_info =
             feature_vector_id_located.reason_codes(vec![VendorAPI::IdologyExpectID]);
         let expected_codes = vec![
-            (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
+            (
+                FootprintReasonCode::SubjectDeceased,
+                VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
+            ),
             // Note: the last name and IpState do not match, so they do NOT appear as info reason codes
             (
                 FootprintReasonCode::NameLastDoesNotMatch,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::IpStateDoesNotMatch,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             // All other info codes present, though
-            (FootprintReasonCode::AddressMatches, VendorAPI::IdologyExpectID),
+            (
+                FootprintReasonCode::AddressMatches,
+                VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
+            ),
             (
                 FootprintReasonCode::AddressZipCodeMatches,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::AddressStreetNameMatches,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::AddressStreetNumberMatches,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::AddressStateMatches,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
-            (FootprintReasonCode::DobYobMatches, VendorAPI::IdologyExpectID),
-            (FootprintReasonCode::DobMobMatches, VendorAPI::IdologyExpectID),
-            (FootprintReasonCode::SsnMatches, VendorAPI::IdologyExpectID),
+            (
+                FootprintReasonCode::DobYobMatches,
+                VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
+            ),
+            (
+                FootprintReasonCode::DobMobMatches,
+                VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
+            ),
+            (
+                FootprintReasonCode::SsnMatches,
+                VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
+            ),
             (
                 FootprintReasonCode::PhoneNumberMatches,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::InputPhoneNumberMatchesInputState,
                 VendorAPI::IdologyExpectID,
+                id_vres_id.clone(),
             ),
             (
                 FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
                 VendorAPI::IdologyExpectID,
+                id_vres_id,
             ),
         ];
         assert_have_same_elements(expected_codes, idology_reason_codes_with_info);

@@ -208,7 +208,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
         let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
-            common::kyc_decision_from_fixture(fixture_decision)
+            common::kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };

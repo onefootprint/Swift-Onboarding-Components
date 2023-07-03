@@ -23,11 +23,14 @@ use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 use crate::{
     decision::{
         self, engine,
-        onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput},
+        onboarding::{Decision, DecisionReasonCodes, KycRuleGroup, OnboardingRulesDecisionOutput},
         utils::FixtureDecision,
         vendor::{
             tenant_vendor_control::TenantVendorControl,
-            vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
+            vendor_api::{
+                vendor_api_response::build_vendor_response_map_from_vendor_results,
+                vendor_api_struct::{ExperianPreciseID, IdologyExpectID},
+            },
             vendor_result::VendorResult,
         },
     },
@@ -179,21 +182,43 @@ pub async fn assert_kyc_vendor_calls_completed(
     Ok(vendor_requests.completed_requests)
 }
 
-pub type KycDecision = (
-    OnboardingRulesDecisionOutput,
-    Vec<(FootprintReasonCode, VendorAPI)>,
-);
+pub type KycDecision = (OnboardingRulesDecisionOutput, DecisionReasonCodes);
 
-#[tracing::instrument]
-pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
-    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-    let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-
-    (rules_output, reason_codes)
+// TODO: this is an awful temporary hack but should go away when we refactor things so we pass reason codes directly into rule execution
+// In sandbox/demo, we still make Vres's based on the Tenant's TVC. We should probably just have some dummy TestVendor or something or
+// always simulate just Idology, but for now we just robustly take the first of either Idology or Experian that exists
+#[tracing::instrument(skip_all)]
+fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<VerificationResultId> {
+    let (_, vendor_ids_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let idology = vendor_ids_map
+        .get(&IdologyExpectID)
+        .map(|r| r.verification_result_id.clone());
+    let experian = vendor_ids_map
+        .get(&ExperianPreciseID)
+        .map(|r| r.verification_result_id.clone());
+    Ok(idology.or(experian).ok_or(decision::Error::FixtureVresNotFound)?)
 }
 
-#[tracing::instrument]
-pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> KycDecision {
+#[tracing::instrument(skip_all)]
+pub fn kyc_decision_from_fixture(
+    fixture_decision: FixtureDecision,
+    vendor_results: &[VendorResult],
+) -> ApiResult<KycDecision> {
+    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+    let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
+    let vres_id = get_vres_id_for_fixture(vendor_results)?;
+    let reason_codes = reason_codes
+        .into_iter()
+        .map(|r| (r.0, r.1, vres_id.clone()))
+        .collect();
+    Ok((rules_output, reason_codes))
+}
+
+#[tracing::instrument(skip_all)]
+pub fn alpaca_kyc_decision_from_fixture(
+    fixture_decision: FixtureDecision,
+    vendor_results: &[VendorResult],
+) -> ApiResult<KycDecision> {
     let decision_status = match fixture_decision {
         // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
         (newtypes::DecisionStatus::Fail, true) => DecisionStatus::Pass,
@@ -214,8 +239,13 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ky
         rules_not_triggered: vec![],
     };
     let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fixture_decision);
+    let vres_id = get_vres_id_for_fixture(vendor_results)?;
+    let reason_codes = reason_codes
+        .into_iter()
+        .map(|r| (r.0, r.1, vres_id.clone()))
+        .collect();
 
-    (rules_output, reason_codes)
+    Ok((rules_output, reason_codes))
 }
 
 #[tracing::instrument(skip_all)]
@@ -223,9 +253,12 @@ pub fn get_decision(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     vendor_results: &[VendorResult],
-) -> ApiResult<KycDecision> {
-    let (vendor_response_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
-    let (rules_output, reason_codes) = rule_group.rule_group().evaluate(&vendor_response_map)?;
+) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    let (vendor_response_map, vendor_ids_map) =
+        build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let (rules_output, reason_codes) = rule_group
+        .rule_group()
+        .evaluate(&vendor_response_map, &vendor_ids_map)?;
     Ok((rules_output, reason_codes))
 }
 

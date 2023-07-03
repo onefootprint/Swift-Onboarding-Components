@@ -216,11 +216,32 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(mr.is_none());
-    assert!(!rs.is_empty()); // TODO: assert specific risk signals
+
+    match user_kind {
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
+            assert!(rs
+                .iter()
+                .all(|rs| rs.reason_code.severity() == SignalSeverity::Info));
+        }
+        UserKind::Live => {
+            assert_have_same_elements(
+                vec![
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                ],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
+        }
+    };
 }
 
-// #[test_state_case(UserKind::Sandbox("manualreview"))]
-// #[test_state_case(UserKind::Sandbox("fail"))]
+#[test_state_case(UserKind::Sandbox("manualreview"))]
+#[test_state_case(UserKind::Sandbox("fail"))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn fail(state: &mut State, user_kind: UserKind) {
@@ -325,16 +346,23 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             } else {
                 SignalSeverity::High
             };
+            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
             assert!(rs.iter().all(|rs| rs.reason_code.severity() == severity));
         }
         UserKind::Live => {
-            assert!(!rs.is_empty());
-            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
-            assert!(rs
-                .iter()
-                .any(|rs| rs.reason_code == FootprintReasonCode::SsnDoesNotMatch));
+            assert_have_same_elements(
+                vec![
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                ],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
         }
-    };
+    }
     // Test Redo as well
     match user_kind {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
@@ -419,4 +447,16 @@ async fn redo_and_pass(
     assert!(prior_ob.authorized_at == ob.authorized_at);
     assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
     assert!(prior_ob.decision_made_at == ob.decision_made_at);
+
+    assert_have_same_elements(
+        vec![
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+        ],
+        rs.into_iter()
+            .map(|rs| (rs.vendor_api, rs.reason_code))
+            .collect_vec(),
+    );
 }

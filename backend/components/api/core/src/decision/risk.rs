@@ -1,6 +1,4 @@
-use newtypes::{
-    DbActor, FootprintReasonCode, OnboardingId, ReviewReason, VendorAPI, VerificationResultId, WorkflowId,
-};
+use newtypes::{DbActor, OnboardingId, ReviewReason, VerificationResultId, WorkflowId};
 
 use db::{
     models::{
@@ -13,7 +11,7 @@ use db::{
     TxnPgConn,
 };
 
-use super::onboarding::OnboardingRulesDecisionOutput;
+use super::onboarding::{DecisionReasonCodes, OnboardingRulesDecisionOutput};
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::VaultWrapper,
@@ -28,7 +26,7 @@ use crate::{
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
     ob_id: OnboardingId,
-    reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
+    reason_codes: DecisionReasonCodes,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,
@@ -102,7 +100,7 @@ pub fn save_final_decision(
         conn,
         NewRiskSignals::LegacyObd {
             onboarding_decision_id: obd.id.clone(),
-            signals: reason_codes,
+            signals: reason_codes.into_iter().map(|r| (r.0, r.1)).collect(),
         },
     )?;
     Ok(obd)

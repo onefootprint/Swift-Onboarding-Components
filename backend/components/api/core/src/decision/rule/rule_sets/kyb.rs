@@ -93,6 +93,8 @@ mod tests {
     use super::*;
     use crate::decision::{features::kyb_features::MiddeskFeatures, rule::rules_engine};
     use newtypes::VendorAPI;
+    use newtypes::VerificationResultId;
+    use std::str::FromStr;
     use test_case::test_case;
 
     fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> KybFeatureVector {
@@ -102,6 +104,7 @@ mod tests {
             },
             bo_obds: vec![],
             vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
+            verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
         }
     }
 

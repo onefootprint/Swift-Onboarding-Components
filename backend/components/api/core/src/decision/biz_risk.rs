@@ -85,6 +85,6 @@ pub async fn make_kyb_decision(
         )));
     }
 
-    let fv = KybFeatureVector::new(business_response, obds, vendor_api);
+    let fv = KybFeatureVector::new(business_response, obds, vendor_api, vres_id.clone());
     engine::make_onboarding_decision(&ob, fv, db_pool, vec![vres_id.clone()]).await
 }

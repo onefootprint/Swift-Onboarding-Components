@@ -14,6 +14,7 @@ use db::{
         tenant::Tenant,
         vault::Vault,
         verification_request::VerificationRequest,
+        verification_result::VerificationResult,
         workflow::Workflow as DbWorkflow,
     },
     DbError,
@@ -26,7 +27,7 @@ use idv::incode::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, AlpacaKycConfig, DecisionStatus, FootprintReasonCode,
-    OnboardingStatus, ReasonCode, ReviewReason, Vendor, VendorAPI,
+    OnboardingStatus, ReasonCode, ReviewReason, Vendor, VendorAPI, VerificationResultId,
 };
 use webhooks::WebhookClient;
 
@@ -225,7 +226,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let vault = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
         let kyc_decision = if let Some(fixture_decision) = fixture_decision {
-            common::alpaca_kyc_decision_from_fixture(fixture_decision)
+            common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
@@ -327,7 +328,7 @@ impl AlpacaKycWatchlistCheck {
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistCheck {
     type AsyncRes = (
-        Either<WatchlistResultResponse, FixtureDecision>,
+        Either<(VerificationResult, WatchlistResultResponse), (VerificationResult, FixtureDecision)>,
         Vec<VendorResult>,
         Arc<dyn WebhookClient>,
     );
@@ -358,7 +359,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         let watchlist_res = if let Some(fixture_decision) = fixture_decision {
             // TODO: since we are now saving a mock incode response, we could make the sandbox reason_code logic in `on_commit` just operate on the mocked vres instead of synthetically deriving from fixture_decision
-            decision::sandbox::save_fixture_incode_watchlist_result(
+            let vres = decision::sandbox::save_fixture_incode_watchlist_result(
                 &state.db_pool,
                 fixture_decision,
                 &di.id,
@@ -367,7 +368,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             )
             .await?;
 
-            Either::Right(fixture_decision)
+            Either::Right((vres, fixture_decision))
         } else {
             Either::Left(
                 vendor::incode_watchlist::make_watchlist_result_call(
@@ -408,15 +409,15 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         // Watchlist reason codes
         let wc_reason_codes = match &watchlist_res {
-            Either::Left(watchlist_res) => {
+            Either::Left((vres, watchlist_res)) => {
                 let wc_reason_codes =
                     decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
                 wc_reason_codes
                     .into_iter()
-                    .map(|r| (r, VendorAPI::IncodeWatchlistCheck))
+                    .map(|r| (r, VendorAPI::IncodeWatchlistCheck, vres.id.clone()))
                     .collect::<Vec<_>>()
             }
-            Either::Right(fixture_decision) => match fixture_decision.0 {
+            Either::Right((vres, fixture_decision)) => match fixture_decision.0 {
                 // For Alpaca sandbox fixtures, we treat "#fail" as meaning there was a watchlist hit. If we stepup (or pass), we don't simulate watchlist hits
                 DecisionStatus::StepUp | DecisionStatus::Pass => vec![],
                 DecisionStatus::Fail => vec![
@@ -424,21 +425,29 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                     (
                         FootprintReasonCode::WatchlistHitOfac,
                         VendorAPI::IncodeWatchlistCheck,
+                        vres.id.clone(),
                     ),
                     (
                         FootprintReasonCode::AdverseMediaHit,
                         VendorAPI::IncodeWatchlistCheck,
+                        vres.id.clone(),
                     ),
                 ],
             },
         };
 
+        // RiskSignal::bulk_create(conn, NewVres {
+        //     verification_result_id: VerificationResultId,
+        //     vendor_api: VendorAPI,
+        //     reason_codes: Vec<FootprintReasonCode>,
+        // });
+
         // For now, we need to re-run the KYC decisioning so we can get reason codes
         // and have these written at the same time as the Watchlist reason codes
         // and our OBD. (In future, we migrate risk_signal to point to VRes and can remove this temp hack)
         let is_sandbox = watchlist_res.is_right();
-        let (kyc_decision, kyc_reason_codes) = if let Some(fixture_decision) = watchlist_res.right() {
-            common::alpaca_kyc_decision_from_fixture(fixture_decision)
+        let (kyc_decision, kyc_reason_codes) = if let Some((_, fixture_decision)) = watchlist_res.right() {
+            common::alpaca_kyc_decision_from_fixture(fixture_decision, &kyc_vendor_results)?
         } else {
             common::get_decision(&self, conn, &kyc_vendor_results)?
         };
@@ -461,7 +470,10 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 create_manual_review: true,
             }
         };
-        let review_reasons = get_review_reasons(&wc_reason_codes, doc_req.is_some());
+        let review_reasons = get_review_reasons(
+            &wc_reason_codes.iter().map(|r| r.0.clone()).collect::<Vec<_>>(),
+            doc_req.is_some(),
+        );
 
         let decision = (
             OnboardingRulesDecisionOutput {
@@ -475,6 +487,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .chain(wc_reason_codes.into_iter())
                 .collect(),
         );
+
         common::save_kyc_decision(
             conn,
             webhook_client,
@@ -648,11 +661,7 @@ impl WorkflowState for AlpacaKycComplete {
     }
 }
 
-fn get_review_reasons(
-    wc_reason_codes: &[(FootprintReasonCode, VendorAPI)],
-    collected_doc: bool,
-) -> Vec<ReviewReason> {
-    let wc_reason_codes = wc_reason_codes.iter().map(|r| r.0.clone()).collect::<Vec<_>>();
+fn get_review_reasons(wc_reason_codes: &[(FootprintReasonCode)], collected_doc: bool) -> Vec<ReviewReason> {
     let adverse_media: bool = wc_reason_codes
         .iter()
         .any(|rs| rs == &FootprintReasonCode::AdverseMediaHit);
@@ -685,15 +694,15 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck)], false => vec![ReviewReason::WatchlistHit])]
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck), (FootprintReasonCode::WatchlistHitPep, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck)], false => vec![ReviewReason::AdverseMediaHit])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck), (FootprintReasonCode::WatchlistHitNonSdn, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac)], false => vec![ReviewReason::WatchlistHit])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac), (FootprintReasonCode::WatchlistHitPep)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit)], false => vec![ReviewReason::AdverseMediaHit])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit), (FootprintReasonCode::WatchlistHitNonSdn)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
 
     fn test_get_review_reasons(
-        wc_reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
+        wc_reason_codes: Vec<(FootprintReasonCode)>,
         collected_doc: bool,
     ) -> Vec<ReviewReason> {
         get_review_reasons(&wc_reason_codes, collected_doc)

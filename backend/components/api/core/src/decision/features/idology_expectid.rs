@@ -5,13 +5,15 @@ use idv::idology::{
     expectid::response::{ExpectIDResponse, PaWatchlistHit},
 };
 use itertools::Itertools;
-use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI};
+use newtypes::{
+    idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI, VerificationResultId,
+};
 use strum::IntoEnumIterator;
 
 use crate::decision::{
     onboarding::FeatureSet,
     vendor::vendor_api::{
-        vendor_api_response::VendorAPIResponseMap,
+        vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
         vendor_api_struct::{IdologyExpectID, WrappedVendorAPI},
     },
 };
@@ -20,6 +22,7 @@ use crate::decision::{
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
+    pub verification_result_id: VerificationResultId,
 }
 
 impl FeatureSet for IDologyFeatures {
@@ -29,14 +32,18 @@ impl FeatureSet for IDologyFeatures {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IdologyExpectID
     }
+    fn verification_result_id(&self) -> &VerificationResultId {
+        &self.verification_result_id
+    }
 }
 
 impl IDologyFeatures {
-    pub fn from(resp: ExpectIDResponse) -> Self {
+    pub fn from(resp: ExpectIDResponse, verification_result_id: VerificationResultId) -> Self {
         let footprint_reason_codes: Vec<FootprintReasonCode> = Self::footprint_reason_codes(resp);
 
         Self {
             footprint_reason_codes,
+            verification_result_id,
         }
     }
 
@@ -200,18 +207,29 @@ impl IDologyFeatures {
     }
 }
 
-impl TryFrom<&VendorAPIResponseMap> for IDologyFeatures {
+impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for IDologyFeatures {
     type Error = crate::decision::Error;
 
-    fn try_from(value: &VendorAPIResponseMap) -> Result<Self, Self::Error> {
+    fn try_from(
+        maps: (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
+    ) -> Result<Self, Self::Error> {
+        let (response_map, ids_map) = maps;
         let v = IdologyExpectID;
-        let f = value
+        let f = response_map
+            .get(&v)
+            .ok_or(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::from(WrappedVendorAPI::from(v.clone())),
+            ))?;
+        let ids = ids_map
             .get(&v)
             .ok_or(crate::decision::Error::FeatureVectorConversionError(
                 VendorAPI::from(WrappedVendorAPI::from(v)),
             ))?;
 
-        Ok(IDologyFeatures::from(f.clone()))
+        Ok(IDologyFeatures::from(
+            f.clone(),
+            ids.verification_result_id.clone(),
+        ))
     }
 }
 

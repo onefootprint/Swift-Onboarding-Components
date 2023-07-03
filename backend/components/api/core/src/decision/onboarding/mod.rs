@@ -1,8 +1,9 @@
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
 
 use crate::errors::ApiResult;
 use crate::{decision::Error, ApiError};
 
+use super::vendor::vendor_api::vendor_api_response::VendorAPIResponseIdentifiersMap;
 use super::{
     features::{
         experian::ExperianFeatures, idology_expectid::IDologyFeatures, kyc_features::KycFeatureVector,
@@ -33,7 +34,7 @@ pub struct Decision {
     pub create_manual_review: bool,
 }
 
-pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI)>;
+pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>;
 pub trait FeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)>;
 }
@@ -41,16 +42,22 @@ pub trait FeatureVector {
 pub trait FeatureSet {
     fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode>;
     fn vendor_api(&self) -> VendorAPI;
+    fn verification_result_id(&self) -> &VerificationResultId;
 }
 
 /// Derive rule inputs
-pub fn rule_input_from_vendor_results<'a, T>(vendor_response_map: &'a VendorAPIResponseMap) -> ApiResult<T>
+pub fn rule_input_from_vendor_results<'a, T>(
+    vendor_response_map: &'a VendorAPIResponseMap,
+    vendor_ids_map: &'a VendorAPIResponseIdentifiersMap,
+) -> ApiResult<T>
 where
-    T: TryFrom<&'a VendorAPIResponseMap>,
+    T: TryFrom<(&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap)>,
     T: Clone + FeatureSet,
-    ApiError: std::convert::From<<T as std::convert::TryFrom<&'a VendorAPIResponseMap>>::Error>,
+    ApiError: std::convert::From<
+        <T as std::convert::TryFrom<(&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap)>>::Error,
+    >,
 {
-    let res = T::try_from(vendor_response_map)?;
+    let res = T::try_from((vendor_response_map, vendor_ids_map))?;
 
     Ok(res)
 }
@@ -58,19 +65,22 @@ where
 pub fn evaluate_rule_set_from_vendor_results<'a, T>(
     rule_set: RuleSet<T>,
     vendor_response_map: &'a VendorAPIResponseMap,
+    vendor_ids_map: &'a VendorAPIResponseIdentifiersMap,
 ) -> ApiResult<(OnboardingEvaluationResult, DecisionReasonCodes)>
 where
-    T: TryFrom<&'a VendorAPIResponseMap>,
+    T: TryFrom<(&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap)>,
     T: Clone + FeatureSet,
-    ApiError: std::convert::From<<T as std::convert::TryFrom<&'a VendorAPIResponseMap>>::Error>,
+    ApiError: std::convert::From<
+        <T as std::convert::TryFrom<(&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap)>>::Error,
+    >,
 {
-    let input: T = rule_input_from_vendor_results(vendor_response_map)?;
+    let input: T = rule_input_from_vendor_results(vendor_response_map, vendor_ids_map)?;
     let reason_codes = input.footprint_reason_codes().clone();
     Ok((
         evaluate_onboarding_rule_set(rule_set, &input),
         reason_codes
             .into_iter()
-            .map(|rs| (rs, input.vendor_api()))
+            .map(|rs| (rs, input.vendor_api(), input.verification_result_id().clone()))
             .collect(),
     ))
 }
@@ -84,9 +94,10 @@ impl RuleGroup {
     pub fn evaluate(
         &self,
         vendor_response_map: &VendorAPIResponseMap,
+        vendor_ids_map: &VendorAPIResponseIdentifiersMap,
     ) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         match self {
-            RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map),
+            RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map, vendor_ids_map),
         }
     }
 }
@@ -108,12 +119,21 @@ impl KycRuleGroup {
     pub fn evaluate_kyc_rules_with_waterfall(
         &self,
         vendor_response_map: &VendorAPIResponseMap,
+        vendor_ids_map: &VendorAPIResponseIdentifiersMap,
     ) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
-        let idology_rule_result =
-            evaluate_rule_set_from_vendor_results(self.idology_rules.clone(), vendor_response_map).ok();
-        let experian_rule_result =
-            evaluate_rule_set_from_vendor_results(self.experian_rules.clone(), vendor_response_map).ok();
+        let idology_rule_result = evaluate_rule_set_from_vendor_results(
+            self.idology_rules.clone(),
+            vendor_response_map,
+            vendor_ids_map,
+        )
+        .ok();
+        let experian_rule_result = evaluate_rule_set_from_vendor_results(
+            self.experian_rules.clone(),
+            vendor_response_map,
+            vendor_ids_map,
+        )
+        .ok();
 
         let rule_results: Vec<(OnboardingEvaluationResult, DecisionReasonCodes)> =
             vec![experian_rule_result, idology_rule_result]

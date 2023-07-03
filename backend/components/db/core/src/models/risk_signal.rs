@@ -300,13 +300,13 @@ mod tests {
                             KeyType::Obd => NewRiskSignals::LegacyObd {
                                 onboarding_decision_id: obd.id.clone(),
                                 signals: reason_codes
-                                    .into_iter()
-                                    .map(|rc| (rc.clone(), vendor_api.clone()))
+                                    .iter()
+                                    .map(|rc| (rc.clone(), *vendor_api))
                                     .collect_vec(),
                             },
                             KeyType::Vres => NewRiskSignals::NewVres {
                                 verification_result_id: vres.id,
-                                vendor_api: vendor_api.clone(),
+                                vendor_api: *vendor_api,
                                 reason_codes: reason_codes.clone(),
                             },
                         };

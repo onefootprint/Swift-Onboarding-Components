@@ -32,7 +32,7 @@ use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum UserKind {
     Demo,
     Sandbox(&'static str),
@@ -106,7 +106,14 @@ pub async fn query_data(
             let sv = ScopedVault::get(conn, &svid).unwrap();
             let (ob, _, mr, obd) = Onboarding::get(conn, (&sv.id, &sv.vault_id)).unwrap();
 
-            let rs = obd
+            let latest_obd = OnboardingDecision::latest_footprint_actor_decision(
+                conn,
+                &sv.fp_id,
+                &sv.tenant_id,
+                sv.is_live,
+            )
+            .unwrap();
+            let rs = latest_obd
                 .as_ref()
                 .map(|obd| RiskSignal::list_by_onboarding_decision_id(conn, &obd.id).unwrap())
                 .unwrap_or_default();

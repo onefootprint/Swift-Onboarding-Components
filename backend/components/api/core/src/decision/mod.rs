@@ -30,6 +30,8 @@ pub enum Error {
     KycFeatureVectorConversionError(VerificationResultId),
     #[error("Cannot build features for: {0}")]
     FeatureVectorConversionError(VendorAPI),
+    #[error("Fixture vres not found")]
+    FixtureVresNotFound,
 }
 
 #[derive(thiserror::Error, Debug)]

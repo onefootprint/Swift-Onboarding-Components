@@ -40,8 +40,7 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId,
-    VerificationResultId, WorkflowId,
+    OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 
@@ -310,7 +309,7 @@ pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
     rules_output: OnboardingRulesDecisionOutput,
-    reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
+    reason_codes: DecisionReasonCodes,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,

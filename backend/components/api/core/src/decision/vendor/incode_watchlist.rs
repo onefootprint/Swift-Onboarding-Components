@@ -25,7 +25,7 @@ async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     api_or_vreq_id: Either<VendorAPI, VerificationRequestId>, // Since for now, the watchlist-result Vreq is written before the vres
-) -> ApiResult<()> {
+) -> ApiResult<VerificationResult> {
     let is_error = res.result.is_error();
     let raw_response = res.raw_response.clone();
     let scrubbed_response = res
@@ -39,7 +39,7 @@ async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize
 
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
-    db_pool
+    let vres = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let vreq_id = match api_or_vreq_id {
                 Either::Left(vendor_api) => {
@@ -49,10 +49,11 @@ async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize
                 Either::Right(vreq_id) => vreq_id,
             };
 
-            let _vres = VerificationResult::create(conn, vreq_id, scrubbed_response, e_response, is_error)?;
-            Ok(())
+            let vres = VerificationResult::create(conn, vreq_id, scrubbed_response, e_response, is_error)?;
+            Ok(vres)
         })
-        .await
+        .await?;
+    Ok(vres)
 }
 
 async fn call_start_onboarding(
@@ -101,7 +102,7 @@ async fn call_watchlist_result(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
-) -> ApiResult<WatchlistResultResponse> {
+) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
     let svid = sv_id.clone();
     let diid = di_id.clone();
     let vreq = state
@@ -131,7 +132,7 @@ async fn call_watchlist_result(
         .await
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
-    save_vres_and_maybe_vreq(
+    let vres = save_vres_and_maybe_vreq(
         &state.db_pool,
         res.clone(),
         sv_id,
@@ -145,7 +146,7 @@ async fn call_watchlist_result(
         .result
         .into_success()
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-    Ok(res)
+    Ok((vres, res))
 }
 
 pub async fn make_watchlist_result_call(
@@ -154,7 +155,7 @@ pub async fn make_watchlist_result_call(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey, // TODO: pass in stuff like this and tvc or query for it on the fly? i never know
-) -> ApiResult<WatchlistResultResponse> {
+) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
     let res = call_start_onboarding(state, tvc, sv_id, di_id, user_vault_public_key).await?;
 
     let token = res.token;

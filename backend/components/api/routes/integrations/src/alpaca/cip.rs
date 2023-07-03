@@ -474,12 +474,14 @@ fn document_and_photo(
         .get(&ocr_api)
         .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
             ocr_api,
-        )))?;
+        )))?
+        .clone();
     let score_response = vendor_map
         .get(&scores_api)
         .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
             scores_api,
-        )))?;
+        )))?
+        .clone();
 
     let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
     let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
@@ -500,7 +502,7 @@ fn document_and_photo(
     };
     let frcs = features::incode_docv::footprint_reason_codes(
         ocr_response.clone(),
-        score_response.clone(),
+        score_response,
         incode_vault_data,
         expect_selfie,
     )?;

@@ -119,8 +119,7 @@ pub fn get_fixture_reason_codes_alpaca(
                 FootprintReasonCode::AddressMatches,
                 FootprintReasonCode::DobMatches,
                 FootprintReasonCode::SsnMatches,
-                FootprintReasonCode::NameFirstMatches,
-                FootprintReasonCode::NameLastMatches,
+                FootprintReasonCode::NameMatches,
             ]
         }
         // #stepup
@@ -128,8 +127,7 @@ pub fn get_fixture_reason_codes_alpaca(
             let mismatch_reason_codes = vec![
                 FootprintReasonCode::AddressDoesNotMatch,
                 FootprintReasonCode::DobDoesNotMatch,
-                FootprintReasonCode::NameFirstDoesNotMatch,
-                FootprintReasonCode::NameLastDoesNotMatch,
+                FootprintReasonCode::NameMatches,
             ];
             let rng = &mut rand::thread_rng();
             let n = rng.gen_range(0..=mismatch_reason_codes.len());
@@ -212,25 +210,25 @@ pub async fn save_fixture_incode_watchlist_result(
     di_id: &DecisionIntentId,
     sv_id: &ScopedVaultId,
     vault_public_key: &VaultPublicKey,
-) -> ApiResult<()> {
+) -> ApiResult<VerificationResult> {
     let raw = incode_watchlist_result_response_for_fixture(fixture_decision);
 
     let di_id = di_id.clone();
     let sv_id = sv_id.clone();
     let vault_public_key = vault_public_key.clone();
-    db_pool
+    let vres = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let vreq = VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::IncodeWatchlistCheck)?;
             let e_response = vendor::verification_result::encrypt_verification_result_response(
                 &raw.clone().into(),
                 &vault_public_key,
             )?;
-            let _vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
-            Ok(())
+            let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
+            Ok(vres)
         })
         .await?;
 
-    Ok(())
+    Ok(vres)
 }
 
 #[cfg(test)]

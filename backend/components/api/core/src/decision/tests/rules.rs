@@ -1,14 +1,15 @@
-use newtypes::FootprintReasonCode;
-
 use crate::decision::{
     features::idology_expectid::IDologyFeatures,
     rule::{rule_set::Action, rule_sets::kyc::idology_rule_set, rules_engine::evaluate_onboarding_rules},
 };
+use newtypes::{FootprintReasonCode, VerificationResultId};
+use std::str::FromStr;
 use test_case::test_case;
 
 fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeatures {
     IDologyFeatures {
         footprint_reason_codes: fp_reason_codes,
+        verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
     }
 }
 
