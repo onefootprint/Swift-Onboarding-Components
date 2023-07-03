@@ -10,25 +10,47 @@ import {
 
 import airplane from 'airplane';
 
+const NON_CORPORATE_DOMAINS = [
+  'gmail.com',
+  'yahoo.com',
+  'live.com',
+  'msn.com',
+  'hotmail.com',
+  'aol.com',
+  'outlook.com',
+];
+
 const Customers = () => {
   const customersTable = useComponentState('customers');
+  const { id: checkboxId, value: onlyCorporate } = useComponentState();
 
   return (
     <Stack>
+      <Checkbox
+        id={checkboxId}
+        label="Only corporate email domains"
+        defaultChecked
+      ></Checkbox>
       <h1>Customers</h1>
       <Label>Select a row to view a customer's team members</Label>
-      <OrgList></OrgList>
+      <OrgList onlyCorporate={onlyCorporate}></OrgList>
       {customersTable.selectedRow ? (
         <OrgUsers tenantId={customersTable.selectedRow.id}></OrgUsers>
       ) : (
         <></>
       )}
-      <Logins></Logins>
+      <Logins onlyCorporate={onlyCorporate}></Logins>
     </Stack>
   );
 };
 
-const OrgList = () => {
+const OrgList = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
+  const extraFilters = onlyCorporate
+    ? NON_CORPORATE_DOMAINS.map(d => `AND tenant.name NOT LIKE '%${d}'`).join(
+        '\n',
+      )
+    : '';
+
   return (
     <Table
       id="customers"
@@ -46,13 +68,18 @@ const OrgList = () => {
             tenant.name,
             tenant.sandbox_restricted,
             tenant._created_at,
-            COUNT(su.id) FILTER (WHERE su.is_live = 't') AS live,
-            COUNT(su.id) FILTER (WHERE su.is_live = 'f') AS sandbox
+            MAX(sv.start_timestamp) as last_user_created_at,
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 't') AS live_total,
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 't' and ob.authorized_at IS NOT NULL) AS live_with_kyc,
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 'f') AS sandbox_total,
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 't' and ob.authorized_at IS NOT NULL) AS sandbox_with_kyc
           FROM tenant
-            INNER JOIN scoped_vault as su ON su.tenant_id=tenant.id
-            INNER JOIN onboarding as ob ON ob.scoped_vault_id=su.id
-          WHERE tenant.id NOT LIKE '_private_it%' and ob.authorized_at IS NOT NULL
-          GROUP BY tenant.id;
+            LEFT JOIN scoped_vault as sv ON sv.tenant_id=tenant.id
+            LEFT JOIN onboarding as ob ON ob.scoped_vault_id=sv.id
+          WHERE tenant.id NOT LIKE '_private_it%'
+          ${extraFilters}
+          GROUP BY tenant.id
+          ORDER BY tenant.sandbox_restricted, last_user_created_at DESC, tenant._created_at DESC;
           `,
         },
       }}
@@ -107,18 +134,11 @@ const OrgUsers = ({ tenantId }: OrgUserProps) => {
 };
 
 //
-const Logins = () => {
-  const { id: checkboxId, value: checkboxState } = useComponentState();
-  const extraFilters = checkboxState
-    ? `
-          AND tenant_user.email NOT LIKE '%@gmail.com'
-          AND tenant_user.email NOT LIKE '%@yahoo.com'
-          AND tenant_user.email NOT LIKE '%@live.com'
-          AND tenant_user.email NOT LIKE '%@msn.com'
-          AND tenant_user.email NOT LIKE '%@hotmail.com'
-          AND tenant_user.email NOT LIKE '%@aol.com'
-          AND tenant_user.email NOT LIKE '%@outlook.com'
-          `
+const Logins = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
+  const extraFilters = onlyCorporate
+    ? NON_CORPORATE_DOMAINS.map(
+        d => `AND tenant_user.email NOT LIKE '%${d}'`,
+      ).join('\n')
     : '';
   return (
     <Stack>
@@ -127,7 +147,6 @@ const Logins = () => {
         Below is a list of users who have signed up for the dashboard - order by
         "last active" to see who has been active most recently.
       </Label>
-      <Checkbox id={checkboxId} label="Only corporate email domains"></Checkbox>
       <Table
         id="signups"
         title="Dashboard Logins (corporate emails only)"

@@ -38,6 +38,15 @@ const Stats = () => {
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding.authorized_at IS NOT NULL;
           `}
         ></OverviewCard>
+        <OverviewCard
+          title={'Not (yet) Portable IDs'}
+          query={`
+          SELECT count(*) FROM scoped_vault 
+          INNER JOIN vault on scoped_vault.vault_id = vault.id
+          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          `}
+        ></OverviewCard>
       </Stack>
     </Stack>
   );
