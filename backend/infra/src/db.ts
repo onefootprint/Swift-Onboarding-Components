@@ -9,6 +9,7 @@ import { FootprintVpc, Vpc } from './vpc';
 import { EngineType } from '@pulumi/aws/rds';
 import { Database } from './config';
 import * as inputs from '@pulumi/aws/types';
+import * as tailscale from '@pulumi/tailscale';
 
 const DEFAULT_PG_PARAMETERS = [
   // Kill queries that have a deadlock detected after 1s
@@ -236,6 +237,7 @@ export async function CreateDB(
     coreSecurityGroups.jumpbox,
     vpc,
     provider,
+    stackMetadata,
   );
 
   return {
@@ -323,8 +325,35 @@ async function createDbJumpBox(
   securityGroup: awsx.ec2.SecurityGroup,
   vpc: FootprintVpc,
   provider: aws.Provider,
+  stack: StackMetadata,
 ): Promise<aws.ec2.Instance> {
   const size = 't2.micro';
+
+  // generate a tailscale key accessing the jumpbox
+  let tag = '';
+  if (stack.environment === StackEnvironment.DevEphemeral) {
+    tag = `tag:jumpbox-dev`;
+  } else {
+    tag = `tag:jumpbox-${stack.shortStackName}`;
+  }
+
+  const tailscaleAuthKey = new tailscale.TailnetKey(
+    `jump-tskey-${stack.shortStackName}`,
+    {
+      ephemeral: true,
+      preauthorized: true,
+      reusable: true,
+      tags: [tag],
+    },
+  );
+
+  // store the TS-key in SSM
+  const tsKeySecretName = `/db/ts-key-${clusterId}`;
+  new aws.ssm.Parameter(`ssm-param-ts-key-jumpbox-${clusterId}`, {
+    type: 'SecureString',
+    value: tailscaleAuthKey.key,
+    name: tsKeySecretName,
+  });
 
   const instanceRole = new aws.iam.Role(`jump-role-${clusterId}`, {
     assumeRolePolicy: {
@@ -342,7 +371,7 @@ async function createDbJumpBox(
     },
     inlinePolicies: [
       {
-        name: 'get_db_url',
+        name: 'jumpbox_policies',
         policy: JSON.stringify({
           Version: '2012-10-17',
           Statement: [
@@ -350,6 +379,30 @@ async function createDbJumpBox(
               Action: ['ssm:GetParameter'],
               Effect: 'Allow',
               Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
+            },
+            {
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${tsKeySecretName}`,
+            },
+          ],
+        }),
+      },
+      {
+        name: 'cloudwatch_logging',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: [
+                'logs:CreateLogGroup',
+                'logs:PutLogEvents',
+                'logs:DescribeLogStreams',
+                'logs:CreateLogStream',
+                'logs:PutLogEvents',
+              ],
+              Effect: 'Allow',
+              Resource: '*',
             },
           ],
         }),
@@ -364,12 +417,9 @@ async function createDbJumpBox(
     },
   );
 
-  let config = new pulumi.Config();
-  let tailscaleAuthKey = config.get('tailscaleKey');
+  let jumpHostname = `jumpbox-${stack.shortStackName}`;
 
-  let jumpHostname = `jumpbox-${pulumi.getStack()}`;
-
-  const userData = `
+  const userData = pulumi.interpolate`
 #!/bin/bash
 
 sudo yum update -y
@@ -377,7 +427,46 @@ sudo yum install amazon-linux-extras -y
 sudo amazon-linux-extras enable postgresql14 -y
 sudo yum install postgresql jq yum-utils -y
 
-# setup tailscale
+### AWS LOGS ###
+
+# install log agent on ec2 instance
+sudo yum install -y awslogs
+sudo mkdir -p /var/lib/awslogs/state/
+
+# Define our log conf files
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AgentReference.html
+cat <<'EOF' > /etc/awslogs/awslogs.conf
+[general]
+state_file=/var/lib/awslogs/state/agent-state
+
+[/var/log/awslogs]
+log_group_name=/ec2/${jumpHostname}-logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/awslogs*
+initial_position=start_of_file
+
+[/var/log/boot]
+log_group_name=/ec2/${jumpHostname}-boot
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/boot*
+initial_position=start_of_file
+
+[/var/log/cloud-init]
+log_group_name=/ec2/${jumpHostname}-cloud-init
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/cloud-init*.log
+initial_position=start_of_file
+EOF
+
+# start logging daemon
+sudo systemctl start awslogsd
+
+### END AWS LOGS ###
+
+### BEGIN SETUP TAILSCALE ###
 echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
 echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p /etc/sysctl.conf
@@ -385,9 +474,35 @@ sudo sysctl -p /etc/sysctl.conf
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=${vpc.cidrBlock}
 
-# setup db access helper
+cat <<'EOF' > tailscale_connect.sh
+#!/bin/sh
+export TS_KEY="$(aws --region us-east-1 ssm get-parameter --name '${tsKeySecretName}' --with-decryption | jq -r '.Parameter.Value')"
+sudo tailscale up --authkey "$TS_KEY" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=${vpc.cidrBlock} --accept-routes
+EOF
+
+chmod +x tailscale_connect.sh
+
+cat <<'EOF' > tailscale_connect.service
+[Unit]
+Description=tailscale_connect
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart="/tailscale_connect.sh"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo cp tailscale_connect.service /etc/systemd/system/tailscale_connect.service
+sudo systemctl start tailscale_connect.service && sudo systemctl enable tailscale_connect.service
+
+### END SETUP TAILSCALE ###
+
+### BEGIN setup db access helper ###
 cat <<'EOF' > db_proxy.sh
 #!/bin/sh
 export DB_SECRET_NAME="${dbSecretName}"
@@ -411,6 +526,10 @@ chmod +x connect_db.sh`;
 
   const ebsKmsKey = await aws.kms.getKey({ keyId: 'alias/aws/ebs' });
 
+  const userDataBase64 = userData.apply(ud => {
+    return Buffer.from(ud).toString('base64');
+  });
+
   const jumpbox = new aws.ec2.Instance(
     `jumpbox-${clusterId}`,
     {
@@ -418,7 +537,7 @@ chmod +x connect_db.sh`;
       subnetId: vpc.privateSubnetIds[0],
       vpcSecurityGroupIds: [securityGroup.id],
       ami: 'ami-0f9fc25dd2506cf6d',
-      userData: Buffer.from(userData).toString('base64'),
+      userData: userDataBase64,
       iamInstanceProfile,
       associatePublicIpAddress: false,
       tags: {

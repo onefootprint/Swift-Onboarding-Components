@@ -841,6 +841,13 @@
   dependencies:
     "@pulumi/pulumi" "^3.0.0"
 
+"@pulumi/tailscale@0.12.2":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/tailscale/-/tailscale-0.12.2.tgz#48641150cd2893a7598afd5a6c5ad996a2cd84e4"
+  integrity sha512-eDzXu4I7awua494d6is9nwV/8G56dTI4oL53G/WTqWtl1ezVHb+v6bKxMrcPvhhYGugbIhK56ECWPiqg9k5gJg==
+  dependencies:
+    "@pulumi/pulumi" "^3.0.0"
+
 "@types/aws-lambda@^8.10.23":
   version "8.10.99"
   resolved "https://registry.npmjs.org/@types/aws-lambda/-/aws-lambda-8.10.99.tgz"

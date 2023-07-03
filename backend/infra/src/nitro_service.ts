@@ -7,11 +7,16 @@ import { FootprintVpc } from './vpc';
 import * as aws from '@pulumi/aws';
 import { Region } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
-import * as pulumi from '@pulumi/pulumi';
 import { Config } from './config';
-import { StackMetadata, GetStackMetadata } from './stack_metadata';
+import {
+  StackMetadata,
+  GetStackMetadata,
+  StackEnvironment,
+} from './stack_metadata';
 import * as certs from './certs';
 import { Certificate } from './certs';
+import * as tailscale from '@pulumi/tailscale';
+import * as pulumi from '@pulumi/pulumi';
 
 export type NitroServiceOutput = {
   serviceEndpoint: string;
@@ -56,10 +61,6 @@ export async function CreateNitroService(
     { provider },
   );
 
-  const instanceProfile = createInstanceRole(region, provider, [
-    g.secretsStore.enclaveProxySecretName,
-  ]);
-
   // get our base image AMI
   const instanceAmi = await aws.ec2.getAmi(
     {
@@ -98,13 +99,53 @@ export async function CreateNitroService(
 
   const ebsKmsKey = await aws.kms.getKey({ keyId: 'alias/aws/ebs' });
 
+  // setup as a tailscale node
+  let tag = '';
+  if (g.stackMetadata.environment === StackEnvironment.DevEphemeral) {
+    tag = `tag:nitro-server-dev`;
+  } else {
+    tag = `tag:nitro-server-${g.stackMetadata.shortStackName}`;
+  }
+  const tailscaleAuthKey = new tailscale.TailnetKey(
+    `nitro-server-tskey-${g.stackMetadata.shortStackName}`,
+    {
+      ephemeral: true,
+      preauthorized: true,
+      reusable: true,
+      tags: [tag],
+    },
+  );
+
+  // store the TS-key in SSM
+  const tsKeySecretName = `/nitro-server/ts-key-${g.stackMetadata.shortStackName}`;
+  new aws.ssm.Parameter(
+    `ssm-param-ts-key-nitro-server-${g.stackMetadata.shortStackName}`,
+    {
+      type: 'SecureString',
+      value: tailscaleAuthKey.key,
+      name: tsKeySecretName,
+    },
+  );
+
+  const instanceProfile = createInstanceRole(
+    region,
+    provider,
+    `/static_secrets/${g.secretsStore.enclaveProxySecretName}`,
+    tsKeySecretName,
+  );
+
   const launchTemplate = new aws.ec2.LaunchTemplate(
     `i-template-${serviceName}`,
     {
       namePrefix: `i-${serviceName}`,
       instanceType: g.constants.enclave.resources.instance,
       userData: Buffer.from(
-        await userData(g.constants, g.secretsStore),
+        await userData(
+          g.constants,
+          g.secretsStore,
+          tsKeySecretName,
+          g.stackMetadata,
+        ),
       ).toString('base64'),
       enclaveOptions: {
         enabled: true,
@@ -276,7 +317,8 @@ async function createLoadBalancer(
 function createInstanceRole(
   region: Region,
   provider: pulumi.ProviderResource,
-  staticSecretNames: string[],
+  enclaveProxySecretName: string,
+  tailscaleSecretName: string,
 ): aws.iam.InstanceProfile {
   const instanceRole = new aws.iam.Role(`nitro-instance-role-${region}`, {
     assumeRolePolicy: {
@@ -333,16 +375,19 @@ function createInstanceRole(
         }),
       },
       {
-        name: 'enclave_proxy_secret',
+        name: 'secret_params',
         policy: JSON.stringify({
           Version: '2012-10-17',
           Statement: [
             {
-              Action: ['ssm:GetParameters', 'ssm:GetParameter'],
+              Action: ['ssm:GetParameter'],
               Effect: 'Allow',
-              Resource: staticSecretNames.map(name => {
-                return `arn:aws:ssm:*:*:parameter/static_secrets/${name}`;
-              }),
+              Resource: `arn:aws:ssm:*:*:parameter${enclaveProxySecretName}`,
+            },
+            {
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${tailscaleSecretName}`,
             },
           ],
         }),
@@ -365,16 +410,15 @@ function createInstanceRole(
 async function userData(
   constants: Config,
   secretsStore: StaticSecrets,
+  tailscaleSecretName: string,
+  stack: StackMetadata,
 ): Promise<string> {
   const current = await aws.getCallerIdentity({});
   const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
   const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
   const enclaveProxyImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${constants.containers.enclaveVersion}`;
 
-  const pulumiConfig = new pulumi.Config();
-  const tailscaleAuthKeyOut = pulumiConfig.getSecret('serverTailscaleKey');
-  const tailscaleAuthKey = pulumi.interpolate`${tailscaleAuthKeyOut}`;
-  const hostName = `nitro-server-${pulumi.getStack()}`;
+  const hostName = `enclavebox-${stack.shortStackName}`;
   const resources = constants.enclave.resources;
 
   // nitro-cli doesn't let you take all the RAM you ask for from the allocator - I guess it also counts
@@ -386,9 +430,6 @@ async function userData(
   if (actualEnclaveMemory < 256) {
     throw `${BUFFER_FOR_ENCLAVE} MiB of memory are reserved for the enclave, so your provided enclave memory is too low. Please make sure your requested enclave memory - ${BUFFER_FOR_ENCLAVE} >= 256`;
   }
-
-  // Took this out because tailscaleAuthKey isn't rendering correctly as a pulumi.Output<string>
-  const tailscaleCommand = `sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --hostname "${hostName}" --accept-dns=false `;
 
   // TODO: if enclave unhealthy after restart fail health check on ASG.
   // TODO one day we should `set -e` to crash if any of these commands fails
@@ -413,35 +454,35 @@ cat <<'EOF' > /etc/awslogs/awslogs.conf
 state_file=/var/lib/awslogs/state/agent-state
 
 [/var/log/awslogs]
-log_group_name=/ec2/nitro_service_ec2_aws_logs
+log_group_name=/ec2/${hostName}/awslogs
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/awslogs*
 initial_position=start_of_file
 
 [/var/log/boot]
-log_group_name=/ec2/nitro_service_ec2_boot_logs
+log_group_name=/ec2/${hostName}/boot
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/boot*
 initial_position=start_of_file
 
 [/var/log/nitro_enclaves]
-log_group_name=/ec2/nitro_service_ec2_enclave_logs
+log_group_name=/ec2/${hostName}/nitro_enclave
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/nitro_enclaves/*
 initial_position=start_of_file
 
 [/var/log/enclave_proxy]
-log_group_name=/ec2/${hostName}
+log_group_name=/ec2/${hostName}/enclave_proxy
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/enclave_proxy.log
 initial_position=start_of_file
 
 [/var/log/cloud-init]
-log_group_name=/ec2/nitro_service_ec2_cloud_init_logs
+log_group_name=/ec2/${hostName}/cloud_init
 log_stream_name={instance_id}
 time_zone=UTC
 file=/var/log/cloud-init*.log
@@ -451,10 +492,42 @@ EOF
 # start logging daemon
 sudo systemctl start awslogsd
 
-# setup tailscale
+### BEGIN SETUP TAILSCALE ###
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
+
+cat <<'EOF' > tailscale_connect.sh
+#!/bin/sh
+export TS_KEY="$(aws --region us-east-1 ssm get-parameter --name '${tailscaleSecretName}' --with-decryption | jq -r '.Parameter.Value')"
+sudo tailscale up --authkey "$TS_KEY" --ssh --hostname "${hostName}" --accept-dns=false
+EOF
+
+chmod +x tailscale_connect.sh
+
+cat <<'EOF' > tailscale_connect.service
+[Unit]
+Description=tailscale_connect
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart="/tailscale_connect.sh"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo cp tailscale_connect.service /etc/systemd/system/tailscale_connect.service
+sudo systemctl start tailscale_connect.service && sudo systemctl enable tailscale_connect.service
+
+echo "Starting tailscale"
+./tailscale_connect.sh
+sudo tailscale status
+
+### END SETUP TAILSCALE ###
+
 
 # setup enclave
 
