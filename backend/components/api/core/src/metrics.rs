@@ -43,7 +43,9 @@ lazy_static! {
     .expect("Can't create a metric");
 }
 
-pub fn register_all_metrics(registry: &Registry) -> Result<(), prometheus::Error> {
+/// NOTE: this is DEPRECATED. Use the otel exporter defined in the `Metrics` struct below.
+/// This will be available on `state` in all HTTP requests
+pub fn deprecated_register_all_metrics(registry: &Registry) -> Result<(), prometheus::Error> {
     registry.register(Box::new(GET_STATUS_COUNTER.clone()))?;
     registry.register(Box::new(IDOLOGY_EXPECT_ID_SUCCESS.clone()))?;
     registry.register(Box::new(IDOLOGY_EXPECT_ID_ERROR.clone()))?;
@@ -58,6 +60,8 @@ pub struct Metrics {
     pub get_status_counter: UpDownCounter<i64>,
 }
 
+/// Registers all otel metrics that we'll use throughout the app.
+/// The instance of `Metrics` returned here will be available on `State` in all HTTP requests
 pub fn init() -> Metrics {
     let meter = opentelemetry::global::meter("fpc");
     let get_status_counter = meter

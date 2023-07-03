@@ -20,7 +20,7 @@ async fn run_server() -> std::io::Result<()> {
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
     let prom = prometheus::init(&config);
-    metrics::register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
+    metrics::deprecated_register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
 
     // sentry
     let sample_rate = if config.service_config.is_local() {
