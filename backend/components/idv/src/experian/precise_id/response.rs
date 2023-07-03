@@ -44,7 +44,6 @@ pub struct PreciseIDAPIResponse {
 /// Experian uses a variety of fields and values to indicate various scores
 #[derive(PartialEq, Eq, Debug)]
 pub enum PreciseIDParsedScore {
-    ConsumerNotFound,
     Deceased,
     BlockedFile,
     Score(i32),
@@ -53,12 +52,6 @@ pub enum PreciseIDParsedScore {
 impl PreciseIDAPIResponse {
     // Models return scores in [1,999]. Codes in [9000-9999] are exception codes
     pub fn score(&self) -> Result<PreciseIDParsedScore, ExperianError> {
-        let consumer_not_found = self
-            .glb_detail
-            .as_ref()
-            .map(|detail| detail.consumer_not_found())
-            .unwrap_or(false);
-
         let score = self
             .summary
             .as_ref()
@@ -78,26 +71,22 @@ impl PreciseIDAPIResponse {
                 .map_err(ExperianError::from),
         }?;
 
-        if consumer_not_found {
-            Ok(PreciseIDParsedScore::ConsumerNotFound)
-        } else {
-            let score = score_from_response;
+        let score = score_from_response;
 
-            let res = match score {
-                PreciseIDParsedScore::Score(i) => {
-                    // This is found in the v3 Model Governance Doc from https://groups.google.com/a/onefootprint.com/g/vendor-archive/c/F4-foDh5gG8/m/3XTNIyX0CgAJ
-                    // If we get a score that isn't an exception that's above 999, there's an issue
-                    if !(0..=999).contains(&i) {
-                        Err(ExperianError::InvalidScore("invalid score".to_string()))
-                    } else {
-                        Ok(score)
-                    }
+        let res = match score {
+            PreciseIDParsedScore::Score(i) => {
+                // This is found in the v3 Model Governance Doc from https://groups.google.com/a/onefootprint.com/g/vendor-archive/c/F4-foDh5gG8/m/3XTNIyX0CgAJ
+                // If we get a score that isn't an exception that's above 999, there's an issue
+                if !(0..=999).contains(&i) {
+                    Err(ExperianError::InvalidScore("invalid score".to_string()))
+                } else {
+                    Ok(score)
                 }
-                _ => Ok(score),
-            }?;
+            }
+            _ => Ok(score),
+        }?;
 
-            Ok(res)
-        }
+        Ok(res)
     }
 
     pub fn fraud_shield_reason_codes(&self) -> Vec<ExperianFraudShieldCodes> {
@@ -245,16 +234,6 @@ pub struct FraudShieldIndicator {
 pub struct GLBRule {
     pub glb_rule: Option<Vec<ValueCodeDatum>>,
 }
-impl GLBDetail {
-    pub fn consumer_not_found(&self) -> bool {
-        // Occasionally, an inquiry to Experian’s credit files results in a “not found” condition. This condition is identified by the GLB Shared Application Rule 3001 (Consumer Not Found on File One)
-        self.glb_rules
-            .as_ref()
-            .and_then(|rules| rules.glb_rule.as_ref())
-            .map(|rule| rule.iter().any(|r| r.code == Some("3001".to_string())))
-            .unwrap_or(false)
-    }
-}
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -329,24 +308,21 @@ mod tests {
     use crate::test_fixtures::experian_precise_id_response;
     use test_case::test_case;
 
-    #[test_case(false, "656" => PreciseIDParsedScore::Score(656))]
-    #[test_case(true, "656" => PreciseIDParsedScore::ConsumerNotFound)]
-    #[test_case(false, "9001" => PreciseIDParsedScore::Deceased)]
-    #[test_case(false, "9013" => PreciseIDParsedScore::BlockedFile)]
-    fn test_score_success(consumer_not_found: bool, score: &str) -> PreciseIDParsedScore {
-        let r: PreciseIDAPIResponse =
-            serde_json::from_value(experian_precise_id_response(consumer_not_found, score))
-                .expect("could not parse experian precise id");
+    #[test_case("656" => PreciseIDParsedScore::Score(656))]
+    #[test_case("9001" => PreciseIDParsedScore::Deceased)]
+    #[test_case("9013" => PreciseIDParsedScore::BlockedFile)]
+    fn test_score_success(score: &str) -> PreciseIDParsedScore {
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score))
+            .expect("could not parse experian precise id");
 
         r.score().unwrap()
     }
 
-    #[test_case(false, "1000" => "invalid score".to_string())]
-    #[test_case(false, "9999" => "missing or invalid input data".to_string())]
-    fn test_score_errors(consumer_not_found: bool, score: &str) -> String {
-        let r: PreciseIDAPIResponse =
-            serde_json::from_value(experian_precise_id_response(consumer_not_found, score))
-                .expect("could not parse experian precise id");
+    #[test_case("1000" => "invalid score".to_string())]
+    #[test_case("9999" => "missing or invalid input data".to_string())]
+    fn test_score_errors(score: &str) -> String {
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score))
+            .expect("could not parse experian precise id");
 
         match r.score() {
             Ok(_) => panic!("should have failed"),
@@ -358,7 +334,7 @@ mod tests {
     }
     #[test]
     fn test_parses() {
-        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(false, "656"))
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response("656"))
             .expect("could not parse experian precise id");
 
         assert!(r.precise_match.unwrap().consumer_id.unwrap().summary.is_some());

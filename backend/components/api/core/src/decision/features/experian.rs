@@ -42,7 +42,6 @@ impl FeatureSet for ExperianFeatures {
 
 fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCode> {
     match score {
-        PreciseIDParsedScore::ConsumerNotFound => Some(FootprintReasonCode::IdNotLocated),
         PreciseIDParsedScore::Deceased => Some(FootprintReasonCode::SubjectDeceased),
         PreciseIDParsedScore::BlockedFile => Some(FootprintReasonCode::IdNotLocated),
         PreciseIDParsedScore::Score(s) => {

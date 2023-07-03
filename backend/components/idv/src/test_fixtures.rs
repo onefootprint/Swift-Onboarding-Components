@@ -344,7 +344,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                             "fraudSolutions": {
                                 "response": {
                                     "products": {
-                                        "preciseIDServer": experian_precise_id_response(false, "656"),
+                                        "preciseIDServer": experian_precise_id_response("656"),
                                         "customerManagement": {
                                             "version": "1.00",
                                             "reportDate": "03062023",
@@ -647,8 +647,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
     })
 }
 
-pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> serde_json::Value {
-    let glb_rule_val = if consumer_not_found { "3001" } else { "1234" };
+pub fn experian_precise_id_response(score: &str) -> serde_json::Value {
     serde_json::json!({
         "sessionID": "YMWK2SXF855BNZGM01HDWMW2.pidd4v-2303060915341255630306",
         "header": {
@@ -1062,7 +1061,7 @@ pub fn experian_precise_id_response(consumer_not_found: bool, score: &str) -> se
                 "glbRule": [
                     {
                         "value": "",
-                        "code": glb_rule_val
+                        "code": "1234"
                     },
                     {
                         "value": "",
