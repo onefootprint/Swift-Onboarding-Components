@@ -319,7 +319,7 @@ fn identity(
 ) -> alpaca::Identity {
     let (reason_codes, vendors): (Vec<_>, Vec<_>) = risk_signals
         .into_iter()
-        .map(|rs| (rs.reason_code, rs.vendors))
+        .map(|rs| (rs.reason_code, vec![rs.vendor_api.into()]))
         .unzip();
     let vendors = HashSet::<Vendor>::from_iter(vendors.into_iter().flatten())
         .into_iter()

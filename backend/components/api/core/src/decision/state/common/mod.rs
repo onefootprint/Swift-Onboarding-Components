@@ -16,7 +16,7 @@ use db::{
 use feature_flag::FeatureFlagClient;
 use newtypes::{
     DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ReviewReason, ScopedVaultId,
-    TenantId, VaultKind, Vendor, VerificationResultId, WorkflowId, WorkflowKind,
+    TenantId, VaultKind, Vendor, VendorAPI, VerificationResultId, WorkflowId, WorkflowKind,
 };
 use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
 
@@ -181,7 +181,7 @@ pub async fn assert_kyc_vendor_calls_completed(
 
 pub type KycDecision = (
     OnboardingRulesDecisionOutput,
-    Vec<(FootprintReasonCode, Vec<Vendor>)>,
+    Vec<(FootprintReasonCode, VendorAPI)>,
 );
 
 #[tracing::instrument]

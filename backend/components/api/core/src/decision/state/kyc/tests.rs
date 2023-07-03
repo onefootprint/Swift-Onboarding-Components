@@ -29,7 +29,7 @@ use macros::test_state;
 use macros::{test_db_pool, test_state_case};
 use newtypes::{
     DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, SignalSeverity, TenantId, Vendor,
-    WorkflowConfig,
+    VendorAPI, WorkflowConfig,
 };
 use newtypes::{KycConfig, OnboardingStatus};
 use newtypes::{KycState, WorkflowId, WorkflowState};
@@ -329,7 +329,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         }
         UserKind::Live => {
             assert!(!rs.is_empty());
-            assert!(rs.iter().all(|rs| rs.vendors == vec![Vendor::Idology]));
+            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
             assert!(rs
                 .iter()
                 .any(|rs| rs.reason_code == FootprintReasonCode::SsnDoesNotMatch));

@@ -8,7 +8,7 @@ use db::{
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::{
     DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
-    VaultPublicKey, Vendor, VendorAPI,
+    VaultPublicKey, VendorAPI,
 };
 use rand::seq::SliceRandom;
 use rand::Rng;
@@ -76,9 +76,15 @@ pub fn get_fixture_vendor_results(vreqs: Vec<VerificationRequest>) -> ApiResult<
 pub fn get_fixture_reason_codes(
     fixture_decision: FixtureDecision,
     vault_kind: VaultKind,
-) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+) -> Vec<(FootprintReasonCode, VendorAPI)> {
     let reason_code_map = build_reason_code_map(vault_kind);
     let (decision_status, create_manual_review) = fixture_decision;
+
+    let vendor_api = match vault_kind {
+        VaultKind::Person => VendorAPI::IdologyExpectID,
+        VaultKind::Business => VendorAPI::MiddeskBusinessUpdateWebhook,
+    };
+
     // Create some mock risk signals that are somewhat consistent with the mock decision
     let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
         // Straight out rejection
@@ -92,10 +98,8 @@ pub fn get_fixture_reason_codes(
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
     };
-    reason_codes
-        .into_iter()
-        .map(|r| (r, vec![Vendor::Idology]))
-        .collect()
+
+    reason_codes.into_iter().map(|r| (r, vendor_api)).collect()
 }
 
 // For AlpacaKYC workflow, we want fixtures to be:
@@ -105,7 +109,7 @@ pub fn get_fixture_reason_codes(
 // #fail => KYC hard fails (KYC reason_code should be SSN does not match or something else catastrophic)
 pub fn get_fixture_reason_codes_alpaca(
     fixture_decision: FixtureDecision,
-) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+) -> Vec<(FootprintReasonCode, VendorAPI)> {
     let (decision_status, create_manual_review) = fixture_decision;
     let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
         // #pass | #manualreview
@@ -140,7 +144,7 @@ pub fn get_fixture_reason_codes_alpaca(
     };
     reason_codes
         .into_iter()
-        .map(|r| (r, vec![Vendor::Idology]))
+        .map(|r| (r, VendorAPI::IdologyExpectID))
         .collect()
 }
 

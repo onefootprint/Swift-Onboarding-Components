@@ -127,8 +127,8 @@ pub async fn setup_kyb_test_fixtures(
                 OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;
 
-            let biz_risk_signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
-            RiskSignal::bulk_create(conn, biz_obd.id, biz_risk_signals)?;
+            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+            RiskSignal::bulk_create(conn, biz_obd.id, signals)?;
             Ok(())
         })
         .await

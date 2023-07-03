@@ -3,7 +3,7 @@ use db::{
     DbPool,
 };
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{OnboardingId, VerificationResultId};
+use newtypes::{OnboardingId, VendorAPI, VerificationResultId};
 
 use crate::{
     enclave_client::EnclaveClient,
@@ -20,6 +20,7 @@ pub async fn make_kyb_decision(
     ob_id: OnboardingId,
     business_response: &BusinessResponse,
     vres_id: &VerificationResultId,
+    vendor_api: VendorAPI,
 ) -> Result<(), ApiError> {
     let (ob, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -84,6 +85,6 @@ pub async fn make_kyb_decision(
         )));
     }
 
-    let fv = KybFeatureVector::new(business_response, obds);
+    let fv = KybFeatureVector::new(business_response, obds, vendor_api);
     engine::make_onboarding_decision(&ob, fv, db_pool, vec![vres_id.clone()]).await
 }

@@ -1,5 +1,5 @@
 use newtypes::{
-    DbActor, FootprintReasonCode, OnboardingId, ReviewReason, Vendor, VerificationResultId, WorkflowId,
+    DbActor, FootprintReasonCode, OnboardingId, ReviewReason, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use db::{
@@ -28,7 +28,7 @@ use crate::{
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
     ob_id: OnboardingId,
-    reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+    reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,

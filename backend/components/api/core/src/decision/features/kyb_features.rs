@@ -1,6 +1,6 @@
 use db::models::onboarding_decision::OnboardingDecision;
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 
 use crate::{
     decision::{
@@ -46,26 +46,29 @@ impl FeatureSet for KybFeatureVector {
 pub struct KybFeatureVector {
     pub middesk_features: MiddeskFeatures,
     pub bo_obds: Vec<OnboardingDecision>,
+    pub vendor_api: VendorAPI,
 }
 
 impl KybFeatureVector {
     pub fn new(
         middesk_business_response: &BusinessResponse,
         bo_obds: Vec<OnboardingDecision>,
+        vendor_api: VendorAPI, // since the final BusinessResponse can come from either MiddeskBusinessUpdateWebhook or MiddeskGetBusiness, we must specifcy here (threaded into RiskSignal creation)
     ) -> KybFeatureVector {
         Self {
             middesk_features: MiddeskFeatures::new(middesk_business_response),
             bo_obds,
+            vendor_api,
         }
     }
 }
 
 impl KybFeatureVector {
-    fn reason_codes(&self) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
+    fn reason_codes(&self) -> Vec<(FootprintReasonCode, VendorAPI)> {
         self.middesk_features
             .footprint_reason_codes
             .iter()
-            .map(|r| (r.clone(), vec![Vendor::Middesk]))
+            .map(|r| (r.clone(), self.vendor_api))
             .collect()
     }
 }

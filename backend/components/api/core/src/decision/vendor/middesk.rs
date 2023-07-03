@@ -479,12 +479,13 @@ impl MiddeskState<Complete> {
         .pop()
         .ok_or(DbError::ObjectNotFound)?;
 
-        let business_response = match vendor_result.response.response {
-            ParsedResponse::MiddeskGetBusiness(r) => Ok(r),
+        let (business_response, vendor_api) = match vendor_result.response.response {
+            ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
             ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
                 .business_response()
                 .cloned()
-                .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into())),
+                .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
+                .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
             _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
         }?;
 
@@ -494,6 +495,7 @@ impl MiddeskState<Complete> {
             self.middesk_request.onboarding_id,
             &business_response,
             &vendor_result.verification_result_id,
+            vendor_api,
         )
         .await
     }

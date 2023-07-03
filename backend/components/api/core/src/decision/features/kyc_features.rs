@@ -1,7 +1,3 @@
-/// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
-/// we can use to make decisions
-use idv::ParsedResponse;
-
 use crate::decision::{
     onboarding::{Decision, DecisionReasonCodes},
     rule::{
@@ -10,8 +6,11 @@ use crate::decision::{
     },
     Error, RuleError,
 };
+/// This module is for taking parsed responses from vendors and transforming them into a FeatureVector
+/// we can use to make decisions
+use idv::ParsedResponse;
 use itertools::Itertools;
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -131,33 +130,18 @@ impl KycFeatureVector {
             || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
     }
 
-    pub fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, Vec<Vendor>)> {
-        let all_codes = vendor_apis
+    pub fn reason_codes(&self, vendor_apis: Vec<VendorAPI>) -> Vec<(FootprintReasonCode, VendorAPI)> {
+        vendor_apis
             .iter()
             .flat_map(|v| {
                 self.reason_codes_for_vendor_api(v).map(|rcs| {
                     rcs.iter()
-                        .map(|rc| (Vendor::from(v.to_owned()), rc.to_owned()))
-                        .collect::<Vec<(Vendor, FootprintReasonCode)>>()
+                        .map(|rc: &FootprintReasonCode| (rc.to_owned(), v.to_owned()))
+                        .collect::<Vec<(FootprintReasonCode, VendorAPI)>>()
                 })
             })
-            .flatten();
-
-        all_codes
-            .into_iter()
-            .sorted()
-            .group_by(|t| t.1.clone())
-            .into_iter()
-            .map(|(footprint_reason_code, group)| {
-                (
-                    footprint_reason_code,
-                    group
-                        .into_iter()
-                        .map(|(vendor, _)| vendor)
-                        .unique()
-                        .collect::<Vec<Vendor>>(),
-                )
-            })
+            .flatten()
+            .unique()
             .collect()
     }
 }
@@ -326,7 +310,7 @@ mod tests {
         socure::response::SocureIDPlusResponse,
         ParsedResponse, VendorResponse,
     };
-    use newtypes::{DecisionStatus, Vendor, VerificationRequestId, VerificationResultId};
+    use newtypes::{DecisionStatus, VerificationRequestId, VerificationResultId};
     use serde_json::json;
     // Feature tests
     // TODO: add in twilio
@@ -461,9 +445,12 @@ mod tests {
         // only reason codes from specified VendorAPI's are included in output
         assert_have_same_elements(
             vec![
-                (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
-                (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
-                (FootprintReasonCode::IdNotLocated, vec![Vendor::Idology]),
+                (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
+                (
+                    FootprintReasonCode::NameLastDoesNotMatch,
+                    VendorAPI::IdologyExpectID,
+                ),
+                (FootprintReasonCode::IdNotLocated, VendorAPI::IdologyExpectID),
             ],
             feature_vector.reason_codes(vec![VendorAPI::IdologyExpectID]),
         );
@@ -472,13 +459,14 @@ mod tests {
         // correctly consolidates by vendor
         assert_have_same_elements(
             vec![
+                (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
+                (FootprintReasonCode::SubjectDeceased, VendorAPI::SocureIDPlus),
                 (
-                    FootprintReasonCode::SubjectDeceased,
-                    vec![Vendor::Idology, Vendor::Socure],
+                    FootprintReasonCode::NameLastDoesNotMatch,
+                    VendorAPI::IdologyExpectID,
                 ),
-                (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
-                (FootprintReasonCode::SsnIssuedPriorToDob, vec![Vendor::Socure]),
-                (FootprintReasonCode::IdNotLocated, vec![Vendor::Idology]),
+                (FootprintReasonCode::SsnIssuedPriorToDob, VendorAPI::SocureIDPlus),
+                (FootprintReasonCode::IdNotLocated, VendorAPI::IdologyExpectID),
             ],
             yo,
         );
@@ -499,33 +487,48 @@ mod tests {
         let idology_reason_codes_with_info =
             feature_vector_id_located.reason_codes(vec![VendorAPI::IdologyExpectID]);
         let expected_codes = vec![
-            (FootprintReasonCode::SubjectDeceased, vec![Vendor::Idology]),
+            (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID),
             // Note: the last name and IpState do not match, so they do NOT appear as info reason codes
-            (FootprintReasonCode::NameLastDoesNotMatch, vec![Vendor::Idology]),
-            (FootprintReasonCode::IpStateDoesNotMatch, vec![Vendor::Idology]),
+            (
+                FootprintReasonCode::NameLastDoesNotMatch,
+                VendorAPI::IdologyExpectID,
+            ),
+            (
+                FootprintReasonCode::IpStateDoesNotMatch,
+                VendorAPI::IdologyExpectID,
+            ),
             // All other info codes present, though
-            (FootprintReasonCode::AddressMatches, vec![Vendor::Idology]),
-            (FootprintReasonCode::AddressZipCodeMatches, vec![Vendor::Idology]),
+            (FootprintReasonCode::AddressMatches, VendorAPI::IdologyExpectID),
+            (
+                FootprintReasonCode::AddressZipCodeMatches,
+                VendorAPI::IdologyExpectID,
+            ),
             (
                 FootprintReasonCode::AddressStreetNameMatches,
-                vec![Vendor::Idology],
+                VendorAPI::IdologyExpectID,
             ),
             (
                 FootprintReasonCode::AddressStreetNumberMatches,
-                vec![Vendor::Idology],
+                VendorAPI::IdologyExpectID,
             ),
-            (FootprintReasonCode::AddressStateMatches, vec![Vendor::Idology]),
-            (FootprintReasonCode::DobYobMatches, vec![Vendor::Idology]),
-            (FootprintReasonCode::DobMobMatches, vec![Vendor::Idology]),
-            (FootprintReasonCode::SsnMatches, vec![Vendor::Idology]),
-            (FootprintReasonCode::PhoneNumberMatches, vec![Vendor::Idology]),
+            (
+                FootprintReasonCode::AddressStateMatches,
+                VendorAPI::IdologyExpectID,
+            ),
+            (FootprintReasonCode::DobYobMatches, VendorAPI::IdologyExpectID),
+            (FootprintReasonCode::DobMobMatches, VendorAPI::IdologyExpectID),
+            (FootprintReasonCode::SsnMatches, VendorAPI::IdologyExpectID),
+            (
+                FootprintReasonCode::PhoneNumberMatches,
+                VendorAPI::IdologyExpectID,
+            ),
             (
                 FootprintReasonCode::InputPhoneNumberMatchesInputState,
-                vec![Vendor::Idology],
+                VendorAPI::IdologyExpectID,
             ),
             (
                 FootprintReasonCode::InputPhoneNumberMatchesLocatedStateHistory,
-                vec![Vendor::Idology],
+                VendorAPI::IdologyExpectID,
             ),
         ];
         assert_have_same_elements(expected_codes, idology_reason_codes_with_info);

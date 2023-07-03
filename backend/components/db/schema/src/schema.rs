@@ -528,9 +528,9 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        vendors -> Array<Text>,
         verification_result_id -> Nullable<Text>,
         hidden -> Bool,
+        vendor_api -> Text,
     }
 }
 

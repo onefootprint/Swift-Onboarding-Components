@@ -5,8 +5,9 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::risk_signal;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
-use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
+use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
 use serde::{Deserialize, Serialize};
 
 use super::verification_result::VerificationResult;
@@ -21,9 +22,9 @@ pub struct RiskSignal {
     pub deactivated_at: Option<DateTime<Utc>>, // Currently unused!
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub vendors: Vec<Vendor>,
     pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
+    pub vendor_api: VendorAPI,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -31,10 +32,10 @@ pub struct RiskSignal {
 pub struct NewRiskSignal {
     pub onboarding_decision_id: OnboardingDecisionId,
     pub reason_code: FootprintReasonCode,
-    pub vendors: Vec<Vendor>,
     pub created_at: DateTime<Utc>,
     pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
+    pub vendor_api: VendorAPI,
 }
 
 impl RiskSignal {
@@ -42,17 +43,17 @@ impl RiskSignal {
     pub fn bulk_create(
         conn: &mut PgConn,
         onboarding_decision_id: OnboardingDecisionId,
-        signals: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+        signals: Vec<(FootprintReasonCode, VendorAPI)>,
     ) -> DbResult<Vec<Self>> {
         let new: Vec<_> = signals
             .into_iter()
-            .map(|(reason_code, vendors)| NewRiskSignal {
+            .map(|(reason_code, vendor_api)| NewRiskSignal {
                 onboarding_decision_id: onboarding_decision_id.clone(),
                 reason_code,
-                vendors,
                 created_at: Utc::now(),
                 verification_result_id: None,
                 hidden: false,
+                vendor_api,
             })
             .collect();
         let result = diesel::insert_into(risk_signal::table)
@@ -110,7 +111,7 @@ impl RiskSignal {
             .filter(verification_result::id.eq_any(vr_ids))
             // don't include Vres that are errors
             .filter(verification_result::is_error.eq(false))
-            .filter(verification_request::vendor.eq_any(&signal.vendors))
+            .filter(verification_request::vendor_api.eq(&signal.vendor_api)) // this is removed altogether later
             .get_results(conn)?;
         Ok((signal, vrs))
     }

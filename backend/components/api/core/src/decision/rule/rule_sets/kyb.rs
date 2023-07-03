@@ -92,6 +92,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
 mod tests {
     use super::*;
     use crate::decision::{features::kyb_features::MiddeskFeatures, rule::rules_engine};
+    use newtypes::VendorAPI;
     use test_case::test_case;
 
     fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> KybFeatureVector {
@@ -100,6 +101,7 @@ mod tests {
                 footprint_reason_codes: fp_reason_codes,
             },
             bo_obds: vec![],
+            vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
         }
     }
 

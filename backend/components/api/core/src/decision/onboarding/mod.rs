@@ -1,4 +1,4 @@
-use newtypes::{DecisionStatus, FootprintReasonCode, Vendor, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 
 use crate::errors::ApiResult;
 use crate::{decision::Error, ApiError};
@@ -33,7 +33,7 @@ pub struct Decision {
     pub create_manual_review: bool,
 }
 
-pub type DecisionReasonCodes = Vec<(FootprintReasonCode, Vec<Vendor>)>;
+pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI)>;
 pub trait FeatureVector {
     fn evaluate(&self) -> ApiResult<(OnboardingRulesDecisionOutput, DecisionReasonCodes)>;
 }
@@ -70,7 +70,7 @@ where
         evaluate_onboarding_rule_set(rule_set, &input),
         reason_codes
             .into_iter()
-            .map(|rs| (rs, vec![input.vendor_api().into()]))
+            .map(|rs| (rs, input.vendor_api()))
             .collect(),
     ))
 }

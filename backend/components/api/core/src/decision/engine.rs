@@ -310,7 +310,7 @@ pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
     rules_output: OnboardingRulesDecisionOutput,
-    reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+    reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,

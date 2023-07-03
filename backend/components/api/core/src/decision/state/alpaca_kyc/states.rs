@@ -413,7 +413,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                     decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
                 wc_reason_codes
                     .into_iter()
-                    .map(|r| (r, vec![Vendor::Incode]))
+                    .map(|r| (r, VendorAPI::IncodeWatchlistCheck))
                     .collect::<Vec<_>>()
             }
             Either::Right(fixture_decision) => match fixture_decision.0 {
@@ -421,8 +421,14 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 DecisionStatus::StepUp | DecisionStatus::Pass => vec![],
                 DecisionStatus::Fail => vec![
                     // TODO: probably does make sense to just parse these instead from the dummy vres
-                    (FootprintReasonCode::WatchlistHitOfac, vec![Vendor::Incode]),
-                    (FootprintReasonCode::AdverseMediaHit, vec![Vendor::Incode]),
+                    (
+                        FootprintReasonCode::WatchlistHitOfac,
+                        VendorAPI::IncodeWatchlistCheck,
+                    ),
+                    (
+                        FootprintReasonCode::AdverseMediaHit,
+                        VendorAPI::IncodeWatchlistCheck,
+                    ),
                 ],
             },
         };
@@ -643,7 +649,7 @@ impl WorkflowState for AlpacaKycComplete {
 }
 
 fn get_review_reasons(
-    wc_reason_codes: &[(FootprintReasonCode, Vec<Vendor>)],
+    wc_reason_codes: &[(FootprintReasonCode, VendorAPI)],
     collected_doc: bool,
 ) -> Vec<ReviewReason> {
     let wc_reason_codes = wc_reason_codes.iter().map(|r| r.0.clone()).collect::<Vec<_>>();
@@ -679,15 +685,15 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![])], false => vec![ReviewReason::WatchlistHit])]
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![])], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, vec![]), (FootprintReasonCode::WatchlistHitPep, vec![])], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![])], false => vec![ReviewReason::AdverseMediaHit])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![])], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::Document])]
-    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, vec![]), (FootprintReasonCode::WatchlistHitNonSdn, vec![])], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck)], false => vec![ReviewReason::WatchlistHit])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac, VendorAPI::IncodeWatchlistCheck), (FootprintReasonCode::WatchlistHitPep, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::WatchlistHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck)], false => vec![ReviewReason::AdverseMediaHit])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::Document])]
+    #[test_case(vec![(FootprintReasonCode::AdverseMediaHit, VendorAPI::IncodeWatchlistCheck), (FootprintReasonCode::WatchlistHitNonSdn, VendorAPI::IncodeWatchlistCheck)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
 
     fn test_get_review_reasons(
-        wc_reason_codes: Vec<(FootprintReasonCode, Vec<Vendor>)>,
+        wc_reason_codes: Vec<(FootprintReasonCode, VendorAPI)>,
         collected_doc: bool,
     ) -> Vec<ReviewReason> {
         get_review_reasons(&wc_reason_codes, collected_doc)
