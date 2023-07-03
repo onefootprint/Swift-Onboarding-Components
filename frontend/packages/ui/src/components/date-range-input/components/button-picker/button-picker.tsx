@@ -40,7 +40,8 @@ const ButtonPicker = forwardRef(
       null,
     );
     const popper = usePopper(popperRef.current, popperElement, {
-      placement: 'bottom-end',
+      placement: 'bottom-start',
+      strategy: 'fixed',
       modifiers: [{ name: 'offset', options: { offset: [0, 8] } }],
     });
     const theme = useTheme();

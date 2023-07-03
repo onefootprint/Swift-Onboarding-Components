@@ -2,7 +2,6 @@ import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useRef } from 'react';
 
-import Box from '../box';
 import ButtonPicker, { ButtonPickerRef } from './components/button-picker';
 
 export type DateRangeInputProps = {
@@ -35,18 +34,16 @@ const DateRangeInput = ({
   };
 
   return (
-    <Box>
-      <InputContainer>
-        <ButtonPicker onChange={handleStartDateChange} value={startDate} />
-        <IcoArrowRightSmall16 />
-        <ButtonPicker
-          disabledDays={[{ before: startDate }]}
-          onChange={handleEndDateChange}
-          ref={endButtonPickerRef}
-          value={endDate}
-        />
-      </InputContainer>
-    </Box>
+    <InputContainer>
+      <ButtonPicker onChange={handleStartDateChange} value={startDate} />
+      <IcoArrowRightSmall16 />
+      <ButtonPicker
+        disabledDays={[{ before: startDate }]}
+        onChange={handleEndDateChange}
+        ref={endButtonPickerRef}
+        value={endDate}
+      />
+    </InputContainer>
   );
 };
 
@@ -54,7 +51,7 @@ const InputContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     border-radius: ${theme.borderRadius.default};
-    border: 1px solid ${theme.borderColor.primary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     display: inline-flex;
     gap: ${theme.spacing[4]};
     padding: ${theme.spacing[3]} ${theme.spacing[5]};

@@ -178,6 +178,8 @@ const StyledFade = styled(Fade)`
     z-index: ${theme.zIndex.dialog};
     position: absolute;
     margin-top: ${theme.spacing[3]};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

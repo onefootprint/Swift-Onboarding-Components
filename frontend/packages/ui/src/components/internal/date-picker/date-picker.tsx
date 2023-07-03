@@ -41,10 +41,12 @@ const DatePicker = ({
         {`
           .rdp {
             background: ${theme.backgroundColor.primary};
+            border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
             border-radius: ${theme.spacing[2]};
             box-shadow: ${theme.elevation[2]};
             padding: ${theme.spacing[4]} ${theme.spacing[5]};
             width: 312px;
+            margin: ${theme.spacing[2]} 0;
           }
 
           .rdp-table {
