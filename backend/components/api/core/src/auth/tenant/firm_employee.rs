@@ -111,7 +111,12 @@ impl FirmEmployeeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
         let extra_permissions_for_user = if self.is_risk_ops {
-            vec![TenantScope::DecryptAll, TenantScope::ManualReview]
+            vec![
+                TenantScope::DecryptAll,
+                TenantScope::ManualReview,
+                TenantScope::OnboardingConfiguration,
+                TenantScope::ApiKeys,
+            ]
         } else {
             vec![]
         };
@@ -182,6 +187,8 @@ mod test {
         TenantScope::Read,
         TenantScope::DecryptAll,
         TenantScope::ManualReview,
+        TenantScope::OnboardingConfiguration,
+        TenantScope::ApiKeys,
     ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);

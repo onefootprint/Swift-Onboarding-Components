@@ -67,11 +67,11 @@ def test_read_allowed(assumed_token, path):
     "path",
     [
         "org",
-        "org/api_keys/some_id",
+        # "org/api_keys/some_id",
         "org/member",  # this one is weird
         "org/members/some_id",
         "org/roles/some_id",
-        "org/onboarding_configs/some_id",
+        # "org/onboarding_configs/some_id",
     ],
 )
 def test_cannot_patch(assumed_token, path):
@@ -95,16 +95,16 @@ def test_cannot_patch(assumed_token, path):
         #     dict(status="pass", annotation=dict(note="", is_pinned=False)),
         # ),
         # ("entities/some_fp_id/annotations", dict(note="", is_pinned=False)),
-        (
-            "org/onboarding_configs",
-            dict(name="", must_collect_data=[], can_access_data=[]),
-        ),
+        # (
+        #     "org/onboarding_configs",
+        #     dict(name="", must_collect_data=[], can_access_data=[]),
+        # ),
         ("org/members", dict(email="e@onefootprint.com", role_id="", redirect_url="")),
         ("org/members/some_id/deactivate", dict()),
         ("org/roles", dict(name="", scopes=["read"])),
         ("org/roles/some_id/deactivate", dict()),
-        ("org/api_keys", dict(name="")),
-        ("org/api_keys/some_id/reveal", dict()),
+        # ("org/api_keys", dict(name="")),
+        # ("org/api_keys/some_id/reveal", dict()),
     ],
 )
 def test_cannot_post(assumed_token, path, body):
