@@ -1,7 +1,7 @@
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
-use db_schema::schema::risk_signal;
+use db_schema::schema::{onboarding_decision_verification_result_junction, risk_signal};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::VendorAPI;
@@ -35,26 +35,57 @@ pub struct NewRiskSignal {
     pub vendor_api: VendorAPI,
 }
 
-impl RiskSignal {
-    #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
-    pub fn bulk_create(
-        conn: &mut PgConn,
+// temporary struct to differentiate our legacy way of writing all RS's from various Vres's at once when we create an OBD
+// vs our new way which will
+pub enum NewRiskSignals {
+    LegacyObd {
         onboarding_decision_id: OnboardingDecisionId,
         signals: Vec<(FootprintReasonCode, VendorAPI)>,
-    ) -> DbResult<Vec<Self>> {
-        let new: Vec<_> = signals
-            .into_iter()
-            .map(|(reason_code, vendor_api)| NewRiskSignal {
-                onboarding_decision_id: Some(onboarding_decision_id.clone()),
-                reason_code,
-                created_at: Utc::now(),
-                verification_result_id: None,
-                hidden: false,
+    },
+    NewVres {
+        verification_result_id: VerificationResultId,
+        vendor_api: VendorAPI,
+        reason_codes: Vec<FootprintReasonCode>,
+    },
+}
+
+impl RiskSignal {
+    #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
+    pub fn bulk_create(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
+        let new_risk_signals: Vec<NewRiskSignal> = match new {
+            NewRiskSignals::LegacyObd {
+                onboarding_decision_id,
+                signals,
+            } => signals
+                .into_iter()
+                .map(|(reason_code, vendor_api)| NewRiskSignal {
+                    onboarding_decision_id: Some(onboarding_decision_id.clone()),
+                    reason_code,
+                    created_at: Utc::now(),
+                    verification_result_id: None,
+                    hidden: false,
+                    vendor_api,
+                })
+                .collect(),
+            NewRiskSignals::NewVres {
+                verification_result_id,
                 vendor_api,
-            })
-            .collect();
+                reason_codes,
+            } => reason_codes
+                .into_iter()
+                .map(|reason_code| NewRiskSignal {
+                    onboarding_decision_id: None,
+                    reason_code,
+                    created_at: Utc::now(),
+                    verification_result_id: Some(verification_result_id.clone()),
+                    hidden: false,
+                    vendor_api,
+                })
+                .collect(),
+        };
+
         let result = diesel::insert_into(risk_signal::table)
-            .values(new)
+            .values(new_risk_signals)
             .get_results::<Self>(conn)?;
         Ok(result)
     }
@@ -95,14 +126,204 @@ impl RiskSignal {
         Ok(signal)
     }
 
+    // Historically, we were writing RiskSignal's with onboarding_decision_id as a foreign key.
+    // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id = None and instead have
+    // verification_result_id set
+    // This function currently preserves legacy behavior in that it will return RS's created within the context of a certain onboarding_decision_id.
+    // Legacy RS's will be retrieved as usual through rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction table
     #[tracing::instrument("RiskSignal::list_by_onboarding_decision_id", skip_all)]
     pub fn list_by_onboarding_decision_id(
         conn: &mut PgConn,
         onboarding_decision_id: &OnboardingDecisionId,
     ) -> DbResult<Vec<Self>> {
         let results = risk_signal::table
-            .filter(risk_signal::onboarding_decision_id.eq(onboarding_decision_id))
+            .left_join(
+                onboarding_decision_verification_result_junction::table.on(
+                    onboarding_decision_verification_result_junction::verification_result_id
+                        .nullable()
+                        .eq(risk_signal::verification_result_id),
+                ),
+            )
+            .filter(
+                risk_signal::onboarding_decision_id.eq(onboarding_decision_id).or(
+                    onboarding_decision_verification_result_junction::onboarding_decision_id
+                        .eq(onboarding_decision_id),
+                ),
+            )
+            .select(risk_signal::all_columns)
             .get_results(conn)?;
         Ok(results)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::decision_intent::DecisionIntent;
+    use crate::models::onboarding::Onboarding;
+    use crate::models::onboarding_decision::OnboardingDecision;
+    use crate::models::onboarding_decision::OnboardingDecisionCreateArgs;
+    use crate::models::scoped_vault::ScopedVault;
+    use crate::models::verification_request::VerificationRequest;
+    use crate::models::verification_result::VerificationResult;
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::fixtures;
+    use crate::tests::prelude::*;
+    use itertools::Itertools;
+    use macros::db_test_case;
+    use newtypes::Locked;
+    use newtypes::{DbActor, DecisionIntentId, DecisionStatus, ScopedVaultId};
+    use serde_json::json;
+
+    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Locked<Onboarding>) {
+        let t = fixtures::tenant::create(conn);
+        let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+        let uv = fixtures::vault::create_person(conn, true).into_inner();
+        let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+        let di = crate::models::decision_intent::DecisionIntent::get_or_create_onboarding_kyc(conn, &sv.id)
+            .unwrap();
+        let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id);
+        let ob = Onboarding::lock(conn, &ob.id).unwrap();
+
+        (sv, di, ob)
+    }
+
+    fn create_vres(
+        conn: &mut TestPgConn,
+        sv_id: &ScopedVaultId,
+        di_id: &DecisionIntentId,
+        vendor_api: VendorAPI,
+    ) -> VerificationResult {
+        let vreq = VerificationRequest::create(conn, sv_id, di_id, vendor_api).unwrap();
+
+        VerificationResult::create(
+            conn,
+            vreq.id,
+            json!({"yo": "sup"}).into(),
+            newtypes::SealedVaultBytes(
+                newtypes::PiiJsonValue::from(json!({"yo": "sup"}))
+                    .leak_to_vec()
+                    .unwrap(),
+            ),
+            false,
+        )
+        .unwrap()
+    }
+
+    enum KeyType {
+        Obd,
+        Vres,
+    }
+
+    #[db_test_case(vec![
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
+            KeyType::Obd,
+        )],
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SubjectDeceased],
+            KeyType::Obd,
+        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK")]
+    #[db_test_case(vec![
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
+            KeyType::Vres,
+        )],
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SubjectDeceased],
+            KeyType::Vres,
+        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "New Vres FK")]
+    #[db_test_case(vec![
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
+            KeyType::Obd,
+        )],
+        vec![(
+            VendorAPI::IdologyExpectID,
+            vec![FootprintReasonCode::SubjectDeceased],
+            KeyType::Vres,
+        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK and new Vres FK")]
+    fn test_list_by_onboarding_id(
+        conn: &mut TestPgConn,
+        input_risk_signal_groups: Vec<Vec<(VendorAPI, Vec<FootprintReasonCode>, KeyType)>>,
+        expected_risk_signals: Vec<(VendorAPI, FootprintReasonCode)>,
+    ) {
+        // Case 1: only RS with OBD (ie historical OBDs)
+        // Case 2: only RS with Vres
+        // Case 3: mix of RS with OBD and Vres
+
+        let (sv, di, ob) = setup(conn);
+
+        input_risk_signal_groups
+            .into_iter()
+            .for_each(|input_risk_signals| {
+                let vres_with_rs = input_risk_signals
+                    .iter()
+                    .map(|(vendor_api, reason_codes, key_type)| {
+                        (
+                            create_vres(conn, &sv.id, &di.id, *vendor_api),
+                            vendor_api,
+                            reason_codes,
+                            key_type,
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                let obd = OnboardingDecision::create(
+                    conn,
+                    OnboardingDecisionCreateArgs {
+                        vault_id: sv.vault_id.clone(),
+                        onboarding: &ob,
+                        logic_git_hash: "123".to_owned(),
+                        status: DecisionStatus::Pass,
+                        result_ids: vres_with_rs
+                            .iter()
+                            .map(|(vres, _, _, _)| vres.id.clone())
+                            .collect(),
+                        annotation_id: None,
+                        actor: DbActor::Footprint,
+                        seqno: None,
+                        workflow_id: None,
+                    },
+                )
+                .unwrap();
+
+                let _all_created_risk_signals = vres_with_rs
+                    .into_iter()
+                    .map(|(vres, vendor_api, reason_codes, key_type)| {
+                        let new_risk_signals = match key_type {
+                            KeyType::Obd => NewRiskSignals::LegacyObd {
+                                onboarding_decision_id: obd.id.clone(),
+                                signals: reason_codes
+                                    .into_iter()
+                                    .map(|rc| (rc.clone(), vendor_api.clone()))
+                                    .collect_vec(),
+                            },
+                            KeyType::Vres => NewRiskSignals::NewVres {
+                                verification_result_id: vres.id,
+                                vendor_api: vendor_api.clone(),
+                                reason_codes: reason_codes.clone(),
+                            },
+                        };
+
+                        RiskSignal::bulk_create(conn, new_risk_signals).unwrap()
+                    })
+                    .collect::<Vec<_>>();
+            });
+
+        let latest_obd =
+            OnboardingDecision::latest_footprint_actor_decision(conn, &sv.fp_id, &sv.tenant_id, sv.is_live)
+                .unwrap()
+                .unwrap();
+        let rs = RiskSignal::list_by_onboarding_decision_id(conn, &latest_obd.id).unwrap();
+        assert_have_same_elements(
+            expected_risk_signals,
+            rs.into_iter().map(|rs| (rs.vendor_api, rs.reason_code)).collect(),
+        );
     }
 }

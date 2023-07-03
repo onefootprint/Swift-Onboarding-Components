@@ -4,7 +4,7 @@ use db::{
     models::{
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
-        risk_signal::RiskSignal,
+        risk_signal::{NewRiskSignals, RiskSignal},
         vault::Vault,
         verification_request::VerificationRequest,
     },
@@ -128,7 +128,13 @@ pub async fn setup_kyb_test_fixtures(
             )?;
 
             let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
-            RiskSignal::bulk_create(conn, biz_obd.id, signals)?;
+            RiskSignal::bulk_create(
+                conn,
+                NewRiskSignals::LegacyObd {
+                    onboarding_decision_id: biz_obd.id,
+                    signals,
+                },
+            )?;
             Ok(())
         })
         .await

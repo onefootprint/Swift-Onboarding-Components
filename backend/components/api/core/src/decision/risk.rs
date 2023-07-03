@@ -7,7 +7,7 @@ use db::{
         manual_review::ManualReview,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
-        risk_signal::RiskSignal,
+        risk_signal::{NewRiskSignals, RiskSignal},
         scoped_vault::ScopedVault,
     },
     TxnPgConn,
@@ -98,6 +98,12 @@ pub fn save_final_decision(
         )?;
     }
 
-    RiskSignal::bulk_create(conn, obd.id.clone(), reason_codes)?;
+    RiskSignal::bulk_create(
+        conn,
+        NewRiskSignals::LegacyObd {
+            onboarding_decision_id: obd.id.clone(),
+            signals: reason_codes,
+        },
+    )?;
     Ok(obd)
 }
