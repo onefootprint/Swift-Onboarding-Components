@@ -25,33 +25,60 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
     throw 'Alerts must have unique `name`s';
   }
 
-  const recipientChannel = recipientSlackChannel[stackMeta.environment];
-  if (!recipientChannel) {
-    // We don't need to set alerts up for ephemeral environments
-    return;
-  }
+  const slackRecipientChannel = recipientSlackChannel[stackMeta.environment];
+  const slackRecipient: Recipient | undefined = slackRecipientChannel
+    ? {
+        type: 'slack',
+        target: slackRecipientChannel,
+      }
+    : undefined;
 
-  const recipients: Recipient[] = [
-    {
-      type: 'slack',
-      target: recipientChannel,
-    },
-  ];
+  const pagerRecipient: Recipient | undefined =
+    stackMeta.environment === StackEnvironment.Prod
+      ? {
+          type: 'webhook',
+          target: 'OpsGenie',
+        }
+      : undefined;
+
+  console.log(pagerRecipient);
 
   for (const alert of Alerts) {
-    const { datasetName, ...trigger } = alert;
-    const nameHyphen = alert.name.replace(/ /g, '-');
-    const name = `alert-${stackMeta.shortStackName}-${nameHyphen}`;
-    new TriggerResource(name, {
-      apiKey,
-      datasetName: datasetName,
-      trigger: {
-        alert_type: 'on_change',
-        evaluation_schedule_type: 'frequency',
-        frequency: 60, // Evaluate once per minute
-        recipients,
-        ...trigger,
-      },
-    });
+    const { datasetName, slackThreshold, pageThreshold, name, ...trigger } =
+      alert;
+    const nameHyphen = name.replace(/ /g, '-');
+    const commonName = `alert-${stackMeta.shortStackName}-${nameHyphen}`;
+    // Create a slack trigger
+    if (slackRecipient) {
+      new TriggerResource(`${commonName}-slack`, {
+        apiKey,
+        datasetName: datasetName,
+        trigger: {
+          alert_type: 'on_change',
+          evaluation_schedule_type: 'frequency',
+          frequency: 60, // Evaluate once per minute
+          name: `[WARNING] ${name}`,
+          recipients: [slackRecipient],
+          threshold: slackThreshold,
+          ...trigger,
+        },
+      });
+    }
+    // Create a pager trigger
+    if (pagerRecipient) {
+      new TriggerResource(`${commonName}-pager`, {
+        apiKey,
+        datasetName: datasetName,
+        trigger: {
+          alert_type: 'on_change',
+          evaluation_schedule_type: 'frequency',
+          frequency: 60, // Evaluate once per minute
+          name: `[CRITICAL] ${name}`,
+          recipients: [pagerRecipient],
+          threshold: pageThreshold,
+          ...trigger,
+        },
+      });
+    }
   }
 }

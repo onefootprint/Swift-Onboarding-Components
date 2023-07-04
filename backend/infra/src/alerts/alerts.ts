@@ -1,10 +1,16 @@
-import { Trigger } from './trigger';
+import { Trigger, Threshold } from './trigger';
+import { Query } from './query';
 
 // The minimal set of information needed to define an alert
-type Alert = Omit<
-  Trigger,
-  'recipients' | 'alert_type' | 'evaluation_schedule_type' | 'frequency'
-> & { datasetName: string };
+export interface Alert {
+  name: string;
+  description?: string;
+  datasetName: string;
+  disabled?: boolean;
+  query: Query;
+  slackThreshold: Threshold;
+  pageThreshold: Threshold;
+}
 
 export const Alerts: Alert[] = [
   {
@@ -32,9 +38,14 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 0,
+    },
+    // These won't make a ton of sense to page on for a while - we might want to page on a 5xx percentage
+    pageThreshold: {
+      op: '>',
+      value: 10,
     },
   },
   {
@@ -60,9 +71,14 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 0,
+    },
+    // These won't make a ton of sense to page on for a while - we might want to page on a 5xx percentage
+    pageThreshold: {
+      op: '>',
+      value: 10,
     },
   },
   {
@@ -87,9 +103,13 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 10,
     },
   },
   {
@@ -112,9 +132,13 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 50,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 80,
     },
   },
   {
@@ -137,9 +161,13 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 50,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 80,
     },
   },
   {
@@ -166,9 +194,13 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 50,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 80,
     },
   },
   {
@@ -191,9 +223,13 @@ export const Alerts: Alert[] = [
       ],
       filter_combination: 'AND',
     },
-    threshold: {
+    slackThreshold: {
       op: '>',
       value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 2,
     },
   },
 ];

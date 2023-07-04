@@ -1,3 +1,4 @@
+import * as pulumi from '@pulumi/pulumi';
 import { Query } from './query';
 
 export interface Threshold {
@@ -5,10 +6,18 @@ export interface Threshold {
   value: number;
 }
 
+export interface SlackRecipientDetails {
+  slack_channel: string;
+}
+
+export interface WebhookRecipientDetails {
+  webhook_name: string;
+  webhook_url: string;
+  webhook_secret: string;
+}
+
 export interface Recipient {
-  // TODO don't know what to provide ehre
-  id?: string;
-  type: 'slack';
+  type: 'slack' | 'webhook';
   target: string;
 }
 
