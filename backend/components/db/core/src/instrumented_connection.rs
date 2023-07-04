@@ -1,6 +1,9 @@
 // This is a diesel-2.0 compatible version of https://github.com/CQCL/diesel-tracing
 // When diesel-tracing is updated to support 2.0, we can use it instead.
 
+use std::marker::PhantomData;
+
+use diesel::backend::Backend;
 use diesel::connection::{
     AnsiTransactionManager, Connection, DefaultLoadingMode, LoadRowIter, SimpleConnection,
 };
@@ -8,6 +11,7 @@ use diesel::connection::{ConnectionGatWorkaround, LoadConnection, TransactionMan
 use diesel::deserialize::Queryable;
 use diesel::expression::QueryMetadata;
 use diesel::pg::{GetPgMetadataCache, Pg, PgConnection, PgRowByRowLoadingMode};
+use diesel::query_builder::QueryBuilder;
 use diesel::query_builder::{Query, QueryFragment, QueryId};
 use diesel::result::{ConnectionError, ConnectionResult, QueryResult};
 use diesel::select;
@@ -140,7 +144,7 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%diesel::debug_query(source),
+            sql=%DebugQuery::new(source),
         ),
         skip(self, source),
         err,
@@ -178,7 +182,7 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%diesel::debug_query(&source),
+            sql=%DebugQuery::new(&source),
         ),
         skip(self, source),
         err,
@@ -204,7 +208,7 @@ impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%diesel::debug_query(&source),
+            sql=%DebugQuery::new(&source),
         ),
         skip(self, source),
         err,
@@ -224,5 +228,37 @@ impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
 impl GetPgMetadataCache for InstrumentedPgConnection {
     fn get_metadata_cache(&mut self) -> &mut diesel::pg::PgMetadataCache {
         self.inner.get_metadata_cache()
+    }
+}
+
+/// A struct that implements `fmt::Display` to show the SQL representation of a query.
+///
+/// This differs from diesel's implementation of DebugQuery - we purposefully omit showing the raw
+/// values (binds) in the DB query.
+pub struct DebugQuery<'a, T: 'a, DB> {
+    query: &'a T,
+    _marker: PhantomData<DB>,
+}
+
+impl<'a, T, DB> DebugQuery<'a, T, DB> {
+    pub(crate) fn new(query: &'a T) -> Self {
+        DebugQuery {
+            query,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<'a, T, DB> std::fmt::Display for DebugQuery<'a, T, DB>
+where
+    DB: Backend + Default,
+    DB::QueryBuilder: Default,
+    T: QueryFragment<DB>,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut query_builder = DB::QueryBuilder::default();
+        let backend = DB::default();
+        QueryFragment::<DB>::to_sql(self.query, &mut query_builder, &backend).map_err(|_| std::fmt::Error)?;
+        write!(f, "{}", query_builder.finish())
     }
 }
