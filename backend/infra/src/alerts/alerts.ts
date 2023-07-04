@@ -150,20 +150,20 @@ export const Alerts: Alert[] = [
     },
   },
   {
-    name: 'ECS Cluster High CPU',
+    name: 'ECS Service High CPU',
     datasetName: 'aws',
     query: {
       time_range: 240,
-      breakdowns: ['ClusterName'],
+      breakdowns: ['ServiceName'],
       calculations: [
         {
           op: 'MAX',
-          column: 'CpuUtilizationPercentage',
+          column: 'amazonaws.com/AWS/ECS/CPUUtilization.max',
         },
       ],
       filters: [
         {
-          column: 'ClusterName',
+          column: 'ServiceName',
           op: 'exists',
         },
       ],
@@ -179,20 +179,20 @@ export const Alerts: Alert[] = [
     },
   },
   {
-    name: 'ECS Cluster High Memory Use',
+    name: 'ECS Service High Memory Use',
     datasetName: 'aws',
     query: {
       time_range: 240,
-      breakdowns: ['ClusterName'],
+      breakdowns: ['ServiceName'],
       calculations: [
         {
-          op: 'SUM',
-          column: 'MemoryUtilizationPercentage',
+          op: 'MAX',
+          column: 'amazonaws.com/AWS/ECS/MemoryUtilization.max',
         },
       ],
       filters: [
         {
-          column: 'ClusterName',
+          column: 'ServiceName',
           op: 'exists',
         },
       ],
