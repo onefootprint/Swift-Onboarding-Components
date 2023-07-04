@@ -65,7 +65,7 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
       });
     }
     // Create a pager trigger
-    if (pagerRecipient) {
+    if (pagerRecipient && pageThreshold) {
       new TriggerResource(`${commonName}-pager`, {
         apiKey,
         datasetName: datasetName,

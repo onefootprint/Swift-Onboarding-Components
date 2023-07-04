@@ -9,7 +9,7 @@ export interface Alert {
   disabled?: boolean;
   query: Query;
   slackThreshold: Threshold;
-  pageThreshold: Threshold;
+  pageThreshold?: Threshold;
 }
 
 export const Alerts: Alert[] = [
@@ -46,6 +46,43 @@ export const Alerts: Alert[] = [
     pageThreshold: {
       op: '>',
       value: 10,
+    },
+  },
+  // We probably don't want to have alerts on every 4xx in the future, but for now it's nice to keep tabs on our tenants' activity
+  {
+    name: 'HTTP 4xx Errors',
+    description:
+      'HTTP 4xx as reported by the application server. These are duplicates of the observe alerts, which we will soon deprecate if we like this.',
+    datasetName: 'fpc-api',
+    query: {
+      time_range: 240,
+      breakdowns: ['http.method', 'http.route', 'http.status_code'],
+      calculations: [
+        {
+          op: 'COUNT',
+        },
+      ],
+      filters: [
+        {
+          column: 'trace.parent_id',
+          op: 'does-not-exist',
+        },
+        {
+          column: 'http.status_code',
+          op: '>=',
+          value: 400,
+        },
+        {
+          column: 'http.status_code',
+          op: '<',
+          value: 500,
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    slackThreshold: {
+      op: '>',
+      value: 0,
     },
   },
   {
