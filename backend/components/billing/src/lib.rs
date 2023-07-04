@@ -1,5 +1,5 @@
 use db::models::tenant::Tenant;
-use feature_flag::{LaunchDarklyFeatureFlagClient};
+use feature_flag::LaunchDarklyFeatureFlagClient;
 use interval::BillingInterval;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
@@ -148,7 +148,8 @@ impl BillingClient {
             is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&info.interval.label)
         });
         if let Some(i) = existing_invoice {
-            // Delete the existing draft invoice that was created from a previous run
+            // Delete the existing draft invoice that was created from a previous run.
+            // This may fail if the invoice is no longer a draft
             Invoice::delete(&self.client, &i.id).await?;
         }
 
