@@ -182,7 +182,12 @@ pub async fn vault_pii(
                                          mime_type,
                                      }| {
                                         uvw.put_document_unsafe(
-                                            conn, kind, mime_type, filename, e_data_key, s3_url,
+                                            conn,
+                                            kind.into(),
+                                            mime_type,
+                                            filename,
+                                            e_data_key,
+                                            s3_url,
                                         )
                                     },
                                 )

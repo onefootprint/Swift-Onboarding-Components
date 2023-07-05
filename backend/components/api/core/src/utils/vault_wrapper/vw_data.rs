@@ -7,7 +7,6 @@ use db::HasLifetime;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
-use newtypes::DocumentKind;
 use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
@@ -83,7 +82,7 @@ impl<Type> VwData<Type> {
 
     pub fn populated_dis(&self) -> Vec<DataIdentifier> {
         let vds = self.vd.iter().map(|vd| vd.kind.clone()).collect_vec();
-        let docs = self.documents.iter().map(|d| d.kind.into()).collect_vec();
+        let docs = self.documents.iter().map(|d| d.kind.clone()).collect_vec();
         [vds, docs].into_iter().flatten().unique().collect()
     }
 
@@ -111,7 +110,7 @@ impl<Type> VwData<Type> {
     }
 
     // Todo maybe combine with get
-    pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {
-        self.documents.iter().find(|d| d.kind == kind)
+    pub fn get_document(&self, kind: &DataIdentifier) -> Option<&DocumentData> {
+        self.documents.iter().find(|d| &d.kind == kind)
     }
 }

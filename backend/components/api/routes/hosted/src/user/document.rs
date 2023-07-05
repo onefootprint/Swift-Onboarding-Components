@@ -150,7 +150,7 @@ pub async fn post(
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             // Vault the images under latest uploads
             for (side, s3_url) in s3_urls.iter() {
-                let kind = DocumentKind::LatestUpload(id_doc.document_type, *side);
+                let kind = DocumentKind::LatestUpload(id_doc.document_type, *side).into();
                 let name = format!("{}.png", kind);
                 let mime_type = "image/png".to_string();
                 uvw.put_document_unsafe(conn, kind, mime_type, name, e_data_key.clone(), s3_url.clone())?;

@@ -270,8 +270,19 @@ impl FromStr for DataIdentifier {
             .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
-        let prefix = DataIdentifierDiscriminant::from_str(prefix)
-            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
+        let prefix_res = DataIdentifierDiscriminant::from_str(prefix);
+        let prefix = match prefix_res {
+            Ok(prefix) => prefix,
+            Err(_) => {
+                // Some short-term code to parse DocumentKinds as DIs while we migrate the
+                // document_data table
+                // TODO rm this
+                if let Ok(dk) = DocumentKind::from_str(s) {
+                    return Ok(Self::Document(dk));
+                }
+                return Err(EnumDotNotationError::CannotParsePrefix(prefix.to_owned()));
+            }
+        };
         // Parse the suffix differently depending on the prefix
         let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
@@ -411,6 +422,8 @@ mod tests {
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
+    // TODO rm
+    #[test_case("passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

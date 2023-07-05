@@ -782,7 +782,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     let _ = uvw
         .put_document_unsafe(
             conn,
-            DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front),
+            DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front).into(),
             "image/png".into(),
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),

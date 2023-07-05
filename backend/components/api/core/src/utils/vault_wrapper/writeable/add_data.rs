@@ -178,7 +178,7 @@ impl WriteableVw<Person> {
     pub fn put_document_unsafe(
         &self,
         conn: &mut TxnPgConn,
-        kind: DocumentKind,
+        kind: DataIdentifier,
         mime_type: String,
         filename: String,
         e_data_key: SealedVaultDataKey,
@@ -188,7 +188,7 @@ impl WriteableVw<Person> {
         let su_id = self.scoped_vault_id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.into()], seqno)?;
+        DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.clone()], seqno)?;
 
         let doc = DocumentData::create(
             conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key,

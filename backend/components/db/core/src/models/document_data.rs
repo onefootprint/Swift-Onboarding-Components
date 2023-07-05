@@ -10,9 +10,9 @@ use db_schema::schema::data_lifetime;
 use db_schema::schema::document_data;
 use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentDataId;
-use newtypes::DocumentKind;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
@@ -28,7 +28,7 @@ pub struct DocumentData {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
-    pub kind: DocumentKind,
+    pub kind: DataIdentifier,
     pub mime_type: PiiString,
     pub filename: String,
     pub s3_url: String, // TODO newtype
@@ -39,7 +39,7 @@ pub struct DocumentData {
 #[diesel(table_name = document_data)]
 pub struct NewDocumentData {
     pub lifetime_id: DataLifetimeId,
-    pub kind: DocumentKind,
+    pub kind: DataIdentifier,
     pub mime_type: PiiString,
     pub filename: String,
     pub s3_url: String,
@@ -53,7 +53,7 @@ impl DocumentData {
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
         scoped_vault_id: &ScopedVaultId,
-        kind: DocumentKind,
+        kind: DataIdentifier,
         mime_type: String,
         filename: String,
         s3_url: String,
@@ -61,7 +61,7 @@ impl DocumentData {
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
-        let dl = DataLifetime::create(conn, vault_id, scoped_vault_id, kind.into(), seqno)?;
+        let dl = DataLifetime::create(conn, vault_id, scoped_vault_id, kind.clone(), seqno)?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

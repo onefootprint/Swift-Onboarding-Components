@@ -58,16 +58,18 @@ impl<Type> VaultWrapper<Type> {
         // TODO we should do this in VaultWrapperData, not here
         let id = id.into();
         // First see if we can the DI is stored in the document table
-        if let DataIdentifier::Document(d) = id {
-            let lookup_d = match d {
+        if let DataIdentifier::Document(ref d) = id {
+            let lookup_di = match d {
                 // Get mime_type from the parent DocumentData
-                DocumentKind::MimeType(doc_kind, side) => DocumentKind::from_id_doc_kind(doc_kind, side),
-                d => d,
+                DocumentKind::MimeType(doc_kind, side) => {
+                    DocumentKind::from_id_doc_kind(*doc_kind, *side).into()
+                }
+                _ => id.clone(),
             };
             let document = self
                 .speculative
-                .get_document(lookup_d)
-                .or_else(|| self.portable.get_document(lookup_d));
+                .get_document(&lookup_di)
+                .or_else(|| self.portable.get_document(&lookup_di));
             if let Some(document) = document {
                 let data = match d {
                     // This is weird - get the mime type from the document row

@@ -4,8 +4,6 @@ use crate::utils::db2api::DbToApi;
 
 impl DbToApi<DocumentData> for api_wire_types::DocumentUploadedTimelineEvent {
     fn from_db(doc: DocumentData) -> Self {
-        Self {
-            identifier: doc.kind.into(),
-        }
+        Self { identifier: doc.kind }
     }
 }
