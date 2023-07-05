@@ -74,6 +74,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <Box>
         {label ? <Label htmlFor={id}>{label}</Label> : null}
         <FakeInput
+          className="fp-input fp-phone-input"
           data-has-error={hasError}
           data-has-focus={isFocused}
           data-disabled={disabled}
@@ -104,6 +105,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             placeholder={countryPreferences.placeholder}
             type="tel"
             value={getNationalNumber(prefix, value) || undefined}
+            className="fp-input fp-phone-input"
           />
         </FakeInput>
       </Box>

@@ -143,6 +143,10 @@ export type FootprintAppearanceRules = Partial<{
   'input:hover': CSS.Properties;
   'input:focus': CSS.Properties;
   'input:active': CSS.Properties;
+  pinInput: CSS.Properties;
+  'pinInput:hover': CSS.Properties;
+  'pinInput:focus': CSS.Properties;
+  'pinInput:active': CSS.Properties;
   label: CSS.Properties;
   hint: CSS.Properties;
   link: CSS.Properties;

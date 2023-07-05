@@ -104,6 +104,7 @@ const PinInput = ({
               ref={pinInputs.refs[pinIndex]}
               required
               type="tel"
+              className="fp-pin-input"
               value={enteredPin[pinIndex] || ''}
             />
           );
