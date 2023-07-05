@@ -1,4 +1,3 @@
-import { IcoBolt24, Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Box,
@@ -19,7 +18,6 @@ import {
 
 import useTranslation from '@/hooks/use-translation';
 
-import Instructions from '../instructions';
 import ScanContext from '../scan-context';
 import type { CameraSize, CameraType } from './camera.types';
 import Errors from './components/errors';
@@ -33,7 +31,6 @@ type CameraProps = {
   disabled?: boolean;
   Frame?: ({ detector }: { detector: any }) => JSX.Element;
   frameProcessor?: any;
-  instructions: { description?: string; IconComponent: Icon; title: string };
   isObjectDetected?: boolean;
   size?: CameraSize;
   subtitle?: string;
@@ -47,7 +44,6 @@ const Camera = ({
   disabled = false,
   Frame,
   frameProcessor,
-  instructions,
   isObjectDetected,
   size = 'default',
   subtitle,
@@ -65,7 +61,6 @@ const Camera = ({
   const hasFeedback = isError || isSuccess;
   const showActionButtons = !hasFeedback && photo;
   const showTakePhotoManuallyButton = !hasFeedback && !showActionButtons;
-  const showInstructions = !photo && !hasFeedback && !isError;
   const showCamera = !photo && device;
   const zoom = device?.neutralZoom;
 
@@ -142,18 +137,6 @@ const Camera = ({
             )}
             {isError && <Errors errors={errors} />}
           </Box>
-          {showInstructions && (
-            <Instructions
-              options={[
-                {
-                  icon: instructions.IconComponent,
-                  title: instructions.title,
-                  description: instructions.description,
-                },
-                { icon: IcoBolt24, title: t('instructions.capture') },
-              ]}
-            />
-          )}
         </Box>
         <Box gap={4}>
           {isSuccess && (

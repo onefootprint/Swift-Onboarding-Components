@@ -121,50 +121,27 @@
       "drivers-license": {
         "title": "Driver's license",
         "front": {
-          "subtitle": "Front side",
-          "instructions": {
-            "title": "Position your ID in the frame",
-            "description": "Make sure it's the front side."
-          }
+          "subtitle": "Front side"
         },
         "back": {
-          "subtitle": "Back side",
-          "instructions": {
-            "title": "Position your ID in the frame",
-            "description": "Make sure it's the back side."
-          }
+          "subtitle": "Back side"
         }
       },
       "id-card": {
         "title": "ID card",
         "front": {
-          "subtitle": "Front side",
-          "instructions": {
-            "title": "Position your ID in the frame",
-            "description": "Make sure it's the front side."
-          }
+          "subtitle": "Front side"
         },
         "back": {
-          "subtitle": "Back side",
-          "instructions": {
-            "title": "Position your ID in the frame",
-            "description": "Make sure it's the back side."
-          }
+          "subtitle": "Back side"
         }
       },
       "passport": {
         "title": "Passport",
-        "subtitle": "Photo page",
-        "instructions": {
-          "title": "Position your passport in the frame",
-          "description": "Make sure it's open in the photo page"
-        }
+        "subtitle": "Photo page"
       },
       "selfie": {
         "title": "Selfie",
-        "instructions": {
-          "title": "Position your face within the frame"
-        },
         "warnings": {
           "no-face": "Unable to detect a face",
           "not-centralized": "Center your face",

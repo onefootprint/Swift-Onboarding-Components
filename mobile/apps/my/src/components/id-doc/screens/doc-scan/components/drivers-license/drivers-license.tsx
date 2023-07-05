@@ -1,4 +1,3 @@
-import { IcoIdCard24 } from '@onefootprint/icons';
 import { SubmitDocumentSide } from '@onefootprint/types';
 import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
@@ -51,11 +50,6 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
       feedback={feedback}
       Frame={Frame}
       frameProcessor={frameProcessor}
-      instructions={{
-        description: sideT('instructions.description'),
-        IconComponent: IcoIdCard24,
-        title: sideT('instructions.title'),
-      }}
       isObjectDetected={objectedDetected}
       subtitle={sideT('subtitle')}
       title={t('title')}

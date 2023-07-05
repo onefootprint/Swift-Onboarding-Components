@@ -1,4 +1,3 @@
-import { IcoEmojiHappy24 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
@@ -65,10 +64,6 @@ const Selfie = ({ authToken }: SelfieProps) => {
         disabled={isCameraDisabled}
         Frame={Frame}
         frameProcessor={frameProcessor}
-        instructions={{
-          IconComponent: IcoEmojiHappy24,
-          title: t('instructions.title'),
-        }}
         isObjectDetected={objectedDetected}
         size="large"
         title={t('title')}

@@ -1,4 +1,3 @@
-import { IcoPassport24 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
@@ -43,11 +42,6 @@ const Passport = () => {
       feedback={feedback}
       Frame={Frame}
       frameProcessor={frameProcessor}
-      instructions={{
-        description: t('instructions.description'),
-        IconComponent: IcoPassport24,
-        title: t('instructions.title'),
-      }}
       isObjectDetected={objectedDetected}
       subtitle={t('subtitle')}
       title={t('title')}
