@@ -1169,7 +1169,7 @@
             "status": "Status",
             "access-control": {
               "title": "Access control",
-              "tooltip": "You can restrict access to this secret key to specific IP addresses."
+              "tooltip": "Manage access controls from Settings"
             }
           },
           "manage": {

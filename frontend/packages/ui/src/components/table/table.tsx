@@ -97,7 +97,7 @@ const Table = <T,>({
                     {column?.tooltip && (
                       <Tooltip
                         text={column.tooltip.text}
-                        alignment="center"
+                        alignment="end"
                         position="bottom"
                       >
                         <InfoButton
