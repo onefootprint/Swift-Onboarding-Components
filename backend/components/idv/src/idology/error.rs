@@ -27,7 +27,7 @@ pub enum Error {
     #[error("Credentials for tenant not configured")]
     CredentialsNotFound,
     #[error("Parsable APIError {0}")]
-    ParsableAPIError(Box<ParsableAPIError>),
+    ErrorWithResponse(Box<ErrorWithResponse>),
 }
 
 impl Error {
@@ -35,8 +35,8 @@ impl Error {
         matches!(&self, Error::DocumentResultsNotReady | Error::ReqwestError(_))
     }
 
-    pub fn into_parsable_error(self, response: serde_json::Value) -> Self {
-        Self::ParsableAPIError(Box::new(ParsableAPIError {
+    pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
+        Self::ErrorWithResponse(Box::new(ErrorWithResponse {
             error: self,
             response,
         }))
@@ -135,12 +135,12 @@ impl From<String> for RequestError {
 ///
 /// This struct wraps `Error` so that we can propagate the json up and save.
 #[derive(Debug)]
-pub struct ParsableAPIError {
+pub struct ErrorWithResponse {
     pub error: Error,
     pub response: serde_json::Value,
 }
 
-impl Display for ParsableAPIError {
+impl Display for ErrorWithResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.error)
     }

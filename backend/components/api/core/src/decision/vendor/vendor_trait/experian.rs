@@ -19,11 +19,14 @@ impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::exp
         request: ExperianCrossCoreRequest,
     ) -> Result<ExperianCrossCoreResponse, idv::experian::error::Error> {
         let raw_response = idv::experian::cross_core::send_precise_id_request(self, request).await?;
-        let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())?;
+        // catch errors that cannot be deserialized
+        let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())
+            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
 
+        // catch errors that come from deserialized response validations
         parsed_response
             .validate()
-            .map_err(|e| e.into_parsable_error(raw_response.clone()))?;
+            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
 
         Ok(ExperianCrossCoreResponse {
             raw_response: PiiJsonValue::new(raw_response),

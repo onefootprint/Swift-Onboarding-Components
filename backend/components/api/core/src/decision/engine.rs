@@ -201,10 +201,10 @@ impl VendorResults {
     ) -> (VerificationRequest, Option<serde_json::Value>) {
         match v {
             (req, ApiError::VendorRequestFailed(ve)) => match &ve.error {
-                idv::Error::IDologyError(idv::idology::error::Error::ParsableAPIError(e)) => {
+                idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
                     (req.clone(), Some(e.response.clone()))
                 }
-                idv::Error::ExperianError(idv::experian::error::Error::ParsableAPIError(e)) => {
+                idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
                     (req.clone(), Some(e.response.clone()))
                 }
                 // TODO: non-ideal to have empty json, should make response optional

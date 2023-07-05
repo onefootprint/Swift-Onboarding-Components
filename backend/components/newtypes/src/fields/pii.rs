@@ -268,11 +268,14 @@ impl TryFrom<PiiBytes> for PiiJsonValue {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ScrubbedJsonValue(pub serde_json::Value);
+pub struct ScrubbedJsonValue(serde_json::Value);
 impl ScrubbedJsonValue {
     pub fn scrub<T: serde::Serialize>(s: T) -> Result<Self, serde_json::Error> {
         let val = serde_json::to_value(s)?;
         Ok(Self(val))
+    }
+    pub fn inner(self) -> serde_json::Value {
+        self.0
     }
 }
 

@@ -59,7 +59,7 @@ pub fn save_error_verification_results(
 
             Ok(NewVerificationResult {
                 request_id: req.id.clone(),
-                response: ScrubbedJsonValue(r),
+                response: ScrubbedJsonValue::scrub(r)?,
                 timestamp: now,
                 e_response: Some(e_response),
                 is_error: true,
