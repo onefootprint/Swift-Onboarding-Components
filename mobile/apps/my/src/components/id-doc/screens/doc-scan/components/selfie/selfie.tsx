@@ -7,9 +7,8 @@ import { detectFace } from 'vision-camera-plugin-face-detection';
 import { REVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../camera';
+import Camera from '../scan';
 import ConsentDialog from './components/consent-dialog';
-import Frame from './components/frame';
 
 export type SelfieProps = {
   authToken: string;
@@ -60,12 +59,9 @@ const Selfie = ({ authToken }: SelfieProps) => {
   return (
     <>
       <Camera
-        detector={detector}
         disabled={isCameraDisabled}
-        Frame={Frame}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
-        size="large"
         title={t('title')}
         type="front"
         feedback={feedback}

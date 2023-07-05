@@ -9,7 +9,7 @@ type FeedbackProps = {
 const Feedback = ({ children }: FeedbackProps) => {
   return (
     <Container>
-      <Typography variant="caption-3" color="quinary">
+      <Typography variant="label-4" color="quinary">
         {children}
       </Typography>
     </Container>
@@ -18,12 +18,9 @@ const Feedback = ({ children }: FeedbackProps) => {
 
 const Container = styled.View`
   ${({ theme }) => css`
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    top: ${theme.spacing[6]};
-    z-index: 1;
-    padding: ${theme.spacing[1]} ${theme.spacing[3]};
+    background: rgba(0, 0, 0, 0.35);
     border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
   `}
 `;
 

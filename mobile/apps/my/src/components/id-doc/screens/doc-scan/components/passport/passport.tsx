@@ -6,8 +6,7 @@ import { documentProcessor } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../camera';
-import Frame from '../default-frame';
+import Camera from '../scan';
 
 const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
@@ -38,12 +37,9 @@ const Passport = () => {
 
   return (
     <Camera
-      detector={detector}
       feedback={feedback}
-      Frame={Frame}
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      subtitle={t('subtitle')}
       title={t('title')}
     />
   );

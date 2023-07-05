@@ -88,15 +88,11 @@
         },
         "cta": "Continue"
       },
-      "camera": {
-        "cta": "Continue",
+      "preview": {
+        "cta": "Confirm",
         "cta-loading": "Submitting photo...",
         "cta-success": "Photo submitted",
         "retake": "Retake",
-        "take-manually": "Take manually",
-        "instructions": {
-          "capture": "Image will be captured automatically"
-        },
         "errors": {
           "title": "We couldn't process your image",
           "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
@@ -119,22 +115,12 @@
         }
       },
       "drivers-license": {
-        "title": "Driver's license",
-        "front": {
-          "subtitle": "Front side"
-        },
-        "back": {
-          "subtitle": "Back side"
-        }
+        "title-front": "Driver's license - Front side",
+        "back-front": "Driver's license - Back side"
       },
       "id-card": {
-        "title": "ID card",
-        "front": {
-          "subtitle": "Front side"
-        },
-        "back": {
-          "subtitle": "Back side"
-        }
+        "title-front": "ID Card - Front side",
+        "back-front": "ID Card - Back side"
       },
       "passport": {
         "title": "Passport",

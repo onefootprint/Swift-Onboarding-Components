@@ -8,7 +8,7 @@ type ErrorsProps = {
 };
 
 const Errors = ({ errors }: ErrorsProps) => {
-  const { t } = useTranslation('components.scan.camera.errors');
+  const { t } = useTranslation('components.scan.preview.errors');
 
   return (
     <Box gap={3} center marginTop={7}>

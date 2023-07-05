@@ -7,8 +7,7 @@ import { documentProcessor } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../camera';
-import Frame from '../default-frame';
+import Camera from '../scan';
 
 export type DriversLicenseProps = {
   side: SubmitDocumentSide;
@@ -16,9 +15,6 @@ export type DriversLicenseProps = {
 
 const DriversLicense = ({ side }: DriversLicenseProps) => {
   const { t } = useTranslation('components.scan.drivers-license');
-  const { t: sideT } = useTranslation(
-    `components.scan.drivers-license.${side}`,
-  );
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -46,13 +42,10 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
 
   return (
     <Camera
-      detector={detector}
       feedback={feedback}
-      Frame={Frame}
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      subtitle={sideT('subtitle')}
-      title={t('title')}
+      title={t(`title-${side}`)}
     />
   );
 };

@@ -7,8 +7,7 @@ import { documentProcessor } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
-import Camera from '../camera';
-import Frame from '../default-frame';
+import Camera from '../scan';
 
 export type IdCardProps = {
   side: SubmitDocumentSide;
@@ -16,7 +15,6 @@ export type IdCardProps = {
 
 const IdCard = ({ side }: IdCardProps) => {
   const { t } = useTranslation('components.scan.id-card');
-  const { t: sideT } = useTranslation(`components.scan.id-card.${side}`);
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -44,13 +42,10 @@ const IdCard = ({ side }: IdCardProps) => {
 
   return (
     <Camera
-      detector={detector}
       feedback={feedback}
-      Frame={Frame}
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
-      subtitle={sideT('subtitle')}
-      title={t('title')}
+      title={t(`title-${side}`)}
     />
   );
 };
