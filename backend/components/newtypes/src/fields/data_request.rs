@@ -154,20 +154,6 @@ impl DataRequest<()> {
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
     pub fn clean_and_validate(map: DataIdentifierRequest, args: ValidateArgs) -> NtResult<Self> {
-        // TODO for now, while we still accept sandbox suffix in email, strip it here
-        let map: DataIdentifierRequest = map
-            .into_iter()
-            .map(|(di, pii)| {
-                let pii = match di {
-                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email) => {
-                        PiiString::new(pii.leak().split('#').next().unwrap().to_owned())
-                    }
-                    _ => pii,
-                };
-                (di, pii)
-            })
-            .collect();
-
         let unallowed_derived_dis: HashMap<_, _> = map
             .keys()
             .filter_map(|di| {

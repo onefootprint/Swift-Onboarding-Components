@@ -19,6 +19,7 @@ import hashlib
         ("id.address_line1", "1 Footprint Way"),
         ("id.phone_number", "+14444444444"),
         ("id.email", "piip@onefootprint.com"),
+        ("id.email", "example#@gmail.com"),
     ],
 )
 def test_data_vaulting(tenant, key, value):
