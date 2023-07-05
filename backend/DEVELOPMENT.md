@@ -52,6 +52,12 @@ Finally make sure you tell aws about the profile:
 export AWS_PROFILE=dev
 ```
 
+Note: this session will expire after some time. To refresh your credentials, do:
+
+```bash
+aws sso login
+```
+
 ## Local development
 
 First, get your .env file setup. This is stored encrypted in git. To decrypt it, make sure you have AWS creds above, and run the following from `backend/`:
@@ -163,14 +169,16 @@ $ pulumi --stack footprint/prod config set --secret --path <SECRET_NAME> <SECRET
 ```
 
 For example
- ```sh
- $ AWS_PROFILE=dev pulumi --stack footprint/dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
- ```
 
- You can similarly read existing secret values with
- ```
- $ AWS_PROFILE=dev pulumi --stack footprint/dev config get --path constants.grafana.apiKey
- ```
+```sh
+$ AWS_PROFILE=dev pulumi --stack footprint/dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
+```
+
+You can similarly read existing secret values with
+
+```
+$ AWS_PROFILE=dev pulumi --stack footprint/dev config get --path constants.grafana.apiKey
+```
 
 - To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.
 

@@ -120,19 +120,25 @@ configure-aws:
 	@aws configure set default.region ${AWS_REGION}
 	
 update-dot-env:
-	@AWS_REGION=us-east-1 aws kms encrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
-		--plaintext fileb://.env \
-		--output text \
-		--query CiphertextBlob > encrypted.env
+	@command -v rage || (echo "missing rage: installing" && cargo install rage)
+	@cat .env | rage -e -r age1u4858547zdlc7ncghc3wypqxamt7v5xh0kasysqjfk0dt6ahcdnqtprun4 -a -o .env.age
+	@echo "updated .env.age"
 
 set-dot-env:
-	@cat encrypted.env | base64 --decode > /tmp/encrypted.env.bin
+	@command -v rage || (echo "missing rage: installing" && cargo install rage)
+
+	@cat encrypted_env_key.base64 | base64 --decode > /tmp/e_key.age
 	@AWS_REGION=us-east-1 aws kms decrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
-		--ciphertext-blob fileb:///tmp/encrypted.env.bin \
+		--ciphertext-blob fileb:///tmp/e_key.age \
 		--output text \
-		--query Plaintext | base64 --decode > .env
-	@rm /tmp/encrypted.env.bin
-	@echo "created .env:\n"
+		--query Plaintext | base64 --decode > /tmp/key.age
+	@rage -d -i /tmp/key.age -o .env .env.age
+
+	@rm /tmp/e_key.age
+	@rm /tmp/key.age
+
+	@echo "created .env:"
+	@cat .env
 
 setup-integration-tests:
 	@python3 -m venv ~/.virtualenvs/fpc
