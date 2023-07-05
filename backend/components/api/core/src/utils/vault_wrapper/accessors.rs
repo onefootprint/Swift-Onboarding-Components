@@ -1,8 +1,8 @@
 use super::VaultWrapper;
-use db::models::document_data::DocumentData;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
-use db::models::vault_data::VaultedData;
+use db::HasLifetime;
+use db::VaultedData;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DocumentKind;
@@ -55,6 +55,29 @@ impl<Type> VaultWrapper<Type> {
     where
         T: Into<DataIdentifier> + Clone,
     {
+        // TODO we should do this in VaultWrapperData, not here
+        let id = id.into();
+        // First see if we can the DI is stored in the document table
+        if let DataIdentifier::Document(d) = id {
+            let lookup_d = match d {
+                // Get mime_type from the parent DocumentData
+                DocumentKind::MimeType(doc_kind, side) => DocumentKind::from_id_doc_kind(doc_kind, side),
+                d => d,
+            };
+            let document = self
+                .speculative
+                .get_document(lookup_d)
+                .or_else(|| self.portable.get_document(lookup_d));
+            if let Some(document) = document {
+                let data = match d {
+                    // This is weird - get the mime type from the document row
+                    DocumentKind::MimeType(_, _) => VaultedData::NonPrivate(&document.mime_type),
+                    _ => document.data(),
+                };
+                return Some(data);
+            }
+        }
+        // Otherwise surface from the VaultData table. OCR data lives here too.
         self.get(id).map(|v| v.data())
     }
 
@@ -74,11 +97,5 @@ impl<Type> VaultWrapper<Type> {
         T: Into<DataIdentifier> + Clone,
     {
         self.get(id).and_then(|v| v.p_data.as_ref())
-    }
-
-    pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {
-        self.speculative
-            .get_document(kind)
-            .or_else(|| self.portable.get_document(kind))
     }
 }

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use itertools::Itertools;
-use newtypes::{DataLifetimeId, VaultId};
+use newtypes::{DataLifetimeId, PiiString, SealedVaultBytes, VaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
@@ -48,4 +48,16 @@ pub trait HasLifetime {
             .into_group_map();
         Ok(results)
     }
+
+    fn data(&self) -> VaultedData;
+}
+
+pub enum VaultedData<'a> {
+    /// Data that is stored encrypted
+    Sealed(&'a SealedVaultBytes),
+    /// Larger data that is encrypted using an intermediate key. The encrypted data is stored in
+    /// s3, and the intermediate key is encrypted to the user vault's key.
+    LargeSealed(&'a String, &'a newtypes::SealedVaultDataKey),
+    /// Data that is generally not considered private so is stored in plaintext in the DB
+    NonPrivate(&'a PiiString),
 }

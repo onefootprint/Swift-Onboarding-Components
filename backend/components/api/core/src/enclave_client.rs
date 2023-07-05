@@ -10,7 +10,6 @@ use enclave_proxy::{
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
     SignRequest, Signing,
 };
-use enclave_proxy::{DataTransformer, DataTransforms};
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
@@ -34,8 +33,6 @@ pub struct EnclaveClient {
 }
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
-
-pub type EncryptedDocumentData<'a> = (&'a SealedVaultDataKey, &'a String, Vec<DataTransform>);
 
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
@@ -343,15 +340,15 @@ impl EnclaveClient {
     }
 
     #[tracing::instrument(skip_all)]
+    /// Decrypts the each document by decrypting their SealedVaultDataKey from the enclave and using
+    /// this to unseal the actual document bytes, downloaded from s3.
+    /// NOTE: this does not apply any data transforms
     pub async fn batch_decrypt_documents<'a>(
         &self,
         e_private_key: &EncryptedVaultPrivateKey,
-        documents: Vec<EncryptedDocumentData<'a>>,
+        documents: Vec<(&'a SealedVaultDataKey, &'a String)>,
     ) -> Result<Vec<PiiBytes>, ApiError> {
-        let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents
-            .into_iter()
-            .map(|(k, url, transform)| ((k, transform), url))
-            .unzip();
+        let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
         let get_futures = s3_urls.into_iter().map(|s3_url| {
             self.s3_client
                 .get_object_from_s3_url(s3_url)
@@ -359,18 +356,14 @@ impl EnclaveClient {
         });
         let document_bytes = futures::future::try_join_all(get_futures).await?;
 
-        let (sealed_keys, transforms): (Vec<_>, Vec<_>) = sealed_keys.into_iter().unzip();
         let sealing_keys = self
             .decrypt_sealed_vault_data_key(sealed_keys, e_private_key)
             .await?;
         let decrypted_document_bytes = document_bytes
             .into_iter()
             .zip(sealing_keys)
-            .zip(transforms)
-            .map(|((bytes, key), transform)| {
+            .map(|(bytes, key)| {
                 key.unseal_bytes(AeadSealedBytes(bytes.to_vec()))
-                    .map_err(ApiError::from)
-                    .and_then(|data| DataTransforms(transform).apply(data).map_err(ApiError::from))
                     .map(PiiBytes::new)
             })
             .collect::<Result<Vec<_>, _>>()?;

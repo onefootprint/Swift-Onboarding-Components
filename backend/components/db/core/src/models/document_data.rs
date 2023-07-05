@@ -4,6 +4,7 @@ use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
 use crate::TxnPgConn;
+use crate::VaultedData;
 use chrono::{DateTime, Utc};
 use db_schema::schema::data_lifetime;
 use db_schema::schema::document_data;
@@ -12,6 +13,7 @@ use itertools::Itertools;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentDataId;
 use newtypes::DocumentKind;
+use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
 use newtypes::VaultId;
@@ -27,11 +29,9 @@ pub struct DocumentData {
     pub _updated_at: DateTime<Utc>,
     pub lifetime_id: DataLifetimeId,
     pub kind: DocumentKind,
-    // TODO rm
-    pub mime_type: String,
-    // TODO rm
+    pub mime_type: PiiString,
     pub filename: String,
-    pub s3_url: String,
+    pub s3_url: String, // TODO newtype
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -40,7 +40,7 @@ pub struct DocumentData {
 pub struct NewDocumentData {
     pub lifetime_id: DataLifetimeId,
     pub kind: DocumentKind,
-    pub mime_type: String,
+    pub mime_type: PiiString,
     pub filename: String,
     pub s3_url: String,
     pub e_data_key: SealedVaultDataKey,
@@ -66,7 +66,7 @@ impl DocumentData {
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,
             kind,
-            mime_type,
+            mime_type: PiiString::from(mime_type),
             filename,
             s3_url,
             e_data_key,
@@ -130,5 +130,9 @@ impl HasLifetime for DocumentData {
             .filter(document_data::lifetime_id.eq_any(lifetime_ids))
             .get_results(conn)?;
         Ok(results)
+    }
+
+    fn data(&self) -> VaultedData {
+        VaultedData::LargeSealed(&self.s3_url, &self.e_data_key)
     }
 }

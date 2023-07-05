@@ -98,24 +98,19 @@ impl<Type> VwData<Type> {
         self.vd.iter().find(|d| d.kind == di)
     }
 
-    fn get_lifetime<T>(&self, id: T) -> Option<&DataLifetime>
-    where
-        T: Into<DataIdentifier>,
-    {
-        self.get(id).and_then(|d| {
-            let lifetime_id = d.lifetime_id();
-            self.lifetimes.get(lifetime_id)
-        })
-    }
-
     pub(super) fn get_lifetimes<VecT, T>(&self, kinds: VecT) -> Vec<&DataLifetime>
     where
         VecT: IntoIterator<Item = T>,
         T: Into<DataIdentifier>,
     {
-        kinds.into_iter().flat_map(|k| self.get_lifetime(k)).collect()
+        kinds
+            .into_iter()
+            .flat_map(|k| self.get(k))
+            .flat_map(|d| self.lifetimes.get(d.lifetime_id()))
+            .collect()
     }
 
+    // Todo maybe combine with get
     pub fn get_document(&self, kind: DocumentKind) -> Option<&DocumentData> {
         self.documents.iter().find(|d| d.kind == kind)
     }

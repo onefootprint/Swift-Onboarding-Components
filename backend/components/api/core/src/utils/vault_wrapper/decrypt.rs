@@ -6,8 +6,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::State;
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
-use db::models::vault_data::VaultedData;
-use db::DbPool;
+use db::{DbPool, VaultedData};
 use derive_more::{Deref, DerefMut};
 use either::Either;
 use enclave_proxy::DataTransform;
@@ -15,9 +14,8 @@ use enclave_proxy::{DataTransformer, DataTransforms};
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, DocumentKind,
-    IdentityDataKind as IDK, KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
-    StorageType,
+    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, IdentityDataKind as IDK,
+    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
 };
 use std::collections::HashMap;
 
@@ -125,88 +123,85 @@ impl<Type> VaultWrapper<Type> {
             });
         }
 
-        // Split data identifiers by (document kinds, e_data kinds, p_data kinds)
-        let (documents_kinds, remaining_dis): (Vec<_>, Vec<_>) =
-            ids.clone().into_iter().partition_map(|(di, transform)| match di {
-                DataIdentifier::Document(kind)
-                    if matches!(kind.storage_type(), StorageType::DocumentData) =>
-                {
-                    either::Either::Left((kind, transform))
-                }
-                DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) => {
-                    let doc_di = DocumentKind::from_id_doc_kind(doc_kind, side);
-                    let mime_type = self
-                        .get_document(doc_di)
-                        .map(|data| DataTransforms(transform.clone()).apply_str::<PiiString>(&data.mime_type))
-                        .map(|mt| {
-                            Either::Right((EnclaveDecryptOperation::new(di.clone(), transform.clone()), mt))
-                        });
-                    either::Either::Right(mime_type)
-                }
-                _ => either::Either::Right(self.get_data(di.clone()).map(|data| match data {
-                    VaultedData::Sealed(e_data) => Either::Left((
-                        EnclaveDecryptOperation::new(di.clone(), transform.clone()),
-                        e_data,
-                        transform,
-                    )),
-                    VaultedData::NonPrivate(p_data) => Either::Right((
-                        EnclaveDecryptOperation::new(di.clone(), transform.clone()),
-                        DataTransforms(transform).apply_str(p_data.leak()),
-                    )),
-                })),
-            });
-        let (e_data, p_data): (_, Vec<_>) = remaining_dis.into_iter().flatten().partition_map(|x| x);
-
-        let p_data = p_data
+        // Fetch each DI's underlying data from the vault wrapper's in-memory state
+        let datas = ids
+            .clone()
             .into_iter()
-            .map(|(di, p_data_res)| p_data_res.map(|p| (di, p)))
-            .collect::<Result<Vec<_>, _>>()?;
+            .flat_map(|(di, transform)| {
+                self.get_data(di.clone())
+                    .map(|d| (d, EnclaveDecryptOperation::new(di, transform)))
+            })
+            .collect_vec();
 
-        // special case decrypt documents
-        let documents: HashMap<EnclaveDecryptOperation, PiiString> = {
-            let (document_kinds, document_datas): (Vec<_>, _) = documents_kinds
+        // Split data into p_data, e_data, e_large_data, as each have different "decryption" methods
+        let (p_data, e_data): (Vec<_>, Vec<_>) = datas.into_iter().partition_map(|(d, op)| match d {
+            VaultedData::NonPrivate(p_data) => Either::Left((p_data, op)),
+            VaultedData::Sealed(e_data) => Either::Right(Either::Left((e_data, op))),
+            VaultedData::LargeSealed(s3_url, e_data_key) => {
+                Either::Right(Either::Right(((e_data_key, s3_url), op)))
+            }
+        });
+        let (e_data, e_large_data): (Vec<_>, Vec<_>) = e_data.into_iter().partition_map(|x| x);
+
+        // Handle p_data
+        let p_data = {
+            p_data
                 .into_iter()
-                .filter_map(|(kind, transform)| self.get_document(kind).map(|d| (d, transform)))
-                .map(|(doc, transform)| {
-                    (
-                        EnclaveDecryptOperation::new(DataIdentifier::Document(doc.kind), transform.clone()),
-                        (&doc.e_data_key, &doc.s3_url, transform),
-                    )
+                .map(|(p_data, op)| -> ApiResult<_> {
+                    // We apply the data transforms for p_data outside of the enclave here.
+                    let p_data = p_data.leak();
+                    let transformed = DataTransforms(op.transforms.clone()).apply_str::<PiiString>(p_data)?;
+                    Ok((op, transformed))
                 })
-                .unzip();
-
-            let decrypted_documents: Vec<PiiString> = enclave_client
-                .batch_decrypt_documents(&self.vault.e_private_key, document_datas)
-                .await?
-                .into_iter()
-                .map(PiiBytes::into_leak_base64_pii)
-                .collect();
-
-            document_kinds.into_iter().zip(decrypted_documents).collect()
+                .collect::<ApiResult<Vec<_>>>()?
         };
 
-        // decrypt remaining e_data
-        let text = enclave_client
-            .batch_decrypt_to_piistring(e_data, &self.vault.e_private_key)
-            .await?;
+        // Handle e_data
+        let e_data = {
+            let data_to_decrypt = e_data
+                .into_iter()
+                .map(|(e_data, op)| (op.clone(), e_data, op.transforms))
+                .collect();
+            // decrypt remaining e_data
+            enclave_client
+                .batch_decrypt_to_piistring(data_to_decrypt, &self.vault.e_private_key)
+                .await?
+        };
+
+        // Handle e_large_data
+        let e_large_data = {
+            let (document_datas, operations): (Vec<_>, Vec<_>) = e_large_data.into_iter().unzip();
+            let decrypted_documents: Vec<PiiBytes> = enclave_client
+                .batch_decrypt_documents(&self.vault.e_private_key, document_datas)
+                .await?;
+
+            // Zip operations back with the decrypted documents, which are returned in order
+            operations
+                .into_iter()
+                .zip(decrypted_documents)
+                .map(|(op, pii_bytes)| -> ApiResult<_> {
+                    // Apply the document transforms inline since we decrypt the document outside of
+                    // the enclave
+                    let transformed = DataTransforms(op.transforms.clone()).apply(pii_bytes.into_leak())?;
+                    let pii_string = PiiBytes::new(transformed).into_leak_base64_pii();
+                    Ok((op, pii_string))
+                })
+                .collect::<ApiResult<HashMap<_, _>>>()?
+        };
 
         // Don't make access events for the DIs that are already in plaintext
-        let decrypted_dis = ids
+        let decrypted_dis = e_data.keys().chain(e_large_data.keys()).cloned().collect();
+        // Join all the different types of decrypted data into one HashMap
+        let results = p_data
             .into_iter()
-            .filter(|(di, _)| !p_data.iter().any(|(d, _)| &d.identifier == di))
-            .map(|(di, t)| EnclaveDecryptOperation::new(di, t))
-            .collect();
-        let results = documents
-            .into_iter()
-            .chain(text.into_iter())
-            .chain(p_data.into_iter())
+            .chain(e_data.into_iter())
+            .chain(e_large_data.into_iter())
             .collect();
 
         let result = DecryptUncheckedResult {
             results,
             decrypted_dis,
         };
-        // TODO add sandbox suffix to phone/email here
         Ok(result)
     }
 

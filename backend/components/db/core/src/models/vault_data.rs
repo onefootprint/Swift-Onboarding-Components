@@ -3,6 +3,7 @@ use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
 use crate::TxnPgConn;
+use crate::VaultedData;
 use chrono::{DateTime, Utc};
 use db_schema::schema::vault_data;
 use diesel::prelude::*;
@@ -123,21 +124,12 @@ impl HasLifetime for VaultData {
             .get_results(conn)?;
         Ok(results)
     }
-}
 
-impl VaultData {
-    pub fn data(&self) -> VaultedData {
+    fn data(&self) -> VaultedData {
         if let Some(p_data) = self.p_data.as_ref() {
             VaultedData::NonPrivate(p_data)
         } else {
             VaultedData::Sealed(&self.e_data)
         }
     }
-}
-
-pub enum VaultedData<'a> {
-    /// Data that is stored encrypted
-    Sealed(&'a SealedVaultBytes),
-    /// Data that is generally not considered private so is stored in plaintext in the DB
-    NonPrivate(&'a PiiString),
 }

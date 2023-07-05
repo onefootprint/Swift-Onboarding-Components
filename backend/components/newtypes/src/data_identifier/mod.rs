@@ -348,6 +348,7 @@ impl DataIdentifier {
 }
 
 /// Defines variants for how encrypted bytes are actually stored
+/// TODO update this?
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StorageType {
     /// in the database as 'vault_data'
@@ -366,6 +367,7 @@ impl DataIdentifier {
             DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Business(_)
             | DataIdentifier::Id(_)
+            // Custom data won't always be VaultData anymore - will sometimes be document
             | DataIdentifier::Custom(_)
             | DataIdentifier::Card(_) => StorageType::VaultData,
         }

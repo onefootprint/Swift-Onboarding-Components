@@ -54,4 +54,5 @@ def test_decrypt(sandbox_tenant, sb_user_with_investor_profile, fields_to_decryp
     access_event = latest_access_event_for(
         sb_user_with_investor_profile.fp_id, sandbox_tenant.sk
     )
-    assert set(access_event["targets"]) == set(fields_to_decrypt)
+    populated_keys = set(sb_user_with_investor_profile.client.data)
+    assert set(access_event["targets"]) == set(fields_to_decrypt) & populated_keys
