@@ -6,21 +6,23 @@ import Preview from './components/preview';
 import type { CameraType } from './scan.types';
 
 type ScanProps = {
+  children?: React.ReactNode;
   disabled?: boolean;
+  feedback?: string;
   frameProcessor?: any;
   isObjectDetected?: boolean;
   title: string;
   type?: CameraType;
-  feedback?: string;
 };
 
 const Scan = ({
+  children,
   disabled = false,
+  feedback,
   frameProcessor,
   isObjectDetected,
   title,
   type = 'back',
-  feedback,
 }: ScanProps) => {
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
   const showPreview = !!photo;
@@ -44,7 +46,9 @@ const Scan = ({
       onPhotoTaken={handlePhotoTaken}
       title={title}
       type={type}
-    />
+    >
+      {children}
+    </Camera>
   );
 };
 

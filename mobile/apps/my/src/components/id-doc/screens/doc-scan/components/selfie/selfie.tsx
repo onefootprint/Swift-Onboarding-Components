@@ -9,10 +9,13 @@ import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../scan';
 import ConsentDialog from './components/consent-dialog';
+import Frame from './components/frame';
 
 export type SelfieProps = {
   authToken: string;
 };
+
+const { width, height } = Dimensions.get('window');
 
 const Selfie = ({ authToken }: SelfieProps) => {
   const { t } = useTranslation('components.scan.selfie');
@@ -26,10 +29,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
     frame => {
       'worklet';
 
-      const options = {
-        width: windowWidth - 32,
-        height: 220,
-      };
+      const options = { width, height };
       const result = detectFace(frame, options);
 
       if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
@@ -65,7 +65,9 @@ const Selfie = ({ authToken }: SelfieProps) => {
         title={t('title')}
         type="front"
         feedback={feedback}
-      />
+      >
+        <Frame detector={detector} />
+      </Camera>
       {shouldShowContent && (
         <ConsentDialog
           authToken={authToken}
@@ -77,7 +79,5 @@ const Selfie = ({ authToken }: SelfieProps) => {
     </>
   );
 };
-
-const windowWidth = Dimensions.get('window').width;
 
 export default Selfie;

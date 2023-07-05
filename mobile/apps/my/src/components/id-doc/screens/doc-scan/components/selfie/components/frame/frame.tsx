@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { Dimensions } from 'react-native';
 import Reanimated, {
   useAnimatedStyle,
   withTiming,
@@ -30,6 +31,10 @@ const Frame = ({ detector }: FrameProps) => {
     </FrameContainer>
   );
 };
+
+const windowWidth = Dimensions.get('window').width;
+const frameWidth = 260;
+const frameHeight = 320;
 
 const Corner = ({ kind, detector }: { kind: CornerKind; detector: any }) => {
   const borderStyle = useAnimatedStyle(() => {
@@ -64,10 +69,11 @@ const Corner = ({ kind, detector }: { kind: CornerKind; detector: any }) => {
 
 const FrameContainer = styled.View`
   ${({ theme }) => css`
-    height: 320px;
+    height: ${frameHeight}px;
     padding-vertical: ${theme.spacing[9]};
     position: absolute;
-    width: 260px;
+    top: ${windowWidth - frameHeight / 2}px;
+    width: ${frameWidth}px;
     z-index: 1;
   `}
 `;

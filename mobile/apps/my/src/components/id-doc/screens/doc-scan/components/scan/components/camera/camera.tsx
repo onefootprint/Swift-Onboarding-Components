@@ -16,6 +16,7 @@ import Header from './components/header';
 let timerId: NodeJS.Timeout | null = null;
 
 type CameraProps = {
+  children?: React.ReactNode;
   disabled?: boolean;
   feedback?: string;
   frameProcessor?: any;
@@ -26,6 +27,7 @@ type CameraProps = {
 };
 
 const Camera = ({
+  children,
   disabled = false,
   feedback,
   frameProcessor,
@@ -78,6 +80,7 @@ const Camera = ({
             zoom={zoom}
           />
         )}
+        {children}
         {isFlashing ? <Flash /> : null}
         <Buttons>
           {feedback && <Feedback>{feedback}</Feedback>}

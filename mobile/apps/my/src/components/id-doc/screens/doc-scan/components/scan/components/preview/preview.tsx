@@ -98,7 +98,7 @@ const Camera = ({ title, onReset, photo }: PreviewProps) => {
 const Preview = styled(Image)<{ hasError: boolean }>`
   ${({ theme, hasError }) => css`
     border-radius: ${theme.borderRadius.large};
-    height: 260px;
+    height: 390px;
     margin-top: ${theme.spacing[7]};
     width: 100%;
 
