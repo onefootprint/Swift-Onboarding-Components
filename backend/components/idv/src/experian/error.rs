@@ -26,6 +26,17 @@ pub enum Error {
     InvalidScore(String),
     #[error("Experian Validation error {0}")]
     ValidationError(#[from] ValidationError),
+    #[error("Parsable APIError {0}")]
+    ParsableAPIError(Box<ParsableAPIError>),
+}
+
+impl Error {
+    pub fn into_parsable_error(self, response: serde_json::Value) -> Self {
+        Self::ParsableAPIError(Box::new(ParsableAPIError {
+            error: self,
+            response,
+        }))
+    }
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
@@ -54,96 +65,98 @@ pub enum ConversionError {
 pub enum CrossCoreResponseError {
     #[error("Missing preciseID response")]
     PreciseIDResponseNotFound,
+    #[error("Error response code received: {0}")]
+    Error(String),
 }
 
 /// The following is a list of the error codes that can be returned from the Precise ID application.
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, Hash)]
 pub enum ExperianErrorCode {
-    // Consumer is a minor
+    /// Consumer is a minor
     #[serde(rename = "010")]
     E010,
-    // Format error
+    /// Format error
     #[serde(rename = "013")]
     E013,
-    // Information on the inquiry was reported as fraud by the consumer
+    /// Information on the inquiry was reported as fraud by the consumer
     #[serde(rename = "018")]
     E018,
-    // Invalid surname
+    /// Invalid surname
     #[serde(rename = "045")]
     E045,
-    // Current ZIP Code error
+    /// Current ZIP Code error
     #[serde(rename = "049")]
     E049,
-    // State legislation requires match on more identification information
+    /// State legislation requires match on more identification information
     #[serde(rename = "092")]
     E092,
-    // Invalid surname
+    /// Invalid surname
     #[serde(rename = "106")]
     E106,
-    // One or more requested reports unavailable at this time – Please resubmit later
+    /// One or more requested reports unavailable at this time – Please resubmit later
     #[serde(rename = "258")]
     E258,
-    // Components of checkpoint system temporarily unavailable. Please resubmit
+    /// Components of checkpoint system temporarily unavailable. Please resubmit
     #[serde(rename = "259")]
     E259,
-    // *** NFD temporarily unavailable. Please resubmit *** (for the NFD Only product option)
+    /// *** NFD temporarily unavailable. Please resubmit *** (for the NFD Only product option)
     #[serde(rename = "304")]
     E304,
-    // NFD does not process inquiries with a Colorado ZIP Code (for the NFD Only product option)
+    /// NFD does not process inquiries with a Colorado ZIP Code (for the NFD Only product option)
     #[serde(rename = "313")]
     E313,
-    // Not all data available for Experian Detect evaluation
+    /// Not all data available for Experian Detect evaluation
     #[serde(rename = "323")]
     E323,
-    // Experian Detect temporarily unavailable
+    /// Experian Detect temporarily unavailable
     #[serde(rename = "324")]
     E324,
-    // Precise ID system temporarily unavailable
+    /// Precise ID system temporarily unavailable
     #[serde(rename = "352")]
     E352,
-    // Fraud Shield unavailable
+    /// Fraud Shield unavailable
     #[serde(rename = "358")]
     E358,
-    // Credit Reporting temporarily unavailable
+    /// Credit Reporting temporarily unavailable
     #[serde(rename = "362")]
     E362,
-    // Invalid preamble for this subcode
+    /// Invalid preamble for this subcode
     #[serde(rename = "388")]
     E388,
-    // SSN required to access consumer’s file
+    /// SSN required to access consumer’s file
     #[serde(rename = "403")]
     E403,
-    // Generation code required to access consumer’s file
+    /// Generation code required to access consumer’s file
     #[serde(rename = "404")]
     E404,
-    // Year of Birth require to access consumer’s file
+    /// Year of Birth require to access consumer’s file
     #[serde(rename = "405")]
     E405,
-    // Middle name require to access consumer’s file
+    /// Middle name require to access consumer’s file
     #[serde(rename = "406")]
     E406,
-    // Unable to standardize current address
+    /// Unable to standardize current address
     #[serde(rename = "407")]
     E407,
-    // Invalid street address filed
+    /// Invalid street address filed
     #[serde(rename = "627")]
     E627,
-    // Current Address exceeds maximum length
+    /// Current Address exceeds maximum length
     #[serde(rename = "633")]
     E633,
-    // Input validation error
+    /// Input validation error
     #[serde(rename = "708")]
     E708,
-    // Invalid User ID/Password
+    /// Invalid User ID/Password
     #[serde(rename = "709")]
     E709,
-    // Session timeout (for KIQ product options only). May also be returned if the Session ID does not exist (for KIQ product responses only).
+    /// Session timeout (for KIQ product options only). May also be returned if the Session ID does not exist (for KIQ product responses only).
     #[serde(rename = "710")]
     E710,
-    // End User is required
+    /// End User is required
     #[serde(rename = "711")]
     E711,
-    // Other Precise ID system error
+    /// Other Precise ID system error
     #[serde(rename = "720")]
     E720,
     // TODO: Also get json not well formed R0102 in the response header, but not in the docs anywhere /shrug
@@ -172,5 +185,21 @@ impl fmt::Display for EnvironmentMismatchError {
             "is_production={}, is_test_case={}",
             self.is_production, self.is_test_case
         )
+    }
+}
+
+/// In the case that we have errors that get returned in a deserializable json response,
+/// we still want to save these as VerificationResults.
+///
+/// This struct wraps `Error` so that we can propagate the json up and save.
+#[derive(Debug)]
+pub struct ParsableAPIError {
+    pub error: Error,
+    pub response: serde_json::Value,
+}
+
+impl std::fmt::Display for ParsableAPIError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.error)
     }
 }

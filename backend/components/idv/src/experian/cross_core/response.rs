@@ -92,6 +92,20 @@ impl CrossCoreAPIResponse {
 
         Ok(code)
     }
+
+    pub fn validate(&self) -> Result<(), Error> {
+        let err = self
+            .precise_id_response()?
+            .error
+            .and_then(|e| e.error_code)
+            .map(|code| Error::ResponseError(CrossCoreResponseError::Error(code)));
+
+        if let Some(e) = err {
+            Err(e)
+        } else {
+            Ok(())
+        }
+    }
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

@@ -204,6 +204,9 @@ impl VendorResults {
                 idv::Error::IDologyError(idv::idology::error::Error::ParsableAPIError(e)) => {
                     (req.clone(), Some(e.response.clone()))
                 }
+                idv::Error::ExperianError(idv::experian::error::Error::ParsableAPIError(e)) => {
+                    (req.clone(), Some(e.response.clone()))
+                }
                 // TODO: non-ideal to have empty json, should make response optional
                 _ => (req.clone(), None),
             },

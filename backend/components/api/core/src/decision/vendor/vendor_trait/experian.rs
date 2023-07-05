@@ -21,6 +21,10 @@ impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::exp
         let raw_response = idv::experian::cross_core::send_precise_id_request(self, request).await?;
         let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())?;
 
+        parsed_response
+            .validate()
+            .map_err(|e| e.into_parsable_error(raw_response.clone()))?;
+
         Ok(ExperianCrossCoreResponse {
             raw_response: PiiJsonValue::new(raw_response),
             parsed_response,
