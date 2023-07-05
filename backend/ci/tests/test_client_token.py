@@ -100,3 +100,28 @@ def test_insufficient_permissions(sandbox_user):
         }
         post(f"entities/vault/validate", data, auth_token, status_code=401)
         patch(f"entities/vault", data, auth_token, status_code=401)
+
+
+def test_large_objects(sandbox_user):
+    auth_token = client_token_with_scopes(
+        sandbox_user, ["custom.large_id"], ["decrypt", "vault"]
+    )
+
+    di = "custom.large_id"
+    obj = {"some_key": "hello world!" * 100_000}
+
+    post(f"entities/vault/{di}/upload", obj, auth_token)
+
+    resp = post(
+        f"entities/vault/decrypt",
+        {
+            "fields": [di],
+            "reason": "i wanna2",
+        },
+        auth_token,
+    )
+    import base64, json
+
+    assert resp[di]
+    obj_out = base64.b64decode(resp[di])
+    assert json.loads(obj_out)["some_key"] == obj["some_key"]

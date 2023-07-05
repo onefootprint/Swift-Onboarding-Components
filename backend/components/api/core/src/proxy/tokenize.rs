@@ -248,10 +248,10 @@ async fn encrypt_document(
         mime_type.as_ref().map(|s| s.as_str()).unwrap_or("image/png"),
     );
 
-    let (e_data_key, s3_url) = utils::vault_wrapper::encrypt_to_s3(
+    let (e_data_key, s3_url) = utils::vault_wrapper::seal_file_and_upload_to_s3(
         state,
         &file,
-        doc_kind,
+        doc_kind.into(),
         &vault.public_key,
         &vault.id,
         &scoped_vault.id,

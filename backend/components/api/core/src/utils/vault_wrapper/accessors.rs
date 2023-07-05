@@ -79,6 +79,19 @@ impl<Type> VaultWrapper<Type> {
                 return Some(data);
             }
         }
+
+        // next see if it's a custom data which can be stored in the document table too!
+        if let DataIdentifier::Custom(_) = id {
+            let document = self
+                .speculative
+                .get_document(&id)
+                .or_else(|| self.portable.get_document(&id));
+
+            if let Some(doc) = document {
+                return Some(doc.data());
+            }
+        }
+
         // Otherwise surface from the VaultData table. OCR data lives here too.
         self.get(id).map(|v| v.data())
     }

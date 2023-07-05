@@ -83,7 +83,7 @@ async fn patch_inner(
 ) -> JsonApiResponse<EmptyResponse> {
     let insight = CreateInsightEvent::from(insight);
 
-    let tenant_id = auth.tenant().id.clone();
+    let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let principal = auth.actor().into();
 
@@ -94,7 +94,7 @@ async fn patch_inner(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let scoped_user: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
             uvw.patch_data(conn, request)?;

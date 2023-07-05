@@ -337,7 +337,6 @@ def test_kyc(
     assert body["requires_manual_review"] == False
     assert body["status"] == "pass"
 
-
     # confirm OBD timeline event created
     timeline = get(
         f"entities/{fp_id}/timeline",
@@ -356,3 +355,37 @@ def test_kyc(
         },
         sandbox_tenant.sk.key,
     )
+
+
+def test_large_objects(sandbox_tenant):
+    body = post("users/", None, sandbox_tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    data = {
+        "id.first_name": "billy",
+        "id.last_name": "bob",
+    }
+    body = patch(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+
+    di = "custom.large_id"
+    obj = {"some_key": "hello world!" * 250_000}
+
+    post(f"/users/{fp_id}/vault/{di}/upload", obj, sandbox_tenant.sk.key)
+
+    resp = post(
+        f"entities/{fp_id}/vault/decrypt",
+        {
+            "fields": [di, "id.first_name"],
+            "reason": "i wanna2",
+        },
+        sandbox_tenant.sk.key,
+    )
+
+    import base64, json
+
+    assert resp["id.first_name"] == "billy"
+    assert resp[di]
+    obj_out = base64.b64decode(resp[di])
+    assert json.loads(obj_out)["some_key"] == obj["some_key"]

@@ -34,10 +34,10 @@ pub async fn post(
     )
     .await?;
 
-    let (e_data_key, s3_url) = utils::vault_wrapper::encrypt_to_s3(
+    let (e_data_key, s3_url) = utils::vault_wrapper::seal_file_and_upload_to_s3(
         &state,
         &file,
-        kind,
+        kind.into(),
         &user_auth.user().public_key,
         &user_auth.user().id,
         &user_auth.scoped_user.id,

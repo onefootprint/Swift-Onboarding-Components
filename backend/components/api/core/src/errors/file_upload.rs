@@ -10,8 +10,8 @@ pub enum FileUploadError {
     InvalidMimeType,
     #[error("invalid file upload body missing: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
-    #[error("image too large: max size is 1MB")]
-    FileTooLarge,
+    #[error("image too large: max size is {0}")]
+    FileTooLarge(usize),
     #[error("invalid content length")]
     InvalidContentLength,
     #[error("missing filename")]

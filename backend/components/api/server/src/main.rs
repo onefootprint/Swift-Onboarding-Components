@@ -91,6 +91,9 @@ async fn run_server() -> std::io::Result<()> {
             .limit(32_768)
             .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidFormError(err)));
 
+        let payload_cfg = web::PayloadConfig::default().limit(10)
+            .limit(1024*1024*10);
+
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(prom.clone())
@@ -113,6 +116,7 @@ async fn run_server() -> std::io::Result<()> {
             .app_data(json_cfg)
             .app_data(query_cfg)
             .app_data(form_cfg)
+            .app_data(payload_cfg)
             .wrap_api()
             .configure(api_routes_root::configure)
             .with_json_spec_at("docs-spec")

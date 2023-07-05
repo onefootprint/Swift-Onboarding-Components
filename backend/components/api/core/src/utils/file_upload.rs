@@ -58,7 +58,7 @@ pub async fn handle_file_upload(
             .map_err(|_| FileUploadError::InvalidContentLength)?;
 
     if request_content_length > max_allowed_file_size_in_bytes {
-        return Err(FileUploadError::FileTooLarge)?;
+        return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
     }
 
     // extract the file contents from body
@@ -98,7 +98,7 @@ pub async fn handle_file_upload(
         bytes.extend(chunk);
 
         if bytes.len() > request_content_length {
-            return Err(FileUploadError::FileTooLarge)?;
+            return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
         }
     }
 

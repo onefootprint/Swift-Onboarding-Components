@@ -5,6 +5,7 @@ mod delete;
 mod get;
 mod integrity;
 mod patch;
+mod upload;
 mod validate;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -17,7 +18,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(patch::patch)
         .service(patch::patch_client)
         .service(delete::delete)
-        .service(integrity::post);
+        .service(integrity::post)
+        .service(upload::post)
+        .service(upload::post_client);
 
     get::configure_get_aliases(config);
     decrypt::configure_post_aliases(config);
@@ -28,4 +31,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
     validate::configure_post_client_aliases(config);
     delete::configure_delete_aliases(config);
     integrity::configure_post_aliases(config);
+    upload::configure_post_aliases(config);
+    upload::configure_post_client_aliases(config);
 }

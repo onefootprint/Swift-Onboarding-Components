@@ -15,8 +15,8 @@ use itertools::Itertools;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
-    DocumentKind, DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData,
-    PiiString, ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
+    DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString,
+    ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -209,10 +209,10 @@ impl WriteableVw<Person> {
     }
 }
 
-pub async fn encrypt_to_s3(
+pub async fn seal_file_and_upload_to_s3(
     state: &State,
     file: &FileUpload,
-    kind: DocumentKind,
+    kind: DataIdentifier,
     public_key: &VaultPublicKey,
     vault_id: &VaultId,
     scoped_vault_id: &ScopedVaultId,
@@ -244,7 +244,7 @@ fn hash_id<T: ToString>(id: &T) -> String {
     )
 }
 
-fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: DocumentKind) -> String {
+fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: DataIdentifier) -> String {
     format!(
         "docs/encrypted/{}/{}/{}/{}",
         hash_id(vault_id),
