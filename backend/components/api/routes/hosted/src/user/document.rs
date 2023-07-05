@@ -259,7 +259,7 @@ async fn handle_incode_request(
         state,
         tenant_id,
         // TODO: upstream this somewhere based on OBC
-        get_config_id(doc_request.should_collect_selfie),
+        get_config_id(&state.config, doc_request.should_collect_selfie),
         ctx,
     )
     .await?; // TODO: handle this with better requirement checking

@@ -172,6 +172,12 @@ impl State {
             panic!("should not have experian credentials in anything other than local or production!")
         }
 
+        // API path interpolation requires base_url to not end in '/' or else we'll get errors from Incode (`Missing Authentication Token`, argoff can explain why we get that error if interested)
+        // TODO: more intelligently do this in incode client code perhaps
+        if config.incode.base_url.leak_to_string().ends_with('/') {
+            panic!("config.incode.base_url cannot end with /")
+        }
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await

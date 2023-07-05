@@ -19,11 +19,6 @@ use reqwest::header;
 use tokio_retry::strategy::FixedInterval;
 use tokio_retry::RetryIf;
 
-#[allow(unused)]
-// TODO: put these into State
-pub const INCODE_SANDBOX_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
-pub const INCODE_SANDBOX_DOCUMENT_FLOW_ID: &str = "643450886f6f92d20b27599b";
-
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
     base_url: String,
@@ -38,11 +33,6 @@ impl IncodeClientAdapter {
             ));
         }
         Ok(format!("{}/{}", self.base_url, path))
-    }
-
-    // change this to == once we get a prod clientID
-    fn is_production(client_id: &PiiString) -> bool {
-        client_id.leak() != "onefootprint887"
     }
 }
 
@@ -67,11 +57,7 @@ impl AuthenticatedIncodeClientAdapter {
 
 impl IncodeClientAdapter {
     pub fn new(credentials: IncodeCredentials) -> Result<Self, IncodeError> {
-        let base_url = if Self::is_production(&credentials.client_id) {
-            Err(IncodeError::SendError("not enabled in production".into()))
-        } else {
-            Ok("https://demo-api.incodesmile.com".into())
-        }?;
+        let base_url = credentials.base_url.leak_to_string();
 
         // These must be present on every api call
         let mut headers = header::HeaderMap::new();
@@ -465,12 +451,13 @@ mod tests {
         tests::fixtures::images::load_image_and_encode_as_b64,
     };
 
-    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter, INCODE_SANDBOX_SELFIE_FLOW_ID};
+    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
+    const INCODE_SANDBOX_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
 
     pub fn load_client() -> IncodeClientAdapter {
         let creds = IncodeCredentials {
             api_key: PiiString::from(dotenv::var("INCODE_API_KEY").unwrap()),
-            client_id: PiiString::from(dotenv::var("INCODE_CLIENT_ID").unwrap()),
+            base_url: PiiString::from(dotenv::var("INCODE_BASE_URL").unwrap()),
         };
 
         IncodeClientAdapter::new(creds).expect("couldn't load incode client")
@@ -485,10 +472,12 @@ mod tests {
             .onboarding_start(&fp_client, Some(config), None, None)
             .await
             .unwrap();
+
         let parsed = IncodeAPIResult::<OnboardingStartResponse>::try_from(res)
             .unwrap()
             .into_success()
             .unwrap();
+
         // Use token we got from omni/start to authenticate future requests
         (
             fp_client,

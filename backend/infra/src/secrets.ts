@@ -42,7 +42,9 @@ export interface StaticSecrets {
   fpcProtectedCustodianKeyParameter: aws.ssm.Parameter;
   fingerprintSdkKey: aws.ssm.Parameter;
   incodeApiKey: aws.ssm.Parameter;
-  incodeClientId: aws.ssm.Parameter;
+  incodeSelfieFlowId: aws.ssm.Parameter;
+  incodeDocumentFlowId: aws.ssm.Parameter;
+  incodeBaseUrl: aws.ssm.Parameter;
   middeskApiKey: aws.ssm.Parameter;
   middeskWebhookSecret: aws.ssm.Parameter;
   middeskBaseUrl: aws.ssm.Parameter;
@@ -130,7 +132,9 @@ interface Stripe {
 
 interface Incode {
   incodeApiKey: string;
-  incodeClientId: string;
+  incodeSelfieFlowId: string;
+  incodeDocumentFlowId: string;
+  incodeBaseUrl: string;
 }
 
 interface Fingerprint {
@@ -329,9 +333,17 @@ export async function LoadSecrets(
       `incodeApiKey-${stack}`,
       secretConstants.incode.incodeApiKey,
     ),
-    incodeClientId: createSecretParameter(
-      `incodeClientId-${stack}`,
-      secretConstants.incode.incodeClientId,
+    incodeSelfieFlowId: createSecretParameter(
+      `incodeSelfieFlowId-${stack}`,
+      secretConstants.incode.incodeSelfieFlowId,
+    ),
+    incodeDocumentFlowId: createSecretParameter(
+      `incodeDocumentFlowId-${stack}`,
+      secretConstants.incode.incodeDocumentFlowId,
+    ),
+    incodeBaseUrl: createSecretParameter(
+      `incodeBaseUrl-${stack}`,
+      secretConstants.incode.incodeBaseUrl,
     ),
     middeskApiKey: createSecretParameter(
       `middeskApiKey-${stack}`,

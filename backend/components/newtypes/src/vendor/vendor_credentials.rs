@@ -20,7 +20,7 @@ pub struct ExperianCredentialBuilder {
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct IncodeCredentials {
     pub api_key: PiiString,
-    pub client_id: PiiString,
+    pub base_url: PiiString,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]

@@ -276,8 +276,12 @@ pub struct StripeConfig {
 pub struct IncodeConfig {
     #[envconfig(from = "INCODE_API_KEY")]
     pub api_key: PiiString,
-    #[envconfig(from = "INCODE_CLIENT_ID")]
-    pub client_id: PiiString,
+    #[envconfig(from = "INCODE_BASE_URL")]
+    pub base_url: PiiString,
+    #[envconfig(from = "INCODE_DOCUMENT_FLOW_ID")]
+    pub document_flow_id: PiiString,
+    #[envconfig(from = "INCODE_SELFIE_FLOW_ID")]
+    pub selfie_flow_id: PiiString,
 }
 
 #[derive(Envconfig, Debug, Clone)]

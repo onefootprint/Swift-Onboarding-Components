@@ -113,7 +113,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         docv_data,
         doc_request_id: id_doc.request_id,
     };
-    let config_id = get_config_id(is_selfie);
+    let config_id = get_config_id(&state.config, is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();
@@ -343,7 +343,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         docv_data,
         doc_request_id: id_doc.request_id.clone(),
     };
-    let config_id = get_config_id(is_selfie);
+    let config_id = get_config_id(&state.config, is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
         .await
         .unwrap();

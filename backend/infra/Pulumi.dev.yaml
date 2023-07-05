@@ -74,8 +74,12 @@ config:
     incode:
       incodeApiKey:
         secure: v1:H5nhKgfH0nMLUp8e:YUE2teYkDPFEsaohxczRC4nlgYz958HAsXea/GXOhbQARzrUNTvLYSTLO+Y2db41n+70B3R8eIc=
-      incodeClientId:
-        secure: v1:SMiuGYZu2JaDWQ4w:sb6A5z6uF3lM8WM1UsP3ABxonPeu4ewKzo0lzodiMw==
+      incodeBaseUrl:
+        secure: v1:e/D91lOrER6lhRLR:/kc3JjCgTyA2DTIwOHVzZN0pKVMPQlxgAkVFVIusxG1lnL69aV/mdvuAvTgf/tSj
+      incodeDocumentFlowId:
+        secure: v1:XEcXshrWL1DuUfvU:9wjQdVCn9557clzq1Ii1QIZonzbxS+UWULOps5KlNIf0AcpV9RmWfQ==
+      incodeSelfieFlowId:
+        secure: v1:1bDBDR1/+vTSDnkN:To8lU/E3uNwVHyc6lYuCw/vVbg/XnAOy4IQRBt62Jg1LiloVLc28Sw==
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:UDxCGOYtRW7Wj7hH:hf5y2xIB89mGz6PiW8tkKL5tDvTC1CmUAtwNTMURbfK0BvcOJymessVR0TbfptH4Bp/97+bU6hE=
@@ -121,8 +125,8 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

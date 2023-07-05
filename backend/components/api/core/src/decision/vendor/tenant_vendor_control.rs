@@ -194,7 +194,7 @@ impl From<&Config> for IncodeCredentials {
     fn from(config: &Config) -> Self {
         IncodeCredentials {
             api_key: config.incode.api_key.clone(),
-            client_id: config.incode.client_id.clone(),
+            base_url: config.incode.base_url.clone(),
         }
     }
 }

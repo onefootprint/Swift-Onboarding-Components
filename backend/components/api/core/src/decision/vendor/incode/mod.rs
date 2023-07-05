@@ -2,9 +2,10 @@ mod state;
 mod state_machine;
 pub mod states;
 
-use idv::incode::client::{INCODE_SANDBOX_DOCUMENT_FLOW_ID, INCODE_SANDBOX_SELFIE_FLOW_ID};
 use newtypes::IncodeConfigurationId;
 pub use state_machine::*;
+
+use crate::config::Config;
 
 #[cfg(test)]
 mod images;
@@ -12,12 +13,12 @@ mod images;
 mod test;
 
 // TEMP: will get this into State + TVC properly
-pub fn get_config_id(is_selfie: bool) -> IncodeConfigurationId {
+pub fn get_config_id(config: &Config, is_selfie: bool) -> IncodeConfigurationId {
     let id = if is_selfie {
-        INCODE_SANDBOX_SELFIE_FLOW_ID
+        config.incode.selfie_flow_id.clone()
     } else {
-        INCODE_SANDBOX_DOCUMENT_FLOW_ID
+        config.incode.document_flow_id.clone()
     };
 
-    IncodeConfigurationId::from(id.to_string())
+    IncodeConfigurationId::from(id.leak_to_string())
 }

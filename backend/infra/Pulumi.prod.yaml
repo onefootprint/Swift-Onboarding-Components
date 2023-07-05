@@ -18,7 +18,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ''
+      prefix: ""
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -71,9 +71,13 @@ config:
         secure: v1:NEy9kUqxfuQKj1Xb:BQoRc+VSA5pdkg2mv79OwGSNnUEZ71DUfFOTN+lT7/lASQlbI0ol
     incode:
       incodeApiKey:
-        secure: v1:R9/eQeKhN8gH0Xem:QT57b6t1PFpKxCvcbtRIV3L1QXeZ9wR4xUvZiNZg12xZuto6G0Co5eop/SKjPtR6gpDao2Quk8U=
-      incodeClientId:
-        secure: v1:XCx8mvzJqPMUJDBR:Nxt8vmsIm/8SIJ0EwutrrYZSvsZ06lL1IG0ssz7AQQ==
+        secure: v1:37W0G9xCT0syBue4:tqukREyz1n31Q8b2MeYUyoG9Dl3m6nd31Vg2gAEkbAxCOMxZ68Z8AMTo74gx+yitacESDOxqdMo=
+      incodeBaseUrl:
+        secure: v1:wcySrPY9VMPQI4wo:4RZALbcJqUk0skGL0DvwOsb2Le0GKAdvIuiX0eYsSpnSGMJguL2PuD9e0gv5a0ks
+      incodeDocumentFlowId:
+        secure: v1:/hTQSCa+tLgorbRI:nG8KWxDpgtHIQwikwP5mNZxF1YnDtIQHvFTgHQUWbY2SBga9rY0orA==
+      incodeSelfieFlowId:
+        secure: v1:e8Gg1P6We6YtN9zP:SsT2WS903nZIwLrn60NUqu2RJgnmk+R2ORJn3dcALIhp/xZO/rlN/g==
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:DrKn4q/fyK2+S+sJ:V/huczZNR1v2VKctscz6cCDZhx3nl8DyDBw+njGsun69ftSiRh7Z08QDoYAKBCyG9ItmpSiL0YY=
@@ -119,8 +123,8 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
