@@ -386,5 +386,19 @@ export const dropdownBaseBg = '#FDFDFD';
 export const dropdownBaseBgActive = '#F7F7F7';
 export const dropdownBaseColor = '#000000';
 
+// Radio Select
+export const radioSelectBg = 'none';
+export const radioSelectBorderRadius = '6px';
+export const radioSelectBorderWidth = '1px';
+export const radioSelectBorderColor = '#e2e2e2';
+export const radioSelectColor = '#4a24db';
+export const radioSelectHoverBg = '#f7f7f7';
+export const radioSelectHoverBorderColor = '#d4d4d4';
+export const radioSelectSelectedBg = 'rgba(74, 36, 219, 0.08)';
+export const radioSelectSelectedBorderColor = '#4a24db';
+export const radioSelectComponentsIconBg = '#f7f7f7';
+export const radioSelectComponentsIconHoverBg = '#e2e2e2';
+export const radioSelectComponentsIconSelectedBg = '#4a24db';
+
 // Utils
 export const transparent = 'transparent';

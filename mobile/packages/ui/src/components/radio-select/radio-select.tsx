@@ -2,7 +2,7 @@
 import React from 'react';
 
 import { Box, BoxProps } from '../box';
-import Option from './components/option';
+import Option from './components/radio-select-option';
 import type { RadioSelectOption, StringOrNumber } from './radio-select.types';
 
 export type RadioSelectProps<T extends StringOrNumber = string> = BoxProps & {

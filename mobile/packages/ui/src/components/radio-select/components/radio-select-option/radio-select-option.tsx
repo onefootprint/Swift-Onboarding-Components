@@ -9,7 +9,7 @@ import type {
   StringOrNumber,
 } from '../../radio-select.types';
 
-export type OptionProps<T extends StringOrNumber = string> =
+export type RadioSelectOptionProps<T extends StringOrNumber = string> =
   RadioSelectOption<T> & {
     onPress: () => void;
     selected: boolean;
@@ -22,7 +22,7 @@ const Option = <T extends StringOrNumber = string>({
   selected,
   onPress,
   IconComponent,
-}: OptionProps<T>) => {
+}: RadioSelectOptionProps<T>) => {
   const [active, setActive] = useState(false);
 
   return (
@@ -57,11 +57,13 @@ const OptionContainer = styled(Pressable)<{
   active?: boolean;
 }>`
   ${({ theme, selected, active }) => {
+    const { radioSelect } = theme.components;
+
     return css`
       align-items: center;
-      background-color: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius.default};
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      background-color: ${radioSelect.bg};
+      border-radius: ${radioSelect.borderRadius};
+      border: ${radioSelect.borderWidth} solid ${radioSelect.borderColor};
       flex-direction: row;
       gap: ${theme.spacing[4]};
       padding: ${theme.spacing[5]};
@@ -69,41 +71,45 @@ const OptionContainer = styled(Pressable)<{
       ${selected &&
       css`
         z-index: 1;
-        background-color: #4a24db14;
-        border-color: ${theme.borderColor.secondary};
+        background-color: ${radioSelect.selected.bg};
+        border-color: ${radioSelect.selected.borderColor};
       `}
 
       ${active &&
       !selected &&
       css`
-        background-color: ${theme.backgroundColor.secondary};
-        border-color: ${theme.borderColor.primary};
+        background-color: ${radioSelect.hover.bg};
+        border-color: ${radioSelect.hover.borderColor};
       `}
     `;
   }}
 `;
 
 const IconContainer = styled.View<{ selected?: boolean; active?: boolean }>`
-  ${({ theme, active, selected }) => css`
-    align-items: center;
-    background-color: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.full};
-    height: 40px;
-    justify-content: center;
-    width: 40px;
+  ${({ theme, active, selected }) => {
+    const { radioSelect } = theme.components;
 
-    ${selected &&
-    css`
-      border: none;
-      background-color: ${theme.backgroundColor.accent};
-    `}
+    return css`
+      align-items: center;
+      background-color: ${radioSelect.components.icon.bg};
+      border-radius: ${theme.borderRadius.full};
+      height: 40px;
+      justify-content: center;
+      width: 40px;
 
-    ${active &&
-    !selected &&
-    css`
-      background-color: ${theme.backgroundColor.senary};
-    `}
-  `}
+      ${selected &&
+      css`
+        border: none;
+        background-color: ${radioSelect.components.icon.selected.bg};
+      `}
+
+      ${active &&
+      !selected &&
+      css`
+        background-color: ${radioSelect.components.icon.hover.bg};
+      `}
+    `;
+  }}
 `;
 
 export default Option;
