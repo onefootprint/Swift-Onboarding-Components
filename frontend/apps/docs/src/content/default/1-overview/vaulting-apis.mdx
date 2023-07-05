@@ -40,6 +40,32 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 		}'
 ```
 
+<inline-alert variant="info">
+  This endpoint has a JSON body limit of 32KB.
+</inline-alert>
+
+### Store large objects in a user vault
+
+For custom objects that are larger (up to 10MB), use the `POST /users/<fp_id>/vault/<data_identifier>/upload` API.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/custom.card_transaction_history/upload \
+	-X POST \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+	--data-binary @transactions.csv
+```
+
+The raw contents of body will be encrypted and stored in the user vault. Use the same decrypt method as defined below to retrieve the contents.
+
+<inline-alert variant="info">
+  Note that upon decryption, the raw contents of the large object are `base64`
+  encoded.
+</inline-alert>
+
+<inline-alert variant="info">
+  Note, multipart uploads for even larger objects are coming soon!
+</inline-alert>
+
 ## List available data in a user's vault
 
 Check what fields exist on a user's vault.
