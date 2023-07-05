@@ -265,12 +265,6 @@ impl paperclip::actix::OperationModifier for DataIdentifier {}
 impl FromStr for DataIdentifier {
     type Err = EnumDotNotationError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // Some short-term code to parse DocumentKinds as DIs while we migrate the
-        // document_data table
-        // TODO rm this
-        if let Ok(dk) = DocumentKind::from_str(s) {
-            return Ok(Self::Document(dk));
-        }
         let period_idx = s
             .find('.')
             .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
@@ -417,9 +411,6 @@ mod tests {
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
-    // TODO rm
-    #[test_case("passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
-    #[test_case("finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
