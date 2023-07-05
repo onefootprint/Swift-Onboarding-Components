@@ -1,3 +1,4 @@
+mod decrypt;
 mod risk;
 mod task;
 mod token_reveal;
@@ -21,7 +22,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token_reveal::post)
         .service(task::create_overdue_watchlist_check_tasks)
         .service(workflow::create_workflow)
-        .service(workflow::proceed);
+        .service(workflow::proceed)
+        .service(decrypt::post);
 }
 
 #[api_v2_operation(tags(Private, Protected))]

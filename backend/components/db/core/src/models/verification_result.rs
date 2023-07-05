@@ -91,4 +91,12 @@ impl VerificationResult {
 
         Ok(res)
     }
+
+    #[tracing::instrument("VerificationResult::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &VerificationResultId) -> DbResult<Self> {
+        let user = verification_result::table
+            .filter(verification_result::id.eq(id))
+            .first(conn)?;
+        Ok(user)
+    }
 }

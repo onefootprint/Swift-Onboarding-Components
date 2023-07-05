@@ -92,7 +92,7 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument("VerificationRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: VerificationRequestId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &VerificationRequestId) -> DbResult<Self> {
         let res = verification_request::table
             .filter(verification_request::id.eq(id))
             .first(conn)?;
