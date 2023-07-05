@@ -265,24 +265,19 @@ impl paperclip::actix::OperationModifier for DataIdentifier {}
 impl FromStr for DataIdentifier {
     type Err = EnumDotNotationError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // Some short-term code to parse DocumentKinds as DIs while we migrate the
+        // document_data table
+        // TODO rm this
+        if let Ok(dk) = DocumentKind::from_str(s) {
+            return Ok(Self::Document(dk));
+        }
         let period_idx = s
             .find('.')
             .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
-        let prefix_res = DataIdentifierDiscriminant::from_str(prefix);
-        let prefix = match prefix_res {
-            Ok(prefix) => prefix,
-            Err(_) => {
-                // Some short-term code to parse DocumentKinds as DIs while we migrate the
-                // document_data table
-                // TODO rm this
-                if let Ok(dk) = DocumentKind::from_str(s) {
-                    return Ok(Self::Document(dk));
-                }
-                return Err(EnumDotNotationError::CannotParsePrefix(prefix.to_owned()));
-            }
-        };
+        let prefix = DataIdentifierDiscriminant::from_str(prefix)
+            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
         // Parse the suffix differently depending on the prefix
         let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
@@ -424,6 +419,7 @@ mod tests {
     #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
     // TODO rm
     #[test_case("passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
+    #[test_case("finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
