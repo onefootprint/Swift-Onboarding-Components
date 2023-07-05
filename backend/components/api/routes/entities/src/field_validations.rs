@@ -58,6 +58,7 @@ pub async fn get(
         phone: field_validations_map.get(&SignalScope::PhoneNumber).cloned(),
         dob: field_validations_map.get(&SignalScope::Dob).cloned(),
         ssn: field_validations_map.get(&SignalScope::Ssn).cloned(),
+        document: field_validations_map.get(&SignalScope::Document).cloned(),
     };
 
     ResponseData::ok(response).json()
