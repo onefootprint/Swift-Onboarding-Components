@@ -60,26 +60,22 @@ const appearance = {
 footprint.open({ publicKey, appearance });
 ```
 
-### Global variables
+## Global variables
 
-As the name says, global variables are the easiest way to set a specific property to all elements. For example,
-setting `borderRadius` to `4px` is the equivalent of adding the same `4px` to the variables `dialogBorderRadius`,
-`inputBorderRadius`, `buttonBorderRadius` and `dropdownBorderRadius`.
+In the Footprint SDK, visual token inheritance operates on a hierarchical system. A higher-level token can set default values for a series of lower-level tokens. The table below lists these higher-level tokens and the lower-level tokens they influence by default:
 
-| Variable           | Description                                                             |
-| ------------------ | ----------------------------------------------------------------------- |
-| `borderRadius`     | The border radius used for the dialog, inputs, button and dropdown      |
-| `colorError`       | The color used to indicate errors or destructive actions in the element |
-| `colorWarning`     | The color used to indicate warnings in the element                      |
-| `colorSuccess`     | The color user to indicate success in the element                       |
-| `colorAccent`      | TThe color to add emphasis, but without a specific intent               |
-| `borderColorError` | The border color of the elements with an error state                    |
-| `fontFamily`       | The font family. Make sure to load the font first with `fontSrc`        |
+| Higher-level Token | Lower-level Tokens Influenced                                                                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `borderRadius`     | `buttonBorderRadius`, `dialogBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                           |
+| `colorError`       | `borderColorError`, `hintErrorColor`, `linkButtonDestructiveColor`                                                                                                           |
+| `colorAccent`      | `linkColor`, `linkButtonColor`, `linkButtonHoverColor`, `linkButtonActiveColor`, `radioSelectColor`, `radioSelectSelectedBorderColor`, `radioSelectComponentsIconSelectedBg` |
+| `borderColorError` | `inputErrorBorderColor`                                                                                                                                                      |
+
+You can define these tokens to easily propagate design choices across multiple lower-level tokens. However, should you need to customize a specific token, setting it individually will override the higher-level default. This allows you to maintain broad stylistic consistency across your interface while still providing granular control over specific components.
 
 ### Link
 
-Links are just regular anchors. One example is the `Terms of Service` link. If you need to apply more
-propeties or different states, use custom rules.
+Links function like standard anchor tags. A common example is the `Terms of Service` link. To apply more properties or modify states, use custom rules.
 
 <img
   alt="Link"
@@ -88,13 +84,13 @@ propeties or different states, use custom rules.
   width={720}
 />
 
-| Variable    | Description           |
-| ----------- | --------------------- |
-| `linkColor` | The color of the link |
+| Variable    | Description            |
+| ----------- | ---------------------- |
+| `linkColor` | Defines the link color |
 
 ### Dialog
 
-The dialog that wraps our flow.
+The dialog is a crucial component that wraps our flow.
 
 <img
   src="/customization/component-dialog.png"
@@ -103,15 +99,15 @@ The dialog that wraps our flow.
   alt="Dialog"
 />
 
-| Variable             | Description                      |
-| -------------------- | -------------------------------- |
-| `dialogBg`           | The dialog body background color |
-| `dialogBoxShadow`    | The dialog shadow                |
-| `dialogBorderRadius` | The dialog border radius         |
+| Variable             | Description                           |
+| -------------------- | ------------------------------------- |
+| `dialogBg`           | Sets the dialog body background color |
+| `dialogBoxShadow`    | Determines the dialog's shadow        |
+| `dialogBorderRadius` | Defines the dialog's border radius    |
 
 ### Label
 
-It refers to the native label element, the one that will be used to link with its input field.
+The label refers to the native HTML element that pairs with an input field.
 
 <img
   alt="Label"
@@ -120,14 +116,14 @@ It refers to the native label element, the one that will be used to link with it
   width={720}
 />
 
-| Variable     | Description     |
-| ------------ | --------------- |
-| `labelColor` | The label color |
-| `labelFont`  | The label font  |
+| Variable     | Description               |
+| ------------ | ------------------------- |
+| `labelColor` | Sets the label color      |
+| `labelFont`  | Determines the label font |
 
 ### Input
 
-This refers to all the inputs in the platform, including Pin Inputs, Phone Inputs and Address Inputs.
+This encompasses all types of input fields on the platform, including PIN, Phone, and Address Inputs.
 
 <img
   alt="Input"
@@ -136,32 +132,32 @@ This refers to all the inputs in the platform, including Pin Inputs, Phone Input
   width={720}
 />
 
-| Variable                     | Description                                                       |
-| ---------------------------- | ----------------------------------------------------------------- |
-| `inputBorderRadius`          | The input border radius                                           |
-| `inputBorderWidth`           | The input border width                                            |
-| `inputFont`                  | The input font                                                    |
-| `inputHeight`                | The input height                                                  |
-| `inputPlaceholderColor`      | The input placeholder color                                       |
-| `inputColor`                 | The input color                                                   |
-| `inputBg`                    | The input background color                                        |
-| `inputBorderColor`           | The input border color                                            |
-| `inputHoverBg`               | The input background color, when it's hovered                     |
-| `inputHoverBorderColor`      | The input border color, when it's hovered                         |
-| `inputFocusBg`               | The input background color, when it's focused                     |
-| `inputFocusBorderColor`      | The input border color, when it's focused                         |
-| `inputFocusElevation`        | The input box shadow, when it's focused                           |
-| `inputErrorBg`               | The input background color, when it has an error                  |
-| `inputErrorBorderColor`      | The input border color, when it has an error                      |
-| `inputErrorHoverBg`          | The input background color, when it has an error and it's hovered |
-| `inputErrorHoverBorderColor` | The input border color, when it has an error and it's hovered     |
-| `inputErrorFocusBg`          | The input background color, when it has an error and it's focused |
-| `inputErrorFocusBorderColor` | The input border color, when it has an error and it's focused     |
-| `inputErrorFocusElevation`   | The input box shadow, when it has an error and it's focused       |
+| Variable                     | Description                                                                |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `inputBorderRadius`          | Determines the input border radius                                         |
+| `inputBorderWidth`           | Sets the input border width                                                |
+| `inputFont`                  | Sets the input font                                                        |
+| `inputHeight`                | Sets the input height                                                      |
+| `inputPlaceholderColor`      | Defines the input placeholder color                                        |
+| `inputColor`                 | Sets the input color                                                       |
+| `inputBg`                    | Defines the input background color                                         |
+| `inputBorderColor`           | Sets the input border color                                                |
+| `inputHoverBg`               | Determines the input background color when hovered                         |
+| `inputHoverBorderColor`      | Sets the input border color when hovered                                   |
+| `inputFocusBg`               | Determines the input background color when focused                         |
+| `inputFocusBorderColor`      | Sets the input border color when focused                                   |
+| `inputFocusElevation`        | Sets the input box shadow when focused                                     |
+| `inputErrorBg`               | Determines the input background color when an error is present             |
+| `inputErrorBorderColor`      | Sets the input border color when an error is present                       |
+| `inputErrorHoverBg`          | Determines the input background color when an error is present and hovered |
+| `inputErrorHoverBorderColor` | Sets the input border color when an error is present and hovered           |
+| `inputErrorFocusBg`          | Determines the input background color when an error is present and focused |
+| `inputErrorFocusBorderColor` | Sets the input border color when an error is present and focused           |
+| `inputErrorFocusElevation`   | Sets the input box shadow when an error is present and focused             |
 
 ### Hint
 
-The text below the input field, which gives some extra information about the input. It can be used to indicate an error.
+Hints are informative texts below input fields. They can indicate an error or provide additional information.
 
 <img
   alt="Hint"
@@ -170,15 +166,15 @@ The text below the input field, which gives some extra information about the inp
   width={720}
 />
 
-| Variable         | Description                                      |
-| ---------------- | ------------------------------------------------ |
-| `hintColor`      | The hint color                                   |
-| `hintErrorColor` | The hint color when the input has an error state |
-| `hintFont`       | The hint font                                    |
+| Variable         | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| `hintColor`      | Sets the hint color                                              |
+| `hintErrorColor` | Determines the hint color when the input field is in error state |
+| `hintFont`       | Defines the hint font                                            |
 
 ### LinkButton
 
-It's a variant of of our buttons, but without any backgrounds.
+A LinkButton is a variant of our standard button but without any backgrounds.
 
 <img
   alt="LinkButton"
@@ -187,14 +183,14 @@ It's a variant of of our buttons, but without any backgrounds.
   width={720}
 />
 
-| Variable                           | Description                                                      |
-| ---------------------------------- | ---------------------------------------------------------------- |
-| `linkButtonColor`                  | The button color                                                 |
-| `linkButtonHoverColor`             | The button color, when it is hovered                             |
-| `linkButtonActiveColor`            | The button color, when it is pressed                             |
-| `linkButtonDestructiveColor`       | The button color when it has a destrucive intent                 |
-| `linkButtonDestructiveHoverColor`  | The button color when it has a destrucive intent and is horeverd |
-| `linkButtonDestructiveActiveColor` | The button color when it has a destrucive intent and is pressed  |
+| Variable                           | Description                                                                    |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| `linkButtonColor`                  | Sets the button color                                                          |
+| `linkButtonHoverColor`             | Defines the button color when hovered                                          |
+| `linkButtonActiveColor`            | Sets the button color when pressed                                             |
+| `linkButtonDestructiveColor`       | Determines the button color when it signifies a destructive action             |
+| `linkButtonDestructiveHoverColor`  | Sets the button color when it signifies a destructive action and is hovered    |
+| `linkButtonDestructiveActiveColor` | Determines the button color when it signifies a destructive action and pressed |
 
 ### Button
 
@@ -205,42 +201,44 @@ It's a variant of of our buttons, but without any backgrounds.
   width={720}
 />
 
-| Variable                             | Description                                                |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `buttonBorderRadius`                 | The button border radius                                   |
-| `buttonBorderWidth`                  | The button border width                                    |
-| `buttonElevation`                    | The button box shadow                                      |
-| `buttonElevationHover`               | The button box shadow, when it's hovered                   |
-| `buttonElevationActive`              | The button box shadow, when it's activated                 |
-| `buttonOutlineOffset`                | The button outline offset                                  |
-| `buttonPrimaryBg`                    | The primary button background color                        |
-| `buttonPrimaryColor`                 | The primary button color                                   |
-| `buttonPrimaryBorderColor`           | The primary button border color                            |
-| `buttonPrimaryHoverBg`               | The primary button background color, when it's hovered     |
-| `buttonPrimaryHoverColor`            | The primary button color, when it's hovered                |
-| `buttonPrimaryHoverBorderColor`      | The primary button border color, when it's hovered         |
-| `buttonPrimaryActiveBg`              | The primary button background color, when it's activated   |
-| `buttonPrimaryActiveColor`           | The primary button color, when it's activated              |
-| `buttonPrimaryActiveBorderColor`     | The primary button border color, when it's activated       |
-| `buttonPrimaryDisabledBg`            | The primary button background color, when it's disabled    |
-| `buttonPrimaryDisabledColor`         | The primary button color, when it's disabled               |
-| `buttonPrimaryDisabledBorderColor`   | The primary button border color, when it's disabled        |
-| `buttonPrimaryLoadingBg`             | The primary button background color, when it's loading     |
-| `buttonPrimaryLoadingColor`          | The primary button color, when it's loading                |
-| `buttonSecondaryBg`                  | The secondary button background color                      |
-| `buttonSecondaryColor`               | The secondary button color                                 |
-| `buttonSecondaryBorderColor`         | The secondary button border color                          |
-| `buttonSecondaryHoverBg`             | The secondary button background color, when it's hovered   |
-| `buttonSecondaryHoverColor`          | The secondary button color, when it's hovered              |
-| `buttonSecondaryHoverBorderColor`    | The secondary button border color, when it's hovered       |
-| `buttonSecondaryActiveBg`            | The secondary button background color, when it's activated |
-| `buttonSecondaryActiveColor`         | The secondary button color, when it's activated            |
-| `buttonSecondaryActiveBorderColor`   | The secondary button border color, when it's activated     |
-| `buttonSecondaryDisabledBg`          | The secondary button background color, when it's disabled  |
-| `buttonSecondaryDisabledColor`       | The secondary button color, when it's disabled             |
-| `buttonSecondaryDisabledBorderColor` | The secondary button border color, when it's disabled      |
-| `buttonSecondaryLoadingBg`           | The secondary button background color, when it's loading   |
-| `buttonSecondaryLoadingColor`        | The secondary button color, when it's loading              |
+| Variable                             | Description                                                   |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `buttonBorderRadius`                 | Defines the button border radius                              |
+| `buttonBorderWidth`                  | Sets the button border width                                  |
+| `buttonElevation`                    | Determines the button box shadow                              |
+| `buttonElevationHover`               | Sets the button box shadow when hovered                       |
+| `buttonElevationActive`              | Determines the button box shadow when activated               |
+| `buttonOutlineOffset`                | Defines the button outline offset                             |
+| `buttonPrimaryBg`                    | Sets the primary button's background color                    |
+| `buttonPrimaryColor`                 | Defines the primary button's color                            |
+| `buttonPrimaryBorderColor`           | Determines the primary button's border color                  |
+| `buttonPrimaryHoverBg`               | Sets the primary button's background color when hovered       |
+| `buttonPrimaryHoverColor`            | Defines the primary button's color when hovered               |
+| `buttonPrimaryHoverBorderColor`      | Determines the primary button's border color when hovered     |
+| `buttonPrimaryActiveBg`              | Sets the primary button's background color when activated     |
+| `buttonPrimaryActiveColor`           | Defines the primary button's color when activated             |
+| `buttonPrimaryActiveBorderColor`     | Determines the primary button's border color when activated   |
+| `buttonPrimaryDisabledBg`            | Sets the primary button's background color when disabled      |
+| `buttonPrimaryDisabledColor`         | Defines the primary button's color when disabled              |
+| `buttonPrimaryDisabledBorderColor`   | Determines the primary button's border color when disabled    |
+| `buttonPrimaryLoadingBg`             | Sets the primary button's background color when loading       |
+| `buttonPrimaryLoadingColor`          | Defines the primary button's color when loading               |
+| `buttonSecondaryBg`                  | Sets the secondary button's background color                  |
+| `buttonSecondaryColor`               | Defines the secondary button's color                          |
+| `buttonSecondaryBorderColor`         | Determines the secondary button's border color                |
+| `buttonSecondaryHoverBg`             | Sets the secondary button's background color when hovered     |
+| `buttonSecondaryHoverColor`          | Defines the secondary button's color when hovered             |
+| `buttonSecondaryHoverBorderColor`    | Determines the secondary button's border color when hovered   |
+| `buttonSecondaryActiveBg`            | Sets the secondary button's background color when activated   |
+| `buttonSecondaryActiveColor`         | Defines the secondary button's color when activated           |
+| `buttonSecondaryActiveBorderColor`   | Determines the secondary button's border color when activated |
+| `buttonSecondaryDisabledBg`          | Sets the secondary button's background color when disabled    |
+| `buttonSecondaryDisabledColor`       | Defines the secondary button's color when disabled            |
+| `buttonSecondaryDisabledBorderColor` | Determines the secondary button's border color when disabled  |
+| `buttonSecondaryLoadingBg`           | Sets the secondary button's background color when loading     |
+| `buttonSecondaryLoadingColor`        | Defines the secondary button's color when loading             |
+
+Please note that MDX (Markdown for the Component Era) allows you to import and use JSX components in your Markdown files. In my above example, I treated this like a regular markdown table, but you can also use JSX syntax if you want to create more complex and interactive tables.
 
 ### Dropdown
 
@@ -265,6 +263,31 @@ When it's an address input, it's used to display the list of results.
 | `dropdownColorPrimary`   | The dropdown color primary                         |
 | `dropdownColorSecondary` | The dropdown color secondary                       |
 | `dropdownFooterBg`       | The dropdown footer background                     |
+
+### Radio Select
+
+Radio Select is used in two important areas within the Footprint interface. Firstly, it is employed when selecting an outcome for onboarding with a sandbox key. In this case, the chosen outcome is only visible in sandbox mode and remains hidden from end users. Secondly, Radio Select is utilized during the ID document verification process, allowing users to select the type of ID document they wish to use for verification.
+
+<img
+  alt="Radio Select"
+  height={250}
+  src="/customization/component-radio-select.png"
+  width={720}
+/>
+
+| Variable                              | Description                                           |
+| ------------------------------------- | ----------------------------------------------------- |
+| `radioSelectBg`                       | The background of the radio select component          |
+| `radioSelectBorderRadius`             | The border radius of the radio select component       |
+| `radioSelectBorderWidth`              | The border width of the radio select component        |
+| `radioSelectBorderColor`              | The border color of the radio select component        |
+| `radioSelectHoverBg`                  | The hover background of the radio select component    |
+| `radioSelectHoverBorderColor`         | The hover border color of the radio select component  |
+| `radioSelectSelectedBg`               | The background of the selected radio item             |
+| `radioSelectSelectedBorderColor`      | The border color of the selected radio item           |
+| `radioSelectComponentsIconBg`         | The background of the icon in the radio item          |
+| `radioSelectComponentsIconHoverBg`    | The hover background of the icon in the radio item    |
+| `radioSelectComponentsIconSelectedBg` | The background of the selected icon in the radio item |
 
 ## Rules
 
