@@ -51,6 +51,7 @@ const Container = styled.div`
     align-items: center;
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.backgroundColor.primary};
     overflow: hidden;
   `}
 `;
