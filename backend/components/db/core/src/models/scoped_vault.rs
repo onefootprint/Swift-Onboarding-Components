@@ -105,7 +105,12 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for ScopedVaultIdentifier<'a
     }
 }
 
-pub type SerializableOnboarding = (Onboarding, ObConfiguration, InsightEvent, Option<ManualReview>);
+pub type SerializableOnboarding = (
+    Onboarding,
+    ObConfiguration,
+    Option<InsightEvent>,
+    Option<ManualReview>,
+);
 pub type SerializableEntity = (
     ScopedVault,
     Option<WatchlistCheck>,
@@ -233,7 +238,9 @@ impl ScopedVault {
         conn: &mut PgConn,
         ids: Vec<&ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
-        use db_schema::schema::{insight_event, manual_review, ob_configuration, onboarding, watchlist_check};
+        use db_schema::schema::{
+            insight_event, manual_review, ob_configuration, onboarding, watchlist_check,
+        };
         let results: Vec<SerializableEntity> = scoped_vault::table
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
@@ -244,7 +251,7 @@ impl ScopedVault {
             .left_join(
                 onboarding::table
                 .inner_join(ob_configuration::table)
-                .inner_join(insight_event::table)
+                .left_join(insight_event::table)
                 // Only fetch active manual review for this onboarding
                 .left_join(manual_review::table.on(
                     manual_review::onboarding_id.eq(onboarding::id)

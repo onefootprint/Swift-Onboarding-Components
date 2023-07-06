@@ -14,7 +14,7 @@ pub struct Onboarding {
     pub manual_review: Option<ManualReview>,
     pub status: OnboardingStatus,
     pub timestamp: DateTime<Utc>,
-    pub insight_event: InsightEvent,
+    pub insight_event: Option<InsightEvent>,
 }
 
 export_schema!(Onboarding);

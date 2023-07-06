@@ -25,7 +25,7 @@ impl DbToApi<SerializableOnboarding> for api_wire_types::Onboarding {
             manual_review: manual_review.map(api_wire_types::ManualReview::from_db),
             status,
             timestamp: start_timestamp,
-            insight_event: api_wire_types::InsightEvent::from_db(insight),
+            insight_event: insight.map(|i| api_wire_types::InsightEvent::from_db(i)),
         }
     }
 }
