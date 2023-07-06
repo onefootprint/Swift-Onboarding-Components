@@ -38,7 +38,7 @@ const Row = ({ apiKey }: RowProps) => {
         {hasPermission(RoleScope.orgSettings) ? (
           <EditRole apiKey={apiKey} />
         ) : (
-          apiKey.name
+          apiKey.role.name
         )}
       </td>
       <td>
