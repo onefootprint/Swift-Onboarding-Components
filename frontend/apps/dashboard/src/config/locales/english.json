@@ -876,7 +876,7 @@
         "header": {
           "name": "Name",
           "token": "Footprint Token",
-          "status": "Status",
+          "status": "KYB status",
           "submitted-by": "Submitted by (beneficial owner)",
           "start": "Date"
         },
@@ -939,7 +939,7 @@
         "header": {
           "name": "Name",
           "token": "Footprint Token",
-          "status": "Status",
+          "status": "KYC status",
           "email": "Email",
           "ssn": "SSN",
           "phone-number": "Phone number",
