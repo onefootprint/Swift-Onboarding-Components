@@ -12,7 +12,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
 use db::{DbError, PgConn, TxnPgConn};
 use itertools::Itertools;
-use newtypes::BusinessDataKind as BDK;
+use newtypes::{BusinessDataKind as BDK, S3Url};
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
     DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString,
@@ -182,7 +182,7 @@ impl WriteableVw<Person> {
         mime_type: String,
         filename: String,
         e_data_key: SealedVaultDataKey,
-        s3_url: String,
+        s3_url: S3Url,
     ) -> ApiResult<DocumentData> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
@@ -216,7 +216,7 @@ pub async fn seal_file_and_upload_to_s3(
     public_key: &VaultPublicKey,
     vault_id: &VaultId,
     scoped_vault_id: &ScopedVaultId,
-) -> ApiResult<(SealedVaultDataKey, String)> {
+) -> ApiResult<(SealedVaultDataKey, S3Url)> {
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
             public_key.as_ref(),
@@ -234,7 +234,7 @@ pub async fn seal_file_and_upload_to_s3(
 
     tracing::info!(s3_path = s3_path, scoped_vault_id=%scoped_vault_id, vault_id=%vault_id, filename=%file.filename, mime_type=%file.mime_type, "Uploaded Document to S3");
 
-    Ok((e_data_key, s3_path))
+    Ok((e_data_key, S3Url::from(s3_path)))
 }
 
 fn hash_id<T: ToString>(id: &T) -> String {

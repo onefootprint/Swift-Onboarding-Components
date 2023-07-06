@@ -13,7 +13,7 @@ use enclave_proxy::{
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString,
+    fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString, S3Url,
     SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
 use std::collections::HashMap;
@@ -346,7 +346,7 @@ impl EnclaveClient {
     pub async fn batch_decrypt_documents<'a>(
         &self,
         e_private_key: &EncryptedVaultPrivateKey,
-        documents: Vec<(&'a SealedVaultDataKey, &'a String)>,
+        documents: Vec<(&'a SealedVaultDataKey, &'a S3Url)>,
     ) -> Result<Vec<PiiBytes>, ApiError> {
         let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
         let get_futures = s3_urls.into_iter().map(|s3_url| {

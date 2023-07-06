@@ -13,8 +13,6 @@ use newtypes::{
     ScopedVaultId, VaultId,
 };
 
-pub type S3Url = String;
-
 use super::document_request::DocumentRequest;
 use super::document_upload::DocumentUpload;
 

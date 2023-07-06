@@ -14,6 +14,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentDataId;
 use newtypes::PiiString;
+use newtypes::S3Url;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
 use newtypes::VaultId;
@@ -31,7 +32,7 @@ pub struct DocumentData {
     pub kind: DataIdentifier,
     pub mime_type: PiiString,
     pub filename: String,
-    pub s3_url: String, // TODO newtype
+    pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -42,7 +43,7 @@ pub struct NewDocumentData {
     pub kind: DataIdentifier,
     pub mime_type: PiiString,
     pub filename: String,
-    pub s3_url: String,
+    pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
 }
 
@@ -56,7 +57,7 @@ impl DocumentData {
         kind: DataIdentifier,
         mime_type: String,
         filename: String,
-        s3_url: String,
+        s3_url: S3Url,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;

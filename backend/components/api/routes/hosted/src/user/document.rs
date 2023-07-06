@@ -27,7 +27,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifierDiscriminant, WorkflowGuard};
+use newtypes::{DataIdentifierDiscriminant, S3Url, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
     IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
@@ -228,10 +228,10 @@ async fn upload_image(
     req_id: &DocumentRequestId,
     uv_id: &VaultId,
     bucket: &str,
-) -> ApiResult<(DocumentSide, String)> {
+) -> ApiResult<(DocumentSide, S3Url)> {
     let path = IdentityDocument::s3_path_for_document_image(side, req_id, uv_id);
     let s3_url = state.s3_client.put_object(bucket, path, e_data.0, None).await?;
-    Ok((side, s3_url))
+    Ok((side, S3Url::from(s3_url)))
 }
 
 #[allow(clippy::too_many_arguments)]

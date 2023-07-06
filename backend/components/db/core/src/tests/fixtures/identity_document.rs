@@ -7,7 +7,7 @@ use crate::{
     },
     TxnPgConn,
 };
-use newtypes::{DocumentRequestId, DocumentSide, IdDocKind, SealedVaultDataKey};
+use newtypes::{DocumentRequestId, DocumentSide, IdDocKind, S3Url, SealedVaultDataKey};
 
 pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> IdentityDocument {
     let args = NewIdentityDocumentArgs {
@@ -17,6 +17,7 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
     };
     let doc = IdentityDocument::get_or_create(conn, args).unwrap();
     let key = SealedVaultDataKey(vec![]);
-    DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, "".into(), key).unwrap();
+    let s3_url = S3Url::test_data("".into());
+    DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, s3_url, key).unwrap();
     doc
 }

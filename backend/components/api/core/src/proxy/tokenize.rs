@@ -24,6 +24,7 @@ use newtypes::DocumentKind;
 use newtypes::FpId;
 use newtypes::PiiBytes;
 use newtypes::PiiString;
+use newtypes::S3Url;
 use newtypes::SealedVaultDataKey;
 use newtypes::StorageType;
 use newtypes::TenantId;
@@ -209,7 +210,7 @@ pub async fn vault_pii(
 
 struct EncryptedDocumentToStore {
     e_data_key: SealedVaultDataKey,
-    s3_url: String,
+    s3_url: S3Url,
     kind: DocumentKind,
     filename: String,
     mime_type: String,

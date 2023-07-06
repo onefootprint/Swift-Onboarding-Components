@@ -21,7 +21,7 @@ use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo,
     DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason, IncodeVerificationSessionState,
-    PiiString, SealedVaultDataKey, Selfie, VendorAPI,
+    PiiString, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -377,10 +377,17 @@ async fn test_fail(state: &State, is_selfie: bool) {
             assert!(doc.images(conn)?.is_empty());
 
             // Now, add our images to the vault as if the user hit the POST /document APi again
+            let s3_url = S3Url::test_data("".into());
             let key = SealedVaultDataKey(vec![]);
-            DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, "".into(), key.clone())
-                .unwrap();
-            DocumentUpload::create(conn, doc.id, DocumentSide::Back, "".into(), key).unwrap();
+            DocumentUpload::create(
+                conn,
+                doc.id.clone(),
+                DocumentSide::Front,
+                s3_url.clone(),
+                key.clone(),
+            )
+            .unwrap();
+            DocumentUpload::create(conn, doc.id, DocumentSide::Back, s3_url, key).unwrap();
 
             Ok(())
         })

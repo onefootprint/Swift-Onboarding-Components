@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use itertools::Itertools;
-use newtypes::{DataLifetimeId, PiiString, SealedVaultBytes, VaultId};
+use newtypes::{DataLifetimeId, PiiString, S3Url, SealedVaultBytes, VaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
@@ -57,7 +57,7 @@ pub enum VaultedData<'a> {
     Sealed(&'a SealedVaultBytes),
     /// Larger data that is encrypted using an intermediate key. The encrypted data is stored in
     /// s3, and the intermediate key is encrypted to the user vault's key.
-    LargeSealed(&'a String, &'a newtypes::SealedVaultDataKey),
+    LargeSealed(&'a S3Url, &'a newtypes::SealedVaultDataKey),
     /// Data that is generally not considered private so is stored in plaintext in the DB
     NonPrivate(&'a PiiString),
 }

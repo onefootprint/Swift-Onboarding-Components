@@ -7,9 +7,8 @@ use diesel::dsl::count_star;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
+use newtypes::S3Url;
 use newtypes::{DocumentSide, DocumentUploadId, IdentityDocumentId, SealedVaultDataKey};
-
-pub type S3Url = String;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document_upload)]

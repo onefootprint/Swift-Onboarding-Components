@@ -14,6 +14,7 @@ use newtypes::DocumentKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
+use newtypes::S3Url;
 use newtypes::{
     BusinessDataKind as BDK, DocumentSide, IdDocKind, InvestorProfileKind as IPK, SealedVaultBytes,
 };
@@ -786,7 +787,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
             "image/png".into(),
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),
-            "test".into(),
+            S3Url::from("test".to_string()),
         )
         .unwrap();
 
