@@ -7,6 +7,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
+use api_core::errors::AssertionError;
 use api_core::utils::vault_wrapper::Any;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -87,6 +88,40 @@ async fn patch_inner(
     let is_live = auth.is_live()?;
     let principal = auth.actor().into();
 
+    // If the initial request has an ssn4, see if the vault already has the same ssn4 and if so no-op
+    // TODO we'll probably want to generalize this logic for all pieces of info later. Could store
+    // a hash(uv_id || di || value) inline on vault_data purely for duplicate checking
+    use newtypes::IdentityDataKind as IDK;
+    let ssn4 = IDK::Ssn4.into();
+    let mut request = request;
+    if let Some(new_ssn4) = request.get(&ssn4) {
+        let fp_id = fp_id.clone();
+        let tenant_id = tenant_id.clone();
+        let uvw = state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+                let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
+                Ok(vw)
+            })
+            .await??;
+        if uvw.get(ssn4.clone()).is_some() {
+            let existing_ssn4 = uvw
+                .decrypt_unchecked_single(&state.enclave_client, ssn4.clone())
+                .await?
+                .ok_or(AssertionError("No ssn4 found"))?;
+            // If the ssn4 being added to the vault exactly matches the ssn4 on the vault, remove
+            // it from the request to be added to the vault.
+            // This is a special request from grid to prevent us from erroring when an ssn4 is
+            // added that is consistent with the ssn9
+            // This is pretty hacky since no other vaulting endpoints have this logic, and this isn't
+            // represented in POST /validate
+            // TODO https://linear.app/footprint/issue/FP-4973/make-all-vault-writes-idempotent
+            if existing_ssn4.safe_compare(new_ssn4) {
+                request.remove(&ssn4);
+            }
+        }
+    }
     let targets = request.keys().cloned().collect_vec();
     let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let request = request.build_tenant_fingerprints(state, &tenant_id).await?;

@@ -7,6 +7,21 @@ import hmac
 import hashlib
 
 
+def test_ssn_vaulting(tenant):
+    # We have some special logic that no-ops when updating ssn4
+    data = {"id.ssn9": "123-456789"}
+    body = post("users/", data, tenant.sk.key)
+    fp_id = body["id"]
+
+    # Shouldn't be able to add mismatching ssn4
+    data = {"id.ssn4": "0000"}
+    patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+
+    # But should be able to add matching ssn4
+    data = {"id.ssn4": "6789"}
+    patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
+
+
 @pytest.mark.parametrize(
     "key, value",
     [
@@ -14,6 +29,7 @@ import hashlib
         ("id.last_name", "Bye"),
         ("id.dob", "2023-12-25"),
         ("id.ssn9", "123-12-1234"),
+        ("id.ssn4", "1234"),
         ("id.zip", "12345"),
         ("id.zip", "12345-1234"),
         ("id.address_line1", "1 Footprint Way"),
