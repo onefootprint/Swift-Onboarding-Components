@@ -65,7 +65,7 @@ async fn create_tvc_for_requirements(
     IdentityDataKind::PhoneNumber,
     IdentityDataKind::Ssn9,
     IdentityDataKind::Ssn4,
-], Some(vec![Vendor::Idology, Vendor::Experian]) => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::ExperianPreciseID])]
+], Some(vec![Vendor::Idology, Vendor::Experian]) => vec![VendorAPI::IdologyExpectID, VendorAPI::ExperianPreciseID])]
 #[test_case(vec![
     IdentityDataKind::FirstName,
     IdentityDataKind::LastName,
@@ -77,7 +77,7 @@ async fn create_tvc_for_requirements(
     IdentityDataKind::PhoneNumber,
     IdentityDataKind::Ssn9,
     IdentityDataKind::Ssn4,
-], None => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2]; "no tenant vendor control means no experian")]
+], None => vec![VendorAPI::IdologyExpectID]; "no tenant vendor control means no experian")]
 // not enough info for experian, but tenant is xpn enabled
 #[test_case(vec![
     IdentityDataKind::FirstName,
@@ -92,11 +92,11 @@ async fn create_tvc_for_requirements(
 // Catch all case for vendors we expect if we had a full vault
 #[test_case(
     IdentityDataKind::iter().collect()
-, None => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2])]
+, None => vec![VendorAPI::IdologyExpectID])]
 // Catch all case for vendors we expect if we had a full vault and TVC
 #[test_case(
     IdentityDataKind::iter().collect()
-, Some(vec![Vendor::Idology, Vendor::Experian]) => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::ExperianPreciseID])]
+, Some(vec![Vendor::Idology, Vendor::Experian]) => vec![VendorAPI::IdologyExpectID, VendorAPI::ExperianPreciseID])]
 #[tokio::test]
 async fn test_get_vendor_apis_for_verification_requests(
     data_lifetime_kinds: Vec<IdentityDataKind>,

@@ -1,7 +1,7 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_twilio, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview,
-    ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+    mock_idology, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview, ExpectedStatus,
+    OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
@@ -159,7 +159,6 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_twilio(state);
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -278,7 +277,6 @@ async fn fail(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
             );
-            mock_twilio(state);
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -416,7 +414,6 @@ async fn redo_and_pass(
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_twilio(state);
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));

@@ -1,9 +1,8 @@
 use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_incode, mock_twilio, mock_webhooks, query_data, setup_data,
-    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
-    WithHit, WithQualifier,
+    mock_idology, mock_incode, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview,
+    ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::DocCollected;
 use crate::decision::state::ReviewCompleted;
@@ -100,7 +99,6 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_twilio(state);
             mock_incode(state, WithHit(false));
         }
     };
@@ -243,7 +241,6 @@ async fn pass_then_watchlist_hit(
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_twilio(state);
             mock_incode(state, WithHit(true));
         }
     };
@@ -430,7 +427,6 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
             );
-            mock_twilio(state);
             mock_incode(state, WithHit(false));
         }
     };
@@ -589,7 +585,6 @@ async fn fail(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
             );
-            mock_twilio(state);
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -734,7 +729,6 @@ async fn redo_and_pass(
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_twilio(state);
             mock_incode(state, WithHit(false));
         }
     };

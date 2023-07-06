@@ -145,7 +145,7 @@ impl TenantVendorControl {
     fn get_enabled_vendor_apis(vendor_control: &Option<DbTenantVendorControl>) -> Vec<VendorAPI> {
         let all_idology_vendor_apis = newtypes::vendor_apis_from_vendor(Vendor::Idology);
         // default vendors enabled for tenants
-        let mut apis = vec![VendorAPI::TwilioLookupV2, VendorAPI::MiddeskCreateBusiness];
+        let mut apis = vec![VendorAPI::MiddeskCreateBusiness];
 
         // If we have a vendor control, we defer to that for checking Experian and Idology
         if let Some(tvc) = vendor_control {
