@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{DataIdentifier, NtResult, PiiString, ValidateArgs};
+use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiString, ValidateArgs};
 
 mod business;
 mod card;
@@ -70,6 +70,10 @@ pub enum Error {
     CannotSpecifyDerivedEntry,
     #[error("Cannot vault this piece of data.")]
     CannotVault,
+    #[error("Cannot add {0} when vault already has full data")]
+    PartialUpdateNotAllowed(CollectedDataOption),
+    #[error("This piece of data is already set and cannot be replaced.")]
+    CannotReplaceData,
 }
 
 pub type VResult<T> = Result<T, Error>;

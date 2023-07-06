@@ -1,7 +1,7 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
-    errors::{user::UserError, ApiResult, AssertionError},
+    errors::{ApiResult, AssertionError},
     utils::vault_wrapper::VaultWrapper,
 };
 use db::{
@@ -15,8 +15,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, CollectedDataOption, DataRequest, FingerprintRequest, FingerprintScopeKind,
-    Fingerprints, IdentityDataKind as IDK, ScopedVaultId,
+    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataRequest, FingerprintRequest,
+    FingerprintScopeKind, Fingerprints, IdentityDataKind as IDK, ScopedVaultId, ValidationError,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -41,6 +41,8 @@ impl<Type> VaultWrapper<Type> {
         } else {
             vec![(BDK::KycedBeneficialOwners.into(), true)]
         };
+        let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
+
         for (di, check_portable_and_speculative) in irreplaceable_dis {
             let update_has_di = request.keys().any(|x| x == &di);
             let vault_already_has_di = if check_portable_and_speculative {
@@ -53,7 +55,7 @@ impl<Type> VaultWrapper<Type> {
             };
             if update_has_di && vault_already_has_di {
                 // We don't currently support adding a phone/email
-                return Err(UserError::CannotReplaceData(di).into());
+                validation_errors.insert(di.clone(), ValidationError::CannotReplaceData.into());
             }
         }
 
@@ -61,16 +63,28 @@ impl<Type> VaultWrapper<Type> {
         // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
         let existing_cdos = CollectedDataOption::list_from(self.populated_dis());
         let new_cdos = CollectedDataOption::list_from(request.keys().cloned().collect());
-        let offending_partial_cdo =
-            new_cdos
-                .iter()
-                .cloned()
-                .find(|speculative_cdo| match speculative_cdo.full_variant() {
-                    Some(full_cdo) => existing_cdos.contains(&full_cdo),
-                    None => false,
-                });
-        if let Some(offending_partial_cdo) = offending_partial_cdo {
-            return Err(UserError::PartialUpdateNotAllowed(offending_partial_cdo).into());
+        for speculative_cdo in &new_cdos {
+            let speculative_cdo_would_replace_full_cdo = speculative_cdo
+                .full_variant()
+                .map(|full_cdo| existing_cdos.contains(&full_cdo))
+                == Some(true);
+            if speculative_cdo_would_replace_full_cdo {
+                // For each DI in this offending CDO, make a pretty error that shows that the DI
+                // would be overwriting the full CDO that already exists
+                for di in speculative_cdo
+                    .data_identifiers()
+                    .into_iter()
+                    .flatten()
+                    .filter(|di| request.contains_key(di))
+                {
+                    let err = ValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
+                    validation_errors.insert(di, err);
+                }
+            }
+        }
+        if !validation_errors.is_empty() {
+            let validation_error = newtypes::DataValidationError::FieldValidationError(validation_errors);
+            return Err(newtypes::Error::from(validation_error).into());
         }
 
         // Transform the request into a Vec<NewVaultData>

@@ -15,7 +15,11 @@ def test_ssn_vaulting(tenant):
 
     # Shouldn't be able to add mismatching ssn4
     data = {"id.ssn4": "0000"}
-    patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    assert (
+        body["error"]["message"]["id.ssn4"]
+        == "Cannot add ssn4 when vault already has full data"
+    )
 
     # But should be able to add matching ssn4
     data = {"id.ssn4": "6789"}
