@@ -276,6 +276,11 @@ footprint_reason_code_enum! {
         #[note = "Single address located", severity = SignalSeverity::Low,  description = "Only a single address record was located for the individual."]
         AddressAlertSingleAddressInFile,
 
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)] // not sure what this really should be, it's a match but not the _best_ match
+        #[note = "More recent address located", severity = SignalSeverity::Low,  description = "Address input is different from the consumer’s best, most current address."]
+        AddressNewerRecordFound,
+
+
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
         #[note = "Newer address found", severity = SignalSeverity::Low,  description = "The individual was located at the address input, but a more recent record shows a different address for the individual."]
         NewerRecordFound,

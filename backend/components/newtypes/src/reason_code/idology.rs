@@ -7,8 +7,10 @@ use strum_macros::EnumString;
 pub mod idology_match_codes {
     use crate::FootprintReasonCode;
 
-    pub const ADDRESS_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 1] =
-        [FootprintReasonCode::AddressDoesNotMatch];
+    pub const ADDRESS_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 2] = [
+        FootprintReasonCode::AddressDoesNotMatch,
+        FootprintReasonCode::AddressNewerRecordFound,
+    ];
     pub const ADDRESS_PARTIALLY_MATCHES_CODES: [FootprintReasonCode; 4] = [
         FootprintReasonCode::AddressZipCodeDoesNotMatch,
         FootprintReasonCode::AddressStreetNameDoesNotMatch,
@@ -108,7 +110,7 @@ vendor_reason_code_enum! {
         MultipleRecordsFound,
 
         #[ser = "resultcode.newer.record.found", description = "The subject of the search was found at the address submitted, but a more recent record shows a different address for the individual. If a customer intentionally provides an old address and a new one is located, this result will occur, but it also results from a customer providing a current “home” address and the IDology search locating newer real estate, like a second/vacation home or an investment property. Additionally, if the customer provides the address of an inherited property or a relative’s (sibling, parent, etc.) address when signing up for services, then this note could be triggered. Note: Additional parameters to set the address First Seen Date can be enabled through the Additional Risk Settings menu in the IDCenter."]
-        #[footprint_reason_code = Some(FootprintReasonCode::NewerRecordFound)]
+        #[footprint_reason_code = Some(FootprintReasonCode::AddressNewerRecordFound)]
         NewerRecordFound,
 
         #[ser = "resultcode.high.risk.address.alert", description = "Identifies addresses with a known history of fraud activity."]

@@ -54,7 +54,7 @@ vendor_reason_code_enum! {
     pub enum ExperianFraudShieldCodes {
         // Address used on the inquiry is different GLB from the address Experian has as the consumer’s best, most current address.
         #[ser = "01", description = "Inquiry/On-file Current Address Conflict"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(FootprintReasonCode::AddressNewerRecordFound)]
         InputAddressConflict,
         // Address used on the inquire was first GLB reported for the consumer within the last 90 days.
         #[ser = "02", description = "Inquiry Address First Reported < 90 Days"]

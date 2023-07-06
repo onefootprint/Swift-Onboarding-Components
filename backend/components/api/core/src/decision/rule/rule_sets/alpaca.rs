@@ -60,6 +60,8 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
                     // we can partial match address, so this only triggers if there's no match at all
                     f.footprint_reason_codes()
                         .contains(&FootprintReasonCode::AddressDoesNotMatch)
+                        || f.footprint_reason_codes()
+                            .contains(&FootprintReasonCode::AddressNewerRecordFound)
                 }
             },
             name: RuleName::AddressDoesNotMatch,
