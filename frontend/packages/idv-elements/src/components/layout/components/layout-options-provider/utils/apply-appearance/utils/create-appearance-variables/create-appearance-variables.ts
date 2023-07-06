@@ -26,6 +26,16 @@ const iterateOverVariables = (options: {
   const definitions = variablesMap.get(tokenName);
   if (definitions) {
     const cssVariable = definitions.var;
+
+    if (tokenName.startsWith('radio')) {
+      console.log('tokenName', tokenName);
+      console.log('cssVariable', cssVariable);
+      console.log('cssValue', tokenValue);
+      console.log('---');
+      console.log('---');
+      console.log('---');
+    }
+
     styles = addStyleRow({
       styles,
       cssVariable,
