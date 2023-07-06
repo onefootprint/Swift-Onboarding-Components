@@ -2,11 +2,13 @@ use std::sync::Arc;
 
 use db::{
     models::{
+        decision_intent::DecisionIntent,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
-        risk_signal::{NewRiskSignals, RiskSignal},
+        risk_signal::RiskSignal,
         vault::Vault,
         verification_request::VerificationRequest,
+        verification_result::VerificationResult,
     },
     PgConn,
 };
@@ -15,7 +17,7 @@ use newtypes::{
     VaultKind, VendorAPI,
 };
 
-use super::sandbox;
+use super::{sandbox, vendor};
 use crate::{
     errors::{ApiError, ApiResult},
     State,
@@ -119,22 +121,34 @@ pub async fn setup_kyb_test_fixtures(
                 seqno: None,
                 workflow_id: None,
             };
-            let biz_obd = OnboardingDecision::create(conn, new_decision)?;
 
+            let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
+            let uv = Vault::get(conn, &sb.id)?;
+            let vreq =
+                VerificationRequest::create(conn, &sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook)?;
+            let raw = idv::test_fixtures::middesk_business_response();
+            let e_response = vendor::verification_result::encrypt_verification_result_response(
+                &raw.clone().into(),
+                &uv.public_key,
+            )?;
+            let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
+
+            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+            RiskSignal::bulk_create(
+                conn,
+                signals
+                    .into_iter()
+                    .map(|s| (s.0, s.1, vres.id.clone()))
+                    .collect::<Vec<_>>(),
+            )?;
+
+            let _biz_obd = OnboardingDecision::create(conn, new_decision)?;
             Onboarding::update(
                 biz_ob,
                 conn,
                 OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
             )?;
 
-            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
-            RiskSignal::bulk_create(
-                conn,
-                NewRiskSignals::LegacyObd {
-                    onboarding_decision_id: biz_obd.id,
-                    signals,
-                },
-            )?;
             Ok(())
         })
         .await

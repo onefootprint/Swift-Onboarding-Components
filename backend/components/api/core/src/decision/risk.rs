@@ -5,13 +5,12 @@ use db::{
         manual_review::ManualReview,
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
-        risk_signal::{NewRiskSignals, RiskSignal},
         scoped_vault::ScopedVault,
     },
     TxnPgConn,
 };
 
-use super::onboarding::{DecisionReasonCodes, OnboardingRulesDecisionOutput};
+use super::onboarding::OnboardingRulesDecisionOutput;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::VaultWrapper,
@@ -26,7 +25,6 @@ use crate::{
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
     ob_id: OnboardingId,
-    reason_codes: DecisionReasonCodes,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &OnboardingRulesDecisionOutput,
     assert_is_first_decision_for_onboarding: bool,
@@ -96,12 +94,5 @@ pub fn save_final_decision(
         )?;
     }
 
-    RiskSignal::bulk_create(
-        conn,
-        NewRiskSignals::LegacyObd {
-            onboarding_decision_id: obd.id.clone(),
-            signals: reason_codes.into_iter().map(|r| (r.0, r.1)).collect(),
-        },
-    )?;
     Ok(obd)
 }

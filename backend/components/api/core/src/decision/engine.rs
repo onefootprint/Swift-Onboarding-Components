@@ -23,6 +23,7 @@ use crate::{
 use db::{
     models::{
         onboarding::Onboarding,
+        risk_signal::RiskSignal,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -61,11 +62,14 @@ where
     db_pool
         .db_transaction(move |conn| {
             // Save/action/emit risk signals for the decision
+
+            // TODO: remove make_onboarding_decision entirely. used only by the now dead engine::run and the private/protected/make_decision endpoint
+            RiskSignal::bulk_create(conn, reason_codes)?;
+
             save_onboarding_decision(
                 conn,
                 &ob,
                 rules_output,
-                reason_codes,
                 verification_result_ids,
                 true,
                 false,
@@ -313,7 +317,6 @@ pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
     rules_output: WaterfallOnboardingRulesDecisionOutput,
-    reason_codes: DecisionReasonCodes,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,
@@ -324,7 +327,6 @@ pub fn save_onboarding_decision(
     let onboarding_decision = risk::save_final_decision(
         conn,
         ob.id.clone(),
-        reason_codes,
         verification_result_ids,
         &rules_output.output,
         assert_is_first_decision_for_onboarding,

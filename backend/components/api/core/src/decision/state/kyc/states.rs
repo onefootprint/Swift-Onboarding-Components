@@ -5,6 +5,7 @@ use db::models::{
     decision_intent::DecisionIntent,
     ob_configuration::ObConfiguration,
     onboarding::{Onboarding, OnboardingUpdate},
+    risk_signal::RiskSignal,
     scoped_vault::ScopedVault,
     tenant::Tenant,
     vault::Vault,
@@ -216,6 +217,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let su = ScopedVault::get(conn, &self.sv_id)?;
         let tenant = Tenant::get(conn, &su.tenant_id)?;
 
+        RiskSignal::bulk_create(conn, reason_codes)?;
+
         common::save_kyc_decision(
             conn,
             webhook_client,
@@ -226,7 +229,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 .iter()
                 .map(|vr| vr.verification_result_id.clone())
                 .collect(),
-            &(decision, reason_codes),
+            decision,
             self.is_redo,
             fixture_decision.is_some(),
             vec![],

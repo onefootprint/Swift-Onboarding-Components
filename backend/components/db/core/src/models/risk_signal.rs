@@ -35,54 +35,23 @@ pub struct NewRiskSignal {
     pub vendor_api: VendorAPI,
 }
 
-// temporary struct to differentiate our legacy way of writing all RS's from various Vres's at once when we create an OBD
-// vs our new way which will
-pub enum NewRiskSignals {
-    LegacyObd {
-        onboarding_decision_id: OnboardingDecisionId,
-        signals: Vec<(FootprintReasonCode, VendorAPI)>,
-    },
-    NewVres {
-        verification_result_id: VerificationResultId,
-        vendor_api: VendorAPI,
-        reason_codes: Vec<FootprintReasonCode>,
-    },
-}
-
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
-        let new_risk_signals: Vec<NewRiskSignal> = match new {
-            NewRiskSignals::LegacyObd {
-                onboarding_decision_id,
-                signals,
-            } => signals
-                .into_iter()
-                .map(|(reason_code, vendor_api)| NewRiskSignal {
-                    onboarding_decision_id: Some(onboarding_decision_id.clone()),
-                    reason_code,
-                    created_at: Utc::now(),
-                    verification_result_id: None,
-                    hidden: false,
-                    vendor_api,
-                })
-                .collect(),
-            NewRiskSignals::NewVres {
-                verification_result_id,
+    pub fn bulk_create(
+        conn: &mut PgConn,
+        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    ) -> DbResult<Vec<Self>> {
+        let new_risk_signals: Vec<NewRiskSignal> = signals
+            .into_iter()
+            .map(|(reason_code, vendor_api, vres_id)| NewRiskSignal {
+                onboarding_decision_id: None,
+                reason_code,
+                created_at: Utc::now(),
+                verification_result_id: Some(vres_id),
+                hidden: false,
                 vendor_api,
-                reason_codes,
-            } => reason_codes
-                .into_iter()
-                .map(|reason_code| NewRiskSignal {
-                    onboarding_decision_id: None,
-                    reason_code,
-                    created_at: Utc::now(),
-                    verification_result_id: Some(verification_result_id.clone()),
-                    hidden: false,
-                    vendor_api,
-                })
-                .collect(),
-        };
+            })
+            .collect();
 
         let result = diesel::insert_into(risk_signal::table)
             .values(new_risk_signals)
@@ -154,6 +123,55 @@ impl RiskSignal {
             .get_results(conn)?;
         Ok(results)
     }
+
+    #[cfg(test)]
+    fn _bulk_create_for_test(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
+        let new_risk_signals: Vec<NewRiskSignal> = match new {
+            NewRiskSignals::LegacyObd {
+                onboarding_decision_id,
+                signals,
+            } => signals
+                .into_iter()
+                .map(|(reason_code, vendor_api)| NewRiskSignal {
+                    onboarding_decision_id: Some(onboarding_decision_id.clone()),
+                    reason_code,
+                    created_at: Utc::now(),
+                    verification_result_id: None,
+                    hidden: false,
+                    vendor_api,
+                })
+                .collect(),
+            NewRiskSignals::NewVres { signals } => signals
+                .into_iter()
+                .map(|(reason_code, vendor_api, vres_id)| NewRiskSignal {
+                    onboarding_decision_id: None,
+                    reason_code,
+                    created_at: Utc::now(),
+                    verification_result_id: Some(vres_id),
+                    hidden: false,
+                    vendor_api,
+                })
+                .collect(),
+        };
+
+        let result = diesel::insert_into(risk_signal::table)
+            .values(new_risk_signals)
+            .get_results::<Self>(conn)?;
+        Ok(result)
+    }
+}
+
+// temporary struct to differentiate our legacy way of writing all RS's from various Vres's at once when we create an OBD
+// vs our new way which will
+#[cfg(test)]
+enum NewRiskSignals {
+    LegacyObd {
+        onboarding_decision_id: OnboardingDecisionId,
+        signals: Vec<(FootprintReasonCode, VendorAPI)>,
+    },
+    NewVres {
+        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    },
 }
 
 #[cfg(test)]
@@ -305,13 +323,14 @@ mod tests {
                                     .collect_vec(),
                             },
                             KeyType::Vres => NewRiskSignals::NewVres {
-                                verification_result_id: vres.id,
-                                vendor_api: *vendor_api,
-                                reason_codes: reason_codes.clone(),
+                                signals: reason_codes
+                                    .iter()
+                                    .map(|rc| (rc.clone(), *vendor_api, vres.id.clone()))
+                                    .collect_vec(),
                             },
                         };
 
-                        RiskSignal::bulk_create(conn, new_risk_signals).unwrap()
+                        RiskSignal::_bulk_create_for_test(conn, new_risk_signals).unwrap()
                     })
                     .collect::<Vec<_>>();
             });

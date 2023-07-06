@@ -196,7 +196,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 .into_iter()
                 .map(|vr| vr.verification_result_id)
                 .collect(),
-            &(decision, reason_codes),
+            decision,
             true,
             fixture_decision.is_some(),
             vec![],

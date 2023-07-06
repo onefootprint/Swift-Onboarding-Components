@@ -282,19 +282,16 @@ pub fn save_kyc_decision(
     sv_id: &ScopedVaultId,
     workflow_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
-    decision: &KycDecision,
+    rules_output: WaterfallOnboardingRulesDecisionOutput,
     is_redo: bool,
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let (rules_output, reason_codes) = decision;
-
     let (ob, _, _, _) = Onboarding::get(conn, ob_id)?;
     engine::save_onboarding_decision(
         conn,
         &ob,
-        rules_output.clone(),
-        reason_codes.clone(),
+        rules_output,
         verification_result_ids,
         !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,

@@ -225,13 +225,15 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
         let vault = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
-        let kyc_decision = if let Some(fixture_decision) = fixture_decision {
+        let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
 
-        match kyc_decision.0.decision.decision_status {
+        RiskSignal::bulk_create(conn, reason_codes)?;
+
+        match decision.decision.decision_status {
             DecisionStatus::Fail => {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
@@ -244,7 +246,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                         .iter()
                         .map(|vr| vr.verification_result_id.clone())
                         .collect(),
-                    &kyc_decision,
+                    decision,
                     self.is_redo,
                     fixture_decision.is_some(),
                     vec![],
@@ -436,11 +438,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             },
         };
 
-        // RiskSignal::bulk_create(conn, NewVres {
-        //     verification_result_id: VerificationResultId,
-        //     vendor_api: VendorAPI,
-        //     reason_codes: Vec<FootprintReasonCode>,
-        // });
+        // write reason codes from WatchlistCheck
+        RiskSignal::bulk_create(conn, wc_reason_codes.clone())?;
 
         // For now, we need to re-run the KYC decisioning so we can get reason codes
         // and have these written at the same time as the Watchlist reason codes
@@ -479,7 +478,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             doc_req.is_some(),
         );
 
-        let decision = (
+        let (decision, reason_codes) = (
             OnboardingRulesDecisionOutput {
                 decision: final_decision.clone(),
                 // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
@@ -490,7 +489,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             kyc_reason_codes
                 .into_iter()
                 .chain(wc_reason_codes.into_iter())
-                .collect(),
+                .collect::<Vec<_>>(),
         );
 
         common::save_kyc_decision(
@@ -503,7 +502,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .iter()
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
-            &decision,
+            decision,
             self.is_redo,
             is_sandbox,
             review_reasons,
