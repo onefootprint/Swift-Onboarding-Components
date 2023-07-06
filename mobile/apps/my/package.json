@@ -57,7 +57,7 @@
     "react-native-svg": "^13.9.0",
     "react-native-vision-camera": "^2.15.4",
     "usehooks-ts": "^2.9.1",
-    "vision-camera-plugin-document": "^0.2.0",
+    "vision-camera-plugin-document": "^0.7.0",
     "vision-camera-plugin-face-detection": "^0.8.0",
     "xstate": "^4.37.1",
     "zustand": "^4.3.8"

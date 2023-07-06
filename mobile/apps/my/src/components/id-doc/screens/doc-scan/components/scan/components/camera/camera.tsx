@@ -44,7 +44,7 @@ const Camera = ({
 
   useEffect(() => {
     if (isObjectDetected) {
-      timerId = setTimeout(takePhoto, 600);
+      timerId = setTimeout(takePhoto, 500);
       return () => clearTimeout(timerId);
     }
   }, [isObjectDetected]);

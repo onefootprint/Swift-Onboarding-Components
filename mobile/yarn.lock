@@ -18849,10 +18849,10 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vision-camera-plugin-document@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/vision-camera-plugin-document/-/vision-camera-plugin-document-0.2.0.tgz"
-  integrity sha512-xuQX2H4eT73TwXuch5VejuLa7j9BB3ZpvHfhVtlhVmVFR2ELKyu1KdFD5qyadtyty3yr5P8BEHPa767J3uowPg==
+vision-camera-plugin-document@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.7.0.tgz#73c38869a07a23e8379d0749d08e4e4c5c4825b0"
+  integrity sha512-xl4twqEcnBAhelW88TLHzCFCKZfyNEoAWW+vUXymJOtik28riebifsxWZPcIg0m7hQnnQqnfVTOAwrbSqcogrA==
 
 vision-camera-plugin-face-detection@^0.8.0:
   version "0.8.0"

@@ -20,18 +20,20 @@ const Frame = ({ detector }: FrameProps) => {
   return <StyledFrame style={animatedStyles} />;
 };
 
-const windowWidth = Dimensions.get('window').width;
+const dimensions = Dimensions.get('window');
+const frameHeight = 220;
+const frameWidth = dimensions.width - 32;
 
 const StyledFrame = styled(Reanimated.View)`
   ${({ theme }) => css`
     border-color: #FFF;
     border-radius: ${theme.borderRadius.large};
     border: ${theme.borderWidth[2]} solid #FFF  
-    height: 220px;
+    height: ${frameHeight}px};
     position: absolute;
-    width: ${windowWidth - 32}px;
+    top: ${dimensions.height / 2 - frameHeight / 2}px;
+    width: ${frameWidth}px;
     z-index: 1;
-    top: 50px;
   `}
 `;
 

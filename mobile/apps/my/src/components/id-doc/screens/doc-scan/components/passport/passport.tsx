@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Dimensions } from 'react-native';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
-import { documentProcessor } from 'vision-camera-plugin-document';
+import { detectDocument } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
 
+import Frame from '../default-frame';
 import Camera from '../scan';
 
 const Passport = () => {
@@ -18,10 +18,8 @@ const Passport = () => {
     frame => {
       'worklet';
 
-      const options = {
-        frame: { x: 16, y: 50, width: windowWidth - 32, height: 220 },
-      };
-      const result = documentProcessor(frame, options);
+      const options = {};
+      const result = detectDocument(frame, options);
       if (result.is_document) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
@@ -41,10 +39,10 @@ const Passport = () => {
       frameProcessor={frameProcessor}
       isObjectDetected={objectedDetected}
       title={t('title')}
-    />
+    >
+      <Frame detector={detector} />
+    </Camera>
   );
 };
-
-const windowWidth = Dimensions.get('window').width;
 
 export default Passport;
