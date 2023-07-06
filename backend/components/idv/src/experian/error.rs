@@ -30,6 +30,10 @@ pub enum Error {
     ValidationError(#[from] ValidationError),
     #[error("ErrorWithResponse {0}")]
     ErrorWithResponse(Box<ErrorWithResponse>),
+    #[error("JWT Token needs refresh")]
+    JwtTokenNeedsRefresh,
+    #[error("Unknown Error")]
+    UnknownError,
 }
 
 impl Error {

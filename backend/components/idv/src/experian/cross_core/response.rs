@@ -262,6 +262,15 @@ pub struct FraudSolutionResponseProducts {
     // we'd add syntheticID etc here
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CCErrorResponse {
+    pub code: String,
+    pub description: String,
+    pub reason: String,
+    pub details: serde_json::Value,
+}
+
 #[cfg(test)]
 mod tests {
     use newtypes::ExperianFraudShieldCodes;

@@ -2,6 +2,7 @@ use chrono::Utc;
 use newtypes::experian::ProductOptions;
 use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::{IdvData, PiiString, Uuid};
+use tokio_retry::strategy::FixedInterval;
 
 use crate::experian::auth::{self, response::JwtTokenResponse};
 use crate::experian::error::{EnvironmentMismatchError, Error, ValidationError};
@@ -9,6 +10,7 @@ use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{Base64Data, Base64EncodedString};
 
 use super::request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig};
+use super::response::CCErrorResponse;
 use super::validation;
 
 const REQUIRED_X_USER_DOMAIN_HEADER_VAL: &str = "onefootprint.com";
@@ -129,9 +131,10 @@ impl ExperianClientAdapter {
         Ok(response)
     }
 }
+use tokio_retry::RetryIf;
 
 impl ExperianClientAdapter {
-    pub(crate) async fn send_precise_id_request(
+    async fn send_precise_id_request(
         &self,
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
@@ -154,6 +157,42 @@ impl ExperianClientAdapter {
             .map_err(|err| Error::SendError(err.to_string()))?
             .json::<serde_json::Value>()
             .await?;
+
+        // catch any weird error relating to tokens
+        match serde_json::from_value::<CCErrorResponse>(response.clone()) {
+            Ok(e) => {
+                let err = match e.code.as_str() {
+                    "401-000" => Error::JwtTokenNeedsRefresh,
+                    _ => Error::UnknownError,
+                };
+                tracing::error!(err=%err, error_code=%&e.code, "send_precise_id_request error");
+
+                Err(err)
+            }
+            Err(_) => Ok(()),
+        }?;
+
+        Ok(response)
+    }
+
+    fn token_needs_refresh(error: &Error) -> bool {
+        matches!(error, Error::JwtTokenNeedsRefresh | Error::UnknownError)
+    }
+
+    pub(crate) async fn send_precise_id_request_with_retries(
+        &self,
+        client: &FootprintVendorHttpClient,
+        validated_idv_data: ValidatedIdvData,
+    ) -> Result<serde_json::Value, Error> {
+        let retry_strategy = FixedInterval::from_millis(300).take(3);
+
+        let response = RetryIf::spawn(
+            retry_strategy,
+            || self.send_precise_id_request(client, validated_idv_data.to_owned()),
+            Self::token_needs_refresh,
+        )
+        .await
+        .map_err(Error::from)?;
 
         Ok(response)
     }
@@ -231,6 +270,7 @@ impl ExperianClientAdapter {
 }
 
 /// Wrapper struct the ensure we've validated the input data before sending to experian
+#[derive(Clone)]
 pub(crate) struct ValidatedIdvData {
     idv_data: IdvData,
 }
