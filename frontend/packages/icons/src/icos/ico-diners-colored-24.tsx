@@ -15,7 +15,7 @@ const IcoDiners24 = ({ className, testID }: IconProps) => (
     <path
       fillRule="evenodd"
       clipRule="evenodd"
-      d="M1.398 12.163a9.18 9.18 0 1 1 18.36 0 9.18 9.18 0 1 1-18.36 0"
+      d="M1.398 12.163a9.18 9.18 0 1 1 18.36 0 9.18 9.18 0 1 1-18.36 0Z"
       fill="#FFFFFE"
     />
     <path
