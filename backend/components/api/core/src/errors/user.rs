@@ -20,7 +20,6 @@ pub enum UserError {
 
     #[error("Cannot use fixture phone number in non-sandbox mode.")]
     FixtureNumberInLive,
-    // TODO rm
     #[error("Cannot provide sandbox data in live mode or live data in sandbox mode.")]
     SandboxMismatch,
 }

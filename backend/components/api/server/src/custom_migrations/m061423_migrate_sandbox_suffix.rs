@@ -222,15 +222,15 @@ async fn compute_single(
         DataIdentifier::Id(IdentityDataKind::PhoneNumber) => {
             let phone_number = PhoneNumber::parse(decrypted)?;
             // We should only expect to see some legacy non-portable vaults with live emails in sandbox
-            if phone_number.is_live() && vault.is_portable {
-                panic!("Non-live phone number for {}, {}", vault.id, vd.id);
-            }
-            let sandbox_id = if !phone_number.is_live() {
-                phone_number.sandbox_suffix.clone()
-            } else {
+            // if phone_number.is_live() && vault.is_portable {
+            //     panic!("Non-live phone number for {}, {}", vault.id, vd.id);
+            // }
+            let sandbox_id = // if !phone_number.is_live() {
+            //     phone_number.sandbox_suffix.clone()
+            // } else {
                 // Autofill sandbox id for the few non-portable sandbox vaults that had numbers without a suffix
-                crypto::random::gen_random_alphanumeric_code(10)
-            };
+                crypto::random::gen_random_alphanumeric_code(10);
+            // };
             let vault_update = VaultUpdate {
                 id: vault.id,
                 sandbox_id,

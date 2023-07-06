@@ -131,8 +131,7 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
     let phone_number = decrypted
         .remove(&IDK::PhoneNumber.into())
         .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let mut phone_number = PhoneNumber::parse(phone_number)?;
-    phone_number.sandbox_suffix = "".to_owned();
+    let phone_number = PhoneNumber::parse(phone_number)?;
     let email = decrypted
         .remove(&IDK::Email.into())
         .ok_or(BusinessError::PrimaryBoHasNoEmail)?;

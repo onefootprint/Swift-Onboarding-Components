@@ -17,7 +17,6 @@ pub enum Error {
 #[derive(Clone, DeserializeFromStr, Eq, PartialEq, Hash)]
 pub struct PhoneNumber {
     number: phonenumber::PhoneNumber,
-    pub sandbox_suffix: String,
 }
 
 string_api_data_type_alias!(PhoneNumber);
@@ -32,17 +31,9 @@ impl PhoneNumber {
     const FIXTURE_PHONE_NUMBER: &str = "+15555550100";
 
     pub fn parse(number: PiiString) -> NtResult<Self> {
-        let (number, sandbox_suffix) = super::sandbox::split_sandbox_parts(number.leak())?;
-        let number = phonenumber::parse(None, number).map_err(Error::from)?;
+        let number = phonenumber::parse(None, number.leak()).map_err(Error::from)?;
         // Should we be checking phonenumber::is_valid?
-        Ok(Self {
-            number,
-            sandbox_suffix: sandbox_suffix.to_owned(),
-        })
-    }
-
-    pub fn is_live(&self) -> bool {
-        self.sandbox_suffix.is_empty()
+        Ok(Self { number })
     }
 
     /// Returns true for the SINGLE fake, fixture phone number we provide
@@ -53,17 +44,6 @@ impl PhoneNumber {
     // Maybe make two versions of e164: one with sandbox and one without
     pub fn e164(&self) -> PiiString {
         self.number.format().mode(phonenumber::Mode::E164).into()
-    }
-
-    /// Returns a PiiString representation of the phone number in e164 format. Includes the sandbox
-    /// suffix if any
-    pub fn e164_with_suffix(&self) -> PiiString {
-        let e164 = self.e164();
-        if self.sandbox_suffix.is_empty() {
-            e164
-        } else {
-            PiiString::from(format!("{}#{}", e164.leak(), self.sandbox_suffix))
-        }
     }
 
     /// Formats the PhoneNumber with all digits except the country code and last two scrubbed
@@ -95,7 +75,7 @@ impl serde::Serialize for PhoneNumber {
     where
         S: serde::Serializer,
     {
-        let s = self.e164_with_suffix();
+        let s = self.e164();
         s.serialize(serializer)
     }
 }
@@ -121,14 +101,10 @@ mod tests {
     #[test_case("+11231231234" => "+11231231234".to_owned(); "basic")]
     #[test_case("+55 (12) 12345-1234" => "+5512123451234".to_owned(); "brazil")]
     #[test_case("+47 123 12 123" => "+4712312123".to_owned(); "norway")]
-    // Sandbox should be parseable too
-    #[test_case("+1-123-123-1234#blerp" => "+11231231234#blerp".to_owned(); "dashes sandbox")]
-    #[test_case("+55 (12) 12345-1234#derp" => "+5512123451234#derp".to_owned(); "brazil sandbox")]
-    #[test_case("+47 123 12 123#test_1" => "+4712312123#test_1".to_owned(); "norway sandbox")]
     fn test_parse(number: &str) -> String {
         let phone_number = PhoneNumber::parse(number.into()).unwrap();
         assert!(!phone_number.is_fixture_phone_number());
-        phone_number.e164_with_suffix().leak_to_string()
+        phone_number.e164().leak_to_string()
     }
 
     #[test_case("+1-415-123-1234" => "+1 (***) ***-**34".to_owned(); "US")]
@@ -141,24 +117,8 @@ mod tests {
     }
 
     #[test]
-    fn test_sandbox() {
-        let phone_number = PhoneNumber::parse("+1-123-123-1234#sandbox".into()).unwrap();
-        assert_eq!(phone_number.e164_with_suffix().leak(), "+11231231234#sandbox");
-        assert!(!phone_number.is_live());
-
-        let phone_number = PhoneNumber::parse("+1-123-123-1234".into()).unwrap();
-        assert_eq!(phone_number.e164_with_suffix().leak(), "+11231231234");
-        assert!(phone_number.is_live());
-    }
-
-    #[test]
     fn test_fixture_number() {
-        let phone_number = PhoneNumber::parse("+1-555-555-0100#sandbox".into()).unwrap();
-        assert!(!phone_number.is_live());
-        assert!(phone_number.is_fixture_phone_number());
-
         let phone_number = PhoneNumber::parse("+1-555-555-0100".into()).unwrap();
-        assert!(phone_number.is_live());
         assert!(phone_number.is_fixture_phone_number());
     }
 }

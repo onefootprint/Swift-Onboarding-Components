@@ -45,7 +45,7 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
     };
     let invited = Invited {
         email: invited_bo.email.into(),
-        phone_number: invited_bo.phone_number.e164_with_suffix(),
+        phone_number: invited_bo.phone_number.e164(),
     };
 
     let result = HostedBusiness {

@@ -29,7 +29,7 @@ use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
-    PhoneNumber, SandboxId, SessionAuthToken, VaultId, VaultPublicKey,
+    SessionAuthToken, VaultId, VaultPublicKey,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -83,9 +83,7 @@ pub async fn post(
             // TODO this keypair won't always be used... but helps to generate this proactively.
             let keypair = state.enclave_client.generate_sealed_keypair().await?;
             let di = DataIdentifier::from(IDK::PhoneNumber);
-            let parsed_phone_number =
-                PhoneNumber::parse(challenge_state.phone_number_e164_with_suffix.clone())?;
-            let e164 = parsed_phone_number.e164();
+            let e164 = challenge_state.phone_number.clone();
             let global_sh_phone_number = state
                 .compute_fingerprint(GlobalFingerprintKind::PhoneNumber, &e164)
                 .await?;
@@ -107,7 +105,6 @@ pub async fn post(
                 global_sh_phone_number,
                 ob_info,
                 keypair,
-                phone_number: parsed_phone_number,
             };
             ChallengeData::Sms(context)
         }
@@ -246,7 +243,6 @@ struct SmsContext {
     // Only non-null when an ObConfigAuth was provided
     ob_info: Option<OnboardingInfo>,
     keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
-    phone_number: PhoneNumber,
 }
 
 fn validate_sms_challenge(
@@ -264,9 +260,8 @@ fn validate_sms_challenge(
     .into_iter()
     .flatten()
     .collect_vec();
-    let sandbox_id =
-        (!context.phone_number.is_live()).then_some(SandboxId::from(context.phone_number.sandbox_suffix));
-    let existing_user = Vault::find_portable(conn, &fps_to_search, sandbox_id)?;
+    let sandbox_id = context.challenge_state.sandbox_id;
+    let existing_user = Vault::find_portable(conn, &fps_to_search, sandbox_id.clone())?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
@@ -280,9 +275,10 @@ fn validate_sms_challenge(
                 conn,
                 context.keypair,
                 obc,
-                context.challenge_state.phone_number_e164_with_suffix,
+                context.challenge_state.phone_number,
                 context.global_sh_phone_number,
                 tenant_sh_phone_number,
+                sandbox_id,
             )?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }

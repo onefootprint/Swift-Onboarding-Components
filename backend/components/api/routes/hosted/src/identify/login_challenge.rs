@@ -17,8 +17,6 @@ use api_core::utils::headers::SandboxId;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::PhoneNumber;
-use newtypes::PiiString;
 use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
@@ -86,18 +84,6 @@ pub async fn post(
     // If we need to create a challenge, extract the phone number for the user
     let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
     let sandbox_id = uvw.vault.sandbox_id.clone();
-    let phone_number = if let Some(sandbox_id) = uvw.vault.sandbox_id {
-        // TODO the codepath in identify/verify expects this phone number to have the sandbox suffix,
-        // so add it back in here if it exists.
-        // We'll rm this soon
-        PhoneNumber::parse(PiiString::from(format!(
-            "{}#{}",
-            phone_number.e164().leak(),
-            sandbox_id
-        )))?
-    } else {
-        phone_number
-    };
 
     // Initiate the challenge of the requested type
     let challenge_kind = if creds.is_empty() {

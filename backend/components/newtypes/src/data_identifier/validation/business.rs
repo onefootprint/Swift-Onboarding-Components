@@ -18,7 +18,7 @@ impl Validate for BDK {
             BDK::Name => value,
             BDK::Dba => value,
             BDK::Website => clean_and_validate_website(value)?,
-            BDK::PhoneNumber => PhoneNumber::parse(value)?.e164_with_suffix(),
+            BDK::PhoneNumber => PhoneNumber::parse(value)?.e164(),
             BDK::Tin => clean_and_validate_tin(value)?,
             BDK::AddressLine1 => value,
             BDK::AddressLine2 => value,
@@ -94,9 +94,6 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString, args: ValidateAr
         }
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
-        }
-        if bos.iter().any(|bo| !bo.phone_number.is_live()) {
-            return Err(Error::SandboxNotAllowed);
         }
         // Allow non-unique emails and phones in sandbox for easier testing
         if args.is_live && bos.iter().map(|bo| &bo.phone_number).unique().count() != bos.len() {
@@ -196,7 +193,6 @@ mod test {
     #[test_case(Website, "123?.com" => None)]
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
-    #[test_case(PhoneNumber, "+15555555555#sandbox" => Some("+15555555555#sandbox".to_owned()))] // Sandbox phone
     #[test_case(Tin, "12-1234567" => Some("121234567".to_owned()))]
     #[test_case(AddressLine1, "100 Nitro Way@" => Some("100 Nitro Way@".to_owned()))]
     #[test_case(AddressLine1, "100 Enclave Way" => Some("100 Enclave Way".to_owned()))]
@@ -247,14 +243,14 @@ mod test {
         assert_eq!(owner.first_name.leak(), "Piip");
         assert_eq!(owner.last_name.leak(), "Penguin");
         assert_eq!(owner.email.leak(), "piip@onefootprint.com");
-        assert_eq!(owner.phone_number.e164_with_suffix().leak(), "+14155555555",);
+        assert_eq!(owner.phone_number.e164().leak(), "+14155555555",);
         assert_eq!(owner.ownership_stake, 90);
 
         // Test bad email
         let input = json!([{
             "first_name": "Piip",
             "last_name": "Penguin",
-            "email": "piip@onefootprint.com#sandbox",
+            "email": "piip",
             "phone_number": "+14155555555",
             "ownership_stake": 90
         }]);
@@ -272,7 +268,7 @@ mod test {
             "first_name": "Piip",
             "last_name": "Penguin",
             "email": "piip@onefootprint.com",
-            "phone_number": "+14155555555#sandbox",
+            "phone_number": "merp",
             "ownership_stake": 90
         }]);
 

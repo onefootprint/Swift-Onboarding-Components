@@ -36,12 +36,7 @@ fn clean_and_validate_email(value: PiiString) -> NtResult<PiiString> {
 
 fn clean_and_validate_phone(value: PiiString) -> NtResult<PiiString> {
     let phone = PhoneNumber::parse(value)?;
-    if !phone.is_live() {
-        return Err(crate::Error::Custom(
-            "Unexpected: got to validation without stripping sandbox suffix".into(),
-        ));
-    }
-    Ok(phone.e164_with_suffix())
+    Ok(phone.e164())
 }
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
@@ -143,9 +138,8 @@ mod test {
     #[test_case(Email, "flerp@derp.com#sandbox" => None)] // Sandbox email
     #[test_case(PhoneNumber, "flerp" => None)]
     #[test_case(PhoneNumber, "+1-555-555-5555" => Some("+15555555555".to_owned()))]
-    #[test_case(PhoneNumber, "+15555555555#sandbox" => None)] // Sandbox phone
-    #[test_case(Nationality, "US" => Some("US".to_owned()))] // Sandbox phone
-    #[test_case(Nationality, "Flerp" => None)] // Sandbox phone
+    #[test_case(Nationality, "US" => Some("US".to_owned()))]
+    #[test_case(Nationality, "Flerp" => None)]
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
         idk.validate(
             PiiString::new(pii.to_owned()),

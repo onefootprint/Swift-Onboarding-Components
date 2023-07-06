@@ -27,8 +27,7 @@ pub struct Vault {
     pub public_key: VaultPublicKey,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // TODO can probably deprecate this and just check the sandbox_id
-    pub is_live: IsLive,
+    pub is_live: IsLive, // true IFF sandbox_id is null
     pub is_portable: bool,
     pub kind: VaultKind,
     /// A subset of the sandbox, non-is-live users are "fixture" users created specifically with
@@ -39,7 +38,7 @@ pub struct Vault {
     /// The sandbox identifier for this vault. Must be provided for vaults where is_live = false.
     /// The sandbox identifier helps to differentiate multiple sandbox vaults made with the same
     /// phone number / email.
-    pub sandbox_id: Option<SandboxId>,
+    pub sandbox_id: Option<SandboxId>, // is_none() IFF is_live
 }
 
 pub enum VaultIdentifier<'a> {

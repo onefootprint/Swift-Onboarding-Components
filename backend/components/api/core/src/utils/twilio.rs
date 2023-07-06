@@ -142,9 +142,7 @@ impl TwilioClient {
 
         Ok((
             PhoneChallengeState {
-                // TODO
-                phone_number_e164_with_suffix: destination.e164_with_suffix(),
-                phone_number: Some(destination.e164()),
+                phone_number: destination.e164(),
                 sandbox_id,
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
@@ -229,11 +227,7 @@ pub struct BoSessionSmsInfo<'a> {
 /// Phone number challenge in-progress state
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
-    /// Will also include sandbox suffix, if exists
-    /// TODO rm
-    pub phone_number_e164_with_suffix: PiiString,
-    // TODO make phone_number not optional
-    pub phone_number: Option<PiiString>,
+    pub phone_number: PiiString,
     pub sandbox_id: Option<SandboxId>,
     pub h_code: Vec<u8>,
 }

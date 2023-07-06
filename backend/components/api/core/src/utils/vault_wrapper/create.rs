@@ -33,10 +33,11 @@ impl VaultWrapper<Person> {
         phone_number: PiiString,
         global_sh_phone_number: Fingerprint,
         tenant_sh_phone_number: Fingerprint,
+        sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
         let phone_number_parsed = PhoneNumber::parse(phone_number)?;
         // Verify that the ob config is_live matches the user vault
-        if ob_config.is_live != phone_number_parsed.is_live() {
+        if ob_config.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
         }
         if ob_config.is_live && phone_number_parsed.is_fixture_phone_number() {
@@ -52,8 +53,7 @@ impl VaultWrapper<Person> {
             is_portable: true,
             kind: VaultKind::Person,
             is_fixture: phone_number_parsed.is_fixture_phone_number(),
-            sandbox_id: (!phone_number_parsed.is_live())
-                .then_some(SandboxId::from(phone_number_parsed.sandbox_suffix.clone())),
+            sandbox_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
