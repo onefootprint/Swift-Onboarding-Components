@@ -141,7 +141,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     let tests = vec![
-        (BDK::Name, Some(SealedVaultBytes(vec![1]))),
+        (BDK::Name, None), // The business name is stored in plaintext, so it won't show in e_data
         (BDK::Website, Some(SealedVaultBytes(vec![2]))),
         (BDK::PhoneNumber, Some(SealedVaultBytes(vec![3]))),
         (BDK::Tin, None),
@@ -156,6 +156,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         let (attribute, expected_value) = test;
         assert_eq!(bvw.get_e_data(attribute), expected_value.as_ref());
     }
+    assert_eq!(bvw.get_p_data(BDK::Name), Some(&PiiString::from("Acme Inc")));
 }
 
 #[db_test]

@@ -15,7 +15,7 @@ impl<Type> TenantVw<Type> {
             // Only allow deleting speculative data so we don't accidentally affect other tenants'
             // view of the world.
             .filter_map(|di| self.speculative.get(di.clone()).map(|vd| (di, vd)))
-            .map(|(di, vd)| (di, vd.lifetime_id.clone()))
+            .map(|(di, vd)| (di, vd.lifetime_id().clone()))
             .unzip();
 
         let seqno = DataLifetime::get_next_seqno(conn.conn())?;

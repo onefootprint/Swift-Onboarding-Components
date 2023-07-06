@@ -14,8 +14,8 @@ use enclave_proxy::{DataTransformer, DataTransforms};
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
+    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, DataIdentifier, DocumentKind,
+    IdentityDataKind as IDK, KycedBusinessOwnerData, ObConfigurationId, PhoneNumber, PiiBytes, PiiString,
 };
 use std::collections::HashMap;
 
@@ -104,6 +104,20 @@ impl<Type> VaultWrapper<Type> {
         self.fn_decrypt_unchecked(enclave_client, ids).await
     }
 
+    /// Get the VaultedData for the provided id, if exists. This also includes strange logic to
+    /// get the mime type
+    fn get_vaulted_data(&self, di: DataIdentifier) -> Option<VaultedData> {
+        // This is weird - get the mime type from the document row
+        if let &DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = &di {
+            let di: DataIdentifier = DocumentKind::from_id_doc_kind(doc_kind, side).into();
+            let speculative_doc = self.speculative.documents.iter().find(|d| d.kind == di);
+            let portable_doc = || self.portable.documents.iter().find(|d| d.kind == di);
+            let document = speculative_doc.or_else(portable_doc)?;
+            return Some(VaultedData::NonPrivate(&document.mime_type));
+        }
+        self.get(di).map(|v| v.data())
+    }
+
     /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
     /// event.
     ///
@@ -128,7 +142,7 @@ impl<Type> VaultWrapper<Type> {
             .clone()
             .into_iter()
             .flat_map(|(di, transform)| {
-                self.get_data(di.clone())
+                self.get_vaulted_data(di.clone())
                     .map(|d| (d, EnclaveDecryptOperation::new(di, transform)))
             })
             .collect_vec();
@@ -228,7 +242,7 @@ impl<Type> VaultWrapper<Type> {
         let phone_lifetime_id = self
             .get(IDK::PhoneNumber)
             .ok_or(ApiError::NoPhoneNumberForVault)?
-            .lifetime_id
+            .lifetime_id()
             .clone();
         let ci = state
             .db_pool

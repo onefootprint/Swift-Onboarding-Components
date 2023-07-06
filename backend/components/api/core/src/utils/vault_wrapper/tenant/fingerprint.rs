@@ -1,4 +1,7 @@
-use db::models::{fingerprint::NewFingerprint, ob_configuration::ObConfiguration};
+use db::{
+    models::{fingerprint::NewFingerprint, ob_configuration::ObConfiguration},
+    VaultedData,
+};
 use itertools::Itertools;
 use newtypes::{FingerprintScopeKind, FingerprintVersion};
 
@@ -27,7 +30,12 @@ impl<Type> TenantVw<Type> {
             .filter_map(|id| {
                 self.uvw
                     .get(id.clone())
-                    .map(|ed: &db::models::vault_data::VaultData| (&ed.lifetime_id, &ed.e_data))
+                    .and_then(|ed| -> Option<_> {
+                        let VaultedData::Sealed(data) = ed.data() else {
+                            return None
+                        };
+                        Some((ed.lifetime_id(), data))
+                    })
                     .map(|(dl_id, e_data)| ((id, dl_id), ((id, tenant_id), e_data)))
             })
             .unzip();

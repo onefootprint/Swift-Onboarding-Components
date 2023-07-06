@@ -89,12 +89,23 @@ impl<Type> VwData<Type> {
     /// Dispatch queries for a piece of data with a given identifier to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data
-    pub fn get<T>(&self, di: T) -> Option<&VaultData>
+    pub fn get<T>(&self, di: T) -> Option<&dyn HasLifetime>
     where
         T: Into<DataIdentifier>,
     {
         let di = di.into();
-        self.vd.iter().find(|d| d.kind == di)
+        let maybe_vault_data = self
+            .vd
+            .iter()
+            .find(|d| d.kind == di)
+            .map(|vd| vd as &dyn HasLifetime);
+        let maybe_doc_data = || {
+            self.documents
+                .iter()
+                .find(|d| d.kind == di)
+                .map(|dd| dd as &dyn HasLifetime)
+        };
+        maybe_vault_data.or_else(maybe_doc_data)
     }
 
     pub(super) fn get_lifetimes<VecT, T>(&self, kinds: VecT) -> Vec<&DataLifetime>
@@ -107,10 +118,5 @@ impl<Type> VwData<Type> {
             .flat_map(|k| self.get(k))
             .flat_map(|d| self.lifetimes.get(d.lifetime_id()))
             .collect()
-    }
-
-    // Todo maybe combine with get
-    pub fn get_document(&self, kind: &DataIdentifier) -> Option<&DocumentData> {
-        self.documents.iter().find(|d| &d.kind == kind)
     }
 }
