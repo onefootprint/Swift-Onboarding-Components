@@ -85,6 +85,7 @@ pub async fn post(
 
     // If we need to create a challenge, extract the phone number for the user
     let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
+    let sandbox_id = uvw.vault.sandbox_id.clone();
     let phone_number = if let Some(sandbox_id) = uvw.vault.sandbox_id {
         // TODO the codepath in identify/verify expects this phone number to have the sandbox suffix,
         // so add it back in here if it exists.
@@ -114,7 +115,7 @@ pub async fn post(
         ChallengeKind::Sms => {
             let tenant_name = tenant.map(|t| t.name.clone());
             let (challenge_state, time_before_retry_s) = twilio_client
-                .send_challenge(&state, tenant_name, &phone_number)
+                .send_challenge(&state, tenant_name, &phone_number, sandbox_id)
                 .await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             (challenge_data, time_before_retry_s.num_seconds(), None)

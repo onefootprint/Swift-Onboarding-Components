@@ -7,8 +7,8 @@ use crate::{
 use actix_web::http::StatusCode;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::TriggerKind;
 use newtypes::{PhoneNumber, PiiString};
+use newtypes::{SandboxId, TriggerKind};
 use thiserror::Error;
 
 use self::rate_limit::RateLimit;
@@ -119,8 +119,9 @@ impl TwilioClient {
         state: &State,
         tenant_name: Option<String>,
         destination: &PhoneNumber,
+        sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
-        if destination.is_fixture_phone_number() && destination.is_live() {
+        if destination.is_fixture_phone_number() && sandbox_id.is_none() {
             return Err(UserError::FixtureNumberInLive.into());
         }
         let code = if destination.is_fixture_phone_number() {
@@ -141,7 +142,10 @@ impl TwilioClient {
 
         Ok((
             PhoneChallengeState {
+                // TODO
                 phone_number_e164_with_suffix: destination.e164_with_suffix(),
+                phone_number: Some(destination.e164()),
+                sandbox_id,
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
             self.duration_between_challenges,
@@ -226,7 +230,11 @@ pub struct BoSessionSmsInfo<'a> {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
     /// Will also include sandbox suffix, if exists
+    /// TODO rm
     pub phone_number_e164_with_suffix: PiiString,
+    // TODO make phone_number not optional
+    pub phone_number: Option<PiiString>,
+    pub sandbox_id: Option<SandboxId>,
     pub h_code: Vec<u8>,
 }
 

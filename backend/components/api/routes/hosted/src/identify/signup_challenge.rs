@@ -36,7 +36,7 @@ pub async fn post(
     let SignupChallengeRequest { phone_number } = request.into_inner();
     let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
     // TODO clean up when when sandbox_id no longer in phone number
-    let phone_number = if let Some(sandbox_id) = sandbox_id.0 {
+    let phone_number = if let Some(sandbox_id) = sandbox_id.0.clone() {
         let number = PiiString::new(format!("{}#{}", phone_number.e164().leak(), sandbox_id));
         PhoneNumber::parse(number)?
     } else {
@@ -44,7 +44,7 @@ pub async fn post(
     };
     let (challenge_state_data, time_before_retry_s) = state
         .twilio_client
-        .send_challenge(&state, tenant_name, &phone_number)
+        .send_challenge(&state, tenant_name, &phone_number, sandbox_id.0)
         .await?;
 
     let challenge_state = ChallengeState {
