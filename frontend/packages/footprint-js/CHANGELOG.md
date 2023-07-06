@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 2.1.1
+
+### Patch Changes
+
+- 67901cd4a: Add new customization options: radio select
+
 ## 2.1.0
 
 ### Minor Changes
