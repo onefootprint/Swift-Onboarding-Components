@@ -161,6 +161,7 @@ mod tests {
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
             phone_number: Some(PiiString::from("1234567891")),
+            ..Default::default()
         };
 
         let device_session_id = Some(String::from("placeholder"));

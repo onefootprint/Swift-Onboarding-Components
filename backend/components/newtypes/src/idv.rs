@@ -1,4 +1,4 @@
-use crate::{BusinessOwnerData, IdentityDataKind, PiiString};
+use crate::{BusinessOwnerData, IdentityDataKind, PiiString, VerificationRequestId};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
@@ -18,6 +18,8 @@ pub struct IdvData {
     pub dob: Option<PiiString>,
     pub email: Option<PiiString>,
     pub phone_number: Option<PiiString>,
+    // this is convenient to have
+    pub verification_request_id: Option<VerificationRequestId>,
 }
 
 impl IdvData {

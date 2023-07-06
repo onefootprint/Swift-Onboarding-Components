@@ -22,6 +22,7 @@ pub async fn build_idv_data_from_verification_request(
     enclave_client: &EnclaveClient,
     request: VerificationRequest,
 ) -> Result<IdvData, ApiError> {
+    let vreq_id = request.id.clone();
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
     let uvw = db_pool
@@ -53,6 +54,7 @@ pub async fn build_idv_data_from_verification_request(
         dob: decrypted_values.remove(&IDK::Dob.into()),
         email,
         phone_number,
+        verification_request_id: Some(vreq_id),
     };
     Ok(request)
 }

@@ -109,6 +109,7 @@ mod tests {
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
             phone_number: Some(PiiString::from("1085551212")),
+            ..Default::default()
         };
 
         let res = lexis_client.flex_id_request(idv_data).await.unwrap();

@@ -154,6 +154,7 @@ mod tests {
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
             phone_number: None,
+            ..Default::default()
         };
 
         let present_data_kinds = IdvData::present_data_attributes(&idv_data);

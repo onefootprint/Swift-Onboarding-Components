@@ -128,6 +128,7 @@ impl Contact {
             dob,
             email,
             phone_number,
+            verification_request_id: _,
         } = d;
 
         let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;

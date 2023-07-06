@@ -45,6 +45,7 @@ impl SocureRequest {
             dob,
             email,
             phone_number,
+            verification_request_id: _,
         } = idv_data;
 
         // TODO: this zip code validation logic already existed- unsure if its entirely necessary:

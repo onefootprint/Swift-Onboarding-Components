@@ -70,6 +70,7 @@ impl LexisRequest {
             dob: _,
             email: _,
             phone_number,
+            verification_request_id: _,
         } = idv_data;
 
         Ok(Self {

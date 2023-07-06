@@ -1,7 +1,7 @@
 use chrono::Utc;
 use newtypes::experian::ProductOptions;
 use newtypes::vendor_credentials::ExperianCredentials;
-use newtypes::{IdvData, PiiString, Uuid};
+use newtypes::{IdvData, PiiString, Uuid, VerificationRequestId};
 use tokio_retry::strategy::FixedInterval;
 
 use crate::experian::auth::{self, response::JwtTokenResponse};
@@ -139,9 +139,11 @@ impl ExperianClientAdapter {
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
     ) -> Result<serde_json::Value, Error> {
+        let idv_data = validated_idv_data.into_idv_data();
+        let vreq_id = idv_data.verification_request_id.clone();
         let req_struct = &CrossCoreAPIRequest::try_from(
-            validated_idv_data.into_idv_data(),
-            self.config(),
+            idv_data,
+            self.config(vreq_id),
             self.environment == ClientEnvironment::Production,
         )?;
         let req = serde_json::to_string(req_struct)?;
@@ -204,13 +206,14 @@ impl ExperianClientAdapter {
         Ok(response)
     }
 
-    fn config(&self) -> PreciseIDRequestConfig {
+    fn config(&self, verification_request_id: Option<VerificationRequestId>) -> PreciseIDRequestConfig {
         PreciseIDRequestConfig {
             control_options: self.control_options(),
             tenant_id: "105408b68cde455a92e95a3eaa989e".into(),
             request_type: "PreciseIdOnly".into(),
-            // TODO: verification request id?
-            client_reference_id: Uuid::new_v4().to_string(),
+            client_reference_id: verification_request_id
+                .map(|v| v.to_string())
+                .unwrap_or(Uuid::new_v4().to_string()),
             message_time: Utc::now(),
         }
     }
@@ -457,13 +460,13 @@ mod tests {
         assert!(idv_data.phone_number.is_some());
         assert!(idv_data.email.is_some());
         // sandbox we don't send email/phone
-        let req = CrossCoreAPIRequest::try_from(idv_data.clone(), client.config(), false).unwrap();
+        let req = CrossCoreAPIRequest::try_from(idv_data.clone(), client.config(None), false).unwrap();
         let contact = req.payload.contacts[0].clone();
         assert!(contact.emails.is_empty());
         assert!(contact.telephones.is_empty());
 
         // prod we do send email/phone
-        let req = CrossCoreAPIRequest::try_from(idv_data, client.config(), true).unwrap();
+        let req = CrossCoreAPIRequest::try_from(idv_data, client.config(None), true).unwrap();
         let contact = req.payload.contacts[0].clone();
         assert!(!contact.emails.is_empty());
         assert!(!contact.telephones.is_empty());
