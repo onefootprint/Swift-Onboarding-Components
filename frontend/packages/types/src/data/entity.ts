@@ -71,9 +71,6 @@ export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
 });
 
 const getEntityStatus = (entity: Entity): EntityStatus => {
-  if (!entity.isPortable) {
-    return EntityStatus.none;
-  }
   if (!entity.onboarding) {
     return EntityStatus.none;
   }
