@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 4.0.1
+
+### Patch Changes
+
+- 3286077c3: Update peer dependencies
+
 ## 4.0.0
 
 ### Minor Changes
