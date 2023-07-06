@@ -281,10 +281,6 @@ footprint_reason_code_enum! {
         AddressNewerRecordFound,
 
 
-        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
-        #[note = "Newer address found", severity = SignalSeverity::Low,  description = "The individual was located at the address input, but a more recent record shows a different address for the individual."]
-        NewerRecordFound,
-
         // ~~~~~~~~~ DOB ~~~~~~~~~~~~~~~
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
