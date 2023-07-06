@@ -46,7 +46,7 @@ pub fn save_verification_results(
 /// For requests with no response payload, we will notate on VRes that the request was an error
 pub fn save_error_verification_results(
     conn: &mut PgConn,
-    vendor_responses_with_errors: &[(VerificationRequest, Option<serde_json::Value>)],
+    vendor_responses_with_errors: &[(VerificationRequest, Option<PiiJsonValue>)],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<Vec<VerificationResult>, ApiError> {
     let now = Utc::now();
@@ -54,8 +54,8 @@ pub fn save_error_verification_results(
         .iter()
         .map(|(req, response)| {
             // TODO: should just make response optional for is_error
-            let r = response.clone().unwrap_or(serde_json::json!(""));
-            let e_response = encrypt_verification_result_response(&r.clone().into(), user_vault_public_key)?;
+            let r = response.clone().unwrap_or(serde_json::json!("").into());
+            let e_response = encrypt_verification_result_response(&r, user_vault_public_key)?;
 
             Ok(NewVerificationResult {
                 request_id: req.id.clone(),

@@ -40,7 +40,7 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    ObConfigurationId, OnboardingId, ReviewReason, ScopedVaultId, VerificationRequestId,
+    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId,
     VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
@@ -79,7 +79,7 @@ where
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
     vendor_responses: &[VerificationRequestWithVendorResponse],
-    vendor_error_responses: Vec<(VerificationRequest, Option<serde_json::Value>)>,
+    vendor_error_responses: Vec<(VerificationRequest, Option<PiiJsonValue>)>,
     onboarding_id: &OnboardingId,
 ) -> ApiResult<Vec<VendorResult>> {
     let obid = onboarding_id.clone();
@@ -182,7 +182,7 @@ impl VendorResults {
             .collect()
     }
 
-    pub fn all_errors_with_parsable_requests(&self) -> Vec<(VerificationRequest, Option<serde_json::Value>)> {
+    pub fn all_errors_with_parsable_requests(&self) -> Vec<(VerificationRequest, Option<PiiJsonValue>)> {
         self.critical_errors
             .iter()
             .map(Self::construct_requests_with_responses_for_verification_result)
@@ -198,7 +198,7 @@ impl VendorResults {
 impl VendorResults {
     fn construct_requests_with_responses_for_verification_result(
         v: &VerificationRequestWithVendorError,
-    ) -> (VerificationRequest, Option<serde_json::Value>) {
+    ) -> (VerificationRequest, Option<PiiJsonValue>) {
         match v {
             (req, ApiError::VendorRequestFailed(ve)) => match &ve.error {
                 idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {

@@ -1,5 +1,7 @@
 use std::fmt::{Debug, Display};
 
+use newtypes::PiiJsonValue;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("socure type conversion error: {0}")]
@@ -38,7 +40,7 @@ impl Error {
     pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
         Self::ErrorWithResponse(Box::new(ErrorWithResponse {
             error: self,
-            response,
+            response: response.into(),
         }))
     }
 }
@@ -134,14 +136,22 @@ impl From<String> for RequestError {
 /// we still want to save these as VerificationResults.
 ///
 /// This struct wraps `Error` so that we can propagate the json up and save.
-#[derive(Debug)]
 pub struct ErrorWithResponse {
     pub error: Error,
-    pub response: serde_json::Value,
+    pub response: PiiJsonValue,
 }
 
 impl Display for ErrorWithResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.error)
+    }
+}
+
+impl std::fmt::Debug for ErrorWithResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ErrorWithResponse")
+            .field("error", &self.error)
+            .field("response", &"<omitted>")
+            .finish()
     }
 }
