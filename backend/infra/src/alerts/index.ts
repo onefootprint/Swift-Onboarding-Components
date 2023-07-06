@@ -66,6 +66,10 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
     }
     // Create a pager trigger
     if (pageThreshold && pagerRecipient) {
+      const recipients = [pagerRecipient];
+      if (slackRecipient) {
+        recipients.push(slackRecipient);
+      }
       new TriggerResource(`${commonName}-pager`, {
         apiKey,
         datasetName: datasetName,
@@ -74,7 +78,7 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
           evaluation_schedule_type: 'frequency',
           frequency: 60, // Evaluate once per minute
           name: `[CRITICAL] ${name}`,
-          recipients: [pagerRecipient],
+          recipients,
           threshold: pageThreshold,
           ...trigger,
         },
