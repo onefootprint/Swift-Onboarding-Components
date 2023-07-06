@@ -162,10 +162,17 @@ impl ExperianClientAdapter {
         match serde_json::from_value::<CCErrorResponse>(response.clone()) {
             Ok(e) => {
                 let err = match e.code.as_str() {
-                    "401-000" => Error::JwtTokenNeedsRefresh,
-                    _ => Error::UnknownError,
+                    "401-000" => {
+                        let err = Error::JwtTokenNeedsRefresh;
+                        tracing::info!(err=%err, error_code=%&e.code, "send_precise_id_request error");
+                        err
+                    }
+                    _ => {
+                        let err = Error::UnknownError;
+                        tracing::error!(err=%err, error_code=%&e.code, "send_precise_id_request error");
+                        err
+                    }
                 };
-                tracing::error!(err=%err, error_code=%&e.code, "send_precise_id_request error");
 
                 Err(err)
             }
