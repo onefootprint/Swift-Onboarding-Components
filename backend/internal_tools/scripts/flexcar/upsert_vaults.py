@@ -2,6 +2,7 @@ import argparse
 import csv
 from util import call_endpoint
 from dataclasses import dataclass
+import re
 
 def read_seed_data(seed_file_path):
     with open(seed_file_path, "r") as f:
@@ -9,7 +10,6 @@ def read_seed_data(seed_file_path):
     
 
 SEED_FILE_PII_FIELD_TO_FP_DI = {
- 'Address1': 'id.address_line1',
  'Address2': 'id.address_line2',
  'City': 'id.city',
  'State': 'id.state',
@@ -83,12 +83,26 @@ def parse_name(first_name, middle_and_sur_name, last_name):
 
     return Name(first=first, middle_names=middle_names, last=last, suffix=suffix)
 
+EXPERIAN_ADDRES1_REGEX = r"([a-zA-Z0-9# \\\-'$ / \\\.]{1,60}){1}"
+
+def parse_address1(address1):
+    if address1 is None:
+        return address1
+    comps = re.findall(EXPERIAN_ADDRES1_REGEX, address1)
+    if len(address1) < 2:
+        return address1
+    else:
+        fixed_address1 = " ".join([s.strip() for s in comps])
+        fixed_address1 = re.findall(EXPERIAN_ADDRES1_REGEX, fixed_address1)[0]
+        return fixed_address1
+
 def vault_blob_for_seed_file_row(row):
     vault_data = {}
     for k,v in row.items():
-        if k in SEED_FILE_NAME_FIELDS: # handle name parsing separately 
+        if k in SEED_FILE_NAME_FIELDS or k == 'Address1': # handle name parsing separately 
             continue
         if v is not None and v != '': # dont try and vault fields that are blank in seed file
+            v = v.strip()
             if k in SEED_FILE_PII_FIELD_TO_FP_DI:
                 vault_data[SEED_FILE_PII_FIELD_TO_FP_DI[k]] = v
             elif k == 'Chargeback_$': # we error on symbols in key name
@@ -98,9 +112,13 @@ def vault_blob_for_seed_file_row(row):
     vault_data['id.country'] = 'US' # not in seed file, but inferred
 
     name = parse_name(row['First_Name'], row['MiddleAndSurName'], row['Last_Name'])
-    vault_data['id.first_name'] = name.first
-    vault_data['id.last_name'] = name.last
-    # vault_data['id.middle_name'] = name.middle_names # not supported yet
+    vault_data['id.first_name'] = name.first.strip()
+    vault_data['id.last_name'] = name.last.strip()
+    # vault_data['id.middle_name'] = name.middle_names.strip() # not supported yet
+
+    address1 = row['Address1']
+    if address1:
+        vault_data['id.address_line1'] = parse_address1(address1)
     
     return vault_data
 
