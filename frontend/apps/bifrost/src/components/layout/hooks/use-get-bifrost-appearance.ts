@@ -23,13 +23,6 @@ const useGetBifrostAppearance = (): FootprintAppearance | undefined => {
   const variables = searchParams.get('tokens') ?? undefined;
   const rules = searchParams.get('rules') ?? undefined;
 
-  if (rules) {
-    console.log(getParsedApperance(rules));
-  }
-  if (variables) {
-    console.log(getParsedApperance(variables));
-  }
-
   let appearance = config?.appearance;
   if (fontSrc || variables || rules) {
     appearance = {
