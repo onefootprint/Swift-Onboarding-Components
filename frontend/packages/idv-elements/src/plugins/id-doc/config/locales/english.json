@@ -165,19 +165,17 @@
     },
     "front-photo-capture": {
       "title": {
-        "driversLicense": "Driver's license",
-        "idCard": "ID card",
-        "passport": "Passport"
-      },
-      "subtitle": "Front side"
+        "driversLicense": "Driver's license · Front side",
+        "idCard": "ID card · Front side",
+        "passport": "Passport · Photo page"
+      }
     },
     "back-photo-capture": {
       "title": {
-        "driversLicense": "Driver's license",
-        "idCard": "ID card",
-        "passport": "Passport"
-      },
-      "subtitle": "Back side"
+        "driversLicense": "Driver's license · Back side",
+        "idCard": "ID card · Back side",
+        "passport": "Passport · Photo page"
+      }
     },
     "selfie-photo-prompt": {
       "title": "Take a selfie",

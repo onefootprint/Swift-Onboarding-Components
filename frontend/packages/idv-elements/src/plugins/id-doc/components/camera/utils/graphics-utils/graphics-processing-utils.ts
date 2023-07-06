@@ -1,4 +1,4 @@
-import cv, { Mat, MatVector, Rect, RotatedRect } from 'opencv-ts';
+import cv, { Mat, MatVector, Point, Rect, RotatedRect } from 'opencv-ts';
 
 // The numbers are used for edge detection hysteresis thresholding
 // The higher the numbers are, the less number of edges (only the prominent ones) will be detected
@@ -166,12 +166,12 @@ export const coversOutlineSpace = (
   const uprightHeight = uprightRect.height;
 
   // 30% error margin for width
-  // 65% error margin for height
+  // 70% error margin for height
   // the height error margin is higher because backside on the US driver's licenses has a black stripe on it which reduces the contour height
   const isWideEnough =
     (Math.abs(uprightWidth - outlineWidth) * 100) / uprightWidth < 30;
   const isHighEnough =
-    (Math.abs(uprightHeight - outlineHeight) * 100) / uprightHeight < 65;
+    (Math.abs(uprightHeight - outlineHeight) * 100) / uprightHeight < 70;
 
   return (
     isWideEnough &&
@@ -181,10 +181,39 @@ export const coversOutlineSpace = (
   );
 };
 
+// If the card is over aligned, we probably misclassified something else as a card
+export const isOverAligned = ({
+  topLeft,
+  bottomRight,
+  imgWidth,
+  imgHeight,
+}: {
+  topLeft: Point;
+  bottomRight: Point;
+  imgWidth: number;
+  imgHeight: number;
+}) => {
+  // Does the left line of the bounding box aligns exactly with left edge of the image
+  if (topLeft.x === 0) return false;
+
+  // Does the top line of the bounding box aligns exactly with top edge of the image
+  if (topLeft.y === 0) return false;
+
+  // Does the right line of the bounding box aligns exactly with right edge of the image
+  if (bottomRight.x === imgWidth) return false;
+
+  // Does the bottom line of the bounding box aligns exactly with bottom edge of the image
+  if (bottomRight.y === imgHeight) return false;
+
+  return true;
+};
+
 export const getCardCaptureStatus = (
   imgSrc: HTMLImageElement | HTMLCanvasElement,
 ) => {
   if (!cv.Mat) return CardCaptureStatus.detecting; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
+  if (imgSrc.width === 0 || imgSrc.height === 0)
+    return CardCaptureStatus.detecting;
   const src = cv.imread(imgSrc);
   const medianBlurredImage = getMedianBlur(src, true);
   grayScaleImage(medianBlurredImage);
@@ -195,9 +224,27 @@ export const getCardCaptureStatus = (
   const boundingBoxes = getBoundingBoxes(contours);
   const possibleCards: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
   boundingBoxes.forEach(boundingBox => {
+    const topLeft = new cv.Point(
+      boundingBox.uprightRect.x,
+      boundingBox.uprightRect.y,
+    );
+    const bottomRight = new cv.Point(
+      boundingBox.uprightRect.x + boundingBox.uprightRect.width,
+      boundingBox.uprightRect.y + boundingBox.uprightRect.height,
+    );
     if (
       getIsHorizontallyAligned(boundingBox) &&
-      coversOutlineSpace(boundingBox.uprightRect, imgSrc.width, imgSrc.height)
+      coversOutlineSpace(
+        boundingBox.uprightRect,
+        imgSrc.width,
+        imgSrc.height,
+      ) &&
+      isOverAligned({
+        topLeft,
+        bottomRight,
+        imgWidth: imgSrc.width,
+        imgHeight: imgSrc.height,
+      })
     ) {
       possibleCards.push(boundingBox);
     }

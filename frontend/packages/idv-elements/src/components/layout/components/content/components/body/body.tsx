@@ -6,6 +6,8 @@ import useMeasure from 'react-use-measure';
 
 const SHIMMER_HEIGHT = '296px';
 
+export const IDV_BODY_CONTENT_CONTAINER_ID = 'idv-body-content-container';
+
 type BodyProps = {
   children: React.ReactNode;
 };
@@ -20,6 +22,7 @@ const Body = ({ children }: BodyProps) => {
         duration: 0.15,
         type: 'spring',
       }}
+      id={IDV_BODY_CONTENT_CONTAINER_ID}
     >
       <BodyContent ref={refBody}>{children}</BodyContent>
     </Container>
@@ -33,7 +36,7 @@ const Container = styled(motion.div)`
   position: relative;
 `;
 
-const BodyContent = styled.span`
+const BodyContent = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

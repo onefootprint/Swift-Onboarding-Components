@@ -63,13 +63,11 @@ const Overlay = ({
 );
 
 const Container = styled.div<{ width: number; height: number }>`
-  ${({ width, height, theme }) => css`
+  ${({ width, height }) => css`
     position: relative;
     width: ${width}px;
     height: ${height}px;
-    margin-top: calc(
-      -${height}px - ${theme.spacing[5]}
-    ); // Show overlay on top of the video
+    margin-top: calc(-1 * ${height}px); // Show overlay on top of the video
   `}
 `;
 

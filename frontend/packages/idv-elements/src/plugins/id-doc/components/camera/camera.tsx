@@ -1,20 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  IcoEmojiHappy24,
-  IcoLayer0124,
-  Icon,
-  IcoSmartphone24,
-  IcoSmartphone224,
-  IcoSparkles24,
-  IcoSquareFrame24,
-  IcoSun24,
-} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Button, LoadingIndicator, useToast } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
-import { useTimeout } from 'usehooks-ts';
+import { LoadingIndicator } from '@onefootprint/ui';
+import React, { useEffect, useRef, useState } from 'react';
 
-import InfoBox from '../../../../components/info-box';
+import CaptureButton from './components/capture-button/capture-button';
 import Feedback from './components/feedback/feedback';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
@@ -23,6 +12,7 @@ import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
+import getVideoHeight from './utils/get-video-height';
 
 export type CameraKind = 'front' | 'back';
 
@@ -30,9 +20,8 @@ type CameraProps = {
   onCapture: (image: string) => void;
   onError: () => void;
   cameraKind: CameraKind;
-  maxVideoHeight: number;
-  outlineWidthRatio: number; // with respect to the video height (not width)
-  outlineHeightRatio: number; // with respect to the video height
+  outlineWidthRatio: number; // with respect to the video width
+  outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineKind: OutlineKind;
   autocaptureKind: AutocaptureKind;
 };
@@ -47,13 +36,10 @@ const BACK_CAMERA_OPTIONS = {
   video: { facingMode: 'environment' },
 };
 
-const MANUAL_CAPTURE_WAIT_TIME = 12000; // if the autocapture isn't successful for 10 seconds, we trigger manual capture
-
 const Camera = ({
   onCapture,
   onError,
   cameraKind,
-  maxVideoHeight,
   outlineWidthRatio,
   outlineHeightRatio,
   outlineKind,
@@ -63,14 +49,13 @@ const Camera = ({
   const canvasRef = useRef<HTMLCanvasElement>();
   const videoRef = useRef<HTMLVideoElement>();
   const videoSize = useSize(videoRef);
+  const [videoHeight, setVideoHeight] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
   const [image, setImage] = useState<string | undefined>();
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
   >('detecting');
-  const [isManualEnabled, setIsManualEnabled] = useState(false);
-  const toast = useToast();
 
   const mediaStream = useUserMedia(
     cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
@@ -82,17 +67,9 @@ const Camera = ({
     videoRef.current.srcObject = mediaStream;
   }
 
-  useTimeout(
-    () => {
-      setIsManualEnabled(true);
-      toast.show({
-        title: t('manual-enabled-toast.title'),
-        description: t('manual-enabled-toast.description'),
-        variant: 'default',
-      });
-    },
-    isCameraVisible ? MANUAL_CAPTURE_WAIT_TIME : null,
-  );
+  useEffect(() => {
+    setVideoHeight(getVideoHeight());
+  }, []);
 
   const handleCanPlay = () => {
     if (!videoRef.current) {
@@ -114,6 +91,15 @@ const Camera = ({
 
     setIsFlashing(true);
 
+    // We capture the full width
+    // We keep the captured width/height spect ratio same as the outline aspect ratio
+    // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
+    const desiredImageWidth = videoRef.current.clientWidth;
+    const desiredImageHeight = Math.min(
+      videoRef.current.clientHeight,
+      videoRef.current.clientWidth * (outlineHeightRatio / outlineWidthRatio),
+    );
+
     // Capture the image when the flash starts but only call the onCapture
     // callback when flash animation is done This gives animation enough time
     // to complete. Taking the photo at the end of the animation would be
@@ -122,8 +108,9 @@ const Camera = ({
       context,
       videoRef,
       canvasRef,
-      desiredImageWidth: videoRef.current?.clientWidth,
-      desiredImageHeight: videoRef.current?.clientHeight,
+      mediaStream,
+      desiredImageWidth,
+      desiredImageHeight,
     });
 
     setImage(imageString || undefined);
@@ -150,58 +137,13 @@ const Camera = ({
   useAutoCapture({
     videoRef,
     canvasRef,
-    outlineWidth: videoSize ? videoSize.height * outlineWidthRatio : 0,
-    outlineHeight: videoSize ? videoSize.height * outlineHeightRatio : 0,
+    mediaStream,
+    outlineWidth: videoSize ? videoSize.width * outlineWidthRatio : 0,
+    outlineHeight: videoSize ? videoSize.width * outlineHeightRatio : 0,
     onCapture: handleClick,
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
   });
-
-  const documentCaptureInstructions: {
-    title: string;
-    description?: string;
-    Icon: Icon;
-  }[] = [
-    {
-      title: t('guidelines.position-document.title'),
-      Icon: IcoSquareFrame24,
-    },
-    {
-      title: t('guidelines.background.title'),
-      Icon: IcoLayer0124,
-    },
-    {
-      title: t('guidelines.device-steady.title'),
-      Icon: IcoSmartphone224,
-    },
-    {
-      title: t('guidelines.autocapture.title'),
-      Icon: IcoSparkles24,
-    },
-  ];
-
-  const selfieCaptureInstructions: {
-    title: string;
-    description?: string;
-    Icon: Icon;
-  }[] = [
-    {
-      title: t('guidelines.whole-face.title'),
-      Icon: IcoEmojiHappy24,
-    },
-    {
-      title: t('guidelines.check-lighting.title'),
-      Icon: IcoSun24,
-    },
-    {
-      title: t('guidelines.device-steady.title'),
-      Icon: IcoSmartphone24,
-    },
-    {
-      title: t('guidelines.autocapture.title'),
-      Icon: IcoSparkles24,
-    },
-  ];
 
   return (
     <>
@@ -216,7 +158,7 @@ const Camera = ({
             ref={videoRef as React.Ref<HTMLVideoElement>}
             hidden={!isVideoPlaying}
             onCanPlay={handleCanPlay}
-            maxHeight={maxVideoHeight}
+            height={videoHeight}
             data-camera-kind={cameraKind}
             autoPlay
             playsInline
@@ -226,10 +168,8 @@ const Camera = ({
             width={videoSize?.width ?? 0}
             height={videoSize?.height ?? 0}
             outlineKind={outlineKind}
-            outlineWidth={videoSize ? videoSize.height * outlineWidthRatio : 0}
-            outlineHeight={
-              videoSize ? videoSize.height * outlineHeightRatio : 0
-            }
+            outlineWidth={videoSize ? videoSize.width * outlineWidthRatio : 0}
+            outlineHeight={videoSize ? videoSize.width * outlineHeightRatio : 0}
           />
           <Canvas
             ref={canvasRef as React.Ref<HTMLCanvasElement>}
@@ -242,21 +182,8 @@ const Camera = ({
               {t(`autocapture.feedback.${autocaptureFeedback}`)}
             </Feedback>
           )}
+          <CaptureButton onClick={handleClick} />
         </VideoContainer>
-        {!isManualEnabled ? (
-          <InfoBox
-            items={
-              autocaptureKind === 'document'
-                ? documentCaptureInstructions
-                : selfieCaptureInstructions
-            }
-            variant="compact"
-          />
-        ) : (
-          <Button fullWidth onClick={handleClick} variant="primary">
-            {t('take')}
-          </Button>
-        )}
       </Container>
     </>
   );
@@ -296,10 +223,10 @@ const VideoContainer = styled.div`
     flex-grow: 1;
     flex-direction: column;
     width: calc(100% + ${theme.spacing[8]});
-    row-gap: ${theme.spacing[5]};
     margin-left: calc(-1 * ${theme.spacing[5]});
     margin-right: calc(-1 * ${theme.spacing[5]});
-    margin-bottom: ${theme.spacing[8]};
+    margin-bottom: calc(-1 * ${theme.spacing[5]});
+    margin-top: calc(-1 * ${theme.spacing[5]});
   `}
 `;
 
@@ -308,9 +235,9 @@ export const Canvas = styled.canvas`
   position: absolute;
 `;
 
-const Video = styled.video<{ maxHeight: number }>`
-  ${({ maxHeight }) => css`
-    max-height: ${maxHeight}px;
+const Video = styled.video<{ height: number }>`
+  ${({ height }) => css`
+    height: ${height}px;
     width: 100%;
     object-fit: cover; // Should be "cover" for the math to work
 

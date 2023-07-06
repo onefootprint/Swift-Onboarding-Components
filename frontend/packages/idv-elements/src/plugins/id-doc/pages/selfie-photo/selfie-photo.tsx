@@ -1,14 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { HeaderTitle } from '../../../../components';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
-const MAX_VIDEO_HEIGHT = 390;
-const FACE_OUTLINE_TO_HEIGHT_RATIO = 0.7;
+const FACE_OUTLINE_TO_WIDTH_RATIO = 0.6;
 
 const SelfiePhoto = () => {
   const { t } = useTranslation('pages.selfie-photo');
@@ -30,14 +27,16 @@ const SelfiePhoto = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
-      <TitleContainer>
-        <HeaderTitle title={t('title')} />
-      </TitleContainer>
+      <NavigationHeader
+        button={{ variant: 'back', onBack: handleClickBack }}
+        content={{
+          kind: 'static',
+          title: t('title'),
+        }}
+      />
       <PhotoCapture
-        maxVideoHeight={MAX_VIDEO_HEIGHT}
-        outlineHeightRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
-        outlineWidthRatio={FACE_OUTLINE_TO_HEIGHT_RATIO}
+        outlineHeightRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
+        outlineWidthRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
         cameraKind="front"
         outlineKind="corner"
         onComplete={onComplete}
@@ -46,12 +45,5 @@ const SelfiePhoto = () => {
     </>
   );
 };
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    margin-top: calc(-1 * ${theme.spacing[5]});
-    margin-bottom: ${theme.spacing[5]};
-  `}
-`;
 
 export default SelfiePhoto;

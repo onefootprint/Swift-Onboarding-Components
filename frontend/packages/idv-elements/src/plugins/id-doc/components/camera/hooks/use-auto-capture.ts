@@ -14,8 +14,8 @@ const CHECK_INETERVAL = 200;
 // We will check if 3 consecutive tries were successful before considering it a complete success
 const REQUIRED_CONSECUTIVE_SUCCESS = 3;
 
-// We allow 30 pixels offset outside the card outline (15 pixels each side) along the width
-const WIDTH_ERROR_OFFSET = 30;
+// We allow 40 pixels offset outside the card outline (20 pixels each side) along the width
+const WIDTH_ERROR_OFFSET = 40;
 
 // We allow 20 pixels offset outside the card outline (10 pixels each side) along the height
 const HEIGHT_ERROR_OFFSET = 20;
@@ -25,6 +25,7 @@ export type AutocaptureKind = 'document' | 'face';
 type AutoCaptureProps = {
   videoRef: MutableRefObject<HTMLVideoElement | undefined>;
   canvasRef: MutableRefObject<HTMLCanvasElement | undefined>;
+  mediaStream: MediaStream | null;
   outlineWidth: number;
   outlineHeight: number;
   onCapture: () => void;
@@ -35,6 +36,7 @@ type AutoCaptureProps = {
 const useAutoCapture = ({
   videoRef,
   canvasRef,
+  mediaStream,
   outlineWidth,
   outlineHeight,
   onCapture,
@@ -64,12 +66,26 @@ const useAutoCapture = ({
         return;
       }
 
+      // Width and height of the image that will be used for detection algos
+      // We don't want these dimensions to be bigger than video size
+      const desiredImageWidth = Math.min(
+        outlineWidth + WIDTH_ERROR_OFFSET,
+        videoSize.width,
+      );
+      const desiredImageHeight = Math.min(
+        outlineHeight + HEIGHT_ERROR_OFFSET,
+        videoSize.height,
+      );
+
       if (autocaptureKind === 'document') {
         const sourceDimensions = getSourceDimensions({
           videoRef,
-          desiredImageWidth: outlineWidth + WIDTH_ERROR_OFFSET,
-          desiredImageHeight: outlineHeight + HEIGHT_ERROR_OFFSET,
+          mediaStream,
+          desiredImageWidth,
+          desiredImageHeight,
         });
+        canvasRef.current.setAttribute('width', `${sourceDimensions.sWidth}`);
+        canvasRef.current.setAttribute('height', `${sourceDimensions.sHeight}`);
         context.drawImage(
           videoRef.current,
           sourceDimensions.sx,
@@ -78,8 +94,8 @@ const useAutoCapture = ({
           sourceDimensions.sHeight,
           0,
           0,
-          videoRef.current?.clientWidth,
-          videoRef.current?.clientHeight,
+          canvasRef.current?.clientWidth,
+          canvasRef.current?.clientHeight,
         );
         const cardCaptureStatus = getCardCaptureStatus(canvasRef.current);
         if (cardCaptureStatus === CardCaptureStatus.OK) {
@@ -122,6 +138,7 @@ const useAutoCapture = ({
     canvasRef,
     getFaceStatus,
     isCaptured,
+    mediaStream,
     onCapture,
     onStatusChange,
     outlineHeight,

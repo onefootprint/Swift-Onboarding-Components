@@ -9,9 +9,8 @@ import { AutocaptureKind } from '../camera/hooks/use-auto-capture';
 import Preview from '../preview';
 
 type PhotoCaptureProps = {
-  maxVideoHeight: number;
-  outlineWidthRatio: number; // with respect to the video height (not width)
-  outlineHeightRatio: number; // with respect to the video height
+  outlineWidthRatio: number; // with respect to the video width
+  outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
   onComplete: (imageString: string) => void;
@@ -19,7 +18,6 @@ type PhotoCaptureProps = {
 };
 
 const PhotoCapture = ({
-  maxVideoHeight,
   outlineKind,
   outlineWidthRatio,
   outlineHeightRatio,
@@ -87,7 +85,6 @@ const PhotoCapture = ({
       onCapture={handleCapture}
       onError={handleError}
       cameraKind={cameraKind}
-      maxVideoHeight={maxVideoHeight}
       outlineWidthRatio={outlineWidthRatio}
       outlineHeightRatio={outlineHeightRatio}
       outlineKind={outlineKind}

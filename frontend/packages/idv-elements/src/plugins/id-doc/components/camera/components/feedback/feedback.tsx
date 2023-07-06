@@ -18,7 +18,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     background: rgba(0, 0, 0, 0.5);
     position: absolute;
-    top: ${theme.spacing[3]};
+    top: ${theme.spacing[7]};
     z-index: 1;
     padding: ${theme.spacing[1]} ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.default};

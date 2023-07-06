@@ -6,6 +6,7 @@ type GetImageStringProps = {
   context: CanvasRenderingContext2D;
   videoRef: MutableRefObject<HTMLVideoElement | undefined>;
   canvasRef: MutableRefObject<HTMLCanvasElement | undefined>;
+  mediaStream: MediaStream | null;
   desiredImageWidth: number;
   desiredImageHeight: number;
 };
@@ -14,6 +15,7 @@ const getImageStringFromVideo = ({
   context,
   videoRef,
   canvasRef,
+  mediaStream,
   desiredImageWidth,
   desiredImageHeight,
 }: GetImageStringProps) => {
@@ -21,6 +23,7 @@ const getImageStringFromVideo = ({
 
   const sourceDimensions = getSourceDimensions({
     videoRef,
+    mediaStream,
     desiredImageWidth,
     desiredImageHeight,
   });
