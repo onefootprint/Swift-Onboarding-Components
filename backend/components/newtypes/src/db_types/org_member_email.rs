@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 use crate::email::Email;
 
+// TODO just use Email
 #[derive(
     Debug, Clone, DeserializeFromStr, SerializeDisplay, DieselNewType, Default, JsonSchema, Eq, PartialEq,
 )]
@@ -21,9 +22,6 @@ impl FromStr for OrgMemberEmail {
 impl TryFrom<Email> for OrgMemberEmail {
     type Error = crate::Error;
     fn try_from(value: Email) -> Result<Self, Self::Error> {
-        if !value.is_live() {
-            return Err(crate::Error::InvalidEmail);
-        }
         Self::from_str(value.leak())
     }
 }

@@ -136,8 +136,7 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
     let email = decrypted
         .remove(&IDK::Email.into())
         .ok_or(BusinessError::PrimaryBoHasNoEmail)?;
-    let mut email = Email::from_str(email.leak())?;
-    email.suffix = "".to_owned();
+    let email = Email::from_str(email.leak())?;
 
     // Augment the request to include the primary BO's email and phone number
     type Bo = KycedBusinessOwnerData<Option<()>, Option<Email>, Option<PhoneNumber>>;

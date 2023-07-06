@@ -9,7 +9,6 @@ use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
 /// uppercased for consistency.
 pub struct Email {
     pub email: PiiString,
-    pub suffix: String,
 }
 
 string_api_data_type_alias!(Email);
@@ -20,15 +19,7 @@ impl Email {
     }
 
     pub fn to_piistring(&self) -> PiiString {
-        if self.suffix.is_empty() {
-            self.email.clone()
-        } else {
-            PiiString::from(format!("{}#{}", self.email.leak(), self.suffix))
-        }
-    }
-
-    pub fn is_live(&self) -> bool {
-        self.suffix.is_empty()
+        self.email.clone()
     }
 }
 
@@ -53,22 +44,13 @@ impl std::str::FromStr for Email {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // ALL emails are case insensitive
         let s = s.trim().to_lowercase();
-
-        // See if there's a sandbox suffix on the domain of the email
-        let parts = s.split('@').collect::<Vec<&str>>();
-        if parts.len() != 2 {
-            return Err(crate::Error::InvalidEmail);
-        }
-        let (domain, sandbox_suffix) = super::sandbox::split_sandbox_parts(parts[1])?;
-        let email = vec![parts[0], domain].join("@");
         // sanitize by checking against simple regex
         // todo, do we want to try to strip out + variations for gmail accounts / standardize further?
-        if !EMAIL_RE.is_match(&email) {
+        if !EMAIL_RE.is_match(&s) {
             return Err(crate::Error::InvalidEmail);
         }
         Ok(Email {
-            email: PiiString::from(email),
-            suffix: sandbox_suffix.to_owned(),
+            email: PiiString::from(s),
         })
     }
 }
@@ -87,15 +69,15 @@ mod tests {
 
     #[test_case("beep_boop+@gmail.com" => Email {
         email: PiiString::from("beep_boop+@gmail.com"),
-        suffix: "".to_owned()
     })]
-    #[test_case("yoooooo.o.o@biz.real#sandbox1" => Email {
+    #[test_case("yoooooo.o.o@biz.real" => Email {
         email: PiiString::from("yoooooo.o.o@biz.real"),
-        suffix: "sandbox1".to_owned()
     })]
-    #[test_case("flerpderpmerp@onefootprint.com#1" => Email {
+    #[test_case("flerpderpmerp@onefootprint.com" => Email {
         email: PiiString::from("flerpderpmerp@onefootprint.com"),
-        suffix: "1".to_owned()
+    })]
+    #[test_case("example#@gmail.com" => Email {
+        email: PiiString::from("example#@gmail.com"),
     })]
     fn test_email(input: &str) -> Email {
         Email::from_str(input).expect("Could not parse")

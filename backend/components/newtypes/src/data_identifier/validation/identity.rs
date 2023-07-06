@@ -31,11 +31,6 @@ impl Validate for IDK {
 
 fn clean_and_validate_email(value: PiiString) -> NtResult<PiiString> {
     let email = Email::from_str(value.leak())?;
-    if !email.is_live() {
-        return Err(crate::Error::Custom(
-            "Unexpected: got to validation without stripping sandbox suffix".into(),
-        ));
-    }
     Ok(email.to_piistring())
 }
 

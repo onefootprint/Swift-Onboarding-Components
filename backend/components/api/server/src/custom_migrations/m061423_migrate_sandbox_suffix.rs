@@ -242,9 +242,10 @@ async fn compute_single(
             // sandbox suffix - hopefully it's the smae
             let email = Email::from_str(decrypted.leak())?;
             // We should only expect to see some legacy non-portable vaults with live emails in sandbox
-            if email.is_live() && vault.is_portable {
-                panic!("Non-live email for {}, {}", vault.id, vd.id);
-            }
+            // Removing email.is_live()
+            // if email.is_live() && vault.is_portable {
+            //     panic!("Non-live email for {}, {}", vault.id, vd.id);
+            // }
             (email.email, None)
         }
         // sanity check

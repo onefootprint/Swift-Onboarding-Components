@@ -97,9 +97,9 @@ impl State {
         t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
         let existing_user = match identifier {
-            VaultIdentifier::IdentifyId(id, sandbox_id_from_header) => {
+            VaultIdentifier::IdentifyId(id, sandbox_id) => {
                 // Search via fingerprint
-                let (scopes, data, sandbox_id) = match id {
+                let (scopes, data) = match id {
                     IdentifyId::PhoneNumber(phone_number) => (
                         vec![
                             Some(GlobalFingerprintKind::PhoneNumber.scope()),
@@ -108,20 +108,17 @@ impl State {
                             }),
                         ],
                         phone_number.e164(),
-                        (!phone_number.is_live()).then_some(SandboxId::from(phone_number.sandbox_suffix)),
                     ),
                     IdentifyId::Email(email) => (
                         vec![
                             Some(GlobalFingerprintKind::Email.scope()),
                             t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
                         ],
-                        email.email.clone(),
-                        (!email.is_live()).then_some(SandboxId::from(email.suffix)),
+                        email.email,
                     ),
                 };
                 // For now, default to the sandbox id provided inline in the phone or email,
                 // otherwise, default to the one provided via a header
-                let sandbox_id = sandbox_id.or(sandbox_id_from_header);
                 let fps: Vec<_> = scopes
                     .into_iter()
                     .flatten()

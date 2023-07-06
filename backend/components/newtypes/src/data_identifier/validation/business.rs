@@ -95,10 +95,7 @@ fn clean_and_validate_kyced_beneficial_owners(input: PiiString, args: ValidateAr
         if bos.iter().map(|bo| bo.ownership_stake).sum::<u32>() > 100 {
             return Err(Error::BusinessOwnersStakeAbove100);
         }
-        if bos
-            .iter()
-            .any(|bo| !bo.email.is_live() || !bo.phone_number.is_live())
-        {
+        if bos.iter().any(|bo| !bo.phone_number.is_live()) {
             return Err(Error::SandboxNotAllowed);
         }
         // Allow non-unique emails and phones in sandbox for easier testing
