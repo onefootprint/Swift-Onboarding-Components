@@ -8,8 +8,8 @@ export interface Alert {
   datasetName: string;
   disabled?: boolean;
   query: Query;
-  slackThreshold: Threshold;
-  pageThreshold: Threshold;
+  slackThreshold?: Threshold;
+  pageThreshold?: Threshold;
 }
 
 export const Alerts: Alert[] = [
@@ -19,7 +19,12 @@ export const Alerts: Alert[] = [
     datasetName: 'fpc-api',
     query: {
       time_range: 240,
-      breakdowns: ['http.method', 'http.route', 'http.status_code'],
+      breakdowns: [
+        'http.method',
+        'http.route',
+        'http.status_code',
+        'tenant_id',
+      ],
       calculations: [
         {
           op: 'COUNT',
@@ -70,10 +75,6 @@ export const Alerts: Alert[] = [
         },
       ],
       filter_combination: 'AND',
-    },
-    slackThreshold: {
-      op: '>',
-      value: 0,
     },
     // These won't make a ton of sense to page on for a while - we might want to page on a 5xx percentage
     pageThreshold: {

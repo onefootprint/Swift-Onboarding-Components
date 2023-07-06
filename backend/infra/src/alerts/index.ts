@@ -49,7 +49,7 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
     const nameHyphen = name.replace(/ /g, '-');
     const commonName = `alert-${stackMeta.shortStackName}-${nameHyphen}`;
     // Create a slack trigger
-    if (slackRecipient) {
+    if (slackThreshold && slackRecipient) {
       new TriggerResource(`${commonName}-slack`, {
         apiKey,
         datasetName: datasetName,
@@ -65,7 +65,7 @@ export function ConfigureAlerts(stackMeta: StackMetadata) {
       });
     }
     // Create a pager trigger
-    if (pagerRecipient) {
+    if (pageThreshold && pagerRecipient) {
       new TriggerResource(`${commonName}-pager`, {
         apiKey,
         datasetName: datasetName,
