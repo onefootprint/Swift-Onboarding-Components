@@ -2,7 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTimeout } from 'usehooks-ts';
 
+import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import CaptureButton from './components/capture-button/capture-button';
 import Feedback from './components/feedback/feedback';
 import Flash from './components/flash';
@@ -58,7 +60,8 @@ const Camera = ({
     string | undefined
   >('detecting');
   const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(true);
+  const [shouldDetect, setShouldDetect] = useState(false);
+  const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
 
   const mediaStream = useUserMedia(
     cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
@@ -73,6 +76,22 @@ const Camera = ({
   useEffect(() => {
     setVideoHeight(getVideoHeight());
   }, []);
+
+  // We start detecting from the beginning if the we are capturing face
+  useEffect(() => {
+    if (autocaptureKind === 'face') setShouldDetect(true);
+  }, [autocaptureKind]);
+
+  // If the camera is visible and we are capturing document we start a timer to remove instructions and start detection
+  useTimeout(
+    () => {
+      setShouldShowInstruction(false);
+      setShouldDetect(true);
+    },
+    isCameraVisible && autocaptureKind === 'document'
+      ? TRANSITION_DELAY_DEFAULT
+      : null,
+  );
 
   const handleCanPlay = () => {
     if (!videoRef.current) {
@@ -189,6 +208,14 @@ const Camera = ({
                 }
                 outlineHeight={
                   videoSize ? videoSize.width * outlineHeightRatio : 0
+                }
+                instruction={
+                  shouldShowInstructions && autocaptureKind === 'document'
+                    ? {
+                        title: t('instructions.document-capture.title'),
+                        subtitle: t('instructions.document-capture.subtitle'),
+                      }
+                    : undefined
                 }
               />
               <Canvas

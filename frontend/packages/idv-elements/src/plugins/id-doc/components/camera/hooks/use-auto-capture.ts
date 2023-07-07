@@ -129,7 +129,7 @@ const useAutoCapture = ({
 
     const id = setInterval(async () => {
       detectAndCapture();
-      if (successCount.current === REQUIRED_CONSECUTIVE_SUCCESS) {
+      if (successCount.current >= REQUIRED_CONSECUTIVE_SUCCESS) {
         onCapture();
         clearInterval(id);
         setIsCaptured(true);

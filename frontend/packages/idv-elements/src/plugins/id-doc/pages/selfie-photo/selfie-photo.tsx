@@ -5,7 +5,7 @@ import NavigationHeader from '../../../../components/layout/components/navigatio
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
-const FACE_OUTLINE_TO_WIDTH_RATIO = 0.6;
+const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
 
 const SelfiePhoto = () => {
   const { t } = useTranslation('pages.selfie-photo');

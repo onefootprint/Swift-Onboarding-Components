@@ -97,8 +97,10 @@
     },
     "camera": {
       "instructions": {
-        "position": "Position your face within the frame",
-        "readiness": "Take the photo when you're ready"
+        "document-capture": {
+          "title": "Place your document here",
+          "subtitle": "Image will be captured automatically, but you can also capture it manually."
+        }
       },
       "take": "Take photo",
       "autocapture": {
