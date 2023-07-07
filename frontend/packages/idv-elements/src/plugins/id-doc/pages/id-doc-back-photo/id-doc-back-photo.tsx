@@ -18,15 +18,6 @@ const IdDocBackPhoto = () => {
     return null;
   }
 
-  const handleComplete = (image: string) => {
-    send({
-      type: 'receivedImage',
-      payload: {
-        image,
-      },
-    });
-  };
-
   const handleClickBack = () => {
     send({
       type: 'navigatedToPrev',
@@ -40,7 +31,6 @@ const IdDocBackPhoto = () => {
         showGuidelines
         imageType={ImageTypes.back}
         type={type}
-        onComplete={handleComplete}
         country={countryCode3}
       />
     </>

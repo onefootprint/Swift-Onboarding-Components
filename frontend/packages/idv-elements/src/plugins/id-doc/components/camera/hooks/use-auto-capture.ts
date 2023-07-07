@@ -29,6 +29,7 @@ type AutoCaptureProps = {
   outlineWidth: number;
   outlineHeight: number;
   onCapture: () => void;
+  shouldDetect: boolean;
   onStatusChange: (currStatus: string | undefined) => void;
   autocaptureKind: AutocaptureKind;
 };
@@ -42,6 +43,7 @@ const useAutoCapture = ({
   onCapture,
   onStatusChange,
   autocaptureKind,
+  shouldDetect,
 }: AutoCaptureProps) => {
   const successCount = useRef(0);
   const pastStatus = useRef<FaceStatus | CardCaptureStatus | undefined>(
@@ -55,6 +57,7 @@ const useAutoCapture = ({
     const detectAndCapture = async () => {
       const context = canvasRef.current?.getContext('2d');
       if (
+        !shouldDetect ||
         isCaptured ||
         !videoRef.current ||
         !canvasRef.current ||
@@ -143,6 +146,7 @@ const useAutoCapture = ({
     onStatusChange,
     outlineHeight,
     outlineWidth,
+    shouldDetect,
     videoRef,
     videoSize,
   ]);

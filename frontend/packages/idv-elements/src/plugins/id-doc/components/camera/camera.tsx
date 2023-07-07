@@ -8,6 +8,7 @@ import Feedback from './components/feedback/feedback';
 import Flash from './components/flash';
 import Overlay from './components/overlay';
 import { OutlineKind } from './components/overlay/overlay';
+import UploadButton from './components/upload-button/upload-button';
 import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
@@ -56,6 +57,8 @@ const Camera = ({
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
   >('detecting');
+  const [isImageProcessing, setIsImageProcessing] = useState(false);
+  const [shouldDetect, setShouldDetect] = useState(true);
 
   const mediaStream = useUserMedia(
     cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
@@ -143,7 +146,18 @@ const Camera = ({
     onCapture: handleClick,
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
+    shouldDetect,
   });
+
+  const onImageUpload = () => {
+    setIsImageProcessing(true);
+    setShouldDetect(false);
+  };
+
+  const onUploadComplete = () => {
+    setIsImageProcessing(false);
+    setShouldDetect(true);
+  };
 
   return (
     <>
@@ -164,25 +178,43 @@ const Camera = ({
             playsInline
             muted
           />
-          <Overlay
-            width={videoSize?.width ?? 0}
-            height={videoSize?.height ?? 0}
-            outlineKind={outlineKind}
-            outlineWidth={videoSize ? videoSize.width * outlineWidthRatio : 0}
-            outlineHeight={videoSize ? videoSize.width * outlineHeightRatio : 0}
-          />
-          <Canvas
-            ref={canvasRef as React.Ref<HTMLCanvasElement>}
-            width={videoSize?.width}
-            height={videoSize?.height}
-          />
-          <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
-          {autocaptureFeedback && (
-            <Feedback>
-              {t(`autocapture.feedback.${autocaptureFeedback}`)}
-            </Feedback>
+          {!isImageProcessing ? (
+            <>
+              <Overlay
+                width={videoSize?.width ?? 0}
+                height={videoSize?.height ?? 0}
+                outlineKind={outlineKind}
+                outlineWidth={
+                  videoSize ? videoSize.width * outlineWidthRatio : 0
+                }
+                outlineHeight={
+                  videoSize ? videoSize.width * outlineHeightRatio : 0
+                }
+              />
+              <Canvas
+                ref={canvasRef as React.Ref<HTMLCanvasElement>}
+                width={videoSize?.width}
+                height={videoSize?.height}
+              />
+              <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
+              {shouldDetect && autocaptureFeedback && (
+                <Feedback>
+                  {t(`autocapture.feedback.${autocaptureFeedback}`)}
+                </Feedback>
+              )}
+              <CaptureButton onClick={handleClick} />
+              {autocaptureKind === 'document' && (
+                <UploadButton
+                  onUpload={onImageUpload}
+                  onComplete={onUploadComplete}
+                />
+              )}
+            </>
+          ) : (
+            <ProcessingContainer>
+              <LoadingIndicator />
+            </ProcessingContainer>
           )}
-          <CaptureButton onClick={handleClick} />
         </VideoContainer>
       </Container>
     </>
@@ -251,6 +283,21 @@ const Video = styled.video<{ height: number }>`
       display: none !important;
       -webkit-appearance: none;
     }
+  `}
+`;
+
+const ProcessingContainer = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.75;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: ${theme.backgroundColor.primary};
   `}
 `;
 

@@ -33,7 +33,8 @@
         "autocapture": {
           "title": "Image will be captured automatically"
         }
-      }
+      },
+      "continue": "Continue"
     },
     "loading": {
       "processing-front": "Processing image...",

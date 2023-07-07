@@ -7,6 +7,7 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CountryCode3, IdDocType } from '@onefootprint/types';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
@@ -14,29 +15,32 @@ import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons, ImageTypes } from '../../constants/image-types';
 import FadeInContainer from '../fade-in-container';
-import IdDocPhotoButtons from '../id-doc-photo-buttons';
+import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
   type: IdDocType;
   imageType: ImageTypes;
-  onComplete: (image: string) => void;
   country: CountryCode3;
 };
 
 const IdDocPhotoPrompt = ({
   showGuidelines,
-  onComplete,
   imageType,
   type,
   country,
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
+  const [, send] = useIdDocMachine();
   const ImageIcon = imageIcons[imageType];
   const side =
     type === IdDocType.passport && ImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
+
+  const handleTake = () => {
+    send({ type: 'startImageCapture' });
+  };
 
   return (
     <FadeInContainer>
@@ -78,7 +82,9 @@ const IdDocPhotoPrompt = ({
             variant="default"
           />
         )}
-        <IdDocPhotoButtons onComplete={onComplete} />
+        <Button fullWidth onClick={handleTake}>
+          {t('continue')}
+        </Button>
       </PromptContainer>
     </FadeInContainer>
   );

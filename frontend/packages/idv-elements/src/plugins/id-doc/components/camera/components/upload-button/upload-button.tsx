@@ -1,0 +1,110 @@
+import { IcoImages24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
+import React, { useRef, useState } from 'react';
+
+import useProcessImage from '../../../../hooks/use-process-image';
+import { useIdDocMachine } from '../../../machine-provider';
+
+const BUTTON_RADIUS = 56;
+
+type UploadButtonProps = {
+  onUpload: () => void;
+  onComplete: () => void;
+};
+
+const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
+  const [, send] = useIdDocMachine();
+  const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
+  const { processImageFile, convertImageFileToStrippedBase64 } =
+    useProcessImage();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onProcessingDone = () => {
+    setIsLoading(false);
+    onComplete();
+  };
+
+  const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true);
+    onUpload();
+    const { files } = event.target;
+    if (!files?.length) {
+      onProcessingDone();
+      return;
+    }
+
+    const processedImageFile = await processImageFile(files[0]);
+    if (!processedImageFile) {
+      onProcessingDone();
+      return;
+    }
+
+    const imageString = await convertImageFileToStrippedBase64(
+      processedImageFile,
+    );
+    if (!imageString) {
+      onProcessingDone();
+      return;
+    }
+
+    send({
+      type: 'receivedImage',
+      payload: {
+        image: imageString,
+      },
+    });
+    onProcessingDone();
+  };
+
+  const handleUpload = () => {
+    uploadPhotoRef.current?.click();
+  };
+
+  return (
+    <>
+      <RoundButton
+        onClick={handleUpload}
+        radius={BUTTON_RADIUS}
+        disabled={isLoading}
+      >
+        <IcoImages24 color="quinary" />
+      </RoundButton>
+      <StyledInput
+        ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
+        type="file"
+        accept="image/*,.heic,.heif"
+        onChange={handleImage}
+      />
+    </>
+  );
+};
+
+const RoundButton = styled.button<{
+  radius: number;
+}>`
+  ${({ theme, radius }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: ${radius}px;
+    width: ${radius}px;
+    background-color: #00000033;
+    border: none;
+    border-radius: 50%;
+    position: absolute;
+    bottom: ${theme.spacing[7]};
+    left: ${theme.spacing[5]};
+    box-shadow: 0px 4px 4px 0px #0000001a;
+
+    &:hover {
+      cursor: pointer;
+    }
+  `}
+`;
+
+const StyledInput = styled.input`
+  display: none;
+`;
+
+export default UploadButton;
