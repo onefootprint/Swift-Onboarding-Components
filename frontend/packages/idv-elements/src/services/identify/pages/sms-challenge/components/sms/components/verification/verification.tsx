@@ -7,7 +7,7 @@ import ResendButton, { ResendButtonProps } from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 
-export type SmsChallengeVerificationProps = ResendButtonProps & {
+export type VerificationProps = ResendButtonProps & {
   title?: string;
   isVerifying?: boolean;
   isSuccess?: boolean;
@@ -26,7 +26,7 @@ const SmsChallengeVerification = ({
   resendDisabledUntil,
   onResend,
   isResendLoading,
-}: SmsChallengeVerificationProps) => {
+}: VerificationProps) => {
   const { t } = useTranslation('components.sms-challenge-verification');
 
   if (isSuccess) {
@@ -38,7 +38,7 @@ const SmsChallengeVerification = ({
   }
 
   return (
-    <Form autoComplete="off" role="presentation" data-pending={isPending}>
+    <Form autoComplete="off" role="presentation" data-pending={!!isPending}>
       {title && (
         <Typography variant="body-2" color="secondary" as="h3">
           {title}

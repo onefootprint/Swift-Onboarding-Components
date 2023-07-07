@@ -1,10 +1,10 @@
 import { getSessionId } from '@onefootprint/dev-tools';
-import { DeviceInfo } from '@onefootprint/hooks';
 import { D2PGenerateResponse, OnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import { useLayoutOptions } from '../../../components/layout/components/layout-options-provider';
 import useD2PGenerate from '../../../hooks/api/hosted/onboarding/d2p/use-d2p-generate';
+import { DeviceInfo } from '../../../hooks/ui/use-device-info';
 
 type GenerateScopedAuthTokenArgs = {
   authToken?: string;

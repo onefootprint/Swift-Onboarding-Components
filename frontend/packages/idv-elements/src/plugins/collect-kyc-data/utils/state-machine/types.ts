@@ -1,9 +1,9 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectKycDataRequirement,
   OnboardingConfig,
 } from '@onefootprint/types';
 
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { KycData } from '../data-types';
 
 export type MachineContext = {

@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   AuthorizeRequirement,
   CollectInvestorProfileRequirement,
@@ -10,6 +9,8 @@ import {
   OnboardingConfig,
   ProcessRequirement,
 } from '@onefootprint/types';
+
+import { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 
 export type Requirements = {
   kyb?: CollectKybDataRequirement;

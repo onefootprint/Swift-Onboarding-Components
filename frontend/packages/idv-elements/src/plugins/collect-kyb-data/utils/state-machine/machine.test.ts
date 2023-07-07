@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
@@ -9,6 +8,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createCollectKybDataMachine from './machine';
 import { MachineContext } from './types';
 

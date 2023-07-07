@@ -1,16 +1,16 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { IcoFaceid24 } from '@onefootprint/icons';
 import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
+import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import { getBiometricChallengeResponse } from '../../../../utils/biometrics';
-import Verification from './components/verification';
-
-const SUCCESS_EVENT_DELAY_MS = 1500;
 
 const Biometric = () => {
+  const { t } = useTranslation('pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, sandboxId },
@@ -20,7 +20,6 @@ const Biometric = () => {
   const loginChallengeMutation = useLoginChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
 
-  const [isSuccess, setSuccess] = useState(false);
   const [isRetry, setIsRetry] = useState(false);
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || identifyVerifyMutation.isLoading;
@@ -92,15 +91,12 @@ const Biometric = () => {
       },
       {
         onSuccess: ({ authToken }) => {
-          setSuccess(true);
-          setTimeout(() => {
-            send({
-              type: 'challengeSucceeded',
-              payload: {
-                authToken,
-              },
-            });
-          }, SUCCESS_EVENT_DELAY_MS);
+          send({
+            type: 'challengeSucceeded',
+            payload: {
+              authToken,
+            },
+          });
         },
         onError: () => {
           setIsRetry(true);
@@ -117,14 +113,23 @@ const Biometric = () => {
     console.error(error);
   };
 
+  if (isWaiting) {
+    return (
+      <Typography variant="label-3" color="secondary" sx={{ marginBottom: 6 }}>
+        {t('loading')}
+      </Typography>
+    );
+  }
+
   return (
-    <Verification
-      isWaiting={isWaiting}
-      isSuccess={isSuccess}
-      isRetry={isRetry}
-      onComplete={handleComplete}
-      isLoading={isLoading}
-    />
+    <Button
+      fullWidth
+      onClick={handleComplete}
+      loading={isLoading}
+      prefixIcon={IcoFaceid24}
+    >
+      {isRetry ? t('cta-retry') : t('cta')}
+    </Button>
   );
 };
 

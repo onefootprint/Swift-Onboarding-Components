@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
   Identifier,
@@ -6,6 +5,8 @@ import {
   ObConfigAuth,
   OnboardingConfig,
 } from '@onefootprint/types';
+
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   bootstrapData: IdentifyBootstrapData;
@@ -75,5 +76,5 @@ export type MachineEvents =
         authToken: string;
       };
     }
-  | { type: 'challengeFailed' }
+  | { type: 'changeChallengeToSms' }
   | { type: 'navigatedToPrevPage' };

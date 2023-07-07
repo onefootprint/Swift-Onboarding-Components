@@ -1,15 +1,13 @@
 import { MockDate, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { renderIdentify } from '../../config/tests/render';
-import SmsChallengeVerification, {
-  SmsChallengeVerificationProps,
-} from './sms-challenge-verification';
+import { renderIdentify } from '../../../../../../config/tests/render';
+import Verification, { VerificationProps } from './verification';
 
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 const futureDate = new Date('2043-01-19T14:10:20.503Z');
 
-describe('<SmsChallengeVerification />', () => {
+describe('<Verification />', () => {
   beforeAll(() => {
     MockDate.set(testDate);
   });
@@ -27,9 +25,9 @@ describe('<SmsChallengeVerification />', () => {
     resendDisabledUntil,
     onResend = () => {},
     isResendLoading,
-  }: Partial<SmsChallengeVerificationProps>) =>
+  }: Partial<VerificationProps>) =>
     renderIdentify(
-      <SmsChallengeVerification
+      <Verification
         title={title}
         isVerifying={isVerifying}
         isSuccess={isSuccess}

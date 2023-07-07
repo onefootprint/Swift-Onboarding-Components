@@ -17,7 +17,6 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@types/react-dom": "^18.0.10",
-    "@types/ua-parser-js": "^0.7.36",
     "eslint-config-footprint": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -26,8 +25,7 @@
     "typescript": "4.9.5"
   },
   "dependencies": {
-    "next-usequerystate": "^1.7.2",
-    "ua-parser-js": "^1.0.33"
+    "next-usequerystate": "^1.7.2"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

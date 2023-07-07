@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CountryCode,
   IdDocImageError,
@@ -6,6 +5,7 @@ import {
   IdDocType,
 } from '@onefootprint/types';
 
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { ImageTypes } from '../../constants/image-types';
 
 export type MachineContext = {

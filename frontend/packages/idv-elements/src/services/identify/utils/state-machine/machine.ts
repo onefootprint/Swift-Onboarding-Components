@@ -1,6 +1,7 @@
 import { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import { getCanChallengeBiometrics } from '../biometrics';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
@@ -87,48 +88,55 @@ const createIdentifyMachine = ({
               target: 'emailIdentification',
               actions: ['reset'],
             },
-            identifyFailed: {
-              target: 'emailIdentification',
-              actions: ['assignEmail', 'assignPhone'],
-            },
-            identified: {
-              target: 'bootstrapChallenge',
-              actions: [
-                'assignEmail',
-                'assignPhone',
-                'assignUserFound',
-                'assignSuccessfulIdentifier',
-                'assignAvailableChallengeKinds',
-                'assignHasSyncablePassKey',
-              ],
-            },
+            identifyFailed: [
+              {
+                target: 'smsChallenge',
+                actions: ['assignEmail', 'assignPhone'],
+                description:
+                  'Initiate a signup challenge for the phone number even if we could not identify the user',
+                cond: (context, event) =>
+                  !!event.payload.email && !!event.payload.phoneNumber,
+              },
+              {
+                target: 'emailIdentification',
+                actions: ['assignPhone'],
+                description: 'We need to collect email always',
+                cond: (context, event) => !event.payload.email,
+              },
+              {
+                target: 'phoneIdentification',
+                actions: ['assignEmail'],
+                description:
+                  'There is an email, but we need to collect phone always',
+                cond: (context, event) => !event.payload.phoneNumber,
+              },
+            ],
+            identified: [
+              {
+                target: 'biometricChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                cond: (context, event) => !!getCanChallengeBiometrics(
+                    {
+                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
+                      availableChallengeKinds:
+                        event.payload.availableChallengeKinds,
+                    },
+                    context.device,
+                  ),
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifySuccessResult'],
+              },
+            ],
           },
         },
-        bootstrapChallenge: {
-          on: {
-            identifyReset: {
-              target: 'emailIdentification',
-              actions: ['reset'],
-            },
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
-          },
-        },
-        // Other transitions
         emailIdentification: {
           on: {
             identified: [
               {
                 target: 'phoneIdentification',
-                actions: [
-                  'assignEmail',
-                  'assignUserFound',
-                  'assignSuccessfulIdentifier',
-                  'assignAvailableChallengeKinds',
-                  'assignHasSyncablePassKey',
-                ],
+                actions: ['assignIdentifySuccessResult'],
                 description:
                   'Transition to phone registration only if could not find user or will not be able to initiate a challenge',
                 cond: (context, event) =>
@@ -137,14 +145,21 @@ const createIdentifyMachine = ({
                   event.payload.availableChallengeKinds.length === 0,
               },
               {
-                target: 'challenge',
-                actions: [
-                  'assignEmail',
-                  'assignUserFound',
-                  'assignSuccessfulIdentifier',
-                  'assignAvailableChallengeKinds',
-                  'assignHasSyncablePassKey',
-                ],
+                target: 'biometricChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                cond: (context, event) =>
+                  !!getCanChallengeBiometrics(
+                    {
+                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
+                      availableChallengeKinds:
+                        event.payload.availableChallengeKinds,
+                    },
+                    context.device,
+                  ),
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifySuccessResult'],
               },
             ],
           },
@@ -158,20 +173,66 @@ const createIdentifyMachine = ({
               target: 'emailIdentification',
               actions: ['reset'],
             },
-            identified: {
-              target: 'challenge',
-              actions: [
-                'assignPhone',
-                'assignUserFound',
-                'assignSuccessfulIdentifier',
-                'assignAvailableChallengeKinds',
-                'assignHasSyncablePassKey',
-              ],
-            },
+            identified: [
+              {
+                target: 'biometricChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                cond: (context, event) =>
+                  !!getCanChallengeBiometrics(
+                    {
+                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
+                      availableChallengeKinds:
+                        event.payload.availableChallengeKinds,
+                    },
+                    context.device,
+                  ),
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifySuccessResult'],
+              },
+            ],
           },
         },
-        challenge: {
+        smsChallenge: {
           on: {
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
+            },
+            navigatedToPrevPage: [
+              {
+                target: 'biometricChallenge',
+                cond: context =>
+                  !!getCanChallengeBiometrics(
+                    context.challenge,
+                    context.device,
+                  ),
+              },
+              {
+                target: 'phoneIdentification',
+                cond: context =>
+                  !context.identify.userFound || !!context.identify.phoneNumber,
+              },
+              {
+                target: 'emailIdentification',
+              },
+            ],
+          },
+        },
+        biometricChallenge: {
+          on: {
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
+            },
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
+            },
+            changeChallengeToSms: {
+              target: 'smsChallenge',
+            },
             navigatedToPrevPage: [
               {
                 target: 'phoneIdentification',
@@ -182,10 +243,6 @@ const createIdentifyMachine = ({
                 target: 'emailIdentification',
               },
             ],
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
           },
         },
         configInvalid: {
@@ -202,7 +259,6 @@ const createIdentifyMachine = ({
           const { device, config } = event.payload;
           context.device = device !== undefined ? device : context.device;
           context.config = config !== undefined ? config : context.config;
-
           return context;
         }),
         assignSandboxOutcome: assign((context, event) => {
@@ -225,27 +281,29 @@ const createIdentifyMachine = ({
           context.identify.phoneNumber = phoneNumber;
           return context;
         }),
-        assignAvailableChallengeKinds: assign((context, event) => {
-          if (event.payload.availableChallengeKinds) {
-            context.challenge.availableChallengeKinds =
-              event.payload.availableChallengeKinds;
+        assignIdentifySuccessResult: assign((context, event) => {
+          const {
+            email,
+            phoneNumber,
+            userFound,
+            availableChallengeKinds,
+            successfulIdentifier,
+            hasSyncablePassKey,
+          } = event.payload;
+          context.challenge.hasSyncablePassKey = hasSyncablePassKey;
+          context.identify.userFound = userFound;
+          if (email) {
+            context.identify.email = email;
           }
-          return context;
-        }),
-        assignSuccessfulIdentifier: assign((context, event) => {
-          if (event.payload.successfulIdentifier) {
-            context.identify.successfulIdentifier =
-              event.payload.successfulIdentifier;
+          if (phoneNumber) {
+            context.identify.phoneNumber = phoneNumber;
           }
-          return context;
-        }),
-        assignHasSyncablePassKey: assign((context, event) => {
-          context.challenge.hasSyncablePassKey =
-            event.payload.hasSyncablePassKey;
-          return context;
-        }),
-        assignUserFound: assign((context, event) => {
-          context.identify.userFound = event.payload.userFound;
+          if (availableChallengeKinds) {
+            context.challenge.availableChallengeKinds = availableChallengeKinds;
+          }
+          if (successfulIdentifier) {
+            context.identify.successfulIdentifier = successfulIdentifier;
+          }
           return context;
         }),
         assignAuthToken: assign((context, event) => {

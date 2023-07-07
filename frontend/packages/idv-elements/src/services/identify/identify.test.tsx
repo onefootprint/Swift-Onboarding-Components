@@ -6,22 +6,40 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import {
-  ChallengeKind,
-  CLIENT_PUBLIC_KEY_HEADER,
-  IdentifyBootstrapData,
-} from '@onefootprint/types';
-import React from 'react';
+import { ChallengeKind, CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import * as React from 'react';
 
 import { Layout } from '../../components/layout';
 import Identify from './identify';
 import {
+  bootstrapExistingUser,
+  bootstrapExistingUserWithPasskey,
+  bootstrapNewUser,
+  fillIdentifyEmail,
+  fillIdentifyPhone,
+  fillSandboxOutcome,
+  fillSmsPin,
   liveOnboardingConfigFixture,
+  mockGetBiometricChallengeResponse,
+  mockUseDeviceInfo,
   sandboxOnboardingConfigFixture,
   withIdentify,
+  withIdentifyVerify,
   withLoginChallenge,
   withOnboardingConfig,
+  withSignupChallenge,
+  withUserVault,
 } from './identify.test.config';
+
+jest.mock('../../hooks/ui/use-device-info', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../hooks/ui/use-device-info'),
+}));
+
+jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
+  __esModule: true,
+  ...jest.requireActual('./utils/biometrics/get-biometric-challenge-response'),
+}));
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -33,15 +51,15 @@ describe('<Identify />', () => {
     });
   });
 
-  const renderIdentify = (bootstrapData?: IdentifyBootstrapData) => {
+  const renderIdentify = (bootstrapData?: any, onDone?: () => {}) => {
     const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
     customRender(
       <ObserveCollectorProvider appName="bifrost">
-        <Layout>
+        <Layout onClose={() => {}}>
           <Identify
             obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData ?? {}}
-            onDone={() => {}}
+            onDone={onDone ?? (() => {})}
           />
         </Layout>
       </ObserveCollectorProvider>,
@@ -51,6 +69,7 @@ describe('<Identify />', () => {
   describe('when running a sandbox onboarding config', () => {
     beforeEach(() => {
       withOnboardingConfig(sandboxOnboardingConfigFixture);
+      withIdentify(false);
     });
 
     it('shows sandbox outcome selection page', async () => {
@@ -111,87 +130,74 @@ describe('<Identify />', () => {
     it('proceeds to email identification when sandbox outcome was successful', async () => {
       renderIdentify();
 
-      await waitFor(() => {
-        expect(screen.getByText('Select test outcome')).toBeInTheDocument();
-      });
-
-      const testIDField = screen.getByLabelText('Test ID');
-      await userEvent.type(testIDField, 'validtestid1234');
-      await userEvent.click(screen.getByText('Continue'));
+      await fillSandboxOutcome();
 
       await waitFor(() => {
         expect(
           screen.getByText('Enter your email to get started.'),
         ).toBeInTheDocument();
       });
+
+      await fillIdentifyEmail();
     });
 
-    describe('When there is bootstrap data', () => {
+    describe('When there is bootstrap email + phone data', () => {
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false);
+          withIdentify(false, []);
+          withIdentifyVerify();
+          withSignupChallenge();
+          withUserVault();
         });
 
         it('takes new user to sandbox page', async () => {
           const email = 'piip@onefootprint.com';
           const phoneNumber = '+1 234 567 8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              email,
+              phoneNumber,
+            },
+            onDone,
+          );
 
+          await fillSandboxOutcome();
+          await bootstrapNewUser();
           await waitFor(() => {
-            expect(screen.getByText('Select test outcome')).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
-          const testIDField = screen.getByLabelText('Test ID');
-          await userEvent.type(testIDField, 'testId');
-          await userEvent.click(screen.getByText('Continue'));
-
-          await waitFor(() => {
-            expect(screen.getByLabelText('Email')).toBeInTheDocument();
-          });
-          const emailField = screen.getByLabelText('Email');
-          expect(emailField).toHaveValue(email);
         });
       });
 
       describe('When user found', () => {
         beforeEach(() => {
+          mockUseDeviceInfo();
+          mockGetBiometricChallengeResponse();
           withIdentify(true);
-          withLoginChallenge(ChallengeKind.sms);
+          withIdentifyVerify();
+          withLoginChallenge(ChallengeKind.biometric);
         });
 
         it('takes user to sandbox then challenge', async () => {
           const email = 'piip@onefootprint.com';
           const phoneNumber = '+1 234 567 8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              email,
+              phoneNumber,
+            },
+            onDone,
+          );
 
-          await waitFor(() => {
-            expect(screen.getByText('Select test outcome')).toBeInTheDocument();
-          });
-          const testIDField = screen.getByLabelText('Test ID');
-          await userEvent.type(testIDField, 'testId');
-          await userEvent.click(screen.getByText('Continue'));
-
-          await waitFor(() => {
-            expect(
-              screen.getByText(
-                'We found a Footprint account with the information you provided to Acme Bank.',
-              ),
-            ).toBeInTheDocument();
-          });
+          await fillSandboxOutcome();
+          await bootstrapExistingUserWithPasskey();
 
           await waitFor(() => {
-            expect(
-              screen.getByText(
-                'Enter the 6-digit code sent to +1 ••• ••• ••99.',
-              ),
-            ).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
         });
       });
@@ -206,52 +212,64 @@ describe('<Identify />', () => {
     describe('When there is bootstrap email', () => {
       describe('When user found', () => {
         beforeEach(() => {
-          withIdentify(true);
+          withIdentify(true, [ChallengeKind.sms]);
+          withIdentifyVerify();
           withLoginChallenge(ChallengeKind.sms);
         });
 
-        it.skip('skips to challenge', async () => {
+        it('skips to challenge', async () => {
           const email = 'piip@onefootprint.com';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-          });
+          renderIdentify(
+            {
+              email,
+            },
+            onDone,
+          );
 
+          await bootstrapExistingUser();
           await waitFor(() => {
-            expect(
-              screen.getByText(
-                'We found a Footprint account with the information you provided to Acme Bank.',
-              ),
-            ).toBeInTheDocument();
-          });
-
-          await waitFor(() => {
-            expect(
-              screen.getByText(
-                'Enter the 6-digit code sent to +1 (•••) •••-••99.',
-              ),
-            ).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
         });
       });
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false);
+          withIdentify(false, []);
+          withIdentifyVerify();
+          withSignupChallenge();
+          withUserVault();
         });
 
         it('prefills email', async () => {
           const email = 'piip@onefootprint.com';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-          });
+          renderIdentify(
+            {
+              email,
+            },
+            onDone,
+          );
 
           await waitFor(() => {
-            expect(screen.getByLabelText('Email')).toBeInTheDocument();
+            expect(
+              screen.getByText('piip@onefootprint.com'),
+            ).toBeInTheDocument();
           });
-          const emailField = screen.getByLabelText('Email');
-          expect(emailField).toHaveValue(email);
+          await fillIdentifyPhone();
+          await waitFor(() => {
+            expect(
+              screen.getByTestId('navigation-back-button'),
+            ).toBeInTheDocument();
+          });
+          await fillSmsPin();
+
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
         });
       });
     });
@@ -259,47 +277,47 @@ describe('<Identify />', () => {
     describe('When there is bootstrap phone', () => {
       describe('When user found', () => {
         beforeEach(() => {
-          withIdentify(true);
+          withIdentify(true, [ChallengeKind.sms]);
+          withIdentifyVerify();
           withLoginChallenge(ChallengeKind.sms);
         });
 
-        it.skip('skips to challenge', async () => {
+        it('skips to challenge', async () => {
           const phoneNumber = '+1 234 567 8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              phoneNumber,
+            },
+            onDone,
+          );
 
+          await bootstrapExistingUser();
           await waitFor(() => {
-            expect(
-              screen.getByText(
-                'We found a Footprint account with the information you provided to Acme Bank.',
-              ),
-            ).toBeInTheDocument();
-          });
-
-          await waitFor(() => {
-            expect(
-              screen.getByText(
-                'Enter the 6-digit code sent to +1 ••• ••• ••99.',
-              ),
-            ).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
         });
       });
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false);
+          withIdentify(false, []);
+          withIdentifyVerify();
+          withSignupChallenge();
+          withUserVault();
         });
 
-        // TODO: Phone default value prefill is broken
         it('prefills the phone', async () => {
           const phoneNumber = '+1 (234) 567-8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              phoneNumber,
+            },
+            onDone,
+          );
 
           await waitFor(() => {
             expect(screen.getByLabelText('Email')).toBeInTheDocument();
@@ -314,6 +332,13 @@ describe('<Identify />', () => {
           expect(
             screen.getByDisplayValue('(234) 567-8999'),
           ).toBeInTheDocument();
+          await userEvent.click(screen.getByText('Continue'));
+
+          await fillSmsPin();
+
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
         });
       });
     });
@@ -321,64 +346,58 @@ describe('<Identify />', () => {
     describe('When there is bootstrap email and phone', () => {
       describe('When user found', () => {
         beforeEach(() => {
+          mockUseDeviceInfo();
+          mockGetBiometricChallengeResponse();
           withIdentify(true);
-          withLoginChallenge(ChallengeKind.sms);
+          withIdentifyVerify();
+          withLoginChallenge(ChallengeKind.biometric);
         });
 
-        it.skip('skips to challenge', async () => {
+        it('skips to challenge', async () => {
           const email = 'piip@onefootprint.com';
           const phoneNumber = '+1 234 567 8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              email,
+              phoneNumber,
+            },
+            onDone,
+          );
 
+          await bootstrapExistingUserWithPasskey();
           await waitFor(() => {
-            expect(
-              screen.getByText(
-                'We found a Footprint account with the information you provided to Acme Bank.',
-              ),
-            ).toBeInTheDocument();
-          });
-
-          await waitFor(() => {
-            expect(
-              screen.getByText(
-                'Enter the 6-digit code sent to +1 ••• ••• ••99.',
-              ),
-            ).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
         });
       });
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false);
+          withIdentify(false, []);
+          withIdentifyVerify();
+          withSignupChallenge();
+          withUserVault();
         });
 
-        it('prefills email and phone', async () => {
+        it('skips to sms challenge', async () => {
           const email = 'piip@onefootprint.com';
           const phoneNumber = '+1 234 567 8999';
+          const onDone = jest.fn();
 
-          renderIdentify({
-            email,
-            phoneNumber,
-          });
+          renderIdentify(
+            {
+              email,
+              phoneNumber,
+            },
+            onDone,
+          );
 
+          await bootstrapNewUser();
           await waitFor(() => {
-            expect(screen.getByLabelText('Email')).toBeInTheDocument();
+            expect(onDone).toHaveBeenCalled();
           });
-          const emailField = screen.getByLabelText('Email');
-          expect(emailField).toHaveValue(email);
-          await userEvent.click(screen.getByText('Continue'));
-
-          await waitFor(() => {
-            expect(screen.getByText('Phone number')).toBeInTheDocument();
-          });
-          expect(
-            screen.getByDisplayValue('(234) 567-8999'),
-          ).toBeInTheDocument();
         });
       });
     });

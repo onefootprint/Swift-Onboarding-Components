@@ -1,7 +1,10 @@
-import { useEffect } from 'react';
 import UAParser from 'ua-parser-js';
+import { useEffectOnce } from 'usehooks-ts';
 
-import { DeviceInfo } from './use-device-info.types';
+export type DeviceInfo = {
+  hasSupportForWebauthn: boolean;
+  type: string;
+};
 
 // UAParser device type can have an undefined type, because
 // it could get executed on the server side. We assign a default
@@ -24,12 +27,11 @@ async function checkDeviceInfo() {
 }
 
 const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void) => {
-  useEffect(() => {
+  useEffectOnce(() => {
     checkDeviceInfo().then(info => {
       onComplete(info);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 };
 
 export default useDeviceInfo;

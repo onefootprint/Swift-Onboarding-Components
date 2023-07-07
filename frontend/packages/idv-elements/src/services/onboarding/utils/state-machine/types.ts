@@ -1,5 +1,6 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import { IdDIData, OnboardingConfig } from '@onefootprint/types';
+
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   authToken: string;

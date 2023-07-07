@@ -1,9 +1,9 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useUserToken } from '../../../../../../../../hooks/api';
+import { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
 import useIdentify from './hooks/use-identify';
 import useIdentifyVerify, {
   IdentifyVerifyResponse,

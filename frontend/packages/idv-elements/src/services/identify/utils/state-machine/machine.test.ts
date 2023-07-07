@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
@@ -8,6 +7,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createIdentifyMachine from './machine';
 
 describe('Identify Machine Tests', () => {
@@ -81,7 +81,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('biometricChallenge');
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
@@ -137,7 +137,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('smsChallenge');
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
@@ -193,7 +193,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('smsChallenge');
 
       state = machine.send({
         type: 'challengeSucceeded',
@@ -257,7 +257,7 @@ describe('Identify Machine Tests', () => {
         userFound: false,
       });
       expect(state.context.challenge).toEqual({});
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('smsChallenge');
 
       // Go back and change the phone number
       state = machine.send({
@@ -272,7 +272,7 @@ describe('Identify Machine Tests', () => {
           userFound: false,
         },
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('smsChallenge');
     });
 
     it('editing email while registering phone', () => {
@@ -348,7 +348,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('biometricChallenge');
 
       state = machine.send({
         type: 'challengeSucceeded',
@@ -383,11 +383,7 @@ describe('Identify Machine Tests', () => {
           hasSyncablePassKey: false,
         },
       });
-      expect(state.value).toEqual('challenge');
-
-      state = machine.send({
-        type: 'challengeFailed',
-      });
+      expect(state.value).toEqual('biometricChallenge');
 
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
@@ -398,7 +394,6 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: false,
       });
-      expect(state.value).toEqual('challenge');
 
       state = machine.send({
         type: 'challengeSucceeded',
@@ -448,7 +443,7 @@ describe('Identify Machine Tests', () => {
         availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
         hasSyncablePassKey: true,
       });
-      expect(state.value).toEqual('challenge');
+      expect(state.value).toEqual('biometricChallenge');
 
       state = machine.send({
         type: 'challengeSucceeded',

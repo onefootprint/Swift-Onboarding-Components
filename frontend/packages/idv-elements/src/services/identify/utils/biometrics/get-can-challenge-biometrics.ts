@@ -1,7 +1,7 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 
-import { MachineChallengeContext } from '../state-machine';
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import { MachineChallengeContext } from '../state-machine/types';
 
 const getCanChallengeBiometrics = (
   challengeContext: MachineChallengeContext,

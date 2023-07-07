@@ -1,4 +1,4 @@
-import { DeviceInfo } from '@onefootprint/hooks';
+import { DeviceInfo } from '@onefootprint/idv-elements';
 import {
   IdvBootstrapData,
   ObConfigAuth,

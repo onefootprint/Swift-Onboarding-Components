@@ -14,22 +14,18 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'challengeSucceeded';
-    assignAvailableChallengeKinds: 'identified';
-    assignEmail: 'identified' | 'identifyFailed';
-    assignHasSyncablePassKey: 'identified';
+    assignEmail: 'identifyFailed';
+    assignIdentifySuccessResult: 'identified';
     assignInitContext: 'initContextUpdated';
-    assignPhone: 'identified' | 'identifyFailed';
+    assignPhone: 'identifyFailed';
     assignSandboxOutcome: 'sandboxOutcomeSubmitted';
-    assignSuccessfulIdentifier: 'identified';
-    assignUserFound: 'identified';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'bootstrapChallenge'
-    | 'challenge'
+    | 'biometricChallenge'
     | 'configInvalid'
     | 'emailIdentification'
     | 'init'
@@ -37,6 +33,7 @@ export interface Typegen0 {
     | 'initialized'
     | 'phoneIdentification'
     | 'sandboxOutcome'
+    | 'smsChallenge'
     | 'success';
   tags: never;
 }

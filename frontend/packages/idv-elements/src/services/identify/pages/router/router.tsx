@@ -2,14 +2,14 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import BootstrapChallenge from '../bootstrap-challenge';
-import Challenge from '../challenge';
+import BiometricChallenge from '../biometric-challenge';
 import ConfigInvalid from '../config-invalid';
 import EmailIdentification from '../email-identification';
 import Init from '../init';
 import InitBootstrap from '../init-bootstrap';
 import PhoneIdentification from '../phone-identification';
 import SandboxOutcome from '../sandbox-outcome';
+import SmsChallenge from '../sms-challenge';
 
 export type DonePayload = {
   authToken: string;
@@ -33,7 +33,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   useEffect(() => {
     if (!authToken) {
-      // TODO: log event
       return;
     }
     if (isDone) {
@@ -53,10 +52,10 @@ const Router = ({ onDone }: RouterProps) => {
       {state.matches('configInvalid') && <ConfigInvalid />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
       {state.matches('initBootstrap') && <InitBootstrap />}
-      {state.matches('bootstrapChallenge') && <BootstrapChallenge />}
       {state.matches('emailIdentification') && <EmailIdentification />}
       {state.matches('phoneIdentification') && <PhoneIdentification />}
-      {state.matches('challenge') && <Challenge />}
+      {state.matches('smsChallenge') && <SmsChallenge />}
+      {state.matches('biometricChallenge') && <BiometricChallenge />}
     </>
   );
 };

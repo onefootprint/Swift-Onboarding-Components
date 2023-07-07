@@ -1,4 +1,3 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedKycDataOption,
   IdDI,
@@ -6,6 +5,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createOnboardingMachine, { OnboardingMachineArgs } from './machine';
 
 describe('Onboarding Machine Tests', () => {

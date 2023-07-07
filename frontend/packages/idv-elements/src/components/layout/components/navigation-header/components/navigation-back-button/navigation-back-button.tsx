@@ -13,7 +13,11 @@ const NavigationBackButton = ({ onBack }: NavigationBackButtonProps) => {
   );
 
   return (
-    <IconButton aria-label={t('aria-label')} onClick={onBack}>
+    <IconButton
+      aria-label={t('aria-label')}
+      onClick={onBack}
+      testID="navigation-back-button"
+    >
       <IcoChevronLeftBig24 />
     </IconButton>
   );

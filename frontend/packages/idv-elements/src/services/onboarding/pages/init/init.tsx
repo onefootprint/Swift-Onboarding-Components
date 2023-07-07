@@ -1,5 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
-import { DeviceInfo, useDeviceInfo, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedDataOptionLabels } from '@onefootprint/types';
@@ -7,6 +7,9 @@ import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import useDeviceInfo, {
+  DeviceInfo,
+} from '../../../../hooks/ui/use-device-info';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';
 

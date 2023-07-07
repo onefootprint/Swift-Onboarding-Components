@@ -1,5 +1,6 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
+
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   device: DeviceInfo;

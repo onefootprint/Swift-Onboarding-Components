@@ -1,4 +1,4 @@
-import { DeviceInfo } from '@onefootprint/hooks';
+import { DeviceInfo } from '../hooks/ui/use-device-info';
 
 export type PluginContext<T> = {
   authToken: string;

@@ -1,5 +1,6 @@
-import { DeviceInfo } from '@onefootprint/hooks';
 import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
+
+import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type EmploymentData = Pick<
   InvestorProfileData,
