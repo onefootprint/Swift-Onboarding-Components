@@ -70,7 +70,11 @@ type TemplateProps = {
   tenantName: string;
 };
 
-const OnboardingInstructions = ({ appearance, obKey, tenantName }: TemplateProps) => (
+const OnboardingInstructions = ({
+  appearance,
+  obKey,
+  tenantName,
+}: TemplateProps) => (
   <>
     <Head>
       <title>Footprint ❤️ {tenantName}</title>

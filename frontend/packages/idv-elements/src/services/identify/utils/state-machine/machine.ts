@@ -115,7 +115,8 @@ const createIdentifyMachine = ({
               {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) => !!getCanChallengeBiometrics(
+                cond: (context, event) =>
+                  !!getCanChallengeBiometrics(
                     {
                       hasSyncablePassKey: event.payload.hasSyncablePassKey,
                       availableChallengeKinds:
