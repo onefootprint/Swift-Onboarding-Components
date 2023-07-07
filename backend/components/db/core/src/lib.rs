@@ -189,9 +189,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         access_event, annotation, business_owner, contact_info, data_lifetime, document_data,
         document_request, document_upload, fingerprint, fingerprint_visit_event, identity_document,
         incode_verification_session, liveness_event, manual_review, middesk_request, onboarding,
-        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal, scoped_vault,
-        socure_device_session, user_timeline, vault, vault_data, verification_request, verification_result,
-        watchlist_check, webauthn_credential, workflow, workflow_event,
+        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal,
+        risk_signal_group, scoped_vault, socure_device_session, user_timeline, vault, vault_data,
+        verification_request, verification_result, watchlist_check, webauthn_credential, workflow,
+        workflow_event,
     };
     let mut deleted_rows = 0;
 
@@ -353,6 +354,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 deleted_rows += diesel::delete(risk_signal::table)
                     .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone().nullable()))
                     .filter(risk_signal::verification_result_id.is_null())
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(risk_signal_group::table)
+                    .filter(risk_signal_group::scoped_vault_id.eq_any(su_ids.clone()))
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(onboarding_decision::table)
