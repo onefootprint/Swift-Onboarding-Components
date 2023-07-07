@@ -1,3 +1,4 @@
+import { IcoFaceid24 } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
@@ -46,6 +47,24 @@ export default {
       options: ['primary', 'secondary'],
       description: 'Changes the style of the button',
     },
+    iconColor: {
+      control: 'select',
+      options: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'quaternary',
+        'quinary',
+        'senary',
+        'info',
+        'error',
+        'warning',
+        'success',
+        'accent',
+        'neutral',
+      ],
+      description: 'Changes the color of the icon',
+    },
   },
 } as Meta;
 
@@ -60,6 +79,8 @@ const Template: Story<ButtonProps> = ({
   loadingAriaLabel,
   type,
   variant,
+  prefixIcon,
+  iconColor,
 }: ButtonProps) => (
   <Button
     loading={loading}
@@ -71,6 +92,8 @@ const Template: Story<ButtonProps> = ({
     testID={testID}
     type={type}
     variant={variant}
+    prefixIcon={prefixIcon}
+    iconColor={iconColor}
   >
     {children}
   </Button>
@@ -125,4 +148,10 @@ export const Disabled = Template.bind({});
 Disabled.args = {
   children: 'Disabled',
   disabled: true,
+};
+
+export const ButtonWithPrefixIcon = Template.bind({});
+ButtonWithPrefixIcon.args = {
+  children: 'With Icon',
+  prefixIcon: IcoFaceid24,
 };

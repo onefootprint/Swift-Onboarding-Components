@@ -17,12 +17,14 @@ export default {
     },
     type: { control: 'select', options: ['button', 'submit'] },
     variant: { control: 'select', options: ['primary', 'secondary'] },
+    loading: { control: 'boolean' },
   },
 } as Meta;
 
 const Template: Story<FootprintButtonProps> = ({
   disabled,
   fullWidth,
+  loading,
   onClick,
   size,
   testID,
@@ -37,6 +39,7 @@ const Template: Story<FootprintButtonProps> = ({
     testID={testID}
     type={type}
     text={text}
+    loading={loading}
   />
 );
 

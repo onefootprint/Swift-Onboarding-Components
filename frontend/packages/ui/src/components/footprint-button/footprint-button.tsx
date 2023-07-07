@@ -1,5 +1,4 @@
 import { IcoFootprint24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
 import Button, { ButtonProps } from '../button';
@@ -36,8 +35,9 @@ const FootprintButton = ({
     testID={testID}
     type={type}
     variant="primary"
+    prefixIcon={IcoFootprint24}
+    iconColor="septenary"
   >
-    <StyledIcoFootprint color="septenary" />
     <Typography
       color="quinary"
       variant={footprintButtonFontVariantBySize[size]}
@@ -46,11 +46,5 @@ const FootprintButton = ({
     </Typography>
   </Button>
 );
-
-const StyledIcoFootprint = styled(IcoFootprint24)`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]};
-  `}
-`;
 
 export default FootprintButton;

@@ -1,3 +1,5 @@
+import { Color } from '@onefootprint/design-tokens';
+import { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
@@ -18,6 +20,8 @@ export type ButtonProps = {
   testID?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
+  prefixIcon?: Icon;
+  iconColor?: Color;
   sx?: SXStyleProps;
 };
 
@@ -36,10 +40,29 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type = 'button',
       variant = 'primary',
       sx,
+      prefixIcon: PrefixIcon,
+      iconColor = variant === 'primary' ? 'quinary' : 'primary',
     }: ButtonProps,
     ref,
   ) => {
     const sxStyles = useSX(sx);
+
+    const getContent = () => (
+      <Box
+        as="span"
+        sx={{
+          visibility: loading ? 'hidden' : 'visible',
+          display: 'flex',
+          gap: 3,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {PrefixIcon && <PrefixIcon color={iconColor} />}
+        {children}
+      </Box>
+    );
+
     return (
       <ButtonContainer
         className="fp-button"
@@ -58,13 +81,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         variant={variant}
       >
-        {!loading ? (
-          children
-        ) : (
-          <Box as="span" sx={{ visibility: 'hidden' }}>
-            {children}
-          </Box>
-        )}
+        {getContent()}
         <Box
           sx={{
             visibility: loading ? 'visible' : 'hidden',
