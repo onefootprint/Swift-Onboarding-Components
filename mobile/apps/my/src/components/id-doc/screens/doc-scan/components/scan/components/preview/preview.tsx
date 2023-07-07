@@ -14,20 +14,25 @@ import { PhotoFile } from 'react-native-vision-camera';
 import useTranslation from '@/hooks/use-translation';
 
 import ScanContext from '../../../scan-context';
+import type { ScanSize } from '../../scan.types';
 import Errors from './components/errors';
+import { DEFAULT_HEIGHT, LARGE_HEIGHT } from './preview.constants';
 import encodeImagePath from './utils/encode-image-path';
 
 type PreviewProps = {
   onReset: () => void;
   photo: PhotoFile;
+  size?: ScanSize;
   title: string;
+  subtitle?: string;
 };
 
-const Camera = ({ title, onReset, photo }: PreviewProps) => {
+const Preview = ({ title, subtitle, onReset, photo, size }: PreviewProps) => {
   const { t } = useTranslation('components.scan.preview');
   const { isLoading, isError, isSuccess, onSubmit, errors, onResetErrors } =
     useContext(ScanContext);
   const showActionButtons = !isError && !isSuccess;
+  const imageHeight = size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT;
 
   const handleSubmit = async () => {
     if (!photo) return;
@@ -45,17 +50,26 @@ const Camera = ({ title, onReset, photo }: PreviewProps) => {
       <StatusBar barStyle="dark-content" />
       <Container>
         <Box flex={1}>
-          <Box>
-            <Typography marginVertical={5} variant="heading-3" center>
+          <Box marginVertical={5}>
+            <Typography variant="heading-3" center>
               {title}
             </Typography>
-            <Preview
-              hasError={isError}
-              resizeMode="cover"
-              source={{ uri: photo.path }}
-            />
-            {isError && <Errors errors={errors} />}
+            {subtitle && (
+              <Typography variant="label-2" center>
+                {subtitle}
+              </Typography>
+            )}
           </Box>
+          <Box width="100%" height={imageHeight}>
+            <PreviewImg
+              hasError={isError}
+              height={imageHeight}
+              size={size}
+              source={{ uri: photo.path }}
+              width="100%"
+            />
+          </Box>
+          {isError && <Errors errors={errors} />}
         </Box>
         <Box gap={4}>
           {isSuccess && (
@@ -95,10 +109,10 @@ const Camera = ({ title, onReset, photo }: PreviewProps) => {
   );
 };
 
-const Preview = styled(Image)<{ hasError: boolean }>`
-  ${({ theme, hasError }) => css`
+const PreviewImg = styled(Image)<{ hasError: boolean; size: ScanSize }>`
+  ${({ theme, size, hasError }) => css`
     border-radius: ${theme.borderRadius.large};
-    height: 390px;
+    height: ${size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT}px;
     margin-top: ${theme.spacing[7]};
     width: 100%;
 
@@ -110,4 +124,4 @@ const Preview = styled(Image)<{ hasError: boolean }>`
   `}
 `;
 
-export default Camera;
+export default Preview;

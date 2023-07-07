@@ -61,11 +61,11 @@ const Selfie = ({ authToken }: SelfieProps) => {
     <Instructions>
       <Camera
         disabled={isCameraDisabled}
+        feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
         title={t('title')}
         type="front"
-        feedback={feedback}
       >
         <Frame detector={detector} />
       </Camera>

@@ -15,7 +15,7 @@ export type DriversLicenseProps = {
 };
 
 const DriversLicense = ({ side }: DriversLicenseProps) => {
-  const { t } = useTranslation('components.scan.drivers-license');
+  const { t, allT } = useTranslation('components.scan.drivers-license');
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -45,7 +45,8 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
-        title={t(`title.${side}`)}
+        subtitle={allT(`doc-side.${side}`)}
+        title={t('title')}
       >
         <Frame detector={detector} />
       </Scan>

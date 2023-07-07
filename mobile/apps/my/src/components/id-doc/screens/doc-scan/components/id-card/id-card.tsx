@@ -15,7 +15,7 @@ export type IdCardProps = {
 };
 
 const IdCard = ({ side }: IdCardProps) => {
-  const { t } = useTranslation('components.scan.id-card');
+  const { t, allT } = useTranslation('components.scan.id-card');
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -45,7 +45,8 @@ const IdCard = ({ side }: IdCardProps) => {
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
-        title={t(`title-${side}`)}
+        subtitle={allT(`doc-side.${side}`)}
+        title={t('title')}
       >
         <Frame detector={detector} />
       </Scan>

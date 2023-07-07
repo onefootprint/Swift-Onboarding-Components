@@ -3,7 +3,7 @@ import { PhotoFile } from 'react-native-vision-camera';
 
 import Camera from './components/camera';
 import Preview from './components/preview';
-import type { CameraType } from './scan.types';
+import type { ScanSize, ScanType } from './scan.types';
 
 type ScanProps = {
   children?: React.ReactNode;
@@ -11,8 +11,10 @@ type ScanProps = {
   feedback?: string;
   frameProcessor?: any;
   isObjectDetected?: boolean;
+  size?: ScanSize;
   title: string;
-  type?: CameraType;
+  subtitle?: string;
+  type?: ScanType;
 };
 
 const Scan = ({
@@ -21,7 +23,9 @@ const Scan = ({
   feedback,
   frameProcessor,
   isObjectDetected,
+  size = 'default',
   title,
+  subtitle,
   type = 'back',
 }: ScanProps) => {
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
@@ -36,7 +40,13 @@ const Scan = ({
   };
 
   return showPreview ? (
-    <Preview title={title} photo={photo} onReset={handleResetPhoto} />
+    <Preview
+      onReset={handleResetPhoto}
+      photo={photo}
+      size={size}
+      subtitle={subtitle}
+      title={title}
+    />
   ) : (
     <Camera
       disabled={disabled}
@@ -44,6 +54,7 @@ const Scan = ({
       frameProcessor={frameProcessor}
       isObjectDetected={isObjectDetected}
       onPhotoTaken={handlePhotoTaken}
+      subtitle={subtitle}
       title={title}
       type={type}
     >

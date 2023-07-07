@@ -7,7 +7,7 @@ import {
   useCameraDevices,
 } from 'react-native-vision-camera';
 
-import type { CameraType } from '../../scan.types';
+import type { ScanType } from '../../scan.types';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
@@ -22,8 +22,9 @@ type CameraProps = {
   frameProcessor?: any;
   isObjectDetected?: boolean;
   onPhotoTaken: (photo: PhotoFile) => void;
+  subtitle?: string;
   title: string;
-  type?: CameraType;
+  type?: ScanType;
 };
 
 const AUTO_CAPTURE_DELAY = 750;
@@ -35,6 +36,7 @@ const Camera = ({
   frameProcessor,
   isObjectDetected,
   onPhotoTaken,
+  subtitle,
   title,
   type = 'back',
 }: CameraProps) => {
@@ -73,7 +75,9 @@ const Camera = ({
     <>
       <StatusBar barStyle="light-content" />
       <CameraContainer>
-        <Header>{title}</Header>
+        <Header>
+          {title} - {subtitle}
+        </Header>
         {device && (
           <StyledCamera
             device={device}

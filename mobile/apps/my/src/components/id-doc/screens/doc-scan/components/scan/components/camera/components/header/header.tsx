@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const HEADER_HEIGHT = 56;
 
 type HeaderProps = {
-  children: string;
+  children: React.ReactNode;
 };
 
 const Header = ({ children }: HeaderProps) => {

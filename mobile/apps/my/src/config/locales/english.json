@@ -1,4 +1,8 @@
 {
+  "doc-side": {
+    "front": "Front side",
+    "back": "Back back"
+  },
   "di": {
     "id.name": "Name",
     "id.phone_number": "Phone number",
@@ -132,20 +136,14 @@
         }
       },
       "drivers-license": {
-        "title": {
-          "front": "Driver's license - Front side",
-          "back": "Driver's license - Back side"
-        },
+        "title": "Driver's license",
         "instructions": {
           "front": "Scan the front side of your driver's license",
           "back": "Scan the back side of your driver's license"
         }
       },
       "id-card": {
-        "title": {
-          "front": "ID Card - Front side",
-          "back": "ID Card - Back side"
-        },
+        "title": "ID card",
         "instructions": {
           "front": "Scan the front side of your id card",
           "back": "Scan the back side of your id card"

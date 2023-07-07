@@ -1,1 +1,3 @@
-export type CameraType = 'front' | 'back';
+export type ScanType = 'front' | 'back';
+
+export type ScanSize = 'default' | 'large';
