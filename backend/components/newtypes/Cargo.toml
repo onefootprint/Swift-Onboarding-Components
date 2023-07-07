@@ -41,5 +41,7 @@ diesel_as_jsonb = "1.0.0"
 phonenumber = "0.3.1"
 url = { workspace = true }
 
+email_address = "0.2.4"
+
 [dev-dependencies]
 test-case = { workspace = true }

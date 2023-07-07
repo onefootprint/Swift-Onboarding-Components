@@ -1,5 +1,4 @@
 pub use derive_more::{Add, From, FromStr, Into};
-use regex::Regex;
 use serde_with::DeserializeFromStr;
 
 use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
@@ -23,11 +22,6 @@ impl Email {
     }
 }
 
-lazy_static! {
-    pub static ref EMAIL_RE: Regex =
-        Regex::new(r"(^[a-zA-Z0-9_.+\-!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
-}
-
 impl serde::Serialize for Email {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -44,11 +38,12 @@ impl std::str::FromStr for Email {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // ALL emails are case insensitive
         let s = s.trim().to_lowercase();
-        // sanitize by checking against simple regex
         // todo, do we want to try to strip out + variations for gmail accounts / standardize further?
-        if !EMAIL_RE.is_match(&s) {
+
+        if !email_address::EmailAddress::is_valid(&s) {
             return Err(crate::Error::InvalidEmail);
         }
+
         Ok(Email {
             email: PiiString::from(s),
         })
@@ -87,6 +82,8 @@ mod tests {
     #[test_case("flerpderpmerp!_sdf@onefootprint.com" => true)]
     #[test_case("abcABC098_.+-!#$%&'*+-/=?^_`{|}~@onefootprint.com" => true)]
     #[test_case("abcABC098_ .+-!#$%&'*+-/=?^_`{|}~@onefootprint.com" => false)]
+    #[test_case("ç+example@gmail.com" => true)]
+    #[test_case("flerp@derp.com#sandbox" => true)]
     fn test_parse(input: &str) -> bool {
         Email::from_str(input).is_ok()
     }
