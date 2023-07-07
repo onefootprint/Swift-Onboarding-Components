@@ -151,7 +151,7 @@
       },
       "passport": {
         "title": "Passport",
-        "subtitle": "Photo page"
+        "instructions": "Scan the photo page of your passport"
       },
       "selfie": {
         "title": "Selfie",

@@ -6,6 +6,7 @@ import { detectDocument } from 'vision-camera-plugin-document';
 import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
+import DocInstructions from '../doc-instructions';
 import Camera from '../scan';
 
 const Passport = () => {
@@ -34,14 +35,16 @@ const Passport = () => {
   );
 
   return (
-    <Camera
-      feedback={feedback}
-      frameProcessor={frameProcessor}
-      isObjectDetected={objectedDetected}
-      title={t('title')}
-    >
-      <Frame detector={detector} />
-    </Camera>
+    <DocInstructions title={t('instructions')}>
+      <Camera
+        feedback={feedback}
+        frameProcessor={frameProcessor}
+        isObjectDetected={objectedDetected}
+        title={t('title')}
+      >
+        <Frame detector={detector} />
+      </Camera>
+    </DocInstructions>
   );
 };
 
