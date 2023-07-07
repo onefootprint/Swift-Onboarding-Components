@@ -7,7 +7,14 @@ import type { IconProps } from '../types';
 const IcoEmojiHappy24 = ({ color = 'primary', style }: IconProps) => {
   const theme = useTheme();
   return (
-    <Svg width={24} height={24} fill="none" style={style} aria-hidden={true}>
+    <Svg
+      width={24}
+      height={24}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={style}
+      aria-hidden={true}
+    >
       <Path
         fillRule="evenodd"
         clipRule="evenodd"

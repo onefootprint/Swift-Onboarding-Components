@@ -7,6 +7,7 @@ import { detectDocument } from 'vision-camera-plugin-document';
 import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
+import DocInstructions from '../doc-instructions';
 import Camera from '../scan';
 
 export type DriversLicenseProps = {
@@ -31,7 +32,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
         runOnJS(setFeedback)('Hold still...');
       } else {
         detector.value = false;
-        runOnJS(setFeedback)('Detecting...');
+        runOnJS(setFeedback)('Position the document in view');
         runOnJS(setObjectDetected)(false);
       }
     },
@@ -39,14 +40,16 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
   );
 
   return (
-    <Camera
-      feedback={feedback}
-      frameProcessor={frameProcessor}
-      isObjectDetected={objectedDetected}
-      title={t(`title-${side}`)}
-    >
-      <Frame detector={detector} />
-    </Camera>
+    <DocInstructions title={t(`instructions.${side}`)}>
+      <Camera
+        feedback={feedback}
+        frameProcessor={frameProcessor}
+        isObjectDetected={objectedDetected}
+        title={t(`title.${side}`)}
+      >
+        <Frame detector={detector} />
+      </Camera>
+    </DocInstructions>
   );
 };
 

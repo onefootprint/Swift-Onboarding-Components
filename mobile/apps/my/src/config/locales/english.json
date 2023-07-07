@@ -88,6 +88,21 @@
         },
         "cta": "Continue"
       },
+      "instructions": {
+        "document": {
+          "contrast": "Find a background with good contrast",
+          "in-view": "Position the document in view",
+          "steady": "Hold your device steady",
+          "auto-capture": "Image will be captured automatically",
+          "cta": "Continue"
+        },
+        "face": {
+          "frame": "Position your face within the frame",
+          "steady": "Hold your device steady",
+          "auto-capture": "Selfie will be captured automatically",
+          "cta": "Continue"
+        }
+      },
       "preview": {
         "cta": "Confirm",
         "cta-loading": "Submitting photo...",
@@ -115,8 +130,14 @@
         }
       },
       "drivers-license": {
-        "title-front": "Driver's license - Front side",
-        "back-front": "Driver's license - Back side"
+        "title": {
+          "front": "Driver's license - Front side",
+          "back": "Driver's license - Back side"
+        },
+        "instructions": {
+          "front": "Scan the front side of your driver's license",
+          "back": "Scan the bakc side of your driver's license"
+        }
       },
       "id-card": {
         "title-front": "ID Card - Front side",
