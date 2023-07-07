@@ -1,7 +1,9 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use newtypes::{
-    EncryptedVaultPrivateKey, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
+    EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
+    VerificationRequestId, VerificationResultId,
 };
+use serde::Serialize;
 
 use crate::{enclave_client::EnclaveClient, errors::ApiResult};
 
@@ -66,6 +68,51 @@ where
     let parsed: T::Value = serde_json::from_value(value)?;
 
     Ok(parsed)
+}
+
+fn scrub_response<T>(value: &PiiJsonValue) -> Result<ScrubbedPiiJsonValue, serde_json::Error>
+where
+    T: TypedMapKey<VendorAPIResponseMarker>,
+    T::Value: DeserializeOwned + Serialize,
+{
+    let parsed: T::Value = serde_json::from_value(value.clone().into_leak())?;
+    let scrubbed = ScrubbedPiiJsonValue::scrub(parsed)?;
+
+    Ok(scrubbed)
+}
+
+pub fn scrub_raw_vendor_response(
+    vendor_api: &VendorAPI,
+    raw_response: &PiiJsonValue,
+) -> Result<ScrubbedPiiJsonValue, serde_json::Error> {
+    match vendor_api {
+        VendorAPI::IdologyExpectID => scrub_response::<IdologyExpectID>(raw_response),
+        VendorAPI::IdologyScanVerifySubmission => scrub_response::<IdologyScanVerifySubmission>(raw_response),
+        VendorAPI::IdologyScanVerifyResults => scrub_response::<IdologyScanVerifyResults>(raw_response),
+        VendorAPI::IdologyScanOnboarding => scrub_response::<IdologyScanOnboarding>(raw_response),
+        VendorAPI::IdologyPa => scrub_response::<IdologyPa>(raw_response),
+        VendorAPI::TwilioLookupV2 => scrub_response::<TwilioLookupV2>(raw_response),
+        VendorAPI::SocureIDPlus => scrub_response::<SocureIDPlus>(raw_response),
+        VendorAPI::ExperianPreciseID => scrub_response::<ExperianPreciseID>(raw_response),
+        VendorAPI::MiddeskCreateBusiness => scrub_response::<MiddeskCreateBusiness>(raw_response),
+        VendorAPI::MiddeskGetBusiness => scrub_response::<MiddeskGetBusiness>(raw_response),
+        VendorAPI::MiddeskBusinessUpdateWebhook => {
+            scrub_response::<MiddeskBusinessUpdateWebhook>(raw_response)
+        }
+        VendorAPI::MiddeskTinRetriedWebhook => scrub_response::<MiddeskTinRetriedWebhook>(raw_response),
+        VendorAPI::IncodeStartOnboarding => scrub_response::<IncodeStartOnboarding>(raw_response),
+        VendorAPI::IncodeAddFront => scrub_response::<IncodeAddFront>(raw_response),
+        VendorAPI::IncodeAddBack => scrub_response::<IncodeAddBack>(raw_response),
+        VendorAPI::IncodeProcessId => scrub_response::<IncodeProcessId>(raw_response),
+        VendorAPI::IncodeFetchScores => scrub_response::<IncodeFetchScores>(raw_response),
+        VendorAPI::IncodeAddPrivacyConsent => scrub_response::<IncodeAddPrivacyConsent>(raw_response),
+        VendorAPI::IncodeAddMLConsent => scrub_response::<IncodeAddMLConsent>(raw_response),
+        VendorAPI::IncodeFetchOCR => scrub_response::<IncodeFetchOCR>(raw_response),
+        VendorAPI::IncodeAddSelfie => scrub_response::<IncodeAddSelfie>(raw_response),
+        VendorAPI::IncodeWatchlistCheck => scrub_response::<IncodeWatchlistCheck>(raw_response),
+        VendorAPI::IncodeGetOnboardingStatus => scrub_response::<IncodeGetOnboardingStatus>(raw_response),
+        VendorAPI::IncodeProcessFace => scrub_response::<IncodeProcessFace>(raw_response),
+    }
 }
 
 // given a map and a raw response, parse and insert into our map

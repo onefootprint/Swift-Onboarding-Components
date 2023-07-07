@@ -4,7 +4,9 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{decision_intent, verification_request, verification_result};
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{ScrubbedJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId};
+use newtypes::{
+    ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
+};
 use serde::{Deserialize, Serialize};
 
 use super::decision_intent::DecisionIntent;
@@ -16,7 +18,7 @@ pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,
     #[diesel(deserialize_as = serde_json::Value)]
-    pub response: ScrubbedJsonValue,
+    pub response: ScrubbedPiiJsonValue,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -30,7 +32,7 @@ pub struct NewVerificationResult {
     pub request_id: VerificationRequestId,
     // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have been scrubbed and you need to use the e_response
     #[diesel(serialize_as = serde_json::Value)]
-    pub response: ScrubbedJsonValue,
+    pub response: ScrubbedPiiJsonValue,
     pub timestamp: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
     pub is_error: bool,
@@ -42,7 +44,7 @@ impl VerificationResult {
         conn: &mut PgConn,
         request_id: VerificationRequestId,
         // To be removed once we are finished testing
-        response: ScrubbedJsonValue,
+        response: ScrubbedPiiJsonValue,
         e_response: SealedVaultBytes,
         is_error: bool,
     ) -> Result<VerificationResult, DbError> {

@@ -1,6 +1,6 @@
 use newtypes::{
     vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeSessionId, PiiJsonValue,
-    ScrubbedJsonValue,
+    ScrubbedPiiJsonValue,
 };
 use serde::de::DeserializeOwned;
 
@@ -47,10 +47,10 @@ impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
         }
     }
 
-    pub fn scrub(&self) -> Result<ScrubbedJsonValue, error::Error> {
+    pub fn scrub(&self) -> Result<ScrubbedPiiJsonValue, error::Error> {
         let res = match self {
-            IncodeAPIResult::Success(s) => ScrubbedJsonValue::scrub(s),
-            IncodeAPIResult::ResponseError(e) => ScrubbedJsonValue::scrub(e),
+            IncodeAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
+            IncodeAPIResult::ResponseError(e) => ScrubbedPiiJsonValue::scrub(e),
         }?;
 
         Ok(res)

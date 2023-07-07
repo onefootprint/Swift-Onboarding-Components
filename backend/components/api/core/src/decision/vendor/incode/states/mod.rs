@@ -53,7 +53,7 @@ use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, IdDocKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedJsonValue, ScrubbedPiiString,
+    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString,
     VendorAPI,
 };
 
@@ -68,7 +68,7 @@ pub struct VerificationSession {
 struct SaveVerificationResultArgs<'a> {
     is_error: bool,
     raw_response: PiiJsonValue,
-    scrubbed_response: ScrubbedJsonValue,
+    scrubbed_response: ScrubbedPiiJsonValue,
     vendor_api: VendorAPI,
     ctx: &'a IncodeContext,
 }

@@ -271,9 +271,9 @@ impl TryFrom<PiiBytes> for PiiJsonValue {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ScrubbedJsonValue(serde_json::Value);
-impl ScrubbedJsonValue {
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct ScrubbedPiiJsonValue(serde_json::Value);
+impl ScrubbedPiiJsonValue {
     pub fn scrub<T: serde::Serialize>(s: T) -> Result<Self, serde_json::Error> {
         let val = serde_json::to_value(s)?;
         Ok(Self(val))
@@ -283,21 +283,27 @@ impl ScrubbedJsonValue {
     }
 }
 
-impl From<ScrubbedJsonValue> for serde_json::Value {
-    fn from(v: ScrubbedJsonValue) -> Self {
+impl From<ScrubbedPiiJsonValue> for serde_json::Value {
+    fn from(v: ScrubbedPiiJsonValue) -> Self {
         v.0
     }
 }
 
-impl From<serde_json::Value> for ScrubbedJsonValue {
+impl From<serde_json::Value> for ScrubbedPiiJsonValue {
     fn from(v: serde_json::Value) -> Self {
         Self(v)
     }
 }
 
-impl From<ScrubbedJsonValue> for PiiJsonValue {
-    fn from(s: ScrubbedJsonValue) -> Self {
+impl From<ScrubbedPiiJsonValue> for PiiJsonValue {
+    fn from(s: ScrubbedPiiJsonValue) -> Self {
         Self(s.0)
+    }
+}
+
+impl Debug for ScrubbedPiiJsonValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<redacted json value>")
     }
 }
 

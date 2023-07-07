@@ -10,9 +10,14 @@ use db::{
     },
     DbError, PgConn,
 };
-use newtypes::{EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedJsonValue, SealedVaultBytes, VaultPublicKey};
+use newtypes::{
+    EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey,
+};
 
-use super::make_request::VerificationRequestWithVendorResponse;
+use super::{
+    make_request::VerificationRequestWithVendorResponse,
+    vendor_api::vendor_api_response::scrub_raw_vendor_response,
+};
 
 /// Save a verification result, encrypting the response payload in the process
 pub fn save_verification_results(
@@ -25,7 +30,7 @@ pub fn save_verification_results(
         .iter()
         .map(|(req, res)| {
             // For testing rollout of footprint
-            let scrubbed_json = ScrubbedJsonValue::scrub(&res.response)?;
+            let scrubbed_json = ScrubbedPiiJsonValue::scrub(&res.response)?;
 
             let e_response = encrypt_verification_result_response(&res.raw_response, user_vault_public_key)?;
 
@@ -59,7 +64,7 @@ pub fn save_error_verification_results(
 
             Ok(NewVerificationResult {
                 request_id: req.id.clone(),
-                response: ScrubbedJsonValue::scrub(r)?,
+                response: scrub_raw_vendor_response(&req.vendor_api, &r)?,
                 timestamp: now,
                 e_response: Some(e_response),
                 is_error: true,
