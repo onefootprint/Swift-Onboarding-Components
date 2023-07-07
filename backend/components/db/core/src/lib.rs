@@ -376,10 +376,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                     .select(verification_result::id);
 
                 deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(
-                        risk_signal::verification_result_id
-                            .eq_any(verification_result_ids.clone().nullable()),
-                    )
+                    .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
                     .execute(conn.conn())?;
 
                 deleted_rows += diesel::delete(verification_result::table)

@@ -12,6 +12,8 @@ use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
 use serde::{Deserialize, Serialize};
+#[cfg(test)]
+use std::str::FromStr;
 
 use super::risk_signal_group::RiskSignalGroup;
 
@@ -25,7 +27,7 @@ pub struct RiskSignal {
     pub deactivated_at: Option<DateTime<Utc>>, // Currently unused!
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub verification_result_id: Option<VerificationResultId>,
+    pub verification_result_id: VerificationResultId,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: Option<RiskSignalGroupId>,
@@ -37,7 +39,7 @@ pub struct NewRiskSignal {
     pub onboarding_decision_id: Option<OnboardingDecisionId>,
     pub reason_code: FootprintReasonCode,
     pub created_at: DateTime<Utc>,
-    pub verification_result_id: Option<VerificationResultId>,
+    pub verification_result_id: VerificationResultId,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: Option<RiskSignalGroupId>,
@@ -59,7 +61,7 @@ impl RiskSignal {
                 onboarding_decision_id: None,
                 reason_code,
                 created_at: Utc::now(),
-                verification_result_id: Some(vres_id),
+                verification_result_id: vres_id,
                 hidden: false,
                 vendor_api,
                 risk_signal_group_id: Some(rsg.id.clone()),
@@ -122,7 +124,6 @@ impl RiskSignal {
             .left_join(
                 onboarding_decision_verification_result_junction::table.on(
                     onboarding_decision_verification_result_junction::verification_result_id
-                        .nullable()
                         .eq(risk_signal::verification_result_id),
                 ),
             )
@@ -149,7 +150,7 @@ impl RiskSignal {
                     onboarding_decision_id: Some(onboarding_decision_id.clone()),
                     reason_code,
                     created_at: Utc::now(),
-                    verification_result_id: None,
+                    verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
                     hidden: false,
                     vendor_api,
                     risk_signal_group_id: None,
@@ -161,7 +162,7 @@ impl RiskSignal {
                     onboarding_decision_id: None,
                     reason_code,
                     created_at: Utc::now(),
-                    verification_result_id: Some(vres_id),
+                    verification_result_id: vres_id,
                     hidden: false,
                     vendor_api,
                     risk_signal_group_id: None,

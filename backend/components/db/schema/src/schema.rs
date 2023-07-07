@@ -528,7 +528,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        verification_result_id -> Nullable<Text>,
+        verification_result_id -> Text,
         hidden -> Bool,
         vendor_api -> Text,
         risk_signal_group_id -> Nullable<Text>,
