@@ -26,6 +26,8 @@ type CameraProps = {
   type?: CameraType;
 };
 
+const AUTO_CAPTURE_DELAY = 750;
+
 const Camera = ({
   children,
   disabled = false,
@@ -44,8 +46,10 @@ const Camera = ({
 
   useEffect(() => {
     if (isObjectDetected) {
-      timerId = setTimeout(takePhoto, 500);
+      timerId = setTimeout(takePhoto, AUTO_CAPTURE_DELAY);
       return () => clearTimeout(timerId);
+    } else {
+      resetAutoCapture();
     }
   }, [isObjectDetected]);
 
@@ -60,8 +64,8 @@ const Camera = ({
     if (!camera.current) return;
     setIsFlashing(true);
     const newPhoto = await camera.current.takePhoto({});
-    onPhotoTaken(newPhoto);
     resetAutoCapture();
+    onPhotoTaken(newPhoto);
     setIsFlashing(false);
   };
 

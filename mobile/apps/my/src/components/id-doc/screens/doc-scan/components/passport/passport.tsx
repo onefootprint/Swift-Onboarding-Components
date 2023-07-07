@@ -7,7 +7,7 @@ import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
-import Camera from '../scan';
+import Scan from '../scan';
 
 const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
@@ -36,14 +36,14 @@ const Passport = () => {
 
   return (
     <DocInstructions title={t('instructions')}>
-      <Camera
+      <Scan
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
         title={t('title')}
       >
         <Frame detector={detector} />
-      </Camera>
+      </Scan>
     </DocInstructions>
   );
 };

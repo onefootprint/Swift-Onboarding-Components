@@ -8,7 +8,7 @@ import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
-import Camera from '../scan';
+import Scan from '../scan';
 
 export type IdCardProps = {
   side: SubmitDocumentSide;
@@ -41,14 +41,14 @@ const IdCard = ({ side }: IdCardProps) => {
 
   return (
     <DocInstructions title={t(`instructions.${side}`)}>
-      <Camera
+      <Scan
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
         title={t(`title-${side}`)}
       >
         <Frame detector={detector} />
-      </Camera>
+      </Scan>
     </DocInstructions>
   );
 };
