@@ -1,4 +1,3 @@
-BEGIN;
 WITH sanbox_kyb_svids_missing_di AS (
   SELECT
     distinct(sv.id) scoped_vault_id
