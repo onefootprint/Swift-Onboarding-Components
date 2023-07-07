@@ -13,8 +13,8 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, ScopedVaultId, TenantId,
-    VaultKind, VendorAPI,
+    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, RiskSignalGroupKind,
+    ScopedVaultId, TenantId, VaultKind, VendorAPI,
 };
 
 use super::{sandbox, vendor};
@@ -136,10 +136,12 @@ pub async fn setup_kyb_test_fixtures(
             let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
             RiskSignal::bulk_create(
                 conn,
+                &sb.id,
                 signals
                     .into_iter()
                     .map(|s| (s.0, s.1, vres.id.clone()))
                     .collect::<Vec<_>>(),
+                RiskSignalGroupKind::Kyb,
             )?;
 
             let _biz_obd = OnboardingDecision::create(conn, new_decision)?;

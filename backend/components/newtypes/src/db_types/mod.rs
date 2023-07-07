@@ -23,6 +23,7 @@ mod onboarding_status;
 mod org_member_email;
 mod proxy_ingress_kind;
 mod requirement_status;
+mod risk_signal_group;
 mod sealed_bytes;
 mod session_kind;
 mod task_status;
@@ -41,7 +42,7 @@ pub use self::{
     data_priority::*, decision_intent_kind::*, decision_status::*, document_request_status::*,
     document_side::*, fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, incode::*,
     liveness_source::*, manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*,
-    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, sealed_bytes::*, session_kind::*,
-    task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vendor::*,
-    verification_status::*, watchlist_check::*, workflow::*,
+    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, risk_signal_group::*, sealed_bytes::*,
+    session_kind::*, task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*,
+    vault_kind::*, vendor::*, verification_status::*, watchlist_check::*, workflow::*,
 };

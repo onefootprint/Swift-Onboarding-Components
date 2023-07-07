@@ -1,13 +1,19 @@
 use crate::DbResult;
 use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::{onboarding_decision_verification_result_junction, risk_signal};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::RiskSignalGroupId;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
 use serde::{Deserialize, Serialize};
+
+use super::risk_signal_group::RiskSignalGroup;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = risk_signal)]
@@ -22,6 +28,7 @@ pub struct RiskSignal {
     pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
+    pub risk_signal_group_id: Option<RiskSignalGroupId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -33,14 +40,19 @@ pub struct NewRiskSignal {
     pub verification_result_id: Option<VerificationResultId>,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
+    pub risk_signal_group_id: Option<RiskSignalGroupId>,
 }
 
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
         signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+        risk_group_kind: RiskSignalGroupKind,
     ) -> DbResult<Vec<Self>> {
+        let rsg = RiskSignalGroup::create(conn.conn(), scoped_vault_id, risk_group_kind)?;
+
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
             .map(|(reason_code, vendor_api, vres_id)| NewRiskSignal {
@@ -50,12 +62,13 @@ impl RiskSignal {
                 verification_result_id: Some(vres_id),
                 hidden: false,
                 vendor_api,
+                risk_signal_group_id: Some(rsg.id.clone()),
             })
             .collect();
 
         let result = diesel::insert_into(risk_signal::table)
             .values(new_risk_signals)
-            .get_results::<Self>(conn)?;
+            .get_results::<Self>(conn.conn())?;
         Ok(result)
     }
 
@@ -139,6 +152,7 @@ impl RiskSignal {
                     verification_result_id: None,
                     hidden: false,
                     vendor_api,
+                    risk_signal_group_id: None,
                 })
                 .collect(),
             NewRiskSignals::NewVres { signals } => signals
@@ -150,6 +164,7 @@ impl RiskSignal {
                     verification_result_id: Some(vres_id),
                     hidden: false,
                     vendor_api,
+                    risk_signal_group_id: None,
                 })
                 .collect(),
         };

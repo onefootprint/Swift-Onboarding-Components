@@ -13,7 +13,9 @@ use db::models::{
 };
 
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{FootprintReasonCode, KycConfig, VaultKind, Vendor, VerificationResultId};
+use newtypes::{
+    FootprintReasonCode, KycConfig, RiskSignalGroupKind, VaultKind, Vendor, VerificationResultId,
+};
 use webhooks::WebhookClient;
 
 use super::{
@@ -217,7 +219,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let su = ScopedVault::get(conn, &self.sv_id)?;
         let tenant = Tenant::get(conn, &su.tenant_id)?;
 
-        RiskSignal::bulk_create(conn, reason_codes)?;
+        RiskSignal::bulk_create(conn, &self.sv_id, reason_codes, RiskSignalGroupKind::Kyc)?;
 
         common::save_kyc_decision(
             conn,

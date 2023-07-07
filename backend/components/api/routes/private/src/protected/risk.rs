@@ -17,7 +17,9 @@ use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
-use newtypes::{DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId};
+use newtypes::{
+    DecisionStatus, FpId, TenantId, VaultKind, Vendor, VerificationRequestId, VerificationResultId,
+};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -206,7 +208,14 @@ async fn make_decision(
         .collect();
 
     let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
-    decision::engine::make_onboarding_decision(&ob, fv, &state.db_pool, vendor_result_ids.clone()).await?;
+    decision::engine::make_onboarding_decision(
+        &ob,
+        fv,
+        &state.db_pool,
+        vendor_result_ids.clone(),
+        VaultKind::Person,
+    )
+    .await?;
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 

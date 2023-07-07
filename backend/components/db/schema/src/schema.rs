@@ -531,6 +531,20 @@ table! {
         verification_result_id -> Nullable<Text>,
         hidden -> Bool,
         vendor_api -> Text,
+        risk_signal_group_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
+    risk_signal_group (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        kind -> Text,
     }
 }
 
@@ -911,7 +925,9 @@ joinable!(proxy_config_server_cert -> proxy_config (config_id));
 joinable!(proxy_request_log -> proxy_config (config_id));
 joinable!(proxy_request_log -> tenant (tenant_id));
 joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
+joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
 joinable!(risk_signal -> verification_result (verification_result_id));
+joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
 joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
@@ -975,6 +991,7 @@ allow_tables_to_appear_in_same_query!(
     proxy_config_server_cert,
     proxy_request_log,
     risk_signal,
+    risk_signal_group,
     scoped_vault,
     session,
     socure_device_session,

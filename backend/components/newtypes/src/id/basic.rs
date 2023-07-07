@@ -171,3 +171,4 @@ define_newtype_id!(
 define_newtype_id!(WorkflowId, String, "Identifier for a workflow");
 define_newtype_id!(WorkflowEventId, String, "Identifier for a workflow_event");
 define_newtype_id!(S3Url, String, "URL to S3 for document data");
+define_newtype_id!(RiskSignalGroupId, String, "Identifier for a risk_signal_group");

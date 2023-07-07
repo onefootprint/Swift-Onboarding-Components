@@ -1020,6 +1020,22 @@ impl FootprintReasonCode {
     }
 }
 
+impl FootprintReasonCode {
+    #[allow(unused)]
+    pub fn is_watchlist(&self) -> bool {
+        matches!(
+            self,
+            FootprintReasonCode::WatchlistHitOfac
+                | FootprintReasonCode::WatchlistHitNonSdn
+                | FootprintReasonCode::WatchlistHitPep
+        )
+    }
+
+    pub fn is_adverse_media(&self) -> bool {
+        matches!(self, FootprintReasonCode::AdverseMediaHit)
+    }
+}
+
 #[derive(
     Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema, Hash,
 )]

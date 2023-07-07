@@ -41,8 +41,8 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId,
-    VerificationResultId, WorkflowId,
+    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, RiskSignalGroupKind, ScopedVaultId,
+    VaultKind, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 
@@ -51,6 +51,7 @@ pub async fn make_onboarding_decision<T>(
     fv: T,
     db_pool: &DbPool,
     verification_result_ids: Vec<VerificationResultId>,
+    vault_kind: VaultKind,
 ) -> ApiResult<()>
 where
     T: FeatureVector + Send + Sync,
@@ -64,7 +65,11 @@ where
             // Save/action/emit risk signals for the decision
 
             // TODO: remove make_onboarding_decision entirely. used only by the now dead engine::run and the private/protected/make_decision endpoint
-            RiskSignal::bulk_create(conn, reason_codes)?;
+            let rsg_kind = match vault_kind {
+                VaultKind::Person => RiskSignalGroupKind::Kyc,
+                VaultKind::Business => RiskSignalGroupKind::Kyb,
+            };
+            RiskSignal::bulk_create(conn, &ob.scoped_vault_id, reason_codes, rsg_kind)?;
 
             save_onboarding_decision(
                 conn,

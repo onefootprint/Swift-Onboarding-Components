@@ -27,7 +27,7 @@ use idv::incode::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, AlpacaKycConfig, DecisionStatus, FootprintReasonCode,
-    OnboardingStatus, ReasonCode, ReviewReason, Vendor, VendorAPI, VerificationResultId,
+    OnboardingStatus, ReasonCode, ReviewReason, RiskSignalGroupKind, Vendor, VendorAPI, VerificationResultId,
 };
 use webhooks::WebhookClient;
 
@@ -35,7 +35,7 @@ use crate::{
     auth::tenant::AuthActor,
     decision::{
         self,
-        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        onboarding::{Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput},
         review::save_review_decision,
         state::{
             actions::{MakeDecision, WorkflowActions},
@@ -231,7 +231,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
 
-        RiskSignal::bulk_create(conn, reason_codes)?;
+        RiskSignal::bulk_create(conn, &self.sv_id, reason_codes, RiskSignalGroupKind::Kyc)?;
 
         match decision.decision.decision_status {
             DecisionStatus::Fail => {
@@ -438,8 +438,22 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             },
         };
 
-        // write reason codes from WatchlistCheck
-        RiskSignal::bulk_create(conn, wc_reason_codes.clone())?;
+        let (adverse_media_reason_codes, watchlist_reason_codes) =
+            partition_adverse_media_watchlist_reason_codes(wc_reason_codes.clone());
+
+        // write reason codes from Incode watchlist/am
+        RiskSignal::bulk_create(
+            conn,
+            &self.sv_id,
+            adverse_media_reason_codes,
+            RiskSignalGroupKind::AdverseMedia,
+        )?;
+        RiskSignal::bulk_create(
+            conn,
+            &self.sv_id,
+            watchlist_reason_codes,
+            RiskSignalGroupKind::Watchlist,
+        )?;
 
         // For now, we need to re-run the KYC decisioning so we can get reason codes
         // and have these written at the same time as the Watchlist reason codes
@@ -693,9 +707,18 @@ fn get_review_reasons(wc_reason_codes: &[(FootprintReasonCode)], collected_doc: 
     reasons
 }
 
+fn partition_adverse_media_watchlist_reason_codes(
+    reason_codes: DecisionReasonCodes,
+) -> (DecisionReasonCodes, DecisionReasonCodes) {
+    reason_codes
+        .into_iter()
+        .partition(|(frc, _, _)| frc.is_adverse_media())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str::FromStr;
     use test_case::test_case;
 
     #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac)], false => vec![ReviewReason::WatchlistHit])]
@@ -710,5 +733,22 @@ mod tests {
         collected_doc: bool,
     ) -> Vec<ReviewReason> {
         get_review_reasons(&wc_reason_codes, collected_doc)
+    }
+
+    fn drc(frc: FootprintReasonCode) -> (FootprintReasonCode, VendorAPI, VerificationResultId) {
+        (
+            frc,
+            VendorAPI::IncodeWatchlistCheck,
+            VerificationResultId::from_str("123").unwrap(),
+        )
+    }
+
+    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac)] => (vec![], vec![drc(FootprintReasonCode::WatchlistHitOfac)]))]
+    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)] => (vec![], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
+    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn), drc(FootprintReasonCode::AdverseMediaHit)] => (vec![drc(FootprintReasonCode::AdverseMediaHit)], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
+    fn test_partition_adverse_media_watchlist_reason_codes(
+        wc_reason_codes: DecisionReasonCodes,
+    ) -> (DecisionReasonCodes, DecisionReasonCodes) {
+        partition_adverse_media_watchlist_reason_codes(wc_reason_codes)
     }
 }
