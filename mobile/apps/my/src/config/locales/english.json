@@ -136,12 +136,18 @@
         },
         "instructions": {
           "front": "Scan the front side of your driver's license",
-          "back": "Scan the bakc side of your driver's license"
+          "back": "Scan the back side of your driver's license"
         }
       },
       "id-card": {
-        "title-front": "ID Card - Front side",
-        "back-front": "ID Card - Back side"
+        "title": {
+          "front": "ID Card - Front side",
+          "back": "ID Card - Back side"
+        },
+        "instructions": {
+          "front": "Scan the front side of your id card",
+          "back": "Scan the back side of your id card"
+        }
       },
       "passport": {
         "title": "Passport",

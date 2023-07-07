@@ -7,6 +7,7 @@ import { detectDocument } from 'vision-camera-plugin-document';
 import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
+import DocInstructions from '../doc-instructions';
 import Camera from '../scan';
 
 export type IdCardProps = {
@@ -39,14 +40,16 @@ const IdCard = ({ side }: IdCardProps) => {
   );
 
   return (
-    <Camera
-      feedback={feedback}
-      frameProcessor={frameProcessor}
-      isObjectDetected={objectedDetected}
-      title={t(`title-${side}`)}
-    >
-      <Frame detector={detector} />
-    </Camera>
+    <DocInstructions title={t(`instructions.${side}`)}>
+      <Camera
+        feedback={feedback}
+        frameProcessor={frameProcessor}
+        isObjectDetected={objectedDetected}
+        title={t(`title-${side}`)}
+      >
+        <Frame detector={detector} />
+      </Camera>
+    </DocInstructions>
   );
 };
 
