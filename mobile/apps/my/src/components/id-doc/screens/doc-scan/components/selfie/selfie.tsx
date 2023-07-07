@@ -10,6 +10,7 @@ import useTranslation from '@/hooks/use-translation';
 import Camera from '../scan';
 import ConsentDialog from './components/consent-dialog';
 import Frame from './components/frame';
+import Instructions from './components/instructions';
 
 export type SelfieProps = {
   authToken: string;
@@ -41,7 +42,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
         runOnJS(setObjectDetected)(false);
 
         if (!result.hasFace) {
-          runOnJS(setFeedback)('Detecting...');
+          runOnJS(setFeedback)('Position your face within the frame');
           return;
         }
         if (!result.isFaceInCenter) {
@@ -57,7 +58,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
   );
 
   return (
-    <>
+    <Instructions>
       <Camera
         disabled={isCameraDisabled}
         frameProcessor={frameProcessor}
@@ -76,7 +77,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
           }}
         />
       )}
-    </>
+    </Instructions>
   );
 };
 

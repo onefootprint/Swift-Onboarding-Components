@@ -32,7 +32,7 @@ const IdCard = ({ side }: IdCardProps) => {
         runOnJS(setFeedback)('Hold still...');
       } else {
         detector.value = false;
-        runOnJS(setFeedback)('Detecting...');
+        runOnJS(setFeedback)('Position the document in view');
         runOnJS(setObjectDetected)(false);
       }
     },

@@ -96,7 +96,9 @@
           "auto-capture": "Image will be captured automatically",
           "cta": "Continue"
         },
-        "face": {
+        "selfie": {
+          "title": "Take a selfie",
+          "subtitle": "This will allow us to validate the ID you uploaded in the previous step.",
           "frame": "Position your face within the frame",
           "steady": "Hold your device steady",
           "auto-capture": "Selfie will be captured automatically",
@@ -155,6 +157,7 @@
       },
       "selfie": {
         "title": "Selfie",
+        "instructions": "Scan the photo page of your passport",
         "warnings": {
           "no-face": "Unable to detect a face",
           "not-centralized": "Center your face",
