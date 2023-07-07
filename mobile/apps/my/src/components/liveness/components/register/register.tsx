@@ -34,7 +34,7 @@ const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
       {registerBiometric.isSuccess ? (
         <Success />
       ) : (
-        <Box width="100%" gap={4}>
+        <Box width="100%" gap={7}>
           <Button onPress={handlePress} loading={registerBiometric.isLoading}>
             {t('cta')}
           </Button>
