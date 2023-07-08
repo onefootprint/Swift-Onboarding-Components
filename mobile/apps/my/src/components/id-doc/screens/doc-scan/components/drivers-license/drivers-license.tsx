@@ -14,6 +14,8 @@ export type DriversLicenseProps = {
   side: SubmitDocumentSide;
 };
 
+const DEFAULT_ASPECT_RATIO = 1.586;
+
 const DriversLicense = ({ side }: DriversLicenseProps) => {
   const { t, allT } = useTranslation('components.scan.drivers-license');
   const [feedback, setFeedback] = useState('');
@@ -48,7 +50,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
         subtitle={allT(`doc-side.${side}`)}
         title={t('title')}
       >
-        <Frame detector={detector} />
+        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>
     </DocInstructions>
   );

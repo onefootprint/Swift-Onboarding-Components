@@ -14,6 +14,8 @@ export type IdCardProps = {
   side: SubmitDocumentSide;
 };
 
+const DEFAULT_ASPECT_RATIO = 1.586;
+
 const IdCard = ({ side }: IdCardProps) => {
   const { t, allT } = useTranslation('components.scan.id-card');
   const [feedback, setFeedback] = useState('');
@@ -48,7 +50,7 @@ const IdCard = ({ side }: IdCardProps) => {
         subtitle={allT(`doc-side.${side}`)}
         title={t('title')}
       >
-        <Frame detector={detector} />
+        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>
     </DocInstructions>
   );

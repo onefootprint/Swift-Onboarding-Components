@@ -9,6 +9,8 @@ import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
 import Scan from '../scan';
 
+const DEFAULT_ASPECT_RATIO = 1.42;
+
 const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
   const [feedback, setFeedback] = useState('');
@@ -42,7 +44,7 @@ const Passport = () => {
         isObjectDetected={objectedDetected}
         title={t('title')}
       >
-        <Frame detector={detector} />
+        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>
     </DocInstructions>
   );
