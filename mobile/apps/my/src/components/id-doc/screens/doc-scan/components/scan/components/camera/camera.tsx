@@ -1,8 +1,14 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
+import Reanimated, {
+  useAnimatedProps,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import {
   Camera as VisionCamera,
+  CameraProps as VisionCameraProps,
   PhotoFile,
   useCameraDevices,
 } from 'react-native-vision-camera';
@@ -12,6 +18,11 @@ import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
 import Header from './components/header';
+
+const ReanimatedCamera = Reanimated.createAnimatedComponent(VisionCamera);
+Reanimated.addWhitelistedNativeProps({
+  zoom: true,
+});
 
 let timerId: NodeJS.Timeout | null = null;
 
@@ -44,7 +55,16 @@ const Camera = ({
   const camera = useRef<VisionCamera>(null);
   const devices = useCameraDevices();
   const device = devices[type];
-  const zoom = device?.neutralZoom;
+  const zoom = useSharedValue(0);
+  const neutralZoom = device?.neutralZoom;
+  const animatedProps = useAnimatedProps<Partial<VisionCameraProps>>(
+    () => ({ zoom: zoom.value }),
+    [zoom],
+  );
+
+  useEffect(() => {
+    zoom.value = withSpring(neutralZoom);
+  }, [zoom, neutralZoom]);
 
   useEffect(() => {
     if (isObjectDetected) {
@@ -80,12 +100,12 @@ const Camera = ({
         </Header>
         {device && (
           <StyledCamera
+            animatedProps={animatedProps}
             device={device}
             frameProcessor={frameProcessor}
             isActive={!disabled}
             photo
             ref={camera}
-            zoom={zoom}
           />
         )}
         {children}
@@ -108,7 +128,7 @@ const CameraContainer = styled.View`
   `}
 `;
 
-const StyledCamera = styled(VisionCamera)`
+const StyledCamera = styled(ReanimatedCamera)`
   height: 100%;
   width: 100%;
 `;
