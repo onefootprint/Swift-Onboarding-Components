@@ -18,7 +18,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ""
+      prefix: ''
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -89,7 +89,7 @@ config:
       webhookSecret:
         secure: v1:JwLRbuAPf0pSaGKC:UXrgvZZ1LmLXmmeJcWGekg40tnmEvCkKhj/cYVcVu4jRmHDxppMyTpZArO/D3Picu1rEGh2UgiAMTKZfSFzBTZo=
     resources:
-      cpuUnits: 2048
+      cpuUnits: 4096
       maxInstances: 50
       memoryMB: 16384
       minInstances: 6
@@ -123,8 +123,8 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: "+13393311410"
-      phoneNumber: "+15105883668"
+      integrationTestPhoneNumber: '+13393311410'
+      phoneNumber: '+15105883668'
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
