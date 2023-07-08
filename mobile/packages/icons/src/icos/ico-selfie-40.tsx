@@ -7,14 +7,7 @@ import type { IconProps } from '../types';
 const IcoSelfie40 = ({ color = 'primary', style }: IconProps) => {
   const theme = useTheme();
   return (
-    <Svg
-      width={40}
-      height={41}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={style}
-      aria-hidden={true}
-    >
+    <Svg width={40} height={41} fill="none" style={style} aria-hidden={true}>
       <Circle cx={16.5} cy={17} r={2} fill={theme.color[color]} />
       <Circle cx={23.5} cy={17} r={2} fill={theme.color[color]} />
       <Path

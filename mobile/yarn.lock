@@ -3661,11 +3661,6 @@
   resolved "https://registry.npmjs.org/@react-native-community/slider/-/slider-4.4.2.tgz"
   integrity sha512-D9bv+3Vd2gairAhnRPAghwccgEmoM7g562pm8i4qB3Esrms5mggF81G3UvCyc0w3jjtFHh8dpQkfEoKiP0NW/Q==
 
-"@react-native-masked-view/masked-view@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.npmjs.org/@react-native-masked-view/masked-view/-/masked-view-0.2.8.tgz"
-  integrity sha512-+1holBPDF1yi/y0uc1WB6lA5tSNHhM7PpTMapT3ypvSnKQ9+C6sy/zfjxNxRA/llBQ1Ci6f94EaK56UCKs5lTA==
-
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@react-native/assets/-/assets-1.0.0.tgz"
@@ -15932,11 +15927,6 @@ react-native-app-clip@^0.1.2:
     "@react-native-community/cli" "^10.2.0"
     expo "~48.0.4"
 
-react-native-base64@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.npmjs.org/react-native-base64/-/react-native-base64-0.2.1.tgz"
-  integrity sha512-eHgt/MA8y5ZF0aHfZ1aTPcIkDWxza9AaEk4GcpIX+ZYfZ04RcaNahO+527KR7J44/mD3efYfM23O2C1N44ByWA==
-
 react-native-builder-bob@^0.20.4:
   version "0.20.4"
   resolved "https://registry.yarnpkg.com/react-native-builder-bob/-/react-native-builder-bob-0.20.4.tgz#02df01b8dc02f1bb2d566f820e33c5d42bfb9c99"
@@ -18849,10 +18839,10 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vision-camera-plugin-document@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.7.0.tgz#73c38869a07a23e8379d0749d08e4e4c5c4825b0"
-  integrity sha512-xl4twqEcnBAhelW88TLHzCFCKZfyNEoAWW+vUXymJOtik28riebifsxWZPcIg0m7hQnnQqnfVTOAwrbSqcogrA==
+vision-camera-plugin-document@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.7.1.tgz#eb2f0f3c317167433d7153f11b5019943fbea5c6"
+  integrity sha512-VC6WA7hEi1L2Je5f1904902MvcAMdgxnPMsrv+PobVmNHGM3WHawlX8uZSLxnrluba+ARj+IURuHAwdbG4Ctyw==
 
 vision-camera-plugin-face-detection@^0.8.0:
   version "0.8.0"

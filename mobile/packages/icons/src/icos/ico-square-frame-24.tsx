@@ -8,14 +8,7 @@ import type { IconProps } from '../types';
 const IcoSquareFrame24 = ({ color = 'primary', style }: IconProps) => {
   const theme = useTheme();
   return (
-    <Svg
-      width={24}
-      height={28}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={style}
-      aria-hidden={true}
-    >
+    <Svg width={24} height={28} fill="none" style={style} aria-hidden={true}>
       <G filter="url(#prefix__a)">
         <Path
           fillRule="evenodd"

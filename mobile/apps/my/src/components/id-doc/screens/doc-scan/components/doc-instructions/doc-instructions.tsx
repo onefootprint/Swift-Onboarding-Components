@@ -42,7 +42,7 @@ const DocInstructions = ({ title, children }: DocInstructionsProps) => {
   };
 
   return show ? (
-    children
+    <Box>{children}</Box>
   ) : (
     <Container>
       <Box flex={1} justifyContent="space-between">

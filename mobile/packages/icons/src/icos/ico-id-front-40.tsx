@@ -7,14 +7,7 @@ import type { IconProps } from '../types';
 const IcoIdFront40 = ({ color = 'primary', style }: IconProps) => {
   const theme = useTheme();
   return (
-    <Svg
-      width={40}
-      height={40}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={style}
-      aria-hidden={true}
-    >
+    <Svg width={40} height={40} fill="none" style={style} aria-hidden={true}>
       <Ellipse
         cx={13.454}
         cy={13.455}

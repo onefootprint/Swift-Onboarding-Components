@@ -9,11 +9,11 @@ import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-type DocInstructionsProps = {
+type InstructionsProps = {
   children?: React.ReactNode;
 };
 
-const DocInstructions = ({ children }: DocInstructionsProps) => {
+const Instructions = ({ children }: InstructionsProps) => {
   const { t } = useTranslation('components.scan.instructions.selfie');
   const [show, setShow] = useState(false);
   const options = [
@@ -36,7 +36,7 @@ const DocInstructions = ({ children }: DocInstructionsProps) => {
   };
 
   return show ? (
-    children
+    <Box>{children}</Box>
   ) : (
     <Container>
       <Box flex={1} justifyContent="space-between">
@@ -75,4 +75,4 @@ const DocInstructions = ({ children }: DocInstructionsProps) => {
   );
 };
 
-export default DocInstructions;
+export default Instructions;

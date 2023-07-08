@@ -493,7 +493,7 @@ PODS:
     - React-RCTImage
   - RNSVG (13.9.0):
     - React-Core
-  - vision-camera-plugin-document (0.7.0):
+  - vision-camera-plugin-document (0.7.1):
     - React-Core
   - vision-camera-plugin-face-detection (0.8.0):
     - React-Core
@@ -757,11 +757,11 @@ SPEC CHECKSUMS:
   RNReanimated: addc4900bf47882118d0a1b21747fa6705fa8cff
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
-  vision-camera-plugin-document: 33ba78e7b99ec01293517bb90bcbd0f937e49066
+  vision-camera-plugin-document: 07cbe03b0386ac2ba3176e4e5359c73283e458b3
   vision-camera-plugin-face-detection: 0d203ca501d02ec9e174c4c67eb31e3360a0da34
   VisionCamera: c6356b309f7b8e185b7be2e703ec67bb35acf345
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
 
-PODFILE CHECKSUM: f10f54319364ba8044f3d96d749cef0f48305b6d
+PODFILE CHECKSUM: cc57c7dd519cd5eee55ef0bef11d0aecbbafc818
 
 COCOAPODS: 1.12.1
