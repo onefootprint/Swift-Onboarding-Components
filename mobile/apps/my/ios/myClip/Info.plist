@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8.1</string>
+	<string>1.8.7</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -53,8 +53,10 @@
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
-		</dict>
+		</dict>	
 	</dict>
+	<key>NSMotionUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs access to your Motion.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Need to access your camera to capture a photo add and update profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

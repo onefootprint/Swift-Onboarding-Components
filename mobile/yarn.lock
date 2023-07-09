@@ -18839,15 +18839,15 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vision-camera-plugin-document@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.7.1.tgz#eb2f0f3c317167433d7153f11b5019943fbea5c6"
-  integrity sha512-VC6WA7hEi1L2Je5f1904902MvcAMdgxnPMsrv+PobVmNHGM3WHawlX8uZSLxnrluba+ARj+IURuHAwdbG4Ctyw==
-
-vision-camera-plugin-face-detection@^0.8.0:
+vision-camera-plugin-document@^0.8.0:
   version "0.8.0"
-  resolved "https://registry.npmjs.org/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.8.0.tgz"
-  integrity sha512-pjF6CbGSj8yKGY7DxpSGz0ro/WPuDGMXPtYnp5Gpaosn8Yxj7JYACMe3jzNgWqpNO+NVf7CdN9w4f9QEQ+5Quw==
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.8.0.tgz#7bff3229b5c25f31ca25c3146cf8972b59bdfb1b"
+  integrity sha512-Dx6bXORNX+jeP/OZsYZLoA3Dk+dwapEzPJwhTjRwAumAouY9PGNG5fomTROkZmdQXghPYfw39C5lr+u49oY1eA==
+
+vision-camera-plugin-face-detection@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.8.2.tgz#b895380b7d300fb58799612cbfb1dc9fdcbc8629"
+  integrity sha512-h/V7Qe5sSEyHBG4i/A20bY6nniyCzFhrf3MuQtfirHcSNJIbLG0eWJoU1PoBRqNXwp5uA5Q/8StgzRQrH5ZjnA==
 
 vlq@^1.0.0:
   version "1.0.1"

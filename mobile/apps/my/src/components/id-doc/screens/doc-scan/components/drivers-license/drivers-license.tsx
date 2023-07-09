@@ -28,14 +28,14 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
 
       const options = {};
       const result = detectDocument(frame, options);
-      if (result.is_document) {
+      if (result.isDocument) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
         runOnJS(setFeedback)('Hold still...');
       } else {
         detector.value = false;
-        runOnJS(setFeedback)('Position the document in view');
         runOnJS(setObjectDetected)(false);
+        runOnJS(setFeedback)('Position the document in view');
       }
     },
     [detector],

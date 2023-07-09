@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --external react react-native react-native-reanimated",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "tsup src/index.tsx --format esm,cjs --watch --external react react-native react-native-reanimated",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --external react react-native react-native-reanimated",
     "lint": "eslint src --fix",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit"

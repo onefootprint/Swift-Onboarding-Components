@@ -60,13 +60,12 @@ const Preview = ({ title, subtitle, onReset, photo, size }: PreviewProps) => {
               </Typography>
             )}
           </Box>
-          <Box width="100%" height={imageHeight}>
+          <Box height={imageHeight}>
             <PreviewImg
               hasError={isError}
               height={imageHeight}
               size={size}
               source={{ uri: photo.path }}
-              width="100%"
             />
           </Box>
           {isError && <Errors errors={errors} />}

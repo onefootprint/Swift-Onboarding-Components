@@ -52,8 +52,8 @@
     "react-native-screens": "~3.20.0",
     "react-native-svg": "^13.9.0",
     "react-native-vision-camera": "^2.15.4",
-    "vision-camera-plugin-document": "^0.7.1",
-    "vision-camera-plugin-face-detection": "^0.8.0",
+    "vision-camera-plugin-document": "^0.8.0",
+    "vision-camera-plugin-face-detection": "^0.8.2",
     "xstate": "^4.37.1",
     "zustand": "^4.3.8"
   },

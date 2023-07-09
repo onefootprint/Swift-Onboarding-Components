@@ -33,7 +33,12 @@ const Selfie = ({ authToken }: SelfieProps) => {
       const options = { width, height };
       const result = detectFace(frame, options);
 
-      if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
+      if (
+        result.hasFace &&
+        result.isFaceInCenter &&
+        result.isFaceStraight &&
+        result.isStable
+      ) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
         runOnJS(setFeedback)('Hold still...');
@@ -41,8 +46,8 @@ const Selfie = ({ authToken }: SelfieProps) => {
         detector.value = false;
         runOnJS(setObjectDetected)(false);
 
-        if (!result.hasFace) {
-          runOnJS(setFeedback)('Position your face within the frame');
+        if (!result.hasFace || !result.isStable) {
+          runOnJS(setFeedback)('Position face, stay steady');
           return;
         }
         if (!result.isFaceInCenter) {
@@ -64,6 +69,7 @@ const Selfie = ({ authToken }: SelfieProps) => {
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
+        size="large"
         title={t('title')}
         type="front"
       >

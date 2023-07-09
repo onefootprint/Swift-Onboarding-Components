@@ -1,14 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
-import Reanimated, {
-  useAnimatedProps,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
 import {
   Camera as VisionCamera,
-  CameraProps as VisionCameraProps,
   PhotoFile,
   useCameraDevices,
 } from 'react-native-vision-camera';
@@ -18,11 +12,6 @@ import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
 import Header from './components/header';
-
-const ReanimatedCamera = Reanimated.createAnimatedComponent(VisionCamera);
-Reanimated.addWhitelistedNativeProps({
-  zoom: true,
-});
 
 let timerId: NodeJS.Timeout | null = null;
 
@@ -38,7 +27,7 @@ type CameraProps = {
   type?: ScanType;
 };
 
-const AUTO_CAPTURE_DELAY = 750;
+const AUTO_CAPTURE_DELAY = 600;
 
 const Camera = ({
   children,
@@ -53,18 +42,10 @@ const Camera = ({
 }: CameraProps) => {
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
+  const [showFeedback, setShowFeedback] = useState(true);
   const devices = useCameraDevices();
   const device = devices[type];
-  const zoom = useSharedValue(0);
-  const neutralZoom = device?.neutralZoom;
-  const animatedProps = useAnimatedProps<Partial<VisionCameraProps>>(
-    () => ({ zoom: zoom.value }),
-    [zoom],
-  );
-
-  useEffect(() => {
-    zoom.value = withSpring(neutralZoom);
-  }, [zoom, neutralZoom]);
+  const zoom = device?.neutralZoom ?? 1;
 
   useEffect(() => {
     if (isObjectDetected) {
@@ -85,6 +66,7 @@ const Camera = ({
   const takePhoto = async () => {
     if (!camera.current) return;
     setIsFlashing(true);
+    setShowFeedback(false);
     const newPhoto = await camera.current.takePhoto({});
     resetAutoCapture();
     onPhotoTaken(newPhoto);
@@ -100,18 +82,18 @@ const Camera = ({
         </Header>
         {device && (
           <StyledCamera
-            animatedProps={animatedProps}
             device={device}
             frameProcessor={frameProcessor}
             isActive={!disabled}
             photo
             ref={camera}
+            zoom={zoom}
           />
         )}
         {children}
         {isFlashing ? <Flash /> : null}
         <Buttons>
-          {feedback && <Feedback>{feedback}</Feedback>}
+          {showFeedback && feedback && <Feedback>{feedback}</Feedback>}
           <CaptureButton onPress={takePhoto} />
         </Buttons>
       </CameraContainer>
@@ -128,7 +110,7 @@ const CameraContainer = styled.View`
   `}
 `;
 
-const StyledCamera = styled(ReanimatedCamera)`
+const StyledCamera = styled(VisionCamera)`
   height: 100%;
   width: 100%;
 `;
