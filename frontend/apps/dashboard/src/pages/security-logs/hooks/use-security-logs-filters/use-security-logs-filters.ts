@@ -5,7 +5,8 @@ import useRequestParams from './hooks/use-request-params';
 import { SecurityLogsQueryString } from './use-security-logs-filters.types';
 
 const defaultQueryString = {
-  data_attributes: undefined,
+  data_attributes_business: undefined,
+  data_attributes_personal: undefined,
   date_range: undefined,
   search: undefined,
 };

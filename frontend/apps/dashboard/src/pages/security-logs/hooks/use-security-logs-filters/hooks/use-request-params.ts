@@ -5,7 +5,8 @@ import { SecurityLogsFilterValues } from '../use-security-logs-filters.types';
 
 const useRequestParams = ({
   dateRange,
-  dataAttributes,
+  dataAttributesBusiness,
+  dataAttributesPersonal,
   search,
 }: SecurityLogsFilterValues) => {
   const requestParams = useMemo(() => {
@@ -24,11 +25,15 @@ const useRequestParams = ({
     if (search) {
       params.search = search;
     }
-    if (dataAttributes.length) {
-      params.targets = dataAttributes.join();
+    if (dataAttributesBusiness.length || dataAttributesPersonal.length) {
+      const mergedAttrs = [
+        ...dataAttributesBusiness,
+        ...dataAttributesPersonal,
+      ];
+      params.targets = mergedAttrs.join();
     }
     return params;
-  }, [dateRange, search, dataAttributes]);
+  }, [dateRange, search, dataAttributesBusiness, dataAttributesPersonal]);
 
   return requestParams;
 };

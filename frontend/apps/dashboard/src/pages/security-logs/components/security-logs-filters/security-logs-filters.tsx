@@ -13,8 +13,8 @@ const SecurityLogsFilters = () => {
     <Filters
       controls={[
         {
-          query: 'data_attributes',
-          label: t('attributes.label'),
+          query: 'data_attributes_personal',
+          label: t('attributes.id.label'),
           kind: 'multi-select-grouped',
           options: [
             {
@@ -84,6 +84,14 @@ const SecurityLogsFilters = () => {
                 },
               ],
             },
+          ],
+          selectedOptions: filters.values.dataAttributesPersonal ?? [],
+        },
+        {
+          query: 'data_attributes_business',
+          label: t('attributes.business.label'),
+          kind: 'multi-select-grouped',
+          options: [
             {
               label: t('attributes.business.basic.title'),
               options: [
@@ -143,7 +151,7 @@ const SecurityLogsFilters = () => {
               ],
             },
           ],
-          selectedOptions: filters.values.dataAttributes,
+          selectedOptions: filters.values.dataAttributesBusiness ?? [],
         },
         {
           query: 'date_range',

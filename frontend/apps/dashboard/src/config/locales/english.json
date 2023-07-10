@@ -1049,24 +1049,25 @@
       },
       "filters": {
         "attributes": {
-          "label": "Data attributes",
           "id": {
+            "label": "Personal data",
             "basic": {
-              "title": "Personal basic data"
+              "title": "Basic data"
             },
             "identity": {
-              "title": "Personal identity data"
+              "title": "Identity data"
             },
             "address": {
-              "title": "Personal address data"
+              "title": "Address data"
             }
           },
           "business": {
+            "label": "Business data",
             "basic": {
-              "title": "Business basic data"
+              "title": "Basic data"
             },
             "address": {
-              "title": "Business address data"
+              "title": "Address data"
             }
           }
         },

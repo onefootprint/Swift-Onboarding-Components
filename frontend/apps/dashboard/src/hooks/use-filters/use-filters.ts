@@ -8,13 +8,10 @@ const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
   const router = useRouter();
 
   const push = (newQuery: T) => {
-    router.push(
-      { query: clean(router.query, newQuery as ParsedUrlQuery) },
-      undefined,
-      {
-        shallow: true,
-      },
-    );
+    const query = clean(router.query, newQuery as ParsedUrlQuery);
+    router.push({ query }, undefined, {
+      shallow: true,
+    });
   };
 
   const clear = () => {

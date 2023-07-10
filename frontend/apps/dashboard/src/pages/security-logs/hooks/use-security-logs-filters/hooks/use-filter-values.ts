@@ -13,18 +13,25 @@ const useFilterValues = (
   const filterValues = useMemo(() => {
     const search = query.search || '';
     const dateRange = queryToArray(query.date_range);
-    let dataAttributes = queryToArray(query.data_attributes);
+    let dataAttributesPersonal = queryToArray(query.data_attributes_personal);
+    const dataAttributesBusiness = queryToArray(query.data_attributes_business);
 
-    if (dataAttributes.includes(IdDI.ssn9)) {
-      dataAttributes = [...dataAttributes, IdDI.ssn4];
+    if (dataAttributesPersonal.includes(IdDI.ssn9)) {
+      dataAttributesPersonal = [...dataAttributesPersonal, IdDI.ssn4];
     }
 
     return {
-      dataAttributes,
+      dataAttributesPersonal,
+      dataAttributesBusiness,
       search,
       dateRange,
     };
-  }, [query.data_attributes, query.date_range, query.search]);
+  }, [
+    query.data_attributes_business,
+    query.data_attributes_personal,
+    query.date_range,
+    query.search,
+  ]);
   return filterValues;
 };
 
