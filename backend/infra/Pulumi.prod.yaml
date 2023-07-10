@@ -93,8 +93,8 @@ config:
       maxInstances: 50
       memoryMB: 16384
       minInstances: 6
-      targetCpuUtilization: 70
-      targetMemoryUtilization: 70
+      targetCpuUtilization: 60
+      targetMemoryUtilization: 60
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents
