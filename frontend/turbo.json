@@ -52,10 +52,6 @@
       "dependsOn": [],
       "outputs": []
     },
-    "test:e2e": {
-      "dependsOn": [],
-      "outputs": []
-    },
     "lint": {
       "dependsOn": [
         "^build"
@@ -96,12 +92,5 @@
     "set:dot-env": {
       "cache": false
     }
-  },
-  "globalDependencies": [
-    "tsconfig.json",
-    ".env.*"
-  ],
-  "globalEnv": [
-    "GITHUB_TOKEN"
-  ]
+  }
 }
