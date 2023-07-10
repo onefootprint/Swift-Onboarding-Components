@@ -30,7 +30,7 @@ const getSections = (content: string) => {
   // Code blocks might contain special characters like # header tags, so ignore these
   const regXCode = /```[a-zA-Z0-9]+?\n([\s\S]+?)\n```\n/gi;
   const contentWithoutCode = content.replaceAll(regXCode, '');
-  const regXHeader = /#{1,6}.+/g;
+  const regXHeader = /#{1,6}\s([^\n[\]`]+)\n/g;
   const sections = contentWithoutCode.match(regXHeader);
   return sections ? sections.map(getSectionMeta) : [];
 };
