@@ -1,21 +1,15 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::{
-    decision_intent::DecisionIntent,
-    onboarding::{Onboarding, OnboardingUpdate},
-    scoped_vault::ScopedVault,
-    vault::Vault,
-    workflow::Workflow as DbWorkflow,
-};
-use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{DocumentConfig, FootprintReasonCode, VaultKind, Vendor, VerificationResultId};
+use db::models::{vault::Vault, workflow::Workflow as DbWorkflow};
+use feature_flag::FeatureFlagClient;
+use newtypes::DocumentConfig;
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 use webhooks::WebhookClient;
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::{
-    onboarding::{FeatureVector, KycRuleGroup, OnboardingRulesDecisionOutput, RuleGroup},
+    onboarding::{KycRuleGroup, RuleGroup},
     rule::rule_sets,
     state::{
         actions::{DocCollected, WorkflowActions},
@@ -23,17 +17,15 @@ use crate::decision::{
         traits::HasRuleGroup,
         WorkflowState,
     },
-    utils::FixtureDecision,
 };
 use crate::{
     decision::{
-        self, engine,
-        state::{OnAction, StateError},
+        self,
+        state::OnAction,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
-    errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
-    ApiError, State,
+    errors::ApiResult,
+    State,
 };
 
 ///
@@ -74,7 +66,7 @@ pub struct DocumentComplete;
 /// ////////////////
 impl DocumentDataCollection {
     #[tracing::instrument("DocumentDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocumentDataCollection {
@@ -96,10 +88,9 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: DocCollected,
+        _action: DocCollected,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
 
@@ -107,7 +98,7 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
     }
 
     #[tracing::instrument("OnAction<DocCollected, DocumentState>::on_commit", skip_all)]
-    fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
+    fn on_commit(self, _tvc: TenantVendorControl, _conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
         Ok(DocumentState::from(DocumentDecisioning {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
@@ -132,7 +123,7 @@ impl WorkflowState for DocumentDataCollection {
 /// ////////////////
 impl DocumentDecisioning {
     #[tracing::instrument("DocumentDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
         let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocumentDecisioning {
@@ -144,7 +135,6 @@ impl DocumentDecisioning {
     }
 }
 
-type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     type AsyncRes = (
@@ -159,7 +149,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeDecision,
+        _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // TODO
@@ -179,7 +169,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let vault = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
-        let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
+        let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision, &vendor_results)?
         } else {
             common::get_decision(&self, conn, &vendor_results)?
@@ -220,7 +210,7 @@ impl WorkflowState for DocumentDecisioning {
 /// ////////////////
 impl DocumentComplete {
     #[tracing::instrument("DocumentComplete::init", skip_all)]
-    pub async fn init(_state: &State, workflow: DbWorkflow, config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
         Ok(DocumentComplete)
     }
 }

@@ -9,7 +9,6 @@ pub mod review;
 pub mod risk;
 pub mod rule;
 pub mod sandbox;
-#[allow(unused)]
 pub mod state;
 #[cfg(test)]
 pub mod tests;

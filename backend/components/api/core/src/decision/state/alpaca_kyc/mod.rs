@@ -4,8 +4,7 @@ pub mod states;
 mod tests;
 
 use super::{
-    actions::MakeDecision, traits::HasRuleGroup, DoAction, MakeVendorCalls, MakeWatchlistCheckCall,
-    StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
+    traits::HasRuleGroup, DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
 use crate::{
     decision::{

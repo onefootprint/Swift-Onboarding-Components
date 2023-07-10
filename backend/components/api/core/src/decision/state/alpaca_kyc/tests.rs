@@ -4,72 +4,49 @@ use crate::decision::state::test_utils::{
     mock_idology, mock_incode, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview,
     ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
 };
-use crate::decision::state::DocCollected;
-use crate::decision::state::ReviewCompleted;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::MakeWatchlistCheckCall;
 use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowKind;
 use crate::decision::state::WorkflowWrapper;
-use crate::decision::tests::test_helpers;
-use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-use crate::utils::mock_enclave::MockEnclave;
+
 use crate::{decision::state::alpaca_kyc::*, State};
 use api_wire_types::{CreateAnnotationRequest, DecisionRequest, TerminalDecisionStatus};
-use chrono::Utc;
-use db::models::manual_review::ManualReview;
-use db::models::ob_configuration::ObConfiguration;
+
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::RiskSignal;
-use db::models::scoped_vault::ScopedVault;
-use db::models::tenant::Tenant;
-use db::models::tenant_user::TenantUser;
-use db::models::tenant_vendor::TenantVendorControl;
-use db::models::verification_request::VerificationRequest;
-use db::models::workflow::NewWorkflow;
+
 use db::models::workflow::Workflow;
-use db::models::workflow_event::WorkflowEvent;
+
 use db::test_helpers::assert_have_same_elements;
-use db::tests::fixtures;
-use db::tests::test_db_pool::TestDbPool;
+
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
+
 use feature_flag::MockFeatureFlagClient;
-use idv::experian::ExperianCrossCoreRequest;
-use idv::experian::ExperianCrossCoreResponse;
-use idv::idology::IdologyExpectIDAPIResponse;
-use idv::idology::IdologyExpectIDRequest;
-use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::WatchlistResultResponse;
-use idv::incode::watchlist::IncodeWatchlistCheckRequest;
-use idv::incode::IncodeResponse;
-use idv::incode::IncodeStartOnboardingRequest;
-use idv::twilio::TwilioLookupV2APIResponse;
-use idv::twilio::TwilioLookupV2Request;
+
 use itertools::Itertools;
-use macros::{test_db_pool, test_state_case};
+use macros::test_state_case;
+use newtypes::FootprintReasonCode;
+use newtypes::OnboardingStatus;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
-    SealedVaultBytes, VendorAPI,
+    VendorAPI,
 };
-use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
-use newtypes::{FootprintReasonCode, TenantUserId};
-use newtypes::{KycConfig, ScopedVaultId};
-use newtypes::{KycState, WorkflowId, WorkflowState};
-use newtypes::{SignalSeverity, WorkflowConfig};
-use std::str::FromStr;
+
+use newtypes::WorkflowState;
+
 use std::sync::Arc;
 
-///
-///
-///
-///
+//
+//
+//
+//
 
 #[test_state_case(UserKind::Demo)]
 #[test_state_case(UserKind::Sandbox("pass"))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn pass(state: &mut State, user_kind: UserKind) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, _tu) =
         setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
@@ -77,7 +54,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     mock_ff_client
@@ -104,9 +81,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect webhook
     mock_webhooks(
         state,
@@ -118,33 +95,33 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
-    /// MakeVendorCalls
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
-    /// MakeDecision
+    // MakeDecision
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Pending, ob.status);
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
-    /// MakeWatchlistCheckCall
+    // MakeWatchlistCheckCall
     // Expect Webhooks
     mock_webhooks(
         state,
@@ -154,7 +131,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
             ExpectedRequiresManualReview(false),
         )],
     );
-    let (ww, _) = ww
+    let (_, _) = ww
         .action(
             state,
             WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
@@ -162,7 +139,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
     let obd = obd.unwrap();
@@ -210,7 +187,7 @@ async fn pass_then_watchlist_hit(
     user_kind: UserKind,
     review_decision: TerminalDecisionStatus,
 ) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, tu) =
         setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
@@ -218,7 +195,7 @@ async fn pass_then_watchlist_hit(
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     let tenant_id = tenant.id.clone();
@@ -246,9 +223,9 @@ async fn pass_then_watchlist_hit(
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect Webhooks
     mock_webhooks(
         state,
@@ -260,26 +237,26 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
-    /// MakeVendorCalls
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
-    /// MakeDecision
+    // MakeDecision
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Pending, ob.status);
@@ -296,7 +273,7 @@ async fn pass_then_watchlist_hit(
         )],
     );
 
-    /// MakeWatchlistCheckCall
+    // MakeWatchlistCheckCall
     let (ww, _) = ww
         .action(
             state,
@@ -305,7 +282,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
     // manual_review should exist and have correct review_reasons
@@ -349,7 +326,7 @@ async fn pass_then_watchlist_hit(
         TerminalDecisionStatus::Fail => {}
     }
 
-    let (ww, _) = ww
+    let (_, _) = ww
         .action(
             state,
             WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
@@ -366,13 +343,13 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     match review_decision {
         TerminalDecisionStatus::Pass => {
             assert_eq!(OnboardingStatus::Pass, ob.status);
-            assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+            assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id: _ }));
             assert!(!rs.is_empty()); // sanity check since we made a new OBD
         }
         TerminalDecisionStatus::Fail => {
@@ -394,7 +371,7 @@ async fn pass_then_watchlist_hit(
 #[test_state_case(UserKind::Sandbox("stepup"))]
 #[tokio::test]
 async fn step_up(state: &mut State, user_kind: UserKind) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, tu) =
         setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
@@ -402,7 +379,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     mock_ff_client
@@ -432,9 +409,9 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect Webhook
     mock_webhooks(
         state,
@@ -449,7 +426,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state);
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
@@ -470,7 +447,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         )],
     );
 
-    /// DocCollected
+    // DocCollected
     let ww = ww
         .run(
             state,
@@ -479,7 +456,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(obd.is_some());
@@ -522,7 +499,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
         vec![],
     );
-    let (ww, _) = ww
+    let (_, _) = ww
         .action(
             state,
             WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
@@ -539,11 +516,11 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, ob.status);
-    assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id }));
+    assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id: _ }));
     assert!(!rs.is_empty()); // sanity check since we made a new OBD
 }
 
@@ -551,7 +528,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn fail(state: &mut State, user_kind: UserKind) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, _tu) =
         setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
@@ -559,7 +536,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     let tenant_id = tenant.id.clone();
@@ -589,9 +566,9 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect Webhooks
     mock_webhooks(
         state,
@@ -603,21 +580,21 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
-    /// MakeVendorCalls
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
     // Expect Webhook
-    let expect_review = match user_kind {
+    let _expect_review = match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => false,
         UserKind::Live => {
             // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
@@ -635,13 +612,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         )],
     );
 
-    /// MakeDecision
-    let (ww, _) = ww
+    // MakeDecision
+    let (_, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -706,7 +683,7 @@ async fn redo_and_pass(
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     let tenant_id = tenant_id.clone();
@@ -743,12 +720,12 @@ async fn redo_and_pass(
         vec![],
     );
 
-    let ww: WorkflowWrapper = ww
+    let _: WorkflowWrapper = ww
         .run(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     // new obd was written
     let obd = obd.unwrap();

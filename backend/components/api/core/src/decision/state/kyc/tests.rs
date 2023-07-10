@@ -8,13 +8,10 @@ use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowKind;
 use crate::decision::state::WorkflowWrapper;
 use crate::decision::tests::test_helpers;
-use crate::utils::mock_enclave::MockEnclave;
 use crate::{decision::state::kyc, State};
 use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::VerificationRequest;
 use db::models::workflow::NewWorkflow;
 use db::models::workflow::Workflow;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -22,21 +19,17 @@ use db::models::workflow_event::WorkflowEvent;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::test_db_pool::TestDbPool;
 use feature_flag::BoolFlag;
-use feature_flag::FeatureFlagClient;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_state;
-use macros::{test_db_pool, test_state_case};
+use macros::test_state_case;
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, SignalSeverity, TenantId, Vendor,
-    VendorAPI, WorkflowConfig,
+    DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, SignalSeverity, TenantId, VendorAPI,
+    WorkflowConfig,
 };
 use newtypes::{KycConfig, OnboardingStatus};
 use newtypes::{KycState, WorkflowId, WorkflowState};
 use std::sync::Arc;
-use std::time::Duration;
-use webhooks::events::WebhookEvent;
-use webhooks::MockWebhookClient;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let (_, _, _, sv, _, _) = test_helpers::create_user_and_onboarding(
@@ -130,14 +123,14 @@ async fn invalid_action(state: &mut State) {
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn pass(state: &mut State, user_kind: UserKind) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     mock_ff_client
@@ -163,9 +156,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect Webhook
     mock_webhooks(
         state,
@@ -178,20 +171,20 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
-    /// MakeVendorCalls
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::Decisioning), wf.state);
 
@@ -205,13 +198,13 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         )],
     );
 
-    /// MakeDecision
-    let (ww, _) = ww
+    // MakeDecision
+    let (_, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(mr.is_none());
@@ -244,14 +237,14 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn fail(state: &mut State, user_kind: UserKind) {
-    /// DATA SETUP
+    // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     let tenant_id = tenant.id.clone();
@@ -281,9 +274,9 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     };
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    /// TESTS
-    ///
-    /// Authorize
+    // TESTS
+    //
+    // Authorize
     // Expect Webhooks
     mock_webhooks(
         state,
@@ -294,14 +287,14 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (ob, wf, wfe, mr, obd, rs, fps) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(ob.authorized_at.is_some());
     assert!(ob.idv_reqs_initiated_at.is_some());
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
-    /// MakeVendorCalls
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
@@ -318,13 +311,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         )],
     );
 
-    /// MakeDecision
-    let (ww, _) = ww
+    // MakeDecision
+    let (_, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -391,7 +384,7 @@ async fn redo_and_pass(
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
-    /// MOCKING
+    // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
 
     let tenant_id = tenant_id.clone();
@@ -427,12 +420,12 @@ async fn redo_and_pass(
         vec![],
     );
 
-    let ww: WorkflowWrapper = ww
+    let _: WorkflowWrapper = ww
         .run(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
 
-    let (ob, wf, wfe, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     // new obd was written
     let obd = obd.unwrap();

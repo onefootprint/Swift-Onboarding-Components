@@ -1,46 +1,27 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::{
-    decision_intent::DecisionIntent,
-    ob_configuration::ObConfiguration,
-    onboarding::{Onboarding, OnboardingUpdate},
-    risk_signal::RiskSignal,
-    scoped_vault::ScopedVault,
-    tenant::Tenant,
-    vault::Vault,
-    workflow::Workflow as DbWorkflow,
-};
+use db::models::{risk_signal::RiskSignal, vault::Vault, workflow::Workflow as DbWorkflow};
 
-use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{
-    FootprintReasonCode, KycConfig, RiskSignalGroupKind, VaultKind, Vendor, VerificationResultId,
-};
+use feature_flag::FeatureFlagClient;
+use newtypes::{KycConfig, RiskSignalGroupKind};
 use webhooks::WebhookClient;
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
 };
-use crate::{
-    decision::{
-        self, engine,
-        state::{OnAction, StateError},
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
-    },
-    errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
-    ApiError, State,
+use crate::decision::state::{
+    actions::{Authorize, WorkflowActions},
+    common, WorkflowState,
 };
 use crate::{
     decision::{
-        onboarding::{FeatureVector, OnboardingRulesDecisionOutput},
-        state::{
-            actions::{Authorize, WorkflowActions},
-            common, WorkflowState,
-        },
-        utils::FixtureDecision,
+        self,
+        state::OnAction,
+        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
-    utils::vault_wrapper::TenantVw,
+    errors::ApiResult,
+    State,
 };
 
 // TODO: how do we want to model sandbox here 🤔? Could (1) do entirely seperatly from workflow, (2) special case it within workflow, (3) model it as an immediate transition from DataCollection -> Complete
@@ -71,14 +52,13 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
     #[tracing::instrument("OnAction<Authorize, KycState>::execute_async_idempotent_actions", skip_all)]
     async fn execute_async_idempotent_actions(
         &self,
-        action: Authorize,
+        _action: Authorize,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // Write fingerprints
         common::write_authorized_fingerprints(state, &self.sv_id).await?;
 
         // Create TVC for use in writing vreqs in `on_commit`
-        let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
 
@@ -137,7 +117,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeVendorCalls,
+        _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
@@ -187,7 +167,6 @@ impl KycDecisioning {
     }
 }
 
-type IsSandbox = bool;
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
     type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
@@ -198,7 +177,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeDecision,
+        _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
@@ -215,9 +194,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
-
-        let su = ScopedVault::get(conn, &self.sv_id)?;
-        let tenant = Tenant::get(conn, &su.tenant_id)?;
 
         RiskSignal::bulk_create(conn, &self.sv_id, reason_codes, RiskSignalGroupKind::Kyc)?;
 
@@ -255,7 +231,7 @@ impl WorkflowState for KycDecisioning {
 /// ////////////////
 impl KycComplete {
     #[tracing::instrument("KycComplete::init", skip_all)]
-    pub async fn init(_state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KycConfig) -> ApiResult<Self> {
         Ok(KycComplete)
     }
 }

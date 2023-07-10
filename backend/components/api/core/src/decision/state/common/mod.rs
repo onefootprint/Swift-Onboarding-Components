@@ -1,30 +1,26 @@
 use std::sync::Arc;
 
-use chrono::Utc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
-        tenant::Tenant,
         vault::Vault,
         workflow::Workflow,
     },
     DbError, DbPool, DbResult, TxnPgConn,
 };
-use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ReviewReason, ScopedVaultId,
-    TenantId, VaultKind, Vendor, VendorAPI, VerificationResultId, WorkflowId, WorkflowKind,
+    DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, TenantId, VaultKind,
+    VendorAPI, VerificationResultId, WorkflowId,
 };
-use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
+use webhooks::WebhookClient;
 
 use crate::{
     decision::{
         self, engine,
         onboarding::{
-            Decision, DecisionReasonCodes, KycRuleGroup, OnboardingRulesDecisionOutput,
+            Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput,
             WaterfallOnboardingRulesDecisionOutput,
         },
         utils::FixtureDecision,
@@ -38,7 +34,7 @@ use crate::{
         },
     },
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Any, Person, TenantVw, VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     ApiError, State,
 };
 
@@ -115,7 +111,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     .await?;
 
     // If we are Sandbox/Demo, we do not make real vendor calls and instead just artificially produce some canned vendor responses
-    let vendor_results = if let (Some(fixture_decision)) = fixture_decision {
+    let vendor_results = if fixture_decision.is_some() {
         decision::sandbox::get_fixture_vendor_results(vendor_requests.outstanding_requests)?
     } else {
         let tvc = TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config).await?;
@@ -262,7 +258,7 @@ pub fn alpaca_kyc_decision_from_fixture(
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
     rule_group: &impl HasRuleGroup,
-    conn: &mut TxnPgConn,
+    _conn: &mut TxnPgConn,
     vendor_results: &[VendorResult],
 ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
     let (vendor_response_map, vendor_ids_map) =
@@ -273,11 +269,11 @@ pub fn get_decision(
     Ok((rules_output, reason_codes))
 }
 
-#[tracing::instrument(skip(conn, webhook_client))]
+#[tracing::instrument(skip(conn, _webhook_client))]
 #[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
-    webhook_client: Arc<dyn WebhookClient>,
+    _webhook_client: Arc<dyn WebhookClient>,
     ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
     workflow_id: &WorkflowId,

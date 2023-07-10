@@ -15,19 +15,15 @@ use db::models::{
     tenant_vendor::TenantVendorControl, workflow::Workflow,
 };
 use db::tests::fixtures;
-use feature_flag::MockFeatureFlagClient;
-use idv::experian::ExperianCrossCoreRequest;
-use idv::experian::ExperianCrossCoreResponse;
 use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::WatchlistResultResponse;
-use idv::incode::watchlist::IncodeWatchlistCheckRequest;
+
 use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
-use newtypes::{CipKind, ScopedVaultId, SealedVaultBytes, WorkflowId};
+use newtypes::{CipKind, ScopedVaultId, WorkflowId};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
@@ -56,7 +52,7 @@ pub async fn setup_data(
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     // TODO: create sandbox vs demo vs real, diff sandbox fixues
     let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, ob, _, sv, _, obc) = test_helpers::create_user_and_onboarding(
+    let (tenant, ob, _, _, _, obc) = test_helpers::create_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         Some(vec![CDO::FullAddress]), // so we can meet min req for kyc vendor calls
@@ -71,7 +67,7 @@ pub async fn setup_data(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // only enable Idology for this dummy test merchant
-            let tvc = TenantVendorControl::create(conn, tid, true, false, None).unwrap();
+            TenantVendorControl::create(conn, tid, true, false, None).unwrap();
 
             let tu = fixtures::tenant_user::create(conn);
 

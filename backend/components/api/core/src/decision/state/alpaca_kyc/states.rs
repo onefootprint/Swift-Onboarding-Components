@@ -2,32 +2,22 @@ use std::sync::Arc;
 
 use api_wire_types::DecisionRequest;
 use async_trait::async_trait;
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        manual_review::ManualReview,
-        onboarding::{Onboarding, OnboardingUpdate},
-        onboarding_decision::OnboardingDecision,
-        risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-        vault::Vault,
-        verification_request::VerificationRequest,
-        verification_result::VerificationResult,
-        workflow::Workflow as DbWorkflow,
-    },
-    DbError,
+use db::models::{
+    decision_intent::DecisionIntent,
+    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    onboarding::{Onboarding, OnboardingUpdate},
+    risk_signal::RiskSignal,
+    scoped_vault::ScopedVault,
+    vault::Vault,
+    verification_result::VerificationResult,
+    workflow::Workflow as DbWorkflow,
 };
 use either::Either;
-use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use idv::incode::{
-    watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
-    IncodeStartOnboardingRequest,
-};
+use feature_flag::FeatureFlagClient;
+use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, AlpacaKycConfig, DecisionStatus, FootprintReasonCode,
-    OnboardingStatus, ReasonCode, ReviewReason, RiskSignalGroupKind, Vendor, VendorAPI, VerificationResultId,
+    AlpacaKycConfig, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
+    RiskSignalGroupKind, VendorAPI,
 };
 use webhooks::WebhookClient;
 
@@ -40,7 +30,7 @@ use crate::{
         state::{
             actions::{MakeDecision, WorkflowActions},
             common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall, OnAction,
-            ReviewCompleted, StateError, WorkflowState,
+            ReviewCompleted, WorkflowState,
         },
         utils::FixtureDecision,
         vendor::{self, tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
@@ -82,14 +72,12 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: Authorize,
+        _action: Authorize,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // Write fingerprints
         common::write_authorized_fingerprints(state, &self.sv_id).await?;
 
-        // Create TVC for use in writing vreqs in `on_commit`
-        let svid = self.sv_id.clone();
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
 
@@ -148,7 +136,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeVendorCalls,
+        _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
@@ -158,7 +146,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     fn on_commit(
         self,
         vendor_results: Vec<VendorResult>,
-        conn: &mut db::TxnPgConn,
+        _conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
@@ -212,7 +200,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeDecision,
+        _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
@@ -286,7 +274,8 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     only_us: true,
                     doc_type_restriction: None,
                 };
-                let doc_req = DocumentRequest::create(conn, args)?;
+                DocumentRequest::create(conn, args)?;
+
                 Ok(AlpacaKycState::from(AlpacaKycDocCollection {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,
@@ -341,7 +330,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: MakeWatchlistCheckCall,
+        _action: MakeWatchlistCheckCall,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // TODO: query for already complete (Vreq/Vres) for edge case where server crashes after `make_watchlist_result_call` but before `on_commit` commits
@@ -492,7 +481,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             doc_req.is_some(),
         );
 
-        let (decision, reason_codes) = (
+        let (decision, _) = (
             OnboardingRulesDecisionOutput {
                 decision: final_decision.clone(),
                 // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
@@ -548,7 +537,7 @@ impl WorkflowState for AlpacaKycWatchlistCheck {
 /// ////////////////
 impl AlpacaKycPendingReview {
     #[tracing::instrument("AlpacaKycPendingReview::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: AlpacaKycConfig) -> ApiResult<Self> {
         let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
         Ok(AlpacaKycPendingReview {
             sv_id: sv.id,
@@ -631,7 +620,7 @@ impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        action: DocCollected,
+        _action: DocCollected,
         _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok(())
@@ -659,12 +648,12 @@ impl WorkflowState for AlpacaKycDocCollection {
     }
 }
 
-/////////////////////
-/// Complete
-/// ////////////////
+// //////////////////
+// Complete
+// ////////////////
 impl AlpacaKycComplete {
     #[tracing::instrument("AlpacaKycComplete::init", skip_all)]
-    pub async fn init(_state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: AlpacaKycConfig) -> ApiResult<Self> {
         Ok(AlpacaKycComplete)
     }
 }
@@ -679,7 +668,7 @@ impl WorkflowState for AlpacaKycComplete {
     }
 }
 
-fn get_review_reasons(wc_reason_codes: &[(FootprintReasonCode)], collected_doc: bool) -> Vec<ReviewReason> {
+fn get_review_reasons(wc_reason_codes: &[FootprintReasonCode], collected_doc: bool) -> Vec<ReviewReason> {
     let adverse_media: bool = wc_reason_codes
         .iter()
         .any(|rs| rs == &FootprintReasonCode::AdverseMediaHit);
@@ -718,6 +707,7 @@ fn partition_adverse_media_watchlist_reason_codes(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use newtypes::VerificationResultId;
     use std::str::FromStr;
     use test_case::test_case;
 
@@ -729,7 +719,7 @@ mod tests {
     #[test_case(vec![(FootprintReasonCode::AdverseMediaHit), (FootprintReasonCode::WatchlistHitNonSdn)], true => vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit,  ReviewReason::Document])]
 
     fn test_get_review_reasons(
-        wc_reason_codes: Vec<(FootprintReasonCode)>,
+        wc_reason_codes: Vec<FootprintReasonCode>,
         collected_doc: bool,
     ) -> Vec<ReviewReason> {
         get_review_reasons(&wc_reason_codes, collected_doc)

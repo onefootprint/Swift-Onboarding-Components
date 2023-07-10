@@ -6,7 +6,7 @@ mod tests;
 use super::{
     actions::{MakeDecision, MakeVendorCalls},
     traits::HasRuleGroup,
-    DoAction, OnAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
+    DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
 use crate::{
     decision::{

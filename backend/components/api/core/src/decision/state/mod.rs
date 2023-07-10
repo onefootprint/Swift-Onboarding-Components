@@ -1,10 +1,9 @@
-use async_trait::async_trait;
-use db::{models::workflow::Workflow as DbWorkflow, TxnPgConn};
+use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
 use newtypes::WorkflowId;
 use thiserror::Error;
 
-use crate::{errors::ApiResult, ApiError, State};
+use crate::{errors::ApiResult, State};
 
 use self::actions::WorkflowActions;
 
@@ -77,9 +76,9 @@ impl WorkflowWrapper {
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
-            newtypes::WorkflowState::Kyc(s) => KycState::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::AlpacaKyc(s) => AlpacaKycState::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::Document(s) => DocumentState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::AlpacaKyc(_) => AlpacaKycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow).await?.into(),
         };
         Ok(Self {
             state: s,
