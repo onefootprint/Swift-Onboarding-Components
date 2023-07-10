@@ -9,7 +9,7 @@ on:
   pull_request:
     paths:
       - 'mobile/**'
-      - '.github/workflows/*.yml'
+      - '.github/workflows/mobile_ci.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
