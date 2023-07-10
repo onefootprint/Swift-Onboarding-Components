@@ -43,6 +43,9 @@ const Sms = () => {
   const userEmailMutation = useUserEmail();
   const [isSuccess, setSuccess] = useState(false);
   const [isResend, setResend] = useState(false);
+  const isPending = loginChallengeMutation.isLoading || !challengeData;
+  const isVerifying =
+    identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
   // Either scrub the phone number collected from the previous steps, or use the
   // challenge data scrubbed number
@@ -265,8 +268,8 @@ const Sms = () => {
   return (
     <Verification
       title={title}
-      isPending={loginChallengeMutation.isLoading || !challengeData}
-      isVerifying={identifyVerifyMutation.isLoading}
+      isPending={isPending}
+      isVerifying={isVerifying}
       isSuccess={isSuccess}
       hasError={identifyVerifyMutation.isError}
       onComplete={verifyPin}

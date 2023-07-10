@@ -16,7 +16,7 @@ export type VerificationProps = ResendButtonProps & {
   onComplete: (code: string) => void;
 };
 
-const SmsChallengeVerification = ({
+const Verification = ({
   title,
   isPending,
   isVerifying,
@@ -70,4 +70,4 @@ const Form = styled.form`
   `}
 `;
 
-export default SmsChallengeVerification;
+export default Verification;

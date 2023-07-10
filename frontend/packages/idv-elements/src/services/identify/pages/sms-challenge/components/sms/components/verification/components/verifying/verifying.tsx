@@ -8,7 +8,14 @@ const Verifying = () => {
 
   return (
     <Container>
-      <Box sx={{ width: '40px', height: '40px' }}>
+      <Box
+        sx={{
+          width: '40px',
+          height: '40px',
+          justifyContent: 'center',
+          display: 'flex',
+        }}
+      >
         <LoadingIndicator />
       </Box>
       <Typography variant="label-3">{t('verifying')}</Typography>
@@ -23,7 +30,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     height: 100px;
-    row-gap: ${theme.spacing[8]};
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 
