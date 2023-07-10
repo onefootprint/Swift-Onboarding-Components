@@ -84,4 +84,6 @@ export interface EnclaveResources {
   cpus: number;
   memory: number;
   cid: number;
+  minInstances: number;
+  maxInstances: number;
 }

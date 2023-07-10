@@ -185,9 +185,9 @@ export async function CreateNitroService(
   const autoScaling = new aws.autoscaling.Group(
     `asg-${serviceName}`,
     {
-      minSize: 2,
-      maxSize: 4,
-      desiredCapacity: 2,
+      minSize: g.constants.enclave.resources.minInstances,
+      maxSize: g.constants.enclave.resources.maxInstances,
+      desiredCapacity: g.constants.enclave.resources.minInstances,
       launchTemplate: {
         id: launchTemplate.id,
         version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`),
