@@ -16,8 +16,6 @@ import useTranslation from '@/hooks/use-translation';
 
 import hasUserCancelledPasskey from '../utils/has-user-canceled-passkey';
 
-const passkey = new Passkey('onefootprint.com', 'Footprint');
-
 const loginChallenge = async (identifier: Identifier) => {
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
@@ -33,16 +31,19 @@ const loginChallenge = async (identifier: Identifier) => {
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricLoginChallengeJson;
   const { publicKey } = challengeJson;
-  const result = await passkey.auth(
-    base64url.toBase64(publicKey.challenge as unknown as string),
-  );
+  const result = await Passkey.authenticate({
+    challenge: base64url.toBase64(publicKey.challenge as unknown as string),
+    timeout: publicKey.timeout,
+    userVerification: publicKey.userVerification,
+    rpId: publicKey.rpId,
+  });
   const pk = {
-    rawId: base64url.toBase64(result.credentialID),
-    id: result.credentialID,
+    rawId: base64url.toBase64(result.rawId),
+    id: result.id,
     type: 'public-key',
     response: {
-      clientDataJSON: result.response.rawClientDataJSON,
-      authenticatorData: result.response.rawAuthenticatorData,
+      clientDataJSON: base64url.toBase64(result.response.clientDataJSON),
+      authenticatorData: base64url.toBase64(result.response.authenticatorData),
       signature: result.response.signature,
     },
   };

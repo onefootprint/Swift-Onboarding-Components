@@ -9,7 +9,14 @@ import { Passkey } from 'react-native-passkey';
 
 import { AUTH_HEADER } from '@/config/constants';
 
-const passkey = new Passkey('onefootprint.com', 'Footprint');
+type RegisterResponse = {
+  id: string;
+  rawId: string;
+  response: {
+    clientDataJSON: string;
+    attestationObject: string;
+  };
+};
 
 const biometricInit = async (authToken: string) => {
   const { data } = await request<{
@@ -29,17 +36,29 @@ const biometricInit = async (authToken: string) => {
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
   const { publicKey } = challengeJson;
-  const result = await passkey.register(
-    base64url.toBase64(publicKey.challenge as unknown as string),
-    base64url.toBase64(publicKey.user.id as unknown as string),
-  );
+  const result = (await Passkey.register({
+    challenge: base64url.toBase64(publicKey.challenge as unknown as string),
+    rp: {
+      id: publicKey.rp.id,
+      name: publicKey.rp.name,
+    },
+    user: {
+      id: base64url.toBase64(publicKey.user.id as unknown as string),
+      name: publicKey.user.name,
+      displayName: publicKey.user.displayName,
+    },
+    pubKeyCredParams: publicKey.pubKeyCredParams,
+    timeout: publicKey.timeout,
+    attestation: publicKey.attestation,
+    authenticatorSelection: publicKey.authenticatorSelection,
+  })) as RegisterResponse;
   const response = {
-    rawId: base64url.toBase64(result.credentialID),
-    id: result.credentialID,
+    rawId: base64url.toBase64(result.rawId),
+    id: result.id,
     type: 'public-key',
     response: {
-      clientDataJSON: result.response.rawClientDataJSON,
-      attestationObject: result.response.rawAttestationObject,
+      clientDataJSON: result.response.clientDataJSON,
+      attestationObject: result.response.attestationObject,
     },
   };
   return JSON.stringify(response);

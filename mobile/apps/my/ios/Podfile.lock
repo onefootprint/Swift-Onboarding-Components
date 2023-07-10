@@ -361,7 +361,7 @@ PODS:
   - React-jsinspector (0.71.11)
   - React-logger (0.71.11):
     - glog
-  - react-native-passkey (1.1.3):
+  - react-native-passkey (2.0.0):
     - React-Core
   - react-native-safe-area-context (4.5.0):
     - RCT-Folly
@@ -735,7 +735,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 18b5b33c5f2687a784a61bc8176611b73524ae77
   React-jsinspector: b6ed4cb3ffa27a041cd440300503dc512b761450
   React-logger: 186dd536128ae5924bc38ed70932c00aa740cd5b
-  react-native-passkey: 302db72441de94b1479033fb8af2122d7d2b670e
+  react-native-passkey: 39cbd3e28ecdb1a520f648c480666acc7af48637
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   React-perflogger: e706562ab7eb8eb590aa83a224d26fa13963d7f2
   React-RCTActionSheet: 57d4bd98122f557479a3359ad5dad8e109e20c5a

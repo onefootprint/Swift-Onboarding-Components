@@ -1,6 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export type ContainerProps = {
   center?: boolean;
@@ -33,7 +32,7 @@ const Container = ({
   );
 };
 
-const Wrapper = styled(SafeAreaView)`
+const Wrapper = styled.SafeAreaView`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     width: 100%;
