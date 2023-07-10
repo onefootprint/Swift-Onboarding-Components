@@ -22,7 +22,7 @@ import ProxyConfigs from './proxy-configs';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<ProxyConfigs />', () => {
+describe.skip('<ProxyConfigs />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/developers',

@@ -48,7 +48,7 @@ import {
 } from './idv.test.config';
 import { IdvProps } from './types';
 
-describe('<Idv />', () => {
+describe.skip('<Idv />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({

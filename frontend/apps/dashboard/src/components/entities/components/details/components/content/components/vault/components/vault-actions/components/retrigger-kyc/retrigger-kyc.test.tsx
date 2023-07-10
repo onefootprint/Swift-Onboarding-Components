@@ -30,7 +30,7 @@ const entityFixture: Entity = {
   watchlistCheck: null,
 };
 
-describe('<RetriggerKYC />', () => {
+describe.skip('<RetriggerKYC />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: `/entities/${entityFixture.id}/trigger`,

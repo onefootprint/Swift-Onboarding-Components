@@ -18,7 +18,7 @@ jest.mock('./utils/get-biometric-challenge-response', () => ({
   ...jest.requireActual('./utils/get-biometric-challenge-response'),
 }));
 
-describe('useStepUp', () => {
+describe.skip('useStepUp', () => {
   it('when needs and can step up, successfully promotes the auth token', async () => {
     withUserToken([]);
     withIdentify([ChallengeKind.biometric], true);

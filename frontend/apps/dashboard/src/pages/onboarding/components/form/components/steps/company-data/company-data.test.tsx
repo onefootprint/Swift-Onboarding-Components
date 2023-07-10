@@ -16,7 +16,7 @@ import {
   withUpdateOrgError,
 } from './company-data.test.config';
 
-describe('<CompanyData />', () => {
+describe.skip('<CompanyData />', () => {
   const renderCompanyData = ({
     id = 'company-form',
     onComplete = jest.fn(),

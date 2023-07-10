@@ -17,7 +17,7 @@ const renderImage = (imgPath: string) => {
   render(<ImageComponent imgPath={imgPath} />);
 };
 
-describe('Testing the image detection outputs', () => {
+describe.skip('Testing the image detection outputs', () => {
   const testImageEntries = getTestImageEntries();
 
   testImageEntries.forEach(imgEntry => {

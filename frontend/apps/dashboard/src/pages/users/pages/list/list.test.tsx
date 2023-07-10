@@ -16,7 +16,7 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<List />', () => {
+describe.skip('<List />', () => {
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({

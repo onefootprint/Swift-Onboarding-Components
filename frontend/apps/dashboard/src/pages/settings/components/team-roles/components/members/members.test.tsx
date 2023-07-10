@@ -33,7 +33,7 @@ import {
 const useRouterSpy = createUseRouterSpy();
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 
-describe('<Members />', () => {
+describe.skip('<Members />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/settings',

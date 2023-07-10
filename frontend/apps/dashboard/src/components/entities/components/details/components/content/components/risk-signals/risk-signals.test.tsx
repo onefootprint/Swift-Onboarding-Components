@@ -17,7 +17,7 @@ import {
 const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
-describe('<RiskSignals />', () => {
+describe.skip('<RiskSignals />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/entities',

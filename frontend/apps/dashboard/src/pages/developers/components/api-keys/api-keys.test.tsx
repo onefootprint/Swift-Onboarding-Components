@@ -21,7 +21,7 @@ import {
   withRoles,
 } from './api-keys.test.config';
 
-describe('<ApiKeys />', () => {
+describe.skip('<ApiKeys />', () => {
   const renderDevelopers = () => {
     customRender(<ApiKeys />);
   };

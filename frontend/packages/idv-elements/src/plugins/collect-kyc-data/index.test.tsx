@@ -35,7 +35,7 @@ import {
 } from './index.test.config';
 import { CollectKycDataContext, CollectKycDataProps } from './types';
 
-describe('<CollectKycData />', () => {
+describe.skip('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({

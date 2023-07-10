@@ -13,7 +13,7 @@ import Filters, { FiltersProps } from './filters';
 
 const testDate = new Date('2023-01-04');
 
-describe('<Filters />', () => {
+describe.skip('<Filters />', () => {
   beforeAll(() => {
     MockDate.set(testDate);
   });

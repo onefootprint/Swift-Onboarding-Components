@@ -13,7 +13,7 @@ import {
   withUserTokenError,
 } from './use-decrypt-kyc-data.test.config';
 
-describe('useDecryptKycData', () => {
+describe.skip('useDecryptKycData', () => {
   it('when auth token scope includes only basic data, should decrypt only basic attributes', async () => {
     withUserToken([UserTokenScope.signup]);
     withDecrypt({

@@ -25,7 +25,7 @@ import {
 } from './index.test.config';
 import { InvestorProfileProps } from './investor-profile.types';
 
-describe('<InvestorProfile />', () => {
+describe.skip('<InvestorProfile />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({

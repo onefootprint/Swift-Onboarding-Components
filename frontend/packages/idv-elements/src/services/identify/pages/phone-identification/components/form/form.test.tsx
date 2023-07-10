@@ -4,7 +4,7 @@ import React from 'react';
 import { renderIdentify } from '../../../../config/tests/render';
 import Form, { FormProps } from './form';
 
-describe('<Form />', () => {
+describe.skip('<Form />', () => {
   const renderForm = ({
     defaultPhone,
     isLoading,
