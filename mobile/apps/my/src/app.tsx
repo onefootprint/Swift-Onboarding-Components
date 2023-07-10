@@ -4,7 +4,6 @@ import { useFonts } from '@expo-google-fonts/dm-sans';
 import { QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback } from 'react';
-import { StatusBar } from 'react-native';
 
 import Debug from './components/debug';
 import queryClient from './config/initializers/react-query';
@@ -41,7 +40,6 @@ const App = () => {
       ) : (
         <Wallet onLoad={handleLoad} />
       )}
-      <StatusBar barStyle="dark-content" />
     </QueryClientProvider>
   ) : null;
 };

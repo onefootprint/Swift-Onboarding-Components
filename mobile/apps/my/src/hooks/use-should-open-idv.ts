@@ -1,10 +1,17 @@
 import * as Linking from 'expo-linking';
-import { isClip } from 'react-native-app-clip';
+import { Platform } from 'react-native';
+
+const isAppClip = () => {
+  if (Platform.OS !== 'ios') {
+    return false;
+  }
+  const { isClip } = require('react-native-app-clip');
+  return isClip();
+};
 
 const useShouldOpenIdv = () => {
   const linkingUrl = Linking.useURL();
-  const isAppClip = isClip();
-  const shouldOpen = isAppClip || linkingUrl?.includes('http://handoff');
+  const shouldOpen = isAppClip() || linkingUrl?.includes('http://handoff');
   return { shouldOpen, linkingUrl };
 };
 
