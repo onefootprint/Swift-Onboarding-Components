@@ -27,7 +27,7 @@ type CameraProps = {
   type?: ScanType;
 };
 
-const AUTO_CAPTURE_DELAY = 600;
+const AUTO_CAPTURE_DELAY = 750;
 
 const Camera = ({
   children,
@@ -43,9 +43,8 @@ const Camera = ({
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
   const [showFeedback, setShowFeedback] = useState(true);
-  const devices = useCameraDevices();
+  const devices = useCameraDevices('wide-angle-camera');
   const device = devices[type];
-  const zoom = device?.neutralZoom ?? 1;
 
   useEffect(() => {
     if (isObjectDetected) {
@@ -77,9 +76,13 @@ const Camera = ({
     <>
       <StatusBar barStyle="light-content" />
       <CameraContainer>
-        <Header>
-          {title} - {subtitle}
-        </Header>
+        {subtitle ? (
+          <Header>
+            {title} - {subtitle}
+          </Header>
+        ) : (
+          <Header>{title}</Header>
+        )}
         {device && (
           <StyledCamera
             device={device}
@@ -87,7 +90,6 @@ const Camera = ({
             isActive={!disabled}
             photo
             ref={camera}
-            zoom={zoom}
           />
         )}
         {children}
