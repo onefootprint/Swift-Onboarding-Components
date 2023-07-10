@@ -21,6 +21,8 @@ module.exports = {
     usesNonExemptEncryption: 'false',
   },
   android: {
+    package: 'com.onefootprint.my',
+    versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
