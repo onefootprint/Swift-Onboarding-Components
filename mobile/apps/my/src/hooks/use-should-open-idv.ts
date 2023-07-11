@@ -11,7 +11,7 @@ const isAppClip = () => {
 
 const useShouldOpenIdv = () => {
   const linkingUrl = Linking.useURL();
-  const shouldOpen = isAppClip() || linkingUrl?.includes('http://handoff');
+  const shouldOpen = isAppClip() || linkingUrl?.includes('https://handoff');
   return { shouldOpen, linkingUrl };
 };
 
