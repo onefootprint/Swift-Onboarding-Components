@@ -7,8 +7,8 @@ use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_wire_types::{CreateProxyConfigRequest, PatchProxyConfigRequest};
-use db::models::proxy_config::{NewProxyConfigArgs, ProxyConfig, UpdateProxyConfigArgs};
+use api_wire_types::{CreateProxyConfigRequest, GetProxyConfigRequest, PatchProxyConfigRequest};
+use db::models::proxy_config::{NewProxyConfigArgs, ProxyConfig, ProxyConfigFilters, UpdateProxyConfigArgs};
 use db::DbError;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -22,15 +22,25 @@ type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBas
 #[actix::get("/org/proxy_configs")]
 pub async fn get(
     state: web::Data<State>,
+    filters: web::Json<GetProxyConfigRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<ProxyConfigsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
+    let GetProxyConfigRequest { status } = filters.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
     let configs = state
         .db_pool
-        .db_query(move |conn| -> Result<_, DbError> { ProxyConfig::list(conn, &tenant_id, is_live) })
+        .db_query(move |conn| -> Result<_, DbError> {
+            let filters = ProxyConfigFilters {
+                status,
+                tenant_id: &tenant_id,
+                is_live,
+            };
+            let res = ProxyConfig::list(conn, filters)?;
+            Ok(res)
+        })
         .await??;
 
     let configs = configs

@@ -166,6 +166,12 @@ pub struct UpdateProxyConfigArgs {
     pub access_reason: Option<String>,
 }
 
+pub struct ProxyConfigFilters<'a> {
+    pub status: Option<ApiKeyStatus>,
+    pub tenant_id: &'a TenantId,
+    pub is_live: bool,
+}
+
 /// a helper type for holding all of the proxy config
 /// related rows in a single type
 pub type DbProxyConfigAll = (
@@ -412,11 +418,16 @@ impl ProxyConfig {
     }
 
     #[tracing::instrument("ProxyConfig::list", skip_all)]
-    pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
-        let result = proxy_config::table
-            .filter(proxy_config::tenant_id.eq(tenant_id))
-            .filter(proxy_config::is_live.eq(is_live))
+    pub fn list(conn: &mut PgConn, filters: ProxyConfigFilters) -> DbResult<Vec<Self>> {
+        let mut query = proxy_config::table
+            .filter(proxy_config::tenant_id.eq(filters.tenant_id))
+            .filter(proxy_config::is_live.eq(filters.is_live))
             .filter(proxy_config::deactivated_at.is_null())
+            .into_boxed();
+        if let Some(status) = filters.status {
+            query = query.filter(proxy_config::status.eq(status));
+        }
+        let result = query
             .order_by(proxy_config::created_at.desc())
             .get_results(conn)?;
 

@@ -1,6 +1,12 @@
 use crate::*;
 
 /// Create a new proxy configuration
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+pub struct GetProxyConfigRequest {
+    pub status: Option<ApiKeyStatus>,
+}
+
+/// Create a new proxy configuration
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
 pub struct CreateProxyConfigRequest {
     /// a friendly name for this proxy config
