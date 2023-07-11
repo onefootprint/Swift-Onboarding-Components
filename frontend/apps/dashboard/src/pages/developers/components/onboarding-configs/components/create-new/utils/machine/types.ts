@@ -7,7 +7,7 @@ import {
   IdDocType,
 } from '@onefootprint/types';
 
-type IdDocData = {
+export type IdDocData = {
   selfieRequired: boolean;
   types: IdDocType[];
   regionality: IdDocRegionality;
@@ -19,9 +19,6 @@ export type MachineContext = {
   kycCollect?: {
     ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
     [CollectedKycDataOption.nationality]: boolean;
-    idDoc: IdDocData;
-  };
-  kycStepUp?: {
     idDoc: IdDocData;
   };
   kycInvestorProfile?: {
@@ -37,9 +34,6 @@ export type MachineContext = {
     [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
     [CollectedKybDataOption.website]: boolean;
     [CollectedKybDataOption.phoneNumber]: boolean;
-  };
-  kybBoStepUp?: {
-    idDoc: IdDocData;
   };
   kybAccess?: {
     allKybData: boolean;
@@ -71,12 +65,6 @@ export type MachineEvents =
       };
     }
   | {
-      type: 'kycStepUpSubmitted';
-      payload: {
-        idDoc: IdDocData;
-      };
-    }
-  | {
       type: 'kycInvestorProfileSubmitted';
       payload: {
         [CollectedInvestorProfileDataOption.investorProfile]: boolean;
@@ -97,12 +85,6 @@ export type MachineEvents =
         [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
         [CollectedKybDataOption.website]: boolean;
         [CollectedKybDataOption.phoneNumber]: boolean;
-      };
-    }
-  | {
-      type: 'kybBoStepUpSubmitted';
-      payload: {
-        idDoc: IdDocData;
       };
     }
   | {

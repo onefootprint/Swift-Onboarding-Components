@@ -19,7 +19,7 @@ type FormData = {
 
 const KybCollect = () => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyb-collect-form',
+    'pages.developers.onboarding-configs.create-new.kyb-collect-form',
   );
   const [state, send] = useOnboardingConfigMachine();
   const {

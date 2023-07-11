@@ -37,10 +37,24 @@ const order: CollectedDataOption[] = [
   CollectedDocumentDataOption.documentAndSelfie,
 ];
 
+const isDocumentDi = (cdo: string) => cdo.startsWith('document.');
+
+const isDocumentAndSelfieDi = (cdo: string) =>
+  isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
+
 const CdoTagList = ({ testID, cdos, disableSort }: CdoTagListProps) => {
   const { t } = useTranslation('cdo');
+  const processedCdos = cdos.map(cdo => {
+    if (isDocumentAndSelfieDi(cdo)) {
+      return CollectedDocumentDataOption.documentAndSelfie;
+    }
+    if (isDocumentDi(cdo)) {
+      return CollectedDocumentDataOption.document;
+    }
+    return cdo;
+  });
   const attributeLabels = order.map(attr => t(attr));
-  const tagLabels = cdos.map(attr => t(attr));
+  const tagLabels = processedCdos.map(attr => t(attr));
   if (!disableSort)
     tagLabels.sort(
       (a, b) => attributeLabels.indexOf(a) - attributeLabels.indexOf(b),

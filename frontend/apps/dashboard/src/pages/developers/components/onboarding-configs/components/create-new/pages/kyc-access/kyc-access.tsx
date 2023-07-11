@@ -23,16 +23,16 @@ type FormData = Record<
 >;
 
 const KycAccess = () => {
+  const { t, allT } = useTranslation(
+    'pages.developers.onboarding-configs.create-new.kyc-access-form',
+  );
   const [state, send] = useOnboardingConfigMachine();
   const { kycCollect, kycInvestorProfile } = state.context;
   const hasCollectedDoc = !!kycCollect && kycCollect?.idDoc.types.length > 0;
   const hasCollectedSelfie =
     hasCollectedDoc && !!kycCollect && kycCollect?.idDoc.selfieRequired;
-  const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyc-access-form',
-  );
 
-  const { register, handleSubmit, watch, setValue } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: getDefaultKycAccess(state.context),
   });
   const idDocAccess = watch(CollectedDocumentDataOption.document);
@@ -119,6 +119,7 @@ const KycAccess = () => {
               </AnimatedContainer>
             </Box>
           )}
+
           {kycInvestorProfile?.[
             CollectedInvestorProfileDataOption.investorProfile
           ] && (

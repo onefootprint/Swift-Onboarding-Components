@@ -5,7 +5,7 @@ import React from 'react';
 
 const InvestorProfileQuestions = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyc-collect-form.add-ons.investor-profile.questions',
+    'pages.developers.onboarding-configs.create-new.kyc-collect-form.add-ons.investor-profile.questions',
   );
 
   return (

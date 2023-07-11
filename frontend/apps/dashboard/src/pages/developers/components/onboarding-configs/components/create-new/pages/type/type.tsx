@@ -14,7 +14,7 @@ type FormData = {
 
 const Type = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create.type-form',
+    'pages.developers.onboarding-configs.create-new.type-form',
   );
   const [state, send] = useOnboardingConfigMachine();
   const { type } = state.context;

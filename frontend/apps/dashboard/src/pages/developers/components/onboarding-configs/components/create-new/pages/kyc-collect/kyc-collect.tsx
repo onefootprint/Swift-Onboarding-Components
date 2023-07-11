@@ -6,7 +6,7 @@ import KycCollectForm from '../../components/kyc-collect-form';
 
 const KycCollect = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyc-collect-form',
+    'pages.developers.onboarding-configs.create-new.kyc-collect-form',
   );
 
   return (

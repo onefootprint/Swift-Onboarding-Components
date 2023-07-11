@@ -31,7 +31,7 @@ const KybAccess = () => {
   const hasCollectedSelfie =
     hasCollectedDoc && !!kycCollect && kycCollect?.idDoc.selfieRequired;
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyb-access-form',
+    'pages.developers.onboarding-configs.create-new.kyb-access-form',
   );
 
   const handleBeforeSubmit = (formData: FormData) => {

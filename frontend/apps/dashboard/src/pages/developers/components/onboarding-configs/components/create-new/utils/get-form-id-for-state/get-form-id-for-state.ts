@@ -16,9 +16,6 @@ const getFormIdForState = (value: StateValue) => {
   if (value === 'kybCollect') {
     return 'kyb-collect-form';
   }
-  if (value === 'kybBoStepUp') {
-    return 'kyb-bo-step-up-form';
-  }
   if (value === 'kybAccess') {
     return 'kyb-access-form';
   }

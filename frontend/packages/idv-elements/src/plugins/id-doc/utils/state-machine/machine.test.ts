@@ -58,7 +58,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('frontImage');
       expect(state.context.idDoc.country).toEqual('US');
 
-      expect(state.context.idDoc.type).toEqual('driver_license');
+      expect(state.context.idDoc.type).toEqual(IdDocType.driversLicense);
       state = machine.send({
         type: 'navigatedToPrev',
       });

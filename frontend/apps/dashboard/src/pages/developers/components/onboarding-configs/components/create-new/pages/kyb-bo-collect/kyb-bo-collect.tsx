@@ -7,7 +7,7 @@ import KycCollectForm from '../../components/kyc-collect-form';
 
 const KybBoCollect = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create.kyb-bo-collect-form',
+    'pages.developers.onboarding-configs.create-new.kyb-bo-collect-form',
   );
 
   return (
@@ -17,7 +17,7 @@ const KybBoCollect = () => {
       <Box sx={{ margin: 5 }} />
       <FormTitle
         title={t('subtitle')}
-        description={t('description-subtitle')}
+        description={t('subtitle-description')}
       />
       <KycCollectForm />
     </>

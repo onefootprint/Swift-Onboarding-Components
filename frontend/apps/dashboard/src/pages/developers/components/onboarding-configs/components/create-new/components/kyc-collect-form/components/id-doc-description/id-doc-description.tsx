@@ -6,7 +6,7 @@ import { Trans } from 'react-i18next';
 const IdDocDescription = () => (
   <Typography variant="body-3" color="tertiary">
     <Trans
-      i18nKey="pages.developers.onboarding-configs.create.kyc-collect-form.add-ons.document-description"
+      i18nKey="pages.developers.onboarding-configs.create-new.kyc-collect-form.add-ons.document-description"
       components={{
         a: (
           <Link

@@ -12,7 +12,7 @@ type FormData = {
 
 const Name = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create.name-form',
+    'pages.developers.onboarding-configs.create-new.name-form',
   );
   const [state, send] = useOnboardingConfigMachine();
   const { name } = state.context;

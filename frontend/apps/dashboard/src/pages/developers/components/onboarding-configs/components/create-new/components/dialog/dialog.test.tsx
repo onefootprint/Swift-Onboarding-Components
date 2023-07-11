@@ -12,9 +12,15 @@ import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
 import withCreateOnboardingConfig from './dialog.test.config';
 
-// TODO: (clodoan/belce) Add these tests back in & add tests for new features
+const SELFIE_LABEL = 'Request a selfie';
+const SSN_FULL_LABEL = 'SSN (Full)';
+const SSN_LAST_FOUR_LABEL = 'SSN (Last 4)';
+const NATIONALITY_LABEL = 'Request users to specify their nationality';
+const ID_CARD_LABEL = 'ID Document';
+const PASSPORT_LABEL = 'Passport';
+const DRIVERS_LICENSE_LABEL = "Driver's license";
 
-describe.skip('<CreateConfig />', () => {
+describe.skip('<Dialog />', () => {
   const defaultOptions = {
     open: true,
     onClose: jest.fn(),
@@ -31,21 +37,23 @@ describe.skip('<CreateConfig />', () => {
     customRender(<Dialog open={open} onClose={onClose} onCreate={onCreate} />);
   };
 
-  it('should hide dialog if not open', () => {
-    renderDialog({ open: false });
-    expect(
-      screen.queryByTestId('onboarding-configs-create-dialog'),
-    ).not.toBeInTheDocument();
+  describe('When toggling open/closed state', () => {
+    it('should hide dialog if not open', () => {
+      renderDialog({ open: false });
+      expect(
+        screen.queryByTestId('onboarding-configs-create-dialog'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('should show dialog if open', () => {
+      renderDialog({ open: true });
+      expect(
+        screen.getByTestId('onboarding-configs-create-dialog'),
+      ).toBeInTheDocument();
+    });
   });
 
-  it('should show dialog if open', () => {
-    renderDialog({ open: true });
-    expect(
-      screen.getByTestId('onboarding-configs-create-dialog'),
-    ).toBeInTheDocument();
-  });
-
-  describe('Type form', () => {
+  describe('When collecting type', () => {
     it('user can toggle between kyb and kyc types', async () => {
       renderDialog();
 
@@ -90,7 +98,7 @@ describe.skip('<CreateConfig />', () => {
     });
   });
 
-  describe('Name form', () => {
+  describe('When collecting name', () => {
     it('should show an error if name is not filled', async () => {
       renderDialog();
 
@@ -164,7 +172,7 @@ describe.skip('<CreateConfig />', () => {
     });
   });
 
-  describe('KycCollectForm', () => {
+  describe('When collecting KYC data', () => {
     it('should show collected data options', async () => {
       renderDialog();
 
@@ -182,6 +190,7 @@ describe.skip('<CreateConfig />', () => {
       ).toBeInTheDocument();
 
       const collectedData = screen.getByTestId('collected-data');
+
       expect(within(collectedData).getByText('Email')).toBeInTheDocument();
       expect(
         within(collectedData).getByText('Phone number'),
@@ -191,44 +200,57 @@ describe.skip('<CreateConfig />', () => {
         within(collectedData).getByText('Date of birth'),
       ).toBeInTheDocument();
       expect(within(collectedData).getByText('Address')).toBeInTheDocument();
-      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText(SSN_LAST_FOUR_LABEL),
+      ).toBeInTheDocument();
 
       // Select SSN (Last 4) option
-      const ssnLast4Option = screen.getByLabelText('SSN (Last 4)');
+      const ssnLast4Option = screen.getByLabelText(SSN_FULL_LABEL);
       await userEvent.click(ssnLast4Option);
       expect(
-        within(collectedData).getByText('SSN (Last 4)'),
+        within(collectedData).getByText(SSN_LAST_FOUR_LABEL),
       ).toBeInTheDocument();
 
       // Select SSN (Full) option
-      const ssnFullOption = screen.getByLabelText('SSN (Full)');
+      const ssnFullOption = screen.getByLabelText(SSN_FULL_LABEL);
       await userEvent.click(ssnFullOption);
-      expect(within(collectedData).getByText('SSN (Full)')).toBeInTheDocument();
+      expect(
+        within(collectedData).getByText(SSN_FULL_LABEL),
+      ).toBeInTheDocument();
 
       // Select nationality option
-      const nationalityOption = screen.getByLabelText('Nationality');
+      const nationalityOption = screen.getByLabelText(NATIONALITY_LABEL);
       await userEvent.click(nationalityOption);
       expect(
-        within(collectedData).getByText('Nationality'),
+        within(collectedData).getByText(NATIONALITY_LABEL),
       ).toBeInTheDocument();
 
-      // Unselect nationality option
-      await userEvent.click(nationalityOption);
-      expect(
-        within(collectedData).queryByText('Nationality'),
-      ).not.toBeInTheDocument();
-      // Re-select so we can test in access form
-      await userEvent.click(nationalityOption);
-
-      // Select ID Document
-      const idDocumentOption = screen.getByLabelText('ID Document');
+      // Select ID card
+      const idDocumentOption = screen.getByLabelText(ID_CARD_LABEL);
       await userEvent.click(idDocumentOption);
       expect(
-        within(collectedData).getByText('ID Document'),
+        within(collectedData).getByText(ID_CARD_LABEL),
       ).toBeInTheDocument();
+      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
+
+      // Select Passport
+      const passportOption = screen.getByLabelText(PASSPORT_LABEL);
+      await userEvent.click(passportOption);
+      expect(
+        within(collectedData).getByText(PASSPORT_LABEL),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
+
+      // Select Driver's license
+      const driversLicenseOption = screen.getByLabelText(DRIVERS_LICENSE_LABEL);
+      await userEvent.click(driversLicenseOption);
+      expect(
+        within(collectedData).getByText(DRIVERS_LICENSE_LABEL),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
 
       // Select Selfie
-      const selfieOption = screen.getByLabelText('Selfie');
+      const selfieOption = screen.getByLabelText(SELFIE_LABEL);
       await userEvent.click(selfieOption);
       expect(
         within(collectedData).getByText('ID Document & Selfie'),
@@ -237,18 +259,10 @@ describe.skip('<CreateConfig />', () => {
       // Unselect Selfie
       await userEvent.click(selfieOption);
       expect(
-        within(collectedData).getByText('ID Document'),
+        within(collectedData).getByText(ID_CARD_LABEL),
       ).toBeInTheDocument();
 
       // Select Selfie & Unselect ID Document
-      await userEvent.click(selfieOption);
-      await userEvent.click(idDocumentOption);
-      expect(
-        within(collectedData).queryByText('ID Document & Selfie'),
-      ).not.toBeInTheDocument();
-      expect(
-        within(collectedData).queryByText('ID Document'),
-      ).not.toBeInTheDocument();
     });
 
     it('should go back to the name form', async () => {
@@ -314,7 +328,7 @@ describe.skip('<CreateConfig />', () => {
       ).toBeInTheDocument();
 
       // Select nationality option - unchecked by default
-      const nationalityOption = screen.getByLabelText('Nationality');
+      const nationalityOption = screen.getByLabelText(NATIONALITY_LABEL);
       await userEvent.click(nationalityOption);
 
       await userEvent.click(nextButton);
@@ -349,14 +363,14 @@ describe.skip('<CreateConfig />', () => {
       expect(address).toBeInTheDocument();
       expect(address.checked).toBeTruthy();
 
-      const ssnFull = screen.getByLabelText('SSN (Full)') as HTMLInputElement;
+      const ssnFull = screen.getByLabelText(SSN_FULL_LABEL) as HTMLInputElement;
       expect(ssnFull).toBeInTheDocument();
       expect(ssnFull.checked).toBeTruthy();
       await userEvent.click(ssnFull);
       expect(ssnFull.checked).toBeFalsy();
 
       const nationality = screen.getByLabelText(
-        'Nationality',
+        NATIONALITY_LABEL,
       ) as HTMLInputElement;
       expect(nationality).toBeInTheDocument();
       expect(nationality.checked).toBeTruthy();
@@ -380,12 +394,12 @@ describe.skip('<CreateConfig />', () => {
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
       const options = screen.getByTestId('id-doc-form');
-      const idDocumentOption = within(options).getByLabelText('ID Document');
+      const idDocumentOption = within(options).getByLabelText(ID_CARD_LABEL);
       await userEvent.click(idDocumentOption);
 
       const collectedData = screen.getByTestId('collected-data');
       expect(
-        within(collectedData).getByText('ID Document'),
+        within(collectedData).getByText(ID_CARD_LABEL),
       ).toBeInTheDocument();
       await userEvent.click(nextButton);
 
@@ -393,14 +407,14 @@ describe.skip('<CreateConfig />', () => {
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const idDocCheckbox = screen.getByLabelText('ID Document');
+      const idDocCheckbox = screen.getByLabelText(ID_CARD_LABEL);
       expect(idDocCheckbox).toBeInTheDocument();
       expect(idDocCheckbox).toBeChecked();
-      expect(screen.queryByLabelText('Selfie')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
 
       await userEvent.click(idDocCheckbox);
       expect(idDocCheckbox).not.toBeChecked();
-      expect(screen.queryByLabelText('Selfie')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
     });
 
     it('should show document and selfie if document and selfie were collected', async () => {
@@ -419,9 +433,9 @@ describe.skip('<CreateConfig />', () => {
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
       const options = screen.getByTestId('id-doc-form');
-      const idDocumentOption = within(options).getByLabelText('ID Document');
+      const idDocumentOption = within(options).getByLabelText(ID_CARD_LABEL);
       await userEvent.click(idDocumentOption);
-      const selfieOption = screen.getByLabelText('Selfie');
+      const selfieOption = screen.getByLabelText(SELFIE_LABEL);
       await userEvent.click(selfieOption);
       await userEvent.click(nextButton);
 
@@ -429,11 +443,11 @@ describe.skip('<CreateConfig />', () => {
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const idDocCheckbox = screen.getByLabelText('ID Document');
+      const idDocCheckbox = screen.getByLabelText(ID_CARD_LABEL);
       expect(idDocCheckbox).toBeInTheDocument();
       expect(idDocCheckbox).toBeChecked();
 
-      const selfieCheckbox = screen.getByLabelText('Selfie');
+      const selfieCheckbox = screen.getByLabelText(SELFIE_LABEL);
       expect(selfieCheckbox).toBeInTheDocument();
       expect(selfieCheckbox).toBeChecked();
 
@@ -442,7 +456,7 @@ describe.skip('<CreateConfig />', () => {
 
       await userEvent.click(idDocCheckbox);
       expect(idDocCheckbox).not.toBeChecked();
-      expect(screen.queryByLabelText('Selfie')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
     });
 
     it('should go back to kyc collect form', async () => {

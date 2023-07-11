@@ -44,22 +44,11 @@ export const createOnboardingConfigMachine = () =>
         kycCollect: {
           on: {
             kycCollectSubmitted: {
-              target: 'kycStepUp',
+              target: 'kycInvestorProfile',
               actions: ['assignKycCollect'],
             },
             prevClicked: {
               target: 'name',
-            },
-          },
-        },
-        kycStepUp: {
-          on: {
-            kycStepUpSubmitted: {
-              target: 'kycInvestorProfile',
-              actions: ['assignKycStepUp'],
-            },
-            prevClicked: {
-              target: 'kycCollect',
             },
           },
         },
@@ -70,7 +59,7 @@ export const createOnboardingConfigMachine = () =>
               actions: ['assignKycInvestorProfile'],
             },
             prevClicked: {
-              target: 'kycStepUp',
+              target: 'kycCollect',
             },
           },
         },
@@ -99,22 +88,11 @@ export const createOnboardingConfigMachine = () =>
         kybBoCollect: {
           on: {
             kycCollectSubmitted: {
-              target: 'kybBoStepUp',
+              target: 'kybAccess',
               actions: ['assignKycCollect'],
             },
             prevClicked: {
               target: 'kybCollect',
-            },
-          },
-        },
-        kybBoStepUp: {
-          on: {
-            kybBoStepUpSubmitted: {
-              target: 'kybAccess',
-              actions: ['assignKybBoStepUp'],
-            },
-            prevClicked: {
-              target: 'kybBoCollect',
             },
           },
         },
@@ -125,7 +103,7 @@ export const createOnboardingConfigMachine = () =>
               actions: ['assignKybAccess'],
             },
             prevClicked: {
-              target: 'kybBoStepUp',
+              target: 'kybBoCollect',
             },
           },
         },
@@ -148,10 +126,6 @@ export const createOnboardingConfigMachine = () =>
           ...context,
           kycCollect: event.payload,
         })),
-        assignKycStepUp: assign((context, event) => ({
-          ...context,
-          kycStepUp: event.payload,
-        })),
         assignKycInvestorProfile: assign((context, event) => ({
           ...context,
           kycInvestorProfile: event.payload,
@@ -163,10 +137,6 @@ export const createOnboardingConfigMachine = () =>
         assignKybCollect: assign((context, event) => ({
           ...context,
           kybCollect: event.payload,
-        })),
-        assignKybBoStepUp: assign((context, event) => ({
-          ...context,
-          kybBoStepUp: event.payload,
         })),
         assignKybAccess: assign((context, event) => ({
           ...context,
