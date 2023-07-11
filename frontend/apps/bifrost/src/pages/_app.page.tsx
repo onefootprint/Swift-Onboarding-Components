@@ -56,7 +56,8 @@ const GlobalStyle = createGlobalStyle`
   html {
     --navigation-header-height: 65px;
     --loading-container-min-height: 188px;
-
+    height: 100%;
+    
     ${media.greaterThan('md')`
       --navigation-header-height: 57px;
     `}
@@ -64,6 +65,14 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     background: transparent;
+    height: 100%;
+
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
   }
 `;
 

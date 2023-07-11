@@ -51,10 +51,6 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
       max-height: calc(100% - (2 * ${theme.spacing[9]}));
       width: 480px;
       margin: ${theme.spacing[9]};
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
       margin: 0;
     `}
   `}
