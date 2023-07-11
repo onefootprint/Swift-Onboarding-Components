@@ -140,7 +140,8 @@ export const createOnboardingConfigMachine = () =>
         })),
         assignKybAccess: assign((context, event) => ({
           ...context,
-          kybAccess: event.payload,
+          kybAccess: event.payload.kybAccess,
+          kycAccess: event.payload.kycAccess,
         })),
       },
     },

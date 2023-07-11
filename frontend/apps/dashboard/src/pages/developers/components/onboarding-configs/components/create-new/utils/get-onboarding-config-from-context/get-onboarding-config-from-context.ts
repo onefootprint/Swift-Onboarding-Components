@@ -8,7 +8,12 @@ import {
   OrgOnboardingConfigCreateRequest,
 } from '@onefootprint/types';
 
-import { IdDocData, MachineContext } from '../machine/types';
+import {
+  IdDocData,
+  KybCollectData,
+  KycCollectData,
+  MachineContext,
+} from '../machine/types';
 
 const getMustCollectDocumentCdo = (idDocData: IdDocData) => {
   const { selfieRequired, types, regionality } = idDocData;
@@ -18,18 +23,16 @@ const getMustCollectDocumentCdo = (idDocData: IdDocData) => {
   return `document.${typeString}.${country}.${selfie}`;
 };
 
-const getKycCollectFields = (
-  context: MachineContext,
-): (CollectedKycDataOption | string)[] => {
-  const { kycCollect } = context;
-  const mustCollectData: (CollectedKycDataOption | string)[] = [
-    CollectedKycDataOption.email,
-    CollectedKycDataOption.name,
-    CollectedKycDataOption.fullAddress,
-    CollectedKycDataOption.phoneNumber,
-    CollectedKycDataOption.dob,
-  ];
+export const getRequiredKycCollectFields = () => [
+  CollectedKycDataOption.email,
+  CollectedKycDataOption.phoneNumber,
+  CollectedKycDataOption.name,
+  CollectedKycDataOption.dob,
+  CollectedKycDataOption.fullAddress,
+];
 
+export const getOptionalKycCollectFields = (kycCollect?: KycCollectData) => {
+  const mustCollectData: (CollectedKycDataOption | string)[] = [];
   if (kycCollect?.ssnKind === CollectedKycDataOption.ssn4) {
     mustCollectData.push(CollectedKycDataOption.ssn4);
   } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
@@ -45,6 +48,28 @@ const getKycCollectFields = (
   }
 
   return mustCollectData;
+};
+
+export const getRequiredKybCollectFields = () => [
+  CollectedKybDataOption.name,
+  CollectedKybDataOption.address,
+  CollectedKybDataOption.tin,
+  CollectedKybDataOption.beneficialOwners,
+];
+
+export const getOptionalKybCollectFields = (kybCollect?: KybCollectData) => {
+  const mustCollectKybData: CollectedKybDataOption[] = [];
+  if (kybCollect?.[CollectedKybDataOption.website]) {
+    mustCollectKybData.push(CollectedKybDataOption.website);
+  }
+  if (kybCollect?.[CollectedKybDataOption.phoneNumber]) {
+    mustCollectKybData.push(CollectedKybDataOption.phoneNumber);
+  }
+  if (kybCollect?.[CollectedKybDataOption.kycedBeneficialOwners]) {
+    mustCollectKybData.push(CollectedKybDataOption.kycedBeneficialOwners);
+  }
+
+  return mustCollectKybData;
 };
 
 const getKycAccessFields = (
@@ -88,42 +113,13 @@ const getKycAccessFields = (
   return canAccessData;
 };
 
-const getKybCollectFields = (
-  context: MachineContext,
-): CollectedKybDataOption[] => {
-  const { kybCollect } = context;
-  const mustCollectKybData: CollectedKybDataOption[] = [
-    CollectedKybDataOption.name,
-    CollectedKybDataOption.address,
-    CollectedKybDataOption.tin,
-    CollectedKybDataOption.beneficialOwners,
-  ];
-
-  // Optional KYB attributes
-  if (kybCollect?.[CollectedKybDataOption.website]) {
-    mustCollectKybData.push(CollectedKybDataOption.website);
-  }
-  if (kybCollect?.[CollectedKybDataOption.phoneNumber]) {
-    mustCollectKybData.push(CollectedKybDataOption.phoneNumber);
-  }
-  if (kybCollect?.[CollectedKybDataOption.kycedBeneficialOwners]) {
-    // Remove the beneficialOwners entry, add the kycedBeneficialOwners one
-    const index = mustCollectKybData.indexOf(
-      CollectedKybDataOption.beneficialOwners,
-    );
-    if (index > -1) {
-      mustCollectKybData.splice(index, 1);
-    }
-    mustCollectKybData.push(CollectedKybDataOption.kycedBeneficialOwners);
-  }
-
-  return mustCollectKybData;
-};
-
 const getKycOnboardingConfigFromContext = (context: MachineContext) => {
-  const { kycAccess, kycInvestorProfile } = context;
+  const { kycCollect, kycAccess, kycInvestorProfile } = context;
 
-  const mustCollectData = getKycCollectFields(context);
+  const mustCollectData = [
+    ...getRequiredKycCollectFields(),
+    ...getOptionalKycCollectFields(kycCollect),
+  ];
   if (
     kycInvestorProfile?.[CollectedInvestorProfileDataOption.investorProfile]
   ) {
@@ -138,11 +134,31 @@ const getKycOnboardingConfigFromContext = (context: MachineContext) => {
 };
 
 const getKybOnboardingConfigFromContext = (context: MachineContext) => {
-  const { kybAccess } = context;
+  const { kycCollect, kybCollect, kybAccess } = context;
 
-  const mustCollectKybData = getKybCollectFields(context);
-  const mustCollectKycData = getKycCollectFields(context);
-  const mustCollectData = [...mustCollectKybData, ...mustCollectKycData];
+  const mustCollectKybData = [
+    ...getRequiredKybCollectFields(),
+    ...getOptionalKybCollectFields(kybCollect),
+  ];
+
+  if (
+    mustCollectKybData.includes(CollectedKybDataOption.kycedBeneficialOwners) &&
+    mustCollectKybData.includes(CollectedKybDataOption.beneficialOwners)
+  ) {
+    // Remove the beneficialOwners entry, add the kycedBeneficialOwners one
+    const index = mustCollectKybData.indexOf(
+      CollectedKybDataOption.beneficialOwners,
+    );
+    if (index > -1) {
+      mustCollectKybData.splice(index, 1);
+    }
+  }
+
+  const mustCollectData = [
+    ...mustCollectKybData,
+    ...getRequiredKycCollectFields(),
+    ...getOptionalKycCollectFields(kycCollect),
+  ];
 
   const canAccessData: CollectedDataOption[] = kybAccess?.allKybData
     ? [...mustCollectKybData]

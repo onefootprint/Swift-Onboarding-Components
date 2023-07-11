@@ -10,17 +10,49 @@ import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
-import withCreateOnboardingConfig from './dialog.test.config';
+import {
+  ADDRESS_LABEL,
+  BENEFICIAL_OWNERS_LABEL,
+  BUSINESS_ADDRESS_LABEL,
+  BUSINESS_BO_FULL_KYC_LABEL,
+  BUSINESS_BO_FULL_KYC_OPTION,
+  BUSINESS_NAME_LABEL,
+  BUSINESS_PHONE_LABEL,
+  BUSINESS_TIN_LABEL,
+  BUSINESS_WEBSITE_LABEL,
+  checkCollectedDataDoesNotExist,
+  checkCollectedDataExists,
+  clickBack,
+  clickNext,
+  DOB_LABEL,
+  DRIVERS_LICENSE_OPTION,
+  EMAIL_LABEL,
+  fillInvestorProfile,
+  fillKybAccess,
+  fillKybCollect,
+  fillKycAccess,
+  fillKycCollect,
+  fillName,
+  ID_CARD_OPTION,
+  ID_DOCUMENT_AND_SELFIE_LABEL,
+  ID_DOCUMENT_LABEL,
+  INVESTOR_PROFILE_LABEL,
+  NAME_LABEL,
+  NATIONALITY_LABEL,
+  NATIONALITY_OPTION,
+  PASSPORT_OPTION,
+  PHONE_LABEL,
+  selectType,
+  SELFIE_LABEL,
+  SELFIE_OPTION,
+  SSN_FULL_LABEL,
+  SSN_LAST_FOUR_LABEL,
+  toggleAccessOption,
+  toggleCollectOption,
+  withCreateOnboardingConfig,
+} from './dialog.test.config';
 
-const SELFIE_LABEL = 'Request a selfie';
-const SSN_FULL_LABEL = 'SSN (Full)';
-const SSN_LAST_FOUR_LABEL = 'SSN (Last 4)';
-const NATIONALITY_LABEL = 'Request users to specify their nationality';
-const ID_CARD_LABEL = 'ID Document';
-const PASSPORT_LABEL = 'Passport';
-const DRIVERS_LICENSE_LABEL = "Driver's license";
-
-describe.skip('<Dialog />', () => {
+describe('<Dialog />', () => {
   const defaultOptions = {
     open: true,
     onClose: jest.fn(),
@@ -102,13 +134,10 @@ describe.skip('<Dialog />', () => {
     it('should show an error if name is not filled', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      expect(nextButton).toBeInTheDocument();
-      await userEvent.click(nextButton);
+      await selectType();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      await userEvent.click(nextButton);
+      await clickNext();
       await waitFor(() => {
         const errorMessage = screen.getByText(
           'Please enter a name for your onboarding configuration.',
@@ -121,13 +150,12 @@ describe.skip('<Dialog />', () => {
       renderDialog();
 
       expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      expect(nextButton).toBeInTheDocument();
-      await userEvent.click(nextButton);
+
+      await clickNext();
+      await clickNext();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const backButton = screen.getByRole('button', { name: 'Go back' });
-      await userEvent.click(backButton);
+      await clickBack();
 
       expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
     });
@@ -136,14 +164,14 @@ describe.skip('<Dialog />', () => {
       renderDialog();
 
       expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      expect(nextButton).toBeInTheDocument();
-      await userEvent.click(nextButton);
+
+      await clickNext();
+      await clickNext();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
       const nameInput = screen.getByLabelText('Onboarding configuration name');
       await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await clickNext();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
@@ -157,14 +185,13 @@ describe.skip('<Dialog />', () => {
       const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
       await userEvent.click(kyb);
 
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      expect(nextButton).toBeInTheDocument();
-      await userEvent.click(nextButton);
+      await clickNext();
+      await clickNext();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
       const nameInput = screen.getByLabelText('Onboarding configuration name');
       await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await clickNext();
 
       expect(
         screen.getByTestId(getFormIdForState('kybCollect')),
@@ -176,313 +203,209 @@ describe.skip('<Dialog />', () => {
     it('should show collected data options', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
 
-      const collectedData = screen.getByTestId('collected-data');
+      await checkCollectedDataExists([
+        EMAIL_LABEL,
+        PHONE_LABEL,
+        NAME_LABEL,
+        DOB_LABEL,
+        ADDRESS_LABEL,
+        SSN_FULL_LABEL,
+      ]);
 
-      expect(within(collectedData).getByText('Email')).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('Phone number'),
-      ).toBeInTheDocument();
-      expect(within(collectedData).getByText('Full name')).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('Date of birth'),
-      ).toBeInTheDocument();
-      expect(within(collectedData).getByText('Address')).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText(SSN_LAST_FOUR_LABEL),
-      ).toBeInTheDocument();
+      await toggleCollectOption(SSN_LAST_FOUR_LABEL, SSN_LAST_FOUR_LABEL, true);
+      await toggleCollectOption(SSN_FULL_LABEL, SSN_FULL_LABEL, true);
+      await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, true);
+      await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, false);
 
-      // Select SSN (Last 4) option
-      const ssnLast4Option = screen.getByLabelText(SSN_FULL_LABEL);
-      await userEvent.click(ssnLast4Option);
-      expect(
-        within(collectedData).getByText(SSN_LAST_FOUR_LABEL),
-      ).toBeInTheDocument();
+      // Select ID card & selfie
+      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
+      await toggleCollectOption(
+        SELFIE_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        true,
+      );
 
-      // Select SSN (Full) option
-      const ssnFullOption = screen.getByLabelText(SSN_FULL_LABEL);
-      await userEvent.click(ssnFullOption);
-      expect(
-        within(collectedData).getByText(SSN_FULL_LABEL),
-      ).toBeInTheDocument();
+      // Unselect Selfie & then ID card
+      await toggleCollectOption(
+        SELFIE_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        false,
+      );
+      await checkCollectedDataExists([ID_DOCUMENT_LABEL]);
+      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, false);
+      expect(screen.queryByText(SELFIE_OPTION)).not.toBeInTheDocument();
 
-      // Select nationality option
-      const nationalityOption = screen.getByLabelText(NATIONALITY_LABEL);
-      await userEvent.click(nationalityOption);
-      expect(
-        within(collectedData).getByText(NATIONALITY_LABEL),
-      ).toBeInTheDocument();
+      // Select Passport & selfie
+      await toggleCollectOption(PASSPORT_OPTION, ID_DOCUMENT_LABEL, true);
+      await toggleCollectOption(
+        SELFIE_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        true,
+      );
 
-      // Select ID card
-      const idDocumentOption = screen.getByLabelText(ID_CARD_LABEL);
-      await userEvent.click(idDocumentOption);
-      expect(
-        within(collectedData).getByText(ID_CARD_LABEL),
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
+      // Unselect passport
+      // This should automatically unselect the selfie
+      await toggleCollectOption(
+        PASSPORT_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        false,
+      );
+      await checkCollectedDataDoesNotExist([ID_DOCUMENT_LABEL]);
 
-      // Select Passport
-      const passportOption = screen.getByLabelText(PASSPORT_LABEL);
-      await userEvent.click(passportOption);
-      expect(
-        within(collectedData).getByText(PASSPORT_LABEL),
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
-
-      // Select Driver's license
-      const driversLicenseOption = screen.getByLabelText(DRIVERS_LICENSE_LABEL);
-      await userEvent.click(driversLicenseOption);
-      expect(
-        within(collectedData).getByText(DRIVERS_LICENSE_LABEL),
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText(SELFIE_LABEL)).toBeInTheDocument();
-
-      // Select Selfie
-      const selfieOption = screen.getByLabelText(SELFIE_LABEL);
-      await userEvent.click(selfieOption);
-      expect(
-        within(collectedData).getByText('ID Document & Selfie'),
-      ).toBeInTheDocument();
-
-      // Unselect Selfie
-      await userEvent.click(selfieOption);
-      expect(
-        within(collectedData).getByText(ID_CARD_LABEL),
-      ).toBeInTheDocument();
-
-      // Select Selfie & Unselect ID Document
+      // Select Driver's license & selfie
+      await toggleCollectOption(
+        DRIVERS_LICENSE_OPTION,
+        ID_DOCUMENT_LABEL,
+        true,
+      );
+      await toggleCollectOption(
+        SELFIE_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        true,
+      );
     });
 
     it('should go back to the name form', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      expect(nextButton).toBeInTheDocument();
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
-      const backButton = screen.getByRole('button', { name: 'Go back' });
-      await userEvent.click(backButton);
+      await clickBack();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-    });
-
-    it('should go to the kyc access form next', async () => {
-      renderDialog();
-
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
-
-      expect(
-        screen.getByTestId(getFormIdForState('kycCollect')),
-      ).toBeInTheDocument();
-      await userEvent.click(nextButton);
-
-      expect(
-        screen.getByTestId(getFormIdForState('kycAccess')),
-      ).toBeInTheDocument();
     });
   });
 
-  describe('KycAccessForm', () => {
+  describe('When collecting KYC data access', () => {
     it('should show collected data options selected by default', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
 
       // Select nationality option - unchecked by default
-      const nationalityOption = screen.getByLabelText(NATIONALITY_LABEL);
-      await userEvent.click(nationalityOption);
+      await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, true);
+      await clickNext();
 
-      await userEvent.click(nextButton);
+      await fillInvestorProfile();
 
       expect(
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const email = screen.getByLabelText('Email') as HTMLInputElement;
-      expect(email).toBeInTheDocument();
-      expect(email.checked).toBeTruthy();
+      await toggleAccessOption(EMAIL_LABEL, false);
+      await toggleAccessOption(PHONE_LABEL, false);
+      await toggleAccessOption(NAME_LABEL, false);
+      await toggleAccessOption(DOB_LABEL, false);
+      await toggleAccessOption(NATIONALITY_LABEL, false);
+      await toggleAccessOption(ADDRESS_LABEL, false);
+      await toggleAccessOption(SSN_FULL_LABEL, false);
+    });
 
-      const phoneNumber = screen.getByLabelText(
-        'Phone number',
-      ) as HTMLInputElement;
-      expect(phoneNumber).toBeInTheDocument();
-      expect(phoneNumber.checked).toBeTruthy();
+    it('should show investor profile if it was collected', async () => {
+      renderDialog();
 
-      const fullName = screen.getByLabelText('Full name') as HTMLInputElement;
-      expect(fullName).toBeInTheDocument();
-      expect(fullName.checked).toBeTruthy();
+      await selectType();
+      await fillName();
 
-      const dateOfBirth = screen.getByLabelText(
-        'Date of birth',
-      ) as HTMLInputElement;
-      expect(dateOfBirth).toBeInTheDocument();
-      expect(dateOfBirth.checked).toBeTruthy();
-      await userEvent.click(dateOfBirth);
-      expect(dateOfBirth.checked).toBeFalsy();
+      await fillKycCollect();
 
-      const address = screen.getByLabelText('Address') as HTMLInputElement;
-      expect(address).toBeInTheDocument();
-      expect(address.checked).toBeTruthy();
+      await fillInvestorProfile(true);
 
-      const ssnFull = screen.getByLabelText(SSN_FULL_LABEL) as HTMLInputElement;
-      expect(ssnFull).toBeInTheDocument();
-      expect(ssnFull.checked).toBeTruthy();
-      await userEvent.click(ssnFull);
-      expect(ssnFull.checked).toBeFalsy();
+      expect(
+        screen.getByTestId(getFormIdForState('kycAccess')),
+      ).toBeInTheDocument();
 
-      const nationality = screen.getByLabelText(
-        NATIONALITY_LABEL,
-      ) as HTMLInputElement;
-      expect(nationality).toBeInTheDocument();
-      expect(nationality.checked).toBeTruthy();
-      await userEvent.click(nationality);
-      expect(nationality.checked).toBeFalsy();
+      await toggleAccessOption(INVESTOR_PROFILE_LABEL, false);
     });
 
     it('should show document if only document was collected', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
-      const options = screen.getByTestId('id-doc-form');
-      const idDocumentOption = within(options).getByLabelText(ID_CARD_LABEL);
-      await userEvent.click(idDocumentOption);
+      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
+      await clickNext();
 
-      const collectedData = screen.getByTestId('collected-data');
-      expect(
-        within(collectedData).getByText(ID_CARD_LABEL),
-      ).toBeInTheDocument();
-      await userEvent.click(nextButton);
+      await fillInvestorProfile();
 
       expect(
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const idDocCheckbox = screen.getByLabelText(ID_CARD_LABEL);
-      expect(idDocCheckbox).toBeInTheDocument();
-      expect(idDocCheckbox).toBeChecked();
+      await toggleAccessOption(ID_DOCUMENT_LABEL, false);
       expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
 
-      await userEvent.click(idDocCheckbox);
-      expect(idDocCheckbox).not.toBeChecked();
+      await toggleAccessOption(ID_DOCUMENT_LABEL, true);
       expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
     });
 
     it('should show document and selfie if document and selfie were collected', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
-      const options = screen.getByTestId('id-doc-form');
-      const idDocumentOption = within(options).getByLabelText(ID_CARD_LABEL);
-      await userEvent.click(idDocumentOption);
-      const selfieOption = screen.getByLabelText(SELFIE_LABEL);
-      await userEvent.click(selfieOption);
-      await userEvent.click(nextButton);
+      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
+      await toggleCollectOption(
+        SELFIE_OPTION,
+        ID_DOCUMENT_AND_SELFIE_LABEL,
+        true,
+      );
+      await clickNext();
+
+      await fillInvestorProfile();
 
       expect(
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const idDocCheckbox = screen.getByLabelText(ID_CARD_LABEL);
-      expect(idDocCheckbox).toBeInTheDocument();
-      expect(idDocCheckbox).toBeChecked();
-
-      const selfieCheckbox = screen.getByLabelText(SELFIE_LABEL);
-      expect(selfieCheckbox).toBeInTheDocument();
-      expect(selfieCheckbox).toBeChecked();
-
-      await userEvent.click(selfieCheckbox);
-      expect(selfieCheckbox).not.toBeChecked();
-
-      await userEvent.click(idDocCheckbox);
-      expect(idDocCheckbox).not.toBeChecked();
+      await toggleAccessOption(ID_DOCUMENT_LABEL, false);
       expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
+      await toggleAccessOption(ID_DOCUMENT_LABEL, true);
+      await toggleAccessOption(SELFIE_LABEL, true);
     });
 
     it('should go back to kyc collect form', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
-
-      expect(
-        screen.getByTestId(getFormIdForState('kycCollect')),
-      ).toBeInTheDocument();
-      await userEvent.click(nextButton);
+      await selectType();
+      await fillName();
+      await fillKycCollect();
+      await fillInvestorProfile();
 
       expect(
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      const backButton = screen.getByRole('button', { name: 'Go back' });
-      await userEvent.click(backButton);
+      await clickBack();
+      expect(
+        screen.getByTestId(getFormIdForState('kycInvestorProfile')),
+      ).toBeInTheDocument();
 
+      await clickBack();
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
@@ -495,25 +418,11 @@ describe.skip('<Dialog />', () => {
       const onClose = jest.fn();
       renderDialog({ onCreate, onClose });
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
-
-      expect(
-        screen.getByTestId(getFormIdForState('kycCollect')),
-      ).toBeInTheDocument();
-      await userEvent.click(nextButton);
-
-      expect(
-        screen.getByTestId(getFormIdForState('kycAccess')),
-      ).toBeInTheDocument();
-      const saveButton = screen.getByRole('button', { name: 'Save' });
-      await userEvent.click(saveButton);
+      await selectType();
+      await fillName();
+      await fillKycCollect();
+      await fillInvestorProfile();
+      await fillKycAccess();
 
       await waitFor(() => {
         expect(onCreate).toHaveBeenCalled();
@@ -529,7 +438,7 @@ describe.skip('<Dialog />', () => {
     });
   });
 
-  describe('KybCollectForm', () => {
+  describe('When collecting KYB data', () => {
     it('should show collected data options', async () => {
       renderDialog();
 
@@ -537,74 +446,52 @@ describe.skip('<Dialog />', () => {
       const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
       await userEvent.click(kyb);
 
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
+      await clickNext();
 
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
       const nameInput = screen.getByLabelText('Onboarding configuration name');
       await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await clickNext();
 
       expect(
         screen.getByTestId(getFormIdForState('kybCollect')),
       ).toBeInTheDocument();
 
-      const collectedData = screen.getByTestId('collected-data');
-      expect(
-        within(collectedData).getByText('Business name'),
-      ).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('Registered business address'),
-      ).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('Business beneficial owners'),
-      ).toBeInTheDocument();
-      expect(
-        within(collectedData).getByText('Taxpayer Identification Number (TIN)'),
-      ).toBeInTheDocument();
+      await checkCollectedDataExists([
+        BUSINESS_NAME_LABEL,
+        BUSINESS_TIN_LABEL,
+        BUSINESS_ADDRESS_LABEL,
+        BENEFICIAL_OWNERS_LABEL,
+      ]);
 
-      const options = screen.getByTestId('kyb-collect-form-options');
-      const website = within(options).getByLabelText(
-        'Business website',
-      ) as HTMLInputElement;
-      expect(website).toBeInTheDocument();
-      expect(website.checked).toBeFalsy();
-      await userEvent.click(website);
-      expect(website.checked).toBeTruthy();
+      await toggleCollectOption(
+        BUSINESS_BO_FULL_KYC_OPTION,
+        BUSINESS_BO_FULL_KYC_LABEL,
+        true,
+      );
+      await checkCollectedDataDoesNotExist([BENEFICIAL_OWNERS_LABEL]);
 
-      const phoneNumber = within(options).getByLabelText(
-        'Business phone number',
-      ) as HTMLInputElement;
-      expect(phoneNumber).toBeInTheDocument();
-      expect(phoneNumber.checked).toBeFalsy();
-      await userEvent.click(phoneNumber);
-      expect(phoneNumber.checked).toBeTruthy();
-
-      const kycBos = within(options).getByLabelText(
-        'Fully KYC all beneficial owners',
-      ) as HTMLInputElement;
-      expect(kycBos).toBeInTheDocument();
-      expect(kycBos.checked).toBeFalsy();
-      await userEvent.click(kycBos);
-      expect(kycBos.checked).toBeTruthy();
+      await toggleCollectOption(
+        BUSINESS_WEBSITE_LABEL,
+        BUSINESS_WEBSITE_LABEL,
+        true,
+      );
+      await toggleCollectOption(
+        BUSINESS_PHONE_LABEL,
+        BUSINESS_PHONE_LABEL,
+        true,
+      );
     });
 
-    describe('when non-firm-employee', () => {
+    describe('When user is not a firm-employee', () => {
       beforeEach(asAdminUser);
 
       it('should not display option to KYC all BOs', async () => {
         renderDialog();
 
         // Advance to data collection screen
-        const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
-        await userEvent.click(kyb);
-        const nextButton = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(nextButton);
-        const nameInput = screen.getByLabelText(
-          'Onboarding configuration name',
-        );
-        await userEvent.type(nameInput, 'Test name');
-        await userEvent.click(nextButton);
+        await selectType(true);
+        await fillName();
 
         // Make sure we don't see fully-KYCed option
         expect(
@@ -621,52 +508,65 @@ describe.skip('<Dialog />', () => {
     it('should go back to name form', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
-      await userEvent.click(kyb);
-
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType(true);
+      await clickNext();
+      await fillName();
 
       expect(
         screen.getByTestId(getFormIdForState('kybCollect')),
       ).toBeInTheDocument();
 
-      const backButton = screen.getByRole('button', { name: 'Go back' });
-      await userEvent.click(backButton);
-
+      await clickBack();
       expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
     });
 
     it('should go to kyb bo collect form next', async () => {
       renderDialog();
 
-      expect(screen.getByTestId(getFormIdForState('type'))).toBeInTheDocument();
-      const kyb = screen.getByLabelText('KYB') as HTMLButtonElement;
-      await userEvent.click(kyb);
-
-      const nextButton = screen.getByRole('button', { name: 'Next' });
-      await userEvent.click(nextButton);
-
-      expect(screen.getByTestId(getFormIdForState('name'))).toBeInTheDocument();
-      const nameInput = screen.getByLabelText('Onboarding configuration name');
-      await userEvent.type(nameInput, 'Test name');
-      await userEvent.click(nextButton);
+      await selectType(true);
+      await fillName();
+      await fillKybCollect();
+      await fillKycCollect();
 
       expect(
-        screen.getByTestId(getFormIdForState('kybCollect')),
+        screen.getByTestId(getFormIdForState('kybAccess')),
       ).toBeInTheDocument();
 
-      await userEvent.click(nextButton);
-
+      await clickBack();
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
+
+      await clickBack();
+      expect(
+        screen.getByTestId(getFormIdForState('kybCollect')),
+      ).toBeInTheDocument();
+    });
+
+    it('should save onboarding config next', async () => {
+      withCreateOnboardingConfig();
+
+      const onCreate = jest.fn();
+      const onClose = jest.fn();
+      renderDialog({ onCreate, onClose });
+
+      await selectType(true);
+      await fillName();
+      await fillKybCollect();
+      await fillKycCollect();
+      await fillKybAccess();
+
+      await waitFor(() => {
+        expect(onCreate).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(
+          screen.getByText('Onboarding config created successfully.'),
+        ).toBeInTheDocument();
+      });
     });
   });
 });

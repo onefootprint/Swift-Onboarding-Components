@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoIdCard24, IcoStore24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { RadioSelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -33,7 +34,7 @@ const Type = () => {
   };
 
   return (
-    <form
+    <Form
       data-testid={getFormIdForState(state.value)}
       id={getFormIdForState(state.value)}
       onSubmit={handleSubmit(onSubmit)}
@@ -63,8 +64,16 @@ const Type = () => {
           />
         )}
       />
-    </form>
+    </Form>
   );
 };
+
+const Form = styled.form`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[7]};
+  `}
+`;
 
 export default Type;

@@ -13,31 +13,41 @@ export type IdDocData = {
   regionality: IdDocRegionality;
 };
 
+export type KycCollectData = {
+  ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+  [CollectedKycDataOption.nationality]: boolean;
+  idDoc: IdDocData;
+};
+
+export type KycInvestorProfileData = {
+  [CollectedInvestorProfileDataOption.investorProfile]: boolean;
+};
+
+export type KycAccessData = Record<
+  | CollectedKycDataOption
+  | CollectedDocumentDataOption
+  | CollectedInvestorProfileDataOption,
+  boolean
+>;
+
+export type KybCollectData = {
+  [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
+  [CollectedKybDataOption.website]: boolean;
+  [CollectedKybDataOption.phoneNumber]: boolean;
+};
+
+export type KybAccessData = {
+  allKybData: boolean;
+};
+
 export type MachineContext = {
   type?: 'kyb' | 'kyc';
   name?: string;
-  kycCollect?: {
-    ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-    [CollectedKycDataOption.nationality]: boolean;
-    idDoc: IdDocData;
-  };
-  kycInvestorProfile?: {
-    [CollectedInvestorProfileDataOption.investorProfile]: boolean;
-  };
-  kycAccess?: Record<
-    | CollectedKycDataOption
-    | CollectedDocumentDataOption
-    | CollectedInvestorProfileDataOption,
-    boolean
-  >;
-  kybCollect?: {
-    [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
-    [CollectedKybDataOption.website]: boolean;
-    [CollectedKybDataOption.phoneNumber]: boolean;
-  };
-  kybAccess?: {
-    allKybData: boolean;
-  };
+  kycCollect?: KycCollectData;
+  kycInvestorProfile?: KycInvestorProfileData;
+  kycAccess?: KycAccessData;
+  kybCollect?: KybCollectData;
+  kybAccess?: KybAccessData;
 };
 
 export type MachineEvents =
@@ -58,44 +68,24 @@ export type MachineEvents =
     }
   | {
       type: 'kycCollectSubmitted';
-      payload: {
-        ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-        [CollectedKycDataOption.nationality]: boolean;
-        idDoc: IdDocData;
-      };
+      payload: KycCollectData;
     }
   | {
       type: 'kycInvestorProfileSubmitted';
-      payload: {
-        [CollectedInvestorProfileDataOption.investorProfile]: boolean;
-      };
+      payload: KycInvestorProfileData;
     }
   | {
       type: 'kycAccessSubmitted';
-      payload: Record<
-        | CollectedKycDataOption
-        | CollectedDocumentDataOption
-        | CollectedInvestorProfileDataOption,
-        boolean
-      >;
+      payload: KycAccessData;
     }
   | {
       type: 'kybCollectSubmitted';
-      payload: {
-        [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
-        [CollectedKybDataOption.website]: boolean;
-        [CollectedKybDataOption.phoneNumber]: boolean;
-      };
+      payload: KybCollectData;
     }
   | {
       type: 'kybAccessSubmitted';
       payload: {
-        allKybData: boolean;
-        kycAccess: Record<
-          | CollectedKycDataOption
-          | CollectedDocumentDataOption
-          | CollectedInvestorProfileDataOption,
-          boolean
-        >;
+        kybAccess: KybAccessData;
+        kycAccess: KycAccessData;
       };
     };

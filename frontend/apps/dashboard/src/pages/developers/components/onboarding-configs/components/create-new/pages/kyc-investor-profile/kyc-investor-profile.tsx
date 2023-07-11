@@ -5,8 +5,13 @@ import { Checkbox, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import CollectedDataSummary from '../../components/collected-data-summary';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getFormIdForState from '../../utils/get-form-id-for-state';
+import {
+  getOptionalKycCollectFields,
+  getRequiredKycCollectFields,
+} from '../../utils/get-onboarding-config-from-context';
 import InvestorProfileForm from './components/investor-profile-form';
 
 type FormData = {
@@ -18,14 +23,21 @@ const KycInvestorProfile = () => {
     'pages.developers.onboarding-configs.create-new.kyc-investor-profile',
   );
   const [state, send] = useOnboardingConfigMachine();
-  const { kycInvestorProfile } = state.context;
+  const { kycInvestorProfile, kycCollect } = state.context;
   const methods = useForm<FormData>({
     defaultValues: {
       shouldCollect: kycInvestorProfile?.investor_profile || false,
     },
   });
   const { handleSubmit, register, watch } = methods;
-  const investorProfileQuestionsVisible = watch('shouldCollect');
+  const shouldCollect = watch('shouldCollect');
+  const collectedData = [
+    ...getRequiredKycCollectFields(),
+    ...getOptionalKycCollectFields(kycCollect),
+  ];
+  if (shouldCollect) {
+    collectedData.push(CollectedInvestorProfileDataOption.investorProfile);
+  }
 
   const handleBeforeSubmit = (formData: FormData) => {
     send({
@@ -44,6 +56,7 @@ const KycInvestorProfile = () => {
         id={getFormIdForState(state.value)}
         onSubmit={handleSubmit(handleBeforeSubmit)}
       >
+        <CollectedDataSummary collectedData={collectedData} />
         <Section>
           <SectionTitle>
             <Typography variant="label-2">{t('title')}</Typography>
@@ -51,7 +64,7 @@ const KycInvestorProfile = () => {
           </SectionTitle>
           <SectionContent>
             <Checkbox label={t('label')} {...register('shouldCollect')} />
-            <InvestorProfileForm isExpanded={investorProfileQuestionsVisible} />
+            <InvestorProfileForm isExpanded={shouldCollect} />
           </SectionContent>
         </Section>
       </Form>

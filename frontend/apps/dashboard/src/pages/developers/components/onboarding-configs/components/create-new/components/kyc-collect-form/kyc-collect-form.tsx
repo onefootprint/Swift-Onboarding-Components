@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDataOption,
+  CollectedDocumentDataOption,
   CollectedKycDataOption,
   IdDocRegionality,
   IdDocType,
@@ -11,6 +12,8 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
+import { getRequiredKycCollectFields } from '../../utils/get-onboarding-config-from-context';
+import CollectedDataSummary from '../collected-data-summary';
 import IdDocForm from '../id-doc-form';
 import { useOnboardingConfigMachine } from '../machine-provider';
 
@@ -22,7 +25,11 @@ type FormData = {
   selfieRequired: boolean;
 };
 
-const KycCollectForm = () => {
+type KycCollectFormProps = {
+  title?: string | React.ReactNode;
+};
+
+const KycCollectForm = ({ title }: KycCollectFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create-new.kyc-collect-form',
   );
@@ -41,22 +48,23 @@ const KycCollectForm = () => {
     },
   });
   const { register, handleSubmit, watch } = methods;
+  const collectedData: CollectedDataOption[] = getRequiredKycCollectFields();
   const ssnKind = watch('ssnKind');
-  const nationality = watch(CollectedKycDataOption.nationality);
-  const collectedData: CollectedDataOption[] = [
-    CollectedKycDataOption.email,
-    CollectedKycDataOption.phoneNumber,
-    CollectedKycDataOption.name,
-    CollectedKycDataOption.dob,
-    CollectedKycDataOption.fullAddress,
-  ];
   collectedData.push(
     ssnKind === CollectedKycDataOption.ssn4
       ? CollectedKycDataOption.ssn4
       : CollectedKycDataOption.ssn9,
   );
+  const nationality = watch(CollectedKycDataOption.nationality);
   if (nationality) {
     collectedData.push(CollectedKycDataOption.nationality);
+  }
+  const idDoc = watch('idDocType');
+  const selfie = watch('selfieRequired');
+  if (idDoc?.length && selfie) {
+    collectedData.push(CollectedDocumentDataOption.documentAndSelfie);
+  } else if (idDoc?.length) {
+    collectedData.push(CollectedDocumentDataOption.document);
   }
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -82,6 +90,8 @@ const KycCollectForm = () => {
         id={getFormIdForState(state.value)}
         onSubmit={handleSubmit(handleBeforeSubmit)}
       >
+        <CollectedDataSummary collectedData={collectedData} />
+        {title}
         <Section>
           <Typography variant="label-3">{t('ssn')}</Typography>
           <OptionsContainer>

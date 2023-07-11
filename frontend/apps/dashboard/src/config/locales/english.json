@@ -1354,7 +1354,7 @@
             }
           },
           "collected-data-summary": {
-            "title": "Collected data"
+            "will-collect": "Will collect:"
           },
           "id-doc-form": {
             "selfie": {
@@ -1412,7 +1412,9 @@
           },
           "kyb-bo-collect-form": {
             "title": "KYC of a Beneficial owner",
-            "description": "To successfully verify a business we also need to verify its beneficial owner's identity."
+            "description": "To successfully verify a business we also need to verify its beneficial owner's identity.",
+            "step-up": "Step-up document request",
+            "step-up-description": "When users cannot be instantly verified with the data they submitted, you can request them to submit extra documentation. This step up improves the conversion rate of your onboarding process and has an extra cost per request."
           },
           "kyb-access-form": {
             "title": "Authorized scopes",

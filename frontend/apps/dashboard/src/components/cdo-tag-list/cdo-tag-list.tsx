@@ -7,10 +7,11 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { Tag } from '@onefootprint/ui';
+import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type CdoTagListProps = {
+  label?: string;
   testID?: string;
   cdos: CollectedDataOption[];
   disableSort?: boolean;
@@ -42,7 +43,7 @@ const isDocumentDi = (cdo: string) => cdo.startsWith('document.');
 const isDocumentAndSelfieDi = (cdo: string) =>
   isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
 
-const CdoTagList = ({ testID, cdos, disableSort }: CdoTagListProps) => {
+const CdoTagList = ({ label, testID, cdos, disableSort }: CdoTagListProps) => {
   const { t } = useTranslation('cdo');
   const processedCdos = cdos.map(cdo => {
     if (isDocumentAndSelfieDi(cdo)) {
@@ -62,6 +63,15 @@ const CdoTagList = ({ testID, cdos, disableSort }: CdoTagListProps) => {
 
   return (
     <Container data-testid={testID}>
+      {label && (
+        <Typography
+          variant="label-4"
+          color="secondary"
+          sx={{ marginRight: 2, alignItems: 'center', display: 'flex' }}
+        >
+          {label}
+        </Typography>
+      )}
       {tagLabels.map((tag: string) => (
         <Tag role="listitem" aria-label={tag} key={tag}>
           {tag}

@@ -9,12 +9,11 @@ const KycCollect = () => {
     'pages.developers.onboarding-configs.create-new.kyc-collect-form',
   );
 
-  return (
-    <>
-      <FormTitle title={t('title')} description={t('description')} />
-      <KycCollectForm />
-    </>
+  const getTitle = () => (
+    <FormTitle title={t('title')} description={t('description')} />
   );
+
+  return <KycCollectForm title={getTitle()} />;
 };
 
 export default KycCollect;

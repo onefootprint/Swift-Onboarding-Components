@@ -16,9 +16,16 @@ const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create-new.id-doc-form',
   );
-  const { register, watch } = useFormContext();
+  const { register, watch, setValue } = useFormContext();
   const idDocTypes = watch('idDocType');
   const hasDocument = idDocTypes.length > 0;
+
+  const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.checked && idDocTypes.length === 1) {
+      setValue('selfieRequired', false);
+      setValue('regionality', IdDocRegionality.international);
+    }
+  };
 
   return (
     <Container data-testid="id-doc-form">
@@ -36,7 +43,9 @@ const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
             key={type}
             label={allT(`id_document.${type}`)}
             value={type}
-            {...register('idDocType')}
+            {...register('idDocType', {
+              onChange: handleDocumentChange,
+            })}
           />
         ))}
       </OptionsContainer>
