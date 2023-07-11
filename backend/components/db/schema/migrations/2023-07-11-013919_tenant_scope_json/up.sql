@@ -16,4 +16,5 @@ SET scopes_json = (
 -- TODO will drop this in next PR, keeping around for reverting if needed
 ALTER TABLE tenant_role RENAME COLUMN scopes TO scopes_old;
 ALTER TABLE tenant_role RENAME COLUMN scopes_json TO scopes;
+ALTER TABLE tenant_role ALTER COLUMN scopes_old DROP NOT NULL;
 ALTER TABLE tenant_role ALTER COLUMN scopes SET NOT NULL;
