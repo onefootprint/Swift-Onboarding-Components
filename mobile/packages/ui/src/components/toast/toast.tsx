@@ -8,10 +8,13 @@ import haptic from '../../utils/haptic';
 import Notification from './components/notification';
 import type { MessageComponentProps, ShowToast } from './toast.types';
 
+const DURATION = 5000;
+
 export const ToastProvider = () => (
   <FlashMessage
     position="top"
-    autoHide={false}
+    autoHide={true}
+    duration={DURATION}
     MessageComponent={({ message }: MessageComponentProps) => (
       <Notification
         cta={message.cta}

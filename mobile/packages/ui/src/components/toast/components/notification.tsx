@@ -1,14 +1,11 @@
 import { IcoCloseSmall24, IcoInfo24, IcoWarning24 } from '@onefootprint/icons';
 import React from 'react';
-import { useTimeout } from 'usehooks-ts';
 
 import { Box } from '../../box';
 import { IconButton } from '../../icon-button';
 import { LinkButton } from '../../link-button';
 import { Typography } from '../../typography';
 import type { NotificationVariants } from '../toast.types';
-
-const DURATION = 5000;
 
 export type NotificationProps = {
   cta?: {
@@ -28,12 +25,6 @@ const Notification = ({
   onClose,
   variant,
 }: NotificationProps) => {
-  useTimeout(() => {
-    if (variant !== 'error') {
-      onClose?.();
-    }
-  }, DURATION);
-
   return (
     <Box
       backgroundColor="primary"
