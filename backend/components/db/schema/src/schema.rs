@@ -671,7 +671,7 @@ table! {
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         is_immutable -> Bool,
-        scopes -> Array<Text>,
+        scopes -> Array<Jsonb>,
     }
 }
 
