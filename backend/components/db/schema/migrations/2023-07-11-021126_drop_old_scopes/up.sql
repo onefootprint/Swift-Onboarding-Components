@@ -1,0 +1,1 @@
+ALTER TABLE tenant_role DROP COLUMN scopes_old;

@@ -1,0 +1,1 @@
+ALTER TABLE tenant_role ADD COLUMN scopes_old TEXT[];
