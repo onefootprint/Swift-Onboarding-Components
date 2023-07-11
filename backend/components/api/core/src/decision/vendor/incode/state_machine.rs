@@ -40,7 +40,6 @@ impl IncodeState {
             Self::ProcessFace(_) => IncodeVerificationSessionState::ProcessFace,
             Self::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
             IncodeState::GetOnboardingStatus(_) => IncodeVerificationSessionState::GetOnboardingStatus,
-            Self::FetchOCR(_) => IncodeVerificationSessionState::FetchOCR,
             Self::Complete(_) => IncodeVerificationSessionState::Complete,
             Self::Fail(_) => IncodeVerificationSessionState::Fail,
         }
@@ -143,7 +142,6 @@ impl IncodeStateMachine {
             IncodeVerificationSessionState::ProcessId => ProcessId::new(),
             IncodeVerificationSessionState::ProcessFace => ProcessFace::new(),
             IncodeVerificationSessionState::FetchScores => FetchScores::new(),
-            IncodeVerificationSessionState::FetchOCR => FetchOCR::new(),
             IncodeVerificationSessionState::GetOnboardingStatus => GetOnboardingStatus::new(),
             IncodeVerificationSessionState::Complete => Complete::new(),
             IncodeVerificationSessionState::Fail => Fail::new(),

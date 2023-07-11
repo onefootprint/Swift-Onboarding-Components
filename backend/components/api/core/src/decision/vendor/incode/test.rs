@@ -227,7 +227,6 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::GetOnboardingStatus),
                 Some(IncodeVerificationSessionState::FetchScores),
-                Some(IncodeVerificationSessionState::FetchOCR),
                 Some(IncodeVerificationSessionState::Complete),
             ]
             .into_iter()
@@ -438,7 +437,6 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 Some(IncodeVerificationSessionState::ProcessId),
                 Some(IncodeVerificationSessionState::FetchScores),
                 Some(IncodeVerificationSessionState::GetOnboardingStatus),
-                Some(IncodeVerificationSessionState::FetchOCR),
                 Some(IncodeVerificationSessionState::Complete),
             ]
             .into_iter()

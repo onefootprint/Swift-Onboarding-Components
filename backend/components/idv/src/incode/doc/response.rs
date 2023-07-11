@@ -61,7 +61,7 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 
 /// Response from fetch scores
 // TODO!
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
     pub id_validation: Option<IdValidation>,

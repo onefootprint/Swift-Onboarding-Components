@@ -1,6 +1,6 @@
 use super::{
     states::{
-        AddBack, AddConsent, AddFront, AddSelfie, Complete, Fail, FetchOCR, FetchScores, GetOnboardingStatus,
+        AddBack, AddConsent, AddFront, AddSelfie, Complete, Fail, FetchScores, GetOnboardingStatus,
         ProcessFace, ProcessId, VerificationSession,
     },
     IncodeContext,
@@ -184,7 +184,6 @@ pub enum IncodeState {
     ProcessFace(Uninitialized<ProcessFace>),
     GetOnboardingStatus(Uninitialized<GetOnboardingStatus>),
     FetchScores(Uninitialized<FetchScores>),
-    FetchOCR(Uninitialized<FetchOCR>),
     Complete(Uninitialized<Complete>),
     Fail(Uninitialized<Fail>),
 }

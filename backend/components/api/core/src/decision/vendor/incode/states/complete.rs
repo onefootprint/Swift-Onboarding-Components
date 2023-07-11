@@ -15,6 +15,7 @@ use db::models::vault::Vault;
 use db::DbPool;
 use db::TxnPgConn;
 use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
@@ -42,6 +43,7 @@ impl Complete {
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
         fetch_ocr_response: FetchOCRResponse,
+        _score_response: FetchScoresResponse,
     ) -> ApiResult<()> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
         let (id_doc, doc_req) = IdentityDocument::get(conn, id_doc_id)?;

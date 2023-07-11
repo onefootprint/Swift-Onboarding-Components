@@ -36,7 +36,6 @@ pub enum IncodeVerificationSessionState {
     ProcessFace,
     GetOnboardingStatus,
     FetchScores,
-    FetchOCR,
     Complete,
     Fail,
 }

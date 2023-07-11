@@ -187,7 +187,15 @@ pub async fn post(
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
                     )?;
                     let doc_type = request.document_type;
-                    Complete::enter(conn, &vault2, &su_id, &id_doc.id, doc_type, ocr)?;
+                    Complete::enter(
+                        conn,
+                        &vault2,
+                        &su_id,
+                        &id_doc.id,
+                        doc_type,
+                        ocr,
+                        idv::incode::doc::response::FetchScoresResponse::default(),
+                    )?;
                 }
                 None
             };

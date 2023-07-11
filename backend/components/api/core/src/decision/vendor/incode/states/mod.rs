@@ -25,9 +25,6 @@ pub use process_id::*;
 mod fetch_scores;
 pub use fetch_scores::*;
 
-mod fetch_ocr;
-pub use fetch_ocr::*;
-
 mod complete;
 pub use complete::*;
 
