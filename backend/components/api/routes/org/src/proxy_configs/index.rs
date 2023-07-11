@@ -22,7 +22,7 @@ type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBas
 #[actix::get("/org/proxy_configs")]
 pub async fn get(
     state: web::Data<State>,
-    filters: web::Json<GetProxyConfigRequest>,
+    filters: web::Query<GetProxyConfigRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<ProxyConfigsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
