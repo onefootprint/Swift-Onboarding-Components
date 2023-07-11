@@ -17,8 +17,12 @@ use crate::State;
 
 use api_core::proxy::config::JustInTimeProxyConfig;
 use api_core::proxy::config::ProxyIdAdditonalHeaders;
+use api_core::utils::body_bytes::BodyBytes;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
+
+/// Limit the body payload to 5MB
+const FIVE_MB: usize = 5 * 1024 * 1024;
 
 #[tracing::instrument(skip(state, body_bytes, request))]
 #[api_v2_operation(
@@ -30,7 +34,7 @@ pub async fn just_in_time(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     jit: JustInTimeProxyConfig,
-    body_bytes: web::Bytes,
+    body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
@@ -55,7 +59,7 @@ pub async fn id(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     proxy_config_id: web::Path<ProxyConfigId>,
-    body_bytes: web::Bytes,
+    body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
     _: ProxyIdAdditonalHeaders,
@@ -84,7 +88,7 @@ async fn invoke_vault_proxy(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     source: ProxyConfigSource,
-    body_bytes: web::Bytes,
+    body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {

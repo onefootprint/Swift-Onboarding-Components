@@ -1,3 +1,5 @@
+pub mod actix;
+pub mod body_bytes;
 pub mod challenge;
 pub mod db2api;
 pub mod email;
@@ -7,12 +9,11 @@ pub mod headers;
 pub mod large_json;
 pub mod liveness;
 pub mod magic_link;
+pub mod paperclip;
 pub mod session;
 pub mod twilio;
 pub mod vault_wrapper;
 pub mod webhook_app;
-pub mod actix;
-pub mod paperclip;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]

@@ -5,10 +5,9 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use actix_web::HttpRequest;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
-use api_core::errors::file_upload::FileUploadError;
+use api_core::utils::body_bytes::BodyBytes;
 use api_core::utils::file_upload::FileUpload;
 use api_core::utils::{self};
 use db::models::access_event::NewAccessEvent;
@@ -18,9 +17,11 @@ use db::models::vault::Vault;
 use macros::route_alias;
 use newtypes::{AccessEventKind, DataIdentifier, FpId};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
-use reqwest::header::CONTENT_LENGTH;
 
-#[tracing::instrument(skip(state, request, body))]
+/// Limit upload to ~10MB (eventually we will support a multipart upload for arbitrarily large uploads)
+const TEN_MB: usize = 10 * 1024 * 1024;
+
+#[tracing::instrument(skip(state, body))]
 #[route_alias(
     actix::post(
         "/users/{fp_id}/vault/{data_identifier}/upload",
@@ -41,17 +42,16 @@ use reqwest::header::CONTENT_LENGTH;
 pub async fn post(
     state: web::Data<State>,
     path: Path<(FpId, DataIdentifier)>,
-    request: HttpRequest,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-    body: web::Bytes,
+    body: BodyBytes<TEN_MB>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (fp_id, identifier) = path.into_inner();
-    post_upload_inner(&state, request, body, auth, fp_id, identifier, insight).await
+    post_upload_inner(&state, body, auth, fp_id, identifier, insight).await
 }
 
-#[tracing::instrument(skip(state, auth, request, body))]
+#[tracing::instrument(skip(state, auth, body))]
 #[route_alias(actix::post(
     "/users/vault/{data_identifier}/upload",
     tags(Client, Vault, Users, PublicApi),
@@ -67,23 +67,17 @@ pub async fn post_client(
     path: Path<DataIdentifier>,
     auth: ClientTenantAuthContext,
     insight: InsightHeaders,
-    request: HttpRequest,
-    body: web::Bytes,
+    body: BodyBytes<TEN_MB>,
 ) -> JsonApiResponse<EmptyResponse> {
     let identifier = path.into_inner();
     let auth = auth.check_guard(CanVault::new(vec![identifier.clone()]))?;
     let fp_id = auth.fp_id.clone();
-    post_upload_inner(&state, request, body, Box::new(auth), fp_id, identifier, insight).await
+    post_upload_inner(&state, body, Box::new(auth), fp_id, identifier, insight).await
 }
-
-/// We limit single-part uploads to 10MB
-/// Eventually we will add a `multi-part upload` for unlimited large objects.
-const MAX_UPLOAD_SIZE_BYTES: usize = 10_485_760;
 
 async fn post_upload_inner(
     state: &State,
-    request: HttpRequest,
-    body: web::Bytes,
+    body: BodyBytes<TEN_MB>,
     auth: Box<dyn TenantAuth>,
     fp_id: FpId,
     data_identifier: DataIdentifier,
@@ -104,15 +98,6 @@ async fn post_upload_inner(
         }
     };
 
-    let request_content_length: usize =
-        crate::utils::headers::get_required_header(CONTENT_LENGTH.as_str(), request.headers())?
-            .parse()
-            .map_err(|_| FileUploadError::InvalidContentLength)?;
-
-    if request_content_length > MAX_UPLOAD_SIZE_BYTES {
-        return Err(FileUploadError::FileTooLarge(MAX_UPLOAD_SIZE_BYTES))?;
-    }
-
     let (vault, scoped_vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -123,7 +108,7 @@ async fn post_upload_inner(
         .await?;
 
     let file = FileUpload {
-        bytes: body,
+        bytes: body.into_inner(),
         mime_type: "application/octet-stream".into(),
         filename: data_identifier.to_string(),
         file_extension: "bin".to_string(),

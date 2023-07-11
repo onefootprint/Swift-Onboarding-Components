@@ -13,6 +13,7 @@ use crate::State;
 use actix_web::FromRequest;
 use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
+use api_core::utils::body_bytes::BodyBytes;
 use api_core::utils::headers::get_header;
 use futures_util::Future;
 use newtypes::FpId;
@@ -62,7 +63,7 @@ impl FromRequest for HeaderParams {
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-    body_bytes: web::Bytes,
+    body_bytes: BodyBytes<5_242_880>,
     insight: InsightHeaders,
     request: HttpRequest,
     _: HeaderParams,
