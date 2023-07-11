@@ -20,7 +20,7 @@ type FormData = {
 
 const KycInvestorProfile = () => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create-new.kyc-investor-profile',
+    'pages.developers.onboarding-configs.create.kyc-investor-profile',
   );
   const [state, send] = useOnboardingConfigMachine();
   const { kycInvestorProfile, kycCollect } = state.context;

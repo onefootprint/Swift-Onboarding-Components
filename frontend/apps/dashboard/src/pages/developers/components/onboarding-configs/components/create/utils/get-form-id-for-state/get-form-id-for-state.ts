@@ -10,6 +10,9 @@ const getFormIdForState = (value: StateValue) => {
   if (value === 'kycCollect' || value === 'kybBoCollect') {
     return 'kyc-collect-form';
   }
+  if (value === 'kycInvestorProfile') {
+    return 'kyc-investor-profile-form';
+  }
   if (value === 'kycAccess') {
     return 'kyc-access-form';
   }

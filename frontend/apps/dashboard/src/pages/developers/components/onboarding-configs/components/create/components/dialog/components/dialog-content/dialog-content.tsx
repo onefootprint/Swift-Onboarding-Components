@@ -13,6 +13,7 @@ import KybBoCollect from '../../../../pages/kyb-bo-collect';
 import KybCollect from '../../../../pages/kyb-collect';
 import KycAccess from '../../../../pages/kyc-access';
 import KycCollect from '../../../../pages/kyc-collect';
+import KycInvestorProfile from '../../../../pages/kyc-investor-profile';
 import Name from '../../../../pages/name';
 import Type from '../../../../pages/type';
 import getFormIdForState from '../../../../utils/get-form-id-for-state';
@@ -133,6 +134,7 @@ const DialogContent = ({ onClose, onCreate }: DialogContentProps) => {
       {state.matches('type') && <Type />}
       {state.matches('name') && <Name />}
       {state.matches('kycCollect') && <KycCollect />}
+      {state.matches('kycInvestorProfile') && <KycInvestorProfile />}
       {state.matches('kycAccess') && <KycAccess />}
       {state.matches('kybCollect') && <KybCollect />}
       {state.matches('kybBoCollect') && <KybBoCollect />}

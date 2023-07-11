@@ -35,6 +35,7 @@
   "id_document": {
     "id_card": "ID card",
     "driver_license": "Driver's license",
+    "drivers_license": "Driver's license",
     "passport": "Passport"
   },
   "di": {
@@ -1250,87 +1251,6 @@
           }
         },
         "create": {
-          "title": "Create onboarding config",
-          "type-form": {
-            "title": "Types of onboarding configuration",
-            "description": "Select the type of verification flow you want to create:",
-            "kyc": {
-              "title": "KYC",
-              "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them."
-            },
-            "kyb": {
-              "title": "KYB",
-              "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
-            }
-          },
-          "name-form": {
-            "name": {
-              "label": "Onboarding configuration name",
-              "placeholder": "User ID verification",
-              "errors": {
-                "required": "Please enter a name for your onboarding configuration."
-              }
-            }
-          },
-          "kyc-collect-form": {
-            "title": "KYC",
-            "description": "You can customize the verification flow by choosing optional fields to collect.",
-            "collected-data": "Collected data",
-            "ssn": "SSN",
-            "nationality": "Nationality",
-            "add-ons": {
-              "title": "Add-ons",
-              "document-description": "We might still need to ask some users to capture their ID Document as part of our step-up verification flow. For the full list of countries and document types we support, please go <a>here.</a>",
-              "investor-profile": {
-                "label": "Broker questions (Investor profile)",
-                "description": "Required for all brokerage and investment apps.",
-                "questions": {
-                  "employment": "What's your employment status and occupation?",
-                  "brokerage-employment": "Are you employed by a brokerage firm?",
-                  "income": "What's your annual income?",
-                  "net-worth": "What's your net worth?",
-                  "investment-goals": "What are your investment goals?",
-                  "risk-tolerance": "How would you describe your risk tolerance?",
-                  "declarations": "Do any of the following apply to you or a member of your immediate family?"
-                }
-              }
-            }
-          },
-          "kyc-access-form": {
-            "title": "Authorized scopes",
-            "description": "Select the data attributes you need read access to after a user onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected."
-          },
-          "kyb-collect-form": {
-            "title": "KYB",
-            "description": "You can customize the verification flow by choosing optional fields to collect.",
-            "collected-data": "Collected data",
-            "optional": "Optionally required",
-            "beneficial-owner-warning": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.",
-            "kyced-beneficial-owners": "Fully KYC all beneficial owners"
-          },
-          "kyb-bo-collect-form": {
-            "title": "KYC of a Beneficial owner",
-            "description": "To successfully verify a business we also need to verify its beneficial owner's identity.",
-            "subtitle": "Step-up document request",
-            "subtitle-description": "When users cannot be instantly verified with the data they submitted, you can request them to submit extra documentation. This step up improves the conversion rate of your onboarding process and has an extra cost per request."
-          },
-          "kyb-access-form": {
-            "title": "Authorized scopes",
-            "description": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
-            "all-business-info": "All business information",
-            "beneficial-owner": "Beneficial owner"
-          },
-          "cta": {
-            "aria-label": "Creating a new onboarding config..."
-          },
-          "feedback": {
-            "success": {
-              "title": "Success",
-              "description": "Onboarding config created successfully."
-            }
-          }
-        },
-        "create-new": {
           "title": "Create onboarding config",
           "type-form": {
             "title": "Types of onboarding configuration",

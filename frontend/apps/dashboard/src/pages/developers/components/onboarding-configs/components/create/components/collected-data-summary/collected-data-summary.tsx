@@ -9,7 +9,7 @@ type CollectedDataSummaryProps = {
 
 const CollectedDataSummary = ({ collectedData }: CollectedDataSummaryProps) => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create-new.collected-data-summary',
+    'pages.developers.onboarding-configs.create.collected-data-summary',
   );
 
   return (

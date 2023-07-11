@@ -10,7 +10,7 @@ type InvestorProfileFormProps = {
 
 const InvestorProfileForm = ({ isExpanded }: InvestorProfileFormProps) => {
   const { t } = useTranslation(
-    'pages.developers.onboarding-configs.create-new.kyc-investor-profile',
+    'pages.developers.onboarding-configs.create.kyc-investor-profile',
   );
   const questions = [
     t('questions.employment'),

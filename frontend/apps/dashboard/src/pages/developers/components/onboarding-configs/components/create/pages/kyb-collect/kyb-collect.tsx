@@ -4,12 +4,13 @@ import { CollectedKybDataOption } from '@onefootprint/types';
 import { Checkbox, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import CdoTagList from 'src/components/cdo-tag-list';
 import useSession from 'src/hooks/use-session';
 
+import CollectedDataSummary from '../../components/collected-data-summary';
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getFormIdForState from '../../utils/get-form-id-for-state';
+import { getRequiredKybCollectFields } from '../../utils/get-onboarding-config-from-context';
 
 type FormData = {
   [CollectedKybDataOption.kycedBeneficialOwners]: boolean;
@@ -54,16 +55,16 @@ const KybCollect = () => {
   );
   const website = watch(CollectedKybDataOption.website);
   const phoneNumber = watch(CollectedKybDataOption.phoneNumber);
-  const collectedData: CollectedKybDataOption[] = [
-    CollectedKybDataOption.name,
-    CollectedKybDataOption.tin,
-    CollectedKybDataOption.address,
-  ];
+  const collectedData: CollectedKybDataOption[] = getRequiredKybCollectFields();
   // Always collect BOs, but optionally allow fully KYCing the BOs
   if (kycedBeneficialOwners) {
+    const index = collectedData.indexOf(
+      CollectedKybDataOption.beneficialOwners,
+    );
+    if (index > -1) {
+      collectedData.splice(index, 1);
+    }
     collectedData.push(CollectedKybDataOption.kycedBeneficialOwners);
-  } else {
-    collectedData.push(CollectedKybDataOption.beneficialOwners);
   }
   if (website) {
     collectedData.push(CollectedKybDataOption.website);
@@ -73,50 +74,41 @@ const KybCollect = () => {
   }
 
   return (
-    <>
+    <Form
+      data-testid={getFormIdForState(state.value)}
+      id={getFormIdForState(state.value)}
+      onSubmit={handleSubmit(handleBeforeSubmit)}
+    >
+      <CollectedDataSummary collectedData={collectedData} />
       <FormTitle title={t('title')} description={t('description')} />
-      <Form
-        data-testid={getFormIdForState(state.value)}
-        id={getFormIdForState(state.value)}
-        onSubmit={handleSubmit(handleBeforeSubmit)}
-      >
-        <Section>
-          <Typography variant="label-3">{t('collected-data')}</Typography>
-          <CdoTagList
-            testID="collected-data"
-            cdos={collectedData}
-            disableSort
+      <Section>
+        <Typography variant="label-3" color="tertiary">
+          {t('optional')}
+        </Typography>
+        <OptionsContainer data-testid="kyb-collect-form-options">
+          {/* Long term, all KYB configs will KYC all BOs. For now, just a flag for employees */}
+          {user?.isFirmEmployee && (
+            <Checkbox
+              label={t('kyced-beneficial-owners')}
+              {...register(CollectedKybDataOption.kycedBeneficialOwners)}
+            />
+          )}
+          <Checkbox
+            label={allT('cdo.business_website')}
+            {...register(CollectedKybDataOption.website)}
           />
-        </Section>
-        <Section>
-          <Typography variant="label-3" color="tertiary">
-            {t('optional')}
-          </Typography>
-          <OptionsContainer data-testid="kyb-collect-form-options">
-            {/* Long term, all KYB configs will KYC all BOs. For now, just a flag for employees */}
-            {user?.isFirmEmployee && (
-              <Checkbox
-                label={t('kyced-beneficial-owners')}
-                {...register(CollectedKybDataOption.kycedBeneficialOwners)}
-              />
-            )}
-            <Checkbox
-              label={allT('cdo.business_website')}
-              {...register(CollectedKybDataOption.website)}
-            />
-            <Checkbox
-              label={allT('cdo.business_phone_number')}
-              {...register(CollectedKybDataOption.phoneNumber)}
-            />
-          </OptionsContainer>
-        </Section>
-        <InlineAlert variant="info" sx={{ alignItems: 'center' }}>
-          <Typography variant="body-3" color="info">
-            {t('beneficial-owner-warning')}
-          </Typography>
-        </InlineAlert>
-      </Form>
-    </>
+          <Checkbox
+            label={allT('cdo.business_phone_number')}
+            {...register(CollectedKybDataOption.phoneNumber)}
+          />
+        </OptionsContainer>
+      </Section>
+      <InlineAlert variant="info" sx={{ alignItems: 'center' }}>
+        <Typography variant="body-3" color="info">
+          {t('beneficial-owner-warning')}
+        </Typography>
+      </InlineAlert>
+    </Form>
   );
 };
 

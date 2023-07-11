@@ -26,7 +26,10 @@ type FormData = {
 
 const KybAccess = () => {
   const [state, send] = useOnboardingConfigMachine();
-  const { kycCollect, kycAccess, kybAccess } = state.context;
+  const { kycCollect, kybAccess } = state.context;
+  const hasCollectedDoc = !!kycCollect && kycCollect?.idDoc.types.length > 0;
+  const hasCollectedSelfie =
+    hasCollectedDoc && !!kycCollect && kycCollect?.idDoc.selfieRequired;
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create.kyb-access-form',
   );
@@ -37,7 +40,9 @@ const KybAccess = () => {
     send({
       type: 'kybAccessSubmitted',
       payload: {
-        allKybData: formData.allKybData,
+        kybAccess: {
+          allKybData: formData.allKybData,
+        },
         kycAccess: kycAccessFormData,
       },
     });
@@ -46,7 +51,7 @@ const KybAccess = () => {
   const { register, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
       allKybData: kybAccess ? kybAccess.allKybData : true,
-      ...getDefaultKycAccess(kycCollect, kycAccess),
+      ...getDefaultKycAccess(state.context),
     },
   });
 
@@ -58,88 +63,81 @@ const KybAccess = () => {
   };
 
   return (
-    <>
+    <Form
+      id={getFormIdForState(state.value)}
+      data-testid={getFormIdForState(state.value)}
+      onSubmit={handleSubmit(handleBeforeSubmit)}
+    >
       <FormTitle title={t('title')} description={t('description')} />
-      <Form
-        id={getFormIdForState(state.value)}
-        data-testid={getFormIdForState(state.value)}
-        onSubmit={handleSubmit(handleBeforeSubmit)}
-      >
-        <OptionsContainer>
+      <OptionsContainer>
+        <Checkbox label={t('all-business-info')} {...register('allKybData')} />
+      </OptionsContainer>
+      <Divider />
+      <OptionsContainer>
+        <Typography variant="label-3" sx={{ marginBottom: 3 }}>
+          {t('beneficial-owner')}
+        </Typography>
+        <Checkbox
+          label={allT('cdo.email')}
+          {...register(CollectedKycDataOption.email)}
+        />
+        <Checkbox
+          label={allT('cdo.phone_number')}
+          {...register(CollectedKycDataOption.phoneNumber)}
+        />
+        <Checkbox
+          label={allT('cdo.name')}
+          {...register(CollectedKycDataOption.name)}
+        />
+        <Checkbox
+          label={allT('cdo.dob')}
+          {...register(CollectedKycDataOption.dob)}
+        />
+        <Checkbox
+          label={allT('cdo.full_address')}
+          {...register(CollectedKycDataOption.fullAddress)}
+        />
+        {kycCollect?.ssnKind === CollectedKycDataOption.ssn4 && (
           <Checkbox
-            label={t('all-business-info')}
-            {...register('allKybData')}
+            label={allT('cdo.ssn4')}
+            {...register(CollectedKycDataOption.ssn4)}
           />
-        </OptionsContainer>
-        <Divider />
-        <OptionsContainer>
-          <Typography variant="label-3" sx={{ marginBottom: 3 }}>
-            {t('beneficial-owner')}
-          </Typography>
+        )}
+        {kycCollect?.ssnKind === CollectedKycDataOption.ssn9 && (
           <Checkbox
-            label={allT('cdo.email')}
-            {...register(CollectedKycDataOption.email)}
+            label={allT('cdo.ssn9')}
+            {...register(CollectedKycDataOption.ssn9)}
           />
+        )}
+        {kycCollect?.[CollectedKycDataOption.nationality] && (
           <Checkbox
-            label={allT('cdo.phone_number')}
-            {...register(CollectedKycDataOption.phoneNumber)}
+            label={allT('cdo.nationality')}
+            {...register(CollectedKycDataOption.nationality)}
           />
-          <Checkbox
-            label={allT('cdo.name')}
-            {...register(CollectedKycDataOption.name)}
-          />
-          <Checkbox
-            label={allT('cdo.dob')}
-            {...register(CollectedKycDataOption.dob)}
-          />
-          <Checkbox
-            label={allT('cdo.full_address')}
-            {...register(CollectedKycDataOption.fullAddress)}
-          />
-          {kycCollect?.ssnKind === CollectedKycDataOption.ssn4 && (
+        )}
+        {hasCollectedDoc && (
+          <Box>
             <Checkbox
-              label={allT('cdo.ssn4')}
-              {...register(CollectedKycDataOption.ssn4)}
+              label={allT('cdo.document')}
+              {...register(CollectedDocumentDataOption.document, {
+                onChange: handleDocumentChange,
+              })}
             />
-          )}
-          {kycCollect?.ssnKind === CollectedKycDataOption.ssn9 && (
-            <Checkbox
-              label={allT('cdo.ssn9')}
-              {...register(CollectedKycDataOption.ssn9)}
-            />
-          )}
-          {kycCollect?.[CollectedKycDataOption.nationality] && (
-            <Checkbox
-              label={allT('cdo.nationality')}
-              {...register(CollectedKycDataOption.nationality)}
-            />
-          )}
-          {kycCollect?.[CollectedDocumentDataOption.document] && (
-            <Box>
+            <AnimatedContainer
+              isExpanded={
+                hasCollectedDoc && hasCollectedSelfie && !!idDocAccess
+              }
+              sx={{ marginLeft: 5, marginTop: 3 }}
+            >
               <Checkbox
-                label={allT('cdo.document')}
-                {...register(CollectedDocumentDataOption.document, {
-                  onChange: handleDocumentChange,
-                })}
+                label={allT('cdo.selfie')}
+                {...register(CollectedDocumentDataOption.documentAndSelfie)}
               />
-              <AnimatedContainer
-                isExpanded={
-                  !!kycCollect?.[
-                    CollectedDocumentDataOption.documentAndSelfie
-                  ] && !!idDocAccess
-                }
-                sx={{ marginLeft: 5, marginTop: 3 }}
-              >
-                <Checkbox
-                  label={allT('cdo.selfie')}
-                  {...register(CollectedDocumentDataOption.documentAndSelfie)}
-                />
-              </AnimatedContainer>
-            </Box>
-          )}
-        </OptionsContainer>
-      </Form>
-    </>
+            </AnimatedContainer>
+          </Box>
+        )}
+      </OptionsContainer>
+    </Form>
   );
 };
 

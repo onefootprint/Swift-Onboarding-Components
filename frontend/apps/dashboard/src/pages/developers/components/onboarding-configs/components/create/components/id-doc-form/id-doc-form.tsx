@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocRegionality, IdDocType } from '@onefootprint/types';
+import { IdDocRegionality, SupportedIdDocTypes } from '@onefootprint/types';
 import { Box, Checkbox, Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -14,7 +14,7 @@ type IdDocFormProps = {
 
 const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
   const { t, allT } = useTranslation(
-    'pages.developers.onboarding-configs.create-new.id-doc-form',
+    'pages.developers.onboarding-configs.create.id-doc-form',
   );
   const { register, watch, setValue } = useFormContext();
   const idDocTypes = watch('idDocType');
@@ -38,7 +38,7 @@ const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
         </Typography>
       </SectionTitle>
       <OptionsContainer>
-        {Object.values(IdDocType).map((type: IdDocType) => (
+        {Object.values(SupportedIdDocTypes).map((type: SupportedIdDocTypes) => (
           <Checkbox
             key={type}
             label={allT(`id_document.${type}`)}

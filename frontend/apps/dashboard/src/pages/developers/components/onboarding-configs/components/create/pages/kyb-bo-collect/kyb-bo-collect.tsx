@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Divider } from '@onefootprint/ui';
 import React from 'react';
 
 import FormTitle from '../../components/form-title';
@@ -9,12 +10,15 @@ const KybBoCollect = () => {
     'pages.developers.onboarding-configs.create.kyb-bo-collect-form',
   );
 
-  return (
+  const getTitle = () => (
     <>
       <FormTitle title={t('title')} description={t('description')} />
-      <KycCollectForm />
+      <Divider />
+      <FormTitle title={t('step-up')} description={t('step-up-description')} />
     </>
   );
+
+  return <KycCollectForm title={getTitle()} />;
 };
 
 export default KybBoCollect;

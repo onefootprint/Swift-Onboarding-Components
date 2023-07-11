@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignKybCollect: 'kybCollectSubmitted';
     assignKycAccess: 'kycAccessSubmitted';
     assignKycCollect: 'kycCollectSubmitted';
+    assignKycInvestorProfile: 'kycInvestorProfileSubmitted';
     assignName: 'nameSubmitted';
     assignType: 'typeSubmitted';
   };
@@ -30,6 +31,7 @@ export interface Typegen0 {
     | 'kybCollect'
     | 'kycAccess'
     | 'kycCollect'
+    | 'kycInvestorProfile'
     | 'name'
     | 'type';
   tags: never;

@@ -44,11 +44,22 @@ export const createOnboardingConfigMachine = () =>
         kycCollect: {
           on: {
             kycCollectSubmitted: {
-              target: 'kycAccess',
+              target: 'kycInvestorProfile',
               actions: ['assignKycCollect'],
             },
             prevClicked: {
               target: 'name',
+            },
+          },
+        },
+        kycInvestorProfile: {
+          on: {
+            kycInvestorProfileSubmitted: {
+              target: 'kycAccess',
+              actions: ['assignKycInvestorProfile'],
+            },
+            prevClicked: {
+              target: 'kycCollect',
             },
           },
         },
@@ -59,7 +70,7 @@ export const createOnboardingConfigMachine = () =>
               actions: ['assignKycAccess'],
             },
             prevClicked: {
-              target: 'kycCollect',
+              target: 'kycInvestorProfile',
             },
           },
         },
@@ -115,6 +126,10 @@ export const createOnboardingConfigMachine = () =>
           ...context,
           kycCollect: event.payload,
         })),
+        assignKycInvestorProfile: assign((context, event) => ({
+          ...context,
+          kycInvestorProfile: event.payload,
+        })),
         assignKycAccess: assign((context, event) => ({
           ...context,
           kycAccess: event.payload,
@@ -125,10 +140,8 @@ export const createOnboardingConfigMachine = () =>
         })),
         assignKybAccess: assign((context, event) => ({
           ...context,
+          kybAccess: event.payload.kybAccess,
           kycAccess: event.payload.kycAccess,
-          kybAccess: {
-            allKybData: event.payload.allKybData,
-          },
         })),
       },
     },
