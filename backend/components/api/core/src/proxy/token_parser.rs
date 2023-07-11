@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn test_correct_body_parser() {
-        let global = FpId::from("fp_id_xyz".to_string());
+        let global = FpId::from("fp_id_abcd".to_string());
         let result = ProxyTokenParser::parse(VALID_JSON_BODY, Some(global)).expect("failed to parse");
 
         assert!(result
@@ -219,7 +219,7 @@ mod tests {
             vec![Prefix { count: 2 }, ToUppercase]
         )));
 
-        assert!(result.matches.contains_key(&tok1("fp_id_xyz", DI::Id(IDK::Dob))));
+        assert!(result.matches.contains_key(&tok1("fp_id_abcd", DI::Id(IDK::Dob))));
 
         // test that we found two matches for this token
         assert_eq!(
@@ -301,7 +301,7 @@ mod tests {
     const B_3: &str = r#"{{ {{ {{ }} {{id.dob}} }}"#;
     const B_4: &str = r#"{{ custom.ach}"#;
     const B_5: &str =
-        r#"{{ fp_id_x.custom.ach}} {{{fp_id_y.id.ssn9}} sdf {{ custom.ach2}}} {{fp_id_y.id.ssn9}}"#;
+        r#"{{ fp_id_x.custom.ach}} {{{fp_id_y.id.ssn9}} sdf {{ fp_id_z.custom.ach2}}} {{fp_id_y.id.ssn9}}"#;
     const B_6: &str = r#"{ { {{{ fp_id_1.custom.ach     }}"#;
 
     #[test_case(B_1, Some("fp_id_xyz"), &[
@@ -316,12 +316,12 @@ mod tests {
         (tok1("fp_id_xyz", DI::Id(IDK::Dob)), 1),
     ])]
     #[test_case(B_4, Some("fp_id_xyz"), &[])]
-    #[test_case(B_5, Some("fp_id_xyz"), &[
+    #[test_case(B_5, None, &[
         (tok1("fp_id_x", custom("ach")), 1),
         (tok1("fp_id_y", DI::Id(IDK::Ssn9)), 2),
-        (tok1("fp_id_xyz", custom("ach2")), 1),
+        (tok1("fp_id_z", custom("ach2")), 1),
     ])]
-    #[test_case(B_6, Some("fp_id_xyz"), &[
+    #[test_case(B_6, None, &[
         (tok1("fp_id_1", custom("ach")), 1),
     ])]
     fn test_edge_case_parsing(body: &str, global_fp_id: Option<&str>, expected: &[(ProxyToken, usize)]) {
