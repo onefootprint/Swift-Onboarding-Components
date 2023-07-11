@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Organization, RoleScope } from '@onefootprint/types';
+import { Organization, RoleScopeKind } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -35,7 +35,7 @@ const Logo = ({ organization }: LogoProps) => {
 
       <ButtonContainer>
         <PermissionGate
-          scope={RoleScope.orgSettings}
+          scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}
         >
           <Label>

@@ -1,5 +1,5 @@
 import { act, customRenderHook, mockRequest } from '@onefootprint/test-utils';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { resetUser } from 'src/config/tests';
 
 import useSession from './use-session';
@@ -19,7 +19,7 @@ const getOrgMemberResponse = {
   firstName: 'Piip',
   lastName: 'Penguin',
   isAssumedSession: false,
-  scopes: [RoleScope.admin],
+  scopes: [{ kind: RoleScopeKind.admin }],
   tenant: {
     name: 'Acme',
     logoUrl: null,
@@ -65,7 +65,9 @@ describe('useSession', () => {
       expect(result.current.data.user?.firstName).toEqual('Piip');
       expect(result.current.data.user?.lastName).toEqual('Penguin');
       expect(result.current.data.user?.isAssumedSession).toEqual(false);
-      expect(result.current.data.user?.scopes).toEqual([RoleScope.admin]);
+      expect(result.current.data.user?.scopes[0].kind).toEqual(
+        RoleScopeKind.admin,
+      );
       expect(result.current.data.org).toEqual({
         isLive: true,
         isSandboxRestricted: false,

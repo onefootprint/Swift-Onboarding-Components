@@ -67,6 +67,7 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
     DocumentDI.finraComplianceLetter,
     ...Object.values(InvestorProfileDI).map(value => value),
   ],
+  card: [],
 };
 
 export default CdoToDiMap;

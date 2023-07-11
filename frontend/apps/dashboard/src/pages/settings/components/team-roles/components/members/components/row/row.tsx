@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { Member, RoleScope } from '@onefootprint/types';
+import { Member, RoleScopeKind } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
@@ -32,7 +32,7 @@ const Row = ({ member }: RowProps) => {
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
       <Td>
-        {shouldShowActions && hasPermission(RoleScope.orgSettings) ? (
+        {shouldShowActions && hasPermission(RoleScopeKind.orgSettings) ? (
           <EditRole member={member} />
         ) : (
           member.role.name

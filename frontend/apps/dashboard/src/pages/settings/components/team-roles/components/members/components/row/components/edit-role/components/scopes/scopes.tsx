@@ -2,17 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { RoleScope } from '@onefootprint/types';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
-
-const groupScopes = (scopes: RoleScope[]) => {
-  const decryptScopes = scopes.filter((scope: RoleScope) =>
-    scope.startsWith('decrypt'),
-  );
-  const nonDecryptScopes = scopes.filter(
-    (scope: RoleScope) => !scope.startsWith('decrypt'),
-  );
-  const isAdmin = scopes.includes(RoleScope.admin);
-  return { isAdmin, decryptScopes, nonDecryptScopes };
-};
+import groupScopes from 'src/pages/settings/components/team-roles/components/roles/components/row/components/scopes/utils/group-scopes';
 
 export type ScopesListProps = {
   scopes: RoleScope[];
@@ -20,30 +10,32 @@ export type ScopesListProps = {
 
 const ScopesList = ({ scopes }: ScopesListProps) => {
   const { t } = useTranslation('pages.settings.roles');
-  const { isAdmin, decryptScopes, nonDecryptScopes } = groupScopes(scopes);
+  const { isAdmin, decryptOptions, nonDecryptScopes } = groupScopes(scopes);
 
   return isAdmin ? (
     <span>{t('scopes.admin')}</span>
   ) : (
     <>
       {nonDecryptScopes.map(scope => (
-        <span key={scope}>{t(`scopes.${scope}`)}</span>
+        <span key={scope.kind}>{t(`scopes.${scope.kind}`)}</span>
       ))}
-      {decryptScopes.length === 1 && (
+      {decryptOptions.length === 1 && (
         <span>
-          {t(`scopes.decrypt_fields`, {
+          {t(`scopes.decrypt_fields_one`, {
             count: 1,
-            field: t(`scopes.${decryptScopes[0]}`),
+            field: t(`scopes.decrypt.${decryptOptions[0]}`),
           })}
         </span>
       )}
-      {decryptScopes.length > 1 && (
+      {decryptOptions.length > 1 && (
         <Tooltip
-          text={decryptScopes.map(scope => t(`scopes.${scope}`)).join(', ')}
+          text={decryptOptions
+            .map(scope => t(`scopes.decrypt.${scope}`))
+            .join(', ')}
         >
           <span>
-            {t(`scopes.decrypt_fields`, {
-              count: decryptScopes.length,
+            {t(`scopes.decrypt_fields_other`, {
+              count: decryptOptions.length,
             })}
           </span>
         </Tooltip>

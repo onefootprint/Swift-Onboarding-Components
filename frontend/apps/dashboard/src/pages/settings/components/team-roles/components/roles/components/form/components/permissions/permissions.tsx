@@ -1,7 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import {
   Box,
   Checkbox,
@@ -12,25 +12,19 @@ import {
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import useDecryptOptions from './hooks/use-decrypt-options';
+import useDecryptOptions, { DecryptOption } from './hooks/use-decrypt-options';
 
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
   const { t } = useTranslation('pages.settings.roles');
-  const { register, watch, control, setValue, getValues, formState } =
-    useFormContext();
+  const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
   const decryptOptions = useDecryptOptions();
   const showDecryptSelect = watch('showDecrypt');
 
   useEffect(() => {
     if (!showDecryptSelect) {
-      const scopes = getValues('scopes') as RoleScope[];
-      const scopesWithoutDecryptFields = scopes.filter(
-        scope => !scope.startsWith('decrypt'),
-      );
-      setValue('scopes', scopesWithoutDecryptFields);
-      setValue('decryptFields', []);
+      setValue('decryptOptions', []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDecryptSelect]);
@@ -44,43 +38,43 @@ const Permissions = () => {
         <Checkbox disabled label={t('scopes.read')} checked />
         <Checkbox
           label={t('scopes.onboarding_configuration')}
-          value="onboarding_configuration"
-          {...register('scopes')}
+          value={RoleScopeKind.onboardingConfiguration}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.api_keys')}
-          value="api_keys"
-          {...register('scopes')}
+          value={RoleScopeKind.apiKeys}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.org_settings')}
-          value="org_settings"
-          {...register('scopes')}
+          value={RoleScopeKind.orgSettings}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.manual_review')}
-          value="manual_review"
-          {...register('scopes')}
+          value={RoleScopeKind.manualReview}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.write_entities')}
-          value="write_entities"
-          {...register('scopes')}
+          value={RoleScopeKind.writeEntities}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.vault_proxy')}
-          value="vault_proxy"
-          {...register('scopes')}
+          value={RoleScopeKind.vaultProxy}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.cip_integration')}
-          value="cip_integration"
-          {...register('scopes')}
+          value={RoleScopeKind.cipIntegration}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('scopes.trigger_kyc')}
-          value="trigger_kyc"
-          {...register('scopes')}
+          value={RoleScopeKind.triggerKyc}
+          {...register('scopeKinds')}
         />
         <Checkbox
           label={t('form.decrypt.label')}
@@ -91,7 +85,7 @@ const Permissions = () => {
             <DecryptContainer>
               <Controller
                 control={control}
-                name="decryptFields"
+                name="decryptOptions"
                 rules={{
                   required: {
                     value: true,
@@ -103,7 +97,7 @@ const Permissions = () => {
                     label={t('form.decrypt-attributes.label')}
                     options={decryptOptions}
                     allOption={{
-                      value: RoleScope.decryptAll,
+                      value: DecryptOption.all,
                       label: t('scopes.decrypt_all'),
                     }}
                     size="compact"

@@ -1634,19 +1634,19 @@
           "decrypt_custom": "Custom attributes",
           "decrypt_documents": "Documents",
           "decrypt": {
+            "all": "Everything",
             "name": "Full name",
-            "dob": "Date of birth",
-            "ssn9": "SSN",
-            "ssn4": "SSN (last 4)",
-            "full_address": "Address",
-            "partial_address": "Partial address (Country & Zip Code)",
             "email": "Email",
             "phone_number": "Phone number",
+            "ssn9": "SSN",
+            "ssn4": "SSN (last 4)",
+            "dob": "Date of birth",
             "documents": "Documents",
-            "document_and_selfie": "Document and selfie",
+            "full_address": "Address",
+            "partial_address": "Partial address (Country & Zip Code)",
             "custom": "Custom attributes",
-            "card": "Card data",
-            "investor_profile": "Broker questions (Investor profile)"
+            "investor_profile": "Broker questions (Investor profile)",
+            "card": "Card data"
           }
         }
       }

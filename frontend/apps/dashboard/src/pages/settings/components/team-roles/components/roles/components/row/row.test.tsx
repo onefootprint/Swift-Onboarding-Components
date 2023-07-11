@@ -4,7 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { RoleScope } from '@onefootprint/types';
+import { CollectedKycDataOption, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -44,21 +44,33 @@ describe('<Row />', () => {
 
   describe('when is admin', () => {
     it('should render "everything"', () => {
-      renderRow({ role: { ...roleFixture, scopes: [RoleScope.admin] } });
+      renderRow({
+        role: { ...roleFixture, scopes: [{ kind: RoleScopeKind.admin }] },
+      });
       expect(screen.getByText('Everything')).toBeInTheDocument();
     });
   });
 
   describe('when is not admin', () => {
     it('should render the scopes', () => {
-      renderRow({ role: { ...roleFixture, scopes: [RoleScope.read] } });
+      renderRow({
+        role: { ...roleFixture, scopes: [{ kind: RoleScopeKind.read }] },
+      });
       expect(screen.getByText('Read-only')).toBeInTheDocument();
     });
 
     describe('when it has one decrypt field', () => {
       it('should render the scope', () => {
         renderRow({
-          role: { ...roleFixture, scopes: [RoleScope.decryptName] },
+          role: {
+            ...roleFixture,
+            scopes: [
+              {
+                kind: RoleScopeKind.decrypt,
+                data: CollectedKycDataOption.name,
+              },
+            ],
+          },
         });
         const tag = screen.getByText('Decrypt Full name');
         expect(tag).toBeInTheDocument();
@@ -70,7 +82,16 @@ describe('<Row />', () => {
         renderRow({
           role: {
             ...roleFixture,
-            scopes: [RoleScope.decryptName, RoleScope.decryptEmail],
+            scopes: [
+              {
+                kind: RoleScopeKind.decrypt,
+                data: CollectedKycDataOption.name,
+              },
+              {
+                kind: RoleScopeKind.decrypt,
+                data: CollectedKycDataOption.email,
+              },
+            ],
           },
         });
         const tag = screen.getByText('Decrypt 2 fields');

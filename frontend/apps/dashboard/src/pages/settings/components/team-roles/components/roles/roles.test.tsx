@@ -8,7 +8,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { Role, RoleScope } from '@onefootprint/types';
+import { Role, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -166,7 +166,10 @@ describe.skip('<Roles />', () => {
           withCreateRole({
             id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
             name: 'Customer Support',
-            scopes: [RoleScope.read, RoleScope.apiKeys],
+            scopes: [
+              { kind: RoleScopeKind.read },
+              { kind: RoleScopeKind.apiKeys },
+            ],
             isImmutable: false,
             createdAt: '2022-09-19T16:24:35.367322Z',
             numActiveUsers: 0,
@@ -180,7 +183,10 @@ describe.skip('<Roles />', () => {
             {
               id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
               name: 'Customer Support',
-              scopes: [RoleScope.read, RoleScope.apiKeys],
+              scopes: [
+                { kind: RoleScopeKind.read },
+                { kind: RoleScopeKind.apiKeys },
+              ],
               isImmutable: false,
               createdAt: '2022-09-19T16:24:35.367322Z',
               numActiveUsers: 0,
@@ -285,7 +291,11 @@ describe.skip('<Roles />', () => {
     describe('when updating a role', () => {
       const updatedRole: Role = {
         ...RoleToEdit,
-        scopes: [RoleScope.read, RoleScope.apiKeys, RoleScope.manualReview],
+        scopes: [
+          { kind: RoleScopeKind.read },
+          { kind: RoleScopeKind.apiKeys },
+          { kind: RoleScopeKind.manualReview },
+        ],
       };
       const rolesWithoutUpdatedRole = RolesFixture.filter(
         role => role.id !== RoleToEdit.id,

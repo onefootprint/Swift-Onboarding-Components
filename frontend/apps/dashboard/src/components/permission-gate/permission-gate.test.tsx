@@ -4,7 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asUserWithScope } from 'src/config/tests';
 
@@ -13,10 +13,10 @@ import PermissionGate from './permission-gate';
 describe('<PermissionGate />', () => {
   describe('when the user has permission', () => {
     it('should just render the button', () => {
-      asUserWithScope([RoleScope.admin]);
+      asUserWithScope([RoleScopeKind.admin]);
       customRender(
         <PermissionGate
-          scope={RoleScope.apiKeys}
+          scopeKind={RoleScopeKind.apiKeys}
           fallbackText="You don't have permission"
         >
           <button type="button">Create</button>
@@ -29,10 +29,10 @@ describe('<PermissionGate />', () => {
 
   describe('when the user does not have permission', () => {
     it('should disable the button and show a tooltip', async () => {
-      asUserWithScope([RoleScope.read]);
+      asUserWithScope([RoleScopeKind.read]);
       customRender(
         <PermissionGate
-          scope={RoleScope.apiKeys}
+          scopeKind={RoleScopeKind.apiKeys}
           fallbackText="You don't have permission"
         >
           <button type="button">Create</button>

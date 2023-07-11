@@ -1,5 +1,5 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -19,7 +19,7 @@ const Create = ({ onCreate }: CreateProps) => {
     <>
       <PermissionGate
         fallbackText={t('cta-not-allowed')}
-        scope={RoleScope.onboardingConfiguration}
+        scopeKind={RoleScopeKind.onboardingConfiguration}
       >
         <Button onClick={openCreateDialog} variant="secondary" size="small">
           {t('cta')}

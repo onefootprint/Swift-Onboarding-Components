@@ -12,7 +12,7 @@ export type ScopesProps = {
 
 const Scopes = ({ scopes }: ScopesProps) => {
   const { t } = useTranslation('pages.settings.roles');
-  const { isAdmin, decryptScopes, nonDecryptScopes } = groupScopes(scopes);
+  const { isAdmin, decryptOptions, nonDecryptScopes } = groupScopes(scopes);
 
   if (isAdmin) {
     return <span>{t('scopes.admin')}</span>;
@@ -21,23 +21,25 @@ const Scopes = ({ scopes }: ScopesProps) => {
   return (
     <Tags>
       {nonDecryptScopes.map(scope => (
-        <Tag key={scope}>{t(`scopes.${scope}`)}</Tag>
+        <Tag key={scope.kind}>{t(`scopes.${scope.kind}`)}</Tag>
       ))}
-      {decryptScopes.length === 1 && (
+      {decryptOptions.length === 1 && (
         <Tag>
-          {t(`scopes.decrypt_fields`, {
+          {t(`scopes.decrypt_fields_one`, {
             count: 1,
-            field: t(`scopes.${decryptScopes[0]}`),
+            field: t(`scopes.decrypt.${decryptOptions[0]}`),
           })}
         </Tag>
       )}
-      {decryptScopes.length > 1 && (
+      {decryptOptions.length > 1 && (
         <Tooltip
-          text={decryptScopes.map(scope => t(`scopes.${scope}`)).join(', ')}
+          text={decryptOptions
+            .map(scope => t(`scopes.decrypt.${scope}`))
+            .join(', ')}
         >
           <Tag>
-            {t(`scopes.decrypt_fields`, {
-              count: decryptScopes.length,
+            {t(`scopes.decrypt_fields_other`, {
+              count: decryptOptions.length,
             })}
           </Tag>
         </Tooltip>

@@ -1,9 +1,108 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { RoleScope } from '@onefootprint/types';
+import {
+  CollectedInvestorProfileDataOption,
+  CollectedKycDataOption,
+  RoleScope,
+  RoleScopeKind,
+} from '@onefootprint/types';
+
+// These aren't sent to the API - just used to represent all the options of decryptable things in
+// the MultiSelect. We need this since different decrypt options have special serializations in the API
+export enum DecryptOption {
+  all = 'all',
+  name = 'name',
+  email = 'email',
+  phoneNumber = 'phone_number',
+  ssn9 = 'ssn9',
+  ssn4 = 'ssn4',
+  dob = 'dob',
+  documents = 'documents',
+  fullAddress = 'full_address',
+  partialAddress = 'partial_address',
+  custom = 'custom',
+  investorProfile = 'investor_profile',
+  card = 'card',
+}
+
+/// Reverse lookup of DecryptOptionToRoleScope
+export const decryptOptionFromScope = (
+  scope: RoleScope,
+): DecryptOption | undefined => {
+  const result = Object.entries(DecryptOptionToRoleScope).find(opt =>
+    scopeEqual(opt[1], scope),
+  );
+  return result?.[0] as DecryptOption;
+};
+
+const scopeEqual = (a: RoleScope, b: RoleScope) => {
+  // Non-decrypt scopes just need the type to match
+  if (a.kind !== RoleScopeKind.decrypt && a.kind === b.kind) {
+    return true;
+  }
+  // For decrypt scopes, check that the data matches
+  if (
+    a.kind === RoleScopeKind.decrypt &&
+    b.kind === RoleScopeKind.decrypt &&
+    a.data === b.data
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const DecryptOptionToRoleScope: Record<DecryptOption, RoleScope> = {
+  [DecryptOption.all]: { kind: RoleScopeKind.decryptAll },
+  [DecryptOption.name]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.name,
+  },
+  [DecryptOption.email]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.email,
+  },
+  [DecryptOption.phoneNumber]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.phoneNumber,
+  },
+  [DecryptOption.ssn9]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.ssn9,
+  },
+  [DecryptOption.ssn4]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.ssn4,
+  },
+  [DecryptOption.dob]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.dob,
+  },
+  [DecryptOption.documents]: {
+    kind: RoleScopeKind.decryptDocuments,
+  },
+  [DecryptOption.fullAddress]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.fullAddress,
+  },
+  [DecryptOption.partialAddress]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.partialAddress,
+  },
+  [DecryptOption.custom]: {
+    kind: RoleScopeKind.decryptCustom,
+  },
+  [DecryptOption.investorProfile]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedInvestorProfileDataOption.investorProfile,
+  },
+  [DecryptOption.card]: {
+    kind: RoleScopeKind.decrypt,
+    data: 'card',
+  },
+};
 
 export type Option = {
   label: string;
-  value: RoleScope;
+  value: DecryptOption;
 };
 
 export type Group = {
@@ -18,10 +117,16 @@ const useDecryptOptions = () => {
     {
       label: 'Basic Data',
       options: [
-        { value: RoleScope.decryptName, label: t('decrypt.name') },
-        { value: RoleScope.decryptEmail, label: t('decrypt.email') },
         {
-          value: RoleScope.decryptPhoneNumber,
+          value: DecryptOption.name,
+          label: t('decrypt.name'),
+        },
+        {
+          value: DecryptOption.email,
+          label: t('decrypt.email'),
+        },
+        {
+          value: DecryptOption.phoneNumber,
           label: t('decrypt.phone_number'),
         },
       ],
@@ -30,29 +135,32 @@ const useDecryptOptions = () => {
       label: 'Identity data',
       options: [
         {
-          value: RoleScope.decryptSsn9,
+          value: DecryptOption.ssn9,
           label: t('decrypt.ssn9'),
         },
         {
-          value: RoleScope.decryptSsn4,
+          value: DecryptOption.ssn4,
           label: t('decrypt.ssn4'),
         },
         {
-          value: RoleScope.decryptDob,
+          value: DecryptOption.dob,
           label: t('decrypt.dob'),
         },
-        { value: RoleScope.decryptDocuments, label: t('decrypt.documents') },
+        {
+          value: DecryptOption.documents,
+          label: t('decrypt.documents'),
+        },
       ],
     },
     {
       label: 'Address data',
       options: [
         {
-          value: RoleScope.decryptFullAddress,
+          value: DecryptOption.fullAddress,
           label: t('decrypt.full_address'),
         },
         {
-          value: RoleScope.decryptPartialAddress,
+          value: DecryptOption.partialAddress,
           label: t('decrypt.partial_address'),
         },
       ],
@@ -61,15 +169,15 @@ const useDecryptOptions = () => {
       label: 'Other',
       options: [
         {
-          value: RoleScope.decryptCustom,
+          value: DecryptOption.custom,
           label: t('decrypt.custom'),
         },
         {
-          value: RoleScope.decryptInvestorProfile,
+          value: DecryptOption.investorProfile,
           label: t('decrypt.investor_profile'),
         },
         {
-          value: RoleScope.decryptCard,
+          value: DecryptOption.card,
           label: t('decrypt.card'),
         },
       ],

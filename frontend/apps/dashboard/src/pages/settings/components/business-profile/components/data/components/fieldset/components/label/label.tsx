@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, IconButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -31,7 +31,7 @@ const Label = ({ children, cta }: LabelProps) => {
       </Typography>
       {cta && (
         <PermissionGate
-          scope={RoleScope.orgSettings}
+          scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}
         >
           <IconButton aria-label={cta.label} onClick={cta.onClick}>

@@ -1,4 +1,6 @@
-export enum RoleScope {
+import { CollectedDataOption } from './collected-data-option';
+
+export enum RoleScopeKind {
   read = 'read',
   admin = 'admin',
   onboardingConfiguration = 'onboarding_configuration',
@@ -8,26 +10,23 @@ export enum RoleScope {
   manualReview = 'manual_review',
   writeEntities = 'write_entities',
   decryptAll = 'decrypt_all',
-  decryptName = 'decrypt.name',
-  decryptDob = 'decrypt.dob',
-  decryptSsn4 = 'decrypt.ssn4',
-  decryptSsn9 = 'decrypt.ssn9',
-  decryptFullAddress = 'decrypt.full_address',
-  decryptPartialAddress = 'decrypt.partial_address',
-  decryptEmail = 'decrypt.email',
-  decryptPhoneNumber = 'decrypt.phone_number',
-  decryptDocuments = 'decrypt.document_and_selfie',
-  decryptInvestorProfile = 'decrypt.investor_profile',
-  decryptCard = 'decrypt.card',
+  decryptDocuments = 'decrypt_document_and_selfie',
+  decrypt = 'decrypt',
   decryptCustom = 'decrypt_custom',
-  decryptBusinessName = 'decrypt.business_name',
-  decryptBusinessTin = 'decrypt.business_tin',
-  decryptBusinessAddress = 'decrypt.business_address',
-  decryptBusinessPhoneNumber = 'decrypt.business_phone_number',
-  decryptBusinessWebsite = 'decrypt.business_website',
-  decryptBusinessBeneficialOwners = 'decrypt.business_beneficial_owners',
-  decryptBusinessCorporationType = 'decrypt.business_corporation_type',
+  cipIntegration = 'cip_integration',
+  triggerKyc = 'trigger_kyc',
 }
+
+export type DecryptRoleScope = {
+  kind: RoleScopeKind.decrypt;
+  data: CollectedDataOption;
+};
+
+export type NonDecryptRoleScope = {
+  kind: Exclude<RoleScopeKind, RoleScopeKind.decrypt>;
+};
+
+export type RoleScope = NonDecryptRoleScope | DecryptRoleScope;
 
 export type Role = {
   createdAt: string;

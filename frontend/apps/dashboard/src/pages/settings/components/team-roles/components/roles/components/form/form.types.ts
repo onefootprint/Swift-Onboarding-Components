@@ -1,8 +1,10 @@
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
+
+import { DecryptOption } from './components/permissions/hooks/use-decrypt-options';
 
 export type FormData = {
-  decryptFields: { label: string; value: RoleScope }[];
+  decryptOptions: { label: string; value: DecryptOption }[];
   name: string;
-  scopes: RoleScope[];
+  scopeKinds: Exclude<RoleScopeKind, RoleScopeKind.decrypt>[];
   showDecrypt: boolean;
 };

@@ -1,5 +1,5 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -13,7 +13,7 @@ const Invite = () => {
   return (
     <>
       <PermissionGate
-        scope={RoleScope.orgSettings}
+        scopeKind={RoleScopeKind.orgSettings}
         fallbackText={t('not-allowed')}
       >
         <Button size="small" variant="secondary" onClick={open}>

@@ -1,4 +1,4 @@
-import { RoleScope } from '@onefootprint/types';
+import { RoleScope, RoleScopeKind } from '@onefootprint/types';
 import { useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
@@ -8,7 +8,7 @@ const baseUser = {
   email: 'jane.doe@acme.com',
   firstName: 'Jane',
   lastName: 'Doe',
-  scopes: [RoleScope.admin],
+  scopes: [{ kind: RoleScopeKind.admin } as RoleScope],
   isAssumedSession: false,
 };
 
@@ -112,27 +112,15 @@ export const asAdminUserInLive = () => {
   });
 };
 
-export const asMemberUser = () => {
+export const asUserWithScope = (
+  scopeKinds: Exclude<RoleScopeKind, RoleScopeKind.decrypt>[],
+) => {
   useStore.setState({
     data: {
       auth: '1',
       user: {
         ...baseUser,
-        scopes: ['member' as RoleScope],
-      },
-      org: baseOrg,
-      meta: baseMeta,
-    },
-  });
-};
-
-export const asUserWithScope = (scopes: RoleScope[]) => {
-  useStore.setState({
-    data: {
-      auth: '1',
-      user: {
-        ...baseUser,
-        scopes,
+        scopes: scopeKinds.map(s => ({ kind: s })),
       },
       org: baseOrg,
       meta: baseMeta,

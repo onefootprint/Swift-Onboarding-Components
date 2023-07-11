@@ -1,11 +1,11 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Role, RoleScope } from '@onefootprint/types';
+import { Role, RoleScopeKind } from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {
     id: 'Role_aExxJ5gSBpvqIJ2VcHH6J',
     name: 'Customer support',
-    scopes: [RoleScope.apiKeys],
+    scopes: [{ kind: RoleScopeKind.apiKeys }],
     isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
     numActiveUsers: 0,
@@ -14,7 +14,7 @@ export const RolesFixture: Role[] = [
   {
     id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Super',
-    scopes: [RoleScope.admin],
+    scopes: [{ kind: RoleScopeKind.admin }],
     isImmutable: true,
     createdAt: '2023-01-25T21:47:22.679708Z',
     numActiveUsers: 2,
@@ -24,7 +24,7 @@ export const RolesFixture: Role[] = [
     id: 'Role_erflKNWEF13143EWRWELJN',
     name: 'Read only',
     isImmutable: true,
-    scopes: [RoleScope.read],
+    scopes: [{ kind: RoleScopeKind.read }],
     createdAt: '2023-01-06T04:33:34.272399Z',
     numActiveUsers: 4,
     numActiveApiKeys: 5,

@@ -4,6 +4,7 @@ import { Dialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
 import Form from '../../../../../form';
+import groupScopes from '../../../scopes/utils/group-scopes';
 import useEditRole from './hooks/use-edit-role';
 
 export type EditHandler = {
@@ -19,9 +20,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
   const { t: scopesT } = useTranslation('pages.settings.roles.scopes');
   const [open, setOpen] = useState(false);
   const editRoleMutation = useEditRole(role.id);
-  const decryptScopes = role.scopes.filter(scope =>
-    scope.startsWith('decrypt'),
-  );
+  const { decryptOptions, nonDecryptScopes } = groupScopes(role.scopes);
 
   const handleOpen = () => {
     setOpen(true);
@@ -64,13 +63,13 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
       <Form
         onSubmit={handleSubmit}
         defaultValues={{
-          decryptFields: decryptScopes.map(scope => ({
-            value: scope,
-            label: scopesT(scope),
+          decryptOptions: decryptOptions.map(opt => ({
+            value: opt,
+            label: scopesT(`decrypt.${opt}`),
           })),
           name: role.name,
-          scopes: role.scopes,
-          showDecrypt: role.scopes.some(scope => scope.includes('decrypt')),
+          scopeKinds: nonDecryptScopes.map(s => s.kind),
+          showDecrypt: !!decryptOptions.length,
         }}
       />
     </Dialog>

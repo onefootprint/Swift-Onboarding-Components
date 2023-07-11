@@ -1,7 +1,8 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
-import PermissionGate, { Scope } from 'src/components/permission-gate';
+import PermissionGate from 'src/components/permission-gate';
 import SectionHeader from 'src/components/section-header';
 
 import CreateDialog from './components/create-dialog';
@@ -17,7 +18,7 @@ const ApiKeys = () => {
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
         <PermissionGate
           fallbackText={t('header.cta-not-allowed')}
-          scope={Scope.apiKeys}
+          scopeKind={RoleScopeKind.apiKeys}
         >
           <Button onClick={openCreateDialog} size="small" variant="secondary">
             {t('header.cta')}

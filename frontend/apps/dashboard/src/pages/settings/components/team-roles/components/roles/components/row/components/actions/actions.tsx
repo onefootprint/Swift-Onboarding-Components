@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Role, RoleScope } from '@onefootprint/types';
+import { Role, RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -30,7 +30,7 @@ const Actions = ({ role }: ActionsProps) => {
     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Dropdown.Root>
         <PermissionGate
-          scope={RoleScope.orgSettings}
+          scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}
         >
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>

@@ -1,22 +1,22 @@
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
 export type PermissionGateProps = {
   children: JSX.Element;
-  scope: RoleScope;
+  scopeKind: Exclude<RoleScopeKind, RoleScopeKind.decrypt>;
   fallbackText: string;
 };
 
 const PermissionGate = ({
   children,
-  scope,
+  scopeKind,
   fallbackText,
 }: PermissionGateProps) => {
   const { hasPermission } = usePermissions();
 
-  return hasPermission(scope) ? (
+  return hasPermission(scopeKind) ? (
     children
   ) : (
     <Tooltip text={fallbackText}>
@@ -31,4 +31,4 @@ const PermissionGate = ({
 
 export default PermissionGate;
 
-export { RoleScope as Scope };
+// export { RoleScope as Scope };

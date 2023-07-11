@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { Member, RoleScope } from '@onefootprint/types';
+import { Member, RoleScopeKind } from '@onefootprint/types';
 import {
   Box,
   createFontStyles,
@@ -54,7 +54,7 @@ const Actions = ({ member }: ActionsProps) => {
     >
       <Dropdown.Root>
         <PermissionGate
-          scope={RoleScope.orgSettings}
+          scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}
         >
           <Dropdown.Trigger aria-label={t('aria-label', { email })}>

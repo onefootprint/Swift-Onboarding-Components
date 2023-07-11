@@ -8,7 +8,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 
 import Members from './members';
@@ -266,7 +266,7 @@ describe.skip('<Members />', () => {
                 name: 'Admin',
                 numActiveUsers: 1,
                 numActiveApiKeys: 0,
-                scopes: [RoleScope.admin],
+                scopes: [{ kind: RoleScopeKind.admin }],
               },
               rolebinding: {
                 lastLoginAt: '2023-01-18T17:54:10.668420Z',

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
-import { RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Box, Dropdown } from '@onefootprint/ui';
 import React from 'react';
-import PermissionGate, { Scope } from 'src/components/permission-gate';
+import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';
 
 import EditRole from './components/edit-role';
@@ -35,7 +35,7 @@ const Row = ({ apiKey }: RowProps) => {
         <Badge variant={isEnabled ? 'success' : 'error'}>{apiKey.status}</Badge>
       </td>
       <td>
-        {hasPermission(RoleScope.orgSettings) ? (
+        {hasPermission(RoleScopeKind.orgSettings) ? (
           <EditRole apiKey={apiKey} />
         ) : (
           apiKey.role.name
@@ -50,7 +50,7 @@ const Row = ({ apiKey }: RowProps) => {
         >
           <Dropdown.Root>
             <PermissionGate
-              scope={Scope.apiKeys}
+              scopeKind={RoleScopeKind.apiKeys}
               fallbackText={t('not-allowed')}
             >
               <Dropdown.Trigger aria-label={t('aria-label')}>

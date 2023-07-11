@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Member, Role, RoleScope } from '@onefootprint/types';
+import { Member, Role, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
 beforeEach(() => {
@@ -28,7 +28,7 @@ export const membersFixture: Member[] = [
       name: 'Admin',
       numActiveUsers: 1,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.admin],
+      scopes: [{ kind: RoleScopeKind.admin }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-18T17:54:10.668420Z',
@@ -46,7 +46,7 @@ export const membersFixture: Member[] = [
       name: 'Member',
       numActiveUsers: 5,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.read],
+      scopes: [{ kind: RoleScopeKind.read }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-19T13:02:16.268743Z',
@@ -64,7 +64,7 @@ export const membersFixture: Member[] = [
       name: 'Member',
       numActiveUsers: 5,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.read],
+      scopes: [{ kind: RoleScopeKind.read }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-17T20:14:10.836665Z',
@@ -82,7 +82,7 @@ export const membersFixture: Member[] = [
       name: 'Member',
       numActiveUsers: 5,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.read],
+      scopes: [{ kind: RoleScopeKind.read }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-19T00:25:39.500544Z',
@@ -100,7 +100,7 @@ export const membersFixture: Member[] = [
       name: 'Member',
       numActiveUsers: 5,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.read],
+      scopes: [{ kind: RoleScopeKind.read }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-13T12:57:00.098715Z',
@@ -118,7 +118,7 @@ export const membersFixture: Member[] = [
       name: 'Member',
       numActiveUsers: 5,
       numActiveApiKeys: 0,
-      scopes: [RoleScope.read],
+      scopes: [{ kind: RoleScopeKind.read }],
     },
     rolebinding: {
       lastLoginAt: '2023-01-12T20:37:52.240432Z',
@@ -139,7 +139,7 @@ export const RolesFixture: Role[] = [
   {
     id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Admin',
-    scopes: [RoleScope.admin],
+    scopes: [{ kind: RoleScopeKind.admin }],
     isImmutable: true,
     createdAt: '2022-09-19T16:24:35.367322Z',
     numActiveUsers: 1,
@@ -149,7 +149,7 @@ export const RolesFixture: Role[] = [
     id: 'Role_erflKNWEF13143EWRWELJN',
     name: 'Member',
     isImmutable: true,
-    scopes: [RoleScope.read],
+    scopes: [{ kind: RoleScopeKind.read }],
     createdAt: '2023-01-06T05:11:08.415924Z',
     numActiveUsers: 5,
     numActiveApiKeys: 0,
@@ -158,7 +158,7 @@ export const RolesFixture: Role[] = [
     id: 'Role_bX2flKNWEF13143EWRWELJN',
     name: 'Developer',
     isImmutable: true,
-    scopes: [RoleScope.apiKeys],
+    scopes: [{ kind: RoleScopeKind.apiKeys }],
     createdAt: '2023-01-06T05:11:08.415924Z',
     numActiveUsers: 0,
     numActiveApiKeys: 1,
