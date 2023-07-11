@@ -54,23 +54,35 @@ impl ProxyToken {
         } else {
             (raw, vec![])
         };
-        // accept the case where the token is just a data identifier but we have a global fp_id
-        if let (Some(fp_id), Ok(identifier)) = (global_fp_id, DataIdentifier::from_str(token)) {
+
+        if let (Some(fp_id), Ok(identifier)) = (global_fp_id.clone(), DataIdentifier::from_str(token)) {
+            // accept the case where the token is just a data identifier but we have a global fp_id
             return Ok(Self {
                 fp_id,
                 identifier,
                 filter_functions,
             });
-        }
+        };
 
         let mut token = token.split('.');
         let Some(fp_id) = token.next() else {
             return Err(ProxyTokenError::InvalidTokenComponents)?;
         };
+
+        let fp_id =
+            FpId::parse_with_prefix(fp_id).map_err(|_| ProxyTokenError::InvalidFootprintIdInProxyToken)?;
+
+        // don't support mixing FQPTs with a different globally set fp_id
+        if let Some(global_fp_id) = global_fp_id {
+            if fp_id != global_fp_id {
+                return Err(ProxyTokenError::CannotMixFullyQualifiedProxyTokens)?;
+            }
+        }
+
         let data_identifier = token.join(".");
 
         Ok(Self {
-            fp_id: FpId::parse_with_prefix(fp_id)?,
+            fp_id,
             identifier: DataIdentifier::from_str(&data_identifier).map_err(ProxyTokenError::from)?,
             filter_functions,
         })
@@ -113,10 +125,14 @@ impl paperclip::v2::schema::Apiv2Schema for ProxyToken {
 
 #[derive(Debug, Clone, thiserror::Error, PartialEq)]
 pub enum ProxyTokenError {
-    #[error("missing or invalid components")]
+    #[error("Missing or invalid components.")]
     InvalidTokenComponents,
-    #[error("invalid data type identifier: {0}")]
+    #[error("Invalid data type identifier: {0}.")]
     InvalidDataIdentifier(#[from] crate::EnumDotNotationError),
+    #[error("Cannot mix global footprint token with fully-qualified proxy tokens. Please remove the header 'x-fp-id' or remove the 'fp_id.' prefix from proxy tokens.")]
+    CannotMixFullyQualifiedProxyTokens,
+    #[error("Missing or invalid footprint id in proxy token.")]
+    InvalidFootprintIdInProxyToken,
 }
 
 #[cfg(test)]
@@ -154,6 +170,13 @@ mod tests {
     fn test_proxy_parse_token(raw: &str, global: Option<&str>) -> ProxyToken {
         let global: Option<FpId> = global.map(|s| FpId::from(s.to_string()));
         ProxyToken::parse_global(raw, global).expect("failed to parse proxy token")
+    }
+
+    #[test_case("fp_id_abcd.id.ssn9", Some("fp_id_xyz") => false)]
+    #[test_case("fp_id_abcd.id.dob", Some("fp_id_abcd") => true)]
+    fn test_ok_proxy_parse_token(raw: &str, global: Option<&str>) -> bool {
+        let global: Option<FpId> = global.map(|s| FpId::from(s.to_string()));
+        ProxyToken::parse_global(raw, global).is_ok()
     }
 
     #[test_case("id.last_name")]
