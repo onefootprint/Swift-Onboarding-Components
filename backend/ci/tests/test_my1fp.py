@@ -66,7 +66,7 @@ def test_decrypt_sensitive(sandbox_user_real_phone, auth_token):
     # First, step up with the existing auth token
     step_up_user_biometric(auth_token, sandbox_user_real_phone)
     body = get("/hosted/user/token", None, auth_token)
-    assert "sensitive_profile" in body["scopes"]
+    assert "sensitive_profile" in [i for i in body["scopes"]]
 
     # Now, we should be able to decrypt sensitive data
     fields = BASIC_FIELDS + SENSITIVE_FIELDS

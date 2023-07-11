@@ -24,8 +24,6 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
     for r in roles_to_deactivate:
         # Deactivate members using this role
         r_id = r["id"]
-        print("ROLE")
-        print(r)
         members = get(f"org/members", dict(role_ids=r_id), sandbox_tenant.auth_token)
         for m in members["data"]:
             m_id = m["id"]
@@ -57,11 +55,13 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=["read", "onboarding_configuration"],
+        scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
     assert body["name"] == role_data["name"]
-    assert set(i for i in body["scopes"]) == set(i for i in role_data["scopes"])
+    assert set(i["kind"] for i in body["scopes"]) == set(
+        i["kind"] for i in role_data["scopes"]
+    )
     return body
 
 
@@ -239,14 +239,7 @@ def test_cannot_deactivate_current_user(sandbox_tenant):
     "filters,expected_admin_role,expected_limited_role",
     [
         (None, True, True),  # No filters
-        # Filter on scopes
-        (dict(scopes="onboarding_configuration"), False, True),
-        (dict(scopes="admin"), True, False),
-        (dict(scopes="admin, read"), True, True),
-        # Filter on name
-        (dict(search="test limit"), False, True),
-        # Filter on both!
-        (dict(search="admin", scopes="admin, read"), True, False),
+        (dict(search="test limit"), False, True),  # Filter on name
     ],
 )
 def test_get_roles(
@@ -288,7 +281,7 @@ def test_update_roles(sandbox_tenant, limited_role, admin_role):
     suffix = _gen_random_n_digit_number(10)
     patch_data = dict(
         name=f"New role name {suffix}",
-        scopes=["read", "onboarding_configuration"],
+        scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
     )
     patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
 
@@ -298,7 +291,9 @@ def test_update_roles(sandbox_tenant, limited_role, admin_role):
     assert admin_role["id"] in role_ids
     role = next(r for r in body["data"] if r["id"] == role_id)
     assert role["name"] == patch_data["name"]
-    assert set(i for i in role["scopes"]) == set(i for i in patch_data["scopes"])
+    assert set(i["kind"] for i in role["scopes"]) == set(
+        i["kind"] for i in patch_data["scopes"]
+    )
 
 
 def test_cant_update_admin_role(sandbox_tenant, admin_role):

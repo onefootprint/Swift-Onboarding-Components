@@ -15,7 +15,7 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=["read", "onboarding_configuration"],
+        scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
     )
     return post("org/roles", role_data, sandbox_tenant.auth_token)
 

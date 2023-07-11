@@ -6,7 +6,6 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{AsRefStr, EnumDiscriminants};
 
 #[derive(
@@ -20,11 +19,13 @@ use strum::{AsRefStr, EnumDiscriminants};
     EnumDiscriminants,
     Apiv2Schema,
     JsonSchema,
-    SerializeDisplay,
-    DeserializeFromStr,
+    serde::Serialize,
+    serde::Deserialize,
 )]
 #[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind")]
 #[diesel(sql_type = Text)]
 /// Represents a scope that is granted to TenantUsers in a specific TenantRole
 pub enum TenantScope {
@@ -53,7 +54,7 @@ pub enum TenantScope {
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
     /// TODO: Should probably also add a DecryptAll here
-    Decrypt(CollectedDataOption),
+    Decrypt { data: CollectedDataOption },
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
     #[strum(to_string = "decrypt.document")]
@@ -74,6 +75,7 @@ pub enum TenantScope {
     TriggerKyc,
 }
 
+// TODO get rid of this when we migrate the serialization in the DB
 impl_enum_string_diesel!(TenantScope);
 
 /// A custom implementation to make the appearance of serialized TenantScopes much more reasonable.
@@ -83,7 +85,7 @@ impl std::fmt::Display for TenantScope {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
         let suffix = match self {
-            Self::Decrypt(s) => Some(s.to_string()),
+            Self::Decrypt { data } => Some(data.to_string()),
             _ => None,
         };
         if let Some(suffix) = suffix {
@@ -115,7 +117,7 @@ impl FromStr for TenantScope {
                     // We should have parsed this as a Discriminant above
                     return Err(EnumDotNotationError::CannotParsePrefix(s.into()));
                 }
-                Self::Decrypt(cdo)
+                Self::Decrypt { data: cdo }
             }
         };
         Ok(res)
@@ -153,8 +155,8 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(TenantScope::Decrypt(CollectedDataOption::FullAddress) => "decrypt.full_address")]
-    #[test_case(TenantScope::Decrypt(CollectedDataOption::Ssn4) => "decrypt.ssn4")]
+    #[test_case(TenantScope::Decrypt{data: CollectedDataOption::FullAddress} => "decrypt.full_address")]
+    #[test_case(TenantScope::Decrypt{data: CollectedDataOption::Ssn4} => "decrypt.ssn4")]
     #[test_case(TenantScope::DecryptDocumentAndSelfie => "decrypt.document_and_selfie")]
     #[test_case(TenantScope::Read => "read")]
     #[test_case(TenantScope::Admin => "admin")]
@@ -167,8 +169,8 @@ mod tests {
         identifier.to_string()
     }
 
-    #[test_case("decrypt.full_address" => TenantScope::Decrypt(CollectedDataOption::FullAddress))]
-    #[test_case("decrypt.ssn4" => TenantScope::Decrypt(CollectedDataOption::Ssn4))]
+    #[test_case("decrypt.full_address" => TenantScope::Decrypt{data: CollectedDataOption::FullAddress})]
+    #[test_case("decrypt.ssn4" => TenantScope::Decrypt{data: CollectedDataOption::Ssn4})]
     #[test_case("decrypt.document_and_selfie" => TenantScope::DecryptDocumentAndSelfie)]
     #[test_case("read" => TenantScope::Read)]
     #[test_case("admin" => TenantScope::Admin)]

@@ -88,16 +88,20 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
                 Right(token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie))
             }
             DataIdentifier::Document(newtypes::DocumentKind::FinraComplianceLetter) => {
-                Right(token_scopes.contains(&TenantScope::Decrypt(CDO::InvestorProfile)))
+                Right(token_scopes.contains(&TenantScope::Decrypt {
+                    data: CDO::InvestorProfile,
+                }))
             }
-            DataIdentifier::Card(_) => Right(token_scopes.contains(&TenantScope::Decrypt(CDO::Card))),
+            DataIdentifier::Card(_) => {
+                Right(token_scopes.contains(&TenantScope::Decrypt { data: CDO::Card }))
+            }
         });
         // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
         // here is a little different
         let accessible_data: HashSet<_> = token_scopes
             .iter()
             .filter_map(|p| match p {
-                TenantScope::Decrypt(cdo) => Some(cdo),
+                TenantScope::Decrypt { data: cdo } => Some(cdo),
                 _ => None,
             })
             .flat_map(|cdo| cdo.data_identifiers())
@@ -155,24 +159,24 @@ mod test {
     //
     // Identity + business data
     #[test_case(&[TS::ApiKeys], CanDecrypt::new(vec![IDK::Ssn9]) => false)]
-    #[test_case(&[TS::Decrypt(CDO::Name), TS::Decrypt(CDO::FullAddress), TS::ApiKeys], CanDecrypt::new(vec![IDK::FirstName, IDK::City]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![IDK::Ssn9]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![IDK::Ssn4]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![IDK::Ssn4, IDK::FirstName]) => false)]
-    #[test_case(&[TS::Decrypt(CDO::Name)], CanDecrypt::new(vec![IDK::Ssn4]) => false)]
-    #[test_case(&[TS::Decrypt(CDO::Name), TS::Decrypt(CDO::FullAddress)], CanDecrypt::new(vec![IDK::FirstName, IDK::Zip]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::Name), TS::Decrypt(CDO::FullAddress)], CanDecrypt::new(vec![IDK::FirstName, IDK::Email]) => false)]
-    #[test_case(&[TS::Decrypt(CDO::BusinessName)], CanDecrypt::new(vec![BDK::Name]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::BusinessAddress)], CanDecrypt::new(vec![BDK::AddressLine1, BDK::AddressLine2, BDK::City, BDK::State, BDK::Zip, BDK::Country]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::BusinessWebsite)], CanDecrypt::new(vec![BDK::Website]) => true)]
-    #[test_case(&[TS::Decrypt(CDO::BusinessWebsite)], CanDecrypt::new(vec![BDK::Website, BDK::Name]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}, TS::Decrypt{data: CDO::FullAddress}, TS::ApiKeys], CanDecrypt::new(vec![IDK::FirstName, IDK::City]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![IDK::Ssn9]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![IDK::Ssn4]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![IDK::Ssn4, IDK::FirstName]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![IDK::Ssn4]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}, TS::Decrypt{data: CDO::FullAddress}], CanDecrypt::new(vec![IDK::FirstName, IDK::Zip]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}, TS::Decrypt{data: CDO::FullAddress}], CanDecrypt::new(vec![IDK::FirstName, IDK::Email]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::BusinessName}], CanDecrypt::new(vec![BDK::Name]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::BusinessAddress}], CanDecrypt::new(vec![BDK::AddressLine1, BDK::AddressLine2, BDK::City, BDK::State, BDK::Zip, BDK::Country]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::BusinessWebsite}], CanDecrypt::new(vec![BDK::Website]) => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::BusinessWebsite}], CanDecrypt::new(vec![BDK::Website, BDK::Name]) => false)]
     #[test_case(&[], CanDecrypt::new(vec![IDK::FirstName]) => false)]
     #[test_case(&[], CanDecrypt::new(vec![BDK::Name]) => false)]
     // CanDecrypt custom
-    #[test_case(&[TS::Decrypt(CDO::Name)], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => true)]
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
-    #[test_case(&[TS::Decrypt(CDO::Name)], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => false)]
     // CanDecrypt identity docs
     #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
     #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
@@ -180,11 +184,11 @@ mod test {
     #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
     #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => false)]
     // CanDecrypt complex
-    #[test_case(&[TS::DecryptCustom, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
-    #[test_case(&[TS::DecryptCustom, TS::Decrypt(CDO::Ssn9), TS::Decrypt(CDO::BusinessName)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Business(BDK::Name), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt(CDO::Ssn9)], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::Decrypt{data: CDO::Ssn9}, TS::Decrypt{data: CDO::BusinessName}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Business(BDK::Name), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
     //
     // Test Or
     //
@@ -204,7 +208,7 @@ mod test {
     //
     #[test_case(&[TS::ApiKeys], Any => true)]
     #[test_case(&[], Any => true)]
-    #[test_case(&[TS::Decrypt(CDO::Ssn9)], Any => true)]
+    #[test_case(&[TS::Decrypt{data: CDO::Ssn9}], Any => true)]
     /// Test that the token_scopes associated with an authentication method gives access to perform
     /// the requested_permission
     fn test_is_permission_met<T: IsGuardMet<TS>>(token_scopes: &[TS], requested_permission: T) -> bool {

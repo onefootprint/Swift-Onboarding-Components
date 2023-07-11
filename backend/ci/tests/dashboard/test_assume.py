@@ -101,7 +101,7 @@ def test_cannot_patch(assumed_token, path):
         # ),
         ("org/members", dict(email="e@onefootprint.com", role_id="", redirect_url="")),
         ("org/members/some_id/deactivate", dict()),
-        ("org/roles", dict(name="", scopes=["read"])),
+        ("org/roles", dict(name="", scopes=[{"kind": "read"}])),
         ("org/roles/some_id/deactivate", dict()),
         # ("org/api_keys", dict(name="")),
         # ("org/api_keys/some_id/reveal", dict()),

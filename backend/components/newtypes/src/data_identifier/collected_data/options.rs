@@ -284,7 +284,7 @@ impl CollectedDataOption {
                     TenantScope::DecryptDocument
                 }
             }
-            cdo => TenantScope::Decrypt(cdo),
+            data => TenantScope::Decrypt { data },
         }
     }
 }
