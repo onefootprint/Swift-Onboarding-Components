@@ -1,6 +1,6 @@
+import cv from '@onefootprint/opencv-ts';
 import { render, screen, waitFor } from '@onefootprint/test-utils';
 import Image from 'next/image';
-import cv from 'opencv-ts';
 import React from 'react';
 
 import {
@@ -8,6 +8,7 @@ import {
   getCardCaptureStatus,
 } from './graphics-processing-utils';
 import { getTestImageEntries } from './graphics-processing-utils.test.config';
+import { params } from './params';
 
 const ImageComponent = ({ imgPath }: { imgPath: string }) => (
   <Image src={imgPath} width={500} height={500} alt="Test Image" />
@@ -29,8 +30,11 @@ describe.skip('Testing the image detection outputs', () => {
       const imageElement = screen.getByRole('img');
       const cardCaptureStatus = getCardCaptureStatus(
         imageElement as HTMLImageElement,
+        params,
       );
-      expect(cardCaptureStatus === CardCaptureStatus.OK).toEqual(capturable);
+      expect(cardCaptureStatus.status === CardCaptureStatus.OK).toEqual(
+        capturable,
+      );
     });
   });
 });

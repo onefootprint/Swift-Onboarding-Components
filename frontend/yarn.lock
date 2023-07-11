@@ -2720,6 +2720,13 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
+"@onefootprint/opencv-ts@^1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@onefootprint/opencv-ts/-/opencv-ts-1.3.7.tgz#1b3178239dcbee540339aba2fa4f45c3dc4b3652"
+  integrity sha512-dk/Ktz9eABPq2osEd2d/uBw9JWNJgbBrHOQAOtzDHWkAlcRT3mse/bEUj9a4owDI58wv/C+r+puvOCVLF0S3Hw==
+  dependencies:
+    typescript "^4.2.3"
+
 "@onefootprint/postmate@2.1.0":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@onefootprint/postmate/-/postmate-2.1.0.tgz"
@@ -14451,13 +14458,6 @@ open@^9.1.0:
     define-lazy-prop "^3.0.0"
     is-inside-container "^1.0.0"
     is-wsl "^2.2.0"
-
-opencv-ts@^1.3.6:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/opencv-ts/-/opencv-ts-1.3.6.tgz#2242f2c051be272861edc8d7d6ab18b590f842f3"
-  integrity sha512-8iG+ujpzsvc5W7vP0WH0TFUOODZFulp7SBzy2Av2xXmHrHVKw7HWKyutLxmstAkNa7nD6BgnDrEVxTsI/mDkeQ==
-  dependencies:
-    typescript "^4.2.3"
 
 opener@^1.5.2:
   version "1.5.2"

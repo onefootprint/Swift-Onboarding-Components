@@ -5,20 +5,21 @@ import {
   CardCaptureStatus,
   getCardCaptureStatus,
 } from '../utils/graphics-utils/graphics-processing-utils';
+import { params, ParamsType } from '../utils/graphics-utils/params';
 import useFaceDetection, { FaceStatus } from './use-face-detection';
 import useSize from './use-size';
 
 // We send a new capture from video every 200 milliseconds
-const CHECK_INETERVAL = 200;
+const CHECK_INTERVAL = 200;
 
-// We will check if 3 consecutive tries were successful before considering it a complete success
-const REQUIRED_CONSECUTIVE_SUCCESS = 3;
+// We will check if 2 consecutive tries were successful before considering it a complete success
+const REQUIRED_CONSECUTIVE_SUCCESS = 2;
 
 // We allow 40 pixels offset outside the card outline (20 pixels each side) along the width
 const WIDTH_ERROR_OFFSET = 40;
 
-// We allow 20 pixels offset outside the card outline (10 pixels each side) along the height
-const HEIGHT_ERROR_OFFSET = 20;
+// We allow 30 pixels offset outside the card outline (10 pixels each side) along the height
+const HEIGHT_ERROR_OFFSET = 30;
 
 export type AutocaptureKind = 'document' | 'face';
 
@@ -46,6 +47,7 @@ const useAutoCapture = ({
   shouldDetect,
 }: AutoCaptureProps) => {
   const successCount = useRef(0);
+  const rearrangedParams = useRef(params);
   const pastStatus = useRef<FaceStatus | CardCaptureStatus | undefined>(
     FaceStatus.detecting,
   );
@@ -54,6 +56,18 @@ const useAutoCapture = ({
   const [isCaptured, setIsCaptured] = useState(false);
 
   useEffect(() => {
+    // Bring the selected param to the front
+    const rearrangeParams = (
+      selectedParamIndex: number,
+      oldParams: ParamsType[],
+    ) => {
+      const newParams = [...oldParams];
+      const selectedParam = newParams[selectedParamIndex];
+      newParams.splice(selectedParamIndex, 1);
+      newParams.unshift(selectedParam);
+      return newParams;
+    };
+
     const detectAndCapture = async () => {
       const context = canvasRef.current?.getContext('2d');
       if (
@@ -71,6 +85,7 @@ const useAutoCapture = ({
 
       // Width and height of the image that will be used for detection algos
       // We don't want these dimensions to be bigger than video size
+      // We add a little bit of cushion space around the frame outline
       const desiredImageWidth = Math.min(
         outlineWidth + WIDTH_ERROR_OFFSET,
         videoSize.width,
@@ -81,6 +96,7 @@ const useAutoCapture = ({
       );
 
       if (autocaptureKind === 'document') {
+        // Get the dimensions in video source that corresponds to the frame outline with some cushion
         const sourceDimensions = getSourceDimensions({
           videoRef,
           mediaStream,
@@ -89,6 +105,9 @@ const useAutoCapture = ({
         });
         canvasRef.current.setAttribute('width', `${sourceDimensions.sWidth}`);
         canvasRef.current.setAttribute('height', `${sourceDimensions.sHeight}`);
+
+        // We get the static image from the video
+        // We only use the area within the frame outline with a little bit of cushion space around the outline
         context.drawImage(
           videoRef.current,
           sourceDimensions.sx,
@@ -100,13 +119,22 @@ const useAutoCapture = ({
           canvasRef.current?.clientWidth,
           canvasRef.current?.clientHeight,
         );
-        const cardCaptureStatus = getCardCaptureStatus(canvasRef.current);
+
+        // We get the card capture status and the index of the param that successfully detected the card
+        const { status: cardCaptureStatus, paramIndex } = getCardCaptureStatus(
+          canvasRef.current,
+          rearrangedParams.current,
+        );
+
         if (cardCaptureStatus === CardCaptureStatus.OK) {
           successCount.current += 1;
+          rearrangedParams.current = rearrangeParams(
+            paramIndex,
+            rearrangedParams.current,
+          );
           onStatusChange(CardCaptureStatus.OK);
         } else if (pastStatus.current === cardCaptureStatus) {
-          successCount.current = 0;
-          onStatusChange(pastStatus.current);
+          onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
         }
         pastStatus.current = cardCaptureStatus;
       } else if (autocaptureKind === 'face') {
@@ -120,8 +148,7 @@ const useAutoCapture = ({
           successCount.current += 1;
           onStatusChange(FaceStatus.OK);
         } else if (pastStatus.current === faceStatus) {
-          successCount.current = 0;
-          onStatusChange(pastStatus.current);
+          onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
         }
         pastStatus.current = faceStatus;
       }
@@ -134,7 +161,7 @@ const useAutoCapture = ({
         clearInterval(id);
         setIsCaptured(true);
       }
-    }, CHECK_INETERVAL);
+    }, CHECK_INTERVAL);
     return () => clearInterval(id);
   }, [
     autocaptureKind,

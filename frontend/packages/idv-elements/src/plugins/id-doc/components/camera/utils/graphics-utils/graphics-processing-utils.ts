@@ -1,9 +1,12 @@
-import cv, { Mat, MatVector, Point, Rect, RotatedRect } from 'opencv-ts';
+import cv, {
+  Mat,
+  MatVector,
+  Point,
+  Rect,
+  RotatedRect,
+} from '@onefootprint/opencv-ts';
 
-// The numbers are used for edge detection hysteresis thresholding
-// The higher the numbers are, the less number of edges (only the prominent ones) will be detected
-const HYSTERESIS_FIRST_THRESHOLD = 50;
-const HYSTERESIS_SECOND_THRESHOLD = 100;
+import { ParamsType } from './params';
 
 // The threshold value used for finding contours.
 // If the pixel value is less than the threshold, it will be set to 0
@@ -16,43 +19,28 @@ export enum CardCaptureStatus {
   detecting = 'detecting',
 }
 
-export const grayScaleImage = (src: Mat) => {
-  const numDestChannels = 0; // number of destination channels - if the parameter is 0, the number of the channels is derived automatically from src and code.
-  cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, numDestChannels);
-};
-
-export const getMedianBlur = (src: Mat, shouldCleanUp: Boolean) => {
+export const getMedianBlur = (
+  src: Mat,
+  kSize: number,
+  shouldCleanUp: Boolean,
+) => {
   const dst = new cv.Mat();
-  cv.medianBlur(src, dst, 9); // Kernel with size 9x9 worked best during testing
+  cv.medianBlur(src, dst, kSize); // Kernel with size 9x9 worked best during testing
 
   // cleanup
   if (shouldCleanUp) src.delete();
   return dst;
 };
 
-export const getGaussianBlur = (src: Mat, shouldCleanUp: boolean) => {
+export const getEdges = (
+  src: Mat,
+  firstThreshold: number,
+  secondThreshold: number,
+  apertureSize: number,
+  shouldCleanUp: boolean,
+) => {
   const dst = new cv.Mat();
-  const numRowsAndCols = 3; // number of rows and cols in the Gaussian matrix
-  const ksize = new cv.Size(numRowsAndCols, numRowsAndCols);
-  const standardDeviationXY = 0; // standard deviation along x and y
-  cv.GaussianBlur(
-    src,
-    dst,
-    ksize,
-    standardDeviationXY,
-    standardDeviationXY,
-    cv.BORDER_DEFAULT,
-  );
-
-  // cleanup
-  if (shouldCleanUp) src.delete();
-
-  return dst;
-};
-
-export const getEdges = (src: Mat, shouldCleanUp: boolean) => {
-  const dst = new cv.Mat();
-  cv.Canny(src, dst, HYSTERESIS_FIRST_THRESHOLD, HYSTERESIS_SECOND_THRESHOLD);
+  cv.Canny(src, dst, firstThreshold, secondThreshold, apertureSize);
 
   // cleanup
   if (shouldCleanUp) src.delete();
@@ -63,7 +51,7 @@ export const getEdges = (src: Mat, shouldCleanUp: boolean) => {
 export const getDilatedImage = (src: Mat, shouldCleanUp: boolean) => {
   const dst = new cv.Mat();
   const Ones = cv.Mat.ones;
-  const numRowsAndCols = 1; // number of rows and cols in the kernel matrix
+  const numRowsAndCols = 5; // number of rows and cols in the kernel matrix
   const M = new Ones(numRowsAndCols, numRowsAndCols, cv.CV_8U);
   const anchor = new cv.Point(-1, -1); // anchor position (-1, -1) means that the anchor is at the center
   const numIterations = 1;
@@ -147,10 +135,10 @@ export const getIsHorizontallyAligned = ({
     return false;
   }
 
-  // The differences between the area cannot be more than 5% (play around with this value)
+  // The differences between the area cannot be more than 10% (play around with this value)
   const diff = (Math.abs(uprightArea - minArea) * 100) / minArea;
 
-  if (diff > 5) {
+  if (diff > 10) {
     return false;
   }
 
@@ -194,62 +182,75 @@ export const isOverAligned = ({
   imgHeight: number;
 }) => {
   // Does the left line of the bounding box aligns exactly with left edge of the image
-  if (topLeft.x === 0) return false;
+  if (topLeft.x === 0) return true;
 
   // Does the top line of the bounding box aligns exactly with top edge of the image
-  if (topLeft.y === 0) return false;
+  if (topLeft.y === 0) return true;
 
   // Does the right line of the bounding box aligns exactly with right edge of the image
-  if (bottomRight.x === imgWidth) return false;
+  if (bottomRight.x === imgWidth) return true;
 
   // Does the bottom line of the bounding box aligns exactly with bottom edge of the image
-  if (bottomRight.y === imgHeight) return false;
+  if (bottomRight.y === imgHeight) return true;
 
-  return true;
+  return false;
 };
 
 export const getCardCaptureStatus = (
   imgSrc: HTMLImageElement | HTMLCanvasElement,
+  params: ParamsType[],
 ) => {
-  if (!cv.Mat) return CardCaptureStatus.detecting; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
+  if (!cv.Mat) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
   if (imgSrc.width === 0 || imgSrc.height === 0)
-    return CardCaptureStatus.detecting;
+    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
   const src = cv.imread(imgSrc);
-  const medianBlurredImage = getMedianBlur(src, true);
-  grayScaleImage(medianBlurredImage);
-  const blurredImage = getGaussianBlur(medianBlurredImage, true);
-  const edges = getEdges(blurredImage, true);
-  const dilatedEdges = getDilatedImage(edges, true);
-  const contours = getExternalContours(dilatedEdges, true);
-  const boundingBoxes = getBoundingBoxes(contours);
-  const possibleCards: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
-  boundingBoxes.forEach(boundingBox => {
-    const topLeft = new cv.Point(
-      boundingBox.uprightRect.x,
-      boundingBox.uprightRect.y,
+
+  for (let i = 0; i < params.length; i += 1) {
+    const { kSize, fThresh, sThresh, aperSize } = params[i];
+    const medianBlurredImage = getMedianBlur(src, kSize, false); // should not clean the src since we need it for every iteration of the loop
+    const edges = getEdges(
+      medianBlurredImage,
+      fThresh,
+      sThresh,
+      aperSize,
+      true,
     );
-    const bottomRight = new cv.Point(
-      boundingBox.uprightRect.x + boundingBox.uprightRect.width,
-      boundingBox.uprightRect.y + boundingBox.uprightRect.height,
-    );
-    if (
-      getIsHorizontallyAligned(boundingBox) &&
-      coversOutlineSpace(
-        boundingBox.uprightRect,
-        imgSrc.width,
-        imgSrc.height,
-      ) &&
-      isOverAligned({
-        topLeft,
-        bottomRight,
-        imgWidth: imgSrc.width,
-        imgHeight: imgSrc.height,
-      })
-    ) {
-      possibleCards.push(boundingBox);
+    const dilatedEdges = getDilatedImage(edges, true);
+    const contours = getExternalContours(dilatedEdges, true);
+    const boundingBoxes = getBoundingBoxes(contours);
+    const possibleCards: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
+    boundingBoxes.forEach(boundingBox => {
+      const topLeft = new cv.Point(
+        boundingBox.uprightRect.x,
+        boundingBox.uprightRect.y,
+      );
+      const bottomRight = new cv.Point(
+        boundingBox.uprightRect.x + boundingBox.uprightRect.width,
+        boundingBox.uprightRect.y + boundingBox.uprightRect.height,
+      );
+      if (
+        getIsHorizontallyAligned(boundingBox) &&
+        coversOutlineSpace(
+          boundingBox.uprightRect,
+          imgSrc.width,
+          imgSrc.height,
+        ) &&
+        !isOverAligned({
+          topLeft,
+          bottomRight,
+          imgWidth: imgSrc.width,
+          imgHeight: imgSrc.height,
+        })
+      ) {
+        possibleCards.push(boundingBox);
+      }
+    });
+    contours.delete();
+    if (possibleCards.length === 1) {
+      src.delete(); // now we can clean the src
+      return { status: CardCaptureStatus.OK, paramIndex: i };
     }
-  });
-  contours.delete();
-  if (possibleCards.length === 1) return CardCaptureStatus.OK;
-  return CardCaptureStatus.detecting;
+  }
+  src.delete(); // now we can clean the src
+  return { status: CardCaptureStatus.detecting, paramIndex: -1 };
 };
