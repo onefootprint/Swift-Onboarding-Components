@@ -14,10 +14,9 @@ import UploadButton from './components/upload-button/upload-button';
 import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
+import { CameraKind } from './utils/get-camera-options';
 import getImageStringFromVideo from './utils/get-image-string-from-video';
 import getVideoHeight from './utils/get-video-height';
-
-export type CameraKind = 'front' | 'back';
 
 type CameraProps = {
   onCapture: (image: string) => void;
@@ -27,16 +26,6 @@ type CameraProps = {
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineKind: OutlineKind;
   autocaptureKind: AutocaptureKind;
-};
-
-const FRONT_CAMERA_OPTIONS = {
-  audio: false,
-  video: { facingMode: 'user' },
-};
-
-const BACK_CAMERA_OPTIONS = {
-  audio: false,
-  video: { facingMode: 'environment' },
 };
 
 const Camera = ({
@@ -63,10 +52,7 @@ const Camera = ({
   const [shouldDetect, setShouldDetect] = useState(false);
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
 
-  const mediaStream = useUserMedia(
-    cameraKind === 'front' ? FRONT_CAMERA_OPTIONS : BACK_CAMERA_OPTIONS,
-    onError,
-  );
+  const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {

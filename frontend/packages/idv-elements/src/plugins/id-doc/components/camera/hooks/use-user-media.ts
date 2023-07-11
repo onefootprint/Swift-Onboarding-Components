@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react';
 
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
+import getCameraOptions, { CameraKind } from '../utils/get-camera-options';
 
-const useUserMedia = (
-  requestedMedia: MediaStreamConstraints,
-  onError?: () => void,
-) => {
+const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   const onCameraError = useHandleCameraError();
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
 
   useEffect(() => {
     const enableVideoStream = async () => {
+      const cameraOptions = await getCameraOptions(cameraKind);
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(
-          requestedMedia,
-        );
+        const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
         setMediaStream(stream);
       } catch (err) {
         onCameraError(err);
@@ -35,7 +32,7 @@ const useUserMedia = (
     }
     return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaStream, requestedMedia]);
+  }, [mediaStream, cameraKind]);
 
   return mediaStream;
 };

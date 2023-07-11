@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import Camera from '../camera';
-import { CameraKind } from '../camera/camera';
 import { OutlineKind } from '../camera/components/overlay/overlay';
 import { AutocaptureKind } from '../camera/hooks/use-auto-capture';
+import { CameraKind } from '../camera/utils/get-camera-options';
 import Preview from '../preview';
 
 type PhotoCaptureProps = {

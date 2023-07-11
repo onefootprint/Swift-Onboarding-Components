@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
-import { CameraKind } from '../camera/camera';
+import { CameraKind } from '../camera/utils/get-camera-options';
 
 type PreviewProps = {
   imageSrc: string;
