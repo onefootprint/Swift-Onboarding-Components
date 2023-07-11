@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError};
+use crate::{
+    incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError},
+    test_fixtures::{self, DocTestOpts},
+};
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
@@ -141,6 +144,14 @@ impl FetchScoresResponse {
             .ok_or(IncodeError::AssertionError(
                 "missing face recognition status".into(),
             ))
+    }
+
+    #[allow(non_snake_case)]
+    pub fn TEST_ONLY_FIXTURE() -> Result<Self, IncodeError> {
+        let resp: Self =
+            serde_json::from_value(test_fixtures::incode_fetch_scores_response(DocTestOpts::default()))?;
+
+        Ok(resp)
     }
 }
 

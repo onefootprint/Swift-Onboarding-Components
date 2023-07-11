@@ -1,5 +1,7 @@
 use super::IncodeStateTransition;
 use super::VerificationSession;
+use crate::decision::features::incode_docv;
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiResult;
@@ -10,6 +12,7 @@ use async_trait::async_trait;
 use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
+use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::DbPool;
@@ -27,6 +30,8 @@ use newtypes::IdentityDocumentId;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use std::collections::HashMap;
 
 // TODO this is more like the other workflow state transitions where it's actually a function
@@ -35,6 +40,7 @@ use std::collections::HashMap;
 pub struct Complete {}
 
 impl Complete {
+    #[allow(clippy::too_many_arguments)]
     /// Must call this before instantiating Complete
     pub fn enter(
         conn: &mut TxnPgConn,
@@ -43,7 +49,11 @@ impl Complete {
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
         fetch_ocr_response: FetchOCRResponse,
-        _score_response: FetchScoresResponse,
+        score_response: FetchScoresResponse,
+        vault_data: IncodeOcrComparisonDataFields,
+        expect_selfie: bool,
+        ocr_verification_result_id: VerificationResultId,
+        score_verification_result_id: VerificationResultId,
     ) -> ApiResult<()> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
         let (id_doc, doc_req) = IdentityDocument::get(conn, id_doc_id)?;
@@ -85,7 +95,7 @@ impl Complete {
         }
 
         use DocumentKind::*;
-        let r = fetch_ocr_response;
+        let r = fetch_ocr_response.clone();
         let data = match dk {
             IdDocKind::IdCard => vec![
                 di(IdCardExpiration, r.expiration_date().ok()),
@@ -111,6 +121,30 @@ impl Complete {
         let data = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(vault.is_live))?;
         let data = data.no_fingerprints();
         uvw.patch_data(conn, data)?;
+
+        // ////////////
+        // Save Risk Signals
+        // ////////////
+        let score_reason_codes =
+            incode_docv::reason_codes_from_score_response(score_response, expect_selfie)?
+                .into_iter()
+                .map(|r| {
+                    (
+                        r,
+                        VendorAPI::IncodeFetchScores,
+                        score_verification_result_id.clone(),
+                    )
+                });
+        let ocr_reason_codes = incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)?
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()));
+
+        RiskSignal::bulk_create(
+            conn,
+            sv_id,
+            score_reason_codes.chain(ocr_reason_codes).collect(),
+            newtypes::RiskSignalGroupKind::Doc,
+        )?;
 
         // TODO: still need to fingerprint data afterwards!
 

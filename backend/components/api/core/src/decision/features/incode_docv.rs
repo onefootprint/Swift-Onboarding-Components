@@ -7,6 +7,7 @@ use newtypes::{
 use crate::decision::onboarding::FeatureSet;
 
 
+#[derive(Default)]
 pub struct IncodeOcrComparisonDataFields {
     pub first_name: PiiString,
     pub last_name: PiiString,
@@ -48,7 +49,7 @@ pub fn footprint_reason_codes(
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
 
-fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: bool) -> Result<Vec<FootprintReasonCode>, idv::Error> {
+pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: bool) -> Result<Vec<FootprintReasonCode>, idv::Error> {
     let mut reason_codes = vec![];
     // Overall score
     // 
@@ -103,7 +104,7 @@ fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: 
     Ok(reason_codes)
 }
 
-fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
+pub fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
         let first_name_ocr: PiiString = ocr.name.as_ref().and_then(|n| n.first_name.clone().map(|f| f.into())).ok_or(idv::Error::from(idv::incode::error::Error::OcrError("missing first name".into())))?;
         let paternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.paternal_last_name.clone().map(|f| f.into()));
         let maternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.maternal_last_name.clone().map(|f| f.into()));

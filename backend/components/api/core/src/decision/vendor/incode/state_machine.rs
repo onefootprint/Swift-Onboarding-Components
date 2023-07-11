@@ -2,6 +2,7 @@ use super::state::{IncodeState, IncodeStateTransition, RunTransition, StepResult
 use super::states::*;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
 use crate::vendor_clients::IncodeClients;
 use crate::{ApiError, State};
@@ -27,6 +28,7 @@ pub struct IncodeContext {
     pub vault: Vault,
     pub docv_data: DocVData,
     pub doc_request_id: DocumentRequestId,
+    pub enclave_client: EnclaveClient,
 }
 
 impl IncodeState {

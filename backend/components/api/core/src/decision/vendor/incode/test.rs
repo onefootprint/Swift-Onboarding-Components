@@ -6,6 +6,7 @@ use db::{
         identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
         incode_verification_session_event::IncodeVerificationSessionEvent,
+        risk_signal::RiskSignal,
         user_consent::UserConsent,
         verification_request::VerificationRequest,
     },
@@ -21,7 +22,7 @@ use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo,
     DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason, IncodeVerificationSessionState,
-    PiiString, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
+    PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -112,6 +113,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         vault: uv.clone(),
         docv_data,
         doc_request_id: id_doc.request_id,
+        enclave_client: state.enclave_client.clone(),
     };
     let config_id = get_config_id(&state.config, is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
@@ -256,6 +258,11 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             );
             assert!(score_result.id_validation.is_some());
 
+            let risk_signals =
+                RiskSignal::latest_by_risk_signal_group_kind(conn, &su.id, RiskSignalGroupKind::Doc).unwrap();
+
+            assert!(!risk_signals.is_empty());
+
             db::private_cleanup_integration_tests(conn, uv.id).unwrap();
 
             Ok(())
@@ -342,6 +349,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         vault: uv.clone(),
         docv_data,
         doc_request_id: id_doc.request_id.clone(),
+        enclave_client: state.enclave_client.clone(),
     };
     let config_id = get_config_id(&state.config, is_selfie);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)

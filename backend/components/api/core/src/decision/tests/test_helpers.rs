@@ -90,6 +90,10 @@ pub fn create_user_and_populate_vault(
             IdentityDataKind::City.into(),
             PiiString::new("Bobville".to_owned()),
         ),
+        (
+            IdentityDataKind::Dob.into(),
+            PiiString::new("1990-01-01".to_owned()),
+        ),
         (IdentityDataKind::State.into(), PiiString::new("GA".to_owned())),
         (IdentityDataKind::Zip.into(), PiiString::new("30303".to_owned())),
         (IdentityDataKind::Country.into(), PiiString::new("US".to_owned())),

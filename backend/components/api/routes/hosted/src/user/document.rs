@@ -7,8 +7,10 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
 use api_core::auth::user::{UserObAuthContext, UserObSession};
 use api_core::auth::SessionContext;
+use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::{DocCollected, WorkflowWrapper};
+use api_core::decision::vendor;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
@@ -25,9 +27,12 @@ use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifierDiscriminant, S3Url, WorkflowGuard};
+use newtypes::{DataIdentifierDiscriminant, S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
     IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
@@ -187,6 +192,19 @@ pub async fn post(
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
                     )?;
                     let doc_type = request.document_type;
+                    tracing::info!("***********HIHIHIHI");
+
+                    // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
+                    let fake_score_response =
+                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap();
+                    let vres = save_vres_for_fixture_risk_signals(
+                        conn,
+                        &su_id,
+                        &vault2,
+                        serde_json::to_value(fake_score_response)?,
+                    )?;
+
+                    // Enter the complete state
                     Complete::enter(
                         conn,
                         &vault2,
@@ -194,7 +212,12 @@ pub async fn post(
                         &id_doc.id,
                         doc_type,
                         ocr,
-                        idv::incode::doc::response::FetchScoresResponse::default(),
+                        // TODO: support fixture decision!
+                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap(),
+                        IncodeOcrComparisonDataFields::default(),
+                        doc_request.should_collect_selfie,
+                        vres.id.clone(),
+                        vres.id,
                     )?;
                 }
                 None
@@ -262,6 +285,7 @@ async fn handle_incode_request(
         vault,
         docv_data,
         doc_request_id: doc_request.id,
+        enclave_client: state.enclave_client.clone(),
     };
     let machine = IncodeStateMachine::init(
         state,
@@ -323,4 +347,21 @@ async fn advance_workflow_if_needed(
         tracing::warn!("Workflow not found");
     };
     Ok(())
+}
+
+fn save_vres_for_fixture_risk_signals(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    vault: &Vault,
+    response: serde_json::Value,
+) -> Result<VerificationResult, ApiError> {
+    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;
+    let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IncodeFetchScores)?;
+    let e_response = vendor::verification_result::encrypt_verification_result_response(
+        &response.clone().into(),
+        &vault.public_key,
+    )?;
+    let vres = VerificationResult::create(conn, vreq.id, response.into(), e_response, false)?;
+
+    Ok(vres)
 }

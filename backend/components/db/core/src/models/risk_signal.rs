@@ -138,6 +138,20 @@ impl RiskSignal {
         Ok(results)
     }
 
+    pub fn latest_by_risk_signal_group_kind(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        risk_group_kind: RiskSignalGroupKind,
+    ) -> DbResult<Vec<Self>> {
+        let latest_rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, risk_group_kind)?;
+
+        let res = risk_signal::table
+            .filter(risk_signal::risk_signal_group_id.eq(latest_rsg.id))
+            .get_results(conn)?;
+
+        Ok(res)
+    }
+
     #[cfg(test)]
     fn _bulk_create_for_test(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
         let new_risk_signals: Vec<NewRiskSignal> = match new {
