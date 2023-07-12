@@ -5,6 +5,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::api_headers_schema;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
 use api_core::utils::body_bytes::BodyBytes;
@@ -17,6 +18,17 @@ use db::models::vault::Vault;
 use macros::route_alias;
 use newtypes::{AccessEventKind, DataIdentifier, FpId};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
+
+api_headers_schema! {
+    pub struct UploadHeaderParams {
+        required: {}
+
+        optional: {
+            /// Specify the content type of the object like `application/json` or `image/png`
+            mime_type: String = "content-type";
+        }
+    }
+}
 
 /// Limit upload to ~10MB (eventually we will support a multipart upload for arbitrarily large uploads)
 const TEN_MB: usize = 10 * 1024 * 1024;
@@ -44,11 +56,12 @@ pub async fn post(
     path: Path<(FpId, DataIdentifier)>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
+    headers: UploadHeaderParams,
     body: BodyBytes<TEN_MB>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (fp_id, identifier) = path.into_inner();
-    post_upload_inner(&state, body, auth, fp_id, identifier, insight).await
+    post_upload_inner(&state, body, headers, auth, fp_id, identifier, insight).await
 }
 
 #[tracing::instrument(skip(state, auth, body))]
@@ -68,16 +81,18 @@ pub async fn post_client(
     auth: ClientTenantAuthContext,
     insight: InsightHeaders,
     body: BodyBytes<TEN_MB>,
+    headers: UploadHeaderParams,
 ) -> JsonApiResponse<EmptyResponse> {
     let identifier = path.into_inner();
     let auth = auth.check_guard(CanVault::new(vec![identifier.clone()]))?;
     let fp_id = auth.fp_id.clone();
-    post_upload_inner(&state, body, Box::new(auth), fp_id, identifier, insight).await
+    post_upload_inner(&state, body, headers, Box::new(auth), fp_id, identifier, insight).await
 }
 
 async fn post_upload_inner(
     state: &State,
     body: BodyBytes<TEN_MB>,
+        headers: UploadHeaderParams,
     auth: Box<dyn TenantAuth>,
     fp_id: FpId,
     data_identifier: DataIdentifier,
@@ -109,7 +124,7 @@ async fn post_upload_inner(
 
     let file = FileUpload {
         bytes: body.into_inner(),
-        mime_type: "application/octet-stream".into(),
+        mime_type: headers.mime_type.unwrap_or("application/octet-stream".into()),
         filename: data_identifier.to_string(),
         file_extension: "bin".to_string(),
     };
