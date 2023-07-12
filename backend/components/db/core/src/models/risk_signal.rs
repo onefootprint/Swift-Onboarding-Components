@@ -2,6 +2,7 @@ use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use db_schema::schema::risk_signal_group;
 use db_schema::schema::{onboarding_decision_verification_result_junction, risk_signal};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -12,6 +13,7 @@ use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
 
@@ -122,6 +124,42 @@ impl RiskSignal {
         let res = risk_signal::table
             .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
             .get_results(conn)?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("RiskSignal::latest_by_risk_signal_group_kind", skip_all)]
+    pub fn latest_by_risk_signal_group_kinds(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
+        // let rsg = RiskSignalGroup::latest_by_kinds(conn, scoped_vault_id)?;
+        let rsg: Vec<RiskSignalGroup> = risk_signal_group::table
+            .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
+            .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))
+            .distinct_on(risk_signal_group::kind)
+            .get_results(conn)?;
+        let rsg_ids: Vec<RiskSignalGroupId> = rsg.iter().map(|r| r.id.clone()).collect();
+        let rsg_map: HashMap<RiskSignalGroupId, RiskSignalGroupKind> =
+            rsg.into_iter().map(|r| (r.id, r.kind)).collect();
+
+        let risk_signals: Vec<RiskSignal> = risk_signal::table
+            .filter(risk_signal::risk_signal_group_id.eq_any(rsg_ids))
+            .get_results(conn)?;
+
+        // construct output
+        let res = risk_signals
+            .into_iter()
+            .filter_map(|rs| {
+                let rsg_kind = rs
+                    .risk_signal_group_id
+                    .clone()
+                    .and_then(|id| rsg_map.get(&id))
+                    .cloned();
+
+                rsg_kind.map(|kind| (kind, rs))
+            })
+            .collect();
+
         Ok(res)
     }
 

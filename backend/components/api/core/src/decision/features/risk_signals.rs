@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use db::models::risk_signal::RiskSignal;
 use newtypes::{FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, VerificationResultId};
 
@@ -131,27 +133,44 @@ impl From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)> for RiskSigna
 // READ
 //
 
-// TODO: POC, this should multi fetch and make a `RiskSignalsForDecision` struct
-pub fn fetch_risk_signals<T>(
+pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
-    kind: T,
-) -> Result<RiskSignalGroupStruct<T>, ApiError>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-{
-    let db_risk_signals =
-        RiskSignal::latest_by_risk_signal_group_kind(conn, scoped_vault_id, kind.clone().into().into())?;
-
-    let res = RiskSignalGroupStruct {
-        footprint_reason_codes: db_risk_signals
+) -> Result<RiskSignalsForDecision, ApiError> {
+    let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
+        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id)?
             .into_iter()
-            .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-            .collect(),
-        group: kind,
+            .fold(HashMap::new(), |mut acc, (kind, rs)| {
+                acc.entry(kind).or_default().push(rs);
+                acc
+            });
+    let kyc: RiskSignalGroupStruct<Kyc> = RiskSignalGroupStruct {
+        footprint_reason_codes: db_risk_signals_map
+            .remove(&RiskSignalGroupKind::Kyc)
+            .map(|rs| {
+                rs.into_iter()
+                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+                    .collect::<Vec<_>>()
+            })
+            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
+            .unwrap_or(vec![]),
+        group: Kyc,
     };
 
-    Ok(res)
+    let doc: RiskSignalGroupStruct<Doc> = RiskSignalGroupStruct {
+        footprint_reason_codes: db_risk_signals_map
+            .remove(&RiskSignalGroupKind::Doc)
+            .map(|rs| {
+                rs.into_iter()
+                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+                    .collect::<Vec<_>>()
+            })
+            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
+            .unwrap_or(vec![]),
+        group: Doc,
+    };
+
+    Ok(RiskSignalsForDecision { kyc, doc })
 }
 
 // RiskSignalGroupKind is defined in `newtypes` with all the other
@@ -255,19 +274,8 @@ impl TryFrom<RiskSignalGroupStruct<Kyc>> for ExperianFeatures {
     }
 }
 
+#[derive(Clone)]
 pub struct RiskSignalsForDecision {
     pub kyc: RiskSignalGroupStruct<Kyc>,
     pub doc: RiskSignalGroupStruct<Doc>,
 }
-// #[cfg(test)]
-// mod tests {
-//     use newtypes::risk_signal_group_struct;
-
-//     use super::RiskSignalGroupStruct;
-
-//     #[test]
-//     fn test_create_risk_signals() {
-//         let s: RiskSignalGroupStruct<risk_signal_group_struct::Doc> =
-//             super::create_risk_signals_from_vendor_results(vec![]).unwrap();
-//     }
-// }

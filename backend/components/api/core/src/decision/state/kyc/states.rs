@@ -15,9 +15,8 @@ use super::{
 };
 use crate::decision::{
     features::risk_signals::{
-        create_risk_signals_from_vendor_results, fetch_risk_signals,
-        risk_signal_group_struct::{self, Doc, Kyc},
-        save_risk_signals, RiskSignalGroupStruct, RiskSignalsForDecision,
+        create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, risk_signal_group_struct,
+        save_risk_signals, RiskSignalGroupStruct,
     },
     state::{
         actions::{Authorize, WorkflowActions},
@@ -161,6 +160,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals)?;
+        // we might need doc signals here too, so we reload
+        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
@@ -169,7 +170,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-            risk_signal_group: risk_signals,
+            risk_signals,
         }))
     }
 }
@@ -195,9 +196,9 @@ impl KycDecisioning {
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
         let svid = sv.id.clone();
-        let risk_signal_group = state
+        let risk_signals = state
             .db_pool
-            .db_query(move |conn| fetch_risk_signals(conn, &svid, Kyc))
+            .db_query(move |conn| fetch_latest_risk_signals_map(conn, &svid))
             .await??;
 
         Ok(KycDecisioning {
@@ -207,7 +208,7 @@ impl KycDecisioning {
             sv_id: sv.id,
             t_id: sv.tenant_id,
             vendor_results,
-            risk_signal_group,
+            risk_signals,
         })
     }
 }
@@ -238,12 +239,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
-            // TODO: prob move this to what is stashed on KycDecisioning
-            let risk_signals_for_decision = RiskSignalsForDecision {
-                kyc: self.risk_signal_group.clone(),
-                doc: RiskSignalGroupStruct::<Doc>::default(),
-            };
-            common::get_decision_using_risk_signals(&self, conn, risk_signals_for_decision)?
+            common::get_decision_using_risk_signals(&self, conn, self.risk_signals.clone())?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision

@@ -60,4 +60,15 @@ impl RiskSignalGroup {
 
         Ok(res)
     }
+
+    #[tracing::instrument("RiskSignalGroup::latest_by_kind", skip(conn))]
+    pub fn latest_by_kinds(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let res = risk_signal_group::table
+            .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
+            .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))
+            .distinct_on(risk_signal_group::kind)
+            .get_results(conn)?;
+
+        Ok(res)
+    }
 }

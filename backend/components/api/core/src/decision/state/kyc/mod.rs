@@ -10,7 +10,7 @@ use super::{
 };
 use crate::{
     decision::{
-        features::risk_signals::{risk_signal_group_struct::Kyc, RiskSignalGroupStruct},
+        features::risk_signals::RiskSignalsForDecision,
         onboarding::{KycRuleGroup, RuleGroup},
         rule::rule_sets,
         vendor::vendor_result::VendorResult,
@@ -53,7 +53,7 @@ pub struct KycDecisioning {
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
-    risk_signal_group: RiskSignalGroupStruct<Kyc>,
+    risk_signals: RiskSignalsForDecision,
 }
 
 impl HasRuleGroup for KycDecisioning {

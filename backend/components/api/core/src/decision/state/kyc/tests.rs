@@ -345,13 +345,6 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             } else {
                 SignalSeverity::High
             };
-            println!(
-                "{:?}",
-                rs.clone()
-                    .into_iter()
-                    .map(|rs| rs.reason_code)
-                    .collect::<Vec<_>>()
-            );
             assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
             assert!(rs.iter().all(|rs| rs.reason_code.severity() == severity));
         }

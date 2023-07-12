@@ -1,7 +1,6 @@
 use crate::util::impl_enum_str_diesel;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use enum_variant_type::EnumVariantType;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -23,7 +22,7 @@ use strum_macros::EnumString;
     EnumString,
     AsRefStr,
     JsonSchema,
-    EnumVariantType,
+    Hash,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

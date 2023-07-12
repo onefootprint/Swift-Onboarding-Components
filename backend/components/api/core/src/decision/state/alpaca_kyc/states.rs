@@ -13,6 +13,7 @@ use db::models::{
     verification_result::VerificationResult,
     workflow::Workflow as DbWorkflow,
 };
+
 use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
@@ -27,9 +28,9 @@ use crate::{
     decision::{
         self,
         features::risk_signals::{
-            create_risk_signals_from_vendor_results, fetch_risk_signals,
-            risk_signal_group_struct::{self, Doc, Kyc},
-            save_risk_signals, RiskSignalGroupStruct, RiskSignalsForDecision,
+            create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
+            risk_signal_group_struct::{self},
+            save_risk_signals, RiskSignalGroupStruct,
         },
         onboarding::{Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput},
         review::save_review_decision,
@@ -180,6 +181,9 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
 
         save_risk_signals(conn, &self.sv_id, &risk_signals)?;
 
+        // we might need doc signals here too, so we reload
+        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
@@ -187,7 +191,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-            risk_signal_group: risk_signals,
+            risk_signals,
         }))
     }
 }
@@ -212,9 +216,9 @@ impl AlpacaKycDecisioning {
 
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
         let svid = sv.id.clone();
-        let risk_signal_group = state
+        let risk_signals = state
             .db_pool
-            .db_query(move |conn| fetch_risk_signals(conn, &svid, Kyc))
+            .db_query(move |conn| fetch_latest_risk_signals_map(conn, &svid))
             .await??;
 
         Ok(AlpacaKycDecisioning {
@@ -224,7 +228,7 @@ impl AlpacaKycDecisioning {
             sv_id: sv.id,
             t_id: sv.tenant_id,
             vendor_results,
-            risk_signal_group,
+            risk_signals,
         })
     }
 }
@@ -256,12 +260,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
-            let risk_signals_for_decision = RiskSignalsForDecision {
-                kyc: self.risk_signal_group.clone(),
-                // This is placeholder
-                doc: RiskSignalGroupStruct::<Doc>::default(),
-            };
-            common::get_decision_using_risk_signals(&self, conn, risk_signals_for_decision)?
+            common::get_decision_using_risk_signals(&self, conn, self.risk_signals.clone())?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision

@@ -267,8 +267,9 @@ async fn pass_then_watchlist_hit(
 
     let (ob, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
-    assert!(obd.is_none());
+
     assert_eq!(OnboardingStatus::Pending, ob.status);
+    assert!(obd.is_none());
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
     // Some risk signals are unhidden now
