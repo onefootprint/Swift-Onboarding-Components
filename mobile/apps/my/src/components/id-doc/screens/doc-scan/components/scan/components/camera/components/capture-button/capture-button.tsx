@@ -25,7 +25,7 @@ const CaptureButton = ({ onPress }: CaptureButtonProps) => {
 const OuterCircle = styled.View`
   ${({ theme }) => css`
     align-items: center;
-    background-color: ${theme.backgroundColor.primary};
+    border: 6px solid ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
     height: 72px;
     justify-content: center;
@@ -41,7 +41,7 @@ const InnerCircle = styled.View<{ active: boolean }>`
     border-radius: ${theme.borderRadius.full};
     height: 56px;
     width: 56px;
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, ${active ? 0 : 0.12 });
   `}
 `;
 
