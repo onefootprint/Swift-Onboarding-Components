@@ -50,6 +50,13 @@ impl IncodeStateTransition for FetchScores {
         // we need an overall score or else we should fail
         score_response.overall_score().map_err(map_to_api_err)?;
 
+        // There's a really annoying/subtle thing with the incode API:
+        //    if you don't have selfie enabled in the incode flow builder, it will gladly allow you to send selfie image, it just silently doesn't include the selfie in the actual score/result
+        // So let's assert here that we have gotten back a score
+        if session.kind.requires_selfie() {
+            score_response.selfie_match().map_err(map_to_api_err)?;
+        }
+
         // make the OCR to incode
         let ocr_request = IncodeFetchOCRRequest {
             credentials: session.credentials.clone(),
