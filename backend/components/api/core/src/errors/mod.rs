@@ -233,7 +233,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::BusinessError(_) => StatusCode::BAD_REQUEST,
-            ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Webauthn(_) => StatusCode::BAD_REQUEST,
             ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
