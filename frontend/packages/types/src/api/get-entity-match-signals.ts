@@ -16,4 +16,5 @@ export type GetEntityMatchSignalsResponse = {
   name: GetEntityMatchSignalsResponseValues;
   phone: GetEntityMatchSignalsResponseValues;
   ssn: GetEntityMatchSignalsResponseValues;
+  document: GetEntityMatchSignalsResponseValues;
 };

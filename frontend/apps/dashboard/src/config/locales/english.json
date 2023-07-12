@@ -752,7 +752,8 @@
                 "address": "Address",
                 "dob": "Date of birth",
                 "email": "Email",
-                "ssn": "SSN"
+                "ssn": "SSN",
+                "document": "Document"
               },
               "match-level": {
                 "exact": "Matched",

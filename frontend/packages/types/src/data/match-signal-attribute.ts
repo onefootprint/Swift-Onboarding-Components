@@ -5,6 +5,7 @@ export enum MatchSignalAttribute {
   address = 'address',
   email = 'email',
   phone = 'phone',
+  document = 'document',
 }
 
 export default MatchSignalAttribute;

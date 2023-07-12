@@ -3,7 +3,7 @@ import { IcoWarning16 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import Timeline from 'src/components/timeline';
+import Timeline, { TimelineVariant } from 'src/components/timeline';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
@@ -47,6 +47,7 @@ const ValidationItems = () => {
     const timelineItems = data.map(validationEntry => {
       const { attribute, matchLevel, signals } = validationEntry;
       return {
+        variant: TimelineVariant.compact,
         headerComponent: (
           <ValidationTimelineItemHeader
             attribute={attribute}

@@ -2,6 +2,7 @@ import {
   IcoBuilding16,
   IcoCake16,
   IcoEmail16,
+  IcoFileText16,
   IcoFileText216,
   IcoPhone16,
   IcoUser16,
@@ -33,6 +34,9 @@ const ValidationTimelineItemIcon = ({
   }
   if (attribute === MatchSignalAttribute.ssn) {
     return <IcoFileText216 />;
+  }
+  if (attribute === MatchSignalAttribute.document) {
+    return <IcoFileText16 />;
   }
   return null;
 };
