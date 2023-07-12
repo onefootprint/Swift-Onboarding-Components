@@ -24,9 +24,9 @@ pub struct AccessEvent {
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
     /// Denormalized from scoped_vault for faster querying
-    pub tenant_id: Option<TenantId>,
+    pub tenant_id: TenantId,
     /// Denormalized from scoped_vault for faster querying
-    pub is_live: Option<bool>,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone)]

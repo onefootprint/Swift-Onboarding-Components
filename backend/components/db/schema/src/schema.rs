@@ -13,8 +13,8 @@ table! {
         ordering_id -> Int8,
         kind -> Text,
         targets -> Array<Text>,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        tenant_id -> Text,
+        is_live -> Bool,
     }
 }
 
@@ -888,6 +888,7 @@ table! {
 
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_vault (scoped_vault_id));
+joinable!(access_event -> tenant (tenant_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(appearance -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));

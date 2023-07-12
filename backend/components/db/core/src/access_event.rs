@@ -12,14 +12,12 @@ use db_schema::schema;
 use diesel::prelude::*;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
-use newtypes::FpId;
 use newtypes::TenantId;
 use newtypes::VaultId;
 
 #[derive(Debug)]
 pub struct AccessEventListQueryParams {
     pub tenant_id: TenantId,
-    pub fp_id: Option<FpId>,
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
@@ -50,18 +48,12 @@ impl AccessEventListItemForTenant {
                 let mut results = schema::access_event::table
                     .inner_join(schema::scoped_vault::table)
                     .left_join(schema::insight_event::table)
-                    .left_join(
-                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_vault::tenant_id)),
-                    )
+                    .inner_join(schema::tenant::table)
                     .order_by(schema::access_event::ordering_id.desc())
-                    .filter(schema::scoped_vault::tenant_id.eq(params.tenant_id))
-                    .filter(schema::scoped_vault::is_live.eq(params.is_live))
+                    .filter(schema::access_event::tenant_id.eq(params.tenant_id))
+                    .filter(schema::access_event::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
-
-                if let Some(fp_id) = params.fp_id {
-                    results = results.filter(schema::scoped_vault::fp_id.eq(fp_id))
-                }
 
                 if let Some(search) = params.search {
                     results = results.filter(
@@ -93,7 +85,7 @@ impl AccessEventListItemForTenant {
                     results = results.filter(schema::access_event::ordering_id.le(cursor));
                 }
 
-                let results: Vec<(AccessEvent, ScopedVault, Option<InsightEvent>, Option<Tenant>)> =
+                let results: Vec<(AccessEvent, ScopedVault, Option<InsightEvent>, Tenant)> =
                     results.load(conn)?;
 
                 // Saturate the actors from the DB

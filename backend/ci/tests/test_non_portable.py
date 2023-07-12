@@ -212,7 +212,7 @@ def test_vault_create_write_decrypt(tenant):
     # verify access events created
     body = get(
         "org/access_events",
-        dict(footprint_user_id=fp_id),
+        dict(search=fp_id),
         tenant.sk.key,
     )
     access_events = body["data"]
@@ -237,7 +237,7 @@ def test_vault_create_write_decrypt(tenant):
     # check the access events and check it's correct
     body = get(
         "org/access_events",
-        dict(footprint_user_id=fp_id),
+        dict(search=fp_id),
         tenant.sk.key,
     )
     access_events = body["data"]

@@ -189,7 +189,7 @@ def test_access_events_list(sandbox_user):
     # Then check the access event list
     body = get(
         "org/access_events",
-        dict(footprint_user_id=sandbox_user.fp_id),
+        dict(search=sandbox_user.fp_id),
         tenant.sk.key,
     )
     access_events = body["data"]
@@ -202,7 +202,7 @@ def test_access_events_list(sandbox_user):
     # Test filtering on kinds. We provide two different kinds, and we should get all access events
     # that contain at least one of these fields
     params = dict(
-        footprint_user_id=sandbox_user.fp_id,
+        search=sandbox_user.fp_id,
         targets=",".join(["id.email", "id.address_line1"]),
         kind="decrypt",
     )
