@@ -159,7 +159,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             );
             Ok(())
         }))
-        .max_size(12)
+        .max_size(50)
         .build()?;
 
     Ok(DbPool(pool))
