@@ -213,7 +213,8 @@
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
     "business_tin": "Taxpayer Identification Number (TIN)",
-    "beneficial_owners": "Business beneficial owners"
+    "beneficial_owners": "Business beneficial owners",
+    "selfie": "Selfie image"
   },
   "components": {
     "timeline": {
