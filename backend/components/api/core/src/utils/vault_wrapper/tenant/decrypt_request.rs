@@ -2,7 +2,8 @@ use crate::State;
 use crate::{errors::ApiResult, utils::vault_wrapper::decrypt::EnclaveDecryptOperation};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use newtypes::{AccessEventKind, DbActor, ScopedVaultId};
+use db::models::scoped_vault::ScopedVault;
+use newtypes::{AccessEventKind, DbActor};
 
 pub struct DecryptRequest {
     pub reason: String,
@@ -14,7 +15,7 @@ impl DecryptRequest {
     pub(super) async fn create_access_event(
         self,
         state: &State,
-        scoped_user_id: ScopedVaultId,
+        scoped_vault: &ScopedVault,
         targets: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<()> {
         let DecryptRequest {
@@ -23,7 +24,9 @@ impl DecryptRequest {
             insight,
         } = self;
         let event = NewAccessEvent {
-            scoped_vault_id: scoped_user_id,
+            scoped_vault_id: scoped_vault.id.clone(),
+            tenant_id: scoped_vault.tenant_id.clone(),
+            is_live: scoped_vault.is_live,
             reason: Some(reason),
             principal,
             insight,

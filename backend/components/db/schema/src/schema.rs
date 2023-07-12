@@ -13,6 +13,8 @@ table! {
         ordering_id -> Int8,
         kind -> Text,
         targets -> Array<Text>,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 

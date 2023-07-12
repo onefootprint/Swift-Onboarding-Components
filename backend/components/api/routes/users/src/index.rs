@@ -95,6 +95,8 @@ pub async fn post(
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_vault_id: su.id.clone(),
+                    tenant_id: su.tenant_id.clone(),
+                    is_live: su.is_live,
                     reason: None,
                     principal,
                     insight,

@@ -4,11 +4,10 @@ mod decrypt;
 mod decrypt_request;
 mod delete;
 
-use db::models::onboarding::OnboardingAndConfig;
+use db::models::{onboarding::OnboardingAndConfig, scoped_vault::ScopedVault};
 pub use decrypt_request::DecryptRequest;
 
 use super::{Any, VaultWrapper};
-use newtypes::ScopedVaultId;
 
 use derive_more::Deref;
 pub mod fingerprint;
@@ -20,6 +19,6 @@ pub mod fingerprint;
 pub struct TenantVw<Type = Any> {
     #[deref]
     uvw: VaultWrapper<Type>,
-    pub scoped_vault_id: ScopedVaultId,
+    pub scoped_vault: ScopedVault,
     pub onboarding: Option<OnboardingAndConfig>,
 }

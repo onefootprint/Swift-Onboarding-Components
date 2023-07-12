@@ -101,9 +101,9 @@ async fn post_upload_inner(
     let (vault, scoped_vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vault = Vault::get(conn, &scoped_user.id)?;
-            Ok((vault, scoped_user))
+            let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let vault = Vault::get(conn, &scoped_vault.id)?;
+            Ok((vault, scoped_vault))
         })
         .await?;
 
@@ -140,6 +140,8 @@ async fn post_upload_inner(
             // Create an access event to show data was added
             NewAccessEvent {
                 scoped_vault_id: scoped_vault.id,
+                tenant_id: scoped_vault.tenant_id,
+                is_live: scoped_vault.is_live,
                 reason: None,
                 principal,
                 insight,

@@ -137,6 +137,8 @@ async fn patch_inner(
             // Create an access event to show data was added
             NewAccessEvent {
                 scoped_vault_id: scoped_user.id.clone(),
+                tenant_id: scoped_user.tenant_id,
+                is_live: scoped_user.is_live,
                 reason: None,
                 principal,
                 insight,

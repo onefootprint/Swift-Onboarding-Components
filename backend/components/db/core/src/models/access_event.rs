@@ -2,7 +2,9 @@ use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::access_event;
 use diesel::{Insertable, Queryable, RunQueryDsl};
-use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId};
+use newtypes::{
+    AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
+};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
@@ -21,11 +23,17 @@ pub struct AccessEvent {
     pub ordering_id: i64,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
+    /// Denormalized from scoped_vault for faster querying
+    pub tenant_id: Option<TenantId>,
+    /// Denormalized from scoped_vault for faster querying
+    pub is_live: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
     pub scoped_vault_id: ScopedVaultId,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
     pub reason: Option<String>,
     pub principal: DbActor,
     pub insight: CreateInsightEvent,
@@ -42,6 +50,8 @@ struct NewAccessEventWithInsight {
     principal: DbActor,
     kind: AccessEventKind,
     targets: Vec<DataIdentifier>,
+    tenant_id: TenantId,
+    is_live: bool,
 }
 
 impl NewAccessEvent {
@@ -55,6 +65,8 @@ impl NewAccessEvent {
             principal: self.principal,
             kind: self.kind,
             targets: self.targets,
+            tenant_id: self.tenant_id,
+            is_live: self.is_live,
         };
 
         diesel::insert_into(db_schema::schema::access_event::table)

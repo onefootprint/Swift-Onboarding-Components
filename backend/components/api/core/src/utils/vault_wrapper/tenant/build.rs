@@ -14,12 +14,14 @@ use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
+    // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
     pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
         let uvw = Self::build(conn, VwArgs::Tenant(sv_id))?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![sv_id])?.remove(sv_id);
+        let scoped_vault = ScopedVault::get(conn, sv_id)?;
         Ok(TenantVw {
             uvw,
-            scoped_vault_id: sv_id.clone(),
+            scoped_vault,
             onboarding,
         })
     }
@@ -67,12 +69,13 @@ impl<Type> VaultWrapper<Type> {
                     document_datas.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
                 )?;
+                let sv_id = sv.id.clone();
                 let uvw = TenantVw {
                     uvw,
-                    scoped_vault_id: sv.id.clone(),
                     onboarding: onboarding_map.get(&sv.id).cloned(),
+                    scoped_vault: sv,
                 };
-                Ok((sv.id, uvw))
+                Ok((sv_id, uvw))
             })
             .collect::<ApiResult<_>>()?;
         Ok(results)

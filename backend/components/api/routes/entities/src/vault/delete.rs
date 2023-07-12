@@ -80,6 +80,8 @@ pub async fn delete(
 
             NewAccessEvent {
                 scoped_vault_id: scoped_user.id,
+                tenant_id: scoped_user.tenant_id,
+                is_live: scoped_user.is_live,
                 reason: None,
                 principal: actor.into(),
                 insight: CreateInsightEvent::from(insight),

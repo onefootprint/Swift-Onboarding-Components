@@ -148,6 +148,8 @@ pub async fn vault_pii(
 
                 NewAccessEvent {
                     scoped_vault_id: scoped_vault.id.clone(),
+                    tenant_id: scoped_vault.tenant_id.clone(),
+                    is_live: scoped_vault.is_live,
                     reason: None,
                     principal,
                     insight,

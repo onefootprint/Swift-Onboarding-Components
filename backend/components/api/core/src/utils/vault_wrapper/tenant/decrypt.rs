@@ -69,7 +69,7 @@ impl<Type> TenantVw<Type> {
             .uvw
             .fn_decrypt_unchecked(&state.enclave_client, dis_and_transforms)
             .await?;
-        req.create_access_event(state, self.scoped_vault_id.clone(), results.decrypted_dis)
+        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
             .await?;
         Ok(results.results)
     }
