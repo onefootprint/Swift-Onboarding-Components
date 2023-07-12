@@ -654,7 +654,7 @@ footprint_reason_code_enum! {
         DocumentLowMatchScoreWithSelfie,
 
         #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = Some(MatchLevel::Exact)]
-        #[note = "Document image matches selfie", severity = SignalSeverity::High,  description = "The image on the document matches the captured selfie."]
+        #[note = "Document image matches selfie", severity = SignalSeverity::Info,  description = "The image on the document matches the captured selfie."]
         DocumentSelfieMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = Some(MatchLevel::NoMatch)]
