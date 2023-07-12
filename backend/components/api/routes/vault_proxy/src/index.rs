@@ -15,8 +15,8 @@ use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 
-use api_core::proxy::config::JustInTimeProxyConfig;
-use api_core::proxy::config::ProxyIdAdditonalHeaders;
+use api_core::proxy::config::JitProxyHeaderParams;
+use api_core::proxy::config::ProxyHeaderParams;
 use api_core::utils::body_bytes::BodyBytes;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
@@ -24,7 +24,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpR
 /// Limit the body payload to 5MB
 const FIVE_MB: usize = 5 * 1024 * 1024;
 
-#[tracing::instrument(skip(state, body_bytes, request))]
+#[tracing::instrument(skip(state, body_bytes, jit_params, opt_params, request))]
 #[api_v2_operation(
     description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
     tags(VaultProxy, PublicApi)
@@ -33,15 +33,18 @@ const FIVE_MB: usize = 5 * 1024 * 1024;
 pub async fn just_in_time(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-    jit: JustInTimeProxyConfig,
     body_bytes: BodyBytes<FIVE_MB>,
+    jit_params: JitProxyHeaderParams,
+    opt_params: ProxyHeaderParams,
     insight: InsightHeaders,
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
+    let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
+
     invoke_vault_proxy(
         state,
         auth,
-        ProxyConfigSource::JustInTime(jit.config),
+        ProxySource::JustInTime(proxy_config),
         body_bytes,
         insight,
         request,
@@ -49,7 +52,7 @@ pub async fn just_in_time(
     .await
 }
 
-#[tracing::instrument(skip(state, body_bytes, request))]
+#[tracing::instrument(skip(state, body_bytes, params, request))]
 #[api_v2_operation(
     description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
     tags(VaultProxy, PublicApi)
@@ -61,14 +64,14 @@ pub async fn id(
     proxy_config_id: web::Path<ProxyConfigId>,
     body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
+    params: ProxyHeaderParams,
     request: HttpRequest,
-    _: ProxyIdAdditonalHeaders,
 ) -> ApiResult<HttpResponse> {
     let id = proxy_config_id.into_inner();
     invoke_vault_proxy(
         state,
         auth,
-        ProxyConfigSource::Id(id),
+        ProxySource::Id(id, params),
         body_bytes,
         insight,
         request,
@@ -76,37 +79,33 @@ pub async fn id(
     .await
 }
 
-#[derive(Debug)]
-#[allow(clippy::large_enum_variant)]
-enum ProxyConfigSource {
-    Id(ProxyConfigId),
+enum ProxySource {
+    Id(ProxyConfigId, ProxyHeaderParams),
     JustInTime(ProxyConfig),
 }
 
-#[tracing::instrument(skip(state, body_bytes, request))]
+#[tracing::instrument(skip(state, body_bytes, source, request))]
 async fn invoke_vault_proxy(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-    source: ProxyConfigSource,
+    source: ProxySource,
     body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
     // Will eventually require the permission to decrypt attributes
     let auth = auth.check_guard(TenantGuard::VaultProxy)?;
-    let _is_live = auth.is_live()?;
 
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
         return Err(ApiError::InvalidProxyBody);
     };
 
-    // parse the proxy configuration either by ID or just in time via headers
     let config = match source {
-        ProxyConfigSource::Id(proxy_id) => {
-            ProxyConfig::load_from_db(&state, auth.as_ref(), proxy_id, request.headers()).await?
+        ProxySource::Id(proxy_id, params) => {
+            ProxyConfig::load_from_db(&state, auth.as_ref(), proxy_id, params, request.headers()).await?
         }
-        ProxyConfigSource::JustInTime(config) => config,
+        ProxySource::JustInTime(config) => config,
     };
 
     // 1. parse

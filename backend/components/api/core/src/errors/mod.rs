@@ -139,6 +139,21 @@ pub enum ApiError {
     MissingRequiredEntityData(DataIdentifier, Csv<enclave_proxy::DataTransform>),
     #[error("Enclave transform error: {0}")]
     EnclaveDataTransformError(#[from] enclave_proxy::TransformError),
+
+    #[error("Invalid URL")]
+    InvalidUrl(#[from] url::ParseError),
+
+    #[error("Invalid HTTP Method")]
+    InvalidHttpMethod(#[from] http::method::InvalidMethod),
+
+    #[error("Invalid identifier")]
+    InvalidIdentifierFound(#[from] strum::ParseError),
+}
+
+impl From<std::convert::Infallible> for ApiError {
+    fn from(_: std::convert::Infallible) -> Self {
+        panic!("impossible condition convert Infallible to ApiError")
+    }
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -258,6 +273,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
+            ApiError::InvalidUrl(_)
+            | ApiError::InvalidHttpMethod(_)
+            | ApiError::InvalidIdentifierFound(_) => StatusCode::BAD_REQUEST,
             ApiError::CipIntegrationError(c) => c.status_code(),
         }
     }

@@ -102,6 +102,8 @@ typedmap = {version = "0.4.0", features = ["clone"]}
 
 alpaca = { path = "../../integrations/alpaca" }
 
+http = "0.2.8"
+
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../enclave/enclave"}

@@ -1,38 +1,65 @@
-
 #[macro_export]
 macro_rules! api_headers_schema {
     (
-        pub mod $group:ident {
-            $(
-                $(#[doc = $doc:expr])*
-                #[required = $required:literal]
-                $name:ident = $header:literal;
-            )*
-        }
-    ) => {
-        pub mod $group {
-            use paperclip::v2::models::Parameter;
-            use paperclip::v2::models::DefaultSchemaRaw;
+        $(#[doc = $g_doc:expr])*
+        pub struct $group:ident {
+            required: {
+                $(
 
-            $(
-                $(#[doc = $doc])*
-                pub const $name: &'static str = $header;
-            )*
-
-            pub fn schema() -> Vec<Parameter<DefaultSchemaRaw>> {
-                schema_opts(false)
+                    $(#[doc = $r_doc:expr])*
+                    $r_name:ident: $r_typ:ty = $r_header:literal;
+                )*
             }
 
-            paste::paste! {
-                pub fn schema_opts(mark_all_optional: bool) -> Vec<Parameter<DefaultSchemaRaw>> {
+            optional: {
+                $(
+
+                    $(#[doc = $o_doc:expr])*
+                    $o_name:ident: $o_typ:ty = $o_header:literal;
+                )*
+            }
+        }
+    ) => {
+
+        paste::paste! {
+            $(#[doc = $g_doc])*
+            #[derive(Debug, Clone)]
+            pub struct $group {
+                $(
+                    pub [<$r_name:lower>]: $r_typ,
+                )*
+
+                $(
+
+                    pub [<$o_name:lower>]: Option<$o_typ>,
+                )*
+            }
+
+            impl $group {
+                $(
+                    $(#[doc = $r_doc])*
+                    pub const [<$r_name:upper _HEADER_NAME>]: &'static str = $r_header;
+                )*
+
+                $(
+                    $(#[doc = $o_doc])*
+                    pub const [<$o_name:upper _HEADER_NAME>]: &'static str = $o_header;
+
+                    #[allow(unused)]
+                    pub fn [<get_ $o_name>](&self) -> Result<$o_typ, $crate::ApiError> {
+                        self.$o_name.clone().ok_or($crate::ApiError::MissingRequiredHeader($o_header))
+                    }
+                )*
+
+                pub fn schema() -> Vec<paperclip::v2::models::Parameter<paperclip::v2::models::DefaultSchemaRaw>> {
                     vec![
                         $(
-                            Parameter {
-                                name: $header.to_owned(),
+                            paperclip::v2::models::Parameter {
+                                name: $r_header.to_owned(),
                                 in_: paperclip::v2::models::ParameterIn::Header,
                                 description: Some(
                                     vec![$(
-                                        $doc.trim(),
+                                        $r_doc.trim(),
                                     )*].join(" ")
                                 ),
                                 data_type: {
@@ -43,50 +70,144 @@ macro_rules! api_headers_schema {
                                     use paperclip::v2::schema::TypedData;
                                     String::format()
                                 },
-                                required: $required && !mark_all_optional,
+                                required: true,
+                                ..Default::default()
+                            },
+                        )*
+
+                        $(
+                            paperclip::v2::models::Parameter {
+                                name: $o_header.to_owned(),
+                                in_: paperclip::v2::models::ParameterIn::Header,
+                                description: Some(
+                                    vec![$(
+                                        $o_doc.trim(),
+                                    )*].join(" ")
+                                ),
+                                data_type: {
+                                    use paperclip::v2::schema::TypedData;
+                                    Some(String::data_type())
+                                },
+                                format: {
+                                    use paperclip::v2::schema::TypedData;
+                                    String::format()
+                                },
+                                required: false,
                                 ..Default::default()
                             },
                         )*
                     ]
                 }
-
             }
+
+            impl paperclip::v2::schema::Apiv2Schema for  $group {
+                fn header_parameter_schema() -> Vec<paperclip::v2::models::Parameter<paperclip::v2::models::DefaultSchemaRaw>> {
+                    $group::schema()
+                }
+            }
+            impl paperclip::actix::OperationModifier for $group {}
+
+            impl actix_web::FromRequest for $group {
+                type Error = $crate::ApiError;
+                type Future = std::pin::Pin<Box<dyn std::future::Future<Output = Result<Self, Self::Error>>>>;
+                fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+
+                    fn get_header<'a, 'b>(name: &'a str, req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                        req.get(name).and_then(|h| h.to_str().ok())
+                    }
+                    use std::str::FromStr;
+
+                    $(
+                        let [<$r_name _res>] = get_header($r_header, req.headers()).map($r_typ::from_str).transpose().map_err($crate::ApiError::from);
+                    )*
+                    $(
+                        let [<$o_name _res>] = get_header($o_header, req.headers()).map($o_typ::from_str).transpose().map_err($crate::ApiError::from);
+                    )*
+                    Box::pin(async move {
+                        Ok(Self {
+                            $(
+                                $r_name: [<$r_name _res>]?.ok_or($crate::ApiError::MissingRequiredHeader($r_header))?,
+                            )*
+                            $(
+                                $o_name: [<$o_name _res>]?,
+                            )*
+                        })
+                    })
+                }
+            }
+
+
         }
+
 
     };
 }
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_header() {
-        api_headers_schema! {
-            pub mod test_group {
-                /// test description
-                #[required = true]
-                TEST_HEADER = "x-fp-test";
+    use actix_web::FromRequest;
 
-                /// test description 2
-                /// multline
-                #[required = true]
-                TEST_HEADER2 = "x-fp-test-2";
+    api_headers_schema! {
+        /// Test headers
+        pub struct TestGroupParams {
+            required: {
+                /// test description
+                test_header: String = "x-fp-test";
+
+                /// test description
+                test_header2: String = "x-fp-test-2";
+            }
+            optional: {
+                /// test description 3
+                /// multline 3
+                test_header3: String = "x-fp-test-3";
+
+                /// test description 4
+                test_header4: String = "x-fp-test-4";
             }
         }
+    }
+    #[test]
+    fn test_header() {
+        assert_eq!(TestGroupParams::TEST_HEADER_HEADER_NAME, "x-fp-test");
+        assert_eq!(TestGroupParams::TEST_HEADER2_HEADER_NAME, "x-fp-test-2");
+        assert_eq!(TestGroupParams::TEST_HEADER3_HEADER_NAME, "x-fp-test-3");
+        assert_eq!(TestGroupParams::TEST_HEADER4_HEADER_NAME, "x-fp-test-4");
 
-        assert_eq!(test_group::TEST_HEADER, "x-fp-test");
-        assert_eq!(test_group::TEST_HEADER2, "x-fp-test-2");
         assert_eq!(
-            test_group::schema().first().unwrap().description.clone().unwrap(),
+            TestGroupParams::schema()
+                .first()
+                .unwrap()
+                .description
+                .clone()
+                .unwrap(),
             "test description".to_string()
         );
         assert_eq!(
-            test_group::schema()
+            TestGroupParams::schema()
                 .into_iter()
-                .nth(1)
+                .nth(2)
                 .unwrap()
                 .description
                 .unwrap(),
-            "test description 2 multline".to_string()
+            "test description 3 multline 3".to_string()
         );
+    }
+
+    #[actix_web::test]
+    async fn test_from_request() {
+        let (req, mut payload) = actix_web::test::TestRequest::default()
+            .insert_header(("x-fp-test", "hello world"))
+            .insert_header(("x-fp-test-2", "hello world2"))
+            .insert_header(("x-fp-test-4", "hello world4"))
+            .to_http_parts();
+
+        let s = TestGroupParams::from_request(&req, &mut payload).await.unwrap();
+
+        assert_eq!(s.test_header, "hello world".to_string());
+        assert_eq!(s.test_header2, "hello world2".to_string());
+
+        assert_eq!(s.test_header3, None);
+        assert_eq!(s.test_header4, Some("hello world4".into()));
     }
 }

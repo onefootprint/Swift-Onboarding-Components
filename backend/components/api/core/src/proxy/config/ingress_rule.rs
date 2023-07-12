@@ -6,7 +6,8 @@ use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::{FilterFunction, FpId, ProxyToken};
 
-use super::proxy_headers::INGRESS_RULE_HEADER;
+use super::ProxyHeaderParams;
+
 
 /// Ingress rules define how to vault data in the response
 /// from the proxy requests
@@ -105,10 +106,10 @@ impl TryFrom<&HeaderMap> for ParsedIngressRules {
 
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
         let global_fp_id =
-            get_header(super::proxy_headers::USER_TOKEN_ASSIGNMENT_HEADER, headers).map(FpId::from);
+            get_header(ProxyHeaderParams::USER_TOKEN_ASSIGNMENT_HEADER_NAME, headers).map(FpId::from);
 
         let result = headers
-            .get_all(INGRESS_RULE_HEADER)
+            .get_all(ProxyHeaderParams::INGRESS_RULE_HEADER_NAME)
             .map(|value| {
                 let value = value
                     .to_str()

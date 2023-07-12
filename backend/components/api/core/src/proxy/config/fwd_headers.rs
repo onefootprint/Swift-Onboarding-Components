@@ -8,8 +8,7 @@ use reqwest::header::HeaderValue;
 
 use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
 
-use super::proxy_headers::FORWARD_HEADER_PREFIX;
-
+use super::ProxyHeaderParams;
 
 /// Parses out headers to forward along the egress
 #[derive(Debug, Clone, Default)]
@@ -27,9 +26,14 @@ impl TryFrom<&HeaderMap> for ForwardProxyHeaders {
     fn try_from(map: &HeaderMap) -> ApiResult<Self> {
         let result = map
             .iter()
-            .filter(|(n, _v)| n.as_str().starts_with(FORWARD_HEADER_PREFIX))
+            .filter(|(n, _v)| {
+                n.as_str()
+                    .starts_with(ProxyHeaderParams::FORWARD_HEADER_PREFIX_HEADER_NAME)
+            })
             .map(|(n, value)| {
-                let name_string = n.as_str().replacen(FORWARD_HEADER_PREFIX, "", 1);
+                let name_string =
+                    n.as_str()
+                        .replacen(ProxyHeaderParams::FORWARD_HEADER_PREFIX_HEADER_NAME, "", 1);
                 let parse = || {
                     let value = value.to_str().ok()?.to_string();
                     Some((name_string.clone(), PiiString::from(value)))

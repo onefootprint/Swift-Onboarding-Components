@@ -1,12 +1,9 @@
-use crate::{
-    errors::{proxy::VaultProxyError, ApiError, ApiResult},
-    utils::headers::get_header,
-};
+use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
 use actix_web::http::header::HeaderMap;
 
 use std::fmt::Debug;
 
-use super::proxy_headers::{PROXY_CLIENT_CERT_HEADER, PROXY_CLIENT_KEY_HEADER, PROXY_PIN_SERVER_CERT_HEADER};
+use super::ProxyHeaderParams;
 
 /// Client certificate authentication to use for the upstream proxy
 #[derive(Clone)]
@@ -43,17 +40,17 @@ pub struct ParsedClientCertificate {
     pub client_tls_credential: Option<ClientCertificateKey>,
 }
 
-impl TryFrom<&HeaderMap> for ParsedClientCertificate {
+impl TryFrom<&ProxyHeaderParams> for ParsedClientCertificate {
     type Error = ApiError;
 
-    fn try_from(headers: &HeaderMap) -> ApiResult<Self> {
-        let cert = get_header(PROXY_CLIENT_CERT_HEADER, headers);
-        let key = get_header(PROXY_CLIENT_KEY_HEADER, headers);
+    fn try_from(params: &ProxyHeaderParams) -> ApiResult<Self> {
+        let cert = params.client_cert.clone();
+        let key = params.client_key.clone();
 
         match (cert, key) {
             (Some(cert), Some(key)) => {
                 let cert = urlencoding::decode(&cert).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
-                let key = urlencoding::decode(&key).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
+                let key = urlencoding::decode(key.leak()).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
 
                 Ok(ParsedClientCertificate {
                     client_tls_credential: Some(ClientCertificateKey::parse_cert_and_key(
@@ -81,7 +78,7 @@ impl TryFrom<&HeaderMap> for PinnedServerCertificates {
 
     fn try_from(headers: &HeaderMap) -> Result<Self, VaultProxyError> {
         let certs = headers
-            .get_all(PROXY_PIN_SERVER_CERT_HEADER)
+            .get_all(ProxyHeaderParams::PIN_CERT_HEADER_NAME)
             .map(|value| -> Result<_, VaultProxyError> {
                 let value = value
                     .to_str()

@@ -1,5 +1,3 @@
-use std::pin::Pin;
-
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::ApiError;
@@ -10,51 +8,29 @@ use crate::proxy::token_parser::ProxyTokenParser;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 
-use actix_web::FromRequest;
 use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
 use api_core::utils::body_bytes::BodyBytes;
-use api_core::utils::headers::get_header;
-use futures_util::Future;
 use newtypes::FpId;
-use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
-use paperclip::v2::models::DefaultSchemaRaw;
-use paperclip::v2::models::Parameter;
+use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
 
 api_headers_schema! {
-    pub mod reflect_headers {
-        /// When reflect requests are on behalf of a single footprint vault, you can
-        /// can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead
-        /// of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.
-        #[required = false]
-        USER_TOKEN_ASSIGNMENT_HEADER = "x-fp-id";
+    pub struct ReflectHeaderParams {
+        required: {}
+        optional: {
+            /// When reflect requests are on behalf of a single footprint vault, you can
+            /// can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead
+            /// of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.
+            user_token_assignment: FpId = "x-fp-id";
 
-        /// Access reason for any decryption operations during the reflection request
-        #[required = false]
-        ACCESS_REASON = "x-fp-access-reason";
-
+            /// Access reason for any decryption operations during the reflection request
+            access_reason: String = "x-fp-access-reason";
+        }
     }
 }
 
-/// Expose the headers to docs
-#[derive(Debug, Clone)]
-pub struct HeaderParams;
-impl paperclip::v2::schema::Apiv2Schema for HeaderParams {
-    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
-        reflect_headers::schema()
-    }
-}
-impl paperclip::actix::OperationModifier for HeaderParams {}
-impl FromRequest for HeaderParams {
-    type Error = crate::ApiError;
-    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
-    fn from_request(_: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        Box::pin(async move { Ok(HeaderParams) })
-    }
-}
-
-#[tracing::instrument(skip(state, body_bytes, request))]
+#[tracing::instrument(skip(state, body_bytes, params))]
 #[api_v2_operation(
     description = "Decrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
     tags(VaultProxy, Preview)
@@ -65,8 +41,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     body_bytes: BodyBytes<5_242_880>,
     insight: InsightHeaders,
-    request: HttpRequest,
-    _: HeaderParams,
+    params: ReflectHeaderParams,
 ) -> ApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
@@ -74,8 +49,7 @@ pub async fn post(
     };
 
     // 0. pull out a global fp_id if exists
-    let global_fp_id =
-        get_header(reflect_headers::USER_TOKEN_ASSIGNMENT_HEADER, request.headers()).map(FpId::from);
+    let global_fp_id = params.user_token_assignment;
 
     // 1. parse
     let parser = ProxyTokenParser::parse(body, global_fp_id)?;
@@ -88,7 +62,7 @@ pub async fn post(
         &state,
         auth.as_ref(),
         parser.matches.keys().cloned().collect(),
-        get_header(reflect_headers::ACCESS_REASON, request.headers()),
+        params.access_reason,
         insight.clone(),
     )
     .await?;
