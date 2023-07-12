@@ -35,6 +35,7 @@ pub enum RuleName {
     AddressLocatedIsWarm,
     AddressLocatedIsHighRiskAddress,
     MultipleRecordsFound,
+    DocumentNotVerified,
     #[cfg(test)]
     Test(String),
     BusinessWatchlistHit,

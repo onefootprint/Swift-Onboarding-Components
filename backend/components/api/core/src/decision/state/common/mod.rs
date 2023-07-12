@@ -3,6 +3,7 @@ use std::sync::Arc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
+        document_request::DocumentRequest,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         vault::Vault,
@@ -266,7 +267,7 @@ pub fn get_decision(
     let (vendor_response_map, vendor_ids_map) =
         build_vendor_response_map_from_vendor_results(vendor_results)?;
     let (rules_output, reason_codes) = rule_group
-        .rule_group()
+        .rule_group(false)
         .evaluate(&vendor_response_map, &vendor_ids_map)?;
     Ok((rules_output, reason_codes))
 }
@@ -274,10 +275,14 @@ pub fn get_decision(
 #[tracing::instrument(skip_all)]
 pub fn get_decision_using_risk_signals(
     rule_group: &impl HasRuleGroup,
-    _conn: &mut TxnPgConn,
+    conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
+    sv_id: &ScopedVaultId,
 ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
-    let (rules_output, reason_codes) = rule_group.rule_group().evaluate_with_risk_signals(risk_signals)?;
+    let include_doc = DocumentRequest::get(conn, sv_id)?.is_some();
+    let (rules_output, reason_codes) = rule_group
+        .rule_group(include_doc)
+        .evaluate_with_risk_signals(risk_signals)?;
     Ok((rules_output, reason_codes))
 }
 

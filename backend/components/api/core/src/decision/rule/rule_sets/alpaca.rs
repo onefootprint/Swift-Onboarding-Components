@@ -1,7 +1,9 @@
 use newtypes::{FootprintReasonCode, RuleSetName};
 
 use crate::decision::{
-    features::{experian::ExperianFeatures, idology_expectid::IDologyFeatures},
+    features::{
+        experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
+    },
     onboarding::FeatureSet,
     rule::{
         rule_set::{Action, Rule, RuleSet},
@@ -40,6 +42,12 @@ pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
     }
 }
 
+pub fn incode_rule_set() -> RuleSet<IncodeDocumentFeatures> {
+    RuleSet {
+        rules: vec![],
+        name: RuleSetName::AlpacaIncodeRules,
+    }
+}
 // Rules for matching various identity data attributes
 fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
     vec![

@@ -50,7 +50,7 @@ pub struct DocumentDecisioning {
 
 impl HasRuleGroup for DocumentDecisioning {
     // TODO: change this to document rules
-    fn rule_group(&self) -> RuleGroup {
+    fn rule_group(&self, _include_doc: bool) -> RuleGroup {
         RuleGroup::Kyc(KycRuleGroup {
             idology_rules: rule_sets::kyc::idology_rule_set(),
             experian_rules: rule_sets::kyc::experian_rule_set(),

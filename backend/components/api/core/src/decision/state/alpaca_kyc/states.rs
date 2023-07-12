@@ -260,10 +260,11 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
-            common::get_decision_using_risk_signals(&self, conn, self.risk_signals.clone())?
+            common::get_decision_using_risk_signals(&self, conn, self.risk_signals.clone(), &self.sv_id)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision
+        // TODO: what if doc failed by KYC passed? fix this
         let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
         RiskSignal::unhide_risk_signals_for_risk_signal_group(
             conn,

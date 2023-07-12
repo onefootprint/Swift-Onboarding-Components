@@ -23,7 +23,7 @@ pub(super) trait WorkflowState: std::marker::Send + std::marker::Sync + 'static 
 }
 
 pub trait HasRuleGroup {
-    fn rule_group(&self) -> RuleGroup;
+    fn rule_group(&self, include_doc: bool) -> RuleGroup;
 }
 
 /// Implement this for a State to indicate that when in that State, the workflow responds to action A.

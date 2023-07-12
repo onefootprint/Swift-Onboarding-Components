@@ -3,7 +3,9 @@ use std::collections::HashMap;
 use db::models::risk_signal::RiskSignal;
 use newtypes::{FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, VerificationResultId};
 
-use super::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
+use super::{
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
+};
 use crate::{
     decision::vendor::vendor_api::vendor_api_response::{
         VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
@@ -268,6 +270,39 @@ impl TryFrom<RiskSignalGroupStruct<Kyc>> for ExperianFeatures {
                 footprint_reason_codes,
                 verification_result_id: verification_result_ids.pop().ok_or(
                     crate::decision::Error::FeatureVectorConversionError(VendorAPI::ExperianPreciseID),
+                )?,
+            })
+        }
+    }
+}
+
+impl TryFrom<RiskSignalGroupStruct<Doc>> for IncodeDocumentFeatures {
+    type Error = crate::decision::Error;
+
+    fn try_from(group: RiskSignalGroupStruct<Doc>) -> Result<Self, Self::Error> {
+        let apis = vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR];
+
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
+            .footprint_reason_codes
+            .into_iter()
+            .filter_map(|(frc, vendor_api, verification_result_id)| {
+                if apis.contains(&vendor_api) {
+                    Some((frc, verification_result_id))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        if footprint_reason_codes.is_empty() {
+            Err(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::IncodeFetchScores,
+            ))
+        } else {
+            Ok(Self {
+                footprint_reason_codes,
+                verification_result_id: verification_result_ids.pop().ok_or(
+                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IncodeFetchScores),
                 )?,
             })
         }

@@ -11,7 +11,7 @@ use super::{
 use crate::{
     decision::{
         features::risk_signals::RiskSignalsForDecision,
-        onboarding::{KycRuleGroup, RuleGroup},
+        onboarding::{KycRuleGroup, KycWithDocumentRuleGroup, RuleGroup},
         rule::rule_sets,
         vendor::vendor_result::VendorResult,
     },
@@ -57,11 +57,19 @@ pub struct KycDecisioning {
 }
 
 impl HasRuleGroup for KycDecisioning {
-    fn rule_group(&self) -> RuleGroup {
-        RuleGroup::Kyc(KycRuleGroup {
-            idology_rules: rule_sets::kyc::idology_rule_set(),
-            experian_rules: rule_sets::kyc::experian_rule_set(),
-        })
+    fn rule_group(&self, include_doc: bool) -> RuleGroup {
+        if include_doc {
+            RuleGroup::KycWithDocument(KycWithDocumentRuleGroup {
+                idology_rules: rule_sets::kyc::idology_rule_set(),
+                experian_rules: rule_sets::kyc::experian_rule_set(),
+                incode_rules: rule_sets::doc::incode_rule_set(),
+            })
+        } else {
+            RuleGroup::Kyc(KycRuleGroup {
+                idology_rules: rule_sets::kyc::idology_rule_set(),
+                experian_rules: rule_sets::kyc::experian_rule_set(),
+            })
+        }
     }
 }
 

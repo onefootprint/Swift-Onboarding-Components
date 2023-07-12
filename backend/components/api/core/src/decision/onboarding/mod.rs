@@ -4,6 +4,7 @@ use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResul
 use crate::errors::ApiResult;
 use crate::{decision::Error, ApiError};
 
+use super::features::incode_docv::IncodeDocumentFeatures;
 use super::features::risk_signals::{
     RiskSignalGroupStruct, RiskSignalsForDecision, WrappedRiskSignalGroupKind,
 };
@@ -100,6 +101,7 @@ where
     let reason_codes = input.footprint_reason_codes().clone();
     Ok((
         evaluate_onboarding_rule_set(rule_set, &input),
+        // TODO: remove this
         reason_codes
             .into_iter()
             .map(|rs| (rs, input.vendor_api(), input.verification_result_id().clone()))
@@ -133,6 +135,7 @@ where
 // A rule group encodes a logic grouping of rulesets for a specific purpose.
 pub enum RuleGroup {
     Kyc(KycRuleGroup),
+    KycWithDocument(KycWithDocumentRuleGroup),
 }
 
 impl RuleGroup {
@@ -143,6 +146,8 @@ impl RuleGroup {
     ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         match self {
             RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map, vendor_ids_map),
+            // TODO: remove `evalaute` in next PR
+            RuleGroup::KycWithDocument(_) => unimplemented!(),
         }
     }
 
@@ -152,6 +157,7 @@ impl RuleGroup {
     ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
         match self {
             RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_risk_signals(risk_signals),
+            RuleGroup::KycWithDocument(rg) => rg.evaluate_rules_with_risk_signals(risk_signals),
         }
     }
 }
@@ -249,6 +255,73 @@ impl KycRuleGroup {
             .filter(|(ober, _)| ober != &result)
             .map(|(ober, _)| OnboardingRulesDecisionOutput::from(ober))
             .collect();
+
+        let output = WaterfallOnboardingRulesDecisionOutput {
+            output: OnboardingRulesDecisionOutput::from(result),
+            additional_evaluated: additional_results,
+        };
+
+        Ok((output, reason_codes))
+    }
+}
+
+pub struct KycWithDocumentRuleGroup {
+    pub idology_rules: RuleSet<IDologyFeatures>,
+    pub experian_rules: RuleSet<ExperianFeatures>,
+    pub incode_rules: RuleSet<IncodeDocumentFeatures>,
+}
+
+impl KycWithDocumentRuleGroup {
+    fn evaluate_rules_with_risk_signals(
+        &self,
+        risk_signals: RiskSignalsForDecision,
+    ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+        // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
+        let idology_rule_result =
+            evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.kyc.clone()).ok();
+        let experian_rule_result =
+            evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.kyc).ok();
+        let incode_rule_result =
+            evaluate_rule_set_from_risk_signals(self.incode_rules.clone(), risk_signals.doc)?; // error since we know we need doc signals
+
+        // Check we have a KYC result from one of the vendors
+        let kyc_rule_results: Vec<(OnboardingEvaluationResult, DecisionReasonCodes)> =
+            vec![experian_rule_result, idology_rule_result]
+                .into_iter()
+                .flatten()
+                .collect();
+
+        if kyc_rule_results.is_empty() {
+            Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
+        }
+
+        // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
+        let kyc_result = kyc_rule_results
+            .iter()
+            .min_by(|x, y| x.0.triggered_action.cmp(&y.0.triggered_action))
+            .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
+            .map_err(crate::decision::Error::from)?
+            .clone();
+
+        // Then we evaluate w/ doc, but now we look for which one failed
+        let (result, reason_codes) = vec![kyc_result, incode_rule_result.clone()]
+            .iter()
+            .max_by(|x, y| x.0.triggered_action.cmp(&y.0.triggered_action))
+            .ok_or(RuleError::AssertionError("could not compute doc result".into()))
+            .map_err(crate::decision::Error::from)?
+            .clone();
+
+        let mut additional_results: Vec<OnboardingRulesDecisionOutput> = kyc_rule_results
+            .into_iter()
+            .filter(|(ober, _)| ober != &result)
+            .map(|(ober, _)| OnboardingRulesDecisionOutput::from(ober))
+            .collect();
+
+        // Add in doc to additional log if it's not causing the failure
+        if !result.vendor_api.is_incode_doc_flow_api() {
+            let (incode_res, _) = incode_rule_result;
+            additional_results.push(OnboardingRulesDecisionOutput::from(incode_res));
+        }
 
         let output = WaterfallOnboardingRulesDecisionOutput {
             output: OnboardingRulesDecisionOutput::from(result),
