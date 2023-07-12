@@ -33,12 +33,20 @@ const Footer = () => {
               <Typography variant="body-3" color="tertiary">
                 {t('phone-number')}
               </Typography>
-              <Image
-                src="/footer/soc-2-badge-vanta.svg"
-                height={40}
-                width={40}
-                alt="Soc2 badge"
-              />
+              <Badges>
+                <Image
+                  src="/footer/soc-2-badge-vanta.svg"
+                  height={40}
+                  width={40}
+                  alt="Soc2 badge"
+                />
+                <Image
+                  src="/footer/PCI.png"
+                  height={45}
+                  width={45}
+                  alt="PCI badge"
+                />
+              </Badges>
             </TopLeftLinks>
             <SocialLogosContainer>
               <Link
@@ -217,6 +225,15 @@ const SocialLogosContainer = styled.div`
     display: flex;
     flex-direction: row;
     gap: ${theme.spacing[3]};
+  `}
+`;
+
+const Badges = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: ${theme.spacing[4]};
   `}
 `;
 
