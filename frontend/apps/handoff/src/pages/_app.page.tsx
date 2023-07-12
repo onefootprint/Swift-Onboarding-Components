@@ -31,15 +31,21 @@ const App = ({ Component, pageProps }: AppProps) => (
 
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
+    html {
+      height: 100%;
+    }
+
     body {
       background-color: ${theme.backgroundColor.primary};
       overflow: hidden;
+      height: 100%;
     }
 
     #__next {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
     }
   `}`;
 

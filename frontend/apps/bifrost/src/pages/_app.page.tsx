@@ -67,7 +67,7 @@ const GlobalStyle = createGlobalStyle`
     background: transparent;
     height: 100%;
 
-    > div {
+    #__next {
       display: flex;
       align-items: center;
       justify-content: center;
