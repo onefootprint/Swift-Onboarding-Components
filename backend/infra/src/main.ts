@@ -152,7 +152,7 @@ export default async function main() {
 
   const service = await createCoreService(globalState);
 
-  ConfigureAlerts(stackMetadata);
+  ConfigureAlerts(globalState, stackMetadata);
 
   return {
     service,

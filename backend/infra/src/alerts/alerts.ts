@@ -1,5 +1,6 @@
 import { Trigger, Threshold } from './trigger';
 import { Query } from './query';
+import { GlobalState } from '../main';
 
 // The minimal set of information needed to define an alert
 export interface Alert {
@@ -234,3 +235,42 @@ export const Alerts: Alert[] = [
     },
   },
 ];
+
+export const generateAlerts = (g: GlobalState) => {
+  const dynamicAlerts: Alert[] = [
+    {
+      name: 'API server scaled up',
+      description:
+        'The API server has scaled up. Autoscaling on the enclave is not set up yet - please check enclave health and prepare to scale up the enclave if needed.',
+      datasetName: 'aws',
+      query: {
+        time_range: 240,
+        breakdowns: ['TargetGroup'],
+        calculations: [
+          {
+            op: 'MAX',
+            column: 'amazonaws.com/AWS/ApplicationELB/HealthyHostCount.max',
+          },
+        ],
+        filters: [
+          {
+            column: 'TargetGroup',
+            op: 'exists',
+          },
+          {
+            column: 'TargetGroup',
+            op: 'contains',
+            value: 'fpc-tg',
+          },
+        ],
+        filter_combination: 'AND',
+      },
+      pageThreshold: {
+        op: '>',
+        // Alert when we've scaled up past the minimum number of instances
+        value: g.constants.resources.minInstances,
+      },
+    },
+  ];
+  return dynamicAlerts.concat(Alerts);
+};

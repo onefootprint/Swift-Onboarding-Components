@@ -26,9 +26,6 @@ use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString};
 #[strum_discriminants(name(DocumentKindDiscriminant))]
 #[strum_discriminants(derive(EnumString, AsRefStr, Display, EnumIter))]
 #[diesel(sql_type = Text)]
-// TODO backfill
-// passport -> passport.front.image
-// passport.back -> passport.back.image, etc
 pub enum DocumentKind {
     /// represents the verified image for a document
     /// document.[doc_kind].[side].image

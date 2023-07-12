@@ -3,6 +3,7 @@ import { Recipient } from './trigger';
 import { TriggerResource } from './provider';
 import { Alerts } from './alerts';
 import { StackEnvironment, StackMetadata } from '../stack_metadata';
+import { GlobalState } from '../main';
 
 const recipientSlackChannel: Partial<Record<StackEnvironment, string>> = {
   [StackEnvironment.Dev]: '#honeycomb-backend-dev',
@@ -13,7 +14,7 @@ type HoneycombSecrets = {
   apiKey: string;
 };
 
-export function ConfigureAlerts(stackMeta: StackMetadata) {
+export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
   let config = new pulumi.Config();
   let honeycombSecrets = config.getSecretObject<HoneycombSecrets>('honeycomb');
   if (!honeycombSecrets) {
