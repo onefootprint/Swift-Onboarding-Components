@@ -43,7 +43,6 @@ import {
   PASSPORT_OPTION,
   PHONE_LABEL,
   selectType,
-  SELFIE_LABEL,
   SELFIE_OPTION,
   SSN_FULL_LABEL,
   SSN_LAST_FOUR_LABEL,
@@ -352,11 +351,11 @@ describe('<Dialog />', () => {
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
+      expect(
+        screen.queryByLabelText(ID_DOCUMENT_AND_SELFIE_LABEL),
+      ).not.toBeInTheDocument();
       await toggleAccessOption(ID_DOCUMENT_LABEL, false);
-      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
-
       await toggleAccessOption(ID_DOCUMENT_LABEL, true);
-      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
     });
 
     it('should show document and selfie if document and selfie were collected', async () => {
@@ -382,10 +381,7 @@ describe('<Dialog />', () => {
         screen.getByTestId(getFormIdForState('kycAccess')),
       ).toBeInTheDocument();
 
-      await toggleAccessOption(ID_DOCUMENT_LABEL, false);
-      expect(screen.queryByLabelText(SELFIE_LABEL)).not.toBeInTheDocument();
-      await toggleAccessOption(ID_DOCUMENT_LABEL, true);
-      await toggleAccessOption(SELFIE_LABEL, true);
+      await toggleAccessOption(ID_DOCUMENT_AND_SELFIE_LABEL, false);
     });
 
     it('should go back to kyc collect form', async () => {

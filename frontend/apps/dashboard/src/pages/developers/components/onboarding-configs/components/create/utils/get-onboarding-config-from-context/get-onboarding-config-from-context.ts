@@ -106,8 +106,7 @@ const getKycAccessFields = (
   const canAccessIdDoc =
     hasCollectedIdDoc && kycAccess?.[CollectedDocumentDataOption.document];
   if (canAccessIdDoc) {
-    const documentDetails = getMustCollectDocumentCdo(kycCollect.idDoc);
-    canAccessData.push(documentDetails);
+    canAccessData.push(getMustCollectDocumentCdo(kycCollect.idDoc));
   }
 
   return canAccessData;

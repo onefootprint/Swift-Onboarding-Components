@@ -8,7 +8,6 @@ import {
 import { Box, Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import AnimatedContainer from 'src/components/animated-container';
 
 import FormTitle from '../../components/form-title';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
@@ -29,19 +28,11 @@ const KycAccess = () => {
   const [state, send] = useOnboardingConfigMachine();
   const { kycCollect, kycInvestorProfile } = state.context;
   const hasCollectedDoc = !!kycCollect && kycCollect?.idDoc.types.length > 0;
-  const hasCollectedSelfie =
-    hasCollectedDoc && !!kycCollect && kycCollect?.idDoc.selfieRequired;
+  const hasCollectedSelfie = !!kycCollect && kycCollect?.idDoc.selfieRequired;
 
-  const { register, handleSubmit, setValue, watch } = useForm<FormData>({
+  const { register, handleSubmit } = useForm<FormData>({
     defaultValues: getDefaultKycAccess(state.context),
   });
-  const idDocAccess = watch(CollectedDocumentDataOption.document);
-
-  const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.checked) {
-      setValue(CollectedDocumentDataOption.documentAndSelfie, false);
-    }
-  };
 
   const handleBeforeSubmit = (formData: FormData) => {
     send({
@@ -101,22 +92,13 @@ const KycAccess = () => {
         {hasCollectedDoc && (
           <Box>
             <Checkbox
-              label={allT('cdo.document')}
-              {...register(CollectedDocumentDataOption.document, {
-                onChange: handleDocumentChange,
-              })}
-            />
-            <AnimatedContainer
-              isExpanded={
-                hasCollectedDoc && hasCollectedSelfie && !!idDocAccess
+              label={
+                hasCollectedSelfie
+                  ? allT('cdo.document_and_selfie')
+                  : allT('cdo.document')
               }
-              sx={{ marginLeft: 5, marginTop: 3 }}
-            >
-              <Checkbox
-                label={allT('cdo.selfie')}
-                {...register(CollectedDocumentDataOption.documentAndSelfie)}
-              />
-            </AnimatedContainer>
+              {...register(CollectedDocumentDataOption.document)}
+            />
           </Box>
         )}
         {kycInvestorProfile?.[
