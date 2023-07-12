@@ -1,17 +1,15 @@
 use db::models::risk_signal::RiskSignal;
-use newtypes::{
-    risk_signal_group_struct, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
-    VerificationResultId,
-};
+use newtypes::{FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, VerificationResultId};
 
+use super::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
 use crate::{
     decision::vendor::vendor_api::vendor_api_response::{
         VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
     },
     ApiError,
 };
-
-use super::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
+use derive_more::Display;
+use enum_variant_type::EnumVariantType;
 
 // There are 2 main ways we interact RiskSignals:
 //  - WRITE - when handling vendor responses, in order to produce and save risk signals
@@ -35,12 +33,25 @@ use super::{experian::ExperianFeatures, idology_expectid::IDologyFeatures};
 //  convenience and type safety, and makes the decisioning code more generic
 
 // Represents a typed grouping of FootprintReasonCodes
+#[derive(Clone)]
 pub struct RiskSignalGroupStruct<T>
 where
-    T: Into<RiskSignalGroupKind>,
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
 {
     pub footprint_reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
     pub group: T,
+}
+
+impl<T> Default for RiskSignalGroupStruct<T>
+where
+    T: Into<WrappedRiskSignalGroupKind> + Clone + Default,
+{
+    fn default() -> Self {
+        Self {
+            footprint_reason_codes: vec![],
+            group: T::default(),
+        }
+    }
 }
 
 //
@@ -50,7 +61,7 @@ pub fn create_risk_signals_from_vendor_results<T>(
     vendor_result_maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
 ) -> Result<RiskSignalGroupStruct<T>, ApiError>
 where
-    T: Into<RiskSignalGroupKind>,
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
     RiskSignalGroupStruct<T>: From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>,
 {
     let res = RiskSignalGroupStruct::<T>::from(vendor_result_maps);
@@ -61,17 +72,17 @@ where
 pub fn save_risk_signals<T>(
     conn: &mut db::TxnPgConn,
     scoped_vault_id: &ScopedVaultId,
-    risk_signals: RiskSignalGroupStruct<T>,
+    risk_signals: &RiskSignalGroupStruct<T>,
 ) -> Result<(), ApiError>
 where
-    T: Into<RiskSignalGroupKind>,
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
     RiskSignalGroupStruct<T>: From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>,
 {
     RiskSignal::bulk_create(
         conn,
         scoped_vault_id,
-        risk_signals.footprint_reason_codes,
-        risk_signals.group.into(),
+        risk_signals.footprint_reason_codes.clone(),
+        risk_signals.group.clone().into().into(),
         // default to hiding for things using this code path
         true,
     )?;
@@ -79,9 +90,7 @@ where
     Ok(())
 }
 
-impl From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>
-    for RiskSignalGroupStruct<risk_signal_group_struct::Kyc>
-{
+impl From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)> for RiskSignalGroupStruct<Kyc> {
     fn from(maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)) -> Self {
         let (response_map, ids_map) = maps;
         let idology_features = IDologyFeatures::try_from((&response_map, &ids_map))
@@ -113,11 +122,143 @@ impl From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>
                 .into_iter()
                 .chain(experian_features.into_iter())
                 .collect(),
-            group: risk_signal_group_struct::Kyc,
+            group: Kyc,
         }
     }
 }
 
+//
+// READ
+//
+
+// TODO: POC, this should multi fetch and make a `RiskSignalsForDecision` struct
+pub fn fetch_risk_signals<T>(
+    conn: &mut db::PgConn,
+    scoped_vault_id: &ScopedVaultId,
+    kind: T,
+) -> Result<RiskSignalGroupStruct<T>, ApiError>
+where
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
+{
+    let db_risk_signals =
+        RiskSignal::latest_by_risk_signal_group_kind(conn, scoped_vault_id, kind.clone().into().into())?;
+
+    let res = RiskSignalGroupStruct {
+        footprint_reason_codes: db_risk_signals
+            .into_iter()
+            .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+            .collect(),
+        group: kind,
+    };
+
+    Ok(res)
+}
+
+// RiskSignalGroupKind is defined in `newtypes` with all the other
+/// db types, we have another "Wrapped" enum here so we can implement extra functionality that is
+/// helpful for working with RiskSignals in application code
+#[derive(Debug, Display, Clone, Copy, Hash, PartialEq, Eq, EnumVariantType)]
+#[evt(module = "risk_signal_group_struct")]
+#[evt(derive(Clone, Hash, PartialEq, Eq, Default))]
+pub enum WrappedRiskSignalGroupKind {
+    Kyc,
+    Kyb,
+    Watchlist,
+    AdverseMedia,
+    Doc,
+}
+use risk_signal_group_struct::*;
+
+impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
+    fn from(value: RiskSignalGroupKind) -> Self {
+        match value {
+            RiskSignalGroupKind::Kyc => Self::Kyc,
+            RiskSignalGroupKind::Kyb => Self::Kyb,
+            RiskSignalGroupKind::Watchlist => Self::Watchlist,
+            RiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
+            RiskSignalGroupKind::Doc => Self::Doc,
+        }
+    }
+}
+
+impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
+    fn from(value: WrappedRiskSignalGroupKind) -> Self {
+        match value {
+            WrappedRiskSignalGroupKind::Kyc => Self::Kyc,
+            WrappedRiskSignalGroupKind::Kyb => Self::Kyb,
+            WrappedRiskSignalGroupKind::Watchlist => Self::Watchlist,
+            WrappedRiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
+            WrappedRiskSignalGroupKind::Doc => Self::Doc,
+        }
+    }
+}
+
+impl TryFrom<RiskSignalGroupStruct<Kyc>> for IDologyFeatures {
+    type Error = crate::decision::Error;
+
+    fn try_from(group: RiskSignalGroupStruct<Kyc>) -> Result<Self, Self::Error> {
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
+            .footprint_reason_codes
+            .into_iter()
+            .filter_map(|(frc, vendor_api, verification_result_id)| {
+                if vendor_api == VendorAPI::IdologyExpectID {
+                    Some((frc, verification_result_id))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        if footprint_reason_codes.is_empty() {
+            Err(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::IdologyExpectID,
+            ))
+        } else {
+            Ok(Self {
+                footprint_reason_codes,
+                verification_result_id: verification_result_ids.pop().ok_or(
+                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IdologyExpectID),
+                )?,
+            })
+        }
+    }
+}
+
+impl TryFrom<RiskSignalGroupStruct<Kyc>> for ExperianFeatures {
+    type Error = crate::decision::Error;
+
+    fn try_from(group: RiskSignalGroupStruct<Kyc>) -> Result<Self, Self::Error> {
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
+            .footprint_reason_codes
+            .into_iter()
+            .filter_map(|(frc, vendor_api, verification_result_id)| {
+                if vendor_api == VendorAPI::ExperianPreciseID {
+                    Some((frc, verification_result_id))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        if footprint_reason_codes.is_empty() {
+            Err(crate::decision::Error::FeatureVectorConversionError(
+                VendorAPI::ExperianPreciseID,
+            ))
+        } else {
+            Ok(Self {
+                footprint_reason_codes,
+                verification_result_id: verification_result_ids.pop().ok_or(
+                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::ExperianPreciseID),
+                )?,
+            })
+        }
+    }
+}
+
+pub struct RiskSignalsForDecision {
+    pub kyc: RiskSignalGroupStruct<Kyc>,
+    pub doc: RiskSignalGroupStruct<Doc>,
+}
 // #[cfg(test)]
 // mod tests {
 //     use newtypes::risk_signal_group_struct;

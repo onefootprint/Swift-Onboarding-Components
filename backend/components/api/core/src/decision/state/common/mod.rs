@@ -19,6 +19,7 @@ use webhooks::WebhookClient;
 use crate::{
     decision::{
         self, engine,
+        features::risk_signals::RiskSignalsForDecision,
         onboarding::{
             Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput,
             WaterfallOnboardingRulesDecisionOutput,
@@ -255,6 +256,7 @@ pub fn alpaca_kyc_decision_from_fixture(
     Ok((rules_output, reason_codes))
 }
 
+// Deprecate
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
     rule_group: &impl HasRuleGroup,
@@ -266,6 +268,16 @@ pub fn get_decision(
     let (rules_output, reason_codes) = rule_group
         .rule_group()
         .evaluate(&vendor_response_map, &vendor_ids_map)?;
+    Ok((rules_output, reason_codes))
+}
+
+#[tracing::instrument(skip_all)]
+pub fn get_decision_using_risk_signals(
+    rule_group: &impl HasRuleGroup,
+    _conn: &mut TxnPgConn,
+    risk_signals: RiskSignalsForDecision,
+) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    let (rules_output, reason_codes) = rule_group.rule_group().evaluate_with_risk_signals(risk_signals)?;
     Ok((rules_output, reason_codes))
 }
 

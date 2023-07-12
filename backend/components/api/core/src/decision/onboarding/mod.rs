@@ -4,6 +4,9 @@ use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResul
 use crate::errors::ApiResult;
 use crate::{decision::Error, ApiError};
 
+use super::features::risk_signals::{
+    RiskSignalGroupStruct, RiskSignalsForDecision, WrappedRiskSignalGroupKind,
+};
 use super::vendor::vendor_api::vendor_api_response::VendorAPIResponseIdentifiersMap;
 use super::{
     features::{
@@ -70,6 +73,40 @@ where
     Ok(res)
 }
 
+// Convert a typed group of risk signals into a Vendor specific FeatureSet
+pub fn rule_input_from_risk_signals<T, F>(risk_signals: RiskSignalGroupStruct<T>) -> ApiResult<F>
+where
+    F: TryFrom<RiskSignalGroupStruct<T>>,
+    F: Clone + FeatureSet,
+    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalGroupStruct<T>>>::Error>,
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
+{
+    let res = F::try_from(risk_signals)?;
+
+    Ok(res)
+}
+
+pub fn evaluate_rule_set_from_risk_signals<T, F>(
+    rule_set: RuleSet<F>,
+    risk_signals: RiskSignalGroupStruct<T>,
+) -> ApiResult<(OnboardingEvaluationResult, DecisionReasonCodes)>
+where
+    F: TryFrom<RiskSignalGroupStruct<T>>,
+    F: Clone + FeatureSet,
+    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalGroupStruct<T>>>::Error>,
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
+{
+    let input: F = rule_input_from_risk_signals(risk_signals)?;
+    let reason_codes = input.footprint_reason_codes().clone();
+    Ok((
+        evaluate_onboarding_rule_set(rule_set, &input),
+        reason_codes
+            .into_iter()
+            .map(|rs| (rs, input.vendor_api(), input.verification_result_id().clone()))
+            .collect(),
+    ))
+}
+
 pub fn evaluate_rule_set_from_vendor_results<'a, T>(
     rule_set: RuleSet<T>,
     vendor_response_map: &'a VendorAPIResponseMap,
@@ -108,6 +145,15 @@ impl RuleGroup {
             RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_waterfall(vendor_response_map, vendor_ids_map),
         }
     }
+
+    pub fn evaluate_with_risk_signals(
+        &self,
+        risk_signals: RiskSignalsForDecision,
+    ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+        match self {
+            RuleGroup::Kyc(rg) => rg.evaluate_kyc_rules_with_risk_signals(risk_signals),
+        }
+    }
 }
 
 pub struct KycRuleGroup {
@@ -124,6 +170,7 @@ impl Default for KycRuleGroup {
     }
 }
 impl KycRuleGroup {
+    // TODO: deprecate
     pub fn evaluate_kyc_rules_with_waterfall(
         &self,
         vendor_response_map: &VendorAPIResponseMap,
@@ -142,6 +189,45 @@ impl KycRuleGroup {
             vendor_ids_map,
         )
         .ok();
+
+        let rule_results: Vec<(OnboardingEvaluationResult, DecisionReasonCodes)> =
+            vec![experian_rule_result, idology_rule_result]
+                .into_iter()
+                .flatten()
+                .collect();
+        if rule_results.is_empty() {
+            Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
+        }
+
+        let (result, reason_codes) = rule_results
+            .iter()
+            .min_by(|x, y| x.0.triggered_action.cmp(&y.0.triggered_action))
+            .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
+            .map_err(crate::decision::Error::from)?
+            .clone();
+        let additional_results = rule_results
+            .into_iter()
+            .filter(|(ober, _)| ober != &result)
+            .map(|(ober, _)| OnboardingRulesDecisionOutput::from(ober))
+            .collect();
+
+        let output = WaterfallOnboardingRulesDecisionOutput {
+            output: OnboardingRulesDecisionOutput::from(result),
+            additional_evaluated: additional_results,
+        };
+
+        Ok((output, reason_codes))
+    }
+
+    fn evaluate_kyc_rules_with_risk_signals(
+        &self,
+        risk_signals: RiskSignalsForDecision,
+    ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+        // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
+        let idology_rule_result =
+            evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.kyc.clone()).ok();
+        let experian_rule_result =
+            evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.kyc).ok();
 
         let rule_results: Vec<(OnboardingEvaluationResult, DecisionReasonCodes)> =
             vec![experian_rule_result, idology_rule_result]

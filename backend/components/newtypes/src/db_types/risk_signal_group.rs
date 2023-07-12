@@ -28,8 +28,6 @@ use strum_macros::EnumString;
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-#[evt(module = "risk_signal_group_struct")]
-#[evt(derive(Clone, Hash, PartialEq, Eq))]
 pub enum RiskSignalGroupKind {
     Kyc,
     Kyb,
