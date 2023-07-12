@@ -87,8 +87,9 @@ webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd7
 webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
 
 reqwest = {version = "0.11.13", features=["json", "default-tls", "rustls-tls", "rustls-tls-manual-roots", "rustls-tls-webpki-roots", "native-tls"]}
-reqwest-middleware = "0.1.6"
-reqwest-retry = "0.1.5"
+reqwest-middleware = "0.2.2"
+reqwest-retry = "0.2.2"
+retry-policies = "0.1.2"
 
 schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"]}
 
@@ -108,4 +109,4 @@ sentry-tracing = "0.30.0"
 log = "0.4.14"
 byteorder = "1.4"
 
-opentelemetry_api = {version = "0.18.0", features = ["metrics"]}
+opentelemetry_api = {version = "0.19.0", features = ["metrics"]}

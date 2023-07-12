@@ -12,24 +12,22 @@ actix-web = { workspace = true }
 async-trait = "0.1"
 env_logger = "0.9.0"
 log = "0.4.14"
-opentelemetry = { version = "0.17.0", features = [
+opentelemetry = { version = "0.19", features = [
     "rt-tokio",
     "metrics",
-    "serialize",
 ] }
-tracing-opentelemetry = "0.17"
+tracing-opentelemetry = "0.19"
 tracing = { workspace = true }
-tracing-actix-web = { version = "0.6.0", features = ["opentelemetry_0_17"] }
+tracing-actix-web = { version = "0.7.5", features = ["opentelemetry_0_19"] }
 tracing-subscriber = { version = "0.3", features = [
     "json",
     "registry",
     "env-filter",
 ] }
-tracing-bunyan-formatter = "0.3.2"
 envconfig = "0.10.0"
 dotenv = { workspace = true }
 either = { workspace = true }
-opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
+opentelemetry-otlp = { version = "0.12", features = ["tonic", "metrics"] }
 tokio = { workspace = true }
 futures-util = { workspace = true }
 futures = { workspace = true }

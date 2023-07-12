@@ -1,15 +1,12 @@
-use futures_util::Stream;
-use futures_util::StreamExt;
 use opentelemetry::global;
+use opentelemetry::sdk::metrics::controllers::BasicController;
 use opentelemetry::sdk::metrics::selectors;
-use opentelemetry::sdk::metrics::PushController;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
 use opentelemetry_otlp::WithExportConfig;
 use tracing::Span;
 use tracing_actix_web::root_span;
 use tracing_actix_web::DefaultRootSpanBuilder;
 use tracing_actix_web::RootSpanBuilder;
-use tracing_bunyan_formatter::JsonStorageLayer;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Registry;
@@ -18,7 +15,7 @@ use crate::config::Config;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::headers::TelemetryHeaders;
 
-pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::error::Error>> {
+pub fn init(config: &Config) -> Result<Option<BasicController>, Box<dyn std::error::Error>> {
     env_logger::init();
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
@@ -45,7 +42,7 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     let tracer = opentelemetry_otlp::new_pipeline()
         .tracing()
         .with_exporter(exporter)
-        .install_simple()?;
+        .install_batch(opentelemetry::runtime::Tokio)?;
 
     // sentry layer
     let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
@@ -57,7 +54,6 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging
     let sub = Registry::default()
         .with(env_filter)
-        .with(JsonStorageLayer)
         .with(tracing_subscriber::fmt::layer().with_ansi(false).pretty())
         .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .with(sentry_layer);
@@ -65,13 +61,13 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
     tracing::subscriber::set_global_default(sub)?;
 
     // init metrics
-    fn delayed_interval(duration: std::time::Duration) -> impl Stream<Item = tokio::time::Instant> {
-        opentelemetry::util::tokio_interval_stream(duration).skip(1)
-    }
     let metrics = opentelemetry_otlp::new_pipeline()
-        .metrics(tokio::spawn, delayed_interval)
+        .metrics(
+            selectors::simple::inexpensive(),
+            opentelemetry::sdk::export::metrics::aggregation::stateless_temporality_selector(),
+            opentelemetry::runtime::Tokio,
+        )
         .with_exporter(opentelemetry_otlp::new_exporter().tonic())
-        .with_aggregator_selector(selectors::simple::Selector::Exact)
         .build()?;
 
     Ok(Some(metrics))
@@ -145,7 +141,10 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         span
     }
 
-    fn on_request_end<B>(span: Span, outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>) {
+    fn on_request_end<B: actix_web::body::MessageBody>(
+        span: Span,
+        outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>,
+    ) {
         DefaultRootSpanBuilder::on_request_end(span, outcome)
     }
 }

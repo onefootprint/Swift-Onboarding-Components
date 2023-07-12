@@ -83,6 +83,7 @@ impl ChallengeState {
     }
 }
 
+#[allow(clippy::type_complexity)]
 #[tracing::instrument(skip(state))]
 async fn get_user_challenge_context(
     state: &web::Data<State>,

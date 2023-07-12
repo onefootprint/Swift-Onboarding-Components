@@ -31,5 +31,5 @@ diesel = { workspace = true }
 
 byteorder = { workspace = true } 
 
-opentelemetry_api = { workspace = true }
+opentelemetry_api = { version = "0.18" }
 actix-web-opentelemetry = { version = "0.13.0", features = ["metrics"] }

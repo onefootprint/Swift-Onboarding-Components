@@ -142,7 +142,7 @@ export abstract class ServiceContainers {
         secretsStore.stripeApiKey.arn,
         secretsStore.fpcProtectedCustodianKeyParameter.arn,
         secretsStore.fingerprintSdkKey.arn,
-        secretsStore.incodeApiKey.arn,        
+        secretsStore.incodeApiKey.arn,
         secretsStore.incodeSelfieFlowId.arn,
         secretsStore.incodeDocumentFlowId.arn,
         secretsStore.incodeBaseUrl.arn,
@@ -438,16 +438,19 @@ export abstract class ServiceContainers {
                 value: nitroService.serviceEndpoint,
               },
             ],
-            healthCheck: {
-              command: [
-                'CMD-SHELL',
-                `curl -f http://localhost:${appPort}/health || exit 1`,
-              ],
-              interval: 5,
-              retries: 3,
-              startPeriod: 30,
-              timeout: 5,
-            },
+            // TODO: I've suggested some more tolerant values
+            // but still disabling this for now!
+            //
+            // healthCheck: {
+            //   command: [
+            //     'CMD-SHELL',
+            //     `curl -f http://localhost:${appPort}/health || exit 1`,
+            //   ],
+            //   interval: 300,
+            //   retries: 10,
+            //   startPeriod: 30,
+            //   timeout: 30,
+            // },
             dependsOn: [
               {
                 containerName: traceOtelCollectorContainerName,
@@ -487,6 +490,7 @@ export abstract class ServiceContainers {
     serverContainerPort: number,
     metricsEndpointPath: string,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
+    const metadata = GetStackMetadata();
     const out = pulumi
       .all([
         secrets.traceOtelConfig.arn,
@@ -542,7 +546,7 @@ export abstract class ServiceContainers {
           logConfiguration: {
             logDriver: 'awslogs',
             options: {
-              'awslogs-group': `/ecs/otelcollect_logs`,
+              'awslogs-group': `/ecs/otelcollect_logs/${metadata.shortStackName}`,
               'awslogs-region': `${region}`,
               'awslogs-create-group': 'true',
               'awslogs-stream-prefix': 'ecs',
@@ -580,9 +584,9 @@ export abstract class ServiceContainers {
           name: 'heartbeat',
           image:
             'ghcr.io/onefootprint/heartbeat@sha256:56773827f9fb79264e46b95d128f448c0a4e49b9692ae3dd5bb408812e0efe82',
-          essential: true,
+          essential: false,
           secrets,
-          dependsOn: [{ containerName: appName, condition: 'HEALTHY' }],
+          dependsOn: [{ containerName: appName, condition: 'START' }],
           environment: [
             {
               name: 'FPC_MONITOR_URL',

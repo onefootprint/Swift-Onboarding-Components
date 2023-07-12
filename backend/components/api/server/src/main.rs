@@ -35,7 +35,7 @@ async fn run_server() -> std::io::Result<()> {
             release: sentry::release_name!(),
             environment: Some(Cow::Owned(config.service_config.environment.clone())),
             sample_rate,
-            attach_stacktrace: true,
+            attach_stacktrace: false,
             ..Default::default()
         },
     ));

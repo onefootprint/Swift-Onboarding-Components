@@ -1,13 +1,10 @@
-use std::time::Duration;
-
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
-use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use rpc::{EnclavePayload, RpcRequest};
+use std::time::Duration;
 
 #[derive(Clone, Debug)]
 pub struct ProxyHttpClient {
     endpoint: String,
-    client: ClientWithMiddleware,
+    client: reqwest::Client,
     bearer_token: String,
 }
 
@@ -23,18 +20,9 @@ pub struct ProxyPayloadResponse {
 
 impl ProxyHttpClient {
     pub fn new(endpoint: &str, proxy_auth_token: &str) -> Result<Self, crate::Error> {
-        let retry_policy = ExponentialBackoff::builder()
-            .backoff_exponent(2)
-            .retry_bounds(Duration::from_millis(2), Duration::from_millis(6))
-            .build_with_max_retries(3);
-
         let client = reqwest::ClientBuilder::new()
-            .timeout(Duration::from_secs(4))
+            .timeout(Duration::from_secs(1))
             .build()?;
-
-        let client = ClientBuilder::new(client)
-            .with(RetryTransientMiddleware::new_with_policy(retry_policy))
-            .build();
 
         Ok(Self {
             client,
@@ -61,17 +49,44 @@ impl ProxyHttpClient {
 
     /// send/recieve response from the proxy
     pub async fn send_request(&self, request: RpcRequest) -> Result<EnclavePayload, crate::Error> {
+        self.send_request_inner(request, 2).await
+    }
+
+    /// send/recieve response from the proxy
+    async fn send_request_inner(
+        &self,
+        request: RpcRequest,
+        mut retries_left: i32,
+    ) -> Result<EnclavePayload, crate::Error> {
         let url = self.url("proxy");
-        let request = ProxyPayloadRequest { request };
-        let response: ProxyPayloadResponse = self
+        let payload_request = ProxyPayloadRequest {
+            request: request.clone(),
+        };
+
+        let mut response = self
             .client
-            .post(url)
+            .post(&url)
             .bearer_auth(&self.bearer_token)
-            .json(&request)
+            .json(&payload_request)
             .send()
-            .await?
-            .json()
-            .await?;
+            .await;
+
+        while match &response {
+            Ok(response) if response.status().as_u16() >= 500 && retries_left > 0 => true,
+            Err(e) if e.is_timeout() && retries_left > 0 => true,
+            Ok(_) | Err(_) => false,
+        } {
+            response = self
+                .client
+                .post(&url)
+                .bearer_auth(&self.bearer_token)
+                .json(&payload_request)
+                .send()
+                .await;
+            retries_left -= 1;
+        }
+
+        let response: ProxyPayloadResponse = response?.json().await?;
         Ok(response.response)
     }
 }
