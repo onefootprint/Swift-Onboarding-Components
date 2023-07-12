@@ -1,7 +1,6 @@
 import { IcoCheck24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-
 import { Box } from '../box';
 import { Typography } from '../typography';
 
@@ -16,7 +15,7 @@ const FeedbackButton = ({ children }: FeedbackButtonProps) => {
       <Typography variant="label-3" color="quinary">
         {children}
       </Typography>
-      <Box />
+      <Box width={24}/>
     </FeedbackButtonContainer>
   );
 };
@@ -27,6 +26,7 @@ const FeedbackButtonContainer = styled.View`
 
     return css`
       align-items: center;
+      justify-content: center;
       background: ${theme.color.success};
       border-radius: ${button.borderRadius};
       flex-direction: row;
