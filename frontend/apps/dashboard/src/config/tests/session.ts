@@ -1,14 +1,14 @@
-import { RoleScope, RoleScopeKind } from '@onefootprint/types';
-import { useStore } from 'src/hooks/use-session';
+import { RoleScopeKind } from '@onefootprint/types';
+import { UserSession, useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
 
-const baseUser = {
+const baseUser: UserSession = {
   id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
   email: 'jane.doe@acme.com',
   firstName: 'Jane',
   lastName: 'Doe',
-  scopes: [{ kind: RoleScopeKind.admin } as RoleScope],
+  scopes: [{ kind: RoleScopeKind.admin }],
   isAssumedSession: false,
 };
 

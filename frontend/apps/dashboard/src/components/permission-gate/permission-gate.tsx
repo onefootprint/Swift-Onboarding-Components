@@ -30,5 +30,3 @@ const PermissionGate = ({
 };
 
 export default PermissionGate;
-
-// export { RoleScope as Scope };

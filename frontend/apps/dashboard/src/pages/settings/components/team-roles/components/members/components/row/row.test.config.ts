@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Member, Role, RoleScope, RoleScopeKind } from '@onefootprint/types';
+import { Member, Role, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
 export const withCurrentUserDifferentFromMember = () => {
@@ -24,7 +24,7 @@ afterAll(() => {
   resetUser();
 });
 
-export const memberFixture = {
+export const memberFixture: Member = {
   id: 'orguser_k0xUYuO2fFCwMHFPShuK77',
   email: 'jack.doe@acme.com',
   firstName: 'Jack',
@@ -36,7 +36,7 @@ export const memberFixture = {
     name: 'Admin',
     numActiveUsers: 1,
     numActiveApiKeys: 0,
-    scopes: [{ kind: RoleScopeKind.admin } as RoleScope],
+    scopes: [{ kind: RoleScopeKind.admin }],
   },
   rolebinding: {
     lastLoginAt: '2023-01-18T17:54:10.668420Z',
