@@ -1,5 +1,6 @@
 # Each line is a file pattern followed by one or more owners.
 
 /frontend @onefootprint/frontend
+/mobile @onefootprint/mobile
 /backend @onefootprint/backend
 /backend/components/enclave @agrinman
