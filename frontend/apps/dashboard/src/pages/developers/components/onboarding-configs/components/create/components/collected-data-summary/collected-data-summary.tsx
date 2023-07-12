@@ -27,7 +27,6 @@ const CollectedDataSummary = ({ collectedData }: CollectedDataSummaryProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     position: sticky;
-    top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,7 +34,7 @@ const Container = styled.div`
     width: calc(100% + 2 * ${theme.spacing[7]});
     margin: calc(-1 * ${theme.spacing[7]}) calc(-1 * ${theme.spacing[7]}) 0
       calc(-1 * ${theme.spacing[7]});
-    padding: ${theme.spacing[3]} ${theme.spacing[7]};
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
   `}
 `;
