@@ -13,6 +13,7 @@ use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, Default)]
 pub struct ScopedVaultListQueryParams {
@@ -142,44 +143,61 @@ macro_rules! list_query {
                 // - the data is portablized (could be added by any tenant)
                 // These two subqueries handle each case respectively
 
-                let owned_scoped_vault_ids = scoped_vault::table
-                    .filter(scoped_vault::tenant_id.eq($params.tenant_id))
-                    .select(scoped_vault::id);
-                let matching_speculative_v_ids: Vec<VaultId> = data_lifetime::table
-                    .left_join(fingerprint::table)
-                    .left_join(vault_data::table)
-                    // Active, non-portablized lifetimes that were added by this tenant
+                // Specifically get the matching vault_ids (the scoped_vault_id might belong to another tenant)
+                // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
+                // scoped_vault table... So, we have to actually execute these subqueries
+                let matching_speculative_fp_ids: Vec<VaultId> = fingerprint::table
+                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+                    // SPECULATIVE visibility filters
                     .filter(data_lifetime::deactivated_seqno.is_null())
                     .filter(data_lifetime::portablized_seqno.is_null())
-                    .filter(data_lifetime::scoped_vault_id.eq_any(owned_scoped_vault_ids))
-                    // Matching data or fingerprint
-                    .filter(
-                        vault_data::p_data.ilike(format!("%{}%", search.leak()))
-                            .or(fingerprint::sh_data.eq_any(&fingerprints))
-                    )
-                    // Specifically get the matching vault_id (the scoped_vault_id might belong to another tenant)
+                    .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
+                    // Matching filter
+                    .filter(fingerprint::sh_data.eq_any(&fingerprints))
                     .select(data_lifetime::vault_id)
-                    // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
-                    // scoped_vault table... So, we have to actually execute the subquery
                     .get_results($conn)?;
 
-                let matching_portable_v_ids = data_lifetime::table
-                    .left_join(fingerprint::table)
-                    .left_join(vault_data::table)
-                    // Active, PORTABLE lifetimes
+                // TODO we should store the plaintext on the fingerprint table so all searching
+                // happens on one table
+                let matching_speculative_plaintext_ids: Vec<VaultId> = vault_data::table
+                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+                    // SPECULATIVE visibility filters
+                    .filter(data_lifetime::deactivated_seqno.is_null())
+                    .filter(data_lifetime::portablized_seqno.is_null())
+                    .filter(scoped_vault::tenant_id.eq($params.tenant_id))
+                    // Matching filter
+                    // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
+                    .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
+                    .select(data_lifetime::vault_id)
+                    .get_results($conn)?;
+
+                // TODO should we evaluate these into RAM too?
+                let matching_portable_fp_ids = fingerprint::table
+                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+                    // PORTABLE visibility filters
                     .filter(data_lifetime::deactivated_seqno.is_null())
                     .filter(not(data_lifetime::portablized_seqno.is_null()))
-                    // Matching data or fingerprint
-                    .filter(
-                        vault_data::p_data.ilike(format!("%{}%", search.leak()))
-                            .or(fingerprint::sh_data.eq_any(fingerprints))
-                    )
-                    // Specifically get the matching vault_id (the scoped_vault_id might belong to another tenant)
+                    // Matching filter
+                    .filter(fingerprint::sh_data.eq_any(fingerprints))
                     .select(data_lifetime::vault_id);
+
+                let matching_portable_plaintext_ids = vault_data::table
+                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+                    // PORTABLE visibility filters
+                    .filter(data_lifetime::deactivated_seqno.is_null())
+                    .filter(not(data_lifetime::portablized_seqno.is_null()))
+                    // Matching filter
+                    .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
+                    .select(data_lifetime::vault_id);
+
+                let all_ids: HashSet<_> = vec![
+                    matching_speculative_fp_ids.into_iter(),
+                    matching_speculative_plaintext_ids.into_iter(),
+                ].into_iter().flatten().collect();
                 query = query.filter(
-                    scoped_vault::vault_id
-                        .eq_any(matching_portable_v_ids)
-                        .or(scoped_vault::vault_id.eq_any(matching_speculative_v_ids)),
+                    scoped_vault::vault_id.eq_any(all_ids)
+                        .or(scoped_vault::vault_id.eq_any(matching_portable_fp_ids))
+                        .or(scoped_vault::vault_id.eq_any(matching_portable_plaintext_ids))
                 );
             }
             query
@@ -188,6 +206,7 @@ macro_rules! list_query {
 }
 
 pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
+    // TODO in the API requests where we do count and list, we should save results of subqueries in RAM
     let query = list_query!(conn, params);
     let count = query.count().get_result(conn)?;
     Ok(count)
