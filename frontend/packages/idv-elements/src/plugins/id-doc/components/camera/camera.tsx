@@ -5,12 +5,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
-import CaptureButton from './components/capture-button/capture-button';
-import Feedback from './components/feedback/feedback';
+import CaptureButton from './components/capture-button';
+import Feedback from './components/feedback';
 import Flash from './components/flash';
-import Overlay from './components/overlay';
-import { OutlineKind } from './components/overlay/overlay';
-import UploadButton from './components/upload-button/upload-button';
+import Overlay, { OutlineKind } from './components/overlay';
+import UploadButton from './components/upload-button';
 import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';

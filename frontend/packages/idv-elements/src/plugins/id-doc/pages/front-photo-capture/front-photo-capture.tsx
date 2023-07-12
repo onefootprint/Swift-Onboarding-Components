@@ -20,10 +20,10 @@ const FrontPhotoCapture = () => {
   const [state, send] = useIdDocMachine();
 
   const {
-    idDoc: { type: doctType },
+    idDoc: { type: docType },
   } = state.context;
 
-  if (!doctType) return null;
+  if (!docType) return null;
 
   const onComplete = (imageString: string) =>
     send({
@@ -45,7 +45,7 @@ const FrontPhotoCapture = () => {
         button={{ variant: 'back', onBack: handleClickBack }}
         content={{
           kind: 'static',
-          title: t(`title.${translationIndex[doctType]}`),
+          title: t(`title.${translationIndex[docType]}`),
         }}
       />
       <PhotoCapture

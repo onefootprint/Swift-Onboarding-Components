@@ -1,24 +1,15 @@
 import cv from '@onefootprint/opencv-ts';
-import { render, screen, waitFor } from '@onefootprint/test-utils';
-import Image from 'next/image';
-import React from 'react';
+import { waitFor } from '@onefootprint/test-utils';
+import Jimp from 'jimp';
 
 import {
   CardCaptureStatus,
-  getCardCaptureStatus,
+  detectCardStatus,
 } from './graphics-processing-utils';
 import { getTestImageEntries } from './graphics-processing-utils.test.config';
 import { params } from './params';
 
-const ImageComponent = ({ imgPath }: { imgPath: string }) => (
-  <Image src={imgPath} width={500} height={500} alt="Test Image" />
-);
-
-const renderImage = (imgPath: string) => {
-  render(<ImageComponent imgPath={imgPath} />);
-};
-
-describe.skip('Testing the image detection outputs', () => {
+describe('Testing the image detection outputs', () => {
   const testImageEntries = getTestImageEntries();
 
   testImageEntries.forEach(imgEntry => {
@@ -26,10 +17,12 @@ describe.skip('Testing the image detection outputs', () => {
     const { path, capturable } = value;
     it(`Testing for ${key}`, async () => {
       await waitFor(() => expect(cv.Mat).not.toBeUndefined());
-      renderImage(path);
-      const imageElement = screen.getByRole('img');
-      const cardCaptureStatus = getCardCaptureStatus(
-        imageElement as HTMLImageElement,
+      const jimpSrc = await Jimp.read(path);
+      const src = cv.matFromImageData(jimpSrc.bitmap as any as ImageData);
+      const cardCaptureStatus = detectCardStatus(
+        src,
+        jimpSrc.bitmap.width,
+        jimpSrc.bitmap.height,
         params,
       );
       expect(cardCaptureStatus.status === CardCaptureStatus.OK).toEqual(

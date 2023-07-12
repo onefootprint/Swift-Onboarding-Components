@@ -196,15 +196,12 @@ export const isOverAligned = ({
   return false;
 };
 
-export const getCardCaptureStatus = (
-  imgSrc: HTMLImageElement | HTMLCanvasElement,
+export const detectCardStatus = (
+  src: Mat,
+  imgWidth: number,
+  imgHeight: number,
   params: ParamsType[],
 ) => {
-  if (!cv.Mat) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
-  if (imgSrc.width === 0 || imgSrc.height === 0)
-    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
-  const src = cv.imread(imgSrc);
-
   for (let i = 0; i < params.length; i += 1) {
     const { kSize, fThresh, sThresh, aperSize } = params[i];
     const medianBlurredImage = getMedianBlur(src, kSize, false); // should not clean the src since we need it for every iteration of the loop
@@ -230,16 +227,12 @@ export const getCardCaptureStatus = (
       );
       if (
         getIsHorizontallyAligned(boundingBox) &&
-        coversOutlineSpace(
-          boundingBox.uprightRect,
-          imgSrc.width,
-          imgSrc.height,
-        ) &&
+        coversOutlineSpace(boundingBox.uprightRect, imgWidth, imgHeight) &&
         !isOverAligned({
           topLeft,
           bottomRight,
-          imgWidth: imgSrc.width,
-          imgHeight: imgSrc.height,
+          imgWidth,
+          imgHeight,
         })
       ) {
         possibleCards.push(boundingBox);
@@ -253,4 +246,15 @@ export const getCardCaptureStatus = (
   }
   src.delete(); // now we can clean the src
   return { status: CardCaptureStatus.detecting, paramIndex: -1 };
+};
+
+export const getCardCaptureStatus = (
+  imgSrc: HTMLImageElement | HTMLCanvasElement,
+  params: ParamsType[],
+) => {
+  if (!cv.Mat) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
+  if (imgSrc.width === 0 || imgSrc.height === 0)
+    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
+  const src = cv.imread(imgSrc);
+  return detectCardStatus(src, imgSrc.width, imgSrc.height, params);
 };

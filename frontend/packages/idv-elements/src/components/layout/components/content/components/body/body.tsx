@@ -36,7 +36,7 @@ const Container = styled(motion.div)`
   position: relative;
 `;
 
-const BodyContent = styled.div`
+const BodyContent = styled.span`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

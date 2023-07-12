@@ -40,7 +40,7 @@ const getSourceDimensions = ({
     sHeight: 0,
   };
 
-  if (!videoRef || !videoRef.current || !mediaStream) {
+  if (!videoRef.current || !mediaStream) {
     return initialDimensions;
   }
 
