@@ -69,7 +69,7 @@ where
                 VaultKind::Person => RiskSignalGroupKind::Kyc,
                 VaultKind::Business => RiskSignalGroupKind::Kyb,
             };
-            RiskSignal::bulk_create(conn, &ob.scoped_vault_id, reason_codes, rsg_kind)?;
+            RiskSignal::bulk_create(conn, &ob.scoped_vault_id, reason_codes, rsg_kind, false)?;
 
             save_onboarding_decision(
                 conn,

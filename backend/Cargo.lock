@@ -4759,6 +4759,7 @@ dependencies = [
  "diesel_as_jsonb",
  "either",
  "email_address",
+ "enum_variant_type",
  "futures",
  "futures-util",
  "itertools 0.10.3",

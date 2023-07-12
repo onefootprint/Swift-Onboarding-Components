@@ -7,6 +7,7 @@ use db::models::{
     document_request::{DocumentRequest, NewDocumentRequestArgs},
     onboarding::{Onboarding, OnboardingUpdate},
     risk_signal::RiskSignal,
+    risk_signal_group::RiskSignalGroup,
     scoped_vault::ScopedVault,
     vault::Vault,
     verification_result::VerificationResult,
@@ -16,8 +17,8 @@ use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    AlpacaKycConfig, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
-    RiskSignalGroupKind, VendorAPI,
+    risk_signal_group_struct, AlpacaKycConfig, DecisionStatus, FootprintReasonCode, OnboardingStatus,
+    ReviewReason, RiskSignalGroupKind, VendorAPI,
 };
 use webhooks::WebhookClient;
 
@@ -25,15 +26,23 @@ use crate::{
     auth::tenant::AuthActor,
     decision::{
         self,
+        features::risk_signals::{
+            create_risk_signals_from_vendor_results, save_risk_signals, RiskSignalGroupStruct,
+        },
         onboarding::{Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput},
         review::save_review_decision,
         state::{
             actions::{MakeDecision, WorkflowActions},
-            common, Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall, OnAction,
-            ReviewCompleted, WorkflowState,
+            common::{self, get_vres_id_for_fixture},
+            Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall, OnAction, ReviewCompleted,
+            WorkflowState,
         },
         utils::FixtureDecision,
-        vendor::{self, tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+        vendor::{
+            self, tenant_vendor_control::TenantVendorControl,
+            vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
+            vendor_result::VendorResult,
+        },
     },
     errors::ApiResult,
     State,
@@ -128,7 +137,7 @@ impl AlpacaKycVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
-    type AsyncRes = Vec<VendorResult>;
+    type AsyncRes = (Vec<VendorResult>, Arc<dyn FeatureFlagClient>);
 
     #[tracing::instrument(
         "OnAction<MakeVendorCalls, AlpacaKycState>::execute_async_idempotent_actions",
@@ -139,15 +148,36 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
+        Ok((
+            common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await?,
+            state.feature_flag_client.clone(),
+        ))
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(
-        self,
-        vendor_results: Vec<VendorResult>,
-        _conn: &mut db::TxnPgConn,
-    ) -> ApiResult<AlpacaKycState> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+        let (vendor_results, ff_client) = async_res;
+        let vault = Vault::get(conn, &self.sv_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
+        let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
+            if let Some(fd) = fixture_decision {
+                let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fd);
+                let vres_id = get_vres_id_for_fixture(&vendor_results)?;
+
+                RiskSignalGroupStruct {
+                    footprint_reason_codes: reason_codes
+                        .into_iter()
+                        .map(|r| (r.0, r.1, vres_id.clone()))
+                        .collect(),
+                    group: risk_signal_group_struct::Kyc,
+                }
+            } else {
+                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+                create_risk_signals_from_vendor_results(vendor_result_maps)?
+            };
+
+        save_risk_signals(conn, &self.sv_id, risk_signals)?;
+
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
@@ -209,17 +239,24 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     #[tracing::instrument("OnAction<MakeDecision, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         let (ff_client, webhook_client) = async_res;
-        // TODO: pass in/otherwise specify Alpaca Rules
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
         let vault = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
-        let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
+        // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
+        // TODO: load risk signals here, and use that to evaluate the rules
+        let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
 
-        RiskSignal::bulk_create(conn, &self.sv_id, reason_codes, RiskSignalGroupKind::Kyc)?;
+        // Now, we unhide the risk signals for the vendor that made the decision
+        let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
+        RiskSignal::unhide_risk_signals_for_risk_signal_group(
+            conn,
+            &rsg.id,
+            vec![decision.output.decision.vendor_api],
+        )?;
 
         match decision.decision.decision_status {
             DecisionStatus::Fail => {
@@ -436,12 +473,14 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             &self.sv_id,
             adverse_media_reason_codes,
             RiskSignalGroupKind::AdverseMedia,
+            false,
         )?;
         RiskSignal::bulk_create(
             conn,
             &self.sv_id,
             watchlist_reason_codes,
             RiskSignalGroupKind::Watchlist,
+            false,
         )?;
 
         // For now, we need to re-run the KYC decisioning so we can get reason codes

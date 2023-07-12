@@ -1,18 +1,28 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::{risk_signal::RiskSignal, vault::Vault, workflow::Workflow as DbWorkflow};
+use db::models::{
+    risk_signal::RiskSignal, risk_signal_group::RiskSignalGroup, vault::Vault,
+    workflow::Workflow as DbWorkflow,
+};
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{KycConfig, RiskSignalGroupKind};
+use newtypes::{risk_signal_group_struct, KycConfig, RiskSignalGroupKind, VaultKind};
 use webhooks::WebhookClient;
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
 };
-use crate::decision::state::{
-    actions::{Authorize, WorkflowActions},
-    common, WorkflowState,
+use crate::decision::{
+    features::risk_signals::{
+        create_risk_signals_from_vendor_results, save_risk_signals, RiskSignalGroupStruct,
+    },
+    state::{
+        actions::{Authorize, WorkflowActions},
+        common::{self, get_vres_id_for_fixture},
+        WorkflowState,
+    },
+    vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
 };
 use crate::{
     decision::{
@@ -109,7 +119,7 @@ impl KycVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
-    type AsyncRes = Vec<VendorResult>;
+    type AsyncRes = (Vec<VendorResult>, Arc<dyn FeatureFlagClient>);
 
     #[tracing::instrument(
         "OnAction<MakeVendorCalls, KycState>::execute_async_idempotent_actions",
@@ -120,11 +130,36 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await
+        Ok((
+            common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await?,
+            state.feature_flag_client.clone(),
+        ))
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, KycState>::on_commit", skip_all)]
-    fn on_commit(self, vendor_results: Vec<VendorResult>, _conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
+        let (vendor_results, ff_client) = async_res;
+        let vault = Vault::get(conn, &self.sv_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
+        let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
+            if let Some(fd) = fixture_decision {
+                let reason_codes = decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person);
+                let vres_id = get_vres_id_for_fixture(&vendor_results)?;
+
+                RiskSignalGroupStruct {
+                    footprint_reason_codes: reason_codes
+                        .into_iter()
+                        .map(|r| (r.0, r.1, vres_id.clone()))
+                        .collect(),
+                    group: risk_signal_group_struct::Kyc,
+                }
+            } else {
+                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+                create_risk_signals_from_vendor_results(vendor_result_maps)?
+            };
+
+        save_risk_signals(conn, &self.sv_id, risk_signals)?;
+
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
@@ -189,13 +224,20 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let vault = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
-        let (decision, reason_codes) = if let Some(fixture_decision) = fixture_decision {
+        // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
+        let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
             common::get_decision(&self, conn, &self.vendor_results)?
         };
 
-        RiskSignal::bulk_create(conn, &self.sv_id, reason_codes, RiskSignalGroupKind::Kyc)?;
+        // Now, we unhide the risk signals for the vendor that made the decision
+        let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
+        RiskSignal::unhide_risk_signals_for_risk_signal_group(
+            conn,
+            &rsg.id,
+            vec![decision.output.decision.vendor_api],
+        )?;
 
         common::save_kyc_decision(
             conn,

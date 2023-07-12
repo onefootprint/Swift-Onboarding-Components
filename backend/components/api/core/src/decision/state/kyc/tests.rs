@@ -1,7 +1,7 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview, ExpectedStatus,
-    OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+    mock_idology, mock_webhooks, query_data, query_risk_signals, setup_data, ExpectedRequiresManualReview,
+    ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
@@ -12,6 +12,7 @@ use crate::{decision::state::kyc, State};
 use chrono::Utc;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::RiskSignal;
 use db::models::workflow::NewWorkflow;
 use db::models::workflow::Workflow;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -24,8 +25,8 @@ use itertools::Itertools;
 use macros::test_state;
 use macros::test_state_case;
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, SignalSeverity, TenantId, VendorAPI,
-    WorkflowConfig,
+    DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, RiskSignalGroupKind, SignalSeverity,
+    TenantId, VendorAPI, WorkflowConfig,
 };
 use newtypes::{KycConfig, OnboardingStatus};
 use newtypes::{KycState, WorkflowId, WorkflowState};
@@ -135,7 +136,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -187,6 +188,9 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert!(ob.decision_made_at.is_none());
     assert_eq!(WorkflowState::Kyc(KycState::Decisioning), wf.state);
+    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs.is_empty());
+    assert!(rs.iter().all(|r| r.hidden));
 
     // Expect Webhooks
     mock_webhooks(
@@ -250,7 +254,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -300,6 +304,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
+    let rs_failing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs_failing.is_empty());
+    assert!(rs_failing.iter().all(|r| r.hidden));
+
     // Expect Webhook
     let expect_review = matches!(user_kind, UserKind::Sandbox("manualreview")); //#fail currently indicates hard failing without raising review
     mock_webhooks(
@@ -337,6 +345,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             } else {
                 SignalSeverity::High
             };
+            println!(
+                "{:?}",
+                rs.clone()
+                    .into_iter()
+                    .map(|rs| rs.reason_code)
+                    .collect::<Vec<_>>()
+            );
             assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
             assert!(rs.iter().all(|rs| rs.reason_code.severity() == severity));
         }
@@ -359,7 +374,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
-            redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key).await;
+            redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key, rs_failing).await;
         }
     }
 }
@@ -371,6 +386,7 @@ async fn redo_and_pass(
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     ob_config_key: &ObConfigurationKey,
+    previous_risk_signals: Vec<RiskSignal>,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_ob.scoped_vault_id.clone();
@@ -390,7 +406,7 @@ async fn redo_and_pass(
     let tenant_id = tenant_id.clone();
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -437,6 +453,15 @@ async fn redo_and_pass(
     assert!(prior_ob.authorized_at == ob.authorized_at);
     assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
     assert!(prior_ob.decision_made_at == ob.decision_made_at);
+
+    // check RSG is different
+    let rs_passing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    let previous_rs_ids: Vec<newtypes::RiskSignalId> =
+        previous_risk_signals.into_iter().map(|r| r.id).collect();
+    assert!(!rs_passing.is_empty());
+    rs_passing
+        .into_iter()
+        .for_each(|r| assert!(!previous_rs_ids.contains(&r.id) && !r.hidden));
 
     assert_have_same_elements(
         vec![

@@ -144,6 +144,8 @@ impl Complete {
             sv_id,
             score_reason_codes.chain(ocr_reason_codes).collect(),
             newtypes::RiskSignalGroupKind::Doc,
+            // TODO: FP-5062
+            false,
         )?;
 
         // TODO: still need to fingerprint data afterwards!

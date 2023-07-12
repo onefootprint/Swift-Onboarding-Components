@@ -52,6 +52,7 @@ impl RiskSignal {
         scoped_vault_id: &ScopedVaultId,
         signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
         risk_group_kind: RiskSignalGroupKind,
+        hidden: bool,
     ) -> DbResult<Vec<Self>> {
         let rsg = RiskSignalGroup::create(conn.conn(), scoped_vault_id, risk_group_kind)?;
 
@@ -62,7 +63,7 @@ impl RiskSignal {
                 reason_code,
                 created_at: Utc::now(),
                 verification_result_id: vres_id,
-                hidden: false,
+                hidden,
                 vendor_api,
                 risk_signal_group_id: Some(rsg.id.clone()),
             })
@@ -110,6 +111,37 @@ impl RiskSignal {
         Ok(signal)
     }
 
+    #[tracing::instrument("RiskSignal::latest_by_risk_signal_group_kind", skip_all)]
+    pub fn latest_by_risk_signal_group_kind(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        kind: RiskSignalGroupKind,
+    ) -> DbResult<Vec<Self>> {
+        let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
+        // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to unhide
+        let res = risk_signal::table
+            .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
+            .get_results(conn)?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("RiskSignal::unhide_risk_signals_for_risk_signal_group", skip_all)]
+    pub fn unhide_risk_signals_for_risk_signal_group(
+        conn: &mut TxnPgConn,
+        rsg_id: &RiskSignalGroupId,
+        vendor_apis: Vec<VendorAPI>,
+    ) -> DbResult<usize> {
+        let rows_updated = diesel::update(
+            risk_signal::table
+                .filter(risk_signal::risk_signal_group_id.eq(rsg_id))
+                .filter(risk_signal::vendor_api.eq_any(vendor_apis)),
+        )
+        .set(risk_signal::hidden.eq(false))
+        .execute(conn.conn())?;
+
+        Ok(rows_updated)
+    }
+
     // Historically, we were writing RiskSignal's with onboarding_decision_id as a foreign key.
     // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id = None and instead have
     // verification_result_id set
@@ -136,20 +168,6 @@ impl RiskSignal {
             .select(risk_signal::all_columns)
             .get_results(conn)?;
         Ok(results)
-    }
-
-    pub fn latest_by_risk_signal_group_kind(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        risk_group_kind: RiskSignalGroupKind,
-    ) -> DbResult<Vec<Self>> {
-        let latest_rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, risk_group_kind)?;
-
-        let res = risk_signal::table
-            .filter(risk_signal::risk_signal_group_id.eq(latest_rsg.id))
-            .get_results(conn)?;
-
-        Ok(res)
     }
 
     #[cfg(test)]

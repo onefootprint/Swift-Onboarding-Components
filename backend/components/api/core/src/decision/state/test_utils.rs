@@ -23,7 +23,7 @@ use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
-use newtypes::{CipKind, ScopedVaultId, WorkflowId};
+use newtypes::{CipKind, RiskSignalGroupKind, ScopedVaultId, WorkflowId};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
@@ -112,7 +112,10 @@ pub async fn query_data(
             let rs = latest_obd
                 .as_ref()
                 .map(|obd| RiskSignal::list_by_onboarding_decision_id(conn, &obd.id).unwrap())
-                .unwrap_or_default();
+                .unwrap_or_default()
+                .into_iter()
+                .filter(|rs| !rs.hidden)
+                .collect();
 
             let wf = Workflow::get(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
@@ -121,6 +124,19 @@ pub async fn query_data(
 
             (ob, wf, wfe, mr, obd, rs, fps)
         })
+        .await
+        .unwrap()
+}
+
+pub async fn query_risk_signals(
+    state: &State,
+    sv_id: &ScopedVaultId,
+    kind: RiskSignalGroupKind,
+) -> Vec<RiskSignal> {
+    let s = sv_id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind).unwrap())
         .await
         .unwrap()
 }

@@ -190,7 +190,7 @@ pub type KycDecision = (
 // In sandbox/demo, we still make Vres's based on the Tenant's TVC. We should probably just have some dummy TestVendor or something or
 // always simulate just Idology, but for now we just robustly take the first of either Idology or Experian that exists
 #[tracing::instrument(skip_all)]
-fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<VerificationResultId> {
+pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<VerificationResultId> {
     let (_, vendor_ids_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let idology = vendor_ids_map
         .get(&IdologyExpectID)

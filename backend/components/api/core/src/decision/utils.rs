@@ -142,6 +142,7 @@ pub async fn setup_kyb_test_fixtures(
                     .map(|s| (s.0, s.1, vres.id.clone()))
                     .collect::<Vec<_>>(),
                 RiskSignalGroupKind::Kyb,
+                false,
             )?;
 
             let _biz_obd = OnboardingDecision::create(conn, new_decision)?;

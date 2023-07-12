@@ -1,8 +1,9 @@
 use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_incode, mock_webhooks, query_data, setup_data, ExpectedRequiresManualReview,
-    ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
+    mock_idology, mock_incode, mock_webhooks, query_data, query_risk_signals, setup_data,
+    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
+    WithHit, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeWatchlistCheckCall;
@@ -25,12 +26,12 @@ use feature_flag::MockFeatureFlagClient;
 
 use itertools::Itertools;
 use macros::test_state_case;
-use newtypes::FootprintReasonCode;
 use newtypes::OnboardingStatus;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
     VendorAPI,
 };
+use newtypes::{FootprintReasonCode, RiskSignalGroupKind};
 
 use newtypes::WorkflowState;
 
@@ -59,7 +60,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(3)
+        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -107,6 +108,10 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
+
+    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs.is_empty());
+    assert!(rs.iter().all(|r| r.hidden));
 
     // MakeDecision
     let (ww, _) = ww
@@ -201,7 +206,7 @@ async fn pass_then_watchlist_hit(
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .times(3)
+        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -250,6 +255,10 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
+    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs.is_empty());
+    assert!(rs.iter().all(|r| r.hidden));
+
     // MakeDecision
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
@@ -262,6 +271,10 @@ async fn pass_then_watchlist_hit(
     assert_eq!(OnboardingStatus::Pending, ob.status);
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
+    // Some risk signals are unhidden now
+    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs.is_empty());
+    assert!(rs.iter().all(|r| !r.hidden));
 
     // Expect Webhooks
     mock_webhooks(
@@ -384,7 +397,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(3)
+        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -542,7 +555,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .times(2)
+        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -592,6 +605,9 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
+    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs.is_empty());
+    assert!(rs.iter().all(|r| r.hidden));
 
     // Expect Webhook
     let _expect_review = match user_kind {
@@ -689,7 +705,7 @@ async fn redo_and_pass(
     let tenant_id = tenant_id.clone();
     mock_ff_client
         .expect_flag()
-        .times(3)
+        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 

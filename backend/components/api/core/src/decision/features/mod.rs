@@ -7,4 +7,5 @@ pub mod incode_watchlist;
 pub mod kyb_features;
 pub mod kyc_features;
 pub mod middesk;
+pub mod risk_signals;
 pub mod socure_idplus;

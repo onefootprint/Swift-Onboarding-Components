@@ -95,7 +95,7 @@ once_cell = { workspace = true }
 paste = "1.0"
 
 enum_dispatch = "0.3.11"
-enum_variant_type = "0.3.1"
+enum_variant_type = {workspace = true}
 typedmap = {version = "0.4.0", features = ["clone"]}
 
 alpaca = { path = "../../integrations/alpaca" }
