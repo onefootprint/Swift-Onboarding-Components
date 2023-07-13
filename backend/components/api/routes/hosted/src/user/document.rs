@@ -5,11 +5,8 @@ use crate::types::response::ResponseData;
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
-use api_core::auth::user::{UserObAuthContext, UserObSession};
-use api_core::auth::SessionContext;
+use api_core::auth::user::UserObAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::{DocCollected, WorkflowWrapper};
 use api_core::decision::vendor;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
@@ -32,11 +29,11 @@ use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifierDiscriminant, S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
     IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
+use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 /// Backend APIs for working with identity documents.
@@ -192,7 +189,6 @@ pub async fn post(
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
                     )?;
                     let doc_type = request.document_type;
-                    tracing::info!("***********HIHIHIHI");
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =
@@ -230,7 +226,7 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request, &user_auth).await?
+        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request).await?
     } else {
         // Fixture response - we always complete successfully!
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
@@ -239,7 +235,6 @@ pub async fn post(
         if next_side_to_collect.is_none() {
             // Save fixture VRes
             save_incode_fixtures(&state, &user_auth.scoped_user.id.clone()).await?;
-            advance_workflow_if_needed(&state, &user_auth).await?;
         }
         DocumentResponse {
             next_side_to_collect,
@@ -273,7 +268,6 @@ async fn handle_incode_request(
     decision_intent_id: DecisionIntentId,
     vault: Vault,
     doc_request: DbDocumentRequest,
-    user_auth: &SessionContext<UserObSession>,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
@@ -307,10 +301,7 @@ async fn handle_incode_request(
         IncodeVerificationSessionState::AddConsent => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::Fail => None,
-        IncodeVerificationSessionState::Complete => {
-            advance_workflow_if_needed(state, user_auth).await?;
-            None
-        }
+        IncodeVerificationSessionState::Complete => None,
         // We shouldn't cleanly break from the machine in any other state
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
@@ -322,31 +313,6 @@ async fn handle_incode_request(
         is_retry_limit_exceeded,
     };
     Ok(result)
-}
-
-#[tracing::instrument(skip_all)]
-async fn advance_workflow_if_needed(
-    state: &State,
-    user_auth: &SessionContext<UserObSession>,
-) -> ApiResult<()> {
-    if let Some(wf) = user_auth.workflow() {
-        let ww = WorkflowWrapper::init(state, wf.clone()).await?;
-        // This is kind of hacky but in some cases when we are collecting a doc, that is because we step'd up and are reflecting that with a DocCollection state in a workflow
-        // In other cases, the OBC might be configured to just always collect doc. If that's the case, then we expect the workflow to just be in the generic DataCollection state
-        // and we don't need to run the workflow (Bifrost will run the workflow by pinging /authorize when all required data is collected)
-        let obc = user_auth.ob_config()?;
-        if !obc.must_collect(DataIdentifierDiscriminant::Document) {
-            let _ww = ww
-                .run(state, WorkflowActions::DocCollected(DocCollected {}))
-                .await?;
-        } else {
-            tracing::info!(curr_state=?wf.state, "OBC must collect document, skipping running workflow");
-        }
-    } else {
-        // for now gracefully allow this since we are still FF'ing creation of workflows
-        tracing::warn!("Workflow not found");
-    };
-    Ok(())
 }
 
 fn save_vres_for_fixture_risk_signals(

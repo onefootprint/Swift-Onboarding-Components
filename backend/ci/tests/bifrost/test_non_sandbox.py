@@ -78,7 +78,8 @@ def test_liveness(bifrost):
 
 def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     # Manually authorize
-    bifrost.handle_authorize()
+    bifrost.handle_requirements(kind="authorize")
+    bifrost.handle_requirements(kind="process")
     body = bifrost.validate()
     data = dict(validation_token=body["validation_token"])
     # Shouldn't be able to validate with other tenant

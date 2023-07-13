@@ -9,9 +9,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
-use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::common;
-use api_core::decision::state::WorkflowWrapper;
 use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
@@ -20,7 +18,6 @@ use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::tenant::Tenant;
-use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -103,19 +100,6 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             common::write_authorized_fingerprints(&state, &sv_biz_id).await?;
         }
     }
-
-    let wf = user_auth.workflow().ok_or(OnboardingError::NoWorkflow)?;
-    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-    let res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;
-    // To be consistent with current behavior of the non-WF code, we swallow errors
-    match res {
-        Ok(ww) => {
-            tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "[Authorize] Ran workflow");
-        }
-        Err(e) => {
-            tracing::error!(error=%e, "[Authorize] Error running workflow");
-        }
-    };
 
     // Run KYB
     let tenant = user_auth.tenant()?;

@@ -190,11 +190,7 @@ class BifrostClient:
         elif requirement["kind"] == "authorize":
             self.handle_authorize()
         elif requirement["kind"] == "process":
-            # For now, the process requirement is usually handled inline during the handling of other
-            # requirements. Will move it out of line.
-            # TODO handle this automatically
-            # self.handle_process()
-            pass
+            self.handle_process()
         else:
             kind = requirement["kind"]
             assert False, f"Unknown requirement {kind}"

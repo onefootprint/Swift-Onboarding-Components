@@ -14,6 +14,7 @@ use api_core::decision::state::DocCollected;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::workflow::WorkflowError;
+use api_core::errors::AssertionError;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use decision::state::Authorize;
@@ -42,23 +43,32 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    // TODO once every UserObAuthContext has a workflow, hard error if workflow doesn't exist
-    if let Some(wf) = user_auth.workflow() {
-        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-        // Since actions are typed right now, infer which action needs to be sent to the workflow
-        // in order to make it proceed
-        match ww.state {
-            WorkflowKind::Kyc(KycState::DataCollection(_))
-            | WorkflowKind::AlpacaKyc(AlpacaKycState::DataCollection(_)) => {
-                ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
-            }
-            WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
-            | WorkflowKind::Document(DocumentState::DataCollection(_)) => {
-                ww.run(&state, WorkflowActions::DocCollected(DocCollected {}))
-                    .await?;
-            }
-            s => return Err(WorkflowError::WorkflowCannotProceed(newtypes::WorkflowState::from(&s)).into()),
+    let wf = user_auth
+        .workflow()
+        .ok_or(AssertionError("User doesn't have a workflow"))?;
+    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+    // Since actions are typed right now, infer which action needs to be sent to the workflow
+    // in order to make it proceed
+    match ww.state {
+        WorkflowKind::Kyc(KycState::DataCollection(_))
+        | WorkflowKind::AlpacaKyc(AlpacaKycState::DataCollection(_)) => {
+            // If Authorize fails, we don't want to block the user from finishing onboarding onto bifrost
+            let res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;
+            match res {
+                Ok(ww) => {
+                    tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "[Authorize] Ran workflow");
+                }
+                Err(e) => {
+                    tracing::error!(error=%e, "[Authorize] Error running workflow");
+                }
+            };
         }
+        WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
+        | WorkflowKind::Document(DocumentState::DataCollection(_)) => {
+            ww.run(&state, WorkflowActions::DocCollected(DocCollected {}))
+                .await?;
+        }
+        s => return Err(WorkflowError::WorkflowCannotProceed(newtypes::WorkflowState::from(&s)).into()),
     }
     ResponseData::ok(EmptyResponse {}).json()
 }
