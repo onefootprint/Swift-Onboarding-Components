@@ -13,7 +13,7 @@ config:
     db:
       deletionProtection: true
       maxAcus: 64
-      minAcus: 2
+      minAcus: 16
     domain:
       assets: i.onefp.net
       base: api.onefootprint.com
