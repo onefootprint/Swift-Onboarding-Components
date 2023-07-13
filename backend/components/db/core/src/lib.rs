@@ -110,7 +110,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
     let manager = Manager::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
-        .wait_timeout(Some(Duration::from_secs(1)))
+        // .wait_timeout(Some(Duration::from_secs(1)))
         .recycle_timeout(Some(Duration::from_secs(1)))
         .create_timeout(Some(Duration::from_secs(1)))
         .pre_recycle(Hook::sync_fn(move |_, metrics| {
