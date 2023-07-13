@@ -18,11 +18,9 @@ const handleOpen = () => {
         colorError: '#F64B4C',
         colorSuccess: '#46642D',
         colorWarning: '#D06B2F',
-        borderRadius: '0.4rem',
 
         // label
         labelColor: '#545454',
-        labelFont: '400 14px/16px Varta',
 
         // button
         buttonPrimaryBg: '#2D3B46',
