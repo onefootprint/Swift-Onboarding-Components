@@ -7,6 +7,7 @@ import { MissingPermissionsSheetProvider } from './components/missing-permission
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { ImageTypes } from './constants/image-types';
+import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import { IdDocProps } from './types';
 import { MachineContext } from './utils/state-machine';
@@ -17,6 +18,8 @@ const App = ({ context, onDone }: IdDocProps) => {
   if (!customData) {
     return null;
   }
+
+  const { shouldCollectSelfie: isSelfieRequired } = customData.requirement;
 
   const initialContext: MachineContext = {
     authToken,
@@ -39,7 +42,9 @@ const App = ({ context, onDone }: IdDocProps) => {
       <I18nextProvider i18n={configureI18next()}>
         <QueryClientProvider client={queryClient}>
           <MissingPermissionsSheetProvider>
-            <Router onDone={onDone} />
+            <FaceModelProvider selfieRequired={isSelfieRequired}>
+              <Router onDone={onDone} />
+            </FaceModelProvider>
           </MissingPermissionsSheetProvider>
         </QueryClientProvider>
       </I18nextProvider>

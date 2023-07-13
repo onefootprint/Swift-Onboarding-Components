@@ -1,20 +1,17 @@
 import {
   detectSingleFace,
   matchDimensions,
-  nets,
   resizeResults,
   TinyFaceDetectorOptions,
 } from 'face-api.js';
-import { useEffect, useState } from 'react';
 
+import { useFaceModel } from '../../../hooks/use-face-model-loader';
 import {
   calculateFaceAngle,
   isFaceCloseEnough,
   isFaceInTheFrame,
   isHeadStraight,
 } from '../utils/face-utils';
-
-const MODEL_URL = '/model'; // make sure to copy the "model" directory from "@vladmandic/face-api" module to "frontend/apps/handoff/public"
 
 export enum FaceStatus {
   OK = 'ok',
@@ -25,21 +22,9 @@ export enum FaceStatus {
 }
 
 const useFaceDetection = () => {
-  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const modelsLoaded = useFaceModel();
 
   const options = new TinyFaceDetectorOptions();
-
-  useEffect(() => {
-    const loadModels = async () => {
-      Promise.all([
-        nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-      ]).then(() => {
-        setModelsLoaded(true);
-      });
-    };
-    loadModels();
-  }, [modelsLoaded]);
 
   const getFaceStatus = async (
     videoElement: HTMLVideoElement,
