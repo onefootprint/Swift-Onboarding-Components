@@ -14,6 +14,7 @@ use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId};
 use std::collections::HashSet;
+use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
 pub struct ScopedVaultListQueryParams {
@@ -171,40 +172,40 @@ macro_rules! list_query {
                     .select(data_lifetime::vault_id)
                     .get_results($conn)?;
 
-                // TODO should we evaluate these into RAM too?
-                let matching_portable_fp_ids = fingerprint::table
+                let matching_portable_fp_ids: Vec<VaultId> = fingerprint::table
                     .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
                     // PORTABLE visibility filters
                     .filter(data_lifetime::deactivated_seqno.is_null())
                     .filter(not(data_lifetime::portablized_seqno.is_null()))
                     // Matching filter
                     .filter(fingerprint::sh_data.eq_any(fingerprints))
-                    .select(data_lifetime::vault_id);
+                    .select(data_lifetime::vault_id)
+                    .get_results($conn)?;
 
-                let matching_portable_plaintext_ids = vault_data::table
+                let matching_portable_plaintext_ids: Vec<VaultId> = vault_data::table
                     .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
                     // PORTABLE visibility filters
                     .filter(data_lifetime::deactivated_seqno.is_null())
                     .filter(not(data_lifetime::portablized_seqno.is_null()))
                     // Matching filter
                     .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
-                    .select(data_lifetime::vault_id);
+                    .select(data_lifetime::vault_id)
+                    .get_results($conn)?;
 
                 let all_ids: HashSet<_> = vec![
                     matching_speculative_fp_ids.into_iter(),
                     matching_speculative_plaintext_ids.into_iter(),
+                    matching_portable_fp_ids.into_iter(),
+                    matching_portable_plaintext_ids.into_iter(),
                 ].into_iter().flatten().collect();
-                query = query.filter(
-                    scoped_vault::vault_id.eq_any(all_ids)
-                        .or(scoped_vault::vault_id.eq_any(matching_portable_fp_ids))
-                        .or(scoped_vault::vault_id.eq_any(matching_portable_plaintext_ids))
-                );
+                query = query.filter(scoped_vault::vault_id.eq_any(all_ids));
             }
             query
         }
     };
 }
 
+#[instrument(skip_all)]
 pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
     // TODO in the API requests where we do count and list, we should save results of subqueries in RAM
     let query = list_query!(conn, params);
@@ -213,6 +214,7 @@ pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQue
 }
 
 /// lists all scoped_vaults across all configurations
+#[instrument(skip_all)]
 pub fn list_authorized_for_tenant(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,
