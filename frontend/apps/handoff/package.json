@@ -55,5 +55,8 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"
+  },
+  "browser": {
+    "fs": false
   }
 }

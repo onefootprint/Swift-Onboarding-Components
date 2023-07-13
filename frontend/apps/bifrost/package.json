@@ -69,5 +69,8 @@
     "setupFiles": [
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
     ]
+  },
+  "browser": {
+    "fs": false
   }
 }

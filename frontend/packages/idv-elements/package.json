@@ -86,5 +86,8 @@
     "setupFilesAfterEnv": [
       "<rootDir>/src/utils/tests/setupTests.js"
     ]
+  },
+  "browser": {
+    "fs": false
   }
 }
