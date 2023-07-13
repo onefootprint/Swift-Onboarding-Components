@@ -6,7 +6,6 @@ use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use db::models::tenant_api_key::TenantApiKey;
-use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantApiKeyId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -33,31 +32,23 @@ async fn post(
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
-    let (key, role, last_used_at) = state
+    let (key, role) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
-            let last_used_at = TenantApiKeyAccessLog::get(conn, vec![&key.id])?
-                .get(&key.id)
-                .map(|x| x.to_owned());
-            Ok((key, role, last_used_at))
+            Ok((key, role))
         })
         .await??;
 
     let tenant = auth.tenant();
     let decrypted_secret_key = state
         .enclave_client
-        .decrypt_to_piistring(
-            &key.e_secret_api_key,
-            &tenant.e_private_key,
-            vec![],
-        )
+        .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key, vec![])
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         key,
         role,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
-        last_used_at,
     )))))
 }

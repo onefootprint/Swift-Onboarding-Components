@@ -1,4 +1,3 @@
-use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -28,6 +27,7 @@ pub struct TenantApiKey {
     pub name: String,
     pub created_at: DateTime<Utc>,
     pub role_id: TenantRoleId,
+    pub last_used_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -166,7 +166,20 @@ impl TenantApiKey {
         if role.tenant_id != api_key.tenant_id {
             return Err(DbError::TenantRoleMismatch);
         }
-        TenantApiKeyAccessLog::create(conn, api_key.id.clone())?;
+        let update_last_used_at = match api_key.last_used_at {
+            // Save when the key was last used if at least 5 seconds have passed since the last use
+            Some(d) if (Utc::now() - d).num_seconds() > 5 => true,
+            None => true,
+            _ => false,
+        };
+        let api_key = if update_last_used_at {
+            diesel::update(tenant_api_key::table)
+                .filter(tenant_api_key::id.eq(api_key.id))
+                .set(tenant_api_key::last_used_at.eq(Utc::now()))
+                .get_result(conn)?
+        } else {
+            api_key
+        };
         Ok((api_key, tenant, role))
     }
 

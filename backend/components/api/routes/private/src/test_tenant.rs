@@ -149,18 +149,14 @@ async fn post(
     // Get the actual raw API key value
     let decrypted_api_key = state
         .enclave_client
-        .decrypt_to_piistring(
-            &api_key.e_secret_api_key,
-            &tenant.e_private_key,
-            vec![],
-        )
+        .decrypt_to_piistring(&api_key.e_secret_api_key, &tenant.e_private_key, vec![])
         .await?;
     let decrypted_api_key = SecretApiKey::from(decrypted_api_key.leak().to_string());
 
     Ok(Json(ResponseData {
         data: NewClientResponse {
             org_id: tenant.id,
-            key: api_wire_types::SecretApiKey::from_db((api_key, role, Some(decrypted_api_key), None)),
+            key: api_wire_types::SecretApiKey::from_db((api_key, role, Some(decrypted_api_key))),
             auth_token,
             tenant_user_id: rb.tenant_user_id,
         },

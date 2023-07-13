@@ -11,7 +11,6 @@ use api_core::errors::tenant::TenantError;
 use api_wire_types::ApiKeyFilters;
 use chrono::{DateTime, Utc};
 use db::models::tenant_api_key::{ApiKeyListFilters, TenantApiKey};
-use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
 use newtypes::secret_api_key::SecretApiKey;
@@ -44,14 +43,12 @@ pub async fn get(
         role_ids,
         status,
     };
-    let (keys, id_to_last_used, count) = state
+    let (keys, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let keys = TenantApiKey::list(conn, &query, cursor, (page_size + 1) as i64)?;
             let count = TenantApiKey::count(conn, &query)?;
-            let tenant_api_key_ids = keys.iter().map(|x| &x.0.id).collect();
-            let id_to_last_used = TenantApiKeyAccessLog::get(conn, tenant_api_key_ids)?;
-            Ok((keys, id_to_last_used, count))
+            Ok((keys, count))
         })
         .await??;
 
@@ -59,10 +56,7 @@ pub async fn get(
     let keys = keys
         .into_iter()
         .take(page_size)
-        .map(|(key, role)| {
-            let last_used = id_to_last_used.get(&key.id).copied();
-            (key, role, None, last_used)
-        })
+        .map(|(key, role)| (key, role, None))
         .map(api_wire_types::SecretApiKey::from_db)
         .collect::<Vec<api_wire_types::SecretApiKey>>();
     Ok(Json(CursorPaginatedResponse::ok(keys, cursor, Some(count))))
@@ -106,7 +100,6 @@ pub async fn post(
         api_key,
         role,
         Some(secret_key),
-        None,
     )))))
 }
 
@@ -149,6 +142,6 @@ pub async fn patch(
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
-        api_key, role, None, None,
+        api_key, role, None,
     )))))
 }
