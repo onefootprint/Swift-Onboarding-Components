@@ -2,17 +2,17 @@ import themes from '@onefootprint/design-tokens';
 import { customRenderHook, waitFor } from '@onefootprint/test-utils';
 import { D2PStatus } from '@onefootprint/types';
 
-import useExtendedAppearance from './use-extended-appearance';
+import useStyleParams from './use-style-params';
 import {
   authTokenFixture,
   withD2PStatus,
-} from './use-extended-appearance.test.config';
+} from './use-style-params.test.config';
 
 const defaultTheme = themes.light;
 
 // TODO:
 // https://linear.app/footprint/issue/FP-4116/test-in-ci-is-taking-too-long
-describe.skip('useExtendedAppearance', () => {
+describe.skip('useStyleParams', () => {
   describe('when the d2p has a valid style params', () => {
     beforeEach(() => {
       withD2PStatus({
@@ -26,7 +26,7 @@ describe.skip('useExtendedAppearance', () => {
 
     it('should just return the default theme', async () => {
       const { result } = customRenderHook(() =>
-        useExtendedAppearance(authTokenFixture),
+        useStyleParams(authTokenFixture),
       );
 
       const expectedTheme = structuredClone(defaultTheme);
@@ -54,7 +54,7 @@ describe.skip('useExtendedAppearance', () => {
 
     it('should just return the extended theme', async () => {
       const { result } = customRenderHook(() =>
-        useExtendedAppearance(authTokenFixture),
+        useStyleParams(authTokenFixture),
       );
       await waitFor(() => {
         expect(result.current.data).toEqual(defaultTheme);
@@ -74,7 +74,7 @@ describe.skip('useExtendedAppearance', () => {
 
     it('should just return the default theme', async () => {
       const { result } = customRenderHook(() =>
-        useExtendedAppearance(authTokenFixture),
+        useStyleParams(authTokenFixture),
       );
       await waitFor(() => {
         expect(result.current.data).toEqual(defaultTheme);

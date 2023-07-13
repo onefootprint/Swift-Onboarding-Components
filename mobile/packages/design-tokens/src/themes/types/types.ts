@@ -5,6 +5,7 @@ import type {
   Input,
   Label,
   LinkButton,
+  RadioSelect,
 } from './components';
 
 export type UIStates = {
@@ -141,6 +142,7 @@ export type Theme = {
     label: Label;
     hint: Hint;
     input: Input;
+    radioSelect: RadioSelect;
   };
 };
 

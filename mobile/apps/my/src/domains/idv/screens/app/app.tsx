@@ -3,13 +3,12 @@ import styled, { css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React from 'react';
 
-import { REVIEW_AUTH_TOKEN } from '@/config/constants';
+import createTheme from '@/utils/create-theme';
 
-import AppStoreReview from '../app-store-review';
 import Error from '../error';
 import Router from '../router';
-import ThemeProvider from './components/theme-provider';
-import useParseHandoffUrl from './hooks/use-parse-handoff-url';
+import useAuthToken from './hooks/use-auth-token';
+import useStyleParams from './hooks/use-style-params';
 
 type AppProps = {
   linkingUrl?: string;
@@ -17,9 +16,12 @@ type AppProps = {
 };
 
 const App = ({ linkingUrl, onLoad }: AppProps) => {
-  const { isError, data } = useParseHandoffUrl(linkingUrl);
+  const tokenQuery = useAuthToken(linkingUrl);
+  const authToken = tokenQuery.data?.authToken;
+  const styleQuery = useStyleParams(authToken);
+  const styleParams = styleQuery.data;
 
-  if (isError) {
+  if (tokenQuery.isError) {
     return (
       <DesignSystemProvider theme={themes.light}>
         <Container onLayout={onLoad}>
@@ -28,17 +30,14 @@ const App = ({ linkingUrl, onLoad }: AppProps) => {
       </DesignSystemProvider>
     );
   }
-  if (data) {
+  if (authToken && styleQuery.isFetched) {
+    const theme = createTheme(themes.light, styleParams);
     return (
-      <ThemeProvider authToken={data.authToken}>
+      <DesignSystemProvider theme={theme}>
         <Container onLayout={onLoad}>
-          {data.authToken === REVIEW_AUTH_TOKEN ? (
-            <AppStoreReview authToken={data.authToken} />
-          ) : (
-            <Router authToken={data.authToken} />
-          )}
+          <Router authToken={authToken} />
         </Container>
-      </ThemeProvider>
+      </DesignSystemProvider>
     );
   }
   return null;

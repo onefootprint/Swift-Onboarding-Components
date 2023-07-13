@@ -1,9 +1,9 @@
-import themes, { Theme } from '@onefootprint/design-tokens';
+import { Theme } from '@onefootprint/design-tokens';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
-import { FootprintAppearanceVariables } from '../../theme.types';
 import variablesMap from './constants/variables-map';
+import { FootprintAppearanceVariables } from './theme.types';
 
 const mutateTheme = (options: {
   theme: Theme;
@@ -50,8 +50,8 @@ const iterateOverVariables = (options: {
 };
 
 export const createTokens = (
-  variables: FootprintAppearanceVariables,
   baseTheme: Theme,
+  variables: FootprintAppearanceVariables,
 ): Theme => {
   if (!variables || Object.keys(variables).length === 0) return baseTheme;
   return Object.entries(variables).reduce((theme, [tokenName, tokenValue]) => {
@@ -59,19 +59,11 @@ export const createTokens = (
   }, baseTheme);
 };
 
-const createTheme = (appearanceAsString: string): Theme => {
-  const appearance = parseString(appearanceAsString);
-  if (!appearance) return themes.light;
-  const variables = parseUriComponent(appearance.variables);
-  return createTokens(variables, cloneDeep(themes.light));
-};
-
-const parseString = (params: string) => {
-  try {
-    return JSON.parse(params);
-  } catch (_) {
-    return null;
-  }
+const createTheme = (baseTheme: Theme, styleParams: string = ''): Theme => {
+  if (!styleParams) return baseTheme;
+  const appearance = parseUriComponent(styleParams);
+  if (!appearance) return baseTheme;
+  return createTokens(cloneDeep(baseTheme), appearance.variables);
 };
 
 const parseUriComponent = (params: string) => {

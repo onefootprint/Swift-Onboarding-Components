@@ -4,8 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '@/config/constants';
 
-import createTheme from './theme-factory/create-theme';
-
 const getD2PStatus = async (authToken: string) => {
   const response = await request<GetD2PResponse>({
     method: 'GET',
@@ -14,16 +12,13 @@ const getD2PStatus = async (authToken: string) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  return response.data;
+  return response.data.meta.styleParams;
 };
 
-const getAppearance = async (authToken: string) => {
-  const response = await getD2PStatus(authToken);
-  return createTheme(response.meta.styleParams ?? '');
+const useStyleParams = (authToken: string = '') => {
+  return useQuery(['appearance', authToken], () => getD2PStatus(authToken), {
+    enabled: !!authToken,
+  });
 };
 
-const useExtendedAppearance = (authToken: string) => {
-  return useQuery(['appearance', authToken], () => getAppearance(authToken));
-};
-
-export default useExtendedAppearance;
+export default useStyleParams;

@@ -14,7 +14,7 @@ const getToken = (url?: string) => {
   return { authToken: decodeURI(authToken) };
 };
 
-const useParseHandoffUrl = (deepLinkUrl = '') => {
+const useAuthToken = (deepLinkUrl = '') => {
   const debugUrl = IS_DEV ? DEBUG_HANDOFF_URL : undefined;
   const url = debugUrl || deepLinkUrl;
   return useQuery({
@@ -23,4 +23,4 @@ const useParseHandoffUrl = (deepLinkUrl = '') => {
   });
 };
 
-export default useParseHandoffUrl;
+export default useAuthToken;

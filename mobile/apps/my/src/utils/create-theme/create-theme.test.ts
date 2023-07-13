@@ -1,7 +1,7 @@
 import themes from '@onefootprint/design-tokens';
 
-import { FootprintAppearanceVariables } from '../../theme.types';
 import createTheme, { createTokens } from './create-theme';
+import { FootprintAppearanceVariables } from './theme.types';
 
 const defaultTheme = themes.light;
 
@@ -9,7 +9,7 @@ describe('create theme', () => {
   describe('createTokens', () => {
     it('should return the default theme when no variables are passed', () => {
       const variables: FootprintAppearanceVariables = {};
-      expect(createTokens(variables, defaultTheme)).toEqual(defaultTheme);
+      expect(createTokens(defaultTheme, variables)).toEqual(defaultTheme);
     });
 
     describe('global definitions', () => {
@@ -18,11 +18,12 @@ describe('create theme', () => {
           borderRadius: '10px',
         };
         const expectedTheme = structuredClone(defaultTheme);
-        const { button, input } = expectedTheme.components;
+        const { button, input, radioSelect } = expectedTheme.components;
         expectedTheme.borderRadius.default = '10px';
         button.borderRadius = '10px';
         input.global.borderRadius = '10px';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        radioSelect.borderRadius = '10px';
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
 
@@ -35,7 +36,7 @@ describe('create theme', () => {
         const { button } = expectedTheme.components;
         button.variant.primary.bg = 'green';
         button.variant.primary.active.bg = 'green';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
 
@@ -48,7 +49,7 @@ describe('create theme', () => {
         const { linkButton } = expectedTheme.components;
         linkButton.variant.default.color.text.initial = 'red';
         linkButton.variant.default.color.text.active = 'red';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
 
@@ -60,7 +61,7 @@ describe('create theme', () => {
         const expectedTheme = structuredClone(defaultTheme);
         const { label } = expectedTheme.components;
         label.states.default.color = 'purple';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
 
@@ -72,7 +73,7 @@ describe('create theme', () => {
         const expectedTheme = structuredClone(defaultTheme);
         const { hint } = expectedTheme.components;
         hint.states.default.color = 'blue';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
 
@@ -86,7 +87,7 @@ describe('create theme', () => {
         input.state.default.initial.bg = 'black';
         input.state.default.hover.bg = 'black';
         input.state.default.focus.bg = 'black';
-        expect(createTokens(variables, defaultTheme)).toEqual(expectedTheme);
+        expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
   });
@@ -94,16 +95,17 @@ describe('create theme', () => {
   describe('createTheme', () => {
     it('should generate the theme correctly', () => {
       const styleParams =
-        '{"variables":"%7B%22borderRadius%22%3A%220px%22%2C%22buttonPrimaryBg%22%3A%22purple%22%7D"}';
+        '{"variables":{"borderRadius": "0px", "buttonPrimaryBg": "purple"}}';
 
       const expectedTheme = structuredClone(defaultTheme);
-      const { button, input } = expectedTheme.components;
+      const { button, input, radioSelect } = expectedTheme.components;
       expectedTheme.borderRadius.default = '0px';
       button.borderRadius = '0px';
       input.global.borderRadius = '0px';
+      radioSelect.borderRadius = '0px';
       button.variant.primary.bg = 'purple';
       button.variant.primary.active.bg = 'purple';
-      expect(createTheme(styleParams)).toEqual(expectedTheme);
+      expect(createTheme(defaultTheme, styleParams)).toEqual(expectedTheme);
     });
   });
 });

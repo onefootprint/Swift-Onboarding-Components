@@ -49,9 +49,11 @@ const DocSelection = ({ onSubmit }: DocSelectionProps) => {
 
   return (
     <Container>
-      <Box center marginBottom={7} marginTop={3} >
-        <IcoIdGeneric40  />
-        <Typography variant="heading-3" marginTop={7} marginBottom={3}>{t('title')}</Typography>
+      <Box center marginBottom={7} marginTop={3}>
+        <IcoIdGeneric40 />
+        <Typography variant="heading-3" marginTop={7} marginBottom={3}>
+          {t('title')}
+        </Typography>
         <Typography variant="body-2">{t('subtitle')}</Typography>
       </Box>
       <Box justifyContent="space-between" flex={1}>
