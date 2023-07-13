@@ -76,6 +76,21 @@ impl<'conn, 'query> ConnectionGatWorkaround<'conn, 'query, Pg, PgRowByRowLoading
     type Row = <PgConnection as ConnectionGatWorkaround<'conn, 'query, Pg, PgRowByRowLoadingMode>>::Row;
 }
 
+impl InstrumentedPgConnection {
+    #[instrument(skip_all)]
+    fn get_pg_connection_info(conn: &mut PgConnection) -> Result<PgConnectionInfo, ConnectionError> {
+        let info: PgConnectionInfo = select((
+            current_database(),
+            inet_server_addr(),
+            inet_server_port(),
+            version(),
+        ))
+        .get_result(conn)
+        .map_err(ConnectionError::CouldntSetupConfiguration)?;
+        Ok(info)
+    }
+}
+
 impl Connection for InstrumentedPgConnection {
     type Backend = Pg;
     type TransactionManager = AnsiTransactionManager;
@@ -98,14 +113,7 @@ impl Connection for InstrumentedPgConnection {
         let mut conn = PgConnection::establish(database_url)?;
 
         debug!("querying postgresql connection information");
-        let info: PgConnectionInfo = select((
-            current_database(),
-            inet_server_addr(),
-            inet_server_port(),
-            version(),
-        ))
-        .get_result(&mut conn)
-        .map_err(ConnectionError::CouldntSetupConfiguration)?;
+        let info = Self::get_pg_connection_info(&mut conn)?;
 
         let span = tracing::Span::current();
         span.record("db.name", info.current_database.as_str());
