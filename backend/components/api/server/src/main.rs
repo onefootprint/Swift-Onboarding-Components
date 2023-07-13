@@ -54,11 +54,6 @@ async fn run_server() -> std::io::Result<()> {
         .await
         .expect("failed to run custom migrations");
 
-    // only perform Socure Reason Code API check on prod startups
-    if config.service_config.is_production() {
-        socure_reason_code_check(&state.config).await;
-    }
-
     log::info!("starting server on port {}", config.port);
 
     // Export metrics
@@ -136,6 +131,7 @@ async fn default_not_found() -> impl actix_web::Responder {
     ApiError::EndpointNotFound.error_response()
 }
 
+#[allow(unused)]
 #[allow(clippy::expect_used)]
 #[tracing::instrument(skip(config))]
 async fn socure_reason_code_check(config: &Config) {
