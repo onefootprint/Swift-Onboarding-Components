@@ -8,7 +8,7 @@ use db_schema::schema::tenant_role::{self, BoxedQuery};
 use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{ApiKeyStatus, Locked, TenantId, TenantRoleId, TenantScope};
+use newtypes::{ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantScope};
 
 pub type IsImmutable = bool;
 pub type NumActiveUsers = i64;
@@ -54,10 +54,34 @@ impl ImmutableRoleKind {
 }
 
 impl TenantRole {
-    fn validate_scopes(scopes: &[TenantScope]) -> DbResult<()> {
+    fn validate_scopes(conn: &mut PgConn, scopes: &[TenantScope], tenant_id: &TenantId) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
             // Every role must have at least Read permissions for now
             return Err(DbError::InsufficientTenantScopes);
+        }
+        if scopes.iter().unique().count() != scopes.len() {
+            return Err(DbError::NonUniqeTenantScopes);
+        }
+        use db_schema::schema::proxy_config;
+        let proxy_config_ids = scopes
+            .iter()
+            .filter_map(|s| match s {
+                TenantScope::InvokeVaultProxy {
+                    data: InvokeVaultProxyPermission::Id { id },
+                } => Some(id.clone()),
+                _ => None,
+            })
+            .collect_vec();
+
+        if !proxy_config_ids.is_empty() {
+            let proxy_configs_count: i64 = proxy_config::table
+                .filter(proxy_config::tenant_id.eq(tenant_id))
+                .filter(proxy_config::id.eq_any(&proxy_config_ids))
+                .count()
+                .get_result(conn)?;
+            if (proxy_config_ids.len() as i64) != proxy_configs_count {
+                return Err(DbError::InvalidProxyConfigId);
+            }
         }
         Ok(())
     }
@@ -114,7 +138,7 @@ impl TenantRole {
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
     ) -> DbResult<Self> {
-        Self::validate_scopes(&scopes)?;
+        Self::validate_scopes(conn, &scopes, &tenant_id)?;
         let new = NewTenantRoleRow {
             tenant_id,
             name,
@@ -205,18 +229,18 @@ impl TenantRole {
         name: Option<String>,
         scopes: Option<Vec<TenantScope>>,
     ) -> DbResult<Self> {
+        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if let Some(scopes) = scopes.as_ref() {
-            Self::validate_scopes(scopes)?;
+            Self::validate_scopes(conn, scopes, &role.tenant_id)?;
+        }
+        if role.is_immutable {
+            return Err(DbError::CannotUpdateImmutableRole(role.name));
         }
         let update = TenantRoleUpdate {
             name,
             scopes,
             ..TenantRoleUpdate::default()
         };
-        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
-        if role.is_immutable {
-            return Err(DbError::CannotUpdateImmutableRole(role.name));
-        }
         let results: Vec<Self> = diesel::update(tenant_role::table)
             .filter(tenant_role::id.eq(id))
             .filter(tenant_role::tenant_id.eq(tenant_id))

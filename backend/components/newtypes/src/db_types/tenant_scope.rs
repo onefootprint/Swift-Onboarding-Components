@@ -10,6 +10,7 @@ use strum::{AsRefStr, EnumDiscriminants};
     Clone,
     Eq,
     PartialEq,
+    Hash,
     AsRefStr,
     EnumDiscriminants,
     Apiv2Schema,

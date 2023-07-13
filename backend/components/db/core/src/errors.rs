@@ -66,6 +66,10 @@ pub enum DbError {
     CannotUpdateImmutableRole(String),
     #[error("Tenant role scopes must include at least Read")]
     InsufficientTenantScopes,
+    #[error("Tenant role scopes must be unique")]
+    NonUniqeTenantScopes,
+    #[error("Proxy config with provided ID does not exist")]
+    InvalidProxyConfigId,
     #[error("{0}")]
     ValidationError(String),
 

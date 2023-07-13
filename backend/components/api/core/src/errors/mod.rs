@@ -195,6 +195,8 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
         DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
         DbError::InsufficientTenantScopes => StatusCode::BAD_REQUEST,
+        DbError::NonUniqeTenantScopes => StatusCode::BAD_REQUEST,
+        DbError::InvalidProxyConfigId => StatusCode::BAD_REQUEST,
         DbError::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
         DbError::ValidationError(_) => StatusCode::BAD_REQUEST,
     }
