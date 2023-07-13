@@ -31,6 +31,7 @@ mod tenant_scope;
 mod user_timeline_event;
 mod vault_key_pair;
 mod vault_kind;
+mod vault_proxy_permission;
 mod vendor;
 mod verification_status;
 mod watchlist_check;
@@ -44,5 +45,6 @@ pub use self::{
     liveness_source::*, manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*,
     org_member_email::*, proxy_ingress_kind::*, requirement_status::*, risk_signal_group::*, sealed_bytes::*,
     session_kind::*, task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*,
-    vault_kind::*, vendor::*, verification_status::*, watchlist_check::*, workflow::*,
+    vault_kind::*, vault_proxy_permission::*, vendor::*, verification_status::*, watchlist_check::*,
+    workflow::*,
 };

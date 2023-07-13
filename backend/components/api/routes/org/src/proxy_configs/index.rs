@@ -83,7 +83,7 @@ pub async fn post(
     request: Json<CreateProxyConfigRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
-    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
+    let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;
@@ -191,7 +191,7 @@ pub async fn patch(
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
-    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
+    let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;

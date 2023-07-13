@@ -2,7 +2,10 @@ use super::{CanCheckTenantGuard, IsGuardMet, TenantAuth};
 use crate::auth::{CanDecrypt, Either};
 use either::Either::{Left, Right};
 use itertools::Itertools;
-use newtypes::{CollectedDataOption as CDO, DataIdentifier, DocumentKind, DocumentSide, TenantScope};
+use newtypes::{
+    CollectedDataOption as CDO, DataIdentifier, DocumentKind, DocumentSide, InvokeVaultProxyPermission,
+    TenantScope,
+};
 use std::collections::HashSet;
 use strum::Display;
 
@@ -17,8 +20,8 @@ pub enum TenantGuard {
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
+    ManageVaultProxy,
     ManualReview,
-    VaultProxy,
     CipIntegration,
     TriggerKyc,
 }
@@ -33,8 +36,8 @@ impl TenantGuard {
             Self::OnboardingConfiguration => TenantScope::OnboardingConfiguration,
             Self::ApiKeys => TenantScope::ApiKeys,
             Self::OrgSettings => TenantScope::OrgSettings,
+            Self::ManageVaultProxy => TenantScope::ManageVaultProxy,
             Self::ManualReview => TenantScope::ManualReview,
-            Self::VaultProxy => TenantScope::VaultProxy,
             Self::CipIntegration => TenantScope::CipIntegration,
             Self::TriggerKyc => TenantScope::TriggerKyc,
         }
@@ -44,6 +47,20 @@ impl TenantGuard {
 impl IsGuardMet<TenantScope> for TenantGuard {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         token_scopes.contains(&self.granting_scope())
+    }
+}
+
+impl IsGuardMet<TenantScope> for InvokeVaultProxyPermission {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        let allowed_vault_proxy_permissions = token_scopes
+            .iter()
+            .filter_map(|ts| match ts {
+                TenantScope::InvokeVaultProxy { data } => Some(data),
+                _ => None,
+            })
+            .collect_vec();
+        allowed_vault_proxy_permissions.contains(&&InvokeVaultProxyPermission::Any)
+            || allowed_vault_proxy_permissions.contains(&&self)
     }
 }
 

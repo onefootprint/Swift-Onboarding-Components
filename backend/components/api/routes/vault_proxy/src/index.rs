@@ -1,6 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 
@@ -17,7 +16,9 @@ use crate::State;
 
 use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
+use api_core::auth::tenant::TenantAuth;
 use api_core::utils::body_bytes::BodyBytes;
+use newtypes::InvokeVaultProxyPermission;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
 
@@ -40,7 +41,7 @@ pub async fn just_in_time(
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
-
+    let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
     invoke_vault_proxy(
         state,
         auth,
@@ -68,6 +69,7 @@ pub async fn id(
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
     let id = proxy_config_id.into_inner();
+    let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
     invoke_vault_proxy(
         state,
         auth,
@@ -84,18 +86,15 @@ enum ProxySource {
     JustInTime(ProxyConfig),
 }
 
-#[tracing::instrument(skip(state, body_bytes, source, request))]
+#[tracing::instrument(skip_all)]
 async fn invoke_vault_proxy(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: Box<dyn TenantAuth>,
     source: ProxySource,
     body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
 ) -> ApiResult<HttpResponse> {
-    // Will eventually require the permission to decrypt attributes
-    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
-
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
         return Err(ApiError::InvalidProxyBody);

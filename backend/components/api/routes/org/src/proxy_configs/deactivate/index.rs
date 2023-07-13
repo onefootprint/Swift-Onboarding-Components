@@ -20,7 +20,7 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     proxy_config_id: web::Path<ProxyConfigId>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::VaultProxy)?;
+    let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;

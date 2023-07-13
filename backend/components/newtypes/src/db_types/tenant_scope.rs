@@ -1,4 +1,4 @@
-use crate::CollectedDataOption;
+use crate::{CollectedDataOption, InvokeVaultProxyPermission};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -40,8 +40,10 @@ pub enum TenantScope {
     ApiKeys,
     /// Allows updating org settings, roles, and users
     OrgSettings,
-    /// Allows updating and creating vault proxy configuration
-    VaultProxy,
+    /// Allows updating and creating vault proxy configurations
+    ManageVaultProxy,
+    /// Allows invoking the vault proxy
+    InvokeVaultProxy { data: InvokeVaultProxyPermission },
     /// Allows performing manual review actions on users, like making a new decision or adding an annotation
     ManualReview,
     /// Allows creating new users and updating existing entities' data
@@ -73,6 +75,7 @@ pub enum TenantScope {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ProxyConfigId;
     use test_case::test_case;
 
     #[test_case(TenantScope::Decrypt{data: CollectedDataOption::FullAddress} => "{\"kind\":\"decrypt\",\"data\":\"full_address\"}")]
@@ -85,6 +88,8 @@ mod tests {
     #[test_case(TenantScope::OrgSettings => "{\"kind\":\"org_settings\"}")]
     #[test_case(TenantScope::DecryptCustom => "{\"kind\":\"decrypt_custom\"}")]
     #[test_case(TenantScope::ManualReview => "{\"kind\":\"manual_review\"}")]
+    #[test_case(TenantScope::InvokeVaultProxy{data: InvokeVaultProxyPermission::Any} => "{\"kind\":\"invoke_vault_proxy\",\"data\":{\"kind\":\"any\"}}")]
+    #[test_case(TenantScope::InvokeVaultProxy{data: InvokeVaultProxyPermission::Id{id: ProxyConfigId::from("abc".to_owned())}} => "{\"kind\":\"invoke_vault_proxy\",\"data\":{\"kind\":\"id\",\"id\":\"abc\"}}")]
     fn test_to_string(identifier: TenantScope) -> String {
         serde_json::ser::to_string(&identifier).unwrap()
     }
@@ -99,6 +104,8 @@ mod tests {
     #[test_case("{\"kind\": \"org_settings\"}" => TenantScope::OrgSettings)]
     #[test_case("{\"kind\": \"decrypt_custom\"}" => TenantScope::DecryptCustom)]
     #[test_case("{\"kind\": \"manual_review\"}" => TenantScope::ManualReview)]
+    #[test_case("{\"kind\": \"invoke_vault_proxy\", \"data\": {\"kind\": \"any\"}}" => TenantScope::InvokeVaultProxy{data: InvokeVaultProxyPermission::Any})]
+    #[test_case("{\"kind\": \"invoke_vault_proxy\", \"data\": {\"kind\": \"id\", \"id\": \"abc\"}}" => TenantScope::InvokeVaultProxy{data: InvokeVaultProxyPermission::Id{id: ProxyConfigId::from("abc".to_owned())}})]
     fn test_from_str(input: &str) -> TenantScope {
         serde_json::de::from_str(input).unwrap()
     }
