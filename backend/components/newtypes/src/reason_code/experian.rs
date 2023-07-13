@@ -169,7 +169,7 @@ vendor_reason_code_enum! {
         #[footprint_reason_code = Some(FootprintReasonCode::DobNotOnFile)]
         NotOnFile,
         #[ser = "5", description = "SSN not on file, search cannot be performed"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(FootprintReasonCode::DobCouldNotMatch)]
         SsnNotOnFile,
         #[ser = "6", description = "DOB not provided on search request"]
         #[footprint_reason_code = None]

@@ -284,15 +284,15 @@ footprint_reason_code_enum! {
         // ~~~~~~~~~ DOB ~~~~~~~~~~~~~~~
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "DOB year mismatch", severity = SignalSeverity::High,  description = "The year of birth located does not match the input."]
+        #[note = "DOB year mismatch", severity = SignalSeverity::Medium,  description = "The year of birth located does not match the input."]
         DobYobDoesNotMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "DOB year mismatch by 1", severity = SignalSeverity::Medium,  description = "A one year difference between the YOB input and the YOB located."]
+        #[note = "DOB year mismatch by 1", severity = SignalSeverity::Low,  description = "A one year difference between the YOB input and the YOB located."]
         DobYobDoesNotMatchWithin1Year,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "DOB month mismatch", severity = SignalSeverity::Medium,  description = "Month of birth input does not match the month of birth located."]
+        #[note = "DOB month mismatch", severity = SignalSeverity::Low,  description = "Month of birth input does not match the month of birth located."]
         DobMobDoesNotMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
@@ -316,7 +316,7 @@ footprint_reason_code_enum! {
         DobLocatedCoppaAlert,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Dob does not match", severity = SignalSeverity::High,  description = "DOB located does not match input"]
+        #[note = "Dob does not match", severity = SignalSeverity::Medium,  description = "DOB located does not match input"]
         DobDoesNotMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
@@ -324,8 +324,14 @@ footprint_reason_code_enum! {
         DobPartialMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
-        #[note = "Dob was not found on file", severity = SignalSeverity::Medium,  description = "No DOB was located for the individual"]
+        #[note = "Dob was not found on file", severity = SignalSeverity::Low,  description = "No DOB was located for the individual"]
         DobNotOnFile,
+
+        #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "Dob could not be matched", severity = SignalSeverity::Low,  description = "DOB could not be matched"]
+        DobCouldNotMatch,
+
+
 
 
         // ~~~~~~~~~~~~ SSN ~~~~~~~~~~~~
