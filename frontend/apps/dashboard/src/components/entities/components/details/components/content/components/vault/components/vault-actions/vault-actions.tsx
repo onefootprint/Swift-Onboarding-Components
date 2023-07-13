@@ -29,7 +29,7 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {controls.isIdle && (
         <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
-          <Box sx={{ display: 'flex', gap: 3 }}>
+          <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
             <Button
               disabled={!canDecrypt}
               onClick={controls.start}
