@@ -151,17 +151,22 @@ pub async fn post(
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             // Vault the images under latest uploads
-            for (side, s3_url) in s3_urls.iter() {
-                let kind = DocumentKind::LatestUpload(id_doc.document_type, *side).into();
-                let name = format!("{}.png", kind);
-                let mime_type = "image/png".to_string();
-                uvw.put_document_unsafe(conn, kind, mime_type, name, e_data_key.clone(), s3_url.clone())?;
-            }
+            let s3_urls = s3_urls
+                .into_iter()
+                .map(|(side, s3_url)| -> ApiResult<_> {
+                    let kind = DocumentKind::LatestUpload(id_doc.document_type, side).into();
+                    let name = format!("{}.png", kind);
+                    let mt = "image/png".to_string();
+                    let (_, seqno) =
+                        uvw.put_document_unsafe(conn, kind, mt, name, e_data_key.clone(), s3_url.clone())?;
+                    Ok((side, s3_url, seqno))
+                })
+                .collect::<ApiResult<Vec<_>>>()?;
             // Create each of the uploads
             s3_urls
                 .into_iter()
-                .map(|(side, s3_url)| {
-                    DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone())
+                .map(|(side, s3_url, seqno)| {
+                    DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone(), seqno)
                 })
                 .collect::<db::DbResult<Vec<_>>>()?;
             let existing_sides = id_doc.images(conn)?.into_iter().map(|u| u.side).collect_vec();

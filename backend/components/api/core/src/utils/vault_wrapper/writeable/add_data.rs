@@ -12,7 +12,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
 use db::{DbError, PgConn, TxnPgConn};
 use itertools::Itertools;
-use newtypes::{BusinessDataKind as BDK, S3Url};
+use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, S3Url};
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
     DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString,
@@ -183,7 +183,7 @@ impl WriteableVw<Person> {
         filename: String,
         e_data_key: SealedVaultDataKey,
         s3_url: S3Url,
-    ) -> ApiResult<DocumentData> {
+    ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
 
@@ -196,7 +196,7 @@ impl WriteableVw<Person> {
 
         self.add_document_uploaded_timeline_event(conn, doc.id.clone())?;
 
-        Ok(doc)
+        Ok((doc, seqno))
     }
 
     fn add_document_uploaded_timeline_event(

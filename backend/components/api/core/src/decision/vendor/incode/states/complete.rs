@@ -79,7 +79,7 @@ impl Complete {
                 let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
                 let name = format!("{}.png", kind);
                 let mime_type = "image/png".to_string();
-                let r = uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url)?;
+                let (r, _) = uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url)?;
                 Ok((u.side, r.lifetime_id))
             })
             .collect::<ApiResult<_>>()?;

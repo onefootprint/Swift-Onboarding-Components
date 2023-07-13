@@ -140,7 +140,7 @@ where
                     } => {
                         // Mark the sides as failed to require re-uploading. Otherwise, the user
                         // could re-initiate the incode machine without uploading a new doc
-                        DocumentUpload::deactivate(conn, &ctx.id_doc_id, clear_sides)?;
+                        DocumentUpload::deactivate(conn, &ctx.id_doc_id, clear_sides, reasons.clone())?;
 
                         // AFTER marking the uploads as failed, count if we have failed too many times
                         let attempts_by_side = DocumentUpload::count_failed_attempts(conn, &ctx.id_doc_id)?;

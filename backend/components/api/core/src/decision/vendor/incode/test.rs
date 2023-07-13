@@ -1,6 +1,7 @@
 use chrono::Utc;
 use db::{
     models::{
+        data_lifetime::DataLifetime,
         document_request::{DocumentRequest, NewDocumentRequestArgs},
         document_upload::DocumentUpload,
         identity_document::IdentityDocument,
@@ -386,15 +387,17 @@ async fn test_fail(state: &State, is_selfie: bool) {
             // Now, add our images to the vault as if the user hit the POST /document APi again
             let s3_url = S3Url::test_data("".into());
             let key = SealedVaultDataKey(vec![]);
+            let seqno = DataLifetime::get_next_seqno(conn)?;
             DocumentUpload::create(
                 conn,
                 doc.id.clone(),
                 DocumentSide::Front,
                 s3_url.clone(),
                 key.clone(),
+                seqno,
             )
             .unwrap();
-            DocumentUpload::create(conn, doc.id, DocumentSide::Back, s3_url, key).unwrap();
+            DocumentUpload::create(conn, doc.id, DocumentSide::Back, s3_url, key, seqno).unwrap();
 
             Ok(())
         })

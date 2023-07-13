@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use crate::{
     models::{
+        data_lifetime::DataLifetime,
         document_upload::DocumentUpload,
         identity_document::{IdentityDocument, NewIdentityDocumentArgs},
     },
@@ -18,6 +19,7 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
     let doc = IdentityDocument::get_or_create(conn, args).unwrap();
     let key = SealedVaultDataKey(vec![]);
     let s3_url = S3Url::test_data("".into());
-    DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, s3_url, key).unwrap();
+    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    DocumentUpload::create(conn, doc.id.clone(), DocumentSide::Front, s3_url, key, seqno).unwrap();
     doc
 }
