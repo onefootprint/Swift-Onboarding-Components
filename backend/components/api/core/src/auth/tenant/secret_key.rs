@@ -11,8 +11,8 @@ use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
-use tracing_actix_web::RootSpan;
 use std::pin::Pin;
+use tracing_actix_web::RootSpan;
 
 #[derive(Debug, Clone)]
 pub struct CheckedSecretTenantAuth {
@@ -45,7 +45,7 @@ impl FromRequest for SecretTenantAuthContext {
 
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
-        
+
         let root_span = RootSpan::from_request(req, payload);
 
         Box::pin(async move {
@@ -57,8 +57,8 @@ impl FromRequest for SecretTenantAuthContext {
 
             let (api_key, tenant, role) = state
                 .db_pool
-                .db_query(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
-                .await?
+                .db_transaction(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
+                .await
                 .map_err(|e| {
                     if e.is_not_found() {
                         if sk.is_maybe_ob_config_key() {
@@ -72,7 +72,7 @@ impl FromRequest for SecretTenantAuthContext {
                 })?;
 
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
-            
+
             root_span.record("tenant_id", &tenant.id.to_string());
             root_span.record("api_key_id", &api_key.id.to_string());
             root_span.record("role.id", &role.id.to_string());

@@ -148,7 +148,7 @@ impl TenantApiKey {
 
     #[tracing::instrument("TenantApiKey::get_enabled", skip_all)]
     pub fn get_enabled(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         sh_api_key: Fingerprint,
     ) -> DbResult<(TenantApiKey, Tenant, TenantRole)> {
         use db_schema::schema::tenant;
@@ -156,7 +156,7 @@ impl TenantApiKey {
             .inner_join(tenant::table)
             .inner_join(tenant_role::table)
             .filter(tenant_api_key::sh_secret_api_key.eq(sh_api_key))
-            .first(conn)?;
+            .first(conn.conn())?;
         if api_key.status != ApiKeyStatus::Enabled {
             return Err(DbError::ApiKeyDisabled);
         }
@@ -166,21 +166,48 @@ impl TenantApiKey {
         if role.tenant_id != api_key.tenant_id {
             return Err(DbError::TenantRoleMismatch);
         }
-        let update_last_used_at = match api_key.last_used_at {
+        let api_key = api_key.maybe_update_last_used_at(conn)?;
+        Ok((api_key, tenant, role))
+    }
+
+    fn should_update_last_used_at(&self) -> bool {
+        match self.last_used_at {
             // Save when the key was last used if at least 5 seconds have passed since the last use
             Some(d) if (Utc::now() - d).num_seconds() > 5 => true,
             None => true,
+            // No-op, key was updated recently
             _ => false,
+        }
+    }
+
+    /// Updates the last_used_at timestamp on this API key, including some controls to prevent
+    /// flooding the DB with writes for lots of API requests made in rapid succession
+    fn maybe_update_last_used_at(self, conn: &mut TxnPgConn) -> DbResult<Self> {
+        // First, check if the key has been updated recently. No need to add write throughput to the
+        // db if this timestamp was updated recently
+        if !self.should_update_last_used_at() {
+            return Ok(self);
+        }
+        let locked_api_key = tenant_api_key::table
+            .filter(tenant_api_key::id.eq(&self.id))
+            .for_no_key_update()
+            .skip_locked()
+            .get_result::<Self>(conn.conn())
+            .optional()?;
+        let Some(locked_api_key) = locked_api_key else {
+            // If the API key is already locked by another process, just return - that process will
+            // be updating the last used timestamp
+            return Ok(self);
         };
-        let api_key = if update_last_used_at {
-            diesel::update(tenant_api_key::table)
-                .filter(tenant_api_key::id.eq(api_key.id))
-                .set(tenant_api_key::last_used_at.eq(Utc::now()))
-                .get_result(conn)?
-        } else {
-            api_key
-        };
-        Ok((api_key, tenant, role))
+        // Check again now that we have the locked row if we need to update the timestamp
+        if !locked_api_key.should_update_last_used_at() {
+            return Ok(locked_api_key);
+        }
+        let api_key = diesel::update(tenant_api_key::table)
+            .filter(tenant_api_key::id.eq(locked_api_key.id))
+            .set(tenant_api_key::last_used_at.eq(Utc::now()))
+            .get_result(conn.conn())?;
+        Ok(api_key)
     }
 
     #[tracing::instrument("TenantApiKey::create", skip_all)]
