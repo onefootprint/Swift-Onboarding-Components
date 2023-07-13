@@ -35,8 +35,8 @@ use db::{
 use idv::ParsedResponse;
 use newtypes::{
     format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId, IdDocKind,
-    IdentityDataKind, MatchLevel, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor,
-    VendorAPI,
+    IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
+    Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use DataIdentifier::*;
@@ -186,9 +186,9 @@ async fn create_cip_request(
                 Id(Nationality),
                 Id(Zip),
                 Id(Country),
-                Document(PassportNumber),
-                Document(IdCardNumber),
-                Document(DriversLicenseNumber),
+                Document(OcrData(IdDocKind::DriverLicense, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)),
             ],
         )
         .await?;
@@ -274,10 +274,14 @@ fn kyc(
         None
     };
     // find a gov't id number if we have one
-    let id_number = vec![PassportNumber, IdCardNumber, DriversLicenseDob]
-        .into_iter()
-        .flat_map(|id| decrypted_data.get_di(id).ok())
-        .next();
+    let id_number = vec![
+        OcrData(IdDocKind::DriverLicense, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber),
+    ]
+    .into_iter()
+    .flat_map(|id| decrypted_data.get_di(id).ok())
+    .next();
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
@@ -528,10 +532,11 @@ fn document_and_photo(
             ocr_response.gender.as_ref().map(|p| (**p).clone()),
             "missing gender".into(),
         )?,
-        date_of_birth: dob,
+        date_of_birth: dob.into(),
         date_of_expiry: ocr_response
             .expiration_date()
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?,
+            .map_err(|e| ApiError::from(idv::Error::from(e)))?
+            .into(),
         issuing_country: ok_or(
             ocr_response.issuing_country.as_ref().map(|p| (*p).clone().into()),
             "missing issuing_country".into(),

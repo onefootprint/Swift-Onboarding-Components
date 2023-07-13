@@ -110,7 +110,7 @@ pub fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: Incode
         let maternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.maternal_last_name.clone().map(|f| f.into()));
         // TODO: 
         //   switch MM-DD and DD-MM
-        let dob_ocr: PiiString = ocr.dob()?;        
+        let dob_ocr: PiiString = ocr.dob()?.into();
 
         // matches, eventually should do levinstein or something else to determine "partial" matches
         let first_name_matches = pii_strings_match(&first_name_ocr, &vault_data.first_name);

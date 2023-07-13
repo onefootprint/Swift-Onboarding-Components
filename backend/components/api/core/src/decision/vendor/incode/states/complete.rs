@@ -27,8 +27,10 @@ use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
+use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
+use newtypes::ScrubbedPiiString;
 use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
@@ -90,29 +92,23 @@ impl Complete {
         IdentityDocument::update(conn, id_doc_id, update)?;
 
         // Add some extracted OCR data to the vault.
-        fn di<I: Into<DataIdentifier>>(i: I, pii: Option<PiiString>) -> Option<(DataIdentifier, PiiString)> {
-            pii.map(|x| (i.into(), x))
-        }
+        let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
+            pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
+        };
 
-        use DocumentKind::*;
         let r = fetch_ocr_response.clone();
-        let data = match dk {
-            IdDocKind::IdCard => vec![
-                di(IdCardExpiration, r.expiration_date().ok()),
-                di(IdCardNumber, r.document_number.map(|p| (*p).clone())),
-            ],
-            IdDocKind::DriverLicense => vec![
-                di(DriversLicenseExpiration, r.expiration_date().ok()),
-                di(DriversLicenseDob, r.dob().ok()),
-                di(DriversLicenseNumber, r.document_number.map(|p| (*p).clone())),
-                di(DriversLicenseIssuingState, r.issuing_state.map(|p| (*p).clone())),
-            ],
-            IdDocKind::Passport => vec![
-                di(PassportExpiration, r.expiration_date().ok()),
-                di(PassportDob, r.dob().ok()),
-                di(PassportNumber, r.document_number.map(|p| (*p).clone())),
-            ],
-        }
+        let data = vec![
+            di(ODK::Dob, r.dob().ok()),
+            di(ODK::ExpiresAt, r.expiration_date().ok()),
+            di(ODK::IssuedAt, r.issue_date().ok()),
+            di(ODK::Gender, r.gender),
+            di(ODK::FullAddress, r.address),
+            di(ODK::DocumentNumber, r.document_number),
+            di(ODK::IssuingState, r.issuing_state),
+            di(ODK::IssuingCountry, r.issuing_country),
+            di(ODK::RefNumber, r.ref_number),
+            di(ODK::FullName, r.name.and_then(|n| n.full_name)),
+        ]
         .into_iter()
         .flatten()
         .collect_vec();

@@ -97,9 +97,9 @@ def test_tenant_document_get_decrypt(user_with_documents):
     )
     assert resp["document.drivers_license.front.image"]
     assert resp["document.drivers_license.selfie.image"]
-    assert resp["document.drivers_license.number"]
+    assert resp["document.drivers_license.document_number"]
     assert resp["document.drivers_license.issuing_state"]
-    assert resp["document.drivers_license.expiration"]
+    assert resp["document.drivers_license.expires_at"]
     assert resp["document.drivers_license.dob"]
 
 
@@ -111,9 +111,9 @@ def test_tenant_document_decrypt(user_with_documents):
     fields = [
         "document.drivers_license.front.latest_upload",
         "document.drivers_license.front.image",
-        "document.drivers_license.number",
+        "document.drivers_license.document_number",
         "document.drivers_license.issuing_state",
-        "document.drivers_license.expiration",
+        "document.drivers_license.expires_at",
         "document.drivers_license.dob",
     ]
     data = {
@@ -131,9 +131,9 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["document.drivers_license.front.latest_upload"] == test_image_dl_front
     assert resp["document.drivers_license.front.image"] == test_image_dl_front
     # These OCR values come from TEST_ONLY_FIXTURE
-    assert resp["document.drivers_license.number"] == "Y12341234"
+    assert resp["document.drivers_license.document_number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "MA"
-    assert resp["document.drivers_license.expiration"] == "2024-10-15"
+    assert resp["document.drivers_license.expires_at"] == "2024-10-15"
     assert resp["document.drivers_license.dob"] == "1986-10-16"
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)

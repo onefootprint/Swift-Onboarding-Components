@@ -45,27 +45,26 @@ pub enum DocumentKind {
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
     FinraComplianceLetter,
 
-    #[strum_discriminants(strum(to_string = "passport.number"))]
-    PassportNumber,
-    #[strum_discriminants(strum(to_string = "passport.expiration"))]
-    PassportExpiration,
-    #[strum_discriminants(strum(to_string = "passport.dob"))]
-    PassportDob,
-    #[strum_discriminants(strum(to_string = "drivers_license.number"))]
-    DriversLicenseNumber,
-    #[strum_discriminants(strum(to_string = "drivers_license.expiration"))]
-    DriversLicenseExpiration,
-    #[strum_discriminants(strum(to_string = "drivers_license.dob"))]
-    DriversLicenseDob,
-    #[strum_discriminants(strum(to_string = "drivers_license.issuing_state"))]
-    DriversLicenseIssuingState,
-    #[strum_discriminants(strum(to_string = "id_card.number"))]
-    IdCardNumber,
-    #[strum_discriminants(strum(to_string = "id_card.expiration"))]
-    IdCardExpiration,
+    /// Extracted OCR information from the image
+    OcrData(IdDocKind, OcrDataKind),
 }
 
 crate::util::impl_enum_string_diesel!(DocumentKind);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumString, AsRefStr, Display, EnumIter)]
+#[strum(serialize_all = "snake_case")]
+pub enum OcrDataKind {
+    FullName,
+    Dob,
+    Gender,
+    FullAddress,
+    DocumentNumber,
+    ExpiresAt,
+    IssuedAt,
+    IssuingState,
+    IssuingCountry,
+    RefNumber,
+}
 
 impl From<DocumentKind> for DataIdentifier {
     fn from(value: DocumentKind) -> Self {
@@ -95,15 +94,7 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
     fn is_optional(&self) -> bool {
         match self {
             DocumentKind::FinraComplianceLetter
-            | DocumentKind::PassportNumber
-            | DocumentKind::PassportExpiration
-            | DocumentKind::PassportDob
-            | DocumentKind::DriversLicenseNumber
-            | DocumentKind::DriversLicenseExpiration
-            | DocumentKind::DriversLicenseDob
-            | DocumentKind::DriversLicenseIssuingState
-            | DocumentKind::IdCardNumber
-            | DocumentKind::IdCardExpiration
+            | DocumentKind::OcrData(_, _)
             | DocumentKind::Image(_, _)
             | DocumentKind::MimeType(_, _)
             | DocumentKind::LatestUpload(_, _) => true,
@@ -114,17 +105,9 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
         match self {
             DocumentKind::Image(_, _) => Some(CollectedData::Document),
             // allow storing this data independently
-            DocumentKind::PassportNumber
-            | DocumentKind::PassportExpiration
-            | DocumentKind::PassportDob
-            | DocumentKind::DriversLicenseNumber
-            | DocumentKind::DriversLicenseExpiration
-            | DocumentKind::DriversLicenseDob
-            | DocumentKind::DriversLicenseIssuingState
-            | DocumentKind::IdCardNumber
-            | DocumentKind::IdCardExpiration
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => None,
+            DocumentKind::OcrData(_, _) | DocumentKind::MimeType(_, _) | DocumentKind::LatestUpload(_, _) => {
+                None
+            }
             DocumentKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
     }
@@ -140,17 +123,9 @@ impl DocumentKind {
                 DocumentSide::Selfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
             },
             DocumentKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
-            DocumentKind::PassportNumber
-            | DocumentKind::PassportExpiration
-            | DocumentKind::PassportDob
-            | DocumentKind::DriversLicenseNumber
-            | DocumentKind::DriversLicenseExpiration
-            | DocumentKind::DriversLicenseDob
-            | DocumentKind::DriversLicenseIssuingState
-            | DocumentKind::IdCardNumber
-            | DocumentKind::IdCardExpiration
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => vec![],
+            DocumentKind::OcrData(_, _) | DocumentKind::MimeType(_, _) | DocumentKind::LatestUpload(_, _) => {
+                vec![]
+            }
         }
     }
 
@@ -167,48 +142,28 @@ impl DocumentKind {
             | DocumentKind::FinraComplianceLetter
             | DocumentKind::LatestUpload(_, _) => StorageType::DocumentData,
             DocumentKind::MimeType(_, _) => StorageType::DocumentMetadata,
-            DocumentKind::PassportNumber
-            | DocumentKind::PassportExpiration
-            | DocumentKind::PassportDob
-            | DocumentKind::DriversLicenseNumber
-            | DocumentKind::DriversLicenseExpiration
-            | DocumentKind::DriversLicenseDob
-            | DocumentKind::DriversLicenseIssuingState
-            | DocumentKind::IdCardNumber
-            | DocumentKind::IdCardExpiration => StorageType::VaultData,
+            DocumentKind::OcrData(_, _) => StorageType::VaultData,
         }
     }
 }
 
 impl DocumentKind {
     pub fn searchable() -> Vec<Self> {
-        vec![
-            Self::PassportNumber,
-            Self::DriversLicenseNumber,
-            Self::IdCardNumber,
-        ]
+        IdDocKind::iter()
+            .map(|k| Self::OcrData(k, OcrDataKind::DocumentNumber))
+            .collect()
     }
 }
 
 impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
-    type Error = crate::Error;
+    type Error = strum::ParseError;
     fn try_from(value: DocumentKindDiscriminant) -> Result<Self, Self::Error> {
         let v = match value {
             DocumentKindDiscriminant::FinraComplianceLetter => DocumentKind::FinraComplianceLetter,
-            DocumentKindDiscriminant::PassportNumber => DocumentKind::PassportNumber,
-            DocumentKindDiscriminant::PassportExpiration => DocumentKind::PassportExpiration,
-            DocumentKindDiscriminant::PassportDob => DocumentKind::PassportDob,
-            DocumentKindDiscriminant::DriversLicenseNumber => DocumentKind::DriversLicenseNumber,
-            DocumentKindDiscriminant::DriversLicenseExpiration => DocumentKind::DriversLicenseExpiration,
-            DocumentKindDiscriminant::DriversLicenseDob => DocumentKind::DriversLicenseDob,
-            DocumentKindDiscriminant::DriversLicenseIssuingState => DocumentKind::DriversLicenseIssuingState,
-            DocumentKindDiscriminant::IdCardNumber => DocumentKind::IdCardNumber,
-            DocumentKindDiscriminant::IdCardExpiration => DocumentKind::IdCardExpiration,
-            DocumentKindDiscriminant::Image
+            DocumentKindDiscriminant::OcrData
+            | DocumentKindDiscriminant::Image
             | DocumentKindDiscriminant::MimeType
-            | DocumentKindDiscriminant::LatestUpload => {
-                return Err(crate::Error::Custom("Cannot convert".to_owned()))
-            }
+            | DocumentKindDiscriminant::LatestUpload => return Err(strum::ParseError::VariantNotFound),
         };
         Ok(v)
     }
@@ -233,6 +188,7 @@ impl std::str::FromStr for DocumentKind {
         };
 
         let variant: DocumentKind = match variant {
+            // First try parsing based on the suffix, like mime_type or latest_upload
             Ok(DocumentKindDiscriminant::LatestUpload) => {
                 let (prefix, suffix) = get_parts()?;
                 DocumentKind::LatestUpload(prefix, suffix)
@@ -245,10 +201,21 @@ impl std::str::FromStr for DocumentKind {
                 let (prefix, suffix) = get_parts()?;
                 DocumentKind::Image(prefix, suffix)
             }
+            // Otherwise, try parsing as other variants
             _ => {
-                let variant =
-                    DocumentKindDiscriminant::from_str(s).map_err(|_| strum::ParseError::VariantNotFound)?;
-                Self::try_from(variant).map_err(|_| strum::ParseError::VariantNotFound)?
+                if let Ok(variant) = DocumentKindDiscriminant::from_str(s)
+                    .map_err(|_| strum::ParseError::VariantNotFound)
+                    .and_then(Self::try_from)
+                {
+                    // TODO should we just remove discriminant code?
+                    variant
+                } else {
+                    let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
+                    let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
+                    let prefix = IdDocKind::correct_from_str(prefix)?;
+                    let suffix = OcrDataKind::from_str(suffix)?;
+                    Self::OcrData(prefix, suffix)
+                }
             }
         };
 
@@ -270,15 +237,25 @@ impl std::fmt::Display for DocumentKind {
                     DocumentKindDiscriminant::from(self),
                 )
             }
-            _ => write!(f, "{}", DocumentKindDiscriminant::from(self)),
+            DocumentKind::OcrData(doc_kind, data_kind) => {
+                write!(f, "{}.{}", doc_kind.correct_fmt(), data_kind)
+            }
+            DocumentKind::FinraComplianceLetter => write!(f, "{}", DocumentKindDiscriminant::from(self)),
         }
     }
 }
 
 impl DocumentKind {
+    /// Enumerate all possible DIs for DocumentKind that we'll display in API docs
     pub fn api_examples() -> Vec<Self> {
-        DocumentKindDiscriminant::iter()
-            .filter_map(|d| Self::try_from(d).ok())
-            .collect()
+        let complex_types = IdDocKind::iter().flat_map(|k| {
+            // Purposefully omitting LatestUpload here
+            let image_types =
+                DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
+            let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
+            image_types.chain(ocr_types)
+        });
+        let simple_types = DocumentKindDiscriminant::iter().filter_map(|d| Self::try_from(d).ok());
+        complex_types.chain(simple_types).collect()
     }
 }

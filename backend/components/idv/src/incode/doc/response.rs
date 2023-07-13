@@ -284,6 +284,8 @@ pub struct FetchOCRResponse {
     pub tax_id_number: Option<ScrubbedPiiString>,
     // UTC timestamp, in ms
     pub expire_at: Option<String>,
+    // UTC timestamp, in ms
+    pub issued_at: Option<String>,
     // year of expiration
     pub expiration_date: Option<i32>,
     pub additional_timestamps: Option<serde_json::Value>,
@@ -306,21 +308,26 @@ pub struct FetchOCRResponse {
 }
 
 impl FetchOCRResponse {
-    pub fn expiration_date(&self) -> Result<PiiString, IncodeError> {
-        let expiration_timestamp = self
-            .expire_at
-            .clone()
-            .ok_or(IncodeError::OcrError("missing field expire_at".into()))?
+    fn format_date(date: Option<&String>) -> Result<ScrubbedPiiString, IncodeError> {
+        let expiration_timestamp = date
+            .ok_or(IncodeError::OcrError("missing timestamp field".into()))?
             .parse::<i64>()?;
 
-        let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0).ok_or(
-            IncodeError::OcrError("could not parse expiration timestamp".into()),
-        )?;
+        let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0)
+            .ok_or(IncodeError::OcrError("could not parse timestamp".into()))?;
 
-        Ok(PiiString::from(naive.format("%Y-%m-%d")))
+        Ok(ScrubbedPiiString::from(naive.format("%Y-%m-%d")))
     }
 
-    pub fn dob(&self) -> Result<PiiString, IncodeError> {
+    pub fn expiration_date(&self) -> Result<ScrubbedPiiString, IncodeError> {
+        Self::format_date(self.expire_at.as_ref())
+    }
+
+    pub fn issue_date(&self) -> Result<ScrubbedPiiString, IncodeError> {
+        Self::format_date(self.issued_at.as_ref())
+    }
+
+    pub fn dob(&self) -> Result<ScrubbedPiiString, IncodeError> {
         let date = self
             .birth_date
             .ok_or(IncodeError::OcrError("missing field birth_date".into()))?;
@@ -330,7 +337,7 @@ impl FetchOCRResponse {
             "could not parse birth_date timestamp".into(),
         ))?;
 
-        Ok(PiiString::from(naive.format("%Y-%m-%d")))
+        Ok(ScrubbedPiiString::from(naive.format("%Y-%m-%d")))
     }
 
     pub fn age(&self) -> Result<i64, IncodeError> {

@@ -394,7 +394,7 @@ mod tests {
     #[test_case(DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriverLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration_month")]
-    #[test_case(DataIdentifier::Document(DocumentKind::DriversLicenseNumber) => "document.drivers_license.number")]
+    #[test_case(DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::DriverLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -410,7 +410,7 @@ mod tests {
     #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriverLicense, DocumentSide::Front)))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
-    #[test_case("document.passport.number" => DataIdentifier::Document(DocumentKind::PassportNumber))]
+    #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
