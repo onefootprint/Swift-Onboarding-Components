@@ -18,7 +18,6 @@ use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
 use db::models::tenant_user::TenantUser;
-use db::tenant::get_opt_by_workos_org_id;
 use db::OffsetPagination;
 use itertools::Itertools;
 use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId};
@@ -162,8 +161,11 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     // 1. try get tenant by workos org id returned from profile
     // This will only ever really happen with SAML/SSO
     if let Some(org_id) = &profile.organization_id {
-        let tenant = get_opt_by_workos_org_id(&state.db_pool, org_id.to_string())
-            .await?
+        let org_id = org_id.to_string();
+        let tenant = state
+            .db_pool
+            .db_query(move |conn| Tenant::get_opt_by_workos_org_id(conn, &org_id))
+            .await??
             .ok_or(WorkOsError::TenantForOrgDoesNotExist)?;
 
         tracing::info!("matched workos auth by org id");
@@ -191,7 +193,11 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
 
         let workos_org_id = if let Some(org) = orgs.data.first() {
             // An org on workos owns this domain!
-            let tenant = get_opt_by_workos_org_id(&state.db_pool, org.id.to_string()).await?;
+            let org_id = org.id.to_string();
+            let tenant = state
+                .db_pool
+                .db_query(move |conn| Tenant::get_opt_by_workos_org_id(conn, &org_id))
+                .await??;
             if let Some(tenant) = tenant {
                 // The tenant exists inside the DB
                 tracing::info!("matched workos auth by domain");

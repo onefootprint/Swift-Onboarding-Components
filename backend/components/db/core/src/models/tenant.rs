@@ -163,6 +163,15 @@ impl Tenant {
             .get_results(conn)?;
         Ok(res)
     }
+
+    #[tracing::instrument("Tenant::get_opt_by_workos_org_id", skip_all)]
+    pub fn get_opt_by_workos_org_id(conn: &mut PgConn, workos_org_id: &String) -> DbResult<Option<Tenant>> {
+        let res = tenant::table
+            .filter(tenant::workos_id.eq(workos_org_id))
+            .first(conn)
+            .optional()?;
+        Ok(res)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, Default)]

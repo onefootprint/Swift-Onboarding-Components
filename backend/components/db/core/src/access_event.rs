@@ -14,6 +14,7 @@ use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::TenantId;
 use newtypes::VaultId;
+use tracing::instrument;
 
 #[derive(Debug)]
 pub struct AccessEventListQueryParams {
@@ -37,6 +38,7 @@ pub struct AccessEventListItemForTenant {
 
 impl AccessEventListItemForTenant {
     // lists all access events across all configurations
+    #[instrument("AccessEventListItemForTenant::get", skip_all)]
     pub async fn get(
         pool: &DbPool,
         params: AccessEventListQueryParams,
@@ -118,6 +120,7 @@ pub struct AccessEventListItemForUser {
 
 impl AccessEventListItemForUser {
     /// get access events for a user
+    #[instrument("AccessEventListItemForUser::get", skip_all)]
     pub async fn get(pool: &DbPool, vault_id: VaultId) -> Result<Vec<Self>, DbError> {
         let list_items = pool
             .db_query(move |conn| -> DbResult<_> {

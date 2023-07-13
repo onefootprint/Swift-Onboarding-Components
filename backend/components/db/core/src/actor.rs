@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
+use tracing::instrument;
 
 use crate::{
     models::{
@@ -48,6 +49,7 @@ impl HasActor for DbActor {
     }
 }
 
+#[instrument(skip_all)]
 pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> DbResult<Vec<(T, SaturatedActor)>>
 where
     T: HasActor,
