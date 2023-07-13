@@ -112,7 +112,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
         .runtime(Runtime::Tokio1)
         // .wait_timeout(Some(Duration::from_secs(1)))
         .recycle_timeout(Some(Duration::from_secs(1)))
-        .create_timeout(Some(Duration::from_secs(1)))
+        .create_timeout(Some(Duration::from_secs(4)))
         .pre_recycle(Hook::sync_fn(move |_, metrics| {
             let now = std::time::Instant::now();
 
