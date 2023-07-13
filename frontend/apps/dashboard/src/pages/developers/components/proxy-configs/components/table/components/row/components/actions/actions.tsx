@@ -30,7 +30,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Dropdown.Root>
         <PermissionGate
-          scopeKind={RoleScopeKind.vaultProxy}
+          scopeKind={RoleScopeKind.manageVaultProxy}
           fallbackText={t('not-allowed')}
         >
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>

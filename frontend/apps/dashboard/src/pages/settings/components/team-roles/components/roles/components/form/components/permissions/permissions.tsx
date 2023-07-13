@@ -12,15 +12,21 @@ import {
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import useDecryptOptions, { DecryptOption } from './hooks/use-decrypt-options';
+import useDecryptOptions from '../../../../../../hooks/use-decrypt-options';
+import useVaultProxyOptions from '../../../../../../hooks/use-vault-proxy-options';
 
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
+  const [animateProxyConfigSelect] = useAutoAnimate<HTMLDivElement>();
   const { t } = useTranslation('pages.settings.roles');
   const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
-  const decryptOptions = useDecryptOptions();
+  const { options: decryptOptions, allOption: decryptAllOption } =
+    useDecryptOptions();
+  const { options: proxyOptions, allOption: proxyAllOption } =
+    useVaultProxyOptions();
   const showDecryptSelect = watch('showDecrypt');
+  const showProxySelect = watch('showProxyConfigs');
 
   useEffect(() => {
     if (!showDecryptSelect) {
@@ -28,6 +34,12 @@ const Permissions = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDecryptSelect]);
+  useEffect(() => {
+    if (!showProxySelect) {
+      setValue('vaultProxyConfigs', []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showProxySelect]);
 
   return (
     <>
@@ -62,11 +74,6 @@ const Permissions = () => {
           {...register('scopeKinds')}
         />
         <Checkbox
-          label={t('scopes.vault_proxy')}
-          value={RoleScopeKind.vaultProxy}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
           label={t('scopes.cip_integration')}
           value={RoleScopeKind.cipIntegration}
           {...register('scopeKinds')}
@@ -77,40 +84,79 @@ const Permissions = () => {
           {...register('scopeKinds')}
         />
         <Checkbox
-          label={t('form.decrypt.label')}
-          {...register('showDecrypt')}
+          label={t('scopes.manage_vault_proxy')}
+          value={RoleScopeKind.manageVaultProxy}
+          {...register('scopes')}
         />
-        <div ref={animateDecryptSelect}>
-          {showDecryptSelect && (
-            <DecryptContainer>
-              <Controller
-                control={control}
-                name="decryptOptions"
-                rules={{
-                  required: {
-                    value: true,
-                    message: t('form.decrypt.errors.required'),
-                  },
-                }}
-                render={({ field }) => (
-                  <MultiSelect
-                    label={t('form.decrypt-attributes.label')}
-                    options={decryptOptions}
-                    allOption={{
-                      value: DecryptOption.all,
-                      label: t('scopes.decrypt_all'),
-                    }}
-                    size="compact"
-                    onBlur={field.onBlur}
-                    onChange={field.onChange}
-                    value={field.value}
-                    hasError={!!errors.decryptFields}
-                    hint={errors.decryptFields?.message as string}
-                  />
-                )}
-              />
-            </DecryptContainer>
-          )}
+        <div>
+          <Checkbox
+            label={t('scopes.invoke_vault_proxy.checkbox')}
+            {...register('showProxyConfigs')}
+          />
+          <div ref={animateProxyConfigSelect}>
+            {showProxySelect && (
+              <MultiSelectContainer>
+                <Controller
+                  control={control}
+                  name="vaultProxyConfigs"
+                  rules={{
+                    required: {
+                      value: true,
+                      message: t('form.proxy-configs.errors.required'),
+                    },
+                  }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      label={t('form.proxy-configs.label')}
+                      options={proxyOptions}
+                      allOption={proxyAllOption}
+                      size="compact"
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      value={field.value}
+                      hasError={!!errors.vaultProxyConfigs}
+                      hint={errors.vaultProxyConfigs?.message as string}
+                    />
+                  )}
+                />
+              </MultiSelectContainer>
+            )}
+          </div>
+        </div>
+        <div>
+          <Checkbox
+            label={t('form.decrypt.label')}
+            {...register('showDecrypt')}
+          />
+          <div ref={animateDecryptSelect}>
+            {showDecryptSelect && (
+              <MultiSelectContainer>
+                <Controller
+                  control={control}
+                  name="decryptOptions"
+                  rules={{
+                    required: {
+                      value: true,
+                      message: t('form.decrypt.errors.required'),
+                    },
+                  }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      label={t('form.decrypt-attributes.label')}
+                      options={decryptOptions}
+                      allOption={decryptAllOption}
+                      size="compact"
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      value={field.value}
+                      hasError={!!errors.decryptFields}
+                      hint={errors.decryptFields?.message as string}
+                    />
+                  )}
+                />
+              </MultiSelectContainer>
+            )}
+          </div>
         </div>
       </ToggleContainer>
     </>
@@ -129,9 +175,9 @@ const ToggleContainer = styled.div`
   `}
 `;
 
-const DecryptContainer = styled.div`
+const MultiSelectContainer = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]};
+    margin-top: ${theme.spacing[4]};
     margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
   `}
 `;

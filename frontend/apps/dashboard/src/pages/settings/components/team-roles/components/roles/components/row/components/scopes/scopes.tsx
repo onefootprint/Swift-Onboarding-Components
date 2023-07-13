@@ -1,10 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { RoleScope } from '@onefootprint/types';
-import { Tag, Tooltip } from '@onefootprint/ui';
+import { Tag } from '@onefootprint/ui';
 import React from 'react';
 
-import groupScopes from './utils/group-scopes';
+import groupScopes from '../../../../../../utils/group-scopes';
+import DecryptOptions from '../../../../../decrypt-options';
+import VaultProxyOptions from '../../../../../vault-proxy-options';
 
 export type ScopesProps = {
   scopes: RoleScope[];
@@ -12,7 +14,8 @@ export type ScopesProps = {
 
 const Scopes = ({ scopes }: ScopesProps) => {
   const { t } = useTranslation('pages.settings.roles');
-  const { isAdmin, decryptOptions, nonDecryptScopes } = groupScopes(scopes);
+  const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } =
+    groupScopes(scopes);
 
   if (isAdmin) {
     return <span>{t('scopes.admin')}</span>;
@@ -20,30 +23,11 @@ const Scopes = ({ scopes }: ScopesProps) => {
 
   return (
     <Tags>
-      {nonDecryptScopes.map(scope => (
+      {basicScopes.map(scope => (
         <Tag key={scope.kind}>{t(`scopes.${scope.kind}`)}</Tag>
       ))}
-      {decryptOptions.length === 1 && (
-        <Tag>
-          {t(`scopes.decrypt_fields_one`, {
-            count: 1,
-            field: t(`scopes.decrypt.${decryptOptions[0]}`),
-          })}
-        </Tag>
-      )}
-      {decryptOptions.length > 1 && (
-        <Tooltip
-          text={decryptOptions
-            .map(scope => t(`scopes.decrypt.${scope}`))
-            .join(', ')}
-        >
-          <Tag>
-            {t(`scopes.decrypt_fields_other`, {
-              count: decryptOptions.length,
-            })}
-          </Tag>
-        </Tooltip>
-      )}
+      <DecryptOptions options={decryptOptions} as={Tag} />
+      <VaultProxyOptions options={vaultProxyOptions} as={Tag} />
     </Tags>
   );
 };

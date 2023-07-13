@@ -1609,6 +1609,12 @@
           "permissions": {
             "title": "Permissions"
           },
+          "proxy-configs": {
+            "label": "Allowed proxy configs",
+            "errors": {
+              "required": "Must select at least one proxy configuration"
+            }
+          },
           "decrypt": {
             "label": "Decrypt data",
             "errors": {
@@ -1626,7 +1632,18 @@
           "read": "Read-only",
           "onboarding_configuration": "Manage onboarding configurations",
           "api_keys": "Manage API keys",
-          "vault_proxy": "Make vault proxy requests",
+          "manage_vault_proxy": "Manage vault proxy configurations",
+          "invoke_vault_proxy_options": {
+            "all": "All",
+            "jit": "Just-in-time proxy"
+          },
+          "invoke_vault_proxy": {
+            "checkbox": "Invoke vault proxy",
+            "all": "Invoke all vault proxies",
+            "jit": "Invoke just-in-time proxy",
+            "one": "Invoke one vault proxy",
+            "other": "Invoke {{ count }} vault proxies"
+          },
           "cip_integration": "Make CIP proxy requests",
           "org_settings": "Modify organization settings",
           "manual_review": "Perform manual review",

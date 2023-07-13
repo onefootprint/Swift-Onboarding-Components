@@ -113,7 +113,7 @@ export type Group = {
 const useDecryptOptions = () => {
   const { t } = useTranslation('pages.settings.roles.scopes');
 
-  const defaultOptions: Group[] = [
+  const options: Group[] = [
     {
       label: 'Basic Data',
       options: [
@@ -183,7 +183,11 @@ const useDecryptOptions = () => {
       ],
     },
   ];
-  return defaultOptions;
+  const allOption = {
+    value: DecryptOption.all,
+    label: t('scopes.decrypt_all'),
+  };
+  return { options, allOption };
 };
 
 export default useDecryptOptions;

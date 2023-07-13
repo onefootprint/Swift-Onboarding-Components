@@ -1,4 +1,4 @@
-import { RoleScopeKind } from '@onefootprint/types';
+import { BasicRoleScopeKind, RoleScopeKind } from '@onefootprint/types';
 import { UserSession, useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
@@ -112,9 +112,7 @@ export const asAdminUserInLive = () => {
   });
 };
 
-export const asUserWithScope = (
-  scopeKinds: Exclude<RoleScopeKind, RoleScopeKind.decrypt>[],
-) => {
+export const asUserWithScope = (scopeKinds: BasicRoleScopeKind[]) => {
   useStore.setState({
     data: {
       auth: '1',

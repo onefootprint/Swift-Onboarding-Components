@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CreateRoleRequest,
+  RoleScope,
   RoleScopeKind,
   UpdateRoleRequest,
 } from '@onefootprint/types';
@@ -8,8 +9,9 @@ import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { DecryptOptionToRoleScope } from '../../../../hooks/use-decrypt-options';
+import { scopeFromVaultProxyOption } from '../../../../hooks/use-vault-proxy-options';
 import Permissions from './components/permissions';
-import { DecryptOptionToRoleScope } from './components/permissions/hooks/use-decrypt-options';
 import type { FormData } from './form.types';
 
 export type FormProps = {
@@ -24,6 +26,8 @@ const Form = ({
     scopeKinds: [],
     showDecrypt: false,
     decryptOptions: [],
+    vaultProxyConfigs: [],
+    showProxyConfigs: false,
   },
 }: FormProps) => {
   const { t } = useTranslation('pages.settings.roles.form');
@@ -35,15 +39,22 @@ const Form = ({
   } = formMethods;
 
   const handleAfterSubmit = (formData: FormData) => {
-    const { name, scopeKinds, decryptOptions } = formData;
+    const { name, scopeKinds, decryptOptions, vaultProxyConfigs } = formData;
     const decryptScopes = decryptOptions.map(
       ({ value }) => DecryptOptionToRoleScope[value],
+    );
+    const vaultProxyScopes: RoleScope[] = vaultProxyConfigs.map(({ value }) =>
+      scopeFromVaultProxyOption(value),
     );
     if (!scopeKinds.includes(RoleScopeKind.read)) {
       scopeKinds.push(RoleScopeKind.read);
     }
     const scopes = scopeKinds.map(s => ({ kind: s }));
-    const allScopes = [...scopes, ...decryptScopes];
+    const allScopes: RoleScope[] = [
+      ...scopes,
+      ...decryptScopes,
+      ...vaultProxyScopes,
+    ];
     onSubmit({
       name,
       scopes: allScopes,

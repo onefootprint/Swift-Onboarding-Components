@@ -16,7 +16,7 @@ const Create = () => {
     <>
       <PermissionGate
         fallbackText={t('create.cta-not-allowed')}
-        scopeKind={RoleScopeKind.vaultProxy}
+        scopeKind={RoleScopeKind.manageVaultProxy}
       >
         <Button size="small" variant="secondary" onClick={open}>
           {t('create.cta')}

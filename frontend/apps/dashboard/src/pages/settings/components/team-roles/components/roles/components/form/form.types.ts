@@ -1,10 +1,18 @@
-import { RoleScopeKind } from '@onefootprint/types';
+import { BasicRoleScopeKind } from '@onefootprint/types';
 
-import { DecryptOption } from './components/permissions/hooks/use-decrypt-options';
+import { DecryptOption } from '../../../../hooks/use-decrypt-options';
+import { VaultProxyOption } from '../../../../hooks/use-vault-proxy-options';
+
+export type VaultProxySelectOption = {
+  label: string;
+  value: VaultProxyOption;
+};
 
 export type FormData = {
   decryptOptions: { label: string; value: DecryptOption }[];
+  vaultProxyConfigs: VaultProxySelectOption[];
   name: string;
-  scopeKinds: Exclude<RoleScopeKind, RoleScopeKind.decrypt>[];
+  scopeKinds: BasicRoleScopeKind[];
   showDecrypt: boolean;
+  showProxyConfigs: boolean;
 };

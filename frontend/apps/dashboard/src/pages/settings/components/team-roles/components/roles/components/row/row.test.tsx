@@ -7,6 +7,7 @@ import {
 import { CollectedKycDataOption, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
+import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
 
 import Row, { RowProps } from './row';
 import roleFixture from './row.test.config';
@@ -14,6 +15,7 @@ import roleFixture from './row.test.config';
 describe('<Row />', () => {
   beforeEach(() => {
     asAdminUser();
+    withProxyConfigs();
   });
 
   afterAll(() => {
