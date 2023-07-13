@@ -2,10 +2,11 @@ use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use db_schema::schema::risk_signal;
 use db_schema::schema::risk_signal_group;
-use db_schema::schema::{onboarding_decision_verification_result_junction, risk_signal};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::RiskSignalGroupId;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
@@ -190,20 +191,24 @@ impl RiskSignal {
         conn: &mut PgConn,
         onboarding_decision_id: &OnboardingDecisionId,
     ) -> DbResult<Vec<Self>> {
+        use db_schema::schema::onboarding_decision_verification_result_junction as obd_vres_junction;
+        // Postgres wasn't happy about evaluation a where clause with an OR here, so we just evaluate
+        // the two ways of getting risk signals separately and then fetch all rows together
+        let ids = risk_signal::table
+            .filter(risk_signal::onboarding_decision_id.eq(onboarding_decision_id))
+            .select(risk_signal::id)
+            .get_results::<RiskSignalId>(conn)?;
+        let ids2 = obd_vres_junction::table
+            .inner_join(
+                risk_signal::table
+                    .on(risk_signal::verification_result_id.eq(obd_vres_junction::verification_result_id)),
+            )
+            .filter(obd_vres_junction::onboarding_decision_id.eq(onboarding_decision_id))
+            .select(risk_signal::id)
+            .get_results(conn)?;
+        let all_ids = ids.into_iter().chain(ids2.into_iter()).unique().collect_vec();
         let results = risk_signal::table
-            .left_join(
-                onboarding_decision_verification_result_junction::table.on(
-                    onboarding_decision_verification_result_junction::verification_result_id
-                        .eq(risk_signal::verification_result_id),
-                ),
-            )
-            .filter(
-                risk_signal::onboarding_decision_id.eq(onboarding_decision_id).or(
-                    onboarding_decision_verification_result_junction::onboarding_decision_id
-                        .eq(onboarding_decision_id),
-                ),
-            )
-            .select(risk_signal::all_columns)
+            .filter(risk_signal::id.eq_any(all_ids))
             .get_results(conn)?;
         Ok(results)
     }
