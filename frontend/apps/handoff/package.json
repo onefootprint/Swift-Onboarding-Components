@@ -27,7 +27,7 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@sentry/nextjs": "^7.28.1",
-    "@tanstack/react-query": "^4.29.5",
+    "@tanstack/react-query": "^4.29.19",
     "@xstate/react": "^3.2.1",
     "axios-case-converter": "^0.9.0",
     "axios": "^1.2.1",

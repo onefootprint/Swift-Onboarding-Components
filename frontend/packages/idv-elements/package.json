@@ -29,7 +29,7 @@
     "@onefootprint/styled": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@tanstack/react-query": "^4.29.5",
+    "@tanstack/react-query": "^4.29.19",
     "@xstate/react": "^3.2.1",
     "base64url": "^3.0.1",
     "browser-image-compression": "^2.0.0",
