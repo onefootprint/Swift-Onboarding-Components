@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
+import { OpenCvProvider } from 'opencv-react-ts';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
@@ -43,7 +44,9 @@ const App = ({ context, onDone }: IdDocProps) => {
         <QueryClientProvider client={queryClient}>
           <MissingPermissionsSheetProvider>
             <FaceModelProvider selfieRequired={isSelfieRequired}>
-              <Router onDone={onDone} />
+              <OpenCvProvider>
+                <Router onDone={onDone} />
+              </OpenCvProvider>
             </FaceModelProvider>
           </MissingPermissionsSheetProvider>
         </QueryClientProvider>

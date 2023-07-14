@@ -1,12 +1,18 @@
-import cv, {
+import {
   Mat,
   MatVector,
   Point,
   Rect,
   RotatedRect,
-} from '@onefootprint/opencv-ts';
+  useOpenCv,
+} from 'opencv-react-ts';
 
 import { ParamsType } from './params';
+
+export type OpenCVType = Exclude<
+  ReturnType<typeof useOpenCv>['cv'],
+  null | undefined
+>;
 
 // The threshold value used for finding contours.
 // If the pixel value is less than the threshold, it will be set to 0
@@ -20,6 +26,7 @@ export enum CardCaptureStatus {
 }
 
 export const getMedianBlur = (
+  cv: OpenCVType,
   src: Mat,
   kSize: number,
   shouldCleanUp: Boolean,
@@ -33,6 +40,7 @@ export const getMedianBlur = (
 };
 
 export const getEdges = (
+  cv: OpenCVType,
   src: Mat,
   firstThreshold: number,
   secondThreshold: number,
@@ -48,11 +56,14 @@ export const getEdges = (
   return dst;
 };
 
-export const getDilatedImage = (src: Mat, shouldCleanUp: boolean) => {
+export const getDilatedImage = (
+  cv: OpenCVType,
+  src: Mat,
+  shouldCleanUp: boolean,
+) => {
   const dst = new cv.Mat();
-  const Ones = cv.Mat.ones;
   const numRowsAndCols = 5; // number of rows and cols in the kernel matrix
-  const M = new Ones(numRowsAndCols, numRowsAndCols, cv.CV_8U);
+  const M = cv.Mat.ones(numRowsAndCols, numRowsAndCols, cv.CV_8U);
   const anchor = new cv.Point(-1, -1); // anchor position (-1, -1) means that the anchor is at the center
   const numIterations = 1;
   cv.dilate(
@@ -74,7 +85,11 @@ export const getDilatedImage = (src: Mat, shouldCleanUp: boolean) => {
   return dst;
 };
 
-export const getExternalContours = (src: Mat, shouldCleanUp: boolean) => {
+export const getExternalContours = (
+  cv: OpenCVType,
+  src: Mat,
+  shouldCleanUp: boolean,
+) => {
   cv.threshold(
     src,
     src,
@@ -101,9 +116,9 @@ export const getExternalContours = (src: Mat, shouldCleanUp: boolean) => {
   return contours;
 };
 
-export const getBoundingBoxes = (contours: MatVector) => {
+export const getBoundingBoxes = (cv: OpenCVType, contours: MatVector) => {
   const boundingBoxes: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
-  const totalContours = contours.size();
+  const totalContours = (contours.size() as unknown as number) ?? 0;
 
   for (let i = 0; i < totalContours; i += 1) {
     const contour = contours.get(i);
@@ -197,6 +212,7 @@ export const isOverAligned = ({
 };
 
 export const detectCardStatus = (
+  cv: OpenCVType,
   src: Mat,
   imgWidth: number,
   imgHeight: number,
@@ -204,17 +220,18 @@ export const detectCardStatus = (
 ) => {
   for (let i = 0; i < params.length; i += 1) {
     const { kSize, fThresh, sThresh, aperSize } = params[i];
-    const medianBlurredImage = getMedianBlur(src, kSize, false); // should not clean the src since we need it for every iteration of the loop
+    const medianBlurredImage = getMedianBlur(cv, src, kSize, false); // should not clean the src since we need it for every iteration of the loop
     const edges = getEdges(
+      cv,
       medianBlurredImage,
       fThresh,
       sThresh,
       aperSize,
       true,
     );
-    const dilatedEdges = getDilatedImage(edges, true);
-    const contours = getExternalContours(dilatedEdges, true);
-    const boundingBoxes = getBoundingBoxes(contours);
+    const dilatedEdges = getDilatedImage(cv, edges, true);
+    const contours = getExternalContours(cv, dilatedEdges, true);
+    const boundingBoxes = getBoundingBoxes(cv, contours);
     const possibleCards: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
     boundingBoxes.forEach(boundingBox => {
       const topLeft = new cv.Point(
@@ -251,10 +268,12 @@ export const detectCardStatus = (
 export const getCardCaptureStatus = (
   imgSrc: HTMLImageElement | HTMLCanvasElement,
   params: ParamsType[],
+  cv: OpenCVType,
+  loaded: boolean,
 ) => {
-  if (!cv.Mat) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
+  if (!loaded) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
   if (imgSrc.width === 0 || imgSrc.height === 0)
     return { status: CardCaptureStatus.detecting, paramIndex: -1 };
   const src = cv.imread(imgSrc);
-  return detectCardStatus(src, imgSrc.width, imgSrc.height, params);
+  return detectCardStatus(cv, src, imgSrc.width, imgSrc.height, params);
 };

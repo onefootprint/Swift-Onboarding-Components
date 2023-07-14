@@ -1,3 +1,4 @@
+import { useOpenCv } from 'opencv-react-ts';
 import { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
@@ -54,6 +55,7 @@ const useAutoCapture = ({
   const videoSize = useSize(videoRef);
   const { getFaceStatus } = useFaceDetection();
   const [isCaptured, setIsCaptured] = useState(false);
+  const { cv, loaded } = useOpenCv();
 
   useEffect(() => {
     // Bring the selected param to the front
@@ -69,7 +71,9 @@ const useAutoCapture = ({
     };
 
     const detectAndCapture = async () => {
-      const context = canvasRef.current?.getContext('2d');
+      const context = canvasRef.current?.getContext('2d', {
+        willReadFrequently: true,
+      });
       if (
         !shouldDetect ||
         isCaptured ||
@@ -96,6 +100,8 @@ const useAutoCapture = ({
       );
 
       if (autocaptureKind === 'document') {
+        if (!cv) return;
+
         // Get the dimensions in video source that corresponds to the frame outline with some cushion
         const sourceDimensions = getSourceDimensions({
           videoRef,
@@ -124,6 +130,8 @@ const useAutoCapture = ({
         const { status: cardCaptureStatus, paramIndex } = getCardCaptureStatus(
           canvasRef.current,
           rearrangedParams.current,
+          cv,
+          loaded,
         );
 
         if (cardCaptureStatus === CardCaptureStatus.OK) {
@@ -166,8 +174,10 @@ const useAutoCapture = ({
   }, [
     autocaptureKind,
     canvasRef,
+    cv,
     getFaceStatus,
     isCaptured,
+    loaded,
     mediaStream,
     onCapture,
     onStatusChange,

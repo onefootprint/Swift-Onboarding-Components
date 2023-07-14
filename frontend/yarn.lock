@@ -2978,13 +2978,6 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
-"@onefootprint/opencv-ts@^1.3.7":
-  version "1.3.7"
-  resolved "https://registry.yarnpkg.com/@onefootprint/opencv-ts/-/opencv-ts-1.3.7.tgz#1b3178239dcbee540339aba2fa4f45c3dc4b3652"
-  integrity sha512-dk/Ktz9eABPq2osEd2d/uBw9JWNJgbBrHOQAOtzDHWkAlcRT3mse/bEUj9a4owDI58wv/C+r+puvOCVLF0S3Hw==
-  dependencies:
-    typescript "^4.2.3"
-
 "@onefootprint/postmate@2.1.0":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@onefootprint/postmate/-/postmate-2.1.0.tgz"
@@ -7372,7 +7365,7 @@ buffer@^4.3.0:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
-buffer@^5.2.0, buffer@^5.5.0:
+buffer@^5.2.0, buffer@^5.4.3, buffer@^5.5.0:
   version "5.7.1"
   resolved "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz"
   integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
@@ -10246,6 +10239,11 @@ file-system-cache@^2.0.0:
   dependencies:
     fs-extra "^11.1.0"
     ramda "^0.28.0"
+
+file-type@^12.3.0:
+  version "12.4.2"
+  resolved "https://registry.yarnpkg.com/file-type/-/file-type-12.4.2.tgz#a344ea5664a1d01447ee7fb1b635f72feb6169d9"
+  integrity sha512-UssQP5ZgIOKelfsaB5CuGAL+Y+q7EmONuiwF3N5HAH0t27rvrttgi6Ra9k/+DVaY9UF6+ybxu5pOXLUdA8N7Vg==
 
 file-type@^16.5.4:
   version "16.5.4"
@@ -14192,6 +14190,21 @@ minizlib@^2.1.1:
     minipass "^3.0.0"
     yallist "^4.0.0"
 
+mirada@^0.0.15:
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/mirada/-/mirada-0.0.15.tgz#f5e98bc5d6ec7fafde1ceb27947147780884ee0a"
+  integrity sha512-mbm4c+wjBVcmUzHRLv/TfOAq+iy03D24KwGxx8H+NSXkD5EOZV9zFWbVxTvZCc9XwR0FIUhryU/kQm12SMSQ3g==
+  dependencies:
+    buffer "^5.4.3"
+    cross-fetch "^3.0.4"
+    file-type "^12.3.0"
+    misc-utils-of-mine-generic "^0.2.31"
+
+misc-utils-of-mine-generic@^0.2.31:
+  version "0.2.45"
+  resolved "https://registry.yarnpkg.com/misc-utils-of-mine-generic/-/misc-utils-of-mine-generic-0.2.45.tgz#db1b76db1ab5a04771b24173e38957182e9e292d"
+  integrity sha512-WsG2zYiui2cdEbHF2pXmJfnjHb4zL+cy+PaYcLgIpMju98hwX89VbjlvGIfamCfEodbQ0qjCEvD3ocgkCXfMOQ==
+
 mississippi@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/mississippi/-/mississippi-3.0.0.tgz"
@@ -14794,6 +14807,13 @@ open@^9.1.0:
     define-lazy-prop "^3.0.0"
     is-inside-container "^1.0.0"
     is-wsl "^2.2.0"
+
+opencv-react-ts@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/opencv-react-ts/-/opencv-react-ts-0.0.11.tgz#a85bd1983e67232a68c93d8599e1b2a8ef13de99"
+  integrity sha512-I4UAf6WCFQ8ZFgOKkyIo7GyO5lyo8bCnsDHwQtwnGl7Z2OH49CRGcleIOO0HyK+E+vSxylGoMEBIH3LEAAMAvQ==
+  optionalDependencies:
+    mirada "^0.0.15"
 
 opener@^1.5.2:
   version "1.5.2"
@@ -18452,7 +18472,7 @@ typedarray@^0.0.6:
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript@4.9.5, typescript@^4.2.3, typescript@^4.9.5:
+typescript@4.9.5, typescript@^4.9.5:
   version "4.9.5"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
