@@ -41,13 +41,6 @@ export abstract class ServiceContainers {
       metricsEndpointPath,
     );
 
-    const hearbeats = ServiceContainers.createHeartbeatContainer(
-      serverContainerName,
-      appPort,
-      secretsStore,
-      constants,
-    );
-
     const apiServer = await ServiceContainers.createApiServer(
       serverContainerName,
       otelCollectorContainerName,
@@ -65,9 +58,9 @@ export abstract class ServiceContainers {
     );
 
     const containerDef = pulumi
-      .all([traceOtelCollector, hearbeats, apiServer])
-      .apply(([traceOtelCollector, hearbeats, apiServer]) => {
-        const def = [apiServer, traceOtelCollector, hearbeats];
+      .all([traceOtelCollector, apiServer])
+      .apply(([traceOtelCollector, apiServer]) => {
+        const def = [apiServer, traceOtelCollector];
         return JSON.stringify(def);
       });
     return containerDef;
@@ -552,59 +545,6 @@ export abstract class ServiceContainers {
               'awslogs-stream-prefix': 'ecs',
             },
           },
-        };
-
-        return def;
-      });
-
-    return out;
-  }
-
-  /**
-   * A Heartbeat agent to ping /status
-   */
-  static createHeartbeatContainer(
-    appName: string,
-    appPort: number,
-    secrets: StaticSecrets,
-    constants: Config,
-  ): pulumi.Output<aws.ecs.ContainerDefinition> {
-    const serviceEnvironment = pulumi.getStack();
-
-    const out = pulumi
-      .all([secrets.elasticApiKey.arn])
-      .apply(([apiKey]) => [
-        {
-          name: 'ELASTIC_APM_API_KEY',
-          valueFrom: apiKey,
-        },
-      ])
-      .apply(secrets => {
-        let def: aws.ecs.ContainerDefinition = {
-          name: 'heartbeat',
-          image:
-            'ghcr.io/onefootprint/heartbeat@sha256:56773827f9fb79264e46b95d128f448c0a4e49b9692ae3dd5bb408812e0efe82',
-          essential: false,
-          secrets,
-          dependsOn: [{ containerName: appName, condition: 'START' }],
-          environment: [
-            {
-              name: 'FPC_MONITOR_URL',
-              value: `http://localhost:${appPort}/status`,
-            },
-            {
-              name: 'FPC_ENV',
-              value: serviceEnvironment,
-            },
-            {
-              name: 'ELASTIC_APM_ID',
-              value: constants.elastic.id,
-            },
-            {
-              name: 'ELASTIC_CLOUD_ID',
-              value: `heartbeat:${constants.elastic.heartbeatCloudId}`,
-            },
-          ],
         };
 
         return def;
