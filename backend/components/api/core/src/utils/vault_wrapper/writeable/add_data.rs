@@ -21,6 +21,11 @@ use newtypes::{
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
 
+pub struct PatchDataResult {
+    pub new_ci: Vec<NewContactInfo>,
+    pub seqno: DataLifetimeSeqno,
+}
+
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the VaultWrapper for a specific tenant.
 /// These are the publically accessible utils to update data on a VaultWrapper.
@@ -31,23 +36,27 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest<Fingerprints>,
-    ) -> ApiResult<Vec<NewContactInfo>> {
+    ) -> ApiResult<PatchDataResult> {
         request.assert_allowable_identifiers(self.vault.kind)?;
         let keys = request.keys().cloned().collect();
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
-        let new_contact_info = if !request.is_empty() {
+        let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw
             let request = self.validate_request(request)?;
-            let vds = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
-            Self::create_contact_info_if_needed(conn, vds)?
+            let (vds, seqno) = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
+            let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
+            (new_ci, seqno)
         } else {
-            vec![]
+            // The request was a no-op, no reason to increment the seqno
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+            (vec![], seqno)
         };
         self.create_bos_if_needed(conn, kyced_bos)?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys)?;
 
-        Ok(new_contact_info)
+        let result = PatchDataResult { new_ci, seqno };
+        Ok(result)
     }
 
     /// We have book-keeping for business owners that are KYCed outside of the vault. When BOs are
@@ -165,7 +174,8 @@ mod test {
             } else {
                 request.no_fingerprints()
             };
-            self.patch_data(conn, request)
+            let new_ci = self.patch_data(conn, request)?.new_ci;
+            Ok(new_ci)
         }
     }
 }

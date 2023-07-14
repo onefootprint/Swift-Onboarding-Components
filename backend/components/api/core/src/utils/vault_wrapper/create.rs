@@ -1,4 +1,4 @@
-use super::{Any, Person, VaultWrapper};
+use super::{Any, PatchDataResult, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
@@ -83,7 +83,7 @@ impl VaultWrapper<Person> {
             .into_iter()
             .flatten(),
         ));
-        let new_ci = uvw.patch_data(conn, request)?;
+        let PatchDataResult { new_ci, seqno } = uvw.patch_data(conn, request)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault
         let (_, ci) = new_ci
@@ -91,8 +91,6 @@ impl VaultWrapper<Person> {
             .find(|(di, _)| di == &DataIdentifier::from(IDK::PhoneNumber))
             .ok_or(AssertionError("No CI made with new vault"))?;
         ContactInfo::mark_verified(conn, &ci.id)?;
-        // I don't love this trick, but it is tricky to propogate the created_seqno of the DL through
-        let seqno = DataLifetime::get_current_seqno(conn)?;
         DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
 
         Ok((uv, su))

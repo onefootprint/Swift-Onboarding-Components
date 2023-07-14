@@ -9,8 +9,8 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DocumentRequestId, DocumentSide, IdDocKind, IdentityDocumentId,
-    ScopedVaultId, VaultId,
+    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentSide, IdDocKind,
+    IdentityDocumentId, ScopedVaultId, VaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -27,9 +27,12 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    // TODO I don't think these lifetime_id columns are ever read - we could probably drop them in
+    // favor of the completed_seqno
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
+    pub completed_seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -55,6 +58,7 @@ pub struct IdentityDocumentUpdate {
     pub front_lifetime_id: Option<DataLifetimeId>,
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
+    pub completed_seqno: Option<DataLifetimeSeqno>,
 }
 
 impl IdentityDocument {

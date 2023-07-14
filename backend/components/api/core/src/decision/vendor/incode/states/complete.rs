@@ -84,13 +84,6 @@ impl Complete {
             })
             .collect::<ApiResult<_>>()?;
 
-        let update = IdentityDocumentUpdate {
-            front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
-            back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
-            selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
-        };
-        IdentityDocument::update(conn, id_doc_id, update)?;
-
         // Add some extracted OCR data to the vault.
         let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
             pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
@@ -116,7 +109,15 @@ impl Complete {
         let data = HashMap::from_iter(data);
         let data = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(vault.is_live))?;
         let data = data.no_fingerprints();
-        uvw.patch_data(conn, data)?;
+        let completed_seqno = uvw.patch_data(conn, data)?.seqno;
+
+        let update = IdentityDocumentUpdate {
+            front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
+            back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
+            selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
+            completed_seqno: Some(completed_seqno),
+        };
+        IdentityDocument::update(conn, id_doc_id, update)?;
 
         // ////////////
         // Save Risk Signals

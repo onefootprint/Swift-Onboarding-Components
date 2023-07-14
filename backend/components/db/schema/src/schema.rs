@@ -232,6 +232,7 @@ table! {
         front_lifetime_id -> Nullable<Text>,
         back_lifetime_id -> Nullable<Text>,
         selfie_lifetime_id -> Nullable<Text>,
+        completed_seqno -> Nullable<Int8>,
     }
 }
 

@@ -15,8 +15,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataRequest, FingerprintRequest,
-    FingerprintScopeKind, Fingerprints, IdentityDataKind as IDK, ScopedVaultId, ValidationError,
+    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSeqno, DataRequest,
+    FingerprintRequest, FingerprintScopeKind, Fingerprints, IdentityDataKind as IDK, ScopedVaultId,
+    ValidationError,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -114,7 +115,7 @@ impl ValidatedDataRequest {
         conn: &mut TxnPgConn,
         user_vault: &Vault,
         scoped_user_id: ScopedVaultId,
-    ) -> ApiResult<Vec<VaultData>> {
+    ) -> ApiResult<(Vec<VaultData>, DataLifetimeSeqno)> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
         let overwrite_kinds = self
@@ -169,6 +170,6 @@ impl ValidatedDataRequest {
 
         Fingerprint::bulk_create(conn, fingerprints)?;
 
-        Ok(vds)
+        Ok((vds, seqno))
     }
 }
