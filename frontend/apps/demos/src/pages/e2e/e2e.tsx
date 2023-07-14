@@ -6,7 +6,12 @@ import React from 'react';
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 
 const handleOpen = () => {
-  footprint.open({ publicKey });
+  footprint.open({
+    publicKey,
+    options: {
+      showCompletionPage: true,
+    },
+  });
 };
 
 // Do not change this page. It is used for E2E testing.
