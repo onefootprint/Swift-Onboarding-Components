@@ -57,6 +57,7 @@ impl SimpleConnection for InstrumentedPgConnection {
     fn batch_execute(&mut self, query: &str) -> QueryResult<()> {
         debug!("executing batch query");
         self.inner.batch_execute(query)?;
+        // TODO should we instrument this?
 
         Ok(())
     }
@@ -153,6 +154,7 @@ impl Connection for InstrumentedPgConnection {
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
             sql=%DebugQuery::new(source),
+            num_rows=field::Empty,
         ),
         skip(self, source),
         err,
@@ -161,7 +163,13 @@ impl Connection for InstrumentedPgConnection {
     where
         T: QueryFragment<Pg> + QueryId,
     {
-        self.inner.execute_returning_count(source)
+        let result = self.inner.execute_returning_count(source);
+        if let Ok(r) = &result {
+            // Instrument the number of rows returned on a successful result
+            let span = tracing::Span::current();
+            span.record("num_rows", r);
+        }
+        result
     }
 
     #[instrument(
@@ -191,6 +199,7 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
             sql=%DebugQuery::new(&source),
+            num_rows=field::Empty,
         ),
         skip(self, source),
         err,
@@ -203,12 +212,19 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
         T: Query + QueryFragment<Pg> + QueryId + 'query,
         Self::Backend: QueryMetadata<T::SqlType>,
     {
-        <PgConnection as LoadConnection<DefaultLoadingMode>>::load(&mut self.inner, source)
+        let result = <PgConnection as LoadConnection<DefaultLoadingMode>>::load(&mut self.inner, source);
+        if let Ok(r) = &result {
+            // Instrument the number of rows returned on a successful result
+            let span = tracing::Span::current();
+            span.record("num_rows", r.len());
+        }
+        result
     }
 }
 
 impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
     #[instrument(
+        "load_row_by_row",
         fields(
             db.name=%self.info.current_database,
             db.system="postgresql",
