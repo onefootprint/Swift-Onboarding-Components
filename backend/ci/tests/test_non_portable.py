@@ -410,3 +410,38 @@ def test_large_objects(sandbox_tenant):
     assert resp[di]
     obj_out = base64.b64decode(resp[di])
     assert json.loads(obj_out)["some_key"] == obj["some_key"]
+
+
+def test_too_large_object_upload(sandbox_tenant):
+    body = post("users/", None, sandbox_tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    di = "custom.large_id2"
+    obj = {"some_key": "helloworld" * 1_200_000}  # over 10MB
+
+    import aiohttp, asyncio
+
+    # need to use a different http client because requests hangs! wow python
+    # ridiculous issue they won't fix: https://github.com/psf/requests/issues/2165
+    async def run():
+        from tests.utils import url
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url(
+                    f"users/{fp_id}/vault/{di}/upload",
+                ),
+                json=obj,
+                headers={"x-footprint-secret-key": sandbox_tenant.sk.key.value},
+            ) as response:
+                print("got response", response)
+                return (response.status, await response.json())
+
+    (status, body) = asyncio.run(run())
+    assert status == 400
+    assert (
+        body["error"]["message"]
+        == "The request is too large, max size accepted is 10485760 KB."
+    )

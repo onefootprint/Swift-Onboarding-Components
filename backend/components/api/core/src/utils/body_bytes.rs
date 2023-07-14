@@ -1,5 +1,4 @@
 use actix_web::dev::Payload;
-use actix_web::error::Error as ActixError;
 use actix_web::FromRequest;
 use actix_web::HttpRequest;
 use futures::Future;
@@ -10,6 +9,8 @@ use std::{
     task::{ready, Context, Poll},
 };
 pub use web::{Bytes, BytesMut};
+
+use crate::ApiError;
 
 /// Just like Actix's bytes, but custom size limit represented in the type
 #[derive(derive_more::Deref, derive_more::DerefMut)]
@@ -22,7 +23,7 @@ impl<const L: usize> BodyBytes<L> {
 }
 // This is our actual deserialzier (where the limit is used)
 impl<const LIMIT: usize> FromRequest for BodyBytes<LIMIT> {
-    type Error = ActixError;
+    type Error = ApiError;
     type Future = actix_bytes::BytesExtractFut<LIMIT>;
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
@@ -38,9 +39,20 @@ impl<const LIMIT: usize> std::fmt::Display for BodyBytes<LIMIT> {
     }
 }
 
+#[derive(thiserror::Error, Debug)]
+pub enum InvalidBodyError {
+    #[error("The request is too large, max size accepted is {max} KB.")]
+    RequestTooLarge { max: usize },
+    #[error("The request is missing a Content-Length header.")]
+    UnknownLength,
+    #[error("The request body is incomplete.")]
+    Incomplete,
+    #[error("The request body could not be decoded.")]
+    FailedToDecode,
+}
 /// adapted from actix_web payload.rs to control limits per request
 mod actix_bytes {
-    use actix_web::{dev, error::PayloadError, http::header};
+    use actix_web::{dev, http::header};
     use futures_util::Stream;
 
     pub use super::*;
@@ -51,7 +63,7 @@ mod actix_bytes {
     }
 
     impl<const LIMIT: usize> Future for BytesExtractFut<LIMIT> {
-        type Output = Result<BodyBytes<LIMIT>, ActixError>;
+        type Output = Result<BodyBytes<LIMIT>, ApiError>;
 
         fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             Pin::new(&mut self.body_fut).poll(cx).map_err(Into::into)
@@ -64,7 +76,7 @@ mod actix_bytes {
         length: Option<usize>,
         stream: dev::Decompress<dev::Payload>,
         buf: BytesMut,
-        err: Option<PayloadError>,
+        err: Option<ApiError>,
     }
 
     impl<const LIMIT: usize> HttpMessageBody<LIMIT> {
@@ -79,13 +91,13 @@ mod actix_bytes {
                     Ok(s) => match s.parse::<usize>() {
                         Ok(l) => {
                             if l > LIMIT {
-                                err = Some(PayloadError::Overflow);
+                                err = Some(ApiError::from(InvalidBodyError::RequestTooLarge { max: LIMIT }));
                             }
                             length = Some(l)
                         }
-                        Err(_) => err = Some(PayloadError::UnknownLength),
+                        Err(_) => err = Some(ApiError::from(InvalidBodyError::UnknownLength)),
                     },
-                    Err(_) => err = Some(PayloadError::UnknownLength),
+                    Err(_) => err = Some(ApiError::from(InvalidBodyError::UnknownLength)),
                 }
             }
 
@@ -101,7 +113,7 @@ mod actix_bytes {
     }
 
     impl<const LIMIT: usize> Future for HttpMessageBody<LIMIT> {
-        type Output = Result<BodyBytes<LIMIT>, PayloadError>;
+        type Output = Result<BodyBytes<LIMIT>, ApiError>;
 
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.get_mut();
@@ -114,9 +126,26 @@ mod actix_bytes {
                 let res = ready!(Pin::new(&mut this.stream).poll_next(cx));
                 match res {
                     Some(chunk) => {
-                        let chunk = chunk?;
+                        let chunk = chunk
+                            .map_err(|err| match &err {
+                                actix_web::error::PayloadError::Overflow => {
+                                    InvalidBodyError::RequestTooLarge { max: LIMIT }
+                                }
+                                actix_web::error::PayloadError::UnknownLength => {
+                                    InvalidBodyError::UnknownLength
+                                }
+                                actix_web::error::PayloadError::Incomplete(_) => InvalidBodyError::Incomplete,
+                                _ => {
+                                    tracing::warn!(error=?err, "io/http2/encoding error");
+                                    InvalidBodyError::FailedToDecode
+                                }
+                            })
+                            .map_err(ApiError::from)?;
+
                         if this.buf.len() + chunk.len() > LIMIT {
-                            return Poll::Ready(Err(PayloadError::Overflow));
+                            return Poll::Ready(Err(ApiError::from(InvalidBodyError::RequestTooLarge {
+                                max: LIMIT,
+                            })));
                         } else {
                             this.buf.extend_from_slice(&chunk);
                         }

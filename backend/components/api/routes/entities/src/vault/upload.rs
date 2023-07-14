@@ -92,7 +92,7 @@ pub async fn post_client(
 async fn post_upload_inner(
     state: &State,
     body: BodyBytes<TEN_MB>,
-        headers: UploadHeaderParams,
+    headers: UploadHeaderParams,
     auth: Box<dyn TenantAuth>,
     fp_id: FpId,
     data_identifier: DataIdentifier,

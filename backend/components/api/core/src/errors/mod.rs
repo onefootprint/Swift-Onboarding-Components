@@ -27,7 +27,7 @@ pub use assertion::*;
 use crate::{
     decision::vendor::{middesk, VendorAPIError},
     types::error::{ApiResponseError, FpResponseErrorInfo},
-    utils::twilio::TwilioError,
+    utils::{body_bytes::InvalidBodyError, twilio::TwilioError},
 };
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
@@ -89,6 +89,8 @@ pub enum ApiError {
     InvalidQueryParam(QueryPayloadError),
     #[error("{0}")]
     InvalidFormError(UrlencodedError),
+    #[error("{0}")]
+    InvalidBody(#[from] InvalidBodyError),
     #[error("{0}")]
     SerdeJson(#[from] serde_json::Error),
     #[error("{0}")]
@@ -270,7 +272,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
             ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
             ApiError::FileUploadError(_) => StatusCode::BAD_REQUEST,
-            ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
+            ApiError::InvalidBody(_) | ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
