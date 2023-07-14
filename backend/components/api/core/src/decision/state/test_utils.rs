@@ -111,7 +111,7 @@ pub async fn query_data(
             .unwrap();
             let rs = latest_obd
                 .as_ref()
-                .map(|obd| RiskSignal::list_by_onboarding_decision_id(conn, &obd.id).unwrap())
+                .map(|obd| RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &obd.id).unwrap())
                 .unwrap_or_default()
                 .into_iter()
                 .filter(|rs| !rs.hidden)

@@ -4,6 +4,7 @@ use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::risk_signal;
 use db_schema::schema::risk_signal_group;
+use db_schema::schema::scoped_vault;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
@@ -83,25 +84,19 @@ impl RiskSignal {
         tenant_id: &'a TenantId,
         is_live: bool,
     ) -> risk_signal::BoxedQuery<'a, diesel::pg::Pg> {
-        use db_schema::schema::{onboarding, onboarding_decision, scoped_vault};
-        let onboarding_decision_ids = onboarding_decision::table
-            .inner_join(
-                onboarding::table
-                    .inner_join(scoped_vault::table)
-                    // Must provide explicit ON since onboarding::latest_decision_id is used by default
-                    .on(onboarding_decision::onboarding_id.eq(onboarding::id)),
-            )
+        let risk_signal_group_ids = risk_signal_group::table
+            .inner_join(scoped_vault::table)
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .select(onboarding_decision::id.nullable());
+            .select(risk_signal_group::id);
         risk_signal::table
-            .filter(risk_signal::onboarding_decision_id.eq_any(onboarding_decision_ids))
+            .filter(risk_signal::risk_signal_group_id.eq_any(risk_signal_group_ids))
             .into_boxed()
     }
 
-    #[tracing::instrument("RiskSignal::get", skip_all)]
-    pub fn get(
+    #[tracing::instrument("RiskSignal::get_tenant_visible", skip_all)]
+    pub fn get_tenant_visible(
         conn: &mut PgConn,
         id: &RiskSignalId,
         fp_id: &FpId,
@@ -110,6 +105,7 @@ impl RiskSignal {
     ) -> DbResult<Self> {
         let signal = Self::query(fp_id, tenant_id, is_live)
             .filter(risk_signal::id.eq(id))
+            .filter(risk_signal::hidden.eq(false))
             .get_result::<Self>(conn)?;
         Ok(signal)
     }
@@ -183,8 +179,8 @@ impl RiskSignal {
     // verification_result_id set
     // This function currently preserves legacy behavior in that it will return RS's created within the context of a certain onboarding_decision_id.
     // Legacy RS's will be retrieved as usual through rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction table
-    #[tracing::instrument("RiskSignal::list_by_onboarding_decision_id", skip_all)]
-    pub fn list_by_onboarding_decision_id(
+    #[tracing::instrument("RiskSignal::list_tenant_visible_by_onboarding_decision_id", skip_all)]
+    pub fn list_tenant_visible_by_onboarding_decision_id(
         conn: &mut PgConn,
         onboarding_decision_id: &OnboardingDecisionId,
     ) -> DbResult<Vec<Self>> {
@@ -193,6 +189,7 @@ impl RiskSignal {
         // the two ways of getting risk signals separately and then fetch all rows together
         let ids = risk_signal::table
             .filter(risk_signal::onboarding_decision_id.eq(onboarding_decision_id))
+            .filter(risk_signal::hidden.eq(false))
             .select(risk_signal::id)
             .get_results::<RiskSignalId>(conn)?;
         let ids2 = obd_vres_junction::table
@@ -201,6 +198,7 @@ impl RiskSignal {
                     .on(risk_signal::verification_result_id.eq(obd_vres_junction::verification_result_id)),
             )
             .filter(obd_vres_junction::onboarding_decision_id.eq(onboarding_decision_id))
+            .filter(risk_signal::hidden.eq(false))
             .select(risk_signal::id)
             .get_results(conn)?;
         let all_ids = ids.into_iter().chain(ids2.into_iter()).unique().collect_vec();
@@ -427,7 +425,7 @@ mod tests {
             OnboardingDecision::latest_footprint_actor_decision(conn, &sv.fp_id, &sv.tenant_id, sv.is_live)
                 .unwrap()
                 .unwrap();
-        let rs = RiskSignal::list_by_onboarding_decision_id(conn, &latest_obd.id).unwrap();
+        let rs = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &latest_obd.id).unwrap();
         assert_have_same_elements(
             expected_risk_signals,
             rs.into_iter().map(|rs| (rs.vendor_api, rs.reason_code)).collect(),

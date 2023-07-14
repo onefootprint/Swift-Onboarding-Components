@@ -41,7 +41,9 @@ pub async fn get(
                 OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
 
             match latest_onboarding_decision {
-                Some(obd) => Ok(RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?),
+                Some(obd) => Ok(RiskSignal::list_tenant_visible_by_onboarding_decision_id(
+                    conn, &obd.id,
+                )?),
                 None => Ok(vec![]),
             }
         })

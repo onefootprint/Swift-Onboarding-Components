@@ -106,7 +106,8 @@ async fn create_cip_request(
 
                 let (risk_signals, fp_obd, mr, manual_obd) = match obd {
                     Some(obd) => {
-                        let risk_signals = RiskSignal::list_by_onboarding_decision_id(conn, &obd.id)?;
+                        let risk_signals =
+                            RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &obd.id)?;
 
                         match obd.status {
                             DecisionStatus::Pass => (risk_signals, obd, None, None),
