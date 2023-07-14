@@ -7,14 +7,8 @@ import TimelineItemTime, {
   TimelineItemTimeData,
 } from './components/timeline-item-time';
 
-export enum TimelineVariant {
-  default = 'default',
-  compact = 'compact',
-}
-
 export type TimelineItem = {
   time?: TimelineItemTimeData;
-  variant?: TimelineVariant;
   iconComponent?: React.ReactNode; // If icon is not provided, we show a dashed line between prev and next items
   headerComponent: React.ReactNode;
   bodyComponent?: React.ReactNode;
@@ -48,8 +42,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
       <TimelineContainer>
         {items.map((item: TimelineItem, i: number) => {
           const key = `${getKeyForItemTime(item.time)}-${i}`;
-          const { variant, iconComponent, headerComponent, bodyComponent } =
-            item;
+          const { iconComponent, headerComponent, bodyComponent } = item;
           const hasDashedBorder = !iconComponent;
           const last = i === items.length - 1;
 
@@ -65,7 +58,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                     <IconContainer>{iconComponent}</IconContainer>
                   )}
                 </IconAndLine>
-                <Content data-variant={variant ?? 'default'}>
+                <Content>
                   <Header>{headerComponent}</Header>
                   {bodyComponent && (
                     <BodyContainer>{bodyComponent}</BodyContainer>
@@ -106,16 +99,8 @@ const Content = styled.div`
     justify-content: flex-start;
     gap: ${theme.spacing[2]};
     width: 100%;
-
-    &[data-variant='default'] {
-      margin-left: ${theme.spacing[5]};
-      padding-bottom: ${theme.spacing[8]};
-    }
-
-    &[data-variant='compact'] {
-      margin-left: ${theme.spacing[4]};
-      padding-bottom: ${theme.spacing[7]};
-    }
+    margin-left: ${theme.spacing[5]};
+    padding-bottom: ${theme.spacing[7]};
   `}
 `;
 

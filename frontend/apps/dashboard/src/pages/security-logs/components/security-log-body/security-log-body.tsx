@@ -89,7 +89,7 @@ const AccessEventBodyContainer = styled.div`
   flex-direction: column;
   ${({ theme }) => css`
     gap: ${theme.spacing[9]};
-    margin: ${theme.spacing[5]} 0 ${theme.spacing[10]}
+    margin: ${theme.spacing[5]} 0 ${theme.spacing[9]}
       calc(-1 * ${theme.spacing[3]});
   `};
 `;
