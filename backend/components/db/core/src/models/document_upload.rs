@@ -26,9 +26,9 @@ pub struct DocumentUpload {
     pub created_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
     /// The seqno at which the image was uploaded to the vault
-    pub created_seqno: Option<DataLifetimeSeqno>,
+    pub created_seqno: DataLifetimeSeqno,
     /// When non-empty, the reasons why the image could not be verified
-    pub failure_reasons: Option<Vec<IncodeFailureReason>>,
+    pub failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, Clone, Insertable)]

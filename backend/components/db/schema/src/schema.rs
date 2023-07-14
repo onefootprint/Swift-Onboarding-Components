@@ -179,8 +179,8 @@ table! {
         e_data_key -> Bytea,
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
-        created_seqno -> Nullable<Int8>,
-        failure_reasons -> Nullable<Array<Text>>,
+        created_seqno -> Int8,
+        failure_reasons -> Array<Text>,
     }
 }
 
