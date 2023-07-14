@@ -57,9 +57,6 @@ const Init = () => {
       bootstrapData,
       options: { showCompletionPage },
     } = args;
-    observeCollector.setAppContext({
-      bootstrapData,
-    });
     send({
       type: 'initContextUpdated',
       payload: {
