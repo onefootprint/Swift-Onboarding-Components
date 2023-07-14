@@ -122,14 +122,26 @@ pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
 }
 
 pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
-    vec![Rule {
-        rule: |f: &ExperianFeatures| {
-            f.footprint_reason_codes
-                .contains(&FootprintReasonCode::IdNotLocated)
+    vec![
+        Rule {
+            rule: |f: &ExperianFeatures| {
+                f.footprint_reason_codes
+                    .contains(&FootprintReasonCode::IdNotLocated)
+            },
+            name: RuleName::IdNotLocated,
+            action: Action::Fail,
         },
-        name: RuleName::IdNotLocated,
-        action: Action::Fail,
-    }]
+        Rule {
+            rule: {
+                |f: &ExperianFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::SsnDoesNotMatch)
+                }
+            },
+            name: RuleName::SsnDoesNotMatch,
+            action: Action::Fail,
+        },
+    ]
 }
 
 pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
