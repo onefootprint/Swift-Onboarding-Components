@@ -1,8 +1,6 @@
 // Input: HEIC Image File. Output: JPEG Image File.
 const convertHEICImage = async (file: File): Promise<File | undefined> => {
-  // Importing heic2any or requiring it globally causes build errors,
-  // so require it locally inside this function only
-  const heic2any = require('heic2any'); // eslint-disable-line global-require
+  const heic2any = (await import('heic2any')).default;
 
   // Check if input file is actually HEIC format
   const { type, name, lastModified } = file;
