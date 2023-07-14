@@ -1,4 +1,3 @@
-// import { SecureRender } from '@onefootprint/components';
 import styled, { css } from '@onefootprint/styled';
 import { DataIdentifier } from '@onefootprint/types';
 import { Button, media, TextInput, Typography } from '@onefootprint/ui';

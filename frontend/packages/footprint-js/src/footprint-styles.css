@@ -94,3 +94,70 @@
 .footprint-button svg {
   margin-right: 8px;
 }
+
+
+.footprint-components-body-locked {
+  overflow: hidden;
+}
+
+.footprint-components-overlay {
+  align-items: center;
+  background: var(--fp-overlay-bg);
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  overflow-y: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50000;
+}
+
+.footprint-components-modal {
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50001;
+}
+
+@keyframes footprint-components-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footprint-components-loading-indicator {
+  background: var(--fp-loading-bg);
+  border-radius: var(--fp-loading-border-radius);
+  padding: var(--fp-loading-padding);
+}
+
+.footprint-components-loading-indicator svg path {
+  fill: var(--fp-loading-color);
+}
+
+.footprint-components-loading-spin {
+  animation: footprint-components-rotate 0.8s linear infinite;
+}
+
+.footprint-components-inline-loader {
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.footprint-components-inline {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

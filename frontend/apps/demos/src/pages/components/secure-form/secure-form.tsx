@@ -1,17 +1,13 @@
-import { SecureForm, SecureFormType } from '@onefootprint/components';
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
+import footprintComponent, {
+  FootprintComponentKind,
+  SecureFormType,
+} from '@onefootprint/footprint-components-js';
 import styled, { css } from '@onefootprint/styled';
-import {
-  Button,
-  media,
-  TextInput,
-  Typography,
-  useToast,
-} from '@onefootprint/ui';
+import { Button, media, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
-import Link from 'next/link';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useEffectOnce } from 'usehooks-ts';
 
 import useClientToken, { ClientTokenResponse } from './hooks/use-client-token';
 
@@ -22,9 +18,11 @@ type FormData = {
 };
 
 const SecureFormDemo = () => {
-  const [showSecureForm, setShowSecureForm] = useState(false);
-  const [authToken, setAuthToken] = useState<string | undefined>();
-  const toast = useToast();
+  const [showSecureForm, setShowSecureForm] = useState(true);
+  const [authToken, setAuthToken] = useState<string | undefined>(
+    'tok_F5FnVRxEV65avd0vZcYAHuF3c1x3qNE3Pw',
+  );
+  // const toast = useToast();
   const clientTokenMutation = useClientToken();
   const {
     register,
@@ -52,27 +50,21 @@ const SecureFormDemo = () => {
     );
   };
 
-  const handleSave = () => {
-    const dashboardUrl = `${DASHBOARD_BASE_URL}/users/${getValues('userId')}`;
-    const dashboardLink = <Link href={dashboardUrl}>your dashboard</Link>;
-    toast.show({
-      title: 'Payment method saved',
-      description: (
-        <span>
-          User saved the payment method form. Please visit {dashboardLink} to
-          decrypt and view.
-        </span>
-      ),
-    });
-  };
+  useEffectOnce(() => {
+    if (!authToken) return;
 
-  const handleCancel = () => {
-    toast.show({
-      variant: 'error',
-      title: 'Payment method not saved',
-      description: 'User cancelled the payment method form',
+    footprintComponent.render({
+      kind: FootprintComponentKind.SecureForm,
+      props: {
+        authToken,
+        cardAlias: getValues('cardAlias'),
+        title: 'Your payment information',
+        type: SecureFormType.cardAndName,
+        variant: 'card',
+      },
+      containerId: 'footprint-secure-form',
     });
-  };
+  });
 
   return (
     <Container>
@@ -84,17 +76,7 @@ const SecureFormDemo = () => {
           Secure Form Demo
         </Typography>
         {showSecureForm && authToken ? (
-          <SecureFormContainer>
-            <SecureForm
-              authToken={authToken}
-              cardAlias={getValues('cardAlias')}
-              title="Your payment information"
-              type={SecureFormType.cardAndName}
-              variant="card"
-              onSave={handleSave}
-              onCancel={handleCancel}
-            />
-          </SecureFormContainer>
+          <SecureFormContainer id="footprint-secure-form" />
         ) : (
           <Form onSubmit={handleSubmit(onSubmit)}>
             <TextInput

@@ -102,7 +102,6 @@ module.exports = {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
-    '@onefootprint/components',
   ],
   async redirects() {
     return [

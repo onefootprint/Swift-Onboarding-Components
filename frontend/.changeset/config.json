@@ -31,6 +31,5 @@
     "@onefootprint/idv",
     "@onefootprint/types",
     "@onefootprint/idv-elements",
-    "@onefootprint/components"
   ]
 }

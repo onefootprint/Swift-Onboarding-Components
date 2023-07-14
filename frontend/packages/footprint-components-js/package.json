@@ -1,0 +1,59 @@
+{
+  "name": "@onefootprint/footprint-components-js",
+  "private": false,
+  "type": "module",
+  "version": "0.0.1",
+  "main": "./dist/footprint-components-js.umd.js",
+  "module": "./dist/footprint-components-js.js",
+  "types": "./dist/footprint-components-js.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/footprint-components-js.umd.js",
+      "import": "./dist/footprint-components-js.js",
+      "types": "./dist/footprint-components-js.d.ts"
+    },
+    "./dist/footprint-components-js.css": {
+      "import": "./dist/footprint-components-js.css",
+      "require": "./dist/footprint-components-js.css"
+    }
+  },
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "kyc",
+    "identity verification",
+    "components",
+    "pci"
+  ],
+  "scripts": {
+    "test": "jest --ci --bail --passWithNoTests",
+    "test:watch": "jest --watch",
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "lint": "eslint src --fix",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "publish:local": "yarn && yarn build && yalc publish"
+  },
+  "devDependencies": {
+    "@onefootprint/jest-presets": "*",
+    "@onefootprint/postmate": "2.1.0",
+    "csstype": "^3.1.1",
+    "eslint-config-footprint": "*",
+    "jest-fetch-mock": "^3.0.3",
+    "tsconfig": "*",
+    "tsup": "^6.5.0",
+    "typescript": "4.9.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jest": {
+    "preset": "@onefootprint/jest-presets/jest/web"
+  }
+}
