@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 
 import SearchInput from '../../search-input';
@@ -18,6 +18,11 @@ const TableFilter = ({
   placeholder,
 }: TableFilterProps) => {
   const [search, setSearch] = useState(initialValue);
+
+  useEffect(() => {
+    setSearch(initialValue);
+  }, [initialValue]);
+
   const debouncedSearch = useDebounce(search, 300);
 
   const handleChangeText = (nextValue: string) => {
