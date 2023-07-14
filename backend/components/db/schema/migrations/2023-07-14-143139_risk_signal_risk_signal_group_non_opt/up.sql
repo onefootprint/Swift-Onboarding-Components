@@ -1,0 +1,1 @@
+ALTER TABLE risk_signal ALTER COLUMN risk_signal_group_id SET NOT NULL;

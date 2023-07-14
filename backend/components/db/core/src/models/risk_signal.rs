@@ -33,7 +33,7 @@ pub struct RiskSignal {
     pub verification_result_id: VerificationResultId,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
-    pub risk_signal_group_id: Option<RiskSignalGroupId>,
+    pub risk_signal_group_id: RiskSignalGroupId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -45,7 +45,7 @@ pub struct NewRiskSignal {
     pub verification_result_id: VerificationResultId,
     pub hidden: bool,
     pub vendor_api: VendorAPI,
-    pub risk_signal_group_id: Option<RiskSignalGroupId>,
+    pub risk_signal_group_id: RiskSignalGroupId,
 }
 
 impl RiskSignal {
@@ -68,7 +68,7 @@ impl RiskSignal {
                 verification_result_id: vres_id,
                 hidden,
                 vendor_api,
-                risk_signal_group_id: Some(rsg.id.clone()),
+                risk_signal_group_id: rsg.id.clone(),
             })
             .collect();
 
@@ -151,11 +151,8 @@ impl RiskSignal {
         let res = risk_signals
             .into_iter()
             .filter_map(|rs| {
-                let rsg_kind = rs
-                    .risk_signal_group_id
-                    .clone()
-                    .and_then(|id| rsg_map.get(&id))
-                    .cloned();
+                let rsg_id = rs.risk_signal_group_id.clone();
+                let rsg_kind = rsg_map.get(&rsg_id).cloned();
 
                 rsg_kind.map(|kind| (kind, rs))
             })
@@ -228,7 +225,7 @@ impl RiskSignal {
                     verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
                     hidden: false,
                     vendor_api,
-                    risk_signal_group_id: None,
+                    risk_signal_group_id: RiskSignalGroupId::from_str("rsg123").unwrap(),
                 })
                 .collect(),
             NewRiskSignals::NewVres { signals } => signals
@@ -240,7 +237,7 @@ impl RiskSignal {
                     verification_result_id: vres_id,
                     hidden: false,
                     vendor_api,
-                    risk_signal_group_id: None,
+                    risk_signal_group_id: RiskSignalGroupId::from_str("rsg123").unwrap(),
                 })
                 .collect(),
         };

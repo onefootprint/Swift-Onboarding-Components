@@ -517,7 +517,7 @@ table! {
         verification_result_id -> Text,
         hidden -> Bool,
         vendor_api -> Text,
-        risk_signal_group_id -> Nullable<Text>,
+        risk_signal_group_id -> Text,
     }
 }
 
