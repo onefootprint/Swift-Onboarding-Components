@@ -19,6 +19,9 @@ UPDATE document_upload
 SET failure_reasons = ARRAY[]::TEXT[]
 WHERE document_upload.failure_reasons IS NULL;
 
+COMMIT;
+BEGIN;
+
 ALTER TABLE document_upload
     ALTER COLUMN created_seqno SET NOT NULL,
     ALTER COLUMN failure_reasons SET NOT NULL;
