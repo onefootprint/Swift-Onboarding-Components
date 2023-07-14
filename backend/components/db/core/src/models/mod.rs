@@ -31,7 +31,6 @@ pub mod socure_device_session;
 pub mod task;
 pub mod tenant;
 pub mod tenant_api_key;
-pub mod tenant_api_key_access_log;
 pub mod tenant_role;
 pub mod tenant_rolebinding;
 pub mod tenant_user;

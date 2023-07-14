@@ -103,25 +103,6 @@ table! {
 table! {
     use diesel::sql_types::*;
 
-    data_lifetime_backup (id) {
-        id -> Text,
-        _created_at -> Nullable<Timestamptz>,
-        _updated_at -> Nullable<Timestamptz>,
-        vault_id -> Nullable<Text>,
-        scoped_vault_id -> Nullable<Text>,
-        created_at -> Nullable<Timestamptz>,
-        portablized_at -> Nullable<Timestamptz>,
-        deactivated_at -> Nullable<Timestamptz>,
-        created_seqno -> Nullable<Int8>,
-        portablized_seqno -> Nullable<Int8>,
-        deactivated_seqno -> Nullable<Int8>,
-        kind -> Nullable<Text>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-
     decision_intent (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -656,18 +637,6 @@ table! {
 table! {
     use diesel::sql_types::*;
 
-    tenant_api_key_access_log (id) {
-        id -> Text,
-        tenant_api_key_id -> Text,
-        timestamp -> Timestamptz,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-
     tenant_role (id) {
         id -> Text,
         tenant_id -> Text,
@@ -941,7 +910,6 @@ joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
-joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
@@ -972,7 +940,6 @@ allow_tables_to_appear_in_same_query!(
     contact_info,
     custom_migration,
     data_lifetime,
-    data_lifetime_backup,
     decision_intent,
     document_data,
     document_request,
@@ -1005,7 +972,6 @@ allow_tables_to_appear_in_same_query!(
     task,
     tenant,
     tenant_api_key,
-    tenant_api_key_access_log,
     tenant_role,
     tenant_rolebinding,
     tenant_user,
