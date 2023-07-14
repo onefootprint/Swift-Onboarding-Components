@@ -133,24 +133,29 @@ impl IdentityDocument {
         Ok(results)
     }
 
-    /// Get all the documents collected for a given onboarding
+    /// Get all the documents collected for a given scoped vault over all workflows
     #[tracing::instrument("IdentityDocument::list", skip_all)]
-    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .select(identity_document::all_columns)
             .get_results(conn)?;
 
         Ok(results)
     }
 
     #[tracing::instrument("IdentityDocument::images", skip_all)]
-    pub fn images(&self, conn: &mut PgConn) -> DbResult<Vec<DocumentUpload>> {
-        let results = document_upload::table
+    pub fn images(&self, conn: &mut PgConn, only_active: bool) -> DbResult<Vec<DocumentUpload>> {
+        let mut query = document_upload::table
             .filter(document_upload::document_id.eq(&self.id))
-            .filter(document_upload::deactivated_at.is_null())
-            .get_results(conn)?;
+            .into_boxed();
+        if only_active {
+            query = query.filter(document_upload::deactivated_at.is_null())
+        }
+        let results = query.get_results(conn)?;
         Ok(results)
     }
 }

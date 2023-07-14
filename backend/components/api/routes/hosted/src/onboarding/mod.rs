@@ -277,7 +277,7 @@ fn get_requirement_inner(
                 let identity_document_types = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                     let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
-                    id_docs.iter().map(|id| id.document_type).unique().collect()
+                    id_docs.iter().map(|(id, _)| id.document_type).unique().collect()
                 } else {
                     vec![]
                 };

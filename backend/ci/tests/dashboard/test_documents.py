@@ -75,3 +75,19 @@ def test_tenant_document_decrypt(user_with_documents):
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
     assert set(access_event["targets"]) == set(fields)
+
+
+def test_get_entity_documents(user_with_documents):
+    tenant = user_with_documents.tenant
+    fp_id = user_with_documents.fp_id
+    body = get(f"entities/{fp_id}/documents", None, tenant.sk.key)
+    doc = body[0]
+    assert doc["kind"] == "drivers_license"
+    assert doc["status"] == "complete"
+    assert all(u["failure_reasons"] == [] for u in doc["uploads"])
+    front = next(u for u in doc["uploads"] if u["side"] == "front")
+    back = next(u for u in doc["uploads"] if u["side"] == "back")
+    selfie = next(u for u in doc["uploads"] if u["side"] == "selfie")
+    assert front["created_seqno"] < back["created_seqno"]
+    assert back["created_seqno"] < selfie["created_seqno"]
+    assert selfie["created_seqno"] < doc["completed_seqno"]

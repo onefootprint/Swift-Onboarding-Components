@@ -169,7 +169,11 @@ pub async fn post(
                     DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone(), seqno)
                 })
                 .collect::<db::DbResult<Vec<_>>>()?;
-            let existing_sides = id_doc.images(conn)?.into_iter().map(|u| u.side).collect_vec();
+            let existing_sides = id_doc
+                .images(conn, true)?
+                .into_iter()
+                .map(|u| u.side)
+                .collect_vec();
             let required_sides = id_doc
                 .document_type
                 .sides()

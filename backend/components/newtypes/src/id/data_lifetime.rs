@@ -1,3 +1,5 @@
+use paperclip::actix::Apiv2Schema;
+
 #[doc = "Sequence number used to order DataLifetimes"]
 #[derive(
     Debug,
@@ -16,6 +18,7 @@
     Default,
     DieselNewType,
     schemars::JsonSchema,
+    Apiv2Schema,
     // This is implemented separately because we need to derive Copy...
     Copy,
 )]

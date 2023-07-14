@@ -93,3 +93,6 @@ pub use self::vault_created::*;
 
 mod workflow;
 pub use self::workflow::*;
+
+mod document;
+pub use document::*;

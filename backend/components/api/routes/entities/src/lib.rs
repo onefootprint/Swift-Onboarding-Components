@@ -4,6 +4,7 @@ use paperclip::actix::web;
 mod annotations;
 mod client_token;
 mod decisions;
+mod documents;
 mod field_validations;
 mod get;
 mod kyc;
@@ -25,6 +26,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(annotations::patch)
         .service(annotations::post)
         .service(decisions::post)
+        .service(documents::get)
         .service(liveness::get)
         .service(timeline::get)
         .service(risk_signals::get)

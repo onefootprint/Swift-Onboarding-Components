@@ -106,7 +106,7 @@ pub async fn build_docv_data_for_submission_from_verification_request(
         .db_query(
             move |conn| -> ApiResult<_> {
                 let (doc, dr) = IdentityDocument::get(conn, &identity_doc_id)?;
-                let images = doc.images(conn)?;
+                let images = doc.images(conn, true)?;
                 let vault = Vault::get(conn, &dr.scoped_vault_id)?;
                 Ok((doc, dr.ref_id, images, vault))
             },
@@ -144,7 +144,7 @@ pub async fn build_docv_data_from_identity_doc(
         .db_query(
             move |conn| -> ApiResult<_> {
                 let (doc, dr) = IdentityDocument::get(conn, &identity_document_id)?;
-                let images = doc.images(conn)?;
+                let images = doc.images(conn, true)?;
                 // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
                 // This would allow us to re-use the uvw util to decrypt an image
                 let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &dr.scoped_vault_id)?;

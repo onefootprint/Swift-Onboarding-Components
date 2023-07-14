@@ -73,7 +73,7 @@ impl Complete {
         // Now that we have the correct type of the document, add the images to the vault
         // under the correct type
         let mut lifetime_ids: HashMap<_, _> = id_doc
-            .images(conn)?
+            .images(conn, true)?
             .into_iter()
             .map(|u| -> ApiResult<_> {
                 let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
