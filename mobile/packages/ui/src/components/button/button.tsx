@@ -1,4 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { Color } from '@onefootprint/design-tokens';
+import { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 import { GestureResponderEvent, Text } from 'react-native';
@@ -15,6 +17,8 @@ export type ButtonProps = BoxProps & {
   loadingLabel?: string;
   onPress?: (event: GestureResponderEvent) => void;
   variant?: ButtonVariant;
+  iconColor?: Color;
+  prefixIcon?: Icon;
 };
 
 const Button = ({
@@ -24,6 +28,8 @@ const Button = ({
   loadingLabel,
   onPress,
   variant = 'primary',
+  prefixIcon: PrefixIcon,
+  iconColor = variant === 'primary' ? 'quinary' : 'primary',
   ...props
 }: ButtonProps) => {
   const [active, setActive] = useState(false);
@@ -44,13 +50,22 @@ const Button = ({
         onPressOut={() => setActive(false)}
         variant={variant}
       >
-        {!loading ? (
-          <ButtonText variant={variant} disabled={disabled}>
-            {children}
-          </ButtonText>
-        ) : (
-          <HiddenButtonText>{children}</HiddenButtonText>
-        )}
+        <Box
+          display="flex"
+          gap={3}
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="row"
+        >
+          {PrefixIcon && <PrefixIcon color={iconColor} />}
+          {!loading ? (
+            <ButtonText variant={variant} disabled={disabled}>
+              {children}
+            </ButtonText>
+          ) : (
+            <HiddenButtonText>{children}</HiddenButtonText>
+          )}
+        </Box>
         <LoadingContainer loading={loading}>
           {loadingLabel ? (
             <Box flexDirection="row" justifyContent="space-between">
