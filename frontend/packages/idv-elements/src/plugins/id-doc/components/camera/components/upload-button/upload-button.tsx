@@ -95,7 +95,7 @@ const RoundButton = styled.button<{
     position: absolute;
     bottom: ${theme.spacing[7]};
     left: ${theme.spacing[5]};
-    box-shadow: 0px 4px 4px 0px #0000001a;
+    box-shadow: ${theme.elevation[2]};
 
     &:hover {
       cursor: pointer;

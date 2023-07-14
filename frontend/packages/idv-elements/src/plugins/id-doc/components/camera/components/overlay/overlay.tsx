@@ -31,29 +31,29 @@ const Overlay = ({
         <CornerOutline
           width={width}
           height={height}
-          outlineWidth={outlineWidth}
-          outlineHeight={outlineHeight}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
           corner="top-left"
         />
         <CornerOutline
           width={width}
           height={height}
-          outlineWidth={outlineWidth}
-          outlineHeight={outlineHeight}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
           corner="top-right"
         />
         <CornerOutline
           width={width}
           height={height}
-          outlineWidth={outlineWidth}
-          outlineHeight={outlineHeight}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
           corner="bottom-left"
         />
         <CornerOutline
           width={width}
           height={height}
-          outlineWidth={outlineWidth}
-          outlineHeight={outlineHeight}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
           corner="bottom-right"
         />
       </>
@@ -62,8 +62,8 @@ const Overlay = ({
       <FullFrameOutline
         width={width}
         height={height}
-        outlineWidth={outlineWidth}
-        outlineHeight={outlineHeight}
+        $outlineWidth={outlineWidth}
+        $outlineHeight={outlineHeight}
       />
     )}
     <AnimatePresence>
@@ -71,8 +71,8 @@ const Overlay = ({
         <InstructionContainer
           width={width}
           height={height}
-          outlineWidth={outlineWidth}
-          outlineHeight={outlineHeight}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
           exit={{ opacity: 0 }}
         >
           <Typography
@@ -107,22 +107,22 @@ const Container = styled.div<{ width: number; height: number }>`
 const CornerOutline = styled.div<{
   width: number;
   height: number;
-  outlineWidth: number;
-  outlineHeight: number;
+  $outlineWidth: number;
+  $outlineHeight: number;
   corner: string;
 }>`
-  ${({ width, height, outlineWidth, outlineHeight, corner, theme }) => css`
-    top: calc(${height / 2}px - ${outlineHeight / 2}px);
-    left: calc(${width / 2}px - ${outlineWidth / 2}px);
-    height: ${outlineHeight}px;
-    width: ${outlineWidth}px;
+  ${({ width, height, $outlineWidth, $outlineHeight, corner, theme }) => css`
+    top: calc(${height / 2}px - ${$outlineHeight / 2}px);
+    left: calc(${width / 2}px - ${$outlineWidth / 2}px);
+    height: ${$outlineHeight}px;
+    width: ${$outlineWidth}px;
     position: absolute;
 
     &::before {
       content: ' ';
       position: absolute;
-      width: ${outlineWidth / 4}px;
-      height: ${outlineHeight / 4}px;
+      width: ${$outlineWidth / 4}px;
+      height: ${$outlineHeight / 4}px;
       top: ${corner === 'top-left' || corner === 'top-right' ? 0 : 'auto'};
       left: ${corner === 'top-left' || corner === 'bottom-left' ? 0 : 'auto'};
       right: ${corner === 'top-right' || corner === 'bottom-right'
@@ -154,14 +154,14 @@ const CornerOutline = styled.div<{
 const FullFrameOutline = styled.div<{
   width: number;
   height: number;
-  outlineWidth: number;
-  outlineHeight: number;
+  $outlineWidth: number;
+  $outlineHeight: number;
 }>`
-  ${({ width, height, outlineWidth, outlineHeight, theme }) => css`
-    top: calc(${height / 2}px - ${outlineHeight / 2}px);
-    left: calc(${width / 2}px - ${outlineWidth / 2}px);
-    height: ${outlineHeight}px;
-    width: ${outlineWidth}px;
+  ${({ width, height, $outlineWidth, $outlineHeight, theme }) => css`
+    top: calc(${height / 2}px - ${$outlineHeight / 2}px);
+    left: calc(${width / 2}px - ${$outlineWidth / 2}px);
+    height: ${$outlineHeight}px;
+    width: ${$outlineWidth}px;
     position: absolute;
     border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.large};
@@ -171,14 +171,14 @@ const FullFrameOutline = styled.div<{
 const InstructionContainer = styled(motion.div)<{
   width: number;
   height: number;
-  outlineWidth: number;
-  outlineHeight: number;
+  $outlineWidth: number;
+  $outlineHeight: number;
 }>`
-  ${({ width, height, outlineWidth, outlineHeight, theme }) => css`
-    top: calc(${height / 2}px - ${outlineHeight / 2}px);
-    left: calc(${width / 2}px - ${outlineWidth / 2}px);
-    height: ${outlineHeight}px;
-    width: ${outlineWidth}px;
+  ${({ width, height, $outlineWidth, $outlineHeight, theme }) => css`
+    top: calc(${height / 2}px - ${$outlineHeight / 2}px);
+    left: calc(${width / 2}px - ${$outlineWidth / 2}px);
+    height: ${$outlineHeight}px;
+    width: ${$outlineWidth}px;
     position: absolute;
     border: none;
     display: flex;

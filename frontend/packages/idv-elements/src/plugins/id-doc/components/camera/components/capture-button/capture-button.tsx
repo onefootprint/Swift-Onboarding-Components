@@ -44,7 +44,7 @@ const InnerCircle = styled.div<{
     background-color: ${theme.backgroundColor.primary};
     border: none;
     border-radius: 50%;
-    box-shadow: 0px 1px 4px 0px #0000001f;
+    box-shadow: ${theme.elevation[2]};
   `}
 `;
 
