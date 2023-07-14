@@ -15,7 +15,7 @@ from tests.constants import (
     FIXTURE_PHONE_NUMBER,
 )
 
-url = lambda path: "{}/{}".format(TEST_URL, path)
+url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
 EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", None)

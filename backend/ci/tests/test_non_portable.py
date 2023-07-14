@@ -393,7 +393,7 @@ def test_large_objects(sandbox_tenant):
     di = "custom.large_id"
     obj = {"some_key": "hello world!" * 250_000}
 
-    post(f"/users/{fp_id}/vault/{di}/upload", obj, sandbox_tenant.sk.key)
+    post(f"users/{fp_id}/vault/{di}/upload", obj, sandbox_tenant.sk.key)
 
     resp = post(
         f"entities/{fp_id}/vault/decrypt",
