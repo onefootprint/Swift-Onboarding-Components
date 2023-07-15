@@ -156,6 +156,12 @@ const handleOpen = () => {
         },
       },
     },
+    onCanceled: () => {
+      console.log('onCanceled');
+    },
+    onCompleted: (validationToken: string) => {
+      console.log('onCompleted', validationToken);
+    },
   });
 };
 

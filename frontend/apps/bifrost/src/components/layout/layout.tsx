@@ -26,7 +26,7 @@ const Layout = ({ children }: LayoutProps) => {
       isSandbox={isSandbox}
       appearance={appearance}
       tenantPk={tenantPk}
-      onClose={footprint.close}
+      onClose={footprint.cancel}
     >
       {children}
     </AppLayout>

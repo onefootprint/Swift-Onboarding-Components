@@ -9,17 +9,17 @@ const iframeManager = new IframeManager();
 let hasIframeOpened = false;
 
 const footprint = () => {
-  const handleOnCompleted = (callback: (validationToken: string) => void) =>
+  const subscribeToComplete = (callback?: (validationToken: string) => void) =>
     iframeManager.on(FootprintPublicEvent.completed, (data: any) => {
       if (data && typeof data === 'string') {
-        callback(data);
+        callback?.(data);
       }
     });
 
-  const handleOnCanceled = (callback: () => void) =>
+  const subscribeToCancel = (callback: () => void) =>
     iframeManager.on(FootprintPublicEvent.canceled, callback);
 
-  const handleOnClosed = (callback: () => void) =>
+  const subscribeToClose = (callback: () => void) =>
     iframeManager.on(FootprintPublicEvent.closed, callback);
 
   const open = async ({
@@ -38,13 +38,12 @@ const footprint = () => {
     const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
     const url = getURL({ fontSrc, publicKey, rules, variables });
     await iframeManager.open(url, userData, options);
-    if (onCompleted) {
-      handleOnCompleted(onCompleted);
-    }
-    if (onCanceled) {
-      handleOnCanceled(onCanceled);
-    }
-    handleOnClosed(close);
+    subscribeToComplete(onCompleted);
+    subscribeToCancel(() => {
+      onCanceled?.();
+      close();
+    });
+    subscribeToClose(close);
   };
 
   const close = async () => {

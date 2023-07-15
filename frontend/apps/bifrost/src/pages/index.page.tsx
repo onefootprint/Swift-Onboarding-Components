@@ -42,7 +42,7 @@ const Root = () => {
             obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
-            onClose={footprint.close}
+            onClose={footprint.cancel}
             showCompletionPage={showCompletionPage}
           />
         )}
