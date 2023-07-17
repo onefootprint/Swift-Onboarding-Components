@@ -1,7 +1,7 @@
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use crypto::zeroize::Zeroize;
 use crypto::{base64, hex};
-use newtypes::{PiiString, VaultPublicKey};
+use newtypes::{export_reason_codes, PiiString, VaultPublicKey};
 
 #[derive(Parser)]
 #[command(name = "MyApp")]
@@ -19,6 +19,7 @@ enum Commands {
     Seal(SealArgs),
     /// Generate a data key sealed to a footprint public key
     GenerateDataKey(GenerateDataKeyArgs),
+    ExportFootprintReasonCode,
 }
 
 #[derive(Args)]
@@ -89,6 +90,11 @@ fn main() -> anyhow::Result<()> {
             let out = public_key.seal_bytes(&key)?;
             key.zeroize(); // ensure this key is gone from memory
             hex::encode(out)
+        }
+        Commands::ExportFootprintReasonCode => {
+            export_reason_codes();
+
+            "export complete!".into()
         }
     };
     print!("{}", out);
