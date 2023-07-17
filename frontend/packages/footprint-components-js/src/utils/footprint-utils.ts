@@ -23,9 +23,9 @@ export const getURL = (
   }
   const searchParamsStr = searchParams.toString();
   if (!searchParamsStr) {
-    return `${url}${kind}`;
+    return `${url}/${kind}`;
   }
-  return `${url}${kind}?${searchParams.toString()}`;
+  return `${url}/${kind}?${searchParams.toString()}`;
 };
 
 export const getAppearanceStyles = ({
