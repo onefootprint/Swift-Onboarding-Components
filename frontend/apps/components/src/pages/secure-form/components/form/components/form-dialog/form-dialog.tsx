@@ -43,7 +43,7 @@ const FormDialog = ({
   onClose,
   variant = 'modal',
 }: FormDialogProps) => {
-  const { t } = useTranslation('components.secure-form.form-dialog');
+  const { t } = useTranslation('pages.secure-form.form-dialog');
 
   return (
     <Container data-testid={testID} data-variant={variant}>

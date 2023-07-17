@@ -8,15 +8,22 @@ import React from 'react';
 import { useFootprintProvider } from '../../components/footprint-provider';
 import useProps from '../../components/footprint-provider/hooks/use-props';
 import Form, { FormData } from './components/form';
+import Invalid from './components/invalid';
+import Loading from './components/loading';
 import useUsersVault from './hooks/use-users-vault';
+import arePropsValid from './utils/are-props-valid';
 
 const SecureForm = () => {
   const usersVaultMutation = useUsersVault();
-  const props = useProps<SecureFormDataProps>();
   const footprintProvider = useFootprintProvider();
+  const props = useProps<SecureFormDataProps>();
   if (!props) {
-    // TODO: create shimmer here
-    return null;
+    return <Loading />;
+  }
+
+  const isValid = arePropsValid(props);
+  if (!isValid) {
+    return <Invalid />;
   }
 
   const { authToken, cardAlias, title, type, variant } = props;
@@ -47,6 +54,7 @@ const SecureForm = () => {
           footprintProvider.send(SecureFormEvent.secureFormSaved);
         },
         onError: (error: unknown) => {
+          // eslint-disable-next-line no-console
           console.error(
             'Encountered error while saving user data to vault: ',
             error,

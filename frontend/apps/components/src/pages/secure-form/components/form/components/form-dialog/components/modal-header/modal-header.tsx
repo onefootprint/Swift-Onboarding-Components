@@ -10,9 +10,7 @@ type ModalHeaderProps = {
 };
 
 const ModalHeader = ({ title, onClose }: ModalHeaderProps) => {
-  const { t } = useTranslation(
-    'components.secure-form.form-dialog.modal-header',
-  );
+  const { t } = useTranslation('pages.secure-form.form-dialog.modal-header');
 
   return (
     <Header>

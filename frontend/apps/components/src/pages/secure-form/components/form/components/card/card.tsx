@@ -19,7 +19,7 @@ const DEFAULT_CVC_NUM_DIGITS = CvcLength.three;
 const AMEX_CVC_NUM_DIGITS = CvcLength.four;
 
 const Card = () => {
-  const { t } = useTranslation('components.secure-form.card.form');
+  const { t } = useTranslation('pages.secure-form.card.form');
   const { register, watch, formState } = useFormContext<CardData>();
   const { errors } = formState;
 

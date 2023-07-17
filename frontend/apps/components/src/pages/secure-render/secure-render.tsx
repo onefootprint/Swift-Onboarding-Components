@@ -5,17 +5,18 @@ import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useProps from '../../components/footprint-provider/hooks/use-props';
+import Invalid from './components/invalid';
+import Loading from './components/loading';
 import Render from './components/render';
 import useEntitiesVaultDecrypt from './hooks/use-entities-vault-decrypt';
 import { SecureRenderProps } from './types';
+import arePropsValid from './utils/are-props-valid';
 import getMaskForId from './utils/get-mask-for-id';
-import isValidDI from './utils/is-valid-di';
 
 const SecureRender = () => {
-  const { t } = useTranslation('components.secure-render');
+  const { t } = useTranslation('pages.secure-render');
   const props = useProps<SecureRenderProps>();
   const decryptMutation = useEntitiesVaultDecrypt();
-
   const {
     authToken = '',
     id = '',
@@ -28,13 +29,13 @@ const SecureRender = () => {
     decryptMutation.mutate({ authToken, field });
   });
   const [isHidden, setIsHidden] = useState(isHiddenDefault);
-
   if (!props) {
-    // TODO: create shimmer here
-    return null;
+    return <Loading />;
   }
-  if (!isValidDI(id)) {
-    throw new TypeError(`Expected id to be a valid DI, got ${id}`);
+
+  const isValid = arePropsValid(props);
+  if (!isValid) {
+    return <Invalid />;
   }
 
   const field = id as DataIdentifier;

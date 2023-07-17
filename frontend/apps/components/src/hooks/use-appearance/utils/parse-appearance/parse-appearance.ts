@@ -3,6 +3,7 @@ const getParsedApperanceField = (params: string) => {
     const parsed = JSON.parse(decodeURIComponent(params));
     return parsed;
   } catch (_) {
+    // eslint-disable-next-line no-console
     console.warn(`Could not parse appearance rules. They will be ignored.`);
     return null;
   }

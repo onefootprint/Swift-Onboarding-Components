@@ -35,6 +35,7 @@ class IframeAdapter implements FootprintClient {
     if (this.postmate) {
       this.postmate.emit(eventName, data);
     } else {
+      // eslint-disable-next-line no-console
       console.warn(
         `Footprint-components.js must be initialized in order to dispatch the event "${eventName}"`,
       );

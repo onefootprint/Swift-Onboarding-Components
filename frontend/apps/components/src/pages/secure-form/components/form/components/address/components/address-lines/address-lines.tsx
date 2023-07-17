@@ -18,7 +18,7 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
     setValue,
     resetField,
   } = useFormContext();
-  const { t } = useTranslation('components.secure-form.address.form');
+  const { t } = useTranslation('pages.secure-form.address.form');
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,

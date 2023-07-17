@@ -12,7 +12,7 @@ export type NameProps = {
 };
 
 const Name = ({ label }: NameProps) => {
-  const { t } = useTranslation('components.secure-form.name.form');
+  const { t } = useTranslation('pages.secure-form.name.form');
   const {
     register,
     formState: { errors },

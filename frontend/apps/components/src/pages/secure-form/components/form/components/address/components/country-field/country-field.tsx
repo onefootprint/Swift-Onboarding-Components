@@ -9,7 +9,7 @@ type CountryFieldProps = {
 
 const CountryField = ({ onChange }: CountryFieldProps) => {
   const { control } = useFormContext();
-  const { t } = useTranslation('components.secure-form.address.form.country');
+  const { t } = useTranslation('pages.secure-form.address.form.country');
 
   return (
     <Controller

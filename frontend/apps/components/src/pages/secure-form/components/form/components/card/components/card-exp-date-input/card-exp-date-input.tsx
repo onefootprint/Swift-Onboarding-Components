@@ -42,7 +42,7 @@ const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
     }: CardExpDateInputProps,
     ref,
   ) => {
-    const { t } = useTranslation('components.secure-form.card.form.expiry');
+    const { t } = useTranslation('pages.secure-form.card.form.expiry');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
       value ? checkIsInvalid(value) : false,

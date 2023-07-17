@@ -8,7 +8,7 @@ const CityField = () => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('components.secure-form.address.form.city');
+  const { t } = useTranslation('pages.secure-form.address.form.city');
 
   return (
     <TextInput

@@ -24,7 +24,7 @@ const Render = ({
   value,
   canCopy,
 }: RenderProps) => {
-  const { t } = useTranslation('components.secure-render');
+  const { t } = useTranslation('pages.secure-render');
   const [values, setValues] = useState({
     showValue: '',
     hiddenValue: '',

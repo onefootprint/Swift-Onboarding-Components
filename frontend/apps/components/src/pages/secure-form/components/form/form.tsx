@@ -40,7 +40,7 @@ const Form = ({
   onCancel,
   onClose,
 }: FormProps) => {
-  const { t } = useTranslation('components.secure-form');
+  const { t } = useTranslation('pages.secure-form');
   const handleBeforeSubmit = (data: FormData) => {
     onSave?.(data);
   };

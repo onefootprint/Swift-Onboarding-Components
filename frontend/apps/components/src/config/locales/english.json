@@ -2,8 +2,13 @@
   "global": {
     "errors": {}
   },
-  "components": {
+  "components": {},
+  "pages": {
     "secure-form": {
+      "invalid": {
+        "title": "Integration incorrectly configured",
+        "subtitle": "It seems like the form integration is using an invalid authentication. Please contact the owner of this product."
+      },
       "title": "Add credit card",
       "section-title": {
         "card-information": "Card information",
@@ -85,6 +90,9 @@
       }
     },
     "secure-render": {
+      "invalid": {
+        "title": "Unavailable"
+      },
       "toggle": {
         "show-aria-label": "Show",
         "hide-aria-label": "Hide"
@@ -214,6 +222,5 @@
         }
       }
     }
-  },
-  "pages": {}
+  }
 }

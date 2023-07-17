@@ -14,7 +14,7 @@ const StateField = ({ inputKind }: StateFieldProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('components.secure-form.address.form.state');
+  const { t } = useTranslation('pages.secure-form.address.form.state');
 
   return inputKind === 'dropdown' ? (
     <Controller

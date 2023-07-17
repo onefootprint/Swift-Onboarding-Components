@@ -6,7 +6,7 @@ import React from 'react';
 
 const SecuredByFootprint = () => {
   const { t } = useTranslation(
-    'components.secure-form.form-dialog.secured-by-footprint',
+    'pages.secure-form.form-dialog.secured-by-footprint',
   );
 
   return (
