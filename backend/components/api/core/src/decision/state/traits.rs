@@ -1,7 +1,7 @@
 use super::actions::WorkflowActions;
 use super::StateError;
 use super::WorkflowKind;
-use crate::decision::onboarding::rule_group::RuleGroup;
+use crate::decision::onboarding::rules::RuleGroup;
 use crate::task;
 use crate::{errors::ApiResult, State};
 use async_trait::async_trait;

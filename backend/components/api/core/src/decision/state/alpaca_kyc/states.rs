@@ -257,8 +257,8 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         // TODO: load risk signals here, and use that to evaluate the rules
-        let (decision, _) = if let Some(fixture_decision) = fixture_decision {
-            common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
+        let decision = if let Some(fixture_decision) = fixture_decision {
+            common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
             common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id)?
         };
@@ -436,12 +436,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let (watchlist_res, vendor_results, webhook_client) = res;
 
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
-        // TODO: remove in follow up PR
-        let kyc_vendor_results: Vec<_> = vendor_results
-            .clone()
-            .into_iter()
-            .filter(|vr| VendorAPI::from(&vr.response.response).is_kyc_call())
-            .collect();
 
         // Watchlist reason codes
         let wc_reason_codes = match &watchlist_res {
@@ -495,8 +489,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         // and have these written at the same time as the Watchlist reason codes
         // and our OBD. (In future, we migrate risk_signal to point to VRes and can remove this temp hack)
         let is_sandbox = watchlist_res.is_right();
-        let (kyc_decision, kyc_reason_codes) = if let Some((_, fixture_decision)) = watchlist_res.right() {
-            common::alpaca_kyc_decision_from_fixture(fixture_decision, &kyc_vendor_results)?
+        let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
+            common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
             common::get_decision(&self, conn, risk_signals, &self.sv_id)?
         };
@@ -528,19 +522,13 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             doc_req.is_some(),
         );
 
-        let (decision, _) = (
-            OnboardingRulesDecisionOutput {
-                decision: final_decision.clone(),
-                // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
-                rules_triggered: kyc_decision.rules_triggered.clone(),
-                rules_not_triggered: kyc_decision.rules_not_triggered.clone(),
-            }
-            .into(),
-            kyc_reason_codes
-                .into_iter()
-                .chain(wc_reason_codes.into_iter())
-                .collect::<Vec<_>>(),
-        );
+        let decision = OnboardingRulesDecisionOutput {
+            decision: final_decision.clone(),
+            // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
+            rules_triggered: kyc_decision.rules_triggered.clone(),
+            rules_not_triggered: kyc_decision.rules_not_triggered.clone(),
+        }
+        .into();
 
         common::save_kyc_decision(
             conn,

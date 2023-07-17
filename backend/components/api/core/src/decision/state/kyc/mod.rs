@@ -11,7 +11,7 @@ use super::{
 use crate::{
     decision::{
         features::risk_signals::RiskSignalsForDecision,
-        onboarding::rule_group::{KycRuleGroup, KycWithDocumentRuleGroup, RuleGroup},
+        onboarding::rules::{KycRuleGroup, KycWithDocumentRuleGroup, RuleGroup},
         rule::rule_sets,
         vendor::vendor_result::VendorResult,
     },

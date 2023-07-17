@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use super::{
     features::kyc_features::KycFeatureVector,
     onboarding::{
-        rule_group::calculate_kyc_rules_output_with_waterfall, rule_group::KycRuleGroup, DecisionReasonCodes,
+        rules::calculate_kyc_rules_output_with_waterfall, rules::KycRuleGroup, DecisionReasonCodes,
         FeatureVector, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
     },
     vendor::{

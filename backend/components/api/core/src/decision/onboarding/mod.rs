@@ -4,7 +4,7 @@ use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResul
 use crate::errors::ApiResult;
 
 use super::rule::RuleName;
-pub mod rule_group;
+pub mod rules;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct OnboardingRulesDecisionOutput {

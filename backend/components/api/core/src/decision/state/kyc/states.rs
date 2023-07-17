@@ -236,8 +236,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
 
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
-        let (decision, _) = if let Some(fixture_decision) = fixture_decision {
-            common::kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
+        let decision = if let Some(fixture_decision) = fixture_decision {
+            common::kyc_decision_from_fixture(fixture_decision)?
         } else {
             common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id)?
         };

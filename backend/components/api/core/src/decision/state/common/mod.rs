@@ -12,8 +12,8 @@ use db::{
     DbError, DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, TenantId, VaultKind,
-    VendorAPI, VerificationResultId, WorkflowId,
+    DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, TenantId, VendorAPI,
+    VerificationResultId, WorkflowId,
 };
 use webhooks::WebhookClient;
 
@@ -21,10 +21,7 @@ use crate::{
     decision::{
         self, engine,
         features::risk_signals::RiskSignalsForDecision,
-        onboarding::{
-            Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput,
-            WaterfallOnboardingRulesDecisionOutput,
-        },
+        onboarding::{Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput},
         utils::FixtureDecision,
         vendor::{
             tenant_vendor_control::TenantVendorControl,
@@ -206,23 +203,16 @@ pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<Ver
 #[tracing::instrument(skip_all)]
 pub fn kyc_decision_from_fixture(
     fixture_decision: FixtureDecision,
-    vendor_results: &[VendorResult],
-) -> ApiResult<KycDecision> {
+) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision).into();
-    let reason_codes = decision::sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Person);
-    let vres_id = get_vres_id_for_fixture(vendor_results)?;
-    let reason_codes = reason_codes
-        .into_iter()
-        .map(|r| (r.0, r.1, vres_id.clone()))
-        .collect();
-    Ok((rules_output, reason_codes))
+
+    Ok(rules_output)
 }
 
 #[tracing::instrument(skip_all)]
 pub fn alpaca_kyc_decision_from_fixture(
     fixture_decision: FixtureDecision,
-    vendor_results: &[VendorResult],
-) -> ApiResult<KycDecision> {
+) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let decision_status = match fixture_decision {
         // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
         (newtypes::DecisionStatus::Fail, true) => DecisionStatus::Pass,
@@ -247,14 +237,8 @@ pub fn alpaca_kyc_decision_from_fixture(
         },
         additional_evaluated: vec![],
     };
-    let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fixture_decision);
-    let vres_id = get_vres_id_for_fixture(vendor_results)?;
-    let reason_codes = reason_codes
-        .into_iter()
-        .map(|r| (r.0, r.1, vres_id.clone()))
-        .collect();
 
-    Ok((rules_output, reason_codes))
+    Ok(rules_output)
 }
 
 #[tracing::instrument(skip_all)]
@@ -263,10 +247,10 @@ pub fn get_decision(
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     sv_id: &ScopedVaultId,
-) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let include_doc = DocumentRequest::get(conn, sv_id)?.is_some();
-    let (rules_output, reason_codes) = rule_group.rule_group(include_doc).evaluate(risk_signals)?;
-    Ok((rules_output, reason_codes))
+    let rules_output = rule_group.rule_group(include_doc).evaluate(risk_signals)?;
+    Ok(rules_output)
 }
 
 #[tracing::instrument(skip(conn, _webhook_client))]

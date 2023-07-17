@@ -1,6 +1,6 @@
 use crate::decision::{
     onboarding::{
-        rule_group::calculate_kyc_rules_output_with_waterfall, rule_group::KycRuleGroup, DecisionReasonCodes,
+        rules::calculate_kyc_rules_output_with_waterfall, rules::KycRuleGroup, DecisionReasonCodes,
         WaterfallOnboardingRulesDecisionOutput,
     },
     Error,
