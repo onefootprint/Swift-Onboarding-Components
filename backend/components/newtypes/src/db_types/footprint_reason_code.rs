@@ -130,22 +130,38 @@ footprint_reason_code_enum! {
         #[note = "Identity not located", severity = SignalSeverity::High,  description = "Identity could not be located with the information provided"]
         IdNotLocated,
 
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = None]
+        #[note = "High activity reported for consumer", severity = SignalSeverity::Low,  description = "More than 3 credit inquiries have been posted to the consumer’s account within the last 30 days"]
+        CreditMoreThan3InquiriesInLast30Days,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = None]
+        #[note = "Credit established before SSN issue date", severity = SignalSeverity::Medium,  description = "Credit was established for this consumer before the input SSN's issue date"]
+        CreditEstablishedBeforeSSNDate,
+
         // ~~~~~~~~~ Address ~~~~~~~~~~~~~~~
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
+        #[note = "Address input is not residential", severity = SignalSeverity::Medium,  description = "Address input is not a residential address"]
+        AddressInputIsNonResidential,
+
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
+        #[note = "Address located is not residential", severity = SignalSeverity::Medium,  description = "Address located is not a residential address"]
+        AddressLocatedIsNonResidential,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Address does not match", severity = SignalSeverity::High,  description = "Address located does not match address input."]
         AddressDoesNotMatch,
 
  #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
- #[note = "Address partially matches", severity = SignalSeverity::Medium,  description = "Address located partially matches address input."]
+ #[note = "Address partially matches", severity = SignalSeverity::Low,  description = "Address located partially matches address input."]
  AddressPartiallyMatches,
 
  #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::Zip], match_level = Some(MatchLevel::NoMatch)]
- #[note = "ZIP code does not match", severity = SignalSeverity::Medium,  description = "ZIP code located does not match the ZIP code input."]
+ #[note = "ZIP code does not match", severity = SignalSeverity::Low,  description = "ZIP code located does not match the ZIP code input."]
  AddressZipCodeDoesNotMatch,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::City], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "City does not match", severity = SignalSeverity::Medium,  description = "City located does not match the city input."]
+        #[note = "City does not match", severity = SignalSeverity::Low,  description = "City located does not match the city input."]
         AddressCityDoesNotMatch,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::City], match_level = Some(MatchLevel::Exact)]
@@ -153,7 +169,7 @@ footprint_reason_code_enum! {
         AddressCityMatches,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Street name does not match", severity = SignalSeverity::Medium,  description = "Street name located does not match input street name."]
+        #[note = "Street name does not match", severity = SignalSeverity::Low,  description = "Street name located does not match input street name."]
         AddressStreetNameDoesNotMatch,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::Partial)]
@@ -161,7 +177,7 @@ footprint_reason_code_enum! {
         AddressStreetNamePartiallyMatches,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::StreetAddress], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Street number does not match", severity = SignalSeverity::Medium,  description = "Street number located does not match input street number."]
+        #[note = "Street number does not match", severity = SignalSeverity::Low,  description = "Street number located does not match input street number."]
         AddressStreetNumberDoesNotMatch,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::State], match_level = Some(MatchLevel::NoMatch)]
@@ -177,7 +193,7 @@ footprint_reason_code_enum! {
         AddressInputIsPoBox,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
-        #[note = "Address is correctional facility", severity = SignalSeverity::High,  description = "Address is a correctional facility"]
+        #[note = "Address is correctional facility", severity = SignalSeverity::Medium,  description = "Address is a correctional facility"]
         AddressInputIsCorrectionalFacility,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
@@ -215,6 +231,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
         #[note = "Input address input is USPO", severity = SignalSeverity::Medium,  description = "The input address is a United States Postal Office."]
         AddressInputIsNotStandardUspo,
+
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
+        #[note = "Input address is not on file", severity = SignalSeverity::Medium,  description = "The input address is not on file at a credit Bureau"]
+        AddressInputNotOnFile,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
         #[note = "Located address is PO box", severity = SignalSeverity::Medium,  description = "The located address is a PO Box."]
@@ -261,6 +281,10 @@ footprint_reason_code_enum! {
         AddressLocatedIsHighRiskAddress,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
+        #[note = "Potential fraudulent activity on the address provided", severity = SignalSeverity::Medium,  description = "The input address has had potentially fraudulent activity reported on it."]
+        AddressRiskAlert,
+
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = None]
         #[note = "High velocity address", severity = SignalSeverity::Medium,  description = "The individual has a high number of addresses within a defined time period."]
         AddressAlertVelocity,
 
@@ -277,14 +301,14 @@ footprint_reason_code_enum! {
         AddressAlertSingleAddressInFile,
 
         #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)] // not sure what this really should be, it's a match but not the _best_ match
-        #[note = "More recent address located", severity = SignalSeverity::Low,  description = "Address input is different from the consumer’s best, most current address."]
+        #[note = "More recent address located", severity = SignalSeverity::Medium,  description = "Address input is different from the consumer’s best, most current address."]
         AddressNewerRecordFound,
 
 
         // ~~~~~~~~~ DOB ~~~~~~~~~~~~~~~
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "DOB year mismatch", severity = SignalSeverity::Medium,  description = "The year of birth located does not match the input."]
+        #[note = "DOB year mismatch", severity = SignalSeverity::Low,  description = "The year of birth located does not match the input."]
         DobYobDoesNotMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
@@ -308,7 +332,7 @@ footprint_reason_code_enum! {
         DobLocatedAgeBelowMinimum,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = None]
-        #[note = "Age above maximum", severity = SignalSeverity::High,  description = "The person is above 85."]
+        #[note = "Age above maximum", severity = SignalSeverity::Medium,  description = "The person is above 85."]
         DobLocatedAgeAboveMaximum,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = None]
@@ -316,7 +340,7 @@ footprint_reason_code_enum! {
         DobLocatedCoppaAlert,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Dob does not match", severity = SignalSeverity::Medium,  description = "DOB located does not match input"]
+        #[note = "Dob does not match", severity = SignalSeverity::High,  description = "DOB located does not match input"]
         DobDoesNotMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
@@ -324,11 +348,11 @@ footprint_reason_code_enum! {
         DobPartialMatch,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
-        #[note = "Dob was not found on file", severity = SignalSeverity::Low,  description = "No DOB was located for the individual"]
+        #[note = "Dob was not found on file", severity = SignalSeverity::High,  description = "No DOB was located for the individual"]
         DobNotOnFile,
 
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
-        #[note = "Dob could not be matched", severity = SignalSeverity::Low,  description = "DOB could not be matched"]
+        #[note = "Dob could not be matched", severity = SignalSeverity::High,  description = "DOB could not be matched"]
         DobCouldNotMatch,
 
 
@@ -337,12 +361,12 @@ footprint_reason_code_enum! {
         // ~~~~~~~~~~~~ SSN ~~~~~~~~~~~~
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
-        #[note = "SSN not available", severity = SignalSeverity::Low,  description = "No SSN information located. "]
+        #[note = "SSN not available", severity = SignalSeverity::High,  description = "No SSN information located. "]
         SsnNotAvailable,
 
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "SSN9 partial match", severity = SignalSeverity::Low,  description = "SSN 9 partially located matches SSN 9 input."]
+        #[note = "SSN9 partial match", severity = SignalSeverity::Medium,  description = "SSN 9 partially located matches SSN 9 input."]
         SsnPartiallyMatches,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
@@ -354,11 +378,11 @@ footprint_reason_code_enum! {
         SsnDoesNotMatchWithin1Digit,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Input SSN is ITIN", severity = SignalSeverity::Low,  description = "The input SSN is an ITIN (Individual Taxpayer Identification Number)."]
+        #[note = "Input SSN is ITIN", severity = SignalSeverity::Medium,  description = "The input SSN is an ITIN (Individual Taxpayer Identification Number)."]
         SsnInputIsItin,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Located SSN is ITIN", severity = SignalSeverity::Low,  description = "The located SSN is an ITIN (Individual Taxpayer Identification Number)."]
+        #[note = "Located SSN is ITIN", severity = SignalSeverity::Medium,  description = "The located SSN is an ITIN (Individual Taxpayer Identification Number)."]
         SsnLocatedIsItin,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
@@ -376,7 +400,7 @@ footprint_reason_code_enum! {
         // ~~~~~~~~~~~~ Name ~~~~~~~~~~~~
 
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Last name does not match", severity = SignalSeverity::Medium,  description = "The located last name does not match the input last name."]
+        #[note = "Last name does not match", severity = SignalSeverity::Low,  description = "The located last name does not match the input last name."]
         NameLastDoesNotMatch,
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
         #[note = "Last name partially matches", severity = SignalSeverity::Low,  description = "The located last name partially matches the input last name."]
@@ -386,7 +410,7 @@ footprint_reason_code_enum! {
  #[note = "Name matches", severity = SignalSeverity::Info,  description = "The located name matches the input name."]
  NameMatches,
  #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
- #[note = "Name does not matches", severity = SignalSeverity::Medium,  description = "The located name does not match the input name."]
+ #[note = "Name does not matches", severity = SignalSeverity::High,  description = "The located name does not match the input name."]
  NameDoesNotMatch,
  #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
  #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
@@ -517,7 +541,7 @@ footprint_reason_code_enum! {
         // ~~~~~~~~~~~~ Identity ~~~~~~~~~~~~
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Multiple identities found", severity = SignalSeverity::Low,  description = "Several valid records exist containing conflicting identifying information."]
+        #[note = "Multiple identities found", severity = SignalSeverity::Medium,  description = "Several valid records exist containing conflicting identifying information."]
         MultipleRecordsFound,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
@@ -527,6 +551,26 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "SSN issued before DOB", severity = SignalSeverity::High,  description = "The SSN number was issued before the individual’s DOB."]
         SsnIssuedPriorToDob,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "SSN issue date cannot be verified", severity = SignalSeverity::Medium,  description = "The issues date of the SSN provided on cannot be verified by the Social Security Administration (SSA)"]
+        SsnIssueDateCannotBeVerified,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "SSN located for this consumer has been reported as deceased", severity = SignalSeverity::High,  description = "The Social Security Administration (SSA) has reported that death benefits are being paid on the best on-file SSN"]
+        SsnLocatedIsDeceased,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "The issue date for the SSN located for this consumer cannot be verified", severity = SignalSeverity::Medium,  description = "The issue date of the best on-file SSN cannot be verified by the Social Security Administration (SSA)"]
+        SsnLocatedIssueDateCannotBeVerified,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "The SSN provided has been associated more often with another consumer", severity = SignalSeverity::Medium,  description = "The SSN input is more frequently reported for another consumer"]
+        SsnPotentiallyBelongsToAnother,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "The SSN provided has been strongly associated more often with another consumer", severity = SignalSeverity::High,  description = "There is a high probability the SSN provided belongs to another consumer."]
+        SsnLikelyBelongsToAnother,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
         #[note = "Thin file", severity = SignalSeverity::Low,  description = "The record located had very little information, specifically only name + address, and lacks sufficient information to strongly identify individual."]
@@ -575,7 +619,7 @@ footprint_reason_code_enum! {
         DocumentBarcodeContentMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document barcode content does not match OCR data", severity = SignalSeverity::High,  description = "Data extracted from the barcode does not match. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
+        #[note = "Document barcode content does not match OCR data", severity = SignalSeverity::Medium,  description = "Data extracted from the barcode does not match. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
         DocumentBarcodeContentDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -604,7 +648,7 @@ footprint_reason_code_enum! {
 
         // Crosschecks
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document crosscheck failed", severity = SignalSeverity::High,  description = "A field crosscheck (comparing data on the front of the document to the back) failed during the document authentication."]
+        #[note = "Document crosscheck failed", severity = SignalSeverity::Medium,  description = "A field crosscheck (comparing data on the front of the document to the back) failed during the document authentication."]
         DocumentFieldCrosscheckFailed,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -734,6 +778,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "DOB month match", severity = SignalSeverity::Info,  description = "Month of birth input matches the month of birth located."]
         DobMobMatches,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
+        #[note = "SSN located is deceased", severity = SignalSeverity::High,  description = "The best on-file SSN for this consumer at a bureau recorded As Deceased"]
+        LocatedSsnIsDeceased,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "SSN matches", severity = SignalSeverity::Info,  description = "SSN located matches SSN input."]

@@ -330,15 +330,7 @@ mod tests {
         let ssn_match = r.ssn_match_reason_codes().unwrap();
         let watchlist_match = r.watchlist_match_reason_codes().unwrap();
 
-        assert_have_same_elements(
-            fs_matches,
-            vec![
-                ExperianFraudShieldCodes::InputSSNIssueDataCannotBeVerified,
-                ExperianFraudShieldCodes::InputSSNDeceased,
-                ExperianFraudShieldCodes::LocatedAddressNonResidential,
-                ExperianFraudShieldCodes::BestLocatedSSNCannotBeVerified,
-            ],
-        );
+        assert_have_same_elements(fs_matches, vec![ExperianFraudShieldCodes::InputSSNDeceased]);
 
         assert_eq!(dob_match, ExperianDobMatchReasonCodes::YobOnlyExactMatch);
         assert_eq!(address_and_name_match, ExperianAddressAndNameMatchReasonCodes::A1);

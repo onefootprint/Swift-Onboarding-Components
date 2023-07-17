@@ -36,6 +36,7 @@ pub enum RuleName {
     AddressLocatedIsHighRiskAddress,
     MultipleRecordsFound,
     DocumentNotVerified,
+    SelfieDoesNotMatch,
     #[cfg(test)]
     Test(String),
     BusinessWatchlistHit,

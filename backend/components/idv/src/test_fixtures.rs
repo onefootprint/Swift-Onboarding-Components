@@ -1503,7 +1503,7 @@ pub fn cross_core_response_with_fraud_shield_codes(
                                                             "code": "03"
                                                         },
                                                         {
-                                                            "value": "Y",
+                                                            "value": "N",
                                                             "code": "04"
                                                         },
                                                         {
@@ -1539,7 +1539,7 @@ pub fn cross_core_response_with_fraud_shield_codes(
                                                             "code": "16"
                                                         },
                                                         {
-                                                            "value": "Y",
+                                                            "value": "N",
                                                             "code": "17"
                                                         },
                                                         {
@@ -1555,7 +1555,7 @@ pub fn cross_core_response_with_fraud_shield_codes(
                                                             "code": "25"
                                                         },
                                                         {
-                                                            "value": "Y",
+                                                            "value": "N",
                                                             "code": "26"
                                                         }
                                                     ]
