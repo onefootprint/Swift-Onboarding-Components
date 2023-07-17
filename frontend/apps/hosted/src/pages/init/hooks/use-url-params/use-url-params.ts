@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 export enum TokenType {
-  beneficialOwner = 'kyb_bo',
+  beneficialOwner = 'bo',
   onboardingConfigPublicKey = 'ob_pk',
   user = 'user',
 }
