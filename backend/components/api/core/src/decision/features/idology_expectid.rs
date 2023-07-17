@@ -32,9 +32,6 @@ impl FeatureSet for IDologyFeatures {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IdologyExpectID
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result_id
-    }
 }
 
 impl IDologyFeatures {

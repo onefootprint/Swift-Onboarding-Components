@@ -35,9 +35,6 @@ impl FeatureSet for ExperianFeatures {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::ExperianPreciseID
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result_id
-    }
 }
 
 fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCode> {

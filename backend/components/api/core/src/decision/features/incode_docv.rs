@@ -30,9 +30,6 @@ impl FeatureSet for IncodeDocumentFeatures {
         // eventually should move this to some sort of vendor api struct
         VendorAPI::IncodeFetchScores
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result_id
-    }
 }
 
 // Once we move RiskSignals to being computed at the time are handling the VRes, we can use this method.

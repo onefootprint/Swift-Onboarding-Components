@@ -36,5 +36,4 @@ pub trait FeatureVector {
 pub trait FeatureSet {
     fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode>;
     fn vendor_api(&self) -> VendorAPI;
-    fn verification_result_id(&self) -> &VerificationResultId;
 }

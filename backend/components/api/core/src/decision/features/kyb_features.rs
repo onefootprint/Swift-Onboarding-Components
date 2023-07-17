@@ -41,9 +41,6 @@ impl FeatureSet for KybFeatureVector {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::MiddeskBusinessUpdateWebhook
     }
-    fn verification_result_id(&self) -> &VerificationResultId {
-        &self.verification_result_id
-    }
 }
 
 #[derive(Clone, Debug)]
