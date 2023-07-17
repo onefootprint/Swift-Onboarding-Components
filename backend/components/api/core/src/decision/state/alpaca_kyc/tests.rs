@@ -1,9 +1,9 @@
 use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_incode, mock_webhooks, query_data, query_risk_signals, setup_data,
-    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
-    WithHit, WithQualifier,
+    mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
+    setup_data, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
+    UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeWatchlistCheckCall;
@@ -36,11 +36,6 @@ use newtypes::{FootprintReasonCode, RiskSignalGroupKind};
 use newtypes::WorkflowState;
 
 use std::sync::Arc;
-
-//
-//
-//
-//
 
 #[test_state_case(UserKind::Demo)]
 #[test_state_case(UserKind::Sandbox("pass"))]
@@ -390,6 +385,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
+    let svid2 = wf.scoped_vault_id.clone();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
@@ -419,6 +415,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
             );
             mock_incode(state, WithHit(false));
+            mock_incode_doc_collection(state, svid2).await;
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));

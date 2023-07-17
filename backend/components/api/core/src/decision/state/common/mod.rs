@@ -257,32 +257,15 @@ pub fn alpaca_kyc_decision_from_fixture(
     Ok((rules_output, reason_codes))
 }
 
-// Deprecate
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
-    rule_group: &impl HasRuleGroup,
-    _conn: &mut TxnPgConn,
-    vendor_results: &[VendorResult],
-) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
-    let (vendor_response_map, vendor_ids_map) =
-        build_vendor_response_map_from_vendor_results(vendor_results)?;
-    let (rules_output, reason_codes) = rule_group
-        .rule_group(false)
-        .evaluate(&vendor_response_map, &vendor_ids_map)?;
-    Ok((rules_output, reason_codes))
-}
-
-#[tracing::instrument(skip_all)]
-pub fn get_decision_using_risk_signals(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     sv_id: &ScopedVaultId,
 ) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
     let include_doc = DocumentRequest::get(conn, sv_id)?.is_some();
-    let (rules_output, reason_codes) = rule_group
-        .rule_group(include_doc)
-        .evaluate_with_risk_signals(risk_signals)?;
+    let (rules_output, reason_codes) = rule_group.rule_group(include_doc).evaluate(risk_signals)?;
     Ok((rules_output, reason_codes))
 }
 

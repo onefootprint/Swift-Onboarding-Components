@@ -6,7 +6,7 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
 use api_core::decision::features;
-use api_core::decision::onboarding::{Decision, KycRuleGroup, OnboardingRulesDecisionOutput};
+use api_core::decision::onboarding::{rule_group::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
 use api_core::task;

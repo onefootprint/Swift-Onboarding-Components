@@ -80,7 +80,6 @@ pub fn save_risk_signals<T>(
 ) -> Result<(), ApiError>
 where
     T: Into<WrappedRiskSignalGroupKind> + Clone,
-    RiskSignalGroupStruct<T>: From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>,
 {
     RiskSignal::bulk_create(
         conn,

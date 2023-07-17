@@ -260,7 +260,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let (decision, _) = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &self.vendor_results)?
         } else {
-            common::get_decision_using_risk_signals(&self, conn, self.risk_signals.clone(), &self.sv_id)?
+            common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision
@@ -435,14 +435,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results, webhook_client) = res;
 
-        // TODO: !! Hack: this will retrieve VRes's from every vendor api, including watchlist check + doc scan.
-        // Soon, we will migrate RiskSignal to point to VRes and then we will just write risk signals when we save the vres
-        // but for now we need to do this hack where we write all risk signals at once when we write an OBD.
-        // The reason codes for the risk signals based on the KYC vendor calls are generated via kyc_features. So for now, we
-        // need to filter all the Vres's we have to just the ones from the KYC vendor calls so we can pass those to kyc_features and generate
-        // the KYC reason_codes we need to write.
-        // A nice alternative here might be to make a new DI for KYC vs Incode flow vs watchlist check. But im not sure if thats worth the effort
-        // given the migration of RiskSignal to VRes will remove the need for this hack anyway
+        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+        // TODO: remove in follow up PR
         let kyc_vendor_results: Vec<_> = vendor_results
             .clone()
             .into_iter()
@@ -504,7 +498,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let (kyc_decision, kyc_reason_codes) = if let Some((_, fixture_decision)) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision, &kyc_vendor_results)?
         } else {
-            common::get_decision(&self, conn, &kyc_vendor_results)?
+            common::get_decision(&self, conn, risk_signals, &self.sv_id)?
         };
 
         // If we collected a doc, we go to review and fail OBD even if no hits

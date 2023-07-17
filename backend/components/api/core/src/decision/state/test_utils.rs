@@ -1,20 +1,29 @@
 use std::sync::Arc;
 
+use crate::decision::features::risk_signals::risk_signal_group_struct::Doc;
+use crate::decision::features::risk_signals::{save_risk_signals, RiskSignalGroupStruct};
+use crate::decision::vendor;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::errors::ApiResult;
+use crate::ApiError;
 use crate::{decision::tests::test_helpers, State};
+use db::models::decision_intent::DecisionIntent;
 use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
 use db::models::workflow_event::WorkflowEvent;
 use db::models::{
     ob_configuration::ObConfiguration, tenant::Tenant, tenant_user::TenantUser,
     tenant_vendor::TenantVendorControl, workflow::Workflow,
 };
 use db::tests::fixtures;
+use db::TxnPgConn;
 use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::incode::response::OnboardingStartResponse;
@@ -23,7 +32,7 @@ use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
-use newtypes::{CipKind, RiskSignalGroupKind, ScopedVaultId, WorkflowId};
+use newtypes::{CipKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowId};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
@@ -248,4 +257,54 @@ pub fn mock_webhooks(
     }
 
     state.set_webhook_client(Arc::new(mock_webhook_client));
+}
+
+pub fn save_vres_for_fixture_risk_signals(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    vault: &Vault,
+    response: serde_json::Value,
+    vendor_api: VendorAPI,
+) -> Result<VerificationResult, ApiError> {
+    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;
+    let vreq = VerificationRequest::create(conn, sv_id, &di.id, vendor_api)?;
+    let e_response = vendor::verification_result::encrypt_verification_result_response(
+        &response.clone().into(),
+        &vault.public_key,
+    )?;
+    let vres = VerificationResult::create(conn, vreq.id, response.into(), e_response, false)?;
+
+    Ok(vres)
+}
+
+// TODO: we need to simulate actually collecting a document, but incode machine is not currently mockable.
+pub async fn mock_incode_doc_collection(state: &State, scoped_vault_id: ScopedVaultId) {
+    state
+        .db_pool
+        .db_transaction(move |conn| {
+            let vault = Vault::get(conn.conn(), &scoped_vault_id).unwrap();
+            let vres = save_vres_for_fixture_risk_signals(
+                conn,
+                &scoped_vault_id,
+                &vault,
+                serde_json::to_value(
+                    idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap(),
+                )
+                .unwrap(),
+                VendorAPI::IncodeFetchScores,
+            )
+            .unwrap();
+            let rsg = RiskSignalGroupStruct::<Doc> {
+                footprint_reason_codes: vec![(
+                    FootprintReasonCode::DocumentVerified,
+                    VendorAPI::IncodeFetchOCR,
+                    vres.id,
+                )],
+                group: Doc,
+            };
+
+            save_risk_signals(conn, &scoped_vault_id, &rsg)
+        })
+        .await
+        .unwrap();
 }
