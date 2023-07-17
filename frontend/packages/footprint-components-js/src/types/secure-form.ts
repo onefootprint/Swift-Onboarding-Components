@@ -4,6 +4,7 @@ export enum SecureFormType {
   cardOnly = 'cardOnly',
   cardAndName = 'cardAndName',
   cardAndNameAndAddress = 'cardAndNameAndAddress',
+  cardAndZip = 'cardAndZip',
 }
 
 export type SecureFormVariant = 'modal' | 'card';

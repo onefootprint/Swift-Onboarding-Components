@@ -1,3 +1,4 @@
+import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { CountrySelectOption, Grid, SelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -21,6 +22,7 @@ const Address = () => {
   const methods = useFormContext<AddressData>();
   const { watch, setFocus, resetField } = methods;
   const country = watch('country');
+  const countryValue = country.value ?? DEFAULT_COUNTRY.value;
 
   const handleCountryChange = () => {
     setFocus('addressLine1');
@@ -34,16 +36,16 @@ const Address = () => {
   return (
     <>
       <CountryField onChange={handleCountryChange} />
-      <AddressLines countryCode={country.value} />
+      <AddressLines countryCode={countryValue} />
       <Grid.Row>
         <Grid.Column col={6}>
           <CityField />
         </Grid.Column>
         <Grid.Column col={6}>
-          <ZipField countryCode={country.value} />
+          <ZipField countryCode={countryValue} />
         </Grid.Column>
       </Grid.Row>
-      <StateField inputKind={country.value === 'US' ? 'dropdown' : 'text'} />
+      <StateField inputKind={countryValue === 'US' ? 'dropdown' : 'text'} />
     </>
   );
 };

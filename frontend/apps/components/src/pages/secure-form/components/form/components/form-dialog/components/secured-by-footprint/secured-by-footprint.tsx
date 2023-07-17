@@ -11,7 +11,9 @@ const SecuredByFootprint = () => {
 
   return (
     <Container>
-      <IcoFootprint16 />
+      <IconContainer>
+        <IcoFootprint16 />
+      </IconContainer>
       <TextContainer>
         <Typography variant="caption-1" color="secondary">
           {t('label')}
@@ -31,6 +33,10 @@ const TextContainer = styled.div`
   ${({ theme }) => css`
     margin-left: ${theme.spacing[2]};
   `}
+`;
+
+const IconContainer = styled.div`
+  min-width: 16px;
 `;
 
 export default SecuredByFootprint;

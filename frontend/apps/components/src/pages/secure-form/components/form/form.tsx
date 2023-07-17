@@ -10,7 +10,7 @@ import { Divider } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import Address, { AddressData } from './components/address';
+import Address, { AddressData, PartialAddress } from './components/address';
 import Card, { CardData } from './components/card';
 import FormDialog from './components/form-dialog';
 import Name, { NameData } from './components/name';
@@ -109,6 +109,21 @@ const Form = ({
                 iconComponent={<IcoBuilding24 />}
               />
               <Address />
+            </>
+          )}
+          {type === SecureFormType.cardAndZip && (
+            <>
+              <Title
+                label={t('section-title.card-information')}
+                iconComponent={<IcoCreditcard24 />}
+              />
+              <Card />
+              <StyledDivider />
+              <Title
+                label={t('section-title.billing-address')}
+                iconComponent={<IcoBuilding24 />}
+              />
+              <PartialAddress />
             </>
           )}
         </StyledForm>

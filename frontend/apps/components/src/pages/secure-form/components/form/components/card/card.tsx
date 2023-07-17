@@ -31,48 +31,52 @@ const Card = () => {
   }
 
   return (
-    <Grid.Row>
-      <Grid.Column col={6}>
-        <CardNumberInput
-          data-private
-          hasError={!!errors.number}
-          hint={errors.number?.message}
-          {...register('number', {
-            required: {
-              value: true,
-              message: t('number.error'),
-            },
-          })}
-        />
-      </Grid.Column>
-      <Grid.Column col={3}>
-        <CardExpDateInput
-          data-private
-          hasError={!!errors.expiry}
-          hint={errors.expiry?.message}
-          {...register('expiry', {
-            required: {
-              value: true,
-              message: t('expiry.error'),
-            },
-          })}
-        />
-      </Grid.Column>
-      <Grid.Column col={3}>
-        <CardCvc
-          data-private
-          hasError={!!errors.cvc}
-          hint={errors.cvc?.message}
-          numDigits={numDigits}
-          {...register('cvc', {
-            required: {
-              value: true,
-              message: t('cvc.error'),
-            },
-          })}
-        />
-      </Grid.Column>
-    </Grid.Row>
+    <>
+      <Grid.Row>
+        <Grid.Column col={12}>
+          <CardNumberInput
+            data-private
+            hasError={!!errors.number}
+            hint={errors.number?.message}
+            {...register('number', {
+              required: {
+                value: true,
+                message: t('number.error'),
+              },
+            })}
+          />
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column col={6}>
+          <CardExpDateInput
+            data-private
+            hasError={!!errors.expiry}
+            hint={errors.expiry?.message}
+            {...register('expiry', {
+              required: {
+                value: true,
+                message: t('expiry.error'),
+              },
+            })}
+          />
+        </Grid.Column>
+        <Grid.Column col={6}>
+          <CardCvc
+            data-private
+            hasError={!!errors.cvc}
+            hint={errors.cvc?.message}
+            numDigits={numDigits}
+            {...register('cvc', {
+              required: {
+                value: true,
+                message: t('cvc.error'),
+              },
+            })}
+          />
+        </Grid.Column>
+      </Grid.Row>
+    </>
   );
 };
 
