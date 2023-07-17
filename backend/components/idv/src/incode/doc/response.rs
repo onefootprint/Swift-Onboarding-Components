@@ -357,33 +357,50 @@ impl FetchOCRResponse {
     ) -> serde_json::Value {
         let first_name = first_name.unwrap_or(PiiString::from("Bobby"));
         let last_name = last_name.unwrap_or(PiiString::from("Bobierto"));
+        let full_name = format!("{} {}", first_name.leak(), last_name.leak());
         let dob = dob.unwrap_or(529873860000);
 
         serde_json::json!(
             {"additionalTimestamps":null,
-            "address":null,
-            "addressFields":null,
+            "address": "567 HAYES ST SAN FRANCISCO CA 941020000 USA",
+            "addressFields": {
+                "street": "567 HAYES ST",
+                "colony": null,
+                "postalCode": "941020000",
+                "city": "SAN FRANCISCO",
+                "state": "CA"
+            },
             "birthDate":dob,
-            "checkedAddress":null,
-            "checkedAddressBean":null,
+            "checkedAddress": "567 Hayes St, San Francisco, CA 94102, United States",
+            "checkedAddressBean": {
+                "street": "567 Hayes St",
+                "colony": "Hayes Valley",
+                "postalCode": "94102",
+                "city": "San Francisco",
+                "state": "CA",
+                "label": "567 Hayes St, San Francisco, CA 94102, United States",
+                "latitude": 37.01795,
+                "longitude": -122.01123,
+                "zipColonyOptions": []
+            },
             "dlClassDetails":null,
             "documentBackSubtype":null,
             "documentFrontSubtype":null,
             "documentNumber":"Y12341234",
             "expirationDate":null,
             "expireAt":"1728950400000",
-            "gender":"Female",
-            "issueDate":null,
+            "gender":"M",
+            "issueDate":2022,
             "issuingAuthority":null,
             "issuingCountry":"US",
-            "issuingState":"MA",
+            "issuingState":"CALIFORNIA",
             "name":{
                 "firstName":first_name,
-                "fullName":null,
-                "givenName":null,
+                "fullName":first_name,
+                "givenName":full_name,
                 "givenNameMrz":null,
                 "lastNameMrz":null,
-                "machineReadableFullName":null,
+                "machineReadableFullName":full_name,
                 "maternalLastName":null,
                 "middleName":null,
                 "nameSuffix":null,
@@ -393,7 +410,7 @@ impl FetchOCRResponse {
             "nationalityMrz":null,
             "ocrDataConfidence":null,
             "personalNumber":null,
-            "refNumber":null,
+            "refNumber": "03/05/2020503OD/BBFD/24",
             "restrictions":null,
             "taxIdNumber":null,
             "typeOfId":"DriversLicense"

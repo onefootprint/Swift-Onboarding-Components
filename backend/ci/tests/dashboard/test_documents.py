@@ -37,6 +37,10 @@ def test_tenant_document_get_decrypt(user_with_documents):
     assert resp["document.drivers_license.document_number"]
     assert resp["document.drivers_license.issuing_state"]
     assert resp["document.drivers_license.expires_at"]
+    assert resp["document.drivers_license.full_name"]
+    assert resp["document.drivers_license.issuing_country"]
+    assert resp["document.drivers_license.full_address"]
+    assert resp["document.drivers_license.gender"]
     assert resp["document.drivers_license.dob"]
 
 
@@ -69,7 +73,7 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["document.drivers_license.front.image"] == test_image_dl_front
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.document_number"] == "Y12341234"
-    assert resp["document.drivers_license.issuing_state"] == "MA"
+    assert resp["document.drivers_license.issuing_state"] == "CALIFORNIA"
     assert resp["document.drivers_license.expires_at"] == "2024-10-15"
     assert resp["document.drivers_license.dob"] == "1986-10-16"
 
