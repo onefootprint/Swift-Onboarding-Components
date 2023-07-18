@@ -18,6 +18,7 @@
 mod business_data_kind;
 mod card_data_kind;
 mod collected_data;
+mod decryptable_identifier;
 mod document_kind;
 mod id_doc_kind;
 mod identity_data_kind;
@@ -26,8 +27,9 @@ mod kv_data_key;
 mod validation;
 
 pub use self::{
-    business_data_kind::*, card_data_kind::*, collected_data::*, document_kind::*, id_doc_kind::*,
-    identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError, validation::*,
+    business_data_kind::*, card_data_kind::*, collected_data::*, decryptable_identifier::*, document_kind::*,
+    id_doc_kind::*, identity_data_kind::*, investor_profile_kind::*, validation::Error as ValidationError,
+    validation::*,
 };
 use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, ValidateArgs, VaultKind,

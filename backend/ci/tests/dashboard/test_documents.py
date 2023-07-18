@@ -62,12 +62,7 @@ def test_tenant_document_decrypt(user_with_documents):
         "reason": "Responding to a customer request",
     }
 
-    resp = post(
-        f"users/{user_with_documents.fp_id}/vault/decrypt",
-        data,
-        tenant.sk.key,
-        status_code=200,
-    )
+    resp = post(f"users/{user_with_documents.fp_id}/vault/decrypt", data, tenant.sk.key)
 
     assert resp["document.drivers_license.front.latest_upload"] == test_image_dl_front
     assert resp["document.drivers_license.front.image"] == test_image_dl_front
@@ -95,3 +90,50 @@ def test_get_entity_documents(user_with_documents):
     assert front["created_seqno"] < back["created_seqno"]
     assert back["created_seqno"] < selfie["created_seqno"]
     assert selfie["created_seqno"] < doc["completed_seqno"]
+
+
+def test_decrypt_historical(user_with_documents):
+    from tests.image_fixtures import test_image_dl_front
+
+    tenant = user_with_documents.tenant
+    fp_id = user_with_documents.fp_id
+    body = get(f"entities/{fp_id}/documents", None, tenant.sk.key)
+    doc = body[0]
+    assert doc["kind"] == "drivers_license"
+    front = next(u for u in doc["uploads"] if u["side"] == "front")
+    front_version = front["created_seqno"]
+    ocr_data_version = doc["completed_seqno"]
+
+    fields = [
+        "document.drivers_license.front.latest_upload",
+        f"document.drivers_license.front.latest_upload:{front_version}",
+        f"document.drivers_license.front.latest_upload:{front_version - 1}",
+        "document.drivers_license.document_number",
+        f"document.drivers_license.document_number:{ocr_data_version}",
+        f"document.drivers_license.document_number:{ocr_data_version - 1}",
+    ]
+    data = {
+        "fields": fields,
+        "reason": "Testing historical decryption",
+    }
+    body = post(f"users/{user_with_documents.fp_id}/vault/decrypt", data, tenant.sk.key)
+
+    assert body["document.drivers_license.front.latest_upload"] == test_image_dl_front
+    assert (
+        body[f"document.drivers_license.front.latest_upload:{front_version}"]
+        == test_image_dl_front
+    )
+    # Version before created version should be empty
+    assert (
+        body[f"document.drivers_license.front.latest_upload:{front_version - 1}"]
+        == None
+    )
+    assert body["document.drivers_license.document_number"] == "Y12341234"
+    assert (
+        body[f"document.drivers_license.document_number:{ocr_data_version}"]
+        == "Y12341234"
+    )
+    # Version before created version should be empty
+    assert (
+        body[f"document.drivers_license.document_number:{ocr_data_version - 1}"] == None
+    )

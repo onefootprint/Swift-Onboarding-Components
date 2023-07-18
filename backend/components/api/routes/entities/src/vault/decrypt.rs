@@ -6,28 +6,29 @@ use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapp
 use crate::{errors::ApiError, State};
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanDecrypt;
+use api_core::errors::{ApiResult, AssertionError};
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{flat_api_object_map_type, PiiString};
-use newtypes::{DataIdentifier, FpId};
+use newtypes::FpId;
+use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, PiiString, VersionedDataIdentifier};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
-    fields: HashSet<DataIdentifier>,
+    fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     reason: String,
 }
 
 flat_api_object_map_type!(
-    DecryptResponse<DataIdentifier, Option<PiiString>>,
+    DecryptResponse<VersionedDataIdentifier, Option<PiiString>>,
     description="A key-value map with the corresponding decrypted values",
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
@@ -58,7 +59,8 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
     let request = request.into_inner();
-    let auth = auth.check_guard(CanDecrypt::new(request.fields.iter().cloned().collect()))?;
+    let dis = request.fields.iter().map(|id| id.di.clone()).collect();
+    let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights).await?;
     Ok(result)
@@ -82,7 +84,8 @@ pub async fn post_client(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
     let request = request.into_inner();
-    let auth = auth.check_guard(CanDecrypt::new(request.fields.iter().cloned().collect()))?;
+    let dis = request.fields.iter().map(|id| id.di.clone()).collect();
+    let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
 
     // TODO would be really cool if we could share the handler - the only difference is one gets
@@ -100,17 +103,23 @@ async fn post_inner(
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
     let DecryptRequest { fields, reason } = request;
-    let fields = fields.into_iter().collect_vec();
+    // Create a VW for each version in fields
+    let version_to_fields = fields.into_iter().map(|f| (f.version, f.di)).into_group_map();
+    let versions = version_to_fields.keys().cloned().collect_vec();
 
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
-    let uvw = state
+    let mut uvws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            Ok(uvw)
+            // Build a VW for every version requested
+            let uvws = versions
+                .into_iter()
+                .map(|v| VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v).map(|vw| (v, vw)))
+                .collect::<ApiResult<_>>()?;
+            Ok(uvws)
         })
         .await??;
 
@@ -119,9 +128,21 @@ async fn post_inner(
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
     };
-    let mut results = uvw.decrypt(state, &fields, req).await?;
-    // Is this step necessary? Every key is present in the response if it was in the request?
-    let results = HashMap::from_iter(fields.into_iter().map(|di| (di.clone(), results.remove(&di.into()))));
+    let mut results = HashMap::new();
+    for (v, fields) in version_to_fields {
+        let vw = uvws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
+        // TODO this will make separate access events for each version - maybe fine?
+        let mut v_results = vw.decrypt(state, &fields, req.clone()).await?;
+        // Is this step necessary? Every key is present in the response if it was in the request?
+        let v_results: HashMap<_, _> = fields
+            .into_iter()
+            .map(|di| (di.clone(), v_results.remove(&di.into())))
+            .collect();
+        for (di, result) in v_results {
+            let id = VersionedDataIdentifier { di, version: v };
+            results.insert(id, result);
+        }
+    }
     let out = DecryptResponse { map: results };
 
     ResponseData::ok(out).json()

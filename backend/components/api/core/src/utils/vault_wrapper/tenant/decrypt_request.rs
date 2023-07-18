@@ -5,6 +5,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::{AccessEventKind, DbActor};
 
+#[derive(Clone)]
 pub struct DecryptRequest {
     pub reason: String,
     pub principal: DbActor,

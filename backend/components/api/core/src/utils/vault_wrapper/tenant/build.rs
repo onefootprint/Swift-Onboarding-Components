@@ -16,7 +16,20 @@ use std::collections::HashMap;
 impl<Type> VaultWrapper<Type> {
     // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
     pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
-        let uvw = Self::build(conn, VwArgs::Tenant(sv_id))?;
+        Self::build_for_tenant_version(conn, sv_id, None)
+    }
+
+    pub fn build_for_tenant_version(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        version: Option<DataLifetimeSeqno>,
+    ) -> ApiResult<TenantVw<Type>> {
+        let args = if let Some(version) = version {
+            VwArgs::Historical(sv_id, version)
+        } else {
+            VwArgs::Tenant(sv_id)
+        };
+        let uvw = Self::build(conn, args)?;
         let onboarding = Onboarding::bulk_get_for_users(conn, vec![sv_id])?.remove(sv_id);
         let scoped_vault = ScopedVault::get(conn, sv_id)?;
         Ok(TenantVw {
