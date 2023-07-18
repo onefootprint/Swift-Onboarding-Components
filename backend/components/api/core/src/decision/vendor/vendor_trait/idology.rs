@@ -18,6 +18,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IdologyExpectIDRequest"))]
     async fn make_request(
         &self,
         request: IdologyExpectIDRequest,
@@ -59,6 +60,7 @@ impl VendorAPIResponse for IdologyExpectIDAPIResponse {
 impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IdologyPaRequest"))]
     async fn make_request(
         &self,
         request: IdologyPaRequest,

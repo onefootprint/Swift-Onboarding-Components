@@ -17,6 +17,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>
     for MiddeskClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "MiddeskCreateBusinessRequest"))]
     async fn make_request(
         &self,
         request: MiddeskCreateBusinessRequest,
@@ -49,6 +50,7 @@ impl VendorAPIResponse for MiddeskCreateBusinessResponse {
 impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>
     for MiddeskClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "MiddeskGetBusinessRequest"))]
     async fn make_request(
         &self,
         request: MiddeskGetBusinessRequest,

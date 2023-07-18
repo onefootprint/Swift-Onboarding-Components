@@ -35,6 +35,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeStartOnboardingRequest"))]
     async fn make_request(
         &self,
         request: IncodeStartOnboardingRequest,
@@ -77,6 +78,7 @@ impl VendorAPIResponse for IncodeResponse<OnboardingStartResponse> {
 impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddFrontRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddFrontRequest,
@@ -119,6 +121,7 @@ impl VendorAPIResponse for IncodeResponse<AddSideResponse> {
 impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddBackRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddBackRequest,
@@ -144,6 +147,7 @@ impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, Incode
 impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeProcessIdRequest"))]
     async fn make_request(
         &self,
         request: IncodeProcessIdRequest,
@@ -183,6 +187,7 @@ impl VendorAPIResponse for IncodeResponse<ProcessIdResponse> {
 impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeFetchScoresRequest"))]
     async fn make_request(
         &self,
         request: IncodeFetchScoresRequest,
@@ -225,6 +230,7 @@ impl VendorAPIResponse for IncodeResponse<FetchScoresResponse> {
 impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddPrivacyConsentRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddPrivacyConsentRequest,
@@ -250,6 +256,7 @@ impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResp
 impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddMLConsentRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddMLConsentRequest,
@@ -289,6 +296,7 @@ impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
 impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeFetchOCRRequest"))]
     async fn make_request(
         &self,
         request: IncodeFetchOCRRequest,
@@ -327,6 +335,7 @@ impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
 impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddSelfieRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddSelfieRequest,
@@ -365,6 +374,7 @@ impl VendorAPIResponse for IncodeResponse<AddSelfieResponse> {
 impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeWatchlistCheckRequest"))]
     async fn make_request(
         &self,
         request: IncodeWatchlistCheckRequest,
@@ -416,6 +426,7 @@ impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
 impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeProcessFaceRequest"))]
     async fn make_request(
         &self,
         request: IncodeProcessFaceRequest,
@@ -455,6 +466,11 @@ impl VendorAPIResponse for IncodeResponse<ProcessFaceResponse> {
 impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardingStatusResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument(
+        "make_request",
+        skip_all,
+        fields(request = "IncodeGetOnboardingStatusRequest")
+    )]
     async fn make_request(
         &self,
         request: IncodeGetOnboardingStatusRequest,

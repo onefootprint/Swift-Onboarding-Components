@@ -12,6 +12,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 /// /// ////////////////
 #[async_trait]
 impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error> for twilio::Client {
+    #[tracing::instrument("make_request", skip_all, fields(request = "TwilioLookupV2Request"))]
     async fn make_request(
         &self,
         request: TwilioLookupV2Request,

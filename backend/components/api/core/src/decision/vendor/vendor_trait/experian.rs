@@ -14,6 +14,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>
     for FootprintVendorHttpClient
 {
+    #[tracing::instrument("make_request", skip_all, fields(request = "ExperianCrossCoreRequest"))]
     async fn make_request(
         &self,
         request: ExperianCrossCoreRequest,

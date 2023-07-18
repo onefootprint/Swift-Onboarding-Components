@@ -12,6 +12,7 @@ use super::{VendorAPICall, VendorAPIResponse};
 /// /// ////////////////
 #[async_trait]
 impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error> for SocureClient {
+    #[tracing::instrument("make_request", skip_all, fields(request = "SocureIDPlusRequest"))]
     async fn make_request(
         &self,
         request: SocureIDPlusRequest,
