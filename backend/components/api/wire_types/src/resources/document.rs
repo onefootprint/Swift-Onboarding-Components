@@ -6,7 +6,7 @@ pub struct Document {
     pub kind: ModernIdDocKind,
     pub started_at: DateTime<Utc>,
     pub status: DocumentRequestStatus,
-    pub completed_seqno: Option<DataLifetimeSeqno>,
+    pub completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,
 }
 
@@ -16,7 +16,7 @@ pub struct DocumentUpload {
     pub timestamp: DateTime<Utc>,
     pub side: DocumentSide,
     pub failure_reasons: Vec<DocumentImageError>,
-    pub created_seqno: DataLifetimeSeqno,
+    pub version: DataLifetimeSeqno,
 }
 
 export_schema!(Document);

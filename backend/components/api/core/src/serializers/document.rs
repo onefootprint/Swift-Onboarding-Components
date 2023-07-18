@@ -26,7 +26,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             kind: document_type.into(),
             started_at: created_at,
             status,
-            completed_seqno,
+            completed_version: completed_seqno,
             uploads,
         }
     }
@@ -49,7 +49,7 @@ impl DbToApi<DocumentUpload> for api_wire_types::DocumentUpload {
         Self {
             timestamp: created_at,
             side,
-            created_seqno,
+            version: created_seqno,
             failure_reasons,
         }
     }

@@ -87,9 +87,9 @@ def test_get_entity_documents(user_with_documents):
     front = next(u for u in doc["uploads"] if u["side"] == "front")
     back = next(u for u in doc["uploads"] if u["side"] == "back")
     selfie = next(u for u in doc["uploads"] if u["side"] == "selfie")
-    assert front["created_seqno"] < back["created_seqno"]
-    assert back["created_seqno"] < selfie["created_seqno"]
-    assert selfie["created_seqno"] < doc["completed_seqno"]
+    assert front["version"] < back["version"]
+    assert back["version"] < selfie["version"]
+    assert selfie["version"] < doc["completed_version"]
 
 
 def test_decrypt_historical(user_with_documents):
@@ -101,8 +101,8 @@ def test_decrypt_historical(user_with_documents):
     doc = body[0]
     assert doc["kind"] == "drivers_license"
     front = next(u for u in doc["uploads"] if u["side"] == "front")
-    front_version = front["created_seqno"]
-    ocr_data_version = doc["completed_seqno"]
+    front_version = front["version"]
+    ocr_data_version = doc["completed_version"]
 
     fields = [
         "document.drivers_license.front.latest_upload",
