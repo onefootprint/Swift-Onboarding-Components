@@ -201,7 +201,7 @@ impl WriteableVw<Person> {
         DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.clone()], seqno)?;
 
         let doc = DocumentData::create(
-            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key,
+            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno,
         )?;
 
         self.add_document_uploaded_timeline_event(conn, doc.id.clone())?;
