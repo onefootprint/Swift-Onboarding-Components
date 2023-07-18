@@ -24,6 +24,7 @@ const Router = () => {
     obConfigAuth,
     onClose,
     onComplete,
+    showLogo,
   } = state.context;
   useLogStateMachine('idv', state);
   const isDone = state.matches('complete');
@@ -63,6 +64,7 @@ const Router = () => {
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
+          showLogo={showLogo}
         />
       )}
       {state.matches('onboarding') && authToken && (

@@ -18,9 +18,13 @@ const PhoneIdentification = () => {
   const {
     identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
+    showLogo,
+    config,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
+  const logoUrl = config?.logoUrl;
+  const orgName = config?.orgName;
   const showRequestErrorToast = useRequestErrorToast();
 
   const handleSubmit = (formData: FormData) => {
@@ -63,7 +67,11 @@ const PhoneIdentification = () => {
 
   return (
     <>
-      <Header />
+      <Header
+        showLogo={showLogo}
+        orgName={orgName}
+        logoUrl={logoUrl ?? undefined}
+      />
       <EmailPreview email={email} onChange={handleChangeEmail} />
       <Form
         onSubmit={handleSubmit}

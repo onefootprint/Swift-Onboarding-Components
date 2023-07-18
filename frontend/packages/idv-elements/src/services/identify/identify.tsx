@@ -12,12 +12,18 @@ type IdentifyProps = IdentifyMachineArgs & {
   onDone: (payload: DonePayload) => void;
 };
 
-const Identify = ({ bootstrapData, obConfigAuth, onDone }: IdentifyProps) => (
+const Identify = ({
+  bootstrapData,
+  obConfigAuth,
+  onDone,
+  showLogo,
+}: IdentifyProps) => (
   <I18nextProvider i18n={configureI18next()}>
     <QueryClientProvider client={queryClient}>
       <IdentifyMachineProvider
         bootstrapData={bootstrapData}
         obConfigAuth={obConfigAuth}
+        showLogo={showLogo}
       >
         <Router onDone={onDone} />
       </IdentifyMachineProvider>

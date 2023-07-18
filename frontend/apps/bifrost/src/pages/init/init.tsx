@@ -55,13 +55,14 @@ const Init = () => {
   useFootprintProviderArgs(args => {
     const {
       bootstrapData,
-      options: { showCompletionPage },
+      options: { showCompletionPage, showLogo },
     } = args;
     send({
       type: 'initContextUpdated',
       payload: {
         bootstrapData,
         showCompletionPage,
+        showLogo,
       },
     });
   });

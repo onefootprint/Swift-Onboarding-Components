@@ -16,6 +16,7 @@ export type MachineContext = {
   validationToken?: string;
   userFound?: boolean;
   showCompletionPage?: boolean;
+  showLogo?: boolean;
 };
 
 export type MachineEvents =

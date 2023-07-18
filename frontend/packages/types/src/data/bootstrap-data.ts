@@ -5,6 +5,7 @@ import { IdDI } from './di';
 export type IdvBootstrapData = KycBootstrapData;
 export type IdvOptions = {
   showCompletionPage?: boolean;
+  showLogo?: boolean;
 };
 
 export type KycBootstrapData = Partial<{

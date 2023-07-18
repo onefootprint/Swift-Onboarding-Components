@@ -18,7 +18,7 @@ const Header = () => {
 
   return (
     <HeaderContainer>
-      <Avatar name={tenantName} size="large" src={onboardingConfig?.logoUrl} />
+      <Avatar name={tenantName} size="xlarge" src={onboardingConfig?.logoUrl} />
       {businessBoKycData ? (
         <HeaderTitle
           title={t('bo-kyc.title', { tenantName })}

@@ -7,7 +7,7 @@ const ContentSecurityPolicy = `
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-src 'self' vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live vercel.com;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com *.onefp.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com js.dvnfo.com maps.googleapis.com fpnpmcdn.net cdn.jsdelivr.net docs.opencv.org;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;

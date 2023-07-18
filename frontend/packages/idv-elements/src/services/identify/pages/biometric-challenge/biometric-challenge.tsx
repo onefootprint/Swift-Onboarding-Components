@@ -7,6 +7,7 @@ import React from 'react';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import LegalFooter from '../../components/legal-footer';
+import Logo from '../../components/logo';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import Biometric from './components/biometric';
 
@@ -17,9 +18,12 @@ const BiometricChallenge = () => {
     config,
     bootstrapData,
     identify: { userFound },
+    showLogo,
   } = state.context;
   const isBootstrap = bootstrapData?.email || bootstrapData?.phoneNumber;
   const title = t('title');
+  const logoUrl = config?.logoUrl;
+  const orgName = config?.orgName;
   const subtitle =
     isBootstrap && userFound
       ? t('bootstrap-subtitle', { tenantName: config?.orgName })
@@ -52,7 +56,12 @@ const BiometricChallenge = () => {
             : { variant: 'back', onBack: handleBack }
         }
       />
-      <HeaderTitle data-private title={title} subtitle={subtitle} />
+      <ContentHeader>
+        {showLogo && orgName && (
+          <Logo orgName={orgName} logoUrl={logoUrl ?? undefined} />
+        )}
+        <HeaderTitle data-private title={title} subtitle={subtitle} />
+      </ContentHeader>
       <Biometric />
       <StyledDivider />
       <Button
@@ -89,6 +98,14 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: ${theme.spacing[7]};
+  `}
+`;
+
+const ContentHeader = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
     gap: ${theme.spacing[7]};
   `}
 `;

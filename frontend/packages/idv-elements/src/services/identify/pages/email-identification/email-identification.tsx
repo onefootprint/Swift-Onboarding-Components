@@ -18,9 +18,13 @@ const EmailIdentification = () => {
   const {
     identify: { email, sandboxId },
     obConfigAuth,
+    config,
+    showLogo,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
+  const logoUrl = config?.logoUrl;
+  const orgName = config?.orgName;
   const showRequestErrorToast = useRequestErrorToast();
 
   const handleSubmit = (formData: FormData) => {
@@ -58,7 +62,11 @@ const EmailIdentification = () => {
 
   return (
     <>
-      <EmailIdentificationHeader />
+      <EmailIdentificationHeader
+        showLogo={showLogo}
+        orgName={orgName}
+        logoUrl={logoUrl ?? undefined}
+      />
       <EmailIdentificationForm
         defaultEmail={email}
         onSubmit={handleSubmit}

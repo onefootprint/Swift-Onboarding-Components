@@ -47,7 +47,8 @@ export const createBifrostMachine = () =>
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const { config, bootstrapData, showCompletionPage } = event.payload;
+          const { config, bootstrapData, showCompletionPage, showLogo } =
+            event.payload;
           context.config = config !== undefined ? config : context.config;
           context.bootstrapData =
             bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
@@ -55,6 +56,8 @@ export const createBifrostMachine = () =>
             showCompletionPage !== undefined
               ? showCompletionPage
               : context.showCompletionPage;
+          context.showLogo =
+            showLogo !== undefined ? showLogo : context.showLogo;
           return context;
         }),
         resetContext: assign(() => ({})),

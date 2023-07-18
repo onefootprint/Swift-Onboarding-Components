@@ -10,11 +10,13 @@ import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 export type IdentifyMachineArgs = {
   bootstrapData?: IdentifyBootstrapData;
   obConfigAuth: ObConfigAuth;
+  showLogo?: boolean;
 };
 
 const createIdentifyMachine = ({
   bootstrapData,
   obConfigAuth,
+  showLogo,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -31,6 +33,7 @@ const createIdentifyMachine = ({
         bootstrapData: bootstrapData ?? {},
         identify: {},
         challenge: {},
+        showLogo,
       },
       states: {
         init: {

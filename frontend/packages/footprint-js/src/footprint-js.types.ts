@@ -232,4 +232,5 @@ export type IdentifyRequest = {
 
 export type FootprintOptions = {
   showCompletionPage?: boolean;
+  showLogo?: boolean;
 };

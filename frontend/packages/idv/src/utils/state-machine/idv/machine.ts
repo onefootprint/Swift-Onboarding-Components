@@ -11,6 +11,7 @@ export type IdvMachineArgs = {
   showCompletionPage?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
+  showLogo?: boolean;
 };
 
 const createIdvMachine = (args: IdvMachineArgs) =>

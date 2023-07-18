@@ -15,6 +15,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   identify: MachineIdentifyContext;
   challenge: MachineChallengeContext;
+  showLogo?: boolean;
 };
 
 export type MachineIdentifyContext = {
