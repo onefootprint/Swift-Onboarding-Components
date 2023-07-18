@@ -1,6 +1,8 @@
 import initFootprintComponent from './footprint-components';
+import vanillaIntegration from './utils/footprint-components-vanilla';
 
 const footprintComponent = initFootprintComponent();
+vanillaIntegration(footprintComponent);
 
 export type {
   FootprintAppearance,
