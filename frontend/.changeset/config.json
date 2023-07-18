@@ -30,6 +30,6 @@
     "@onefootprint/dev-tools",
     "@onefootprint/idv",
     "@onefootprint/types",
-    "@onefootprint/idv-elements",
+    "@onefootprint/idv-elements"
   ]
 }
