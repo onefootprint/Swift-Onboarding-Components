@@ -33,11 +33,20 @@ pub struct AddSideResponse {
 
 impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
-    pub fn failure_reason(&self) -> Option<IncodeFailureReason> {
-        self.fail_reason.as_ref().map(|e| {
+    pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
+        let fail_reason = self.fail_reason.as_ref().map(|e| {
             IncodeFailureReason::try_from(e.as_str())
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
-        })
+        });
+
+        [
+            fail_reason,
+            (self.correct_glare == Some(false)).then_some(IncodeFailureReason::DocumentGlare),
+            (self.correct_sharpness == Some(false)).then_some(IncodeFailureReason::DocumentSharpness),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
     }
 }
 
@@ -577,7 +586,7 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
-        let failure = parsed.failure_reason().unwrap();
+        let failure = parsed.failure_reasons().pop().unwrap();
         assert_eq!(failure, IncodeFailureReason::WrongDocumentSide);
 
         // No failure
@@ -593,8 +602,8 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
-        let failure = parsed.failure_reason();
-        assert!(failure.is_none())
+        let failure = parsed.failure_reasons();
+        assert!(failure.is_empty())
     }
 
     #[test]

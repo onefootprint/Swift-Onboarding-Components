@@ -89,6 +89,8 @@ pub enum IncodeFailureReason {
     SelfieHasFaceMask,
     UnknownCountryCode,
     CountryCodeMismatch,
+    DocumentGlare,
+    DocumentSharpness,
     Other(String),
 }
 

@@ -71,11 +71,15 @@ impl IncodeStateTransition for AddBack {
         let type_of_id = self.response.type_of_id.as_ref();
         let country_code = self.response.country_code.as_ref();
         let mismatch_reason = super::parse_type_of_id(ctx, type_of_id, country_code)?.err();
-        let failure_reason = self.response.failure_reason();
-        if let Some(reason) = mismatch_reason.or(failure_reason) {
+        let mut failure_reasons = self.response.failure_reasons();
+        if let Some(reason) = mismatch_reason {
+            failure_reasons.push(reason);
+        }
+
+        if !failure_reasons.is_empty() {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
-                reasons: vec![reason],
+                reasons: failure_reasons,
                 clear_sides: vec![DocumentSide::Back],
             });
         }

@@ -103,6 +103,8 @@ pub enum DocumentImageError {
     UnknownCountryCode,
     CountryCodeMismatch,
     UnknownError,
+    DocumentGlare,
+    DocumentSharpness,
 }
 export_schema!(DocumentImageError);
 
@@ -143,6 +145,8 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::UnknownCountryCode => Self::UnknownCountryCode,
             IncodeFailureReason::CountryCodeMismatch => Self::CountryCodeMismatch,
             IncodeFailureReason::Other(_) => Self::UnknownError,
+            IncodeFailureReason::DocumentGlare => Self::DocumentGlare,
+            IncodeFailureReason::DocumentSharpness => Self::DocumentSharpness,
         }
     }
 }

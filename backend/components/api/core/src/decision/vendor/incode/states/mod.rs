@@ -3,6 +3,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
+
 use idv::test_fixtures::DocTestOpts;
 use newtypes::incode::IncodeDocumentType;
 pub use start_onboarding::*;
