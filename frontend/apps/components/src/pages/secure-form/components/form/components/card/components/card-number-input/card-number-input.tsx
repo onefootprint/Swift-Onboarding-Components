@@ -44,7 +44,7 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     ref,
   ) => {
     const { t } = useTranslation('pages.secure-form.card.form.number');
-    const brand = creditcardutils.parseCardType(value || '');
+    const [brand, setBrand] = useState('');
     const [blurred, setBlurred] = useState(false);
     const [isInvalid, setIsInvalid] = useState(
       value ? checkIsInvalid(value) : false,
@@ -66,9 +66,9 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setBlurred(false);
       setIsInvalid(false);
+      setBrand(creditcardutils.parseCardType(event.target.value));
       onChange?.(event);
     };
-
     return (
       <InternalInput
         {...props}

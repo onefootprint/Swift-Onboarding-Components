@@ -98,30 +98,40 @@ describe('<CardNumberInput />', () => {
 
   describe('brands', () => {
     describe('visa', () => {
-      it('should format correctly', () => {
-        renderCardNumberInput({ value: '4242424242424242' });
+      it('should format correctly', async () => {
+        renderCardNumberInput({});
         const input = getCardNumberInput();
-        expect(input.value).toEqual('4242 4242 4242 4242');
+        await userEvent.type(input, '4242424242424242');
+        await waitFor(() => {
+          expect(input.value).toEqual('4242 4242 4242 4242');
+        });
       });
 
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '4242 4242');
+        await userEvent.type(input, '42424242');
         expect(input.value).toEqual('4242 4242 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '4242424242424242' });
-        expect(screen.getByRole('img', { name: 'visa' })).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '4242424242424242');
+        await waitFor(() => {
+          expect(screen.getByRole('img', { name: 'visa' })).toBeInTheDocument();
+        });
       });
     });
 
     describe('mastercard', () => {
-      it('should format correctly', () => {
-        renderCardNumberInput({ value: '5555555555554444' });
+      it('should format correctly', async () => {
+        renderCardNumberInput({});
         const input = getCardNumberInput();
-        expect(input.value).toEqual('5555 5555 5555 4444');
+        await userEvent.type(input, '5555555555554444');
+        await waitFor(() => {
+          expect(input.value).toEqual('5555 5555 5555 4444');
+        });
       });
 
       it('should format correctly when typing', async () => {
@@ -131,75 +141,97 @@ describe('<CardNumberInput />', () => {
         expect(input.value).toEqual('5555 5555 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '5555555555554444' });
-        expect(
-          screen.getByRole('img', { name: 'mastercard' }),
-        ).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '5555555555554444');
+        await waitFor(() => {
+          expect(
+            screen.getByRole('img', { name: 'mastercard' }),
+          ).toBeInTheDocument();
+        });
       });
     });
 
     describe('amex', () => {
-      it('should format correctly', () => {
-        renderCardNumberInput({ value: '378282246310005' });
+      it('should format correctly', async () => {
+        renderCardNumberInput({});
         const input = getCardNumberInput();
-        expect(input.value).toEqual('3782 822463 10005');
+        await userEvent.type(input, '378282246310005');
+        await waitFor(() => {
+          expect(input.value).toEqual('3782 822463 10005');
+        });
       });
 
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '3782 822463');
+        await userEvent.type(input, '3782822463');
         expect(input.value).toEqual('3782 822463 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '378282246310005' });
-        expect(screen.getByRole('img', { name: 'amex' })).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '378282246310005');
+        await waitFor(() => {
+          expect(screen.getByRole('img', { name: 'amex' })).toBeInTheDocument();
+        });
       });
     });
 
     describe('discover', () => {
-      it('should format correctly', () => {
-        renderCardNumberInput({ value: '6011111111111117' });
+      it('should format correctly', async () => {
+        renderCardNumberInput({});
         const input = getCardNumberInput();
-        expect(input.value).toEqual('6011 1111 1111 1117');
+        await userEvent.type(input, '6011111111111117');
+        await waitFor(() => {
+          expect(input.value).toEqual('6011 1111 1111 1117');
+        });
       });
 
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '6011 1111');
+        await userEvent.type(input, '60111111');
         expect(input.value).toEqual('6011 1111 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '6011111111111117' });
-        expect(
-          screen.getByRole('img', { name: 'discover' }),
-        ).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '6011111111111117');
+        await waitFor(() => {
+          expect(
+            screen.getByRole('img', { name: 'discover' }),
+          ).toBeInTheDocument();
+        });
       });
     });
 
     describe('diners', () => {
       it('should format correctly', () => {
-        renderCardNumberInput({ value: '3600 0000 0000 08	' });
+        renderCardNumberInput({ value: '30569309025904' });
         const input = getCardNumberInput();
-        expect(input.value).toEqual('3600 000000 0008');
+        expect(input.value).toEqual('3056 930902 5904');
       });
 
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '3600 000000');
-        expect(input.value).toEqual('3600 000000 ');
+        await userEvent.type(input, '3056 930932');
+        expect(input.value).toEqual('3056 930932 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '3600 0000 0000 08	' });
-        expect(
-          screen.getByRole('img', { name: 'dinersclub' }),
-        ).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '30569309025904');
+        await waitFor(() => {
+          expect(
+            screen.getByRole('img', { name: 'dinersclub' }),
+          ).toBeInTheDocument();
+        });
       });
     });
 
@@ -213,13 +245,17 @@ describe('<CardNumberInput />', () => {
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '3530 1113');
+        await userEvent.type(input, '35301113');
         expect(input.value).toEqual('3530 1113 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '3530111333300000' });
-        expect(screen.getByRole('img', { name: 'jcb' })).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '3530111333300000');
+        await waitFor(() => {
+          expect(screen.getByRole('img', { name: 'jcb' })).toBeInTheDocument();
+        });
       });
     });
 
@@ -233,15 +269,19 @@ describe('<CardNumberInput />', () => {
       it('should format correctly when typing', async () => {
         renderCardNumberInput({});
         const input = getCardNumberInput();
-        await userEvent.type(input, '6200 0000');
+        await userEvent.type(input, '62000000');
         expect(input.value).toEqual('6200 0000 ');
       });
 
-      it('should render the brand icon', () => {
-        renderCardNumberInput({ value: '6200000000000005' });
-        expect(
-          screen.getByRole('img', { name: 'unionpay' }),
-        ).toBeInTheDocument();
+      it('should render the brand icon', async () => {
+        renderCardNumberInput({});
+        const input = getCardNumberInput();
+        await userEvent.type(input, '6200000000000005');
+        await waitFor(() => {
+          expect(
+            screen.getByRole('img', { name: 'unionpay' }),
+          ).toBeInTheDocument();
+        });
       });
     });
   });
