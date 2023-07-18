@@ -157,7 +157,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             let svid = args.scoped_vault_id.clone();
             self.db_pool
                 .db_transaction(move |conn| -> DbResult<()> {
-                    let ut = UserTimeline::get_by_event_data_id(conn, wc.id.to_string())?;
+                    let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string())?;
                     if ut.is_none() {
                         UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, svid)?;
                     }

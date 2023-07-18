@@ -288,8 +288,13 @@ impl UserTimeline {
     }
 
     #[tracing::instrument("UserTimeline::get_by_event_data_id", skip_all)]
-    pub fn get_by_event_data_id(conn: &mut PgConn, id: String) -> DbResult<Option<Self>> {
+    pub fn get_by_event_data_id(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        id: String,
+    ) -> DbResult<Option<Self>> {
         let res = user_timeline::table
+            .filter(user_timeline::scoped_vault_id.eq(sv_id))
             .filter(
                 user_timeline::event
                     .retrieve_by_path_as_text(vec!["data", "id"])

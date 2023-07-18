@@ -400,11 +400,10 @@ async fn get_data(
     let (wc, vreqs, ut) = db_pool
         .db_query(move |conn| {
             let wc = WatchlistCheck::_get_by_svid(conn, &svid).unwrap();
+            let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string()).unwrap();
             let vreqs =
                 VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, svid)
                     .unwrap();
-
-            let ut = UserTimeline::get_by_event_data_id(conn, wc.id.to_string()).unwrap();
 
             // TODO: add usertimeline
             (wc, vreqs, ut)
