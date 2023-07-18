@@ -14,9 +14,9 @@ import {
   removeInlineLoaderContainer,
   removeLoader,
   removeOverlay,
-} from './footprint-ui';
+} from './ui-utils';
 
-class FootprintIframe {
+class FootprintComponentsIframe {
   private child: Postmate.ParentAPI | null = null;
 
   private sendProps(props?: FootprintComponentProps) {
@@ -130,4 +130,4 @@ class FootprintIframe {
   }
 }
 
-export default FootprintIframe;
+export default FootprintComponentsIframe;

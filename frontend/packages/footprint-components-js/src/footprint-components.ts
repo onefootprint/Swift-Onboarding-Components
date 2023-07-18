@@ -1,4 +1,4 @@
-import './footprint-styles.css';
+import './footprint-components-styles.css';
 
 import {
   FootprintComponentKind,
@@ -7,8 +7,8 @@ import {
   SecureFormEvent,
   SecureFormProps,
 } from './types';
-import IframeManager from './utils/footprint-iframe';
-import { getAppearanceStyles, getURL } from './utils/footprint-utils';
+import IframeManager from './utils/footprint-components-iframe';
+import { getAppearanceStyles, getURL } from './utils/url-utils';
 
 const iframeManager = new IframeManager();
 let hasIframeOpened = false;

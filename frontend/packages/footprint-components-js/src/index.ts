@@ -1,4 +1,4 @@
-import initFootprintComponent from './footprint';
+import initFootprintComponent from './footprint-components';
 
 const footprintComponent = initFootprintComponent();
 
