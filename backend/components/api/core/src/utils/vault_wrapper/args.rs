@@ -1,6 +1,6 @@
 use crate::errors::ApiResult;
 use db::{
-    models::{scoped_vault::ScopedVault, vault::Vault, verification_request::VerificationRequest},
+    models::{scoped_vault::ScopedVault, vault::Vault},
     PgConn,
 };
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
@@ -13,18 +13,17 @@ use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 ///
 /// The VwArgs variants below are used to construct a VaultWrapper specific to the use case.
 pub enum VwArgs<'a> {
-    /// Used to build a VW that sees ALL portable data and speculative data
-    /// Allows reconstructing a VaultWrapper at the time a VerificationRequest was made
-    /// This is only used during the onboarding process
-    Idv(VerificationRequest),
     /// Used to build a VW for a user that sees ALL portable data, or if it's non-portable, just speculative.
     /// This is generally used in user-authed APIs for my1fp
     Vault(&'a VaultId),
     /// Used to build a VW that sees ALL portable data and speculative data
-    /// Generally used during APIs on the bifrost onboarding path when WRITING data to the vault or
-    /// in tenant-authed APIs when READING data from the vault.
-    /// TODO should we have this include the list of fields to be decrypted so we can selectively choose what to load?
+    /// Generally used during APIs on the tenant-specific bifrost onboarding path or
+    /// in tenant-authed APIs.
     Tenant(&'a ScopedVaultId),
+    /// Used to build a VW that sees ALL portable data and speculative data.
+    /// Allows reconstructing a VaultWrapper from the view of a given tenant at a historical point
+    /// in time.
+    Historical(&'a ScopedVaultId, DataLifetimeSeqno),
 }
 
 type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
@@ -32,10 +31,10 @@ type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
-            Self::Idv(req) => {
-                let su = ScopedVault::get(conn, &req.scoped_vault_id)?;
+            Self::Historical(sv_id, seqno) => {
+                let su = ScopedVault::get(conn, sv_id)?;
                 let uv = Vault::get(conn, &su.vault_id)?;
-                (uv, Some(su.id), Some(req.uvw_snapshot_seqno))
+                (uv, Some(su.id), Some(seqno))
             }
             Self::Vault(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;

@@ -374,7 +374,7 @@ impl DataLifetime {
                 .and(data_lifetime::created_seqno.le(seqno));
             query = query.filter(q_is_portable.or(q_belongs_to_tenant));
         } else {
-            // Only fetch portable, portable data
+            // Only fetch portable data
             query = query.filter(q_is_portable)
         }
 

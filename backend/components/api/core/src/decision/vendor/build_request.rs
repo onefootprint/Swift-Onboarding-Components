@@ -14,7 +14,7 @@ use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
 use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId, DocumentSide, EncryptedVaultPrivateKey};
 use std::collections::HashMap;
-use std::{str::FromStr};
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 pub async fn build_idv_data_from_verification_request(
@@ -26,7 +26,7 @@ pub async fn build_idv_data_from_verification_request(
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
     let uvw = db_pool
-        .db_query(|conn| VaultWrapper::<Person>::build(conn, VwArgs::Idv(request)))
+        .db_query(move |conn| VaultWrapper::<Person>::build(conn, VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno)))
         .await??;
 
     let all_idks: Vec<_> = IDK::iter().map(DataIdentifier::from).collect();
@@ -213,7 +213,8 @@ pub async fn build_business_data_from_verification_request(
     let (sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<(ScopedVault, VaultWrapper<_>)> {
             let sv = ScopedVault::get(conn, &request.scoped_vault_id)?;
-            let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Idv(request))?;
+            let args = VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno);
+            let bvw = VaultWrapper::<Business>::build(conn, args)?;
 
             Ok((sv, bvw))
         })
