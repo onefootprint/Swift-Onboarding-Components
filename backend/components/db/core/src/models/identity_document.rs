@@ -33,6 +33,10 @@ pub struct IdentityDocument {
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub completed_seqno: Option<DataLifetimeSeqno>,
+    // DO NOT CHANGE THE ORDER OF THESE FIELDS
+    pub document_score: Option<f64>,
+    pub selfie_score: Option<f64>,
+    pub ocr_confidence_score: Option<f64>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -59,6 +63,9 @@ pub struct IdentityDocumentUpdate {
     pub back_lifetime_id: Option<DataLifetimeId>,
     pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub completed_seqno: Option<DataLifetimeSeqno>,
+    pub document_score: Option<f64>,
+    pub selfie_score: Option<f64>,
+    pub ocr_confidence_score: Option<f64>,
 }
 
 impl IdentityDocument {

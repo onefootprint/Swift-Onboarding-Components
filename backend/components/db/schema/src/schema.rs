@@ -214,6 +214,9 @@ table! {
         back_lifetime_id -> Nullable<Text>,
         selfie_lifetime_id -> Nullable<Text>,
         completed_seqno -> Nullable<Int8>,
+        document_score -> Nullable<Float8>,
+        selfie_score -> Nullable<Float8>,
+        ocr_confidence_score -> Nullable<Float8>,
     }
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE identity_document DROP COLUMN document_score, DROP COLUMN selfie_score, DROP COLUMN ocr_confidence_score;

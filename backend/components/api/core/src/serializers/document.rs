@@ -13,6 +13,9 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             created_at,
             document_type,
             completed_seqno,
+            document_score,
+            selfie_score,
+            ocr_confidence_score,
             ..
         } = identity_doc;
 
@@ -22,12 +25,16 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             .into_iter()
             .map(api_wire_types::DocumentUpload::from_db)
             .collect();
+
         Self {
             kind: document_type.into(),
             started_at: created_at,
             status,
             completed_version: completed_seqno,
             uploads,
+            document_score,
+            selfie_score,
+            ocr_confidence_score,
         }
     }
 }

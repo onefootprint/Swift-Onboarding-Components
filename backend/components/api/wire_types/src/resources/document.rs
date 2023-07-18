@@ -8,6 +8,9 @@ pub struct Document {
     pub status: DocumentRequestStatus,
     pub completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,
+    pub document_score: Option<f64>,
+    pub selfie_score: Option<f64>,
+    pub ocr_confidence_score: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]

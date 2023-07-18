@@ -53,8 +53,8 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
     if scores
-        .overall_score()
-        .map(|s| s == IncodeStatus::Fail)
+        .document_score()
+        .map(|s| s.1 == IncodeStatus::Fail)
         .map_err(idv::Error::from)?
     {
         reason_codes.push(FootprintReasonCode::DocumentNotVerified);
@@ -68,7 +68,7 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     //  would overall score always be failure then?
     if scores
         .id_ocr_confidence()
-        .map(|s| s == IncodeStatus::Fail)
+        .map(|s| s.1 == IncodeStatus::Fail)
         .map_err(idv::Error::from)?
     {
         reason_codes.push(FootprintReasonCode::DocumentOcrNotSuccessful);
@@ -79,7 +79,7 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     // only populate reason code if we collected a selfie
     if expect_selfie {
         if scores.selfie_match()
-        .map(|s| s == IncodeStatus::Fail)
+        .map(|s| s.1 == IncodeStatus::Fail)
         .map_err(idv::Error::from)?
         {
             reason_codes.push(FootprintReasonCode::DocumentSelfieDoesNotMatch);

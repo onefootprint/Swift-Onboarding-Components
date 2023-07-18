@@ -48,7 +48,7 @@ impl IncodeStateTransition for FetchScores {
             .map_err(map_to_api_err)?;
 
         // we need an overall score or else we should fail
-        score_response.overall_score().map_err(map_to_api_err)?;
+        score_response.document_score().map_err(map_to_api_err)?;
 
         // There's a really annoying/subtle thing with the incode API:
         //    if you don't have selfie enabled in the incode flow builder, it will gladly allow you to send selfie image, it just silently doesn't include the selfie in the actual score/result

@@ -87,12 +87,8 @@ pub struct FetchScoresResponse {
 }
 
 impl FetchScoresResponse {
-    pub fn overall_score(&self) -> Result<IncodeStatus, IncodeError> {
-        self.overall
-            .as_ref()
-            .and_then(|o| o.status.as_ref())
-            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
-            .ok_or(IncodeError::AssertionError("missing score status".into()))
+    pub fn document_score(&self) -> Result<(f64, IncodeStatus), IncodeError> {
+        Self::score_and_status("document", &self.overall)
     }
 
     pub fn get_id_tests(&self) -> HashMap<IncodeTest, IncodeStatus> {
@@ -135,24 +131,21 @@ impl FetchScoresResponse {
             .collect()
     }
 
-    pub fn id_ocr_confidence(&self) -> Result<IncodeStatus, IncodeError> {
-        self.id_ocr_confidence
-            .as_ref()
-            .and_then(|i| i.overall_confidence.as_ref())
-            .and_then(|o| o.status.as_ref())
-            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
-            .ok_or(IncodeError::AssertionError("missing id confidence status".into()))
+    pub fn id_ocr_confidence(&self) -> Result<(f64, IncodeStatus), IncodeError> {
+        Self::score_and_status(
+            "ocr_confidence",
+            &self
+                .id_ocr_confidence
+                .as_ref()
+                .and_then(|i| i.overall_confidence.clone()),
+        )
     }
 
-    pub fn selfie_match(&self) -> Result<IncodeStatus, IncodeError> {
-        self.face_recognition
-            .as_ref()
-            .and_then(|i| i.overall.as_ref())
-            .and_then(|o| o.status.as_ref())
-            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
-            .ok_or(IncodeError::AssertionError(
-                "missing face recognition status".into(),
-            ))
+    pub fn selfie_match(&self) -> Result<(f64, IncodeStatus), IncodeError> {
+        Self::score_and_status(
+            "face_recognition",
+            &self.face_recognition.as_ref().and_then(|i| i.overall.clone()),
+        )
     }
 
     #[allow(non_snake_case)]
@@ -161,6 +154,31 @@ impl FetchScoresResponse {
             serde_json::from_value(test_fixtures::incode_fetch_scores_response(DocTestOpts::default()))?;
 
         Ok(resp)
+    }
+
+    fn score_and_status(
+        score_type: &str,
+        id_test: &Option<IdTest>,
+    ) -> Result<(f64, IncodeStatus), IncodeError> {
+        let status = id_test
+            .as_ref()
+            .and_then(|o| o.status.as_ref())
+            .and_then(|s| IncodeStatus::try_from(s.as_str()).ok())
+            .ok_or(IncodeError::AssertionError(format!(
+                "missing score status: {}",
+                score_type
+            )))?;
+
+        let score = id_test
+            .as_ref()
+            .and_then(|o| o.value.as_ref())
+            .ok_or(IncodeError::AssertionError(format!(
+                "missing score value: {}",
+                score_type
+            )))?
+            .parse::<f64>()?;
+
+        Ok((score, status))
     }
 }
 
@@ -523,8 +541,8 @@ mod tests {
         let raw_response = test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
 
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        assert_eq!(parsed.id_ocr_confidence().unwrap(), IncodeStatus::Ok);
-        assert_eq!(parsed.selfie_match().unwrap(), IncodeStatus::Ok);
+        assert_eq!(parsed.id_ocr_confidence().unwrap().1, IncodeStatus::Ok);
+        assert_eq!(parsed.selfie_match().unwrap().1, IncodeStatus::Ok);
         let parsed_tests = parsed.get_id_tests();
 
         // Check a few tests
@@ -567,7 +585,7 @@ mod tests {
         );
 
         // Overall score
-        assert_eq!(parsed.overall_score().unwrap(), IncodeStatus::Ok)
+        assert_eq!(parsed.document_score().unwrap().1, IncodeStatus::Ok)
     }
 
     #[test]

@@ -1,3 +1,4 @@
+use super::map_to_api_err;
 use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
@@ -111,11 +112,18 @@ impl Complete {
         let data = data.no_fingerprints();
         let completed_seqno = uvw.patch_data(conn, data)?.seqno;
 
+        let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
+        let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;
+        let (selfie_score, _) = score_response.selfie_match().map_err(map_to_api_err)?;
+
         let update = IdentityDocumentUpdate {
             front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
             back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
             selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
             completed_seqno: Some(completed_seqno),
+            document_score: Some(document_score),
+            selfie_score: Some(selfie_score),
+            ocr_confidence_score: Some(ocr_confidence_score),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

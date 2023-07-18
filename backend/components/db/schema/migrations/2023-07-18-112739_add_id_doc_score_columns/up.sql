@@ -1,0 +1,1 @@
+ALTER TABLE identity_document ADD COLUMN document_score double precision, ADD COLUMN selfie_score double precision, ADD COLUMN ocr_confidence_score double precision;
