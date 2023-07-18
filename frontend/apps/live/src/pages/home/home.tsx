@@ -24,7 +24,7 @@ const Live = () => {
       case 'kyb':
         return 'kyb';
       case 'kyc-id-doc':
-        return 'kyc';
+        return 'kyc-id-doc';
       default:
         return 'kyc';
     }
@@ -43,10 +43,11 @@ const Live = () => {
 
   const type = getType();
   const publicKey = getPublicKey(type);
+  const translationsKey = type === 'kyb' ? 'kyb' : 'kyc';
 
   return (
     <>
-      <SEO title={t(`${type}.html-title`)} />
+      <SEO title={t(`${translationsKey}.html-title`)} />
       <BlurredBackground>
         <Wrapper>
           <Nav>
@@ -61,21 +62,21 @@ const Live = () => {
           <HeroContainer>
             <TextContainer>
               <Typography as="h1" variant="display-2">
-                {t(`${type}.title`)}
+                {t(`${translationsKey}.title`)}
               </Typography>
               <Typography as="h1" variant="display-4">
-                {t(`${type}.subtitle`)}
+                {t(`${translationsKey}.subtitle`)}
               </Typography>
               <ActionsContainer>
                 <FootprintButton
                   publicKey={publicKey}
-                  label={t(`${type}.cta`)}
+                  label={t(`${translationsKey}.cta`)}
                   onCompleted={() => {
                     router.push('/ending');
                   }}
                 />
                 <Typography as="p" variant="body-2" color="secondary">
-                  {t(`${type}.disclaimer`)}
+                  {t(`${translationsKey}.disclaimer`)}
                 </Typography>
               </ActionsContainer>
             </TextContainer>
