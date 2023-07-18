@@ -3,9 +3,9 @@ import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
 
-// Retro bank tenant
+// Acme bank tenant
 // With id doc
-const publicKey = 'ob_test_0uHOuBqL4BX4WRzJOtbNyq';
+const publicKey = 'ob_test_BdkyTJgurgl8T6EHR5FDsc';
 
 const handleOpen = () => {
   footprint.open({
