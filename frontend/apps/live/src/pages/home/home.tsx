@@ -13,11 +13,37 @@ import Footer from './components/footer';
 
 const kycPublicKey = process.env.NEXT_PUBLIC_KYC_TENANT_KEY;
 const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY;
+const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY;
 
 const Live = () => {
   const { t } = useTranslation('home');
   const router = useRouter();
-  const type = router.query.type === 'kyb' ? 'kyb' : 'kyc';
+
+  const getType = () => {
+    switch (router.query.type) {
+      case 'kyb':
+        return 'kyb';
+      case 'kyc-id-doc':
+        return 'kyc';
+      default:
+        return 'kyc';
+    }
+  };
+
+  const getPublicKey = (type: string) => {
+    switch (type) {
+      case 'kyb':
+        return kybPublicKey;
+      case 'kyc-id-doc':
+        return kycIdDocPublicKey;
+      default:
+        return kycPublicKey;
+    }
+  };
+
+  const type = getType();
+  const publicKey = getPublicKey(type);
+
   return (
     <>
       <SEO title={t(`${type}.html-title`)} />
@@ -42,7 +68,7 @@ const Live = () => {
               </Typography>
               <ActionsContainer>
                 <FootprintButton
-                  publicKey={type === 'kyb' ? kybPublicKey : kycPublicKey}
+                  publicKey={publicKey}
                   label={t(`${type}.cta`)}
                   onCompleted={() => {
                     router.push('/ending');
