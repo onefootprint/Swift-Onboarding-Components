@@ -1,7 +1,7 @@
-use crate::{export_schema, Apiv2Schema, JsonSchema, Serialize};
+use crate::{export_schema, Apiv2Schema, Deserialize, JsonSchema, Serialize};
 use newtypes::{FootprintReasonCode, WatchlistCheckId, WatchlistCheckStatusKind};
 
-#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Apiv2Schema)]
 pub struct WatchlistCheck {
     pub id: WatchlistCheckId,
     pub status: WatchlistCheckStatusKind,

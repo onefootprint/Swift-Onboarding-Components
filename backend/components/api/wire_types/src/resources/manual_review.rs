@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct ManualReview {
@@ -9,7 +9,7 @@ pub struct ManualReview {
 
 export_schema!(ManualReview);
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct ManualReviewReason {

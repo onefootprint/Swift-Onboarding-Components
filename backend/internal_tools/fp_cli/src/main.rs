@@ -2,6 +2,7 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 use crypto::zeroize::Zeroize;
 use crypto::{base64, hex};
 use newtypes::{export_reason_codes, PiiString, VaultPublicKey};
+mod export_entity_results;
 
 #[derive(Parser)]
 #[command(name = "MyApp")]
@@ -19,7 +20,19 @@ enum Commands {
     Seal(SealArgs),
     /// Generate a data key sealed to a footprint public key
     GenerateDataKey(GenerateDataKeyArgs),
+    /// Export footprint's reason codes in a friendly format
     ExportFootprintReasonCode,
+    /// Fetch users and export there results (no pii)
+    ExportEntityResults {
+        /// api key to use
+        #[arg(long)]
+        api_key: String,
+        /// page size
+        #[arg(short, long, default_value = "64")]
+        page_size: usize,
+        #[arg(long)]
+        out_file: Option<std::path::PathBuf>,
+    },
 }
 
 #[derive(Args)]
@@ -76,7 +89,8 @@ enum KeyForm {
     Der,
 }
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let out = match cli.command {
         Commands::Seal(args) => {
@@ -93,8 +107,30 @@ fn main() -> anyhow::Result<()> {
         }
         Commands::ExportFootprintReasonCode => {
             export_reason_codes();
-
             "export complete!".into()
+        }
+        Commands::ExportEntityResults {
+            api_key,
+            page_size,
+            out_file,
+        } => {
+            let rows = export_entity_results::run(api_key, page_size).await?;
+            if let Some(out_file) = out_file {
+                let mut writer = csv::Writer::from_path(&out_file)?;
+                for row in rows {
+                    writer.serialize(row)?;
+                }
+                writer.flush()?;
+                format!("wrote results to {}\n", out_file.to_string_lossy())
+            } else {
+                let mut writer = csv::WriterBuilder::new().from_writer(vec![]);
+                for row in rows {
+                    writer.serialize(row)?;
+                }
+                writer.flush()?;
+
+                String::from_utf8(writer.into_inner()?)?
+            }
         }
     };
     print!("{}", out);

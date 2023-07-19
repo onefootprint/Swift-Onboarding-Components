@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Object that represents a user Onboarding
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
 pub struct Onboarding {

@@ -1,7 +1,7 @@
 use crate::*;
 
 /// A risk event
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct RiskSignal {
     pub id: RiskSignalId,
