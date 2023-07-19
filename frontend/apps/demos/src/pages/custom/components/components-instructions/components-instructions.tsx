@@ -30,7 +30,7 @@ type ComponentsInstructionsProps = {
 
 const installation = `npm install @onefootprint/footprint-components-js`;
 
-const generateAuthToken = ({
+const createAuthTokenInstructions = ({
   secretKey,
   userId,
   cardAlias,
@@ -215,7 +215,12 @@ const ComponentsInstructions = ({
               Id:
             </Typography>
             <CodeBlock language="bash">
-              {generateAuthToken({ secretKey, userId, cardAlias, ttl: 1800 })}
+              {createAuthTokenInstructions({
+                secretKey,
+                userId,
+                cardAlias,
+                ttl: 1800,
+              })}
             </CodeBlock>
             <Typography variant="body-2">5. Now, add to your app:</Typography>
             {framework === 'react' && (
