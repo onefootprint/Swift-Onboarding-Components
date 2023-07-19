@@ -87,6 +87,14 @@
       "buttons": {
         "save": "Save",
         "cancel": "Cancel"
+      },
+      "confirm-close": {
+        "title": "Are you sure?",
+        "description": "Leaving this flow will not save your data.",
+        "buttons": {
+          "yes": "Yes",
+          "no": "No"
+        }
       }
     },
     "secure-render": {

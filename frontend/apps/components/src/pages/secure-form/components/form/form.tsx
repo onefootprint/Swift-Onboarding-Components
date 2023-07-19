@@ -6,7 +6,7 @@ import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Divider } from '@onefootprint/ui';
+import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -41,9 +41,7 @@ const Form = ({
   onClose,
 }: FormProps) => {
   const { t } = useTranslation('pages.secure-form');
-  const handleBeforeSubmit = (data: FormData) => {
-    onSave?.(data);
-  };
+  const confirmationDialog = useConfirmationDialog();
   const hasCountry =
     type === SecureFormType.cardAndNameAndAddress ||
     type === SecureFormType.cardAndZip;
@@ -56,7 +54,44 @@ const Form = ({
   const methods = useForm<FormData>({
     defaultValues,
   });
-  const { handleSubmit } = methods;
+  const {
+    handleSubmit,
+    formState: { isDirty },
+  } = methods;
+
+  const confirmClose = (callback: () => void) => {
+    if (!isDirty) {
+      callback();
+      return;
+    }
+    confirmationDialog.open({
+      title: t('confirm-close.title'),
+      description: t('confirm-close.description'),
+      primaryButton: {
+        label: t('confirm-close.buttons.yes'),
+        onClick: callback,
+      },
+      secondaryButton: {
+        label: t('confirm-close.buttons.no'),
+      },
+    });
+  };
+
+  const handleBeforeSubmit = (data: FormData) => {
+    onSave?.(data);
+  };
+
+  const handleClose = () => {
+    if (onClose) {
+      confirmClose(onClose);
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      confirmClose(onCancel);
+    }
+  };
 
   return (
     <FormDialog
@@ -71,10 +106,10 @@ const Form = ({
         onCancel && {
           label: t('buttons.cancel'),
           type: 'reset',
-          onClick: onCancel,
+          onClick: handleCancel,
         }
       }
-      onClose={onClose}
+      onClose={handleClose}
     >
       <FormProvider {...methods}>
         <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
