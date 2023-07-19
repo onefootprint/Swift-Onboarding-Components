@@ -105,11 +105,13 @@ const Container = styled.div`
       box-shadow: ${theme.elevation[3]};
       border: none;
       height: 100%;
+      width: 100%;
       border-radius: 0;
+      margin: 0;
 
       ${media.greaterThan('md')`
         height: auto;
-        width: 500px;
+        max-width: calc(100% - (2 * ${theme.spacing[9]}));
         max-height: calc(100% - (2 * ${theme.spacing[9]}));
         margin: ${theme.spacing[9]};
         border-radius: ${theme.borderRadius.default};

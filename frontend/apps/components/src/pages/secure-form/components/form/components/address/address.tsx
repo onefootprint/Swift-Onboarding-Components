@@ -21,8 +21,8 @@ export type AddressData = {
 const Address = () => {
   const methods = useFormContext<AddressData>();
   const { watch, setFocus, resetField } = methods;
-  const country = watch('country');
-  const countryValue = country.value ?? DEFAULT_COUNTRY.value;
+  const country = watch('country') ?? DEFAULT_COUNTRY;
+  const countryValue = country.value;
 
   const handleCountryChange = () => {
     setFocus('addressLine1');

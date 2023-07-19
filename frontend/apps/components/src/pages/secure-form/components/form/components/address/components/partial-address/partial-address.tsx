@@ -14,7 +14,7 @@ export type AddressData = {
 const PartialAddress = () => {
   const methods = useFormContext<AddressData>();
   const { watch, resetField } = methods;
-  const country = watch('country');
+  const country = watch('country') ?? DEFAULT_COUNTRY;
 
   const handleCountryChange = () => {
     resetField('zip');
@@ -23,10 +23,10 @@ const PartialAddress = () => {
   return (
     <Grid.Row>
       <Grid.Column col={6}>
-        <CountryField onChange={handleCountryChange} />
+        <ZipField countryCode={country.value} />
       </Grid.Column>
       <Grid.Column col={6}>
-        <ZipField countryCode={country.value ?? DEFAULT_COUNTRY.value} />
+        <CountryField onChange={handleCountryChange} />
       </Grid.Column>
     </Grid.Row>
   );
