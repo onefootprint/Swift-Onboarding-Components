@@ -168,7 +168,7 @@ const ComponentsInstructions = ({
     );
   }
 
-  const handleClick = () => {
+  const openModal = () => {
     setIsVisible(true);
   };
 
@@ -248,12 +248,12 @@ const ComponentsInstructions = ({
             </Typography>
           </Content>
           <MobileButtonContainer>
-            <Button onClick={handleClick}>Submit Payment</Button>
+            <Button onClick={openModal}>Submit Payment</Button>
           </MobileButtonContainer>
         </Left>
         <Right>
           <DesktopButtonContainer>
-            <Button onClick={handleClick}>Submit Payment</Button>
+            <Button onClick={openModal}>Submit Payment</Button>
           </DesktopButtonContainer>
         </Right>
         {isVisible && (

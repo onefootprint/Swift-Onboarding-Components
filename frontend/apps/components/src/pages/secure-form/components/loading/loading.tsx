@@ -1,30 +1,38 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFootprint16 } from '@onefootprint/icons';
 import styled, { css, keyframes } from '@onefootprint/styled';
-import { Grid, Shimmer, Typography } from '@onefootprint/ui';
+import { Grid, ScrollArea, Shimmer, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Container>
-    <Form>
+  <Container id="footprint-components-container">
+    <Header>
+      <CloseButton />
       <Title />
-      <Grid.Row>
-        <Grid.Column col={12}>
-          <Label />
-          <CardNumberInput />
-        </Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column col={6}>
-          <Label />
-          <CardExpDateInput />
-        </Grid.Column>
-        <Grid.Column col={6}>
-          <Label />
-          <CardCvc />
-        </Grid.Column>
-      </Grid.Row>
-    </Form>
+    </Header>
+    <div style={{ flexGrow: 1 }}>
+      <ScrollArea sx={{ padding: 7 }}>
+        <Form>
+          <SectionTitle />
+          <Grid.Row>
+            <Grid.Column col={12}>
+              <Label />
+              <CardNumberInput />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column col={6}>
+              <Label />
+              <CardExpDateInput />
+            </Grid.Column>
+            <Grid.Column col={6}>
+              <Label />
+              <CardCvc />
+            </Grid.Column>
+          </Grid.Row>
+        </Form>
+      </ScrollArea>
+    </div>
     <Footer>
       <SecuredByFootprint />
       <ButtonsContainer>
@@ -35,7 +43,32 @@ const Loading = () => (
   </Container>
 );
 
-const Title = () => (
+const Header = styled.header`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    z-index: 1;
+    padding: ${theme.spacing[4]};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
+  `}
+`;
+
+const CloseButton = () => (
+  <Shimmer
+    sx={{ width: '30px', height: '30px', position: 'absolute', left: '20px' }}
+  />
+);
+
+const Title = () => <Shimmer sx={{ width: '120px', height: '25px' }} />;
+
+const SectionTitle = () => (
   <Shimmer sx={{ width: '120px', height: '25px', marginBottom: 4 }} />
 );
 
@@ -58,31 +91,27 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default};
     justify-content: stretch;
     width: 100%;
-    display: grid;
   `}
 `;
 
 const Form = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
     display: grid;
     row-gap: ${theme.spacing[5]};
-    padding: ${theme.spacing[7]};
   `}
 `;
 
-const Button = () => (
-  <Shimmer sx={{ width: '100px', height: '48px', marginBottom: 5 }} />
-);
+const Button = () => <Shimmer sx={{ width: '100px', height: '40px' }} />;
 
 const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[4]};
+    overflow: hidden;
+    position: relative;
   `}
 `;
 
@@ -99,6 +128,8 @@ const Footer = styled.footer`
     bottom: 0;
     border-radius: 0 0 ${theme.borderRadius.default}
       ${theme.borderRadius.default};
+    position: relative;
+    overflow: hidden;
   `}
 `;
 
