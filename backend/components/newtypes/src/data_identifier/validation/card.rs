@@ -18,6 +18,7 @@ impl Validate for CI {
             CDK::Last4 => validate_card_number_last4(value)?,
             CDK::Name => validate_card_name(value)?,
             CDK::BillingZip => utils::clean_and_validate_zip(value)?,
+            CDK::BillingCountry => utils::clean_and_validate_country(value)?,
             CDK::Issuer => utils::parse_enum::<CardIssuer>(value)?,
         };
         Ok(result)

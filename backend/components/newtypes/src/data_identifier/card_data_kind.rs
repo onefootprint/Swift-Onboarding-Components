@@ -12,6 +12,8 @@ pub enum CardDataKind {
     Name,
     #[strum(to_string = "billing_address.zip")]
     BillingZip,
+    #[strum(to_string = "billing_address.country")]
+    BillingCountry,
 
     // Derived entries
     #[strum(to_string = "expiration_month")]
