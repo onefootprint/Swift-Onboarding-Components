@@ -50,7 +50,7 @@ const Option = <
       role="option"
       tabIndex={innerProps.tabIndex}
     >
-      <Content>
+      <Content data-selected={isSelected}>
         <StyledFlag code={value} />
         <Highlighter
           searchWords={inputValue.split(' ')}
@@ -64,10 +64,17 @@ const Option = <
           {label}
         </Highlighter>
       </Content>
-      {isSelected && <IcoCheck16 color="primary" />}
+      {isSelected && <IcoCheck color="primary" />}
     </OptionContainer>
   );
 };
+
+const IcoCheck = styled(IcoCheck16)`
+  ${({ theme }) => css`
+    min-width: 16px;
+    margin-left: ${theme.spacing[4]};
+  `};
+`;
 
 const OptionContainer = styled.div<{
   highlighted: boolean;
@@ -85,6 +92,7 @@ const OptionContainer = styled.div<{
     position: absolute;
     top: 0;
     width: 100%;
+    height: 100%;
 
     ${highlighted &&
     css`
@@ -96,11 +104,33 @@ const OptionContainer = styled.div<{
 const Content = styled.div`
   display: flex;
   align-items: center;
+  height: 100%;
+  width: 100%;
+
+  &[data-selected='true'] {
+    width: calc(100% - 28px); // Minus the check icon + margin
+  }
+
+  > span {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    > span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
 `;
 
 const StyledFlag = styled(Flag)`
   ${({ theme }) => css`
     margin-right: ${theme.spacing[3]};
+    min-width: 20px;
   `}
 `;
 

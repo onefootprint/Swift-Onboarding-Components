@@ -41,10 +41,17 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       <Content data-private={isPrivate} data-testid={testID}>
         {children}
       </Content>
-      <IcoChevronDown16 />
+      <IcoDown />
     </BaseSelectTriggerContainer>
   ),
 );
+
+const IcoDown = styled(IcoChevronDown16)`
+  ${({ theme }) => css`
+    min-width: 16px;
+    margin-left: ${theme.spacing[4]};
+  `};
+`;
 
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
   ${({ theme }) => {
@@ -112,6 +119,7 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
 const Content = styled.span`
   display: flex;
   align-items: center;
+  max-width: calc(100% - 28px); // Minus the width of the icon + margin
 `;
 
 export default BaseSelectTrigger;

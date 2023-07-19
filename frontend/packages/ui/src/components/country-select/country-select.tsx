@@ -64,15 +64,22 @@ const CountrySelect = ({
         testID={triggerTestID}
       >
         {selectedOption && <StyledFlag code={selectedOption.value} />}
-        {selectedOption?.label || placeholder}
+        <LabelContainer>{selectedOption?.label || placeholder}</LabelContainer>
       </BaseSelectTrigger>
     )}
   />
 );
 
+const LabelContainer = styled.div`
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
 const StyledFlag = styled(Flag)`
   ${({ theme }) => css`
     margin-right: ${theme.spacing[4]};
+    min-width: 20px;
   `}
 `;
 
