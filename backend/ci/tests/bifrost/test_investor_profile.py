@@ -123,16 +123,6 @@ def test_valid_doc_upload(incomplete_client, sandbox_tenant):
         response["document.finra_compliance_letter"]
     )
 
-    timeline = get(f"/entities/{user.fp_id}/timeline", None, sandbox_tenant.sk.key)
-    doc_upload_events = [
-        e for e in timeline if e["event"]["kind"] == "document_uploaded"
-    ]
-    assert len(doc_upload_events) == 1
-    assert (
-        "document.finra_compliance_letter"
-        == doc_upload_events[0]["event"]["data"]["identifier"]
-    )
-
 
 # Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
 def test_doc_reupload(sandbox_tenant, investor_profile_ob_config, twilio):

@@ -10,13 +10,13 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::VaultData;
-use db::{DbError, PgConn, TxnPgConn};
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, S3Url};
 use newtypes::{
-    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, DocumentDataId,
-    DocumentUploadedInfo, Fingerprints, IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString,
-    ScopedVaultId, SealedVaultDataKey, VaultId, VaultPublicKey,
+    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
+    IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
+    VaultPublicKey,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -204,18 +204,7 @@ impl WriteableVw<Person> {
             conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno,
         )?;
 
-        self.add_document_uploaded_timeline_event(conn, doc.id.clone())?;
-
         Ok((doc, seqno))
-    }
-
-    fn add_document_uploaded_timeline_event(
-        &self,
-        conn: &mut PgConn,
-        doc_id: DocumentDataId,
-    ) -> Result<(), DbError> {
-        let info = DocumentUploadedInfo { id: doc_id };
-        UserTimeline::create(conn, info, self.vault().id.clone(), self.scoped_vault_id.clone())
     }
 }
 
