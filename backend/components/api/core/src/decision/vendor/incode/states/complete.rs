@@ -114,7 +114,7 @@ impl Complete {
 
         let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;
-        let (selfie_score, _) = score_response.selfie_match().map_err(map_to_api_err)?;
+        let selfie_score = score_response.selfie_match().ok().map(|(s, _)| s);
 
         let update = IdentityDocumentUpdate {
             front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
@@ -122,7 +122,7 @@ impl Complete {
             selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
             completed_seqno: Some(completed_seqno),
             document_score: Some(document_score),
-            selfie_score: Some(selfie_score),
+            selfie_score,
             ocr_confidence_score: Some(ocr_confidence_score),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
