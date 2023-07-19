@@ -7,7 +7,7 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const IdDocBackPhoto = () => {
-  const [state, send] = useIdDocMachine();
+  const [state] = useIdDocMachine();
   const {
     idDoc: { type, country },
   } = state.context;
@@ -18,15 +18,9 @@ const IdDocBackPhoto = () => {
     return null;
   }
 
-  const handleClickBack = () => {
-    send({
-      type: 'navigatedToPrev',
-    });
-  };
-
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <NavigationHeader />
       <IdDocPhotoPrompt
         showGuidelines
         imageType={ImageTypes.back}
