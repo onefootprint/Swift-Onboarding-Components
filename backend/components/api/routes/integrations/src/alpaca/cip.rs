@@ -27,9 +27,14 @@ use chrono::{DateTime, Utc};
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
-        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        document_request::{DocRequestIdentifier, DocumentRequest},
+        insight_event::InsightEvent,
+        manual_review::ManualReview,
+        onboarding::Onboarding,
+        onboarding_decision::OnboardingDecision,
+        risk_signal::RiskSignal,
+        scoped_vault::ScopedVault,
+        verification_request::VerificationRequest,
     },
 };
 use idv::ParsedResponse;
@@ -129,7 +134,8 @@ async fn create_cip_request(
                 };
 
                 let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-                let collected_document = DocumentRequest::get(conn, &sv.id)?.map(|d| d.should_collect_selfie);
+                let id = DocRequestIdentifier::new(&sv.id, ob.workflow_id.as_ref());
+                let collected_document = DocumentRequest::get(conn, id)?.map(|d| d.should_collect_selfie);
                 let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 

@@ -2,8 +2,10 @@ use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use db_schema::schema::document_request::BoxedQuery;
 use db_schema::schema::{document_request, identity_document};
 use diesel::dsl::not;
+use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::ModernIdDocKind;
@@ -50,6 +52,12 @@ pub struct DocRequestIdentifier<'a> {
     pub wf_id: Option<&'a WorkflowId>,
 }
 
+impl<'a> DocRequestIdentifier<'a> {
+    pub fn new(sv_id: &'a ScopedVaultId, wf_id: Option<&'a WorkflowId>) -> Self {
+        Self { sv_id, wf_id }
+    }
+}
+
 impl DocumentRequest {
     #[tracing::instrument("DocumentRequest::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
@@ -89,12 +97,10 @@ impl DocumentRequest {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument("DocumentRequest::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
-        let mut query = document_request::table
-            .filter(document_request::status.eq(DocumentRequestStatus::Pending))
-            .into_boxed();
+    fn get_query(id: DocRequestIdentifier) -> BoxedQuery<Pg> {
+        let mut query = document_request::table.into_boxed();
 
+        // TODO we should backfill workflow_id on DocumentRequest and deprecate this old codepath
         if let Some(wf_id) = id.wf_id {
             query = query.filter(document_request::workflow_id.eq(wf_id))
         } else {
@@ -104,54 +110,32 @@ impl DocumentRequest {
                 .filter(document_request::scoped_vault_id.eq(id.sv_id))
                 .filter(document_request::workflow_id.is_null())
         }
+        query
+    }
 
-        let result = query.first(conn).optional()?;
-
+    #[tracing::instrument("DocumentRequest::get_active", skip_all)]
+    pub fn get_active(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
+        let result = Self::get_query(id)
+            .filter(document_request::status.eq(DocumentRequestStatus::Pending))
+            .first(conn)
+            .optional()?;
         Ok(result)
     }
 
     #[tracing::instrument("DocumentRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
-        let result = document_request::table
-            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .first(conn)
-            .optional()?;
-
+    pub fn get(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
+        let result = Self::get_query(id).first(conn).optional()?;
         Ok(result)
     }
 
     #[tracing::instrument("DocumentRequest::update", skip_all)]
     pub fn update(self, conn: &mut PgConn, update: DocumentRequestUpdate) -> DbResult<Self> {
         // Intentionally consume self so the stale version is not used
-        let result = Self::update_by_id(conn, &self.id, update)?;
-        Ok(result)
-    }
-
-    #[tracing::instrument("DocumentRequest::update_by_id", skip_all)]
-    pub fn update_by_id(
-        conn: &mut PgConn,
-        id: &DocumentRequestId,
-        update: DocumentRequestUpdate,
-    ) -> DbResult<Self> {
         let result = diesel::update(document_request::table)
-            .filter(document_request::id.eq(id))
+            .filter(document_request::id.eq(&self.id))
             .set(update)
             .get_result(conn)?;
         Ok(result)
-    }
-
-    #[tracing::instrument("DocumentRequest::count_statuses", skip_all)]
-    pub fn count_statuses(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        statuses: Vec<DocumentRequestStatus>,
-    ) -> DbResult<i64> {
-        let num_status: i64 = document_request::table
-            .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .filter(document_request::status.eq_any(statuses))
-            .count()
-            .get_result(conn)?;
-        Ok(num_status)
     }
 
     #[tracing::instrument("DocumentRequest::lock", skip_all)]
@@ -175,6 +159,7 @@ impl DocumentRequest {
     ) -> DbResult<Option<(DocumentRequest, IdentityDocument)>> {
         let res = document_request::table
             .inner_join(identity_document::table)
+            // TODO should this be only Complete?
             .filter(not(document_request::status.eq(DocumentRequestStatus::Pending)))
             .filter(document_request::scoped_vault_id.eq(sv_id))
             .first(conn)

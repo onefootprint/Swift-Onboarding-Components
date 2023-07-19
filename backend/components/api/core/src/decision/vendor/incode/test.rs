@@ -2,7 +2,7 @@ use chrono::Utc;
 use db::{
     models::{
         data_lifetime::DataLifetime,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
+        document_request::{DocRequestIdentifier, DocumentRequest, NewDocumentRequestArgs},
         document_upload::DocumentUpload,
         identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
@@ -477,7 +477,9 @@ async fn test_fail(state: &State, is_selfie: bool) {
             assert!(score_result.id_validation.is_some());
 
             // Check business logic bookkeeping
-            let doc_request = DocumentRequest::get(conn, &su.id)?.unwrap();
+
+            let id = DocRequestIdentifier::new(&su.id, None);
+            let doc_request = DocumentRequest::get(conn, id)?.unwrap();
             assert_eq!(doc_request.status, DocumentRequestStatus::Complete);
 
             Ok(())

@@ -4,7 +4,7 @@ use api_wire_types::DecisionRequest;
 use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
-    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    document_request::{DocRequestIdentifier, DocumentRequest, NewDocumentRequestArgs},
     onboarding::{Onboarding, OnboardingUpdate},
     risk_signal::RiskSignal,
     risk_signal_group::RiskSignalGroup,
@@ -260,7 +260,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id)?
+            common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id, &self.wf_id)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision
@@ -492,12 +492,12 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, risk_signals, &self.sv_id)?
+            common::get_decision(&self, conn, risk_signals, &self.sv_id, &self.wf_id)?
         };
 
         // If we collected a doc, we go to review and fail OBD even if no hits
-        // TODO: query by wf_id instead
-        let doc_req = DocumentRequest::get(conn, &self.sv_id)?;
+        let id = DocRequestIdentifier::new(&self.sv_id, Some(&self.wf_id));
+        let doc_req = DocumentRequest::get(conn, id)?;
 
         // TODO: in future could express this as a Rule or at least an engine decision
         let final_decision = if wc_reason_codes.is_empty() && doc_req.is_none() {

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        document_request::DocumentRequest,
+        document_request::{DocRequestIdentifier, DocumentRequest},
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         vault::Vault,
@@ -246,8 +246,10 @@ pub fn get_decision(
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     sv_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-    let include_doc = DocumentRequest::get(conn, sv_id)?.is_some();
+    let id = DocRequestIdentifier::new(sv_id, Some(wf_id));
+    let include_doc = DocumentRequest::get(conn, id)?.is_some();
     let rules_output = rule_group.rule_group(include_doc).evaluate(risk_signals)?;
     Ok(rules_output)
 }

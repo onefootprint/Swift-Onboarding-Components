@@ -75,7 +75,7 @@ pub fn create(
     // If we want to simulate having collected an id document
     if opts.collected_doc_opts.id_doc_collected {
         let args = NewIdentityDocumentArgs {
-            request_id: doc_request.id,
+            request_id: doc_request.id.clone(),
             document_type: newtypes::IdDocKind::DriverLicense,
             country_code: "USA".to_owned(),
         };
@@ -113,11 +113,8 @@ pub fn create(
     }
 
     // Set our desired status
-    let reloaded_doc_req = DocumentRequest::get(conn, &opts.scoped_user_id).unwrap().unwrap();
     let update = DocumentRequestUpdate::status(opts.desired_status);
+    let doc_request = doc_request.update(conn.conn(), update).unwrap();
 
-    (
-        reloaded_doc_req.update(conn.conn(), update).unwrap(),
-        verification_info,
-    )
+    (doc_request, verification_info)
 }
