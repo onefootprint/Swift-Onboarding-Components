@@ -2,9 +2,10 @@ use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::IncodeContext;
+use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
-use crate::ApiError;
+
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
@@ -52,6 +53,6 @@ impl IncodeStateTransition for Fail {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        Err(ApiError::AssertionError("Incode machine already failed".into()))
+        Err(ApiErrorKind::AssertionError("Incode machine already failed".into()))?
     }
 }

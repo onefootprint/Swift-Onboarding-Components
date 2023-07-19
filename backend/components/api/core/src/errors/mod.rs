@@ -38,13 +38,36 @@ pub type ApiResult<T> = Result<T, ApiError>;
     code=400 description="Invalid request",
     code=401, description="Unauthorized: Can't read session from header",
 )]
-#[allow(clippy::large_enum_variant)]
+#[derive(Error, Debug)]
+#[error(transparent)]
+pub struct ApiError(Box<ApiErrorKind>);
+
+impl ApiError {
+    pub fn kind(&self) -> &ApiErrorKind {
+        self.0.as_ref()
+    }
+
+    pub fn into_kind(self) -> ApiErrorKind {
+        *self.0
+    }
+}
+
+impl<E> From<E> for ApiError
+where
+    ApiErrorKind: From<E>,
+{
+    #[inline]
+    fn from(err: E) -> Self {
+        ApiError(Box::new(ApiErrorKind::from(err)))
+    }
+}
+
 #[derive(Debug, Error)]
-pub enum ApiError {
+pub enum ApiErrorKind {
     #[error("{0}")]
     AuthError(#[from] crate::auth::AuthError),
     #[error("{0}")]
-    KmsError(#[from] kms::KmsSignError),
+    KmsError(Box<kms::KmsSignError>),
     #[error("{0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
     #[error("{0}")]
@@ -62,7 +85,7 @@ pub enum ApiError {
     #[error("{0}")]
     Crypto(#[from] crypto::Error),
     #[error("{0}")]
-    Database(#[from] DbError),
+    Database(Box<DbError>),
     #[error("{0}")]
     Dotenv(#[from] dotenv::Error),
     #[error("{0}")]
@@ -78,7 +101,7 @@ pub enum ApiError {
     #[error("Sendgrid error: {0}")]
     SendgridError(String),
     #[error("{0}")]
-    NewtypeError(#[from] newtypes::Error),
+    NewtypeError(Box<newtypes::Error>),
     #[error("{0}")]
     BillingError(#[from] billing::Error),
     #[error("{0}")]
@@ -102,15 +125,15 @@ pub enum ApiError {
     #[error("Resource not found")]
     ResourceNotFound,
     #[error("{0}")]
-    IdvError(#[from] idv::Error),
+    IdvError(Box<idv::Error>),
     #[error("{0}")]
     Io(#[from] std::io::Error),
     #[error("{0}")]
-    S3Error(#[from] crate::s3::S3Error),
+    S3Error(Box<crate::s3::S3Error>),
     #[error("{0}")]
     PrivacyPassError(#[from] privacy_pass::Error),
     #[error("Vendor request failed {0}")]
-    VendorRequestFailed(VendorAPIError),
+    VendorRequestFailed(Box<VendorAPIError>),
     #[error("One or more vendor requests failed")]
     VendorRequestsFailed,
     #[error("{0}")]
@@ -157,6 +180,24 @@ impl From<std::convert::Infallible> for ApiError {
         panic!("impossible condition convert Infallible to ApiError")
     }
 }
+
+macro_rules! box_from_error_impl {
+    ($var:ident, $typ:ty) => {
+        impl From<$typ> for ApiErrorKind {
+            #[inline]
+            fn from(value: $typ) -> Self {
+                ApiErrorKind::$var(Box::new(value))
+            }
+        }
+    };
+}
+
+box_from_error_impl!(KmsError, kms::KmsSignError);
+box_from_error_impl!(Database, DbError);
+box_from_error_impl!(NewtypeError, newtypes::Error);
+box_from_error_impl!(IdvError, idv::Error);
+box_from_error_impl!(S3Error, crate::s3::S3Error);
+box_from_error_impl!(VendorRequestFailed, VendorAPIError);
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
     match e {
@@ -206,36 +247,42 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 
 impl ApiError {
     fn message(&self) -> ErrorMessage {
-        match self {
-            Self::NewtypeError(newtypes::Error::ValidationError(e)) => e.json_message(),
-            ApiError::Database(e) => ErrorMessage::String(e.message()),
-            _ => ErrorMessage::String(self.to_string()),
-        }
+        use ApiErrorKind::*;
+        match self.0.as_ref() {
+            NewtypeError(e) => {
+                if let newtypes::Error::ValidationError(err) = e.as_ref() {
+                    return err.json_message();
+                }
+            }
+            Database(e) => return ErrorMessage::String(e.message()),
+            _ => {}
+        };
+        ErrorMessage::String(self.to_string())
     }
 }
 
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
-        match self {
-            ApiError::AuthError(_) => StatusCode::UNAUTHORIZED,
-            ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::EnclaveDataTransformError(_) | ApiError::EnclaveError(_) => {
+        match self.0.as_ref() {
+            ApiErrorKind::AuthError(_) => StatusCode::UNAUTHORIZED,
+            ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::EnclaveDataTransformError(_) | ApiErrorKind::EnclaveError(_) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            ApiError::Database(e) => status_code_for_db_error(e),
-            ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::Database(e) => status_code_for_db_error(e),
+            ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
-            ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::HandoffError(_) => StatusCode::BAD_REQUEST,
-            ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Twilio(e) => e.status_code(),
-            ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
-            ApiError::BillingError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkOsError(e) => match e {
+            ApiErrorKind::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::Twilio(e) => e.status_code(),
+            ApiErrorKind::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::NewtypeError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::BillingError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::ChallengeError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::WorkOsError(e) => match e {
                 workos::WorkOsError::GetProfileAndToken(::workos::WorkOsError::Operation(e)) => {
                     if e.error == *"invalid_grant" {
                         // Should not 500 when the token is invalid
@@ -246,41 +293,41 @@ impl actix_web::ResponseError for ApiError {
                 }
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
             },
-            ApiError::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkflowError(_) => StatusCode::BAD_REQUEST,
-            ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
-            ApiError::UserError(_) => StatusCode::BAD_REQUEST,
-            ApiError::BusinessError(_) => StatusCode::BAD_REQUEST,
-            ApiError::Webauthn(_) => StatusCode::BAD_REQUEST,
-            ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::CannotDecodeUtf8(_)
-            | ApiError::InvalidJsonBody(_)
-            | ApiError::InvalidFormError(_)
-            | ApiError::InvalidQueryParam(_)
-            | ApiError::SerdeJson(_)
-            | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
-            ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
-            ApiError::ResourceNotFound => StatusCode::NOT_FOUND,
-            ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            ApiError::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InvalidProxyBody => StatusCode::BAD_REQUEST,
-            ApiError::VaultProxyError(_) => StatusCode::BAD_REQUEST,
-            ApiError::FileUploadError(_) => StatusCode::BAD_REQUEST,
-            ApiError::InvalidBody(_) | ApiError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
-            ApiError::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
-            ApiError::InvalidUrl(_)
-            | ApiError::InvalidHttpMethod(_)
-            | ApiError::InvalidIdentifierFound(_) => StatusCode::BAD_REQUEST,
-            ApiError::CipIntegrationError(c) => c.status_code(),
+            ApiErrorKind::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::OnboardingError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::WorkflowError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::TenantError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::UserError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::BusinessError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::Webauthn(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::VendorRequestFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::CannotDecodeUtf8(_)
+            | ApiErrorKind::InvalidJsonBody(_)
+            | ApiErrorKind::InvalidFormError(_)
+            | ApiErrorKind::InvalidQueryParam(_)
+            | ApiErrorKind::SerdeJson(_)
+            | ApiErrorKind::SerdeCbor(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::EndpointNotFound => StatusCode::NOT_FOUND,
+            ApiErrorKind::ResourceNotFound => StatusCode::NOT_FOUND,
+            ApiErrorKind::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::ValidationError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::InvalidProxyBody => StatusCode::BAD_REQUEST,
+            ApiErrorKind::VaultProxyError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::FileUploadError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::InvalidBody(_) | ApiErrorKind::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::StateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::InvalidUrl(_)
+            | ApiErrorKind::InvalidHttpMethod(_)
+            | ApiErrorKind::InvalidIdentifierFound(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::CipIntegrationError(c) => c.status_code(),
         }
     }
 

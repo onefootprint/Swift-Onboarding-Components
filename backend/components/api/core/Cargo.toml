@@ -112,3 +112,10 @@ tokio-test = "0.4.2"
 mockall = { workspace = true }
 
 opentelemetry_api = { workspace = true }
+
+criterion = { version = "0.5.1", features = ["html_reports"] }
+
+[[bench]]
+name = "api_error"
+path = "benches/api_error.rs"
+harness = false

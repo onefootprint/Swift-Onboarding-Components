@@ -9,7 +9,7 @@ use api_core::decision::features;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::AssertionError;
-use api_core::task;
+use api_core::{task, ApiErrorKind};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -122,7 +122,7 @@ async fn make_vendor_calls(
     .await?;
 
     if !vendor_results.critical_errors.is_empty() {
-        return Err(ApiError::VendorRequestsFailed);
+        return Err(ApiErrorKind::VendorRequestsFailed)?;
     }
 
     let vendor_results = decision::engine::save_vendor_responses(
@@ -300,10 +300,10 @@ async fn shadow_run(
 
     let all_vendor_errors: Vec<&ApiError> = vendor_results.all_errors();
     if !all_vendor_errors.is_empty() {
-        return Err(ApiError::AssertionError(format!(
+        return Err(ApiErrorKind::AssertionError(format!(
             "Vendor call(s) failed: {:?}",
             &all_vendor_errors
-        )));
+        )))?;
     }
 
     // calculate_decision currently requires Vec<VendorResult> which we normally get from saving VerificationResult's to PG

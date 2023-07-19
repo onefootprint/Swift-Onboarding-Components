@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::{
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiResult, ApiErrorKind},
     utils::vault_wrapper::{Person, VaultWrapper},
 };
 
@@ -50,9 +50,9 @@ pub fn get_vendor_apis_for_verification_requests(
         .filter(|v| tenant_vendor_control.enabled_vendor_apis().contains(v))
         .collect::<Vec<_>>();
     if vendor_apis.is_empty() {
-        return Err(ApiError::AssertionError(
+        return Err(ApiErrorKind::AssertionError(
             "Not enough information to send to any vendors".into(),
-        ));
+        ))?;
     } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
     Ok(vendor_apis)
 }

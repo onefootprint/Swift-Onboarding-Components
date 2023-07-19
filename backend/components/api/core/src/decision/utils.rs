@@ -19,7 +19,7 @@ use newtypes::{
 
 use super::{sandbox, vendor};
 use crate::{
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiResult, ApiErrorKind},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -65,7 +65,7 @@ pub fn create_document_verification_request(
     // As of now, we only support 1 vendor for sending documents too
     if vendor_api != VendorAPI::IdologyScanOnboarding {
         let msg = format!("cannot send document request to {}", vendor_api);
-        return Err(ApiError::AssertionError(msg));
+        return Err(ApiErrorKind::AssertionError(msg))?;
     }
 
     VerificationRequest::create_document_verification_request(

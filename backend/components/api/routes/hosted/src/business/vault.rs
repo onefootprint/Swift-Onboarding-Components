@@ -10,7 +10,7 @@ use api_core::errors::business::BusinessError;
 use api_core::errors::AssertionError;
 use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::{Person, TenantVw};
-use api_core::ApiError;
+use api_core::{ApiErrorKind};
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
@@ -130,7 +130,7 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
     let mut decrypted = pbo_vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
     let phone_number = decrypted
         .remove(&IDK::PhoneNumber.into())
-        .ok_or(ApiError::NoPhoneNumberForVault)?;
+        .ok_or(ApiErrorKind::NoPhoneNumberForVault)?;
     let phone_number = PhoneNumber::parse(phone_number)?;
     let email = decrypted
         .remove(&IDK::Email.into())

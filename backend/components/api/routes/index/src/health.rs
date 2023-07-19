@@ -1,11 +1,13 @@
 use crate::types::{ResponseData, StringResponse};
+use crate::State;
 use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
-use crate::{metrics, State};
 
 use actix_web::cookie::time::Instant;
 use api_core::errors::AssertionError;
+
+use api_core::metrics;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
-use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+use paperclip::actix::{api_v2_errors, api_v2_operation, get, web, Apiv2Schema};
 
 use serde::{Deserialize, Serialize};
 
@@ -20,6 +22,35 @@ async fn handler() -> StringResponse {
     Ok("ok".to_string())
 }
 
+use derive_more::Display;
+
+#[api_v2_errors]
+#[derive(Debug, Display)]
+pub enum CustomError {
+    #[display(fmt = "Custom Error 1")]
+    CustomOne,
+    #[allow(unused)]
+    #[display(fmt = "Custom Error 2")]
+    CustomTwo,
+}
+
+impl actix_web::ResponseError for CustomError {
+    fn status_code(&self) -> reqwest::StatusCode {
+        reqwest::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
+        actix_web::HttpResponse::InternalServerError().body(self.to_string())
+    }
+}
+
+#[api_v2_operation(tags(Private), description = "Returns health of services running")]
+#[tracing::instrument(name = "status2")]
+#[get("/status2")]
+async fn status2() -> Result<String, CustomError> {
+    Err(CustomError::CustomOne)
+}
+
 #[api_v2_operation(tags(Private), description = "Returns health of services running")]
 #[tracing::instrument(name = "status", skip(state))]
 #[get("/status")]
@@ -28,7 +59,7 @@ async fn status(state: web::Data<State>) -> StringResponse {
     let context = opentelemetry_api::Context::current();
     state.metrics.get_status_counter.add(&context, 1, &[]);
 
-    let before_enclave = chrono::Utc::now().timestamp_millis();
+    let before_enclave: i64 = chrono::Utc::now().timestamp_millis();
     state.enclave_client.pong().await?;
     let after_enclave = chrono::Utc::now().timestamp_millis();
 

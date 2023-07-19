@@ -5,10 +5,11 @@ use crate::decision::features::incode_docv;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
+use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
-use crate::ApiError;
+
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
@@ -176,6 +177,6 @@ impl IncodeStateTransition for Complete {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        Err(ApiError::AssertionError("Incode machine already complete".into()))
+        Err(ApiErrorKind::AssertionError("Incode machine already complete".into()))?
     }
 }

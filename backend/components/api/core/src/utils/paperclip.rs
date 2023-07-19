@@ -47,7 +47,7 @@ macro_rules! api_headers_schema {
 
                     #[allow(unused)]
                     pub fn [<get_ $o_name>](&self) -> Result<$o_typ, $crate::ApiError> {
-                        self.$o_name.clone().ok_or($crate::ApiError::MissingRequiredHeader($o_header))
+                        self.$o_name.clone().ok_or($crate::ApiError::from($crate::ApiErrorKind::MissingRequiredHeader($o_header)))
                     }
                 )*
 
@@ -126,7 +126,7 @@ macro_rules! api_headers_schema {
                     Box::pin(async move {
                         Ok(Self {
                             $(
-                                $r_name: [<$r_name _res>]?.ok_or($crate::ApiError::MissingRequiredHeader($r_header))?,
+                                $r_name: [<$r_name _res>]?.ok_or($crate::ApiErrorKind::MissingRequiredHeader($r_header))?,
                             )*
                             $(
                                 $o_name: [<$o_name _res>]?,

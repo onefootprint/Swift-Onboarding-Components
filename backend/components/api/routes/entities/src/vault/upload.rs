@@ -107,9 +107,9 @@ async fn post_upload_inner(
     match data_identifier {
         DataIdentifier::Custom(_) | DataIdentifier::Document(_) => {}
         _ => {
-            return Err(api_core::ApiError::AssertionError(
+            return Err(api_core::ApiErrorKind::AssertionError(
                 "large object upload only available for custom.* and document.* data identifiers".into(),
-            ))
+            ))?
         }
     };
 

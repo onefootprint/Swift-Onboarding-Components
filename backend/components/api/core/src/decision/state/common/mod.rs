@@ -32,9 +32,8 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
-    errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
-    ApiError, State,
+    errors::{onboarding::OnboardingError, ApiResult, ApiErrorKind},
+    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs}, State,
 };
 
 use super::{traits::HasRuleGroup, StateError};
@@ -145,7 +144,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
 
     if has_critical_error {
         tracing::error!(errors = error_message, "VendorRequestsFailed");
-        return Err(ApiError::VendorRequestsFailed);
+        return Err(ApiErrorKind::VendorRequestsFailed)?;
     }
 
     let all_vendor_results: Vec<VendorResult> = vendor_requests

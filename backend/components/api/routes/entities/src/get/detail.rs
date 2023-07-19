@@ -9,6 +9,7 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::ApiErrorKind;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
@@ -51,11 +52,11 @@ pub async fn get(
         .db_query(move |conn| -> Result<_, ApiError> {
             let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
                 .pop()
-                .ok_or(ApiError::ResourceNotFound)?;
+                .ok_or(ApiErrorKind::ResourceNotFound)?;
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?
                 .remove(&sv.id)
-                .ok_or(ApiError::ResourceNotFound)?;
+                .ok_or(ApiErrorKind::ResourceNotFound)?;
 
             Ok((entity, vw))
         })

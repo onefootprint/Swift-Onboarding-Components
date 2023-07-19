@@ -1,9 +1,9 @@
 use crate::State;
+use api_core::ApiErrorKind;
 use api_core::decision::vendor;
 use api_core::{
     auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
-    ApiError,
 };
 use db::models::{
     vault::Vault, verification_request::VerificationRequest, verification_result::VerificationResult,
@@ -53,12 +53,12 @@ pub async fn post(
         &state.enclave_client,
         vec![vres
             .e_response
-            .ok_or(ApiError::AssertionError("e_response is None".to_owned()))?],
+            .ok_or(ApiErrorKind::AssertionError("e_response is None".to_owned()))?],
         &uv.e_private_key,
     )
     .await?
     .pop()
-    .ok_or(ApiError::AssertionError(
+    .ok_or(ApiErrorKind::AssertionError(
         "decrypt_verification_result_response returned empty list".to_owned(),
     ))?;
 

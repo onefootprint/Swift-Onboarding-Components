@@ -2,6 +2,7 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_core::ApiErrorKind;
 use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard};
 use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
@@ -100,7 +101,7 @@ async fn proceed(
     let action = if let Some(wf_action_kind) = wf_action_kind {
         WorkflowActions::try_from(wf_action_kind)?
     } else {
-        ww.state.default_action().ok_or(ApiError::AssertionError(
+        ww.state.default_action().ok_or(ApiErrorKind::AssertionError(
             "Current state has no default action".to_string(),
         ))?
     };

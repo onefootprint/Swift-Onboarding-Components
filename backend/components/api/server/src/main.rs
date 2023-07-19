@@ -8,28 +8,19 @@ use api_core::{config::Config, *};
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    run_server().await
-}
-
 #[allow(clippy::expect_used)]
-async fn run_server() -> std::io::Result<()> {
+fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
 
-    // telemetry
-    let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
-    let prom = prometheus::init(&config);
-    metrics::deprecated_register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
-
     // sentry
-    let sample_rate = if config.service_config.is_local() {
+    let sample_rate: f32 = if config.service_config.is_local() {
         // Don't send local errors to sentry
         0.0
     } else {
         1.0
     };
-    let _guard = sentry::init((
+
+    let _guard: sentry::ClientInitGuard = sentry::init((
         config.sentry_url.as_str(),
         sentry::ClientOptions {
             release: sentry::release_name!(),
@@ -47,7 +38,18 @@ async fn run_server() -> std::io::Result<()> {
 
     std::env::set_var("RUST_BACKTRACE", "1");
 
-    let state = State::init_or_die(config.clone()).await;
+    let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
+    runtime.block_on(async move { run_server(config).await })
+}
+
+#[allow(clippy::expect_used)]
+async fn run_server(config: Config) -> std::io::Result<()> {
+    // telemetry
+    let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
+    let prom = prometheus::init(&config);
+    metrics::deprecated_register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
+
+    let state: State = State::init_or_die(config.clone()).await;
 
     // run custom migrations if needed
     custom_migrations::run(&state)
@@ -62,7 +64,7 @@ async fn run_server() -> std::io::Result<()> {
 
     // telemetry::shutdown();
     HttpServer::new(move || {
-        let cors = actix_cors::Cors::default()
+        let cors: actix_cors::Cors = actix_cors::Cors::default()
             .allow_any_origin()
             .allow_any_header()
             .allow_any_method()
@@ -77,14 +79,14 @@ async fn run_server() -> std::io::Result<()> {
             // accept any content type
             .content_type(|_| true)
             // use custom error handler
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidJsonBody(err))));
 
         let query_cfg = web::QueryConfig::default()
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidQueryParam(err)));
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidQueryParam(err))));
 
         let form_cfg = web::FormConfig::default()
             .limit(32_768)
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidFormError(err)));
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidFormError(err))));
 
 
         App::new()
@@ -93,10 +95,7 @@ async fn run_server() -> std::io::Result<()> {
             .wrap(request_metrics.clone()) // Export otel metrics for each API request
             // TODO also wrap RequestTracing::new()
             .wrap(
-                sentry_actix::Sentry::builder()
-                    .capture_server_errors(true)
-                    .start_transaction(true)
-                    .finish(),
+                sentry_actix::Sentry::new()
             )
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
@@ -128,7 +127,7 @@ async fn run_server() -> std::io::Result<()> {
 }
 
 async fn default_not_found() -> impl actix_web::Responder {
-    ApiError::EndpointNotFound.error_response()
+    ApiError::from(ApiErrorKind::EndpointNotFound).error_response()
 }
 
 #[allow(unused)]

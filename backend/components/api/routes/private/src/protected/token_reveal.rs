@@ -6,8 +6,7 @@ use api_core::{
         tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
         Either,
     },
-    types::{JsonApiResponse, ResponseData},
-    ApiError,
+    types::{JsonApiResponse, ResponseData}, ApiErrorKind,
 };
 use db::models::session::Session;
 use newtypes::{SealedSessionBytes, SessionAuthToken};
@@ -52,7 +51,7 @@ pub async fn post(
         .await??;
 
     let Some(session) = session else {
-        return Err(ApiError::ResourceNotFound);
+        return Err(ApiErrorKind::ResourceNotFound)?;
     };
 
     // First try just decrypting the session, as some sessions aren't stored encrypted

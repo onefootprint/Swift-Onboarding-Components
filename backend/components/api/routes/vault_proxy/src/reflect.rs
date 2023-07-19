@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiError;
+
 use crate::errors::ApiResult;
 
 use crate::proxy;
@@ -11,6 +11,7 @@ use crate::State;
 use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
 use api_core::utils::body_bytes::BodyBytes;
+use api_core::ApiErrorKind;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
@@ -45,7 +46,7 @@ pub async fn post(
 ) -> ApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
-        return Err(ApiError::InvalidProxyBody);
+        return Err(ApiErrorKind::InvalidProxyBody)?;
     };
 
     // 0. pull out a global fp_id if exists

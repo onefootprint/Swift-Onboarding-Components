@@ -2,6 +2,7 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_core::ApiErrorKind;
 use api_core::errors::AssertionError;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
@@ -78,10 +79,10 @@ async fn post(
                     .collect();
 
                 if !unallowed_affected_tenants.is_empty() {
-                    return Err(ApiError::AssertionError(format!(
+                    return Err(ApiErrorKind::AssertionError(format!(
                         "Clearing vault would have impacted tenants: {}",
                         unallowed_affected_tenants.join(",")
-                    )));
+                    )))?;
                 }
             }
 

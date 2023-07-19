@@ -16,7 +16,7 @@ use super::{
 };
 use crate::{
     enclave_client::EnclaveClient,
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiErrorKind, ApiResult},
     metrics,
     vendor_clients::VendorClient,
 };
@@ -208,8 +208,8 @@ impl VendorResults {
     fn construct_requests_with_responses_for_verification_result(
         v: &VerificationRequestWithVendorError,
     ) -> (VerificationRequest, Option<PiiJsonValue>) {
-        match v {
-            (req, ApiError::VendorRequestFailed(ve)) => match &ve.error {
+        match (&v.0, v.1.kind()) {
+            (req, ApiErrorKind::VendorRequestFailed(ve)) => match &ve.error {
                 idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
                     (req.clone(), Some(e.response.clone()))
                 }
@@ -238,8 +238,8 @@ fn partition_vendor_errors(
     });
 
     let (critical_errors, non_critical_errors) = errors.into_iter().partition(|(_, e)| {
-        match e {
-            ApiError::VendorRequestFailed(vendor_api_error) => {
+        match e.kind() {
+            ApiErrorKind::VendorRequestFailed(vendor_api_error) => {
                 if utils::should_throw_error_in_decision_engine_if_error_in_request(&vendor_api_error.vendor_api) {
                     true
                 } else {

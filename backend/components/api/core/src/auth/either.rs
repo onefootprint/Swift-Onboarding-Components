@@ -12,7 +12,7 @@ use paperclip::{
 };
 
 use crate::{
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiErrorKind, ApiResult},
     State,
 };
 
@@ -51,21 +51,23 @@ where
                 // The goal here is to produce a better error message
                 // as it's possible there's a real auth error or some headers are missing
                 (Err(e1), Err(e2)) => {
-                    match (e1, e2) {
+                    match (e1.into_kind(), e2.into_kind()) {
                         // if both headers are missing
                         (
-                            ApiError::AuthError(AuthError::MissingHeader(h1)),
-                            ApiError::AuthError(AuthError::MissingHeader(h2)),
-                        ) => Err(ApiError::AuthError(AuthError::MissingHeader(format!(
+                            ApiErrorKind::AuthError(AuthError::MissingHeader(h1)),
+                            ApiErrorKind::AuthError(AuthError::MissingHeader(h2)),
+                        ) => Err(ApiError::from(AuthError::MissingHeader(format!(
                             "{} or {}",
                             h1, h2
                         )))),
 
                         // if there's a non missing header error on one side, pick that one
-                        (ApiError::AuthError(AuthError::MissingHeader(_)), e)
-                        | (e, ApiError::AuthError(AuthError::MissingHeader(_))) => Err(e),
+                        (ApiErrorKind::AuthError(AuthError::MissingHeader(_)), e)
+                        | (e, ApiErrorKind::AuthError(AuthError::MissingHeader(_))) => Err(ApiError::from(e)),
 
                         (e1, e2) => {
+                            let e1 = ApiError::from(e1);
+                            let e2 = ApiError::from(e2);
                             tracing::warn!(error1=?e1, error2=?e2, "Got dual error in Either FromRequest");
                             // arbitrarily choose the first one
                             Err(e1)

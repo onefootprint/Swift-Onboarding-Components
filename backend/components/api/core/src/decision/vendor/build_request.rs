@@ -1,5 +1,5 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{ApiResult, AssertionError};
+use crate::errors::{ApiResult, AssertionError, ApiErrorKind};
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs, Person, Business, TenantVw, DecryptedBusinessOwners};
 use crate::{errors::ApiError, State};
@@ -98,9 +98,9 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     request: VerificationRequest,
 ) -> Result<DocVData, ApiError> {
     let Some(identity_doc_id) = request.identity_document_id.clone() else { 
-        return Err(ApiError::AssertionError(
+        return Err(ApiErrorKind::AssertionError(
             format!("{} is not a document verification vendor", request.vendor_api),
-    ))};
+    ))?};
 
     let (doc, ref_id, images, vault) = db_pool
         .db_query(
@@ -179,9 +179,9 @@ pub async fn build_docv_data_from_identity_doc(
 #[allow(dead_code)]
 async fn build_docv_for_scan_verify_results(state: &State, request: VerificationRequest) -> Result<DocVData, ApiError> {
     let Some(identity_doc_id) = request.identity_document_id.clone() else { 
-        return Err(ApiError::AssertionError(
+        return Err(ApiErrorKind::AssertionError(
             format!("{} is not a document verification vendor", request.vendor_api),
-    ))};
+    ))?};
 
     let ref_id = state
         .db_pool

@@ -3,7 +3,7 @@ use crate::enclave_client::EnclaveClient;
 use crate::errors::business::BusinessError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
-use crate::State;
+use crate::{State, ApiErrorKind};
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
 use db::{DbPool, VaultedData};
@@ -79,7 +79,8 @@ impl DecryptUncheckedResult {
         let di = di.into();
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
-            .ok_or(ApiError::MissingRequiredEntityData(di, Csv(transforms)))
+            .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
+            .map_err(ApiError::from)
     }
 
     pub fn get_di<D: Into<DataIdentifier>>(&self, di: D) -> ApiResult<PiiString> {
@@ -95,7 +96,8 @@ impl DecryptUncheckedResult {
         self.results
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
             .cloned()
-            .ok_or(ApiError::MissingRequiredEntityData(di, Csv(transforms)))
+            .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
+            .map_err(ApiError::from)
     }
 }
 
@@ -255,7 +257,7 @@ impl<Type> VaultWrapper<Type> {
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<PhoneNumber, ApiError> {
         let phone_lifetime_id = self
             .get(IDK::PhoneNumber)
-            .ok_or(ApiError::NoPhoneNumberForVault)?
+            .ok_or(ApiErrorKind::NoPhoneNumberForVault)?
             .lifetime_id()
             .clone();
         let ci = state
@@ -273,7 +275,7 @@ impl<Type> VaultWrapper<Type> {
         let e164 = self
             .decrypt_unchecked_single(&state.enclave_client, IDK::PhoneNumber.into())
             .await?
-            .ok_or(ApiError::NoPhoneNumberForVault)?;
+            .ok_or(ApiErrorKind::NoPhoneNumberForVault)?;
         let phone_number = PhoneNumber::parse(e164)?;
         Ok(phone_number)
     }

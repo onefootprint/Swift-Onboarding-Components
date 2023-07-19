@@ -1,4 +1,4 @@
-use crate::ApiError;
+use crate::{ApiError, ApiErrorKind};
 
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 500 assertion error.
@@ -9,6 +9,6 @@ pub struct AssertionError<'a>(pub &'a str);
 
 impl<'a> From<AssertionError<'a>> for ApiError {
     fn from(value: AssertionError<'a>) -> Self {
-        ApiError::AssertionError(value.0.to_string())
+        ApiError::from(ApiErrorKind::AssertionError(value.0.to_string()))
     }
 }

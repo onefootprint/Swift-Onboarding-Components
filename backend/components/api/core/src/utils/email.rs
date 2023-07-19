@@ -1,5 +1,5 @@
 use crate::auth::session::user::EmailVerifySession;
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiErrorKind};
 use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};
 use crypto::random::gen_random_alphanumeric_code;
@@ -191,7 +191,7 @@ impl SendgridClient {
         }
 
         let err = &res.text().await?;
-        Err(ApiError::SendgridError(err.to_owned()))
+        Err(ApiErrorKind::SendgridError(err.to_owned()))?
     }
 }
 

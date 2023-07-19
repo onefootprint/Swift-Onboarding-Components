@@ -31,17 +31,19 @@ pub fn init(config: &Config) -> Result<Option<BasicController>, Box<dyn std::err
         return Ok(None);
     }
 
-    let exporter = if let Some(otel_endpoint) = &config.otel_endpoint {
-        opentelemetry_otlp::new_exporter()
-            .tonic()
-            .with_endpoint(otel_endpoint)
-    } else {
-        opentelemetry_otlp::new_exporter().tonic()
+    let exporter = || {
+        if let Some(otel_endpoint) = &config.otel_endpoint {
+            opentelemetry_otlp::new_exporter()
+                .tonic()
+                .with_endpoint(otel_endpoint)
+        } else {
+            opentelemetry_otlp::new_exporter().tonic()
+        }
     };
 
     let tracer = opentelemetry_otlp::new_pipeline()
         .tracing()
-        .with_exporter(exporter)
+        .with_exporter(exporter())
         .install_batch(opentelemetry::runtime::Tokio)?;
 
     // sentry layer
@@ -67,7 +69,7 @@ pub fn init(config: &Config) -> Result<Option<BasicController>, Box<dyn std::err
             opentelemetry::sdk::export::metrics::aggregation::stateless_temporality_selector(),
             opentelemetry::runtime::Tokio,
         )
-        .with_exporter(opentelemetry_otlp::new_exporter().tonic())
+        .with_exporter(exporter())
         .build()?;
 
     Ok(Some(metrics))

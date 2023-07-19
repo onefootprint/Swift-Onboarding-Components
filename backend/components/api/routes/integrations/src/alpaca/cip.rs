@@ -20,7 +20,7 @@ use api_core::{
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
-    ApiError, State,
+    ApiError, State, ApiErrorKind,
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse};
 use chrono::{DateTime, Utc};
@@ -570,7 +570,7 @@ fn document_and_photo(
 }
 
 fn ok_or<T>(o: Option<T>, assert_msg: String) -> ApiResult<T> {
-    let unwrapped = o.ok_or(ApiError::AssertionError(assert_msg))?;
+    let unwrapped = o.ok_or(ApiErrorKind::AssertionError(assert_msg))?;
 
     Ok(unwrapped)
 }

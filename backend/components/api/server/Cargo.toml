@@ -22,7 +22,6 @@ actix-cors = "0.6"
 chrono = { workspace = true }
 sentry = { workspace = true }
 sentry-actix = { workspace = true }
-sentry-tracing = { workspace = true }
 
 itertools = { workspace = true }
 

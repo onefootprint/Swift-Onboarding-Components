@@ -34,6 +34,7 @@ pub mod utils;
 pub mod vendor_clients;
 
 pub use crate::errors::ApiError;
+pub use crate::errors::ApiErrorKind;
 pub use paperclip::actix::{web, OpenApiExt};
 
 pub use self::state::State;

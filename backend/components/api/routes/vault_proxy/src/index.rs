@@ -1,6 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 
 use crate::proxy;
@@ -13,10 +12,11 @@ use crate::proxy::token_parser::ProxyTokenParser;
 use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
+use api_core::ApiErrorKind;
 
+use api_core::auth::tenant::TenantAuth;
 use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
-use api_core::auth::tenant::TenantAuth;
 use api_core::utils::body_bytes::BodyBytes;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::ProxyConfigId;
@@ -97,7 +97,7 @@ async fn invoke_vault_proxy(
 ) -> ApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
-        return Err(ApiError::InvalidProxyBody);
+        return Err(ApiErrorKind::InvalidProxyBody)?;
     };
 
     let config = match source {

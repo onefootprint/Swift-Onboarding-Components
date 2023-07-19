@@ -42,7 +42,7 @@ use super::state::IncodeStateTransition;
 use super::IncodeContext;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::{ApiResult, AssertionError};
+use crate::errors::{ApiResult, AssertionError, ApiErrorKind};
 use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
 use crate::{ApiError, State};
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
@@ -175,7 +175,7 @@ pub async fn save_incode_fixtures(state: &State, scoped_vault_id: &ScopedVaultId
     let last_name = vd.rm_di(IdentityDataKind::LastName)?;
     let dob = vd.rm_di(IdentityDataKind::Dob)?;
     let date_of_birth_timestamp = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
-        .map_err(|_| ApiError::AssertionError("invalid date in fixture".into()))?
+        .map_err(|_| ApiErrorKind::AssertionError("invalid date in fixture".into()))?
         .and_hms_milli_opt(0, 0, 0, 0)
         .map(|d| d.timestamp_millis());
 

@@ -6,6 +6,7 @@ use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiErrorKind;
 use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
@@ -137,7 +138,7 @@ pub async fn send_docv_request(
         }
         api => {
             let err = format!("send_docv_request not implemented for {}", api);
-            return Err(ApiError::AssertionError(err));
+            return Err(ApiErrorKind::AssertionError(err))?;
         }
     };
 
@@ -505,7 +506,7 @@ pub async fn make_vendor_requests(
                         log_msg
                     );
 
-                    Err((reqs[idx].clone(), ApiError::VendorRequestFailed(e)))
+                    Err((reqs[idx].clone(), ApiError::from(e)))
                 }
             }
         })

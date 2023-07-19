@@ -11,7 +11,8 @@ use api_core::decision::state::ReviewCompleted;
 use api_core::decision::state::StateError;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::task;
-use api_core::ApiError;
+
+use api_core::ApiErrorKind;
 use api_wire_types::DecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
@@ -65,10 +66,12 @@ pub async fn post(
             .await;
         match res {
             Ok(_) => return EmptyResponse::ok().json(),
-            Err(ApiError::StateError(StateError::UnexpectedActionForState)) => {
-                tracing::info!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
-            }
-            Err(e) => Err(e)?,
+            Err(e) => match e.kind() {
+                ApiErrorKind::StateError(StateError::UnexpectedActionForState) => {
+                    tracing::info!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
+                }
+                _ => Err(e)?,
+            },
         }
     }
 

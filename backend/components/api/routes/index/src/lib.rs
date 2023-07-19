@@ -12,6 +12,7 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(index::headers)
         .service(health::handler)
         .service(health::status)
+        .service(health::status2)
         .service(health::enclave)
         .service(health::enclave_decrypt)
         .service(health::panic_handler)

@@ -1,4 +1,4 @@
-use crate::{errors::ApiResult, ApiError};
+use crate::{errors::ApiResult, ApiErrorKind};
 
 use super::get_header;
 use actix_web::{http::header::HeaderMap, FromRequest};
@@ -56,14 +56,14 @@ impl IdempotencyId {
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResult<Self> {
         let idempotency_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
             if id.len() < 10 || id.len() > 256 {
-                return Err(ApiError::ValidationError(
+                return Err(ApiErrorKind::ValidationError(
                     "Idempotency ID length is invalid. Must be between 10 and 256 characters.".into(),
-                ));
+                ))?;
             }
             if !IDEMPOTENCY_ID_CHARS.is_match(&id) {
-                return Err(ApiError::ValidationError(
+                return Err(ApiErrorKind::ValidationError(
                     "Idempotency ID is invalid. Must only include alphanumeric characters, -, _, or .".into(),
-                ));
+                ))?;
             }
             Some(id)
         } else {
