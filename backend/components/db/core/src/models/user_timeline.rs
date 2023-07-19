@@ -14,13 +14,11 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
-use newtypes::DocumentDataId;
 use newtypes::VendorAPI;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
-use super::document_data::DocumentData;
 use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
@@ -63,7 +61,6 @@ pub enum SaturatedTimelineEvent {
     IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
-    DocumentUploaded(DocumentData),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
     WorkflowTriggered((Workflow, SaturatedActor)),
@@ -164,10 +161,6 @@ impl UserTimeline {
             DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => Some(&e.id),
             _ => None,
         });
-        let document_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
-            _ => None,
-        });
         let watchlist_check_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::WatchlistCheck(ref e) => Some(&e.id),
             _ => None,
@@ -190,8 +183,6 @@ impl UserTimeline {
         let vendor_apis_to_include = VendorAPI::iter()
             .filter(|v| (!matches!(v, &VendorAPI::SocureIDPlus)) || tenant_can_view_socure_risk_signal)
             .collect_vec();
-        let documents: HashMap<DocumentDataId, DocumentData> =
-            DocumentData::get_bulk(conn, document_ids.collect())?;
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
@@ -247,12 +238,6 @@ impl UserTimeline {
                             .clone();
                         SaturatedTimelineEvent::Annotation(annotation)
                     }
-                    DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
-                        documents
-                            .get(&e.id)
-                            .ok_or(DbError::RelatedObjectNotFound)?
-                            .clone(),
-                    ),
                     DbUserTimelineEvent::WatchlistCheck(ref e) => SaturatedTimelineEvent::WatchlistCheck(
                         watchlist_checks
                             .get(&e.id)

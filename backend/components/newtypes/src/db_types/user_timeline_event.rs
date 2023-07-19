@@ -1,6 +1,6 @@
 use crate::{
-    util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, DocumentDataId, IdentityDocumentId,
-    LivenessEventId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
+    util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
+    OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
 };
 use crate::{DbActor, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -34,7 +34,6 @@ pub enum DbUserTimelineEvent {
     OnboardingDecision(OnboardingDecisionInfo),
     Liveness(LivenessInfo),
     Annotation(AnnotationInfo),
-    DocumentUploaded(DocumentUploadedInfo),
     WatchlistCheck(WatchlistCheckInfo),
     VaultCreated(VaultCreatedInfo),
     WorkflowTriggered(WorkflowTriggeredInfo),
@@ -69,12 +68,6 @@ impl From<LivenessInfo> for DbUserTimelineEvent {
 impl From<AnnotationInfo> for DbUserTimelineEvent {
     fn from(s: AnnotationInfo) -> Self {
         Self::Annotation(s)
-    }
-}
-
-impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
-    fn from(s: DocumentUploadedInfo) -> Self {
-        Self::DocumentUploaded(s)
     }
 }
 
@@ -125,11 +118,6 @@ pub struct LivenessInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnnotationInfo {
     pub annotation_id: AnnotationId,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DocumentUploadedInfo {
-    pub id: DocumentDataId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

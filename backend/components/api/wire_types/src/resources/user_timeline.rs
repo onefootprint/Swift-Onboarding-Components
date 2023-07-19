@@ -1,9 +1,8 @@
 use newtypes::CollectedDataOption;
 
 use crate::{
-    export_schema, Actor, Annotation, Apiv2Schema, DateTime, DocumentUploadedTimelineEvent,
-    IdentityDocumentTimelineEvent, JsonSchema, LivenessEvent, OnboardingDecision, Serialize, Utc,
-    VaultCreated, WatchlistCheck, Workflow,
+    export_schema, Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, JsonSchema,
+    LivenessEvent, OnboardingDecision, Serialize, Utc, VaultCreated, WatchlistCheck, Workflow,
 };
 
 /// Describes a liveness event that took place
@@ -31,8 +30,6 @@ pub enum UserTimelineEvent {
         annotation: Option<Annotation>,
     },
     Annotation(Annotation),
-    // TODO where do we use these ??
-    DocumentUploaded(DocumentUploadedTimelineEvent),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(VaultCreated),
     WorkflowTriggered(WorkflowTriggered),

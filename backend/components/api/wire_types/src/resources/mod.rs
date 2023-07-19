@@ -70,9 +70,6 @@ pub use self::proxy_config::*;
 mod webhook_portal;
 pub use self::webhook_portal::*;
 
-mod document_upload_timeline_event;
-pub use self::document_upload_timeline_event::*;
-
 mod watchlist_check;
 pub use self::watchlist_check::*;
 
