@@ -6,11 +6,21 @@ const DEFAULT_INNER_RADIUS = 56;
 
 type CaptureButtonProps = {
   onClick: () => void;
+  disabled?: boolean;
 };
 
-const CaptureButton = ({ onClick }: CaptureButtonProps) => (
-  <RoundButton onClick={onClick} outerRadius={DEFAULT_OUTER_RADIUS}>
-    <InnerCircle innerRadius={DEFAULT_INNER_RADIUS} />
+const CaptureButton = ({ onClick, disabled = false }: CaptureButtonProps) => (
+  <RoundButton
+    aria-disabled={disabled}
+    data-disabled={disabled}
+    onClick={onClick}
+    outerRadius={DEFAULT_OUTER_RADIUS}
+  >
+    <InnerCircle
+      aria-disabled={disabled}
+      data-disabled={disabled}
+      innerRadius={DEFAULT_INNER_RADIUS}
+    />
   </RoundButton>
 );
 
@@ -23,11 +33,17 @@ const RoundButton = styled.div<{
     align-items: center;
     height: ${outerRadius}px;
     width: ${outerRadius}px;
-    background-color: ${theme.backgroundColor.secondary};
-    border: none;
-    border-radius: 50%;
+    background-color: none;
+    border: calc(${theme.spacing[3]} - ${theme.spacing[1]}) solid
+      ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.full};
     position: absolute;
     bottom: ${theme.spacing[5]};
+
+    &[data-disabled='true'] {
+      border-color: ${theme.backgroundColor.senary};
+      pointer-events: none;
+    }
 
     &:hover {
       cursor: pointer;
@@ -35,7 +51,7 @@ const RoundButton = styled.div<{
   `}
 `;
 
-const InnerCircle = styled.div<{
+const InnerCircle = styled.button<{
   innerRadius: number;
 }>`
   ${({ theme, innerRadius }) => css`
@@ -43,8 +59,16 @@ const InnerCircle = styled.div<{
     width: ${innerRadius}px;
     background-color: ${theme.backgroundColor.primary};
     border: none;
-    border-radius: 50%;
+    border-radius: ${theme.borderRadius.full};
     box-shadow: ${theme.elevation[2]};
+
+    &[data-disabled='true'] {
+      background-color: ${theme.backgroundColor.senary};
+    }
+
+    &:active {
+      background-color: ${theme.backgroundColor.secondary};
+    }
   `}
 `;
 
