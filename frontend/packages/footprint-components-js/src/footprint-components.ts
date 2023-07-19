@@ -10,10 +10,10 @@ import {
 import IframeManager from './utils/footprint-components-iframe';
 import { getAppearanceStyles, getURL } from './utils/url-utils';
 
-const iframeManager = new IframeManager();
-let hasIframeOpened = false;
-
 const initFootprintComponent = () => {
+  const iframeManager = new IframeManager();
+  let hasIframeOpened = false;
+
   const registerEvents = (
     kind: FootprintComponentKind,
     props: FootprintComponentProps,

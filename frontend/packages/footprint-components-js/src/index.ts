@@ -16,6 +16,7 @@ export type {
   SecureFormDataProps,
   SecureFormProps,
   SecureFormVariant,
+  SecureRenderDataProps,
   SecureRenderProps,
 } from './types';
 export {

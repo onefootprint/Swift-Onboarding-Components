@@ -17,5 +17,4 @@ export type FootprintComponent = {
   destroy: () => Promise<void>;
 };
 
-// TODO: how to handle events?
 export type FootprintComponentProps = SecureFormProps | SecureRenderProps;

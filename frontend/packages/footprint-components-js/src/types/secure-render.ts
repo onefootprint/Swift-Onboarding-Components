@@ -2,6 +2,9 @@ import { FootprintAppearance } from './appearance';
 
 export type SecureRenderProps = {
   appearance?: FootprintAppearance;
+} & SecureRenderDataProps;
+
+export type SecureRenderDataProps = {
   authToken: string;
   id: string; // a valid data identifier
   label?: string; // defaults to a nice string chosen for that data identifier

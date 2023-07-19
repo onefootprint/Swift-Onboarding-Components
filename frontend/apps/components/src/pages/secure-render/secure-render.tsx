@@ -1,3 +1,4 @@
+import { SecureRenderProps } from '@onefootprint/footprint-components-js';
 import { useTranslation } from '@onefootprint/hooks';
 import { DataIdentifier } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -9,7 +10,6 @@ import Invalid from './components/invalid';
 import Loading from './components/loading';
 import Render from './components/render';
 import useEntitiesVaultDecrypt from './hooks/use-entities-vault-decrypt';
-import { SecureRenderProps } from './types';
 import arePropsValid from './utils/are-props-valid';
 import getMaskForId from './utils/get-mask-for-id';
 

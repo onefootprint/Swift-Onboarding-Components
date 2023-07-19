@@ -172,6 +172,10 @@ const ComponentsInstructions = ({
     setIsVisible(true);
   };
 
+  const dismissModal = () => {
+    setIsVisible(false);
+  };
+
   return (
     <>
       <Head>
@@ -263,6 +267,9 @@ const ComponentsInstructions = ({
             cardAlias={cardAlias}
             type={SecureFormType.cardAndZip}
             variant="modal"
+            onSave={dismissModal}
+            onClose={dismissModal}
+            onCancel={dismissModal}
           />
         )}
       </Grid>

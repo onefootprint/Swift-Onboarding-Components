@@ -44,13 +44,15 @@ const Form = ({
   const handleBeforeSubmit = (data: FormData) => {
     onSave?.(data);
   };
+  const hasCountry =
+    type === SecureFormType.cardAndNameAndAddress ||
+    type === SecureFormType.cardAndZip;
 
-  const defaultValues =
-    type === SecureFormType.cardAndNameAndAddress
-      ? {
-          country: DEFAULT_COUNTRY,
-        }
-      : undefined;
+  const defaultValues = hasCountry
+    ? {
+        country: DEFAULT_COUNTRY,
+      }
+    : undefined;
   const methods = useForm<FormData>({
     defaultValues,
   });

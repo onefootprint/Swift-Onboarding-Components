@@ -1,30 +1,20 @@
 /* eslint-disable no-console */
 import {
-  SecureFormProps,
+  SecureFormDataProps,
   SecureFormType,
 } from '@onefootprint/footprint-components-js';
 
-const isFunction = (fn: any) => typeof fn === 'function';
 const isObject = (obj: any) => typeof obj === 'object';
 
 const arePropsValid = (
   props?: Record<string, any>,
-): props is SecureFormProps => {
+): props is SecureFormDataProps => {
   if (!props || !isObject(props)) {
     console.error('Received empty props');
     return false;
   }
 
-  const {
-    authToken,
-    cardAlias,
-    title,
-    type,
-    variant,
-    onSave,
-    onCancel,
-    onClose,
-  } = props;
+  const { authToken, cardAlias, title, type, variant } = props;
 
   const isAuthTokenValid = typeof authToken === 'string' && !!authToken;
   if (!isAuthTokenValid) console.error('Valid auth token is required.');
@@ -53,26 +43,12 @@ const arePropsValid = (
       variant,
     );
 
-  const isOnSaveValid = onSave === undefined || isFunction(onSave);
-  if (!isOnSaveValid) console.error('onSave must be a function or undefined.');
-
-  const isOnCancelValid = onCancel === undefined || isFunction(onCancel);
-  if (!isOnCancelValid)
-    console.error('onCancel must be a function or undefined.');
-
-  const isOnCloseValid = onClose === undefined || isFunction(onClose);
-  if (!isOnCloseValid)
-    console.error('onClose must be a function or undefined.');
-
   return (
     isAuthTokenValid &&
     isCardAliasValid &&
     isTitleValid &&
     isTypeValid &&
-    isVariantValid &&
-    isOnSaveValid &&
-    isOnCancelValid &&
-    isOnCloseValid
+    isVariantValid
   );
 };
 

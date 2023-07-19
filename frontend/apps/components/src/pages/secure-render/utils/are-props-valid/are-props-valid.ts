@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { SecureRenderProps } from '@onefootprint/footprint-components-js';
+import { SecureRenderDataProps } from '@onefootprint/footprint-components-js';
 
 import isValidDI from '../is-valid-di';
 
@@ -7,7 +7,7 @@ const isObject = (obj: any) => typeof obj === 'object';
 
 const arePropsValid = (
   props?: Record<string, any>,
-): props is SecureRenderProps => {
+): props is SecureRenderDataProps => {
   if (!props || !isObject(props)) {
     console.error('Received empty props');
     return false;

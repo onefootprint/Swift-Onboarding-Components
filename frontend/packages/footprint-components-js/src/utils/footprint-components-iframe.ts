@@ -19,9 +19,22 @@ import {
 class FootprintComponentsIframe {
   private child: Postmate.ParentAPI | null = null;
 
-  private sendProps(props?: FootprintComponentProps) {
-    if (props) {
-      this.child?.call(FootprintComponentsEvent.propsReceived, props);
+  private sendProps(
+    kind: FootprintComponentKind,
+    props?: FootprintComponentProps,
+  ) {
+    if (!props) {
+      return;
+    }
+    // We need to omit appearance and callback props from the props sent to the iframe
+    // Functions cannot be sent via post message and apperaance is already sent via URL
+    if (kind === FootprintComponentKind.SecureForm) {
+      const { onClose, onSave, onCancel, appearance, ...rest } =
+        props as SecureFormProps;
+      this.child?.call(FootprintComponentsEvent.propsReceived, rest);
+    } else if (kind === FootprintComponentKind.SecureRender) {
+      const { appearance, ...rest } = props;
+      this.child?.call(FootprintComponentsEvent.propsReceived, rest);
     }
   }
 
@@ -115,13 +128,15 @@ class FootprintComponentsIframe {
     this.showLoading(container, isModal, false);
 
     this.child.on(FootprintComponentsEvent.started, () => {
-      this.sendProps(props);
+      this.sendProps(kind, props);
     });
   }
 
   on(eventName: string, callback: (data?: any) => void) {
     if (!this.child) {
-      throw new Error('Footprint should be open in order to listen events');
+      throw new Error(
+        'Footprint components should be open in order to listen events',
+      );
     }
     return this.child.on(eventName, callback);
   }
