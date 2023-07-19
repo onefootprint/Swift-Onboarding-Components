@@ -1,6 +1,4 @@
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
-import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 export type OutlineKind = 'full-frame' | 'corner';
@@ -11,10 +9,6 @@ type OverlayProps = {
   outlineKind: OutlineKind;
   outlineWidth: number;
   outlineHeight: number;
-  instruction?: {
-    title: string;
-    subtitle: string;
-  };
 };
 
 const Overlay = ({
@@ -23,7 +17,6 @@ const Overlay = ({
   outlineKind,
   outlineWidth,
   outlineHeight,
-  instruction,
 }: OverlayProps) => (
   <Container width={width} height={height}>
     {outlineKind === 'corner' && (
@@ -66,32 +59,6 @@ const Overlay = ({
         $outlineHeight={outlineHeight}
       />
     )}
-    <AnimatePresence>
-      {instruction && (
-        <InstructionContainer
-          width={width}
-          height={height}
-          $outlineWidth={outlineWidth}
-          $outlineHeight={outlineHeight}
-          exit={{ opacity: 0 }}
-        >
-          <Typography
-            variant="caption-4"
-            color="secondary"
-            sx={{ textAlign: 'center', marginBottom: 2 }}
-          >
-            {instruction.title}
-          </Typography>
-          <Typography
-            variant="caption-4"
-            color="secondary"
-            sx={{ textAlign: 'center' }}
-          >
-            {instruction.subtitle}
-          </Typography>
-        </InstructionContainer>
-      )}
-    </AnimatePresence>
   </Container>
 );
 
@@ -164,29 +131,6 @@ const FullFrameOutline = styled.div<{
     width: ${$outlineWidth}px;
     position: absolute;
     border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.large};
-  `}
-`;
-
-const InstructionContainer = styled(motion.div)<{
-  width: number;
-  height: number;
-  $outlineWidth: number;
-  $outlineHeight: number;
-}>`
-  ${({ width, height, $outlineWidth, $outlineHeight, theme }) => css`
-    top: calc(${height / 2}px - ${$outlineHeight / 2}px);
-    left: calc(${width / 2}px - ${$outlineWidth / 2}px);
-    height: ${$outlineHeight}px;
-    width: ${$outlineWidth}px;
-    position: absolute;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: ${theme.spacing[5]};
-    background-color: #ffffff8c;
     border-radius: ${theme.borderRadius.large};
   `}
 `;

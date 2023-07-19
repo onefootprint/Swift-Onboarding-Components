@@ -96,15 +96,11 @@
       "one-side": "Now the photo page of your passport"
     },
     "camera": {
-      "instructions": {
-        "document-capture": {
-          "title": "Place your document here",
-          "subtitle": "Image will be captured automatically, but you can also capture it manually."
-        }
-      },
       "take": "Take photo",
       "autocapture": {
         "feedback": {
+          "init-document": "Align document to the frame",
+          "init-face": "Align your face to the frame",
           "ok": "Hold still . . .",
           "detecting": "Detecting . . .",
           "face-too-far": "Face is too far from the camera",

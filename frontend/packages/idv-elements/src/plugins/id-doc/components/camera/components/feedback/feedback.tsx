@@ -8,7 +8,7 @@ type FeedbackProps = {
 
 const Feedback = ({ children }: FeedbackProps) => (
   <Container>
-    <Typography variant="caption-3" color="quinary">
+    <Typography variant="label-4" color="quinary">
       {children}
     </Typography>
   </Container>
@@ -20,7 +20,8 @@ const Container = styled.div`
     position: absolute;
     top: ${theme.spacing[7]};
     z-index: 1;
-    padding: ${theme.spacing[1]} ${theme.spacing[3]};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[3]}
+      ${theme.spacing[4]};
     border-radius: ${theme.borderRadius.default};
     text-align: center;
   `}

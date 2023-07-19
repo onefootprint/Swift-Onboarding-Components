@@ -46,10 +46,11 @@ const Camera = ({
   const [image, setImage] = useState<string | undefined>();
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
-  >('detecting');
+  >();
   const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(false);
+  const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
+  const [canCapture, setCanCapture] = useState(false);
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
@@ -62,20 +63,24 @@ const Camera = ({
     setVideoHeight(getVideoHeight());
   }, []);
 
-  // We start detecting from the beginning if the we are capturing face
+  // Initially we show the instruction text for 1.5 seconds
   useEffect(() => {
-    if (autocaptureKind === 'face') setShouldDetect(true);
+    setAutocaptureFeedback(`init-${autocaptureKind}`);
   }, [autocaptureKind]);
 
-  // If the camera is visible and we are capturing document we start a timer to remove instructions and start detection
+  // During the 1.5 seconds when we show instruction text, we do the following:
+  // 1. We keep manual capture button disabled
+  // 2. We don't allow changing the feedback text until the 1.5 seconds have passed
+  // Detection may start working before 1.5 seconds if everything (video, model, etc) is initialized
+  // After 1.5 seconds we enable manual capture, and we let the detection algorithm change the feedback text
+  // Since detection algorithm might have a delay before the current iteration completes, we set the feedback text to "detecting ..."
   useTimeout(
     () => {
       setShouldShowInstruction(false);
-      setShouldDetect(true);
+      setCanCapture(true);
+      if (autocaptureFeedback === 'init') setAutocaptureFeedback('detecting');
     },
-    isCameraVisible && autocaptureKind === 'document'
-      ? TRANSITION_DELAY_DEFAULT
-      : null,
+    isCameraVisible ? TRANSITION_DELAY_DEFAULT : null,
   );
 
   const handleCanPlay = () => {
@@ -97,6 +102,7 @@ const Camera = ({
     }
 
     setIsFlashing(true);
+    setCanCapture(false);
 
     // We capture the full width
     // We keep the captured width/height spect ratio same as the outline aspect ratio
@@ -151,6 +157,7 @@ const Camera = ({
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
     shouldDetect,
+    shouldShowInstructions,
   });
 
   const onImageUpload = () => {
@@ -194,14 +201,6 @@ const Camera = ({
                 outlineHeight={
                   videoSize ? videoSize.width * outlineHeightRatio : 0
                 }
-                instruction={
-                  shouldShowInstructions && autocaptureKind === 'document'
-                    ? {
-                        title: t('instructions.document-capture.title'),
-                        subtitle: t('instructions.document-capture.subtitle'),
-                      }
-                    : undefined
-                }
               />
               <Canvas
                 ref={canvasRef as React.Ref<HTMLCanvasElement>}
@@ -214,7 +213,7 @@ const Camera = ({
                   {t(`autocapture.feedback.${autocaptureFeedback}`)}
                 </Feedback>
               )}
-              <CaptureButton onClick={handleClick} />
+              <CaptureButton onClick={handleClick} disabled={!canCapture} />
               {autocaptureKind === 'document' && (
                 <UploadButton
                   onUpload={onImageUpload}

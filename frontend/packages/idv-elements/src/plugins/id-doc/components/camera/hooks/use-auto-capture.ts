@@ -32,6 +32,7 @@ type AutoCaptureProps = {
   outlineHeight: number;
   onCapture: () => void;
   shouldDetect: boolean;
+  shouldShowInstructions: boolean;
   onStatusChange: (currStatus: string | undefined) => void;
   autocaptureKind: AutocaptureKind;
 };
@@ -45,6 +46,7 @@ const useAutoCapture = ({
   onCapture,
   onStatusChange,
   autocaptureKind,
+  shouldShowInstructions,
   shouldDetect,
 }: AutoCaptureProps) => {
   const successCount = useRef(0);
@@ -140,9 +142,9 @@ const useAutoCapture = ({
             paramIndex,
             rearrangedParams.current,
           );
-          onStatusChange(CardCaptureStatus.OK);
+          if (!shouldShowInstructions) onStatusChange(CardCaptureStatus.OK);
         } else if (pastStatus.current === cardCaptureStatus) {
-          onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+          if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
         }
         pastStatus.current = cardCaptureStatus;
       } else if (autocaptureKind === 'face') {
@@ -154,9 +156,9 @@ const useAutoCapture = ({
         );
         if (faceStatus === FaceStatus.OK) {
           successCount.current += 1;
-          onStatusChange(FaceStatus.OK);
+          if (!shouldShowInstructions) onStatusChange(FaceStatus.OK);
         } else if (pastStatus.current === faceStatus) {
-          onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+          if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
         }
         pastStatus.current = faceStatus;
       }
@@ -184,6 +186,7 @@ const useAutoCapture = ({
     outlineHeight,
     outlineWidth,
     shouldDetect,
+    shouldShowInstructions,
     videoRef,
     videoSize,
   ]);
