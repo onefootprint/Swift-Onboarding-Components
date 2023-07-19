@@ -411,6 +411,21 @@ def test_large_objects(sandbox_tenant):
     obj_out = base64.b64decode(resp[di])
     assert json.loads(obj_out)["some_key"] == obj["some_key"]
 
+    # test the integrity hash
+    signing_key = "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
+
+    resp = post(
+        f"entities/{fp_id}/vault/integrity",
+        dict(fields=list([di]), signing_key=signing_key),
+        sandbox_tenant.sk.key,
+    )
+    expected = hmac.new(
+        bytes.fromhex(signing_key),
+        msg=obj_out,
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+    assert resp[di] == expected
+
 
 def test_too_large_object_upload(sandbox_tenant):
     body = post("users/", None, sandbox_tenant.sk.key)

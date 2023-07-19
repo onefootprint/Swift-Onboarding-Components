@@ -27,6 +27,12 @@ pub struct EnclaveDecryptOperation {
 }
 
 impl EnclaveDecryptOperation {
+    pub fn is_identity_transform(&self) -> bool {
+        self.transforms.is_empty() || self.transforms.iter().all(|t| t == &DataTransform::Identity)
+    }
+}
+
+impl EnclaveDecryptOperation {
     pub fn new(identifier: DataIdentifier, transforms: Vec<DataTransform>) -> Self {
         EnclaveDecryptOperation {
             identifier,
@@ -197,7 +203,15 @@ impl<Type> VaultWrapper<Type> {
                     // Apply the document transforms inline since we decrypt the document outside of
                     // the enclave
                     let transformed = DataTransforms(op.transforms.clone()).apply(pii_bytes.into_leak())?;
-                    let pii_string = PiiBytes::new(transformed).into_leak_base64_pii();
+
+                    // large objects by default may be binary so we always base64 encode them!
+                    // UNLESS we apply a transform, then we take the result of the transform in any
+                    // form it gives us as long as we can convert it to a string
+                    let pii_string = if op.is_identity_transform() {
+                        PiiBytes::new(transformed).into_leak_base64_pii()
+                    } else {
+                        PiiString::try_from(PiiBytes::new(transformed))?
+                    };
                     Ok((op, pii_string))
                 })
                 .collect::<ApiResult<HashMap<_, _>>>()?
