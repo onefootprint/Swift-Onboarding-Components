@@ -1,0 +1,89 @@
+import { FootprintAppearance } from '@onefootprint/footprint-components-js';
+import React from 'react';
+
+import ComponentsInstructions from './components/components-instructions';
+
+const appearance: FootprintAppearance = {
+  fontSrc:
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+  variables: {
+    fontFamily:
+      'BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+    borderRadius: '8px',
+    colorSuccess: '#10b981',
+    colorError: '#F87171',
+    buttonPrimaryBg: '#5550e9',
+    buttonBorderRadius: '6px',
+    buttonPrimaryColor: '#FFFFFF',
+    buttonPrimaryHoverBg: '#6366F1',
+    buttonPrimaryActiveBg: '#4f46e5',
+    inputElevation:
+      'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px',
+    inputPlaceholderColor: '#cbd5e0',
+    inputBorderWidth: '1px',
+    inputHeight: '38px',
+    inputBg: '#FFFFFF',
+    inputBorderColor: '#d1d5db',
+    inputBorderRadius: '6px',
+    inputColor: '#000',
+    inputFocusBg: '#FFF',
+    inputFocusBorderColor: '#6366f1',
+    inputErrorBorderColor: '#F87171',
+    hintFont: '600 14px/21px "Inter"',
+    hintErrorColor: '#F87171',
+    labelColor: '#374151',
+    labelFont: '500 14px/21px "Inter"',
+  },
+  rules: {
+    container: {
+      width: '460px',
+      margin: 'unset',
+      height: '100vh',
+      maxHeight: 'unset',
+      position: 'fixed',
+      right: 0,
+      borderRadius: '0px',
+      boxShadow:
+        '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
+    },
+    input: {
+      transition: '0.15s all cubic-bezier(.4,0,.2,1)',
+    },
+  },
+};
+
+const customCss = `
+.footprint-components-modal {
+  opacity: 0;
+  transition: 0.3s transform ease-in-out;
+  will-change: transform;
+}
+
+.footprint-components-modal-loading {
+  opacity: 0;
+  transform: translate(480px);
+}
+
+.footprint-components-modal-loaded {
+  opacity: 1;
+  transform: translate(0);
+}
+`;
+
+const Aryeo = () => {
+  const secretKey = 'sk_test_taOKEARcXnbYPppTZkA2ag31dFqR0VwYDk';
+  const userId = 'fp_id_JaXmiDijVfxjufnVNzLN4p';
+
+  return (
+    <ComponentsInstructions
+      tenantName="Aryeo"
+      appearance={appearance}
+      secretKey={secretKey}
+      userId={userId}
+      customCSS={customCss}
+      framework="vue"
+    />
+  );
+};
+
+export default Aryeo;

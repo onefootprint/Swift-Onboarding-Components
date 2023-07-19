@@ -46,7 +46,11 @@ const FormDialog = ({
   const { t } = useTranslation('pages.secure-form.form-dialog');
 
   return (
-    <Container data-testid={testID} data-variant={variant}>
+    <Container
+      id="footprint-components-container"
+      data-testid={testID}
+      data-variant={variant}
+    >
       {variant === 'modal' && title && onClose && (
         <ModalHeader onClose={onClose} title={title} />
       )}

@@ -40,6 +40,8 @@ class FootprintComponentsIframe {
       }
     } else if (isModal) {
       removeLoader();
+      this.child?.frame.classList.remove('footprint-components-modal-loading');
+      this.child?.frame.classList.add('footprint-components-modal-loaded');
     } else {
       removeInlineLoaderContainer();
     }
@@ -75,7 +77,10 @@ class FootprintComponentsIframe {
   private getIframeClassList(isModal: boolean) {
     const classList = [];
     if (isModal) {
-      classList.push('footprint-components-modal');
+      classList.push(
+        'footprint-components-modal',
+        'footprint-components-modal-loading',
+      );
     } else {
       classList.push('footprint-components-inline');
     }

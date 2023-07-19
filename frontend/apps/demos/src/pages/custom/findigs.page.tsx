@@ -1,7 +1,7 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js';
 import React from 'react';
 
-import Onboarding from './components/onboarding';
+import OnboardingInstructions from './components/onboarding-instructions';
 
 // findigs pk
 const publicKey = 'ob_test_KYA0PU0awxnHKjzh9M849Y';
@@ -42,7 +42,7 @@ const findigsAppearance: FootprintAppearance = {
 };
 
 const Findigs = () => (
-  <Onboarding
+  <OnboardingInstructions
     appearance={findigsAppearance}
     obKey={publicKey}
     tenantName="Findigs"
