@@ -20,7 +20,7 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
         "Alpaca",
         must_collect_data + ["investor_profile"],
         can_access_data + ["investor_profile"],
-        "alpaca"
+        "alpaca",
     )
 
 
@@ -103,7 +103,7 @@ def test_alpaca_cip(
             == expected_review_reasons
         )
         assert (
-            timeline[-1]["event"]["data"]["decision"]["manual_review"]["review_reasons"]
+            timeline[0]["event"]["data"]["decision"]["manual_review"]["review_reasons"]
             == expected_review_reasons
         )
 
@@ -113,9 +113,7 @@ def test_alpaca_cip(
         "api_key": ALPACA_SANDBOX_API_KEY,
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
-        "enabled_assets": [
-            "us_equity"
-        ],
+        "enabled_assets": ["us_equity"],
         "agreements": [
             {
                 "agreement": "customer_agreement",
@@ -146,13 +144,13 @@ def test_alpaca_cip(
     assert alpaca_response["identity"]["given_name"] == d["id.first_name"]
     assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
     assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
-    declarations = json.loads(d['investor_profile.declarations'])
+    declarations = json.loads(d["investor_profile.declarations"])
     assert alpaca_response["disclosures"] == {
-        "is_control_person": 'senior_executive' in declarations,
-        "is_affiliated_exchange_or_finra": 'affiliated_with_us_broker' in declarations,
-        "is_politically_exposed": 'senior_political_figure' in declarations,
-        "immediate_family_exposed": 'family_of_political_figure' in declarations,
-        "is_discretionary": False
+        "is_control_person": "senior_executive" in declarations,
+        "is_affiliated_exchange_or_finra": "affiliated_with_us_broker" in declarations,
+        "is_politically_exposed": "senior_political_figure" in declarations,
+        "immediate_family_exposed": "family_of_political_figure" in declarations,
+        "is_discretionary": False,
     }
 
     account_id = alpaca_response["id"]

@@ -141,7 +141,9 @@ impl UserTimeline {
             query = query.filter(user_timeline::event_kind.eq_any(kinds));
         }
 
-        let results: Vec<Self> = query.order_by(user_timeline::timestamp.asc()).get_results(conn)?;
+        let results: Vec<Self> = query
+            .order_by(user_timeline::timestamp.desc())
+            .get_results(conn)?;
 
         // Batch fetch any related metadata from the source-of-truth business objects
         let decision_ids = results.iter().flat_map(|ut| match ut.event {
@@ -371,10 +373,10 @@ mod tests {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
-        assert_eq!(ut1.0.id, annotation1.id);
+        assert_eq!(ut1.0.id, annotation3.id);
         match ut1.1 {
-            SaturatedActor::TenantUser(ref tenant_user) => {
-                assert_eq!(tenant_user.id, tenant_user1.id)
+            SaturatedActor::TenantApiKey(ref tenant_api_key2) => {
+                assert_eq!(tenant_api_key.id, tenant_api_key2.id)
             }
             _ => unreachable!(),
         };
@@ -395,10 +397,10 @@ mod tests {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
-        assert_eq!(ut3.0.id, annotation3.id);
+        assert_eq!(ut3.0.id, annotation1.id);
         match ut3.1 {
-            SaturatedActor::TenantApiKey(ref tenant_api_key2) => {
-                assert_eq!(tenant_api_key.id, tenant_api_key2.id)
+            SaturatedActor::TenantUser(ref tenant_user) => {
+                assert_eq!(tenant_user.id, tenant_user1.id)
             }
             _ => unreachable!(),
         };

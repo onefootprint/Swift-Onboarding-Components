@@ -702,7 +702,25 @@
       "audit-trail": {
         "title": "Audit trail",
         "empty": "No entries",
+        "free-form-note": {
+          "add-note-button": {
+            "title": "Add note",
+            "cta-not-allowed": "You're not allowed to add a note"
+          },
+          "dialog": {
+            "title": "Add note",
+            "save": "Save",
+            "cancel": "Cancel",
+            "form": {
+              "prompt": "Why are you marking this user as {{status}}?",
+              "placeholder": "Type your note..."
+            }
+          }
+        },
         "timeline": {
+          "free-form-note-event": {
+            "note-added-by": "Note added by"
+          },
           "liveness-event": {
             "success-title": "Liveness check succeeded",
             "skipped-title": "Liveness check skipped",
@@ -790,21 +808,6 @@
             "previous-checks-drawer": {
               "title": "Watchlist checks"
             }
-          },
-          "free-form-note-event": {
-            "add-note-button": {
-              "title": "Add note"
-            },
-            "dialog": {
-              "title": "Add note",
-              "save": "Save",
-              "cancel": "Cancel",
-              "form": {
-                "prompt": "Why are you marking this user as {{status}}?",
-                "placeholder": "Type your note..."
-              }
-            },
-            "note-added-by": "Note added by"
           },
           "vault-created-event": {
             "user-created-by": "User created by "

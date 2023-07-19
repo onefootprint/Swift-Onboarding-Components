@@ -1,9 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, screen, within } from '@onefootprint/test-utils';
 import { TimelineEvent } from '@onefootprint/types';
 import React from 'react';
 import { entityFixture } from 'src/components/entities/components/details/details.test.config';
@@ -11,31 +6,11 @@ import { entityFixture } from 'src/components/entities/components/details/detail
 import AuditTrailTimeline from './audit-trail-timeline';
 import TimelineFixture from './audit-trail-timeline.test.config';
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('<AuditTrailTimeline />', () => {
-  const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
-
-  beforeAll(() => {
-    useRouterSpy({
-      pathname: '/users/detail',
-      query: {
-        footprint_user_id: userId,
-      },
-    });
-  });
-
   const renderAuditTrailTimeline = (timeline: TimelineEvent[]) =>
     customRender(
       <AuditTrailTimeline entity={entityFixture} timeline={timeline} />,
     );
-
-  describe('when timeline is empty', () => {
-    it('should always display Add note', () => {
-      renderAuditTrailTimeline([]);
-      expect(screen.getByText('Add note')).toBeInTheDocument();
-    });
-  });
 
   describe('when timeline data is loaded', () => {
     it('should render kyc data collection event correctly', () => {

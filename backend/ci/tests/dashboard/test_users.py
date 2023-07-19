@@ -248,7 +248,7 @@ def test_override_onboarding_decision(sandbox_user):
 
     event_kinds = dict(kinds="onboarding_decision")
     events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
-    event = events[-1]["event"]
+    event = events[0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "footprint"
 
     test_note = "This is a test note. Flerp derp"
@@ -268,7 +268,7 @@ def test_override_onboarding_decision(sandbox_user):
     assert onboarding["status"] == "fail"
     # Assert the latest decision is a manual decision
     events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
-    event = events[-1]["event"]
+    event = events[0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "organization"
     assert "@onefootprint.com" in event["data"]["decision"]["source"]["member"]
 

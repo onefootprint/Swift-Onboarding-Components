@@ -26,14 +26,6 @@ import {
   withTimeline,
 } from './details.test.config';
 
-beforeEach(() => {
-  asAdminUser();
-});
-
-afterAll(() => {
-  resetUser();
-});
-
 const useRouterSpy = createUseRouterSpy();
 
 describe.skip('<Details />', () => {

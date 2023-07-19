@@ -6,6 +6,7 @@ import { AUDIT_TRAILS_ID } from '@/entity/constants';
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
 
 import Section from '../section';
+import AddFreeFormNote from './components/add-free-form-note';
 import Content from './components/content';
 
 const AuditTrail = () => {
@@ -13,7 +14,11 @@ const AuditTrail = () => {
   const { data, error } = useCurrentEntityTimeline();
 
   return (
-    <Section title={t('title')} id={AUDIT_TRAILS_ID}>
+    <Section
+      title={t('title')}
+      id={AUDIT_TRAILS_ID}
+      suffixActions={<AddFreeFormNote />}
+    >
       <>
         {error && <Error error={error} />}
         {data && <Content timeline={data} />}

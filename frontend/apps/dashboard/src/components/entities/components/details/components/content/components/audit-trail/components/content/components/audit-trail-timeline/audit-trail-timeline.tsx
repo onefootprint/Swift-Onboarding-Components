@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDownload16,
   IcoFileText16,
+  IcoLayer0116,
   IcoWarning16,
   IcoWriting16,
 } from '@onefootprint/icons';
@@ -36,10 +37,6 @@ import {
   DataCollectedEventIcon,
 } from './components/data-collected-event';
 import {
-  FreeFormNoteAddHeader,
-  FreeFormNoteAddIcon,
-} from './components/free-form-note-add';
-import {
   IdDocUploadedEventHeader,
   IdDocUploadedEventIcon,
 } from './components/id-doc-uploaded-event';
@@ -72,6 +69,14 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
 
   const items: TimelineItem[] = [];
+  if (entity.status === EntityStatus.incomplete) {
+    // Prepend a custom timeline item for incomplete users with no timestamp
+    items.push({
+      iconComponent: <IcoWarning16 />,
+      headerComponent: <AbandonedEventHeader />,
+      bodyComponent: <AbandonedEventBody />,
+    });
+  }
   mergedTimeline.forEach((event: AuditTrailTimelineEvent) => {
     const {
       event: { kind, data },
@@ -91,7 +96,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as CollectedDataEventData;
       items.push({
         time,
-        iconComponent: isFromOtherOrg ? undefined : (
+        iconComponent: isFromOtherOrg ? (
+          <IcoLayer0116 />
+        ) : (
           <DataCollectedEventIcon data={eventData} />
         ),
         headerComponent: (
@@ -183,21 +190,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         ),
       });
     }
-  });
-  if (entity.status === EntityStatus.incomplete) {
-    // Postpend a custom timeline item for incomplete users with no timestamp
-    items.push({
-      time: undefined,
-      iconComponent: <IcoWarning16 />,
-      headerComponent: <AbandonedEventHeader />,
-      bodyComponent: <AbandonedEventBody />,
-    });
-  }
-
-  // TODO only for users with permissions
-  items.push({
-    iconComponent: <FreeFormNoteAddIcon />,
-    headerComponent: <FreeFormNoteAddHeader />,
   });
 
   return items.length > 0 ? (

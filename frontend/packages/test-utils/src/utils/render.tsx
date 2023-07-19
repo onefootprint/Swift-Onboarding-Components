@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-query';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
-import { ThemeProvider } from '@onefootprint/styled';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 

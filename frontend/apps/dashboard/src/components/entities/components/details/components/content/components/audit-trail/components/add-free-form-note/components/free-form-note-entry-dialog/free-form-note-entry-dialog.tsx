@@ -18,9 +18,7 @@ const FreeFormNoteEntryDialog = ({
   open,
   onClose,
 }: FreeFormNoteEntryDialogProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.free-form-note-event',
-  );
+  const { t } = useTranslation('pages.entity.audit-trail.free-form-note');
   const showRequestErrorToast = useRequestErrorToast();
   const submitFreeFormMutation = useSubmitFreeFormNote();
   const entityId = useEntityId();
