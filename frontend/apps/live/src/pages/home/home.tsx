@@ -18,19 +18,9 @@ const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY;
 const Live = () => {
   const { t } = useTranslation('home');
   const router = useRouter();
+  const type = router?.query.type;
 
-  const getType = () => {
-    switch (router.query.type) {
-      case 'kyb':
-        return 'kyb';
-      case 'kyc-id-doc':
-        return 'kyc-id-doc';
-      default:
-        return 'kyc';
-    }
-  };
-
-  const getPublicKey = (type: string) => {
+  const getPublicKey = () => {
     switch (type) {
       case 'kyb':
         return kybPublicKey;
@@ -41,8 +31,7 @@ const Live = () => {
     }
   };
 
-  const type = getType();
-  const publicKey = getPublicKey(type);
+  const publicKey = getPublicKey();
   const translationsKey = type === 'kyb' ? 'kyb' : 'kyc';
 
   return (
