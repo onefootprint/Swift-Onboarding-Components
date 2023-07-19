@@ -13,11 +13,9 @@ const IdDocUploadedEventHeader = ({ data }: IdDocUploadedEventHeaderProps) => {
     'pages.entity.audit-trail.timeline.id-doc-uploaded-event',
   );
 
-  // TODO: Once we receive the dataIdentifier from the backend, we can use and we won't need to append the prefix anymore`
-  // https://linear.app/footprint/issue/FP-3246/return-dataidentifier-for-timeline-iddoc-document-uploaded?noRedirect=1
   return (
     <Container>
-      <Typography variant="label-3">{t('title')}</Typography>
+      <Typography variant="label-3">{t(`title.${data.status}`)}</Typography>
       <Tag>{allT(`id_document.${data.documentType}`)}</Tag>
     </Container>
   );

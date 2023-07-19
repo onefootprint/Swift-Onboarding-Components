@@ -31,6 +31,7 @@ pub enum UserTimelineEvent {
         annotation: Option<Annotation>,
     },
     Annotation(Annotation),
+    // TODO where do we use these ??
     DocumentUploaded(DocumentUploadedTimelineEvent),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(VaultCreated),

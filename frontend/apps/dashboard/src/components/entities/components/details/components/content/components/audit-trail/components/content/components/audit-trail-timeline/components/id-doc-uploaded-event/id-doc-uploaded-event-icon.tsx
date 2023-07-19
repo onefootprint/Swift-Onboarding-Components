@@ -1,11 +1,15 @@
 import { IcoCar16, IcoIdCard16, IcoPassport16 } from '@onefootprint/icons';
-import { IdDocType, IdDocUploadedEventData } from '@onefootprint/types';
+import {
+  IdDocUploadedEventData,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import React from 'react';
 
-const IconByIdDocType: Record<IdDocType, JSX.Element> = {
-  [IdDocType.idCard]: <IcoIdCard16 />,
-  [IdDocType.driversLicense]: <IcoCar16 />,
-  [IdDocType.passport]: <IcoPassport16 />,
+// modern doc type here
+const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
+  [SupportedIdDocTypes.idCard]: <IcoIdCard16 />,
+  [SupportedIdDocTypes.driversLicense]: <IcoCar16 />,
+  [SupportedIdDocTypes.passport]: <IcoPassport16 />,
 };
 
 type IdDocUploadedEventIconProps = {

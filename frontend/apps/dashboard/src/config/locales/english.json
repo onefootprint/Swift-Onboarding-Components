@@ -710,7 +710,10 @@
             "ip-address": "{{ipAddress}} (IP Address)"
           },
           "id-doc-uploaded-event": {
-            "title": "Collected "
+            "title": {
+              "success": "Collected ",
+              "failed": "Unable to collect "
+            }
           },
           "data-collected-event": {
             "title": "Collected ",

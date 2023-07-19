@@ -1,7 +1,7 @@
 import {
   CollectedKycDataOption,
-  DecryptedIdDocStatus,
-  IdDocType,
+  IdDocStatus,
+  SupportedIdDocTypes,
   TimelineEvent,
   TimelineEventKind,
   WatchlistCheckEvent,
@@ -99,10 +99,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.driversLicense,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
           },
@@ -113,10 +111,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.passport,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.passport,
               selfieCollected: true,
             },
           },
@@ -130,10 +126,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.driversLicense,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
           },
@@ -144,10 +138,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.passport,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.passport,
               selfieCollected: true,
             },
           },
@@ -238,10 +230,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.driversLicense,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
           },
@@ -281,10 +271,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              id: 'iddoc_hE3NxjPIrEdYifMWv0MeZB',
-              timestamp: '2023-03-21T18:58:12.453172Z',
-              status: DecryptedIdDocStatus.success,
-              documentType: IdDocType.driversLicense,
+              status: IdDocStatus.success,
+              documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
           },

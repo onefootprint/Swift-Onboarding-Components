@@ -14,3 +14,9 @@ export enum IdDocRegionality {
   international = 'international',
   usOnly = 'us_only',
 }
+
+export enum IdDocStatus {
+  failed = 'failed',
+  pending = 'pending',
+  success = 'success',
+}
