@@ -24,6 +24,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
         let request = IncodeGetOnboardingStatusRequest {
             credentials: session.credentials.clone(),
             session_kind: session.kind.clone(),
+            incode_verification_session_id: session.id.clone(),
         };
         let res = clients.incode_get_onboarding_status.make_request(request).await;
 

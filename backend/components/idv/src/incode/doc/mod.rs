@@ -1,4 +1,7 @@
-use newtypes::{vendor_credentials::IncodeCredentialsWithToken, DocVData, IncodeVerificationSessionKind};
+use newtypes::{
+    vendor_credentials::IncodeCredentialsWithToken, DocVData, IncodeVerificationSessionId,
+    IncodeVerificationSessionKind,
+};
 
 pub mod request;
 pub mod response;
@@ -23,6 +26,7 @@ pub struct IncodeProcessFaceRequest {
 pub struct IncodeGetOnboardingStatusRequest {
     pub credentials: IncodeCredentialsWithToken,
     pub session_kind: IncodeVerificationSessionKind,
+    pub incode_verification_session_id: IncodeVerificationSessionId,
 }
 
 pub struct IncodeProcessIdRequest {

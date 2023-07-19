@@ -9,11 +9,11 @@ use super::{
     IncodeAPIResult,
 };
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
-use newtypes::IncodeVerificationSessionKind;
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
     PiiString,
 };
+use newtypes::{IncodeVerificationSessionId, IncodeVerificationSessionKind};
 use reqwest::header;
 
 use tokio_retry::strategy::FixedInterval;
@@ -311,6 +311,7 @@ impl AuthenticatedIncodeClientAdapter {
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
         session_kind: IncodeVerificationSessionKind,
+        incode_verification_session_id: IncodeVerificationSessionId,
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/onboarding/status")?;
         let response: serde_json::Value = footprint_http_client
@@ -324,7 +325,8 @@ impl AuthenticatedIncodeClientAdapter {
             .await?;
 
         let parsed: GetOnboardingStatusResponse = serde_json::from_value(response.clone())?;
-        if !parsed.ready(session_kind) {
+        if !parsed.ready(&session_kind) {
+            tracing::info!(status=%parsed.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, "incode GetOnboardingStatusResponse not ready");
             return Err(IncodeError::ResultsNotReady);
         }
 
@@ -340,12 +342,19 @@ impl AuthenticatedIncodeClientAdapter {
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
         session_kind: IncodeVerificationSessionKind,
+        incode_verification_session_id: IncodeVerificationSessionId,
     ) -> Result<serde_json::Value, IncodeError> {
-        let retry_strategy = FixedInterval::from_millis(1000).take(14);
+        let retry_strategy = FixedInterval::from_millis(1000).take(20);
 
         let response = RetryIf::spawn(
             retry_strategy,
-            || self.get_onboarding_status(footprint_http_client, session_kind.to_owned()),
+            || {
+                self.get_onboarding_status(
+                    footprint_http_client,
+                    session_kind.to_owned(),
+                    incode_verification_session_id.to_owned(),
+                )
+            },
             Self::session_results_are_not_ready,
         )
         .await
@@ -433,7 +442,7 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 mod tests {
     use newtypes::{
         vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId,
-        IncodeVerificationSessionKind, PiiString,
+        IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiString,
     };
 
     use crate::{
@@ -549,7 +558,11 @@ mod tests {
         // check status
         //
         let status_res = authenticated_client
-            .poll_get_onboarding_status(&fp_client, IncodeVerificationSessionKind::Selfie)
+            .poll_get_onboarding_status(
+                &fp_client,
+                IncodeVerificationSessionKind::Selfie,
+                IncodeVerificationSessionId::from("ivs1234".to_string()),
+            )
             .await;
         assert!(status_res.is_err());
 
@@ -582,7 +595,11 @@ mod tests {
         // check status
         //
         authenticated_client
-            .poll_get_onboarding_status(&fp_client, IncodeVerificationSessionKind::Selfie)
+            .poll_get_onboarding_status(
+                &fp_client,
+                IncodeVerificationSessionKind::Selfie,
+                IncodeVerificationSessionId::from("ivs1234".to_string()),
+            )
             .await
             .expect("results weren't ready after polling!");
         //
