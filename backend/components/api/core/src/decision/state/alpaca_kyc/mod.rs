@@ -8,9 +8,7 @@ use super::{
 };
 use crate::{
     decision::{
-        features::risk_signals::RiskSignalsForDecision,
-        onboarding::rules::{KycRuleGroup, KycWithDocumentRuleGroup, RuleGroup},
-        rule::rule_sets,
+        features::risk_signals::RiskSignalsForDecision, onboarding::rules::KycRuleGroup, rule::rule_sets,
         vendor::vendor_result::VendorResult,
     },
     errors::ApiResult,
@@ -55,18 +53,11 @@ pub struct AlpacaKycDecisioning {
 }
 
 impl HasRuleGroup for AlpacaKycDecisioning {
-    fn rule_group(&self, include_doc: bool) -> RuleGroup {
-        if include_doc {
-            RuleGroup::KycWithDocument(KycWithDocumentRuleGroup {
-                idology_rules: rule_sets::alpaca::idology_rule_set(),
-                experian_rules: rule_sets::alpaca::experian_rule_set(),
-                incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
-            })
-        } else {
-            RuleGroup::Kyc(KycRuleGroup {
-                idology_rules: rule_sets::alpaca::idology_rule_set(),
-                experian_rules: rule_sets::alpaca::experian_rule_set(),
-            })
+    fn rule_group(&self) -> KycRuleGroup {
+        KycRuleGroup {
+            idology_rules: rule_sets::alpaca::idology_rule_set(),
+            experian_rules: rule_sets::alpaca::experian_rule_set(),
+            incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
         }
     }
 }
@@ -80,18 +71,11 @@ pub struct AlpacaKycWatchlistCheck {
 }
 
 impl HasRuleGroup for AlpacaKycWatchlistCheck {
-    fn rule_group(&self, include_doc: bool) -> RuleGroup {
-        if include_doc {
-            RuleGroup::KycWithDocument(KycWithDocumentRuleGroup {
-                idology_rules: rule_sets::alpaca::idology_rule_set(),
-                experian_rules: rule_sets::alpaca::experian_rule_set(),
-                incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
-            })
-        } else {
-            RuleGroup::Kyc(KycRuleGroup {
-                idology_rules: rule_sets::alpaca::idology_rule_set(),
-                experian_rules: rule_sets::alpaca::experian_rule_set(),
-            })
+    fn rule_group(&self) -> KycRuleGroup {
+        KycRuleGroup {
+            idology_rules: rule_sets::alpaca::idology_rule_set(),
+            experian_rules: rule_sets::alpaca::experian_rule_set(),
+            incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
         }
     }
 }

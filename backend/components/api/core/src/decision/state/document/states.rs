@@ -12,7 +12,7 @@ use crate::decision::onboarding::{
     Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
 };
 use crate::decision::{
-    onboarding::rules::{KycRuleGroup, RuleGroup},
+    onboarding::rules::KycRuleGroup,
     rule::rule_sets,
     state::{
         actions::{DocCollected, WorkflowActions},
@@ -52,12 +52,12 @@ pub struct DocumentDecisioning {
 }
 
 impl HasRuleGroup for DocumentDecisioning {
-    // TODO: change this to document rules
-    fn rule_group(&self, _include_doc: bool) -> RuleGroup {
-        RuleGroup::Kyc(KycRuleGroup {
+    fn rule_group(&self) -> KycRuleGroup {
+        KycRuleGroup {
             idology_rules: rule_sets::kyc::idology_rule_set(),
             experian_rules: rule_sets::kyc::experian_rule_set(),
-        })
+            incode_doc_rules: rule_sets::doc::incode_rule_set(),
+        }
     }
 }
 

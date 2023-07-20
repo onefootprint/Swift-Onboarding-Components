@@ -22,7 +22,8 @@ use crate::{
         self, engine,
         features::risk_signals::RiskSignalsForDecision,
         onboarding::{
-            Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+            rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecisionOutput,
+            WaterfallOnboardingRulesDecisionOutput,
         },
         utils::FixtureDecision,
         vendor::{
@@ -34,8 +35,9 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
-    errors::{onboarding::OnboardingError, ApiResult, ApiErrorKind},
-    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs}, State,
+    errors::{onboarding::OnboardingError, ApiErrorKind, ApiResult},
+    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
+    State,
 };
 
 use super::{traits::HasRuleGroup, StateError};
@@ -262,7 +264,8 @@ pub fn get_decision(
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let id = DocRequestIdentifier::new(sv_id, Some(wf_id));
     let include_doc = DocumentRequest::get(conn, id)?.is_some();
-    let rules_output = rule_group.rule_group(include_doc).evaluate(risk_signals)?;
+    let config = KycRuleExecutionConfig { include_doc };
+    let rules_output = rule_group.rule_group().evaluate(risk_signals, config)?;
     Ok(rules_output)
 }
 
