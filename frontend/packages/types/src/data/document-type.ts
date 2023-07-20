@@ -21,5 +21,3 @@ export type Document = {
   selfieScore: number;
   ocrConfidenceScore: number;
 };
-
-export default DocumentType;
