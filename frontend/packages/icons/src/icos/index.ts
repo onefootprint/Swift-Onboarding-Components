@@ -243,6 +243,8 @@ export { default as IcoSmartphone16 } from './ico-smartphone-16';
 export { default as IcoSmartphone24 } from './ico-smartphone-24';
 export { default as IcoSparkles16 } from './ico-sparkles-16';
 export { default as IcoSparkles24 } from './ico-sparkles-24';
+export { default as IcoSpeedometer16 } from './ico-speedometer-16';
+export { default as IcoSpeedometer24 } from './ico-speedometer-24';
 export { default as IcoSpinner16 } from './ico-spinner-16';
 export { default as IcoSpinner24 } from './ico-spinner-24';
 export { default as IcoSpinner40 } from './ico-spinner-40';
