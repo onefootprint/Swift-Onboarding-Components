@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   check_test:
-    runs-on: beast
+    runs-on: 32core
     environment: dev
     services:
       postgres:
@@ -52,6 +52,8 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.0.0
         with:
+          # don't save cache from pull requests
+          save-if: github.event_name != 'pull_request'
           workspaces: |
             backend
 
@@ -81,7 +83,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
 
   integration_migration_tests:
-    runs-on: beast
+    runs-on: 32core
     environment: dev
     strategy:
       matrix:
@@ -248,7 +250,7 @@ jobs:
           fi
 
   clippy:
-    runs-on: beast
+    runs-on: 32core
 
     steps:
       - name: install deps

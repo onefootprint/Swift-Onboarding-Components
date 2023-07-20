@@ -38,6 +38,8 @@ fn main() -> std::io::Result<()> {
 
     std::env::set_var("RUST_BACKTRACE", "1");
 
+    // add something here
+
     let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
     runtime.block_on(async move { run_server(config).await })
 }

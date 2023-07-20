@@ -98,7 +98,7 @@ jobs:
   # build the main api image
   build_api:
     name: Build API container
-    runs-on: [beast, linux]
+    runs-on: 32core
     environment: ${{ inputs.environment }}
     needs: [extract_commit]
     if: success()
@@ -156,7 +156,7 @@ jobs:
   # builds the enclave proxy image as needed
   build_enclave_proxy:
     name: Build Enclave Proxy
-    runs-on: [beast, linux]
+    runs-on: 32core
     environment: ${{ inputs.environment }}
     needs: [extract_commit]
     if: success()
@@ -235,7 +235,7 @@ jobs:
 
   deploy_stack:
     name: deploy stack
-    runs-on: beast
+    runs-on: ubuntu-latest
     outputs:
       url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
     environment:
