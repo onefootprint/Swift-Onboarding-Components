@@ -10,6 +10,7 @@ import Picker from './components/picker';
 import type { BaseOption, SelectOption } from './select.types';
 
 export type SelectProps<T extends BaseOption = BaseOption<string>> = {
+  disabled?: boolean;
   emptyStateResetText?: string;
   emptyStateTitle?: string;
   hasError?: boolean;
@@ -18,15 +19,16 @@ export type SelectProps<T extends BaseOption = BaseOption<string>> = {
   onChange?: (newValue: SelectOption<T>) => void;
   options?: SelectOption<T>[];
   placeholder?: string;
-  searchPlaceholder?: string;
-  value?: SelectOption<T>;
   renderTrigger?: (
     placeholder: string,
     selectedOption?: SelectOption<T>,
   ) => React.ReactNode;
+  searchPlaceholder?: string;
+  value?: SelectOption<T>;
 };
 
 const Select = <T extends BaseOption = BaseOption<string>>({
+  disabled,
   emptyStateResetText = 'Reset search',
   emptyStateTitle = 'No results found',
   hasError,
@@ -35,9 +37,9 @@ const Select = <T extends BaseOption = BaseOption<string>>({
   onChange,
   options = [],
   placeholder = 'Select...',
+  renderTrigger,
   searchPlaceholder = 'Search...',
   value,
-  renderTrigger,
 }: SelectProps<T>) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(false);
@@ -64,6 +66,7 @@ const Select = <T extends BaseOption = BaseOption<string>>({
         </Label>
       )}
       <Pressable
+        disabled={disabled}
         onPress={showPicker}
         onPressIn={() => setActive(true)}
         onPressOut={() => setActive(false)}
@@ -71,7 +74,7 @@ const Select = <T extends BaseOption = BaseOption<string>>({
       >
         <Box
           alignItems="center"
-          backgroundColor={active ? 'secondary' : 'primary'}
+          backgroundColor={active || disabled ? 'secondary' : 'primary'}
           borderColor="primary"
           borderRadius="default"
           borderStyle="solid"

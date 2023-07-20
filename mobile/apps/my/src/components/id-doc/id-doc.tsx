@@ -18,6 +18,10 @@ export type IdDocProps = {
 
 const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const [state, send] = useMachine(() => createMachine({ requirement }));
+  const { currentSide, collectingDocumentMeta } = state.context;
+  const country = getCountryFromCode(
+    collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
+  );
 
   useEffect(() => {
     if (state.done) {
@@ -28,6 +32,9 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   if (state.matches('docSelection')) {
     return (
       <DocSelection
+        requirement={requirement}
+        defaultType={collectingDocumentMeta.type}
+        defaultCountry={country}
         onSubmit={(countryCode, documentType) => {
           send('countryAndTypeSubmitted', {
             payload: { countryCode, documentType },
@@ -41,17 +48,12 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     state.matches('backImage') ||
     state.matches('selfie')
   ) {
-    const { currentSide, collectingDocumentMeta } = state.context;
-    const countryName =
-      getCountryFromCode(collectingDocumentMeta.countryCode).label ||
-      DEFAULT_COUNTRY.label;
-
     return (
       <DocScan
         key={currentSide}
         authToken={authToken}
         countryCode={collectingDocumentMeta.countryCode}
-        countryName={countryName}
+        countryName={country.label}
         onDone={nextSideToCollect => {
           send('imageSubmitted', {
             payload: { nextSideToCollect },

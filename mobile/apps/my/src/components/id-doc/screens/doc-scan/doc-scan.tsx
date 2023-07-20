@@ -32,7 +32,7 @@ const DocScan = ({
   side,
   type,
 }: DocScanProps) => {
-  const { t, allT } = useTranslation('components.scan.camera.errors');
+  const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
   const mutation = useSubmitDoc({
     onError: error => {

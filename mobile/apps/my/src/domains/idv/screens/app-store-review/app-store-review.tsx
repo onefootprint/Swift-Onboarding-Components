@@ -1,4 +1,7 @@
-import { OnboardingRequirementKind } from '@onefootprint/types';
+import {
+  OnboardingRequirementKind,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import IdDoc from '@/components/id-doc';
@@ -26,6 +29,12 @@ const Router = ({ authToken }: RouterProps) => {
         kind: OnboardingRequirementKind.idDoc,
         shouldCollectSelfie: true,
         shouldCollectConsent: true,
+        onlyUsSupported: false,
+        supportedDocumentTypes: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.passport,
+        ],
       }}
     />
   );

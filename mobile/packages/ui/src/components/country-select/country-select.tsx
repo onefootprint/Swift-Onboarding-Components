@@ -7,32 +7,42 @@ import { Select, SelectOption } from '../select';
 import { Typography } from '../typography';
 
 export type CountrySelectProps = {
+  disabled?: boolean;
   hasError?: boolean;
   hint?: string;
   onChange?: (newValue: SelectOption<CountryRecord>) => void;
+  options?: CountryRecord[];
   value?: SelectOption<CountryRecord>;
 };
 
 const CountrySelect = ({
+  disabled,
   hasError,
   hint,
   onChange,
+  options = COUNTRIES,
   value,
 }: CountrySelectProps) => {
   return (
     <Select<CountryRecord>
+      disabled={disabled}
       emptyStateTitle="No countries found"
       hasError={hasError}
       hint={hint}
       label="Country"
       onChange={onChange}
-      options={COUNTRIES}
+      options={options}
       placeholder="Select country"
       renderTrigger={(placeholder, selectedOption) => {
         return selectedOption ? (
           <Box gap={4} flexDirection="row" center>
             <Flag code={selectedOption.value} />
-            <Typography variant="body-4">{selectedOption.label}</Typography>
+            <Typography
+              variant="body-4"
+              color={disabled ? 'quaternary' : 'primary'}
+            >
+              {selectedOption.label}
+            </Typography>
           </Box>
         ) : (
           <Typography variant="body-4">{placeholder}</Typography>

@@ -13,10 +13,10 @@ const createIdDocMachine = (args: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'initState',
+      initial: 'init',
       context: { ...args },
       states: {
-        initState: {
+        init: {
           always: [
             {
               target: 'incompatibleDevice',

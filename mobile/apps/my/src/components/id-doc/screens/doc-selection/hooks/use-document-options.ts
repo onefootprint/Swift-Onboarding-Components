@@ -1,10 +1,30 @@
+import { CountryRecord } from '@onefootprint/global-constants';
 import { IcoCar24, IcoIdCard24, IcoPassport24 } from '@onefootprint/icons';
-import { IdDocType } from '@onefootprint/types';
+import { IdDocType, SupportedIdDocTypes } from '@onefootprint/types';
 
 import useTranslation from '@/hooks/use-translation';
 
-const useDocumentOptions = (availableTypes: IdDocType[]) => {
+import { getAvailableDocTypesByCountry } from '../utils/get-documents-by-country';
+
+// get rid of this once back end fixes the typo with "drivers license" in id-doc type
+const supportedTypeToIdDocType = {
+  [SupportedIdDocTypes.idCard]: IdDocType.idCard,
+  [SupportedIdDocTypes.driversLicense]: IdDocType.driversLicense,
+  [SupportedIdDocTypes.passport]: IdDocType.passport,
+};
+
+const useDocumentOptions = (
+  supportedDocumentTypes: SupportedIdDocTypes[],
+  country: CountryRecord,
+) => {
   const { t } = useTranslation('components.scan.doc-selection');
+  // get rid of this conversion once back end fixes the typo with "drivers license" in id-doc type
+  const supportedIdDocTypes: IdDocType[] = supportedDocumentTypes.map(
+    supportedDocumentType => supportedTypeToIdDocType[supportedDocumentType],
+  );
+  const availableDocTypes: IdDocType[] = getAvailableDocTypesByCountry(
+    country,
+  ).filter(type => supportedIdDocTypes.includes(type));
   const options = {
     [IdDocType.driversLicense]: {
       title: t('options.dl.title'),
@@ -25,7 +45,7 @@ const useDocumentOptions = (availableTypes: IdDocType[]) => {
       IconComponent: IcoPassport24,
     },
   };
-  return availableTypes.map(type => options[type]);
+  return availableDocTypes.map(type => options[type]);
 };
 
 export default useDocumentOptions;

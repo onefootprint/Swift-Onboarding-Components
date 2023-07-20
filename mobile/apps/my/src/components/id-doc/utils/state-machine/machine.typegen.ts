@@ -3,6 +3,7 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
+    '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
   };
   invokeSrcNameMap: {};
@@ -14,6 +15,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignCountryAndType: 'countryAndTypeSubmitted';
+    assignDefaultCountryAndType: '';
     assignNextSideToCollect: 'imageSubmitted';
   };
   eventsCausingDelays: {};
@@ -24,6 +26,7 @@ export interface Typegen0 {
     | 'completed'
     | 'docSelection'
     | 'frontImage'
+    | 'init'
     | 'selfie';
   tags: never;
 }

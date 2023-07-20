@@ -1,7 +1,14 @@
-import { SubmitDocumentSide } from '@onefootprint/types';
+import { getCountryFromCode } from '@onefootprint/global-constants';
+import {
+  IdDocType,
+  SubmitDocumentSide,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
+
+const USCountryCode = getCountryFromCode('US').value;
 
 const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
   createMachine(
@@ -17,13 +24,27 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         requirement: undefined,
         currentSide: SubmitDocumentSide.Front,
         collectingDocumentMeta: {
-          countryCode: null,
-          type: null,
+          countryCode: USCountryCode,
+          type: IdDocType.passport,
         },
         ...initialContext,
       },
-      initial: 'docSelection',
+      initial: 'init',
       states: {
+        init: {
+          always: [
+            {
+              target: 'frontImage',
+              cond: context =>
+                !!context.requirement.onlyUsSupported &&
+                context.requirement.supportedDocumentTypes?.length === 1,
+              actions: 'assignDefaultCountryAndType',
+            },
+            {
+              target: 'docSelection',
+            },
+          ],
+        },
         docSelection: {
           on: {
             countryAndTypeSubmitted: {
@@ -89,6 +110,26 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
     },
     {
       actions: {
+        assignDefaultCountryAndType: assign(context => {
+          const { supportedDocumentTypes } = context.requirement;
+          // get rid of this once back end fixes the typo with "drivers license" in id-doc type
+          const supportedTypeToIdDocType = {
+            [SupportedIdDocTypes.idCard]: IdDocType.idCard,
+            [SupportedIdDocTypes.driversLicense]: IdDocType.driversLicense,
+            [SupportedIdDocTypes.passport]: IdDocType.passport,
+          };
+          const supportedIdDocTypes: IdDocType[] = supportedDocumentTypes.map(
+            supportedDocumentType =>
+              supportedTypeToIdDocType[supportedDocumentType],
+          );
+          return {
+            ...context,
+            collectingDocumentMeta: {
+              countryCode: USCountryCode,
+              type: supportedIdDocTypes[0],
+            },
+          };
+        }),
         assignNextSideToCollect: assign((context, { payload }) => {
           return {
             ...context,
