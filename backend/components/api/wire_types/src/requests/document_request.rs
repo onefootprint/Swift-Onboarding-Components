@@ -1,7 +1,7 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason,
-    PiiString,
+    idology::IdologyImageCaptureErrors, DocumentRequestStatus, DocumentSide, IdDocKind, IdentityDocumentId,
+    IncodeFailureReason, ModernIdDocKind, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -18,6 +18,18 @@ pub struct DocumentRequest {
     pub document_type: IdDocKind,
     /// country of document
     pub country_code: String, // TODO this should be an enum
+}
+
+#[derive(Debug, Apiv2Schema, serde::Deserialize)]
+pub struct CreateIdentityDocumentRequest {
+    // todo tell lucas + ahsan about this
+    pub document_type: ModernIdDocKind,
+    pub country_code: String, // TODO this should be an enum
+}
+
+#[derive(Debug, Apiv2Schema, serde::Serialize)]
+pub struct CreateIdentityDocumentResponse {
+    pub id: IdentityDocumentId,
 }
 
 /// Status of identity document collection
@@ -39,15 +51,6 @@ impl From<DocumentRequestStatus> for DocumentResponseStatus {
             DocumentRequestStatus::Complete => Self::Complete,
         }
     }
-}
-
-// TODO deprecate after getting rid of GET /document/status API
-/// Response for a identity document request. Errors are non-optional if the identity vendor
-/// requires additional images be collected.
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
-pub struct LegacyDocumentResponse {
-    pub status: DocumentResponseStatus,
-    pub errors: Vec<DocumentImageError>,
 }
 
 /// Response for a identity document request. Errors are non-optional if the identity vendor

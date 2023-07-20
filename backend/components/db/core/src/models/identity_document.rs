@@ -73,6 +73,38 @@ pub struct IdentityDocumentUpdate {
 }
 
 impl IdentityDocument {
+    #[tracing::instrument("IdentityDocument::create", skip_all)]
+    pub fn create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
+        document_request::table
+            .filter(document_request::id.eq(&args.request_id))
+            .for_no_key_update()
+            .get_result::<DocumentRequest>(conn.conn())?;
+        // Mark all existing IdentityDocuments for this DocumentRequest as failed
+        diesel::update(identity_document::table)
+            .filter(identity_document::request_id.eq(&args.request_id))
+            .filter(identity_document::status.eq(DocumentRequestStatus::Pending))
+            .set(identity_document::status.eq(DocumentRequestStatus::Failed))
+            .execute(conn.conn())?;
+        // Create a new doc
+        let NewIdentityDocumentArgs {
+            request_id,
+            document_type,
+            country_code,
+        } = args;
+        let new = NewIdentityDocumentRow {
+            request_id,
+            document_type,
+            country_code,
+            created_at: Utc::now(),
+            status: DocumentRequestStatus::Pending,
+        };
+        let result = diesel::insert_into(identity_document::table)
+            .values(new)
+            .get_result(conn.conn())?;
+        Ok(result)
+    }
+
+    // TODO deprecate this
     #[tracing::instrument("IdentityDocument::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
         let existing_doc = identity_document::table

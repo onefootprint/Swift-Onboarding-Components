@@ -1,0 +1,2 @@
+DROP INDEX identity_document_unique_doc_request_id_where_pending;
+ALTER TABLE identity_document ADD CONSTRAINT identity_document_request_id_key UNIQUE(request_id);

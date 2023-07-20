@@ -28,6 +28,8 @@ pub enum OnboardingError {
     NonTerminalState,
     #[error("No pending document request found")]
     NoPendingDocumentRequestFound,
+    #[error("Cannot create a document when no document request exists")]
+    NoDocumentRequestFound,
     #[error("Cannot onboard a non-portable scoped user onto any ob config")]
     NonPortableScopedUser,
     #[error("Cannot edit completed onboarding")]

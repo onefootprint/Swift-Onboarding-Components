@@ -5,6 +5,7 @@ mod authorized_orgs;
 mod biometric;
 mod consent;
 mod document;
+mod documents;
 mod email;
 mod liveness;
 mod token;
@@ -25,6 +26,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(biometric::init_post)
         .service(biometric::complete_post)
         .service(document::post)
+        .service(documents::index::post)
         .service(liveness::get)
         .service(token::get)
         .service(email::verify::post)

@@ -28,6 +28,8 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
 
+    // Some things might break if we start deactivating doc request
+    // look at all uses of DocumentREquest::get - they should be filtering on active
     let results = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
