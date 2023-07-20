@@ -36,7 +36,7 @@ fn main() -> std::io::Result<()> {
         scope.set_tag("footprint-server-version", crate::GIT_HASH.to_string());
     });
 
-    std::env::set_var("RUST_BACKTRACE", "1");
+    std::env::set_var("RUST_BACKTRACE", "full");
 
     // add something here
 
