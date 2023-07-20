@@ -107,6 +107,10 @@
         "vault-proxy": {
           "title": "Vault Proxy",
           "description": "Use Footprint's Vault Proxy to securely access your customers' data."
+        },
+        "embedded-components": {
+          "title": "Embedded Components",
+          "description": "Use Footprint's PCI-compliant components to collect and render sensitive data."
         }
       },
       "banner": {

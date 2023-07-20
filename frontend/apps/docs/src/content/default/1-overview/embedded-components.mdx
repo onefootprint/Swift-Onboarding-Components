@@ -1,0 +1,158 @@
+---
+page: default
+slug: /embedded-components/getting-started
+category: Guides
+title: Embedded Components
+position: 6
+meta:
+  {
+    title: Embedded Components,
+    description: PCI Compliant collection and rendering of sensitive data,
+  }
+---
+
+## Add Footprint-components.js to your app
+
+1. Go to Footprint dashboard [Settings - Roles](https://dashboard.onefootprint.com/settings?tab=roles) page. Create a new role for card vaulting.
+
+   - Select `Create and update users` from the permissions list.
+
+2. Go to Footprint dashboard [Developer - Secret API Keys](https://dashboard.onefootprint.com/developers?tab=api_keys) page. Create a new Secret API Key with the role you have just created.
+
+   - Grab the Secret API Key, for example `sk_live_Zlkert4344in3Gerfere`.
+
+<inline-alert variant='warning'>Treat this key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
+
+4. For the user you will show the component to, if there is no existing Footprint user vault, create a new vault using the `POST /users` API by making a call from the backend. More details can be found [here](https://docs.onefootprint.com/integrate/migrate-existing-data#step-1-create-a-new-user-vault). Grab the Footprint user ID, for example `fp_id_ItdeKyRaEJ7Zpao4i6vTbN`.
+
+5. Generate an auth token for collecting data from the backend
+
+   - You will need to specify a unique `card_alias` that the data will be stored under since Footprint user vaults support multiple cards. You can find more information on the card aliases [here](https://docs-git-belce-docs.preview.onefootprint.com/vault/apis#payment-cards).
+   - You will need to provide a full list of fields you intend to collect. In the example below, card number, CVC, expiration and billing address zip and country.
+   - You will also need to specify a time-to-live (TTL) between 1 min and 1 day.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_ItdeKyRaEJ7Zpao4i6vTbN/client_token
+      -X POST
+      -u sk_live_Zlkert4344in3Gerfere:
+      -d '{
+            "fields": [
+              "card.card_alias.number",
+              "card.card_alias.cvc",
+              "card.card_alias.expiration",
+              "card.card_alias.billing_address.zip",
+              "card.card_alias.billing_address.country",
+            ],
+            "scopes": [
+              "vault"
+            ],
+            "ttl": 1800
+        }'
+```
+
+A sample response can be found below:
+
+```bash
+{"token":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit","expires_at":"2023-07-20T03:59:03.579654Z"}
+```
+
+The token returned will need to be passed into the Footprint component on the frontend.
+
+6. Add the `footprint-components.js` script to your app.
+
+```html
+<head>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.css"
+  />
+</head>
+<body>
+  ...
+  <script
+    crossorigin
+    src="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.umd.js"
+  ></script>
+</body>
+```
+
+or
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-components-js
+
+# With yarn
+yarn add @onefootprint/footprint-components-js
+```
+
+7. Embed the Footprint SecureForm component.
+
+Make sure to pass the auth token generated from Step 5, as well as a unique card_alias for the user. Note that this card_alias has to match the one used to generate the auth token in step 4.
+
+```html
+<div
+  id="footprint-component"
+  data-kind="secure-form"
+  data-props='{
+    "cardAlias":"primary",
+    "authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", 
+    "variant": "card", 
+    "type": "cardAndZip"
+  }'
+></div>
+```
+
+If you are rendering the secure form in a card variant, it will take up all of the space provided by its parent container. The easiest way to customize the placement is to wrap the it in a div and apply styles to this div.
+
+```html
+<style>
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+</style>
+
+<div class="container">
+  <div
+    id="footprint-component"
+    data-kind="secure-form"
+    data-props='{"cardAlias":"primary","authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'card'}'
+  ></div>
+</div>
+```
+
+If you are rendering the secure form in a modal variant, it will take up the whole viewport when launched.
+
+8. Add callbacks for form events
+
+```javascript
+window.footprintComponentsCallbacks = {
+  onSave: function () {
+    // TODO:
+  },
+  onCancel: function () {
+    // TODO:
+  },
+  onClose: function () {
+    // TODO:
+  },
+};
+```
+
+### Decrypt or Proxy card data from the backend
+
+When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
+
+### Available SecureForm Props
+
+| Variable     | Description                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                        |
+| `cardAlias`  | Required. A string that is a unique alias for the card information                                                                               |
+| `title`      | Optional. A string that will be displayed at the top of the field                                                                                |
+| `type`       | Optional. one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
+| `variant`    | Optional. One of `modal` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                           |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                         |

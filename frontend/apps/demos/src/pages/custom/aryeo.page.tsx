@@ -1,5 +1,6 @@
 import { FootprintAppearance } from '@onefootprint/footprint-components-js';
 import React from 'react';
+import { ARYEO_CARD_VAULTING_AUTH_TOKEN } from 'src/config/constants';
 
 import ComponentsInstructions from './components/components-instructions';
 
@@ -70,22 +71,17 @@ const customCss = `
 }
 `;
 
-const Aryeo = () => {
-  const secretKey = 'sk_test_taOKEARcXnbYPppTZkA2ag31dFqR0VwYDk';
-  const userId = 'fp_id_JaXmiDijVfxjufnVNzLN4p';
-
-  return (
-    <ComponentsInstructions
-      appearance={appearance}
-      cardAlias="primary"
-      title="Add a New Card"
-      tenantName="Aryeo"
-      secretKey={secretKey}
-      userId={userId}
-      customCSS={customCss}
-      framework="vue"
-    />
-  );
-};
+const Aryeo = () => (
+  <ComponentsInstructions
+    appearance={appearance}
+    cardAlias="primary"
+    title="Add a New Card"
+    tenantName="Aryeo"
+    customCSS={customCss}
+    framework="vue"
+    userId="fp_id_UIUImA2Kfqkhcrc90qjaMu"
+    secretAuthToken={ARYEO_CARD_VAULTING_AUTH_TOKEN ?? ''}
+  />
+);
 
 export default Aryeo;

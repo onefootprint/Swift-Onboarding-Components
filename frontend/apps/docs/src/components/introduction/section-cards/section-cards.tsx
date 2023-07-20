@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDatabase24,
+  IcoGridMasonry24,
   IcoIdCard24,
   IcoLayer0124,
   IcoStore24,
@@ -48,6 +49,14 @@ const SectionCards = () => {
         imageSrc="/introduction/vault-proxy.png"
         gridArea="vault-proxy"
       />
+      <SectionCard
+        title={t('embedded-components.title')}
+        subtitle={t('embedded-components.description')}
+        href="/embedded-components/getting-started"
+        icon={IcoGridMasonry24}
+        imageSrc="/introduction/embedded-components.png"
+        gridArea="components"
+      />
     </Grid>
   );
 };
@@ -63,13 +72,15 @@ const Grid = styled.div`
       'kyc'
       'kyb'
       'vaulting'
-      'vault-proxy';
+      'vault-proxy'
+      'components';
 
     ${media.greaterThan('md')`
          grid-template-columns: repeat(2, 1fr);
          grid-template-areas:
       'kyc kyb'
-      'vaulting vault-proxy';
+      'vaulting vault-proxy'
+      'components .';
       `}
   `}
 `;
