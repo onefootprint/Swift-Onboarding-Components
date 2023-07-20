@@ -578,6 +578,7 @@
       },
       "decrypt": {
         "start": "Decrypt data",
+        "decrypt": "Decrypt",
         "not-allowed": "You're not allowed to decrypt data",
         "reason-dialog": {
           "title": "Decrypt data",

@@ -33,7 +33,7 @@ const ReasonDialog = ({
       title={t('start')}
       primaryButton={{
         form: 'decrypt-reason-form',
-        label: allT('next'),
+        label: t('decrypt'),
         loading,
         type: 'submit',
       }}
