@@ -26,6 +26,7 @@ pub struct NewPhoneNumberArgs {
 impl VaultWrapper<Person> {
     /// Custom util function to create a user vault, its phone number, and optionally associate it
     /// with a provided ob_config
+    #[tracing::instrument("VaultWrapper::create_user_vault", skip_all)]
     pub fn create_user_vault(
         conn: &mut TxnPgConn,
         keypair: VaultKeyPair,

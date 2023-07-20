@@ -57,6 +57,7 @@ impl<Type> TenantVw<Type> {
     /// the decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
     /// doesn't have any associated data on the UVW.
+    #[tracing::instrument("TenantVw::fn_decrypt", skip_all)]
     pub async fn fn_decrypt(
         &self,
         state: &State,

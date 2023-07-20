@@ -31,7 +31,7 @@ impl<Type> VaultWrapper<Type> {
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("VaultWrapper:build", skip_all)]
     pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
         let (uv, sv_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {

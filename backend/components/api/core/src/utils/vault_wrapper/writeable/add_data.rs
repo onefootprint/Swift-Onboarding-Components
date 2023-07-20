@@ -32,6 +32,7 @@ pub struct PatchDataResult {
 /// They use the private, update_data_unsafe method, which cannot be exposed publically because they don't
 /// take ownership over the VaultWrapper that is potentially stale after an update
 impl<Type> WriteableVw<Type> {
+    #[tracing::instrument("WriteableVw::patch_data", skip_all)]
     pub fn patch_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
@@ -39,6 +40,7 @@ impl<Type> WriteableVw<Type> {
     ) -> ApiResult<PatchDataResult> {
         request.assert_allowable_identifiers(self.vault.kind)?;
         let keys = request.keys().cloned().collect();
+        tracing::info!(dis=?keys, "Patching DIs");
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw
@@ -61,6 +63,7 @@ impl<Type> WriteableVw<Type> {
 
     /// We have book-keeping for business owners that are KYCed outside of the vault. When BOs are
     /// added to the vault, also create those secondary records in the DB.
+    #[tracing::instrument("WriteableVw::create_bos_if_needed", skip_all)]
     fn create_bos_if_needed(&self, conn: &mut TxnPgConn, kyced_bos: Option<PiiString>) -> ApiResult<()> {
         let Some(kyced_bos) = kyced_bos else {
             return Ok(());
@@ -75,6 +78,7 @@ impl<Type> WriteableVw<Type> {
         Ok(())
     }
 
+    #[tracing::instrument("WriteableVw::create_contact_info_if_needed", skip_all)]
     fn create_contact_info_if_needed(
         conn: &mut TxnPgConn,
         new_vds: Vec<VaultData>,
@@ -110,6 +114,7 @@ impl<Type> WriteableVw<Type> {
         Ok(cis)
     }
 
+    #[tracing::instrument("WriteableVw::add_timeline_event", skip_all)]
     fn add_timeline_event(&self, conn: &mut TxnPgConn, keys: Vec<DataIdentifier>) -> ApiResult<()> {
         let cdos = CollectedDataOption::list_from(keys);
         // Add UserTimeline for all the newly added data

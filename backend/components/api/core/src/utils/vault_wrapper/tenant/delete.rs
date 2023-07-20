@@ -5,11 +5,13 @@ use newtypes::DataIdentifier;
 
 impl<Type> TenantVw<Type> {
     /// soft "delete" vault data by deactivating the data-lifetimes to prevent access
+    #[tracing::instrument("TenantVw::soft_delete_vault", skip_all)]
     pub fn soft_delete_vault_data(
         &self,
         conn: &mut TxnPgConn,
         dis: Vec<DataIdentifier>,
     ) -> ApiResult<Vec<DataIdentifier>> {
+        tracing::info!(dis=?dis, "Deleting DIs");
         let (dis, dls) = dis
             .into_iter()
             // Only allow deleting speculative data so we don't accidentally affect other tenants'

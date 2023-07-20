@@ -69,6 +69,7 @@ impl WriteableVw<Person> {
     /// Intentionally consumes the UVW to prevent using a stale reference
     /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured out
     /// the portability story for those types of data
+    #[tracing::instrument("WriteableVw::portablize_identity_data", skip_all)]
     pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
         // TODO only portablize data collected by the ob config rather than all data
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible

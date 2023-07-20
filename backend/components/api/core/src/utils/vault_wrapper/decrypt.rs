@@ -3,7 +3,7 @@ use crate::enclave_client::EnclaveClient;
 use crate::errors::business::BusinessError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiResult};
-use crate::{State, ApiErrorKind};
+use crate::{ApiErrorKind, State};
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
 use db::{DbPool, VaultedData};
@@ -132,6 +132,7 @@ impl<Type> VaultWrapper<Type> {
     /// Returns a hashmap of identifiers to their decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
     /// doesn't exist in the UVW.
+    #[tracing::instrument("VaultWrapper::fn_decrypt_unchecked", skip_all)]
     pub async fn fn_decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
@@ -144,6 +145,7 @@ impl<Type> VaultWrapper<Type> {
                 decrypted_dis: vec![],
             });
         }
+        tracing::info!(dis=?ids.iter().map(|(di, _)| di.clone()).collect_vec(), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         let datas = ids

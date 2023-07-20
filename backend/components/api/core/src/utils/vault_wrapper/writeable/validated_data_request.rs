@@ -110,6 +110,7 @@ impl<Type> VaultWrapper<Type> {
 
 impl ValidatedDataRequest {
     /// Saves the validated updates to the DB
+    #[tracing::instrument("ValidatedDataRequest::save", skip_all)]
     pub(super) fn save(
         self,
         conn: &mut TxnPgConn,
