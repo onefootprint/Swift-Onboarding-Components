@@ -11,7 +11,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 
 use async_trait::async_trait;
-use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
 use db::models::risk_signal::RiskSignal;
@@ -60,11 +59,7 @@ impl Complete {
         score_verification_result_id: VerificationResultId,
     ) -> ApiResult<()> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-        let (id_doc, doc_req) = IdentityDocument::get(conn, id_doc_id)?;
-
-        // Mark the document request as complete
-        let update = DocumentRequestUpdate::status(DocumentRequestStatus::Complete);
-        doc_req.update(conn, update)?;
+        let (id_doc, _) = IdentityDocument::get(conn, id_doc_id)?;
 
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
@@ -125,6 +120,7 @@ impl Complete {
             document_score: Some(document_score),
             selfie_score,
             ocr_confidence_score: Some(ocr_confidence_score),
+            status: Some(DocumentRequestStatus::Complete),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 
@@ -177,6 +173,8 @@ impl IncodeStateTransition for Complete {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        Err(ApiErrorKind::AssertionError("Incode machine already complete".into()))?
+        Err(ApiErrorKind::AssertionError(
+            "Incode machine already complete".into(),
+        ))?
     }
 }

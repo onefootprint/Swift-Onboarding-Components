@@ -136,7 +136,6 @@ table! {
         id -> Text,
         scoped_vault_id -> Text,
         ref_id -> Nullable<Text>,
-        status -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -217,6 +216,7 @@ table! {
         document_score -> Nullable<Float8>,
         selfie_score -> Nullable<Float8>,
         ocr_confidence_score -> Nullable<Float8>,
+        status -> Text,
     }
 }
 

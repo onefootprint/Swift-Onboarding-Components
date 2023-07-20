@@ -2,7 +2,7 @@ use chrono::Utc;
 use db::{
     models::{
         data_lifetime::DataLifetime,
-        document_request::{DocRequestIdentifier, DocumentRequest, NewDocumentRequestArgs},
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
         document_upload::DocumentUpload,
         identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
@@ -381,7 +381,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             );
 
             // Check we cleared out the front image to retry
-            let (doc, _) = IdentityDocument::get(conn, &id_doc.id)?;
+            let (doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
             assert!(doc.images(conn, true)?.is_empty());
 
             // Now, add our images to the vault as if the user hit the POST /document APi again
@@ -477,10 +477,8 @@ async fn test_fail(state: &State, is_selfie: bool) {
             assert!(score_result.id_validation.is_some());
 
             // Check business logic bookkeeping
-
-            let id = DocRequestIdentifier::new(&su.id, None);
-            let doc_request = DocumentRequest::get(conn, id)?.unwrap();
-            assert_eq!(doc_request.status, DocumentRequestStatus::Complete);
+            let (id_doc, _) = IdentityDocument::get(conn, &id_doc.id)?;
+            assert_eq!(id_doc.status, DocumentRequestStatus::Complete);
 
             Ok(())
         })

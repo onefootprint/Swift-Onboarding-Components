@@ -21,7 +21,7 @@ use db::{
 use either::Either;
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{AuthorizeFields, OnboardingRequirement, OnboardingRequirementKind};
+use newtypes::{AuthorizeFields, DocumentRequestStatus, OnboardingRequirement, OnboardingRequirementKind};
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
@@ -255,29 +255,39 @@ fn get_requirement_inner(
                 sv_id: &args.onboarding.scoped_vault_id,
                 wf_id: args.workflow.as_ref().map(|wf| &wf.id),
             };
-            let doc_request = DocumentRequest::get_active(conn, identifier)?;
-            doc_request.map(|dr| OnboardingRequirement::CollectDocument {
-                document_request_id: dr.id,
-                should_collect_selfie: dr.should_collect_selfie,
-                should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
-                // TODO remove only_us_dl feature flag when all of flexcar is migrated.
-                // For now, regardless of what's on the DR for flexcar, restrict to US
-                only_us_supported: dr.only_us || only_us_dl,
-                supported_document_types: if let Some(doc_types) = dr.doc_type_restriction {
-                    doc_types
-                } else if only_us_dl {
-                    vec![ModernIdDocKind::DriversLicense]
-                } else {
-                    ModernIdDocKind::iter().collect()
-                },
-            })
+            if let Some(dr) = DocumentRequest::get(conn, identifier)? {
+                let id_doc = IdentityDocument::get_by_request_id(conn, &dr.id)?;
+                // Show a CollectDocument requirement if there's no id_document or the existing
+                // id_document is still Pending
+                let should_render = match id_doc {
+                    None => true,
+                    Some(d) => d.status == DocumentRequestStatus::Pending,
+                };
+                should_render.then_some(OnboardingRequirement::CollectDocument {
+                    document_request_id: dr.id,
+                    should_collect_selfie: dr.should_collect_selfie,
+                    should_collect_consent: dr.should_collect_selfie && user_consent.is_none(),
+                    // TODO remove only_us_dl feature flag when all of flexcar is migrated.
+                    // For now, regardless of what's on the DR for flexcar, restrict to US
+                    only_us_supported: dr.only_us || only_us_dl,
+                    supported_document_types: if let Some(doc_types) = dr.doc_type_restriction {
+                        doc_types
+                    } else if only_us_dl {
+                        vec![ModernIdDocKind::DriversLicense]
+                    } else {
+                        ModernIdDocKind::iter().collect()
+                    },
+                })
+            } else {
+                None
+            }
         }
         OnboardingRequirementKind::Authorize => {
             if args.onboarding.authorized_at.is_none() {
                 let identity_document_types = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                     let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
-                    id_docs.iter().map(|(id, _)| id.document_type).unique().collect()
+                    id_docs.iter().map(|id| id.document_type).unique().collect()
                 } else {
                     vec![]
                 };

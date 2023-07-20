@@ -30,8 +30,8 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{
-    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
-    IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
+    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, DocumentSide,
+    IdentityDocumentId, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
 use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -61,7 +61,7 @@ pub async fn post(
                 sv_id: &su_id,
                 wf_id: wf_id.as_ref(),
             };
-            let doc_request = DbDocumentRequest::get_active(conn, identifier)?
+            let doc_request = DbDocumentRequest::get(conn, identifier)?
                 .ok_or(OnboardingError::NoPendingDocumentRequestFound)?;
             let vault = Vault::get(conn, &su_id)?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
@@ -129,27 +129,23 @@ pub async fn post(
     let s3_urls = futures::future::try_join_all(s3_upload_futs).await?;
 
     // write a identity_document
-    let doc_request_id = doc_request.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let wf_id = user_auth.workflow().map(|wf| wf.id.clone());
     let vault2 = vault.clone();
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
             // Get or create the identity document
-            let identifier = DocRequestIdentifier {
-                sv_id: &su_id,
-                wf_id: wf_id.as_ref(),
-            };
-            let doc_request = DbDocumentRequest::lock_active(conn, identifier)?;
             let args = NewIdentityDocumentArgs {
-                request_id: doc_request_id,
+                request_id: doc_request.id.clone(),
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
+            if id_doc.status != DocumentRequestStatus::Pending {
+                return Err(OnboardingError::NoPendingDocumentRequestFound.into());
+            }
             // Vault the images under latest uploads
             let s3_urls = s3_urls
                 .into_iter()
@@ -190,7 +186,7 @@ pub async fn post(
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                 let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
-                Some((decision_intent, doc_request.into_inner(), id_doc.id))
+                Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
                     // Create fixture data once all of the sides are uploaded

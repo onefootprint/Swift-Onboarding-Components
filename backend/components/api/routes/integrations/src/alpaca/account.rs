@@ -14,7 +14,7 @@ use api_core::{
 use api_wire_types::{AlpacaCreateAccountRequest, AlpacaCreateAccountResponse};
 use std::str::FromStr;
 
-use db::models::{document_request::DocumentRequest, scoped_vault::ScopedVault};
+use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use newtypes::{
     email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
     InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
@@ -69,13 +69,13 @@ async fn create_create_account_request(
         .db_pool
         .db_query(move |conn| -> ApiResult<(TenantVw<Person>, _)> {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
-            let doc = DocumentRequest::get_latest_complete(conn, sv.id.clone())?;
+            let doc = IdentityDocument::get_latest_complete(conn, sv.id.clone())?;
             let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((uvw, doc))
         })
         .await??;
 
-    let doc_info = doc.map(|(_, id)| {
+    let doc_info = doc.map(|(id, _)| {
         let di_pairs = id
             .document_type
             .sides()

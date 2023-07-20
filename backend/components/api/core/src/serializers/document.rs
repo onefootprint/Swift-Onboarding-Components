@@ -1,14 +1,12 @@
 use api_wire_types::DocumentImageError;
-use db::models::{
-    document_request::DocumentRequest, document_upload::DocumentUpload, identity_document::IdentityDocument,
-};
+use db::models::{document_upload::DocumentUpload, identity_document::IdentityDocument};
 
 use crate::utils::db2api::DbToApi;
 
-pub type DocumentInfo = (IdentityDocument, DocumentRequest, Vec<DocumentUpload>);
+pub type DocumentInfo = (IdentityDocument, Vec<DocumentUpload>);
 
 impl DbToApi<DocumentInfo> for api_wire_types::Document {
-    fn from_db((identity_doc, document_request, uploads): DocumentInfo) -> Self {
+    fn from_db((identity_doc, uploads): DocumentInfo) -> Self {
         let IdentityDocument {
             created_at,
             document_type,
@@ -16,10 +14,9 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             document_score,
             selfie_score,
             ocr_confidence_score,
+            status,
             ..
         } = identity_doc;
-
-        let DocumentRequest { status, .. } = document_request;
 
         let uploads = uploads
             .into_iter()

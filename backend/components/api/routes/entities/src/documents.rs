@@ -32,13 +32,12 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            // TODO maybe we want to find DocumentRequests that don't even have an ID doc yet
             let documents = IdentityDocument::list(conn, &sv.id)?;
             let documents = documents
                 .into_iter()
-                .map(|(d, dr)| -> ApiResult<_> {
+                .map(|d| -> ApiResult<_> {
                     let images = d.images(conn, false)?;
-                    Ok((d, dr, images))
+                    Ok((d, images))
                 })
                 .collect::<ApiResult<Vec<_>>>()?;
             Ok(documents)

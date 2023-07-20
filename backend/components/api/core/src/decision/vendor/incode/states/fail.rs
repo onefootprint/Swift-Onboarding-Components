@@ -7,8 +7,8 @@ use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 
 use async_trait::async_trait;
-use db::models::document_request::DocumentRequestUpdate;
 use db::models::identity_document::IdentityDocument;
+use db::models::identity_document::IdentityDocumentUpdate;
 use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
@@ -21,11 +21,18 @@ pub struct Fail {}
 
 impl Fail {
     pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext) -> ApiResult<()> {
-        // Mark the document request as failed
-        let update = DocumentRequestUpdate::status(DocumentRequestStatus::Failed);
-        let (_, doc_req) = IdentityDocument::get(conn, &ctx.id_doc_id)?;
-
-        doc_req.update(conn, update)?;
+        // Mark the id doc as failed
+        let update = IdentityDocumentUpdate {
+            front_lifetime_id: None,
+            back_lifetime_id: None,
+            selfie_lifetime_id: None,
+            completed_seqno: None,
+            document_score: None,
+            selfie_score: None,
+            ocr_confidence_score: None,
+            status: Some(DocumentRequestStatus::Failed),
+        };
+        IdentityDocument::update(conn, &ctx.id_doc_id, update)?;
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
             id: ctx.id_doc_id.clone(),
@@ -53,6 +60,8 @@ impl IncodeStateTransition for Fail {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        Err(ApiErrorKind::AssertionError("Incode machine already failed".into()))?
+        Err(ApiErrorKind::AssertionError(
+            "Incode machine already failed".into(),
+        ))?
     }
 }

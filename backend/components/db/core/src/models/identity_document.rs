@@ -4,13 +4,14 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document};
 
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentSide, IdDocKind,
-    IdentityDocumentId, ScopedVaultId, VaultId,
+    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentRequestStatus, DocumentSide,
+    IdDocKind, IdentityDocumentId, ScopedVaultId, VaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -37,6 +38,7 @@ pub struct IdentityDocument {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
+    pub status: DocumentRequestStatus, // TODO rename to IdentityDocumentStatus
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -54,6 +56,7 @@ struct NewIdentityDocumentRow {
     document_type: IdDocKind,
     country_code: String,
     created_at: DateTime<Utc>,
+    status: DocumentRequestStatus,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -66,6 +69,7 @@ pub struct IdentityDocumentUpdate {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
+    pub status: Option<DocumentRequestStatus>,
 }
 
 impl IdentityDocument {
@@ -89,6 +93,7 @@ impl IdentityDocument {
                 document_type,
                 country_code,
                 created_at: Utc::now(),
+                status: DocumentRequestStatus::Pending,
             };
             diesel::insert_into(identity_document::table)
                 .values(new)
@@ -124,6 +129,17 @@ impl IdentityDocument {
         Ok(res)
     }
 
+    /// Get the identity document, and the associated document request
+    #[tracing::instrument("IdentityDocument::get_by_request_id", skip_all)]
+    pub fn get_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> DbResult<Option<Self>> {
+        let res = identity_document::table
+            .filter(identity_document::request_id.eq(request_id))
+            .get_result(conn)
+            .optional()?;
+
+        Ok(res)
+    }
+
     #[tracing::instrument("IdentityDocument::get_bulk_with_requests", skip_all)]
     pub fn get_bulk_with_requests(
         conn: &mut PgConn,
@@ -142,16 +158,30 @@ impl IdentityDocument {
 
     /// Get all the documents collected for a given scoped vault over all workflows
     #[tracing::instrument("IdentityDocument::list", skip_all)]
-    pub fn list(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Vec<(Self, DocumentRequest)>> {
+    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
+            .select(identity_document::all_columns)
             .get_results(conn)?;
 
         Ok(results)
+    }
+
+    #[tracing::instrument("IdentityDocument::get_latest_complete", skip_all)]
+    pub fn get_latest_complete(
+        conn: &mut PgConn,
+        sv_id: ScopedVaultId,
+    ) -> DbResult<Option<(IdentityDocument, DocumentRequest)>> {
+        let res = identity_document::table
+            .inner_join(document_request::table)
+            // TODO should this be only Complete?
+            .filter(not(identity_document::status.eq(DocumentRequestStatus::Pending)))
+            .filter(document_request::scoped_vault_id.eq(sv_id))
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
     }
 
     #[tracing::instrument("IdentityDocument::images", skip_all)]

@@ -1,5 +1,4 @@
 pub mod data_lifetime;
-pub mod document_request;
 pub mod fingerprint;
 pub mod identity_document;
 pub mod ob_configuration;
