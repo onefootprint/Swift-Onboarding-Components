@@ -29,8 +29,8 @@ use strum_macros::{AsRefStr, EnumString};
 pub enum DecisionStatus {
     // The ordering of this enum matters
     Fail,
-    Pass,
     StepUp,
+    Pass,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionStatus);
@@ -43,7 +43,7 @@ mod tests {
     use std::cmp::Ordering;
 
     #[test_case(DecisionStatus::Fail, DecisionStatus::Pass => Ordering::Less)]
-    #[test_case(DecisionStatus::Pass, DecisionStatus::StepUp => Ordering::Less)]
+    #[test_case(DecisionStatus::StepUp, DecisionStatus::Pass => Ordering::Less)]
     fn test_cmp_decision_status(s1: DecisionStatus, s2: DecisionStatus) -> Ordering {
         // Test ordering since we rely on it to extract minimum status
         s1.cmp(&s2)

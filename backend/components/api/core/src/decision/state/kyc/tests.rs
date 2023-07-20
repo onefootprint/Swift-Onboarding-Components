@@ -1,7 +1,10 @@
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
-    mock_idology, mock_webhooks, query_data, query_risk_signals, setup_data, ExpectedRequiresManualReview,
-    ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+    mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals, setup_data,
+    DocumentCollectionKind,
+    DocumentOutcome::{self, *},
+    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
+    WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
@@ -119,15 +122,21 @@ async fn invalid_action(state: &mut State) {
     assert_eq!(0, wfe.len());
 }
 
-#[test_state_case(UserKind::Demo)]
-#[test_state_case(UserKind::Sandbox("pass"))]
-#[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Demo, DocumentCollectionKind::DocumentNotRequested)]
+#[test_state_case(UserKind::Sandbox("pass"), DocumentCollectionKind::DocumentNotRequested)]
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentNotRequested)]
+// with doc
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(UserKind::Sandbox("pass"), DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(UserKind::Demo, DocumentCollectionKind::DocumentRequested(Success))]
 #[tokio::test]
-async fn pass(state: &mut State, user_kind: UserKind) {
+async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
+    let svid2 = svid.clone();
+    let document_requested = doc_collection_kind.doc_requested();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
@@ -142,7 +151,12 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox(_) => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            // incode isn't mockable like other vendors atm, so we need to setup some things here
+            if let Some(doc_outcome) = document_requested {
+                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            }
+        }
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -153,6 +167,10 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
+
+            if let Some(doc_outcome) = document_requested {
+                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            }
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -192,6 +210,12 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(!rs.is_empty());
     assert!(rs.iter().all(|r| r.hidden));
 
+    if document_requested.is_some() {
+        let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
+        assert!(!rs.is_empty());
+        assert!(rs.iter().all(|r| !r.hidden));
+    }
+
     // Expect Webhooks
     mock_webhooks(
         state,
@@ -215,19 +239,32 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
-            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
             assert!(rs
                 .iter()
                 .all(|rs| rs.reason_code.severity() == SignalSeverity::Info));
+
+            assert!(rs.iter().all(|rs| matches!(
+                rs.vendor_api,
+                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+            )));
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-                ],
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    document_requested.map(|_| {
+                        (
+                            VendorAPI::IncodeFetchScores,
+                            FootprintReasonCode::DocumentVerified,
+                        )
+                    }),
+                ]
+                .into_iter()
+                .flatten()
+                .collect(),
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
@@ -236,15 +273,33 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     };
 }
 
-#[test_state_case(UserKind::Sandbox("manualreview"))]
-#[test_state_case(UserKind::Sandbox("fail"))]
-#[test_state_case(UserKind::Live)]
+#[test_state_case(
+    UserKind::Sandbox("manualreview"),
+    DocumentCollectionKind::DocumentNotRequested
+)]
+#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentNotRequested)]
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentNotRequested)]
+// with doc
+#[test_state_case(
+    UserKind::Sandbox("manualreview"),
+    DocumentCollectionKind::DocumentRequested(Success)
+)]
+#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(
+    UserKind::Sandbox("manualreview"),
+    DocumentCollectionKind::DocumentRequested(Failure)
+)]
+#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentRequested(Failure))]
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Failure))]
 #[tokio::test]
-async fn fail(state: &mut State, user_kind: UserKind) {
+async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
+    let svid2 = wf.scoped_vault_id.clone();
+    let document_requested = doc_collection_kind.doc_requested();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
@@ -260,7 +315,11 @@ async fn fail(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox(_) => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            if let Some(doc_outcome) = document_requested {
+                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            }
+        }
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -274,6 +333,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
             );
+
+            if let Some(doc_outcome) = document_requested {
+                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            }
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -307,6 +370,12 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let rs_failing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs_failing.is_empty());
     assert!(rs_failing.iter().all(|r| r.hidden));
+
+    if document_requested.is_some() {
+        let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
+        assert!(!rs.is_empty());
+        assert!(rs.iter().all(|r| !r.hidden));
+    }
 
     // Expect Webhook
     let expect_review = matches!(user_kind, UserKind::Sandbox("manualreview")); //#fail currently indicates hard failing without raising review
@@ -345,33 +414,219 @@ async fn fail(state: &mut State, user_kind: UserKind) {
             } else {
                 SignalSeverity::High
             };
-            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
-            assert!(rs.iter().all(|rs| rs.reason_code.severity() == severity));
+            assert!(rs.iter().all(|rs| matches!(
+                rs.vendor_api,
+                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+            )));
+            assert!(rs
+                .iter()
+                .filter(|rs| !rs.vendor_api.is_incode_doc_flow_api())
+                .all(|rs| rs.reason_code.severity() == severity));
         }
         UserKind::Live => {
+            let doc_reason_code = document_requested.and_then(|outcome| {
+                outcome
+                    .footprint_reason_code()
+                    .map(|frc| (VendorAPI::IncodeFetchScores, frc))
+            });
+
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-                ],
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    doc_reason_code,
+                ]
+                .into_iter()
+                .flatten()
+                .collect(),
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
             );
         }
     }
+
+    // this combination of retrying kyc with a failed document isn't handled yet, so we need to special case it
+    let doc_failed = document_requested
+        .map(|o| o == DocumentOutcome::Failure)
+        .unwrap_or(false);
+
     // Test Redo as well
     match user_kind {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
-            redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key, rs_failing).await;
+            if !doc_failed {
+                redo_and_pass(
+                    state,
+                    user_kind,
+                    &ob,
+                    &obd,
+                    &tenant.id,
+                    &obc.key,
+                    rs_failing,
+                    document_requested.is_some(),
+                )
+                .await;
+            }
         }
     }
 }
 
+#[test_state_case(UserKind::Live, Failure)]
+#[test_state_case(UserKind::Live, DocUploadFailed)]
+#[tokio::test]
+async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
+    // DATA SETUP
+    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
+    let wfid = wf.id.clone();
+    let svid = wf.scoped_vault_id.clone();
+    let svid2 = wf.scoped_vault_id.clone();
+
+    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let doc_upload_failed = doc_outcome == DocUploadFailed;
+
+    // MOCKING
+    let mut mock_ff_client = MockFeatureFlagClient::new();
+
+    let tenant_id = tenant.id.clone();
+    mock_ff_client
+        .expect_flag()
+        .times(3)
+        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+        .return_const(matches!(user_kind, UserKind::Demo));
+
+    match user_kind {
+        // If Demo or Sandbox we expect no vendor calls to be attempted
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            // TODO: sandbox won't work yet
+        }
+        // Mock vendor calls for Live users
+        UserKind::Live => {
+            let ob_config_key = obc.key.clone();
+            // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
+            mock_ff_client
+                .expect_flag()
+                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                .return_once(move |_| true);
+
+            // KYC Passes
+            mock_idology(state, WithQualifier(None));
+
+            mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+        }
+    };
+    state.set_ff_client(Arc::new(mock_ff_client));
+
+    // TESTS
+    //
+    // Authorize
+    // Expect Webhooks
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![],
+    );
+    let (ww, _) = ww
+        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .await
+        .unwrap();
+    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(ob.authorized_at.is_some());
+    assert!(ob.idv_reqs_initiated_at.is_some());
+    assert!(ob.decision_made_at.is_none());
+    assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
+    assert!(!fps.is_empty()); //fingerprints were written
+
+    // MakeVendorCalls
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .await
+        .unwrap();
+
+    let rs_failing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+    assert!(!rs_failing.is_empty());
+    assert!(rs_failing.iter().all(|r| r.hidden));
+    if !doc_upload_failed {
+        let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
+        assert!(!rs.is_empty());
+        assert!(rs.iter().all(|r| !r.hidden));
+    }
+
+    // Expect Webhook
+
+    let expect_review = doc_upload_failed;
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(expect_review),
+        )],
+    );
+
+    // MakeDecision
+    let (_, _) = ww
+        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .await
+        .unwrap();
+
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
+    let obd = obd.unwrap();
+    assert!(obd.status == DecisionStatus::Fail);
+    assert!(matches!(obd.actor, DbActor::Footprint));
+    assert_eq!(OnboardingStatus::Fail, ob.status);
+    assert!(ob.decision_made_at.is_some());
+    if expect_review {
+        assert!(mr.is_some());
+    } else {
+        assert!(mr.is_none());
+    }
+
+    match user_kind {
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            assert!(rs.iter().all(|rs| matches!(
+                rs.vendor_api,
+                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+            )));
+            let (doc_rs, kyc_rs): (Vec<_>, Vec<_>) =
+                rs.iter().partition(|rs| rs.vendor_api.is_incode_doc_flow_api());
+
+            assert!(kyc_rs
+                .iter()
+                .all(|rs| rs.reason_code.severity() == SignalSeverity::Info));
+            assert!(doc_rs
+                .iter()
+                .all(|rs| rs.reason_code.severity() == SignalSeverity::High));
+        }
+        UserKind::Live => {
+            assert_have_same_elements(
+                vec![
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    // TODO: assert doc upload failed RS when we have it
+                    (!doc_upload_failed).then_some((
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentNotVerified,
+                    )),
+                ]
+                .into_iter()
+                .flatten()
+                .collect(),
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 async fn redo_and_pass(
     state: &mut State,
     user_kind: UserKind,
@@ -380,6 +635,7 @@ async fn redo_and_pass(
     tenant_id: &TenantId,
     ob_config_key: &ObConfigurationKey,
     previous_risk_signals: Vec<RiskSignal>,
+    doc_requested: bool,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_ob.scoped_vault_id.clone();
@@ -458,11 +714,18 @@ async fn redo_and_pass(
 
     assert_have_same_elements(
         vec![
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-        ],
+            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
+            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
+            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
+            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+            doc_requested.then_some((
+                VendorAPI::IncodeFetchScores,
+                FootprintReasonCode::DocumentVerified,
+            )),
+        ]
+        .into_iter()
+        .flatten()
+        .collect(),
         rs.into_iter()
             .map(|rs| (rs.vendor_api, rs.reason_code))
             .collect_vec(),

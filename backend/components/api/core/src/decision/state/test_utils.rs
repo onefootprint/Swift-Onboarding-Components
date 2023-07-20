@@ -8,6 +8,7 @@ use crate::errors::ApiResult;
 use crate::ApiError;
 use crate::{decision::tests::test_helpers, State};
 use db::models::decision_intent::DecisionIntent;
+use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
 use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
@@ -49,6 +50,36 @@ impl UserKind {
             UserKind::Demo => None,
             UserKind::Sandbox(s) => Some(s.to_string()),
             UserKind::Live => None,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum DocumentOutcome {
+    Success,
+    Failure,
+    DocUploadFailed,
+}
+impl DocumentOutcome {
+    pub fn footprint_reason_code(&self) -> Option<FootprintReasonCode> {
+        match &self {
+            DocumentOutcome::Success => Some(FootprintReasonCode::DocumentVerified),
+            DocumentOutcome::Failure => Some(FootprintReasonCode::DocumentNotVerified),
+            DocumentOutcome::DocUploadFailed => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug)]
+pub enum DocumentCollectionKind {
+    DocumentRequested(DocumentOutcome),
+    DocumentNotRequested,
+}
+
+impl DocumentCollectionKind {
+    pub fn doc_requested(self) -> Option<DocumentOutcome> {
+        match self {
+            DocumentCollectionKind::DocumentRequested(outcome) => Some(outcome),
+            DocumentCollectionKind::DocumentNotRequested => None,
         }
     }
 }
@@ -278,11 +309,31 @@ pub fn save_vres_for_fixture_risk_signals(
 }
 
 // TODO: we need to simulate actually collecting a document, but incode machine is not currently mockable.
-pub async fn mock_incode_doc_collection(state: &State, scoped_vault_id: ScopedVaultId) {
+pub async fn mock_incode_doc_collection(
+    state: &State,
+    scoped_vault_id: ScopedVaultId,
+    document_outcome: DocumentOutcome,
+    wf_id: WorkflowId,
+    create_doc_request: bool,
+) {
     state
         .db_pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let vault = Vault::get(conn.conn(), &scoped_vault_id).unwrap();
+
+            if create_doc_request {
+                // we need a doc request in order to indicate to the decision engine that we should include document rules in decisioning
+                let args = NewDocumentRequestArgs {
+                    scoped_vault_id: scoped_vault_id.clone(),
+                    ref_id: None,
+                    workflow_id: Some(wf_id),
+                    should_collect_selfie: false,
+                    only_us: false,
+                    doc_type_restriction: None,
+                };
+                DocumentRequest::create(conn, args).unwrap();
+            }
+
             let vres = save_vres_for_fixture_risk_signals(
                 conn,
                 &scoped_vault_id,
@@ -294,16 +345,18 @@ pub async fn mock_incode_doc_collection(state: &State, scoped_vault_id: ScopedVa
                 VendorAPI::IncodeFetchScores,
             )
             .unwrap();
-            let rsg = RiskSignalGroupStruct::<Doc> {
-                footprint_reason_codes: vec![(
-                    FootprintReasonCode::DocumentVerified,
-                    VendorAPI::IncodeFetchOCR,
-                    vres.id,
-                )],
-                group: Doc,
-            };
 
-            save_risk_signals(conn, &scoped_vault_id, &rsg)
+            // If we are simulating document not being able to be uploaded, we won't have risk signals saved
+            if let Some(frc) = document_outcome.footprint_reason_code() {
+                let rsg = RiskSignalGroupStruct::<Doc> {
+                    footprint_reason_codes: vec![(frc, VendorAPI::IncodeFetchScores, vres.id)],
+                    group: Doc,
+                };
+                // incode state machine defaults this to not hidden
+                save_risk_signals(conn, &scoped_vault_id, &rsg, false).unwrap();
+            }
+
+            Ok(())
         })
         .await
         .unwrap();

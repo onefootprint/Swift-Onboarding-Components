@@ -182,7 +182,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                 create_risk_signals_from_vendor_results(vendor_result_maps)?
             };
 
-        save_risk_signals(conn, &self.sv_id, &risk_signals)?;
+        save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
 
         // we might need doc signals here too, so we reload
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;

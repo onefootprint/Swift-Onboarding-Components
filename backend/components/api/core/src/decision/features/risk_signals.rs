@@ -77,6 +77,7 @@ pub fn save_risk_signals<T>(
     conn: &mut db::TxnPgConn,
     scoped_vault_id: &ScopedVaultId,
     risk_signals: &RiskSignalGroupStruct<T>,
+    hidden: bool,
 ) -> Result<(), ApiError>
 where
     T: Into<WrappedRiskSignalGroupKind> + Clone,
@@ -87,7 +88,7 @@ where
         risk_signals.footprint_reason_codes.clone(),
         risk_signals.group.clone().into().into(),
         // default to hiding for things using this code path
-        true,
+        hidden,
     )?;
 
     Ok(())

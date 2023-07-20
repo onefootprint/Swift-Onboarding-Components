@@ -2,8 +2,8 @@ use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
     mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
-    setup_data, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
-    UserKind, WithHit, WithQualifier,
+    setup_data, DocumentOutcome, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
+    OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeWatchlistCheckCall;
@@ -400,7 +400,9 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox(_) => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            mock_incode_doc_collection(state, svid2, DocumentOutcome::Success, wfid.clone(), false).await;
+        }
         // Mock vendor calls for Live users
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
@@ -415,7 +417,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
             );
             mock_incode(state, WithHit(false));
-            mock_incode_doc_collection(state, svid2).await;
+            mock_incode_doc_collection(state, svid2, DocumentOutcome::Success, wfid.clone(), false).await;
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -477,7 +479,10 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
-            assert!(rs.iter().all(|rs| rs.vendor_api == VendorAPI::IdologyExpectID));
+            assert!(rs.iter().all(|rs| matches!(
+                rs.vendor_api,
+                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+            )));
             assert!(rs
                 .iter()
                 .any(|rs| rs.reason_code == FootprintReasonCode::SsnMatches));
@@ -496,6 +501,10 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                     (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
                     (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
                     (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentVerified,
+                    ),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
