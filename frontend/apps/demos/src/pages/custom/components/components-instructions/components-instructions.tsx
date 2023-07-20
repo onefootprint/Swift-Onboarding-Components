@@ -42,16 +42,16 @@ const createAuthTokenInstructions = ({
   cardAlias: string;
   ttl: number;
 }) => `
-  curl https://api.onefootprint.com/users/${userId}/client_token
-      -X POST
-      -u ${secretKey}:
+  curl https://api.onefootprint.com/users/${userId}/client_token \
+      -X POST \
+      -u ${secretKey}: \
       -d '{
             "fields": [
               "card.${cardAlias}.number",
               "card.${cardAlias}.cvc",
               "card.${cardAlias}.expiration",
               "card.${cardAlias}.billing_address.zip",
-              "card.${cardAlias}.billing_address.country",
+              "card.${cardAlias}.billing_address.country"
             ],
             "scopes": [
               "vault"
