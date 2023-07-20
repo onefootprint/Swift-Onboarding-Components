@@ -52,8 +52,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       <DocScan
         key={currentSide}
         authToken={authToken}
-        countryCode={collectingDocumentMeta.countryCode}
-        countryName={country.label}
+        country={country}
         onDone={nextSideToCollect => {
           send('imageSubmitted', {
             payload: { nextSideToCollect },

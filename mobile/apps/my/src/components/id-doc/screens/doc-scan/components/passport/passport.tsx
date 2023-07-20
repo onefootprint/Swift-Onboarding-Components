@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
 import { detectDocument } from 'vision-camera-plugin-document';
@@ -8,11 +8,13 @@ import useTranslation from '@/hooks/use-translation';
 import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
 import Scan from '../scan';
+import ScanContext from '../scan-context';
 
 const DEFAULT_ASPECT_RATIO = 1.42;
 
 const Passport = () => {
   const { t } = useTranslation('components.scan.passport');
+  const { country } = useContext(ScanContext);
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
@@ -37,7 +39,7 @@ const Passport = () => {
   );
 
   return (
-    <DocInstructions title={t('instructions')}>
+    <DocInstructions title={t('instructions', { country: country.value3 })}>
       <Scan
         feedback={feedback}
         frameProcessor={frameProcessor}

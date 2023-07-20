@@ -1,9 +1,6 @@
+import { CountryRecord } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  CountryCode,
-  IdDocType,
-  SubmitDocumentSide,
-} from '@onefootprint/types';
+import { IdDocType, SubmitDocumentSide } from '@onefootprint/types';
 import React, { useMemo, useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
@@ -17,21 +14,13 @@ import useSubmitDoc from './hooks/use-submit-doc';
 
 export type DocScanProps = {
   authToken: string;
-  countryCode: CountryCode;
-  countryName: string;
+  country: CountryRecord;
   onDone: (nextSideToCollect: SubmitDocumentSide) => void;
   side: SubmitDocumentSide;
   type: IdDocType;
 };
 
-const DocScan = ({
-  authToken,
-  countryCode,
-  countryName,
-  onDone,
-  side,
-  type,
-}: DocScanProps) => {
+const DocScan = ({ authToken, country, onDone, side, type }: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
   const mutation = useSubmitDoc({
@@ -48,7 +37,7 @@ const DocScan = ({
     mutation.mutate(
       {
         authToken,
-        countryCode,
+        countryCode: country.value,
         documentType: type,
         selfieImage: side === SubmitDocumentSide.Selfie ? image : null,
         frontImage: side === SubmitDocumentSide.Front ? image : null,
@@ -60,7 +49,7 @@ const DocScan = ({
             const documentType = allT(`document-type.${type}`);
             setErrors(
               response.errors.map(error =>
-                t(error, { documentType, countryName }),
+                t(error, { documentType, countryName: country.label }),
               ),
             );
           } else {
@@ -75,6 +64,7 @@ const DocScan = ({
 
   const contextValues = useMemo(
     () => ({
+      country,
       authToken,
       errors,
       isError: errors.length > 0,
@@ -83,7 +73,7 @@ const DocScan = ({
       onSubmit: handleSubmit,
       onResetErrors: handleResetErrors,
     }),
-    [authToken, errors, mutation],
+    [authToken, country, errors, mutation],
   );
 
   return (

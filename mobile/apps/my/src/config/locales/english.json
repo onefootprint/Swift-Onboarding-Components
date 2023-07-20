@@ -138,20 +138,20 @@
       "drivers-license": {
         "title": "Driver's license",
         "instructions": {
-          "front": "Scan the front side of your driver's license",
-          "back": "Scan the back side of your driver's license"
+          "front": "Scan the front side of your driver's license ({{country}})",
+          "back": "Scan the back side of your driver's license ({{country}})"
         }
       },
       "id-card": {
         "title": "ID card",
         "instructions": {
-          "front": "Scan the front side of your id card",
-          "back": "Scan the back side of your id card"
+          "front": "Scan the front side of your id card ({{country}})",
+          "back": "Scan the back side of your id card ({{country}})"
         }
       },
       "passport": {
         "title": "Passport",
-        "instructions": "Scan the photo page of your passport"
+        "instructions": "Scan the photo page of your passport ({{country}})"
       },
       "selfie": {
         "title": "Selfie",
