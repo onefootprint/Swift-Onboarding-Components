@@ -363,9 +363,13 @@ async fn test_fail(state: &State, is_selfie: bool) {
 
     // Assert machine is in the correct state
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);
-    assert_eq!(
+
+    assert_have_same_elements(
         failure_reasons,
-        vec![IncodeFailureReason::UnsupportedDocumentType]
+        vec![
+            IncodeFailureReason::UnableToAlignDocument,
+            IncodeFailureReason::UnsupportedDocumentType,
+        ],
     );
 
     let id_doc_id = id_doc.id.clone();
@@ -375,9 +379,12 @@ async fn test_fail(state: &State, is_selfie: bool) {
         .db_transaction(move |conn| -> DbResult<_> {
             let session = IncodeVerificationSession::get(conn, &id_doc_id).unwrap().unwrap();
             assert_eq!(session.state, IncodeVerificationSessionState::AddFront);
-            assert_eq!(
+            assert_have_same_elements(
                 session.latest_failure_reasons,
-                vec![IncodeFailureReason::UnsupportedDocumentType]
+                vec![
+                    IncodeFailureReason::UnableToAlignDocument,
+                    IncodeFailureReason::UnsupportedDocumentType,
+                ],
             );
 
             // Check we cleared out the front image to retry
