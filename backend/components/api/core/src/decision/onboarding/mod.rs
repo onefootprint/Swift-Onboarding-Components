@@ -14,9 +14,9 @@ pub struct OnboardingRulesDecisionOutput {
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum DecisionResult {
-    // an evaluated decision
+    /// an evaluated decision
     Evaluated(OnboardingRulesDecisionOutput),
-    // if only doc or kyc is required
+    /// if only doc or kyc is required
     NotRequired,
 }
 

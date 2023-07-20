@@ -232,9 +232,10 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, ob.status);
+    assert!(obd.unwrap().seqno.is_some());
     assert!(mr.is_none());
 
     match user_kind {
@@ -399,6 +400,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
+    assert!(obd.seqno.is_none());
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
     if expect_review {
@@ -502,6 +504,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
             // TODO: sandbox won't work yet
+            // https://linear.app/footprint/issue/FP-5157/sandbox-fixtures
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
@@ -577,6 +580,8 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
+    // TODO: fix this
+    assert!(obd.seqno.is_none());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
@@ -696,6 +701,7 @@ async fn redo_and_pass(
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
+    assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, ob.status);
     // redo flow hasn't modified timestamps on ob

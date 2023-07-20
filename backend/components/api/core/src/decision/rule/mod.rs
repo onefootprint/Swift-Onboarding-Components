@@ -37,6 +37,7 @@ pub enum RuleName {
     MultipleRecordsFound,
     DocumentNotVerified,
     SelfieDoesNotMatch,
+    DocumentUploadFailed,
     #[cfg(test)]
     Test(String),
     BusinessWatchlistHit,

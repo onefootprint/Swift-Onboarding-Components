@@ -1,5 +1,6 @@
 use newtypes::{DecisionStatus, VendorAPI};
 
+use crate::decision::rule::RuleName;
 use crate::errors::ApiResult;
 use crate::{decision::Error, ApiError};
 
@@ -78,12 +79,13 @@ impl KycRuleGroup {
         config: KycRuleExecutionConfig,
     ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
+        // (for now, until we have doc only)
         let idology_rule_result =
             evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.kyc.clone()).ok();
         let experian_rule_result =
             evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.kyc).ok();
         let incode_doc_rule_result =
-            evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), risk_signals.doc).ok(); // error since we know we need doc signals
+            evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), risk_signals.doc).ok();
 
         // Check we have a KYC result from one of the vendors
         let kyc_rule_results: Vec<OnboardingEvaluationResult> =
@@ -137,7 +139,7 @@ impl KycRuleGroup {
             None => {
                 tracing::error!("missing incode doc rules result");
                 OnboardingEvaluationResult {
-                    rules_triggered: vec![],
+                    rules_triggered: vec![RuleName::DocumentUploadFailed],
                     rules_not_triggered: vec![],
                     triggered_action: Some(Action::ManualReview),
                     vendor_api: VendorAPI::IncodeFetchScores,

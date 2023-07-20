@@ -144,6 +144,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert_eq!(OnboardingStatus::Pass, ob.status);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Pass);
+    assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(mr.is_none());
 
@@ -291,9 +292,11 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
+    // we commit in this case
+    assert!(obd.unwrap().seqno.is_some());
     // manual_review should exist and have correct review_reasons
     let mr = mr.unwrap();
     assert_eq!(
@@ -472,7 +475,8 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, ob.status);
-    assert!(obd.is_some());
+    let obd = obd.unwrap();
+    assert!(obd.seqno.is_some());
     // manual_review should exist and have correct review_reasons
     let mr = mr.unwrap();
     assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
@@ -540,7 +544,11 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, ob.status);
-    assert!(matches!(obd.unwrap().actor, DbActor::TenantUser { id: _ }));
+    let obd = obd.unwrap();
+    assert!(matches!(obd.actor, DbActor::TenantUser { id: _ }));
+    // this OBD since it's from a review, does not commit
+    assert!(obd.seqno.is_none());
+
     assert!(!rs.is_empty()); // sanity check since we made a new OBD
 }
 
@@ -646,6 +654,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
+    assert!(obd.seqno.is_none());
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
     assert!(mr.is_none());
@@ -754,6 +763,7 @@ async fn redo_and_pass(
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
+    assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, ob.status);
     // redo flow hasn't modified timestamps on ob
