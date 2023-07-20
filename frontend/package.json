@@ -9,8 +9,8 @@
   "scripts": {
     "build": "turbo run build",
     "predev": "yarn install && yarn build:packages",
-    "dev": "turbo run dev --parallel --concurrency 30 --continue",
-    "dev:storybook": "turbo run dev:storybook --concurrency 30",
+    "dev": "turbo run dev --parallel --concurrency 50 --continue",
+    "dev:storybook": "turbo run dev:storybook --concurrency 50",
     "build:packages": "turbo run build --filter=./packages/*",
     "format": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
