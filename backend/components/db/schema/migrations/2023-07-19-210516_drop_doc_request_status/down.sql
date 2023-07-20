@@ -1,0 +1,1 @@
+ALTER TABLE document_request ADD COLUMN status TEXT;
