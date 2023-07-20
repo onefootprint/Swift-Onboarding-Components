@@ -256,13 +256,13 @@ fn get_requirement_inner(
                 wf_id: args.workflow.as_ref().map(|wf| &wf.id),
             };
             if let Some(dr) = DocumentRequest::get(conn, identifier)? {
-                let id_doc = IdentityDocument::get_by_request_id(conn, &dr.id)?;
+                let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
-                let should_render = match id_doc {
-                    None => true,
-                    Some(d) => d.status == IdentityDocumentStatus::Pending,
-                };
+                let should_render = id_doc.is_empty()
+                    || id_doc
+                        .into_iter()
+                        .any(|d| d.status == IdentityDocumentStatus::Pending);
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,

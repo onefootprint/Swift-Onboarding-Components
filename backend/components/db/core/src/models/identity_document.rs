@@ -163,11 +163,10 @@ impl IdentityDocument {
 
     /// Get the identity document, and the associated document request
     #[tracing::instrument("IdentityDocument::get_by_request_id", skip_all)]
-    pub fn get_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> DbResult<Option<Self>> {
+    pub fn list_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> DbResult<Vec<Self>> {
         let res = identity_document::table
             .filter(identity_document::request_id.eq(request_id))
-            .get_result(conn)
-            .optional()?;
+            .get_results(conn)?;
 
         Ok(res)
     }

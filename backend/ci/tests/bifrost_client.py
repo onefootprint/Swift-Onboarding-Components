@@ -235,24 +235,23 @@ class BifrostClient:
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)
 
-        common_data = {
-            "document_type": "driver_license",
+        data = {
+            "document_type": "drivers_license",
             "country_code": "US",
         }
-        sides = [
-            "front",
-            "back",
-        ]
+        body = post("hosted/user/documents", data, self.auth_token)
+        doc_id = body["id"]
+
+        sides = ["front", "back"]
         if requirement["should_collect_selfie"]:
             sides.append("selfie")
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
-            image = {
+            data = {
                 f"{side}_image": self.data[f"document.drivers_license.{side}.image"]
             }
-            data = {**common_data, **image}
-            body = post("hosted/user/document", data, self.auth_token)
+            body = post(f"hosted/user/documents/{doc_id}/upload", data, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
             assert not body["errors"]
