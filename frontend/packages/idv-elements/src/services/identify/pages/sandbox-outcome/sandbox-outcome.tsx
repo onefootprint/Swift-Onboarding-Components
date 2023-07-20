@@ -105,7 +105,7 @@ const SandboxOutcome = () => {
             },
             // Must not contain special characters
             pattern: {
-              value: /^[A-z0-9]+$/,
+              value: /^(?!.*\\)[A-Za-z0-9]+$/,
               message: t('test-id.errors.invalid'),
             },
           })}

@@ -91,6 +91,25 @@ describe.skip('<Identify />', () => {
       });
     });
 
+    it('will flag backslash as invalid test ID config number', async () => {
+      renderIdentify();
+
+      await waitFor(() => {
+        expect(screen.getByText('Select test outcome')).toBeInTheDocument();
+      });
+
+      const testIDField = screen.getByLabelText('Test ID');
+      await userEvent.type(testIDField, 'm\\');
+      await userEvent.click(screen.getByText('Continue'));
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Test ID is invalid. Please remove spaces and special characters.',
+          ),
+        ).toBeInTheDocument();
+      });
+    });
+
     it('shows errors if sandbox test id is empty or invalid', async () => {
       renderIdentify();
 
