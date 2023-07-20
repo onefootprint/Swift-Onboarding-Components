@@ -12,6 +12,7 @@ const task = async params => {
       `• num scoped users: ${tenant.num_scoped_vaults || 0}`,
       `• max number of keys on one user: ${tenant.max_keys_per_user || 0}`,
       `• num proxy requests: ${tenant.num_proxy_requests || 0}`,
+      `• num keys in use: ${tenant.count_keys || 0}`,
       `• keys in use: ${keysInUse}`,
     ].join('\n');
   };

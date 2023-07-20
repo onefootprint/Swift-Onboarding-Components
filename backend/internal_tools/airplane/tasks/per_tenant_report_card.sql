@@ -9,8 +9,10 @@ identifiers_per_tenant AS (
     live_tenant.id as tenant_id,
     array_agg(DISTINCT CASE
       WHEN data_lifetime.kind ilike 'card.%.%' THEN REGEXP_REPLACE(data_lifetime.kind, 'card\.(.*)\.(.*)', 'card.*.\2')
+      WHEN data_lifetime.kind ilike 'custom.%' THEN 'custom.*'
       ELSE data_lifetime.kind
-    END) as all_keys
+    END) as all_keys,
+    COUNT(DISTINCT data_lifetime.kind) as count_keys
   FROM live_tenant
   INNER JOIN scoped_vault
     ON scoped_vault.tenant_id = live_tenant.id AND scoped_vault.is_live = 't'
@@ -63,6 +65,7 @@ SELECT
   live_tenant.id as tenant_id,
   live_tenant.name,
   identifiers_per_tenant.all_keys,
+  identifiers_per_tenant.count_keys,
   scoped_vaults_per_tenant.count as num_scoped_vaults,
   max_num_keys_per_su_per_tenant.max as max_keys_per_user,
   num_proxy_requests_per_tenant.count as num_proxy_reqs

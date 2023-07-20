@@ -1,6 +1,7 @@
 SELECT
   CASE
     WHEN data_lifetime.kind ilike 'card.%.%' THEN REGEXP_REPLACE(data_lifetime.kind, 'card\.(.*)\.(.*)', 'card.*.\2')
+    WHEN data_lifetime.kind ilike 'custom.%' THEN 'custom.*'
     ELSE data_lifetime.kind
   END,
   COUNT(DISTINCT data_lifetime.vault_id)
