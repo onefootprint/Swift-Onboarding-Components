@@ -55,6 +55,44 @@ export const Alerts: Alert[] = [
     },
   },
   {
+    name: 'Latent HTTP request',
+    description: 'HTTP request took longer than 15s',
+    datasetName: 'fpc-api',
+    query: {
+      time_range: 240,
+      breakdowns: ['http.method', 'http.route', 'http.status_code'],
+      calculations: [
+        {
+          op: 'COUNT',
+        },
+      ],
+      filters: [
+        {
+          column: 'trace.parent_id',
+          op: 'does-not-exist',
+        },
+        {
+          column: 'http.route',
+          op: 'exists',
+        },
+        {
+          column: 'duration_ms',
+          op: '>=',
+          value: 15000,
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    slackThreshold: {
+      op: '>',
+      value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 5,
+    },
+  },
+  {
     name: 'ALB Target 5xx Errors',
     description:
       'Elevated 5xx that originated from the loadbalancer target. This will likely fire any time the HTTP 5xx errors alert fires',
