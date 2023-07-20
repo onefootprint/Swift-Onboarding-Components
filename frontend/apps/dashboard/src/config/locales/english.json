@@ -556,6 +556,15 @@
       "fieldset": {
         "select-all": "Select all",
         "deselect-all": "Deselect all",
+        "document": {
+          "hide": "Hide",
+          "show": "Show",
+          "drawer": {
+            "drivers_license.title": "Driver's license and selfie",
+            "id_card.title": "ID card and selfie",
+            "passport.title": "Passport and selfie"
+          }
+        },
         "cards": {
           "title_other": "({{count}} cards)",
           "title_one": "",
