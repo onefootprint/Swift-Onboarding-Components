@@ -30,12 +30,12 @@ export default PaymentForm;`;
 
 export const getVueIntegration = (cardAlias: string) => `
 <script>
-  import footprintComponents from '@onefootprint/footprint-components-js';
+  import footprintComponent from '@onefootprint/footprint-components-js';
   import { appearance } from './config';
 
   export default {
     mounted() {
-      footprintComponents.render({
+      footprintComponent.render({
         kind: 'secure-form',
         containerId: 'footprint-secure-form',
         props: {
