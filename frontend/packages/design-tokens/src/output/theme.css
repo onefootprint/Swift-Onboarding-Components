@@ -161,6 +161,16 @@
   --fp-typography-body-body-default: 400 1rem/150% 'DM Sans';
   --fp-typography-body-body-compact: 400 0.9375/133.33% 'DM Sans';
   --fp-typography-body-body-tiny: 400 14px/133.33% 'DM Sans';
+
+  --fp-base-inputs-typography-default-label: 500 0.875rem/133.33% 'DM Sans';
+  --fp-base-inputs-typography-default-input-content: 400 0.9375rem/150%
+    'DM Sans';
+  --fp-base-inputs-typography-default-hint: 500 0.8125rem/142.86% 'DM Sans';
+  --fp-base-inputs-typography-compact-label: 500 0.8125rem/142.86% 'DM Sans';
+  --fp-base-inputs-typography-compact-input-content: 400 0.875rem/133.3%
+    'DM Sans';
+  --fp-base-inputs-typography-compact-hint: 400 0.75rem/123.1% 'DM Sans';
+
   --fp-border-radius-full: 500px;
   --fp-border-radius-large: 16px;
   --fp-border-radius-default: 6px;
@@ -483,12 +493,7 @@
   --fp-base-inputs-spacing-paddings-horizontal-compact: 16px;
   --fp-base-inputs-spacing-paddings-vertical-default: 10px;
   --fp-base-inputs-spacing-paddings-vertical-compact: 6px;
-  --fp-base-inputs-typography-default-label: 500 14px/20px 'DM Sans';
-  --fp-base-inputs-typography-default-input-content: 400 15px/20px 'DM Sans';
-  --fp-base-inputs-typography-default-hint: 400 13px/16px 'DM Sans';
-  --fp-base-inputs-typography-compact-label: 500 13px/16px 'DM Sans';
-  --fp-base-inputs-typography-compact-input-content: 400 14px/20px 'DM Sans';
-  --fp-base-inputs-typography-compact-hint: 400 13px/16px 'DM Sans';
+
   --fp-base-inputs-initial-elevation: none;
   --fp-base-inputs-hover-elevation: none;
   --fp-base-inputs-elevation-focus: 0px 0px 0px 4px
