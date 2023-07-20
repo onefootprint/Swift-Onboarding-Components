@@ -12,7 +12,7 @@ use db::models::identity_document::IdentityDocumentUpdate;
 use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
-use newtypes::DocumentRequestStatus;
+use newtypes::IdentityDocumentStatus;
 
 // TODO this is more like the other workflow state transitions where it has behavior that must be
 // atomic with entering the state.
@@ -30,7 +30,7 @@ impl Fail {
             document_score: None,
             selfie_score: None,
             ocr_confidence_score: None,
-            status: Some(DocumentRequestStatus::Failed),
+            status: Some(IdentityDocumentStatus::Failed),
         };
         IdentityDocument::update(conn, &ctx.id_doc_id, update)?;
         // Create a timeline event

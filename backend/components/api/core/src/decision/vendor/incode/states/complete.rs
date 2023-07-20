@@ -24,10 +24,10 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
-use newtypes::DocumentRequestStatus;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
+use newtypes::IdentityDocumentStatus;
 use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
@@ -120,7 +120,7 @@ impl Complete {
             document_score: Some(document_score),
             selfie_score,
             ocr_confidence_score: Some(ocr_confidence_score),
-            status: Some(DocumentRequestStatus::Complete),
+            status: Some(IdentityDocumentStatus::Complete),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

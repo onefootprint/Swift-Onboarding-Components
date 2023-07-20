@@ -5,7 +5,7 @@ use crate::*;
 pub struct Document {
     pub kind: ModernIdDocKind,
     pub started_at: DateTime<Utc>,
-    pub status: DocumentRequestStatus,
+    pub status: IdentityDocumentStatus,
     pub completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,
     pub document_score: Option<f64>,

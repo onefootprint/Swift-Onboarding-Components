@@ -10,8 +10,8 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentRequestStatus, DocumentSide,
-    IdDocKind, IdentityDocumentId, ScopedVaultId, VaultId,
+    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentSide, IdDocKind,
+    IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, VaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -38,7 +38,7 @@ pub struct IdentityDocument {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
-    pub status: DocumentRequestStatus, // TODO rename to IdentityDocumentStatus
+    pub status: IdentityDocumentStatus, // TODO rename to IdentityDocumentStatus
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -56,7 +56,7 @@ struct NewIdentityDocumentRow {
     document_type: IdDocKind,
     country_code: String,
     created_at: DateTime<Utc>,
-    status: DocumentRequestStatus,
+    status: IdentityDocumentStatus,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -69,7 +69,7 @@ pub struct IdentityDocumentUpdate {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
-    pub status: Option<DocumentRequestStatus>,
+    pub status: Option<IdentityDocumentStatus>,
 }
 
 impl IdentityDocument {
@@ -82,8 +82,8 @@ impl IdentityDocument {
         // Mark all existing IdentityDocuments for this DocumentRequest as failed
         diesel::update(identity_document::table)
             .filter(identity_document::request_id.eq(&args.request_id))
-            .filter(identity_document::status.eq(DocumentRequestStatus::Pending))
-            .set(identity_document::status.eq(DocumentRequestStatus::Failed))
+            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
+            .set(identity_document::status.eq(IdentityDocumentStatus::Failed))
             .execute(conn.conn())?;
         // Create a new doc
         let NewIdentityDocumentArgs {
@@ -96,7 +96,7 @@ impl IdentityDocument {
             document_type,
             country_code,
             created_at: Utc::now(),
-            status: DocumentRequestStatus::Pending,
+            status: IdentityDocumentStatus::Pending,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
@@ -125,7 +125,7 @@ impl IdentityDocument {
                 document_type,
                 country_code,
                 created_at: Utc::now(),
-                status: DocumentRequestStatus::Pending,
+                status: IdentityDocumentStatus::Pending,
             };
             diesel::insert_into(identity_document::table)
                 .values(new)
@@ -208,7 +208,7 @@ impl IdentityDocument {
         let res = identity_document::table
             .inner_join(document_request::table)
             // TODO should this be only Complete?
-            .filter(not(identity_document::status.eq(DocumentRequestStatus::Pending)))
+            .filter(not(identity_document::status.eq(IdentityDocumentStatus::Pending)))
             .filter(document_request::scoped_vault_id.eq(sv_id))
             .first(conn)
             .optional()?;

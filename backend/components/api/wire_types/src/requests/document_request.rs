@@ -1,6 +1,6 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentRequestStatus, DocumentSide, IdDocKind, IdentityDocumentId,
+    idology::IdologyImageCaptureErrors, DocumentSide, IdDocKind, IdentityDocumentId, IdentityDocumentStatus,
     IncodeFailureReason, ModernIdDocKind, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
@@ -43,12 +43,12 @@ pub enum DocumentResponseStatus {
 }
 
 // This is temporary
-impl From<DocumentRequestStatus> for DocumentResponseStatus {
-    fn from(document_request_status: DocumentRequestStatus) -> Self {
+impl From<IdentityDocumentStatus> for DocumentResponseStatus {
+    fn from(document_request_status: IdentityDocumentStatus) -> Self {
         match document_request_status {
-            DocumentRequestStatus::Pending => Self::Pending,
-            DocumentRequestStatus::Failed => Self::Error,
-            DocumentRequestStatus::Complete => Self::Complete,
+            IdentityDocumentStatus::Pending => Self::Pending,
+            IdentityDocumentStatus::Failed => Self::Error,
+            IdentityDocumentStatus::Complete => Self::Complete,
         }
     }
 }

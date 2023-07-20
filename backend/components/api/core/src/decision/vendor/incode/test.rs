@@ -21,9 +21,9 @@ use idv::{
 use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo,
-    DocumentRequestStatus, DocumentSide, IdDocKind, IncodeFailureReason, IncodeVerificationSessionState,
-    PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo, DocumentSide,
+    IdDocKind, IdentityDocumentStatus, IncodeFailureReason, IncodeVerificationSessionState, PiiString,
+    RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -478,7 +478,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
 
             // Check business logic bookkeeping
             let (id_doc, _) = IdentityDocument::get(conn, &id_doc.id)?;
-            assert_eq!(id_doc.status, DocumentRequestStatus::Complete);
+            assert_eq!(id_doc.status, IdentityDocumentStatus::Complete);
 
             Ok(())
         })

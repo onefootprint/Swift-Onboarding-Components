@@ -30,8 +30,8 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{
-    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentRequestStatus, DocumentSide,
-    IdentityDocumentId, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
+    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
 };
 use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -143,7 +143,7 @@ pub async fn post(
                 country_code: request.country_code.clone(),
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
-            if id_doc.status != DocumentRequestStatus::Pending {
+            if id_doc.status != IdentityDocumentStatus::Pending {
                 return Err(OnboardingError::NoPendingDocumentRequestFound.into());
             }
             // Vault the images under latest uploads

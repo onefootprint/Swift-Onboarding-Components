@@ -21,7 +21,7 @@ use db::{
 use either::Either;
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{AuthorizeFields, DocumentRequestStatus, OnboardingRequirement, OnboardingRequirementKind};
+use newtypes::{AuthorizeFields, IdentityDocumentStatus, OnboardingRequirement, OnboardingRequirementKind};
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
@@ -261,7 +261,7 @@ fn get_requirement_inner(
                 // id_document is still Pending
                 let should_render = match id_doc {
                     None => true,
-                    Some(d) => d.status == DocumentRequestStatus::Pending,
+                    Some(d) => d.status == IdentityDocumentStatus::Pending,
                 };
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
