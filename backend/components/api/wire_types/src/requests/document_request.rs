@@ -21,8 +21,17 @@ pub struct DocumentRequest {
 }
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
+pub struct CreateIdentityDocumentUploadRequest {
+    /// base64 standard encoded image bytes
+    pub front_image: Option<PiiString>,
+    /// base64 standard encoded image bytes
+    pub back_image: Option<PiiString>,
+    /// base64 standard encoded image bytes
+    pub selfie_image: Option<PiiString>,
+}
+
+#[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentRequest {
-    // todo tell lucas + ahsan about this
     pub document_type: ModernIdDocKind,
     pub country_code: String, // TODO this should be an enum
 }

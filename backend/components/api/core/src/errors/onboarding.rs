@@ -26,8 +26,8 @@ pub enum OnboardingError {
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,
-    #[error("No pending document request found")]
-    NoPendingDocumentRequestFound,
+    #[error("Identity document is not pending upload")]
+    IdentityDocumentNotPending,
     #[error("Cannot create a document when no document request exists")]
     NoDocumentRequestFound,
     #[error("Cannot onboard a non-portable scoped user onto any ob config")]
