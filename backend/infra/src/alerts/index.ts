@@ -38,7 +38,7 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
     stackMeta.environment === StackEnvironment.Prod
       ? {
           type: 'webhook',
-          target: 'OpsGenie',
+          target: 'BetterStack',
         }
       : undefined;
 
