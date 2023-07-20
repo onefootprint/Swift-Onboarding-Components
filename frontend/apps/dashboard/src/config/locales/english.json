@@ -148,7 +148,8 @@
       "expiration": "Expiration",
       "cvc": "Security code (CVC)",
       "billing_address": {
-        "zip": "Billing address (Zip code)"
+        "zip": "Billing address (Zip code)",
+        "country": "Billing address (Country)"
       },
       "verbose": {
         "name": "Name on card",
