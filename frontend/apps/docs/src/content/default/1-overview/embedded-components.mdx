@@ -32,16 +32,16 @@ meta:
    - You will also need to specify a time-to-live (TTL) between 1 min and 1 day.
 
 ```bash
-curl https://api.onefootprint.com/users/fp_id_ItdeKyRaEJ7Zpao4i6vTbN/client_token
-      -X POST
-      -u sk_live_Zlkert4344in3Gerfere:
+curl https://api.onefootprint.com/users/fp_id_ItdeKyRaEJ7Zpao4i6vTbN/client_token \
+      -X POST \
+      -u sk_live_Zlkert4344in3Gerfere: \
       -d '{
             "fields": [
               "card.card_alias.number",
               "card.card_alias.cvc",
               "card.card_alias.expiration",
               "card.card_alias.billing_address.zip",
-              "card.card_alias.billing_address.country",
+              "card.card_alias.billing_address.country"
             ],
             "scopes": [
               "vault"
