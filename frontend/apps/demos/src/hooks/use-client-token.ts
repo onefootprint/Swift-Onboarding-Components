@@ -25,6 +25,8 @@ const clientToken = async (payload: ClientTokenRequest) => {
         `card.${cardAlias}.cvc`,
         `card.${cardAlias}.expiration`,
         `card.${cardAlias}.name`,
+        `card.${cardAlias}.billing_address.zip`,
+        `card.${cardAlias}.billing_address.country`,
       ],
       scopes: ['vault'],
       ttl: 1800,

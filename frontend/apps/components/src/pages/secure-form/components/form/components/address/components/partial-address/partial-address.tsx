@@ -6,13 +6,13 @@ import { useFormContext } from 'react-hook-form';
 import CountryField from '../country-field';
 import ZipField from '../zip-field';
 
-export type AddressData = {
+export type PartialAddressData = {
   country: CountrySelectOption;
   zip: string;
 };
 
 const PartialAddress = () => {
-  const methods = useFormContext<AddressData>();
+  const methods = useFormContext<PartialAddressData>();
   const { watch, resetField } = methods;
   const country = watch('country') ?? DEFAULT_COUNTRY;
 

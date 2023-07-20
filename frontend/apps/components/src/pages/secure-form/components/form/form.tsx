@@ -10,7 +10,11 @@ import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import Address, { AddressData, PartialAddress } from './components/address';
+import Address, {
+  AddressData,
+  PartialAddress,
+  PartialAddressData,
+} from './components/address';
 import Card, { CardData } from './components/card';
 import FormDialog from './components/form-dialog';
 import Name, { NameData } from './components/name';
@@ -19,12 +23,14 @@ import Title from './components/title';
 export type FormData =
   | CardData
   | (CardData & NameData)
-  | (CardData & NameData & AddressData);
+  | (CardData & NameData & AddressData)
+  | (CardData & PartialAddressData);
 
 export type FormProps = {
   title?: string;
   type?: SecureFormType;
   variant?: SecureFormVariant;
+  isLoading?: boolean;
   onSave?: (data: FormData) => void;
   onCancel?: () => void;
   onClose?: () => void;
@@ -36,6 +42,7 @@ const Form = ({
   title,
   type = SecureFormType.cardAndName,
   variant = 'modal',
+  isLoading,
   onSave,
   onCancel,
   onClose,
@@ -101,12 +108,14 @@ const Form = ({
         form: FORM_ID,
         label: t('buttons.save'),
         type: 'submit',
+        loading: isLoading,
       }}
       secondaryButton={
         onCancel && {
           label: t('buttons.cancel'),
           type: 'reset',
           onClick: handleCancel,
+          disabled: isLoading,
         }
       }
       onClose={handleClose}

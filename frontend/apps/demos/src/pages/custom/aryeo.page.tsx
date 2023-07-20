@@ -76,8 +76,10 @@ const Aryeo = () => {
 
   return (
     <ComponentsInstructions
-      tenantName="Aryeo"
       appearance={appearance}
+      cardAlias="primary"
+      title="Add a New Card"
+      tenantName="Aryeo"
       secretKey={secretKey}
       userId={userId}
       customCSS={customCss}

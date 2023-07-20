@@ -64,6 +64,8 @@ export enum CardDIField {
   expiration = 'expiration',
   expirationMonth = 'expiration_month',
   expirationYear = 'expiration_year',
+  zip = 'billing_address.zip',
+  country = 'billing_address.country',
 }
 
 export type CardDI<T extends string = string> =

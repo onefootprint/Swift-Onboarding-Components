@@ -19,11 +19,12 @@ import useClientToken from 'src/hooks/use-client-token';
 import { useEffectOnce } from 'usehooks-ts';
 
 type ComponentsInstructionsProps = {
-  appearance: FootprintAppearance;
   tenantName: string;
   secretKey: string;
   userId: string;
-  cardAlias?: string;
+  appearance: FootprintAppearance;
+  cardAlias: string;
+  title?: string;
   customCSS?: string;
   framework?: 'react' | 'vue';
 };
@@ -141,10 +142,11 @@ export const appearance: FootprintAppearance = ${JSON.stringify(
 
 const ComponentsInstructions = ({
   appearance,
+  cardAlias = 'primary',
+  title,
   tenantName,
   secretKey,
   userId,
-  cardAlias = 'primary',
   customCSS,
   framework = 'react',
 }: ComponentsInstructionsProps) => {
@@ -272,6 +274,7 @@ const ComponentsInstructions = ({
             cardAlias={cardAlias}
             type={SecureFormType.cardAndZip}
             variant="modal"
+            title={title}
             onSave={dismissModal}
             onClose={dismissModal}
             onCancel={dismissModal}

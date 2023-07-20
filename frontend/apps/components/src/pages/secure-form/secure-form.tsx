@@ -38,6 +38,12 @@ const SecureForm = () => {
     if ('name' in formData) {
       values[CardDIField.name] = formData.name;
     }
+    if ('zip' in formData) {
+      values[CardDIField.zip] = formData.zip;
+    }
+    if ('country' in formData) {
+      values[CardDIField.country] = formData.country.value;
+    }
     const valueMap = Object.entries(values).map(([key, value]) => [
       `card.${cardAlias}.${key}`,
       value,
@@ -77,6 +83,7 @@ const SecureForm = () => {
       title={title}
       type={type}
       variant={variant}
+      isLoading={usersVaultMutation.isLoading}
       onSave={handleSave}
       onCancel={handleCancel}
       onClose={handleClose}
