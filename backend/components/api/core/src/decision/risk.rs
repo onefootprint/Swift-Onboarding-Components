@@ -10,7 +10,7 @@ use db::{
     TxnPgConn,
 };
 
-use super::onboarding::OnboardingRulesDecisionOutput;
+use super::onboarding::Decision;
 use crate::{
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::VaultWrapper,
@@ -26,7 +26,7 @@ pub fn save_final_decision(
     conn: &mut TxnPgConn,
     ob_id: OnboardingId,
     verification_result_ids: Vec<VerificationResultId>,
-    decision: &OnboardingRulesDecisionOutput,
+    decision: &Decision,
     assert_is_first_decision_for_onboarding: bool,
     workflow_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
@@ -44,7 +44,7 @@ pub fn save_final_decision(
     }
 
     // If we should commit, portablize all data for the onboarding
-    let seqno = if decision.decision.should_commit {
+    let seqno = if decision.should_commit {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
         if uvw.vault.is_portable {
             let seqno = uvw.portablize_identity_data(conn)?;
@@ -61,7 +61,7 @@ pub fn save_final_decision(
         vault_id: scoped_user.vault_id,
         onboarding: &ob,
         logic_git_hash: crate::GIT_HASH.to_string(),
-        status: decision.decision.decision_status,
+        status: decision.decision_status,
         result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,
@@ -71,7 +71,7 @@ pub fn save_final_decision(
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
     // Create ManualReview row if requested and an active one does not already exist
-    if decision.decision.create_manual_review {
+    if decision.create_manual_review {
         let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
         if existing_review.is_none() {
             ManualReview::create(conn, ob_id, review_reasons)?;
@@ -84,14 +84,10 @@ pub fn save_final_decision(
         Onboarding::update(
             ob,
             conn,
-            OnboardingUpdate::set_decision_and_decision_made_at(decision.decision.decision_status),
+            OnboardingUpdate::set_decision_and_decision_made_at(decision.decision_status),
         )?;
     } else {
-        Onboarding::update(
-            ob,
-            conn,
-            OnboardingUpdate::set_decision(decision.decision.decision_status),
-        )?;
+        Onboarding::update(ob, conn, OnboardingUpdate::set_decision(decision.decision_status))?;
     }
 
     Ok(obd)

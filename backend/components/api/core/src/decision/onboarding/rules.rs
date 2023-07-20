@@ -21,7 +21,7 @@ use crate::decision::{
 };
 
 use super::{
-    Decision, DecisionReasonCodes, FeatureSet, OnboardingRulesDecisionOutput,
+    Decision, DecisionReasonCodes, DecisionResult, FeatureSet, OnboardingRulesDecisionOutput,
     WaterfallOnboardingRulesDecisionOutput,
 };
 
@@ -114,10 +114,12 @@ impl KycRuleGroup {
             .map(OnboardingRulesDecisionOutput::from)
             .collect();
 
-        let output = WaterfallOnboardingRulesDecisionOutput {
-            output: OnboardingRulesDecisionOutput::from(result),
-            additional_evaluated: additional_results,
-        };
+        let output = WaterfallOnboardingRulesDecisionOutput::new(
+            DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(result)),
+            DecisionResult::NotRequired,
+            DecisionResult::NotRequired,
+            additional_results,
+        );
 
         Ok(output)
     }
@@ -161,29 +163,18 @@ impl KycWithDocumentRuleGroup {
             .map_err(crate::decision::Error::from)?
             .clone();
 
-        // Then we evaluate w/ doc, but now we look for which one failed
-        let result = vec![kyc_result, incode_doc_rule_result.clone()]
-            .iter()
-            .max_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
-            .ok_or(RuleError::AssertionError("could not compute doc result".into()))
-            .map_err(crate::decision::Error::from)?
-            .clone();
-
-        let mut additional_results: Vec<OnboardingRulesDecisionOutput> = kyc_rule_results
+        let additional_results: Vec<OnboardingRulesDecisionOutput> = kyc_rule_results
             .into_iter()
-            .filter(|ober| ober != &result)
+            .filter(|ober| ober != &kyc_result)
             .map(OnboardingRulesDecisionOutput::from)
             .collect();
 
-        // Add in doc to additional log if it's not causing the failure
-        if !result.vendor_api.is_incode_doc_flow_api() {
-            additional_results.push(OnboardingRulesDecisionOutput::from(incode_doc_rule_result));
-        }
-
-        let output = WaterfallOnboardingRulesDecisionOutput {
-            output: OnboardingRulesDecisionOutput::from(result),
-            additional_evaluated: additional_results,
-        };
+        let output = WaterfallOnboardingRulesDecisionOutput::new(
+            DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result)),
+            DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(incode_doc_rule_result)),
+            DecisionResult::NotRequired,
+            additional_results,
+        );
 
         Ok(output)
     }
@@ -229,10 +220,12 @@ pub fn calculate_kyc_rules_output_with_waterfall(
     // TODO: derive this better
     let reason_codes = feature_vector.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
 
-    let output = WaterfallOnboardingRulesDecisionOutput {
-        output: OnboardingRulesDecisionOutput::from(result),
-        additional_evaluated: additional_results,
-    };
+    let output = WaterfallOnboardingRulesDecisionOutput::new(
+        DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(result)),
+        DecisionResult::NotRequired,
+        DecisionResult::NotRequired,
+        additional_results,
+    );
 
     Ok((output, reason_codes))
 }
@@ -264,15 +257,6 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
             },
             rules_triggered: result.rules_triggered.to_owned(),
             rules_not_triggered: result.rules_not_triggered.to_owned(),
-        }
-    }
-}
-
-impl From<OnboardingRulesDecisionOutput> for WaterfallOnboardingRulesDecisionOutput {
-    fn from(value: OnboardingRulesDecisionOutput) -> Self {
-        Self {
-            output: value,
-            additional_evaluated: vec![],
         }
     }
 }

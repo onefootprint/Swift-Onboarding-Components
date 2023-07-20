@@ -57,5 +57,5 @@ fn test_evaluate_onboarding_rules(
 
     // function under test
     let (decision, _) = feature_vector.evaluate().unwrap();
-    decision.output
+    decision.final_kyc_decision().unwrap()
 }

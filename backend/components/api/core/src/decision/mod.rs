@@ -31,6 +31,8 @@ pub enum Error {
     FeatureVectorConversionError(VendorAPI),
     #[error("Fixture vres not found")]
     FixtureVresNotFound,
+    #[error("Decision not found")]
+    DecisionNotFound,
 }
 
 #[derive(thiserror::Error, Debug)]

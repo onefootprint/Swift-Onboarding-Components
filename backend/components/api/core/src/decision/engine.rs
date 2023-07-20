@@ -313,7 +313,7 @@ pub fn calculate_decision(
     let fv = features::kyc_features::create_features(vendor_results);
     let (decision, reason_codes) = calculate_kyc_rules_output_with_waterfall(&fv, rule_group)?;
 
-    Ok((decision.output, reason_codes, fv))
+    Ok((decision.final_kyc_decision()?, reason_codes, fv))
 }
 
 /// Create and save an onboarding decision
@@ -328,12 +328,14 @@ pub fn save_onboarding_decision(
     workflow_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
+    let (final_decision, additional_evaluated) =
+        rules_output.final_kyc_decision_and_additional_kyc_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
         conn,
         ob.id.clone(),
         verification_result_ids,
-        &rules_output.output,
+        &final_decision.decision,
         assert_is_first_decision_for_onboarding,
         workflow_id,
         review_reasons,
@@ -352,12 +354,12 @@ pub fn save_onboarding_decision(
             &ob.id,
             &ob.ob_configuration_id,
             &ob.scoped_vault_id,
-            &rules_output.output,
+            &final_decision,
             rule::CANONICAL_ONBOARDING_RULE_LINE,
         );
 
         // Log any additional decisions
-        rules_output.additional_evaluated.into_iter().for_each(|output| {
+        additional_evaluated.into_iter().for_each(|output| {
             log_rule_evaluation(
                 &ob.id,
                 &ob.ob_configuration_id,

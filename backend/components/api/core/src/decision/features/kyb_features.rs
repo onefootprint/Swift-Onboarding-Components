@@ -5,8 +5,8 @@ use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResul
 use crate::{
     decision::{
         onboarding::{
-            Decision, DecisionReasonCodes, FeatureSet, FeatureVector, OnboardingRulesDecisionOutput,
-            WaterfallOnboardingRulesDecisionOutput,
+            Decision, DecisionReasonCodes, DecisionResult, FeatureSet, FeatureVector,
+            OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
         rule::{
             self,
@@ -96,19 +96,23 @@ impl FeatureVector for KybFeatureVector {
         };
         let create_manual_review = decision_status == DecisionStatus::Fail;
 
-        let output = WaterfallOnboardingRulesDecisionOutput {
-            output: OnboardingRulesDecisionOutput {
-                decision: Decision {
-                    decision_status,
-                    should_commit: false, // never commit business data for now
-                    create_manual_review,
-                    vendor_api: eval_result.vendor_api,
-                },
-                rules_triggered: eval_result.rules_triggered,
-                rules_not_triggered: eval_result.rules_not_triggered,
+        let kyb_decision = OnboardingRulesDecisionOutput {
+            decision: Decision {
+                decision_status,
+                should_commit: false, // never commit business data for now
+                create_manual_review,
+                vendor_api: eval_result.vendor_api,
             },
-            additional_evaluated: vec![],
+            rules_triggered: eval_result.rules_triggered,
+            rules_not_triggered: eval_result.rules_not_triggered,
         };
+
+        let output = WaterfallOnboardingRulesDecisionOutput::new(
+            DecisionResult::NotRequired,
+            DecisionResult::NotRequired,
+            DecisionResult::Evaluated(kyb_decision),
+            vec![],
+        );
 
         let reason_codes = self.reason_codes();
         Ok((output, reason_codes))

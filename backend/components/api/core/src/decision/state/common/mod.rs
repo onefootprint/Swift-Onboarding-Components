@@ -21,7 +21,9 @@ use crate::{
     decision::{
         self, engine,
         features::risk_signals::RiskSignalsForDecision,
-        onboarding::{Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput},
+        onboarding::{
+            Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+        },
         utils::FixtureDecision,
         vendor::{
             tenant_vendor_control::TenantVendorControl,
@@ -203,9 +205,15 @@ pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<Ver
 pub fn kyc_decision_from_fixture(
     fixture_decision: FixtureDecision,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision).into();
+    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
+    let output = WaterfallOnboardingRulesDecisionOutput::new(
+        DecisionResult::Evaluated(rules_output),
+        DecisionResult::NotRequired,
+        DecisionResult::NotRequired,
+        vec![],
+    );
 
-    Ok(rules_output)
+    Ok(output)
 }
 
 #[tracing::instrument(skip_all)]
@@ -222,20 +230,24 @@ pub fn alpaca_kyc_decision_from_fixture(
         // #stepup
         (newtypes::DecisionStatus::StepUp, _) => DecisionStatus::StepUp,
     };
-    let rules_output = WaterfallOnboardingRulesDecisionOutput {
-        output: OnboardingRulesDecisionOutput {
-            decision: Decision {
-                decision_status,
-                should_commit: false,
-                create_manual_review: false,
-                // not used
-                vendor_api: VendorAPI::IdologyExpectID,
-            },
-            rules_triggered: vec![],
-            rules_not_triggered: vec![],
+
+    let final_decision = OnboardingRulesDecisionOutput {
+        decision: Decision {
+            decision_status,
+            should_commit: false,
+            create_manual_review: false,
+            // not used
+            vendor_api: VendorAPI::IdologyExpectID,
         },
-        additional_evaluated: vec![],
+        rules_triggered: vec![],
+        rules_not_triggered: vec![],
     };
+    let rules_output = WaterfallOnboardingRulesDecisionOutput::new(
+        DecisionResult::Evaluated(final_decision),
+        DecisionResult::NotRequired,
+        DecisionResult::NotRequired,
+        vec![],
+    );
 
     Ok(rules_output)
 }

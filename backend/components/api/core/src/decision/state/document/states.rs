@@ -8,7 +8,9 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 use webhooks::WebhookClient;
 
 use super::{DocumentState, MakeDecision};
-use crate::decision::onboarding::{Decision, OnboardingRulesDecisionOutput};
+use crate::decision::onboarding::{
+    Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+};
 use crate::decision::{
     onboarding::rules::{KycRuleGroup, RuleGroup},
     rule::rule_sets,
@@ -174,7 +176,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             common::kyc_decision_from_fixture(fixture_decision)?
         } else {
             // TODO: fixed in PR up stack
-            OnboardingRulesDecisionOutput {
+            let decision = OnboardingRulesDecisionOutput {
                 decision: Decision {
                     decision_status: DecisionStatus::Pass,
                     should_commit: false,
@@ -184,8 +186,14 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
                 rules_triggered: vec![],
                 rules_not_triggered: vec![],
-            }
-            .into()
+            };
+
+            WaterfallOnboardingRulesDecisionOutput::new(
+                DecisionResult::NotRequired,
+                DecisionResult::Evaluated(decision),
+                DecisionResult::NotRequired,
+                vec![],
+            )
         };
 
         // TODO: doc wf shouldn't really be calling this

@@ -247,7 +247,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         RiskSignal::unhide_risk_signals_for_risk_signal_group(
             conn,
             &rsg.id,
-            vec![decision.output.decision.vendor_api],
+            decision.vendors_for_unhiding_risk_signals(),
         )?;
 
         common::save_kyc_decision(

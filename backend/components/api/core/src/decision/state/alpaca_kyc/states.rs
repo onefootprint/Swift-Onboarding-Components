@@ -32,7 +32,10 @@ use crate::{
             risk_signal_group_struct::{self},
             save_risk_signals, RiskSignalGroupStruct,
         },
-        onboarding::{Decision, DecisionReasonCodes, OnboardingRulesDecisionOutput},
+        onboarding::{
+            Decision, DecisionReasonCodes, DecisionResult, OnboardingRulesDecisionOutput,
+            WaterfallOnboardingRulesDecisionOutput,
+        },
         review::save_review_decision,
         state::{
             actions::{MakeDecision, WorkflowActions},
@@ -269,10 +272,10 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         RiskSignal::unhide_risk_signals_for_risk_signal_group(
             conn,
             &rsg.id,
-            vec![decision.output.decision.vendor_api],
+            decision.vendors_for_unhiding_risk_signals(),
         )?;
 
-        match decision.decision.decision_status {
+        match decision.final_kyc_decision()?.decision.decision_status {
             DecisionStatus::Fail => {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
@@ -493,7 +496,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
             common::get_decision(&self, conn, risk_signals, &self.sv_id, &self.wf_id)?
-        };
+        }
+        .final_kyc_decision()?;
 
         // If we collected a doc, we go to review and fail OBD even if no hits
         let id = DocRequestIdentifier::new(&self.sv_id, Some(&self.wf_id));
@@ -526,9 +530,15 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             decision: final_decision.clone(),
             // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
             rules_triggered: kyc_decision.rules_triggered.clone(),
-            rules_not_triggered: kyc_decision.rules_not_triggered.clone(),
-        }
-        .into();
+            rules_not_triggered: kyc_decision.rules_not_triggered,
+        };
+
+        let output = WaterfallOnboardingRulesDecisionOutput::new(
+            DecisionResult::Evaluated(decision),
+            DecisionResult::NotRequired,
+            DecisionResult::NotRequired,
+            vec![],
+        );
 
         common::save_kyc_decision(
             conn,
@@ -540,7 +550,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .iter()
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
-            decision,
+            output,
             self.is_redo,
             is_sandbox,
             review_reasons,
