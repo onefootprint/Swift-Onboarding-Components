@@ -1,4 +1,5 @@
-import { ImageTypes } from '../../constants/image-types';
+import { IdDocImageTypes } from '@onefootprint/types';
+
 import { MachineContext, ProccessingSucceededEvent } from './types';
 
 type MachineTarget = {
@@ -11,7 +12,7 @@ const assignCurrSide = (
   context: MachineContext,
   event: ProccessingSucceededEvent,
 ) => {
-  context.currSide = event.payload.nextSideToCollect as ImageTypes;
+  context.currSide = event.payload.nextSideToCollect as IdDocImageTypes;
   context.errors = [];
 };
 

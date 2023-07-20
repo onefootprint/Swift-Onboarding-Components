@@ -4,19 +4,14 @@ import {
   Icon,
   IcoSelfie40,
 } from '@onefootprint/icons';
-
-export enum ImageTypes {
-  front = 'front',
-  back = 'back',
-  selfie = 'selfie',
-}
+import { IdDocImageTypes } from '@onefootprint/types';
 
 export type ImageIconsType = {
-  [key in ImageTypes]: Icon;
+  [key in IdDocImageTypes]: Icon;
 };
 
 export const imageIcons: ImageIconsType = {
-  [ImageTypes.front]: IcoIdFront40,
-  [ImageTypes.back]: IcoIdBack40,
-  [ImageTypes.selfie]: IcoSelfie40,
+  [IdDocImageTypes.front]: IcoIdFront40,
+  [IdDocImageTypes.back]: IcoIdBack40,
+  [IdDocImageTypes.selfie]: IcoSelfie40,
 };

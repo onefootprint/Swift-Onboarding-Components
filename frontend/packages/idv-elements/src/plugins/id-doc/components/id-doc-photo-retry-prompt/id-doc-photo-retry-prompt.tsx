@@ -1,8 +1,11 @@
-import { IdDocImageError, IdDocType } from '@onefootprint/types';
+import {
+  IdDocImageError,
+  IdDocImageTypes,
+  IdDocType,
+} from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
-import { ImageTypes } from '../../constants/image-types';
 import Error from '../error';
 import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
@@ -10,7 +13,7 @@ import IdDocPhotoButtons from '../id-doc-photo-buttons';
 type IdDocPhotoRetryPromptProps = {
   docType: IdDocType;
   countryName: string;
-  imageType: ImageTypes.front | ImageTypes.back;
+  imageType: IdDocImageTypes.front | IdDocImageTypes.back;
   errors: IdDocImageError[];
   onComplete: (image: string) => void;
 };

@@ -1,3 +1,4 @@
+import { IdDocImageTypes } from '@onefootprint/types';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { OpenCvProvider } from 'opencv-react-ts';
 import React from 'react';
@@ -7,7 +8,6 @@ import { MachineProvider } from './components/machine-provider';
 import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
-import { ImageTypes } from './constants/image-types';
 import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import { IdDocProps } from './types';
@@ -25,7 +25,7 @@ const App = ({ context, onDone }: IdDocProps) => {
   const initialContext: MachineContext = {
     authToken,
     device,
-    currSide: ImageTypes.front,
+    currSide: IdDocImageTypes.front,
     requirement: customData.requirement,
     idDoc: {
       country: customData.requirement.onlyUsSupported ? 'US' : undefined,

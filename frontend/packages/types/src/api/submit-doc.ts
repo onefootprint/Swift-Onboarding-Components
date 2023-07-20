@@ -1,4 +1,9 @@
-import { CountryCode, IdDocImageError, IdDocType } from '../data';
+import {
+  CountryCode,
+  IdDocImageError,
+  IdDocImageTypes,
+  IdDocType,
+} from '../data';
 
 export type SubmitDocRequest = {
   authToken: string;
@@ -11,6 +16,6 @@ export type SubmitDocRequest = {
 
 export type SubmitDocResponse = {
   errors: IdDocImageError[];
-  nextSideToCollect: 'front' | 'back' | 'selfie';
+  nextSideToCollect: IdDocImageTypes;
   isRetryLimitExceeded: boolean;
 };

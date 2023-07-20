@@ -1,16 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { IdDocType } from '@onefootprint/types';
+import { IdDocImageTypes, IdDocType } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
-import { imageIcons, ImageTypes } from '../../constants/image-types';
+import { imageIcons } from '../../constants/image-types';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
-  imageType: ImageTypes;
+  imageType: IdDocImageTypes;
   docType: IdDocType;
   onComplete?: () => void;
 };
@@ -26,7 +26,7 @@ const Success = ({ imageType, onComplete, docType }: SuccessProps) => {
   }, [onComplete]);
 
   const side =
-    imageType === (docType === IdDocType.passport && ImageTypes.front)
+    imageType === (docType === IdDocType.passport && IdDocImageTypes.front)
       ? 'one-side'
       : imageType;
 

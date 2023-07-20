@@ -1,12 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { IdDocImageTypes } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
 import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';
 import { useIdDocMachine } from '../../components/machine-provider';
-import { ImageTypes } from '../../constants/image-types';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const SelfieRetryPrompt = () => {
@@ -33,7 +33,7 @@ const SelfieRetryPrompt = () => {
         <Error
           docType={type}
           countryName={countryName ?? country}
-          imageType={ImageTypes.selfie}
+          imageType={IdDocImageTypes.selfie}
           errors={state.context.errors || []}
         />
         <Button fullWidth onClick={handleClick}>

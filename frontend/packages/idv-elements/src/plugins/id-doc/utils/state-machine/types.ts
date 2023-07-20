@@ -1,19 +1,19 @@
 import {
   CountryCode,
   IdDocImageError,
+  IdDocImageTypes,
   IdDocRequirement,
   IdDocType,
 } from '@onefootprint/types';
 
 import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import { ImageTypes } from '../../constants/image-types';
 
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
   image?: string;
-  currSide?: ImageTypes;
+  currSide?: IdDocImageTypes;
   idDoc: {
     type?: IdDocType;
     country?: CountryCode;

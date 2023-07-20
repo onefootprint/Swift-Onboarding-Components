@@ -1,11 +1,11 @@
 import {
   IdDocImageError,
+  IdDocImageTypes,
   IdDocRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 
-import { ImageTypes } from '../../constants/image-types';
 import { MachineContext } from './types';
 
 export const requirement: IdDocRequirement = {
@@ -26,7 +26,7 @@ export const argsRegular: MachineContext = {
     hasSupportForWebauthn: true,
     type: 'mobile',
   },
-  currSide: ImageTypes.front,
+  currSide: IdDocImageTypes.front,
   requirement: { ...requirement },
   idDoc: {},
 };

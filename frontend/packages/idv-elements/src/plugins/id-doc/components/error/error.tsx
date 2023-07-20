@@ -1,17 +1,21 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocImageError, IdDocType } from '@onefootprint/types';
+import {
+  IdDocImageError,
+  IdDocImageTypes,
+  IdDocType,
+} from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { imageIcons, ImageTypes } from '../../constants/image-types';
+import { imageIcons } from '../../constants/image-types';
 import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
-  imageType: ImageTypes;
+  imageType: IdDocImageTypes;
   errors: IdDocImageError[];
   docType: IdDocType;
   countryName: string;
@@ -21,7 +25,7 @@ const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
   const side =
-    docType === IdDocType.passport && ImageTypes.front
+    docType === IdDocType.passport && IdDocImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 

@@ -6,21 +6,21 @@ import {
   IcoSquareFrame24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CountryCode3, IdDocType } from '@onefootprint/types';
+import { CountryCode3, IdDocImageTypes, IdDocType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { imageIcons, ImageTypes } from '../../constants/image-types';
+import { imageIcons } from '../../constants/image-types';
 import FadeInContainer from '../fade-in-container';
 import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
   type: IdDocType;
-  imageType: ImageTypes;
+  imageType: IdDocImageTypes;
   country: CountryCode3;
 };
 
@@ -34,7 +34,7 @@ const IdDocPhotoPrompt = ({
   const [, send] = useIdDocMachine();
   const ImageIcon = imageIcons[imageType];
   const side =
-    type === IdDocType.passport && ImageTypes.front
+    type === IdDocType.passport && IdDocImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 

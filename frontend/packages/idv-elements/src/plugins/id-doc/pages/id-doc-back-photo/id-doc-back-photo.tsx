@@ -1,8 +1,8 @@
+import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 
 import { NavigationHeader } from '../../../../components';
 import IdDocPhotoPrompt from '../../components/id-doc-photo-prompt';
-import { ImageTypes } from '../../constants/image-types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
@@ -23,7 +23,7 @@ const IdDocBackPhoto = () => {
       <NavigationHeader />
       <IdDocPhotoPrompt
         showGuidelines
-        imageType={ImageTypes.back}
+        imageType={IdDocImageTypes.back}
         type={type}
         country={countryCode3}
       />

@@ -1,8 +1,8 @@
+import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 
 import IdDocPhotoRetryPrompt from '../../components/id-doc-photo-retry-prompt';
 import { useIdDocMachine } from '../../components/machine-provider';
-import { ImageTypes } from '../../constants/image-types';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const IdDocBackPhotoRetry = () => {
@@ -30,7 +30,7 @@ const IdDocBackPhotoRetry = () => {
     <IdDocPhotoRetryPrompt
       docType={type}
       countryName={countryName ?? country}
-      imageType={ImageTypes.back}
+      imageType={IdDocImageTypes.back}
       onComplete={handleComplete}
       errors={state.context.errors || []}
     />

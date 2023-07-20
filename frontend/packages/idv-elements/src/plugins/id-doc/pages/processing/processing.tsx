@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { SubmitDocResponse } from '@onefootprint/types';
+import { IdDocImageTypes, SubmitDocResponse } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -8,15 +8,14 @@ import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';
 import NextSide from '../../components/next-side';
 import Success from '../../components/success';
-import { ImageTypes } from '../../constants/image-types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import RetryLimitExceeded from './components/retry-limit-exceeded';
 import useSubmitDoc from './hooks/use-submit-doc';
 
 const imageRequestFields = {
-  [ImageTypes.front]: 'frontImage',
-  [ImageTypes.back]: 'backImage',
-  [ImageTypes.selfie]: 'selfieImage',
+  [IdDocImageTypes.front]: 'frontImage',
+  [IdDocImageTypes.back]: 'backImage',
+  [IdDocImageTypes.selfie]: 'selfieImage',
 };
 
 const Processing = () => {
@@ -24,7 +23,7 @@ const Processing = () => {
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
-  const [nextSide, setNextSide] = useState<ImageTypes | undefined>();
+  const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
 
@@ -54,7 +53,7 @@ const Processing = () => {
       setMode('success');
     } else {
       setMode('success');
-      setNextSide(nextSideToCollect as ImageTypes);
+      setNextSide(nextSideToCollect as IdDocImageTypes);
     }
   };
 

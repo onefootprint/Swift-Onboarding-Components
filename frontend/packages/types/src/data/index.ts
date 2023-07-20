@@ -24,6 +24,7 @@ export * from './date-range';
 export { default as DecisionStatus } from './decision-status';
 export * from './decrypted-document';
 export * from './di';
+export * from './document-type';
 export * from './entity';
 export * from './entity-cards';
 export * from './id-di-data';
