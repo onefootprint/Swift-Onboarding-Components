@@ -740,6 +740,7 @@
           },
           "id-doc-uploaded-event": {
             "title": {
+              "complete": "Collected ",
               "success": "Collected ",
               "failed": "Unable to collect "
             }
