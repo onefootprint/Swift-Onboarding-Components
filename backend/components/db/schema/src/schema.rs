@@ -634,6 +634,7 @@ table! {
         created_at -> Timestamptz,
         role_id -> Text,
         last_used_at -> Nullable<Timestamptz>,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

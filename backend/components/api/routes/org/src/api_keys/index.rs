@@ -111,7 +111,7 @@ pub struct UpdateApiKeyRequest {
 }
 
 #[api_v2_operation(
-    description = "Generates a new secret tenant api key.",
+    description = "Updates an existing secret tenant api key.",
     tags(Organization, Private)
 )]
 #[patch("/org/api_keys/{id}")]
@@ -138,7 +138,9 @@ pub async fn patch(
     } = request.into_inner();
     let (api_key, role) = state
         .db_pool
-        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id))
+        .db_transaction(move |conn| {
+            TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id, None)
+        })
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((

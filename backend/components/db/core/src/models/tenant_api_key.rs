@@ -23,11 +23,13 @@ pub struct TenantApiKey {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: IsLive,
+    /// Used to temporarily disable a tenant API key
     pub status: ApiKeyStatus,
     pub name: String,
     pub created_at: DateTime<Utc>,
     pub role_id: TenantRoleId,
     pub last_used_at: Option<DateTime<Utc>>,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -49,6 +51,7 @@ struct TenantApiKeyUpdate {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
     role_id: Option<TenantRoleId>,
+    deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone)]
@@ -82,6 +85,7 @@ impl TenantApiKey {
         let mut query = tenant_api_key::table
             .filter(tenant_api_key::tenant_id.eq(&filters.tenant_id))
             .filter(tenant_api_key::is_live.eq(filters.is_live))
+            .filter(tenant_api_key::deactivated_at.is_null())
             .into_boxed();
 
         if let Some(role_ids) = filters.role_ids.as_ref() {
@@ -127,7 +131,10 @@ impl TenantApiKey {
         conn: &mut PgConn,
         id: T,
     ) -> DbResult<(TenantApiKey, TenantRole)> {
-        let mut query = tenant_api_key::table.inner_join(tenant_role::table).into_boxed();
+        let mut query = tenant_api_key::table
+            .inner_join(tenant_role::table)
+            .filter(tenant_api_key::deactivated_at.is_null())
+            .into_boxed();
         match id.into() {
             TenantApiKeyIdentifier::Id(id, tenant_id, is_live) => {
                 query = query
@@ -156,6 +163,7 @@ impl TenantApiKey {
             .inner_join(tenant::table)
             .inner_join(tenant_role::table)
             .filter(tenant_api_key::sh_secret_api_key.eq(sh_api_key))
+            .filter(tenant_api_key::deactivated_at.is_null())
             .first(conn.conn())?;
         if api_key.status != ApiKeyStatus::Enabled {
             return Err(DbError::ApiKeyDisabled);
@@ -250,6 +258,7 @@ impl TenantApiKey {
         Ok(tenant_api_key)
     }
 
+    #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("TenantApiKey::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
@@ -259,11 +268,13 @@ impl TenantApiKey {
         name: Option<String>,
         status: Option<ApiKeyStatus>,
         role_id: Option<TenantRoleId>,
+        deactivated_at: Option<DateTime<Utc>>,
     ) -> DbResult<(Self, TenantRole)> {
         let update = TenantApiKeyUpdate {
             name,
             status,
             role_id,
+            deactivated_at,
         };
         let key = Self::get(conn, (&id, &tenant_id, is_live))?.0;
         let role_id_to_lock = update.role_id.as_ref().unwrap_or(&key.role_id);

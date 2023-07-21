@@ -1,0 +1,1 @@
+ALTER TABLE tenant_api_key ADD COLUMN deactivated_at timestamptz;
