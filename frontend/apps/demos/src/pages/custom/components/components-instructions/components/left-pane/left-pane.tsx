@@ -146,12 +146,12 @@ const LeftPane = ({
         <Typography variant="body-2" as="span">
           When the user&apos;s card data has been successfully saved to
           Footprint, the onSave callback will be called. Later, you can decrypt
-          the data from Footprint, more info can be found
+          the data from Footprint, more info can be found{' '}
           <Link
             href="https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault"
             target="_blank"
           >
-            Footprint developer dashboard
+            here
           </Link>
         </Typography>
       </Content>
