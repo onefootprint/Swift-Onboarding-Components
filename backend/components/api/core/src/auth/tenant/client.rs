@@ -110,6 +110,7 @@ impl TenantAuth for SessionContext<ClientTenantData> {
 pub enum ClientTenantScope {
     Vault(Vec<DataIdentifier>),
     Decrypt(Vec<DataIdentifier>),
+    DecryptDownload(DataIdentifier),
 }
 
 impl IsGuardMet<ClientTenantScope> for CanDecrypt {

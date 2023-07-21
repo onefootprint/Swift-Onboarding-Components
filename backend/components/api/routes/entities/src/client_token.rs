@@ -47,22 +47,57 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let ClientTokenRequest { fields, ttl, scopes, decrypt_reason } = request.into_inner();
+    let ClientTokenRequest {
+        fields,
+        ttl,
+        scopes,
+        decrypt_reason,
+    } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
 
     if scopes.is_empty() {
         return Err(TenantError::MustProvideScope.into());
     }
     let fields = fields.into_iter().collect_vec();
-    let scopes = scopes
+    if fields.is_empty() {
+        return Err(TenantError::MustProvideFields.into());
+    }
+    let scopes: Vec<_> = scopes
         .into_iter()
-        .map(|s| match s {
-            ClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
-            ClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
+        .map(|s| -> ApiResult<_> {
+            let result = match s {
+                ClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
+                ClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
+                ClientTokenScopeKind::DecryptDownload => {
+                    // DecryptDownload scopes have a few other requirements
+                    if fields.len() > 1 {
+                        return Err(TenantError::OneDecryptDownloadField.into());
+                    }
+                    if decrypt_reason.is_none() {
+                        return Err(TenantError::NoDecryptionReasonProvided.into());
+                    }
+                    match ttl {
+                        Some(ttl) if ttl > 60 * 5 => {
+                            return Err(TenantError::InvalidDecryptDownloadExpiry.into());
+                        }
+                        _ => (),
+                    }
+                    let field = fields.first().ok_or(TenantError::OneDecryptDownloadField)?;
+                    ClientTenantScope::DecryptDownload(field.clone())
+                }
+            };
+            Ok(result)
         })
-        .collect();
+        .collect::<ApiResult<_>>()?;
 
-    let ttl = ttl.unwrap_or(30 * 60);
+    let has_decrypt_download_scope = scopes
+        .iter()
+        .any(|s| matches!(s, ClientTenantScope::DecryptDownload(_)));
+    let default_ttl = match has_decrypt_download_scope {
+        true => 5 * 60,
+        false => 30 * 60,
+    };
+    let ttl = ttl.unwrap_or(default_ttl);
     #[allow(clippy::manual_range_contains)]
     if ttl < 60 || ttl > (24 * 60 * 60) {
         return Err(TenantError::InvalidExpiry.into());

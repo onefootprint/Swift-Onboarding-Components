@@ -29,6 +29,12 @@ pub enum TenantError {
     InvalidExpiry,
     #[error("Must provide at least one scope")]
     MustProvideScope,
+    #[error("Must provide at least one field")]
+    MustProvideFields,
+    #[error("Can only provide one field to create a token with decrypt_download scope")]
+    OneDecryptDownloadField,
+    #[error("decrypt_download tokens may not have a TTL longer than 5 mins")]
+    InvalidDecryptDownloadExpiry,
 
     #[error("Missing required data options: {0} for cip: {1}")]
     MissingCdosForCip(Csv<CollectedDataOption>, CipKind),

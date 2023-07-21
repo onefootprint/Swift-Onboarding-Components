@@ -7,6 +7,7 @@ use crate::*;
 pub enum ClientTokenScopeKind {
     Vault,
     Decrypt,
+    DecryptDownload,
 }
 
 export_schema!(ClientTokenScopeKind);
