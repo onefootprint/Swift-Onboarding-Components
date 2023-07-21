@@ -80,7 +80,7 @@
         "secured-by-footprint": {
           "label": "Secured by Footprint"
         },
-        "modal-header": {
+        "header": {
           "close-aria-label": "Close"
         }
       },

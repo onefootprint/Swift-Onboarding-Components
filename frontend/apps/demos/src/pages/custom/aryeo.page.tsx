@@ -35,41 +35,7 @@ const appearance: FootprintAppearance = {
     labelColor: '#374151',
     labelFont: '500 14px/21px "Inter"',
   },
-  rules: {
-    container: {
-      width: '460px',
-      margin: 'unset',
-      height: '100vh',
-      maxHeight: 'unset',
-      position: 'fixed',
-      right: 0,
-      borderRadius: '0px',
-      boxShadow:
-        '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
-    },
-    input: {
-      transition: '0.15s all cubic-bezier(.4,0,.2,1)',
-    },
-  },
 };
-
-const customCss = `
-.footprint-components-modal {
-  opacity: 0;
-  transition: 0.3s transform ease-in-out;
-  will-change: transform;
-}
-
-.footprint-components-modal-loading {
-  opacity: 0;
-  transform: translate(480px);
-}
-
-.footprint-components-modal-loaded {
-  opacity: 1;
-  transform: translate(0);
-}
-`;
 
 const Aryeo = () => (
   <ComponentsInstructions
@@ -77,10 +43,10 @@ const Aryeo = () => (
     cardAlias="primary"
     title="Add a New Card"
     tenantName="Aryeo"
-    customCSS={customCss}
     framework="vue"
     userId="fp_id_UIUImA2Kfqkhcrc90qjaMu"
     secretAuthToken={ARYEO_CARD_VAULTING_AUTH_TOKEN ?? ''}
+    variant="drawer"
   />
 );
 

@@ -21,7 +21,7 @@ export default {
     },
     variant: {
       control: 'select',
-      options: ['modal', 'card'],
+      options: ['modal', 'card', 'drawer'],
       description: 'Variant of the form',
       required: false,
     },

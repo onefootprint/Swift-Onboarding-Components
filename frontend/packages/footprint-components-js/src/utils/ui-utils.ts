@@ -1,7 +1,8 @@
-const CONTAINER_ID = 'footprint-components-container';
+const OVERLAY_CONTAINER_ID = 'footprint-components-overlay-container';
+const INLINE_CONTAINER_ID = 'footprint-components-inline-container';
+const BODY_LOCKED_CLASS = 'footprint-components-body-locked';
 const OVERLAY_ID = 'footprint-components-overlay';
 const LOADING_INDICATOR_ID = 'footprint-components-loading-indicator';
-const INLINE_LOADER_CONTAINER_ID = 'footprint-components-inline-loader';
 
 export const createLoader = (container: HTMLElement) => {
   const loadingIndicator = createLoadingIndicator(LOADING_INDICATOR_ID);
@@ -15,25 +16,8 @@ export const removeLoader = () => {
   }
 };
 
-export const createInlineLoaderContainer = (container: HTMLElement) => {
-  const loaderContainer = document.createElement('div');
-  loaderContainer.classList.add(INLINE_LOADER_CONTAINER_ID);
-  loaderContainer.setAttribute('id', INLINE_LOADER_CONTAINER_ID);
-  container.appendChild(loaderContainer);
-  return loaderContainer;
-};
-
-export const removeInlineLoaderContainer = () => {
-  const inlineLoaderContainer = document.getElementById(
-    INLINE_LOADER_CONTAINER_ID,
-  );
-  if (inlineLoaderContainer) {
-    inlineLoaderContainer.remove();
-  }
-};
-
 export const createOverlay = (container: HTMLElement) => {
-  document.body.classList.add('footprint-components-body-locked');
+  document.body.classList.add(BODY_LOCKED_CLASS);
   const overlay = document.createElement('div');
   overlay.setAttribute('id', OVERLAY_ID);
   overlay.classList.add('footprint-components-overlay');
@@ -42,22 +26,37 @@ export const createOverlay = (container: HTMLElement) => {
 };
 
 export const removeOverlay = () => {
-  document.body.classList.remove('footprint-components-body-locked');
+  document.body.classList.remove(BODY_LOCKED_CLASS);
   const overlay = document.getElementById(OVERLAY_ID);
   if (overlay) {
     overlay.remove();
   }
 };
 
-export const createModalContainer = (): HTMLElement => {
-  const possibleContainer = document.getElementById(CONTAINER_ID);
+export const createOverlayContainer = (): HTMLElement => {
+  const possibleContainer = document.getElementById(OVERLAY_CONTAINER_ID);
   if (possibleContainer) {
     return possibleContainer;
   }
   const container = document.createElement('div');
-  container.setAttribute('id', CONTAINER_ID);
+  container.setAttribute('id', OVERLAY_CONTAINER_ID);
   document.body.appendChild(container);
   return container;
+};
+
+export const createInlineContainer = (container: HTMLElement): HTMLElement => {
+  const inlineContainer = document.createElement('div');
+  inlineContainer.classList.add(INLINE_CONTAINER_ID);
+  inlineContainer.setAttribute('id', INLINE_CONTAINER_ID);
+  container.appendChild(inlineContainer);
+  return inlineContainer;
+};
+
+export const removeInlineContainer = () => {
+  const inlineContainer = document.getElementById(INLINE_CONTAINER_ID);
+  if (inlineContainer) {
+    inlineContainer.remove();
+  }
 };
 
 const createLoadingIndicator = (loaderId: string) => {

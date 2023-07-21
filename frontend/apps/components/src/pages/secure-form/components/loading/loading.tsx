@@ -95,6 +95,9 @@ const Container = styled.div`
     justify-content: stretch;
     width: 100%;
     margin: ${theme.spacing[9]};
+    max-width: 600px;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
   `}
 `;
 

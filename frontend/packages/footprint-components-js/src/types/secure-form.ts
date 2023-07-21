@@ -7,7 +7,7 @@ export enum SecureFormType {
   cardAndZip = 'cardAndZip',
 }
 
-export type SecureFormVariant = 'modal' | 'card';
+export type SecureFormVariant = 'modal' | 'card' | 'drawer';
 
 export type SecureFormProps = {
   appearance?: FootprintAppearance;

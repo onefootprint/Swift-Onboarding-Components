@@ -23,7 +23,7 @@ const DemoForm = ({ authToken, cardAlias }: DemoFormProps) => {
         cardAlias,
         title: 'Add a New Card',
         type: SecureFormType.cardAndName,
-        variant: 'card',
+        variant: 'drawer',
       },
       containerId: 'footprint-secure-form',
     });

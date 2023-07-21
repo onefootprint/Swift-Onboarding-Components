@@ -7,14 +7,16 @@ import {
   SecureFormProps,
 } from '../types';
 import {
-  createInlineLoaderContainer,
+  createInlineContainer,
   createLoader,
-  createModalContainer,
   createOverlay,
-  removeInlineLoaderContainer,
+  createOverlayContainer,
+  removeInlineContainer,
   removeLoader,
   removeOverlay,
 } from './ui-utils';
+
+type ContainerVariant = 'modal' | 'inline' | 'drawer';
 
 class FootprintComponentsIframe {
   private child: Postmate.ParentAPI | null = null;
@@ -40,66 +42,75 @@ class FootprintComponentsIframe {
 
   private showLoading(
     container: HTMLElement,
-    isModal: boolean,
+    variant: ContainerVariant,
     isLoading: boolean,
   ) {
+    const hasOverlay = variant === 'modal' || variant === 'drawer';
+
     if (isLoading) {
-      if (isModal) {
+      if (hasOverlay) {
         const overlay = createOverlay(container);
         createLoader(overlay);
       } else {
-        const inlineContainer = createInlineLoaderContainer(container);
-        createLoader(inlineContainer);
+        createLoader(container);
       }
-    } else if (isModal) {
-      removeLoader();
-      this.child?.frame.classList.remove('footprint-components-modal-loading');
-      this.child?.frame.classList.add('footprint-components-modal-loaded');
-    } else {
-      removeInlineLoaderContainer();
+      return;
     }
+
+    removeLoader();
+    this.child?.frame.classList.remove(
+      `footprint-components-${variant}-loading`,
+    );
+    this.child?.frame.classList.add(`footprint-components-${variant}-loaded`);
   }
 
-  private isModal(
+  private getContainerVariant(
     kind: FootprintComponentKind,
     props: FootprintComponentProps,
   ) {
-    if (kind === FootprintComponentKind.SecureForm) {
-      const formProps = props as SecureFormProps;
-      // Default to modal if no variant is passed
-      return !formProps?.variant || formProps?.variant === 'modal';
+    if (kind !== FootprintComponentKind.SecureForm) {
+      return 'inline';
     }
-    return false;
+    const formProps = props as SecureFormProps;
+    if (formProps.variant === 'drawer') {
+      return 'drawer';
+    }
+    if (formProps.variant === 'card') {
+      return 'inline';
+    }
+    if (formProps.variant === 'modal') {
+      return 'modal';
+    }
+
+    // Default to modal if no variant is passed
+    return 'modal';
   }
 
-  private getOrCreateContainer(isModal: boolean, containerId: string) {
+  private getOrCreateContainer(variant: ContainerVariant, containerId: string) {
     // If rendering in a modal, need to create a new container, otherwise use the containerId passed in
     let container;
-    if (isModal) {
-      container = createModalContainer();
+    const hasOverlay = variant === 'modal' || variant === 'drawer';
+    if (hasOverlay) {
+      container = createOverlayContainer();
     } else {
-      container = document.getElementById(containerId);
-      if (!container) {
+      const clientContainer = document.getElementById(containerId);
+      if (!clientContainer) {
         throw new Error(
           'A valid containerId is required to create a Footprint button',
         );
       }
+      container = createInlineContainer(clientContainer);
     }
     return container;
   }
 
-  private getIframeClassList(isModal: boolean) {
-    const classList = [];
-    if (isModal) {
-      classList.push(
-        'footprint-components-modal',
-        'footprint-components-modal-loading',
-      );
-    } else {
-      classList.push('footprint-components-inline');
-    }
-
-    return classList;
+  // We keep these class names wordy to avoid collisions with other
+  // footprint integrations on the same page
+  private getIframeClassList(variant: ContainerVariant) {
+    return [
+      `footprint-components-${variant}`,
+      `footprint-components-${variant}-loading`,
+    ];
   }
 
   async render(
@@ -108,8 +119,8 @@ class FootprintComponentsIframe {
     props: FootprintComponentProps,
     containerId: string,
   ) {
-    const isModal = this.isModal(kind, props);
-    const container = this.getOrCreateContainer(isModal, containerId);
+    const variant = this.getContainerVariant(kind, props);
+    const container = this.getOrCreateContainer(variant, containerId);
     if (!container) {
       return;
     }
@@ -118,15 +129,15 @@ class FootprintComponentsIframe {
       container.innerHTML = '';
     }
 
-    this.showLoading(container, isModal, true);
+    this.showLoading(container, variant, true);
     this.child = await new Postmate({
-      classListArray: this.getIframeClassList(isModal),
+      classListArray: this.getIframeClassList(variant),
       container,
       name: 'footprint-iframe',
       url,
       allow: 'otp-credentials;',
     });
-    this.showLoading(container, isModal, false);
+    this.showLoading(container, variant, false);
 
     this.child.on(FootprintComponentsEvent.started, () => {
       this.sendProps(kind, props);
@@ -144,7 +155,7 @@ class FootprintComponentsIframe {
 
   destroy() {
     removeOverlay();
-    removeInlineLoaderContainer();
+    removeInlineContainer();
     if (this.child) {
       this.child.destroy();
     }

@@ -1,6 +1,7 @@
 import {
   FootprintAppearance,
   SecureFormType,
+  SecureFormVariant,
 } from '@onefootprint/footprint-components-js';
 import { FootprintSecureForm } from '@onefootprint/footprint-components-react';
 import styled from '@onefootprint/styled';
@@ -21,6 +22,7 @@ type ComponentsInstructionsProps = {
   title?: string;
   customCSS?: string;
   framework?: 'react' | 'vue';
+  variant: SecureFormVariant;
 };
 
 const ComponentsInstructions = ({
@@ -32,6 +34,7 @@ const ComponentsInstructions = ({
   customCSS,
   framework,
   userId,
+  variant,
 }: ComponentsInstructionsProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const toast = useToast();
@@ -90,7 +93,7 @@ const ComponentsInstructions = ({
             authToken={secretAuthToken}
             cardAlias={cardAlias}
             type={SecureFormType.cardAndZip}
-            variant="modal"
+            variant={variant}
             title={title}
             onSave={handleSave}
             onClose={handleClose}

@@ -142,11 +142,11 @@ window.footprintComponentsCallbacks = {
 };
 ```
 
-### Decrypt or Proxy card data from the backend
+## Decrypt or Proxy card data from the backend
 
 When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
 
-### Available SecureForm Props
+## Available SecureForm Props
 
 | Variable     | Description                                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -154,5 +154,5 @@ When the user has completed filling the secure collection form on your product, 
 | `cardAlias`  | Required. A string that is a unique alias for the card information                                                                               |
 | `title`      | Optional. A string that will be displayed at the top of the field                                                                                |
 | `type`       | Optional. one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                           |
+| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                 |
 | `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                         |

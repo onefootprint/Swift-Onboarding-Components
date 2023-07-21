@@ -36,10 +36,13 @@ const arePropsValid = (
     );
 
   const isVariantValid =
-    variant === undefined || variant === 'card' || variant === 'modal';
+    variant === undefined ||
+    variant === 'card' ||
+    variant === 'drawer' ||
+    variant === 'modal';
   if (!isVariantValid)
     console.error(
-      'Form variant has to be one of modal or card, received: ',
+      'Form variant has to be one of modal, drawer or card, received: ',
       variant,
     );
 

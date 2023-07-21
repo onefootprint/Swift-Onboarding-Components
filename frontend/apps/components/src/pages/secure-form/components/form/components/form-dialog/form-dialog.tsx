@@ -1,37 +1,17 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, media, ScrollArea } from '@onefootprint/ui';
+import { media, ScrollArea } from '@onefootprint/ui';
 import React from 'react';
 
-import CardHeader from './components/card-header';
-import ModalHeader from './components/modal-header';
-import SecuredByFootprint from './components/secured-by-footprint';
-
-export type FormDialogButton = {
-  disabled?: boolean;
-  form?: string;
-  label: string;
-  loading?: boolean;
-  onClick?: (dataSubmitted?: any) => void;
-  type?: 'button' | 'submit' | 'reset';
-};
-
-export type AllButtons = {
-  primaryButton: FormDialogButton;
-  secondaryButton: FormDialogButton;
-};
-
-export type OnlyPrimaryButton = {
-  primaryButton: FormDialogButton;
-  secondaryButton?: never;
-};
+import Footer from './components/footer';
+import Header from './components/header';
+import { AllButtons, OnlyPrimaryButton } from './types';
 
 export type FormDialogProps = {
   title?: string;
   onClose?: () => void;
   children: React.ReactNode;
   testID?: string;
-  variant?: 'modal' | 'card';
+  variant?: 'modal' | 'card' | 'drawer';
 } & (AllButtons | OnlyPrimaryButton);
 
 const FormDialog = ({
@@ -42,58 +22,19 @@ const FormDialog = ({
   testID,
   onClose,
   variant = 'modal',
-}: FormDialogProps) => {
-  const { t } = useTranslation('pages.secure-form.form-dialog');
-
-  return (
-    <Container
-      id="footprint-components-container"
-      data-testid={testID}
-      data-variant={variant}
-    >
-      {variant === 'modal' && title && onClose && (
-        <ModalHeader onClose={onClose} title={title} />
-      )}
-      {variant === 'card' && title && <CardHeader title={title} />}
-      <div style={{ flexGrow: 1 }}>
-        <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
-      </div>
-      <Footer>
-        <SecuredByFootprint />
-        <ButtonsContainer>
-          {secondaryButton && (
-            <Button
-              disabled={secondaryButton.disabled}
-              form={secondaryButton.form}
-              loading={secondaryButton.loading}
-              loadingAriaLabel={t('loading-aria-label')}
-              onClick={secondaryButton.onClick}
-              size="compact"
-              type={secondaryButton.type}
-              variant="secondary"
-            >
-              {secondaryButton.label}
-            </Button>
-          )}
-          {primaryButton && (
-            <Button
-              disabled={primaryButton.disabled}
-              form={primaryButton.form}
-              loading={primaryButton.loading}
-              loadingAriaLabel={t('loading-aria-label')}
-              onClick={primaryButton.onClick}
-              size="compact"
-              type={primaryButton.type}
-              variant="primary"
-            >
-              {primaryButton.label}
-            </Button>
-          )}
-        </ButtonsContainer>
-      </Footer>
-    </Container>
-  );
-};
+}: FormDialogProps) => (
+  <Container
+    id="footprint-components-container"
+    data-testid={testID}
+    data-variant={variant}
+  >
+    <Header variant={variant} onClose={onClose} title={title} />
+    <div style={{ flexGrow: 1 }}>
+      <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
+    </div>
+    <Footer primaryButton={primaryButton} secondaryButton={secondaryButton} />
+  </Container>
+);
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -119,31 +60,24 @@ const Container = styled.div`
         max-height: calc(100% - (2 * ${theme.spacing[9]}));
         margin: ${theme.spacing[9]};
         border-radius: ${theme.borderRadius.default};
+        max-width: 600px;
     `}
     }
-  `}
-`;
 
-const Footer = styled.footer`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
-    background-color: ${theme.backgroundColor.primary};
-    width: 100%;
-    z-index: 1;
-    position: sticky;
-    bottom: 0;
-    border-radius: 0 0 ${theme.borderRadius.default}
-      ${theme.borderRadius.default};
-  `}
-`;
+    &[data-variant='drawer'] {
+      box-shadow: ${theme.elevation[3]};
+      border: none;
+      border-radius: 0;
+      height: 100vh;
+      width: 100%;
+      position: fixed;
+      right: 0;
 
-const ButtonsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[4]};
+      ${media.greaterThan('md')`
+        width: 460px;
+        border-radius: 0;
+    `}
+    }
   `}
 `;
 
