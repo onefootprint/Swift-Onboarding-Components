@@ -68,6 +68,14 @@ impl DocumentOutcome {
             DocumentOutcome::DocUploadFailed => None,
         }
     }
+
+    pub fn doc_upload_failed(&self) -> bool {
+        matches!(self, Self::DocUploadFailed)
+    }
+
+    pub fn doc_failed_for_some_reason(&self) -> bool {
+        matches!(self, Self::DocUploadFailed | Self::Failure)
+    }
 }
 #[derive(Clone, Copy, Debug)]
 pub enum DocumentCollectionKind {

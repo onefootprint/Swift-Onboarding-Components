@@ -293,6 +293,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 )]
 #[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentRequested(Failure))]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Failure))]
+#[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(DocUploadFailed))]
 #[tokio::test]
 async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
@@ -372,7 +373,10 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     assert!(!rs_failing.is_empty());
     assert!(rs_failing.iter().all(|r| r.hidden));
 
-    if document_requested.is_some() {
+    if document_requested
+    .map(|dr| !dr.doc_upload_failed()) // no risk signals if doc upload failed
+    .unwrap_or(false)
+    {
         let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
         assert!(!rs.is_empty());
         assert!(rs.iter().all(|r| !r.hidden));
@@ -427,9 +431,13 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         }
         UserKind::Live => {
             let doc_reason_code = document_requested.and_then(|outcome| {
-                outcome
-                    .footprint_reason_code()
-                    .map(|frc| (VendorAPI::IncodeFetchScores, frc))
+                if outcome.doc_upload_failed() {
+                    None
+                } else {
+                    outcome
+                        .footprint_reason_code()
+                        .map(|frc| (VendorAPI::IncodeFetchScores, frc))
+                }
             });
 
             assert_have_same_elements(
@@ -452,7 +460,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 
     // this combination of retrying kyc with a failed document isn't handled yet, so we need to special case it
     let doc_failed = document_requested
-        .map(|o| o == DocumentOutcome::Failure)
+        .map(|o| o.doc_failed_for_some_reason())
         .unwrap_or(false);
 
     // Test Redo as well
