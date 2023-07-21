@@ -41,14 +41,25 @@ export const getVueIntegration = (cardAlias: string) => `
         props: {
           authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
           cardAlias: "${cardAlias}", // this should match the cardAliases used while generating the auth token
-          appearance, // appearance object from step 6
-          onSave: handleSave
+          appearance: appearance, // appearance object from step 6
+          title: "Add a New Card",
+          type: "cardAndZip",
+          variant: "drawer",
+          onSave: handleSave,
+          onClose: handleClose,
+          onCancel: handleCancel
         }
       })
     },
     methods: {
       handleSave() {
         // TODO: Decrypt or proxy the saved data from your backend
+      },
+      handleClose() {
+        // TODO:
+      },
+      handleCancel() {
+        // TODO:
       }
     }
   }
