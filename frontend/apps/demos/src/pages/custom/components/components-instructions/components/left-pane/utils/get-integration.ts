@@ -30,6 +30,7 @@ export default PaymentForm;`;
 
 export const getVueIntegration = (cardAlias: string) => `
 <script>
+  import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
   import footprintComponent from '@onefootprint/footprint-components-js';
   import { appearance } from './config';
 
