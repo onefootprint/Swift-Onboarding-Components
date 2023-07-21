@@ -11,15 +11,15 @@ meta:
   }
 ---
 
-## About the library
+## Footprint libraries
 
-`footprint-js` let's you integrate your application with Footprint. It can be used together
-with any framework or library, such as Angular, React, Vue, or simply plain Javascript. Under the hood, it
-launches an iframe from your website, and exchanges secure messages between Footprint and your application.
+Our `footprint-js` and `footprint-components-js` libraries let you integrate your application with Footprint. They can be used together
+with any framework or library, such as Angular, React, Vue, or simply plain Javascript. Under the hood, they
+launch iframes from your website, and exchange secure messages between Footprint and your application.
 
 ### Browser support
 
-Footprint supports all recent versions of major browsers. For the sake of security and providing the best experience to the majority of customers, we do not support less popular browsers that no longer receive security updates.
+Footprint libraries supports all recent versions of major browsers. For the sake of security and providing the best experience to the majority of customers, we do not support less popular browsers that no longer receive security updates.
 
 | Name                    | Versions              |
 | ----------------------- | --------------------- |
@@ -31,9 +31,11 @@ Footprint supports all recent versions of major browsers. For the sake of securi
 | Safari iOS              | Last 3 major versions |
 | Android default browser | Last 3 major versions |
 
-Footprint products depends on certain native browser functionality. Polyfilling certain browser features (e.g Promises API) may prevent footprint.js from working normally. If footprint.js isn't functioning as expected, try removing polyfills to determine if they might be causing the issue.
+Footprint products depend on certain native browser functionality. Polyfilling certain browser features (e.g Promises API) may prevent footprint.js from working normally. If footprint.js isn't functioning as expected, try removing polyfills to determine if they might be causing the issue.
 
-## Install footprint
+## Footprint.js Library
+
+### How to install footprint.js
 
 1. Install `footprint-js` :
 
@@ -45,7 +47,7 @@ npm install @onefootprint/footprint-js
 yarn add @onefootprint/footprint-js
 ```
 
-## Integrate Footprint
+### How to integrate footprint.js
 
 1. Grab the Onboarding Publishable Key, for example, `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
@@ -60,7 +62,7 @@ yarn add @onefootprint/footprint-js
     <title>Footprint | Vanilla</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@onefootprint/footprint-js@0.5.0/dist/footprint-js.css"
+      href="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.css"
     />
     <script>
       window.onFootprintCompleted = function (validationToken) {
@@ -90,7 +92,7 @@ yarn add @onefootprint/footprint-js
       ></div>
     </main>
     <script
-      src="https://unpkg.com/@onefootprint/footprint-js@0.5.0/dist/footprint-js.umd.js"
+      src="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.umd.js"
       crossorigin
     ></script>
   </body>
@@ -169,7 +171,7 @@ export default {
 </template>
 ```
 
-## Listening to events
+### Listening to events
 
 Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `show` method.
 
@@ -186,3 +188,152 @@ footprint.show({
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | onCompleted | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend |
 | onCanceled  | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe     |
+
+## Footprint-components.js Library
+
+### How to install footprint-components.js
+
+1. Install `footprint-components-js` :
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-components-js
+
+# With yarn
+yarn add @onefootprint/footprint-components-js
+```
+
+### How to integrate FootprintSecureForm
+
+1. Perform steps 1-5 from [here](https://docs.onefootprint.com/embedded-components/getting-started#add-footprint-components-js-to-your-app).
+
+2. Import the styles file and embed the Footprint component, passing the Auth token, card alias, callback functions and any other options:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Footprint Components | Vanilla</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.css"
+    />
+    <script>
+      window.footprintComponentsCallbacks = {
+        onSave: function () {
+          // TODO: Decrypt or proxy the saved data from your backend
+        },
+        onCancel: function () {
+          // TODO:
+        },
+        onClose: function () {
+          // TODO:
+        },
+      };
+    </script>
+    <style>
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <main>
+      <div
+        id="footprint-component"
+        data-kind="secure-form"
+        data-props='{"cardAlias":"primary","authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'card'}'
+      ></div>
+    </main>
+    <script
+      src="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.umd.js"
+      crossorigin
+    ></script>
+  </body>
+</html>
+```
+
+What's happening under the hood?
+
+1. Footprint will identify an element with the id `footprint-component`, and will render a secure component based on the data provided.
+
+   - `data-kind` attribute determines the kind of the secure component to render
+   - `data-props` are the stringified props objects that will be passed into your component
+
+2. When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js) to check out a full example.
+
+### Usage with frameworks
+
+Let's imagine your app was written using [Vue](https://vuejs.org/) (could be any framework or library). To integrate with Footprint components,
+you'll need to tell the integration library the container ID the component should be rendered inside.
+
+This can be achieved easily with our `render` method:
+
+```vue
+<script>
+import footprintComponent from '@onefootprint/footprint-components-js';
+
+export default {
+  mounted() {
+    footprintComponent.render({
+      kind: 'secure-form',
+      containerId: 'footprint-secure-form',
+      props: {
+        authToken: 'tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit', // auth token generated using the Secret API Key on step 5
+        cardAlias: 'primary', // this should match the cardAliases used while generating the auth token
+        onSave: handleSave,
+      },
+    });
+  },
+  methods: {
+    handleSave() {
+      // TODO: Decrypt or proxy the saved data from your backend
+    },
+  },
+};
+</script>
+
+<template>
+  <div id="footprint-secure-form"></div>
+</template>
+```
+
+If you are adding multiple Footprint components into your app, it is important to choose unique container IDs for each of them.
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vue) to check out a full example.
+
+### Listening to SecureForm events
+
+Our Secure Form component provides some events based on actions performed by the user. To listen to event, pass callbacks into the props attribute.
+
+```typescript
+footprintComponent.render({
+  kind: 'secure-form'
+  props: {
+    authToken,
+    cardAlias,
+    title: 'Add a New Card',
+    type: 'cardAndName',
+    variant: 'drawer',
+    onSave: handleSave,
+    onClose: handleClose,
+    onCancel: handleCancel
+  },
+  containerId: 'footprint-secure-form',
+});
+```
+
+| Name     | Description                                                                                                                        |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| onSave   | Triggered after user completes the form and data is saved to the user vault.                                                       |
+| onCancel | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |
+| onClose  | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |

@@ -55,8 +55,6 @@ export const getVueIntegration = (cardAlias: string) => `
 </script>
 
 <template>
-  <div class="card">
-    <div id="footprint-secure-form"/>
-  </div>
+  <div id="footprint-secure-form"/>
 </template>
 `;

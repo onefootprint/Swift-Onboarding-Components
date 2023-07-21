@@ -13,6 +13,8 @@ meta:
 
 ## Add Footprint-components.js to your app
 
+Our embedded components can help you collect and render sensitive PII data in your product in a PCI compliant way. Below is a guide that describes how to integrate our FootprintSecureForm component to collect user data that automatically gets saved to the user's Footprint vault.
+
 1. Go to Footprint dashboard [Settings - Roles](https://dashboard.onefootprint.com/settings?tab=roles) page. Create a new role for card vaulting.
 
    - Select `Create and update users` from the permissions list.
@@ -86,7 +88,7 @@ npm install @onefootprint/footprint-components-js
 yarn add @onefootprint/footprint-components-js
 ```
 
-7. Embed the Footprint SecureForm component.
+7. Embed the FootprintSecureForm component.
 
 Make sure to pass the auth token generated from Step 5, as well as a unique card_alias for the user. Note that this card_alias has to match the one used to generate the auth token in step 4.
 
@@ -131,7 +133,7 @@ If you are rendering the secure form in a modal variant, it will take up the who
 ```javascript
 window.footprintComponentsCallbacks = {
   onSave: function () {
-    // TODO:
+    // TODO: Decrypt or proxy the saved data from your backend
   },
   onCancel: function () {
     // TODO:
@@ -146,7 +148,7 @@ window.footprintComponentsCallbacks = {
 
 When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
 
-## Available SecureForm Props
+## Available FootprintSecureForm Props
 
 | Variable     | Description                                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
