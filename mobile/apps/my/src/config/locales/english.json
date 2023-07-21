@@ -122,6 +122,8 @@
           "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
           "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
           "document_not_readable": "Your document could not be read. Please try again.",
+          "document_glare": "Your document's picture had image glare. Please adjust the lighting and try again.",
+          "document_sharpness": "The document image was blurry. Please upload or capture a sharper image.",
           "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
           "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
           "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",

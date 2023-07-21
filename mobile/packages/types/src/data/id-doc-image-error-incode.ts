@@ -5,6 +5,8 @@ enum IdDocImageError {
   wrongDocumentSide = 'wrong_document_side',
   wrongOneSidedDocument = 'wrong_one_sided_document',
   documentNotReadable = 'document_not_readable',
+  documentGlare = 'document_glare',
+  documentSharpness = 'document_sharpness',
   unableToAlignDocument = 'unable_to_align_document',
   idTypeNotAcceptable = 'id_type_not_acceptable',
   unknownCountryCode = 'unknown_country_code',
