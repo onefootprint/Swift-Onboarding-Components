@@ -340,7 +340,9 @@ footprint.open({ publicKey, appearance });
 | `link:hover`    | The link, when it's hovered     |
 | `link:active`   | The link, when it's activated   |
 
-## Customizing the user flow
+## Additional options
+
+### Customizing the user flow
 
 Footprint also lets you customize some other options that influence the UI flow.
 
@@ -357,7 +359,7 @@ const options = {
 footprint.open({ publicKey, options });
 ```
 
-If the `showCompletionPage` is not provided, the bifrost modal will automatically close when the user onboarding is complete. The completion page looks like the following.
+If the `showCompletionPage` is not provided, the modal will automatically close when the user onboarding is complete. The completion page looks like the following.
 
 <img
   alt="Completed page"
@@ -365,3 +367,43 @@ If the `showCompletionPage` is not provided, the bifrost modal will automaticall
   src="/customization/completed-page.png"
   width={720}
 />
+
+### Logo
+
+You can also add your company logo at the top of the modal by a passing boolean field `showLogo` in the `options` object.
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const options = {
+  showLogo: true,
+};
+
+footprint.open({ publicKey, options });
+```
+
+<img
+  alt="Completed page"
+  height={250}
+  src="/customization/custom-logo.png"
+  width={720}
+/>
+
+You can configure your logo from your [Footprint dashboard](https://dashboard.onefootprint.com/settings).
+If no logo is available, we will use a placeholder with your company name's initial
+letter, as in below:
+
+<img
+  alt="Completed page"
+  height={250}
+  src="/customization/company-initial-logo.png"
+  width={720}
+/>
+
+### Available options
+
+| Option field         | Type      | Description                                                          |
+| -------------------- | --------- | -------------------------------------------------------------------- |
+| `showCompletionPage` | `boolean` | Render a pre-built completion page at the end of the onboarding flow |
+| `showLogo`           | `boolean` | Show company logo at the top of the modal                            |
