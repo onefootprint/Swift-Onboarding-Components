@@ -63,24 +63,24 @@ const ImageContainer = styled.div<{
 }>`
   ${({ theme, height, width }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.full};
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    width: fit-content;
     padding: ${theme.spacing[2]};
     height: ${height};
     width: ${width};
     img {
-      width: 100%;
-      height: 100%;
+      width: ${width};
+      height: ${height};
       object-fit: contain;
     }
 
     &[data-size='xlarge'] {
       padding: ${theme.spacing[4]};
     }
+    border-radius: ${theme.borderRadius.full};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 
