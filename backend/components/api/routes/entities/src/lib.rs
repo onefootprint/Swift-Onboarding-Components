@@ -18,8 +18,10 @@ pub use get::list::parse_search;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
-    client_token::configure_post_aliases(config);
+    client_token::post::configure_post_aliases(config);
     config
+        .service(client_token::post::post)
+        .service(client_token::get::get)
         .service(get::detail::get)
         .service(get::list::get)
         .service(annotations::get)
@@ -33,6 +35,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(field_validations::get)
         .service(trigger::post)
         .service(kyc::post)
-        .service(client_token::post)
         .service(risk_signals::get_detail);
 }

@@ -1,6 +1,6 @@
 import pytest
 from tests.constants import FIELDS_TO_DECRYPT
-from tests.utils import post, patch
+from tests.utils import post, patch, get
 from tests.dashboard.utils import latest_access_event_for
 from tests.headers import ClientTokenAuth
 
@@ -82,6 +82,9 @@ def test_vault(sandbox_user):
         fields=["id.first_name", "id.last_name"],
         scopes=["decrypt", "vault"],
     )
+
+    body = get(f"entities/client_token", None, auth_token)
+    assert set(body["vault_fields"]) == set(["id.first_name", "id.last_name"])
 
     data = {
         "id.first_name": "Hayes",
