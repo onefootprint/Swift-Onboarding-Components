@@ -66,7 +66,8 @@ class FootprintComponentsIframe {
   ) {
     if (kind === FootprintComponentKind.SecureForm) {
       const formProps = props as SecureFormProps;
-      return formProps?.variant === 'modal';
+      // Default to modal if no variant is passed
+      return !formProps?.variant || formProps?.variant === 'modal';
     }
     return false;
   }

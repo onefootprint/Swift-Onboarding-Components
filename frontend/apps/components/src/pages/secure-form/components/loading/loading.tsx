@@ -94,6 +94,7 @@ const Container = styled.div`
     border-radius: ${theme.borderRadius.default};
     justify-content: stretch;
     width: 100%;
+    margin: ${theme.spacing[9]};
   `}
 `;
 
