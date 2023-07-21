@@ -1,4 +1,4 @@
-use newtypes::{output::Csv, CipKind, CollectedDataOption};
+use newtypes::{output::Csv, CipKind, CollectedDataOption, DataIdentifier};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -53,4 +53,7 @@ pub enum TenantError {
 
     #[error("Decryption reason must be provided")]
     NoDecryptionReasonProvided,
+
+    #[error("{0} doesn't exist for user")]
+    DataDoesntExist(DataIdentifier),
 }

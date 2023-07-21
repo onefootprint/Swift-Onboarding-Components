@@ -85,32 +85,23 @@ impl std::fmt::Debug for MaskedHeaderMap {
     }
 }
 
-impl<T> FromRequest for SessionContext<T>
+impl<T> SessionContext<T>
 where
     T: ExtractableAuthSession,
 {
-    type Error = ApiError;
-    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
-
-    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
-        #[allow(clippy::unwrap_used)]
-        let state = req.app_data::<web::Data<State>>().unwrap().clone();
-        let root_span = RootSpan::from_request(req, payload);
-
-        let allowed_headers = T::header_names().join(", "); // Temporary
-        let auth_token = T::header_names()
-            .into_iter()
-            .filter_map(|h| req.headers().get(h))
-            .next()
-            .and_then(|hv| hv.to_str().map(PiiString::from).ok())
-            .ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()));
-        let headers = req.headers().clone();
-
+    pub(in super::super) fn build(
+        state: web::Data<State>,
+        root_span: <RootSpan as FromRequest>::Future,
+        auth_token: Option<PiiString>,
+        headers: MaskedHeaderMap,
+    ) -> Pin<Box<dyn Future<Output = ApiResult<Self>>>> {
         Box::pin(async move {
             #[allow(clippy::unwrap_used)]
             let root_span = root_span.await.unwrap();
 
-            let auth_token = SessionAuthToken::from(auth_token?);
+            let allowed_headers = T::header_names().join(", "); // Temporary
+            let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
+            let auth_token = SessionAuthToken::from(auth_token);
 
             let session = AuthSession::get(&state, &auth_token)
                 .await?
@@ -132,15 +123,37 @@ where
                 })
                 .await??;
             parsed_session_data.log_authed_principal(root_span);
-            
+
             Ok(Self {
                 data: parsed_session_data,
                 auth_token,
-                headers: MaskedHeaderMap(headers),
+                headers,
                 session,
                 phantom: PhantomData,
             })
         })
+    }
+}
+
+impl<T> FromRequest for SessionContext<T>
+where
+    T: ExtractableAuthSession,
+{
+    type Error = ApiError;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
+        #[allow(clippy::unwrap_used)]
+        let state = req.app_data::<web::Data<State>>().unwrap().clone();
+        let root_span = RootSpan::from_request(req, payload);
+
+        let auth_token = T::header_names()
+            .into_iter()
+            .filter_map(|h| req.headers().get(h))
+            .next()
+            .and_then(|hv| hv.to_str().map(PiiString::from).ok());
+        let headers = MaskedHeaderMap(req.headers().clone());
+        Self::build(state, root_span, auth_token, headers)
     }
 }
 

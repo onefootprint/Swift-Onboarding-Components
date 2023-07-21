@@ -62,7 +62,7 @@ class Endpoint:
         # Update the security to filter out Firm Employee Token
         security = [
             security
-            for security in self._path_info["security"]
+            for security in self._path_info.get("security") or []
             if not any(k == "Firm Employee Token" for k in security)
         ]
         assert not any(

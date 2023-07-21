@@ -1,6 +1,6 @@
 use super::{DecryptRequest, TenantVw};
 use crate::auth::AuthError;
-use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii};
 use crate::{errors::ApiResult, State};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, IntegritySigningKey, PiiString};
@@ -67,11 +67,27 @@ impl<Type> TenantVw<Type> {
         let dis = dis_and_transforms.iter().map(|(di, _)| di.clone()).collect_vec();
         self.check_ob_config_access(dis.as_slice())?;
         let results = self
-            .uvw
             .fn_decrypt_unchecked(&state.enclave_client, dis_and_transforms)
             .await?;
         req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
             .await?;
         Ok(results.results)
+    }
+
+    /// Like `fn_decrypt` with no transform
+    pub async fn decrypt_single_raw(
+        &self,
+        state: &State,
+        di: DataIdentifier,
+        req: DecryptRequest,
+    ) -> ApiResult<Option<Pii>> {
+        self.check_ob_config_access(&[di.clone()])?;
+        let results = self
+            .fn_decrypt_unchecked_raw(&state.enclave_client, vec![(di, vec![])])
+            .await?;
+        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
+            .await?;
+        let result = results.results.into_iter().next().map(|(_, v)| v);
+        Ok(result)
     }
 }

@@ -296,6 +296,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::DecisionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::OnboardingError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::WorkflowError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::TenantError(tenant::TenantError::DataDoesntExist(_)) => StatusCode::NOT_FOUND,
             ApiErrorKind::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::UserError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::BusinessError(_) => StatusCode::BAD_REQUEST,

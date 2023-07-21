@@ -2,6 +2,7 @@ use paperclip::actix::web;
 
 mod decrypt;
 mod delete;
+mod download;
 mod get;
 mod integrity;
 mod patch;
@@ -19,6 +20,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(patch::patch_client)
         .service(delete::delete)
         .service(integrity::post)
+        .service(download::get)
         .service(upload::post)
         .service(upload::post_client);
 
@@ -31,6 +33,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     validate::configure_post_client_aliases(config);
     delete::configure_delete_aliases(config);
     integrity::configure_post_aliases(config);
+    download::configure_get_aliases(config);
     upload::configure_post_aliases(config);
     upload::configure_post_client_aliases(config);
 }

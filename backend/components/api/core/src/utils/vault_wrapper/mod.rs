@@ -12,14 +12,13 @@ mod build;
 mod create;
 #[allow(dead_code)]
 mod decrypt;
-pub use decrypt::DecryptUncheckedResult;
 mod tenant;
 mod vw_data;
 mod writeable;
 
 pub use args::VwArgs;
 pub use create::*;
-pub use decrypt::DecryptedBusinessOwners;
+pub use decrypt::{DecryptUncheckedResult, DecryptedBusinessOwners, Pii};
 pub use tenant::*;
 pub use writeable::*;
 

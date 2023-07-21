@@ -19,6 +19,11 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
+pub enum Pii {
+    String(PiiString),
+    Bytes(PiiBytes),
+}
+
 /// The operation perfomed by the enclave
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnclaveDecryptOperation {
@@ -42,10 +47,10 @@ impl EnclaveDecryptOperation {
 }
 
 #[derive(Deref, DerefMut)]
-pub struct DecryptUncheckedResult {
+pub struct DecryptUncheckedResult<T = PiiString> {
     #[deref]
     #[deref_mut]
-    pub results: HashMap<EnclaveDecryptOperation, PiiString>,
+    pub results: HashMap<EnclaveDecryptOperation, T>,
     pub decrypted_dis: Vec<EnclaveDecryptOperation>,
 }
 
@@ -138,6 +143,47 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
     ) -> ApiResult<DecryptUncheckedResult> {
+        tracing::info!(dis=?ids.iter().map(|(di, _)| di.clone()).collect_vec(), "Decrypting DIs");
+
+        let DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        } = self.fn_decrypt_unchecked_raw(enclave_client, ids).await?;
+
+        // Map the PiiBytes to PiiStrings
+        let results = results
+            .into_iter()
+            .map(|(k, v)| -> ApiResult<_> {
+                let pii = match v {
+                    Pii::String(s) => s,
+                    Pii::Bytes(b) => {
+                        if k.is_identity_transform() {
+                            b.into_leak_base64_pii()
+                        } else {
+                            PiiString::try_from(b)?
+                        }
+                    }
+                };
+                Ok((k, pii))
+            })
+            .collect::<ApiResult<_>>()?;
+
+        let result = DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        };
+        Ok(result)
+    }
+
+    /// Decrypts the requested DIs and applies the corresponding transforms WITHOUT checking
+    /// decryption permissions.
+    /// Returns either PiiBytes or PiiString for each entry
+    #[tracing::instrument("VaultWrapper::fn_decrypt_unchecked_raw", skip_all)]
+    pub async fn fn_decrypt_unchecked_raw(
+        &self,
+        enclave_client: &EnclaveClient,
+        ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
+    ) -> ApiResult<DecryptUncheckedResult<Pii>> {
         if ids.is_empty() {
             // Short-circuit so no network requests
             return Ok(DecryptUncheckedResult {
@@ -175,13 +221,13 @@ impl<Type> VaultWrapper<Type> {
                     // We apply the data transforms for p_data outside of the enclave here.
                     let p_data = p_data.leak();
                     let transformed = DataTransforms(op.transforms.clone()).apply_str::<PiiString>(p_data)?;
-                    Ok((op, transformed))
+                    Ok((op, Pii::String(transformed)))
                 })
                 .collect::<ApiResult<Vec<_>>>()?
         };
 
         // Handle e_data
-        let e_data = {
+        let e_data: HashMap<_, _> = {
             let data_to_decrypt = e_data
                 .into_iter()
                 .map(|(e_data, op)| (op.clone(), e_data, op.transforms))
@@ -190,6 +236,9 @@ impl<Type> VaultWrapper<Type> {
             enclave_client
                 .batch_decrypt_to_piistring(data_to_decrypt, &self.vault.e_private_key)
                 .await?
+                .into_iter()
+                .map(|(k, v)| (k, Pii::String(v)))
+                .collect()
         };
 
         // Handle e_large_data
@@ -207,34 +256,26 @@ impl<Type> VaultWrapper<Type> {
                     // Apply the document transforms inline since we decrypt the document outside of
                     // the enclave
                     let transformed = DataTransforms(op.transforms.clone()).apply(pii_bytes.into_leak())?;
-
-                    // large objects by default may be binary so we always base64 encode them!
-                    // UNLESS we apply a transform, then we take the result of the transform in any
-                    // form it gives us as long as we can convert it to a string
-                    let pii_string = if op.is_identity_transform() {
-                        PiiBytes::new(transformed).into_leak_base64_pii()
-                    } else {
-                        PiiString::try_from(PiiBytes::new(transformed))?
-                    };
-                    Ok((op, pii_string))
+                    let pii = Pii::Bytes(PiiBytes::new(transformed));
+                    Ok((op, pii))
                 })
                 .collect::<ApiResult<HashMap<_, _>>>()?
         };
 
-        // Don't make access events for the DIs that are already in plaintext
+        // We don't want to make access events for the DIs that are already in plaintext
         let decrypted_dis = e_data.keys().chain(e_large_data.keys()).cloned().collect();
+
         // Join all the different types of decrypted data into one HashMap
         let results = p_data
             .into_iter()
             .chain(e_data.into_iter())
             .chain(e_large_data.into_iter())
             .collect();
-
-        let result = DecryptUncheckedResult {
+        let results = DecryptUncheckedResult {
             results,
             decrypted_dis,
         };
-        Ok(result)
+        Ok(results)
     }
 
     /// Util to decrypt a DataIdentifier WITHOUT checking permissions or making an access event.

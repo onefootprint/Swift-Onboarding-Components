@@ -1,16 +1,19 @@
-use std::sync::Arc;
-
 use crate::{
     auth::{
-        session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession},
+        session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession, MaskedHeaderMap},
         AuthError, CanDecrypt, CanVault, IsGuardMet, SessionContext,
     },
     errors::ApiResult,
+    State,
 };
+use actix_web::web;
 use db::{models::tenant::Tenant, PgConn};
+use futures_util::Future;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, FpId, TenantApiKeyId};
+use newtypes::{DataIdentifier, FpId, PiiString, TenantApiKeyId};
 use paperclip::actix::Apiv2Security;
+use std::{pin::Pin, sync::Arc};
+use tracing_actix_web::RootSpan;
 
 use super::{AuthActor, TenantAuth};
 
@@ -36,6 +39,32 @@ pub struct ParsedClientTenantData(ClientTenantData);
 
 /// A shorthand for the extractor for a firm employee auth session
 pub type ClientTenantAuthContext = SessionContext<ParsedClientTenantData>;
+
+/// A version of ClientTenantAuthContext that extracts the token from the URL path rather than a
+/// header
+pub struct PathClientTenantAuthContext(pub ClientTenantAuthContext);
+
+impl paperclip::v2::schema::Apiv2Schema for PathClientTenantAuthContext {}
+
+impl paperclip::actix::OperationModifier for PathClientTenantAuthContext {}
+
+impl actix_web::FromRequest for PathClientTenantAuthContext {
+    type Error = crate::ApiError;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
+        #[allow(clippy::unwrap_used)]
+        let state = req.app_data::<web::Data<State>>().unwrap().clone();
+        let root_span = RootSpan::from_request(req, payload);
+        let headers = MaskedHeaderMap(req.headers().clone());
+        let auth_token = Some(PiiString::from(req.match_info().query("token")));
+
+        Box::pin(async move {
+            let auth = ClientTenantAuthContext::build(state, root_span, auth_token, headers).await?;
+            Ok(Self(auth))
+        })
+    }
+}
 
 impl ExtractableAuthSession for ParsedClientTenantData {
     fn header_names() -> Vec<&'static str> {
