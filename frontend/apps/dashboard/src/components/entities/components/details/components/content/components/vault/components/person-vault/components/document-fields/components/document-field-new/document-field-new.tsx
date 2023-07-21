@@ -1,16 +1,28 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  Document,
+  EntityVault,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
+
+import ExtractedDocumentData from './components/extracted-document-data';
 
 export type DocumentFieldProps = {
   label: string;
   vault: EntityVault;
   documentKind?: SupportedIdDocTypes;
+  documents: Document[];
 };
 
-const DocumentField = ({ label, documentKind, vault }: DocumentFieldProps) => {
+const DocumentField = ({
+  label,
+  documentKind,
+  vault,
+  documents,
+}: DocumentFieldProps) => {
   const { t } = useTranslation('pages.entity.fieldset.document');
   const [isDrawerOpen, show, hide] = useToggle(false);
 
@@ -35,8 +47,12 @@ const DocumentField = ({ label, documentKind, vault }: DocumentFieldProps) => {
           title={t(`drawer.${documentKind}.title`)}
           onClose={hide}
         >
+          <ExtractedDocumentData vault={vault} documentKind={documentKind} />
           {/* Placeholder! */}
-          <div>{JSON.stringify(vault)}</div>
+          <div style={{ marginTop: 40 }}>
+            <div>{JSON.stringify(vault)}</div>
+            <div>{JSON.stringify(documents)}</div>
+          </div>
           <DrawerItems />
         </Drawer>
       </>

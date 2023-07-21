@@ -14,9 +14,15 @@ const renderDocumentField = ({
   vault,
   label,
   documentKind,
+  documents,
 }: DocumentFieldProps) =>
   customRender(
-    <DocumentField vault={vault} label={label} documentKind={documentKind} />,
+    <DocumentField
+      vault={vault}
+      label={label}
+      documentKind={documentKind}
+      documents={documents}
+    />,
   );
 
 describe('<DocumentField />', () => {
@@ -25,6 +31,7 @@ describe('<DocumentField />', () => {
       vault: driversLicensePartialDIs,
       label: `Driver's license and selfie`,
       documentKind: SupportedIdDocTypes.driversLicense,
+      documents: [],
     });
 
     const show = screen.getByText('Show');

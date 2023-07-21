@@ -562,7 +562,22 @@
           "drawer": {
             "drivers_license.title": "Driver's license and selfie",
             "id_card.title": "ID card and selfie",
-            "passport.title": "Passport and selfie"
+            "passport.title": "Passport and selfie",
+            "document-data": {
+              "title": "Extracted document data",
+              "labels": {
+                "full_name": "Full name",
+                "dob": "Date of birth",
+                "gender": "Gender",
+                "full_address": "Address",
+                "document_number": "Document number",
+                "issued_at": "Issued at",
+                "expires_at": "Expires at",
+                "issuing_country": "Issuing country",
+                "issuing_state": "Issuing state",
+                "ref_number": "Ref number"
+              }
+            }
           }
         },
         "cards": {

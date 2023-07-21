@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useSession from 'src/hooks/use-session';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
@@ -14,7 +15,7 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 import Field from '../../../field';
 import DocumentField from './components/document-field';
 import DocumentFieldNew from './components/document-field-new';
-import { getDocumentKind } from './utils';
+import { filterDocumentsByKind, getDocumentKind } from './utils';
 
 type DocumentFieldsProps = WithEntityProps;
 
@@ -24,6 +25,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
     data: { user },
   } = useSession();
   const { data: vault } = useEntityVault(entity.id, entity);
+  const { data: documents } = useDocuments(entity.id);
 
   const fields = [
     {
@@ -96,6 +98,10 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
                   label={field.label}
                   vault={vault ?? ({} as EntityVault)}
                   documentKind={getDocumentKind(field.main)}
+                  documents={filterDocumentsByKind(
+                    documents ?? [],
+                    getDocumentKind(field.main),
+                  )}
                 />
               ) : (
                 <DocumentField
