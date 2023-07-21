@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::auth::tenant::TenantAuth;
 
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::DecryptRequest;
@@ -14,6 +15,7 @@ use db::models::scoped_vault::ScopedVault;
 
 use itertools::Itertools;
 
+use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
 
@@ -40,20 +42,25 @@ pub async fn detokenize(
         .map(|tok| (tok.fp_id, (tok.identifier, tok.filter_functions)))
         .into_group_map();
 
-    for (fp_id, targets) in tokens {
-        let tenant_id = auth.tenant().id.clone();
-        let is_live = auth.is_live()?;
+    let fp_ids = tokens.keys().cloned().collect_vec();
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let vws: HashMap<FpId, TenantVw> = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
+            let vws = VaultWrapper::multi_get_for_tenant(conn, svs, &tenant_id, None)?;
+            Ok(vws)
+        })
+        .await??
+        .into_values()
+        .map(|vw| (vw.scoped_vault.fp_id.clone(), vw))
+        .collect();
 
-        let (uvw, scoped_user) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-                let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-                // TODO how do we check perms for custom data? feels like always allowed, only gated
-                // by tenant_role. I think this will break rn
-                Ok((uvw, scoped_user))
-            })
-            .await??;
+    for (fp_id, targets) in tokens.into_iter() {
+        let vw = vws
+            .get(&fp_id)
+            .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
 
         let req = DecryptRequest {
             reason: reason
@@ -70,13 +77,15 @@ pub async fn detokenize(
             })
             .collect();
 
-        let results = uvw
+        // TODO we should support a multi-user batch decrypt.
+        // We're also making all access events sequentially right now
+        let results = vw
             .fn_decrypt(state, targets, req)
             .await?
             .into_iter()
             .map(|(op, v)| {
                 let token = ProxyToken {
-                    fp_id: scoped_user.fp_id.clone(),
+                    fp_id: fp_id.clone(),
                     identifier: op.identifier,
                     filter_functions: op
                         .transforms
@@ -91,4 +100,3 @@ pub async fn detokenize(
 
     Ok(out)
 }
-

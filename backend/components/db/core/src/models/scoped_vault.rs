@@ -233,6 +233,23 @@ impl ScopedVault {
         Ok(result)
     }
 
+    #[tracing::instrument("ScopedVault::bulk_get", skip_all)]
+    pub fn bulk_get(
+        conn: &mut PgConn,
+        fp_ids: Vec<FpId>,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> DbResult<Vec<(Self, Vault)>> {
+        use db_schema::schema::vault;
+        let results = scoped_vault::table
+            .filter(scoped_vault::fp_id.eq_any(fp_ids))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
+            .inner_join(vault::table)
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     #[tracing::instrument("ScopedVault::bulk_get_serializable_info", skip_all)]
     pub fn bulk_get_serializable_info(
         conn: &mut PgConn,

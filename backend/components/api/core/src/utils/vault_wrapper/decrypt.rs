@@ -143,8 +143,6 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
     ) -> ApiResult<DecryptUncheckedResult> {
-        tracing::info!(dis=?ids.iter().map(|(di, _)| di.clone()).collect_vec(), "Decrypting DIs");
-
         let DecryptUncheckedResult {
             results,
             decrypted_dis,
@@ -184,13 +182,6 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
     ) -> ApiResult<DecryptUncheckedResult<Pii>> {
-        if ids.is_empty() {
-            // Short-circuit so no network requests
-            return Ok(DecryptUncheckedResult {
-                results: HashMap::new(),
-                decrypted_dis: vec![],
-            });
-        }
         tracing::info!(dis=?ids.iter().map(|(di, _)| di.clone()).collect_vec(), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
@@ -227,7 +218,9 @@ impl<Type> VaultWrapper<Type> {
         };
 
         // Handle e_data
-        let e_data: HashMap<_, _> = {
+        let e_data: HashMap<_, _> = if e_data.is_empty() {
+            HashMap::new() // short-circuit to avoid network requests
+        } else {
             let data_to_decrypt = e_data
                 .into_iter()
                 .map(|(e_data, op)| (op.clone(), e_data, op.transforms))
@@ -242,7 +235,9 @@ impl<Type> VaultWrapper<Type> {
         };
 
         // Handle e_large_data
-        let e_large_data = {
+        let e_large_data = if e_large_data.is_empty() {
+            HashMap::new() // short-circuit to avoid network requests
+        } else {
             let (document_datas, operations): (Vec<_>, Vec<_>) = e_large_data.into_iter().unzip();
             let decrypted_documents: Vec<PiiBytes> = enclave_client
                 .batch_decrypt_documents(&self.vault.e_private_key, document_datas)

@@ -1,4 +1,4 @@
-use newtypes::{output::Csv, CipKind, CollectedDataOption, DataIdentifier};
+use newtypes::{output::Csv, CipKind, CollectedDataOption, DataIdentifier, FpId};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -56,4 +56,7 @@ pub enum TenantError {
 
     #[error("{0} doesn't exist for user")]
     DataDoesntExist(DataIdentifier),
+
+    #[error("User {0} does not exist")]
+    VaultDoesntExist(FpId),
 }
