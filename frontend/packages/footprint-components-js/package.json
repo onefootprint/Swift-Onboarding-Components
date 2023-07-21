@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-components-js",
   "private": false,
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "./dist/footprint-components-js.umd.js",
   "module": "./dist/footprint-components-js.js",
   "types": "./dist/footprint-components-js.d.ts",
