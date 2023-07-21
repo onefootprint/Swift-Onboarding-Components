@@ -120,10 +120,16 @@ trait CanCheckTenantGuard: Sized {
 /// The implementation of this trait first checks that the TAuthExtractor tenant auth class's scopes are
 /// sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
-pub trait CheckTenantGuard {
+pub trait CheckTenantGuard: Sized {
     /// Checks if the guard is met by self.token_permissions().
     /// If so, returns self.tenant_auth(), otherwise returns an auth error
     fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    where
+        T: IsGuardMet<TenantScope>;
+
+    /// Checks if the guard is met by self.token_permissions().
+    /// If so, returns Self to be reused, otherwise returns an auth error
+    fn check_one_guard<T>(&self, guard: T) -> Result<(), AuthError>
     where
         T: IsGuardMet<TenantScope>;
 
@@ -139,10 +145,18 @@ where
     where
         T: IsGuardMet<TenantScope>,
     {
+        self.check_one_guard(guard)?;
+        Ok(self.tenant_auth())
+    }
+
+    fn check_one_guard<T>(&self, guard: T) -> Result<(), AuthError>
+    where
+        T: IsGuardMet<TenantScope>,
+    {
         let requested_permission_str = format!("{}", guard);
         let permission_to_check = guard.or_admin(); // Admin user can always do anything
         if permission_to_check.is_met(&self.token_scopes()) {
-            Ok(self.tenant_auth())
+            Ok(())
         } else {
             Err(AuthError::MissingTenantPermission(requested_permission_str))
         }

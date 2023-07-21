@@ -7,6 +7,7 @@ use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
 use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::ClientTenantScope;
+use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
@@ -38,8 +39,31 @@ pub async fn post(
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ClientTokenResponse> {
-    // Safeguard so when API keys have less than admin permissions we don't allow making tokens
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let ClientTokenRequest {
+        fields,
+        ttl,
+        scopes,
+        decrypt_reason,
+    } = request.into_inner();
+    let fields = fields.into_iter().collect_vec();
+    if fields.is_empty() {
+        return Err(TenantError::MustProvideFields.into());
+    }
+    if scopes.is_empty() {
+        return Err(TenantError::MustProvideScope.into());
+    }
+    // Check that the authed principal has a superset of the permissions that will be granted to
+    // this token
+    for s in scopes.iter() {
+        match s {
+            ClientTokenScopeKind::Decrypt | ClientTokenScopeKind::DecryptDownload => {
+                auth.check_one_guard(CanDecrypt::new(fields.clone()))?
+            }
+            ClientTokenScopeKind::Vault => auth.check_one_guard(TenantGuard::WriteEntities)?,
+        }
+    }
+    // Can use Any guard here since we've already checked permissions above
+    let auth = auth.check_guard(api_core::auth::Any)?;
     let tenant_api_key_id = match auth.actor() {
         AuthActor::TenantApiKey(id) => id,
         _ => return Err(AssertionError("Non-api key actor in client_token").into()),
@@ -47,21 +71,8 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let ClientTokenRequest {
-        fields,
-        ttl,
-        scopes,
-        decrypt_reason,
-    } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
 
-    if scopes.is_empty() {
-        return Err(TenantError::MustProvideScope.into());
-    }
-    let fields = fields.into_iter().collect_vec();
-    if fields.is_empty() {
-        return Err(TenantError::MustProvideFields.into());
-    }
     let scopes: Vec<_> = scopes
         .into_iter()
         .map(|s| -> ApiResult<_> {

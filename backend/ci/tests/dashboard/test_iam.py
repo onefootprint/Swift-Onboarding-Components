@@ -55,7 +55,7 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
+        scopes=[{"kind": "read"}, {"kind": "write_entities"}],
     )
     body = post("org/roles", role_data, sandbox_tenant.auth_token)
     assert body["name"] == role_data["name"]

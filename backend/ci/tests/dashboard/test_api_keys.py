@@ -15,7 +15,11 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
+        scopes=[
+            {"kind": "read"},
+            {"kind": "onboarding_configuration"},
+            {"kind": "write_entities"},
+        ],
     )
     return post("org/roles", role_data, sandbox_tenant.auth_token)
 
@@ -37,8 +41,7 @@ def test_api_key_limited_role(
 ):
     data = dict(name="Test secret key", role_id=limited_role["id"])
     body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
-    key_id = body["id"]
-    key = SecretApiKey.from_response(body).key
+    key = SecretApiKey.from_response(body)
 
     # Can do ob config operations with limited role
     data = {
@@ -46,24 +49,55 @@ def test_api_key_limited_role(
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
     }
-    post("org/onboarding_configs", data, key)
+    post("org/onboarding_configs", data, key.key)
 
     # Cannot do other actions with limited role
     decrypt_data = dict(fields=["id.first_name"], reason="HI")
     fp_id = sandbox_user.fp_id
-    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key, status_code=401)
+    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=401)
 
     # Now, change the key's role
     data = dict(role_id=admin_role["id"])
     patch(
-        f"org/api_keys/{key_id}",
+        f"org/api_keys/{key.id}",
         data,
         sandbox_tenant.auth_token,
         IsLive("false"),
     )
 
     # And now can do other actions with admin permissions
-    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key)
+    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key)
+
+
+def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_role):
+    data = dict(name="Test secret key", role_id=limited_role["id"])
+    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
+    key = SecretApiKey.from_response(body)
+
+    # Try creating a client token with missing permissions
+    fp_id = sandbox_user.fp_id
+    decrypt_datas = [
+        dict(scopes=["decrypt"], fields=["id.ssn9"]),
+        dict(scopes=["decrypt_download"], fields=["id.ssn9"], decrypt_reason="Flerp"),
+    ]
+    for data in decrypt_datas:
+        post(f"entities/{fp_id}/client_token", data, key.key, status_code=401)
+
+    # Can make client token with vault permissions since limited_role allows write_entities
+    data = dict(scopes=["vault"], fields=["id.first_name"])
+    post(f"entities/{fp_id}/client_token", data, key.key)
+
+    # After changing the API key to have admin perms, should be able to make all of these client tokens
+    data = dict(role_id=admin_role["id"])
+    patch(
+        f"org/api_keys/{key.id}",
+        data,
+        sandbox_tenant.auth_token,
+        IsLive("false"),
+    )
+
+    for data in decrypt_datas:
+        post(f"entities/{fp_id}/client_token", data, key.key)
 
 
 def test_deactivate_api_key_role(limited_role, sandbox_tenant):
