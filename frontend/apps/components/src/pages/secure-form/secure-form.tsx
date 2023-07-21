@@ -21,9 +21,17 @@ const SecureForm = () => {
     return <Loading />;
   }
 
+  const handleCancel = () => {
+    footprintProvider.send(SecureFormEvent.secureFormCanceled);
+  };
+
+  const handleClose = () => {
+    footprintProvider.send(SecureFormEvent.secureFormClosed);
+  };
+
   const isValid = arePropsValid(props);
   if (!isValid) {
-    return <Invalid />;
+    return <Invalid onClose={handleClose} />;
   }
 
   const { authToken, cardAlias, title, type, variant } = props;
@@ -68,14 +76,6 @@ const SecureForm = () => {
         },
       },
     );
-  };
-
-  const handleCancel = () => {
-    footprintProvider.send(SecureFormEvent.secureFormCanceled);
-  };
-
-  const handleClose = () => {
-    footprintProvider.send(SecureFormEvent.secureFormClosed);
   };
 
   return (

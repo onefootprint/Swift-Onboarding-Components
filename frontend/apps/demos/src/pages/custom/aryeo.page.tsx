@@ -1,6 +1,6 @@
 import { FootprintAppearance } from '@onefootprint/footprint-components-js';
 import React from 'react';
-import { ARYEO_CARD_VAULTING_AUTH_TOKEN } from 'src/config/constants';
+import { ARYEO_AUTH_TOKEN } from 'src/config/constants';
 
 import ComponentsInstructions from './components/components-instructions';
 
@@ -45,7 +45,7 @@ const Aryeo = () => (
     tenantName="Aryeo"
     framework="vue"
     userId="fp_id_UIUImA2Kfqkhcrc90qjaMu"
-    secretAuthToken={ARYEO_CARD_VAULTING_AUTH_TOKEN ?? ''}
+    secretAuthToken={ARYEO_AUTH_TOKEN ?? ''}
     variant="drawer"
   />
 );
