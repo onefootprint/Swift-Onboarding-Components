@@ -21,6 +21,8 @@ pub struct ClientTokenRequest {
     pub ttl: Option<u32>,
     /// Specify whether this token should be allowed to vault, decrypt, or both
     pub scopes: Vec<ClientTokenScopeKind>,
+    /// If the token is allowed to decrypt, provide a default decryption reason
+    pub decrypt_reason: Option<String>,
 }
 
 export_schema!(ClientTokenRequest);

@@ -44,4 +44,7 @@ pub enum TenantError {
 
     #[error("Invalid onboarding configuration for Vault. {0}")]
     UnsupportedObcForNpv(String),
+
+    #[error("Decryption reason must be provided")]
+    NoDecryptionReasonProvided,
 }

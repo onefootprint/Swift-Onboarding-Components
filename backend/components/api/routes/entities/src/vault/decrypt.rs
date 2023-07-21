@@ -6,6 +6,7 @@ use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapp
 use crate::{errors::ApiError, State};
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanDecrypt;
+use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::insight_event::CreateInsightEvent;
@@ -25,6 +26,15 @@ pub struct DecryptRequest {
     fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     reason: String,
+}
+
+#[derive(Debug, Deserialize, Apiv2Schema)]
+pub struct ClientDecryptRequest {
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    fields: HashSet<VersionedDataIdentifier>,
+    /// Reason for the data decryption. This will be logged.
+    /// The reason must be provided either here or in the client token
+    reason: Option<String>,
 }
 
 flat_api_object_map_type!(
@@ -79,14 +89,20 @@ pub async fn post(
 #[post("/entities/vault/decrypt")]
 pub async fn post_client(
     state: web::Data<State>,
-    request: Json<DecryptRequest>,
+    request: Json<ClientDecryptRequest>,
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
-    let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
+
+    // Compose the DecryptRequest
+    let ClientDecryptRequest { fields, reason } = request.into_inner();
+    let reason = reason
+        .or(auth.data.decrypt_reason.clone())
+        .ok_or(TenantError::NoDecryptionReasonProvided)?;
+    let request = DecryptRequest { reason, fields };
 
     // TODO would be really cool if we could share the handler - the only difference is one gets
     // the fp_id from the path while the other gets it from the token. could we make an extractor

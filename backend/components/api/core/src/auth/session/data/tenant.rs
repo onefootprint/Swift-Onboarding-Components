@@ -41,6 +41,7 @@ pub struct ClientTenantAuth {
     /// In the future, maybe we'll want to support generating this token through other auth methods,
     /// but for now it only makes sense to create a short-lived token through tenant API key
     pub tenant_api_key_id: TenantApiKeyId,
+    pub decrypt_reason: Option<String>,
 }
 
 impl From<ClientTenantAuth> for super::AuthSessionData {

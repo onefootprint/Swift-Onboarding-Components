@@ -47,7 +47,7 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let ClientTokenRequest { fields, ttl, scopes } = request.into_inner();
+    let ClientTokenRequest { fields, ttl, scopes, decrypt_reason } = request.into_inner();
     let session_key = state.session_sealing_key.clone();
 
     if scopes.is_empty() {
@@ -80,6 +80,7 @@ pub async fn post(
                 tenant_id,
                 scopes,
                 tenant_api_key_id,
+                decrypt_reason,
             };
             let duration = Duration::seconds(ttl.into());
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;

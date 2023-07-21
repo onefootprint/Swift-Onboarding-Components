@@ -21,6 +21,7 @@ pub struct ClientTenantData {
     pub tenant: Tenant,
     pub scopes: Vec<ClientTenantScope>,
     pub tenant_api_key_id: TenantApiKeyId,
+    pub decrypt_reason: Option<String>,
 }
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -54,6 +55,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
                     tenant_id,
                     scopes,
                     tenant_api_key_id,
+                    decrypt_reason,
                 } = data;
                 let tenant = Tenant::get(conn, &tenant_id)?;
                 ClientTenantData {
@@ -62,6 +64,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
                     tenant,
                     scopes,
                     tenant_api_key_id,
+                    decrypt_reason,
                 }
             }
             _ => {
