@@ -50,7 +50,7 @@ const Camera = ({
   const [isImageProcessing, setIsImageProcessing] = useState(false);
   const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
-  const [canCapture, setCanCapture] = useState(false);
+  const [canCapture, setCanCapture] = useState(true);
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
@@ -69,15 +69,13 @@ const Camera = ({
   }, [autocaptureKind]);
 
   // During the 1.5 seconds when we show instruction text, we do the following:
-  // 1. We keep manual capture button disabled
-  // 2. We don't allow changing the feedback text until the 1.5 seconds have passed
+  // We don't allow changing the feedback text until the 1.5 seconds have passed
   // Detection may start working before 1.5 seconds if everything (video, model, etc) is initialized
-  // After 1.5 seconds we enable manual capture, and we let the detection algorithm change the feedback text
+  // After 1.5 seconds, we let the detection algorithm change the feedback text
   // Since detection algorithm might have a delay before the current iteration completes, we set the feedback text to "detecting ..."
   useTimeout(
     () => {
       setShouldShowInstruction(false);
-      setCanCapture(true);
       if (autocaptureFeedback === 'init') setAutocaptureFeedback('detecting');
     },
     isCameraVisible ? TRANSITION_DELAY_DEFAULT : null,
@@ -143,6 +141,8 @@ const Camera = ({
   const handleFlashEnd = () => {
     if (image) {
       onCapture(image);
+    } else {
+      setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
     }
     clearCanvas();
   };
