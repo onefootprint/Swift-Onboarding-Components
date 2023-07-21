@@ -1,9 +1,13 @@
+use api_core::*;
 use paperclip::actix::web;
 
-pub mod index;
-
-pub use api_core::*;
+mod detail;
+mod get;
+mod post;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-    config.service(index::post).service(index::get);
+    config
+        .service(post::post)
+        .service(get::get)
+        .service(detail::detail);
 }

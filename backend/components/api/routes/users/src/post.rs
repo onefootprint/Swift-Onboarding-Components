@@ -1,6 +1,4 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::Either;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
@@ -9,27 +7,22 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
-use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::types::CursorPaginatedResponse;
-use api_core::types::CursorPaginationRequest;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::headers::IdempotencyId;
 use api_core::utils::vault_wrapper::Any;
-use api_route_entities::parse_search;
-use api_wire_types::SearchUsersRequest;
+
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
-use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
 use newtypes::VaultKind;
-use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
+use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
     description = "Creates a new user vault, optionally initializing with the provided data",
@@ -42,7 +35,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
+) -> ApiResult<ResponseData<api_wire_types::UserId>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let principal = auth.actor().into();
@@ -110,52 +103,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped_user))))
-}
-
-#[api_v2_operation(
-    description = "Get a list of users, optionally searching by fingerprint",
-    tags(Users, Preview)
-)]
-#[get("/users")]
-pub async fn get(
-    state: web::Data<State>,
-    pagination: web::Query<CursorPaginationRequest<i64>>,
-    request: web::Query<SearchUsersRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> ApiResult<Json<CursorPaginatedResponse<Vec<api_wire_types::User>, i64>>> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant = auth.tenant();
-    let SearchUsersRequest { search } = request.into_inner();
-
-    let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
-    let params = ScopedVaultListQueryParams {
-        tenant_id: tenant.id.clone(),
-        only_billable: false,
-        is_live: auth.is_live()?,
-        search,
-        fp_id,
-        kind: Some(VaultKind::Person),
-        ..ScopedVaultListQueryParams::default()
-    };
-    let cursor = pagination.cursor;
-    let page_size = pagination.page_size(&state);
-
-    let (svs, count) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let count = db::scoped_vault::count_authorized_for_tenant(conn, params.clone()).map(Some)?;
-            let svs =
-                db::scoped_vault::list_authorized_for_tenant(conn, params, cursor, (page_size + 1) as i64)?;
-            Ok((svs, count))
-        })
-        .await??;
-
-    let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
-
-    let results = svs
-        .into_iter()
-        .map(|(sv, _)| api_wire_types::User::from_db(sv))
-        .collect();
-    Ok(Json(CursorPaginatedResponse::ok(results, cursor, count)))
+    Ok(ResponseData::ok(api_wire_types::UserId::from_db(scoped_user)))
 }
