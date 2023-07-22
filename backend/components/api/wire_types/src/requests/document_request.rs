@@ -23,11 +23,9 @@ pub struct DocumentRequest {
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentUploadRequest {
     /// base64 standard encoded image bytes
-    pub front_image: Option<PiiString>,
-    /// base64 standard encoded image bytes
-    pub back_image: Option<PiiString>,
-    /// base64 standard encoded image bytes
-    pub selfie_image: Option<PiiString>,
+    pub image: PiiString,
+    pub side: DocumentSide,
+    pub mime_type: String,
 }
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]

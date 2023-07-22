@@ -3,7 +3,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::user::documents::upload::{
-    handle_incode_request, save_vres_for_fixture_risk_signals, upload_images,
+    handle_incode_request, save_vres_for_fixture_risk_signals, upload_images, TempUploadDocuments,
 };
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -13,7 +13,7 @@ use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::types::JsonApiResponse;
 use api_wire_types::document_request::DocumentRequest;
-use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentResponse};
+use api_wire_types::DocumentResponse;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocRequestIdentifier, DocumentRequest as DbDocumentRequest};
 use db::models::document_upload::DocumentUpload;
@@ -78,7 +78,7 @@ pub async fn post(
         }
     }
 
-    let req = CreateIdentityDocumentUploadRequest {
+    let req = TempUploadDocuments {
         front_image: request.front_image,
         back_image: request.back_image,
         selfie_image: request.selfie_image,

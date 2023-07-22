@@ -29,7 +29,7 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeVerificationSessionState, SealedVaultDataKey, TenantId, VaultId,
+    IdentityDocumentStatus, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, TenantId, VaultId,
 };
 use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -62,7 +62,7 @@ pub async fn post(
         })
         .await??;
 
-    if request.selfie_image.is_some() {
+    if request.side == DocumentSide::Selfie {
         if !doc_request.should_collect_selfie {
             return Err(OnboardingError::NotExpectingSelfie.into());
         }
@@ -71,8 +71,17 @@ pub async fn post(
         }
     }
 
+    let front_image = (request.side == DocumentSide::Front).then_some(request.image.clone());
+    let back_image = (request.side == DocumentSide::Back).then_some(request.image.clone());
+    let selfie_image = (request.side == DocumentSide::Selfie).then_some(request.image);
+    let r = TempUploadDocuments {
+        front_image,
+        back_image,
+        selfie_image,
+    };
+
     // Upload the image(s) to s3
-    let (e_data_key, s3_urls) = upload_images(&state, request, &vault, &doc_request.id).await?;
+    let (e_data_key, s3_urls) = upload_images(&state, r, &vault, &doc_request.id).await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
@@ -86,6 +95,7 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
+    let mime_type = request.mime_type;
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -99,7 +109,7 @@ pub async fn post(
                 .map(|(side, s3_url)| -> ApiResult<_> {
                     let kind = DocumentKind::LatestUpload(id_doc.document_type, side).into();
                     let name = format!("{}.png", kind);
-                    let mt = "image/png".to_string();
+                    let mt = mime_type.clone();
                     let (_, seqno) =
                         uvw.put_document_unsafe(conn, kind, mt, name, e_data_key.clone(), s3_url.clone())?;
                     Ok((side, s3_url, seqno))
@@ -193,9 +203,16 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
+// TODO clean up
+pub struct TempUploadDocuments {
+    pub front_image: Option<PiiString>,
+    pub back_image: Option<PiiString>,
+    pub selfie_image: Option<PiiString>,
+}
+
 pub(in crate::user) async fn upload_images(
     state: &State,
-    request: CreateIdentityDocumentUploadRequest,
+    request: TempUploadDocuments,
     vault: &Vault,
     doc_request_id: &DocumentRequestId,
 ) -> ApiResult<(SealedVaultDataKey, Vec<(DocumentSide, S3Url)>)> {

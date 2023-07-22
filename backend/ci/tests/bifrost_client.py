@@ -248,9 +248,11 @@ class BifrostClient:
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
-            data = {
-                f"{side}_image": self.data[f"document.drivers_license.{side}.image"]
-            }
+            data = dict(
+                image=self.data[f"document.drivers_license.{side}.image"],
+                side=side,
+                mime_type="image/png",
+            )
             body = post(f"hosted/user/documents/{doc_id}/upload", data, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
