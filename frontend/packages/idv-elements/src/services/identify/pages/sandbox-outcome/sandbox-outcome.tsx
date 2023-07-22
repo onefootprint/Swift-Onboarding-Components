@@ -1,14 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoUser24, IcoWarning24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Button, RadioSelect, TextInput } from '@onefootprint/ui';
-import React from 'react';
+import {
+  Box,
+  Button,
+  LinkButton,
+  RadioSelect,
+  TextInput,
+  Typography,
+} from '@onefootprint/ui';
+import Hint from '@onefootprint/ui/src/components/internal/hint';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
+import getRandomID from './utils/get-random-id';
 import parseTestID from './utils/parse-suffix';
 
 export enum Outcomes {
@@ -27,6 +36,7 @@ const SandboxOutcome = () => {
   useSkipIfHasBootstrapData();
   const [state, send] = useIdentifyMachine();
   const { bootstrapData } = state.context;
+  const parsedId = parseTestID(bootstrapData?.email);
   const {
     control,
     register,
@@ -35,9 +45,11 @@ const SandboxOutcome = () => {
   } = useForm<FormData>({
     defaultValues: {
       outcome: Outcomes.success,
-      testID: parseTestID(bootstrapData?.email),
+      testID: parsedId || getRandomID(),
     },
+    mode: 'onChange',
   });
+  const [idInputLocked, setIdInputLocked] = useState(true);
 
   const handleAfterSubmit = (formData: FormData) => {
     send({
@@ -55,8 +67,11 @@ const SandboxOutcome = () => {
     if (errors?.testID) {
       return t('test-id.errors.invalid');
     }
+    if (idInputLocked) return '';
     return t('test-id.hint');
   };
+
+  const handleSaveOrEdit = () => setIdInputLocked(prev => !prev);
 
   return (
     <Box>
@@ -93,24 +108,48 @@ const SandboxOutcome = () => {
             />
           )}
         />
-        <TextInput
-          hasError={!!errors.testID}
-          label={t('test-id.label')}
-          placeholder={t('test-id.placeholder')}
-          hint={getHint()}
-          {...register('testID', {
-            required: {
-              value: true,
-              message: t('test-id.errors.required'),
-            },
-            // Must not contain special characters
-            pattern: {
-              value: /^(?!.*\\)[A-Za-z0-9]+$/,
-              message: t('test-id.errors.invalid'),
-            },
-          })}
-        />
-        <Button fullWidth type="submit">
+        <InputContainer>
+          <InputTitle>
+            <Typography variant="label-3">{t('test-id.label')}</Typography>
+            <Typography variant="body-3" color="secondary">
+              {t('test-id.description')}
+            </Typography>
+          </InputTitle>
+          <InputControls>
+            <Box sx={{ width: '100%' }}>
+              <TextInput
+                hasError={!!errors.testID}
+                placeholder={t('test-id.placeholder')}
+                sx={{
+                  color: idInputLocked ? 'quaternary' : 'primary',
+                }}
+                disabled={idInputLocked}
+                {...register('testID', {
+                  required: {
+                    value: true,
+                    message: t('test-id.errors.required'),
+                  },
+                  // Must not contain special characters
+                  pattern: {
+                    value: /^[A-Za-z0-9]+$/,
+                    message: t('test-id.errors.invalid'),
+                  },
+                })}
+              />
+            </Box>
+            <LinkButton
+              onClick={handleSaveOrEdit}
+              sx={{ marginRight: 5 }}
+              disabled={!!errors?.testID}
+            >
+              {idInputLocked
+                ? t('test-id.button.edit')
+                : t('test-id.button.save')}
+            </LinkButton>
+          </InputControls>
+          <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
+        </InputContainer>
+        <Button fullWidth type="submit" disabled={!!errors?.testID}>
           {t('cta')}
         </Button>
       </Form>
@@ -123,6 +162,28 @@ const Form = styled.form`
     margin-top: ${theme.spacing[7]};
     display: grid;
     gap: ${theme.spacing[7]};
+  `}
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const InputControls = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[5]};
+  `}
+`;
+
+const InputTitle = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[2]};
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 

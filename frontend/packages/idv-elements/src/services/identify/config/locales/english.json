@@ -43,11 +43,16 @@
       },
       "test-id": {
         "label": "Test ID",
+        "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
         "placeholder": "Enter test ID",
-        "hint": "Test ID helps you create different user onboardings with your email and phone number. Do not use spaces or special characters.",
+        "hint": "Do not use special characters or spaces.",
         "errors": {
           "required": "Test ID is required",
           "invalid": "Test ID is invalid. Please remove spaces and special characters."
+        },
+        "button": {
+          "edit": "Edit",
+          "save": "Save"
         }
       },
       "cta": "Continue"
