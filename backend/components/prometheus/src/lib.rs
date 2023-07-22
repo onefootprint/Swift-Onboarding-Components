@@ -224,7 +224,7 @@ where
         let path = req.path().to_string();
         let inner = this.inner.clone();
 
-        Poll::Ready(Ok(res.map_body(move |mut head, body| {
+        Poll::Ready(Ok(res.map_body(move |head, body| {
             // We short circuit the response status and body to serve the endpoint
             // automagically. This way the user does not need to set the middleware *AND*
             // an endpoint to serve middleware results. The user is only required to set

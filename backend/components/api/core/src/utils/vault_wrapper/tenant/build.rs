@@ -42,7 +42,7 @@ impl<Type> VaultWrapper<Type> {
     // In order to minimize database queries, we would like to be able to bulk fetch
     // various data elements for a set of Users.
     // Note: it is possible that there are multiple scoped users for each user vault
-    // #[tracing::instrument(skip_all)]
+    #[tracing::instrument(skip_all)]
     pub fn multi_get_for_tenant(
         conn: &mut PgConn,
         users: Vec<(ScopedVault, Vault)>,
