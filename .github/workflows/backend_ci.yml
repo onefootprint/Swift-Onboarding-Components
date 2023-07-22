@@ -50,7 +50,7 @@ jobs:
           toolchain: 1.68.0
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.0.0
+        uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
         with:
           # don't save cache from pull requests
           save-if: github.event_name != 'pull_request'
