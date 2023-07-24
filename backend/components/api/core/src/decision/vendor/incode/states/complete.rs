@@ -97,7 +97,11 @@ impl Complete {
             di(ODK::IssuingState, r.issuing_state),
             di(ODK::IssuingCountry, r.issuing_country),
             di(ODK::RefNumber, r.ref_number),
-            di(ODK::FullName, r.name.and_then(|n| n.full_name)),
+            di(
+                ODK::FullName,
+                // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
+                r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
+            ),
         ]
         .into_iter()
         .flatten()
