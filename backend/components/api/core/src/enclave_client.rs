@@ -4,8 +4,8 @@ use crypto::{
     seal::EciesP256Sha256AesGcmSealed,
 };
 use enclave_proxy::{
-    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest,
-    EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
+    http_proxy::client::ProxyHttpClient, DataTransform, DecryptThenSignRequest, EnclavePayload,
+    EnvelopeDecryptThenHmacSignRequest, EnvelopeFnDecryptRequest, EnvelopeHmacSignRequest, FnDecryptRequest,
     FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
     SignRequest, Signing,
@@ -223,13 +223,13 @@ impl EnclaveClient {
     ) -> Result<Vec<PiiBytes>, EnclaveError> {
         let requests = sealed_data
             .into_iter()
-            .map(|(sealed_data, transforms)| DecryptRequest {
+            .map(|(sealed_data, transforms)| FnDecryptRequest {
                 sealed_data,
                 transforms,
             })
             .collect_vec();
         let num_requests = requests.len();
-        let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecryptRequest {
+        let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeFnDecryptRequest {
             kms_creds: self.kms_creds.clone(),
             sealed_ikek: self.sealed_enc_ikek.clone(),
             sealed_key: crypto::aead::AeadSealedBytes(sealed_key.0.clone()),
