@@ -37,6 +37,8 @@ impl TryFrom<EnclavePayload> for FnDecryption {
     fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
         if let EnclavePayload::FnDecryption(r) = value {
             Ok(r)
+        } else if let EnclavePayload::Decryption(r) = value {
+            Ok(r)
         } else if let EnclavePayload::Error(error) = value {
             Err(crate::Error::EnclaveError(error))
         } else {
